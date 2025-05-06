@@ -8,11 +8,10 @@ CMake
 Overview
 ********
 CMake is a cross-platform build system generator. It is used to easily integrate a project/library into another project.
-It also offer the possibility to configure the build with different options, to enable or disable components, or to
+It also offers the possibility to configure the build with different options, to enable or disable components, or to
 integrate custom scripts executions during the configuration/build phase.
 
-LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into an higher
-level cmake build.
+LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into an higher level cmake build.
 
 This project uses CMakePresets to ensure an easy build.
 Find out more on Cmake Presets here: https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
@@ -132,7 +131,6 @@ This snippet adds LVGL and needs an ``lv_conf.h`` file present next to the lvgl 
 
 .. code-block:: cmake
 
-    set(LV_CONF_INCLUDE_SIMPLE OFF)
     add_subdirectory(lvgl)
 
 
@@ -140,6 +138,7 @@ This snippet adds LVGL and needs an ``lv_conf.h`` file present in lvgl/src folde
 
 .. code-block:: cmake
 
+    set(LV_BUILD_CONF_DIR lvgl/src)
     add_subdirectory(lvgl)
 
 
@@ -147,7 +146,7 @@ This snippet adds LVGL and specify a ``lv_conf.h`` to use:
 
 .. code-block:: cmake
 
-    set(LV_CONF_PATH path/to/my_lv_conf.h)
+    set(LV_BUILD_CONF_PATH path/to/my_lv_conf.h)
     add_subdirectory(lvgl)
 
 
@@ -155,15 +154,15 @@ This snippet adds LVGL and specify to use Kconfig as the configuration system:
 
 .. code-block:: cmake
 
-    set(LV_USE_KCONFIG ON)
+    set(LV_BUILD_USE_KCONFIG ON)
     add_subdirectory(lvgl)
 
 This snippet adds LVGL and specify to use Kconfig as the configuration system and to use a specific defconfig:
 
 .. code-block:: cmake
 
-    set(LV_USE_KCONFIG ON)
-    set(LV_DEFCONFIG_PATH path/to/my_defconfig)
+    set(LV_BUILD_USE_KCONFIG ON)
+    set(LV_BUILD_DEFCONFIG_PATH path/to/my_defconfig)
     add_subdirectory(lvgl)
 
 
@@ -171,19 +170,57 @@ To disable the demo/example set these options:
 
 .. code-block:: cmake
 
-    set(LV_CONF_BUILD_DISABLE_EXAMPLES ON)
-    set(LV_CONF_BUILD_DISABLE_DEMOS ON)
+    set(CONF_LV_BUILD_EXAMPLES ON)
+    set(CONF_LV_BUILD_DEMOS ON)
     add_subdirectory(lvgl)
 
+Below is a list of the available options/variables
 
-These cmake options are available to configure LVGL:
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
 
-- ``LV_CONF_PATH`` (STRING): Specify a custom path for ``lv_conf.h``.
-- ``LV_CONF_INCLUDE_SIMPLE`` (BOOLEAN): Use ``#include "lv_conf.h"`` instead of ``#include "../../lv_conf.h"``
-- ``LV_USE_KCONFIG`` (BOOLEAN): Use Kconfig as the configuration source.
-- ``LV_DEFCONFIG_PATH`` (STRING): Specify to use a defconfig file instead of the current .config in a Kconfig setup.
-- ``LV_CONF_BUILD_DISABLE_EXAMPLES`` (BOOLEAN): Disable building the examples if set.
-- ``LV_CONF_BUILD_DISABLE_DEMOS`` (BOOLEAN): Disable building the demos if set.
-- ``LV_CONF_BUILD_DISABLE_THORVG_INTERNAL``: Disable the internal compilation of ThorVG.
-- ``LV_CMAKE_CREATE_CONF_VARS`` (BOOLEAN) : Disable the creation of variables from ``lv_conf_internal.h`` this feature is disabled by default.
-  It is enabled automatically if ``LV_USE_KCONFIG`` is enabled. This feature requires a python3 interpreter with support for the *pip* and *venv* modules
+   * - Variable/Option
+     - Type
+     - Description
+   * - LV_BUILD_CONF_PATH
+     - PATH
+     - Allows to set a custom path for ``lv_conf.h``
+   * - LV_BUILD_CONF_DIR
+     - PATH
+     - Allows to set a directory containing ``lv_conf.h``
+   * - LV_BUILD_USE_KCONFIG
+     - BOOLEAN
+     - When set KConfig is used as the configuration source
+   * - LV_BUILD_DEFCONFIG_PATH
+     - PATH
+     - Specify to use a .defconfig file instead of the current .config in a Kconfig setup.
+   * - LV_BUILD_SET_CONFIG_OPTS
+     - BOOLEAN
+     - When enabled, pre-process lv_conf.h/Kconfig to create ``CONFIG_LV_*`` and
+       ``CONFIG_LV_BUILD_*`` CMake variables reflecting the contents of lv_conf_internal.h
+       If KConfig is used, this feature is enabled automatically.
+       feature requires a python3 interpreter with support for the *pip* and *venv* modules
+    * - CONFIG_LV_BUILD_DEMOS
+      - BOOLEAN
+      - When enabled builds the demos
+    * - CONFIG_LV_BUILD_EXAMPLES
+      - BOOLEAN
+      - When enabled builds the examples
+    * - CONFIG_LV_BUILD_TEST
+      - BOOLEAN
+      - When enabled builds the tests
+    * - CONFIG_LV_USE_PRIVATE_API
+      - BOOLEAN
+      - When enabled the private headers ``*_private.h`` are installed on the system
+    * - CONFIG_LV_USE_THORVG_INTERNAL
+      - BOOLEAN
+      - When enabled the in-tree LVGL version of ThorVG is compiled
+
+
+.. note::
+
+   When ``LV_BUILD_SET_CONFIG_OPTS`` or ``LV_BUILD_USE_KCONFIG`` are enabled,
+   the options/variables beginning with the prefix ``CONFIG_*`` are automatically
+   set to the values found in ``lv_conf.h``
+

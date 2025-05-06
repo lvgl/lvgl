@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
-#include "../lvgl.h"
-#include "../../libs/freetype/lv_freetype_private.h"
+#include "lvgl.h"
+#include "src/libs/freetype/lv_freetype_private.h"
 
 #include "unity/unity.h"
 

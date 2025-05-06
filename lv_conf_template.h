@@ -1294,12 +1294,18 @@
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
 
-/*==================
-* EXAMPLES
-*==================*/
+/*=====================
+* BUILD OPTIONS
+*======================*/
 
 /** Enable examples to be built with the library. */
 #define LV_BUILD_EXAMPLES 1
+
+/** Build the demos */
+#define LV_BUILD_DEMOS 1
+
+/** Build the tests */
+#define LV_BUILD_TEST 1
 
 /*===================
  * DEMO USAGE

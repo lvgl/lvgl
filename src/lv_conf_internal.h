@@ -4185,9 +4185,9 @@
     #endif
 #endif
 
-/*==================
-* EXAMPLES
-*==================*/
+/*=====================
+* BUILD OPTIONS
+*======================*/
 
 /** Enable examples to be built with the library. */
 #ifndef LV_BUILD_EXAMPLES
@@ -4199,6 +4199,32 @@
         #endif
     #else
         #define LV_BUILD_EXAMPLES 1
+    #endif
+#endif
+
+/** Build the demos */
+#ifndef LV_BUILD_DEMOS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_BUILD_DEMOS
+            #define LV_BUILD_DEMOS CONFIG_LV_BUILD_DEMOS
+        #else
+            #define LV_BUILD_DEMOS 0
+        #endif
+    #else
+        #define LV_BUILD_DEMOS 1
+    #endif
+#endif
+
+/** Build the tests */
+#ifndef LV_BUILD_TEST
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_BUILD_TEST
+            #define LV_BUILD_TEST CONFIG_LV_BUILD_TEST
+        #else
+            #define LV_BUILD_TEST 0
+        #endif
+    #else
+        #define LV_BUILD_TEST 1
     #endif
 #endif
 
