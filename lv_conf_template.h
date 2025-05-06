@@ -344,6 +344,9 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
+/* Use EVE FT81X GPU. */
+#define LV_USE_DRAW_EVE 1
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

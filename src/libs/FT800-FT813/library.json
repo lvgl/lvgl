@@ -1,0 +1,22 @@
+{
+  "name": "EmbeddedVideoEngine",
+  "version": "5.0.9",
+  "keywords": "TFT, SPI, EVE2, EVE3, EVE4 ,Bridgetek, F81x, FT813, BT81x, BT815, BT817",
+  "description": "Code library for EVE2/EVE3/EVE4 graphics controller ICs from FTDI/Bridgetek",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RudolphRiedel/FT800-FT813.git"
+  },
+  "authors": [
+    {
+      "name": "Rudolph Riedel",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "build":
+  {
+      "libLDFMode": "chain+",
+      "flags" : "-Wall -Wextra -pedantic"
+  }
+}
