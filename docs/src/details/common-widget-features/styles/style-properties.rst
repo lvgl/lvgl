@@ -723,7 +723,7 @@ Set width of the border. Only pixel values can be used.
 .. raw:: html
 
   <ul>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 2</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
