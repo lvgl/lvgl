@@ -263,13 +263,26 @@ set(CONFIG_LV_BUILD_TEST ON CACHE BOOL "Enable the building of tests")
 
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
+target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
 if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
-    target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>: ${LVGL_C_COMPILE_OPTIONS}>)
+    target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${LVGL_C_COMPILE_OPTIONS}>)
 endif()
-target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>: ${LVGL_CXX_COMPILE_OPTIONS}>)
+
+if (TARGET lvgl_thorvg)
+    target_compile_options(lvgl_thorvg PUBLIC $<$<COMPILE_LANGUAGE:C>:${LVGL_C_COMPILE_OPTIONS}>)
+    target_compile_options(lvgl_thorvg PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
+endif()
+
 if (TARGET lvgl_examples)
-  target_compile_options(lvgl_examples PUBLIC ${LVGL_C_COMPILE_OPTIONS})
+    target_compile_options(lvgl_examples PUBLIC $<$<COMPILE_LANGUAGE:C>:${LVGL_C_COMPILE_OPTIONS}>)
+    target_compile_options(lvgl_examples PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
 endif()
+
+if (TARGET lvgl_demos)
+    target_compile_options(lvgl_demos PUBLIC $<$<COMPILE_LANGUAGE:C>:${LVGL_C_COMPILE_OPTIONS}>)
+    target_compile_options(lvgl_demos PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
+endif()
+
 
 # LVGL_CONF_DIR and LVGL_CONF_PATH are normalized and set by os.cmake
 
