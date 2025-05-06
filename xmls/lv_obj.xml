@@ -48,58 +48,134 @@ Example
 	    <prop name="align" type="enum:lv_align"/>
 	    <prop name="styles"  type="styles[]"/>
 
-	    <prop name="style_x" type="coords"/>
-	    <prop name="style_y" type="coords"/>
-	    <prop name="style_height" type="coords"/>
-	    <prop name="style_min_height" type="coords"/>
-	    <prop name="style_max_height" type="coords"/>
-	    <prop name="style_width" type="coords"/>
-	    <prop name="style_min_width" type="coords"/>
-	    <prop name="style_max_width" type="coords"/>
-	    <prop name="style_align" type="enum:lv_align"/>
-	    <prop name="style_radius" type="int"/>
-	    <prop name="style_bg_color" type="color"/>
-	    <prop name="style_bg_opa" type="int"/>
-	    <prop name="style_bg_image_src" type="image"/>
-	    <prop name="style_bg_image_tiled" type="bool"/>
-	    <prop name="style_border_color" type="color"/>
-	    <prop name="style_border_width" type="int"/>
-	    <prop name="style_border_opa" type="int"/>
-	    <prop name="style_border_side" type="enum:lv_border_side"/>
-	    <prop name="style_outline_color" type="color"/>
-	    <prop name="style_outline_width" type="int"/>
-	    <prop name="style_outline_opa" type="int"/>
-	    <prop name="style_outline_pad" type="int"/>
-	    <prop name="style_text_color" type="color"/>
-	    <prop name="style_text_font" type="font"/>
-	    <prop name="style_text_align" type="enum:lv_text_align"/>
-	    <prop name="style_shadow_width" type="int"/>
-	    <prop name="style_shadow_color" type="color"/>
-	    <prop name="style_shadow_opa" type="int"/>
-	    <prop name="style_shadow_offset_x" type="int"/>
-	    <prop name="style_shadow_offset_y" type="int"/>
-	    <prop name="style_shadow_spread" type="int"/>
-	    <prop name="style_pad_top" type="int"/>
-	    <prop name="style_pad_bottom" type="int"/>
-	    <prop name="style_pad_left" type="int"/>
-	    <prop name="style_pad_right" type="int"/>
-	    <prop name="style_pad_hor" type="int"/>
-	    <prop name="style_pad_ver" type="int"/>
-	    <prop name="style_pad_all" type="int"/>
-	    <prop name="style_pad_row" type="int"/>
-	    <prop name="style_pad_column" type="int"/>
-	    <prop name="style_margin_top" type="int"/>
-	    <prop name="style_margin_bottom" type="int"/>
-	    <prop name="style_margin_left" type="int"/>
-	    <prop name="style_margin_right" type="int"/>
-	    <prop name="style_margin_hor" type="int"/>
-	    <prop name="style_margin_ver" type="int"/>
-	    <prop name="style_margin_all" type="int"/>
-	    <prop name="style_layout" type="enum:lv_layout"/>
-	    <prop name="style_flex_flow" type="enum:lv_flex_flow"/>
-	    <prop name="style_flex_main_place" type="enum:lv_flex_align"/>
-	    <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
-	    <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
+        <prop name="style_x" type="coords"/>
+        <prop name="style_y" type="coords"/>
+        <prop name="style_height" type="coords"/>
+        <prop name="style_min_height" type="coords"/>
+        <prop name="style_max_height" type="coords"/>
+        <prop name="style_width" type="coords"/>
+        <prop name="style_min_width" type="coords"/>
+        <prop name="style_max_width" type="coords"/>
+        <prop name="style_length" type="coords"/>
+
+        <prop name="style_pad_top" type="int"/>
+        <prop name="style_pad_bottom" type="int"/>
+        <prop name="style_pad_left" type="int"/>
+        <prop name="style_pad_right" type="int"/>
+        <prop name="style_pad_hor" type="int"/>
+        <prop name="style_pad_ver" type="int"/>
+        <prop name="style_pad_all" type="int"/>
+        <prop name="style_pad_row" type="int"/>
+        <prop name="style_pad_column" type="int"/>
+        <prop name="style_pad_radial" type="int"/>
+        <prop name="style_pad_radial" type="int"/>
+        <prop name="style_margin_top" type="int"/>
+        <prop name="style_margin_bottom" type="int"/>
+        <prop name="style_margin_left" type="int"/>
+        <prop name="style_margin_right" type="int"/>
+        <prop name="style_margin_hor" type="int"/>
+        <prop name="style_margin_ver" type="int"/>
+        <prop name="style_margin_all" type="int"/>
+
+        <prop name="style_radius" type="int"/>
+        <prop name="style_radial_offset" type="int"/>
+        <prop name="style_align" type="enum:lv_align"/>
+        <prop name="style_clip_corner" type="bool"/>
+        <prop name="style_base_dir" type="enum:lv_base_dir"/>
+
+        <prop name="style_bg_color" type="color"/>
+        <prop name="style_bg_opa" type="int"/>
+        <prop name="style_bg_grad_dir" type="enum:lv_grad_dir"/>
+        <prop name="style_bg_main_stop" type="int"/>
+        <prop name="style_bg_grad_stop" type="int"/>
+        <prop name="style_bg_grad_color" type="color"/>
+
+        <prop name="style_bg_image_src" type="image"/>
+        <prop name="style_bg_image_tiled" type="bool"/>
+        <prop name="style_bg_image_recolor" type="color"/>
+        <prop name="style_bg_image_recolor_opa" type="int"/>
+
+        <prop name="style_border_color" type="color"/>
+        <prop name="style_border_width" type="int"/>
+        <prop name="style_border_opa" type="int"/>
+        <prop name="style_border_side" type="enum:lv_border_side"/>
+        <prop name="style_border_post" type="bool"/>
+
+        <prop name="style_outline_color" type="color"/>
+        <prop name="style_outline_width" type="int"/>
+        <prop name="style_outline_opa" type="int"/>
+        <prop name="style_outline_pad" type="int"/>
+
+        <prop name="style_style_shadow_width" type="int"/>
+        <prop name="style_shadow_color" type="color"/>
+        <prop name="style_shadow_opa" type="int"/>
+        <prop name="style_shadow_offset_x" type="int"/>
+        <prop name="style_shadow_offset_y" type="int"/>
+        <prop name="style_shadow_spread" type="int"/>
+
+        <prop name="style_text_color" type="color"/>
+        <prop name="style_text_opa" type="int"/>
+        <prop name="style_text_font" type="font"/>
+        <prop name="style_text_align" type="enum:lv_text_align"/>
+        <prop name="style_text_letter_space" type="int"/>
+        <prop name="style_text_line_space" type="int"/>
+        <prop name="style_text_decor" type="enum:lv_text_decor"/>
+
+        <prop name="style_image_opa" type="int"/>
+        <prop name="style_image_recolor" type="color"/>
+        <prop name="style_image_recolor_opa" type="int"/>
+
+        <prop name="style_line_width" type="int"/>
+        <prop name="style_line_color" type="color"/>
+        <prop name="style_line_opa" type="int"/>
+        <prop name="style_line_dash_width" type="int"/>
+        <prop name="style_line_dash_gap" type="int"/>
+        <prop name="style_line_rounded" type="bool"/>
+
+        <prop name="style_arc_width" type="int"/>
+        <prop name="style_arc_color" type="color"/>
+        <prop name="style_arc_opa" type="int"/>
+        <prop name="style_arc_rounded" type="bool"/>
+        <prop name="style_arc_image_src" type="image"/>
+
+        <prop name="style_layout" type="enum:lv_layout"/>
+
+        <prop name="style_flex_flow" type="enum:lv_flex_flow"/>
+        <prop name="style_flex_main_place" type="enum:lv_flex_align"/>
+        <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
+        <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
+        <prop name="style_flex_grow" type="int"/>
+
+        <prop name="style_grid_column_align" type="enum:lv_grid_align"/>
+        <prop name="style_grid_row_align" type="enum:lv_grid_align"/>
+        <prop name="style_grid_cell_column_pos" type="int"/>
+        <prop name="style_grid_cell_column_span" type="int"/>
+        <prop name="style_grid_cell_x_align" type="enum:lv_grid_align"/>
+        <prop name="style_grid_cell_row_pos" type="int"/>
+        <prop name="style_grid_cell_row_span" type="int"/>
+        <prop name="style_grid_cell_y_align" type="enum:lv_grid_align"/>
+
+        <prop name="style_opa" type="int"/>
+        <prop name="style_opa_layered" type="int"/>
+        <prop name="style_color_filter_opa" type="int"/>
+        <prop name="style_anim_duration" type="int"/>
+        <prop name="style_blend_mode" type="enum:lv_blend_mode"/>
+        <prop name="style_transform_width" type="int"/>
+        <prop name="style_transform_height" type="int"/>
+        <prop name="style_translate_x" type="int"/>
+        <prop name="style_translate_y" type="int"/>
+        <prop name="style_translate_radial" type="int"/>
+        <prop name="style_transform_scale_x" type="int"/>
+        <prop name="style_transform_scale_y" type="int"/>
+        <prop name="style_transform_rotation" type="int"/>
+        <prop name="style_transform_pivot_x" type="int"/>
+        <prop name="style_transform_pivot_y" type="int"/>
+        <prop name="style_transform_skew_x" type="int"/>
+        <prop name="style_transform_skew_y" type="int"/>
+        <prop name="style_bitmap_mask_src" type="image"/>
+        <prop name="style_rotary_sensitivity" type="int"/>
+        <prop name="style_recolor" type="color"/>
+        <prop name="style_recolor_opa" type="opa"/>
 
 	    <prop name="flex_grow" type="int"/>
 	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
