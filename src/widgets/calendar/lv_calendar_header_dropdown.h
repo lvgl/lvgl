@@ -38,7 +38,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_header_dropdown
  * @param parent    pointer to a calendar object.
  * @return          the created header
  */
-lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent);
+lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent);
 
 /**
  * Sets a custom calendar year list
