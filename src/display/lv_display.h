@@ -364,8 +364,6 @@ void lv_display_set_antialiasing(lv_display_t * disp, bool en);
  */
 bool lv_display_get_antialiasing(lv_display_t * disp);
 
-//! @cond Doxygen_Suppress
-
 /**
  * Call from the display driver when the flushing is finished
  * @param disp      pointer to display whose `flush_cb` was called
@@ -380,8 +378,6 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
  *                  false: there are other areas too which will be refreshed soon
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
-
-//! @endcond
 
 bool lv_display_is_double_buffered(lv_display_t * disp);
 
