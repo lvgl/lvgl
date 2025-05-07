@@ -49,7 +49,7 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
 
     for(int i = 0; i < NUM_OBJECTS; i++) {
         lv_obj_set_flex_grow(objects[i], 1);
-        obj_set_dimension(objects[i], LV_PCT(100)); 
+        obj_set_dimension(objects[i], LV_PCT(100));
     }
 
     lv_obj_update_layout(active_screen);
