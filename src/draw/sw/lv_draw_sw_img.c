@@ -103,62 +103,64 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #endif
 
 #if LV_USE_LAYER_DEBUG
-    lv_draw_fill_dsc_t fill_dsc;
-    lv_draw_fill_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
-    fill_dsc.opa = LV_OPA_20;
-    lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
+    {
+        lv_draw_fill_dsc_t fill_dsc;
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+        fill_dsc.opa = LV_OPA_20;
+        lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
-    lv_draw_border_dsc_t border_dsc;
-    lv_draw_border_dsc_init(&border_dsc);
-    border_dsc.color = fill_dsc.color;
-    border_dsc.opa = LV_OPA_60;
-    border_dsc.width = 2;
-    lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
-
+        lv_draw_border_dsc_t border_dsc;
+        lv_draw_border_dsc_init(&border_dsc);
+        border_dsc.color = fill_dsc.color;
+        border_dsc.opa = LV_OPA_60;
+        border_dsc.width = 2;
+        lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
+    }
 #endif
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
-    uint32_t idx = 0;
-    lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
-    while(draw_unit_tmp != draw_unit) {
-        draw_unit_tmp = draw_unit_tmp->next;
-        idx++;
+    {
+        uint32_t idx = 0;
+        lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
+        while(draw_unit_tmp != draw_unit) {
+            draw_unit_tmp = draw_unit_tmp->next;
+            idx++;
+        }
+        lv_draw_fill_dsc_t fill_dsc;
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+        fill_dsc.opa = LV_OPA_10;
+        lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
+
+        lv_draw_border_dsc_t border_dsc;
+        lv_draw_border_dsc_init(&border_dsc);
+        border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+        border_dsc.opa = LV_OPA_100;
+        border_dsc.width = 2;
+        lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
+
+        lv_point_t txt_size;
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+
+        lv_area_t txt_area;
+        txt_area.x1 = draw_area.x1;
+        txt_area.x2 = draw_area.x1 + txt_size.x - 1;
+        txt_area.y2 = draw_area.y2;
+        txt_area.y1 = draw_area.y2 - txt_size.y + 1;
+
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_color_black();
+        lv_draw_sw_fill(draw_unit, &fill_dsc, &txt_area);
+
+        char buf[8];
+        lv_snprintf(buf, sizeof(buf), "%d", idx);
+        lv_draw_label_dsc_t label_dsc;
+        lv_draw_label_dsc_init(&label_dsc);
+        label_dsc.color = lv_color_white();
+        label_dsc.text = buf;
+        lv_draw_sw_label(draw_unit, &label_dsc, &txt_area);
     }
-
-    lv_draw_fill_dsc_t fill_dsc;
-    lv_draw_rect_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-    fill_dsc.opa = LV_OPA_10;
-    lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
-
-    lv_draw_border_dsc_t border_dsc;
-    lv_draw_border_dsc_init(&border_dsc);
-    border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-    border_dsc.opa = LV_OPA_100;
-    border_dsc.width = 2;
-    lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
-
-    lv_point_t txt_size;
-    lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
-
-    lv_area_t txt_area;
-    txt_area.x1 = draw_area.x1;
-    txt_area.x2 = draw_area.x1 + txt_size.x - 1;
-    txt_area.y2 = draw_area.y2;
-    txt_area.y1 = draw_area.y2 - txt_size.y + 1;
-
-    lv_draw_fill_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_color_black();
-    lv_draw_sw_fill(draw_unit, &fill_dsc, &txt_area);
-
-    char buf[8];
-    lv_snprintf(buf, sizeof(buf), "%d", idx);
-    lv_draw_label_dsc_t label_dsc;
-    lv_draw_label_dsc_init(&label_dsc);
-    label_dsc.color = lv_color_white();
-    label_dsc.text = buf;
-    lv_draw_sw_label(draw_unit, &label_dsc, &txt_area);
 #endif
 }
 
