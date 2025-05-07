@@ -596,7 +596,7 @@ read_image_data(gd_GIF * gif, int interlace)
         if(ret == 1) key_size++;
         entry = table->entries[key];
         str_len = entry.length;
-	if(frm_off + str_len >= frm_size){
+	if(frm_off + str_len > frm_size){
 		LV_LOG_WARN("LZW table token overflows the frame buffer");
 		return -1;
 	}
