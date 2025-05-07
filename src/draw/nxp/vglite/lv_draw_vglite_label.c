@@ -128,12 +128,17 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
                     const bool static_bitmap = lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font);
-                    const void * mask_buf;
-                    const lv_draw_buf_t * draw_buf;
+                    const void * mask_buf = NULL;
+                    const lv_draw_buf_t * draw_buf = NULL;
                     uint32_t mask_stride;
                     if(!static_bitmap) {
                         draw_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
-                        mask_buf = draw_buf->data;
+                        if(draw_buf != NULL) {
+                            mask_buf = draw_buf->data;
+                        }
+                        else {
+                            return;
+                        }
                         mask_stride = draw_buf->header.stride;
                     }
                     else {
