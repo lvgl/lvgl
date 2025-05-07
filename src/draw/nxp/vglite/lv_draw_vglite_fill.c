@@ -215,7 +215,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
         lv_color32_t col32[LV_GRADIENT_MAX_STOPS];
 
         /* Gradient setup */
-        vg_lite_uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        vg_lite_uint32_t cnt = LV_MIN(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
         lv_opa_t opa;
 
         for(uint8_t i = 0; i < cnt; i++) {
