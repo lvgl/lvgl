@@ -14,7 +14,7 @@ static int32_t grid_row_dsc = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LA
 static void set_layout_grid(void)
 {
     lv_obj_set_grid_dsc_array(active_screen, grid_col_dsc, grid_row_dsc);
-    lv_obj_set_grid_align(active_screen, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_SPACE_BETWEEN);
+    lv_obj_set_grid_align(active_screen, LV_GRID_ALIGN_SPACE_BETWEEN, LV_GRID_ALIGN_SPACE_BETWEEN);
 
     for(int i = 0; i < NUM_OBJECTS; i++) {
         lv_obj_set_grid_cell(objects[i], LV_GRID_ALIGN_STRETCH, i % 2, 1, LV_GRID_ALIGN_STRETCH, i / 2, 1);
