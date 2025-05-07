@@ -7,7 +7,7 @@
 #define NUM_OBJECTS 4
 
 static lv_obj_t * active_screen = NULL;
-static lv_obj_t *objects[NUM_OBJECTS] = {NULL};
+static lv_obj_t * objects[NUM_OBJECTS] = {NULL};
 static int32_t grid_col_dsc = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 static int32_t grid_row_dsc = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
@@ -16,8 +16,7 @@ static void set_layout_grid(void)
     lv_obj_set_grid_dsc_array(active_screen, grid_col_dsc, grid_row_dsc);
     lv_obj_set_grid_align(active_screen, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_SPACE_BETWEEN);
 
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
       lv_obj_set_grid_cell (objects[i], LV_GRID_ALIGN_STRETCH, i % 2, 1, LV_GRID_ALIGN_STRETCH, i / 2, 1);
     }
     lv_obj_update_layout(active_screen);
@@ -28,10 +27,9 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
     lv_obj_set_layout(active_screen, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(active_screen, flex_flow);
 
-    void (*obj_set_dimension)(lv_obj_t *obj, int32_t value) = NULL;
+    void (*obj_set_dimension)(lv_obj_t * obj, int32_t value) = NULL;
 
-    switch(flex_flow)
-    {
+    switch(flex_flow) {
         case LV_FLEX_FLOW_COLUMN:
         case LV_FLEX_FLOW_COLUMN_WRAP:
         case LV_FLEX_FLOW_COLUMN_REVERSE:
@@ -45,12 +43,11 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
             obj_set_dimension = lv_obj_set_height;
             break;
         default:
-            LV_LOG_ERROR("Invalid flex flow");    
+            LV_LOG_ERROR("Invalid flex flow");
             return;
     }
 
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
       lv_obj_set_flex_grow(objects[i], 1);
       obj_set_dimension(objects[i], LV_PCT(100)); 
     }
@@ -61,8 +58,7 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
 void setUp(void)
 {
     active_screen = lv_screen_active();
-    for (int i = 0; i < NUM_OBJECTS; i++)
-    {
+    for (int i = 0; i < NUM_OBJECTS; i++) {
       objects[i] = lv_obj_create (active_screen);
     }
 }
