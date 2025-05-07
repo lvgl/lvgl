@@ -387,6 +387,11 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         roller->moved = 0;
         lv_anim_delete(get_label(obj), set_y_anim);
     }
+    else if(code == LV_EVENT_CLICKED) {
+        if(roller->moved == 1) {
+            lv_event_stop_processing(e);
+        }
+    }
     else if(code == LV_EVENT_PRESSING) {
         if(roller->option_cnt <= 1) return;
 

@@ -26,6 +26,8 @@
 #include "tvgIteratorAccessor.h"
 #include "tvgCompressor.h"
 
+using std::function;
+
 /************************************************************************/
 /* Internal Class Implementation                                        */
 /************************************************************************/

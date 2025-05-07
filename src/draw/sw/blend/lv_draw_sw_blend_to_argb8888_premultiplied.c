@@ -4,8 +4,8 @@
  */
 
 /*********************
-*      INCLUDES
-*********************/
+ *      INCLUDES
+ *********************/
 #include "lv_draw_sw_blend_to_argb8888_premultiplied.h"
 #if LV_USE_DRAW_SW
 
@@ -25,10 +25,6 @@
  *      TYPEDEFS
  **********************/
 
-/**********************
-*      TYPEDEFS
-**********************/
-
 typedef struct {
     lv_color32_t fg_saved;
     lv_color32_t bg_saved;
@@ -40,7 +36,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
     static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
@@ -58,11 +53,9 @@ static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cach
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
-static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
-
 /**********************
-*  STATIC VARIABLES
-**********************/
+ *  STATIC VARIABLES
+ **********************/
 
 /**********************
  *      MACROS
@@ -200,7 +193,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888_premultiplied(lv_d
  */
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888_premultiplied(lv_draw_sw_blend_image_dsc_t * dsc)
 {
-
     switch(dsc->src_color_format) {
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
@@ -405,7 +397,6 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                         color_argb.green = (color_argb.green * color_argb.alpha) >> 8;
                         color_argb.blue  = (color_argb.blue  * color_argb.alpha) >> 8;
 
-
                         dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
@@ -505,7 +496,6 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
         }
     }
 }
-
 
 /**
  * @brief Mix two ARGB8888 premultiplied colors.
