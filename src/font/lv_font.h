@@ -63,6 +63,11 @@ typedef struct {
     uint16_t stride;/**< Bytes in each line. If 0 than there is no padding at the end of the line. */
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
+
+    /** 0: Get bitmap should return an A8 or ARGB8888 image.
+      * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
+    uint8_t req_raw_bitmap: 1;
+
     int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
 
     union {
@@ -134,12 +139,27 @@ struct _lv_font_info_t {
 
 /**
  * Return with the bitmap of a font.
- * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t) before you can call this function.
- * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
- * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
- * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
+ * It always converts the normal fonts to A8 format in a draw_buf with
+ * LV_DRAW_BUF_ALIGN and LV_DRAW_BUF_STRIDE_ALIGN
+ * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t)
+ *       before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index
+ *                      and the format.
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph.
+ * @return              pointer to the glyph's data.
+ *                      It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
 const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+
+
+/**
+ * Return the bitmap as it is. It works only if the font stores the bitmap in
+ * a non-volitile memory.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index
+ *                      and the format.
+ * @return              the bitmap as it is
+ */
+const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the descriptor of a glyph
