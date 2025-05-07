@@ -229,7 +229,7 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
             VGLITE_CHECK_ERROR(vg_lite_disable_scissor());
         }
         else {
-            for(int i = 0; i < scissoring_rects.num_rect; i++) {
+            for(uint32_t i = 0; i < scissoring_rects.num_rect; i++) {
                 VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
                                                        scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
                                                        scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
