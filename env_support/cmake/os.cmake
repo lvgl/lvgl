@@ -15,6 +15,12 @@ set(LV_BUILD_DEFCONFIG_PATH "" CACHE PATH
 option(LV_BUILD_SET_CONFIG_OPTS
     "Create variables from the definitions in lv_conf_internal.h"  OFF)
 
+option(LV_BUILD_LVGL_H_SIMPLE_INCLUDE
+    "Disable if the lvgl directory is located at the top-level of your project" ON)
+
+option(LV_BUILD_LVGL_H_SYSTEM_INCLUDE
+    "Enable if LVGL will be installed on the system or the build system of your application uses a sysroot" OFF)
+
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 ### LVGL configuration options always use the prefix CONFIG_
@@ -105,7 +111,6 @@ if (NOT LV_BUILD_USE_KCONFIG)
 
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
         target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
 
     else()
@@ -117,7 +122,6 @@ if (NOT LV_BUILD_USE_KCONFIG)
         set(CONF_INC_DIR ${CMAKE_SOURCE_DIR})
         set(CONF_PATH ${CONF_INC_DIR}/lv_conf.h)
 
-        target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
         target_compile_definitions(lvgl PUBLIC LV_CONF_INCLUDE_SIMPLE)
 
     endif()
@@ -145,6 +149,11 @@ else()
 
 endif()
 
+if (LV_BUILD_LVGL_H_SYSTEM_INCLUDE)
+    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SYSTEM)
+elseif(LV_BUILD_LVGL_H_SIMPLE_INCLUDE)
+    target_compile_definitions(lvgl PUBLIC LV_LVGL_H_INCLUDE_SIMPLE)
+endif()
 
 
 if (LV_BUILD_SET_CONFIG_OPTS)
