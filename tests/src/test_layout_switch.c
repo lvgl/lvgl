@@ -16,7 +16,7 @@ static void set_layout_grid(void)
     lv_obj_set_grid_dsc_array(active_screen, grid_col_dsc, grid_row_dsc);
     lv_obj_set_grid_align(active_screen, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_SPACE_BETWEEN);
 
-    for (int i = 0; i < NUM_OBJECTS; i++) {
+    for(int i = 0; i < NUM_OBJECTS; i++) {
         lv_obj_set_grid_cell (objects[i], LV_GRID_ALIGN_STRETCH, i % 2, 1, LV_GRID_ALIGN_STRETCH, i / 2, 1);
     }
     lv_obj_update_layout(active_screen);
@@ -47,7 +47,7 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
             return;
     }
 
-    for (int i = 0; i < NUM_OBJECTS; i++) {
+    for(int i = 0; i < NUM_OBJECTS; i++) {
         lv_obj_set_flex_grow(objects[i], 1);
         obj_set_dimension(objects[i], LV_PCT(100)); 
     }
@@ -58,7 +58,7 @@ static void set_layout_flex(lv_flex_flow_t flex_flow)
 void setUp(void)
 {
     active_screen = lv_screen_active();
-    for (int i = 0; i < NUM_OBJECTS; i++) {
+    for(int i = 0; i < NUM_OBJECTS; i++) {
         objects[i] = lv_obj_create (active_screen);
     }
 }
