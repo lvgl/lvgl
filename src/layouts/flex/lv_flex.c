@@ -396,8 +396,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             continue;
         }
 
-        int16_t item_w_layout = item->w_layout;
-        int16_t item_h_layout = item->h_layout;
+        uint16_t item_w_layout = item->w_layout;
+        uint16_t item_h_layout = item->h_layout;
 
         int32_t grow_size = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
         if(grow_size) {
