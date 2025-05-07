@@ -37,15 +37,6 @@ typedef struct {
     bool sync_signal;         /**< True when a signal has been issued. */
 } lv_thread_sync_t;
 
-
-#if LV_USE_ST_LTDC
-void startLTDCChibiOS(void);
-#endif
-
-#if LV_ST_LTDC_USE_DMA2D_FLUSH || LV_USE_DRAW_DMA2D
-void startDMA2DChibiOS(void);
-#endif
-
 #ifdef __cplusplus
 }
 #endif
