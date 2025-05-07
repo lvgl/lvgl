@@ -138,10 +138,6 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
     uint32_t layer_height = layer_cfg->ImageHeight;
     uint32_t layer_cf = layer_cfg->PixelFormat;
 #elif defined(LV_OS_CHIBIOS)
-    startLTDCChibiOS();
-#if LV_ST_LTDC_USE_DMA2D_FLUSH || LV_USE_DRAW_DMA2D
-    startDMA2DChibiOS();
-#endif
     const LTDCConfig * layer_cfg = LTDCD1.config;
     uint32_t layer_width = layer_cfg->screen_width;
     uint32_t layer_height = layer_cfg->screen_height;
