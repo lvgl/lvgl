@@ -5,6 +5,7 @@
 .. toctree:: :maxdepth: 2
 
     buildroot/index
+    chibios
     freertos
     mqx
     nuttx

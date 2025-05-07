@@ -143,6 +143,10 @@ menu "LVGL configuration"
 				bool "5: WINDOWS"
 			config LV_OS_MQX
 				bool "6: MQX"
+			config LV_OS_SDL2
+				bool "7: SDL2"
+			config LV_OS_CHIBIOS
+				bool "8: CHIBIOS"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
