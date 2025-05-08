@@ -936,7 +936,27 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else if(v >= 255) value_final.color = tr->end_value.color;
                 else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
                 break;
+            
+            case LV_STYLE_TRANSFORM_HEIGHT:
+            case LV_STYLE_TRANSLATE_Y:
+            case LV_STYLE_TRANSFORM_WIDTH:
+            case LV_STYLE_TRANSLATE_X:
+            int32_t tr_start = tr->start_value.num;
+            int32_t tr_end = tr->end_value.num;
+            if((tr->prop == LV_STYLE_TRANSFORM_HEIGHT  || tr->prop == LV_STYLE_TRANSFORM_WIDTH)) {
+                int32_t wh = (tr->prop == LV_STYLE_TRANSFORM_WIDTH || tr->prop == LV_STYLE_TRANSLATE_X) ? lv_obj_get_width(obj) : lv_obj_get_height(obj);
+                if(LV_COORD_IS_PCT(tr->start_value.num)) {
+                    tr_start = LV_COORD_GET_PCT(tr->start_value.num) * wh / 100;
+                }
 
+                if(LV_COORD_IS_PCT(tr->end_value.num)) {
+                    tr_end = LV_COORD_GET_PCT(tr->end_value.num) * wh / 100;
+                }
+            }
+            if(v == 0) value_final.num = tr_start;
+            else if(v == 255) value_final.num = tr_end;
+            else value_final.num = tr_start + ((int32_t)((int32_t)(tr_end - tr_start) * v) >> 8);
+                break;    
             default:
                 if(v == 0) value_final.num = tr->start_value.num;
                 else if(v == 255) value_final.num = tr->end_value.num;
