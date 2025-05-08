@@ -30,11 +30,13 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+static uint8_t * thread_stack = NULL;
+
 lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
                void * user_data)
 {
-    uint8_t * data = malloc(stack_size);
-    if(data == NULL) {
+    thread_stack = malloc(stack_size);
+    if(thread_stack == NULL) {
         return LV_RESULT_INVALID;
     }
 
@@ -42,7 +44,7 @@ lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(voi
                                    "lv_thread",
                                    (VOID (*)(ULONG))callback,
                                    (ULONG)user_data,
-                                   data,
+                                   thread_stack,
                                    stack_size,
                                    prio,
                                    prio,
@@ -50,7 +52,7 @@ lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(voi
                                    TX_AUTO_START);
 
     if(result != TX_SUCCESS) {
-        free(data);
+        free(thread_stack);
         return LV_RESULT_INVALID;
     }
 
@@ -59,7 +61,9 @@ lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(voi
 
 lv_result_t lv_thread_delete(lv_thread_t * thread)
 {
-    return (tx_thread_delete(&thread->thread) == TX_SUCCESS) ? LV_RESULT_OK : LV_RESULT_INVALID;
+    UINT result = (tx_thread_delete(&thread->thread) == TX_SUCCESS) ? LV_RESULT_OK : LV_RESULT_INVALID;
+    free(thread_stack);
+    return result;
 }
 
 lv_result_t lv_mutex_init(lv_mutex_t * mutex)
