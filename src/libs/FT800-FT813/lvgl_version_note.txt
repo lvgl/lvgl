@@ -1,8 +1,0 @@
-https://github.com/RudolphRiedel/FT800-FT813
-ee35fa45c37aed78dc4f1196b874ee1c8f80429f
-
-Removed    example_pics/
-Removed    examples/
-Added      lv_version_note.txt
-Added      add_lvgl_if.py
-Ran        python3 add_lvgl_if.py
