@@ -65,6 +65,7 @@ struct _lv_display_t {
      *--------------------*/
     lv_draw_buf_t * buf_1;
     lv_draw_buf_t * buf_2;
+    lv_draw_buf_t * buf_3;
 
     /** Internal, used by the library*/
     lv_draw_buf_t * buf_act;
