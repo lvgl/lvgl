@@ -2429,6 +2429,27 @@ uint32_t lv_svg_render_get_size(const lv_svg_render_obj_t * render)
     return size;
 }
 
+lv_result_t lv_svg_render_get_viewport_size(const lv_svg_render_obj_t * render, float * width, float * height)
+{
+    if(!render) {
+        LV_LOG_WARN("Invalid render object");
+        return LV_RESULT_INVALID;
+    }
+
+    if(render->clz != &svg_viewport_class) {
+        LV_LOG_WARN("Invalid render object type");
+        return LV_RESULT_INVALID;
+    }
+    const lv_svg_render_viewport_t * cur = (const lv_svg_render_viewport_t *)render;
+    if(width) {
+        *width = cur->width;
+    }
+    if(height) {
+        *height = cur->height;
+    }
+    return LV_RESULT_OK;
+}
+
 void lv_draw_svg_render(lv_vector_dsc_t * dsc, const lv_svg_render_obj_t * render)
 {
     if(!render || !dsc) {

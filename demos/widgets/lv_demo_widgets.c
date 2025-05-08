@@ -1323,7 +1323,7 @@ static void birthday_event_cb(lv_event_t * e)
                 lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 30);
                 lv_obj_add_event_cb(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
 
-                lv_calendar_header_dropdown_create(calendar);
+                lv_calendar_add_header_dropdown(calendar);
             }
         }
     }

@@ -45,7 +45,6 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-//! @cond Doxygen_Suppress
 /**
  * Return with sinus of an angle
  * @param angle
@@ -54,8 +53,6 @@ typedef struct {
 int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_trigo_sin(int16_t angle);
 
 int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle);
-
-//! @endcond
 
 /**
  * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
@@ -88,8 +85,6 @@ int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3);
  */
 uint16_t lv_atan2(int x, int y);
 
-//! @cond Doxygen_Suppress
-
 /**
  * Get the square root of a number
  * @param x integer which square root should be calculated
@@ -101,8 +96,6 @@ uint16_t lv_atan2(int x, int y);
  * Else: mask = 0x8000
  */
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
-
-//! @endcond
 
 /**
  * Alternative (fast, approximate) implementation for getting the square root of an integer.

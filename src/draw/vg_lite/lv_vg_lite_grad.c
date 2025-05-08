@@ -115,7 +115,7 @@ struct _lv_vg_lite_grad_ctx_t * lv_vg_lite_grad_ctx_create(uint32_t cache_cnt, s
     LV_ASSERT_MALLOC(ctx->item_pool);
     ctx->item_pool_size = cache_cnt;
 
-    ctx->cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(grad_item_ref_t), cache_cnt, ops);
+    ctx->cache = lv_cache_create(&lv_cache_class_lru_ll_count, sizeof(grad_item_ref_t), cache_cnt, ops);
     lv_cache_set_name(ctx->cache, "VG_GRAD");
     ctx->pending = lv_vg_lite_pending_create(sizeof(lv_cache_entry_t *), 4);
     lv_vg_lite_pending_set_free_cb(ctx->pending, grad_cache_release_cb, ctx->cache);

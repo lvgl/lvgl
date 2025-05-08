@@ -8,6 +8,8 @@ from ../lv_conf_template.h that has:
 3.  its #if 0 directive set to #if 1.
 """
 import os
+import sys
+import re
 
 base_path = os.path.dirname(__file__)
 dst_config = os.path.join(base_path, 'lv_conf.h')
@@ -16,10 +18,12 @@ src_config = os.path.abspath(os.path.join(
     '..',
     'lv_conf_template.h'
 ))
+disabled_option_re = re.compile(r'^\s*#define\s+\w+\s+(\b0\b)')
 
 
 def run(c_path=None):
     global dst_config
+    os.chdir(base_path)
 
     if c_path is not None:
         dst_config = c_path
@@ -27,26 +31,34 @@ def run(c_path=None):
     with open(src_config, 'r') as f:
         data = f.read()
 
-    data = data.split('\n')
+    lines = data.split('\n')
 
-    for i, line in enumerate(data):
+    for i, line in enumerate(lines):
         if 'LV_USE_PROFILER' in line:
             continue
 
+        # These 2 fonts have been deprecated in favor of
+        # LV_FONT_SOURCE_HAN_SANS_SC_14_CJK and
+        # LV_FONT_SOURCE_HAN_SANS_SC_16_CJK.
+        if 'LV_FONT_SIMSUN_14_CJK' in line:
+            continue
+
+        if 'LV_FONT_SIMSUN_16_CJK' in line:
+            continue
+
         if 'LV_USE' in line or ('LV_FONT' in line and '#define' in line):
-            line = [item for item in line.split(' ') if item]
-
-            for j, item in enumerate(line):
-                if item == '0':
-                    line[j] = '1'
-
-            line = ' '.join(line)
-            data[i] = line
+            match = disabled_option_re.search(line)
+            if match:
+                # Replace '0' with '1' without altering any other part of line.
+                # Set `j` to index where '0' was found.
+                j = match.regs[1][0]
+                # Surgically insert '1' in place of '0'.
+                lines[i] = line[:j] + '1' + line[j + 1:]
         elif line.startswith('#if 0'):
             line = line.replace('#if 0', '#if 1')
-            data[i] = line
+            lines[i] = line
 
-    data = '\n'.join(data)
+    data = '\n'.join(lines)
 
     with open(dst_config, 'w') as f:
         f.write(data)
@@ -55,3 +67,8 @@ def run(c_path=None):
 def cleanup():
     if os.path.exists(dst_config):
         os.remove(dst_config)
+
+
+if __name__ == '__main__':
+    """Make module importable as well as run-able."""
+    run()

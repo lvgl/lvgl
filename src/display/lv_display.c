@@ -441,6 +441,17 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
     disp->buf_act = disp->buf_1;
 }
 
+void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    LV_ASSERT_MSG(disp->buf_1 != NULL, "buf1 is null");
+    LV_ASSERT_MSG(disp->buf_2 != NULL, "buf2 is null");
+
+    disp->buf_3 = buf3;
+}
+
 void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
                             lv_display_render_mode_t render_mode)
 {
@@ -528,6 +539,7 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
     disp->layer_head->color_format = color_format;
     if(disp->buf_1) disp->buf_1->header.cf = color_format;
     if(disp->buf_2) disp->buf_2->header.cf = color_format;
+    if(disp->buf_3) disp->buf_3->header.cf = color_format;
 
     lv_display_send_event(disp, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 }
@@ -1149,6 +1161,7 @@ uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t 
 
     LV_ASSERT(disp->buf_1 && disp->buf_1->data_size >= buf_size);
     if(disp->buf_2) LV_ASSERT(disp->buf_2->data_size >= buf_size);
+    if(disp->buf_3) LV_ASSERT(disp->buf_3->data_size >= buf_size);
 
     return buf_size;
 }

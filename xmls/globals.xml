@@ -120,7 +120,11 @@
 	    <prop name="x" type="coords"/>
 	    <prop name="y" type="coords"/>
 	    <prop name="height" type="coords"/>
+	    <prop name="min_height" type="coords"/>
+	    <prop name="max_height" type="coords"/>
 	    <prop name="width" type="coords"/>
+	    <prop name="min_width" type="coords"/>
+	    <prop name="max_width" type="coords"/>
 	    <prop name="length" type="coords"/>
 
 	    <prop name="pad_top" type="int"/>

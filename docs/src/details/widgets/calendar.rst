@@ -154,14 +154,14 @@ the API of the headers has been changed.**
 Arrow buttons
 -------------
 
-:cpp:expr:`lv_calendar_header_arrow_create(calendar)` creates a header that
+:cpp:expr:`lv_calendar_add_header_arrow(calendar)` creates a header that
 contains a left and right arrow on the sides and text between the arrows showing the
 current year and month.
 
 Drop-down
 ---------
 
-:cpp:expr:`lv_calendar_header_dropdown_create(calendar)` creates a header that
+:cpp:expr:`lv_calendar_add_header_dropdown(calendar)` creates a header that
 contains 2 Drop-Drown List Widgets for the year and month.
 
 .. _lv_calendar_example:

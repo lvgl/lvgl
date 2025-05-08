@@ -140,6 +140,17 @@ void testSvgElement(void)
     TEST_ASSERT_EQUAL_FLOAT((LV_ARRAY_GET(&svg_node_wh5->attrs, 1, lv_svg_attr_t))->value.fval, 1.0f);
     lv_svg_node_delete(svg_node_wh5);
 
+    const char * svg_wh6 = \
+                           "<svg width=\"2048\" height=\"1023.549\"></svg>";
+    lv_svg_node_t * svg_node_wh6 = lv_svg_load_data(svg_wh6, lv_strlen(svg_wh6));
+    lv_svg_render_obj_t * draw_list = lv_svg_render_create(svg_node_wh6);
+    float svg_wh6_w, svg_wh6_h;
+    lv_svg_render_get_viewport_size(draw_list, &svg_wh6_w, &svg_wh6_h);
+    TEST_ASSERT_EQUAL_FLOAT(svg_wh6_w, 2048.0f);
+    TEST_ASSERT_EQUAL_FLOAT(svg_wh6_h, 1023.549f);
+    lv_svg_render_delete(draw_list);
+    lv_svg_node_delete(svg_node_wh6);
+
     /* preserveAspectRatio */
 
     const char * svg_ar0 = \

@@ -24,8 +24,9 @@ void lv_example_span_1(void)
     lv_style_set_pad_all(&style, 2);
 
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
+    /* Setting a fixed width and height to LV_SIZE_CONTENT will make the text wrap */
     lv_obj_set_width(spans, 300);
-    lv_obj_set_height(spans, 300);
+    lv_obj_set_height(spans, LV_SIZE_CONTENT);
     lv_obj_center(spans);
     lv_obj_add_style(spans, &style, 0);
     lv_obj_add_flag(spans, LV_OBJ_FLAG_CLICKABLE);
@@ -33,7 +34,6 @@ void lv_example_span_1(void)
     lv_spangroup_set_align(spans, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_indent(spans, 20);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
     lv_span_t * span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "China is a beautiful country.");
