@@ -103,6 +103,8 @@ extern "C" {
 #  define CONFIG_LV_USE_OS LV_OS_MQX
 #elif defined (CONFIG_LV_OS_SDL2)
 #  define CONFIG_LV_USE_OS LV_OS_SDL2
+#elif defined (CONFIG_LV_OS_THREADX)
+#  define CONFIG_LV_USE_OS LV_OS_THREADX
 #elif defined (CONFIG_LV_OS_CUSTOM)
 #  define CONFIG_LV_USE_OS LV_OS_CUSTOM
 #endif
