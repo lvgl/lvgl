@@ -29,7 +29,7 @@ extern "C" {
 #define LV_LOG_LEVEL_ERROR 3 /**< Log only critical issues, when system may fail. */
 #define LV_LOG_LEVEL_USER  4 /**< Log only custom log messages added by the user. */
 #define LV_LOG_LEVEL_NONE  5 /**< Do not log anything. */
-#define LV_LOG_LEVEL_NUM   6 /**< Number of log levels */
+#define LV_LOG_LEVEL_NUM   5 /**< Number of log levels */
 
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_TRACE);
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_INFO);
