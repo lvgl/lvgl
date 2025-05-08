@@ -90,7 +90,8 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
 
     /* Apply the properties of the component, e.g. <my_button x="20" styles="red"/> */
     state->item = item;
-    ctx->root_widget->apply_cb(state, attrs);
+    lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(ctx->extends);
+    extended_proc->apply_cb(state, attrs);
 
     return item;
 }
@@ -628,17 +629,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         if(extends == NULL) extends = "lv_obj";
 
-        state->ctx.root_widget = lv_xml_widget_get_processor(extends);
-        if(state->ctx.root_widget == NULL) {
-            lv_xml_component_ctx_t * extended_component = lv_xml_component_get_ctx(extends);
-            if(extended_component) {
-                state->ctx.root_widget = extended_component->root_widget;
-            }
-            else {
-                LV_LOG_WARN("The 'extend'ed widget is not found, using `lv_obj` as a fall back");
-                state->ctx.root_widget = lv_xml_widget_get_processor("lv_obj");
-            }
-        }
+        state->ctx.extends = lv_strdup(extends);
     }
 
     if(lv_streq(name, "widget")) state->ctx.is_widget = 1;

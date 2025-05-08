@@ -144,7 +144,8 @@ void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent
     state.item = state.view;
 
     if(attrs) {
-        ctx->root_widget->apply_cb(&state, attrs);
+        lv_widget_processor_t * proc = lv_xml_widget_get_extended_widget_processor(ctx->extends);
+        proc->apply_cb(&state, attrs);
     }
 
     lv_ll_clear(&state.parent_ll);
@@ -609,5 +610,6 @@ static void view_end_element_handler(void * user_data, const char * name)
         lv_free(current_parent);
     }
 }
+
 
 #endif /* LV_USE_XML */
