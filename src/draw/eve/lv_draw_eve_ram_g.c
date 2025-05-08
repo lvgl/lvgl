@@ -1,5 +1,5 @@
 /**
- * @file eve_ram_g.c
+ * @file lv_draw_eve_ram_g.c
  *
  */
 
@@ -14,7 +14,7 @@
  *********************/
 #include "lv_draw_eve_private.h"
 #if LV_USE_DRAW_EVE
-#include "eve_ram_g.h"
+#include "lv_draw_eve_ram_g.h"
 #include "lv_eve.h"
 
 
@@ -30,7 +30,7 @@
 /*  Memory blocks are organized by type, with 8 (MAX_FONT 8) spaces for Fonts and 32 (MAX_IMAGE 32 )spaces for images (these values can be modified as needed).
  *  This structure is designed to speed up the search process, eliminating the need to traverse the entire array of blocks.
  */
-static ramg_mem_block blocks[MAX_BLOCKS];
+static lv_draw_eve_ram_g_mem_block_t blocks[MAX_BLOCKS];
 static uint32_t ramGptr = EVE_RAM_G;
 
 
@@ -38,25 +38,25 @@ static uint32_t ramGptr = EVE_RAM_G;
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint32_t get_bitmap_addr(uint8_t id)
+uint32_t lv_draw_eve_get_bitmap_addr(uint8_t id)
 {
     return blocks[id].address;
 }
 
-void update_ramg_ptr(uint32_t size)
+void lv_draw_eve_update_ramg_ptr(uint32_t size)
 {
     ramGptr += size;
     uint32_t alignment = 4;
     ramGptr = (ramGptr + alignment - 1) & ~(alignment - 1); /*RamG Aligned*/
 }
 
-uint32_t get_ramg_ptr(void)
+uint32_t lv_draw_eve_get_ramg_ptr(void)
 {
     return ramGptr;
 
 }
 
-void init_eve_ramg()
+void lv_draw_eve_init_eve_ramg()
 {
     for(int i = 0; i < MAX_BLOCKS; i++) {
         blocks[i].address = 0;
@@ -67,7 +67,7 @@ void init_eve_ramg()
     }
 }
 
-uint32_t next_free_ramg_block(DataType data)
+uint32_t lv_draw_eve_next_free_ramg_block(lv_draw_eve_ram_g_datatype_t data)
 {
     uint32_t start = 0;
     uint32_t end = 0;
@@ -93,14 +93,14 @@ uint32_t next_free_ramg_block(DataType data)
 }
 
 
-void set_size_ramg_block(uint8_t Id, uint32_t sz)
+void lv_draw_eve_set_size_ramg_block(uint8_t Id, uint32_t sz)
 {
 
     blocks[Id].size = sz;
 
 }
 
-void set_source_ramg_block(uint8_t Id, const uint8_t * src)
+void lv_draw_eve_set_source_ramg_block(uint8_t Id, const uint8_t * src)
 {
 
     if(Id < MAX_BLOCKS) {
@@ -110,28 +110,28 @@ void set_source_ramg_block(uint8_t Id, const uint8_t * src)
 }
 
 
-void set_addr_ramg_block(uint8_t Id, uint32_t addr)
+void lv_draw_eve_set_addr_ramg_block(uint8_t Id, uint32_t addr)
 {
 
     blocks[Id].address = addr;
 
 }
 
-void set_state_ramg_block(uint8_t Id, bool state)
+void lv_draw_eve_set_state_ramg_block(uint8_t Id, bool state)
 {
 
     blocks[Id].loaded = state;
 
 }
 
-bool update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz)
+bool lv_draw_eve_update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz)
 {
     blocks[id].source = src;
     blocks[id].address = addr;
     blocks[id].size = sz;
     blocks[id].loaded = true;
     blocks[id].id = id;
-    update_ramg_ptr(sz);
+    lv_draw_eve_update_ramg_ptr(sz);
 
     if(ramGptr > EVE_RAM_G_SIZE) {
         return true;
@@ -142,7 +142,7 @@ bool update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz)
 }
 
 
-uint32_t find_ramg_image(const uint8_t * imageSource)
+uint32_t lv_draw_eve_find_ramg_image(const uint8_t * imageSource)
 {
 
     for(uint32_t i = IMAGE_BLOCK_START; i < MAX_IMAGE; i++) {
@@ -155,7 +155,7 @@ uint32_t find_ramg_image(const uint8_t * imageSource)
 }
 
 
-uint32_t find_ramg_font(const uint8_t * fontSource)
+uint32_t lv_draw_eve_find_ramg_font(const uint8_t * fontSource)
 {
 
     for(uint32_t i = FONT_BLOCK_START; i < MAX_FONT; i++) {

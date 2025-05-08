@@ -19,7 +19,7 @@
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
-#include "eve_ram_g.h"
+#include "lv_draw_eve_ram_g.h"
 #include "lv_draw_eve.h"
 #include "lv_eve.h"
 /*********************
@@ -61,7 +61,7 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 void lv_draw_eve_init(void)
 {
-    init_eve_ramg();
+    lv_draw_eve_init_eve_ramg();
 
     lv_draw_eve_unit_t * draw_eve_unit = lv_draw_create_unit(sizeof(lv_draw_eve_unit_t));
     draw_eve_unit->base_unit.dispatch_cb = eve_dispatch;

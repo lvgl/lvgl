@@ -18,7 +18,7 @@
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_rect.h"
 #include "lv_eve.h"
-#include "eve_ram_g.h"
+#include "lv_draw_eve_ram_g.h"
 #include "src/font/lv_font_fmt_txt.h"
 
 /*********************
@@ -126,20 +126,20 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     const uint8_t * font_src = (const uint8_t *)font_in_use; /* font location pointer */
 
     uint32_t font_eveId;
-    font_eveId = find_ramg_font(font_src);
+    font_eveId = lv_draw_eve_find_ramg_font(font_src);
 
     if(font_eveId == NOT_FOUND_BLOCK) { /* If the font is not yet loaded in ramG, load it */
-        uint32_t free_ramg_block = next_free_ramg_block(TYPE_FONT);
+        uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_FONT);
         if(free_ramg_block == NOT_FOUND_BLOCK) {
             LV_LOG_WARN("NOT_FOUND_BLOCK");
             return;
         }
-        uint32_t start_addr_ramg = get_ramg_ptr();
+        uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
 
         uint32_t total_font_size = eve_lv_font_to_ramg(font_in_use, free_ramg_block,
                                                        start_addr_ramg); /* load font to ramG (The block Id is updated in this function) */
 
-        update_ramg_block(free_ramg_block, (uint8_t *)font_src, start_addr_ramg, total_font_size);
+        lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)font_src, start_addr_ramg, total_font_size);
         font_eveId = free_ramg_block;
 
     }

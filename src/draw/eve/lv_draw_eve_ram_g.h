@@ -1,5 +1,5 @@
 /**
- * @file eve_ram_g.h
+ * @file lv_draw_eve_ram_g.h
  *
  */
 
@@ -9,8 +9,8 @@
  *  Modified by LVGL
  */
 
-#ifndef LV_EVE_RAM_G_H
-#define LV_EVE_RAM_G_H
+#ifndef LV_DRAW_EVE_RAM_G_H
+#define LV_DRAW_EVE_RAM_G_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,7 @@ typedef struct {
     uint8_t id;       /* Identifier for the block.*/
     uint8_t * source; /* Pointer to the source of the data stored in the block.*/
     bool loaded;      /* Flag to indicate if the block is loaded.*/
-} ramg_mem_block;
+} lv_draw_eve_ram_g_mem_block_t;
 
 
 /* Enumeration to define the types of data.*/
@@ -58,7 +58,7 @@ typedef enum {
     TYPE_IMAGE = 0,
     TYPE_FONT = 1,
     OTHER
-} DataType;
+} lv_draw_eve_ram_g_datatype_t;
 
 
 
@@ -67,38 +67,38 @@ typedef enum {
  **********************/
 
 /* Function to update the RAM_G pointer with the given size.*/
-void update_ramg_ptr(uint32_t size);
+void lv_draw_eve_update_ramg_ptr(uint32_t size);
 
 /* Function to get the current RAM_G pointer value. */
-uint32_t get_ramg_ptr(void);
+uint32_t lv_draw_eve_get_ramg_ptr(void);
 
 /* Init Memory blocks */
-void init_eve_ramg();
+void lv_draw_eve_init_eve_ramg();
 
 /* Searches for the next free memory block */
-uint32_t next_free_ramg_block(DataType data);
+uint32_t lv_draw_eve_next_free_ramg_block(lv_draw_eve_ram_g_datatype_t data);
 
 /* This function checks if the image has already been loaded into ram_g. If it hasn't been loaded, it returns 'NOT FOUND',
  * otherwise it returns the ID of the block where it is located."
  */
-uint32_t find_ramg_image(const uint8_t * imageSource);
+uint32_t lv_draw_eve_find_ramg_image(const uint8_t * imageSource);
 
 /* "This function checks if the font has already been loaded into ram_g. If it hasn't been loaded, it returns 'NOT FOUND',
  * otherwise it returns the ID of the block where it is located."
  */
-uint32_t find_ramg_font(const uint8_t * fontSource);
+uint32_t lv_draw_eve_find_ramg_font(const uint8_t * fontSource);
 
-uint32_t get_bitmap_addr(uint8_t id);
+uint32_t lv_draw_eve_get_bitmap_addr(uint8_t id);
 
-void set_source_ramg_block(uint8_t Id, const  uint8_t * src);
+void lv_draw_eve_set_source_ramg_block(uint8_t Id, const  uint8_t * src);
 
-void set_addr_ramg_block(uint8_t Id, uint32_t addr);
+void lv_draw_eve_set_addr_ramg_block(uint8_t Id, uint32_t addr);
 
-void set_state_ramg_block(uint8_t Id, bool state);
+void lv_draw_eve_set_state_ramg_block(uint8_t Id, bool state);
 
-void set_size_ramg_block(uint8_t Id, uint32_t sz);
+void lv_draw_eve_set_size_ramg_block(uint8_t Id, uint32_t sz);
 
-bool update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz);
+bool lv_draw_eve_update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz);
 
 
 #endif/*LV_USE_DRAW_EVE*/
@@ -107,4 +107,4 @@ bool update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz);
 } /*extern "C"*/
 #endif
 
-#endif /* LV_EVE_RAM_G_H */
+#endif /* LV_DRAW_EVE_RAM_G_H */

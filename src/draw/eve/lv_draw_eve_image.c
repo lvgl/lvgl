@@ -16,7 +16,7 @@
 #if LV_USE_DRAW_EVE
 
 #include "../lv_draw_image_private.h"
-#include "eve_ram_g.h"
+#include "lv_draw_eve_ram_g.h"
 #include "lv_eve.h"
 
 /*********************
@@ -89,12 +89,12 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     int32_t stride_px_w = img_stride / lv_color_format_get_size(color_f);
     int32_t img_size = stride_px_w * img_h * 2;
 
-    uint32_t img_eveId = find_ramg_image(img_src);
+    uint32_t img_eveId = lv_draw_eve_find_ramg_image(img_src);
 
     if(img_eveId == NOT_FOUND_BLOCK) { /* New image to load  */
 
-        uint32_t free_ramg_block = next_free_ramg_block(TYPE_IMAGE);
-        uint32_t start_addr_ramg = get_ramg_ptr();
+        uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_IMAGE);
+        uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
 
 
         /* Load image to RAM_G */
@@ -130,7 +130,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
         lv_free(temp_buff);
         /* Save RAM_G Memory Block ID info */
-        update_ramg_block(free_ramg_block, (uint8_t *)img_src, start_addr_ramg, img_size);
+        lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)img_src, start_addr_ramg, img_size);
 
         EVE_start_cmd_burst();
     }
@@ -144,7 +144,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         lv_eve_color(draw_dsc->recolor);
     }
 
-    uint32_t img_addr = get_bitmap_addr(img_eveId);
+    uint32_t img_addr = lv_draw_eve_get_bitmap_addr(img_eveId);
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
     EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
