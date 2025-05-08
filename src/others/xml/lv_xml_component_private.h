@@ -38,7 +38,7 @@ struct _lv_xml_component_ctx_t {
     lv_ll_t image_ll;
     lv_ll_t event_ll;
     const char * view_def;
-    struct _lv_widget_processor_t * root_widget;
+    const char * extends;
     uint32_t is_widget : 1;                         /*1: not component but widget registered as a component for preview*/
     struct _lv_xml_component_ctx_t * next;
 };
