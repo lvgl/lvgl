@@ -256,10 +256,10 @@ static void window_update_handler(lv_timer_t * t)
     LV_UNUSED(t);
     int count = 0;
     lv_opengles_window_t * window;
-    if(window->pre) window->pre(window);
 
     /* render each window */
     LV_LL_READ(&egl_window_ll, window) {
+        if(window->pre) window->pre(window);
 
         eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
