@@ -41,13 +41,18 @@ extern "C" {
  *     #define EVE_HAS_CRYSTAL    (`#define EVE_HAS_CRYSTAL` for yes, `#undef EVE_HAS_CRYSTAL` for no)
  *     #define EVE_HAS_GT911      (`#define EVE_HAS_GT911` for yes, `#undef EVE_HAS_GT911` for no)
  *     #define EVE_GEN            ...
- *     #define EVE_BACKLIGHT_FREQ ... (optional, if applicable)
+ *     #define EVE_BACKLIGHT_PWM  ... (optional)
+ *     #define EVE_BACKLIGHT_FREQ ... (optional)
  */
 #include "lv_draw_eve_target_parameters.h" /* see comment above */
 
 /*********************
  *      DEFINES
  *********************/
+
+#ifndef EVE_BACKLIGHT_PWM
+#define EVE_BACKLIGHT_PWM 0x80
+#endif
 
 #ifndef EVE_BACKLIGHT_FREQ
 #define EVE_BACKLIGHT_FREQ (4000U)

@@ -10,10 +10,6 @@ static inline void DELAY_MS(uint16_t ms)
     lv_delay_ms(ms);
 }
 
-static inline void EVE_init_spi(void)
-{
-}
-
 static inline void EVE_cs_set(void)
 {
     lv_draw_eve_target_spi_cs(true);
