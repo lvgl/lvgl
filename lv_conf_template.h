@@ -345,7 +345,7 @@
 #define LV_USE_DRAW_OPENGLES 0
 
 /* Use EVE FT81X GPU. */
-#define LV_USE_DRAW_EVE 1
+#define LV_USE_DRAW_EVE 0
 
 /*=======================
  * FEATURE CONFIGURATION
