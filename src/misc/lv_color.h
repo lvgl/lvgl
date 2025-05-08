@@ -81,6 +81,7 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_NEMA_TSC12A ? 12 : \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
+                                            (cf) == LV_COLOR_FORMAT_RGB565_SWAPPED ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
                                             (cf) == LV_COLOR_FORMAT_YUY2 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_ARGB1555 ? 16 : \
@@ -154,6 +155,7 @@ typedef enum {
     LV_COLOR_FORMAT_ARGB8565          = 0x13,   /**< Not supported by sw renderer yet. */
     LV_COLOR_FORMAT_RGB565A8          = 0x14,   /**< Color array followed by Alpha array*/
     LV_COLOR_FORMAT_AL88              = 0x15,   /**< L8 with alpha >*/
+    LV_COLOR_FORMAT_RGB565_SWAPPED    = 0x1B,
 
     /*3 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB888            = 0x0F,

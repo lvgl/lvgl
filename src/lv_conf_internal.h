@@ -421,6 +421,17 @@
             #define LV_DRAW_SW_SUPPORT_RGB565       1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+            #else
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
+        #endif
+    #endif
     #ifndef LV_DRAW_SW_SUPPORT_RGB565A8
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
