@@ -344,6 +344,14 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 
     int32_t w = lv_obj_get_style_transform_width(obj, part);
     int32_t h = lv_obj_get_style_transform_height(obj, part);
+    if(LV_COORD_IS_PCT(w)) {
+        int32_t pct = LV_COORD_GET_PCT(w);
+        w = lv_obj_get_width(obj) * pct / 100;
+    }
+    if(LV_COORD_IS_PCT(h)) {
+        int32_t pct = LV_COORD_GET_PCT(h);
+        h = lv_obj_get_height(obj) * pct / 100;
+    }
     int32_t wh = LV_MAX(w, h);
     if(wh > 0) s += wh;
 
