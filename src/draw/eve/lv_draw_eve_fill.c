@@ -47,36 +47,6 @@ void lv_draw_eve_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const 
     }
 
     lv_eve_restore_context();
-
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
-
-
-
-    // EVE_end_cmd_burst(); /* stop writing to the cmd-fifo, the cmd-FIFO will be executed automatically after this or when DMA is done */
-
-    // uint16_t list_size = EVE_memRead16(REG_CMD_DL); /* debug-information, get the size of the last generated display-list */
-    // EVE_start_cmd_burst();
-
-    // EVE_cmd_dl_burst(COLOR_RGB(0, 0, 0));
-    // lv_eve_scissor(0, 0, EVE_HSIZE, EVE_VSIZE);
-    // EVE_cmd_text_burst(760, 17, 26, EVE_OPT_RIGHTX, "DL:");
-    // EVE_cmd_number_burst(795, 17, 26, EVE_OPT_RIGHTX, list_size);
-
-    // EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the co-processor to show the list */
-    // EVE_cmd_dl_burst(CMD_SWAP);   /* make this list active */
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-
-    // EVE_start_cmd_burst();
-    // EVE_cmd_dl_burst(CMD_DLSTART);
-    // EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
-    // EVE_cmd_dl_burst(VERTEX_FORMAT(0));
-    // /* use vertex translate 8 ? */
-    // // EVE_cmd_dl_burst(VERTEX_TRANSLATE_X(8));
-    // // EVE_cmd_dl_burst(VERTEX_TRANSLATE_Y(8));
-
 }
 
 
@@ -145,11 +115,6 @@ void lv_draw_eve_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, co
     lv_eve_draw_rect_simple(coords->x1, coords->y1, coords->x2, coords->y2, rout);
 
     lv_eve_restore_context();
-
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
-
 }
 
 #endif /*LV_USE_DRAW_EVE*/

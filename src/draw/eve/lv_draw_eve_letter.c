@@ -79,14 +79,9 @@ void lv_draw_eve_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, cons
     lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
     lv_eve_save_context();
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
-    //draw_unit->target_layer->user_data = (lv_font_t *)dsc->font;
     font_static = dsc->font;
     lv_draw_label_iterate_characters(t, dsc, coords, lv_draw_eve_letter_cb);
     lv_eve_restore_context();
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
-
 }
 
 /**********************
@@ -154,11 +149,6 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     EVE_cmd_dl_burst(BITMAP_LAYOUT(bpp_eve, g_box_w / 2, g_box_h));
 
     lv_eve_vertex_2f(glyph_draw_dsc->letter_coords->x1, glyph_draw_dsc->letter_coords->y1);
-
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
-
 }
 
 
@@ -174,7 +164,6 @@ static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eveId
     uint32_t addr = ad;
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *) font_p->dsc;
 
-    //uint8_t temp_buff[(font_p->line_height * font_p->line_height * font_dsc->bpp) / 8];
     uint8_t * temp_buff = lv_malloc(font_p->line_height * font_p->line_height * font_dsc->bpp); /*Extra mem*/
     uint32_t cmap_max = font_dsc->cmap_num;
     uint32_t range_max = 0;

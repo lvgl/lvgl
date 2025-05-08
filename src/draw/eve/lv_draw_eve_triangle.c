@@ -108,7 +108,6 @@ void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc
     lv_eve_vertex_2f(p[0].x, p[0].y);
     lv_eve_vertex_2f(p[1].x, p[1].y);
     lv_eve_vertex_2f(p[2].x, p[2].y);
-    // lv_eve_vertex_2f(p[0].x, p[0].y);
 
     lv_eve_color_mask(1, 1, 1, 1);
     lv_eve_stencil_func(EVE_EQUAL, 255, 255) ;
@@ -117,9 +116,6 @@ void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc
     lv_eve_vertex_2f(1022, 0);
 
     lv_eve_restore_context();
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
 }
 
 /**********************

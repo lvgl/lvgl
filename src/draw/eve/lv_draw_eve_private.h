@@ -46,9 +46,6 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_eve_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
-                       const lv_area_t * coords);
-
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                        const lv_area_t * coords);
 

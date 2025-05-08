@@ -52,30 +52,6 @@ static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uin
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_eve_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
-{
-
-    /*
-        lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
-
-        if(layer_to_draw->draw_buf == NULL) return;
-
-        lv_image_dsc_t img_dsc = { 0 };
-        img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
-        img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
-        img_dsc.header.cf = layer_to_draw->color_format;
-        img_dsc.header.stride = layer_to_draw->buf_area;
-        img_dsc.data = layer_to_draw->buf;
-
-        lv_draw_image_dsc_t new_draw_dsc;
-        lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
-        new_draw_dsc.src = &img_dsc;
-    */
-    // TODO  lv_draw_eve_image(draw_unit, &new_draw_dsc, coords);
-
-}
-
-
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
 
@@ -114,7 +90,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 buffer_converted = (uint8_t *)img_src;
                 break;
             case LV_COLOR_FORMAT_RGB565A8 :
-                //convert_RGB565A8_to_ARGB4444(src_buf, temp_buff, img_w, img_h);
                 convert_RGB565A8_to_ARGB1555(img_src, temp_buff, stride_px_w, img_h);
                 buffer_converted = temp_buff;
                 break;
@@ -148,8 +123,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
     EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
-    //EVE_cmd_dl_burst(BITMAP_LAYOUT_H(); /*TODO*/
-    //EVE_cmd_dl_burst(BITMAP_SIZE_H)();
     EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, img_w,
                                  img_h)); /*real height and wide is mandatory for rotation a scale (Clip Area)*/
 
@@ -157,19 +130,15 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     switch(color_f) {
         case LV_COLOR_FORMAT_L8 :
             eve_format = EVE_L8;
-            // img_stride = img_w;
             break;
         case LV_COLOR_FORMAT_RGB565 :
             eve_format = EVE_RGB565;
-            // img_stride = img_w * 2;
             break;
         case LV_COLOR_FORMAT_RGB565A8 :
             eve_format = EVE_ARGB1555;
-            // img_stride = img_w * 2;
             break;
         case LV_COLOR_FORMAT_ARGB8888 :
             eve_format = EVE_ARGB4;
-            // img_stride = img_w * 2;
             break;
         default :
             break;
@@ -201,9 +170,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         lv_eve_vertex_2f(coords->x1, coords->y1);
     }
     lv_eve_restore_context();
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
 }
 
 

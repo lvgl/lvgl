@@ -66,9 +66,6 @@ void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     }
 
     lv_eve_restore_context();
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
 }
 
 #endif /*LV_USE_DRAW_EVE*/

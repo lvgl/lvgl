@@ -40,20 +40,7 @@ static int32_t chord_length(int16_t radius, int16_t angleDegrees);
 
 void lv_draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
 {
-    //if(is_same_quadrant(dsc->start_angle, dsc->end_angle)){ /* this method drawing two arc  */
-
-    //lv_draw_arc_dsc_t p = *dsc;
-
-    // p.end_angle =  (p.start_angle + 180) % 360;
-    // draw_eve_arc(draw_unit, &p, coords); // draw mid arc
-
-    // p.start_angle = p.end_angle;
-    // p.end_angle = dsc->end_angle;
-    // draw_eve_arc(draw_unit, &p, coords); // drwa mid arc
-
-    //}else {
     draw_eve_arc(t, dsc, coords);
-    //}
 }
 
 /**********************
@@ -313,7 +300,6 @@ static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, cons
 
     lv_eve_stencil_func(EVE_NOTEQUAL, 1, 0XFF);
     lv_eve_blend_func(EVE_SRC_ALPHA, EVE_ONE_MINUS_SRC_ALPHA);
-    //EVE_cmd_dl_burst(COLOR_A(opa));
 
     lv_eve_color_opa(opa);
     lv_eve_draw_circle_simple(center.x, center.y, radius_out); /* radius_out */
@@ -330,10 +316,6 @@ static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, cons
         draw_rounded_end(center, adjusted_radius, start_angle, half_width);
         lv_eve_restore_context();
     }
-
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
 }
 
 

@@ -103,20 +103,6 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
-    // switch(task->type) {
-    //     // case LV_DRAW_TASK_TYPE_LINE:
-    //     // case LV_DRAW_TASK_TYPE_BORDER:
-    //     // case LV_DRAW_TASK_TYPE_FILL:
-    //     case LV_DRAW_TASK_TYPE_LAYER:
-    //     // case LV_DRAW_TASK_TYPE_IMAGE:
-    //     // case LV_DRAW_TASK_TYPE_LABEL:
-    //     // case LV_DRAW_TASK_TYPE_ARC:
-    //     case LV_DRAW_TASK_TYPE_TRIANGLE:
-    //         return 0;
-    //     default:
-    //         break;
-    // }
-
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_EVE;
@@ -138,10 +124,6 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_eve_fill(t, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_LAYER:
-            return;
-            lv_draw_eve_layer(t, t->draw_dsc, &t->area);
-            break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_eve_image(t, t->draw_dsc, &t->area);
             break;
@@ -158,10 +140,6 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
         default:
             break;
     }
-
-    // EVE_end_cmd_burst();
-    // EVE_execute_cmd();
-    // EVE_start_cmd_burst();
 }
 
 
