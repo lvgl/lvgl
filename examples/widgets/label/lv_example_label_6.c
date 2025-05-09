@@ -1,7 +1,8 @@
 #include "../../lv_examples.h"
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
-static bool fix_w_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc, uint32_t letter, uint32_t letter_next)
+static bool fix_w_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc, uint32_t letter,
+                                uint32_t letter_next)
 {
     bool ret = lv_font_get_glyph_dsc_fmt_txt(font, dsc, letter, letter_next);
     if(!ret) return false;

@@ -23,8 +23,8 @@ typedef struct {
 
 static float angle_accum = 0.0f;
 static lv_obj_t * legend_container = NULL;
-static slice_info_t *active_info = NULL;
-static lv_obj_t *active_arc = NULL;
+static slice_info_t * active_info = NULL;
+static lv_obj_t * active_arc = NULL;
 
 static void anim_move_cb(void * var, int32_t v)
 {
@@ -40,16 +40,16 @@ static void anim_cleanup_cb(lv_anim_t * a)
     lv_free(a->var);
 }
 
-static void arc_click_cb(lv_event_t *e)
+static void arc_click_cb(lv_event_t * e)
 {
-    lv_obj_t   * arc  = lv_event_get_target(e);
+    lv_obj_t * arc  = lv_event_get_target(e);
     slice_info_t * info = (slice_info_t *)lv_event_get_user_data(e);
 
     int32_t x_off = (SLICE_OFFSET * lv_trigo_cos(info->mid_angle)) >> LV_TRIGO_SHIFT;
     int32_t y_off = (SLICE_OFFSET * lv_trigo_sin(info->mid_angle)) >> LV_TRIGO_SHIFT;
 
-    if (active_info && active_info != info && active_info->out) {
-        slice_anim_data_t *anim_back = lv_malloc(sizeof(slice_anim_data_t));
+    if(active_info && active_info != info && active_info->out) {
+        slice_anim_data_t * anim_back = lv_malloc(sizeof(slice_anim_data_t));
         anim_back->obj = active_arc;
         anim_back->start_x = lv_obj_get_x(active_arc) - SLICE_OFFSET;
         anim_back->start_y = lv_obj_get_y(active_arc) - SLICE_OFFSET;
@@ -75,7 +75,8 @@ static void arc_click_cb(lv_event_t *e)
         info->out = false;
         active_info = NULL;
         active_arc = NULL;
-    } else {
+    }
+    else {
         target_x  = info->home.x + x_off;
         target_y  = info->home.y + y_off;
         info->out = true;
@@ -121,15 +122,15 @@ static void create_legend_item(lv_obj_t * parent, const char * text, lv_color_t 
     lv_obj_set_style_text_font(label, &lv_font_montserrat_14, LV_PART_MAIN);
 }
 
-static void create_slice(lv_obj_t *parent, int percentage, const char *slice_category, lv_color_t color)
+static void create_slice(lv_obj_t * parent, int percentage, const char * slice_category, lv_color_t color)
 {
-    if (percentage <= 0) return;
+    if(percentage <= 0) return;
 
     float slice_angle = (percentage * 360.0f) / 100.0f;
     int start = (int)(angle_accum + 0.5f);
     angle_accum += slice_angle;
     int end = (int)(angle_accum + 0.5f);
-    if (end > 360) end = 360;
+    if(end > 360) end = 360;
 
     lv_obj_t * arc = lv_arc_create(parent);
     lv_obj_set_size(arc, CHART_SIZE, CHART_SIZE);
@@ -139,7 +140,7 @@ static void create_slice(lv_obj_t *parent, int percentage, const char *slice_cat
     lv_arc_set_bg_start_angle(arc, start);
     lv_arc_set_bg_end_angle(arc, end);
 
-    lv_obj_set_style_arc_width(arc, CHART_SIZE / 2, LV_PART_MAIN); 
+    lv_obj_set_style_arc_width(arc, CHART_SIZE / 2, LV_PART_MAIN);
     lv_obj_set_style_arc_width(arc, 0, LV_PART_INDICATOR);
 
     lv_obj_set_style_arc_color(arc, color, LV_PART_MAIN);
@@ -147,7 +148,7 @@ static void create_slice(lv_obj_t *parent, int percentage, const char *slice_cat
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
 
-    lv_obj_t *label = lv_label_create(arc);
+    lv_obj_t * label = lv_label_create(arc);
     lv_label_set_text_fmt(label, "%d%%", percentage);
     int mid_angle = start + ((end - start) / 2);
     int radius = CHART_SIZE / 4;
@@ -177,9 +178,7 @@ void lv_example_arc_3(void)
     lv_obj_set_size(root, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_center(root);
     lv_obj_set_flex_flow(root, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(root, LV_FLEX_ALIGN_CENTER,
-                                LV_FLEX_ALIGN_CENTER,
-                                LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(root, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_set_style_pad_all(root, 0, LV_PART_MAIN);
     lv_obj_set_style_border_width(root, 0, LV_PART_MAIN);

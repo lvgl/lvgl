@@ -24,7 +24,8 @@ static void hr_anim_timer_cb(lv_timer_t * timer)
     if(hr_value >= 195) {
         hr_value = 195;
         hr_step = -1;
-    } else if(hr_value <= 98) {
+    }
+    else if(hr_value <= 98) {
         hr_value = 98;
         hr_step = 1;
     }
@@ -60,28 +61,28 @@ void lv_example_scale_10(void)
     lv_obj_set_style_arc_width(scale, 0, LV_PART_MAIN);
 
     // Helper macro to create section styles
-    #define INIT_SECTION_STYLE(name, color)                                  \
-        static lv_style_t name##_items, name##_main, name##_indicator;       \
-        /*Minor ticks style*/                                                \
-        lv_style_init(&name##_items);                                        \
-        lv_style_set_line_color(&name##_items, color);                       \
-        lv_style_set_line_width(&name##_items, 0); \
-        /*Major ticks style*/                                                \
-        lv_style_init(&name##_indicator);                                    \
-        lv_style_set_line_color(&name##_indicator, color);                   \
-        lv_style_set_line_width(&name##_indicator, 0); \
-        /*Scale arc style*/                                                  \
-        lv_style_init(&name##_main);                                         \
-        lv_style_set_arc_color(&name##_main, color);                         \
-        lv_style_set_arc_width(&name##_main, 20);
+#define INIT_SECTION_STYLE(name, color)                                  \
+    static lv_style_t name##_items, name##_main, name##_indicator;       \
+    /*Minor ticks style*/                                                \
+    lv_style_init(&name##_items);                                        \
+    lv_style_set_line_color(&name##_items, color);                       \
+    lv_style_set_line_width(&name##_items, 0); \
+    /*Major ticks style*/                                                \
+    lv_style_init(&name##_indicator);                                    \
+    lv_style_set_line_color(&name##_indicator, color);                   \
+    lv_style_set_line_width(&name##_indicator, 0); \
+    /*Scale arc style*/                                                  \
+    lv_style_init(&name##_main);                                         \
+    lv_style_set_arc_color(&name##_main, color);                         \
+    lv_style_set_arc_width(&name##_main, 20);
 
     // Helper macro to create and add section
-    #define ADD_SECTION(from, to, name)                                          \
-        lv_scale_section_t * name##_sec = lv_scale_add_section(scale);          \
-        lv_scale_set_section_range(scale, name##_sec, from, to);                \
-        lv_scale_set_section_style_items(scale, name##_sec, &name##_items);     \
-        lv_scale_set_section_style_indicator(scale, name##_sec, &name##_indicator); \
-        lv_scale_set_section_style_main(scale, name##_sec, &name##_main);
+#define ADD_SECTION(from, to, name)                                          \
+    lv_scale_section_t * name##_sec = lv_scale_add_section(scale);          \
+    lv_scale_set_section_range(scale, name##_sec, from, to);                \
+    lv_scale_set_section_style_items(scale, name##_sec, &name##_items);     \
+    lv_scale_set_section_style_indicator(scale, name##_sec, &name##_indicator); \
+    lv_scale_set_section_style_main(scale, name##_sec, &name##_main);
 
     // Zone 1: (Grey)
     INIT_SECTION_STYLE(zone1, lv_palette_main(LV_PALETTE_GREY));
@@ -135,10 +136,7 @@ void lv_example_scale_10(void)
     lv_obj_set_flex_flow(hr_container, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_all(hr_container, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_row(hr_container, 0, 0);
-    lv_obj_set_flex_align(hr_container,
-        LV_FLEX_ALIGN_CENTER,
-        LV_FLEX_ALIGN_CENTER,
-        LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(hr_container, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     hr_value_label = lv_label_create(hr_container);
     lv_label_set_text_fmt(hr_value_label, "%d", current_hr);

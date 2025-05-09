@@ -48,7 +48,7 @@ void lv_example_scale_12(void)
         int y_axis_height = lv_obj_get_height(y_axis);
         int max_percentage = 100;
         int bar_height = (percentages[i] * y_axis_height) / max_percentage;
-    
+
         lv_obj_set_size(bar, bar_width, bar_height);
 
         int tick_count = num_bars + 1;
@@ -57,7 +57,7 @@ void lv_example_scale_12(void)
         int tick_x = x_coords.x1 + tick_spacing * (i + 1);
 
         lv_obj_align(bar, LV_ALIGN_BOTTOM_LEFT, tick_x - bar_width / 2, -55);
-    
+
         lv_obj_t * label = lv_label_create(scr);
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d%%", percentages[i]);

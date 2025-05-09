@@ -19,7 +19,8 @@ static void label_color_cb(lv_event_t * e)
     if(strcmp(txt, "06") == 0 || strcmp(txt, "12") == 0 ||
        strcmp(txt, "18") == 0 || strcmp(txt, "24") == 0) {
         label_dsc->color = lv_color_white();
-    } else {
+    }
+    else {
         label_dsc->color = lv_palette_darken(LV_PALETTE_GREY, 1);
     }
 }
@@ -46,7 +47,7 @@ void lv_example_scale_sun_hours(void)
     lv_scale_set_angle_range(scale, 360);
     lv_scale_set_rotation(scale, 105);
     lv_scale_set_label_show(scale, true);
-    lv_obj_set_style_text_font(scale, &lv_font_montserrat_12 , LV_PART_INDICATOR);
+    lv_obj_set_style_text_font(scale, &lv_font_montserrat_12, LV_PART_INDICATOR);
     lv_obj_set_style_pad_radial(scale, -6, LV_PART_INDICATOR);
 
     /* Style for major ticks */
@@ -80,9 +81,9 @@ void lv_example_scale_sun_hours(void)
 
     static const char * hour_labels[] = {
         "01", "02", "03", "04", "05",
-        "06", "07", "08", "09", "10", 
-        "11", "12", "13", "14", "15", 
-        "16", "17", "18", "19", "20", 
+        "06", "07", "08", "09", "10",
+        "11", "12", "13", "14", "15",
+        "16", "17", "18", "19", "20",
         "21", "22", "23", "24",
         NULL
     };
