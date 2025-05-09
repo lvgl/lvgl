@@ -27,7 +27,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 ### They can be set using the -D argument or cmake-gui(1) and are kept in cache
 ### The option names are the same as the defines in lv_conf.h - so check it for a description
 
-### WARNING: When LV_BUILD_SET_CONFIG_OPTS is enabled - these options are set automatically
+### INFO: When LV_BUILD_SET_CONFIG_OPTS is enabled - these options are set automatically
 ### based on lv_conf.h or Kconfig
 
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
