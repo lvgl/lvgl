@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_SCALE && LV_BUILD_EXAMPLES
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_40 && LV_FONT_MONTSERRAT_18
 
 static int32_t hr_value = 98;
 static int8_t hr_step = 1;
@@ -8,7 +8,19 @@ static lv_obj_t * hr_value_label = NULL;
 static lv_obj_t * bpm_label = NULL;
 static lv_obj_t * scale = NULL;
 
-lv_color_t get_hr_zone_color(int32_t hr)
+typedef struct {
+    lv_style_t items;
+    lv_style_t indicator;
+    lv_style_t main;
+} section_styles_t;
+
+static section_styles_t zone1_styles;
+static section_styles_t zone2_styles;
+static section_styles_t zone3_styles;
+static section_styles_t zone4_styles;
+static section_styles_t zone5_styles;
+
+static lv_color_t get_hr_zone_color(int32_t hr)
 {
     if(hr < 117) return lv_palette_main(LV_PALETTE_GREY);      // Zone 1
     else if(hr < 135) return lv_palette_main(LV_PALETTE_BLUE); // Zone 2
@@ -19,6 +31,8 @@ lv_color_t get_hr_zone_color(int32_t hr)
 
 static void hr_anim_timer_cb(lv_timer_t * timer)
 {
+    LV_UNUSED(timer);
+
     hr_value += hr_step;
 
     if(hr_value >= 195) {
@@ -42,6 +56,33 @@ static void hr_anim_timer_cb(lv_timer_t * timer)
     lv_obj_set_style_text_color(bpm_label, zone_color, 0);
 }
 
+static void init_section_styles(section_styles_t * styles, lv_color_t color)
+{
+    lv_style_init(&styles->items);
+    lv_style_set_line_color(&styles->items, color);
+    lv_style_set_line_width(&styles->items, 0);
+
+    lv_style_init(&styles->indicator);
+    lv_style_set_line_color(&styles->indicator, color);
+    lv_style_set_line_width(&styles->indicator, 0);
+
+    lv_style_init(&styles->main);
+    lv_style_set_arc_color(&styles->main, color);
+    lv_style_set_arc_width(&styles->main, 20);
+}
+
+static void add_section(lv_obj_t * scale,
+                        int32_t from,
+                        int32_t to,
+                        const section_styles_t * styles)
+{
+    lv_scale_section_t * sec = lv_scale_add_section(scale);
+    lv_scale_set_section_range(scale, sec, from, to);
+    lv_scale_set_section_style_items(scale, sec, &styles->items);
+    lv_scale_set_section_style_indicator(scale, sec, &styles->indicator);
+    lv_scale_set_section_style_main(scale, sec, &styles->main);
+}
+
 void lv_example_scale_10(void)
 {
     scale = lv_scale_create(lv_screen_active());
@@ -60,49 +101,25 @@ void lv_example_scale_10(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_obj_set_style_arc_width(scale, 0, LV_PART_MAIN);
 
-    // Helper macro to create section styles
-#define INIT_SECTION_STYLE(name, color)                                  \
-    static lv_style_t name##_items, name##_main, name##_indicator;       \
-    /*Minor ticks style*/                                                \
-    lv_style_init(&name##_items);                                        \
-    lv_style_set_line_color(&name##_items, color);                       \
-    lv_style_set_line_width(&name##_items, 0); \
-    /*Major ticks style*/                                                \
-    lv_style_init(&name##_indicator);                                    \
-    lv_style_set_line_color(&name##_indicator, color);                   \
-    lv_style_set_line_width(&name##_indicator, 0); \
-    /*Scale arc style*/                                                  \
-    lv_style_init(&name##_main);                                         \
-    lv_style_set_arc_color(&name##_main, color);                         \
-    lv_style_set_arc_width(&name##_main, 20);
-
-    // Helper macro to create and add section
-#define ADD_SECTION(from, to, name)                                          \
-    lv_scale_section_t * name##_sec = lv_scale_add_section(scale);          \
-    lv_scale_set_section_range(scale, name##_sec, from, to);                \
-    lv_scale_set_section_style_items(scale, name##_sec, &name##_items);     \
-    lv_scale_set_section_style_indicator(scale, name##_sec, &name##_indicator); \
-    lv_scale_set_section_style_main(scale, name##_sec, &name##_main);
-
     // Zone 1: (Grey)
-    INIT_SECTION_STYLE(zone1, lv_palette_main(LV_PALETTE_GREY));
-    ADD_SECTION(98, 117, zone1);
+    init_section_styles(&zone1_styles, lv_palette_main(LV_PALETTE_GREY));
+    add_section(scale, 98, 117, &zone1_styles);
 
     // Zone 2: (Blue)
-    INIT_SECTION_STYLE(zone2, lv_palette_main(LV_PALETTE_BLUE));
-    ADD_SECTION(117, 135, zone2);
+    init_section_styles(&zone2_styles, lv_palette_main(LV_PALETTE_BLUE));
+    add_section(scale, 117, 135, &zone2_styles);
 
     // Zone 3: (Green)
-    INIT_SECTION_STYLE(zone3, lv_palette_main(LV_PALETTE_GREEN));
-    ADD_SECTION(135, 158, zone3);
+    init_section_styles(&zone3_styles, lv_palette_main(LV_PALETTE_GREEN));
+    add_section(scale, 135, 158, &zone3_styles);
 
     // Zone 4: (Orange)
-    INIT_SECTION_STYLE(zone4, lv_palette_main(LV_PALETTE_ORANGE));
-    ADD_SECTION(158, 176, zone4);
+    init_section_styles(&zone4_styles, lv_palette_main(LV_PALETTE_ORANGE));
+    add_section(scale, 158, 176, &zone4_styles);
 
     // Zone 5: (Red)
-    INIT_SECTION_STYLE(zone5, lv_palette_main(LV_PALETTE_RED));
-    ADD_SECTION(176, 195, zone5);
+    init_section_styles(&zone5_styles, lv_palette_main(LV_PALETTE_RED));
+    add_section(scale, 176, 195, &zone5_styles);
 
     needle_line = lv_line_create(scale);
 

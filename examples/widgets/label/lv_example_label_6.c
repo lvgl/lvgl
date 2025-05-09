@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_LABEL && LV_BUILD_EXAMPLES
+#if LV_USE_LABEL && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_20
 
 static bool fix_w_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc, uint32_t letter,
                                 uint32_t letter_next)
