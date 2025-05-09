@@ -254,12 +254,14 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
+
     if(fdsc->stride == 0) dsc_out->stride = 0;
     else {
-        /*font_dsc stride is is e.g. 4 to align to 4 byte boundary.
-         *In glyph_dsc store the actual line length*/
+        /*e.g. font_dsc stride ==  4 means align to 4 byte boundary.
+         *In glyph_dsc store the actual line length in bytes*/
         dsc_out->stride = LV_ROUND_UP(dsc_out->box_w, fdsc->stride);
     }
+
     dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
     dsc_out->gid.index = gid;
