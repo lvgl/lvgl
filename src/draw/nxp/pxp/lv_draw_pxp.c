@@ -375,7 +375,6 @@ static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
 static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
@@ -395,13 +394,13 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_pxp_fill(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_fill(t);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_pxp_img(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_img(t);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_pxp_layer(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_layer(t);
             break;
         default:
             break;

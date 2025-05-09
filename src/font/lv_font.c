@@ -115,6 +115,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->adv_w = 0;
 #endif
 
+    dsc_out->stride = 0;
     dsc_out->resolved_font = NULL;
     dsc_out->box_h = font_p->line_height;
     dsc_out->ofs_x = 0;
@@ -166,6 +167,11 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
                      && lv_strcmp(ft_info_1->name, ft_info_2->name) == 0);
 
     return is_equal;
+}
+
+bool lv_font_has_static_bitmap(const lv_font_t * font)
+{
+    return font->static_bitmap;
 }
 
 /**********************
