@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_SCALE && LV_BUILD_EXAMPLES
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_12 && LV_FONT_MONTSERRAT_16 && LV_FONT_MONTSERRAT_20
 
 #include <string.h>
 

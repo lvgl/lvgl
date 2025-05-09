@@ -71,16 +71,16 @@ static void init_section_styles(section_styles_t * styles, lv_color_t color)
     lv_style_set_arc_width(&styles->main, 20);
 }
 
-static void add_section(lv_obj_t * scale,
+static void add_section(lv_obj_t * target_scale,
                         int32_t from,
                         int32_t to,
                         const section_styles_t * styles)
 {
-    lv_scale_section_t * sec = lv_scale_add_section(scale);
-    lv_scale_set_section_range(scale, sec, from, to);
-    lv_scale_set_section_style_items(scale, sec, &styles->items);
-    lv_scale_set_section_style_indicator(scale, sec, &styles->indicator);
-    lv_scale_set_section_style_main(scale, sec, &styles->main);
+    lv_scale_section_t * sec = lv_scale_add_section(target_scale);
+    lv_scale_set_section_range(target_scale, sec, from, to);
+    lv_scale_set_section_style_items(target_scale, sec, &styles->items);
+    lv_scale_set_section_style_indicator(target_scale, sec, &styles->indicator);
+    lv_scale_set_section_style_main(target_scale, sec, &styles->main);
 }
 
 void lv_example_scale_10(void)
