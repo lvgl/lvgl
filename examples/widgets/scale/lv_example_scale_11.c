@@ -25,7 +25,7 @@ static void label_color_cb(lv_event_t * e)
     }
 }
 
-void lv_example_scale_sun_hours(void)
+void lv_example_scale_11(void)
 {
     lv_obj_t * bg = lv_obj_create(lv_screen_active());
     lv_obj_set_size(bg, 210, 210);
