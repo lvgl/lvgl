@@ -138,6 +138,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->box_w = 0;
     dsc_out->adv_w = 0;
 #endif
+
     dsc_out->stride = 0;
     dsc_out->resolved_font = NULL;
     dsc_out->box_h = font_p->line_height;
