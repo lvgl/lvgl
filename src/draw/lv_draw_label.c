@@ -216,7 +216,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                                       const lv_area_t * coords,
                                       lv_draw_glyph_cb_t cb)
 {
-    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
+    lv_draw_dsc_base_t base_dsc = dsc->base;
     const lv_font_t * font = dsc->font;
     int32_t w;
 
@@ -235,19 +235,13 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        if(base_dsc->obj && !lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+        if(base_dsc.obj && !lv_obj_has_flag(base_dsc.obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             w = dsc->text_size.x;
         }
         else {
-            lv_text_attributes_t attributes = {0};
-
-            attributes.letter_space = dsc->letter_space;
-            attributes.line_space = dsc->line_space;
-            attributes.max_width = LV_COORD_MAX;
-            attributes.text_flags = dsc->flag;
-
             lv_point_t p;
-            lv_text_get_size_attributes(&p, dsc->text, dsc->font, &attributes);
+            lv_text_get_size(&p, dsc->text, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
+                             dsc->flag);
             w = p.x;
         }
     }
