@@ -165,7 +165,7 @@ if (LV_BUILD_SET_CONFIG_OPTS)
         --defs ${CONF_DEFINES}
         --include ${LVGL_ROOT_DIR} ${CMAKE_SOURCE_DIR} ${LVGL_ROOT_DIR}/src ${CONF_INC_DIR}
         RESULT_VARIABLE ret
-        )
+    )
     if(NOT "${ret}" STREQUAL "0")
         message(FATAL_ERROR "preprocess_lv_conf_internal.py failed with return code: ${ret}")
     endif()
@@ -187,7 +187,7 @@ if (LV_BUILD_SET_CONFIG_OPTS)
         ${PARENT_SCOPE_ARG}
         ${GEN_VARS_KCONFIG_MODE_FLAG}
         RESULT_VARIABLE ret
-        )
+    )
 
     if(NOT "${ret}" STREQUAL "0")
         message(FATAL_ERROR "generate_cmake_variables.py command failed with return code: ${ret}")
