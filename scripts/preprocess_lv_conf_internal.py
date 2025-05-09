@@ -166,7 +166,7 @@ def main():
         print("Failed to locate pcpp - installing it")
         venv_path = init_venv(args.workfolder)
         pcpp_exe = install_pcpp_in_venv(venv_path)
-        if pcpp_exe == None:
+        if pcpp_exe is None:
             exit(1)
 
     preprocess_file(pcpp_exe, args.input, args.tmp_file, args.output, args.include, args.defs)
