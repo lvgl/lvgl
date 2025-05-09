@@ -256,7 +256,7 @@ endif()
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
-# Set LV_BUILD_CONF_PATH so os.cmake knows about it before compiling lvgl
+# Set LV_BUILD_CONF_PATH so os_desktop.cmake knows about it before compiling lvgl
 # Used to preprocess lv_conf_internal.h with the test config
 set(LV_BUILD_CONF_PATH "${LVGL_TEST_DIR}/src/lv_test_conf.h" CACHE STRING "set test configuration")
 set(CONFIG_LV_BUILD_TEST ON CACHE BOOL "Enable the building of tests")
@@ -284,7 +284,7 @@ if (TARGET lvgl_demos)
 endif()
 
 
-# LVGL_CONF_DIR and LVGL_CONF_PATH are normalized and set by os.cmake
+# LVGL_CONF_DIR and LVGL_CONF_PATH are normalized and set by os_desktop.cmake
 
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
