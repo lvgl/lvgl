@@ -7,6 +7,7 @@ Renderers and GPUs
 
     sw
     arm2d
+    eve
     nema_gfx
     nxp_pxp
     nxp_vglite_gpu
