@@ -1304,9 +1304,6 @@
 /** Build the demos */
 #define LV_BUILD_DEMOS 1
 
-/** Build the tests */
-#define LV_BUILD_TEST 1
-
 /*===================
  * DEMO USAGE
  ====================*/

@@ -4215,19 +4215,6 @@
     #endif
 #endif
 
-/** Build the tests */
-#ifndef LV_BUILD_TEST
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_BUILD_TEST
-            #define LV_BUILD_TEST CONFIG_LV_BUILD_TEST
-        #else
-            #define LV_BUILD_TEST 0
-        #endif
-    #else
-        #define LV_BUILD_TEST 1
-    #endif
-#endif
-
 /*===================
  * DEMO USAGE
  ====================*/
