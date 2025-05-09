@@ -22,6 +22,7 @@
 
 #include "../../lv_draw_label_private.h"
 #include "../../../stdlib/lv_string.h"
+#include "../../../font/lv_font_fmt_txt_private.h"
 
 /*********************
  *      DEFINES
@@ -52,6 +53,8 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
  *  STATIC VARIABLES
  **********************/
 
+static bool _use_static_bitmap = false;
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -70,6 +73,12 @@ void lv_draw_vglite_label(vglite_draw_task_t * vglite_task)
     const lv_area_t * coords = &vglite_task->t->area;
 
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)dsc->font->dsc;
+    bool src_buf_align = vglite_src_buf_aligned(fdsc->glyph_bitmap, fdsc->stride, LV_COLOR_FORMAT_A8);
+    bool static_bitmap = lv_font_has_static_bitmap(dsc->font);
+
+    _use_static_bitmap = src_buf_align & static_bitmap;
 
     lv_draw_label_iterate_characters(vglite_task->t, dsc, coords, _draw_vglite_letter);
 }
@@ -127,11 +136,10 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                         return;
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-                    const bool static_bitmap = lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font);
                     const void * mask_buf = NULL;
                     const lv_draw_buf_t * draw_buf = NULL;
                     uint32_t mask_stride;
-                    if(!static_bitmap) {
+                    if(!_use_static_bitmap) {
                         draw_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         if(draw_buf != NULL) {
                             mask_buf = draw_buf->data;
@@ -162,7 +170,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     /* Set matrix. */
                     vglite_set_translation_matrix(&blend_area);
 
-                    if(!static_bitmap)
+                    if(!_use_static_bitmap)
                         lv_draw_buf_invalidate_cache(draw_buf, &mask_area);
 
                     _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);

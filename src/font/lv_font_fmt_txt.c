@@ -251,6 +251,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
     dsc_out->format = (uint8_t)fdsc->bpp;
+    dsc_out->stride = fdsc->stride;
     if(fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
         /*Offset in the enum to the ALIGNED values */
         dsc_out->format += LV_FONT_GLYPH_FORMAT_A1_ALIGNED - LV_FONT_GLYPH_FORMAT_A1;
