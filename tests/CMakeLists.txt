@@ -259,11 +259,11 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 # Set LV_BUILD_CONF_PATH so os_desktop.cmake knows about it before compiling lvgl
 # Used to preprocess lv_conf_internal.h with the test config
 set(LV_BUILD_CONF_PATH "${LVGL_TEST_DIR}/src/lv_test_conf.h" CACHE STRING "set test configuration")
-set(CONFIG_LV_BUILD_TEST ON CACHE BOOL "Enable the building of tests")
 
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${LVGL_CXX_COMPILE_OPTIONS}>)
+target_compile_definitions(lvgl PUBLIC LV_BUILD_TEST)
 if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>:${LVGL_C_COMPILE_OPTIONS}>)
 endif()
@@ -336,7 +336,7 @@ add_library(test_common
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
-target_compile_definitions(test_common PRIVATE ${LVGL_COMPILER_DEFINES})
+target_compile_definitions(test_common PRIVATE LV_BUILD_TEST ${LVGL_COMPILER_DEFINES})
 
 # Generate one test executable for each source file pair.
 # The sources in ${CMAKE_CURRENT_BINARY_DIR} is auto-generated, the
@@ -470,8 +470,8 @@ endif()
 if (TEST_LIBS_FILES)
     add_library(test_libs STATIC ${TEST_LIBS_FILES})
     target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} "src/test_libs")
+    target_compile_definitions(test_libs PRIVATE LV_BUILD_TEST ${LVGL_COMPILER_DEFINES})
     target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
-    target_compile_definitions(test_libs PRIVATE ${LVGL_COMPILER_DEFINES})
     list(APPEND TEST_LIBS test_libs)
 endif()
 

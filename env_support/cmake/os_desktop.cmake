@@ -32,7 +32,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 option(CONFIG_LV_BUILD_DEMOS "Build demos" ON)
 option(CONFIG_LV_BUILD_EXAMPLES "Build examples" ON)
-option(CONFIG_LV_BUILD_TEST "Build tests" OFF)
 option(CONFIG_LV_USE_THORVG_INTERNAL "Use the internal version of ThorVG" ON)
 option(CONFIG_LV_USE_PRIVATE_API "If set - install the private headers" OFF)
 
@@ -69,10 +68,6 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp
 # Build LVGL library
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
-
-if (CONFIG_LV_BUILD_TEST)
-    target_compile_definitions(lvgl PUBLIC LV_BUILD_TEST)
-endif()
 
 if (NOT LV_BUILD_USE_KCONFIG)
 

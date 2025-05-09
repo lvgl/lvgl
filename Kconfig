@@ -2066,12 +2066,6 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 	endmenu
 
-	menu "Tests"
-		config LV_BUILD_TESTS
-			bool "Build the unit tests"
-			default n
-	endmenu
-
 	menu "Demos"
 		config LV_BUILD_DEMOS
 			bool "Build demos"
