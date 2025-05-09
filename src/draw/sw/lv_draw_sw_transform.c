@@ -77,8 +77,8 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
 
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 static void transform_rgb565a8_swapped(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
-    int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-    int32_t x_end, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa);
+                                       int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                       int32_t x_end, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa);
 #endif
 
 #if LV_DRAW_SW_SUPPORT_A8
@@ -277,8 +277,8 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
             case LV_COLOR_FORMAT_RGB565_SWAPPED:
                 transform_rgb565a8_swapped(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
-                                   (uint16_t *)dest_buf,
-                                   alpha_buf, true, aa);
+                                           (uint16_t *)dest_buf,
+                                           alpha_buf, true, aa);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_RGB565A8
@@ -753,31 +753,24 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
 
 #if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 
-static inline uint16_t LV_ATTRIBUTE_FAST_MEM swap_rgb(uint16_t c)
-{
-    return (c >> 8) | (c << 8);
-}
-
-static void transform_rgb565a8_swapped(const uint8_t *src, int32_t src_w, int32_t src_h, int32_t src_stride,
+static void transform_rgb565a8_swapped(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                        int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                                       int32_t x_end, uint16_t *cbuf, uint8_t *abuf, bool src_has_a8, bool aa)
+                                       int32_t x_end, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
 
-    const lv_opa_t *src_alpha = src + src_stride * src_h;
+    const lv_opa_t * src_alpha = src + src_stride * src_h;
     int32_t alpha_stride = src_stride / 2;
 
-    for (int32_t x = 0; x < x_end; x++)
-    {
+    for(int32_t x = 0; x < x_end; x++) {
         xs_ups = xs_ups_start + ((xs_step * x) >> 8);
         ys_ups = ys_ups_start + ((ys_step * x) >> 8);
 
         int32_t xs_int = xs_ups >> 8;
         int32_t ys_int = ys_ups >> 8;
 
-        if (xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h)
-        {
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
             abuf[x] = 0x00;
             continue;
         }
@@ -786,94 +779,80 @@ static void transform_rgb565a8_swapped(const uint8_t *src, int32_t src_w, int32_
         int32_t ys_fract = ys_ups & 0xFF;
 
         int32_t x_next, y_next;
-        if (xs_fract < 0x80)
-        {
+        if(xs_fract < 0x80) {
             x_next = -1;
             xs_fract = (0x7F - xs_fract) * 2;
         }
-        else
-        {
+        else {
             x_next = 1;
             xs_fract = (xs_fract - 0x80) * 2;
         }
-        if (ys_fract < 0x80)
-        {
+        if(ys_fract < 0x80) {
             y_next = -1;
             ys_fract = (0x7F - ys_fract) * 2;
         }
-        else
-        {
+        else {
             y_next = 1;
             ys_fract = (ys_fract - 0x80) * 2;
         }
 
-        const uint16_t *src_tmp_u16 = (const uint16_t *)(src + (ys_int * src_stride) + xs_int * 2);
-        uint16_t px_center = swap_rgb(src_tmp_u16[0]);
-        cbuf[x] = swap_rgb(px_center); // write back as swapped
+        const uint16_t * src_tmp_u16 = (const uint16_t *)(src + (ys_int * src_stride) + xs_int * 2);
+        uint16_t px_center = lv_color_swap_16(src_tmp_u16[0]);
+        cbuf[x] = lv_color_swap_16(px_center); // write back as swapped
 
-        if (aa &&
-            xs_int + x_next >= 0 &&
-            xs_int + x_next <= src_w - 1 &&
-            ys_int + y_next >= 0 &&
-            ys_int + y_next <= src_h - 1)
-        {
+        if(aa &&
+           xs_int + x_next >= 0 &&
+           xs_int + x_next <= src_w - 1 &&
+           ys_int + y_next >= 0 &&
+           ys_int + y_next <= src_h - 1) {
 
-            uint16_t px_hor = swap_rgb(src_tmp_u16[x_next]);
-            uint16_t px_ver = swap_rgb(*(const uint16_t *)((const uint8_t *)src_tmp_u16 + (y_next * src_stride)));
+            uint16_t px_hor = lv_color_swap_16(src_tmp_u16[x_next]);
+            uint16_t px_ver = lv_color_swap_16(*(const uint16_t *)((const uint8_t *)src_tmp_u16 + (y_next * src_stride)));
 
-            if (src_has_a8)
-            {
-                const lv_opa_t *src_alpha_tmp = src_alpha + (ys_int * alpha_stride) + xs_int;
+            if(src_has_a8) {
+                const lv_opa_t * src_alpha_tmp = src_alpha + (ys_int * alpha_stride) + xs_int;
                 abuf[x] = src_alpha_tmp[0];
 
                 lv_opa_t a_hor = src_alpha_tmp[x_next];
                 lv_opa_t a_ver = src_alpha_tmp[y_next * alpha_stride];
 
-                if (a_ver != abuf[x])
+                if(a_ver != abuf[x])
                     a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
-                if (a_hor != abuf[x])
+                if(a_hor != abuf[x])
                     a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
                 abuf[x] = (a_ver + a_hor) >> 1;
 
-                if (abuf[x] == 0x00)
+                if(abuf[x] == 0x00)
                     continue;
             }
-            else
-            {
+            else {
                 abuf[x] = 0xff;
             }
 
-            if (px_center != px_ver || px_center != px_hor)
-            {
+            if(px_center != px_ver || px_center != px_hor) {
                 uint16_t v = lv_color_16_16_mix(px_ver, px_center, ys_fract);
                 uint16_t h = lv_color_16_16_mix(px_hor, px_center, xs_fract);
                 uint16_t blended = lv_color_16_16_mix(h, v, LV_OPA_50);
-                cbuf[x] = swap_rgb(blended); // write blended, swapped
+                cbuf[x] = lv_color_swap_16(blended); // write blended, swapped
             }
         }
-        else
-        {
+        else {
             lv_opa_t a;
-            if (src_has_a8)
-            {
-                const lv_opa_t *src_alpha_tmp = src_alpha + (ys_int * alpha_stride) + xs_int;
+            if(src_has_a8) {
+                const lv_opa_t * src_alpha_tmp = src_alpha + (ys_int * alpha_stride) + xs_int;
                 a = src_alpha_tmp[0];
             }
-            else
-            {
+            else {
                 a = 0xff;
             }
 
-            if ((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))
-            {
+            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
                 abuf[x] = (a * (0xFF - xs_fract)) >> 8;
             }
-            else if ((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))
-            {
+            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
                 abuf[x] = (a * (0xFF - ys_fract)) >> 8;
             }
-            else
-            {
+            else {
                 abuf[x] = a;
             }
         }
