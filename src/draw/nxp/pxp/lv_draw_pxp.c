@@ -203,6 +203,11 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 {
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
+    bool is_tiled = draw_dsc->tile;
+    /* Tiled image (repeat image) is currently not supported. */
+    if(is_tiled)
+        return false;
+
     bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
     bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                           draw_dsc->scale_y != LV_SCALE_NONE);
@@ -291,9 +296,6 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
                     return 0;
 
-                if(draw_dsc->tile)
-                    return 0;
-
                 if((!_pxp_src_cf_supported(img_dsc->header.cf)) ||
                    (!pxp_buf_aligned(img_dsc->data, img_dsc->header.stride)))
                     return 0;
@@ -375,7 +377,6 @@ static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
 static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
@@ -395,13 +396,13 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_pxp_fill(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_fill(t);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_pxp_img(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_img(t);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_pxp_layer(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_layer(t);
             break;
         default:
             break;
