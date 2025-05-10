@@ -42,6 +42,12 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 
 #include "lvgl.h"
 
+#if LV_WAYLAND_USE_DMABUF
+    #include "drm/drm_fourcc.h"
+    #include "linux-dmabuf-unstable-v1-client-protocol.h"
+    #include "linux-explicit-synchronization-unstable-v1-client-protocol.h"
+#endif
+
 #if !LV_WAYLAND_WL_SHELL
     #include "wayland_xdg_shell.h"
     #define LV_WAYLAND_XDG_SHELL 1
@@ -134,13 +140,38 @@ struct seat {
     } xkb;
 };
 
+
+
+#define MAX_BUFFER_PLANES 4
+struct buffer {
+    int busy;
+
+#if LV_WAYLAND_USE_DMABUF
+    struct window * window;
+    int plane_count;
+
+    int dmabuf_fds[MAX_BUFFER_PLANES];
+    uint32_t strides[MAX_BUFFER_PLANES];
+    uint32_t offsets[MAX_BUFFER_PLANES];
+    struct wl_buffer * buffer;
+
+    struct zwp_linux_buffer_release_v1 * buffer_release;
+#endif
+
+    void * buf_base[MAX_BUFFER_PLANES];
+    lv_draw_buf_t * lv_draw_buf;
+};
+
 struct graphic_object {
     struct window * window;
 
     struct wl_surface * surface;
     bool surface_configured;
+    struct buffer * buffers[LV_WAYLAND_BUF_COUNT];
+#if !LV_WAYLAND_USE_DMABUF
     smm_buffer_t * pending_buffer;
     smm_group_t * buffer_group;
+#endif
     struct wl_subsurface * subsurface;
 
     enum object_type type;
@@ -172,7 +203,9 @@ struct application {
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
 #endif
-
+#if LV_WAYLAND_USE_DMABUF
+    struct zwp_linux_dmabuf_v1 * dmabuf;
+#endif
     uint32_t shm_format;
 
     struct xkb_context * xkb_context;
@@ -192,7 +225,7 @@ struct application {
 
 struct window {
     lv_display_t * lv_disp;
-    lv_draw_buf_t * lv_disp_draw_buf;
+
 
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
@@ -1258,6 +1291,25 @@ static const struct xdg_wm_base_listener xdg_wm_base_listener = {
 };
 #endif
 
+#if LV_WAYLAND_USE_DMABUF
+static void
+dmabuf_modifiers(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dmabuf,
+                 uint32_t format, uint32_t modifier_hi, uint32_t modifier_lo)
+{
+    struct application * app = data;
+}
+
+static void
+dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dmabuf, uint32_t format)
+{
+    /* XXX: deprecated */
+}
+
+static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener = {
+    dmabuf_format,
+    dmabuf_modifiers
+};
+#endif
 
 static void handle_global(void * data, struct wl_registry * registry,
                           uint32_t name, const char * interface, uint32_t version)
@@ -1292,6 +1344,15 @@ static void handle_global(void * data, struct wl_registry * registry,
         /* Explicitly support version 4 of the xdg protocol */
         app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 4);
         xdg_wm_base_add_listener(app->xdg_wm, &xdg_wm_base_listener, app);
+    }
+#endif
+#if LV_WAYLAND_USE_DMABUF
+    else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
+        if(version < 3)
+            return;
+        app->dmabuf = wl_registry_bind(app->registry,
+                                       name, &zwp_linux_dmabuf_v1_interface, 3);
+        zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener, app);
     }
 #endif
 }
@@ -1594,19 +1655,19 @@ static struct graphic_object * create_graphic_obj(struct application * app, stru
         LV_LOG_ERROR("cannot create surface for graphic object");
         goto err_free;
     }
-
+#if !LV_WAYLAND_USE_DMABUF
     obj->buffer_group = smm_create();
     if(obj->buffer_group == NULL) {
         LV_LOG_ERROR("cannot create buffer group for graphic object");
         goto err_destroy_surface;
     }
-
-    obj->window = window;
-    obj->type = type;
-    obj->surface_configured = true;
     obj->pending_buffer = NULL;
     wl_surface_set_user_data(obj->surface, obj);
     SMM_TAG(obj->buffer_group, TAG_LOCAL, obj);
+#endif
+    obj->window = window;
+    obj->type = type;
+    obj->surface_configured = true;
 
     return obj;
 
@@ -1627,7 +1688,9 @@ static void destroy_graphic_obj(struct graphic_object * obj)
     }
 
     wl_surface_destroy(obj->surface);
+#if !LV_WAYLAND_USE_DMABUF
     smm_destroy(obj->buffer_group);
+#endif
     lv_free(obj);
 }
 
@@ -1927,6 +1990,133 @@ static void detach_decoration(struct window * window,
 }
 #endif
 
+#if LV_WAYLAND_USE_DMABUF
+static void
+buffer_release(void * data, struct wl_buffer * buffer)
+{
+    struct buffer * buf = data;
+    buf->busy = 0;
+}
+
+static const struct wl_buffer_listener buffer_listener = {
+    buffer_release
+};
+
+static void
+create_succeeded(void * data,
+                 struct zwp_linux_buffer_params_v1 * params,
+                 struct wl_buffer * new_buffer)
+{
+    struct buffer * buffer = data;
+    buffer->buffer = new_buffer;
+    /* When not using explicit synchronization listen to wl_buffer.release
+     * for release notifications, otherwise we are going to use
+     * zwp_linux_buffer_release_v1. */
+    wl_buffer_add_listener(buffer->buffer, &buffer_listener,
+                           buffer);
+
+    zwp_linux_buffer_params_v1_destroy(params);
+}
+
+static void
+create_failed(void * data, struct zwp_linux_buffer_params_v1 * params)
+{
+    struct buffer * buffer = data;
+
+    buffer->buffer = NULL;
+    zwp_linux_buffer_params_v1_destroy(params);
+
+    fprintf(stderr, "Error: zwp_linux_buffer_params.create failed.\n");
+}
+
+static const struct zwp_linux_buffer_params_v1_listener params_listener = {
+    create_succeeded,
+    create_failed
+};
+
+static lv_result_t create_window_buffers(struct window * window)
+{
+    static uint32_t flags = 0;
+    int status = LV_RESULT_OK;
+    struct zwp_linux_buffer_params_v1 * params;
+    int stride = lv_draw_buf_width_to_stride(window->width,
+                                             lv_display_get_color_format(window->lv_disp));
+
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        struct buffer * buffer = calloc(1, sizeof(struct buffer));
+        u_int32_t drmcf = 0;
+
+        window->body->buffers[i] = buffer;
+        buffer->window = window;
+        buffer->lv_draw_buf = lv_draw_buf_create(
+                                  window->width, window->height,
+                                  lv_display_get_color_format(window->lv_disp),
+                                  stride);
+
+        buffer->strides[0] = stride;
+        buffer->dmabuf_fds[0] = lv_draw_buf_get_fd(buffer->lv_draw_buf);
+        buffer->buf_base[0] = buffer->lv_draw_buf->data;
+        params = zwp_linux_dmabuf_v1_create_params(window->application->dmabuf);
+
+        switch(lv_display_get_color_format(window->lv_disp)) {
+            case LV_COLOR_FORMAT_XRGB8888:
+                drmcf = DRM_FORMAT_XRGB8888;
+                break;
+            case LV_COLOR_FORMAT_ARGB8888:
+                drmcf = DRM_FORMAT_ARGB8888;
+                break;
+            case LV_COLOR_FORMAT_RGB565:
+                drmcf = DRM_FORMAT_RGB565;
+                break;
+            default:
+                drmcf = DRM_FORMAT_ARGB8888;
+        }
+
+        zwp_linux_buffer_params_v1_add(params,
+                                       buffer->dmabuf_fds[0],
+                                       0,
+                                       buffer->offsets[0],
+                                       buffer->strides[0],
+                                       0,
+                                       0);
+
+        zwp_linux_buffer_params_v1_add_listener(params, &params_listener, buffer);
+        zwp_linux_buffer_params_v1_create(params,
+                                          window->width,
+                                          window->height,
+                                          drmcf,
+                                          flags);
+    }
+
+    wl_display_roundtrip(application.display);
+
+    return status;
+}
+static void
+buffer_free(struct buffer * buf)
+{
+    if(buf->buffer_release)
+        zwp_linux_buffer_release_v1_destroy(buf->buffer_release);
+
+    if(buf->buffer)
+        wl_buffer_destroy(buf->buffer);
+
+    if(buf->lv_draw_buf)
+        lv_draw_buf_destroy(buf->lv_draw_buf);
+}
+
+static void destroy_window_buffers(struct window * window)
+{
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        if(window->body->buffers[i] != NULL) {
+            buffer_free(window->body->buffers[i]);
+            free(window->body->buffers[i]);
+            window->body->buffers[i] = NULL;
+        }
+    }
+}
+#endif
+
 static bool resize_window(struct window * window, int width, int height)
 {
     struct smm_buffer_t * body_buf1;
@@ -1936,7 +2126,6 @@ static bool resize_window(struct window * window, int width, int height)
 #if LV_WAYLAND_WINDOW_DECORATIONS
     int b;
 #endif
-
 
     window->width = width;
     window->height = height;
@@ -1950,12 +2139,14 @@ static bool resize_window(struct window * window, int width, int height)
 
     bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
+#if !LV_WAYLAND_USE_DMABUF
     /* Update size for newly allocated buffers */
     smm_resize(window->body->buffer_group, ((width * bpp) * height) * 2);
-
+#endif
     window->body->width = width;
     window->body->height = height;
 
+#if !LV_WAYLAND_USE_DMABUF
     /* Pre-allocate two buffers for the window body here */
     body_buf1 = smm_acquire(window->body->buffer_group);
     body_buf2 = smm_acquire(window->body->buffer_group);
@@ -1970,7 +2161,7 @@ static bool resize_window(struct window * window, int width, int height)
     smm_release(body_buf1);
     smm_release(body_buf2);
 
-
+#endif
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->application->opt_disable_decorations && !window->fullscreen) {
         for(b = 0; b < NUM_DECORATIONS; b++) {
@@ -2000,14 +2191,29 @@ static bool resize_window(struct window * window, int width, int height)
     height = window->body->height;
 
     if(window->lv_disp != NULL) {
+#if LV_WAYLAND_BUF_COUNT == 1
         /* Resize draw buffer */
         stride = lv_draw_buf_width_to_stride(width,
                                              lv_display_get_color_format(window->lv_disp));
 
-        window->lv_disp_draw_buf = lv_draw_buf_reshape(
-                                       window->lv_disp_draw_buf,
-                                       lv_display_get_color_format(window->lv_disp),
-                                       width, height / LVGL_DRAW_BUFFER_DIV, stride);
+        lv_draw_buf_destroy(window->body->buffers[0]->lv_draw_buf);
+
+        window->body->buffers[0]->lv_draw_buf = lv_draw_buf_create(
+                                                    width,
+                                                    height / LVGL_DRAW_BUFFER_DIV,
+                                                    lv_display_get_color_format(window->lv_disp),
+                                                    stride);
+
+        lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf, NULL);
+#else
+        destroy_window_buffers(window);
+        if(create_window_buffers(window) != LV_RESULT_OK) {
+            return false;
+        }
+
+        lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf,
+                                    window->body->buffers[1]->lv_draw_buf);
+#endif
 
         lv_display_set_resolution(window->lv_disp, width, height);
 
@@ -2046,6 +2252,10 @@ static struct window * create_window(struct application * app, int width, int he
     if(!window->body) {
         LV_LOG_ERROR("cannot create window body");
         goto err_free_window;
+    }
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        window->body->buffers[i] = lv_malloc(sizeof(struct buffer));
+        lv_memset(window->body->buffers[i], 0x00, sizeof(struct buffer));
     }
 
     // Create shell surface
@@ -2154,6 +2364,32 @@ static void destroy_window(struct window * window)
     destroy_graphic_obj(window->body);
 }
 
+#if LV_WAYLAND_USE_DMABUF
+static struct buffer * _lv_wayland_acquire_buffer(struct window * window, unsigned char * color_p)
+{
+
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        struct buffer * buffer = window->body->buffers[i];
+        if(buffer->buf_base[0] == color_p && buffer->busy == 0) {
+            return buffer;
+        }
+    }
+
+    while(1) {
+        wl_display_roundtrip(application.display);
+
+        for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+            struct buffer * buffer = window->body->buffers[i];
+            if(buffer->buf_base[0] == color_p && buffer->busy == 0) {
+                return buffer;
+            }
+        }
+    }
+
+    return NULL;
+}
+#endif
+
 static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
     void * buf_base;
@@ -2162,7 +2398,9 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
     int32_t src_height;
     struct window * window;
     struct application * app;
+#if !LV_WAYLAND_USE_DMABUF
     smm_buffer_t * buf;
+#endif
     struct wl_callback * cb;
     lv_display_rotation_t rot;
     uint8_t bpp;
@@ -2175,7 +2413,6 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
 
     window = lv_display_get_user_data(disp);
     app = window->application;
-    buf = window->body->pending_buffer;
     src_width = lv_area_get_width(area);
     src_height = lv_area_get_height(area);
     bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
@@ -2196,6 +2433,38 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
     else if((area->x2 < 0) || (area->y2 < 0) || (area->x1 > hres - 1) || (area->y1 > vres - 1)) {
         goto skip;
     }
+
+#if LV_WAYLAND_USE_DMABUF
+    struct buffer * buf = _lv_wayland_acquire_buffer(window, color_p);
+
+    if(!buf) {
+        LV_LOG_ERROR("cannot acquire a wayland window body buffer");
+        goto skip;
+    }
+
+    lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
+
+    /* Mark surface damage */
+    wl_surface_damage(window->body->surface,
+                      area->x1,
+                      area->y1,
+                      src_width,
+                      src_height);
+
+    if(lv_display_flush_is_last(disp)) {
+        /* Finally, attach buffer and commit to surface */
+        wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
+        wl_surface_commit(window->body->surface);
+        window->frame_done = false;
+
+        cb = wl_surface_frame(window->body->surface);
+        wl_callback_add_listener(cb, &wl_surface_frame_listener, window->body);
+
+        buf->busy = 1;
+        window->flush_pending = true;
+    }
+#else
+    buf = window->body->pending_buffer;
 
     /* Acquire and map a buffer to attach/commit to surface */
     if(buf == NULL) {
@@ -2253,10 +2522,11 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
 
         window->flush_pending = true;
     }
-
+#endif
     lv_display_flush_ready(disp);
     return;
 skip:
+#if !LV_WAYLAND_USE_DMABUF
     if(buf != NULL) {
         /* Cleanup any intermediate state (in the event that this flush being
          * skipped is in the middle of a flush sequence)
@@ -2266,6 +2536,7 @@ skip:
         smm_release(buf);
         window->body->pending_buffer = NULL;
     }
+#endif
 }
 
 static void _lv_wayland_handle_input(void)
@@ -2482,11 +2753,14 @@ static void wayland_deinit(void)
     struct window * window = NULL;
 
     LV_LL_READ(&application.window_ll, window) {
+#if LV_WAYLAND_USE_DMABUF
+        destroy_window_buffers(window);
+#endif
+
         if(!window->closed) {
             destroy_window(window);
         }
 
-        lv_draw_buf_destroy(window->lv_disp_draw_buf);
         lv_display_delete(window->lv_disp);
     }
 
@@ -2594,15 +2868,26 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     stride = lv_draw_buf_width_to_stride(hor_res,
                                          lv_display_get_color_format(window->lv_disp));
 
-    window->lv_disp_draw_buf = lv_draw_buf_create(
-                                   hor_res,
-                                   ver_res / LVGL_DRAW_BUFFER_DIV,
-                                   lv_display_get_color_format(window->lv_disp),
-                                   stride);
-
-
-    lv_display_set_draw_buffers(window->lv_disp, window->lv_disp_draw_buf, NULL);
+#if LV_WAYLAND_BUF_COUNT == 1
+    window->body->buffers[0]->lv_draw_buf = lv_draw_buf_create(
+                                                hor_res,
+                                                ver_res / LVGL_DRAW_BUFFER_DIV,
+                                                lv_display_get_color_format(window->lv_disp),
+                                                stride);
+    lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf, NULL);
     lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+#else
+    if(create_window_buffers(window) != LV_RESULT_OK) {
+        return NULL;;
+    }
+
+    lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf,
+                                window->body->buffers[1]->lv_draw_buf);
+    lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_FULL);
+
+#endif
+
     lv_display_set_flush_cb(window->lv_disp, _lv_wayland_flush);
     lv_display_set_user_data(window->lv_disp, window);
 
@@ -2844,9 +3129,10 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
 /**
  * Wayland specific timer handler (use in place of LVGL lv_timer_handler)
  */
-bool lv_wayland_timer_handler(void)
+int32_t lv_wayland_timer_handler(void)
 {
     struct window * window;
+    uint32_t idle_time;
 
     /* Wayland input handling - it will also trigger the frame done handler */
     _lv_wayland_handle_input();
@@ -2864,7 +3150,7 @@ bool lv_wayland_timer_handler(void)
             poll(&application.wayland_pfd, 1, -1);
 
             /* Resume lvgl on the next cycle */
-            return false;
+            return -1;
 
         }
         else if(window != NULL && window->body->surface_configured == false) {
@@ -2892,12 +3178,12 @@ bool lv_wayland_timer_handler(void)
             /* Destroy graphical context and execute close_cb */
             _lv_wayland_handle_output();
             wayland_deinit();
-            return false;
+            return -1;
         }
     }
 
     /* LVGL handling */
-    lv_timer_handler();
+    idle_time = lv_timer_handler(); /*Returns the time to the next timer execution*/
 
     /* Wayland output handling */
     _lv_wayland_handle_output();
@@ -2913,7 +3199,7 @@ bool lv_wayland_timer_handler(void)
         }
     }
 
-    return true;
+    return idle_time;
 }
 
 #endif /* LV_USE_WAYLAND */
