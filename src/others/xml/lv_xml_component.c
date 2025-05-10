@@ -106,6 +106,8 @@ lv_xml_component_ctx_t * lv_xml_component_get_ctx(const char * component_name)
     return NULL;
 }
 
+#include <stdio.h>
+
 lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def)
 {
     bool globals = false;
@@ -132,6 +134,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
                      XML_ErrorString(XML_GetErrorCode(parser)),
                      (unsigned long)XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
+        lv_free((char *)state.ctx.extends);
         return LV_RESULT_INVALID;
     }
 
@@ -229,6 +232,7 @@ lv_result_t lv_xml_component_unregister(const char * name)
 
     lv_free((char *)ctx->name);
     lv_free((char *)ctx->view_def);
+    lv_free((char *)ctx->extends);
 
     lv_xml_const_t * cnst;
     LV_LL_READ(&ctx->const_ll, cnst) {
@@ -634,7 +638,6 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
 
     if(lv_streq(name, "widget")) state->ctx.is_widget = 1;
 
-
     /* Process elements based on current context */
     switch(state->section) {
         case LV_XML_PARSER_SECTION_API:
@@ -646,10 +649,12 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <consts>*/
             process_const_element(state, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_GRAD:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <gradients>*/
             process_grad_element(state, name, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_GRAD_STOP:
             process_grad_stop_element(state, attrs);
             break;
@@ -658,10 +663,12 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             lv_xml_style_register(&state->ctx, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_FONTS:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             process_font_element(state, name, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_IMAGES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             process_image_element(state, name, attrs);
