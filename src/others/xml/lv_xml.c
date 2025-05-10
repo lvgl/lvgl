@@ -143,11 +143,6 @@ void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent
 
     state.item = state.view;
 
-    if(attrs) {
-        lv_widget_processor_t * proc = lv_xml_widget_get_extended_widget_processor(ctx->extends);
-        proc->apply_cb(&state, attrs);
-    }
-
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
 
@@ -164,7 +159,9 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
         lv_xml_parser_state_t state;
         lv_xml_parser_state_init(&state);
         state.parent = parent;
-        state.ctx.name = "";
+        /*When a widget is just created there is no context where
+         *its styles, constants, etc are stored. So use the global context.*/
+        state.ctx = *lv_xml_component_get_ctx("globals");
         state.item = p->create_cb(&state, attrs);
         if(attrs) {
             p->apply_cb(&state, attrs);
@@ -175,6 +172,21 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     lv_xml_component_ctx_t * ctx = lv_xml_component_get_ctx(name);
     if(ctx) {
         item = lv_xml_create_from_ctx(parent, NULL, ctx, attrs);
+
+        if(attrs) {
+            lv_xml_parser_state_t state;
+            lv_xml_parser_state_init(&state);
+            state.parent = parent;
+            state.item = item;
+
+            /*When a component is just created there is no context where
+             *its styles, constants, etc are stored. So use the global context.*/
+            state.ctx = *lv_xml_component_get_ctx("globals");
+
+            p = lv_xml_widget_get_extended_widget_processor(ctx->extends);
+            p->apply_cb(&state, attrs);
+        }
+
         return item;
     }
 
