@@ -377,6 +377,21 @@
     #endif
 #endif
 
+/** Thread priority of the drawing task.
+ *  Higher values mean higher priority.
+ *  Can use values from lv_thread_prio_t enum in lv_os.h: LV_THREAD_PRIO_LOWEST,
+ *  LV_THREAD_PRIO_LOW, LV_THREAD_PRIO_MID, LV_THREAD_PRIO_HIGH, LV_THREAD_PRIO_HIGHEST
+ *  Make sure the priority value aligns with the OS-specific priority levels.
+ *  On systems with limited priority levels (e.g., FreeRTOS), a higher value can improve
+ *  rendering performance but might cause other tasks to starve. */
+#ifndef LV_DRAW_THREAD_PRIO
+    #ifdef CONFIG_LV_DRAW_THREAD_PRIO
+        #define LV_DRAW_THREAD_PRIO CONFIG_LV_DRAW_THREAD_PRIO
+    #else
+        #define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW

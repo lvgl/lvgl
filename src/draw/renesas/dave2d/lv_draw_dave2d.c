@@ -99,7 +99,7 @@ void lv_draw_dave2d_init(void)
     lv_ll_init(&_ll_Dave2D_Tasks, 4);
 
 #if LV_USE_OS
-    lv_thread_init(&draw_dave2d_unit->thread, "dave2d", LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024,
+    lv_thread_init(&draw_dave2d_unit->thread, "dave2d", LV_DRAW_THREAD_PRIO, _dave2d_render_thread_cb, 8 * 1024,
                    draw_dave2d_unit);
 #endif
 

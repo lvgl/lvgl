@@ -78,7 +78,7 @@ void lv_draw_g2d_init(void)
         LV_LOG_ERROR("g2d_open fail.\n");
     }
 #if LV_USE_G2D_DRAW_THREAD
-    lv_thread_init(&draw_g2d_unit->thread, "g2ddraw", LV_THREAD_PRIO_HIGH, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
+    lv_thread_init(&draw_g2d_unit->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
 #endif
 }
 
