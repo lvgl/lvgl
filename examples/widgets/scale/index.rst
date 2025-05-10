@@ -51,3 +51,21 @@ A horizontal scale with labels rotated and translated
 
 .. lv_example:: widgets/scale/lv_example_scale_9
   :language: c
+
+A round scale style simulating a Heart Rate monitor
+-----------------------------------------------------
+
+.. lv_example:: widgets/scale/lv_example_scale_10
+  :language: c
+
+A round scale style simulating a sunset/sunrise widget
+-----------------------------------------------------
+
+.. lv_example:: widgets/scale/lv_example_scale_11
+  :language: c
+
+Two scales for x and y axis of a bar chart
+-----------------------------------------------------
+
+.. lv_example:: widgets/scale/lv_example_scale_12
+  :language: c
