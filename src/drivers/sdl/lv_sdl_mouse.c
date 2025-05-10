@@ -12,6 +12,7 @@
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
+#include "../../indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -27,6 +28,19 @@
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data);
 static void release_indev_cb(lv_event_t * e);
 
+#if LV_USE_GESTURE_RECOGNITION
+    #define TOUCH_MAX 10
+    /* An array that stores the collected touch events */
+    static lv_indev_touch_data_t touches[TOUCH_MAX];
+
+    /* A counter that needs to be incremented each time a touch event is received */
+    static uint8_t touch_cnt;
+
+    static void lv_sdl_touch_gesture_queue_add(SDL_Event * event);
+    static void lv_sdl_touch_gesture_read(lv_indev_t * indev, lv_indev_data_t * data);
+
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -38,7 +52,10 @@ typedef struct {
 #if LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_CROWN
     int32_t diff;
 #endif
+    bool first_mouse_input;
+    int8_t finger_id;
 } lv_sdl_mouse_t;
+static bool mouse_input_exist = false;
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -49,6 +66,11 @@ lv_indev_t * lv_sdl_mouse_create(void)
     lv_sdl_mouse_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mouse_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
+    lv_indev_t * indev_finger_map = lv_indev_get_next(NULL);
+    while(indev_finger_map) {
+        indev_finger_map = lv_indev_get_next(indev_finger_map);
+        dsc->finger_id++;
+    }
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -60,6 +82,14 @@ lv_indev_t * lv_sdl_mouse_create(void)
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, sdl_mouse_read);
     lv_indev_set_driver_data(indev, dsc);
+
+    if(!mouse_input_exist) {
+        dsc->first_mouse_input = true;
+        mouse_input_exist = true;
+    }
+    else {
+        dsc->first_mouse_input = false;
+    }
 
     lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);
     lv_indev_add_event_cb(indev, release_indev_cb, LV_EVENT_DELETE, indev);
@@ -74,6 +104,11 @@ lv_indev_t * lv_sdl_mouse_create(void)
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_sdl_mouse_t * dsc = lv_indev_get_driver_data(indev);
+
+#if LV_USE_GESTURE_RECOGNITION
+    if(dsc->first_mouse_input)/*Only update for the first mouse input*/
+        lv_sdl_touch_gesture_read(indev, data);
+#endif
 
     /*Store the collected data*/
     data->point.x = dsc->last_x;
@@ -90,6 +125,9 @@ static void release_indev_cb(lv_event_t * e)
     lv_indev_t * indev = (lv_indev_t *) lv_event_get_user_data(e);
     lv_sdl_mouse_t * dsc = lv_indev_get_driver_data(indev);
     if(dsc) {
+        if(dsc->first_mouse_input) {
+            mouse_input_exist = false;
+        }
         lv_indev_set_driver_data(indev, NULL);
         lv_indev_set_read_cb(indev, NULL);
         lv_free(dsc);
@@ -100,6 +138,7 @@ static void release_indev_cb(lv_event_t * e)
 void lv_sdl_mouse_handler(SDL_Event * event)
 {
     uint32_t win_id = UINT32_MAX;
+    int indev_find_id = 0;
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
@@ -116,6 +155,10 @@ void lv_sdl_mouse_handler(SDL_Event * event)
         case SDL_FINGERUP:
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
+            indev_find_id = event->tfinger.fingerId;
+#if LV_USE_GESTURE_RECOGNITION
+            lv_sdl_touch_gesture_queue_add(event);
+#endif
 #if SDL_VERSION_ATLEAST(2,0,12)
             win_id = event->tfinger.windowID;
 #endif
@@ -131,16 +174,22 @@ void lv_sdl_mouse_handler(SDL_Event * event)
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
+    lv_sdl_mouse_t * indev_dev = NULL;
     while(indev) {
         if(lv_indev_get_read_cb(indev) == sdl_mouse_read) {
             /*If disp is NULL for any reason use the first indev with the correct type*/
-            if(disp == NULL || lv_indev_get_display(indev) == disp) break;
+            /*If more than one mouse indev are created, link it to the coresponding finger id*/
+            if((disp == NULL || lv_indev_get_display(indev) == disp) ){
+                indev_dev = lv_indev_get_driver_data(indev);
+                if(indev_dev == NULL)continue;
+                if(indev_find_id==indev_dev->finger_id)break;
+            }
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_mouse_t * indev_dev = lv_indev_get_driver_data(indev);
+    indev_dev = lv_indev_get_driver_data(indev);
     if(indev_dev == NULL) return;
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
@@ -200,5 +249,86 @@ void lv_sdl_mouse_handler(SDL_Event * event)
     }
     lv_indev_read(indev);
 }
+
+#if LV_USE_GESTURE_RECOGNITION
+
+static void lv_sdl_touch_gesture_queue_add(SDL_Event * event)
+{
+    lv_indev_touch_data_t * cur;
+    lv_indev_touch_data_t * t;
+    uint32_t time;
+    int i;
+    int id;
+    int type;
+
+    type = event->type;
+
+    id = event->tfinger.fingerId;
+    time = event->common.timestamp;
+
+    /* Get the last event for contact point */
+    t = &touches[0];
+    cur = NULL;
+
+    for(i = 0; i < touch_cnt; i++) {
+        if(t->id == id) {
+            cur = t;
+        }
+        t++;
+    }
+
+    if(cur != NULL && cur->timestamp == time) {
+        /* Previous event has the same timestamp - ignore duplicate event */
+        return;
+    }
+
+    if(cur == NULL ||
+       type == SDL_FINGERUP ||
+       type == SDL_FINGERDOWN) {
+
+        /* create new event */
+        if(touch_cnt < TOUCH_MAX) {
+            cur = &touches[touch_cnt];
+            touch_cnt++;
+        }
+        else {
+            return;
+        }
+    }
+
+    lv_display_t * disp = lv_sdl_get_disp_from_win_id(event->window.windowID);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
+    float zoom = lv_sdl_window_get_zoom(disp);
+
+    switch(type) {
+        case SDL_FINGERDOWN:
+        case SDL_FINGERMOTION:
+
+            cur->point.x = (int16_t)((float)hor_res * event->tfinger.x / zoom);
+            cur->point.y = (int16_t)((float)ver_res * event->tfinger.y / zoom);
+            cur->state = LV_INDEV_STATE_PRESSED;
+            break;
+
+        case SDL_FINGERUP:
+
+            cur->state = LV_INDEV_STATE_RELEASED;
+            cur->point.x = 0;
+            cur->point.y = 0;
+            break;
+    }
+
+    cur->timestamp = time;
+    cur->id = id;
+}
+
+static void lv_sdl_touch_gesture_read(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    lv_indev_gesture_recognizers_update(indev, &touches[0], touch_cnt);
+    touch_cnt = 0;
+    lv_indev_gesture_recognizers_set_data(indev, data);
+}
+#endif
+
 
 #endif /*LV_USE_SDL*/
