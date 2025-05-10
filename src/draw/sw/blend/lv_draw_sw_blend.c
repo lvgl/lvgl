@@ -19,6 +19,9 @@
 #if LV_DRAW_SW_SUPPORT_RGB565
     #include "lv_draw_sw_blend_to_rgb565.h"
 #endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+    #include "lv_draw_sw_blend_to_rgb565_swapped.h"
+#endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
     #include "lv_draw_sw_blend_to_argb8888.h"
 #endif
@@ -177,6 +180,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
             lv_draw_sw_blend_color_to_rgb565(fill_dsc);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            lv_draw_sw_blend_color_to_rgb565_swapped(fill_dsc);
+            break;
+#endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
         case LV_COLOR_FORMAT_ARGB8888:
             lv_draw_sw_blend_color_to_argb8888(fill_dsc);
@@ -225,6 +233,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB565A8:
             lv_draw_sw_blend_image_to_rgb565(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            lv_draw_sw_blend_image_to_rgb565_swapped(image_dsc);
             break;
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888
