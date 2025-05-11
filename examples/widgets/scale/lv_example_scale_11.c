@@ -1,8 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_12 && LV_FONT_MONTSERRAT_16 && LV_FONT_MONTSERRAT_20
 
-#include <string.h>
-
 static void label_color_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
@@ -16,8 +14,8 @@ static void label_color_cb(lv_event_t * e)
 
     const char * txt = label_dsc->text;
 
-    if(strcmp(txt, "06") == 0 || strcmp(txt, "12") == 0 ||
-       strcmp(txt, "18") == 0 || strcmp(txt, "24") == 0) {
+    if(lv_strcmp(txt, "06") == 0 || lv_strcmp(txt, "12") == 0 ||
+       lv_strcmp(txt, "18") == 0 || lv_strcmp(txt, "24") == 0) {
         label_dsc->color = lv_color_white();
     }
     else {
@@ -49,6 +47,10 @@ void lv_example_scale_11(void)
     lv_scale_set_label_show(scale, true);
     lv_obj_set_style_text_font(scale, &lv_font_montserrat_12, LV_PART_INDICATOR);
     lv_obj_set_style_pad_radial(scale, -6, LV_PART_INDICATOR);
+
+    /*Rotate the labels of the ticks*/
+    lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT,
+                                        LV_PART_INDICATOR);
 
     /* Style for major ticks */
     static lv_style_t style_ticks;

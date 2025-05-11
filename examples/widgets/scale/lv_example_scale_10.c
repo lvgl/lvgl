@@ -146,7 +146,7 @@ void lv_example_scale_10(void)
 
     lv_obj_t * hr_container = lv_obj_create(circle);
     lv_obj_center(hr_container);
-    lv_obj_set_size(hr_container, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_size(hr_container, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_opa(hr_container, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(hr_container, 0, 0);
     lv_obj_set_layout(hr_container, LV_LAYOUT_FLEX);

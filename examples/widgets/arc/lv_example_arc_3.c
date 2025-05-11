@@ -22,7 +22,6 @@ typedef struct {
 } slice_anim_data_t;
 
 static float angle_accum = 0.0f;
-static lv_obj_t * legend_container = NULL;
 static slice_info_t * active_info = NULL;
 static lv_obj_t * active_arc = NULL;
 
@@ -101,28 +100,7 @@ static void arc_click_cb(lv_event_t * e)
     lv_anim_start(&a);
 }
 
-static void create_legend_item(lv_obj_t * parent, const char * text, lv_color_t color)
-{
-    lv_obj_t * row = lv_obj_create(parent);
-    lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
-    lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_width(row, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(row, 0, LV_PART_MAIN);
-
-    lv_obj_t * color_box = lv_obj_create(row);
-    lv_obj_set_size(color_box, 20, 20);
-    lv_obj_set_style_bg_color(color_box, color, LV_PART_MAIN);
-    lv_obj_set_style_radius(color_box, 3, LV_PART_MAIN);
-    lv_obj_set_style_border_width(color_box, 0, LV_PART_MAIN);
-    lv_obj_remove_flag(color_box, LV_OBJ_FLAG_SCROLLABLE);
-
-    lv_obj_t * label = lv_label_create(row);
-    lv_label_set_text(label, text);
-    lv_obj_set_style_text_font(label, &lv_font_montserrat_14, LV_PART_MAIN);
-}
-
-static void create_slice(lv_obj_t * parent, int percentage, const char * slice_category, lv_color_t color)
+static void create_slice(lv_obj_t * parent, int percentage, lv_color_t color)
 {
     if(percentage <= 0) return;
 
@@ -165,10 +143,6 @@ static void create_slice(lv_obj_t * parent, int percentage, const char * slice_c
     info->home.x = lv_obj_get_x(arc);
     info->home.y = lv_obj_get_y(arc);
     lv_obj_add_event_cb(arc, arc_click_cb, LV_EVENT_CLICKED, info);
-
-    /* Create chart legend */
-    if(legend_container && slice_category)
-        create_legend_item(legend_container, slice_category, color);
 }
 
 void lv_example_arc_3(void)
@@ -186,35 +160,23 @@ void lv_example_arc_3(void)
     lv_obj_set_style_bg_opa(root, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_remove_flag(root, LV_OBJ_FLAG_SCROLLABLE);
 
-    /* Chart container */
-    lv_obj_t * chart_container = lv_obj_create(root);
-    lv_obj_set_size(chart_container, CHART_SIZE + 2 * SLICE_OFFSET, CHART_SIZE + 2 * SLICE_OFFSET);
-    lv_obj_set_style_pad_all(chart_container, 0, LV_PART_MAIN);
-    lv_obj_set_style_margin_all(chart_container, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(chart_container, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_color(chart_container, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(chart_container, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_remove_flag(chart_container, LV_OBJ_FLAG_SCROLLABLE);
-
-    /* Legend container */
-    legend_container = lv_obj_create(root);
-    lv_obj_set_size(legend_container, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_flex_flow(legend_container, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(legend_container, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(legend_container, 5, LV_PART_MAIN);
-    lv_obj_set_style_pad_column(legend_container, 8, LV_PART_MAIN);
-    lv_obj_set_style_border_width(legend_container, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_color(legend_container, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(legend_container, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_remove_flag(legend_container, LV_OBJ_FLAG_SCROLLABLE);
+    /* Slices container */
+    lv_obj_t * slices_container = lv_obj_create(root);
+    lv_obj_set_size(slices_container, CHART_SIZE + 2 * SLICE_OFFSET, CHART_SIZE + 2 * SLICE_OFFSET);
+    lv_obj_set_style_pad_all(slices_container, 0, LV_PART_MAIN);
+    lv_obj_set_style_margin_all(slices_container, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(slices_container, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_color(slices_container, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(slices_container, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_remove_flag(slices_container, LV_OBJ_FLAG_SCROLLABLE);
 
     /* Create slices */
     angle_accum = 0.0f;
-    create_slice(chart_container, 12, "Clothes", lv_palette_main(LV_PALETTE_RED));
-    create_slice(chart_container, 18, "Leisure", lv_palette_main(LV_PALETTE_BLUE));
-    create_slice(chart_container, 26, "Food",    lv_palette_main(LV_PALETTE_GREEN));
-    create_slice(chart_container, 24, "Savings", lv_palette_main(LV_PALETTE_ORANGE));
-    create_slice(chart_container, 20, "Health",  lv_palette_main(LV_PALETTE_BLUE_GREY));
+    create_slice(slices_container, 12, lv_palette_main(LV_PALETTE_RED));
+    create_slice(slices_container, 18, lv_palette_main(LV_PALETTE_BLUE));
+    create_slice(slices_container, 26, lv_palette_main(LV_PALETTE_GREEN));
+    create_slice(slices_container, 24, lv_palette_main(LV_PALETTE_ORANGE));
+    create_slice(slices_container, 20, lv_palette_main(LV_PALETTE_BLUE_GREY));
 }
 
 #endif
