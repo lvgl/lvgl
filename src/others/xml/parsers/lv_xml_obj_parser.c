@@ -61,7 +61,9 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         size_t name_len = lv_strlen(name);
 
 #if LV_USE_OBJ_NAME
-        if(lv_streq("name", name)) lv_obj_set_name(item, value);
+        if(lv_streq("name", name)) {
+            lv_obj_set_name(item, value);
+        }
 #endif
         if(lv_streq("x", name)) lv_obj_set_x(item, lv_xml_to_size(value));
         else if(lv_streq("y", name)) lv_obj_set_y(item, lv_xml_to_size(value));

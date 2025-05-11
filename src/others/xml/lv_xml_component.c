@@ -93,6 +93,19 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
     lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(ctx->extends);
     extended_proc->apply_cb(state, attrs);
 
+
+#if LV_USE_OBJ_NAME
+    /*Set a default indexed name*/
+    if(state->item) {
+        const char * value_of_name = lv_xml_get_value_of(attrs, "name");
+        if(value_of_name) lv_obj_set_name(item, value_of_name);
+        else {
+            char name_buf[128];
+            lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
+            lv_obj_set_name(state->item, name_buf);
+        }
+    }
+#endif
     return item;
 }
 
