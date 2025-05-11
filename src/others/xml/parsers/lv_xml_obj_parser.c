@@ -123,7 +123,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("styles", name)) lv_xml_style_add_to_obj(state, item, value);
 
         else if(lv_streq("bind_checked", name)) {
-            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject) {
                 lv_obj_bind_checked(item, subject);
             }
@@ -158,7 +158,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
                     LV_LOG_WARN("Reference value is missing in lv_obj bind_flag");
                 }
                 else {
-                    lv_subject_t * subject = lv_xml_get_subject(&state->ctx, subject_str);
+                    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
                     if(subject == NULL) {
                         LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj bind_flag", value);
                     }
@@ -197,7 +197,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
                     LV_LOG_WARN("Reference value is missing in lv_obj bind_state");
                 }
                 else {
-                    lv_subject_t * subject = lv_xml_get_subject(&state->ctx, subject_str);
+                    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
                     if(subject == NULL) {
                         LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj bind_state", value);
                     }
@@ -305,9 +305,9 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(bg_grad_color, lv_xml_to_color(value));
     else SET_STYLE_IF(bg_main_stop, lv_xml_atoi(value));
     else SET_STYLE_IF(bg_grad_stop, lv_xml_atoi(value));
-    else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(&state->ctx, value));
+    else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(&state->scope, value));
 
-    else SET_STYLE_IF(bg_image_src, lv_xml_get_image(&state->ctx, value));
+    else SET_STYLE_IF(bg_image_src, lv_xml_get_image(&state->scope, value));
     else SET_STYLE_IF(bg_image_tiled, lv_xml_to_bool(value));
     else SET_STYLE_IF(bg_image_recolor, lv_xml_to_color(value));
     else SET_STYLE_IF(bg_image_recolor_opa, lv_xml_to_opa(value));
@@ -331,7 +331,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(shadow_opa, lv_xml_to_opa(value));
 
     else SET_STYLE_IF(text_color, lv_xml_to_color(value));
-    else SET_STYLE_IF(text_font, lv_xml_get_font(&state->ctx, value));
+    else SET_STYLE_IF(text_font, lv_xml_get_font(&state->scope, value));
     else SET_STYLE_IF(text_opa, lv_xml_to_opa(value));
     else SET_STYLE_IF(text_align, lv_xml_text_align_to_enum(value));
     else SET_STYLE_IF(text_letter_space, lv_xml_atoi(value));
@@ -353,7 +353,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(arc_opa, lv_xml_to_opa(value));
     else SET_STYLE_IF(arc_width, lv_xml_atoi(value));
     else SET_STYLE_IF(arc_rounded, lv_xml_to_bool(value));
-    else SET_STYLE_IF(arc_image_src, lv_xml_get_image(&state->ctx, value));
+    else SET_STYLE_IF(arc_image_src, lv_xml_get_image(&state->scope, value));
 
     else SET_STYLE_IF(opa, lv_xml_to_opa(value));
     else SET_STYLE_IF(opa_layered, lv_xml_to_opa(value));
@@ -371,7 +371,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
-    else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(&state->ctx, value));
+    else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(&state->scope, value));
     else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
     else SET_STYLE_IF(recolor, lv_xml_to_color(value));
     else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));

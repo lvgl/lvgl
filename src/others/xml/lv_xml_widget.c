@@ -77,7 +77,7 @@ lv_widget_processor_t * lv_xml_widget_get_extended_widget_processor(const char *
         proc = lv_xml_widget_get_processor(extends);
         if(proc) break;
 
-        lv_xml_component_ctx_t * extended_component = lv_xml_component_get_ctx(extends);
+        lv_xml_component_scope_t * extended_component = lv_xml_component_get_scope(extends);
         if(extended_component) {
             extends = extended_component->extends;
         }
