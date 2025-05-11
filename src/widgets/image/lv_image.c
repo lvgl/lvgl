@@ -884,7 +884,26 @@ static void draw_image(lv_event_t * e)
             label_dsc.base.layer = layer;
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
             label_dsc.text = img->src;
-            lv_draw_label(layer, &label_dsc, &obj->coords);
+            lv_area_t * coords;
+            lv_area_t aligned_coords;
+            const bool image_area_is_same_as_coords = img->w == lv_area_get_width(&obj->coords)
+                                                      && img->h == lv_area_get_height(&obj->coords);
+            const bool needs_inner_alignment = img->align > LV_IMAGE_ALIGN_TOP_LEFT
+                                               && !image_area_is_same_as_coords;
+            const bool has_offset = img->offset.x || img->offset.y;
+            const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
+            if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
+                lv_point_t text_size;
+                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
+                                 label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+                lv_area_set(&aligned_coords, 0, 0, text_size.x, text_size.y);
+                lv_area_align(&obj->coords, &aligned_coords, img->align, img->offset.x, img->offset.y);
+                coords = &aligned_coords;
+            }
+            else {
+                coords = &obj->coords;
+            }
+            lv_draw_label(layer, &label_dsc, coords);
         }
         else if(img->src == NULL) {
             /*Do not need to draw image when src is NULL*/
