@@ -27,7 +27,7 @@ extern "C" {
 
 typedef  void * (*lv_xml_component_process_cb_t)(lv_obj_t * parent, const char * data, const char ** attrs);
 
-struct _lv_xml_component_ctx_t {
+struct _lv_xml_component_scope_t {
     const char * name;
     lv_ll_t style_ll;
     lv_ll_t const_ll;
@@ -40,7 +40,7 @@ struct _lv_xml_component_ctx_t {
     const char * view_def;
     const char * extends;
     uint32_t is_widget : 1;                         /*1: not component but widget registered as a component for preview*/
-    struct _lv_xml_component_ctx_t * next;
+    struct _lv_xml_component_scope_t * next;
 };
 
 typedef struct {
@@ -75,9 +75,9 @@ void lv_xml_component_init(void);
 
 /**
  * Initialize the linked lists of a component context
- * @param ctx       pointer to a component contexts
+ * @param scope     pointer to a component contexts
  */
-void lv_xml_component_ctx_init(lv_xml_component_ctx_t * ctx);
+void lv_xml_component_scope_init(lv_xml_component_scope_t * scope);
 
 /**********************
  *      MACROS
