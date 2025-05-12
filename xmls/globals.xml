@@ -153,7 +153,7 @@
 	    <prop name="base_dir" type="enum:lv_base_dir"/>
 
 	    <prop name="bg_color" type="color"/>
-	    <prop name="bg_opa" type="int"/>
+	    <prop name="bg_opa" type="opa"/>
 	    <prop name="bg_grad_dir" type="enum:lv_grad_dir"/>
 	    <prop name="bg_main_stop" type="int"/>
 	    <prop name="bg_grad_stop" type="int"/>
@@ -162,48 +162,48 @@
 	    <prop name="bg_image_src" type="image"/>
 	    <prop name="bg_image_tiled" type="bool"/>
 	    <prop name="bg_image_recolor" type="color"/>
-	    <prop name="bg_image_recolor_opa" type="int"/>
+	    <prop name="bg_image_recolor_opa" type="opa"/>
 
 	    <prop name="border_color" type="color"/>
 	    <prop name="border_width" type="int"/>
-	    <prop name="border_opa" type="int"/>
+	    <prop name="border_opa" type="opa"/>
 	    <prop name="border_side" type="enum:lv_border_side"/>
 	    <prop name="border_post" type="bool"/>
 
 	    <prop name="outline_color" type="color"/>
 	    <prop name="outline_width" type="int"/>
-	    <prop name="outline_opa" type="int"/>
+	    <prop name="outline_opa" type="opa"/>
 	    <prop name="outline_pad" type="int"/>
 
 	    <prop name="shadow_width" type="int"/>
 	    <prop name="shadow_color" type="color"/>
-	    <prop name="shadow_opa" type="int"/>
+	    <prop name="shadow_opa" type="opa"/>
 	    <prop name="shadow_offset_x" type="int"/>
 	    <prop name="shadow_offset_y" type="int"/>
 	    <prop name="shadow_spread" type="int"/>
 
 	    <prop name="text_color" type="color"/>
-	    <prop name="text_opa" type="int"/>
+	    <prop name="text_opa" type="opa"/>
 	    <prop name="text_font" type="font"/>
 	    <prop name="text_align" type="enum:lv_text_align"/>
 	    <prop name="text_letter_space" type="int"/>
 	    <prop name="text_line_space" type="int"/>
 	    <prop name="text_decor" type="enum:lv_text_decor"/>
 
-	    <prop name="image_opa" type="int"/>
+	    <prop name="image_opa" type="opa"/>
 	    <prop name="image_recolor" type="color"/>
-	    <prop name="image_recolor_opa" type="int"/>
+	    <prop name="image_recolor_opa" type="opa"/>
 
 	    <prop name="line_width" type="int"/>
 	    <prop name="line_color" type="color"/>
-	    <prop name="line_opa" type="int"/>
+	    <prop name="line_opa" type="opa"/>
 	    <prop name="line_dash_width" type="int"/>
 	    <prop name="line_dash_gap" type="int"/>
 	    <prop name="line_rounded" type="bool"/>
 
 	    <prop name="arc_width" type="int"/>
 	    <prop name="arc_color" type="color"/>
-	    <prop name="arc_opa" type="int"/>
+	    <prop name="arc_opa" type="opa"/>
 	    <prop name="arc_rounded" type="bool"/>
 	    <prop name="arc_image_src" type="image"/>
 
@@ -224,9 +224,9 @@
 	    <prop name="grid_cell_row_span" type="int"/>
 	    <prop name="grid_cell_y_align" type="enum:lv_grid_align"/>
 
-	    <prop name="opa" type="int"/>
-	    <prop name="opa_layered" type="int"/>
-	    <prop name="color_filter_opa" type="int"/>
+	    <prop name="opa" type="opa"/>
+	    <prop name="opa_layered" type="opa"/>
+	    <prop name="color_filter_opa" type="opa"/>
 	    <prop name="anim_duration" type="int"/>
 	    <prop name="blend_mode" type="enum:lv_blend_mode"/>
 	    <prop name="transform_width" type="int"/>
