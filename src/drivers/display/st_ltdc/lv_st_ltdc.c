@@ -13,9 +13,9 @@
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
     #include "ltdc.h"
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
     #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
     #define LTDC_PIXEL_FORMAT_ARGB8888 LTDC_FMT_ARGB8888
     #define LTDC_PIXEL_FORMAT_RGB888  LTDC_FMT_RGB888
@@ -37,9 +37,9 @@
     #if LV_USE_DRAW_DMA2D
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
     #endif /*LV_USE_DRAW_DMA2D*/
-    #if !defined(LV_OS_CHIBIOS)
+    #if LV_USE_OS != LV_OS_CHIBIOS
         #include "dma2d.h"
-    #elif defined(LV_OS_CHIBIOS)
+    #elif LV_USE_OS == LV_OS_CHIBIOS
         #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
     #endif /*LV_OS_CHIBIOS*/
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
@@ -67,16 +67,16 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void flush_wait_cb(lv_display_t * disp);
 static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf);
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
     static void reload_event_callback(LTDC_HandleTypeDef * hltdc);
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
     static void reload_event_callback(void);
 #endif
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
-    #if !defined(LV_OS_CHIBIOS)
+    #if LV_USE_OS != LV_OS_CHIBIOS
         static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d);
-    #elif defined(LV_OS_CHIBIOS)
+    #elif LV_USE_OS == LV_OS_CHIBIOS
         static void transfer_complete_callback(void);
     #endif
     static uint32_t get_dma2d_output_cf_from_layer_cf(uint32_t cf);
@@ -132,12 +132,12 @@ lv_display_t * lv_st_ltdc_create_partial(void * render_buf_1, void * render_buf_
 static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32_t layer_idx,
                              lv_display_render_mode_t mode)
 {
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
     LTDC_LayerCfgTypeDef * layer_cfg = &hltdc.LayerCfg[layer_idx];
     uint32_t layer_width = layer_cfg->ImageWidth;
     uint32_t layer_height = layer_cfg->ImageHeight;
     uint32_t layer_cf = layer_cfg->PixelFormat;
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
     const LTDCConfig * layer_cfg = LTDCD1.config;
     uint32_t layer_width = layer_cfg->screen_width;
     uint32_t layer_height = layer_cfg->screen_height;
@@ -155,9 +155,9 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
         lv_display_set_buffers(disp, buf1, buf2, layer_width * layer_height * cf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
 
         if(buf1 != NULL && buf2 != NULL) {
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
             HAL_LTDC_RegisterCallback(&hltdc, HAL_LTDC_RELOAD_EVENT_CB_ID, reload_event_callback);
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
             nvicEnableVector(LTDC_IRQn, 11);
             LTDC->IER |= LTDC_IER_RRIE;
 #endif
@@ -168,9 +168,9 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
         lv_display_set_buffers(disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
         hdma2d.XferCpltCallback = transfer_complete_callback;
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
         nvicEnableVector(DMA2D_IRQn, 11);
 #endif
         SYNC_INIT(layer_idx);
@@ -187,11 +187,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
         if(lv_display_is_double_buffered(disp) && lv_display_flush_is_last(disp)) {
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
             HAL_LTDC_SetAddress_NoReload(&hltdc, (uint32_t)px_map, layer_idx);
             g_data.layer_interrupt_is_owned[layer_idx] = true;
             HAL_LTDC_Reload(&hltdc, LTDC_RELOAD_VERTICAL_BLANKING);
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
             ltdcBgSetFrameAddress(&LTDCD1, (uint32_t *)px_map);
             g_data.layer_interrupt_is_owned[layer_idx] = true;
             ltdcStartReload(&LTDCD1, false);
@@ -202,17 +202,17 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         }
     }
     else {
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
         LTDC_LayerCfgTypeDef * layer_cfg = &hltdc.LayerCfg[layer_idx];
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
         const LTDCConfig * layer_cfg = LTDCD1.config;
 #endif
 
         lv_color_format_t cf = lv_display_get_color_format(disp);
         int32_t disp_width = disp->hor_res;
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
         uint8_t * fb = (uint8_t *) layer_cfg->FBStartAdress;
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
         uint8_t * fb = (uint8_t *)layer_cfg->bg_laycfg->frame->bufferp;
 #endif
         uint32_t px_size = lv_color_format_get_size(cf);
@@ -228,9 +228,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         if(rotation == LV_DISPLAY_ROTATION_0) {
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
             uint32_t dma2d_input_cf = get_dma2d_input_cf_from_lv_cf(cf);
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
             uint32_t dma2d_output_cf = get_dma2d_output_cf_from_layer_cf(layer_cfg->PixelFormat);
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
             uint32_t dma2d_output_cf = get_dma2d_output_cf_from_layer_cf(layer_cfg->bg_laycfg->frame->fmt);
 #endif
             while(DMA2D->CR & DMA2D_CR_START);
@@ -242,9 +242,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             DMA2D->OOR = disp_width - area_width;
             DMA2D->NLR = (area_width << DMA2D_NLR_PL_Pos) | (area_height << DMA2D_NLR_NL_Pos);
             g_data.dma2d_interrupt_owner = layer_idx + 1;
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
             DMA2D->CR = DMA2D_CR_START | DMA2D_CR_TCIE | (0x1U << DMA2D_CR_MODE_Pos); /* memory-to-memory with PFC */
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
             DMA2D->CR = DMA2D_CR_TCIE | (0x1U << DMA2D_CR_MODE_Pos);
             dma2dJobStart(&DMA2DD1);
 #endif
@@ -293,9 +293,9 @@ static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf)
             LV_ASSERT_MSG(0, "the LTDC color format is not supported");
     }
 }
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
     static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
     static void reload_event_callback(void)
 #endif
 {
@@ -308,7 +308,7 @@ static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf)
     }
 }
 
-#if defined(LV_OS_CHIBIOS)
+#if LV_USE_OS == LV_OS_CHIBIOS
 void reload_event_callback_handler(void)
 {
     reload_event_callback();
@@ -316,9 +316,9 @@ void reload_event_callback_handler(void)
 #endif
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
-#if !defined(LV_OS_CHIBIOS)
+#if LV_USE_OS != LV_OS_CHIBIOS
     static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d)
-#elif defined(LV_OS_CHIBIOS)
+#elif LV_USE_OS == LV_OS_CHIBIOS
     static void transfer_complete_callback(void)
 #endif
 {
@@ -330,7 +330,7 @@ void reload_event_callback_handler(void)
         SYNC_SIGNAL_ISR(owner);
     }
 }
-#if defined(LV_OS_CHIBIOS)
+#if LV_USE_OS == LV_OS_CHIBIOS
 void transfer_complete_callback_handler(void)
 {
     transfer_complete_callback();
