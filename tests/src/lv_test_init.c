@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || LV_BUILD_TEST_PERF
 #include "lv_test_init.h"
 #include <stdio.h>
 #include <stdlib.h>
