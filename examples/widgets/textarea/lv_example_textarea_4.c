@@ -26,10 +26,10 @@ void lv_example_textarea_4(void)
     lv_style_set_bg_opa(&style_underline, LV_OPA_TRANSP);
     lv_style_set_border_color(&style_underline, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_border_side(&style_underline, LV_BORDER_SIDE_BOTTOM);
-    lv_style_set_pad_hor(&style_underline, 1); // set width of cursor using pad
-    lv_style_set_border_width(&style_underline, 3); // set thickness of underline cursor
+    lv_style_set_pad_hor(&style_underline, 1); /* set width of cursor using pad */
+    lv_style_set_border_width(&style_underline, 3); /* set thickness of underline cursor */
 
-    /* Full block cursor with many styles*/
+    /* Full block cursor with many styles */
     lv_style_init(&style_block);
     lv_style_set_bg_opa(&style_block, LV_OPA_COVER);
     lv_style_set_bg_color(&style_block, lv_palette_main(LV_PALETTE_ORANGE));
@@ -40,7 +40,7 @@ void lv_example_textarea_4(void)
     lv_style_set_border_width(&style_block, 1);
     lv_style_set_radius(&style_block, 4);
     lv_style_set_text_color(&style_block, lv_color_white());
-    lv_style_set_pad_all(&style_block, 1); // set width of cursor using pad
+    lv_style_set_pad_all(&style_block, 1); /* set width of cursor using pad */
 
     /* Create 3 independent textareas, each with a unique styled cursor */
     create_styled_textarea_cursor("This is a simple red cursor", 10,  &style_simple);

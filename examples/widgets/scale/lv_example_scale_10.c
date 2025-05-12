@@ -22,11 +22,11 @@ static section_styles_t zone5_styles;
 
 static lv_color_t get_hr_zone_color(int32_t hr)
 {
-    if(hr < 117) return lv_palette_main(LV_PALETTE_GREY);      // Zone 1
-    else if(hr < 135) return lv_palette_main(LV_PALETTE_BLUE); // Zone 2
-    else if(hr < 158) return lv_palette_main(LV_PALETTE_GREEN);// Zone 3
-    else if(hr < 176) return lv_palette_main(LV_PALETTE_ORANGE);// Zone 4
-    else return lv_palette_main(LV_PALETTE_RED);               // Zone 5
+    if(hr < 117) return lv_palette_main(LV_PALETTE_GREY); /* Zone 1 */
+    else if(hr < 135) return lv_palette_main(LV_PALETTE_BLUE); /* Zone 2 */
+    else if(hr < 158) return lv_palette_main(LV_PALETTE_GREEN); /* Zone 3 */
+    else if(hr < 176) return lv_palette_main(LV_PALETTE_ORANGE); /* Zone 4 */
+    else return lv_palette_main(LV_PALETTE_RED); /* Zone 5 */
 }
 
 static void hr_anim_timer_cb(lv_timer_t * timer)
@@ -101,29 +101,29 @@ void lv_example_scale_10(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_obj_set_style_arc_width(scale, 0, LV_PART_MAIN);
 
-    // Zone 1: (Grey)
+    /* Zone 1: (Grey) */
     init_section_styles(&zone1_styles, lv_palette_main(LV_PALETTE_GREY));
     add_section(scale, 98, 117, &zone1_styles);
 
-    // Zone 2: (Blue)
+    /* Zone 2: (Blue) */
     init_section_styles(&zone2_styles, lv_palette_main(LV_PALETTE_BLUE));
     add_section(scale, 117, 135, &zone2_styles);
 
-    // Zone 3: (Green)
+    /* Zone 3: (Green) */
     init_section_styles(&zone3_styles, lv_palette_main(LV_PALETTE_GREEN));
     add_section(scale, 135, 158, &zone3_styles);
 
-    // Zone 4: (Orange)
+    /* Zone 4: (Orange) */
     init_section_styles(&zone4_styles, lv_palette_main(LV_PALETTE_ORANGE));
     add_section(scale, 158, 176, &zone4_styles);
 
-    // Zone 5: (Red)
+    /* Zone 5: (Red) */
     init_section_styles(&zone5_styles, lv_palette_main(LV_PALETTE_RED));
     add_section(scale, 176, 195, &zone5_styles);
 
     needle_line = lv_line_create(scale);
 
-    // Optional styling
+    /* Optional styling */
     lv_obj_set_style_line_color(needle_line, lv_color_black(), LV_PART_MAIN);
     lv_obj_set_style_line_width(needle_line, 12, LV_PART_MAIN);
     lv_obj_set_style_length(needle_line, 20, LV_PART_MAIN);
