@@ -961,6 +961,15 @@
     #endif
 #endif
 
+/* Use EVE FT81X GPU. */
+#ifndef LV_USE_DRAW_EVE
+    #ifdef CONFIG_LV_USE_DRAW_EVE
+        #define LV_USE_DRAW_EVE CONFIG_LV_USE_DRAW_EVE
+    #else
+        #define LV_USE_DRAW_EVE 0
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

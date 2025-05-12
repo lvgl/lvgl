@@ -505,6 +505,10 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
+
+		config LV_USE_DRAW_EVE
+			bool "Use EVE FT81X GPU."
+			default n
 	endmenu
 
 	menu "Feature Configuration"
