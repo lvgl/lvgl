@@ -233,7 +233,7 @@ static THD_FUNCTION(IdleStatThread, arg)
     }
 }
 
-void idleStatInit(void)
+static void idleStatInit(void)
 {
     static bool initialized = false;
 
