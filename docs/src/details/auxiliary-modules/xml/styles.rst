@@ -48,31 +48,6 @@ Local styles can be used directly in a Widget, for example:
 
 
 
-Style Variants
-**************
-
-The ``<style>`` tags can have ``<variant>`` child tags:
-
-.. code-block:: xml
-
-    <styles>
-        <style name="big_button" bg_color="0xf00" border_width="1px" pad_left="10px">
-            <variant name="color" case="red" bg_color="0xf00"/>
-            <variant name="color" case="green" bg_color="0x0f0"/>
-            <variant name="color" case="blue" bg_color="0x00f"/>
-        </style>
-    </styles>
-
-``<variant>`` elements allow altering styles at runtime.
-The ``variant_<name>`` :ref:`Subjects <observer_subject>` of the Component Library
-are used for each setting, and an observer callback is generated with all the style
-properties valid for that variant.  The observer callback first resets the style and
-then sets all the properties.
-
-This feature is not supported yet.
-
-
-
 Gradients
 *********
 
