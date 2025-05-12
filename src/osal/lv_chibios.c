@@ -33,7 +33,7 @@ lv_result_t lv_thread_init(lv_thread_t * pxThread, const char * const name,
 {
     pxThread->pTaskArg = xAttr;
     pxThread->pvStartRoutine = pvStartRoutine;
-    pxThread->pThreadHandle = chThdCreateFromHeap(NULL, usStackSize, name, xSchedPriority,
+    pxThread->pThreadHandle = chThdCreateFromHeap(NULL, usStackSize, name, (NORMALPRIO + xSchedPriority),
                                                   prvRunThread, pxThread);
     if(pxThread->pThreadHandle == NULL) {
         LV_LOG_ERROR("chThdCreateFromHeap failed!");
