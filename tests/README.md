@@ -4,7 +4,7 @@ The tests in the folder can be run locally and automatically by GitHub CI.
 
 ## Running locally
 
-### Native
+### Local
 
 1. Install requirements by:
 
