@@ -151,7 +151,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     }
                     else {
                         glyph_draw_dsc->g->req_raw_bitmap = 1;
-                        mask_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        mask_buf = lv_font_get_glyph_static_bitmap(glyph_draw_dsc->g);
                         mask_stride = lv_draw_buf_width_to_stride(glyph_draw_dsc->g->box_w, LV_COLOR_FORMAT_A8);
                     }
 
