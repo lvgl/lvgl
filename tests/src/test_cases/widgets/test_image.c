@@ -661,4 +661,48 @@ void test_image_properties(void)
 #endif
 }
 
+void test_image_symbol_normal_align(void)
+{
+    lv_obj_t * img;
+    uint32_t i;
+    lv_image_align_t aligns[] = {
+        LV_IMAGE_ALIGN_TOP_LEFT, LV_IMAGE_ALIGN_TOP_MID, LV_IMAGE_ALIGN_TOP_RIGHT,
+        LV_IMAGE_ALIGN_LEFT_MID, LV_IMAGE_ALIGN_CENTER, LV_IMAGE_ALIGN_RIGHT_MID,
+        LV_IMAGE_ALIGN_BOTTOM_LEFT, LV_IMAGE_ALIGN_BOTTOM_MID, LV_IMAGE_ALIGN_BOTTOM_RIGHT,
+    };
+
+    for(i = 0; i < 9; i++) {
+        img = img_create();
+        lv_image_set_src(img, LV_SYMBOL_IMAGE);
+        lv_obj_set_size(img, 200, 120);
+        lv_obj_set_pos(img, 30 + (i % 3) * 260, 40 + (i / 3) * 150);
+        lv_image_set_inner_align(img, aligns[i]);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_symbol_normal_align.png");
+}
+
+void test_image_symbol_normal_align_offset(void)
+{
+    lv_obj_t * img;
+    uint32_t i;
+    lv_image_align_t aligns[] = {
+        LV_IMAGE_ALIGN_TOP_LEFT, LV_IMAGE_ALIGN_TOP_MID, LV_IMAGE_ALIGN_TOP_RIGHT,
+        LV_IMAGE_ALIGN_LEFT_MID, LV_IMAGE_ALIGN_CENTER, LV_IMAGE_ALIGN_RIGHT_MID,
+        LV_IMAGE_ALIGN_BOTTOM_LEFT, LV_IMAGE_ALIGN_BOTTOM_MID, LV_IMAGE_ALIGN_BOTTOM_RIGHT,
+    };
+
+    for(i = 0; i < 9; i++) {
+        img = img_create();
+        lv_image_set_src(img, LV_SYMBOL_IMAGE);
+        lv_obj_set_size(img, 200, 120);
+        lv_obj_set_pos(img, 30 + (i % 3) * 260, 40 + (i / 3) * 150);
+        lv_image_set_inner_align(img, aligns[i]);
+        lv_image_set_offset_x(img, 10);
+        lv_image_set_offset_y(img, 15);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_symbol_normal_align_offset.png");
+}
+
 #endif

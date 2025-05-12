@@ -21,10 +21,13 @@ according to the current rotation settings of the display.
 Note that in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` the small changed areas
 are rendered directly in the frame buffer so they cannot be
 rotated later. Therefore in direct mode only the whole frame buffer can be rotated.
-The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
 
 In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` the small rendered areas
 can be rotated on their own before flushing to the frame buffer.
+
+:cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL` can work with rotation if the buffer(s)
+being rendered to are different than the buffer(s) being rotated to in the flush callback
+and the buffers being rendered to do not have a stride requirement.
 
 Below is an example for rotating when the rendering mode is
 :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the rotated image should be sent to a

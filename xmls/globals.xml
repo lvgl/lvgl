@@ -243,5 +243,7 @@
 	    <prop name="transform_skew_y" type="int"/>
 	    <prop name="bitmap_mask_src" type="image"/>
 	    <prop name="rotary_sensitivity" type="int"/>
+	    <prop name="recolor" type="color"/>
+	    <prop name="recolor_opa" type="opa"/>
 	</styledef>
 </api>
