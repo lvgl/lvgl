@@ -1098,7 +1098,7 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed)
 {
-// At least one compression method must be enabled
+    // At least one compression method must be enabled
 #if (LV_USE_LZ4 || LV_USE_RLE)
     // Check if the decompression method is enabled and valid
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
@@ -1143,7 +1143,7 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         return LV_RESULT_INVALID;
     }
 
-    img_data = decompressed->data;   
+    img_data = decompressed->data;
 
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
 #if LV_USE_RLE
