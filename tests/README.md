@@ -39,7 +39,7 @@ docker build . -f tests/Dockerfile -t lvgl_test_env
 2. Run the tests
 
 ```bash
-docker run --rm -it -v $(pwd):/work lvgl_test_env bash -c "./main.py"
+docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
 ```
 
 This ensures you are testing in a consistent environment with the same dependencies as the CI pipeline.
