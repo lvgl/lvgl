@@ -17,7 +17,7 @@ void tearDown(void)
 void test_xml_image_with_attrs(void)
 {
     LV_IMAGE_DECLARE(test_img_lvgl_logo_png);
-    lv_xml_register_image("logo", &test_img_lvgl_logo_png);
+    lv_xml_register_image(NULL, "logo", &test_img_lvgl_logo_png);
     lv_obj_t * scr = lv_screen_active();
 
     const char * image1_attrs[] = {

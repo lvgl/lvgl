@@ -122,7 +122,8 @@ static unique_ptr<LinearGradient> _applyLinearGradientProperty(SvgStyleGradient*
     //Update the stops
     stopCount = g->stops.count;
     if (stopCount > 0) {
-        stops = (Fill::ColorStop*)calloc(stopCount, sizeof(Fill::ColorStop));
+        stops = (Fill::ColorStop*)lv_zalloc(stopCount * sizeof(Fill::ColorStop));
+        LV_ASSERT_MALLOC(stops);
         if (!stops) return fillGrad;
         auto prevOffset = 0.0f;
         for (uint32_t i = 0; i < g->stops.count; ++i) {
@@ -139,7 +140,7 @@ static unique_ptr<LinearGradient> _applyLinearGradientProperty(SvgStyleGradient*
             prevOffset = stops[i].offset;
         }
         fillGrad->colorStops(stops, stopCount);
-        free(stops);
+        lv_free(stops);
     }
     return fillGrad;
 }
@@ -181,7 +182,8 @@ static unique_ptr<RadialGradient> _applyRadialGradientProperty(SvgStyleGradient*
     //Update the stops
     stopCount = g->stops.count;
     if (stopCount > 0) {
-        stops = (Fill::ColorStop*)calloc(stopCount, sizeof(Fill::ColorStop));
+        stops = (Fill::ColorStop*)lv_zalloc(stopCount * sizeof(Fill::ColorStop));
+        LV_ASSERT_MALLOC(stops);
         if (!stops) return fillGrad;
         auto prevOffset = 0.0f;
         for (uint32_t i = 0; i < g->stops.count; ++i) {
@@ -198,7 +200,7 @@ static unique_ptr<RadialGradient> _applyRadialGradientProperty(SvgStyleGradient*
             prevOffset = stops[i].offset;
         }
         fillGrad->colorStops(stops, stopCount);
-        free(stops);
+        lv_free(stops);
     }
     return fillGrad;
 }
@@ -588,14 +590,14 @@ static unique_ptr<Picture> _imageBuildHelper(SvgLoaderData& loaderData, SvgNode*
         if (encoding == imageMimeTypeEncoding::base64) {
             auto size = b64Decode(href, strlen(href), &decoded);
             if (picture->load(decoded, size, mimetype, false) != Result::Success) {
-                free(decoded);
+                lv_free(decoded);
                 TaskScheduler::async(true);
                 return nullptr;
             }
         } else {
             auto size = svgUtilURLDecode(href, &decoded);
             if (picture->load(decoded, size, mimetype, false) != Result::Success) {
-                free(decoded);
+                lv_free(decoded);
                 TaskScheduler::async(true);
                 return nullptr;
             }

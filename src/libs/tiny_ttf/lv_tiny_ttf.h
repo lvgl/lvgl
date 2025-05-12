@@ -25,6 +25,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    const char * path; /**< Path to the font file*/
+    const void * data; /**< Pointer to the font data*/
+    size_t data_size; /**< Size of the font data*/
+    size_t cache_size; /**< Size of the font cache*/
+} lv_tiny_ttf_font_src_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_tiny_ttf_font_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

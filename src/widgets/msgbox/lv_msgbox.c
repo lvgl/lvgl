@@ -43,7 +43,7 @@ const lv_obj_class_t lv_msgbox_class = {
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_msgbox_t),
-    .name = "msgbox",
+    .name = "lv_msgbox",
 };
 
 const lv_obj_class_t lv_msgbox_header_class = {
@@ -51,7 +51,7 @@ const lv_obj_class_t lv_msgbox_header_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_DPI_DEF / 3,
     .instance_size = sizeof(lv_obj_t),
-    .name = "msgbox-header",
+    .name = "lv_msgbox_header",
 };
 
 const lv_obj_class_t lv_msgbox_content_class = {
@@ -59,7 +59,7 @@ const lv_obj_class_t lv_msgbox_content_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_obj_t),
-    .name = "msgbox-content",
+    .name = "lv_msgbox_content",
 };
 
 const lv_obj_class_t lv_msgbox_footer_class = {
@@ -67,7 +67,7 @@ const lv_obj_class_t lv_msgbox_footer_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_DPI_DEF / 3,
     .instance_size = sizeof(lv_obj_t),
-    .name = "msgbox-footer",
+    .name = "lv_msgbox_footer",
 };
 
 const lv_obj_class_t lv_msgbox_footer_button_class = {
@@ -76,7 +76,7 @@ const lv_obj_class_t lv_msgbox_footer_button_class = {
     .height_def = LV_PCT(100),
     .instance_size = sizeof(lv_obj_t),
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .name = "msgbox-footer-button",
+    .name = "lv_msgbox_footer_button",
 };
 
 const lv_obj_class_t lv_msgbox_header_button_class = {
@@ -85,7 +85,7 @@ const lv_obj_class_t lv_msgbox_header_button_class = {
     .height_def = LV_PCT(100),
     .instance_size = sizeof(lv_obj_t),
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .name = "msgbox-header-button",
+    .name = "lv_msgbox_header_button",
 };
 
 const lv_obj_class_t lv_msgbox_backdrop_class = {
@@ -93,7 +93,7 @@ const lv_obj_class_t lv_msgbox_backdrop_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(100),
     .instance_size = sizeof(lv_obj_t),
-    .name = "msgbox-backdrop",
+    .name = "lv_msgbox_backdrop",
 };
 
 /**********************

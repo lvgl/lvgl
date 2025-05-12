@@ -59,6 +59,7 @@ remove the misleading guide above this code segment.
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
+   - LV_USE_DRAW_G2D
    - LV_USE_DRAW_SDL
    - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_DRAW_ARM2D_ASYNC

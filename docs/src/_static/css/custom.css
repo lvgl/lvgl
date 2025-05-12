@@ -1,0 +1,287 @@
+table, th, td {
+  border: 1px solid #bbb;
+  padding: 10px;
+}
+
+span.pre {
+  padding-right:8px;
+}
+
+span.pre {
+  padding-right: 8px;
+}
+
+span.pre:first-child {
+  padding-right: 0px;
+}
+
+code.sig-name {
+  /*margin-left:8px;*/
+}
+
+/*-------------------------------------------------------------------------
+ * `home-img` class is (at this writing) exclusively used for the large
+ * buttons on the landing page.  The rules below provide their hover
+ * movement behavior.
+ *-------------------------------------------------------------------------
+ */
+.home-img {
+  width: 32%;
+  transition: transform .3s ease-out;
+}
+
+.home-img:hover {
+  transform: translate(0, -10px);
+}
+
+/*-------------------------------------------------------------------------
+ * All `wy-...` and `rst-content` classes are classes from
+ * `sphinx_rtd_theme` `layout.html` template.
+ *-------------------------------------------------------------------------
+ * `wy-side-nav-search` class adorns the <div> element in the upper left
+ * corner of each page that contains:
+ * - the LVGL logo
+ * - documentation-version selector drop-down (matches LVGL release versions)
+ * - search TextBox
+ */
+.wy-side-nav-search {
+  background-color: #f5f5f5;
+}
+
+.wy-side-nav-search > div.version {
+  color: #333;
+  display: none;                               /*replaced by dropdown*/
+}
+
+/* `rst-content` class marks the <div> element that contains the whole
+ * visible part of the right panel where the page content is shown. */
+/*Let `code` wrap*/
+.rst-content code, .rst-content tt, code {
+  white-space: normal;
+}
+
+.wy-nav-content {
+  padding: 1.618em 3.236em;
+  height: 100%;
+  max-width: 1920px;
+  margin: auto
+}
+
+/*-------------------------------------------------------------------------
+ * `lv_example` Sections
+ *-------------------------------------------------------------------------
+ * The below contains a documented example to show the relationships of
+ * the rules below to their selected elements within the example itself.
+ *-------------------------------------------------------------------------
+ * `lv_example` sections are the output of `./docs/src/_ext/lv_example.py`
+ * custom Sphinx extension.  These are generated when the `.rst` source
+ * file contains a pattern like this:
+ *
+ *     A very simple *hello world* label    // Sphinx+docutils (.rst parser) generates
+ *     ---------------------------------    //   the <section> element and title from this.
+ *
+ *     .. lv_example:: get_started/lv_example_get_started_1  // `lv_example.py` generates the
+ *       :language: c                                        //   rest of the <section> content
+ *                                                           //   below from this.
+ *-------------------------------------------------------------------------
+ * Visible layout consists of a <section> element containing:
+ * - <h3> element with title
+ * - <div> element containing live running web-assembly example of LVGL UI
+ * - <div> element containing [> Show C Code]  [G View on GitHub] buttons
+ *     and the C code below them.
+ *
+ * <section id="a-very-simple-hello-world-label">   // Contains whole example, buttons and code.
+ *   <h3>A very simple <em>hello world</em> label...</h3>  // The title itself.
+ *   <div class="lv-example-container">             // Container for running example.
+ *     <div class="lv-example" data-real-src="..." data-is-loaded="true">
+ *       <iframe src="..."></iframe>                // Running web-assembly example.
+ *     </div>
+ *     <div class="lv-example-description"></div>   // Whole area to the right of running example.
+ *   </div>
+ *   <div class="toggle docutils container">        // Contains buttons + code;
+ *     <div class="header docutils container" ...>  // Contains buttons + code; `open` class is added to this to element "open" the code <div> element.
+ *       <p>C code &nbsp;</p>                       // [C code] "button"; JS code in `page.html` template arms this "button" with its events when `$(document).ready` event fires.
+ *       <a class="lv-example-link-button" ...>     // [View on GitHub] "button"; provides hyperlink to the example code on GitHub.
+ *         <i class="fa fa-github"></i>             // "GitHub Cat" icon
+ *         &nbsp;View on GitHub                     // text of "button"
+ *       </a>
+ *     </div>
+ *     <div class="highlight-c notranslate" ...>
+ *       <div class="highlight">
+ *         <pre>
+ *           ...                                    // Highlighted C code
+ *         </pre>
+ *       </div>
+ *     </div>
+ *   </div>
+ *   <hr>
+ * </section>
+ */
+.toggle .header {
+  display: block;
+  clear: both;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Selects <div class="header docutils container" ...> element.
+ * Places "disclosure triangle" icon + non-breaking space to its left.*/
+.toggle .header:before {
+  font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  content: "\f0da \00a0 Show ";        /* \f0da = "closed" disclosure triangle; \f00a0 = non-breaking space */
+  display: inline-block;
+  font-size: 1.1em;
+}
+
+/* Selects <div class="header docutils container" ...> element when it also contains
+ * `open` class, which class is toggled by JS code in `page.html` template. */
+.toggle .header.open:before {
+  content: "\f0d7 \00a0 Hide ";        /* \f0d7 = "open" disclosure triangle; \f00a0 = non-breaking space */
+}
+
+/* Selects the [> C code] "button". */
+.header p {
+  display: inline-block;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+
+/* Selects web-assembly example <div> and child <iframe> elements. */
+.lv-example, .lv-example > iframe {
+  border: none;
+  outline: none;
+  padding: 0;
+  display: block;
+  width: 320px;
+  height: 240px;
+  flex: none;
+  position: relative;
+}
+
+/* Selects only the <iframe> elements. */
+.lv-example > iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Selects outer example <div> container elements. */
+.lv-example-container {
+  display: flex;
+  padding-bottom: 16px;
+}
+
+/* Selects <div class="lv-example-description"></div>
+ * which is the whole area to the right of running example. */
+.lv-example-description {
+  flex: 1 1 auto;
+  margin-left: 1rem;
+}
+
+/* Selects [View on GitHub] "button". */
+.lv-example-link-button {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #2980b9;
+  color: white;
+  margin: 0 4px;
+}
+
+/* Selects [View on GitHub] "button" when in `:hover` state. */
+.lv-example-link-button:hover {
+  color: white;
+  filter: brightness(120%);
+}
+
+/* Selects [View on GitHub] "button" when in `:visited` state. */
+.lv-example-link-button:visited {
+  color: white;
+}
+
+/*-------------------------------------------------------------------------
+ * This doesn't select anything at this writing (29-Mar-2025).
+ *-------------------------------------------------------------------------
+ */
+dl.cpp.unexpanded dd {
+  display: none;
+}
+
+/*-------------------------------------------------------------------------
+ * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
+ *-------------------------------------------------------------------------
+ */
+.lv-api-expansion-button {
+  padding: 4px;
+}
+
+/* There are no elements that these select at this writing (29-Mar-2025). */
+.lv-api-expansion-button::before {
+  font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  display: inline-block;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+/* There are no elements that these select at this writing (29-Mar-2025). */
+.unexpanded .lv-api-expansion-button::before {
+  content: "\f0da \00a0";
+}
+
+.expanded .lv-api-expansion-button::before {
+  content: "\f0d7 \00a0";
+}
+
+/* Selects all <div> elements with "body" class.
+ * There are no elements that this selects at this writing (29-Mar-2025). */
+div.body {
+  min-width: 360px;
+  max-width: 1920px;
+}
+
+/* Selects CPP-expression content <span> elements generated from
+ * :cpp:expr:`...` Interpreted-Text-Role expressions in the `.rst` source files. */
+.cpp-expr {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
+  color: #e74c3c;
+  padding: 2px 5px;
+  border: 1px solid #e1e4e5;
+  font-size: 75%;
+}
+
+/* These replace colors present in `pygments.css` which is used in code highlighting.
+ * These are too dark to be readlable in DARK mode.  They include:
+ * .highlight .nf -- function names
+ * .highlight .nl -- code labels
+ * .descname  .n  -- API documentation function names
+ * .highlight .p  -- Punctuation
+ * .highlight     -- Plain text in a `.. code-block:: none` block
+ * The first 2 were created by lightening the `pygments.css` colors without changing their
+ * angle on the color wheel.  The added attribute "conditional" also limits this change to
+ * DARK MODE only instead of both light and dark modes.
+ */
+/* Name.Function */
+html[data-theme="dark"] .highlight .nf {
+  color: #ccd285;
+}
+
+/* Name.Label */
+html[data-theme="dark"] .highlight .nl {
+  color: #0043e2;
+}
+
+/* Name */
+html[data-theme="dark"] .descname .n {
+  color: #0a44de;
+}
+
+/* Punctuation */
+html[data-theme="dark"] .highlight .p {
+  color: #5c7c72
+}
+
+/* Plain text. */
+html[data-theme="dark"] .highlight {
+  background: #ffffff; color: #bfbfbf
+}
+

@@ -131,7 +131,8 @@ static bool _updateColorTable(SwFill* fill, const Fill* fdata, const SwSurface* 
     if (fill->solid) return true;
 
     if (!fill->ctable) {
-        fill->ctable = static_cast<uint32_t*>(malloc(GRADIENT_STOP_SIZE * sizeof(uint32_t)));
+        fill->ctable = static_cast<uint32_t*>(lv_malloc(GRADIENT_STOP_SIZE * sizeof(uint32_t)));
+        LV_ASSERT_MALLOC(fill->ctable);
         if (!fill->ctable) return false;
     }
 
@@ -857,7 +858,7 @@ const Fill::ColorStop* fillFetchSolid(const SwFill* fill, const Fill* fdata)
 void fillReset(SwFill* fill)
 {
     if (fill->ctable) {
-        free(fill->ctable);
+        lv_free(fill->ctable);
         fill->ctable = nullptr;
     }
     fill->translucent = false;
@@ -869,9 +870,9 @@ void fillFree(SwFill* fill)
 {
     if (!fill) return;
 
-    if (fill->ctable) free(fill->ctable);
+    if (fill->ctable) lv_free(fill->ctable);
 
-    free(fill);
+    lv_free(fill);
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */

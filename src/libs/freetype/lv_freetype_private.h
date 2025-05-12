@@ -28,6 +28,7 @@ extern "C" {
 #include FT_SIZES_H
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
+#include FT_STROKER_H
 
 /*********************
  *      DEFINES
@@ -91,6 +92,7 @@ struct _lv_freetype_cache_node_t {
 
     FT_Face face;
     lv_mutex_t face_lock;
+    bool face_has_kerning;
 
     /*glyph cache*/
     lv_cache_t * glyph_cache;
@@ -119,6 +121,8 @@ typedef struct _lv_freetype_font_dsc_t {
     lv_freetype_cache_node_t * cache_node;
     lv_cache_entry_t * cache_node_entry;
     FTC_FaceID face_id;
+    uint32_t outline_stroke_width;
+    lv_font_kerning_t kerning;
 } lv_freetype_font_dsc_t;
 
 /**********************

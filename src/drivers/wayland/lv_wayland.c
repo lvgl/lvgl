@@ -120,7 +120,6 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
-    lv_indev_gesture_recognizer_t recognizer;
 #endif
 };
 
@@ -169,8 +168,6 @@ struct application {
 #if LV_WAYLAND_XDG_SHELL
     struct xdg_wm_base * xdg_wm;
 #endif
-
-    const char * xdg_runtime_dir;
 
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
@@ -1227,24 +1224,9 @@ static void xdg_toplevel_handle_close(void * data, struct xdg_toplevel * xdg_top
     LV_UNUSED(xdg_toplevel);
 }
 
-static void xdg_toplevel_handle_configure_bounds(void * data, struct xdg_toplevel * xdg_toplevel,
-                                                 int32_t width, int32_t height)
-{
-
-    LV_UNUSED(width);
-    LV_UNUSED(height);
-    LV_UNUSED(data);
-    LV_UNUSED(xdg_toplevel);
-
-    /* Optional: Could set window width/height upper bounds, however, currently
-     *           we'll honor the set width/height.
-     */
-}
-
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
     .configure = xdg_toplevel_handle_configure,
     .close = xdg_toplevel_handle_close,
-    .configure_bounds = xdg_toplevel_handle_configure_bounds
 };
 
 static void xdg_wm_base_ping(void * data, struct xdg_wm_base * xdg_wm_base, uint32_t serial)
@@ -1292,8 +1274,8 @@ static void handle_global(void * data, struct wl_registry * registry,
 #endif
 #if LV_WAYLAND_XDG_SHELL
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
-        /* Explicitly support version 4 of the xdg protocol */
-        app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 4);
+        /* supporting version 2 of the XDG protocol - ensures greater compatibility */
+        app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, &xdg_wm_base_listener, app);
     }
 #endif
@@ -2382,24 +2364,21 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
 
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-    lv_indev_gesture_recognizer_t * recognizer;
 
     if(!window || window->closed) {
         return;
     }
 
     /* Collect touches if there are any - send them to the gesture recognizer */
-    recognizer = &window->body->input.recognizer;
+    lv_indev_gesture_recognizers_update(drv, &window->body->input.touches[0],
+                                        window->body->input.touch_event_cnt);
 
     LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
-
-    lv_indev_gesture_detect_pinch(recognizer, &window->body->input.touches[0],
-                                  window->body->input.touch_event_cnt);
 
     window->body->input.touch_event_cnt = 0;
 
     /* Set the gesture information, before returning to LVGL */
-    lv_indev_set_gesture_data(data, recognizer);
+    lv_indev_gesture_recognizers_set_data(drv, data);
 
 }
 
@@ -2423,9 +2402,6 @@ static void wayland_init(void)
         sme_init_buffer,
         sme_free_buffer
     };
-
-    application.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    LV_ASSERT_MSG(application.xdg_runtime_dir, "cannot get XDG_RUNTIME_DIR");
 
     // Create XKB context
     application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);

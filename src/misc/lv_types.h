@@ -41,6 +41,16 @@ extern "C" {
 
 #endif
 
+#if LV_USE_3DTEXTURE
+#if LV_USE_OPENGLES
+#define LV_3DTEXTURE_ID_NULL 0u
+#endif
+
+#ifndef LV_3DTEXTURE_ID_NULL
+#error enable LV_USE_OPENGLES to use LV_USE_3DTEXTURE
+#endif
+#endif /*LV_USE_3DTEXTURE*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -81,6 +91,12 @@ typedef float lv_value_precise_t;
 typedef int32_t lv_value_precise_t;
 #endif
 
+#if LV_USE_3DTEXTURE
+#if LV_USE_OPENGLES
+typedef unsigned int lv_3dtexture_id_t;
+#endif
+#endif
+
 /**
  * Typedefs from various lvgl modules.
  * They are defined here to avoid circular dependencies.
@@ -116,6 +132,10 @@ typedef struct _lv_theme_t lv_theme_t;
 typedef struct _lv_anim_t lv_anim_t;
 
 typedef struct _lv_font_t lv_font_t;
+typedef struct _lv_font_class_t lv_font_class_t;
+typedef struct _lv_font_info_t lv_font_info_t;
+
+typedef struct _lv_font_manager_t lv_font_manager_t;
 
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
@@ -252,6 +272,8 @@ typedef struct _lv_tileview_t lv_tileview_t;
 typedef struct _lv_tileview_tile_t lv_tileview_tile_t;
 
 typedef struct _lv_win_t lv_win_t;
+
+typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
 typedef struct _lv_observer_t lv_observer_t;
 

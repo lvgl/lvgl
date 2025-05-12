@@ -459,11 +459,11 @@ struct SvgStyleGradient
     void clear()
     {
         stops.reset();
-        free(transform);
-        free(radial);
-        free(linear);
-        free(ref);
-        free(id);
+        lv_free(transform);
+        lv_free(radial);
+        lv_free(linear);
+        lv_free(ref);
+        lv_free(id);
     }
 };
 

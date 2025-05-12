@@ -31,6 +31,7 @@
 #include "../../stdlib/lv_mem.h"
 #include "../../stdlib/lv_string.h"
 #include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
 #include "../../widgets/image/lv_image.h"
 
 /*********************
@@ -129,10 +130,10 @@ static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
     int swapped_x = dsc->swap_axes ? y : x;
     int swapped_y = dsc->swap_axes ? x : y;
 
-    int offset_x = lv_display_get_offset_x(disp);
-    int offset_y = lv_display_get_offset_y(disp);
-    int width = lv_display_get_horizontal_resolution(disp);
-    int height = lv_display_get_vertical_resolution(disp);
+    int offset_x = disp->offset_x;
+    int offset_y = disp->offset_y;
+    int width = disp->hor_res;
+    int height = disp->ver_res;
 
     lv_point_t p;
     p.x = _evdev_calibrate(swapped_x, dsc->min_x, dsc->max_x, offset_x, offset_x + width - 1);

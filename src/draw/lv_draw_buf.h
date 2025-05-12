@@ -318,7 +318,7 @@ void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
  * And is interchangeable with `lv_image_dsc_t`.
  */
 
-void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img);
+lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img);
 
 void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img);
 

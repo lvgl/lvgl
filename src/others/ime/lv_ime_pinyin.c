@@ -58,7 +58,7 @@ const lv_obj_class_t lv_ime_pinyin_class = {
     .group_def      = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size  = sizeof(lv_ime_pinyin_t),
     .base_class     = &lv_obj_class,
-    .name = "ime-pinyin",
+    .name = "lv_ime_pinyin",
 };
 
 #if LV_IME_PINYIN_USE_K9_MODE
@@ -798,6 +798,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
     }
 
     lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_invalidate(pinyin_ime->cand_panel);
 }
 
 static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)

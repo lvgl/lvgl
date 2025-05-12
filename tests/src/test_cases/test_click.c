@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../lv_test_indev.h"
 #include "unity/unity.h"
 
 void setUp(void)
@@ -136,7 +135,7 @@ void test_click(void)
 
     /*Resetting the click streak due to time.*/
     lv_memzero(&counts, sizeof(counts));
-    lv_test_indev_wait(1000);
+    lv_test_wait(1000);
     lv_test_mouse_click_at(12, 14);
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_clicked);
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_short_clicked);
@@ -149,9 +148,9 @@ void test_click(void)
     /*Long press does not continue (or start) click streak.*/
     lv_memzero(&counts, sizeof(counts));
     lv_test_mouse_press();
-    lv_test_indev_wait(1000);
+    lv_test_wait(1000);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_short_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_single_clicked);

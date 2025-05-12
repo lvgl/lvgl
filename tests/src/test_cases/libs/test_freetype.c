@@ -7,9 +7,9 @@
 #if LV_USE_FREETYPE
 
 #ifndef NON_AMD64_BUILD
-    #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(NAME) TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_" NAME ".lp64.png")
+    #define EXT_NAME ".lp64.png"
 #else
-    #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(NAME) TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_" NAME ".lp32.png")
+    #define EXT_NAME ".lp32.png"
 #endif
 
 #define OPTION_GENERATE_OUTLINE_DATA 0
@@ -398,34 +398,50 @@ void setUp(void)
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_obj_clean(lv_screen_active());
 }
 
-void test_freetype_bitmap_rendering_test(void)
+static void test_freetype_with_render_mode(lv_freetype_font_render_mode_t render_mode, const char * screenshot_name)
 {
     /*Create a font*/
     lv_font_t * font_italic = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                      render_mode,
                                                       24,
                                                       LV_FREETYPE_FONT_STYLE_ITALIC);
+    TEST_ASSERT_NOT_NULL(font_italic);
     lv_font_t * font_normal = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                      render_mode,
                                                       24,
                                                       LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_normal);
     lv_font_t * font_normal_small = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-                                                            LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                            render_mode,
                                                             12,
                                                             LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_normal_small);
 
+    /* Emoji is only supported in bitmap mode */
     lv_font_t * font_emoji = lv_freetype_font_create("../examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                      12,
                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_emoji);
 
-    if(!font_italic || !font_normal || !font_normal_small || !font_emoji) {
-        LV_LOG_ERROR("freetype font create failed.");
-        TEST_FAIL();
-    }
+    lv_font_t * font_path_error = lv_freetype_font_create("ERROR_PATH", render_mode, 24,
+                                                          LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NULL(font_path_error);
+
+    font_path_error = lv_freetype_font_create("", render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NULL(font_path_error);
+
+    font_path_error = lv_freetype_font_create(NULL, render_mode, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NULL(font_path_error);
+
+    lv_font_t * font_size_error = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
+                                                          render_mode,
+                                                          0,
+                                                          LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NULL(font_size_error);
 
     /*Create style with the new font*/
     static lv_style_t style_italic;
@@ -476,21 +492,40 @@ void test_freetype_bitmap_rendering_test(void)
     lv_label_set_text(label_emoji, "FreeType Emoji test: 😀");
     lv_obj_align_to(label_emoji, label2, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
-    TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT("1");
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot_name);
+
+    lv_obj_clean(lv_screen_active());
+    lv_style_reset(&style_italic);
+    lv_style_reset(&style_normal);
+    lv_style_reset(&style_normal_small);
+    lv_style_reset(&style_normal_emoji);
+    lv_freetype_font_delete(font_italic);
+    lv_freetype_font_delete(font_normal);
+    lv_freetype_font_delete(font_normal_small);
+    lv_freetype_font_delete(font_emoji);
 }
 
-void test_freetype_outline_rendering_test(void)
+void test_freetype_render_bitmap(void)
 {
+    test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, "libs/freetype_render_bitmap" EXT_NAME);
+}
+
+void test_freetype_render_outline(void)
+{
+#if LV_USE_DRAW_VG_LITE
+    /* VG-Lite support rendering outline */
+    test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, "libs/freetype_render_outline.png");
+    LV_UNUSED(outline_data_U9F98);
+    LV_UNUSED(freetype_outline_event_cb);
+#else
+    /* Outline rendering not supported, compare outline data only */
     /*Create a font*/
     lv_font_t * font_italic = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                                       LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
                                                       24,
                                                       LV_FREETYPE_FONT_STYLE_ITALIC);
 
-    if(!font_italic) {
-        LV_LOG_ERROR("freetype font create failed.");
-        TEST_FAIL();
-    }
+    TEST_ASSERT_NOT_NULL(font_italic);
 
     /*Setup outline event for generating outline drawing data*/
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
@@ -529,6 +564,7 @@ void test_freetype_outline_rendering_test(void)
     font_italic->release_glyph(font_italic, &g);
 
     lv_freetype_font_delete(font_italic);
+#endif
 }
 
 static void freetype_outline_event_cb(lv_event_t * e)
@@ -599,11 +635,11 @@ void tearDown(void)
 {
 }
 
-void test_freetype_bitmap_rendering_test(void)
+void test_freetype_render_bitmap(void)
 {
 }
 
-void test_freetype_outline_rendering_test(void)
+void test_freetype_render_outline(void)
 {
 }
 

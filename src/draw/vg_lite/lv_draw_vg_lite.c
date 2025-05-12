@@ -74,12 +74,12 @@ void lv_draw_vg_lite_init(void)
 
     lv_vg_lite_image_dsc_init(unit);
 #if LV_USE_VECTOR_GRAPHIC
-    lv_vg_lite_grad_init(unit, LV_VG_LITE_GRAD_CACHE_CNT);
+    unit->grad_ctx = lv_vg_lite_grad_ctx_create(LV_VG_LITE_GRAD_CACHE_CNT, unit);
     lv_vg_lite_stroke_init(unit, LV_VG_LITE_STROKE_CACHE_CNT);
 #endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
-    lv_draw_vg_lite_label_init(&unit->base_unit);
+    lv_draw_vg_lite_label_init(unit);
 }
 
 void lv_draw_vg_lite_deinit(void)
@@ -198,7 +198,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, VG_LITE_DRAW_UNIT_ID);
+    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, VG_LITE_DRAW_UNIT_ID);
 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(!t || t->preferred_draw_unit_id != VG_LITE_DRAW_UNIT_ID) {
@@ -277,9 +277,12 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             return 0;
     }
 
-    /* The draw unit is able to draw this task. */
-    task->preference_score = 80;
-    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    if(task->preference_score > 80) {
+        /* The draw unit is able to draw this task. */
+        task->preference_score = 80;
+        task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    }
+
     return 1;
 }
 
@@ -289,11 +292,12 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 
     lv_vg_lite_image_dsc_deinit(unit);
 #if LV_USE_VECTOR_GRAPHIC
-    lv_vg_lite_grad_deinit(unit);
+    lv_vg_lite_grad_ctx_delete(unit->grad_ctx);
     lv_vg_lite_stroke_deinit(unit);
 #endif
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
+    lv_draw_vg_lite_label_deinit(unit);
     return 1;
 }
 

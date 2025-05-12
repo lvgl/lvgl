@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 #include <string.h>
 
 #define OPTION_BUFFER_SZ        (20U)
@@ -32,13 +31,13 @@ void setUp(void)
     lv_roller_set_options(roller_mouse, default_roller_options, LV_ROLLER_MODE_NORMAL);
 
     g = lv_group_create();
-    lv_indev_set_group(lv_test_keypad_indev, g);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_KEYPAD), g);
 
     encoder_g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, encoder_g);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER), encoder_g);
 
     mouse_g = lv_group_create();
-    lv_indev_set_group(lv_test_mouse_indev, mouse_g);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER), mouse_g);
 
     lv_group_add_obj(g, roller);
     lv_group_add_obj(encoder_g, roller_infinite);
@@ -149,7 +148,7 @@ void test_roller_keypad_events(void)
     int16_t expected_index = 1;
     int16_t actual_index = 0;
 
-    lv_test_indev_wait(20);
+    lv_test_wait(20);
 
     return;
 

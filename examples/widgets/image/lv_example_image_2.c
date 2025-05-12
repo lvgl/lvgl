@@ -42,9 +42,10 @@ static void slider_event_cb(lv_event_t * e)
     LV_UNUSED(e);
 
     /*Recolor the image based on the sliders' values*/
-    lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider),
-                                      lv_slider_get_value(blue_slider));
-    lv_opa_t intense = lv_slider_get_value(intense_slider);
+    lv_color_t color  = lv_color_make((uint8_t)lv_slider_get_value(red_slider),
+                                      (uint8_t)lv_slider_get_value(green_slider),
+                                      (uint8_t)lv_slider_get_value(blue_slider));
+    lv_opa_t intense = (lv_opa_t)lv_slider_get_value(intense_slider);
     lv_obj_set_style_image_recolor_opa(img1, intense, 0);
     lv_obj_set_style_image_recolor(img1, color, 0);
 }

@@ -3,7 +3,7 @@
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     uint32_t id = lv_buttonmatrix_get_selected_button(obj);
     bool prev = id == 0;
     bool next = id == 6;

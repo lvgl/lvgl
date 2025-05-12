@@ -373,7 +373,7 @@ template<typename T>
 bool LottieParser::parseTangent(const char *key, LottieVectorFrame<T>& value)
 {
     if (KEY_AS("ti") && getValue(value.inTangent)) ;
-    else if (KEY_AS("to") && getValue(value.outTangent)) ;       
+    else if (KEY_AS("to") && getValue(value.outTangent)) ;
     else return false;
 
     value.hasTangent = true;
@@ -406,7 +406,8 @@ LottieInterpolator* LottieParser::getInterpolator(const char* key, Point& in, Po
 
     //new interpolator
     if (!interpolator) {
-        interpolator = static_cast<LottieInterpolator*>(malloc(sizeof(LottieInterpolator)));
+        interpolator = static_cast<LottieInterpolator*>(lv_malloc(sizeof(LottieInterpolator)));
+        LV_ASSERT_MALLOC(interpolator);
         interpolator->set(key, in, out);
         comp->interpolators.push(interpolator);
     }
@@ -944,7 +945,8 @@ LottieImage* LottieParser::parseImage(const char* data, const char* subPath, boo
     //external image resource
     } else {
         auto len = strlen(dirName) + strlen(subPath) + strlen(data) + 1;
-        image->path = static_cast<char*>(malloc(len));
+        image->path = static_cast<char*>(lv_malloc(len));
+        LV_ASSERT_MALLOC(image->path);
         snprintf(image->path, len, "%s%s%s", dirName, subPath, data);
     }
 
@@ -1024,16 +1026,16 @@ void LottieParser::parseAssets()
 LottieMarker* LottieParser::parseMarker()
 {
     enterObject();
-    
+
     auto marker = new LottieMarker;
-    
+
     while (auto key = nextObjectKey()) {
         if (KEY_AS("cm")) marker->name = getStringCopy();
         else if (KEY_AS("tm")) marker->time = getFloat();
         else if (KEY_AS("dr")) marker->duration = getFloat();
         else skip(key);
     }
-    
+
     return marker;
 }
 
@@ -1406,8 +1408,8 @@ void LottieParser::postProcess(Array<LottieGlyph*>& glyphs)
             auto& font = comp->fonts[i];
             if (!strcmp(font->family, glyph->family) && !strcmp(font->style, glyph->style)) {
                 font->chars.push(glyph);
-                free(glyph->family);
-                free(glyph->style);
+                lv_free(glyph->family);
+                lv_free(glyph->style);
                 break;
             }
         }

@@ -18,6 +18,8 @@ extern "C" {
 
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_event.h"
+#include "../../misc/lv_color.h"
+
 #include LV_STDBOOL_INCLUDE
 
 /*********************
@@ -56,7 +58,13 @@ typedef enum {
     LV_FREETYPE_OUTLINE_LINE_TO,
     LV_FREETYPE_OUTLINE_CUBIC_TO,
     LV_FREETYPE_OUTLINE_CONIC_TO,
+    LV_FREETYPE_OUTLINE_BORDER_START,     /* When line width > 0 the border glyph is drawn after the regular glyph */
 } lv_freetype_outline_type_t;
+
+/* Only path string is required */
+typedef const char lv_freetype_font_src_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -72,6 +80,19 @@ lv_result_t lv_freetype_init(uint32_t max_glyph_cnt);
  * Uninitialize the freetype library
  */
 void lv_freetype_uninit(void);
+
+/**
+ * Initialize a font info structure.
+ * @param font_info font info structure to be initialized.
+ */
+void lv_freetype_init_font_info(lv_font_info_t * font_info);
+
+/**
+ * Create a freetype font with a font info structure.
+ * @param font_info font info structure.
+ * @return Created font, or NULL on failure.
+ */
+lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info);
 
 /**
  * Create a freetype font.

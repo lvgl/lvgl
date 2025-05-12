@@ -24,8 +24,8 @@ void lv_example_canvas_2(void)
     lv_canvas_fill_bg(canvas, lv_palette_main(LV_PALETTE_BLUE), LV_OPA_COVER);
 
     /*Create hole on the canvas*/
-    uint32_t x;
-    uint32_t y;
+    int32_t x;
+    int32_t y;
     for(y = 10; y < 20; y++) {
         for(x = 5; x < 75; x++) {
             lv_canvas_set_px(canvas, x, y, lv_palette_main(LV_PALETTE_BLUE), LV_OPA_50);

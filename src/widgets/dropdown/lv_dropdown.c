@@ -122,7 +122,7 @@ const lv_obj_class_t lv_dropdown_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
-    .name = "dropdown",
+    .name = "lv_dropdown",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_DROPDOWN_START,
     .prop_index_end = LV_PROPERTY_DROPDOWN_END,
@@ -142,7 +142,7 @@ const lv_obj_class_t lv_dropdownlist_class = {
     .event_cb = lv_dropdown_list_event,
     .instance_size = sizeof(lv_dropdown_list_t),
     .base_class = &lv_obj_class,
-    .name = "dropdown-list",
+    .name = "lv_dropdown-list",
 };
 
 /**********************

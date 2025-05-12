@@ -3,12 +3,12 @@
 
 static void set_angle(void * img, int32_t v)
 {
-    lv_image_set_rotation(img, v);
+    lv_image_set_rotation((lv_obj_t *)img, v);
 }
 
 static void set_scale(void * img, int32_t v)
 {
-    lv_image_set_scale(img, v);
+    lv_image_set_scale((lv_obj_t *)img, v);
 }
 
 /**

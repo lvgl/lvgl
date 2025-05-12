@@ -11,13 +11,13 @@ void lv_example_calendar_2(void)
     lv_calendar_set_month_shown(calendar, 2024, 03);
 
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
-    lv_calendar_header_dropdown_create(calendar);
+    lv_calendar_add_header_dropdown(calendar);
 #elif LV_USE_CALENDAR_HEADER_ARROW
-    lv_calendar_header_arrow_create(calendar);
+    lv_calendar_add_header_arrow(calendar);
 #endif
 
     lv_calendar_set_chinese_mode(calendar, true);
-    lv_obj_set_style_text_font(calendar, &lv_font_simsun_14_cjk, LV_PART_MAIN);
+    lv_obj_set_style_text_font(calendar, &lv_font_source_han_sans_sc_14_cjk, LV_PART_MAIN);
 }
 
 #else

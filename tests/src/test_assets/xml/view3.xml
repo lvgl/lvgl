@@ -1,0 +1,24 @@
+<component>
+	<consts>
+		<int name="local_int" value="15"/>
+		<color name="local_blue" value="0x0000ff"/>
+	</consts>
+
+	<styles>
+		<style name="local_style" bg_color="#local_blue" border_color="#global_red" border_width="5"/>
+	</styles>
+
+	<subjects>
+		<int name="local_subject" value="10"/>
+	</subjects>
+
+
+	<view extends="lv_obj" width="480" height="300" flex_flow="column">
+		<lv_label bind_text="global_subject"/>
+		<lv_slider bind_value="global_subject" range_max="#global_int"/>
+
+		<lv_label bind_text="local_subject" style_margin_top="32px"/>
+		<lv_slider bind_value="local_subject" range_max="#local_int"/>
+		<lv_slider bind_value="not_existing" range_max="#local_int"/>
+	</view>
+</component>

@@ -143,7 +143,7 @@ void lv_sdl_keyboard_handler(SDL_Event * event)
         case SDL_TEXTINPUT: {                   /*Text input*/
                 const size_t len = lv_strlen(dsc->buf) + lv_strlen(event->text.text);
                 if(len < KEYBOARD_BUFFER_SIZE - 1)
-                    strcat(dsc->buf, event->text.text);
+                    lv_strcat(dsc->buf, event->text.text);
             }
             break;
         default:

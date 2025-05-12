@@ -119,4 +119,25 @@ void test_xml_style_gradients(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/gradients.png");
 }
 
+
+
+void test_xml_style_same_name(void)
+{
+    const char * comp1 =
+        "<component>"
+        "  <styles>"
+        "    <style name=\"hello\" bg_opa=\"100\" border_width=\"2\"/>"
+        "    <style name=\"hello\" figma_node_id=\"1234\" bg_opa=\"20\" border_side=\"right\"/>"
+        "  </styles>"
+        ""
+        "  <view styles=\"hello\">"
+        "  </view>"
+        "</component>";
+
+    lv_xml_component_register_from_data("comp1", comp1);
+    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
+    TEST_ASSERT_EQUAL(20, lv_obj_get_style_bg_opa(obj, 0));
+
+}
+
 #endif

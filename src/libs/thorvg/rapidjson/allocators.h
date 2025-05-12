@@ -25,6 +25,8 @@
 #include <type_traits>
 #endif
 
+#include "../../../misc/lv_assert.h"
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,10 +86,13 @@ class CrtAllocator {
 public:
     static const bool kNeedFree = true;
     void* Malloc(size_t size) {
-        if (size) //  behavior of malloc(0) is implementation defined.
-            return RAPIDJSON_MALLOC(size);
-        else
+        if (size) { //  behavior of malloc(0) is implementation defined.
+            void * p = RAPIDJSON_MALLOC(size);
+            LV_ASSERT_MALLOC(p);
+            return p;
+        } else {
             return NULL; // standardize to returning NULL.
+        }
     }
     void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
         (void)originalSize;
@@ -95,7 +100,9 @@ public:
             RAPIDJSON_FREE(originalPtr);
             return NULL;
         }
-        return RAPIDJSON_REALLOC(originalPtr, newSize);
+        void * p = RAPIDJSON_REALLOC(originalPtr, newSize);
+        LV_ASSERT_MALLOC(p);
+        return p;
     }
     static void Free(void *ptr) RAPIDJSON_NOEXCEPT { RAPIDJSON_FREE(ptr); }
 

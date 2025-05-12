@@ -215,7 +215,8 @@ char* strDuplicate(const char *str, size_t n)
     auto len = strlen(str);
     if (len < n) n = len;
 
-    auto ret = (char *) malloc(n + 1);
+    auto ret = (char *) lv_malloc(n + 1);
+    LV_ASSERT_MALLOC(ret);
     if (!ret) return nullptr;
     ret[n] = '\0';
 
@@ -226,7 +227,8 @@ char* strAppend(char* lhs, const char* rhs, size_t n)
 {
     if (!rhs) return lhs;
     if (!lhs) return strDuplicate(rhs, n);
-    lhs = (char*)realloc(lhs, strlen(lhs) + n + 1);
+    lhs = (char*)lv_realloc(lhs, strlen(lhs) + n + 1);
+    LV_ASSERT_MALLOC(lhs);
     return strncat(lhs, rhs, n);
 }
 

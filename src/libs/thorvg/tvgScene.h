@@ -29,6 +29,8 @@
 #include "tvgMath.h"
 #include "tvgPaint.h"
 
+using std::list;
+
 struct SceneIterator : Iterator
 {
     list<Paint*>* paints;

@@ -57,10 +57,10 @@ void LottieLoader::run(unsigned tid)
 void LottieLoader::release()
 {
     if (copy) {
-        free((char*)content);
+        lv_free((char*)content);
         content = nullptr;
     }
-    free(dirName);
+    lv_free(dirName);
     dirName = nullptr;
 }
 
@@ -201,13 +201,14 @@ bool LottieLoader::header()
 bool LottieLoader::open(const char* data, uint32_t size, bool copy)
 {
     if (copy) {
-        content = (char*)malloc(size + 1);
+        content = (char*)lv_malloc(size + 1);
+        LV_ASSERT_MALLOC(content);
         if (!content) return false;
         memcpy((char*)content, data, size);
         const_cast<char*>(content)[size] = '\0';
     } else content = data;
 
-    this->dirName = strdup(".");
+    this->dirName = lv_strdup(".");
 
     this->size = size;
     this->copy = copy;
@@ -229,7 +230,8 @@ bool LottieLoader::open(const string& path)
         return false;
     }
 
-    auto content = (char*)(malloc(sizeof(char) * size + 1));
+    auto content = (char*)(lv_malloc(sizeof(char) * size + 1));
+    LV_ASSERT_MALLOC(content);
     fseek(f, 0, SEEK_SET);
     auto ret = fread(content, sizeof(char), size, f);
     if (ret < size) {
@@ -298,7 +300,7 @@ bool LottieLoader::override(const char* slot)
     //override slots
     if (slot) {
         //Copy the input data because the JSON parser will encode the data immediately.
-        auto temp = strdup(slot);
+        auto temp = lv_strdup(slot);
 
         //parsing slot json
         LottieParser parser(temp, dirName);
@@ -315,7 +317,7 @@ bool LottieLoader::override(const char* slot)
         }
 
         if (idx < 1) success = false;
-        free(temp);
+        lv_free(temp);
         rebuild = overridden = success;
     //reset slots
     } else if (overridden) {

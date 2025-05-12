@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK && LV_USE_IME_PINYIN && LV_BUILD_EXAMPLES
+#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SOURCE_HAN_SANS_SC_16_CJK && LV_USE_IME_PINYIN && LV_BUILD_EXAMPLES
 
 static void ta_event_cb(lv_event_t * e)
 {
@@ -23,13 +23,13 @@ static void ta_event_cb(lv_event_t * e)
 void lv_example_ime_pinyin_1(void)
 {
     lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_screen_active());
-    lv_obj_set_style_text_font(pinyin_ime, &lv_font_simsun_16_cjk, 0);
+    lv_obj_set_style_text_font(pinyin_ime, &lv_font_source_han_sans_sc_16_cjk, 0);
     //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in dictionary will be used.
 
     /* ta1 */
     lv_obj_t * ta1 = lv_textarea_create(lv_screen_active());
     lv_textarea_set_one_line(ta1, true);
-    lv_obj_set_style_text_font(ta1, &lv_font_simsun_16_cjk, 0);
+    lv_obj_set_style_text_font(ta1, &lv_font_source_han_sans_sc_16_cjk, 0);
     lv_obj_align(ta1, LV_ALIGN_TOP_LEFT, 0, 0);
 
     /*Create a keyboard and add it to ime_pinyin*/
@@ -48,7 +48,7 @@ void lv_example_ime_pinyin_1(void)
     lv_obj_t * cz_label = lv_label_create(lv_screen_active());
     lv_label_set_text(cz_label,
                       "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
-    lv_obj_set_style_text_font(cz_label, &lv_font_simsun_16_cjk, 0);
+    lv_obj_set_style_text_font(cz_label, &lv_font_source_han_sans_sc_16_cjk, 0);
     lv_obj_set_width(cz_label, 310);
     lv_obj_align_to(cz_label, ta1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 }

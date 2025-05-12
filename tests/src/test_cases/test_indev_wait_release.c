@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../lv_test_indev.h"
 #include "unity/unity.h"
 
 void setUp(void)
@@ -40,18 +39,18 @@ void test_indev_wait_release(void)
     lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, &pressed_count);
 
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_move_to(50, 50);
 
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(2, pressed_count);
 }

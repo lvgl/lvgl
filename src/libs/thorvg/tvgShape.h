@@ -109,7 +109,7 @@ struct Shape::Impl
 
         if ((needComp = needComposition(opacity))) {
             /* Overriding opacity value. If this scene is half-translucent,
-               It must do intermediate composition with that opacity value. */ 
+               It must do intermediate composition with that opacity value. */
             this->opacity = opacity;
             opacity = 255;
         }
@@ -310,16 +310,17 @@ struct Shape::Impl
 
         //Reset dash
         if (!pattern && cnt == 0) {
-            free(rs.stroke->dashPattern);
+        	lv_free(rs.stroke->dashPattern);
             rs.stroke->dashPattern = nullptr;
         } else {
             if (!rs.stroke) rs.stroke = new RenderStroke();
             if (rs.stroke->dashCnt != cnt) {
-                free(rs.stroke->dashPattern);
+            	lv_free(rs.stroke->dashPattern);
                 rs.stroke->dashPattern = nullptr;
             }
             if (!rs.stroke->dashPattern) {
-                rs.stroke->dashPattern = static_cast<float*>(malloc(sizeof(float) * cnt));
+                rs.stroke->dashPattern = static_cast<float*>(lv_malloc(sizeof(float) * cnt));
+                LV_ASSERT_MALLOC(rs.stroke->dashPattern);
                 if (!rs.stroke->dashPattern) return Result::FailedAllocation;
             }
             for (uint32_t i = 0; i < cnt; ++i) {

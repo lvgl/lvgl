@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * slider = NULL;
@@ -25,7 +24,7 @@ void setUp(void)
     lv_slider_set_mode(sliderSymmetricalMode, LV_SLIDER_MODE_SYMMETRICAL);
 
     g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER), g);
 }
 
 void tearDown(void)
@@ -116,7 +115,7 @@ void test_slider_range_mode_should_not_leave_edit_mode_if_released_with_no_left_
     lv_group_set_editing(g, true);
 
     lv_test_encoder_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     /* Always executed when handling LV_EVENT_RELEASED or
      * LV_EVENT_PRESS_LOST */

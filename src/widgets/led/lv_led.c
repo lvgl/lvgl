@@ -42,7 +42,7 @@ const lv_obj_class_t lv_led_class  = {
     .height_def = LV_DPI_DEF / 5,
     .event_cb = lv_led_event,
     .instance_size = sizeof(lv_led_t),
-    .name = "led",
+    .name = "lv_led",
 };
 
 /**********************

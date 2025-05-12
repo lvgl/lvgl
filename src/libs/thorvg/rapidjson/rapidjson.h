@@ -690,18 +690,18 @@ RAPIDJSON_NAMESPACE_END
 
 ///////////////////////////////////////////////////////////////////////////////
 // malloc/realloc/free
-
+#include "../../../stdlib/lv_mem.h"
 #ifndef RAPIDJSON_MALLOC
 ///! customization point for global \c malloc
-#define RAPIDJSON_MALLOC(size) std::malloc(size)
+#define RAPIDJSON_MALLOC(size) lv_malloc(size)
 #endif
 #ifndef RAPIDJSON_REALLOC
 ///! customization point for global \c realloc
-#define RAPIDJSON_REALLOC(ptr, new_size) std::realloc(ptr, new_size)
+#define RAPIDJSON_REALLOC(ptr, new_size) lv_realloc(ptr, new_size)
 #endif
 #ifndef RAPIDJSON_FREE
 ///! customization point for global \c free
-#define RAPIDJSON_FREE(ptr) std::free(ptr)
+#define RAPIDJSON_FREE(ptr) lv_free(ptr)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

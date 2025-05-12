@@ -9,6 +9,7 @@
 #include "lv_ffmpeg_private.h"
 #if LV_USE_FFMPEG != 0
 #include "../../draw/lv_image_decoder_private.h"
+#include "../../draw/lv_draw_buf_private.h"
 #include "../../core/lv_obj_class_private.h"
 
 #include <libavcodec/avcodec.h>
@@ -60,6 +61,7 @@ struct ffmpeg_context_s {
     enum AVPixelFormat video_dst_pix_fmt;
     bool has_alpha;
     lv_draw_buf_t draw_buf;
+    lv_draw_buf_handlers_t draw_buf_handlers;
 };
 
 #pragma pack(1)
@@ -107,7 +109,7 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
     .destructor_cb = lv_ffmpeg_player_destructor,
     .instance_size = sizeof(lv_ffmpeg_player_t),
     .base_class = &lv_image_class,
-    .name = "ffmpeg-player",
+    .name = "lv_ffmpeg_player",
 };
 
 /**********************
@@ -127,9 +129,20 @@ void lv_ffmpeg_init(void)
 
     dec->name = DECODER_NAME;
 
-#if LV_FFMPEG_AV_DUMP_FORMAT == 0
+#if LV_FFMPEG_DUMP_FORMAT == 0
     av_log_set_level(AV_LOG_QUIET);
 #endif
+}
+
+void lv_ffmpeg_deinit(void)
+{
+    lv_image_decoder_t * dec = NULL;
+    while((dec = lv_image_decoder_get_next(dec)) != NULL) {
+        if(dec->info_cb == decoder_info) {
+            lv_image_decoder_delete(dec);
+            break;
+        }
+    }
 }
 
 int lv_ffmpeg_get_frame_num(const char * path)
@@ -169,29 +182,32 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS);
 
     if(!player->ffmpeg_ctx) {
-        LV_LOG_ERROR("ffmpeg file open failed: %s", path);
         goto failed;
     }
 
     if(ffmpeg_image_allocate(player->ffmpeg_ctx) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
         ffmpeg_close(player->ffmpeg_ctx);
+        player->ffmpeg_ctx = NULL;
         goto failed;
     }
 
     bool has_alpha = player->ffmpeg_ctx->has_alpha;
     int width = player->ffmpeg_ctx->video_dec_ctx->width;
     int height = player->ffmpeg_ctx->video_dec_ctx->height;
-    uint32_t data_size = 0;
 
-    data_size = width * height * 4;
+    uint8_t * data = ffmpeg_get_image_data(player->ffmpeg_ctx);
+    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    uint32_t stride = width * lv_color_format_get_size(cf);
+    uint32_t data_size = stride * height;
+    lv_memzero(data, data_size);
 
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
-    player->imgdsc.header.stride = width * lv_color_format_get_size(player->imgdsc.header.cf);
-    player->imgdsc.data = ffmpeg_get_image_data(player->ffmpeg_ctx);
+    player->imgdsc.header.cf = cf;
+    player->imgdsc.header.stride = stride;
+    player->imgdsc.data = data;
 
     lv_image_set_src(&player->img.obj, &(player->imgdsc));
 
@@ -318,11 +334,24 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         dsc->user_data = ffmpeg_ctx;
         lv_draw_buf_t * decoded = &ffmpeg_ctx->draw_buf;
-        decoded->header = dsc->header;
-        decoded->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE;
-        decoded->data = img_data;
-        decoded->data_size = (uint32_t)dsc->header.stride * dsc->header.h;
-        decoded->unaligned_data = NULL;
+        lv_draw_buf_init(
+            decoded,
+            dsc->header.w,
+            dsc->header.h,
+            dsc->header.cf,
+            dsc->header.stride,
+            img_data,
+            dsc->header.stride * dsc->header.h);
+        lv_draw_buf_set_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE);
+
+        /* Empty handlers to avoid decoder asserts */
+        lv_draw_buf_handlers_init(&ffmpeg_ctx->draw_buf_handlers, NULL, NULL, NULL, NULL, NULL, NULL);
+        decoded->handlers = &ffmpeg_ctx->draw_buf_handlers;
+
+        if(dsc->args.premultiply && ffmpeg_ctx->has_alpha) {
+            lv_draw_buf_premultiply(decoded);
+        }
+
         dsc->decoded = decoded;
 
         /* The image is fully decoded. Return with its pointer */
@@ -404,8 +433,6 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
                      av_get_pix_fmt_name(frame->format));
         goto failed;
     }
-
-    LV_LOG_TRACE("video_frame coded_n:%d", frame->coded_picture_number);
 
     /* copy decoded frame to destination buffer:
      * this is required since rawvideo expects non aligned data
@@ -728,15 +755,20 @@ static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_
         return NULL;
     }
 
-    struct ffmpeg_context_s * ffmpeg_ctx = calloc(1, sizeof(struct ffmpeg_context_s));
-
+    struct ffmpeg_context_s * ffmpeg_ctx = lv_malloc_zeroed(sizeof(struct ffmpeg_context_s));
+    LV_ASSERT_MALLOC(ffmpeg_ctx);
     if(ffmpeg_ctx == NULL) {
         LV_LOG_ERROR("ffmpeg_ctx malloc failed");
         goto failed;
     }
 
     if(is_lv_fs_path) {
-        lv_fs_open(&(ffmpeg_ctx->lv_file), path, LV_FS_MODE_RD);    /* image_decoder_get_info says the file truly exists. */
+        const lv_fs_res_t fs_res = lv_fs_open(&(ffmpeg_ctx->lv_file), path, LV_FS_MODE_RD);
+        if(fs_res != LV_FS_RES_OK) {
+            LV_LOG_WARN("Could not open file: %s, res: %d", path, fs_res);
+            lv_free(ffmpeg_ctx);
+            return NULL;
+        }
 
         ffmpeg_ctx->io_ctx = ffmpeg_open_io_context(&(ffmpeg_ctx->lv_file));     /* Save the buffer pointer to free it later */
 
@@ -780,7 +812,7 @@ static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_
         ffmpeg_ctx->video_dst_pix_fmt = (ffmpeg_ctx->has_alpha ? AV_PIX_FMT_BGRA : AV_PIX_FMT_TRUE_COLOR);
     }
 
-#if LV_FFMPEG_AV_DUMP_FORMAT != 0
+#if LV_FFMPEG_DUMP_FORMAT
     /* dump input information to stderr */
     av_dump_format(ffmpeg_ctx->fmt_ctx, 0, path, 0);
 #endif
@@ -856,6 +888,7 @@ static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     avcodec_free_context(&(ffmpeg_ctx->video_dec_ctx));
     avformat_close_input(&(ffmpeg_ctx->fmt_ctx));
+    av_packet_free(&ffmpeg_ctx->pkt);
     av_frame_free(&(ffmpeg_ctx->frame));
     if(ffmpeg_ctx->video_src_data[0] != NULL) {
         av_free(ffmpeg_ctx->video_src_data[0]);
@@ -886,7 +919,7 @@ static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx)
         av_free(ffmpeg_ctx->io_ctx);
         lv_fs_close(&(ffmpeg_ctx->lv_file));
     }
-    free(ffmpeg_ctx);
+    lv_free(ffmpeg_ctx);
 
     LV_LOG_INFO("ffmpeg_ctx closed");
 }

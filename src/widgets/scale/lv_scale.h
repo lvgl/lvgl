@@ -282,9 +282,9 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj);
 /**
  * Get angular location of low end of Scale.
  * @param obj   pointer to Scale Widget
- * @return      Scale major tick every count
+ * @return      Scale low end anglular location
  */
-lv_scale_mode_t lv_scale_get_rotation(lv_obj_t * obj);
+int32_t lv_scale_get_rotation(lv_obj_t * obj);
 
 /**
  * Gets label visibility

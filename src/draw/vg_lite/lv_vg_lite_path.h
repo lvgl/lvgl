@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
+#include <float.h>
 
 /*********************
  *      DEFINES

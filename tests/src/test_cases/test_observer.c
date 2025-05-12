@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static uint32_t observer_called = 0;
 
@@ -58,6 +57,93 @@ void test_observer_add_remove(void)
     observer = lv_subject_add_observer(&uninitialized_subject, observer_int,
                                        NULL);
     TEST_ASSERT_EQUAL_PTR(NULL, observer); /*The observer must be NULL*/
+}
+
+void test_object_observer_add_remove(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_observer_t * observer = lv_obj_bind_flag_if_eq(obj, &subject, LV_OBJ_FLAG_HIDDEN, 5);
+
+    TEST_ASSERT_EQUAL(false, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_observer_remove(observer);
+    lv_subject_set_int(&subject, 1);
+
+    /* This shouldn't get updated */
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_obj_delete(obj);
+    /* We shouldn't crash here */
+}
+
+static lv_event_dsc_t * get_event_delete_from_obj(lv_obj_t * obj)
+{
+
+    /* The remove event is a event callback using the observer as the user data */
+    uint32_t event_cnt = lv_event_get_count(&obj->spec_attr->event_list);
+    for(uint32_t i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * event = lv_obj_get_event_dsc(obj, i);
+        TEST_ASSERT_NOT_NULL(event);
+        if(event->filter == LV_EVENT_DELETE) {
+            return event;
+        }
+    }
+    return NULL;
+}
+void test_obj_remove_from_subject_removes_delete_event(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    (void)lv_subject_add_observer_obj(&subject, observer_basic, obj, NULL);
+
+    {
+        /*
+         * We expect the event delete to be added to the object allowing the observer
+         * to be deleted when the object is deleted
+         */
+        TEST_ASSERT_NOT_NULL(obj->spec_attr);
+        TEST_ASSERT_EQUAL(lv_event_get_count(&obj->spec_attr->event_list), 1);
+        lv_event_dsc_t * delete_event = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NOT_NULL(delete_event);
+    }
+    {
+        /* Removing the object from the subject should remove the delete event entry */
+        lv_obj_remove_from_subject(obj, &subject);
+        lv_event_dsc_t * delete_event  = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NULL(delete_event);
+    }
+
+}
+
+void test_observer_remove_removes_obj_callback(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    lv_observer_t * observer = lv_subject_add_observer_obj(&subject, observer_basic, obj, NULL);
+
+    {
+        /*
+         * We expect the event delete to be added to the object allowing the observer
+         * to be deleted when the object is deleted
+         */
+        TEST_ASSERT_NOT_NULL(obj->spec_attr);
+        TEST_ASSERT_EQUAL(lv_event_get_count(&obj->spec_attr->event_list), 1);
+        lv_event_dsc_t * delete_event = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NOT_NULL(delete_event);
+    }
+    {
+        /* Removing the observer associated with the object should remove the delete event entry */
+        lv_observer_remove(observer);
+        lv_event_dsc_t * delete_event  = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NULL(delete_event);
+    }
 }
 
 void test_observer_int(void)
@@ -664,11 +750,11 @@ void test_observer_label_text_normal(void)
     observer = lv_label_bind_text(obj, &subject_color, NULL);
     TEST_ASSERT_EQUAL_PTR(NULL, observer);
 
-    /*Cannot bind int*/
+    /*Bind it with "%d" if NULL is passed*/
     static lv_subject_t subject_int;
-    lv_subject_init_int(&subject_int, 0);
+    lv_subject_init_int(&subject_int, 10);
     observer = lv_label_bind_text(obj, &subject_int, NULL);
-    TEST_ASSERT_EQUAL_PTR(NULL, observer);
+    TEST_ASSERT_EQUAL_STRING("10", lv_label_get_text(obj));
 
     /*Bind to string*/
     static char buf[32];
@@ -771,11 +857,11 @@ void test_observer_arc_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_release();
 
     TEST_ASSERT_EQUAL(50, lv_arc_get_value(obj));
@@ -797,15 +883,15 @@ void test_observer_slider_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(75, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_release();
 
     TEST_ASSERT_EQUAL(29, lv_slider_get_value(obj));

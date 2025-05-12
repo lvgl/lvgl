@@ -387,7 +387,7 @@ void SwRenderer::clearCompositors()
 {
     //Free Composite Caches
     for (auto comp = compositors.begin(); comp < compositors.end(); ++comp) {
-        free((*comp)->compositor->image.data);
+        lv_free((*comp)->compositor->image.data);
         delete((*comp)->compositor);
         delete(*comp);
     }
@@ -566,7 +566,8 @@ SwSurface* SwRenderer::request(int channelSize)
         //Inherits attributes from main surface
         cmp = new SwSurface(surface);
         cmp->compositor = new SwCompositor;
-        cmp->compositor->image.data = (pixel_t*)malloc(channelSize * surface->stride * surface->h);
+        cmp->compositor->image.data = (pixel_t*)lv_malloc(channelSize * surface->stride * surface->h);
+        LV_ASSERT_MALLOC(cmp->compositor->image.data);
         cmp->compositor->image.w = surface->w;
         cmp->compositor->image.h = surface->h;
         cmp->compositor->image.stride = surface->stride;
@@ -701,7 +702,7 @@ void* SwRenderer::prepareCommon(SwTask* task, const Matrix& transform, const Arr
 
     task->clips = clips;
     task->transform = transform;
-    
+
     //zero size?
     if (task->transform.e11 == 0.0f && task->transform.e12 == 0.0f) return task; //zero width
     if (task->transform.e21 == 0.0f && task->transform.e22 == 0.0f) return task; //zero height

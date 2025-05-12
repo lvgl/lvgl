@@ -44,7 +44,7 @@ RawLoader::RawLoader() : ImageLoader(FileType::Raw)
 
 RawLoader::~RawLoader()
 {
-    if (copy) free(surface.buf32);
+    if (copy) lv_free(surface.buf32);
 }
 
 
@@ -59,7 +59,8 @@ bool RawLoader::open(const uint32_t* data, uint32_t w, uint32_t h, bool copy)
     this->copy = copy;
 
     if (copy) {
-        surface.buf32 = (uint32_t*)malloc(sizeof(uint32_t) * w * h);
+        surface.buf32 = (uint32_t*)lv_malloc(sizeof(uint32_t) * w * h);
+        LV_ASSERT_MALLOC(surface.buf32);
         if (!surface.buf32) return false;
         memcpy((void*)surface.buf32, data, sizeof(uint32_t) * w * h);
     }

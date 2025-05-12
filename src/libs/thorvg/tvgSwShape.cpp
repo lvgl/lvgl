@@ -75,7 +75,7 @@ static void _outlineCubicTo(SwOutline& outline, const Point* ctrl1, const Point*
     outline.types.push(SW_CURVE_TYPE_CUBIC);
 
     outline.pts.push(mathTransform(ctrl2, transform));
-    outline.types.push(SW_CURVE_TYPE_CUBIC);    
+    outline.types.push(SW_CURVE_TYPE_CUBIC);
 
     outline.pts.push(mathTransform(to, transform));
     outline.types.push(SW_CURVE_TYPE_POINT);
@@ -347,7 +347,10 @@ static SwOutline* _genDashOutline(const RenderShape* rshape, const Matrix& trans
     if (trimmed) rshape->stroke->strokeTrim(trimBegin, trimEnd);
 
     if (dash.cnt == 0) {
-        if (trimmed) dash.pattern = (float*)malloc(sizeof(float) * 4);
+        if (trimmed) {
+        	dash.pattern = (float*)lv_malloc(sizeof(float) * 4);
+			LV_ASSERT_MALLOC(dash.pattern);
+        }
         else return nullptr;
     } else {
         //TODO: handle dash + trim - for now trimming ignoring is forced
@@ -414,7 +417,7 @@ static SwOutline* _genDashOutline(const RenderShape* rshape, const Matrix& trans
 
     _outlineEnd(*dash.outline);
 
-    if (trimmed) free(dash.pattern);
+    if (trimmed) lv_free(dash.pattern);
 
     return dash.outline;
 }
@@ -580,7 +583,10 @@ void shapeDelStroke(SwShape* shape)
 
 void shapeResetStroke(SwShape* shape, const RenderShape* rshape, const Matrix& transform)
 {
-    if (!shape->stroke) shape->stroke = static_cast<SwStroke*>(calloc(1, sizeof(SwStroke)));
+    if (!shape->stroke) {
+    	shape->stroke = static_cast<SwStroke*>(lv_zalloc(sizeof(SwStroke)));
+        LV_ASSERT_MALLOC(shape->stroke);
+    }
     auto stroke = shape->stroke;
     if (!stroke) return;
 
@@ -647,7 +653,8 @@ bool shapeGenStrokeFillColors(SwShape* shape, const Fill* fill, const Matrix& tr
 void shapeResetFill(SwShape* shape)
 {
     if (!shape->fill) {
-        shape->fill = static_cast<SwFill*>(calloc(1, sizeof(SwFill)));
+        shape->fill = static_cast<SwFill*>(lv_zalloc(sizeof(SwFill)));
+        LV_ASSERT_MALLOC(shape->fill);
         if (!shape->fill) return;
     }
     fillReset(shape->fill);
@@ -657,7 +664,8 @@ void shapeResetFill(SwShape* shape)
 void shapeResetStrokeFill(SwShape* shape)
 {
     if (!shape->stroke->fill) {
-        shape->stroke->fill = static_cast<SwFill*>(calloc(1, sizeof(SwFill)));
+        shape->stroke->fill = static_cast<SwFill*>(lv_zalloc(sizeof(SwFill)));
+        LV_ASSERT_MALLOC(shape->stroke->fill);
         if (!shape->stroke->fill) return;
     }
     fillReset(shape->stroke->fill);

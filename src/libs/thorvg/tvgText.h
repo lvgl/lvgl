@@ -47,15 +47,15 @@ struct Text::Impl
 
     ~Impl()
     {
-        free(utf8);
+        lv_free(utf8);
         LoaderMgr::retrieve(loader);
         delete(shape);
     }
 
     Result text(const char* utf8)
     {
-        free(this->utf8);
-        if (utf8) this->utf8 = strdup(utf8);
+        lv_free(this->utf8);
+        if (utf8) this->utf8 = lv_strdup(utf8);
         else this->utf8 = nullptr;
         changed = true;
 
@@ -157,7 +157,7 @@ struct Text::Impl
             ++dup->loader->sharing;
         }
 
-        dup->utf8 = strdup(utf8);
+        dup->utf8 = lv_strdup(utf8);
         dup->italic = italic;
         dup->fontSize = fontSize;
 

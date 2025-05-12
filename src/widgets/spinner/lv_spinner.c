@@ -34,7 +34,7 @@ static void arc_anim_end_angle(void * obj, int32_t v);
 const lv_obj_class_t lv_spinner_class = {
     .base_class = &lv_arc_class,
     .constructor_cb = lv_spinner_constructor,
-    .name = "spinner",
+    .name = "lv_spinner",
 };
 
 /**********************

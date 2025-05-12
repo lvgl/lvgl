@@ -2,7 +2,6 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static lv_obj_t * g_screen;
 static lv_group_t * g_group;
@@ -40,7 +39,7 @@ static void gridnav_one_axis_move_only(uint32_t key_grid_axis_next,
                                        lv_gridnav_ctrl_t gridnav_ctrl,
                                        lv_flex_flow_t flex_flow)
 {
-    lv_indev_set_group(lv_test_keypad_indev, g_group);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_KEYPAD), g_group);
 
     lv_obj_t * cont = lv_obj_create(g_screen);
     lv_obj_set_flex_flow(cont, flex_flow);

@@ -188,4 +188,91 @@ void test_area_diff(void)
     TEST_ASSERT_EQUAL_INT8(area_count, 2);
 }
 
+#define GRID_WIDTH 5
+#define GRID_HEIGHT 5
+
+static void grid_assert_equal(char grid1[GRID_HEIGHT][GRID_WIDTH], char grid2[GRID_HEIGHT][GRID_WIDTH])
+{
+    for(int y = 0; y < GRID_HEIGHT; y++) {
+        for(int x = 0; x < GRID_WIDTH; x++) {
+            TEST_ASSERT_EQUAL_CHAR(grid1[y][x], grid2[y][x]);
+        }
+    }
+}
+
+static void grid_mark(char grid[GRID_HEIGHT][GRID_WIDTH], const lv_area_t * area, char c, bool assert_change)
+{
+    for(int y = area->y1; y <= area->y2; y++) {
+        for(int x = area->x1; x <= area->x2; x++) {
+            if(assert_change) TEST_ASSERT_NOT_EQUAL_CHAR(grid[y][x], c);
+            grid[y][x] = c;
+        }
+    }
+}
+
+static void grid_mark_area_diff_simple(char grid[GRID_HEIGHT][GRID_WIDTH], const lv_area_t * outer,
+                                       const lv_area_t * remove)
+{
+    grid_mark(grid, outer, 'x', true);
+
+    lv_area_t intersection;
+    if(lv_area_intersect(&intersection, outer, remove)) {
+        grid_mark(grid, &intersection, ' ', true);
+    }
+}
+
+static void grid_mark_area_diff(char grid[GRID_HEIGHT][GRID_WIDTH], const lv_area_t * outer, const lv_area_t * remove)
+{
+    lv_area_t parts[4];
+    int8_t num_parts = lv_area_diff(parts, outer, remove);
+
+    if(num_parts < 0) {
+        grid_mark(grid, outer, 'x', true);
+    }
+    for(int i = 0; i < num_parts; i++) {
+        grid_mark(grid, &parts[i], 'x', true);
+    }
+}
+
+void test_area_diff_property()
+{
+    lv_rand_set_seed(7875);
+
+    char grid_simple[GRID_HEIGHT][GRID_WIDTH];
+    char grid[GRID_HEIGHT][GRID_WIDTH];
+
+    lv_area_t everything;
+    everything.x1 = 0;
+    everything.y1 = 0;
+    everything.x2 = GRID_WIDTH - 1;
+    everything.y2 = GRID_HEIGHT - 1;
+
+    for(int test = 0; test < 200; test++) {
+        lv_area_t outer;
+        outer.x1 = lv_rand(0, GRID_WIDTH - 1);
+        outer.y1 = lv_rand(0, GRID_HEIGHT - 1);
+        outer.x2 = lv_rand(outer.x1, GRID_WIDTH - 1);
+        outer.y2 = lv_rand(outer.y1, GRID_HEIGHT - 1);
+
+        lv_area_t remove;
+        remove.x1 = lv_rand(0, GRID_WIDTH - 1);
+        remove.y1 = lv_rand(0, GRID_HEIGHT - 1);
+        remove.x2 = lv_rand(remove.x1, GRID_WIDTH - 1);
+        remove.y2 = lv_rand(remove.y1, GRID_HEIGHT - 1);
+
+        TEST_PRINTF("%d %d %d %d / %d %d %d %d", outer.x1, outer.y1, outer.x2, outer.y2, remove.x1, remove.y1, remove.x2,
+                    remove.y2);
+
+        /*Mark remaining area using simple algorithm*/
+        grid_mark(grid_simple, &everything, ' ', false);
+        grid_mark_area_diff_simple(grid_simple, &outer, &remove);
+
+        /*Mark remaining area using more efficient lv_area_diff()*/
+        grid_mark(grid, &everything, ' ', false);
+        grid_mark_area_diff(grid, &outer, &remove);
+
+        grid_assert_equal(grid_simple, grid);
+    }
+}
+
 #endif

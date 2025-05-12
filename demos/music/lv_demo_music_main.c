@@ -799,7 +799,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
-        if(opa < LV_OPA_MIN) return;
+        if(opa <= LV_OPA_MIN) return;
 
         lv_point_t center;
         lv_area_t obj_coords;
@@ -809,7 +809,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 
         lv_draw_triangle_dsc_t draw_dsc;
         lv_draw_triangle_dsc_init(&draw_dsc);
-        draw_dsc.bg_opa = LV_OPA_COVER;
+        draw_dsc.opa = LV_OPA_COVER;
 
         uint16_t r[64];
         uint32_t i;
@@ -865,12 +865,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
                 v = (r[k] * animv + r[j] * (amax - animv)) / amax;
             }
 
-            if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
-            else if(v > (uint32_t)BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
-            else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2,
-                                                                              ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP - BAR_COLOR2_STOP));
-            else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1,
-                                                      ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
+            if(v < BAR_COLOR1_STOP) draw_dsc.color = BAR_COLOR1;
+            else if(v > (uint32_t)BAR_COLOR3_STOP) draw_dsc.color = BAR_COLOR3;
+            else if(v > BAR_COLOR2_STOP) draw_dsc.color = lv_color_mix(BAR_COLOR3, BAR_COLOR2,
+                                                                           ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP - BAR_COLOR2_STOP));
+            else draw_dsc.color = lv_color_mix(BAR_COLOR2, BAR_COLOR1,
+                                                   ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
 
             uint32_t di = deg + deg_space;
 

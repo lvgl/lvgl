@@ -3,13 +3,13 @@
 
 static void add_data(lv_timer_t * t)
 {
-    lv_obj_t * chart = lv_timer_get_user_data(t);
+    lv_obj_t * chart = (lv_obj_t *)lv_timer_get_user_data(t);
     lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
 
-    lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
+    lv_chart_set_next_value(chart, ser, (int32_t)lv_rand(10, 90));
 
-    uint16_t p = lv_chart_get_point_count(chart);
-    uint16_t s = lv_chart_get_x_start_point(chart, ser);
+    uint32_t p = lv_chart_get_point_count(chart);
+    uint32_t s = lv_chart_get_x_start_point(chart, ser);
     int32_t * a = lv_chart_get_series_y_array(chart, ser);
 
     a[(s + 1) % p] = LV_CHART_POINT_NONE;
@@ -36,7 +36,7 @@ void lv_example_chart_8(void)
     /*Prefill with data*/
     uint32_t i;
     for(i = 0; i < 80; i++) {
-        lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
+        lv_chart_set_next_value(chart, ser, (int32_t)lv_rand(10, 90));
     }
 
     lv_timer_create(add_data, 300, chart);

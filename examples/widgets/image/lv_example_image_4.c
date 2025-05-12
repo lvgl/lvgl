@@ -3,7 +3,7 @@
 
 static void ofs_y_anim(void * img, int32_t v)
 {
-    lv_image_set_offset_y(img, v);
+    lv_image_set_offset_y((lv_obj_t *)img, v);
 }
 
 /**

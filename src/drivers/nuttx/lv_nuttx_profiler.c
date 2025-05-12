@@ -72,7 +72,7 @@ static uint64_t tick_get_cb(void)
     static uint32_t prev_tick = 0;
     static uint64_t cur_tick_ns = 0;
     uint32_t act_time = up_perf_gettime();
-    uint32_t elaps;
+    uint64_t elaps;
 
     /*If there is no overflow in sys_time simple subtract*/
     if(act_time >= prev_tick) {

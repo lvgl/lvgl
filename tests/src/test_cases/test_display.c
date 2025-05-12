@@ -2,6 +2,9 @@
 #include "../lvgl.h"
 #include "unity/unity.h"
 
+/*Bypassing resolution check*/
+#define TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT(path) TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), path);
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -9,7 +12,8 @@ void setUp(void)
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_display_set_matrix_rotation(NULL, false);
+    lv_obj_clean(lv_screen_active());
 }
 
 struct display_area_test_set {
@@ -36,6 +40,7 @@ void test_get_drawbuf_size_double_buffered(void)
                                                                                                     LV_COLOR_FORMAT_RGB888), 200, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     TEST_ASSERT_EQUAL(200, lv_display_get_draw_buf_size(disp));
+    lv_display_delete(disp);
 }
 
 void test_get_drawbuf_size_single_buffered(void)
@@ -49,6 +54,7 @@ void test_get_drawbuf_size_single_buffered(void)
                            LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     TEST_ASSERT_EQUAL(200,  lv_display_get_draw_buf_size(disp));
+    lv_display_delete(disp);
 }
 
 static void exec_invalidated_drawbuf_size_test(const struct display_area_test_set * test_set)
@@ -126,5 +132,77 @@ void test_get_invalidated_drawbuf_size_i1_partial()
     exec_invalidated_drawbuf_size_test(&test_set);
 }
 
+void test_display_matrix_rotation(void)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 300, 200);
+    lv_obj_set_pos(obj, 30, 20);
+    lv_obj_t * label = lv_label_create(obj);
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_set_matrix_rotation(disp, true);
+    TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_label_set_text(label, "Rotation: 0 degrees");
+    TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_0.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    lv_label_set_text(label, "Rotation: 90 degrees");
+    TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_90.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    lv_label_set_text(label, "Rotation: 180 degrees");
+    TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_180.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    lv_label_set_text(label, "Rotation: 270 degrees");
+    TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_270.png");
+
+    lv_display_set_matrix_rotation(disp, false);
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_label_set_text(label, "Rotation: 0 degrees");
+    TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT("display_matrix_rotation_0.png");
+#else
+    TEST_PASS();
+#endif
+}
+
+static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+    lv_display_flush_ready(disp);
+}
+
+void test_display_triple_buffer(void)
+{
+    lv_display_t * disp = lv_display_create(480, 320);
+    lv_display_set_flush_cb(disp, dummy_flush_cb);
+    lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_draw_buf_t * buf2 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_draw_buf_t * buf3 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buffers(disp, buf1, buf2);
+    lv_display_set_3rd_draw_buffer(disp, buf3);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf2);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf3);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf1);
+
+    lv_display_delete(disp);
+    lv_draw_buf_destroy(buf1);
+    lv_draw_buf_destroy(buf2);
+    lv_draw_buf_destroy(buf3);
+}
 
 #endif

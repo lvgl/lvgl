@@ -4,7 +4,7 @@
 
 static void set_angle(void * obj, int32_t v)
 {
-    lv_arc_set_value(obj, v);
+    lv_arc_set_value((lv_obj_t *)obj, v);
 }
 
 /**

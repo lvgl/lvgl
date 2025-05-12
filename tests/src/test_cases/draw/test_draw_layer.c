@@ -85,4 +85,15 @@ void test_draw_layer_bitmap_mask_from_image_not_found(void)
 #endif
 }
 
+void test_draw_layer_dispatch(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
+    lv_obj_set_style_opa(obj, LV_OPA_0, 0);
+    lv_obj_center(obj);
+
+    /*Verify whether this scenario will result in a busy loop.*/
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_dispatch.png");
+}
+
 #endif

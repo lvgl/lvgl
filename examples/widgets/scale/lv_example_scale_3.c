@@ -3,17 +3,17 @@
 
 LV_IMAGE_DECLARE(img_hand);
 
-lv_obj_t * needle_line;
-lv_obj_t * needle_img;
+static lv_obj_t * needle_line;
+static lv_obj_t * needle_img;
 
 static void set_needle_line_value(void * obj, int32_t v)
 {
-    lv_scale_set_line_needle_value(obj, needle_line, 60, v);
+    lv_scale_set_line_needle_value((lv_obj_t *)obj, needle_line, 60, v);
 }
 
 static void set_needle_img_value(void * obj, int32_t v)
 {
-    lv_scale_set_image_needle_value(obj, needle_img, v);
+    lv_scale_set_image_needle_value((lv_obj_t *)obj, needle_img, v);
 }
 
 /**

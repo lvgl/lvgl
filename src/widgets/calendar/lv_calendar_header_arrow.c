@@ -40,7 +40,7 @@ const lv_obj_class_t lv_calendar_header_arrow_class = {
     .constructor_cb = my_constructor,
     .width_def = LV_PCT(100),
     .height_def = LV_DPI_DEF / 3,
-    .name = "calendar-header-arrow",
+    .name = "lv_calendar_header_arrow",
 };
 
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
@@ -53,7 +53,7 @@ static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent)
+lv_obj_t * lv_calendar_add_header_arrow(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_arrow_class, parent);
     lv_obj_class_init_obj(obj);

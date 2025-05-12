@@ -129,6 +129,7 @@ typedef struct {
     uint32_t data_size;         /**< Size of the image in bytes*/
     const uint8_t * data;       /**< Pointer to the data of the image*/
     const void * reserved;      /**< A reserved field to make it has same size as lv_draw_buf_t*/
+    const void * reserved_2;    /**< A reserved field to make it has same size as lv_draw_buf_t*/
 } lv_image_dsc_t;
 
 /**********************

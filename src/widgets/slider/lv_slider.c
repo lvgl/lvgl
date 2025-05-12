@@ -102,7 +102,7 @@ const lv_obj_class_t lv_slider_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class,
-    .name = "slider",
+    .name = "lv_slider",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_SLIDER_START,
     .prop_index_end = LV_PROPERTY_SLIDER_END,

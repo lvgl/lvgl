@@ -53,8 +53,8 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
-#define LV_OPA_MIN 2    /**< Opacities below this will be transparent */
-#define LV_OPA_MAX 253  /**< Opacities above this will fully cover */
+#define LV_OPA_MIN 2    /**< Fully transparent if opa <= LV_OPA_MIN */
+#define LV_OPA_MAX 253  /**< Fully cover if opa >= LV_OPA_MAX */
 
 /**
  * Get the pixel size of a color format in bits, bpp
@@ -69,10 +69,16 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
                                             (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
                                             (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC4 ? 4 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6 ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6A ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6AP ? 6 : \
                                             (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_ARGB2222 ? 8 :  \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12 ? 12 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12A ? 12 : \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
@@ -82,6 +88,7 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
                                             (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
                                             (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED ? 32 : \
                                             (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
                                             0                                       \
                                     )
@@ -152,6 +159,7 @@ typedef enum {
     LV_COLOR_FORMAT_RGB888            = 0x0F,
     LV_COLOR_FORMAT_ARGB8888          = 0x10,
     LV_COLOR_FORMAT_XRGB8888          = 0x11,
+    LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED          = 0x1A,
 
     /*Formats not supported by software renderer but kept here so GPU can use it*/
     LV_COLOR_FORMAT_A1                = 0x0B,
@@ -224,8 +232,8 @@ typedef enum {
 
 #define LV_COLOR_MAKE(r8, g8, b8) {b8, g8, r8}
 
-#define LV_OPA_MIX2(a1, a2) (((int32_t)(a1) * (a2)) >> 8)
-#define LV_OPA_MIX3(a1, a2, a3) (((int32_t)(a1) * (a2) * (a3)) >> 16)
+#define LV_OPA_MIX2(a1, a2) ((lv_opa_t)(((int32_t)(a1) * (a2)) >> 8))
+#define LV_OPA_MIX3(a1, a2, a3) ((lv_opa_t)(((int32_t)(a1) * (a2) * (a3)) >> 16))
 
 /**********************
  * GLOBAL PROTOTYPES

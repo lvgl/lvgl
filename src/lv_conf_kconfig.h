@@ -84,6 +84,30 @@ extern "C" {
 #endif
 
 /*******************
+ * LV_USE_OS
+ *******************/
+
+#ifdef CONFIG_LV_OS_NONE
+#  define CONFIG_LV_USE_OS LV_OS_NONE
+#elif defined(CONFIG_LV_OS_PTHREAD)
+#  define CONFIG_LV_USE_OS LV_OS_PTHREAD
+#elif defined(CONFIG_LV_OS_FREERTOS)
+#  define CONFIG_LV_USE_OS LV_OS_FREERTOS
+#elif defined(CONFIG_LV_OS_CMSIS_RTOS2)
+#  define CONFIG_LV_USE_OS LV_OS_CMSIS_RTOS2
+#elif defined (CONFIG_LV_OS_RTTHREAD)
+#  define CONFIG_LV_USE_OS LV_OS_RTTHREAD
+#elif defined (CONFIG_LV_OS_WINDOWS)
+#  define CONFIG_LV_USE_OS LV_OS_WINDOWS
+#elif defined (CONFIG_LV_OS_MQX)
+#  define CONFIG_LV_USE_OS LV_OS_MQX
+#elif defined (CONFIG_LV_OS_SDL2)
+#  define CONFIG_LV_USE_OS LV_OS_SDL2
+#elif defined (CONFIG_LV_OS_CUSTOM)
+#  define CONFIG_LV_USE_OS LV_OS_CUSTOM
+#endif
+
+/*******************
  * LV_MEM_SIZE
  *******************/
 
@@ -204,10 +228,10 @@ extern "C" {
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_28_compressed
 #elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_dejavu_16_persian_hebrew
-#elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_14_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_14_cjk
-#elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_16_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_16_cjk
+#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK)
+#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_14_cjk
+#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK)
+#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_16_cjk
 #elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_unscii_8
 #elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
@@ -257,6 +281,15 @@ extern "C" {
 #  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
 #elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_FULL)
 #  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#endif
+
+
+#ifdef CONFIG_LV_USE_CALENDAR
+#  ifdef CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
+#    define CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES { CONFIG_LV_MONDAY_STR , CONFIG_LV_TUESDAY_STR, CONFIG_LV_WEDNESDAY_STR, CONFIG_LV_THURSDAY_STR, CONFIG_LV_FRIDAY_STR, CONFIG_LV_SATURDAY_STR, CONFIG_LV_SUNDAY_STR }
+#  else
+#    define CONFIG_LV_CALENDAR_DEFAULT_DAY_NAMES { CONFIG_LV_SUNDAY_STR, CONFIG_LV_MONDAY_STR , CONFIG_LV_TUESDAY_STR, CONFIG_LV_WEDNESDAY_STR, CONFIG_LV_THURSDAY_STR, CONFIG_LV_FRIDAY_STR, CONFIG_LV_SATURDAY_STR }
+#  endif
 #endif
 
 #ifdef __cplusplus

@@ -39,7 +39,7 @@ const lv_obj_class_t lv_calendar_header_dropdown_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
     .constructor_cb = my_constructor,
-    .name = "calendar-header-dropdown",
+    .name = "lv_calendar_header_dropdown",
 };
 
 static const char * month_list = "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12";
@@ -61,7 +61,7 @@ static const char * year_list = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent)
+lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_dropdown_class, parent);
     lv_obj_class_init_obj(obj);

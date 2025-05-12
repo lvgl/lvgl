@@ -7,8 +7,8 @@ static lv_chart_cursor_t * cursor;
 
 static void value_changed_event_cb(lv_event_t * e)
 {
-    static int32_t last_id = -1;
-    lv_obj_t * obj = lv_event_get_target(e);
+    uint32_t last_id;
+    lv_obj_t * obj = lv_event_get_target_obj(e);
 
     last_id = lv_chart_get_pressed_point(obj);
     if(last_id != LV_CHART_POINT_NONE) {
@@ -31,12 +31,12 @@ void lv_example_chart_6(void)
     lv_obj_add_event_cb(chart, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_refresh_ext_draw_size(chart);
 
-    cursor = lv_chart_add_cursor(chart, lv_palette_main(LV_PALETTE_BLUE), LV_DIR_LEFT | LV_DIR_BOTTOM);
+    cursor = lv_chart_add_cursor(chart, lv_palette_main(LV_PALETTE_BLUE), (lv_dir_t)(LV_DIR_LEFT | LV_DIR_BOTTOM));
 
     ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
+        lv_chart_set_next_value(chart, ser, (int32_t)lv_rand(10, 90));
     }
 
     //    lv_chart_set_scale_x(chart, 500);

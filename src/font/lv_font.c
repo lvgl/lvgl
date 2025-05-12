@@ -34,8 +34,6 @@
  *  GLOBAL VARIABLES
  **********************/
 
-const lv_font_t * const lv_font_default = LV_FONT_DEFAULT;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -57,6 +55,11 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
+    LV_ASSERT_NULL(g_dsc);
+    if(!g_dsc->entry) {
+        return;
+    }
+
     const lv_font_t * font = g_dsc->resolved_font;
 
     if(font != NULL && font->release_glyph) {
@@ -77,8 +80,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
     const lv_font_t * f = font_p;
 
-    dsc_out->resolved_font = NULL;
-    dsc_out->req_raw_bitmap = 0;
+    lv_memzero(dsc_out, sizeof(lv_font_glyph_dsc_t));
 
     while(f) {
         bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
@@ -149,7 +151,21 @@ int32_t lv_font_get_line_height(const lv_font_t * font)
 
 const lv_font_t * lv_font_get_default(void)
 {
-    return lv_font_default;
+    return LV_FONT_DEFAULT;
+}
+
+bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_t * ft_info_2)
+{
+    LV_ASSERT_NULL(ft_info_1);
+    LV_ASSERT_NULL(ft_info_2);
+
+    bool is_equal = (ft_info_1->size == ft_info_2->size
+                     && ft_info_1->style == ft_info_2->style
+                     && ft_info_1->render_mode == ft_info_2->render_mode
+                     && ft_info_1->kerning == ft_info_2->kerning
+                     && lv_strcmp(ft_info_1->name, ft_info_2->name) == 0);
+
+    return is_equal;
 }
 
 /**********************

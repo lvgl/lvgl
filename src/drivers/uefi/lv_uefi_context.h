@@ -33,7 +33,7 @@ extern "C" {
  **********************/
 
 /**
- * @brief Initialize the UEFI chache variables.
+ * @brief Initialize the UEFI cache variables.
  * @param image_handle The handle of the current image
  * @param system_table Pointer to the system table
  * @remark This has to be called before lv_init().

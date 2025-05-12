@@ -9,47 +9,49 @@ import subprocess
 base_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, base_path)
 
-project_path = os.path.abspath(os.path.join(base_path, '..', '..'))
-docs_path = os.path.join(project_path, 'docs')
+project_dir = os.path.abspath(os.path.join(base_path, '..', '..'))
+docs_path = os.path.join(project_dir, 'docs')
 sys.path.insert(0, docs_path)
 
 import create_fake_lib_c  # NOQA
 import pycparser_monkeypatch  # NOQA
 import pycparser  # NOQA
 
+doxyfile_filename = 'Doxyfile'
 DEVELOP = False
 
 
-temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
+intermediate_dir = tempfile.mkdtemp(suffix='.lvgl_json')
 
 
-def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_private, no_docstrings, *compiler_args):
+def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_private, no_docstrings, *compiler_args):
 
     pycparser_monkeypatch.FILTER_PRIVATE = filter_private
 
-    lvgl_path = project_path
-    lvgl_src_path = os.path.join(lvgl_path, 'src')
-    temp_lvgl = os.path.join(temp_directory, 'lvgl')
+    lvgl_dir = project_dir
+    lvgl_src_dir = os.path.join(lvgl_dir, 'src')
+    int_lvgl_dir = os.path.join(intermediate_dir, 'lvgl')
+    lv_conf_dest_file = os.path.join(intermediate_dir, 'lv_conf.h')
     target_header_base_name = (
         os.path.splitext(os.path.split(target_header)[-1])[0]
     )
 
     try:
-        os.mkdir(temp_lvgl)
-        shutil.copytree(lvgl_src_path, os.path.join(temp_lvgl, 'src'))
-        shutil.copyfile(os.path.join(lvgl_path, 'lvgl.h'), os.path.join(temp_lvgl, 'lvgl.h'))
+        os.mkdir(int_lvgl_dir)
+        shutil.copytree(lvgl_src_dir, os.path.join(int_lvgl_dir, 'src'))
+        shutil.copyfile(os.path.join(lvgl_dir, 'lvgl.h'), os.path.join(int_lvgl_dir, 'lvgl.h'))
 
-        pp_file = os.path.join(temp_directory, target_header_base_name + '.pp')
+        pp_file = os.path.join(intermediate_dir, target_header_base_name + '.pp')
 
-        if lvgl_config_path is None:
-            lvgl_config_path = os.path.join(lvgl_path, 'lv_conf_template.h')
+        if lv_conf_file is None:
+            lv_conf_templ_file = os.path.join(lvgl_dir, 'lv_conf_template.h')
 
-            with open(lvgl_config_path, 'rb') as f:
-                data = f.read().decode('utf-8').split('\n')
+            with open(lv_conf_templ_file, 'rb') as f:
+                lines = f.read().decode('utf-8').split('\n')
 
-            for i, line in enumerate(data):
+            for i, line in enumerate(lines):
                 if line.startswith('#if 0'):
-                    data[i] = '#if 1'
+                    lines[i] = '#if 1'
                 else:
                     for item in (
                         'LV_USE_LOG',
@@ -75,17 +77,15 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
                         'LV_USE_FREETYPE'
                     ):
                         if line.startswith(f'#define {item} '):
-                            data[i] = f'#define {item} 1'
+                            lines[i] = f'#define {item} 1'
                             break
 
-            with open(os.path.join(temp_directory, 'lv_conf.h'), 'wb') as f:
-                f.write('\n'.join(data).encode('utf-8'))
+            with open(lv_conf_dest_file, 'wb') as f:
+                f.write('\n'.join(lines).encode('utf-8'))
         else:
-            src = lvgl_config_path
-            dst = os.path.join(temp_directory, 'lv_conf.h')
-            shutil.copyfile(src, dst)
+            shutil.copyfile(lv_conf_file, lv_conf_dest_file)
 
-        include_dirs = [temp_directory, project_path]
+        include_dirs = [intermediate_dir, project_dir]
 
         if sys.platform.startswith('win'):
             import get_sdl2
@@ -103,7 +103,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
             env = pyMSVC.setup_environment()  # NOQA
             cpp_cmd = ['cl', '/std:c11', '/nologo', '/P']
             output_pp = f'/Fi"{pp_file}"'
-            sdl2_include, _ = get_sdl2.get_sdl2(temp_directory)
+            sdl2_include, _ = get_sdl2.get_sdl2(intermediate_dir)
             include_dirs.append(sdl2_include)
             include_path_env_key = 'INCLUDE'
 
@@ -120,7 +120,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
             ]
             output_pp = f' >> "{pp_file}"'
 
-        fake_libc_path = create_fake_lib_c.run(temp_directory)
+        fake_libc_path = create_fake_lib_c.run(intermediate_dir)
 
         if include_path_env_key not in os.environ:
             os.environ[include_path_env_key] = ''
@@ -178,12 +178,14 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
 
         cparser = pycparser.CParser()
         ast = cparser.parse(pp_data, target_header)
+        doxyfile_src_file = os.path.join(docs_path, doxyfile_filename)
 
-        ast.setup_docs(no_docstrings, temp_directory)
+        ast.setup_docs(no_docstrings, lvgl_src_dir,
+                       intermediate_dir, doxyfile_src_file, output_to_stdout)
 
         if not output_to_stdout and output_path is None:
             if not DEVELOP:
-                shutil.rmtree(temp_directory)
+                shutil.rmtree(intermediate_dir)
 
             return ast
 
@@ -260,9 +262,9 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
         error = 0
 
     if DEVELOP:
-        print('temporary file path:', temp_directory)
+        print('temporary file path:', intermediate_dir)
     else:
-        shutil.rmtree(temp_directory)
+        shutil.rmtree(intermediate_dir)
 
     sys.exit(error)
 
@@ -311,7 +313,7 @@ if __name__ == '__main__':
             "using this feature."
         ),
         action="store",
-        default=os.path.join(temp_directory, "lvgl", "lvgl.h")
+        default=os.path.join(intermediate_dir, "lvgl", "lvgl.h")
     )
     parser.add_argument(
         '--filter-private',

@@ -3,7 +3,7 @@
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * dropdown = lv_event_get_target(e);
+    lv_obj_t * dropdown = lv_event_get_target_obj(e);
     char buf[64];
     lv_dropdown_get_selected_str(dropdown, buf, sizeof(buf));
     LV_LOG_USER("'%s' is selected", buf);

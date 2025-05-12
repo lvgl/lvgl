@@ -26,9 +26,11 @@
 #ifndef _TVG_ARRAY_H_
 #define _TVG_ARRAY_H_
 
+#include "tvgCommon.h"
 #include <memory.h>
 #include <cstdint>
 #include <cstdlib>
+#include "tvgCommon.h"
 
 namespace tvg
 {
@@ -57,7 +59,8 @@ struct Array
     {
         if (count + 1 > reserved) {
             reserved = count + (count + 2) / 2;
-            data = static_cast<T*>(realloc(data, sizeof(T) * reserved));
+            data = static_cast<T*>(lv_realloc(data, sizeof(T) * reserved));
+            LV_ASSERT_MALLOC(data);
         }
         data[count++] = element;
     }
@@ -74,7 +77,8 @@ struct Array
     {
         if (size > reserved) {
             reserved = size;
-            data = static_cast<T*>(realloc(data, sizeof(T) * reserved));
+            data = static_cast<T*>(lv_realloc(data, sizeof(T) * reserved));
+            LV_ASSERT_MALLOC(data);
         }
         return true;
     }
@@ -141,7 +145,7 @@ struct Array
 
     void reset()
     {
-        free(data);
+        lv_free(data);
         data = nullptr;
         count = reserved = 0;
     }
@@ -171,7 +175,7 @@ struct Array
 
     ~Array()
     {
-        free(data);
+        lv_free(data);
     }
 
 private:

@@ -3,8 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
-#include "lv_test_helpers.h"
 
 static void create_ui(void);
 static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -28,7 +26,7 @@ void test_binding(void)
     create_ui();
 
     /*Wait for the animation*/
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
 }

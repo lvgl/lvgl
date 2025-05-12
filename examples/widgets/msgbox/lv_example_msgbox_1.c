@@ -3,7 +3,7 @@
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_target_obj(e);
     lv_obj_t * label = lv_obj_get_child(btn, 0);
     LV_UNUSED(label);
     LV_LOG_USER("Button %s clicked", lv_label_get_text(label));

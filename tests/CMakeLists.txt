@@ -125,17 +125,20 @@ elseif (OPTIONS_TEST_SYSHEAP)
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_MEMORYCHECK)
     # sanitizer is disabled because valgrind uses LD_PRELOAD and the
     # sanitizer lib needs to load first
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
@@ -167,6 +170,10 @@ if ($ENV{NON_AMD64_BUILD})
     set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
 endif()
 
+# Set LV_CONF_PATH so custom.cmake knows about it before compiling lvgl
+# Used to preprocess lv_conf_internal.h with the test config
+set(LV_CONF_PATH "${LVGL_TEST_DIR}/src/lv_test_conf.h")
+set(LV_BUILD_TEST ON)
 # Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH="${LVGL_TEST_DIR}/src/lv_test_conf.h"
@@ -276,9 +283,7 @@ file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
 
 add_library(test_common
     STATIC
-        src/lv_test_indev.c
         src/lv_test_init.c
-        src/lv_test_helpers.c
         src/test_assets/test_animimg001.c
         src/test_assets/test_animimg002.c
         src/test_assets/test_animimg003.c
@@ -295,6 +300,7 @@ add_library(test_common
         src/test_assets/test_font_montserrat_ascii_1bpp.c
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
+        src/test_assets/test_font_montserrat_ascii_8bpp.c
         src/test_assets/test_font_montserrat_ascii_3bpp_compressed.c
         src/test_assets/test_font_1_bin.c
         src/test_assets/test_font_2_bin.c
@@ -311,7 +317,6 @@ add_library(test_common
         src/test_assets/test_imagebutton_right.c
         src/test_assets/test_music_button_play.c
         src/test_assets/test_lottie_approve.c
-        unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}
 )
@@ -352,6 +357,21 @@ endif()
 # libpng is required for the png test case
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
+
+if(NOT WIN32)
+    # FFmpeg is optional for the image and video test cases
+    find_package(PkgConfig)
+    pkg_check_modules(FFMPEG libavformat libavcodec libswscale libavutil)
+    if(FFMPEG_FOUND)
+        include_directories(${FFMPEG_INCLUDE_DIRS})
+    else()
+        message("FFmpeg not found, defaulting to 0")
+        add_definitions(-DLV_USE_FFMPEG=0)
+    endif()
+else()
+    message("Disable FFmpeg for Windows")
+    add_definitions(-DLV_USE_FFMPEG=0)
+endif()
 
 # libfreetype is required for the font test case
 find_package(Freetype REQUIRED)
@@ -474,6 +494,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
+            ${FFMPEG_LIBRARIES}
             m
             pthread
             ${TEST_LIBS})

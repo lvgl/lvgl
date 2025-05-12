@@ -84,7 +84,7 @@ const lv_obj_class_t lv_roller_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
-    .name = "roller",
+    .name = "lv_roller",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_ROLLER_START,
     .prop_index_end = LV_PROPERTY_ROLLER_END,
@@ -102,7 +102,7 @@ const lv_obj_class_t lv_roller_label_class  = {
     .event_cb = lv_roller_label_event,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_label_class,
-    .name = "roller-label",
+    .name = "lv_roller_label",
 };
 
 /**********************
@@ -386,6 +386,11 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         roller->moved = 0;
         lv_anim_delete(get_label(obj), set_y_anim);
+    }
+    else if(code == LV_EVENT_CLICKED) {
+        if(roller->moved == 1) {
+            lv_event_stop_processing(e);
+        }
     }
     else if(code == LV_EVENT_PRESSING) {
         if(roller->option_cnt <= 1) return;

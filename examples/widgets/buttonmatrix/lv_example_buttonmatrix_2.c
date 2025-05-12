@@ -3,9 +3,9 @@
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
     /*When the button matrix draws the buttons...*/
     if(base_dsc->part == LV_PART_ITEMS) {
         bool pressed = false;
@@ -40,6 +40,11 @@ static void event_cb(lv_event_t * e)
                 fill_draw_dsc->radius = LV_RADIUS_CIRCLE;
                 if(pressed) fill_draw_dsc->color = lv_palette_darken(LV_PALETTE_RED, 3);
                 else fill_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
+            }
+
+            lv_draw_box_shadow_dsc_t * box_shadow_draw_dsc = lv_draw_task_get_box_shadow_dsc(draw_task);
+            if(box_shadow_draw_dsc) {
+                box_shadow_draw_dsc->radius = LV_RADIUS_CIRCLE;
             }
         }
         else if(base_dsc->id1 == 3) {

@@ -1,0 +1,29 @@
+<globals>
+	<config name="mylib" help="This is my great component library" />
+
+	<consts>
+		<int name="global_int" value="30" />
+	</consts>
+
+	<styles>
+		<style name="global_red" bg_color="0xf00"
+			radius="global_small_unit" pad_all="12px" />
+	</styles>
+
+	<subjects>
+		<int name="global_subject" value="22" />
+	</subjects>
+
+
+	<images>
+		<file name="logo"
+			src_path="A:src/test_assets/test_img_lvgl_logo.png" />
+	</images>
+
+	<fonts>
+		<bin name="my_bin_font" src_path="A:src/test_assets/test_font_2.fnt" as_file="true"/>
+		<tiny_ttf name="noto_32"
+			src_path="A:src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+			size="32"  as_file="true"/>
+	</fonts>
+</globals>

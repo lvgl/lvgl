@@ -51,8 +51,10 @@ typedef enum {
     LV_IMAGE_ALIGN_RIGHT_MID,
     LV_IMAGE_ALIGN_CENTER,
     LV_IMAGE_ALIGN_AUTO_TRANSFORM,
-    LV_IMAGE_ALIGN_STRETCH,
-    LV_IMAGE_ALIGN_TILE,
+    LV_IMAGE_ALIGN_STRETCH, /* Set X and Y scale to fill the Widget's area. */
+    LV_IMAGE_ALIGN_TILE,    /* Tile image to fill Widget's area. Offset is applied to shift the tiling. */
+    LV_IMAGE_ALIGN_CONTAIN, /* The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area. */
+    LV_IMAGE_ALIGN_COVER,   /* The image keeps its aspect ratio and fills the Widget's area. */
 } lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
@@ -265,6 +267,34 @@ int32_t lv_image_get_scale_x(lv_obj_t * obj);
  * @return          zoom factor (256: no zoom)
  */
 int32_t lv_image_get_scale_y(lv_obj_t * obj);
+
+/**
+ * Get the width of an image before any transformations.
+ * @param obj Pointer to an image object.
+ * @return The width of the image.
+ */
+int32_t lv_image_get_src_width(lv_obj_t * obj);
+
+/**
+ * Get the height of an image before any transformations.
+ * @param obj Pointer to an image object.
+ * @return The height of the image.
+ */
+int32_t lv_image_get_src_height(lv_obj_t * obj);
+
+/**
+ * Get the transformed width of an image object.
+ * @param obj Pointer to an image object.
+ * @return The transformed width of the image.
+ */
+int32_t lv_image_get_transformed_width(lv_obj_t * obj);
+
+/**
+ * Get the transformed height of an image object.
+ * @param obj Pointer to an image object.
+ * @return The transformed height of the image.
+ */
+int32_t lv_image_get_transformed_height(lv_obj_t * obj);
 
 /**
  * Get the current blend mode of the image

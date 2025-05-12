@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -16,7 +16,7 @@ void tearDown(void)
 
 void test_xml_view2_from_xml(void)
 {
-    lv_xml_register_font("lv_montserrat_30", &lv_font_montserrat_30);
+    lv_xml_register_font(NULL, "lv_montserrat_30", &lv_font_montserrat_30);
     lv_xml_component_register_from_file("A:src/test_assets/xml/view2.xml");
 
     lv_xml_create(lv_screen_active(), "view2", NULL);

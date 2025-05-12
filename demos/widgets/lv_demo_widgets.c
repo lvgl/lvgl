@@ -1323,7 +1323,7 @@ static void birthday_event_cb(lv_event_t * e)
                 lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 30);
                 lv_obj_add_event_cb(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
 
-                lv_calendar_header_dropdown_create(calendar);
+                lv_calendar_add_header_dropdown(calendar);
             }
         }
     }
@@ -1427,17 +1427,17 @@ static void chart_event_cb(lv_event_t * e)
             tri_dsc.p[1].y = (int32_t)draw_line_dsc->p2.y;
             tri_dsc.p[2].x = (int32_t)(draw_line_dsc->p1.y < draw_line_dsc->p2.y ? draw_line_dsc->p1.x : draw_line_dsc->p2.x);
             tri_dsc.p[2].y = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
-            tri_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+            tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
             int32_t full_h = lv_obj_get_height(obj);
             int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
             int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj_coords.y1) * 255 / full_h;
-            tri_dsc.bg_grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.bg_grad.stops[0].opa = 255 - fract_uppter;
-            tri_dsc.bg_grad.stops[0].frac = 0;
-            tri_dsc.bg_grad.stops[1].color = lv_chart_get_series_color(obj, ser);
-            tri_dsc.bg_grad.stops[1].opa = 255 - fract_lower;
-            tri_dsc.bg_grad.stops[1].frac = 255;
+            tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
+            tri_dsc.grad.stops[0].opa = 255 - fract_uppter;
+            tri_dsc.grad.stops[0].frac = 0;
+            tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
+            tri_dsc.grad.stops[1].opa = 255 - fract_lower;
+            tri_dsc.grad.stops[1].frac = 255;
 
             lv_draw_triangle(base_dsc->layer, &tri_dsc);
 

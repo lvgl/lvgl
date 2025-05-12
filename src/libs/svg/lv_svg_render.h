@@ -29,6 +29,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_svg_render_class;
 
 typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * next;
@@ -42,6 +43,10 @@ typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * head;
     char * fill_ref;
     char * stroke_ref;
+    struct _lv_svg_render_class * clz;
+} lv_svg_render_obj_t;
+
+typedef struct _lv_svg_render_class {
     void (*set_paint_ref)(struct _lv_svg_render_obj * obj, lv_vector_draw_dsc_t * dsc,
                           const struct _lv_svg_render_obj * target_obj, bool fill);
 
@@ -51,7 +56,7 @@ typedef struct _lv_svg_render_obj {
     void (*get_bounds)(const struct _lv_svg_render_obj * obj, lv_area_t * area);
     void (*get_size)(const struct _lv_svg_render_obj * obj, uint32_t * size);
     void (*destroy)(struct _lv_svg_render_obj * obj);
-} lv_svg_render_obj_t;
+} lv_svg_render_class;
 
 typedef struct _lv_svg_render_hal {
     void (*load_image)(const char * image_url, lv_draw_image_dsc_t * img_dsc);
@@ -87,6 +92,15 @@ void lv_svg_render_delete(lv_svg_render_obj_t * render);
  * @return the bytes of SVG render objects
  */
 uint32_t lv_svg_render_get_size(const lv_svg_render_obj_t * render);
+
+/**
+ * @brief Get viewport's width and height of the render object
+ * @param render pointer to the SVG render object
+ * @param width pointer to save the width of the viewport of the SVG render object
+ * @param height pointer to save the height of the viewport of the SVG render object
+ * @return lv_result_t, LV_RESULT_OK if success, LV_RESULT_INVALID if fail
+ */
+lv_result_t lv_svg_render_get_viewport_size(const lv_svg_render_obj_t * render, float * width, float * height);
 
 /**
  * @brief Render an SVG object to a vector graphics

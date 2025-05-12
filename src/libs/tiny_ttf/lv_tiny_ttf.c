@@ -104,9 +104,22 @@ static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf
                                                                   const tiny_ttf_cache_data_t * rhs);
 
 static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc);
+
+static lv_font_t * tiny_ttf_font_create_cb(const lv_font_info_t * info, const void * src);
+static void tiny_ttf_font_delete_cb(lv_font_t * font);
+static void * tiny_ttf_font_dup_src_cb(const void * src);
+static void tiny_ttf_font_free_src_cb(void * src);
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
+
+const lv_font_class_t lv_tiny_ttf_font_class = {
+    .create_cb = tiny_ttf_font_create_cb,
+    .delete_cb = tiny_ttf_font_delete_cb,
+    .dup_src_cb = tiny_ttf_font_dup_src_cb,
+    .free_src_cb = tiny_ttf_font_free_src_cb,
+};
 
 /**********************
  *  STATIC VARIABLES
@@ -530,6 +543,7 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
     uint32_t stride = draw_buf->header.stride;
     stbtt_MakeGlyphBitmap(info, draw_buf->data, w, h, stride, dsc->scale, dsc->scale, g1);
 
+    lv_draw_buf_flush_cache(draw_buf, NULL);
     node->draw_buf = draw_buf;
     return true;
 }
@@ -553,6 +567,61 @@ static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf
     }
 
     return 0;
+}
+
+static lv_font_t * tiny_ttf_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    const lv_tiny_ttf_font_src_t * font_src = src;
+
+    if(font_src->path) {
+#if LV_TINY_TTF_FILE_SUPPORT
+        if(font_src->cache_size) {
+            return lv_tiny_ttf_create_file_ex(font_src->path, info->size, info->kerning, font_src->cache_size);
+        }
+
+        return lv_tiny_ttf_create_file(font_src->path, info->size);
+#else
+        LV_LOG_WARN("LV_TINY_TTF_FILE_SUPPORT not enabled");
+        return NULL;
+#endif
+    }
+
+    if(font_src->cache_size) {
+        return lv_tiny_ttf_create_data_ex(font_src->data, font_src->data_size, info->size, info->kerning, font_src->cache_size);
+    }
+
+    return lv_tiny_ttf_create_data(font_src->data, font_src->data_size, info->size);
+}
+
+static void tiny_ttf_font_delete_cb(lv_font_t * font)
+{
+    lv_tiny_ttf_destroy(font);
+}
+
+static void * tiny_ttf_font_dup_src_cb(const void * src)
+{
+    const lv_tiny_ttf_font_src_t * font_src = src;
+
+    lv_tiny_ttf_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_tiny_ttf_font_src_t));
+    LV_ASSERT_MALLOC(new_src);
+    *new_src = *font_src;
+
+    if(font_src->path) {
+        new_src->path = lv_strdup(font_src->path);
+    }
+
+    return new_src;
+}
+
+static void tiny_ttf_font_free_src_cb(void * src)
+{
+    lv_tiny_ttf_font_src_t * font_src = src;
+    if(font_src->path) {
+        lv_free((char *)font_src->path);
+        font_src->path = NULL;
+    }
+
+    lv_free(font_src);
 }
 
 #endif

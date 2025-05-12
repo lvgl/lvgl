@@ -406,7 +406,7 @@ size_t calc_buffer_size(struct smm_buffer * buf)
 struct smm_buffer * get_from_pool(struct smm_group * grp)
 {
     int ret;
-    size_t buf_sz;
+    size_t buf_sz = 0;
     struct smm_buffer * buf;
     struct smm_buffer * last = NULL;
 

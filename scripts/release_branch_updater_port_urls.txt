@@ -1,1 +1,9 @@
 https://github.com/lvgl/lv_port_linux
+https://github.com/lvgl/lv_port_pc_eclipse
+https://github.com/lvgl/lv_port_pc_vscode
+https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc
+https://github.com/lvgl/lv_port_riverdi_stm32u5
+https://github.com/lvgl/lv_nuttx
+https://github.com/lvgl/lv_zephyr
+https://github.com/lvgl/lv_esp_idf
+https://github.com/lvgl/lv_port_actions_technology

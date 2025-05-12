@@ -4,9 +4,6 @@
 
 #include "unity/unity.h"
 
-#include "lv_test_helpers.h"
-#include "lv_test_indev.h"
-
 #define SWITCHES_CNT    10
 
 uint8_t value_changed_event_cnt = 0;
@@ -75,14 +72,14 @@ void test_switch_animation(void)
     /* Trigger animation */
     mouse_click_on_switch();
     /* Wait some time  */
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     int32_t checked_anim_state = anim_sw->anim_state;
     TEST_ASSERT_GREATER_THAN(initial_anim_state, checked_anim_state);
     TEST_ASSERT(lv_obj_has_state(sw, LV_STATE_CHECKED));
 
     mouse_click_on_switch();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     TEST_ASSERT_LESS_THAN(checked_anim_state, anim_sw->anim_state);
     TEST_ASSERT_FALSE(lv_obj_has_state(sw, LV_STATE_CHECKED));

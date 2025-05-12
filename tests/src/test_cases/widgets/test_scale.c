@@ -33,6 +33,10 @@ void test_scale_render_example_1(void)
     lv_scale_set_range(scale, 10, 40);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_1.png");
+
+    /* test no major ticks */
+    lv_scale_set_major_tick_every(scale, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_6.png");
 }
 
 /* An vertical scale and a horizontal scale with section and custom styling */
@@ -248,8 +252,9 @@ static void draw_event_cb(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
-    if(base_dsc->part == LV_PART_INDICATOR) {
-        if(label_draw_dsc) {
+    lv_draw_line_dsc_t * line_draw_dsc = lv_draw_task_get_line_dsc(draw_task);
+    if(label_draw_dsc) {
+        if(base_dsc->part == LV_PART_INDICATOR) {
             const lv_color_t color_idx[7] = {
                 lv_palette_main(LV_PALETTE_RED),
                 lv_palette_main(LV_PALETTE_ORANGE),
@@ -281,6 +286,26 @@ static void draw_event_cb(lv_event_t * e)
             draw_task->area.x1 -= (new_w - old_w) / 2;
             draw_task->area.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
 
+        }
+    }
+    else if(line_draw_dsc) {
+        if(base_dsc->part == LV_PART_INDICATOR || base_dsc->part == LV_PART_ITEMS) {
+            const lv_color_t color_idx[7] = {
+                lv_palette_main(LV_PALETTE_RED),
+                lv_palette_main(LV_PALETTE_ORANGE),
+                lv_palette_main(LV_PALETTE_YELLOW),
+                lv_palette_main(LV_PALETTE_GREEN),
+                lv_palette_main(LV_PALETTE_CYAN),
+                lv_palette_main(LV_PALETTE_BLUE),
+                lv_palette_main(LV_PALETTE_PURPLE),
+            };
+            uint32_t tick_idx = base_dsc->id1;
+            uint32_t tick_value = base_dsc->id2;
+
+            line_draw_dsc->color = color_idx[tick_idx % 7];
+
+            int32_t expected_tick_value = lv_map(tick_idx, 0, 31 - 1, 10, 40);
+            TEST_ASSERT_EQUAL(tick_value, expected_tick_value);
         }
     }
 }

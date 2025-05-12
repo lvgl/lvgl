@@ -57,6 +57,12 @@ void lv_refr_now(lv_display_t * disp);
  */
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
 
+/**
+ * Called periodically to handle the refreshing
+ * @param timer pointer to the timer itself, or `NULL`
+ */
+void lv_display_refr_timer(lv_timer_t * timer);
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

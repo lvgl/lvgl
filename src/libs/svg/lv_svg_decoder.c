@@ -146,7 +146,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 lv_svg_render_obj_t * svg_header = lv_svg_render_create(svg_doc);
                 if(svg_header->tag == LV_SVG_TAG_SVG) {
                     lv_area_t bounds;
-                    svg_header->get_bounds(svg_header, &bounds);
+                    svg_header->clz->get_bounds(svg_header, &bounds);
                     width = lv_area_get_width(&bounds) - 1;
                     height = lv_area_get_height(&bounds) - 1;
                 }

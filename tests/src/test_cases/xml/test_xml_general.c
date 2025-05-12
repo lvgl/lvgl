@@ -35,12 +35,16 @@ void test_xml_widget_direct_create(void)
         "range_max", "100",
         "mode", "symmetrical",
         "value", "50",
+        "name", "my_slider",
         NULL, NULL,
     };
 
     slider = lv_xml_create(lv_screen_active(), "lv_slider", attrs);
     lv_obj_set_pos(slider, 10, 200);
-
+#if LV_USE_OBJ_NAME
+    lv_obj_t * same_slider = lv_obj_get_child_by_name(lv_screen_active(), "my_slider");
+    TEST_ASSERT_EQUAL_PTR(slider, same_slider);
+#endif
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/widget_create_1.png");
 }
 
@@ -268,11 +272,11 @@ void test_xml_image_and_font(void)
     /*Monstserrat fonts are registered by LVGL */
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
-    lv_xml_register_image("test_img1", &img_render_lvgl_logo_l8);
-    lv_xml_register_image("test_img2", &img_render_lvgl_logo_rgb565);
+    lv_xml_register_image(NULL, "test_img1", &img_render_lvgl_logo_l8);
+    lv_xml_register_image(NULL, "test_img2", &img_render_lvgl_logo_rgb565);
 
-    lv_xml_register_font("lv_montserrat_16", &lv_font_montserrat_16);
-    lv_xml_register_font("lv_montserrat_18", &lv_font_montserrat_18);
+    lv_xml_register_font(NULL, "lv_montserrat_16", &lv_font_montserrat_16);
+    lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
 
     lv_xml_component_register_from_data("btn", btn_xml);
 

@@ -30,39 +30,40 @@ void test_read(void)
     lv_fs_res_t res;
 
     char cur[512];
-    getcwd(cur, 512);
-    errno = 0;
-    void * a = fopen("src/test_files/readtest.txt", "r");
-    printf("%s, %d, %p\n", cur, errno, a);
-    fclose(a);
+    if(getcwd(cur, 512) != NULL) {
+        errno = 0;
+        void * a = fopen("src/test_files/readtest.txt", "r");
+        printf("%s, %d, %p\n", cur, errno, a);
+        fclose(a);
 
-    /*'A' has cache*/
-    lv_fs_file_t fa;
-    res = lv_fs_open(&fa, "A:src/test_files/readtest.txt", LV_FS_MODE_RD);
-    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
-
-    /*'B' has no cache*/
-    lv_fs_file_t fb;
-    res = lv_fs_open(&fb, "B:src/test_files/readtest.txt", LV_FS_MODE_RD);
-    TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
-
-    /*Use an odd size to make sure it's not aligned with the driver's cache size*/
-    uint8_t buf[79];
-    uint32_t cnt = 0;
-    uint32_t br = 1;
-    while(br) {
-        res = lv_fs_read(&fa, buf, sizeof(buf), &br);
+        /*'A' has cache*/
+        lv_fs_file_t fa;
+        res = lv_fs_open(&fa, "A:src/test_files/readtest.txt", LV_FS_MODE_RD);
         TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
-        TEST_ASSERT_TRUE(memcmp(buf, read_exp + cnt, br) == 0);
 
-        res = lv_fs_read(&fb, buf, sizeof(buf), &br);
+        /*'B' has no cache*/
+        lv_fs_file_t fb;
+        res = lv_fs_open(&fb, "B:src/test_files/readtest.txt", LV_FS_MODE_RD);
         TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
-        TEST_ASSERT_TRUE(memcmp(buf, read_exp + cnt, br) == 0);
-        cnt += br;
+
+        /*Use an odd size to make sure it's not aligned with the driver's cache size*/
+        uint8_t buf[79];
+        uint32_t cnt = 0;
+        uint32_t br = 1;
+        while(br) {
+            res = lv_fs_read(&fa, buf, sizeof(buf), &br);
+            TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+            TEST_ASSERT_TRUE(memcmp(buf, read_exp + cnt, br) == 0);
+
+            res = lv_fs_read(&fb, buf, sizeof(buf), &br);
+            TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
+            TEST_ASSERT_TRUE(memcmp(buf, read_exp + cnt, br) == 0);
+            cnt += br;
+        }
+
+        lv_fs_close(&fa);
+        lv_fs_close(&fb);
     }
-
-    lv_fs_close(&fa);
-    lv_fs_close(&fb);
 }
 
 void test_read_random(void)

@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "../lv_test_indev.h"
 #include "unity/unity.h"
 
 static uint32_t indev_reset_count = 0;
@@ -43,15 +42,15 @@ void test_indev_wait_release(void)
 
     lv_test_mouse_move_to(200, 200);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     lv_test_mouse_move_by(-20, 0);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     lv_test_mouse_move_by(-20, 0);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     lv_test_mouse_release();
 
