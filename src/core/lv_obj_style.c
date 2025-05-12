@@ -899,6 +899,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
 {
     trans_t * tr = _tr;
     lv_obj_t * obj = tr->obj;
+    int32_t tr_start, tr_end;
 
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -941,8 +942,8 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_TRANSLATE_Y:
             case LV_STYLE_TRANSFORM_WIDTH:
             case LV_STYLE_TRANSLATE_X:
-            int32_t tr_start = tr->start_value.num;
-            int32_t tr_end = tr->end_value.num;
+            tr_start = tr->start_value.num;
+            tr_end = tr->end_value.num;
             if((tr->prop == LV_STYLE_TRANSFORM_HEIGHT  || tr->prop == LV_STYLE_TRANSFORM_WIDTH)) {
                 int32_t wh = (tr->prop == LV_STYLE_TRANSFORM_WIDTH || tr->prop == LV_STYLE_TRANSLATE_X) ? lv_obj_get_width(obj) : lv_obj_get_height(obj);
                 if(LV_COORD_IS_PCT(tr->start_value.num)) {
