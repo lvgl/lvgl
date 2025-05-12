@@ -937,7 +937,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else if(v >= 255) value_final.color = tr->end_value.color;
                 else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
                 break;
-            
+
             case LV_STYLE_TRANSFORM_HEIGHT:
             case LV_STYLE_TRANSLATE_Y:
             case LV_STYLE_TRANSFORM_WIDTH:
