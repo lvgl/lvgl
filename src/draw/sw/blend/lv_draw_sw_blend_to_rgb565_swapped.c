@@ -1070,7 +1070,11 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
             lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(x = 0; x < w; x++) {
-                lv_color16_t src_px = lv_color16_from_swapped_u16(&src_buf_u16[x]);
+                uint16_t raw;
+                lv_color16_t src_px;
+                lv_memcpy(&raw, &src_buf_u16[x], sizeof(raw));         /* get raw pixel */
+                raw = lv_color_swap_16(raw);                        /* swap byte order */
+                lv_memcpy(&src_px, &raw, sizeof(src_px));
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
                         if(src_buf_u16[x] == 0x0000) continue;   /*Do not add pure black*/
