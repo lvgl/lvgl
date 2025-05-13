@@ -1098,9 +1098,9 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed)
 {
-    // At least one compression method must be enabled
+    /* At least one compression method must be enabled */
 #if (LV_USE_LZ4 || LV_USE_RLE)
-    // Check if the decompression method is enabled and valid
+    /* Check if the decompression method is enabled and valid */
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
 #if !LV_USE_RLE
         LV_LOG_WARN("RLE decompression is not enabled");
@@ -1158,7 +1158,7 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         uint8_t * output = img_data;
 
         len = lv_rle_decompress(input, input_len, output, out_len, pixel_byte);
-#endif // LV_USE_RLE
+#endif /* LV_USE_RLE */
     }
     else if(compressed->method == LV_IMAGE_COMPRESS_LZ4) {
 #if LV_USE_LZ4
@@ -1167,10 +1167,10 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
         int ret = LZ4_decompress_safe(input, output, (int)input_len, (int)out_len);
         if(ret >= 0) {
-            // Cast is safe because of the above check
+            /* Cast is safe because of the above check */
             len = (uint32_t)ret;
         }
-#endif // LV_USE_LZ4
+#endif /* LV_USE_LZ4 */
     }
 
     if(len != compressed->decompressed_size) {
@@ -1186,5 +1186,5 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     LV_UNUSED(compressed);
     LV_LOG_WARN("At least one compression method must be enabled");
     return LV_RESULT_INVALID;
-#endif // (LV_USE_LZ4 || LV_USE_RLE)
+#endif /* (LV_USE_LZ4 || LV_USE_RLE) */
 }
