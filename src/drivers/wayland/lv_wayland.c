@@ -10,10 +10,6 @@
  *
  ******************************************************************/
 
-typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation unit */
-
-#ifndef _WIN32
-
 /*********************
  *      INCLUDES
  *********************/
@@ -1966,4 +1962,3 @@ bool lv_wayland_timer_handler(void)
 }
 
 #endif /* LV_USE_WAYLAND */
-#endif /* _WIN32 */
