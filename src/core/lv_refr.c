@@ -794,21 +794,48 @@ static void refr_configured_layer(lv_layer_t * layer)
         if(rotation != LV_DISPLAY_ROTATION_0) {
             lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
-            /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
+            /**
+             * The screen rotation direction defined by LVGL is opposite to the drawing angle.
+             * Use direct matrix assignment to reduce precision loss and improve efficiency.
+             */
             switch(rotation) {
                 case LV_DISPLAY_ROTATION_90:
-                    lv_matrix_rotate(&layer->matrix, 270);
-                    lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
+                    /**
+                     * lv_matrix_rotate(&layer->matrix, 270);
+                     * lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
+                     */
+                    layer->matrix.m[0][0] = 0;
+                    layer->matrix.m[0][1] = 1;
+                    layer->matrix.m[0][2] = 0;
+                    layer->matrix.m[1][0] = -1;
+                    layer->matrix.m[1][1] = 0;
+                    layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
                 case LV_DISPLAY_ROTATION_180:
-                    lv_matrix_rotate(&layer->matrix, 180);
-                    lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
+                    /**
+                     * lv_matrix_rotate(&layer->matrix, 180);
+                     * lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
+                     */
+                    layer->matrix.m[0][0] = -1;
+                    layer->matrix.m[0][1] = 0;
+                    layer->matrix.m[0][2] = disp_refr->hor_res;
+                    layer->matrix.m[1][0] = 0;
+                    layer->matrix.m[1][1] = -1;
+                    layer->matrix.m[1][2] = disp_refr->ver_res;
                     break;
 
                 case LV_DISPLAY_ROTATION_270:
-                    lv_matrix_rotate(&layer->matrix, 90);
-                    lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);
+                    /**
+                     * lv_matrix_rotate(&layer->matrix, 90);
+                     * lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);
+                     */
+                    layer->matrix.m[0][0] = 0;
+                    layer->matrix.m[0][1] = -1;
+                    layer->matrix.m[0][2] = disp_refr->hor_res;
+                    layer->matrix.m[1][0] = 1;
+                    layer->matrix.m[1][1] = 0;
+                    layer->matrix.m[1][2] = 0;
                     break;
 
                 default:
