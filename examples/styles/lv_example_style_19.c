@@ -9,7 +9,7 @@ void lv_example_style_19(void)
     /*Add lv_example_style_11 as background*/
     lv_example_style_11();
 
-/* Set to 1 to enable recolor overlay instead of solid background */
+    /* Set to 1 to enable recolor overlay instead of solid background */
 #if 0
     /* Apply a screen-wide tint using recolor (efficient overlay).
      * This modifies the visual appearance by blending a semi-transparent color
