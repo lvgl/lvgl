@@ -497,7 +497,22 @@ static void refr_sync_areas(void)
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
     lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    lv_draw_buf_t * on_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
+    /*Triple buffer sync buffer for off-screen2 updates.*/
+    lv_draw_buf_t * off_screen2;
+    lv_draw_buf_t * on_screen;
+
+    if(disp_refr->buf_act == disp_refr->buf_1) {
+        off_screen2 = disp_refr->buf_2;
+        on_screen = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_2;
+    }
+    else if(disp_refr->buf_act == disp_refr->buf_2) {
+        off_screen2 = disp_refr->buf_3 ? disp_refr->buf_3 : disp_refr->buf_1;
+        on_screen = disp_refr->buf_1;
+    }
+    else {
+        off_screen2 = disp_refr->buf_1;
+        on_screen = disp_refr->buf_2;
+    }
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -551,6 +566,8 @@ static void refr_sync_areas(void)
         }
 #endif
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
+        if(off_screen2 != on_screen)
+            lv_draw_buf_copy(off_screen2, sync_area, on_screen, sync_area);
     }
 
     /*Clear sync areas*/
@@ -679,9 +696,15 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
         /*In direct mode and full mode the the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
-        layer->buf_area.x2 = lv_display_get_original_horizontal_resolution(disp_refr) - 1;
-        layer->buf_area.y2 = lv_display_get_original_vertical_resolution(disp_refr) - 1;
-        layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
+        if(lv_display_get_matrix_rotation(disp_refr)) {
+            layer->buf_area.x2 = lv_display_get_original_horizontal_resolution(disp_refr) - 1;
+            layer->buf_area.y2 = lv_display_get_original_vertical_resolution(disp_refr) - 1;
+        }
+        else {
+            layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
+            layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
+        }
+        layer_reshape_draw_buf(layer, disp_refr->stride_is_auto ? LV_STRIDE_AUTO : layer->draw_buf->header.stride);
     }
 
     /*Try to divide the area to smaller tiles*/
@@ -1324,6 +1347,9 @@ static void draw_buf_flush(lv_display_t * disp)
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
         if(disp->buf_act == disp->buf_1) {
             disp->buf_act = disp->buf_2;
+        }
+        else if(disp->buf_act == disp->buf_2) {
+            disp->buf_act = disp->buf_3 ? disp->buf_3 : disp->buf_1;
         }
         else {
             disp->buf_act = disp->buf_1;

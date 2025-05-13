@@ -18,7 +18,7 @@ extern "C" {
 
 #include "lv_cache_entry.h"
 
-#include "clazz/lv_cache_clazz.h"
+#include "class/lv_cache_class.h"
 #include "instance/lv_cache_instance.h"
 
 /*********************

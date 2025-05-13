@@ -68,7 +68,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
         lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
         /* Create a spinner */
-        lv_obj_t * spinner = lv_spinner_create(lv_screen_active(), 1000, 60);
+        lv_obj_t * spinner = lv_spinner_create(lv_screen_active());
         lv_obj_set_size(spinner, 64, 64);
         lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
 
@@ -157,10 +157,9 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
      * Static or global buffer(s). The second buffer is optional */
     #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
     /* TODO: Declare your own BUFF_SIZE appropriate to your system. */
-    static lv_color_t buf_1[BUFF_SIZE];
     #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
     static uint8_t buf_1[BUFF_SIZE];
-    static lv_color_t buf_2[BUFF_SIZE];
+    static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main`` function, after your peripherals (SPI, GPIOs, LCD
   etc) have been initialised, initialise LVGL using :cpp:func:`lv_init`,
@@ -173,7 +172,7 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
    lv_init();
    lv_display_t *display = lv_display_create(WIDTH, HEIGHT); /* Create the display */
    lv_display_set_flush_cb(display, my_flush_cb);            /* Set a flush callback to draw to the display */
-   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /* Set an initialized buffer */
+   lv_display_set_buffers(display, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /* Set an initialized buffer */
 
    /* Register the touch controller with LVGL - Not included here for brevity. */
 
@@ -187,7 +186,7 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
     /* Create a spinner */
-    lv_obj_t * spinner = lv_spinner_create(lv_screen_active(), 1000, 60);
+    lv_obj_t * spinner = lv_spinner_create(lv_screen_active());
     lv_obj_set_size(spinner, 64, 64);
     lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
 
@@ -237,12 +236,13 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 
 - Finally, create the ``my_flush_cb`` function to output the frame
   buffer to your LCD. The specifics of this function will vary
-  depending on which MCU features you are using. Below is an example
-  for a typical MCU interface.
+  depending on which MCU features you are using. Below is a simple 
+  example of a parallel LCD interface, adjust this to suit your specific
+  display and MCU capabilities.
 
   .. code-block:: c
 
-   void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map);
+   void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
    {
      uint16_t * color_p = (uint16_t *)px_map;
 

@@ -84,6 +84,7 @@ static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cach
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(lv_color32_t * dest, lv_color32_t src,
                                                                       lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache);
+
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************
@@ -284,7 +285,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
             }
         }
-
     }
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
@@ -296,10 +296,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
                 for(x = 0; x < w; x++) {
                     dest_buf[x] = lv_color_32_32_mix(color_argb, dest_buf[x], &cache);
                 }
+
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
             }
         }
-
     }
     /*Masked with full opacity*/
     else if(mask && opa >= LV_OPA_MAX) {
@@ -316,7 +316,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888(lv_draw_sw_blend_f
                 mask += mask_stride;
             }
         }
-
     }
     /*Masked with opacity*/
     else {
@@ -502,11 +501,11 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x++, src_x++) {
                         /*
-                                                dest_buf_c32[dest_x].alpha = src_buf_al88[src_x].alpha;
-                                                dest_buf_c32[dest_x].red = src_buf_al88[src_x].lumi;
-                                                dest_buf_c32[dest_x].green = src_buf_al88[src_x].lumi;
-                                                dest_buf_c32[dest_x].blue = src_buf_al88[src_x].lumi;
-                                                */
+                        dest_buf_c32[dest_x].alpha = src_buf_al88[src_x].alpha;
+                        dest_buf_c32[dest_x].red = src_buf_al88[src_x].lumi;
+                        dest_buf_c32[dest_x].green = src_buf_al88[src_x].lumi;
+                        dest_buf_c32[dest_x].blue = src_buf_al88[src_x].lumi;
+                        */
                         lv_color_8_32_mix(src_buf_al88[src_x].lumi, &dest_buf_c32[dest_x], src_buf_al88[src_x].alpha);
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
@@ -768,7 +767,6 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
 
 static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t src_px_size)
 {
-
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
@@ -814,7 +812,6 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
                     }
                 }
             }
-
         }
         if(mask_buf == NULL && opa < LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc, src_px_size)) {
@@ -830,7 +827,6 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
                     src_buf = drawbuf_next_row(src_buf, src_stride);
                 }
             }
-
         }
         if(mask_buf && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc, src_px_size)) {
@@ -1159,7 +1155,7 @@ static inline lv_color32_t LV_ATTRIBUTE_FAST_MEM lv_color_32_32_mix(lv_color32_t
         if(bg.alpha != cache->bg_saved.alpha || fg.alpha != cache->fg_saved.alpha) {
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-            cache->res_alpha_saved  = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
+            cache->res_alpha_saved = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
             LV_ASSERT(cache->res_alpha_saved != 0);
             cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
         }
@@ -1232,6 +1228,6 @@ static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, ui
     return (void *)((uint8_t *)buf + stride);
 }
 
-#endif
+#endif /* LV_DRAW_SW_SUPPORT_ARGB8888 */
 
-#endif
+#endif /* LV_USE_DRAW_SW */

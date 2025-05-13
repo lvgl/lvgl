@@ -143,7 +143,7 @@ it. Therefore, all positions are relative to the parent.
 
 .. code-block:: c
 
-   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current screen */
+   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current Screen */
    lv_obj_set_size(parent, 100, 80);                       /* Set size of parent */
 
    lv_obj_t * widget1 = lv_obj_create(parent);             /* Create a Widget on previously created parent Widget */
@@ -187,14 +187,14 @@ drawn within.
         lv_event_set_ext_draw_size(e, 30); /*Set 30px extra draw area around the widget*/
     }
 
-Create and delete Widgets
--------------------------
+Creating and deleting Widgets
+-----------------------------
 
 In LVGL, Widgets can be created and deleted dynamically at run time. It
 means only the currently created (existing) Widgets consume RAM.
 
-This allows for the creation of a screen just when a button is clicked
-to open it, and for deletion of screens when a new screen is loaded.
+This allows for the creation of a Screen just when a button is clicked
+to open it, and for deletion of Screens when a new Screen is loaded.
 
 UIs can be created based on the current environment of the device. For
 example one can create meters, charts, bars and sliders based on the
@@ -334,11 +334,16 @@ Loading Screens
 To load a new screen, use :cpp:expr:`lv_screen_load(scr1)`.  This sets ``scr1`` as
 the Active Screen.
 
-Load Screen with Animation
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Load Screen with Extended Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A new screen can be loaded with animation by using
-:cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`. The
+There is a way to load screens that gives you 2 additional (extended) options,
+allowing the caller to specify:
+
+- an optional transition method, and
+- an option to gracefully delete the screen that was being displayed.
+
+:cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`.  The
 following transition types exist:
 
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
@@ -348,7 +353,7 @@ following transition types exist:
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
 
 Setting ``auto_del`` to ``true`` will automatically delete the old
-screen when the animation is finished.
+screen when the animation (if any) is finished.
 
 The new screen will become active (returned by :cpp:func:`lv_screen_active`) when
 the animation starts after ``delay`` time. All inputs are disabled

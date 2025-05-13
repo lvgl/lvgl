@@ -293,6 +293,13 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
 void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
 
 /**
+ * Set the third draw buffer for a display.
+ * @param disp              pointer to a display
+ * @param buf3              third buffer
+ */
+void lv_display_set_3rd_draw_buffer(lv_display_t * disp, lv_draw_buf_t * buf3);
+
+/**
  * Set display render mode
  * @param disp              pointer to a display
  * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
@@ -364,8 +371,6 @@ void lv_display_set_antialiasing(lv_display_t * disp, bool en);
  */
 bool lv_display_get_antialiasing(lv_display_t * disp);
 
-//! @cond Doxygen_Suppress
-
 /**
  * Call from the display driver when the flushing is finished
  * @param disp      pointer to display whose `flush_cb` was called
@@ -380,8 +385,6 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
  *                  false: there are other areas too which will be refreshed soon
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
-
-//! @endcond
 
 bool lv_display_is_double_buffered(lv_display_t * disp);
 

@@ -37,6 +37,8 @@
 #include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_arc_parser.h"
 #include "parsers/lv_xml_checkbox_parser.h"
+#include "parsers/lv_xml_canvas_parser.h"
+#include "parsers/lv_xml_calendar_parser.h"
 #include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
@@ -101,6 +103,12 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
     lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
     lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
+    lv_xml_widget_register("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
+    lv_xml_widget_register("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);
+    lv_xml_widget_register("lv_calendar-header_arrow", lv_xml_calendar_header_arrow_create,
+                           lv_xml_calendar_header_arrow_apply);
+    lv_xml_widget_register("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
+                           lv_xml_calendar_header_dropdown_apply);
 
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
@@ -295,7 +303,7 @@ const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
 {
 
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_const_t * cnst;
     if(ctx) {
@@ -350,7 +358,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * nam
 const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
 {
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_image_t * img;
     if(ctx) {
@@ -400,7 +408,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * 
 lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * name)
 {
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_event_cb_t * e;
     if(ctx) {

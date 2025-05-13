@@ -508,8 +508,6 @@ lv_obj_t * lv_obj_get_child_by_name(const lv_obj_t * parent, const char * path)
 
 lv_obj_t * lv_obj_find_by_name(const lv_obj_t * parent, const char * name)
 {
-    LV_ASSERT_OBJ(parent, MY_CLASS);
-
     if(parent == NULL) parent = lv_display_get_screen_active(NULL);
     if(parent == NULL) return NULL;
 
