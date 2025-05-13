@@ -45,7 +45,7 @@ void tearDown(void)
 
 void test_perf_monitor_start_stop(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     const lv_sysmon_perf_data_t * data = lv_sysmon_perf_stop(basic);
@@ -57,7 +57,7 @@ void test_perf_monitor_start_stop(void)
 
 void test_perf_monitor_refresh(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     mock_refresh();
@@ -72,7 +72,7 @@ void test_perf_monitor_refresh(void)
 
 void test_perf_monitor_render(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     mock_render();
@@ -90,7 +90,7 @@ void test_perf_monitor_render(void)
 
 void test_perf_monitor_real_refresh(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_refr_now(NULL);
@@ -102,7 +102,7 @@ void test_perf_monitor_real_refresh(void)
 
 void test_perf_monitor_fps(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     mock_refresh();
@@ -117,7 +117,8 @@ void test_perf_monitor_fps(void)
 
     const lv_sysmon_perf_data_t * data = lv_sysmon_perf_stop(basic);
     TEST_ASSERT_NOT_NULL(data);
-    TEST_ASSERT_EQUAL(20, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(10, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(20, data->overall.calculated.fps_refr);
     TEST_ASSERT_EQUAL(200, data->overall.calculated.duration);
     TEST_ASSERT_EQUAL((lv_value_precise_t)(MOCK_REFRESH_TIME + MOCK_RENDER_TIME) / 2,
                       data->overall.calculated.refr_avg_time);
@@ -128,7 +129,7 @@ void test_perf_monitor_fps(void)
 
 void test_perf_monitor_reset_data(void)
 {
-    lv_result_t res = lv_sysmon_perf_start(basic);
+    lv_result_t res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     mock_refresh();
@@ -145,7 +146,8 @@ void test_perf_monitor_reset_data(void)
     TEST_ASSERT_EQUAL((lv_value_precise_t)(MOCK_REFRESH_TIME + MOCK_RENDER_TIME) / 2,
                       data->overall.calculated.refr_avg_time);
     TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, data->overall.calculated.render_avg_time);
-    TEST_ASSERT_EQUAL(20, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(10, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(20, data->overall.calculated.fps_refr);
 
     lv_sysmon_perf_reset_data(basic, LV_SYSMON_PERF_TYPE_OVERALL);
     data = lv_sysmon_perf_stop(basic);
@@ -156,15 +158,51 @@ void test_perf_monitor_reset_data(void)
     TEST_ASSERT_EQUAL(0, data->overall.calculated.refr_avg_time);
     TEST_ASSERT_EQUAL(0, data->overall.calculated.render_avg_time);
     TEST_ASSERT_EQUAL(0, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(0, data->overall.calculated.fps_refr);
+}
+
+void test_perf_monitor_start_stop_on_render(void)
+{
+    lv_result_t res = lv_sysmon_perf_start(basic, false);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+
+    /* First refresh should be ignored */
+
+    mock_refresh();
+    lv_tick_inc(100 - MOCK_REFRESH_TIME - MOCK_RENDER_TIME);
+    mock_render();
+
+    /* Duration start from render finished, with one render counted */
+
+    mock_refresh();
+    lv_tick_inc(100 - MOCK_REFRESH_TIME - MOCK_RENDER_TIME);
+    mock_render();
+
+    /* Duration won't increase now, but the refresh will be counted */
+
+    mock_refresh();
+
+    const lv_sysmon_perf_data_t * data = lv_sysmon_perf_stop(basic);
+    TEST_ASSERT_NOT_NULL(data);
+    TEST_ASSERT_EQUAL(4, data->overall.measured.refr_cnt);
+    TEST_ASSERT_EQUAL(2, data->overall.measured.render_cnt);
+    TEST_ASSERT_EQUAL(MOCK_REFRESH_TIME * 2 + MOCK_RENDER_TIME * 2, data->overall.measured.refr_elaps_sum);
+    TEST_ASSERT_EQUAL(MOCK_RENDER_TIME * 2, data->overall.measured.render_elaps_sum);
+    TEST_ASSERT_EQUAL(100, data->overall.calculated.duration);
+    TEST_ASSERT_EQUAL((lv_value_precise_t)(MOCK_REFRESH_TIME + MOCK_RENDER_TIME) / 2,
+                      data->overall.calculated.refr_avg_time);
+    TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, data->overall.calculated.render_avg_time);
+    TEST_ASSERT_EQUAL(10, data->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(30, data->overall.calculated.fps_refr); /* This is a problem we'll get under start-on-render mode */
 }
 
 void test_perf_monitor_scroll(void)
 {
     lv_sysmon_perf_t * scroll = lv_sysmon_perf_create(lv_display_get_default(), "test-scroll", 0, 1);
     TEST_ASSERT_NOT_NULL(scroll);
-    lv_result_t res = lv_sysmon_perf_start(scroll);
+    lv_result_t res = lv_sysmon_perf_start(scroll, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
-    res = lv_sysmon_perf_start(basic);
+    res = lv_sysmon_perf_start(basic, true);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     mock_refresh();
@@ -197,8 +235,10 @@ void test_perf_monitor_scroll(void)
                       data_scroll->overall.calculated.refr_avg_time);
     TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, data_basic->overall.calculated.render_avg_time);
     TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, data_scroll->overall.calculated.render_avg_time);
-    TEST_ASSERT_EQUAL(10, data_basic->overall.calculated.fps);
-    TEST_ASSERT_EQUAL(10, data_scroll->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(5, data_basic->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(5, data_scroll->overall.calculated.fps);
+    TEST_ASSERT_EQUAL(10, data_basic->overall.calculated.fps_refr);
+    TEST_ASSERT_EQUAL(10, data_scroll->overall.calculated.fps_refr);
 
     /* Check scroll data */
 
@@ -214,6 +254,7 @@ void test_perf_monitor_scroll(void)
     TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, info->calculated.refr_avg_time);
     TEST_ASSERT_EQUAL(MOCK_RENDER_TIME, info->calculated.render_avg_time);
     TEST_ASSERT_EQUAL(10, info->calculated.fps);
+    TEST_ASSERT_EQUAL(10, info->calculated.fps_refr);
 
     /* Done */
 

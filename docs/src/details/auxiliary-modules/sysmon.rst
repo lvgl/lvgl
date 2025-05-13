@@ -81,7 +81,7 @@ Custom Performance Monitor without Binding to Label
     lv_sysmon_perf_t * perf = lv_sysmon_perf_create(lv_display_get_default(), "your-perf", 0, 0);
 
     /* Start the performance monitor */
-    lv_sysmon_perf_start(perf);
+    lv_sysmon_perf_start(perf, true);
 
     /* Do something */
 

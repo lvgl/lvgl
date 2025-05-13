@@ -69,7 +69,8 @@ struct _lv_sysmon_perf_info_t {
 
     struct {
         uint32_t duration;
-        lv_value_precise_t fps;
+        lv_value_precise_t fps;                   /**< FPS of render */
+        lv_value_precise_t fps_refr;              /**< FPS of refresh */
         uint32_t cpu;
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
         uint32_t cpu_proc;                        /** The applications idle time percentage */
@@ -150,10 +151,11 @@ void lv_sysmon_perf_destroy(lv_sysmon_perf_t * perf);
 
 /**
  * Start a performance monitor instance, data will be cleared.
- * @param perf pointer to the performance monitor instance
- * @return     LV_RESULT_OK if the performance monitor instance is started successfully, LV_RESULT_INVALID if the performance monitor instance is failed to start
+ * @param perf      pointer to the performance monitor instance
+ * @param immediate if true, the performance monitor will start immediately, otherwise it will delay start until the first render finished
+ * @return          LV_RESULT_OK if the performance monitor instance is started successfully, LV_RESULT_INVALID if the performance monitor instance is failed to start
  */
-lv_result_t lv_sysmon_perf_start(lv_sysmon_perf_t * perf);
+lv_result_t lv_sysmon_perf_start(lv_sysmon_perf_t * perf, bool immediate);
 
 /**
  * Reset the data of a performance monitor instance.
