@@ -22,6 +22,7 @@ extern "C" {
 #include "lv_draw_eve.h"
 #if LV_USE_DRAW_EVE
 
+#include "lv_draw_eve_target.h"
 #include "../lv_draw_private.h"
 #include "../../misc/lv_types.h"
 #include "../lv_draw_triangle.h"
@@ -40,7 +41,12 @@ extern "C" {
 typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
+    lv_display_t * disp;
+    lv_draw_eve_parameters_t params;
+    lv_draw_eve_operation_cb_t op_cb;
 } lv_draw_eve_unit_t;
+
+extern lv_draw_eve_unit_t * lv_draw_eve_unit_g;
 
 /**********************
  * GLOBAL PROTOTYPES

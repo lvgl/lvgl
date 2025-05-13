@@ -159,9 +159,7 @@ extern "C"
 #define EVE_STANDBY      ((uint8_t) 0x41U) /* place EVE in Standby (clk running) */
 #define EVE_SLEEP        ((uint8_t) 0x42U) /* place EVE in Sleep (clk off) */
 #define EVE_CLKEXT       ((uint8_t) 0x44U) /* select external clock source */
-#if EVE_GEN < 4
 #define EVE_CLKINT       ((uint8_t) 0x48U) /* select internal clock source, not a valid option for BT817 / BT818 */
-#endif
 #define EVE_PWRDOWN      ((uint8_t) 0x50U) /* place EVE in Power Down (core off) */
 #define EVE_CLKSEL       ((uint8_t) 0x61U) /* configure system clock */
 #define EVE_RST_PULSE    ((uint8_t) 0x68U) /* reset core - all registers default and processors reset */

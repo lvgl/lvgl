@@ -22,6 +22,7 @@
 #include "lv_draw_eve_ram_g.h"
 #include "lv_draw_eve.h"
 #include "lv_eve.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -32,6 +33,8 @@
  *      TYPEDEFS
  **********************/
 
+lv_draw_eve_unit_t * lv_draw_eve_unit_g;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -41,15 +44,15 @@ static int32_t eve_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
+static void disp_delete_cb(lv_event_t * e);
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
-
 
 /**********************
  *      MACROS
@@ -61,11 +64,28 @@ static int32_t eve_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 void lv_draw_eve_init(void)
 {
-    lv_draw_eve_init_eve_ramg();
-
     lv_draw_eve_unit_t * draw_eve_unit = lv_draw_create_unit(sizeof(lv_draw_eve_unit_t));
     draw_eve_unit->base_unit.dispatch_cb = eve_dispatch;
     draw_eve_unit->base_unit.evaluate_cb = eve_evaluate;
+
+    lv_draw_eve_unit_g = draw_eve_unit;
+
+    lv_draw_eve_init_eve_ramg();
+}
+
+void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params,
+                                  lv_draw_eve_operation_cb_t op_cb)
+{
+    if(lv_draw_eve_unit_g == NULL) {
+        LV_LOG_WARN("lv_draw_eve is not initialized.");
+        return;
+    }
+
+    lv_draw_eve_unit_g->disp = disp;
+    lv_draw_eve_unit_g->params = *params; /* make a copy */
+    lv_draw_eve_unit_g->op_cb = op_cb;
+
+    lv_display_add_event_cb(disp, disp_delete_cb, LV_EVENT_DELETE, lv_draw_eve_unit_g);
 }
 
 /**********************
@@ -142,6 +162,11 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
     }
 }
 
+static void disp_delete_cb(lv_event_t * e)
+{
+    lv_draw_eve_unit_t * draw_eve_unit = lv_event_get_user_data(e);
+    draw_eve_unit->disp = NULL;
+}
 
 
 #endif /*LV_USE_DRAW_EVE*/

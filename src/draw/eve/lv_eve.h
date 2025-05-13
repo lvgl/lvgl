@@ -61,8 +61,6 @@ typedef struct {
     uint8_t blendFunc[2];
     uint16_t scx;
     uint16_t scy;
-    uint16_t scw;
-    uint16_t sch;
 } lv_eve_drawing_context_t;
 
 /**********************

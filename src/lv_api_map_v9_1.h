@@ -119,6 +119,8 @@ extern "C" {
 
 #define lv_slider_set_left_value lv_slider_set_start_value
 
+#define lv_ft81x_spi_operation lv_ft81x_spi_operation_t
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

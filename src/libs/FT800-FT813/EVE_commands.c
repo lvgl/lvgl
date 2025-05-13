@@ -1383,8 +1383,6 @@ uint8_t EVE_init_flash(void)
 
 #endif /* EVE_GEN > 2 */
 
-#if defined (EVE_HAS_GT911)
-
 #if EVE_GEN < 3
 #if defined (__AVR__)
 #include <avr/pgmspace.h>
@@ -1479,7 +1477,6 @@ const uint8_t eve_gt911_data[1184U] PROGMEM =
     EVE_memWrite16(REG_GPIOX_DIR, 0x8000U); /* setting GPIO3 back to input */
 #endif
 }
-#endif
 
 /**
  * @brief Waits for either reading REG_ID with a value of 0x7c, indicating that
@@ -1611,11 +1608,12 @@ uint8_t EVE_init(void)
     EVE_cmdWrite(EVE_RST_PULSE,0U); /* reset, only required for warm-start if PowerDown line is not used */
 #endif
 
-#if defined (EVE_HAS_CRYSTAL)
-    EVE_cmdWrite(EVE_CLKEXT, 0U); /* setup EVE for external clock */
-#else
-    EVE_cmdWrite(EVE_CLKINT, 0U); /* setup EVE for internal clock */
-#endif
+    if(EVE_HAS_CRYSTAL) {
+        EVE_cmdWrite(EVE_CLKEXT, 0U); /* setup EVE for external clock */
+    }
+    else {
+        EVE_cmdWrite(EVE_CLKINT, 0U); /* setup EVE for internal clock */
+    }
 
 #if EVE_GEN > 2
     EVE_cmdWrite(EVE_CLKSEL, 0x46U); /* set clock to 72 MHz */
@@ -1637,9 +1635,9 @@ uint8_t EVE_init(void)
 
 /* we have a display with a Goodix GT911 / GT9271 touch-controller on it,
  so we patch our FT811 or FT813 according to AN_336 or setup a BT815 / BT817 accordingly */
-#if defined (EVE_HAS_GT911)
-            use_gt911();
-#endif
+            if(EVE_HAS_GT911) {
+                use_gt911();
+            }
 
 #if defined (EVE_ADAM101)
             EVE_memWrite8(REG_PWM_DUTY, 0x80U); /* turn off backlight for Glyn ADAM101 module, it uses inverted values */
@@ -1666,19 +1664,9 @@ uint8_t EVE_init(void)
 
             enable_pixel_clock();
 
-#if defined (EVE_BACKLIGHT_FREQ)
             EVE_memWrite16(REG_PWM_HZ, EVE_BACKLIGHT_FREQ); /* set backlight frequency to configured value */
-#endif
 
-#if defined (EVE_BACKLIGHT_PWM)
             EVE_memWrite8(REG_PWM_DUTY, EVE_BACKLIGHT_PWM); /* set backlight pwm to user requested level */
-#else
-#if defined (EVE_ADAM101)
-            EVE_memWrite8(REG_PWM_DUTY, 0x60U); /* turn on backlight pwm to 25% for Glyn ADAM101 module, it uses inverted values */
-#else
-            EVE_memWrite8(REG_PWM_DUTY, 0x20U); /* turn on backlight pwm to 25% for any other module */
-#endif
-#endif
             DELAY_MS(1U);
             EVE_execute_cmd(); /* just to be safe, wait for EVE to not be busy */
 

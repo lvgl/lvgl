@@ -347,6 +347,11 @@
 /* Use EVE FT81X GPU. */
 #define LV_USE_DRAW_EVE 0
 
+#if LV_USE_DRAW_EVE
+    /* EVE_GEN value: 2, 3, or 4 */
+    #define LV_DRAW_EVE_EVE_GENERATION 4
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

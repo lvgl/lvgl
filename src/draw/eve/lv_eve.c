@@ -51,8 +51,6 @@ static lv_eve_drawing_context_t ct = {
     .blendFunc = {EVE_SRC_ALPHA, EVE_ONE_MINUS_SRC_ALPHA},
     .scx = 0,
     .scy = 0,
-    .scw = EVE_HSIZE,
-    .sch = EVE_VSIZE
 };
 
 static lv_eve_drawing_context_t ct_temp;

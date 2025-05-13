@@ -970,6 +970,17 @@
     #endif
 #endif
 
+#if LV_USE_DRAW_EVE
+    /* EVE_GEN value: 2, 3, or 4 */
+    #ifndef LV_DRAW_EVE_EVE_GENERATION
+        #ifdef CONFIG_LV_DRAW_EVE_EVE_GENERATION
+            #define LV_DRAW_EVE_EVE_GENERATION CONFIG_LV_DRAW_EVE_EVE_GENERATION
+        #else
+            #define LV_DRAW_EVE_EVE_GENERATION 4
+        #endif
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
