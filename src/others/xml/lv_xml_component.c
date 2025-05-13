@@ -136,7 +136,11 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
     }
 
     /* Parse the XML to extract metadata */
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Memory_Handling_Suite mem_handlers;
+    mem_handlers.malloc_fcn = lv_malloc;
+    mem_handlers.realloc_fcn = lv_realloc;
+    mem_handlers.free_fcn = lv_free;
+    XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
     XML_SetUserData(parser, &state);
     XML_SetElementHandler(parser, start_metadata_handler, end_metadata_handler);
 

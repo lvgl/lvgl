@@ -129,7 +129,11 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
     *parent_node = parent;
 
     /* Create an XML parser and set handlers */
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Memory_Handling_Suite mem_handlers;
+    mem_handlers.malloc_fcn = lv_malloc;
+    mem_handlers.realloc_fcn = lv_realloc;
+    mem_handlers.free_fcn = lv_free;
+    XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
     XML_SetUserData(parser, &state);
     XML_SetElementHandler(parser, view_start_element_handler, view_end_element_handler);
 
