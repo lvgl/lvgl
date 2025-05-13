@@ -17,12 +17,17 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_wayland.h"
+#include "lv_wl_keyboard.h"
+#include "lv_wl_pointer_axis.h"
+#include "lv_wl_pointer.h"
+#include "lv_wl_touch.h"
 #include "lv_wayland_smm.h"
 
 #if LV_USE_WAYLAND
 
-#include <stdio.h>
+#include "lv_wayland_private.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -42,34 +47,12 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 
 #include "lvgl.h"
 
-#if !LV_WAYLAND_WL_SHELL
-    #include "wayland_xdg_shell.h"
-    #define LV_WAYLAND_XDG_SHELL 1
-#else
-    #define LV_WAYLAND_XDG_SHELL 0
-#endif
 
 
 /*********************
  *      DEFINES
  *********************/
 
-#define LVGL_DRAW_BUFFER_DIV (8)
-#define DMG_CACHE_CAPACITY (32)
-#define TAG_LOCAL         (0)
-#define TAG_BUFFER_DAMAGE (1)
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    #define TITLE_BAR_HEIGHT 24
-    #define BORDER_SIZE 2
-    #define BUTTON_MARGIN LV_MAX((TITLE_BAR_HEIGHT / 6), BORDER_SIZE)
-    #define BUTTON_PADDING LV_MAX((TITLE_BAR_HEIGHT / 8), BORDER_SIZE)
-    #define BUTTON_SIZE (TITLE_BAR_HEIGHT - (2 * BUTTON_MARGIN))
-#endif
-
-#ifndef LV_WAYLAND_CYCLE_PERIOD
-    #define LV_WAYLAND_CYCLE_PERIOD LV_MIN(LV_DEF_REFR_PERIOD,1)
-#endif
 
 #define SHM_FORMAT_UNKNOWN 0xFFFFFF
 
@@ -81,165 +64,8 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
  *      TYPEDEFS
  **********************/
 
-enum object_type {
-    OBJECT_TITLEBAR = 0,
-    OBJECT_BUTTON_CLOSE,
-#if LV_WAYLAND_XDG_SHELL
-    OBJECT_BUTTON_MAXIMIZE,
-    OBJECT_BUTTON_MINIMIZE,
-#endif
-    OBJECT_BORDER_TOP,
-    OBJECT_BORDER_BOTTOM,
-    OBJECT_BORDER_LEFT,
-    OBJECT_BORDER_RIGHT,
-    OBJECT_WINDOW,
-};
-
-#define FIRST_DECORATION (OBJECT_TITLEBAR)
-#define LAST_DECORATION (OBJECT_BORDER_RIGHT)
-#define NUM_DECORATIONS (LAST_DECORATION-FIRST_DECORATION+1)
 
 
-struct window;
-struct input {
-    struct {
-        uint32_t x;
-        uint32_t y;
-        lv_indev_state_t left_button;
-        lv_indev_state_t right_button;
-        lv_indev_state_t wheel_button;
-        int16_t wheel_diff;
-    } pointer;
-
-    struct {
-        lv_key_t key;
-        lv_indev_state_t state;
-    } keyboard;
-
-#if LV_USE_GESTURE_RECOGNITION
-    lv_indev_touch_data_t touches[10];
-    uint8_t touch_event_cnt;
-    uint8_t primary_id;
-#endif
-};
-
-struct seat {
-    struct wl_touch * wl_touch;
-    struct wl_pointer * wl_pointer;
-    struct wl_keyboard * wl_keyboard;
-
-    struct {
-        struct xkb_keymap * keymap;
-        struct xkb_state * state;
-    } xkb;
-};
-
-struct graphic_object {
-    struct window * window;
-
-    struct wl_surface * surface;
-    bool surface_configured;
-    smm_buffer_t * pending_buffer;
-    smm_group_t * buffer_group;
-    struct wl_subsurface * subsurface;
-
-    enum object_type type;
-    int width;
-    int height;
-
-    struct input input;
-};
-
-struct application {
-    struct wl_display * display;
-    struct wl_registry * registry;
-    struct wl_compositor * compositor;
-    struct wl_subcompositor * subcompositor;
-    struct wl_shm * shm;
-    struct wl_seat * wl_seat;
-
-    struct wl_cursor_theme * cursor_theme;
-    struct wl_surface * cursor_surface;
-
-#if LV_WAYLAND_WL_SHELL
-    struct wl_shell * wl_shell;
-#endif
-
-#if LV_WAYLAND_XDG_SHELL
-    struct xdg_wm_base * xdg_wm;
-#endif
-
-#ifdef LV_WAYLAND_WINDOW_DECORATIONS
-    bool opt_disable_decorations;
-#endif
-
-    uint32_t shm_format;
-
-    struct xkb_context * xkb_context;
-
-    struct seat seat;
-
-    struct graphic_object * touch_obj;
-    struct graphic_object * pointer_obj;
-    struct graphic_object * keyboard_obj;
-
-    lv_ll_t window_ll;
-    lv_timer_t * cycle_timer;
-
-    bool cursor_flush_pending;
-    struct pollfd wayland_pfd;
-};
-
-struct window {
-    lv_display_t * lv_disp;
-    lv_draw_buf_t * lv_disp_draw_buf;
-
-    lv_indev_t * lv_indev_pointer;
-    lv_indev_t * lv_indev_pointeraxis;
-    lv_indev_t * lv_indev_touch;
-    lv_indev_t * lv_indev_keyboard;
-
-    lv_wayland_display_close_f_t close_cb;
-
-    struct application * application;
-
-#if LV_WAYLAND_WL_SHELL
-    struct wl_shell_surface * wl_shell_surface;
-#endif
-
-#if LV_WAYLAND_XDG_SHELL
-    struct xdg_surface * xdg_surface;
-    struct xdg_toplevel * xdg_toplevel;
-    uint32_t wm_capabilities;
-#endif
-
-    struct graphic_object * body;
-    struct {
-        lv_area_t cache[DMG_CACHE_CAPACITY];
-        unsigned char start;
-        unsigned char end;
-        unsigned size;
-    } dmg_cache;
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct graphic_object * decoration[NUM_DECORATIONS];
-#endif
-
-    int width;
-    int height;
-
-    bool resize_pending;
-    int resize_width;
-    int resize_height;
-
-    bool flush_pending;
-    bool shall_close;
-    bool closed;
-    bool maximized;
-    bool fullscreen;
-    uint32_t frame_counter;
-    bool frame_done;
-};
 
 /*********************************
  *   STATIC VARIABLES and FUNCTIONS
@@ -316,9 +142,10 @@ static void shm_format(void * data, struct wl_shm * wl_shm, uint32_t format)
 
     LV_UNUSED(wl_shm);
 
-    LV_LOG_TRACE("Supported color space fourcc.h code: %08X", format);
+    LV_LOG_WARN("Supported color space fourcc.h code: %08X", format);
 
     if(LV_COLOR_DEPTH == 32 && format == WL_SHM_FORMAT_ARGB8888) {
+        LV_LOG_WARN("Found WL_SHM_FORMAT_ARGB8888");
 
         /* Wayland compositors MUST support ARGB8888 */
         app->shm_format = format;
@@ -328,6 +155,7 @@ static void shm_format(void * data, struct wl_shm * wl_shm, uint32_t format)
             format == WL_SHM_FORMAT_XRGB8888 &&
             app->shm_format != WL_SHM_FORMAT_ARGB8888) {
 
+        LV_LOG_WARN("Found WL_SHM_FORMAT_XRGB8888");
         /* Select XRGB only if the compositor doesn't support transprancy */
         app->shm_format = format;
 
@@ -340,715 +168,8 @@ static void shm_format(void * data, struct wl_shm * wl_shm, uint32_t format)
 }
 
 static const struct wl_shm_listener shm_listener = {
-    shm_format
+    .format = shm_format
 };
-
-static void pointer_handle_enter(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface,
-                                 wl_fixed_t sx, wl_fixed_t sy)
-{
-    struct application * app = data;
-    const char * cursor = "left_ptr";
-    int pos_x = wl_fixed_to_int(sx);
-    int pos_y = wl_fixed_to_int(sy);
-
-    if(!surface) {
-        app->pointer_obj = NULL;
-        return;
-    }
-
-    app->pointer_obj = wl_surface_get_user_data(surface);
-
-    app->pointer_obj->input.pointer.x = pos_x;
-    app->pointer_obj->input.pointer.y = pos_y;
-
-#if (LV_WAYLAND_WINDOW_DECORATIONS && LV_WAYLAND_XDG_SHELL)
-    if(!app->pointer_obj->window->xdg_toplevel || app->opt_disable_decorations) {
-        return;
-    }
-
-    struct window * window = app->pointer_obj->window;
-
-    switch(app->pointer_obj->type) {
-        case OBJECT_BORDER_TOP:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_x < (BORDER_SIZE * 5)) {
-                cursor = "top_left_corner";
-            }
-            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "top_right_corner";
-            }
-            else {
-                cursor = "top_side";
-            }
-            break;
-        case OBJECT_BORDER_BOTTOM:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_x < (BORDER_SIZE * 5)) {
-                cursor = "bottom_left_corner";
-            }
-            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_right_corner";
-            }
-            else {
-                cursor = "bottom_side";
-            }
-            break;
-        case OBJECT_BORDER_LEFT:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_y < (BORDER_SIZE * 5)) {
-                cursor = "top_left_corner";
-            }
-            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_left_corner";
-            }
-            else {
-                cursor = "left_side";
-            }
-            break;
-        case OBJECT_BORDER_RIGHT:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_y < (BORDER_SIZE * 5)) {
-                cursor = "top_right_corner";
-            }
-            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_right_corner";
-            }
-            else {
-                cursor = "right_side";
-            }
-            break;
-        default:
-            break;
-    }
-#endif
-
-    if(app->cursor_surface) {
-        struct wl_cursor_image * cursor_image = wl_cursor_theme_get_cursor(app->cursor_theme, cursor)->images[0];
-        wl_pointer_set_cursor(pointer, serial, app->cursor_surface, cursor_image->hotspot_x, cursor_image->hotspot_y);
-        wl_surface_attach(app->cursor_surface, wl_cursor_image_get_buffer(cursor_image), 0, 0);
-        wl_surface_damage(app->cursor_surface, 0, 0, cursor_image->width, cursor_image->height);
-        wl_surface_commit(app->cursor_surface);
-        app->cursor_flush_pending = true;
-    }
-}
-
-static void pointer_handle_leave(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface)
-{
-    struct application * app = data;
-
-    LV_UNUSED(pointer);
-    LV_UNUSED(serial);
-
-    if(!surface || (app->pointer_obj == wl_surface_get_user_data(surface))) {
-        app->pointer_obj = NULL;
-    }
-}
-
-static void pointer_handle_motion(void * data, struct wl_pointer * pointer,
-                                  uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
-{
-    struct application * app = data;
-
-    LV_UNUSED(pointer);
-    LV_UNUSED(time);
-
-    if(!app->pointer_obj) {
-        return;
-    }
-
-    app->pointer_obj->input.pointer.x = LV_MAX(0, LV_MIN(wl_fixed_to_int(sx), app->pointer_obj->width - 1));
-    app->pointer_obj->input.pointer.y = LV_MAX(0, LV_MIN(wl_fixed_to_int(sy), app->pointer_obj->height - 1));
-}
-
-static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
-                                  uint32_t serial, uint32_t time, uint32_t button,
-                                  uint32_t state)
-{
-    struct application * app = data;
-
-    LV_UNUSED(serial);
-    LV_UNUSED(wl_pointer);
-    LV_UNUSED(time);
-
-    const lv_indev_state_t lv_state =
-        (state == WL_POINTER_BUTTON_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
-
-    if(!app->pointer_obj) {
-        return;
-    }
-
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window;
-    window = app->pointer_obj->window;
-    int pos_x = app->pointer_obj->input.pointer.x;
-    int pos_y = app->pointer_obj->input.pointer.y;
-#endif
-
-    switch(app->pointer_obj->type) {
-        case OBJECT_WINDOW:
-            switch(button) {
-                case BTN_LEFT:
-                    app->pointer_obj->input.pointer.left_button = lv_state;
-                    break;
-                case BTN_RIGHT:
-                    app->pointer_obj->input.pointer.right_button = lv_state;
-                    break;
-                case BTN_MIDDLE:
-                    app->pointer_obj->input.pointer.wheel_button = lv_state;
-                    break;
-                default:
-                    break;
-            }
-
-            break;
-#if LV_WAYLAND_WINDOW_DECORATIONS
-        case OBJECT_TITLEBAR:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-#if LV_WAYLAND_XDG_SHELL
-                if(window->xdg_toplevel) {
-                    xdg_toplevel_move(window->xdg_toplevel, app->wl_seat, serial);
-                    window->flush_pending = true;
-                }
-#endif
-#if LV_WAYLAND_WL_SHELL
-                if(window->wl_shell_surface) {
-                    wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
-                    window->flush_pending = true;
-                }
-#endif
-            }
-            break;
-        case OBJECT_BUTTON_CLOSE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                window->shall_close = true;
-            }
-            break;
-#if LV_WAYLAND_XDG_SHELL
-        case OBJECT_BUTTON_MAXIMIZE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                if(window->xdg_toplevel) {
-                    if(window->maximized) {
-                        xdg_toplevel_unset_maximized(window->xdg_toplevel);
-                    }
-                    else {
-                        xdg_toplevel_set_maximized(window->xdg_toplevel);
-                    }
-                    window->maximized ^= true;
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BUTTON_MINIMIZE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                if(window->xdg_toplevel) {
-                    xdg_toplevel_set_minimized(window->xdg_toplevel);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_TOP:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_x < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    }
-                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_BOTTOM:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_x < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    }
-                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_LEFT:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_y < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    }
-                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_RIGHT:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_y < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    }
-                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-#endif // LV_WAYLAND_XDG_SHELL
-#endif // LV_WAYLAND_WINDOW_DECORATIONS
-        default:
-            break;
-    }
-}
-
-static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer,
-                                uint32_t time, uint32_t axis, wl_fixed_t value)
-{
-    struct application * app = data;
-    const int diff = wl_fixed_to_int(value);
-
-    LV_UNUSED(time);
-    LV_UNUSED(wl_pointer);
-
-    if(!app->pointer_obj) {
-        return;
-    }
-
-    if(axis == 0) {
-        if(diff > 0) {
-            app->pointer_obj->input.pointer.wheel_diff++;
-        }
-        else if(diff < 0) {
-            app->pointer_obj->input.pointer.wheel_diff--;
-        }
-    }
-}
-
-static const struct wl_pointer_listener pointer_listener = {
-    .enter  = pointer_handle_enter,
-    .leave  = pointer_handle_leave,
-    .motion = pointer_handle_motion,
-    .button = pointer_handle_button,
-    .axis   = pointer_handle_axis,
-};
-
-static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
-{
-    lv_key_t key = 0;
-
-    if(((xkb_key >= XKB_KEY_space) && (xkb_key <= XKB_KEY_asciitilde))) {
-        key = xkb_key;
-    }
-    else if(((xkb_key >= XKB_KEY_KP_0) && (xkb_key <= XKB_KEY_KP_9))) {
-        key = (xkb_key & 0x003f);
-    }
-    else {
-        switch(xkb_key) {
-            case XKB_KEY_BackSpace:
-                key = LV_KEY_BACKSPACE;
-                break;
-            case XKB_KEY_Return:
-            case XKB_KEY_KP_Enter:
-                key = LV_KEY_ENTER;
-                break;
-            case XKB_KEY_Escape:
-                key = LV_KEY_ESC;
-                break;
-            case XKB_KEY_Delete:
-            case XKB_KEY_KP_Delete:
-                key = LV_KEY_DEL;
-                break;
-            case XKB_KEY_Home:
-            case XKB_KEY_KP_Home:
-                key = LV_KEY_HOME;
-                break;
-            case XKB_KEY_Left:
-            case XKB_KEY_KP_Left:
-                key = LV_KEY_LEFT;
-                break;
-            case XKB_KEY_Up:
-            case XKB_KEY_KP_Up:
-                key = LV_KEY_UP;
-                break;
-            case XKB_KEY_Right:
-            case XKB_KEY_KP_Right:
-                key = LV_KEY_RIGHT;
-                break;
-            case XKB_KEY_Down:
-            case XKB_KEY_KP_Down:
-                key = LV_KEY_DOWN;
-                break;
-            case XKB_KEY_Prior:
-            case XKB_KEY_KP_Prior:
-                key = LV_KEY_PREV;
-                break;
-            case XKB_KEY_Next:
-            case XKB_KEY_KP_Next:
-            case XKB_KEY_Tab:
-            case XKB_KEY_KP_Tab:
-                key = LV_KEY_NEXT;
-                break;
-            case XKB_KEY_End:
-            case XKB_KEY_KP_End:
-                key = LV_KEY_END;
-                break;
-            default:
-                break;
-        }
-    }
-
-    return key;
-}
-
-static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard,
-                                   uint32_t format, int fd, uint32_t size)
-{
-    struct application * app = data;
-
-    struct xkb_keymap * keymap;
-    struct xkb_state * state;
-    char * map_str;
-
-    LV_UNUSED(keyboard);
-
-    if(format != WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1) {
-        close(fd);
-        return;
-    }
-
-    map_str = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if(map_str == MAP_FAILED) {
-        close(fd);
-        return;
-    }
-
-    /* Set up XKB keymap */
-    keymap = xkb_keymap_new_from_string(app->xkb_context, map_str,
-                                        XKB_KEYMAP_FORMAT_TEXT_V1, 0);
-    munmap(map_str, size);
-    close(fd);
-
-    if(!keymap) {
-        LV_LOG_ERROR("failed to compile keymap");
-        return;
-    }
-
-    /* Set up XKB state */
-    state = xkb_state_new(keymap);
-    if(!state) {
-        LV_LOG_ERROR("failed to create XKB state");
-        xkb_keymap_unref(keymap);
-        return;
-    }
-
-    xkb_keymap_unref(app->seat.xkb.keymap);
-    xkb_state_unref(app->seat.xkb.state);
-    app->seat.xkb.keymap = keymap;
-    app->seat.xkb.state = state;
-}
-
-static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface,
-                                  struct wl_array * keys)
-{
-    struct application * app = data;
-
-    LV_UNUSED(keyboard);
-    LV_UNUSED(serial);
-    LV_UNUSED(keys);
-
-    if(!surface) {
-        app->keyboard_obj = NULL;
-    }
-    else {
-        app->keyboard_obj = wl_surface_get_user_data(surface);
-    }
-}
-
-static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface)
-{
-    struct application * app = data;
-
-    LV_UNUSED(serial);
-    LV_UNUSED(keyboard);
-
-    if(!surface || (app->keyboard_obj == wl_surface_get_user_data(surface))) {
-        app->keyboard_obj = NULL;
-    }
-}
-
-static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard,
-                                uint32_t serial, uint32_t time, uint32_t key,
-                                uint32_t state)
-{
-    struct application * app = data;
-    const uint32_t code = (key + 8);
-    const xkb_keysym_t * syms;
-    xkb_keysym_t sym = XKB_KEY_NoSymbol;
-
-    LV_UNUSED(serial);
-    LV_UNUSED(time);
-    LV_UNUSED(keyboard);
-
-    if(!app->keyboard_obj || !app->seat.xkb.state) {
-        return;
-    }
-
-    if(xkb_state_key_get_syms(app->seat.xkb.state, code, &syms) == 1) {
-        sym = syms[0];
-    }
-
-    const lv_key_t lv_key = keycode_xkb_to_lv(sym);
-    const lv_indev_state_t lv_state =
-        (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
-
-    if(lv_key != 0) {
-        app->keyboard_obj->input.keyboard.key = lv_key;
-        app->keyboard_obj->input.keyboard.state = lv_state;
-    }
-}
-
-static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard,
-                                      uint32_t serial, uint32_t mods_depressed,
-                                      uint32_t mods_latched, uint32_t mods_locked,
-                                      uint32_t group)
-{
-    struct application * app = data;
-
-    LV_UNUSED(serial);
-    LV_UNUSED(keyboard);
-
-    /* If we're not using a keymap, then we don't handle PC-style modifiers */
-    if(!app->seat.xkb.keymap) {
-        return;
-    }
-
-    xkb_state_update_mask(app->seat.xkb.state,
-                          mods_depressed, mods_latched, mods_locked, 0, 0, group);
-}
-
-static const struct wl_keyboard_listener keyboard_listener = {
-    .keymap     = keyboard_handle_keymap,
-    .enter      = keyboard_handle_enter,
-    .leave      = keyboard_handle_leave,
-    .key        = keyboard_handle_key,
-    .modifiers  = keyboard_handle_modifiers,
-};
-
-#if LV_USE_GESTURE_RECOGNITION
-
-static void touch_handle_down(void * data, struct wl_touch * wl_touch,
-                              uint32_t serial, uint32_t time, struct wl_surface * surface,
-                              int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
-{
-    struct application * app = data;
-    uint8_t i;
-
-    LV_UNUSED(id);
-    LV_UNUSED(time);
-    LV_UNUSED(serial);
-    LV_UNUSED(wl_touch);
-
-    if(!surface) {
-        app->touch_obj = NULL;
-        return;
-    }
-
-    /* Create the touch down event */
-    app->touch_obj = wl_surface_get_user_data(surface);
-    i = app->touch_obj->input.touch_event_cnt;
-
-    app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touches[i].id = id;
-    app->touch_obj->input.touches[i].timestamp = time;
-    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
-    app->touch_obj->input.touch_event_cnt++;
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window = app->touch_obj->window;
-    switch(app->touch_obj->type) {
-        case OBJECT_TITLEBAR:
-#if LV_WAYLAND_XDG_SHELL
-            if(window->xdg_toplevel) {
-                xdg_toplevel_move(window->xdg_toplevel, app->wl_seat, serial);
-                window->flush_pending = true;
-            }
-#endif
-#if LV_WAYLAND_WL_SHELL
-            if(window->wl_shell_surface) {
-                wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
-                window->flush_pending = true;
-            }
-#endif
-            break;
-        default:
-            break;
-    }
-#endif
-}
-
-static void touch_handle_up(void * data, struct wl_touch * wl_touch,
-                            uint32_t serial, uint32_t time, int32_t id)
-{
-    struct application * app = data;
-    uint8_t i;
-
-    LV_UNUSED(serial);
-    LV_UNUSED(time);
-    LV_UNUSED(id);
-    LV_UNUSED(wl_touch);
-
-#if LV_USE_GESTURE_RECOGNITION
-    /* Create a released event */
-    i = app->touch_obj->input.touch_event_cnt;
-
-    app->touch_obj->input.touches[i].point.x = 0;
-    app->touch_obj->input.touches[i].point.y = 0;
-    app->touch_obj->input.touches[i].id = id;
-    app->touch_obj->input.touches[i].timestamp = time;
-    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_RELEASED;
-
-    app->touch_obj->input.touch_event_cnt++;
-#endif
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window = app->touch_obj->window;
-    switch(app->touch_obj->type) {
-        case OBJECT_BUTTON_CLOSE:
-            window->shall_close = true;
-            break;
-#if LV_WAYLAND_XDG_SHELL
-        case OBJECT_BUTTON_MAXIMIZE:
-            if(window->xdg_toplevel) {
-                if(window->maximized) {
-                    xdg_toplevel_unset_maximized(window->xdg_toplevel);
-                }
-                else {
-                    xdg_toplevel_set_maximized(window->xdg_toplevel);
-                }
-                window->maximized ^= true;
-            }
-            break;
-        case OBJECT_BUTTON_MINIMIZE:
-            if(window->xdg_toplevel) {
-                xdg_toplevel_set_minimized(window->xdg_toplevel);
-                window->flush_pending = true;
-            }
-#endif /* LV_WAYLAND_XDG_SHELL */
-        default:
-            break;
-    }
-#endif /* LV_WAYLAND_WINDOW_DECORATIONS */
-
-}
-
-static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
-                                uint32_t time, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
-{
-    struct application * app = data;
-    lv_indev_touch_data_t * touch;
-    lv_indev_touch_data_t * cur;
-    uint8_t i;
-
-    LV_UNUSED(time);
-    LV_UNUSED(id);
-    LV_UNUSED(wl_touch);
-
-    /* Update the contact point of the corresponding id with the latest coordinate */
-    touch = &app->touch_obj->input.touches[0];
-    cur = NULL;
-
-    for(i = 0; i < app->touch_obj->input.touch_event_cnt; i++) {
-        if(touch->id == id) {
-            cur = touch;
-        }
-        touch++;
-    }
-
-    if(cur == NULL) {
-
-        i = app->touch_obj->input.touch_event_cnt;
-        app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
-        app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
-        app->touch_obj->input.touches[i].id = id;
-        app->touch_obj->input.touches[i].timestamp = time;
-        app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
-        app->touch_obj->input.touch_event_cnt++;
-
-    }
-    else {
-
-        cur->point.x = wl_fixed_to_int(x_w);
-        cur->point.y = wl_fixed_to_int(y_w);
-        cur->id = id;
-        cur->timestamp = time;
-    }
-
-}
-
-static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
-{
-    LV_UNUSED(wl_touch);
-    LV_UNUSED(data);
-
-}
-
-static void touch_handle_cancel(void * data, struct wl_touch * wl_touch)
-{
-    LV_UNUSED(wl_touch);
-    LV_UNUSED(data);
-}
-
-static const struct wl_touch_listener touch_listener = {
-    .down   = touch_handle_down,
-    .up     = touch_handle_up,
-    .motion = touch_handle_motion,
-    .frame  = touch_handle_frame,
-    .cancel = touch_handle_cancel,
-};
-
-#endif /* END LV_USE_GESTURE_RECOGNITION */
 
 static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum wl_seat_capability caps)
 {
@@ -1057,7 +178,7 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
 
     if((caps & WL_SEAT_CAPABILITY_POINTER) && !seat->wl_pointer) {
         seat->wl_pointer = wl_seat_get_pointer(wl_seat);
-        wl_pointer_add_listener(seat->wl_pointer, &pointer_listener, app);
+        wl_pointer_add_listener(seat->wl_pointer, lv_wayland_pointer_get_listener(), app);
         app->cursor_surface = wl_compositor_create_surface(app->compositor);
         if(!app->cursor_surface) {
             LV_LOG_WARN("failed to create cursor surface");
@@ -1073,7 +194,7 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
 
     if((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !seat->wl_keyboard) {
         seat->wl_keyboard = wl_seat_get_keyboard(wl_seat);
-        wl_keyboard_add_listener(seat->wl_keyboard, &keyboard_listener, app);
+        wl_keyboard_add_listener(seat->wl_keyboard, lv_wayland_keyboard_get_listener(), app);
     }
     else if(!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && seat->wl_keyboard) {
         wl_keyboard_destroy(seat->wl_keyboard);
@@ -1083,7 +204,7 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
 #if LV_USE_GESTURE_RECOGNITION
     if((caps & WL_SEAT_CAPABILITY_TOUCH) && !seat->wl_touch) {
         seat->wl_touch = wl_seat_get_touch(wl_seat);
-        wl_touch_add_listener(seat->wl_touch, &touch_listener, app);
+        wl_touch_add_listener(seat->wl_touch, lv_wayland_touch_get_listener(), app);
     }
 #endif
     else if(!(caps & WL_SEAT_CAPABILITY_TOUCH) && seat->wl_touch) {
@@ -1253,17 +374,22 @@ static void handle_global(void * data, struct wl_registry * registry,
     LV_UNUSED(data);
 
     if(strcmp(interface, wl_compositor_interface.name) == 0) {
+        LV_LOG_WARN("Found compositor, %s", interface);
+
         app->compositor = wl_registry_bind(registry, name, &wl_compositor_interface, 1);
     }
     else if(strcmp(interface, wl_subcompositor_interface.name) == 0) {
+        LV_LOG_WARN("Found subcompositor, %s", interface);
         app->subcompositor = wl_registry_bind(registry, name, &wl_subcompositor_interface, 1);
     }
     else if(strcmp(interface, wl_shm_interface.name) == 0) {
+        LV_LOG_WARN("Found shm, %s", interface);
         app->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
         wl_shm_add_listener(app->shm, &shm_listener, app);
         app->cursor_theme = wl_cursor_theme_load(NULL, 32, app->shm);
     }
     else if(strcmp(interface, wl_seat_interface.name) == 0) {
+        LV_LOG_WARN("Found seat, %s", interface);
         app->wl_seat = wl_registry_bind(app->registry, name, &wl_seat_interface, 1);
         wl_seat_add_listener(app->wl_seat, &seat_listener, app);
     }
@@ -1274,6 +400,7 @@ static void handle_global(void * data, struct wl_registry * registry,
 #endif
 #if LV_WAYLAND_XDG_SHELL
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
+        LV_LOG_WARN("Found xdg wm base interface, %s", interface);
         /* supporting version 2 of the XDG protocol - ensures greater compatibility */
         app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, &xdg_wm_base_listener, app);
@@ -2320,70 +1447,6 @@ static void _lv_wayland_handle_output(void)
     }
 }
 
-static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
-{
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-
-    if(!window || window->closed) {
-        return;
-    }
-
-    data->point.x = window->body->input.pointer.x;
-    data->point.y = window->body->input.pointer.y;
-    data->state = window->body->input.pointer.left_button;
-}
-
-static void _lv_wayland_pointeraxis_read(lv_indev_t * drv, lv_indev_data_t * data)
-{
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-
-    if(!window || window->closed) {
-        return;
-    }
-
-    data->state = window->body->input.pointer.wheel_button;
-    data->enc_diff = window->body->input.pointer.wheel_diff;
-
-    window->body->input.pointer.wheel_diff = 0;
-}
-
-static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
-{
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-    if(!window || window->closed) {
-        return;
-    }
-
-    data->key = window->body->input.keyboard.key;
-    data->state = window->body->input.keyboard.state;
-}
-
-#if LV_USE_GESTURE_RECOGNITION
-
-static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
-{
-
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-
-    if(!window || window->closed) {
-        return;
-    }
-
-    /* Collect touches if there are any - send them to the gesture recognizer */
-    lv_indev_gesture_recognizers_update(drv, &window->body->input.touches[0],
-                                        window->body->input.touch_event_cnt);
-
-    LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
-
-    window->body->input.touch_event_cnt = 0;
-
-    /* Set the gesture information, before returning to LVGL */
-    lv_indev_gesture_recognizers_set_data(drv, data);
-
-}
-
-#endif /* END LV_USE_GESTURE_RECOGNITION */
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -2410,6 +1473,7 @@ static void wayland_init(void)
         return;
     }
 
+    LV_LOG_USER("---- Display Connect");
     // Connect to Wayland display
     application.display = wl_display_connect(NULL);
     LV_ASSERT_MSG(application.display, "failed to connect to Wayland server");
@@ -2417,12 +1481,18 @@ static void wayland_init(void)
         return;
     }
 
+    LV_LOG_USER("---- Display Connected");
     /* Add registry listener and wait for registry reception */
     application.shm_format = SHM_FORMAT_UNKNOWN;
+    LV_LOG_USER("---- Display Get Registry");
     application.registry = wl_display_get_registry(application.display);
+    LV_LOG_USER("---- Display Adding listener");
     wl_registry_add_listener(application.registry, &registry_listener, &application);
+    LV_LOG_USER("---- Display Dispatching");
     wl_display_dispatch(application.display);
+    LV_LOG_USER("---- Roundtrip");
     wl_display_roundtrip(application.display);
+    LV_LOG_USER("---- Roundtrip done");
 
     LV_ASSERT_MSG(application.compositor, "Wayland compositor not available");
     if(application.compositor == NULL) {
@@ -2592,18 +1662,15 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_user_data(window->lv_disp, window);
 
     /* Register input */
-    window->lv_indev_pointer = lv_indev_create();
-    lv_indev_set_type(window->lv_indev_pointer, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(window->lv_indev_pointer, _lv_wayland_pointer_read);
+    window->lv_indev_pointer = lv_wayland_pointer_create();
+
     lv_indev_set_display(window->lv_indev_pointer, window->lv_disp);
 
     if(!window->lv_indev_pointer) {
         LV_LOG_ERROR("failed to register pointer indev");
     }
 
-    window->lv_indev_pointeraxis = lv_indev_create();
-    lv_indev_set_type(window->lv_indev_pointeraxis, LV_INDEV_TYPE_ENCODER);
-    lv_indev_set_read_cb(window->lv_indev_pointeraxis, _lv_wayland_pointeraxis_read);
+    window->lv_indev_pointeraxis = lv_wayland_pointer_axis_create();
     lv_indev_set_display(window->lv_indev_pointeraxis, window->lv_disp);
 
     if(!window->lv_indev_pointeraxis) {
@@ -2612,9 +1679,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 #if LV_USE_GESTURE_RECOGNITION
 
-    window->lv_indev_touch = lv_indev_create();
-    lv_indev_set_type(window->lv_indev_touch, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(window->lv_indev_touch, _lv_wayland_touch_read);
+
+    window->lv_indev_touch = lv_wayland_touch_create();
     lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
 
     if(!window->lv_indev_touch) {
@@ -2623,15 +1689,13 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 #endif /* END LV_USE_GESTURE_RECOGNITION */
 
-    window->lv_indev_keyboard = lv_indev_create();
-    lv_indev_set_type(window->lv_indev_keyboard, LV_INDEV_TYPE_KEYPAD);
-    lv_indev_set_read_cb(window->lv_indev_keyboard, _lv_wayland_keyboard_read);
+
+    window->lv_indev_keyboard = lv_wayland_keyboard_create();
     lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
 
     if(!window->lv_indev_keyboard) {
         LV_LOG_ERROR("failed to register keyboard indev");
     }
-
     return window->lv_disp;
 }
 
