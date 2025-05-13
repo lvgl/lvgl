@@ -58,7 +58,7 @@ typedef struct {
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
     static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
@@ -309,9 +309,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_al88(lv_draw_sw_blend_fill_
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_al88(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     switch(dsc->src_color_format) {
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
             rgb565_image_blend(dsc);
             break;
 #endif
@@ -625,7 +624,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t 
     }
 }
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
 
 static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
@@ -644,14 +643,11 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
 
     int32_t x, y;
 
-    if(dsc->src_color_format == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-        lv_draw_sw_rgb565_swap((uint8_t *) src_buf_c16, w * h);
-    }
-
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_AL88(dsc)) {
                 for(y = 0; y < h; y++) {
+
                     for(x = 0; x < w; x++) {
                         dest_buf_al88[x].lumi = lv_color16_luminance(src_buf_c16[x]);
                         dest_buf_al88[x].alpha = 255;

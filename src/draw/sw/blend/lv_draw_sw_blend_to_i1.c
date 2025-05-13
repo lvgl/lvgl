@@ -46,7 +46,7 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ i1_image_blend(lv_draw_sw_blend_image_ds
     static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
     static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
@@ -309,9 +309,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_i1(lv_draw_sw_blend_fill_ds
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_i1(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     switch(dsc->src_color_format) {
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
             rgb565_image_blend(dsc);
             break;
 #endif
@@ -829,8 +828,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
     int32_t src_x;
     int32_t y;
 
-
     int32_t bit_ofs = dsc->relative_area.x1 % 8;
+
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         /*Special case*/
@@ -933,7 +932,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
 }
 #endif
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
 static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
@@ -951,14 +950,11 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
     int32_t dest_x;
     int32_t y;
 
-    if(dsc->src_color_format == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-        lv_draw_sw_rgb565_swap((uint8_t *) src_buf_c16, w * h);
-    }
-
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_I1(dsc)) {
                 for(y = 0; y < h; y++) {
+
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
                         uint8_t src = lv_color16_luminance(src_buf_c16[src_x]);
                         if(src > I1_LUM_THRESHOLD) {

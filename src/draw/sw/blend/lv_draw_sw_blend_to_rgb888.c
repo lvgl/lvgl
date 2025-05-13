@@ -52,7 +52,7 @@
     static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 #endif
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
     static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 #endif
 
@@ -334,9 +334,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
     switch(dsc->src_color_format) {
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565_SWAPPED:
             rgb565_image_blend(dsc, dest_px_size);
             break;
 #endif
@@ -646,7 +645,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * 
 
 #endif
 
-#if LV_DRAW_SW_SUPPORT_RGB565 || LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+#if LV_DRAW_SW_SUPPORT_RGB565
 
 static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
@@ -664,14 +663,11 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
     int32_t dest_x;
     int32_t y;
 
-    if(dsc->src_color_format == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-        lv_draw_sw_rgb565_swap((uint8_t *) src_buf_c16, w * h);
-    }
-
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
+
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         dest_buf_u8[dest_x + 2] = (src_buf_c16[src_x].red * 2106) >> 8;  /*To make it rounded*/
                         dest_buf_u8[dest_x + 1] = (src_buf_c16[src_x].green * 1037) >> 8;
