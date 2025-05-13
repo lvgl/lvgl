@@ -559,7 +559,9 @@ static void refr_sync_areas(void)
         /**
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
-        lv_area_intersect(sync_area, sync_area, &disp_area);
+        if(!lv_area_intersect(sync_area, sync_area, &disp_area)) {
+            continue;
+        }
 #if LV_DRAW_TRANSFORM_USE_MATRIX
         if(lv_display_get_matrix_rotation(disp_refr)) {
             lv_display_rotate_area(disp_refr, sync_area);
