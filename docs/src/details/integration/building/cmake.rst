@@ -188,7 +188,7 @@ Below is a list of the available options/variables
      - Allows to set a directory containing ``lv_conf.h``
    * - LV_BUILD_USE_KCONFIG
      - BOOLEAN
-     - When set KConfig is used as the configuration source. This options is disabled by default.
+     - When set KConfig is used as the configuration source. This option is disabled by default.
    * - LV_BUILD_DEFCONFIG_PATH
      - PATH
      - Specify to use a .defconfig file instead of the current .config in a Kconfig setup.
