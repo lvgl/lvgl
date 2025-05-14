@@ -113,6 +113,19 @@ For an example of how draw-unit cration and initialization is done, see
 :cpp:func:`lv_draw_sw_init` in lv_draw_sw.c_ or the other draw units whose ``init``
 functions are optionally called in :cpp:func:`lv_init`.
 
+Thread Priority 
+--------------- 
+
+All draw units operate with a configurable thread priority which can be set using the 
+:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you 
+to fine-tune the priority level across all drawing units, which is especially useful for 
+systems with limited priority levels. 
+
+By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority. 
+This consistent approach ensures that all drawing units (software rendering, hardware 
+accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless 
+explicitly configured otherwise. 
+
 .. _lv_draw_sw.c:  https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c
 
 
