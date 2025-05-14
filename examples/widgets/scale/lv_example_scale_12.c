@@ -9,16 +9,6 @@ void lv_example_scale_12(void)
 
     lv_obj_t * scr = lv_screen_active();
 
-    /* Create Y axis (vertical scale) */
-    lv_obj_t * y_axis = lv_scale_create(scr);
-    lv_obj_set_size(y_axis, 50, 170);
-    lv_obj_align(y_axis, LV_ALIGN_LEFT_MID, 10, -20);
-    lv_scale_set_mode(y_axis, LV_SCALE_MODE_VERTICAL_LEFT);
-    lv_scale_set_range(y_axis, 0, 100);
-    lv_scale_set_total_tick_count(y_axis, 6);
-    lv_scale_set_major_tick_every(y_axis, 1);
-    lv_scale_set_label_show(y_axis, true);
-
     /* Create X axis (horizontal scale) */
     lv_obj_t * x_axis = lv_scale_create(scr);
     lv_obj_set_size(x_axis, 200, 50);
@@ -30,9 +20,24 @@ void lv_example_scale_12(void)
     lv_scale_set_label_show(x_axis, true);
     lv_scale_set_text_src(x_axis, years);
 
+    lv_obj_update_layout(x_axis);
+    lv_coord_t x_axis_y = lv_obj_get_y(x_axis);
+
+    /* Create Y axis (vertical scale) */
+    lv_obj_t * y_axis = lv_scale_create(scr);
+    lv_obj_set_size(y_axis, 50, 170);
+    lv_scale_set_mode(y_axis, LV_SCALE_MODE_VERTICAL_LEFT);
+    lv_scale_set_range(y_axis, 0, 100);
+    lv_scale_set_total_tick_count(y_axis, 6);
+    lv_scale_set_major_tick_every(y_axis, 1);
+    lv_scale_set_label_show(y_axis, true);
+
+    lv_obj_update_layout(y_axis);
+    lv_coord_t y_axis_height = lv_obj_get_height(y_axis);
+    lv_obj_set_pos(y_axis, 10, x_axis_y - y_axis_height);
+
     /* Draw bars */
     int bar_width = 20;
-    lv_obj_update_layout(x_axis);
 
     for(int i = 0; i < num_bars; i++) {
         lv_obj_t * bar = lv_obj_create(scr);

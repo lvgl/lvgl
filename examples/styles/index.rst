@@ -108,7 +108,7 @@ Gradients for button background
   :language: c
 
 Test between recolor style or full background modal
--------------------------------
+---------------------------------------------------
 
 .. lv_example:: styles/lv_example_style_19
   :language: c

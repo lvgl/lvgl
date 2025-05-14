@@ -103,7 +103,7 @@ void lv_example_scale_11(void)
     lv_obj_t * sunrise_lbl = lv_label_create(bg);
     lv_label_set_text(sunrise_lbl, "SUNRISE");
     lv_obj_set_style_text_color(sunrise_lbl, lv_palette_main(LV_PALETTE_GREY), 0);
-    lv_obj_align(sunrise_lbl, LV_ALIGN_LEFT_MID, 25, -10);
+    lv_obj_align(sunrise_lbl, LV_ALIGN_LEFT_MID, 21, -10);
 
     lv_obj_t * sunrise_time = lv_label_create(bg);
     lv_label_set_text(sunrise_time, "6:43");
@@ -114,7 +114,7 @@ void lv_example_scale_11(void)
     lv_obj_t * sunset_lbl = lv_label_create(bg);
     lv_label_set_text(sunset_lbl, "SUNSET");
     lv_obj_set_style_text_color(sunset_lbl, lv_palette_main(LV_PALETTE_GREY), 0);
-    lv_obj_align(sunset_lbl, LV_ALIGN_RIGHT_MID, -25, -10);
+    lv_obj_align(sunset_lbl, LV_ALIGN_RIGHT_MID, -21, -10);
 
     lv_obj_t * sunset_time = lv_label_create(bg);
     lv_label_set_text(sunset_time, "17:37");
