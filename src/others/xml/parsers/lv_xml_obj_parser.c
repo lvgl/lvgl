@@ -72,6 +72,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("align", name)) lv_obj_set_align(item, lv_xml_align_to_enum(value));
         else if(lv_streq("flex_flow", name)) lv_obj_set_flex_flow(item, lv_xml_flex_flow_to_enum(value));
         else if(lv_streq("flex_grow", name)) lv_obj_set_flex_grow(item, lv_xml_atoi(value));
+        else if(lv_streq("ext_click_area", name)) lv_obj_set_ext_click_area(item, lv_xml_atoi(value));
 
         else if(lv_streq("hidden", name))               lv_obj_set_flag(item, LV_OBJ_FLAG_HIDDEN, lv_xml_to_bool(value));
         else if(lv_streq("clickable", name))            lv_obj_set_flag(item, LV_OBJ_FLAG_CLICKABLE, lv_xml_to_bool(value));
