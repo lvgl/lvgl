@@ -20,10 +20,13 @@
 
 #if LV_USE_FLOAT
     #include <math.h>
-#endif
-
-#ifndef  M_PI
-    #define M_PI 3.14159265358979323846
+    #include <float.h>
+    #ifndef  M_PI
+        #define M_PI 3.14159265358979323846264338327950288
+    #endif
+#else
+    /* Use fixed point math for integer only platforms $ M_PI << 8 $ */
+    #define M_PI 804
 #endif
 
 /*********************
@@ -50,6 +53,8 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
 static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
                                          const char ** text_out, uint32_t * len_out,
                                          lv_color_t * color_out);
+static lv_value_precise_t deg_to_rad(lv_value_precise_t deg, int32_t radius);
+static lv_value_precise_t rad_to_deg(lv_value_precise_t rad, int32_t radius);
 
 /**********************
  *  STATIC VARIABLES
@@ -413,7 +418,7 @@ static void arc_label_draw_main(lv_event_t * e)
     arc_r += arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ? -arc_r_delta : arc_r_delta;
 
     const int32_t offset = arc_label->offset;
-    const int32_t angle_offset = offset / M_PI * 180 / arc_r;
+    const lv_value_precise_t angle_offset = rad_to_deg(offset, arc_r);
 
     switch(arc_label->text_align_h) {
         case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
@@ -433,8 +438,8 @@ static void arc_label_draw_main(lv_event_t * e)
 
     uint32_t processed_word_count = 0;
     lv_value_precise_t prev_letter_w = 0;
-    lv_value_precise_t total_arc_length = arc_label->angle_size * M_PI / 180 * arc_r;
-    lv_value_precise_t curr_total_arc_length = angle_start * M_PI / 180 * arc_r;
+    lv_value_precise_t total_arc_length = deg_to_rad(arc_label->angle_size, arc_r);
+    lv_value_precise_t curr_total_arc_length = deg_to_rad(angle_start, arc_r);
 
     while(text) {
         uint32_t word_i = 0;
@@ -457,20 +462,22 @@ static void arc_label_draw_main(lv_event_t * e)
                 }
             }
 
-            const lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ?
-                                                                            curr_total_arc_length : total_arc_length - curr_total_arc_length) * 180 / M_PI / arc_r;
+            const lv_value_precise_t curr_angle = arc_label->angle_start
+                                                  + rad_to_deg(arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE
+                                                               ? curr_total_arc_length
+                                                               : total_arc_length - curr_total_arc_length, arc_r);
 
 #if LV_USE_FLOAT
-            const lv_value_precise_t x = cos(curr_angle * M_PI / 180) * arc_r;
-            const lv_value_precise_t y = sin(curr_angle * M_PI / 180) * arc_r;
+            const lv_value_precise_t x = cosf(deg_to_rad(curr_angle, 1)) * arc_r;
+            const lv_value_precise_t y = sinf(deg_to_rad(curr_angle, 1)) * arc_r;
 #else
-            const lv_value_precise_t x = lv_trigo_cos(curr_angle) * arc_r / 32767;
-            const lv_value_precise_t y = lv_trigo_sin(curr_angle) * arc_r / 32767;
+            const lv_value_precise_t x = (lv_value_precise_t)(lv_trigo_cos(curr_angle) * arc_r / 32767);
+            const lv_value_precise_t y = (lv_value_precise_t)(lv_trigo_sin(curr_angle) * arc_r / 32767);
 #endif
 
             lv_point_t point = {
-                x + lv_area_get_width(&coords) / 2 + coords.x1 + arc_label->center_offset.x,
-                y + lv_area_get_height(&coords) / 2 + coords.y1 + arc_label->center_offset.y,
+                (int32_t)(x + (lv_value_precise_t)(lv_area_get_width(&coords) / 2 + coords.x1  + arc_label->center_offset.x)),
+                (int32_t)(y + (lv_value_precise_t)(lv_area_get_height(&coords) / 2 + coords.y1 + arc_label->center_offset.y)),
             };
 
             lv_draw_letter_dsc_t dsc;
@@ -478,8 +485,8 @@ static void arc_label_draw_main(lv_event_t * e)
             dsc.font = font;
             dsc.color = arc_label->recolor ? recolor_color : color;
             dsc.opa = opa;
-            if(arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE) dsc.rotation = (curr_angle + 90) * 10;
-            else dsc.rotation = (curr_angle - 90) * 10;
+            if(arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE) dsc.rotation = (int32_t)((curr_angle + 90) * 10);
+            else dsc.rotation = (int32_t)((curr_angle - 90) * 10);
 
             dsc.unicode = letter;
             if(dsc.unicode == 0) {
@@ -518,7 +525,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     const char * text_start = text;
     uint32_t processed_letter_count = 0;
     lv_value_precise_t prev_letter_w = 0;
-    const lv_value_precise_t angle_size_in_arc_length = angle_size * M_PI / 180 * radius;
+    const lv_value_precise_t angle_size_in_arc_length = deg_to_rad(angle_size, radius);
     lv_value_precise_t total_arc_length = 0;
 
     while(text) {
@@ -554,7 +561,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
         }
     }
 
-    return total_arc_length * 180 / M_PI / radius;
+    return rad_to_deg(total_arc_length, radius);
 }
 
 static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
@@ -607,6 +614,24 @@ static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
     if(has_cmd && *text == LV_TXT_COLOR_CMD[0]) text++;
 
     return text < text_end && *text ? text : NULL;
+}
+
+static lv_value_precise_t deg_to_rad(lv_value_precise_t deg, int32_t radius)
+{
+#if LV_USE_FLOAT
+    return (lv_value_precise_t)(deg * radius * M_PI / 180);
+#else
+    return (lv_value_precise_t)((deg * radius * M_PI / 180) >> 8);
+#endif
+}
+
+static lv_value_precise_t rad_to_deg(lv_value_precise_t rad, int32_t radius)
+{
+#if LV_USE_FLOAT
+    return (lv_value_precise_t)(rad * 180 / M_PI / radius);
+#else
+    return (lv_value_precise_t)(((rad * 180) << 8) / M_PI / radius);
+#endif
 }
 
 #endif
