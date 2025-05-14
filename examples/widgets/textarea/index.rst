@@ -19,7 +19,7 @@ Text auto-formatting
   :language: c
 
 Text area cursor styling
---------------------
+------------------------
 
 .. lv_example:: widgets/textarea/lv_example_textarea_4
   :language: c

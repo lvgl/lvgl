@@ -30,7 +30,7 @@ Customize circular scrolling animation
   :language: c
 
 Monospace font
---------------------------------------
+--------------
 
 .. lv_example:: widgets/label/lv_example_label_6
   :language: c
