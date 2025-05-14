@@ -39,6 +39,12 @@ How to integrate LVGL with ChibiOS
 .. line-block::
     This tells LVGL how often ticks happen in the system.
     Its best to use a timer since those are not affected by the CPU load or thread priorites.
+    The two safest options would to use a virtual timer that is based on the internal systick or a dedicated hardware timer.
+
+
+.. line-block::
+    Using hardware timers via the GPT driver.
+    Most accurate way, but requires a dedicated timer.
 
 .. code-block:: c
 
@@ -56,7 +62,24 @@ How to integrate LVGL with ChibiOS
     gptStart(&GPTD1, &gptcfg);
     gptStartContinuous(&GPTD1, 100);
 
-3. LTDC driver initialization and start
+.. line-block::
+    Using virtual timers which are based on the systems systick.
+
+.. code-block:: c
+
+    virtual_timer_t vt;
+
+    static void tick_inc_callback(virtual_timer_t vtp, void *p)
+    {
+        (void)vtp;
+        (void)p;
+
+        lv_tick_inc(1);
+    }
+
+    chVTSetContinuous(&vt, TIME_MS2I(1), tick_inc_callback, NULL);
+
+1. LTDC driver initialization and start
 ========================================
 
 .. line-block::
