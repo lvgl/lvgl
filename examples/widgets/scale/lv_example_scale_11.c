@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_SCALE && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_12 && LV_FONT_MONTSERRAT_16 && LV_FONT_MONTSERRAT_20
+#if LV_USE_SCALE && LV_BUILD_EXAMPLES && LV_FONT_MONTSERRAT_12 && LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_16 && LV_FONT_MONTSERRAT_20
 
 static void label_color_cb(lv_event_t * e)
 {
@@ -32,6 +32,7 @@ void lv_example_scale_11(void)
     lv_obj_set_style_bg_color(bg, lv_palette_darken(LV_PALETTE_GREY, 4), 0);
     lv_obj_set_style_bg_opa(bg, LV_OPA_COVER, 0);
     lv_obj_remove_flag(bg, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_pad_all(bg, 0, LV_PART_MAIN);
 
     lv_obj_t * scale = lv_scale_create(bg);
     lv_obj_center(scale);
@@ -98,12 +99,13 @@ void lv_example_scale_11(void)
     lv_label_set_text(today, "TODAY");
     lv_obj_set_style_text_font(today, &lv_font_montserrat_16, 0);
     lv_obj_set_style_text_color(today, lv_color_white(), 0);
-    lv_obj_align(today, LV_ALIGN_TOP_MID, 0, 40);
+    lv_obj_align(today, LV_ALIGN_TOP_MID, 0, 60);
 
     lv_obj_t * sunrise_lbl = lv_label_create(bg);
     lv_label_set_text(sunrise_lbl, "SUNRISE");
+    lv_obj_set_style_text_font(sunrise_lbl, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_color(sunrise_lbl, lv_palette_main(LV_PALETTE_GREY), 0);
-    lv_obj_align(sunrise_lbl, LV_ALIGN_LEFT_MID, 21, -10);
+    lv_obj_align(sunrise_lbl, LV_ALIGN_LEFT_MID, 37, -10);
 
     lv_obj_t * sunrise_time = lv_label_create(bg);
     lv_label_set_text(sunrise_time, "6:43");
@@ -113,8 +115,9 @@ void lv_example_scale_11(void)
 
     lv_obj_t * sunset_lbl = lv_label_create(bg);
     lv_label_set_text(sunset_lbl, "SUNSET");
+    lv_obj_set_style_text_font(sunset_lbl, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_color(sunset_lbl, lv_palette_main(LV_PALETTE_GREY), 0);
-    lv_obj_align(sunset_lbl, LV_ALIGN_RIGHT_MID, -21, -10);
+    lv_obj_align(sunset_lbl, LV_ALIGN_RIGHT_MID, -37, -10);
 
     lv_obj_t * sunset_time = lv_label_create(bg);
     lv_label_set_text(sunset_time, "17:37");
