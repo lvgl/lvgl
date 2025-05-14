@@ -50,7 +50,6 @@ void lv_example_scale_12(void)
         lv_area_t x_coords;
         lv_obj_get_coords(x_axis, &x_coords);
 
-        int y_axis_height = lv_obj_get_height(y_axis);
         int max_percentage = 100;
         int bar_height = (percentages[i] * y_axis_height) / max_percentage;
 
