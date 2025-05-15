@@ -11,6 +11,8 @@
 
 #if LV_WAYLAND_WL_SHELL
 
+/* TODO: WL_SHELL has been deprecated for 3 years now. LV_WAYLAND_WL_SHELL should probably be deprecated soon */
+
 #include "lv_wayland_private.h"
 
 /*********************
