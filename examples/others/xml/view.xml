@@ -10,6 +10,7 @@
         <style name="red_border" border_width="2" border_side="full" border_color="0xff0000"></style>
 	</styles>
 
+<<<<<<< HEAD
     <subjects>
         <int name="subject1" value="10"/>
     </subjects>
@@ -26,11 +27,21 @@
 		<lv_slider bind_value="subject1" />
         <my_card title="Card 1" name="card1"
 				 y="100"
+=======
+	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
+		<lv_label text-translated="tiger"/>
+		<my_card title="Card 1" name="card1"
+				 y="30"
+>>>>>>> 8040ebf9d (feat(xml): add translation support)
                  styles="red_border"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 
+<<<<<<< HEAD
 		<my_card y="185"
+=======
+		<my_card y="120"
+>>>>>>> 8040ebf9d (feat(xml): add translation support)
 				 bg_color="0xffaaaa"
 				 action="Apply"
 				 btn_rel_style="btn_style"

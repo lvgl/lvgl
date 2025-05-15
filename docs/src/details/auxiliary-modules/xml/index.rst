@@ -26,5 +26,6 @@ XML - Declarative UI
     events
     subjects
     animations
-    translations
+    translation
+
     license

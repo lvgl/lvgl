@@ -39,6 +39,7 @@
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 #include "others/sysmon/lv_sysmon_private.h"
+#include "others/translation/lv_translation.h"
 #include "others/xml/lv_xml.h"
 
 #if LV_USE_SVG
@@ -393,6 +394,10 @@ void lv_init(void)
     lv_svg_decoder_init();
 #endif
 
+#if LV_USE_TRANSLATION
+    lv_translation_init();
+#endif
+
 #if LV_USE_XML
     lv_xml_init();
 #endif
@@ -508,6 +513,9 @@ void lv_deinit(void)
 
 #if LV_USE_XML
     lv_xml_test_unregister();
+
+#if LV_USE_TRANSLATION
+    lv_translation_deinit();
 #endif
 
     lv_mem_deinit();

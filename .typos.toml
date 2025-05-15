@@ -21,6 +21,7 @@ extend-ignore-re = [
     "Rename lv_chart_clear_serie",
     "rename LV_ROLLER_MODE_INIFINITE",
     "CARD_INFO_SET\\(&img_multilang_avatar_.*\\)",
+    "ist",
     "ACI\\)",
 ]
 
