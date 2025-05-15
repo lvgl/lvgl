@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 /*-------------------------------------------------------------------------
  * Connect FontAwesome file with FontAwesome family name.  Supplements
  * fontawesome.min.css.  Without this, the codes like `fa-github` don't
@@ -5,9 +7,8 @@
  *-------------------------------------------------------------------------*/
 @font-face {
   font-family: FontAwesome;
-  src:
-    url("../fonts/fontawesome-webfont.woff2") format("woff2"),
-    url("../fonts/fontawesome-webfont.woff") format("woff"),
+  src: url("../fonts/fontawesome-webfont.woff2") format("woff2"),
+    url("../fonts/fontawesome-webfont.woff") format("woff");
 }
 
 .fa {
@@ -16,15 +17,55 @@
 }
 
 /*-------------------------------------------------------------------------
- * Routine Element Overrides
+ * Colors
  *-------------------------------------------------------------------------*/
-table, th, td {
+
+body,
+body[data-theme="light"] {
+  --color-link: #000;
+  --color-sidebar-link-text--top-level: #000;
+  --color-sidebar-item-background--hover: #f0f0f0;
+  --color-toc-item-text--active: #000;
+  --color-toc-item-text: #000;
+  --color-sidebar-background: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --color-link: #fff;
+    --color-sidebar-link-text--top-level: #fff;
+    --color-sidebar-item-background--hover: #222;
+    --color-toc-item-text--active: #fff;
+    --color-toc-item-text: #fff;
+    --color-sidebar-background: transparent;
+  }
+}
+
+body[data-theme="dark"] {
+  --color-link: #fff;
+  --color-sidebar-link-text--top-level: #fff;
+  --color-sidebar-item-background--hover: #222;
+  --color-toc-item-text--active: #fff;
+  --color-toc-item-text: #fff;
+  --color-sidebar-background: transparent;
+}
+
+/*-------------------------------------------------------------------------
+ * Element Overrides
+ *-------------------------------------------------------------------------*/
+section + section {
+  margin-top: 4rem;
+}
+
+table,
+th,
+td {
   border: 1px solid #bbb;
   padding: 10px;
 }
 
 span.pre {
-  padding-right:8px;
+  padding-right: 8px;
 }
 
 span.pre {
@@ -39,6 +80,31 @@ code.sig-name {
   /*margin-left:8px;*/
 }
 
+.sidebar-drawer {
+  width: fit-content;
+  padding: 1rem;
+}
+
+.sidebar-tree label .icon {
+  opacity: 0.25;
+}
+
+.main {
+  justify-content: center;
+  gap: 6rem;
+  padding: 3rem;
+}
+
+.content {
+  padding: 0;
+  width: 100%;
+  max-width: 696px;
+}
+
+.no-toc {
+  display: block;
+}
+
 /*-------------------------------------------------------------------------
  * `home-img` class is (at this writing) exclusively used for the large
  * buttons on the landing page.  The rules below provide their hover
@@ -47,11 +113,16 @@ code.sig-name {
  */
 .home-img {
   width: 32%;
-  transition: transform .3s ease-out;
+  transition: transform 0.3s ease-out;
 }
 
 .home-img:hover {
   transform: translate(0, -10px);
+}
+
+.sidebar-logo {
+  max-width: 120px;
+  align-self: left;
 }
 
 /*-------------------------------------------------------------------------
@@ -126,7 +197,7 @@ code.sig-name {
  * Places "disclosure triangle" icon + non-breaking space to its left.*/
 .toggle .header:before {
   font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-  content: "\f0da \00a0 Show ";        /* \f0da = "closed" disclosure triangle; \f00a0 = non-breaking space */
+  content: "\f0da \00a0 Show "; /* \f0da = "closed" disclosure triangle; \f00a0 = non-breaking space */
   display: inline-block;
   font-size: 1.1em;
 }
@@ -134,7 +205,7 @@ code.sig-name {
 /* Selects <div class="header docutils container" ...> element when it also contains
  * `open` class, which class is toggled by JS code in `page.html` template. */
 .toggle .header.open:before {
-  content: "\f0d7 \00a0 Hide ";        /* \f0d7 = "open" disclosure triangle; \f00a0 = non-breaking space */
+  content: "\f0d7 \00a0 Hide "; /* \f0d7 = "open" disclosure triangle; \f00a0 = non-breaking space */
 }
 
 /* Selects the [> C code] "button". */
@@ -145,7 +216,8 @@ code.sig-name {
 }
 
 /* Selects web-assembly example <div> and child <iframe> elements. */
-.lv-example, .lv-example > iframe {
+.lv-example,
+.lv-example > iframe {
   border: none;
   outline: none;
   padding: 0;
@@ -279,7 +351,7 @@ div.body {
 
 .lv-custom-banner {
   box-sizing: border-box;
-  padding: .5rem;
+  padding: 0.5rem;
   min-width: 100%;
   text-align: center;
   border-bottom: 4px solid darkgreen;
@@ -337,31 +409,30 @@ div.body {
  * Field Lists
  *-------------------------------------------------------------------------*/
 .field-list ul {
-    margin: 0;
-    padding-left: 1em;
+  margin: 0;
+  padding-left: 1em;
 }
 
 .field-list p {
-    margin: 0;
+  margin: 0;
 }
 
 dl.field-list {
-    display: grid;
-    grid-template-columns: auto minmax(70%,95%);
-    margin-bottom: 24px;  /* Up from 16 */
+  display: grid;
+  grid-template-columns: auto minmax(70%, 95%);
+  margin-bottom: 24px; /* Up from 16 */
 }
 
 dl.field-list > dt {
-    font-weight: 600;
-    word-break: break-word;
-    padding-left: 1em;
-    padding-right: 1em;
-    margin-bottom: 0.15em;
-    display: inline-grid;
-    grid-template-columns: max-content auto;
+  font-weight: 600;
+  word-break: break-word;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-bottom: 0.15em;
+  display: inline-grid;
+  grid-template-columns: max-content auto;
 }
 
 dl.field-list > dd {
-    margin: 0;
+  margin: 0;
 }
-

@@ -17,3 +17,4 @@ sphinx-reredirects
 dirsync
 furo
 accessible-pygments
+sphinx-autobuild==2021.3.14
