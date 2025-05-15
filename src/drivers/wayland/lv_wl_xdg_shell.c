@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_wayland.h"
-#include "wayland_xdg_shell.h"
 
 #if LV_USE_WAYLAND
 /*
@@ -18,6 +17,9 @@
 #include "lv_wayland_private.h"
 
 #if LV_WAYLAND_XDG_SHELL
+
+#include "wayland_xdg_shell.h"
+
 /*********************
  *      DEFINES
  *********************/
