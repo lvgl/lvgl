@@ -8,9 +8,9 @@
  *********************/
 
 #include "lv_wayland.h"
-#include <string.h>
 #if LV_USE_WAYLAND
 
+#include <string.h>
 #include "lv_wayland_private.h"
 
 /*********************
