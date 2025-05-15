@@ -30,25 +30,20 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data);
+static void keyboard_read(lv_indev_t * drv, lv_indev_data_t * data);
 
+static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, uint32_t format, int fd, uint32_t size);
+static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                  struct wl_surface * surface, struct wl_array * keys);
+static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                  struct wl_surface * surface);
 
-static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard,
-                                   uint32_t format, int fd, uint32_t size);
-static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface,
-                                  struct wl_array * keys);
-static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface);
-
-static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard,
-                                      uint32_t serial, uint32_t mods_depressed,
-                                      uint32_t mods_latched, uint32_t mods_locked,
+static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                      uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked,
                                       uint32_t group);
 
-static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard,
-                                uint32_t serial, uint32_t time, uint32_t key,
-                                uint32_t state);
+static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
+                                uint32_t key, uint32_t state);
 
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
 
@@ -57,11 +52,11 @@ static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key);
  **********************/
 
 static const struct wl_keyboard_listener keyboard_listener = {
-    .keymap     = keyboard_handle_keymap,
-    .enter      = keyboard_handle_enter,
-    .leave      = keyboard_handle_leave,
-    .key        = keyboard_handle_key,
-    .modifiers  = keyboard_handle_modifiers,
+    .keymap    = keyboard_handle_keymap,
+    .enter     = keyboard_handle_enter,
+    .leave     = keyboard_handle_leave,
+    .key       = keyboard_handle_key,
+    .modifiers = keyboard_handle_modifiers,
 };
 
 /**********************
@@ -72,37 +67,50 @@ static const struct wl_keyboard_listener keyboard_listener = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-const struct wl_keyboard_listener * lv_wayland_keyboard_get_listener(void)
-{
-    return &keyboard_listener;
-}
-
 lv_indev_t * lv_wayland_keyboard_create(void)
 {
 
     lv_indev_t * keyboard = lv_indev_create();
     lv_indev_set_type(keyboard, LV_INDEV_TYPE_KEYPAD);
-    lv_indev_set_read_cb(keyboard, _lv_wayland_keyboard_read);
+    lv_indev_set_read_cb(keyboard, keyboard_read);
 
     return keyboard;
 }
+
+lv_indev_t * lv_wayland_get_keyboard(lv_display_t * display)
+{
+    struct window * window = lv_display_get_user_data(display);
+    if(!window) {
+        return NULL;
+    }
+    return window->lv_indev_keyboard;
+}
+
+/**********************
+ *   PRIVATE FUNCTIONS
+ **********************/
+
+const struct wl_keyboard_listener * lv_wayland_keyboard_get_listener(void)
+{
+    return &keyboard_listener;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
+static void keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
     if(!window || window->closed) {
         return;
     }
 
-    data->key = window->body->input.keyboard.key;
+    data->key   = window->body->input.keyboard.key;
     data->state = window->body->input.keyboard.state;
 }
 
-static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard,
-                                   uint32_t format, int fd, uint32_t size)
+static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, uint32_t format, int fd, uint32_t size)
 {
     struct application * app = data;
 
@@ -124,8 +132,7 @@ static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard,
     }
 
     /* Set up XKB keymap */
-    keymap = xkb_keymap_new_from_string(app->xkb_context, map_str,
-                                        XKB_KEYMAP_FORMAT_TEXT_V1, 0);
+    keymap = xkb_keymap_new_from_string(app->xkb_context, map_str, XKB_KEYMAP_FORMAT_TEXT_V1, 0);
     munmap(map_str, size);
     close(fd);
 
@@ -145,12 +152,11 @@ static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard,
     xkb_keymap_unref(app->seat.xkb.keymap);
     xkb_state_unref(app->seat.xkb.state);
     app->seat.xkb.keymap = keymap;
-    app->seat.xkb.state = state;
+    app->seat.xkb.state  = state;
 }
 
-static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface,
-                                  struct wl_array * keys)
+static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                  struct wl_surface * surface, struct wl_array * keys)
 {
     struct application * app = data;
 
@@ -166,8 +172,8 @@ static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard,
     }
 }
 
-static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard,
-                                  uint32_t serial, struct wl_surface * surface)
+static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                  struct wl_surface * surface)
 {
     struct application * app = data;
 
@@ -179,12 +185,11 @@ static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard,
     }
 }
 
-static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard,
-                                uint32_t serial, uint32_t time, uint32_t key,
-                                uint32_t state)
+static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
+                                uint32_t key, uint32_t state)
 {
     struct application * app = data;
-    const uint32_t code = (key + 8);
+    const uint32_t code      = (key + 8);
     const xkb_keysym_t * syms;
     xkb_keysym_t sym = XKB_KEY_NoSymbol;
 
@@ -205,14 +210,13 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard,
         (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if(lv_key != 0) {
-        app->keyboard_obj->input.keyboard.key = lv_key;
+        app->keyboard_obj->input.keyboard.key   = lv_key;
         app->keyboard_obj->input.keyboard.state = lv_state;
     }
 }
 
-static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard,
-                                      uint32_t serial, uint32_t mods_depressed,
-                                      uint32_t mods_latched, uint32_t mods_locked,
+static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard, uint32_t serial,
+                                      uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked,
                                       uint32_t group)
 {
     struct application * app = data;
@@ -225,8 +229,7 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
         return;
     }
 
-    xkb_state_update_mask(app->seat.xkb.state,
-                          mods_depressed, mods_latched, mods_locked, 0, 0, group);
+    xkb_state_update_mask(app->seat.xkb.state, mods_depressed, mods_latched, mods_locked, 0, 0, group);
 }
 static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
 {
@@ -294,6 +297,5 @@ static lv_key_t keycode_xkb_to_lv(xkb_keysym_t xkb_key)
     }
     return key;
 }
-
 
 #endif /* LV_WAYLAND */

@@ -5,7 +5,6 @@
  *
  */
 
-
 #ifndef LV_WL_TOUCH_H
 #define LV_WL_TOUCH_H
 
@@ -34,6 +33,13 @@ extern "C" {
  **********************/
 
 lv_indev_t * lv_wayland_touch_create(void);
+
+/**
+ * Get touchscreen input device for given LVGL display
+ * @param display LVGL display
+ * @return input device connected to touchscreen, or NULL on error
+ */
+lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * display);
 
 /**********************
  *      MACROS

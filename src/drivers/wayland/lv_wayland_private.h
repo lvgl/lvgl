@@ -7,6 +7,7 @@
 #define LV_WAYLAND_PRIVATE_H
 
 #include <sys/poll.h>
+#include <wayland-client-protocol.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,8 +50,6 @@ extern "C" {
 #define LV_WAYLAND_CYCLE_PERIOD LV_MIN(LV_DEF_REFR_PERIOD, 1)
 #endif
 
-
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -71,7 +70,7 @@ enum object_type {
 
 #define FIRST_DECORATION (OBJECT_TITLEBAR)
 #define LAST_DECORATION (OBJECT_BORDER_RIGHT)
-#define NUM_DECORATIONS (LAST_DECORATION-FIRST_DECORATION+1)
+#define NUM_DECORATIONS (LAST_DECORATION - FIRST_DECORATION + 1)
 
 struct window;
 struct input {
@@ -222,9 +221,81 @@ struct window {
  *      MACROS
  **********************/
 
+extern struct application application;
+
+/**********************
+ *      Driver
+ **********************/
+
+void lv_wayland_init(void);
+void lv_wayland_deinit(void);
+
+/**********************
+ *      Window
+ **********************/
+
+void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t height);
+bool lv_wayland_window_resize(struct window * window, int width, int height);
+void lv_wayland_window_destroy(struct window * window);
+
+#if LV_WAYLAND_WINDOW_DECORATIONS
+uint32_t lv_wayland_window_decoration_create_all(struct window * window);
+void lv_wayland_window_decoration_detach_all(struct window * window);
+bool lv_wayland_window_decoration_create(struct window * window, struct graphic_object * decoration, int window_width,
+                                         int window_height);
+bool lv_wayland_window_decoration_attach(struct window * window, struct graphic_object * decoration,
+                                         smm_buffer_t * decoration_buffer, struct graphic_object * parent);
+void lv_wayland_window_decoration_detach(struct window * window, struct graphic_object * decoration);
+#endif
+
+/**********************
+ *  Window Management
+ **********************/
+
+#if LV_WAYLAND_WL_SHELL
+const struct wl_shell_surface_listener * lv_wayland_wl_shell_get_listener(void);
+#endif
+
+#if LV_WAYLAND_XDG_SHELL
+const struct xdg_surface_listener * lv_wayland_xdg_shell_get_surface_listener(void);
+const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(void);
+const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
+#endif
+
+/**********************
+ *      SHM
+ **********************/
+
+const struct wl_shm_listener * lv_wayland_shm_get_listener(void);
+
+/**********************
+ *      SME
+ **********************/
+
+const struct smm_events * lv_wayland_sme_get_events(void);
+
+/**********************
+ *      Seat
+ **********************/
+
+const struct wl_seat_listener * lv_wayland_seat_get_listener(void);
+
+/**********************
+ *      Input
+ **********************/
+
 const struct wl_keyboard_listener * lv_wayland_keyboard_get_listener(void);
 const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void);
 const struct wl_touch_listener * lv_wayland_touch_get_listener(void);
+
+/**********************
+ *      Cache
+ **********************/
+
+void lv_wayland_cache_add_area(struct window * window, smm_buffer_t * buf, const lv_area_t * area);
+void lv_wayland_cache_clear(struct window * window);
+void lv_wayland_cache_apply_areas(struct window * window, void * dest, void * src, smm_buffer_t * src_buf);
+void lv_wayland_cache_purge(struct window * window, smm_buffer_t * buf);
 
 #endif /* LV_USE_WAYLAND */
 

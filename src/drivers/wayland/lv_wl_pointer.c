@@ -33,22 +33,20 @@
 
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data);
 
-static void pointer_handle_enter(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface,
+static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface,
                                  wl_fixed_t sx, wl_fixed_t sy);
 
-static void pointer_handle_leave(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface);
+static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint32_t serial,
+                                 struct wl_surface * surface);
 
-static void pointer_handle_motion(void * data, struct wl_pointer * pointer,
-                                  uint32_t time, wl_fixed_t sx, wl_fixed_t sy);
+static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx,
+                                  wl_fixed_t sy);
 
-static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
-                                  uint32_t serial, uint32_t time, uint32_t button,
-                                  uint32_t state);
+static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, uint32_t serial, uint32_t time,
+                                  uint32_t button, uint32_t state);
 
-static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer,
-                                uint32_t time, uint32_t axis, wl_fixed_t value);
+static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uint32_t time, uint32_t axis,
+                                wl_fixed_t value);
 
 /**********************
  *  STATIC VARIABLES
@@ -78,6 +76,19 @@ lv_indev_t * lv_wayland_pointer_create(void)
     return indev;
 }
 
+lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
+{
+    struct window * window = lv_display_get_user_data(disp);
+    if(!window) {
+        return NULL;
+    }
+    return window->lv_indev_pointer;
+}
+
+/**********************
+ *   PRIVATE FUNCTIONS
+ **********************/
+
 const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
 {
     return &pointer_listener;
@@ -86,7 +97,6 @@ const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
@@ -98,17 +108,16 @@ static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 
     data->point.x = window->body->input.pointer.x;
     data->point.y = window->body->input.pointer.y;
-    data->state = window->body->input.pointer.left_button;
+    data->state   = window->body->input.pointer.left_button;
 }
 
-static void pointer_handle_enter(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface,
+static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface,
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
     struct application * app = data;
-    const char * cursor = "left_ptr";
-    int pos_x = wl_fixed_to_int(sx);
-    int pos_y = wl_fixed_to_int(sy);
+    const char * cursor      = "left_ptr";
+    int pos_x                = wl_fixed_to_int(sx);
+    int pos_y                = wl_fixed_to_int(sy);
 
     if(!surface) {
         app->pointer_obj = NULL;
@@ -199,8 +208,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer,
     }
 }
 
-static void pointer_handle_leave(void * data, struct wl_pointer * pointer,
-                                 uint32_t serial, struct wl_surface * surface)
+static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface)
 {
     struct application * app = data;
 
@@ -212,8 +220,7 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer,
     }
 }
 
-static void pointer_handle_motion(void * data, struct wl_pointer * pointer,
-                                  uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
+static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
     struct application * app = data;
 
@@ -228,9 +235,8 @@ static void pointer_handle_motion(void * data, struct wl_pointer * pointer,
     app->pointer_obj->input.pointer.y = LV_MAX(0, LV_MIN(wl_fixed_to_int(sy), app->pointer_obj->height - 1));
 }
 
-static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
-                                  uint32_t serial, uint32_t time, uint32_t button,
-                                  uint32_t state)
+static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, uint32_t serial, uint32_t time,
+                                  uint32_t button, uint32_t state)
 {
     struct application * app = data;
 
@@ -245,10 +251,9 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
         return;
     }
 
-
 #if LV_WAYLAND_WINDOW_DECORATIONS
     struct window * window;
-    window = app->pointer_obj->window;
+    window    = app->pointer_obj->window;
     int pos_x = app->pointer_obj->input.pointer.x;
     int pos_y = app->pointer_obj->input.pointer.y;
 #endif
@@ -328,8 +333,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -347,8 +351,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -366,8 +369,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -385,8 +387,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel,
-                                        window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -398,11 +399,11 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer,
     }
 }
 
-static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer,
-                                uint32_t time, uint32_t axis, wl_fixed_t value)
+static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uint32_t time, uint32_t axis,
+                                wl_fixed_t value)
 {
     struct application * app = data;
-    const int diff = wl_fixed_to_int(value);
+    const int diff           = wl_fixed_to_int(value);
 
     LV_UNUSED(time);
     LV_UNUSED(wl_pointer);
