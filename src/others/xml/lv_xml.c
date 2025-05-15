@@ -10,6 +10,7 @@
 #include "lv_xml.h"
 #if LV_USE_XML
 
+#include "lv_xml_translation.h"
 #include "lv_xml_base_types.h"
 #include "lv_xml_parser.h"
 #include "lv_xml_component.h"
@@ -71,6 +72,8 @@ static void view_end_element_handler(void * user_data, const char * name);
 
 void lv_xml_init(void)
 {
+    lv_xml_translation_init();
+
     lv_xml_component_init();
 
     lv_xml_register_font(NULL, "lv_font_default", lv_font_get_default());
