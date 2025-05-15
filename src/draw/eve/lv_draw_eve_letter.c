@@ -235,7 +235,7 @@ static void bitmap_to_evenWidth(uint32_t addr, const uint8_t * img_in, uint8_t *
                 nibble_1 = get_nibble_1(img_in[addr_it]);
                 nibble_2 = get_nibble_2(img_in[addr_it]);
             }
-            if(key == 1) {
+            else {
                 nibble_1 = get_nibble_2(img_in[addr_it - 1]);
                 nibble_2 = get_nibble_1(img_in[addr_it]);
             }
