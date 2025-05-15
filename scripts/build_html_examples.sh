@@ -28,7 +28,7 @@ fi
 cd ..
 
 # Generate lv_conf
-LV_CONF_PATH=lvgl/configs/ci/docs/lv_conf_docs.h
+LV_CONF_PATH=`pwd`/lvgl/configs/ci/docs/lv_conf_docs.h
 
 cp lvgl/lv_conf_template.h $LV_CONF_PATH
 python ./lvgl/scripts/generate_lv_conf.py \
@@ -38,7 +38,7 @@ python ./lvgl/scripts/generate_lv_conf.py \
 
 mkdir cmbuild
 cd cmbuild
-emcmake cmake .. -DLV_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+emcmake cmake .. -DLV_BUILD_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 emmake make -j$(nproc)
 rm -rf CMakeFiles
 cd ../..

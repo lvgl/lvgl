@@ -1,0 +1,1 @@
+# A default defconfig doesn't need to store anything as it'll just take the default parameters when expanded into an actual config
