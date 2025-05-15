@@ -217,11 +217,22 @@ html_theme = 'furo'
 # is preserved by commenting it out in case it is ever needed again.
 html_theme_options = {
     "sidebar_hide_name": True,      # True when the logo carries project name
+    "light_logo": "images/logo-light.svg",
+    "dark_logo": "images/logo-dark.svg",
     "top_of_page_buttons": ["view"],
     # The below 3 direct the "top_of_page_buttons" to github for view and edit buttons.
     "source_repository": "https://github.com/lvgl/lvgl/",
     "source_branch": "master",
     "source_directory": "docs/src/",
+    "light_css_variables": {
+        "--font-stack": "\"Inter\", sans-serif",
+        "color-brand-primary": "#7C4DFF",
+        "color-brand-content": "#7C4DFF",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#7C4DFF",
+        "color-brand-content": "#7C4DFF",
+    },
     # "announcement": "<em>Semi-permanent announcement</em> from <code>conf.py</code>.",
 }
 
@@ -252,7 +263,7 @@ html_context = {
     'conf_py_path': '/docs/src/'
 }
 
-html_logo = '_static/images/logo_lvgl.png'
+html_logo = ''
 html_favicon = '_static/images/favicon.png'
 
 html_css_files = [
@@ -291,7 +302,7 @@ html_permalinks = True              # Default = True, add link anchor for each h
 # html_link_suffix = html_file_suffix
 html_show_copyright = True         # Default = True; shows copyright notice in footer.
 # html_show_search_summary = True  # Default = True
-# html_show_sphinx = True          # Default = True; adds "Created using Sphinx" to footer.
+html_show_sphinx = False          # Default = True; adds "Created using Sphinx" to footer.
 # html_output_encoding = 'utf-8'   # Default = 'utf-8'
 # html_compact_lists = True        # Default = True
 # html_secnumber_suffix = '. '     # Default = '. '; set to ' ' to suppress final dot on section numbers.
