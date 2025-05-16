@@ -828,8 +828,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_
     int32_t src_x;
     int32_t y;
 
-
     int32_t bit_ofs = dsc->relative_area.x1 % 8;
+
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         /*Special case*/
@@ -954,6 +954,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_I1(dsc)) {
                 for(y = 0; y < h; y++) {
+
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
                         uint8_t src = lv_color16_luminance(src_buf_c16[src_x]);
                         if(src > I1_LUM_THRESHOLD) {
