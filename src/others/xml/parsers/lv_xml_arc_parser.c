@@ -85,7 +85,7 @@ void lv_xml_arc_apply(lv_xml_parser_state_t * state, const char ** attrs)
             lv_arc_set_mode(item, mode_text_to_enum_value(value));
         }
         else if(lv_streq("bind_value", name)) {
-            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject) {
                 lv_arc_bind_value(item, subject);
             }

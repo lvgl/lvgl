@@ -49,12 +49,12 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
 lv_result_t lv_xml_component_register_from_file(const char * path);
 
 /**
- * Get the ctx of a component which was registered by
+ * Get the scope of a component which was registered by
  * `lv_xml_component_register_from_data` or `lv_xml_component_register_from_file`
  * @param component_name    name of the component
- * @return                  pointer the ctx or NULL if not found
+ * @return                  pointer the scope or NULL if not found
  */
-lv_xml_component_ctx_t * lv_xml_component_get_ctx(const char * component_name);
+lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_name);
 
 /**
  * Remove a component from from the list.
