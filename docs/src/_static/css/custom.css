@@ -1,3 +1,23 @@
+/*-------------------------------------------------------------------------
+ * Connect FontAwesome file with FontAwesome family name.  Supplements
+ * fontawesome.min.css.  Without this, the codes like `fa-github` don't
+ # work in the Furo theme as they did with RTD theme.
+ *-------------------------------------------------------------------------*/
+@font-face {
+  font-family: FontAwesome;
+  src:
+    url("../fonts/fontawesome-webfont.woff2") format("woff2"),
+    url("../fonts/fontawesome-webfont.woff") format("woff"),
+}
+
+.fa {
+  font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+}
+
+/*-------------------------------------------------------------------------
+ * Routine Element Overrides
+ *-------------------------------------------------------------------------*/
 table, th, td {
   border: 1px solid #bbb;
   padding: 10px;
@@ -35,36 +55,14 @@ code.sig-name {
 }
 
 /*-------------------------------------------------------------------------
- * All `wy-...` and `rst-content` classes are classes from
- * `sphinx_rtd_theme` `layout.html` template.
- *-------------------------------------------------------------------------
- * `wy-side-nav-search` class adorns the <div> element in the upper left
- * corner of each page that contains:
- * - the LVGL logo
- * - documentation-version selector drop-down (matches LVGL release versions)
- * - search TextBox
- */
-.wy-side-nav-search {
-  background-color: #f5f5f5;
-}
-
-.wy-side-nav-search > div.version {
-  color: #333;
-  display: none;                               /*replaced by dropdown*/
-}
-
-/* `rst-content` class marks the <div> element that contains the whole
- * visible part of the right panel where the page content is shown. */
-/*Let `code` wrap*/
-.rst-content code, .rst-content tt, code {
-  white-space: normal;
-}
-
-.wy-nav-content {
-  padding: 1.618em 3.236em;
-  height: 100%;
-  max-width: 1920px;
-  margin: auto
+ * Version Dropdown Styling
+ *-------------------------------------------------------------------------*/
+#version_dropdown {
+  background-color: var(--color-sidebar-background);
+  color: var(--color-foreground-primary);
+  margin: 4px 0;
+  width: 150px;
+  border-radius: 5px;
 }
 
 /*-------------------------------------------------------------------------
@@ -200,14 +198,6 @@ code.sig-name {
 }
 
 /*-------------------------------------------------------------------------
- * This doesn't select anything at this writing (29-Mar-2025).
- *-------------------------------------------------------------------------
- */
-dl.cpp.unexpanded dd {
-  display: none;
-}
-
-/*-------------------------------------------------------------------------
  * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
  *-------------------------------------------------------------------------
  */
@@ -232,6 +222,13 @@ dl.cpp.unexpanded dd {
   content: "\f0d7 \00a0";
 }
 
+/* This hides the <dd> elements that contain a code-element's documentation
+ * when it has class "unexpanded".  "expanded" and "unexpanded" classes in the
+ * <dl> elements are added and managed dynamically via code in `custom.js`. */
+dl.cpp.unexpanded dd {
+  display: none;
+}
+
 /* Selects all <div> elements with "body" class.
  * There are no elements that this selects at this writing (29-Mar-2025). */
 div.body {
@@ -249,39 +246,122 @@ div.body {
   font-size: 75%;
 }
 
-/* These replace colors present in `pygments.css` which is used in code highlighting.
- * These are too dark to be readlable in DARK mode.  They include:
- * .highlight .nf -- function names
- * .highlight .nl -- code labels
- * .descname  .n  -- API documentation function names
- * .highlight .p  -- Punctuation
- * .highlight     -- Plain text in a `.. code-block:: none` block
- * The first 2 were created by lightening the `pygments.css` colors without changing their
- * angle on the color wheel.  The added attribute "conditional" also limits this change to
- * DARK MODE only instead of both light and dark modes.
- */
-/* Name.Function */
-html[data-theme="dark"] .highlight .nf {
-  color: #ccd285;
+/*-------------------------------------------------------------------------
+ * Custom Banners...
+ *
+ * ...are inserted between these two elements at the top of the page:
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+<div class="lv-custom-banner-list">
+  <p class="lv-custom-banner highest-priority">
+     Highest-priority announcement!
+  </p>
+  <p class="lv-custom-banner high-priority">
+     We are hiring a Front-End Developer in our Editor Team (Electron, React, Node.JS)!
+  </p>
+  <a href="specified_url" class="lv-custom-banner normal-priority">
+    <p>
+      Normal-priority announcement.
+    </p>
+  </a>
+</div>
+
+<div class="page">
+  ...page content...
+ *-------------------------------------------------------------------------*/
+.lv-custom-banner-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: auto;
+  border-top: 4px solid darkgreen;
 }
 
-/* Name.Label */
-html[data-theme="dark"] .highlight .nl {
-  color: #0043e2;
+.lv-custom-banner {
+  box-sizing: border-box;
+  padding: .5rem;
+  min-width: 100%;
+  text-align: center;
+  border-bottom: 4px solid darkgreen;
+  margin: 0;
 }
 
-/* Name */
-html[data-theme="dark"] .descname .n {
-  color: #0a44de;
+/* Hyperlinks within banners (when banner label had a hyperlink in it) */
+.lv-custom-banner a {
+  color: var(--color-announcement-text);
+  text-decoration-color: var(--color-announcement-text);
 }
 
-/* Punctuation */
-html[data-theme="dark"] .highlight .p {
-  color: #5c7c72
+.lv-custom-banner a:hover {
+  color: var(--color-announcement-text);
+  text-decoration-color: var(--color-link--hover);
 }
 
-/* Plain text. */
-html[data-theme="dark"] .highlight {
-  background: #ffffff; color: #bfbfbf
+/* Paragraphs within banner HTML (when Banners text contains <p> elements). */
+.lv-custom-banner p {
+  margin: 0;
+}
+
+/* Banner priorities */
+.lv-custom-banner.highest-priority {
+  background-image: linear-gradient(45deg, black, darkred);
+  color: white;
+  padding: 18px 3em;
+}
+
+.lv-custom-banner.high-priority {
+  background-image: linear-gradient(45deg, black, darkgreen);
+  color: white;
+  padding: 14px 3em;
+}
+
+.lv-custom-banner.normal-priority {
+  background-image: linear-gradient(45deg, black, #5e5e5e);
+  color: white;
+  padding: 10px 3em;
+}
+
+.lv-custom-banner.low-priority {
+  background-image: linear-gradient(45deg, black, darkblue);
+  color: white;
+  padding: 8px 3em;
+}
+
+.lv-custom-banner.lowest-priority {
+  background-image: linear-gradient(45deg, black, var(--color-sidebar-background));
+  color: var(--color-content-foreground);
+  padding: 8px 3em;
+}
+
+/*-------------------------------------------------------------------------
+ * Field Lists
+ *-------------------------------------------------------------------------*/
+.field-list ul {
+    margin: 0;
+    padding-left: 1em;
+}
+
+.field-list p {
+    margin: 0;
+}
+
+dl.field-list {
+    display: grid;
+    grid-template-columns: auto minmax(70%,95%);
+    margin-bottom: 24px;  /* Up from 16 */
+}
+
+dl.field-list > dt {
+    font-weight: 600;
+    word-break: break-word;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-bottom: 0.15em;
+    display: inline-grid;
+    grid-template-columns: max-content auto;
+}
+
+dl.field-list > dd {
+    margin: 0;
 }
 
