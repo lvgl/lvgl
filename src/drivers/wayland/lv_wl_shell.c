@@ -95,7 +95,8 @@ lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maxim
         /* The wl_shell has been deprecated */
         // wl_shell_surface_set_maximized(window->wl_shell_surface);
         return LV_RESULT_INVALID;
-    } else {
+    }
+    else {
         wl_shell_surface_set_toplevel(window->wl_shell_surface);
     }
     return LV_RESULT_OK;
@@ -110,7 +111,8 @@ lv_result_t lv_wayland_wl_shell_set_fullscreen(struct window * window, bool full
     }
     if(fullscreen) {
         wl_shell_surface_set_fullscreen(window->wl_shell_surface, WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE, 0, NULL);
-    } else {
+    }
+    else {
         wl_shell_surface_set_toplevel(window->wl_shell_surface);
     }
     return LV_RESULT_OK;
@@ -143,7 +145,8 @@ void lv_wayland_wl_shell_handle_pointer_event(struct application * app, uint32_t
         case OBJECT_BORDER_BOTTOM:
         case OBJECT_BORDER_LEFT:
         case OBJECT_BORDER_RIGHT:
-        case OBJECT_WINDOW: break;
+        case OBJECT_WINDOW:
+            break;
     }
 }
 
@@ -165,7 +168,8 @@ static void wl_shell_handle_configure(void * data, struct wl_shell_surface * she
 
     if((width <= 0) || (height <= 0)) {
         return;
-    } else if((width != window->width) || (height != window->height)) {
+    }
+    else if((width != window->width) || (height != window->height)) {
         window->resize_width   = width;
         window->resize_height  = height;
         window->resize_pending = true;

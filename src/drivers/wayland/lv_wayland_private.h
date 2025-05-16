@@ -271,7 +271,7 @@ const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(
 const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
 lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maximized);
 lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window);
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window , bool fullscreen);
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen);
 lv_result_t lv_wayland_xdg_shell_create_window(struct application * app, struct window * window, const char * title);
 lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window);
 lv_result_t lv_wayland_xdg_shell_destroy_window_surface(struct window * window);

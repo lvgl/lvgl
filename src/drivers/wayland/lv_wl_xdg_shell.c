@@ -109,7 +109,8 @@ lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool ful
     }
     if(fullscreen) {
         xdg_toplevel_set_fullscreen(window->xdg_toplevel, NULL);
-    } else {
+    }
+    else {
         xdg_toplevel_unset_fullscreen(window->xdg_toplevel);
     }
     return LV_RESULT_OK;
@@ -123,7 +124,8 @@ lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maxi
 
     if(maximized) {
         xdg_toplevel_set_maximized(window->xdg_toplevel);
-    } else {
+    }
+    else {
         xdg_toplevel_unset_maximized(window->xdg_toplevel);
     }
 
@@ -196,7 +198,7 @@ lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window)
  *   Shell Input
  **********************/
 
-void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t serial,
+void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_t serial,
                                                uint32_t button, uint32_t state)
 {
     struct window * window = app->pointer_obj->window;
@@ -233,9 +235,11 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t
                     uint32_t edge;
                     if(pos_x < (BORDER_SIZE * 5)) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    } else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
+                    }
+                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    } else {
+                    }
+                    else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
                     }
                     xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
@@ -249,9 +253,11 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t
                     uint32_t edge;
                     if(pos_x < (BORDER_SIZE * 5)) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    } else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
+                    }
+                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    } else {
+                    }
+                    else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
                     }
                     xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
@@ -265,9 +271,11 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t
                     uint32_t edge;
                     if(pos_y < (BORDER_SIZE * 5)) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    } else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
+                    }
+                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    } else {
+                    }
+                    else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
                     }
                     xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
@@ -281,9 +289,11 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t
                     uint32_t edge;
                     if(pos_y < (BORDER_SIZE * 5)) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    } else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
+                    }
+                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    } else {
+                    }
+                    else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
                     }
                     xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
@@ -313,48 +323,61 @@ const char * lv_wayland_xdg_shell_get_cursor_name(const struct application * app
         case OBJECT_BORDER_TOP:
             if(window->maximized) {
                 // do nothing
-            } else if(pos_x < (BORDER_SIZE * 5)) {
+            }
+            else if(pos_x < (BORDER_SIZE * 5)) {
                 return "top_left_corner";
-            } else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
+            }
+            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
                 return "top_right_corner";
-            } else {
+            }
+            else {
                 return "top_side";
             }
             break;
         case OBJECT_BORDER_BOTTOM:
             if(window->maximized) {
                 // do nothing
-            } else if(pos_x < (BORDER_SIZE * 5)) {
+            }
+            else if(pos_x < (BORDER_SIZE * 5)) {
                 return "bottom_left_corner";
-            } else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
+            }
+            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
                 return "bottom_right_corner";
-            } else {
+            }
+            else {
                 return "bottom_side";
             }
             break;
         case OBJECT_BORDER_LEFT:
             if(window->maximized) {
                 // do nothing
-            } else if(pos_y < (BORDER_SIZE * 5)) {
+            }
+            else if(pos_y < (BORDER_SIZE * 5)) {
                 return "top_left_corner";
-            } else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
+            }
+            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
                 return "bottom_left_corner";
-            } else {
+            }
+            else {
                 return "left_side";
             }
             break;
         case OBJECT_BORDER_RIGHT:
             if(window->maximized) {
                 // do nothing
-            } else if(pos_y < (BORDER_SIZE * 5)) {
+            }
+            else if(pos_y < (BORDER_SIZE * 5)) {
                 return "top_right_corner";
-            } else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
+            }
+            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
                 return "bottom_right_corner";
-            } else {
+            }
+            else {
                 return "right_side";
             }
             break;
-        default: break;
+        default:
+            break;
     }
 
     return LV_WAYLAND_DEFAULT_CURSOR_NAME;
@@ -375,7 +398,8 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
         if(window->resize_pending == false) {
             /* Use the size passed to the create_window function */
             lv_wayland_window_draw(window, window->width, window->height);
-        } else {
+        }
+        else {
 
             /* Handle early maximization or fullscreen, */
             /* by using the size communicated by the compositor */
@@ -413,7 +437,8 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
         window->resize_height  = height;
         window->resize_pending = true;
         LV_LOG_TRACE("resize_pending is set, will resize to w:%d h:%d", width, height);
-    } else {
+    }
+    else {
         LV_LOG_TRACE("resize_pending not set w:%d h:%d", width, height);
     }
 }

@@ -177,14 +177,14 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
     bool open = false;
 
     if(disp == NULL) {
-        LV_LL_READ(&application.window_ll, window)
-        {
+        LV_LL_READ(&application.window_ll, window) {
             if(!window->closed) {
                 open = true;
                 break;
             }
         }
-    } else {
+    }
+    else {
         window = lv_display_get_user_data(disp);
         open   = (!window->closed);
     }
@@ -314,7 +314,8 @@ bool lv_wayland_window_resize(struct window * window, int width, int height)
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->application->opt_disable_decorations && !window->fullscreen) {
         lv_wayland_window_decoration_create_all(window);
-    } else if(!window->application->opt_disable_decorations) {
+    }
+    else if(!window->application->opt_disable_decorations) {
         /* Entering fullscreen, detach decorations to prevent xdg_wm_base error 4 */
         /* requested geometry larger than the configured fullscreen state */
         lv_wayland_window_decoration_detach_all(window);
