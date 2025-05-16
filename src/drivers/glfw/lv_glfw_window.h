@@ -49,8 +49,8 @@ void lv_glfw_window_delete(lv_glfw_window_t * window);
 
 /**
  * Get the GLFW window handle for an lv_glfw_window
- * @param window    	GLFW window to return the handle of
- * @return 		the GLFW window handle
+ * @param window        GLFW window to return the handle of
+ * @return              the GLFW window handle
  */
 void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window);
 

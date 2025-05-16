@@ -359,8 +359,8 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
                 break;
             }
         default:
- 		/*The malloced cache_data->draw_dsc will be freed automatically on failure
-	 	 *in opengles_texture_cache_free_cb*/
+            /*The malloced cache_data->draw_dsc will be freed automatically on failure
+            *in opengles_texture_cache_free_cb*/
             return false;
     }
 
