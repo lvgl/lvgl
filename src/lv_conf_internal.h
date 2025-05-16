@@ -4252,6 +4252,21 @@
     #endif
 #endif
 
+#if LV_USE_DEMO_BENCHMARK
+    /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
+    #ifndef LV_DEMO_BENCHMARK_ALIGNED_FONTS
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+            #else
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
+            #endif
+        #else
+            #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 1
+        #endif
+    #endif
+#endif
+
 /** Render test for each primitive.
  *  - Requires at least 480x272 display. */
 #ifndef LV_USE_DEMO_RENDER
