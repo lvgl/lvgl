@@ -79,6 +79,8 @@ static inline uint16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_24_16_mix(const uint
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
+static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -983,9 +985,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             for(x = 0; x < w; x++) {
                 uint16_t raw;
                 lv_color16_t px;
-                lv_memcpy(&raw, &src_buf_u16[x], sizeof(raw));         /* get raw pixel */
-                raw = lv_color_swap_16(raw);                        /* swap byte order */
-                lv_memcpy(&px, &raw, sizeof(px));
+                raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                px = lv_color16_from_u16(raw);
 
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
@@ -1494,6 +1495,15 @@ static inline uint8_t LV_ATTRIBUTE_FAST_MEM get_bit(const uint8_t * buf, int32_t
 static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
 {
     return (void *)((uint8_t *)buf + stride);
+}
+
+static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t raw)
+{
+    lv_color16_t c;
+    c.red = (raw >> 11) & 0x1F;
+    c.green = (raw >> 5) & 0x3F;
+    c.blue = raw & 0x1F;
+    return c;
 }
 
 #endif /*LV_DRAW_SW_SUPPORT_RGB565*/

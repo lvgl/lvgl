@@ -1072,8 +1072,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             for(x = 0; x < w; x++) {
                 uint16_t raw;
                 lv_color16_t src_px;
-                lv_memcpy(&raw, &src_buf_u16[x], sizeof(raw));         /* get raw pixel */
-                raw = lv_color_swap_16(raw);                        /* swap byte order */
+                raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
                 lv_memcpy(&src_px, &raw, sizeof(src_px));
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
