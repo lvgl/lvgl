@@ -14,6 +14,7 @@
 /* TODO: WL_SHELL has been deprecated for 3 years now. LV_WAYLAND_WL_SHELL should probably be deprecated soon */
 
 #include "lv_wayland_private.h"
+#include <linux/input-event-codes.h>
 
 /*********************
  *      DEFINES
@@ -48,10 +49,107 @@ static const struct wl_shell_surface_listener shell_surface_listener = {
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**********************
+ *   PRIVATE FUNCTIONS
+ **********************/
+
+void lv_wayland_wl_shell_deinit(void)
+{
+    if(application.wl_shell) {
+        wl_shell_destroy(application.wl_shell);
+    }
+}
+
 const struct wl_shell_surface_listener * lv_wayland_wl_shell_get_listener(void)
 {
     return &shell_surface_listener;
 }
+
+lv_result_t lv_wayland_wl_shell_create_window(struct application * app, struct window * window, const char * title)
+{
+    if(!app->wl_shell) {
+        return LV_RESULT_INVALID;
+    }
+
+    window->wl_shell_surface = wl_shell_get_shell_surface(app->wl_shell, window->body->surface);
+    if(!window->wl_shell_surface) {
+        LV_LOG_ERROR("cannot create WL shell surface");
+        return LV_RESULT_INVALID;
+    }
+
+    wl_shell_surface_add_listener(window->wl_shell_surface, lv_wayland_wl_shell_get_listener(), window);
+    wl_shell_surface_set_toplevel(window->wl_shell_surface);
+    wl_shell_surface_set_title(window->wl_shell_surface, title);
+
+    /* For wl_shell, just draw the window, weston doesn't send it */
+    lv_wayland_window_draw(window, window->width, window->height);
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maximized)
+{
+
+    if(!window->wl_shell_surface) {
+    }
+    if(maximized) {
+        /* The wl_shell has been deprecated */
+        // wl_shell_surface_set_maximized(window->wl_shell_surface);
+        return LV_RESULT_INVALID;
+    } else {
+        wl_shell_surface_set_toplevel(window->wl_shell_surface);
+    }
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_wayland_wl_shell_set_minimized(struct window * window)
+{}
+lv_result_t lv_wayland_wl_shell_set_fullscreen(struct window * window, bool fullscreen)
+{
+    if(!window->wl_shell_surface) {
+        return LV_RESULT_INVALID;
+    }
+    if(fullscreen) {
+        wl_shell_surface_set_fullscreen(window->wl_shell_surface, WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE, 0, NULL);
+    } else {
+        wl_shell_surface_set_toplevel(window->wl_shell_surface);
+    }
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_wayland_wl_shell_destroy_window(struct window * window)
+{
+    if(!window->wl_shell_surface) {
+        return LV_RESULT_INVALID;
+    }
+    wl_shell_surface_destroy(window->wl_shell_surface);
+    return LV_RESULT_OK;
+}
+
+void lv_wayland_wl_shell_handle_pointer_event(struct application * app, uint32_t serial, uint32_t button,
+                                              uint32_t state)
+{
+    struct window * window = app->pointer_obj->window;
+    switch(app->pointer_obj->type) {
+        case OBJECT_TITLEBAR:
+            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
+                if(window->wl_shell_surface) {
+                    wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
+                    window->flush_pending = true;
+                }
+            }
+            break;
+        case OBJECT_BUTTON_CLOSE:
+        case OBJECT_BORDER_TOP:
+        case OBJECT_BORDER_BOTTOM:
+        case OBJECT_BORDER_LEFT:
+        case OBJECT_BORDER_RIGHT:
+        case OBJECT_WINDOW: break;
+    }
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void wl_shell_handle_ping(void * data, struct wl_shell_surface * shell_surface, uint32_t serial)
 {
@@ -67,16 +165,11 @@ static void wl_shell_handle_configure(void * data, struct wl_shell_surface * she
 
     if((width <= 0) || (height <= 0)) {
         return;
-    }
-    else if((width != window->width) || (height != window->height)) {
+    } else if((width != window->width) || (height != window->height)) {
         window->resize_width   = width;
         window->resize_height  = height;
         window->resize_pending = true;
     }
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /* LV_WAYLAND_WL_SHELL */

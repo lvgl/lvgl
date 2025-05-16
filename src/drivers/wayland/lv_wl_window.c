@@ -177,14 +177,14 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
     bool open = false;
 
     if(disp == NULL) {
-        LV_LL_READ(&application.window_ll, window) {
+        LV_LL_READ(&application.window_ll, window)
+        {
             if(!window->closed) {
                 open = true;
                 break;
             }
         }
-    }
-    else {
+    } else {
         window = lv_display_get_user_data(disp);
         open   = (!window->closed);
     }
@@ -195,25 +195,14 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 {
     struct window * window = lv_display_get_user_data(disp);
-    lv_result_t err = LV_RESULT_INVALID;
+    lv_result_t err        = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
     }
 
     if(window->maximized != maximized) {
 #if LV_WAYLAND_WL_SHELL
-        if(window->wl_shell_surface) {
-            if(maximized) {
-                /* Maximizing the wl_shell is possible, but requires binding to wl_output */
-                /* The wl_shell has been deperacted */
-                // wl_shell_surface_set_maximized(window->wl_shell_surface);
-            }
-            else {
-                wl_shell_surface_set_toplevel(window->wl_shell_surface);
-            }
-            window->maximized     = maximized;
-            window->flush_pending = true;
-        }
+        err = lv_wayland_wl_shell_set_maximized(window, maximized);
 #elif LV_WAYLAND_XDG_SHELL
         err = lv_wayland_xdg_shell_set_maximized(window, maximized);
 #endif
@@ -231,7 +220,7 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 {
     struct window * window = lv_display_get_user_data(disp);
-    lv_result_t err = LV_RESULT_INVALID;
+    lv_result_t err        = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
     }
@@ -240,19 +229,9 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
         return;
     }
 #if LV_WAYLAND_WL_SHELL
-        else if(window->wl_shell_surface) {
-            if(fullscreen) {
-                wl_shell_surface_set_fullscreen(window->wl_shell_surface, WL_SHELL_SURFACE_FULLSCREEN_METHOD_SCALE, 0,
-                                                NULL);
-            }
-            else {
-                wl_shell_surface_set_toplevel(window->wl_shell_surface);
-            }
-            window->fullscreen    = fullscreen;
-            window->flush_pending = true;
-        }
+    err = lv_wayland_wl_shell_set_fullscreen(window, fullscreen);
 #elif LV_WAYLAND_XDG_SHELL
-        err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen);
+    err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen);
 #endif
 
     if(err == LV_RESULT_INVALID) {
@@ -260,7 +239,7 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
         return;
     }
 
-    window->fullscreen     = fullscreen;
+    window->fullscreen    = fullscreen;
     window->flush_pending = true;
 }
 
@@ -335,8 +314,7 @@ bool lv_wayland_window_resize(struct window * window, int width, int height)
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->application->opt_disable_decorations && !window->fullscreen) {
         lv_wayland_window_decoration_create_all(window);
-    }
-    else if(!window->application->opt_disable_decorations) {
+    } else if(!window->application->opt_disable_decorations) {
         /* Entering fullscreen, detach decorations to prevent xdg_wm_base error 4 */
         /* requested geometry larger than the configured fullscreen state */
         lv_wayland_window_decoration_detach_all(window);
@@ -373,11 +351,8 @@ void lv_wayland_window_destroy(struct window * window)
     }
 
 #if LV_WAYLAND_WL_SHELL
-    if(window->wl_shell_surface) {
-        wl_shell_surface_destroy(window->wl_shell_surface);
-    }
-#endif
-#if LV_WAYLAND_XDG_SHELL
+    lv_wayland_wl_shell_destroy_window(window);
+#elif LV_WAYLAND_XDG_SHELL
     lv_wayland_xdg_shell_destroy_window_toplevel(window);
     lv_wayland_xdg_shell_destroy_window_surface(window);
 #endif
@@ -528,39 +503,18 @@ static struct window * create_window(struct application * app, int width, int he
         goto err_free_window;
     }
 
-    // Create shell surface
-    //
 #if LV_WAYLAND_WL_SHELL
-    else if(app->wl_shell) {
-        window->wl_shell_surface = wl_shell_get_shell_surface(app->wl_shell, window->body->surface);
-        if(!window->wl_shell_surface) {
-            LV_LOG_ERROR("cannot create WL shell surface");
-            goto err_destroy_surface;
-        }
-
-        wl_shell_surface_add_listener(window->wl_shell_surface, lv_wayland_wl_shell_get_listener(), window);
-        wl_shell_surface_set_toplevel(window->wl_shell_surface);
-        wl_shell_surface_set_title(window->wl_shell_surface, title);
-
-        /* For wl_shell, just draw the window, weston doesn't send it */
-        lv_wayland_window_draw(window, window->width, window->height);
-    }
-#elif LV_WAYLAND_XDG_SHELL
-    if (lv_wayland_xdg_shell_create_window(app, window, title) != LV_RESULT_OK) {
+    if(lv_wayland_wl_shell_create_window(app, window, title) != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to create wl shell window");
         goto err_destroy_surface;
     }
-#else /* Should never happen */
-    #error No wayland shell available
+#elif LV_WAYLAND_XDG_SHELL
+    if(lv_wayland_xdg_shell_create_window(app, window, title) != LV_RESULT_OK) {
+        goto err_destroy_surface;
+    }
 #endif
 
     return window;
-
-err_destroy_shell_surface:
-#if LV_WAYLAND_WL_SHELL
-    if(window->wl_shell_surface) {
-        wl_shell_surface_destroy(window->wl_shell_surface);
-    }
-#endif
 
 err_destroy_surface:
     wl_surface_destroy(window->body->surface);

@@ -238,14 +238,10 @@ void lv_wayland_deinit(void)
         wl_shm_destroy(application.shm);
     }
 
-#if LV_WAYLAND_XDG_SHELL
-    lv_wayland_xdg_shell_deinit();
-#endif
-
 #if LV_WAYLAND_WL_SHELL
-    if(application.wl_shell) {
-        wl_shell_destroy(application.wl_shell);
-    }
+    lv_wayland_wl_shell_deinit();
+#elif LV_WAYLAND_XDG_SHELL
+    lv_wayland_xdg_shell_deinit();
 #endif
 
     if(application.wl_seat) {

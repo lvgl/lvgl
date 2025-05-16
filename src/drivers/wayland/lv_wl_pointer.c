@@ -187,7 +187,9 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
     }
     struct window * window = app->pointer_obj->window;
 
-#if LV_WAYLAND_XDG_SHELL
+#if LV_WAYLAND_WL_SHELL
+    lv_wayland_wl_shell_handle_pointer_event(app, serial, button, state);
+#elif LV_WAYLAND_XDG_SHELL
     lv_wayland_xdg_shell_handle_pointer_event(app, serial, button, state);
 #endif
 
@@ -212,19 +214,6 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
                 window->shall_close = true;
             }
             break;
-
-#if LV_WAYLAND_WINDOW_DECORATIONS
-        case OBJECT_TITLEBAR:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-#if LV_WAYLAND_WL_SHELL
-                if(window->wl_shell_surface) {
-                    wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
-                    window->flush_pending = true;
-                }
-#endif
-            }
-            break;
-#endif // LV_WAYLAND_WINDOW_DECORATIONS
         default:
             break;
     }

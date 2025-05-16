@@ -255,10 +255,17 @@ void lv_wayland_window_decoration_detach(struct window * window, struct graphic_
  **********************/
 
 #if LV_WAYLAND_WL_SHELL
+lv_result_t lv_wayland_wl_shell_create_window(struct application * app, struct window * window, const char * title);
 const struct wl_shell_surface_listener * lv_wayland_wl_shell_get_listener(void);
-#endif
+void lv_wayland_wl_shell_handle_pointer_event(struct application * app, uint32_t serial,
+                                              uint32_t button, uint32_t state);
+lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maximized);
+lv_result_t lv_wayland_wl_shell_set_minimized(struct window * window);
+lv_result_t lv_wayland_wl_shell_set_fullscreen(struct window * window, bool fullscreen);
+lv_result_t lv_wayland_wl_shell_destroy_window(struct window * window);
+void lv_wayland_wl_shell_deinit(void);
+#elif LV_WAYLAND_XDG_SHELL
 
-#if LV_WAYLAND_XDG_SHELL
 const struct xdg_surface_listener * lv_wayland_xdg_shell_get_surface_listener(void);
 const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(void);
 const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
@@ -268,11 +275,10 @@ lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window , bool fu
 lv_result_t lv_wayland_xdg_shell_create_window(struct application * app, struct window * window, const char * title);
 lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window);
 lv_result_t lv_wayland_xdg_shell_destroy_window_surface(struct window * window);
-void lv_wayland_xdg_shell_handle_pointer_event(struct application * app,uint32_t serial,
+void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_t serial,
                                                uint32_t button, uint32_t state);
 
 const char * lv_wayland_xdg_shell_get_cursor_name(const struct application * app);
-
 void lv_wayland_xdg_shell_deinit(void);
 #endif
 
