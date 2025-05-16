@@ -64,9 +64,11 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
                           const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
 
+#if LV_DRAW_SW_COMPLEX
 static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                         const lv_image_decoder_dsc_t * decoder_dsc,
                         const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+#endif /*LV_DRAW_SW_COMPLEX*/
 
 static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_image_decoder_dsc_t * decoder_dsc,
@@ -279,10 +281,12 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     else if(!transformed && !radius && draw_dsc->recolor_opa > LV_OPA_MIN) {
         recolor_only(t, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
     }
+#if LV_DRAW_SW_COMPLEX
     /*Handle masked RGB565, RGB888, XRGB888, or ARGB8888 images*/
     else if(!transformed && radius && draw_dsc->recolor_opa <= LV_OPA_MIN) {
         radius_only(t, draw_dsc, decoder_dsc, img_coords,  clipped_img_area);
     }
+#endif /*LV_DRAW_SW_COMPLEX*/
     /* check whether it is possible to accelerate the operation in synchronous mode */
     else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */
                                                   cf,               /* image format */
@@ -297,6 +301,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
 
     }
 }
+#if LV_DRAW_SW_COMPLEX
 static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                         const lv_image_decoder_dsc_t * decoder_dsc,
                         const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
@@ -376,6 +381,7 @@ static void radius_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc
     lv_free(mask_buf);
 
 }
+#endif /*LV_DRAW_SW_COMPLEX*/
 static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                          const lv_image_decoder_dsc_t * decoder_dsc,
                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
