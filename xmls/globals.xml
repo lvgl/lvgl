@@ -120,7 +120,11 @@
 	    <prop name="x" type="coords"/>
 	    <prop name="y" type="coords"/>
 	    <prop name="height" type="coords"/>
+	    <prop name="min_height" type="coords"/>
+	    <prop name="max_height" type="coords"/>
 	    <prop name="width" type="coords"/>
+	    <prop name="min_width" type="coords"/>
+	    <prop name="max_width" type="coords"/>
 	    <prop name="length" type="coords"/>
 
 	    <prop name="pad_top" type="int"/>
@@ -239,5 +243,7 @@
 	    <prop name="transform_skew_y" type="int"/>
 	    <prop name="bitmap_mask_src" type="image"/>
 	    <prop name="rotary_sensitivity" type="int"/>
+	    <prop name="recolor" type="color"/>
+	    <prop name="recolor_opa" type="opa"/>
 	</styledef>
 </api>

@@ -156,6 +156,15 @@
  */
 #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)         /**< [bytes]*/
 
+/** Thread priority of the drawing task.
+ *  Higher values mean higher priority.
+ *  Can use values from lv_thread_prio_t enum in lv_os.h: LV_THREAD_PRIO_LOWEST,
+ *  LV_THREAD_PRIO_LOW, LV_THREAD_PRIO_MID, LV_THREAD_PRIO_HIGH, LV_THREAD_PRIO_HIGHEST
+ *  Make sure the priority value aligns with the OS-specific priority levels.
+ *  On systems with limited priority levels (e.g., FreeRTOS), a higher value can improve
+ *  rendering performance but might cause other tasks to starve. */
+#define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
+
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /*
@@ -319,7 +328,7 @@
     /** Enable border to simulate shadow.
      *  NOTE: which usually improves performance,
      *  but does not guarantee the same rendering quality as the software. */
-    #define LV_VG_LITE_USE_BOX_SHADOW 0
+    #define LV_VG_LITE_USE_BOX_SHADOW 1
 
     /** VG-Lite gradient maximum cache number.
      *  @note  The memory usage of a single gradient image is 4K bytes. */

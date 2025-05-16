@@ -53,7 +53,7 @@ static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent)
+lv_obj_t * lv_calendar_add_header_arrow(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_arrow_class, parent);
     lv_obj_class_init_obj(obj);

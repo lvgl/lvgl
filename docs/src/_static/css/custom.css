@@ -3,10 +3,6 @@ table, th, td {
   padding: 10px;
 }
 
-td {
-  text-align:center;
-}
-
 span.pre {
   padding-right:8px;
 }
@@ -258,18 +254,34 @@ div.body {
  * .highlight .nf -- function names
  * .highlight .nl -- code labels
  * .descname  .n  -- API documentation function names
+ * .highlight .p  -- Punctuation
+ * .highlight     -- Plain text in a `.. code-block:: none` block
  * The first 2 were created by lightening the `pygments.css` colors without changing their
- * angle on the color wheel.  The added "conditional" also limits this change to
+ * angle on the color wheel.  The added attribute "conditional" also limits this change to
  * DARK MODE only instead of both light and dark modes.
  */
+/* Name.Function */
 html[data-theme="dark"] .highlight .nf {
-  color: #3569f5;
+  color: #ccd285;
 }
 
+/* Name.Label */
 html[data-theme="dark"] .highlight .nl {
   color: #0043e2;
 }
 
+/* Name */
 html[data-theme="dark"] .descname .n {
   color: #0a44de;
 }
+
+/* Punctuation */
+html[data-theme="dark"] .highlight .p {
+  color: #5c7c72
+}
+
+/* Plain text. */
+html[data-theme="dark"] .highlight {
+  background: #ffffff; color: #bfbfbf
+}
+

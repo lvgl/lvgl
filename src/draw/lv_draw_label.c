@@ -200,6 +200,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                                       const lv_area_t * coords,
                                       lv_draw_glyph_cb_t cb)
 {
+    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     const lv_font_t * font = dsc->font;
     int32_t w;
 
@@ -218,10 +219,15 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     }
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
-        lv_point_t p;
-        lv_text_get_size(&p, dsc->text, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
-                         dsc->flag);
-        w = p.x;
+        if(base_dsc->obj && !lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+            w = dsc->text_size.x;
+        }
+        else {
+            lv_point_t p;
+            lv_text_get_size(&p, dsc->text, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
+                             dsc->flag);
+            w = p.x;
+        }
     }
 
     int32_t line_height_font = lv_font_get_line_height(font);

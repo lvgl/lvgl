@@ -197,6 +197,7 @@ cfg_lv_conf_filename = 'lv_conf.h'
 cfg_lv_version_filename = 'lv_version.h'
 cfg_doxyfile_filename = 'Doxyfile'
 cfg_top_index_filename = 'index.rst'
+cfg_default_branch = 'master'
 
 # Filename generated in `latex_output_dir` and copied to `pdf_output_dir`.
 cfg_pdf_filename = 'LVGL.pdf'
@@ -353,7 +354,7 @@ def run(args):
             print(f'Argument [{arg}] not recognized.')
             print()
             print_usage_note()
-            exit(1)
+            exit(2)  # 2 = customary Unix command-line syntax error.
 
     # '-E' option forces Sphinx to rebuild its environment so all docs are
     # fully regenerated, even if not changed.
@@ -507,8 +508,8 @@ def run(args):
 
     # If above failed (i.e. `branch` not valid), default to 'master'.
     if status != 0:
-        branch = 'master'
-    elif branch == 'master':
+        branch = cfg_default_branch
+    elif branch == cfg_default_branch:
         # Expected in most cases.  Nothing to change.
         pass
     else:
@@ -517,7 +518,7 @@ def run(args):
             branch = branch[8:]
         else:
             # Default to 'master'.
-            branch = 'master'
+            branch = cfg_default_branch
 
     os.environ['LVGL_URLPATH'] = branch
     os.environ['LVGL_GITCOMMIT'] = branch
@@ -717,13 +718,27 @@ def run(args):
         src = intermediate_dir
         dst = output_dir
         cpu = os.cpu_count()
-        # As of 22-Feb-2025, sadly the -D version=xxx is not working as documented.
-        # So the version strings applicable to Latex/PDF/man pages/texinfo
-        # formats are assembled by `conf.py`.  The -D option in the command
-        # line may go away if it does not, in fact, create some impact on
-        # the doc-gen process.
-        cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
-        cmd(cmd_line)
+
+        debugging_breathe = 0
+        if debugging_breathe:
+            from sphinx.cmd.build import main as sphinx_build
+            # Don't allow parallel processing while debugging (the '-j' arg is removed).
+            sphinx_args = ['-M', 'html', f'{src}', f'{dst}', '-D', f'version={ver}']
+
+            if len(env_opt) > 0:
+                sphinx_args.append(f'{env_opt}')
+
+            sphinx_build(sphinx_args)
+        else:
+            # The -D option correctly replaces (overrides) configuration attribute
+            # values in the `conf.py` module.  Since `conf.py` now correctly
+            # computes its own `version` value, we don't have to override it here
+            # with a -D options.  If it should need to be used in the future,
+            # the value after the '=' MUST NOT have quotation marks around it
+            # or it won't work.  Correct usage:  f'-D version={ver}' .
+            cmd_line = f'sphinx-build -M html "{src}" "{dst}" -j {cpu} {env_opt}'
+            cmd(cmd_line)
+
         t2 = datetime.now()
         announce(__file__, 'HTML gen time :  ' + str(t2 - t1))
 

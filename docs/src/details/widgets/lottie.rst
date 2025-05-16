@@ -53,7 +53,7 @@ the size of the Widget (i.e. the size of the animation) is set to the dimensions
 The buffer can be set with either :cpp:expr:`lv_lottie_set_buffer(lottie, w, h, buf)`
 or :cpp:expr:`lv_lottie_set_draw_buf(lottie, draw_buf)`.
 
-When a draw buffer is used, it must be already initialized by the user with :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` color format.
+When a draw buffer is used, it must be already initialized by the user with :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED` color format.
 
 Set a source
 ------------

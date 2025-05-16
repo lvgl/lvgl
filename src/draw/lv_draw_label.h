@@ -35,6 +35,9 @@ typedef struct {
     /**The text to draw*/
     const char * text;
 
+    /**The size of the text*/
+    lv_point_t text_size;
+
     /**The font to use. Fallback fonts are also handled.*/
     const lv_font_t * font;
 

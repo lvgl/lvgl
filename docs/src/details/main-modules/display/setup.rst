@@ -116,6 +116,14 @@ other hardware should be used to transfer data to the display so the MCU
 can continue drawing.  Doing so allows *rendering* and *refreshing* the
 display to become parallel operations.
 
+Three Buffers
+-------------
+
+Triple buffering enhances parallelism between rendering and data transfer compared
+to double buffering. When one buffer has completed rendering and another is actively
+undergoing DMA transfer, the third buffer enables immediate rendering of the next frame,
+eliminating CPU/GPU idle time caused by waiting for DMA completion.
+The third buffer is configured using the :cpp:func:`lv_display_set_3rd_draw_buffer` function.
 
 
 .. _flush_callback:

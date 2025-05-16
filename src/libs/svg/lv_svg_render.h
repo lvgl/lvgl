@@ -94,6 +94,15 @@ void lv_svg_render_delete(lv_svg_render_obj_t * render);
 uint32_t lv_svg_render_get_size(const lv_svg_render_obj_t * render);
 
 /**
+ * @brief Get viewport's width and height of the render object
+ * @param render pointer to the SVG render object
+ * @param width pointer to save the width of the viewport of the SVG render object
+ * @param height pointer to save the height of the viewport of the SVG render object
+ * @return lv_result_t, LV_RESULT_OK if success, LV_RESULT_INVALID if fail
+ */
+lv_result_t lv_svg_render_get_viewport_size(const lv_svg_render_obj_t * render, float * width, float * height);
+
+/**
  * @brief Render an SVG object to a vector graphics
  * @param dsc pointer to the vector graphics descriptor
  * @param render pointer to the SVG render object to render

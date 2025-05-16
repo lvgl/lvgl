@@ -65,6 +65,7 @@ struct _lv_display_t {
      *--------------------*/
     lv_draw_buf_t * buf_1;
     lv_draw_buf_t * buf_2;
+    lv_draw_buf_t * buf_3;
 
     /** Internal, used by the library*/
     lv_draw_buf_t * buf_act;
@@ -92,6 +93,7 @@ struct _lv_display_t {
     lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
     uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
+    uint32_t stride_is_auto : 1;     /**< 1: The stride of the buffers was not set explicitly. */
 
 
     /** 1: The current screen rendering is in progress*/

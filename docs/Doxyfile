@@ -2060,7 +2060,16 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = DOXYGEN LV_CONF_PATH="../../lv_conf.h"
+PREDEFINED             = DOXYGEN                         \
+                         LV_CONF_PATH="../../lv_conf.h"  \
+                         LV_ATTRIBUTE_TICK_INC=          \
+                         LV_ATTRIBUTE_TIMER_HANDLER=     \
+                         LV_ATTRIBUTE_FLUSH_READY=       \
+                         LV_ATTRIBUTE_MEM_ALIGN=         \
+                         LV_ATTRIBUTE_LARGE_CONST=       \
+                         LV_ATTRIBUTE_LARGE_RAM_ARRAY=   \
+                         LV_ATTRIBUTE_FAST_MEM=          \
+                         LV_ATTRIBUTE_EXTERN_DATA=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

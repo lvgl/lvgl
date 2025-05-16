@@ -169,4 +169,40 @@ void test_display_matrix_rotation(void)
 #endif
 }
 
+static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+    lv_display_flush_ready(disp);
+}
+
+void test_display_triple_buffer(void)
+{
+    lv_display_t * disp = lv_display_create(480, 320);
+    lv_display_set_flush_cb(disp, dummy_flush_cb);
+    lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_draw_buf_t * buf2 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_draw_buf_t * buf3 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buffers(disp, buf1, buf2);
+    lv_display_set_3rd_draw_buffer(disp, buf3);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf2);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf3);
+
+    lv_obj_invalidate(lv_display_get_screen_active(disp));
+    lv_display_refr_timer(lv_display_get_refr_timer(disp));
+    TEST_ASSERT_EQUAL(lv_display_get_buf_active(disp), buf1);
+
+    lv_display_delete(disp);
+    lv_draw_buf_destroy(buf1);
+    lv_draw_buf_destroy(buf2);
+    lv_draw_buf_destroy(buf3);
+}
+
 #endif

@@ -119,6 +119,9 @@ extern "C" {
 
 #define lv_slider_set_left_value lv_slider_set_start_value
 
+#define lv_calendar_header_arrow_create     lv_calendar_add_header_arrow
+#define lv_calendar_header_dropdown_create  lv_calendar_add_header_dropdown
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

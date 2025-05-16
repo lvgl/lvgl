@@ -702,8 +702,15 @@ static char * extract_view_content(const char * xml_definition)
 
     /* Find end of view tag */
     const char * end = strstr(xml_definition, "</view>");
-    if(!end) return NULL;
-    end += 7; /* Include "</view>" in result */
+    if(end) {
+        end += 7; /* Include "</view>" in result */
+    }
+    else {
+        /*If there is no "</view> maybe it's like <view ... />"*/
+        end = strstr(start, "/>");
+        if(!end) return NULL;
+        end += 2; /* Include "/>" in result */
+    }
 
     /* Calculate and allocate length */
     size_t len = end - start;
