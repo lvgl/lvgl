@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_wl_window.h"
-#include <src/misc/lv_types.h>
 
 #if LV_USE_WAYLAND
 
