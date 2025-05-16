@@ -471,7 +471,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_USE_BOX_SHADOW
 			bool "Enable border to simulate shadow"
-			default n
+			default y
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				which usually improves performance,

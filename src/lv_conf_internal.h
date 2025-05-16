@@ -910,10 +910,14 @@
      *  NOTE: which usually improves performance,
      *  but does not guarantee the same rendering quality as the software. */
     #ifndef LV_VG_LITE_USE_BOX_SHADOW
-        #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-            #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+                #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+            #else
+                #define LV_VG_LITE_USE_BOX_SHADOW 0
+            #endif
         #else
-            #define LV_VG_LITE_USE_BOX_SHADOW 0
+            #define LV_VG_LITE_USE_BOX_SHADOW 1
         #endif
     #endif
 
