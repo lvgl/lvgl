@@ -431,6 +431,16 @@ static void image_recolored_2_cb(lv_obj_t * parent)
     image_core_cb(parent, true, 4);
 }
 
+static void image_normal_3_cb(lv_obj_t * parent)
+{
+    image_core_cb(parent, false, 8);
+}
+
+static void image_recolored_3_cb(lv_obj_t * parent)
+{
+    image_core_cb(parent, true, 8);
+}
+
 static lv_obj_t * line_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_precise_t p[])
 {
     lv_obj_t * obj = lv_line_create(parent);
@@ -1108,6 +1118,8 @@ static scene_dsc_t scenes[] = {
     {.name = "image_recolor_1",     .create_cb = image_recolored_1_cb},
     {.name = "image_normal_2",      .create_cb = image_normal_2_cb},
     {.name = "image_recolor_2",     .create_cb = image_recolored_2_cb},
+    {.name = "image_normal_3",      .create_cb = image_normal_3_cb},
+    {.name = "image_recolor_3",     .create_cb = image_recolored_3_cb},
     {.name = "line",                .create_cb = line_cb},
     {.name = "arc_normal",          .create_cb = arc_normal_cb},
     {.name = "arc_image",           .create_cb = arc_image_cb},

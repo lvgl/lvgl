@@ -91,6 +91,8 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(lv_color32
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
+static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -782,7 +784,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
     lv_opa_t opa = dsc->opa;
     lv_color32_t * dest_buf_c32 = dsc->dest_buf;
     int32_t dest_stride = dsc->dest_stride;
-    const lv_color16_t * src_buf_c16 = (const lv_color16_t *) dsc->src_buf;
+    const uint16_t * src_buf_u16 = dsc->src_buf;
     int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
@@ -812,16 +814,15 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
                 color_argb.alpha = opa;
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        lv_memcpy(&raw, &src_buf_c16[x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
                         color_argb.green = (px.green * 1037) >> 8;
                         color_argb.blue = (px.blue * 2106) >> 8;
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+                    src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                 }
             }
         }
@@ -830,16 +831,15 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         color_argb.alpha = mask_buf[x];
-                        lv_memcpy(&raw, &src_buf_c16[x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
                         color_argb.green = (px.green * 1037) >> 8;
                         color_argb.blue = (px.blue * 2106) >> 8;
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+                    src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                     mask_buf += mask_stride;
                 }
             }
@@ -849,16 +849,15 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         color_argb.alpha = LV_OPA_MIX2(mask_buf[x], opa);
-                        lv_memcpy(&raw, &src_buf_c16[x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         color_argb.red = (px.red * 2106) >> 8;  /*To make it rounded*/
                         color_argb.green = (px.green * 1037) >> 8;
                         color_argb.blue = (px.blue * 2106) >> 8;
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-                    src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+                    src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                     mask_buf += mask_stride;
                 }
             }
@@ -868,9 +867,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
         lv_color32_t src_argb;
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
-                lv_memcpy(&raw, &src_buf_c16[x], sizeof(raw));         /* get raw pixel */
-                raw = lv_color_swap_16(raw);                        /* swap byte order */
-                lv_memcpy(&px, &raw, sizeof(px));
+                raw = lv_color_swap_16(src_buf_u16[x]);                        /* swap byte order */
+                px = lv_color16_from_u16(raw);
                 src_argb.red = (px.red * 2106) >> 8;
                 src_argb.green = (px.green * 1037) >> 8;
                 src_argb.blue = (px.blue * 2106) >> 8;
@@ -880,7 +878,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
             }
             if(mask_buf) mask_buf += mask_stride;
             dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-            src_buf_c16 = drawbuf_next_row(src_buf_c16, src_stride);
+            src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
         }
     }
 }
@@ -1350,6 +1348,15 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(lv_color32_t * d
 static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
 {
     return (void *)((uint8_t *)buf + stride);
+}
+
+static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t raw)
+{
+    lv_color16_t c;
+    c.red = (raw >> 11) & 0x1F;
+    c.green = (raw >> 5) & 0x3F;
+    c.blue = raw & 0x1F;
+    return c;
 }
 
 #endif /* LV_DRAW_SW_SUPPORT_ARGB8888 */

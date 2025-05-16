@@ -74,6 +74,8 @@ static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(uint8_t * 
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
+static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -703,9 +705,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend_swapped(lv_draw_sw_blend_im
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_L8(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
-                        lv_memcpy(&raw, &src_buf_u16[src_x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[src_x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         dest_buf_u8[dest_x] = lv_color16_luminance(px);
                     }
                     dest_buf_u8 += dest_stride;
@@ -717,9 +718,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend_swapped(lv_draw_sw_blend_im
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_L8_WITH_OPA(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
-                        lv_memcpy(&raw, &src_buf_u16[src_x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[src_x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         lv_color_8_8_mix(lv_color16_luminance(px), &dest_buf_u8[dest_x], opa);
                     }
                     dest_buf_u8 += dest_stride;
@@ -731,9 +731,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend_swapped(lv_draw_sw_blend_im
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_L8_WITH_MASK(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
-                        lv_memcpy(&raw, &src_buf_u16[src_x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[src_x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         lv_color_8_8_mix(lv_color16_luminance(px), &dest_buf_u8[dest_x], mask_buf[src_x]);
                     }
                     dest_buf_u8 += dest_stride;
@@ -746,9 +745,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend_swapped(lv_draw_sw_blend_im
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_L8_MIX_MASK_OPA(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x++, src_x++) {
-                        lv_memcpy(&raw, &src_buf_u16[src_x], sizeof(raw));         /* get raw pixel */
-                        raw = lv_color_swap_16(raw);                        /* swap byte order */
-                        lv_memcpy(&px, &raw, sizeof(px));
+                        raw = lv_color_swap_16(src_buf_u16[src_x]);                        /* swap byte order */
+                        px = lv_color16_from_u16(raw);
                         lv_color_8_8_mix(lv_color16_luminance(px), &dest_buf_u8[dest_x], LV_OPA_MIX2(opa, mask_buf[src_x]));
                     }
                     dest_buf_u8 += dest_stride;
@@ -762,9 +760,8 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend_swapped(lv_draw_sw_blend_im
         lv_color32_t src_argb;
         for(y = 0; y < h; y++) {
             for(src_x = 0, dest_x = 0; src_x < w; src_x++, dest_x++) {
-                lv_memcpy(&raw, &src_buf_u16[src_x], sizeof(raw));         /* get raw pixel */
-                raw = lv_color_swap_16(raw);                        /* swap byte order */
-                lv_memcpy(&px, &raw, sizeof(px));
+                raw = lv_color_swap_16(src_buf_u16[src_x]);                        /* swap byte order */
+                px = lv_color16_from_u16(raw);
                 src_argb.red = (px.red * 2106) >> 8;
                 src_argb.green = (px.green * 1037) >> 8;
                 src_argb.blue = (px.blue * 2106) >> 8;
@@ -1006,6 +1003,15 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(uint8_t * dest, 
 static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
 {
     return (void *)((uint8_t *)buf + stride);
+}
+
+static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t raw)
+{
+    lv_color16_t c;
+    c.red = (raw >> 11) & 0x1F;
+    c.green = (raw >> 5) & 0x3F;
+    c.blue = raw & 0x1F;
+    return c;
 }
 
 #endif
