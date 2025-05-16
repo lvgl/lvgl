@@ -122,7 +122,8 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     }
 }
 
-void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window) {
+void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window)
+{
     return (void*)(window->window);
 }
 
