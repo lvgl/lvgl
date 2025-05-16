@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_wl_window.h"
+#include <src/misc/lv_types.h>
 
 #if LV_USE_WAYLAND
 
@@ -194,6 +195,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 {
     struct window * window = lv_display_get_user_data(disp);
+    lv_result_t err = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
     }
@@ -212,46 +214,31 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
             window->maximized     = maximized;
             window->flush_pending = true;
         }
-#endif
-#if LV_WAYLAND_XDG_SHELL
-        if(window->xdg_toplevel) {
-            if(maximized) {
-                xdg_toplevel_set_maximized(window->xdg_toplevel);
-            }
-            else {
-                xdg_toplevel_unset_maximized(window->xdg_toplevel);
-            }
-
-            window->maximized     = maximized;
-            window->flush_pending = true;
-        }
+#elif LV_WAYLAND_XDG_SHELL
+        err = lv_wayland_xdg_shell_set_maximized(window, maximized);
 #endif
     }
+
+    if(err == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Failed to maximize wayland window");
+        return;
+    }
+
+    window->maximized     = maximized;
+    window->flush_pending = true;
 }
 
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 {
     struct window * window = lv_display_get_user_data(disp);
+    lv_result_t err = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
     }
 
-    if(window->fullscreen != fullscreen) {
-        if(0) {
-            // Needed for #if madness below
-        }
-#if LV_WAYLAND_XDG_SHELL
-        else if(window->xdg_toplevel) {
-            if(fullscreen) {
-                xdg_toplevel_set_fullscreen(window->xdg_toplevel, NULL);
-            }
-            else {
-                xdg_toplevel_unset_fullscreen(window->xdg_toplevel);
-            }
-            window->fullscreen    = fullscreen;
-            window->flush_pending = true;
-        }
-#endif
+    if(window->fullscreen == fullscreen) {
+        return;
+    }
 #if LV_WAYLAND_WL_SHELL
         else if(window->wl_shell_surface) {
             if(fullscreen) {
@@ -264,11 +251,17 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
             window->fullscreen    = fullscreen;
             window->flush_pending = true;
         }
+#elif LV_WAYLAND_XDG_SHELL
+        err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen);
 #endif
-        else {
-            LV_LOG_WARN("Wayland fullscreen mode not supported");
-        }
+
+    if(err == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Failed to set wayland window to fullscreen");
+        return;
     }
+
+    window->fullscreen     = fullscreen;
+    window->flush_pending = true;
 }
 
 /**********************
@@ -293,9 +286,7 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
     if(!lv_wayland_window_resize(window, width, height)) {
         LV_LOG_ERROR("Failed to resize window");
 #if LV_WAYLAND_XDG_SHELL
-        if(window->xdg_toplevel) {
-            xdg_toplevel_destroy(window->xdg_toplevel);
-        }
+        lv_wayland_xdg_shell_destroy_window_toplevel(window);
 #endif
     }
 
@@ -387,10 +378,8 @@ void lv_wayland_window_destroy(struct window * window)
     }
 #endif
 #if LV_WAYLAND_XDG_SHELL
-    if(window->xdg_toplevel) {
-        xdg_toplevel_destroy(window->xdg_toplevel);
-        xdg_surface_destroy(window->xdg_surface);
-    }
+    lv_wayland_xdg_shell_destroy_window_toplevel(window);
+    lv_wayland_xdg_shell_destroy_window_surface(window);
 #endif
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
@@ -540,35 +529,7 @@ static struct window * create_window(struct application * app, int width, int he
     }
 
     // Create shell surface
-    if(0) {
-        // Needed for #if madness below
-    }
-#if LV_WAYLAND_XDG_SHELL
-    else if(app->xdg_wm) {
-        window->xdg_surface = xdg_wm_base_get_xdg_surface(app->xdg_wm, window->body->surface);
-        if(!window->xdg_surface) {
-            LV_LOG_ERROR("cannot create XDG surface");
-            goto err_destroy_surface;
-        }
-
-        xdg_surface_add_listener(window->xdg_surface, lv_wayland_xdg_shell_get_surface_listener(), window);
-
-        window->xdg_toplevel = xdg_surface_get_toplevel(window->xdg_surface);
-        if(!window->xdg_toplevel) {
-            LV_LOG_ERROR("cannot get XDG toplevel surface");
-            goto err_destroy_shell_surface;
-        }
-
-        xdg_toplevel_add_listener(window->xdg_toplevel, lv_wayland_xdg_shell_get_toplevel_listener(), window);
-        xdg_toplevel_set_title(window->xdg_toplevel, title);
-        xdg_toplevel_set_app_id(window->xdg_toplevel, title);
-
-        // XDG surfaces need to be configured before a buffer can be attached.
-        // An (XDG) surface commit (without an attached buffer) triggers this
-        // configure event
-        window->body->surface_configured = false;
-    }
-#endif
+    //
 #if LV_WAYLAND_WL_SHELL
     else if(app->wl_shell) {
         window->wl_shell_surface = wl_shell_get_shell_surface(app->wl_shell, window->body->surface);
@@ -584,11 +545,13 @@ static struct window * create_window(struct application * app, int width, int he
         /* For wl_shell, just draw the window, weston doesn't send it */
         lv_wayland_window_draw(window, window->width, window->height);
     }
-#endif
-    else {
-        LV_LOG_ERROR("No shell available");
+#elif LV_WAYLAND_XDG_SHELL
+    if (lv_wayland_xdg_shell_create_window(app, window, title) != LV_RESULT_OK) {
         goto err_destroy_surface;
     }
+#else /* Should never happen */
+    #error No wayland shell available
+#endif
 
     return window;
 
@@ -596,11 +559,6 @@ err_destroy_shell_surface:
 #if LV_WAYLAND_WL_SHELL
     if(window->wl_shell_surface) {
         wl_shell_surface_destroy(window->wl_shell_surface);
-    }
-#endif
-#if LV_WAYLAND_XDG_SHELL
-    if(window->xdg_surface) {
-        xdg_surface_destroy(window->xdg_surface);
     }
 #endif
 

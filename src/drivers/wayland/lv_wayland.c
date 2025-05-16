@@ -239,9 +239,7 @@ void lv_wayland_deinit(void)
     }
 
 #if LV_WAYLAND_XDG_SHELL
-    if(application.xdg_wm) {
-        xdg_wm_base_destroy(application.xdg_wm);
-    }
+    lv_wayland_xdg_shell_deinit();
 #endif
 
 #if LV_WAYLAND_WL_SHELL

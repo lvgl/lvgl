@@ -115,7 +115,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
     struct application * app = data;
-    const char * cursor      = "left_ptr";
+    const char * cursor      = LV_WAYLAND_DEFAULT_CURSOR_NAME;
     int pos_x                = wl_fixed_to_int(sx);
     int pos_y                = wl_fixed_to_int(sy);
 
@@ -129,73 +129,8 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
     app->pointer_obj->input.pointer.x = pos_x;
     app->pointer_obj->input.pointer.y = pos_y;
 
-#if (LV_WAYLAND_WINDOW_DECORATIONS && LV_WAYLAND_XDG_SHELL)
-    if(!app->pointer_obj->window->xdg_toplevel || app->opt_disable_decorations) {
-        return;
-    }
-
-    struct window * window = app->pointer_obj->window;
-
-    switch(app->pointer_obj->type) {
-        case OBJECT_BORDER_TOP:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_x < (BORDER_SIZE * 5)) {
-                cursor = "top_left_corner";
-            }
-            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "top_right_corner";
-            }
-            else {
-                cursor = "top_side";
-            }
-            break;
-        case OBJECT_BORDER_BOTTOM:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_x < (BORDER_SIZE * 5)) {
-                cursor = "bottom_left_corner";
-            }
-            else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_right_corner";
-            }
-            else {
-                cursor = "bottom_side";
-            }
-            break;
-        case OBJECT_BORDER_LEFT:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_y < (BORDER_SIZE * 5)) {
-                cursor = "top_left_corner";
-            }
-            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_left_corner";
-            }
-            else {
-                cursor = "left_side";
-            }
-            break;
-        case OBJECT_BORDER_RIGHT:
-            if(window->maximized) {
-                // do nothing
-            }
-            else if(pos_y < (BORDER_SIZE * 5)) {
-                cursor = "top_right_corner";
-            }
-            else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                cursor = "bottom_right_corner";
-            }
-            else {
-                cursor = "right_side";
-            }
-            break;
-        default:
-            break;
-    }
+#if LV_WAYLAND_XDG_SHELL
+    cursor = lv_wayland_xdg_shell_get_cursor_name(app);
 #endif
 
     if(app->cursor_surface) {
@@ -250,12 +185,10 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
     if(!app->pointer_obj) {
         return;
     }
+    struct window * window = app->pointer_obj->window;
 
-#if LV_WAYLAND_WINDOW_DECORATIONS
-    struct window * window;
-    window    = app->pointer_obj->window;
-    int pos_x = app->pointer_obj->input.pointer.x;
-    int pos_y = app->pointer_obj->input.pointer.y;
+#if LV_WAYLAND_XDG_SHELL
+    lv_wayland_xdg_shell_handle_pointer_event(app, serial, button, state);
 #endif
 
     switch(app->pointer_obj->type) {
@@ -273,17 +206,16 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
                 default:
                     break;
             }
-
             break;
+        case OBJECT_BUTTON_CLOSE:
+            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
+                window->shall_close = true;
+            }
+            break;
+
 #if LV_WAYLAND_WINDOW_DECORATIONS
         case OBJECT_TITLEBAR:
             if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-#if LV_WAYLAND_XDG_SHELL
-                if(window->xdg_toplevel) {
-                    xdg_toplevel_move(window->xdg_toplevel, app->wl_seat, serial);
-                    window->flush_pending = true;
-                }
-#endif
 #if LV_WAYLAND_WL_SHELL
                 if(window->wl_shell_surface) {
                     wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
@@ -292,107 +224,6 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
 #endif
             }
             break;
-        case OBJECT_BUTTON_CLOSE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                window->shall_close = true;
-            }
-            break;
-#if LV_WAYLAND_XDG_SHELL
-        case OBJECT_BUTTON_MAXIMIZE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                if(window->xdg_toplevel) {
-                    if(window->maximized) {
-                        xdg_toplevel_unset_maximized(window->xdg_toplevel);
-                    }
-                    else {
-                        xdg_toplevel_set_maximized(window->xdg_toplevel);
-                    }
-                    window->maximized ^= true;
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BUTTON_MINIMIZE:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_RELEASED)) {
-                if(window->xdg_toplevel) {
-                    xdg_toplevel_set_minimized(window->xdg_toplevel);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_TOP:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_x < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    }
-                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_BOTTOM:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_x < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    }
-                    else if(pos_x >= (window->width + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_LEFT:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_y < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
-                    }
-                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-        case OBJECT_BORDER_RIGHT:
-            if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
-                if(window->xdg_toplevel && !window->maximized) {
-                    uint32_t edge;
-                    if(pos_y < (BORDER_SIZE * 5)) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
-                    }
-                    else if(pos_y >= (window->height + BORDER_SIZE - (BORDER_SIZE * 5))) {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
-                    }
-                    else {
-                        edge = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
-                    }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
-                    window->flush_pending = true;
-                }
-            }
-            break;
-#endif // LV_WAYLAND_XDG_SHELL
 #endif // LV_WAYLAND_WINDOW_DECORATIONS
         default:
             break;
