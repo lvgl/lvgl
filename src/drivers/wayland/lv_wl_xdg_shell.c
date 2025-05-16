@@ -202,8 +202,8 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
                                                uint32_t button, uint32_t state)
 {
     struct window * window = app->pointer_obj->window;
-    uint32_t pos_x         = app->pointer_obj->input.pointer.x;
-    uint32_t pos_y         = app->pointer_obj->input.pointer.y;
+    int pos_x         = (int)app->pointer_obj->input.pointer.x;
+    int pos_y         = (int)app->pointer_obj->input.pointer.y;
 
     switch(app->pointer_obj->type) {
         case OBJECT_TITLEBAR:
@@ -314,8 +314,8 @@ const char * lv_wayland_xdg_shell_get_cursor_name(const struct application * app
     if(!app->pointer_obj->window->xdg_toplevel || app->opt_disable_decorations) {
         return LV_WAYLAND_DEFAULT_CURSOR_NAME;
     }
-    uint32_t pos_x = app->pointer_obj->input.pointer.x;
-    uint32_t pos_y = app->pointer_obj->input.pointer.y;
+    int pos_x = (int)app->pointer_obj->input.pointer.x;
+    int pos_y = (int)app->pointer_obj->input.pointer.y;
 
     struct window * window = app->pointer_obj->window;
 
