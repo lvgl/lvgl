@@ -122,6 +122,11 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     }
 }
 
+void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window)
+{
+    return (void *)(window->window);
+}
+
 lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsigned int texture_id, int32_t w, int32_t h)
 {
     lv_glfw_texture_t * texture = lv_ll_ins_tail(&window->textures);
