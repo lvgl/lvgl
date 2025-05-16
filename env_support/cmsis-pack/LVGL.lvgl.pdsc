@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-05-05" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
+    <release date="2025-05-16" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
       - LVGL 9.3.0
       - See Change Log
     </release>
@@ -1767,6 +1767,8 @@
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_buttonmatrix_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_chart_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_checkbox_parser.c" />
+                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_calendar_parser.c" />
+                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_canvas_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_dropdown_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_event_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_image_parser.c" />
