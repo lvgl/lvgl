@@ -77,7 +77,7 @@ lv_part_t lv_xml_style_part_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
-lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
+lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char ** attrs)
 {
     const char * style_name =  lv_xml_get_value_of(attrs, "name");
     if(style_name == NULL) {
@@ -85,14 +85,14 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         return LV_RESULT_INVALID;
     }
 
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) return LV_RESULT_INVALID;
 
 
     lv_xml_style_t * xml_style;
     /*If a style with the same name is already created, use it */
     bool found = false;
-    LV_LL_READ(&ctx->style_ll, xml_style) {
+    LV_LL_READ(&scope->style_ll, xml_style) {
         if(lv_streq(xml_style->name, style_name)) {
             found = true;
             LV_LOG_INFO("Style %s is already registered. Extending it with new properties.", style_name);
@@ -101,12 +101,12 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
     }
 
     if(!found) {
-        xml_style = lv_ll_ins_tail(&ctx->style_ll);
+        xml_style = lv_ll_ins_tail(&scope->style_ll);
         xml_style->name = lv_strdup(style_name);
         lv_style_init(&xml_style->style);
-        size_t long_name_len = lv_strlen(ctx->name) + 1 + lv_strlen(style_name) + 1;
+        size_t long_name_len = lv_strlen(scope->name) + 1 + lv_strlen(style_name) + 1;
         xml_style->long_name = lv_malloc(long_name_len);
-        lv_snprintf((char *)xml_style->long_name, long_name_len, "%s.%s", ctx->name, style_name); /*E.g. my_button.style1*/
+        lv_snprintf((char *)xml_style->long_name, long_name_len, "%s.%s", scope->name, style_name); /*E.g. my_button.style1*/
     }
 
     lv_style_t * style = &xml_style->style;
@@ -121,7 +121,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         if(value[0] == '#') {
             const char * value_clean = &value[1];
             lv_xml_const_t * c;
-            LV_LL_READ(&ctx->const_ll, c) {
+            LV_LL_READ(&scope->const_ll, c) {
                 if(lv_streq(c->name, value_clean)) {
                     value = c->value;
                     break;
@@ -203,9 +203,9 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         else SET_STYLE_IF(bg_grad_color, lv_xml_to_color(value));
         else SET_STYLE_IF(bg_main_stop, lv_xml_atoi(value));
         else SET_STYLE_IF(bg_grad_stop, lv_xml_atoi(value));
-        else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(ctx, value));
+        else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(scope, value));
 
-        else SET_STYLE_IF(bg_image_src, lv_xml_get_image(ctx, value));
+        else SET_STYLE_IF(bg_image_src, lv_xml_get_image(scope, value));
         else SET_STYLE_IF(bg_image_tiled, lv_xml_to_bool(value));
         else SET_STYLE_IF(bg_image_recolor, lv_xml_to_color(value));
         else SET_STYLE_IF(bg_image_recolor_opa, lv_xml_to_opa(value));
@@ -229,7 +229,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         else SET_STYLE_IF(shadow_opa, lv_xml_to_opa(value));
 
         else SET_STYLE_IF(text_color, lv_xml_to_color(value));
-        else SET_STYLE_IF(text_font, lv_xml_get_font(ctx, value));
+        else SET_STYLE_IF(text_font, lv_xml_get_font(scope, value));
         else SET_STYLE_IF(text_opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(text_align, lv_xml_text_align_to_enum(value));
         else SET_STYLE_IF(text_letter_space, lv_xml_atoi(value));
@@ -251,7 +251,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         else SET_STYLE_IF(arc_opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(arc_width, lv_xml_atoi(value));
         else SET_STYLE_IF(arc_rounded, lv_xml_to_bool(value));
-        else SET_STYLE_IF(arc_image_src, lv_xml_get_image(ctx, value));
+        else SET_STYLE_IF(arc_image_src, lv_xml_get_image(scope, value));
 
         else SET_STYLE_IF(opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(opa_layered, lv_xml_to_opa(value));
@@ -269,7 +269,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
         else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
         else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
-        else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(ctx, value));
+        else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(scope, value));
         else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
         else SET_STYLE_IF(recolor, lv_xml_to_color(value));
         else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));
@@ -338,11 +338,11 @@ void lv_xml_style_add_to_obj(lv_xml_parser_state_t * state, lv_obj_t * obj, cons
                 const char * name_clean = &style_name[1];
                 const char * parent_style_name = lv_xml_get_value_of(state->parent_attrs, name_clean);
                 if(parent_style_name) {
-                    xml_style = lv_xml_get_style_by_name(state->parent_ctx, parent_style_name);
+                    xml_style = lv_xml_get_style_by_name(state->parent_scope, parent_style_name);
                 }
             }
             else {
-                xml_style = lv_xml_get_style_by_name(&state->ctx, style_name);
+                xml_style = lv_xml_get_style_by_name(&state->scope, style_name);
             }
             if(xml_style) {
                 /* Apply with the selector */
@@ -355,7 +355,7 @@ void lv_xml_style_add_to_obj(lv_xml_parser_state_t * state, lv_obj_t * obj, cons
     lv_free(str_ori);
 }
 
-lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const char * style_name_raw)
+lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_scope_t * scope, const char * style_name_raw)
 {
     const char * style_name = strrchr(style_name_raw, '.');
 
@@ -364,23 +364,30 @@ lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const ch
         size_t len = (size_t)(style_name - style_name_raw);
         lv_memcpy(component_name, style_name_raw, len);
         component_name[len] = '\0';
-        ctx = lv_xml_component_get_ctx(component_name);
+        scope = lv_xml_component_get_scope(component_name);
+        if(scope == NULL) {
+            LV_LOG_WARN("'%s' component or widget is not found", component_name);
+        }
         style_name++; /*Skip the dot*/
     }
     else {
         style_name = style_name_raw;
     }
 
+    /*Use the global scope is not specified*/
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) return NULL;
+
     lv_xml_style_t * xml_style;
-    LV_LL_READ(&ctx->style_ll, xml_style) {
+    LV_LL_READ(&scope->style_ll, xml_style) {
         if(lv_streq(xml_style->name, style_name)) return xml_style;
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->style_ll, xml_style) {
+    if(!lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->style_ll, xml_style) {
                 if(lv_streq(xml_style->name, style_name)) return xml_style;
             }
         }
@@ -391,10 +398,10 @@ lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const ch
     return NULL;
 }
 
-lv_grad_dsc_t * lv_xml_component_get_grad(lv_xml_component_ctx_t * ctx, const char * name)
+lv_grad_dsc_t * lv_xml_component_get_grad(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_grad_t * d;
-    LV_LL_READ(&ctx->gradient_ll, d) {
+    LV_LL_READ(&scope->gradient_ll, d) {
         if(lv_streq(d->name, name)) return &d->grad_dsc;
     }
 

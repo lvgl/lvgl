@@ -113,27 +113,32 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
 
-void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
+void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * parent_scope,
+                              lv_xml_component_scope_t * scope,
                               const char ** attrs)
 {
     /* Initialize the parser state */
     lv_xml_parser_state_t state;
     lv_xml_parser_state_init(&state);
-    state.ctx = *ctx;
+    state.scope = *scope; /*Scope won't be modified here, so it's safe to copy it by value*/
     state.parent = parent;
     state.parent_attrs = attrs;
-    state.parent_ctx = parent_ctx;
+    state.parent_scope = parent_scope;
 
     lv_obj_t ** parent_node = lv_ll_ins_head(&state.parent_ll);
     *parent_node = parent;
 
     /* Create an XML parser and set handlers */
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Memory_Handling_Suite mem_handlers;
+    mem_handlers.malloc_fcn = lv_malloc;
+    mem_handlers.realloc_fcn = lv_realloc;
+    mem_handlers.free_fcn = lv_free;
+    XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
     XML_SetUserData(parser, &state);
     XML_SetElementHandler(parser, view_start_element_handler, view_end_element_handler);
 
     /* Parse the XML */
-    if(XML_Parse(parser, ctx->view_def, lv_strlen(ctx->view_def), XML_TRUE) == XML_STATUS_ERROR) {
+    if(XML_Parse(parser, scope->view_def, lv_strlen(scope->view_def), XML_TRUE) == XML_STATUS_ERROR) {
         LV_LOG_WARN("XML parsing error: %s on line %lu", XML_ErrorString(XML_GetErrorCode(parser)),
                     XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
@@ -142,9 +147,14 @@ void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent
 
     state.item = state.view;
 
-    if(attrs) {
-        ctx->root_widget->apply_cb(&state, attrs);
+#if LV_USE_OBJ_NAME
+    /*Set a default indexed name*/
+    if(state.item && lv_obj_get_name(state.item) == NULL) {
+        char name_buf[128];
+        lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
+        lv_obj_set_name(state.item, name_buf);
     }
+#endif
 
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
@@ -162,7 +172,11 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
         lv_xml_parser_state_t state;
         lv_xml_parser_state_init(&state);
         state.parent = parent;
-        state.ctx.name = "";
+
+        /* When a component is just created there is no scope where
+         * its styles, constants, etc are stored.
+         * So leave state.scope = NULL which means the global context.*/
+
         state.item = p->create_cb(&state, attrs);
         if(attrs) {
             p->apply_cb(&state, attrs);
@@ -170,9 +184,24 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
         return state.item;
     }
 
-    lv_xml_component_ctx_t * ctx = lv_xml_component_get_ctx(name);
-    if(ctx) {
-        item = lv_xml_create_from_ctx(parent, NULL, ctx, attrs);
+    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
+    if(scope) {
+        item = lv_xml_create_in_scope(parent, NULL, scope, attrs);
+
+        if(attrs) {
+            lv_xml_parser_state_t state;
+            lv_xml_parser_state_init(&state);
+            state.parent = parent;
+            state.item = item;
+
+            /* When a component is just created there is no scope where
+             * its styles, constants, etc are stored.
+             * So leave state.scope = NULL which means the global context.*/
+
+            p = lv_xml_widget_get_extended_widget_processor(scope->extends);
+            p->apply_cb(&state, attrs);
+        }
+
         return item;
     }
 
@@ -181,44 +210,44 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     return NULL;
 }
 
-lv_result_t lv_xml_register_font(lv_xml_component_ctx_t * ctx, const char * name, const lv_font_t * font)
+lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * name, const lv_font_t * font)
 {
 
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) {
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
         LV_LOG_WARN("No component found to register font `%s`", name);
         return LV_RESULT_INVALID;
     }
 
     lv_xml_font_t * f;
-    LV_LL_READ(&ctx->font_ll, f) {
+    LV_LL_READ(&scope->font_ll, f) {
         if(lv_streq(f->name, name)) {
             LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
 
-    f = lv_ll_ins_head(&ctx->font_ll);
+    f = lv_ll_ins_head(&scope->font_ll);
     f->name = lv_strdup(name);
     f->font = font;
 
     return LV_RESULT_OK;
 }
 
-const lv_font_t * lv_xml_get_font(lv_xml_component_ctx_t * ctx, const char * name)
+const lv_font_t * lv_xml_get_font(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_font_t * f;
-    if(ctx) {
-        LV_LL_READ(&ctx->font_ll, f) {
+    if(scope) {
+        LV_LL_READ(&scope->font_ll, f) {
             if(lv_streq(f->name, name)) return f->font;
         }
     }
 
     /*If not found in the component check the global space*/
-    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->font_ll, f) {
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->font_ll, f) {
                 if(lv_streq(f->name, name)) return f->font;
             }
         }
@@ -228,44 +257,44 @@ const lv_font_t * lv_xml_get_font(lv_xml_component_ctx_t * ctx, const char * nam
     return lv_font_get_default();
 }
 
-lv_result_t lv_xml_register_subject(lv_xml_component_ctx_t * ctx, const char * name, lv_subject_t * subject)
+lv_result_t lv_xml_register_subject(lv_xml_component_scope_t * scope, const char * name, lv_subject_t * subject)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) {
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
         LV_LOG_WARN("No component found to register subject `%s`", name);
         return LV_RESULT_INVALID;
     }
 
 
     lv_xml_subject_t * s;
-    LV_LL_READ(&ctx->subjects_ll, s) {
+    LV_LL_READ(&scope->subjects_ll, s) {
         if(lv_streq(s->name, name)) {
             LV_LOG_INFO("Subject %s is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
 
-    s = lv_ll_ins_head(&ctx->subjects_ll);
+    s = lv_ll_ins_head(&scope->subjects_ll);
     s->name = lv_strdup(name);
     s->subject = subject;
 
     return LV_RESULT_OK;
 }
 
-lv_subject_t * lv_xml_get_subject(lv_xml_component_ctx_t * ctx, const char * name)
+lv_subject_t * lv_xml_get_subject(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_subject_t * s;
-    if(ctx) {
-        LV_LL_READ(&ctx->subjects_ll, s) {
+    if(scope) {
+        LV_LL_READ(&scope->subjects_ll, s) {
             if(lv_streq(s->name, name)) return s->subject;
         }
     }
 
     /*If not found in the component check the global space*/
-    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->subjects_ll, s) {
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->subjects_ll, s) {
                 if(lv_streq(s->name, name)) return s->subject;
             }
         }
@@ -275,23 +304,23 @@ lv_subject_t * lv_xml_get_subject(lv_xml_component_ctx_t * ctx, const char * nam
     return NULL;
 }
 
-lv_result_t lv_xml_register_const(lv_xml_component_ctx_t * ctx, const char * name, const char * value)
+lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char * name, const char * value)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) {
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
         LV_LOG_WARN("No component found to register constant `%s`", name);
         return LV_RESULT_INVALID;
     }
 
     lv_xml_const_t * cnst;
-    LV_LL_READ(&ctx->const_ll, cnst) {
+    LV_LL_READ(&scope->const_ll, cnst) {
         if(lv_streq(cnst->name, name)) {
             LV_LOG_INFO("Const %s is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
 
-    cnst = lv_ll_ins_head(&ctx->const_ll);
+    cnst = lv_ll_ins_head(&scope->const_ll);
 
     cnst->name = lv_strdup(name);
     cnst->value = lv_strdup(value);
@@ -299,24 +328,24 @@ lv_result_t lv_xml_register_const(lv_xml_component_ctx_t * ctx, const char * nam
     return LV_RESULT_OK;
 }
 
-const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
+const char * lv_xml_get_const(lv_xml_component_scope_t * scope, const char * name)
 {
 
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return NULL;
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) return NULL;
 
     lv_xml_const_t * cnst;
-    if(ctx) {
-        LV_LL_READ(&ctx->const_ll, cnst) {
+    if(scope) {
+        LV_LL_READ(&scope->const_ll, cnst) {
             if(lv_streq(cnst->name, name)) return cnst->value;
         }
     }
 
     /*If not found in the component check the global space*/
-    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->const_ll, cnst) {
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->const_ll, cnst) {
                 if(lv_streq(cnst->name, name)) return cnst->value;
             }
         }
@@ -327,23 +356,23 @@ const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
 }
 
 
-lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * name, const void * src)
+lv_result_t lv_xml_register_image(lv_xml_component_scope_t * scope, const char * name, const void * src)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) {
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
         LV_LOG_WARN("No component found to register image `%s`", name);
         return LV_RESULT_INVALID;
     }
 
     lv_xml_image_t * img;
-    LV_LL_READ(&ctx->image_ll, img) {
+    LV_LL_READ(&scope->image_ll, img) {
         if(lv_streq(img->name, name)) {
             LV_LOG_INFO("Image %s is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
 
-    img = lv_ll_ins_head(&ctx->image_ll);
+    img = lv_ll_ins_head(&scope->image_ll);
     img->name = lv_strdup(name);
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         img->src = lv_strdup(src);
@@ -355,23 +384,23 @@ lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * nam
     return LV_RESULT_OK;
 }
 
-const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
+const void * lv_xml_get_image(lv_xml_component_scope_t * scope, const char * name)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return NULL;
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) return NULL;
 
     lv_xml_image_t * img;
-    if(ctx) {
-        LV_LL_READ(&ctx->image_ll, img) {
+    if(scope) {
+        LV_LL_READ(&scope->image_ll, img) {
             if(lv_streq(img->name, name)) return img->src;
         }
     }
 
     /*If not found in the component check the global space*/
-    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->image_ll, img) {
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->image_ll, img) {
                 if(lv_streq(img->name, name)) return img->src;
             }
         }
@@ -381,23 +410,23 @@ const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
     return NULL;
 }
 
-lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * name, lv_event_cb_t cb)
+lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const char * name, lv_event_cb_t cb)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) {
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
         LV_LOG_WARN("No component found to register event `%s`", name);
         return LV_RESULT_INVALID;
     }
 
     lv_xml_event_cb_t * e;
-    LV_LL_READ(&ctx->event_ll, e) {
+    LV_LL_READ(&scope->event_ll, e) {
         if(lv_streq(e->name, name)) {
             LV_LOG_INFO("Event_cb %s is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
 
-    e = lv_ll_ins_head(&ctx->event_ll);
+    e = lv_ll_ins_head(&scope->event_ll);
     e->name = lv_strdup(name);
     e->cb = cb;
 
@@ -405,23 +434,23 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * 
 }
 
 
-lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * name)
+lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_scope_t * scope, const char * name)
 {
-    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return NULL;
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) return NULL;
 
     lv_xml_event_cb_t * e;
-    if(ctx) {
-        LV_LL_READ(&ctx->event_ll, e) {
+    if(scope) {
+        LV_LL_READ(&scope->event_ll, e) {
             if(lv_streq(e->name, name)) return e->cb;
         }
     }
 
     /*If not found in the component check the global space*/
-    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
-        ctx = lv_xml_component_get_ctx("globals");
-        if(ctx) {
-            LV_LL_READ(&ctx->event_ll, e) {
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->event_ll, e) {
                 if(lv_streq(e->name, name)) return e->cb;
             }
         }
@@ -435,25 +464,25 @@ lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * nam
  *   STATIC FUNCTIONS
  **********************/
 
-static const char * get_param_type(lv_xml_component_ctx_t * ctx, const char * name)
+static const char * get_param_type(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_param_t * p;
-    LV_LL_READ(&ctx->param_ll, p) {
+    LV_LL_READ(&scope->param_ll, p) {
         if(lv_streq(p->name, name)) return p->type;
     }
     return NULL;
 }
 
-static const char * get_param_default(lv_xml_component_ctx_t * ctx, const char * name)
+static const char * get_param_default(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_param_t * p;
-    LV_LL_READ(&ctx->param_ll, p) {
+    LV_LL_READ(&scope->param_ll, p) {
         if(lv_streq(p->name, name)) return p->def;
     }
     return NULL;
 }
 
-static void resolve_params(lv_xml_component_ctx_t * item_ctx, lv_xml_component_ctx_t * parent_ctx,
+static void resolve_params(lv_xml_component_scope_t * item_scope, lv_xml_component_scope_t * parent_scope,
                            const char ** item_attrs, const char ** parent_attrs)
 {
     uint32_t i;
@@ -465,25 +494,25 @@ static void resolve_params(lv_xml_component_ctx_t * item_ctx, lv_xml_component_c
             /*E.g. the ${my_color} value is the my_color attribute name on the parent*/
             const char * name_clean = &value[1]; /*skips `$`*/
 
-            const char * type = get_param_type(item_ctx, name_clean);
+            const char * type = get_param_type(item_scope, name_clean);
             if(type == NULL) {
-                LV_LOG_WARN("'%s' parameter is not defined on '%s'", name_clean, item_ctx->name);
+                LV_LOG_WARN("'%s' parameter is not defined on '%s'", name_clean, item_scope->name);
             }
             const char * ext_value = lv_xml_get_value_of(parent_attrs, name_clean);
             if(ext_value) {
                 /*If the value is not resolved earlier (e.g. it's a top level element created manually)
                  * use the default value*/
                 if(ext_value[0] == '#' || ext_value[0] == '$') {
-                    ext_value = get_param_default(item_ctx, name_clean);
+                    ext_value = get_param_default(item_scope, name_clean);
                 }
                 else if(lv_streq(type, "style")) {
-                    lv_xml_style_t * s = lv_xml_get_style_by_name(parent_ctx, ext_value);
+                    lv_xml_style_t * s = lv_xml_get_style_by_name(parent_scope, ext_value);
                     ext_value = s->long_name;
                 }
             }
             else {
                 /*If the API attribute is not provide don't set it*/
-                ext_value = get_param_default(item_ctx, name_clean);
+                ext_value = get_param_default(item_scope, name_clean);
             }
             if(ext_value) {
                 item_attrs[i + 1] = ext_value;
@@ -498,7 +527,7 @@ static void resolve_params(lv_xml_component_ctx_t * item_ctx, lv_xml_component_c
     }
 }
 
-static void resolve_consts(const char ** item_attrs, lv_xml_component_ctx_t * ctx)
+static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * scope)
 {
     uint32_t i;
     for(i = 0; item_attrs[i]; i += 2) {
@@ -508,7 +537,7 @@ static void resolve_consts(const char ** item_attrs, lv_xml_component_ctx_t * ct
         if(value[0] == '#') {
             const char * value_clean = &value[1];
 
-            const char * const_value = lv_xml_get_const(ctx, value_clean);
+            const char * const_value = lv_xml_get_const(scope, value_clean);
             if(const_value) {
                 item_attrs[i + 1] = const_value;
             }
@@ -552,9 +581,9 @@ static void view_start_element_handler(void * user_data, const char * name, cons
      *E.g. in `my_button` `<lv_label x="5" text="${title}".
      *This function changes the pointers in the child attributes if the start with '$'
      *with the corresponding parameter. E.g. "text", "${title}" -> "text", "Hello" */
-    resolve_params(&state->ctx, state->parent_ctx, attrs, state->parent_attrs);
+    resolve_params(&state->scope, state->parent_scope, attrs, state->parent_attrs);
 
-    resolve_consts(attrs, &state->ctx);
+    resolve_consts(attrs, &state->scope);
 
     void * item = NULL;
     /* Select the widget specific parser type based on the name */
@@ -568,7 +597,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
          *now it has the button theme styles. However if it were a real widget
          *it had e.g. `my_widget_class` so the button's theme wouldn't apply on it.
          *Removing the style will ensure a better preview*/
-        if(state->ctx.is_widget && is_view) lv_obj_remove_style_all(item);
+        if(state->scope.is_widget && is_view) lv_obj_remove_style_all(item);
 
         /*Apply the attributes from e.g. `<lv_slider value="30" x="20">`*/
         if(item) {
@@ -608,5 +637,6 @@ static void view_end_element_handler(void * user_data, const char * name)
         lv_free(current_parent);
     }
 }
+
 
 #endif /* LV_USE_XML */
