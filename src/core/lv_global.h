@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 #ifndef LV_GLOBAL_H
 #define LV_GLOBAL_H
 
@@ -169,6 +173,10 @@ typedef struct _lv_global_t {
 
 #if LV_USE_FS_FATFS
     lv_fs_drv_t fatfs_fs_drv;
+#endif
+
+#if LV_USE_FS_RAWFS
+    lv_fs_drv_t rawfs_fs_drv;
 #endif
 
 #if LV_USE_FS_WIN32 != '\0'
