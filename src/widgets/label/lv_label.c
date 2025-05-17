@@ -143,9 +143,11 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
     /*If set its own text then reallocate it (maybe its size changed)*/
     if(label->text == text && label->static_txt == 0) {
-        label->text = lv_realloc(label->text, text_len);
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
+        char * new_text = lv_realloc(label->text, text_len);
+        LV_ASSERT_MALLOC(new_text);
+        if(new_text == NULL) return;
+
+        label->text = new_text;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         lv_text_ap_proc(label->text, label->text);
@@ -153,15 +155,17 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
     }
     else {
+        char * new_text = lv_malloc(text_len);
+        LV_ASSERT_MALLOC(new_text);
+        if(new_text == NULL) return;
+
         /*Free the old text*/
         if(label->text != NULL && label->static_txt == 0) {
             lv_free(label->text);
             label->text = NULL;
         }
 
-        label->text = lv_malloc(text_len);
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
+        label->text = new_text;
 
         copy_text_to_label(label, text);
 
