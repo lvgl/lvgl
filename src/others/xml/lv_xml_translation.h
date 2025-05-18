@@ -42,6 +42,7 @@ lv_result_t lv_xml_translation_register_from_data(const char * xml_def);
 void lv_xml_set_language(const char * lang);
 
 const char * lv_xml_get_translation(const char * tag);
+
 /**********************
  *      MACROS
  **********************/
