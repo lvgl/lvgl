@@ -12,14 +12,14 @@
 	</styles>
 
 	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label text="Hello"/>
+		<lv_label text-translated="tiger"/>
 		<my_card title="Card 1" name="card1"
-				 y="0"
+				 y="30"
                  styles="red_border"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 
-		<my_card y="85"
+		<my_card y="120"
 				 bg_color="0xffaaaa"
 				 action="Apply"
 				 btn_rel_style="btn_style"
