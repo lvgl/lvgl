@@ -229,3 +229,76 @@ Direct mode
             chThdSleepMilliseconds(100);
         }
     }
+
+7. Using delegates instead of mutexes
+========================================
+
+.. line-block::
+    If you are using a different thread for handling UI elements, you can use the delegates to handle the UI elements.
+    This is a more efficient way of handling the UI elements, but requires more work to implement.
+    Currently the way to use delegate functions on ChibiOS is chDelegateCallDirectX() where X is the number of arguments passed to the delegated function.
+    X can be a number from 0 to 4
+
+
+
+Main thread
+============
+
+.. code-block:: c
+
+   static thread_t *delegate_tp;
+
+   static THD_WORKING_AREA(waLV_TIMER_HANDLER, 8192);
+   static THD_FUNCTION(LV_TIMER_HANDLER, arg)
+   {
+       (void)arg;
+       chRegSetThreadName("LV_TIMER_HANDLER");
+       uint32_t sleep = 0;
+       ui_init();
+       while (true)
+       {
+           sleep = lv_timer_handler();
+           if (sleep == LV_NO_TIMER_READY)
+           {
+               sleep = LV_DEF_REFR_PERIOD;
+           }
+           if (sleep <= 0)
+           {
+               sleep = 1;
+           }
+           chDelegateDispatch();
+           chThdSleepMilliseconds(sleep);
+       }
+   }
+
+
+Updater thread
+================
+
+.. code-block:: c
+
+   static THD_WORKING_AREA(waValue_Update_Thread, 8192);
+   static THD_FUNCTION(Value_Update_Thread, arg)
+   {
+       (void)arg;
+       chRegSetThreadName("Value_Update_Thread");
+       uint32_t some_value = 0;
+       while (true)
+       {
+           msg_t result = chDelegateCallDirect2(delegate_tp, update_values, (msg_t)pointer_to_screen_object, (msg_t)some_value);
+           some_value++;
+           if (some_value > 100)
+           {
+               some_value = 0;
+           }
+           chThdSleepMilliseconds(100);
+       }
+   }
+
+
+Create the delegate thread
+================
+
+.. code-block:: c
+
+   delegate_tp = chThdCreateStatic(waLV_TIMER_HANDLER, sizeof(waLV_TIMER_HANDLER), NORMALPRIO + 8, LV_TIMER_HANDLER, NULL);
