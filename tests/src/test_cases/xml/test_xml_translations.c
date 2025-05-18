@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -27,9 +27,9 @@ void test_xml_translation(void)
     lv_xml_translation_register_from_data(translations_xml);
 
 
-    const char * languages[] = {"en", "de", "es", NULL};
-    const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-    const char * translations[] = {
+    static const char * languages[] = {"en", "de", "es", NULL};
+    static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+    static const char * translations[] = {
         "The Tiger", "Der Tiger", "El Tigre",
         "The Lion", "Der Löwe", "El León",
         "The Rabbit", "Das Kaninchen", "El Conejo",

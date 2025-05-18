@@ -6,10 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_xml_translation.h"
+#include "../../lvgl.h"
 #if LV_USE_XML
 
-#include "../../lvgl.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_parser.h"
 #include "../../libs/expat/expat.h"
@@ -36,7 +35,6 @@ typedef struct {
     const char ** translation_p; /*E.g. {{"a", "b"}, {"c", "d"}}*/
     lv_array_t translation_array;
 } language_pack_t;
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -134,7 +132,7 @@ lv_result_t lv_xml_translation_register_from_data(const char * xml_def)
     language_pack_t * pack = lv_ll_ins_head(&packs_ll);
     lv_memzero(pack, sizeof(language_pack_t));
     pack->is_pointer = 0;
-    lv_array_init(&pack->translation_array, sizeof(translation_dsc_t), 16);
+    lv_array_init(&pack->translation_array, 16, sizeof(translation_dsc_t));
 
     /* Parse the XML to extract metadata */
     XML_Parser parser = XML_ParserCreate(NULL);
@@ -267,6 +265,7 @@ static void start_handler(void * user_data, const char * name, const char ** att
             LV_LOG_WARN("`tag` is missing from the translation");
             return;
         }
+
         translation_dsc_t tag;
         tag.tag = lv_strdup(tag_name);
         tag.translations = lv_malloc(pack->language_cnt * sizeof(const char *));
@@ -277,7 +276,7 @@ static void start_handler(void * user_data, const char * name, const char ** att
             const char * trans = lv_xml_get_value_of(attrs, pack->languages[i]);
             if(trans == NULL) {
                 tag.translations[i] = NULL;
-                LV_LOG_WARN("`%s` language is missing from tag  `%s`", pack->languages[i], tag_name);
+                LV_LOG_WARN("`%s` language is missing from tag `%s`", pack->languages[i], tag_name);
                 continue;
             }
             tag.translations[i] = lv_strdup(trans);
