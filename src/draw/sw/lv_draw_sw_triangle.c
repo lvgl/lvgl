@@ -189,7 +189,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     }
 
 #else
-    LV_UNUSED(draw_unit);
+    LV_UNUSED(t);
     LV_UNUSED(dsc);
     LV_LOG_WARN("Can't draw triangles with LV_DRAW_SW_COMPLEX == 0");
 #endif /*LV_DRAW_SW_COMPLEX*/

@@ -399,7 +399,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_task_t * t, const lv_dr
         lv_draw_sw_mask_free_param(&mask_bottom_param);
     }
 #else
-    LV_UNUSED(draw_unit);
+    LV_UNUSED(t);
     LV_UNUSED(dsc);
     LV_LOG_WARN("Can't draw skewed line with LV_DRAW_SW_COMPLEX == 0");
 #endif /*LV_DRAW_SW_COMPLEX*/
