@@ -79,7 +79,7 @@ How to integrate LVGL with ChibiOS
 
     chVTSetContinuous(&vt, TIME_MS2I(1), tick_inc_callback, NULL);
 
-1. LTDC driver initialization and start
+3. LTDC driver initialization and start
 ========================================
 
 .. line-block::
