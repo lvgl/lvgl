@@ -81,7 +81,7 @@ void lv_example_table_2(void)
 
     uint32_t i;
     for(i = 0; i < ITEM_CNT; i++) {
-        lv_table_set_cell_value_fmt(table, i, 0, "Item %"LV_PRIu32, i + 1);
+        lv_table_set_cell_value_fmt(table, i, 0, "Item %" LV_PRIu32, i + 1);
     }
 
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
@@ -99,7 +99,7 @@ void lv_example_table_2(void)
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text_fmt(label, "%"LV_PRIu32" items were created in %"LV_PRIu32" ms\n"
+    lv_label_set_text_fmt(label, "%" LV_PRIu32" items were created in %" LV_PRIu32" ms\n"
                           "using %zu bytes of memory",
                           (uint32_t)ITEM_CNT, elaps, mem_used);
 
