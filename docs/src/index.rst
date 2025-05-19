@@ -1,3 +1,5 @@
+:hide-toc:
+
 .. raw:: html
 
     <p style="text-align: right;">
@@ -14,12 +16,6 @@ LVGL:  Light and Versatile Graphics Library
 
 Create beautiful UIs for any MCU, MPU and display type.
 *******************************************************
-
-.. raw:: html
-
-    <div style="margin-bottom:30px; margin-top:14px">
-    <img src="_static/images/gh-header.webp" alt="LVGL Documentation" style="width:100%">
-    </div>
 
 .. raw:: html
 
