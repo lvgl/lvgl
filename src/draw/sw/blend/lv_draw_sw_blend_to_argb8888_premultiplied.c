@@ -295,7 +295,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
                         if(color_argb.alpha >= LV_OPA_MAX) {
                             color_argb.alpha = 0xff;
-                            dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                            dest_buf_c32[x] = color_argb;
                         }
                         else if(color_argb.alpha >= LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
@@ -327,7 +327,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
                         if(alpha >= LV_OPA_MAX) {
                             color_argb.alpha = 0xff;
-                            dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                            dest_buf_c32[x] = color_argb;
                         }
                         else if(alpha >= LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
@@ -359,7 +359,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
                         if(alpha >= LV_OPA_MAX) {
                             color_argb.alpha = 0xff;
-                            dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                            dest_buf_c32[x] = color_argb;
                         }
                         else if(alpha >= LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
@@ -392,7 +392,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
                         if(alpha >= LV_OPA_MAX) {
                             color_argb.alpha = 0xff;
-                            dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                            dest_buf_c32[x] = color_argb;
                         }
                         else if(alpha >= LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
