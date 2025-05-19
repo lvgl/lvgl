@@ -15,6 +15,7 @@ any type of file system for LVGL's use.  File systems already supported are:
 - LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
 - Arduino ESP LITTLEFS (a little fail-safe filesystem designed for Arduino ESP)
 - Arduino SD (allows for reading from and writing to SD cards)
+- `RAWFS <https://docs.nxp.com/bundle/GUIGUIDERUG_1.9.1/page/topics/qspi_flash.html>`__
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between LVGL and these file systems.
