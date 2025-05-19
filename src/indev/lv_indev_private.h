@@ -45,6 +45,7 @@ struct _lv_indev_t {
     uint8_t wait_until_release : 1;
     uint8_t stop_processing_query : 1;
 
+    uint32_t timestamp;            /**< Timestamp of last event */
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
 
