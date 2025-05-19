@@ -246,6 +246,7 @@ struct window {
  *********************************/
 
 static struct application application;
+static bool wayland_initialized = false;
 
 static void color_fill(void * pixels, lv_color_t color, uint32_t width, uint32_t height);
 static void color_fill_XRGB8888(void * pixels, lv_color_t color, uint32_t width, uint32_t height);
@@ -2393,6 +2394,11 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
  */
 static void wayland_init(void)
 {
+    /* Prevent reinitializing wayland */
+    if(wayland_initialized) {
+        return;
+    }
+
     struct smm_events evs = {
         NULL,
         sme_new_pool,
@@ -2456,6 +2462,7 @@ static void wayland_init(void)
     /* Used to wait for events when the window is minimized or hidden */
     application.wayland_pfd.fd = wl_display_get_fd(application.display);
     application.wayland_pfd.events = POLLIN;
+    wayland_initialized = true;
 
 }
 
