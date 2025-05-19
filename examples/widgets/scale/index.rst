@@ -64,8 +64,7 @@ A round scale style simulating a sunset/sunrise widget
 .. lv_example:: widgets/scale/lv_example_scale_11
   :language: c
 
-Two scales for x and y axis of a bar chart
-------------------------------------------
-
-.. lv_example:: widgets/scale/lv_example_scale_12
+Axis ticks and labels with scrolling on a chart
+-----------------------------------------------
+.. lv_example:: widgets/chart/lv_example_chart_2
   :language: c
