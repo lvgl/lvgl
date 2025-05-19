@@ -4,7 +4,7 @@
 static void sw_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * sw = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * sw = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t * list = (lv_obj_t *) lv_event_get_user_data(e);

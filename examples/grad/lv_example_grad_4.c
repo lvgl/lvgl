@@ -8,7 +8,7 @@ static void position_bullet(lv_event_t * e, lv_point_t * p)
     lv_indev_t * indev = (lv_indev_t *) lv_event_get_param(e);
     lv_indev_get_point(indev, p);
 
-    lv_obj_t * bullet = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
 
     p->x -= lv_obj_get_x(parent);
@@ -29,7 +29,7 @@ static void start_event_cb(lv_event_t * e)
     lv_point_t p;
     position_bullet(e, &p);
 
-    lv_obj_t * bullet = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
     p.x -= lv_obj_get_width(parent) / 2;
     p.y -= lv_obj_get_height(parent) / 2;
@@ -48,7 +48,7 @@ static void end_event_cb(lv_event_t * e)
     lv_point_t p;
     position_bullet(e, &p);
 
-    lv_obj_t * bullet = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
     p.x -= lv_obj_get_width(parent) / 2;
     p.y -= lv_obj_get_height(parent) / 2;

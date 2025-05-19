@@ -100,7 +100,7 @@ static void slider_event_cb(lv_event_t * e)
 {
     char buf[16];
     lv_obj_t * label;
-    lv_obj_t * slider = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * slider = lv_event_get_target_obj(e);
 
     if(slider == ginfo.p1_slider) {
         label = ginfo.p1_label;

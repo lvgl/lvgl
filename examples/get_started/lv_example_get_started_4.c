@@ -5,7 +5,7 @@ static lv_obj_t * label;
 
 static void slider_event_cb(lv_event_t * e)
 {
-    lv_obj_t * slider = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * slider = lv_event_get_target_obj(e);
 
     /*Refresh the text*/
     lv_label_set_text_fmt(label, "%" LV_PRId32, lv_slider_get_value(slider));

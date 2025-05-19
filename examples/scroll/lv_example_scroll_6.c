@@ -3,7 +3,7 @@
 
 static void scroll_event_cb(lv_event_t * e)
 {
-    lv_obj_t * cont = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * cont = lv_event_get_target_obj(e);
 
     lv_area_t cont_a;
     lv_obj_get_coords(cont, &cont_a);

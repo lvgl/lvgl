@@ -165,7 +165,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
 
 static void btn_click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_target_obj(e);
     uint32_t idx = lv_obj_get_index(btn);
     lv_subject_set_int(&current_tab_subject, idx);
 }

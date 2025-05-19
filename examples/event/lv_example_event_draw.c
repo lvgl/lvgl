@@ -17,7 +17,7 @@ static void timer_cb(lv_timer_t * timer)
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *) lv_draw_task_get_draw_dsc(draw_task);
     if(base_dsc->part == LV_PART_MAIN) {

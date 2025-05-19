@@ -6,7 +6,7 @@ static uint32_t btn_cnt = 1;
 static void float_button_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * float_btn = (lv_obj_t *) lv_event_get_target(e);
+    lv_obj_t * float_btn = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_CLICKED) {
         lv_obj_t * list = (lv_obj_t *) lv_event_get_user_data(e);
