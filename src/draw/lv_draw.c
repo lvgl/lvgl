@@ -34,6 +34,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
