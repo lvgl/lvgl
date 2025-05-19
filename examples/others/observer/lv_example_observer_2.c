@@ -58,7 +58,7 @@ static lv_subject_t auth_state_subject;
 
 static void textarea_event_cb(lv_event_t * e)
 {
-    lv_obj_t * ta = lv_event_get_target(e);
+    lv_obj_t * ta = lv_event_get_target_obj(e);
     if(lv_strcmp(lv_textarea_get_text(ta), "hello") == 0) {
         lv_subject_set_int(&auth_state_subject, LOGGED_IN);
     }
@@ -69,7 +69,7 @@ static void textarea_event_cb(lv_event_t * e)
 
 static void info_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * label = lv_observer_get_target(observer);
+    lv_obj_t * label = (lv_obj_t *) lv_observer_get_target(observer);
     switch(lv_subject_get_int(subject)) {
         case LOGGED_IN:
             lv_label_set_text(label, "Login successful");

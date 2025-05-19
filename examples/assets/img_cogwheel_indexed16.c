@@ -131,12 +131,14 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16 uint8_t i
 };
 
 const lv_image_dsc_t img_cogwheel_indexed16 = {
-    .header.w = 100,
-    .header.h = 100,
-    .header.stride = 50,
-    .header.cf = LV_COLOR_FORMAT_I4,
-    .data = img_cogwheel_indexed16_map,
+    .header = {
+        .cf = LV_COLOR_FORMAT_I4,
+        .w = 100,
+        .h = 100,
+        .stride = 50,
+    },
     .data_size = sizeof(img_cogwheel_indexed16_map),
+    .data = img_cogwheel_indexed16_map,
 };
 
 #endif /* LV_BUILD_EXAMPLES */

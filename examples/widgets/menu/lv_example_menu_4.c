@@ -18,11 +18,11 @@ static void float_button_event_cb(lv_event_t * e)
 
     cont = lv_menu_cont_create(sub_page);
     label = lv_label_create(cont);
-    lv_label_set_text_fmt(label, "Hello, I am hiding inside %"LV_PRIu32"", btn_cnt);
+    lv_label_set_text_fmt(label, "Hello, I am hiding inside %" LV_PRIu32"", btn_cnt);
 
     cont = lv_menu_cont_create(main_page);
     label = lv_label_create(cont);
-    lv_label_set_text_fmt(label, "Item %"LV_PRIu32"", btn_cnt);
+    lv_label_set_text_fmt(label, "Item %" LV_PRIu32"", btn_cnt);
     lv_menu_set_load_page_event(menu, cont, sub_page);
 
     lv_obj_scroll_to_view_recursive(cont, LV_ANIM_ON);

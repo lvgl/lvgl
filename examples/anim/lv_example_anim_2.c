@@ -3,12 +3,12 @@
 
 static void anim_x_cb(void * var, int32_t v)
 {
-    lv_obj_set_x(var, v);
+    lv_obj_set_x((lv_obj_t *) var, v);
 }
 
 static void anim_size_cb(void * var, int32_t v)
 {
-    lv_obj_set_size(var, v, v);
+    lv_obj_set_size((lv_obj_t *) var, v, v);
 }
 
 /**
