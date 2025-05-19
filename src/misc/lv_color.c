@@ -395,10 +395,6 @@ uint8_t lv_color32_luminance(lv_color32_t c)
     return (uint8_t)((uint16_t)(77u * c.red + 151u * c.green + 28u * c.blue) >> 8);
 }
 
-uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_swap_16(uint16_t c)
-{
-    return (c >> 8) | (c << 8);
-}
 
 /**********************
  *   STATIC FUNCTIONS

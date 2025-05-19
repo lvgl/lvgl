@@ -440,12 +440,16 @@ uint8_t lv_color24_luminance(const uint8_t * c);
  */
 uint8_t lv_color32_luminance(lv_color32_t c);
 
+
 /**
- * Swap the endiannes of an rgb565 color
+ * Swap the endianness of an rgb565 color
  * @param c a color
  * @return the swapped color
  */
-uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_swap_16(uint16_t c);
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_swap_16(uint16_t c)
+{
+    return (c >> 8) | (c << 8);
+}
 
 /**********************
  *      MACROS

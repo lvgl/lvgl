@@ -232,6 +232,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     return 1;
 }
+#include <stdio.h>
 
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
@@ -240,6 +241,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     /* Return if target buffer format is not supported. */
     const lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
     if(!lv_vg_lite_is_dest_cf_supported(base_dsc->layer->color_format)) {
+        printf("################### DRAW TASK IS NOT TAKEN 0\n");
         return -1;
     }
 
@@ -263,6 +265,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
         case LV_DRAW_TASK_TYPE_ARC: {
                 if(!check_arc_is_supported(task->draw_dsc)) {
+                    printf("################### DRAW TASK IS NOT TAKEN 1\n");
                     return 0;
                 }
             }
@@ -270,6 +273,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 if(!check_image_is_supported(task->draw_dsc)) {
+                    printf("################### DRAW TASK IS NOT TAKEN 2\n");
                     return 0;
                 }
             }
@@ -277,6 +281,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
         default:
             /*The draw unit is not able to draw this task. */
+            printf("################### DRAW TASK IS NOT TAKEN 3\n");
             return 0;
     }
 
@@ -284,6 +289,10 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         /* The draw unit is able to draw this task. */
         task->preference_score = 80;
         task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    }
+    else {
+        printf("################### DRAW TASK IS NOT TAKEN 4\n");
+        fflush(stdout);
     }
 
     return 1;

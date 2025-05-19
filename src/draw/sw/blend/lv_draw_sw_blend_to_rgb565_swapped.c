@@ -576,21 +576,17 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
                 uint8_t chan_val = get_bit(src_buf_i1, src_x) * 255;
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
-                        // Additive blending mode
                         res = (LV_MIN(lv_color_swap_16(dest_buf_u16[dest_x]) + l8_to_rgb565(chan_val), 0xFFFF));
                         break;
                     case LV_BLEND_MODE_SUBTRACTIVE:
-                        // Subtractive blending mode
                         res = (LV_MAX(lv_color_swap_16(dest_buf_u16[dest_x]) - l8_to_rgb565(chan_val), 0));
                         break;
                     case LV_BLEND_MODE_MULTIPLY:
-                        // Multiply blending mode
                         res = ((((lv_color_swap_16(dest_buf_u16[dest_x]) >> 11) * (l8_to_rgb565(chan_val) >> 3)) & 0x1F) << 11) |
                               ((((lv_color_swap_16(dest_buf_u16[dest_x]) >> 5) & 0x3F) * ((l8_to_rgb565(chan_val) >> 2) & 0x3F) >> 6) << 5) |
                               (((lv_color_swap_16(dest_buf_u16[dest_x]) & 0x1F) * (l8_to_rgb565(chan_val) & 0x1F)) >> 5);
                         break;
                     case LV_BLEND_MODE_DIFFERENCE:
-                        /*Difference blending mode*/
                         res = (LV_ABS(lv_color_swap_16(dest_buf_u16[dest_x]) - l8_to_rgb565(chan_val)));
                         break;
                     default:
@@ -947,29 +943,32 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             lv_color16_t * src_buf_c16 = (lv_color16_t *) src_buf_u16;
             for(x = 0; x < w; x++) {
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
                         if(src_buf_u16[x] == 0x0000) continue;   /*Do not add pure black*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_MIN(dest_buf_c16[x].red + src_buf_c16[x].red, 31)) << 11;
                         res += (LV_MIN(dest_buf_c16[x].green + src_buf_c16[x].green, 63)) << 5;
                         res += LV_MIN(dest_buf_c16[x].blue + src_buf_c16[x].blue, 31);
                         break;
                     case LV_BLEND_MODE_SUBTRACTIVE:
                         if(src_buf_u16[x] == 0x0000) continue;   /*Do not subtract pure black*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_MAX(dest_buf_c16[x].red - src_buf_c16[x].red, 0)) << 11;
                         res += (LV_MAX(dest_buf_c16[x].green - src_buf_c16[x].green, 0)) << 5;
                         res += LV_MAX(dest_buf_c16[x].blue - src_buf_c16[x].blue, 0);
                         break;
                     case LV_BLEND_MODE_MULTIPLY:
                         if(src_buf_u16[x] == 0xffff) continue;   /*Do not multiply with pure white (considered as 1)*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = ((dest_buf_c16[x].red * src_buf_c16[x].red) >> 5) << 11;
                         res += ((dest_buf_c16[x].green * src_buf_c16[x].green) >> 6) << 5;
                         res += (dest_buf_c16[x].blue * src_buf_c16[x].blue) >> 5;
                         break;
                     case LV_BLEND_MODE_DIFFERENCE:
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_ABS(dest_buf_c16[x].red - src_buf_c16[x].red)) << 11;
                         res += (LV_ABS(dest_buf_c16[x].green - src_buf_c16[x].green)) << 5;
                         res += LV_ABS(dest_buf_c16[x].blue - src_buf_c16[x].blue);
@@ -1068,7 +1067,6 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
         uint16_t res = 0;
         for(y = 0; y < h; y++) {
             lv_color16_t * dest_buf_c16 = (lv_color16_t *) dest_buf_u16;
-            lv_draw_sw_rgb565_swap((uint8_t *) dest_buf_u16, w);
             for(x = 0; x < w; x++) {
                 uint16_t raw;
                 lv_color16_t src_px;
@@ -1077,23 +1075,27 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_swapped_image_blend(lv_draw_sw_blend_im
                 switch(dsc->blend_mode) {
                     case LV_BLEND_MODE_ADDITIVE:
                         if(src_buf_u16[x] == 0x0000) continue;   /*Do not add pure black*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_MIN(dest_buf_c16[x].red + src_px.red, 31)) << 11;
                         res += (LV_MIN(dest_buf_c16[x].green + src_px.green, 63)) << 5;
                         res += LV_MIN(dest_buf_c16[x].blue + src_px.blue, 31);
                         break;
                     case LV_BLEND_MODE_SUBTRACTIVE:
                         if(src_buf_u16[x] == 0x0000) continue;   /*Do not subtract pure black*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_MAX(dest_buf_c16[x].red - src_px.red, 0)) << 11;
                         res += (LV_MAX(dest_buf_c16[x].green - src_px.green, 0)) << 5;
                         res += LV_MAX(dest_buf_c16[x].blue - src_px.blue, 0);
                         break;
                     case LV_BLEND_MODE_MULTIPLY:
                         if(src_buf_u16[x] == 0xffff) continue;   /*Do not multiply with pure white (considered as 1)*/
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = ((dest_buf_c16[x].red * src_px.red) >> 5) << 11;
                         res += ((dest_buf_c16[x].green * src_px.green) >> 6) << 5;
                         res += (dest_buf_c16[x].blue * src_px.blue) >> 5;
                         break;
                     case LV_BLEND_MODE_DIFFERENCE:
+                        dest_buf_u16[x] = lv_color_swap_16(dest_buf_u16[x]);
                         res = (LV_ABS(dest_buf_c16[x].red - src_px.red)) << 11;
                         res += (LV_ABS(dest_buf_c16[x].green - src_px.green)) << 5;
                         res += LV_ABS(dest_buf_c16[x].blue - src_px.blue);

@@ -327,6 +327,7 @@ static lv_obj_t * image_obj_create(lv_obj_t * parent, int32_t col, int32_t row, 
     return obj;
 
 }
+#include <stdio.h>
 
 static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
 {
@@ -334,11 +335,11 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565_swapped);
-    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565a8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888_premultiplied);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565a8);
 
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
@@ -347,8 +348,9 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
         &img_render_lvgl_logo_rgb565_swapped,
-        &img_render_lvgl_logo_rgb565a8,
         &img_render_lvgl_logo_l8,
+        NULL,
+        &img_render_lvgl_logo_rgb565a8,
         &img_render_lvgl_logo_i1,
     };
 
@@ -359,8 +361,10 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "RGB\n888",
         "RGB\n565",
         "RGB\n565\nSWAP",
-        "RGB\n565A8",
         "L8",
+        "", /*Make sure that RGB565A8 and I1 are on the same page.
+              Both are disabled in VGLite as they are not supported*/
+        "RGB\n565A8",
         "I1",
     };
 

@@ -46,6 +46,8 @@ static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+#include <stdio.h>
+
 void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * coords, bool no_cache)
 {
@@ -80,6 +82,8 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     bool premultiply = !lv_vg_lite_support_blend_normal();
     if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply)) {
         LV_PROFILER_DRAW_END;
+        printf("BUFFER OPEN ??????????????\n");
+        fflush(stdout);
         return;
     }
 
