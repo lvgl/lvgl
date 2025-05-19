@@ -73,8 +73,6 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     int32_t indicator_part_width = lv_obj_get_content_width(g_bar);
 
     int32_t expected_coord = (bar_value * indicator_part_width) / bar_max_value;
-    /* NOTE: Add 1 to calculation because the coordinates start at 0 */
-    expected_coord += 1;
 
     TEST_ASSERT_EQUAL_INT32(expected_coord, actual_coord);
 }
@@ -129,7 +127,6 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
     int32_t indicator_width = (bar_value * indicator_part_width) / bar_max_value;
 
     int32_t expected_coord = (bar_width - right_padding) - indicator_width;
-    expected_coord -= 1;
 
     TEST_ASSERT_EQUAL_INT32(expected_coord, actual_coord);
 }
@@ -201,7 +198,134 @@ void test_bar_normal(void)
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, h, w);
     lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_1.png");
+}
+
+/**
+ * Same as test_bar_normal, but with min and max values set.
+ */
+void test_bar_normal_empty_and_full(void)
+{
+    int32_t w = 300;
+    int32_t h = 40;
+    int32_t h_gap = 20;
+    int32_t w_gap = 20;
+    int32_t y = h_gap;
+    int32_t x = w_gap;
+    lv_color_t bg_color = lv_color_black();
+    lv_color_t indic_color = lv_color_hex(0x0000FF);
+
+    lv_obj_t * screen = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(screen);
+    lv_obj_set_size(screen, 800, 480);
+    lv_obj_center(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
+    lv_obj_set_style_pad_all(screen, 0, 0);
+
+    lv_obj_t * test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 0, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, w, h);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    y += h + h_gap;
+
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 0, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, w, h);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    lv_obj_set_style_base_dir(test_bar, LV_BASE_DIR_RTL, 0);
+    y += h + h_gap;
+
+    x = 150;
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 0, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, h, w);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    x += h + w_gap;
+
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 100, 0);
+    lv_bar_set_value(test_bar, 0, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, h, w);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+
+    y = h_gap;
+    x = w_gap + 400;
+
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 100, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, w, h);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    y += h + h_gap;
+
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 100, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, w, h);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    lv_obj_set_style_base_dir(test_bar, LV_BASE_DIR_RTL, 0);
+    y += h + h_gap;
+
+    x += 150;
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 0, 100);
+    lv_bar_set_value(test_bar, 100, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, h, w);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+    x += h + w_gap;
+
+    test_bar = lv_bar_create(screen);
+    lv_obj_set_style_radius(test_bar, 100, 0);
+    lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
+    lv_bar_set_range(test_bar, 100, 0);
+    lv_bar_set_value(test_bar, 100, LV_ANIM_OFF);
+    lv_obj_set_size(test_bar, h, w);
+    lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_3.png");
 }
 
 void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
