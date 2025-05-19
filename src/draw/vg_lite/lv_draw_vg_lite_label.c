@@ -60,6 +60,7 @@ static void bitmap_cache_release_cb(void * entry, void * user_data);
 #if LV_USE_FREETYPE
     static void freetype_outline_event_cb(lv_event_t * e);
     static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
+    static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 #endif /* LV_USE_FREETYPE */
 
 /**********************
@@ -339,65 +340,59 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
+    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
+    vg_lite_scale(scale, scale, &matrix);
 
-    if(!is_rotated) {
-        vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
-        vg_lite_scale(scale, scale, &matrix);
+    /* calc inverse matrix */
+    vg_lite_matrix_t result;
+    if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
+        LV_LOG_ERROR("no inverse matrix");
+        LV_PROFILER_DRAW_END;
+        return;
     }
-    else {
-        vg_lite_translate(pos.x - dsc->g->ofs_x + dsc->pivot.x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
-        vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
-        vg_lite_translate(-dsc->pivot.x, 0, &matrix);
-        vg_lite_scale(scale, scale, &matrix);
-    }
 
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
-        /* set scissor area */
-        lv_vg_lite_set_scissor_area(u, &t->clip_area);
+    const lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
+    const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
 
-        /* no bounding box */
-        lv_vg_lite_path_set_bounding_box(outline,
-                                         (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
-                                         (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
-    }
-    else {
-        if(is_rotated) {
-            LV_LOG_WARN("clip may be incorrect when vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR) is false");
-        }
-
-        /* calc inverse matrix */
-        vg_lite_matrix_t result;
-        if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
-            LV_LOG_ERROR("no inverse matrix");
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-
-        const lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
-        const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
-
-        const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
-        const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
-
-        /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
-        if(is_rotated)
-            lv_vg_lite_path_set_bounding_box(outline,
-                                             (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
-                                             (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
-        else lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
-    }
+    const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
+    const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
     /* matrix for drawing, different from matrix for calculating the bounding box */
     vg_lite_matrix_t draw_matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
 
-    lv_vg_lite_draw(
-        &u->target_buffer,
-        lv_vg_lite_path_get_path(outline),
-        VG_LITE_FILL_NON_ZERO,
-        &draw_matrix,
-        VG_LITE_BLEND_SRC_OVER,
-        lv_vg_lite_color(dsc->color, dsc->opa, true));
+    if(is_rotated) {
+        vg_lite_matrix_t internal_matrix;
+        vg_lite_identity(&internal_matrix);
+        vg_lite_translate(dsc->g->ofs_x + dsc->pivot.x, dsc->g->box_h + dsc->g->ofs_y, &internal_matrix);
+        vg_lite_rotate(dsc->rotation / 10.0f, &internal_matrix);
+        vg_lite_translate(-dsc->pivot.x, 0, &internal_matrix);
+
+        lv_vg_lite_path_t * outline_dup = lv_vg_lite_path_get(u, VG_LITE_FP32);
+        lv_vg_lite_path_set_transform(outline_dup, &internal_matrix);
+        lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(outline), outline_iter_cb, outline_dup);
+        lv_vg_lite_path_set_bounding_box(outline_dup, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+
+        lv_vg_lite_draw(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(outline_dup),
+            VG_LITE_FILL_NON_ZERO,
+            &draw_matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            lv_vg_lite_color(dsc->color, dsc->opa, true));
+
+        lv_vg_lite_path_drop(u, outline_dup);
+    }
+    else {
+        lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+        lv_vg_lite_draw(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(outline),
+            VG_LITE_FILL_NON_ZERO,
+            &draw_matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            lv_vg_lite_color(dsc->color, dsc->opa, true));
+    }
 
     LV_PROFILER_DRAW_END;
 }
@@ -461,6 +456,41 @@ static void freetype_outline_event_cb(lv_event_t * e)
             break;
     }
     LV_PROFILER_DRAW_END;
+}
+
+static void outline_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
+{
+    typedef struct {
+        float x;
+        float y;
+    } point_t;
+
+    lv_vg_lite_path_t * path = user_data;
+    const point_t * pt = (point_t *)data;
+
+    switch(op_code) {
+        case VLC_OP_MOVE:
+            lv_vg_lite_path_move_to(path, pt->x, pt->y);
+            break;
+        case VLC_OP_LINE:
+            lv_vg_lite_path_line_to(path, pt->x, pt->y);
+            break;
+        case VLC_OP_QUAD:
+            lv_vg_lite_path_quad_to(path, pt[0].x, pt[0].y, pt[1].x, pt[1].y);
+            break;
+        case VLC_OP_CUBIC:
+            lv_vg_lite_path_cubic_to(path, pt[0].x, pt[0].y, pt[1].x, pt[1].y, pt[2].x, pt[2].y);
+            break;
+        case VLC_OP_CLOSE:
+            lv_vg_lite_path_close(path);
+            break;
+        case VLC_OP_END:
+            lv_vg_lite_path_end(path);
+            break;
+        default:
+            LV_ASSERT_FORMAT_MSG(false, "unknown op_code: %d", op_code);
+            break;
+    }
 }
 
 #endif /* LV_USE_FREETYPE */
