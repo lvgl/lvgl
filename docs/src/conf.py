@@ -224,16 +224,20 @@ html_theme_options = {
     "source_repository": "https://github.com/lvgl/lvgl/",
     "source_branch": "master",
     "source_directory": "docs/src/",
-    "light_css_variables": {
-        "--font-stack": "\"Inter\", sans-serif",
-        "color-brand-primary": "#7C4DFF",
-        "color-brand-content": "#7C4DFF",
-    },
-    "dark_css_variables": {
-        "color-brand-primary": "#7C4DFF",
-        "color-brand-content": "#7C4DFF",
-    },
     # "announcement": "<em>Semi-permanent announcement</em> from <code>conf.py</code>.",
+}
+
+html_sidebars = {
+    "**": [
+        "sidebar/brand.html",
+        "sidebar/version-selector.html",
+        "sidebar/search.html",
+        "sidebar/scroll-start.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+        "sidebar/variant-selector.html"
+    ]
 }
 
 # For site map generation
