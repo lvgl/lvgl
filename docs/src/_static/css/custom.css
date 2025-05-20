@@ -287,6 +287,10 @@ span.pre:first-child {
   }
 }
 
+.theme-toggle {
+  color: var(--color-text-primary);
+}
+
 .theme-toggle:hover {
   color: var(--color-accent);
 }
