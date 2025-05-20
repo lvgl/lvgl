@@ -2061,6 +2061,8 @@ static struct window * create_window(struct application * app, int width, int he
         // An (XDG) surface commit (without an attached buffer) triggers this
         // configure event
         window->body->surface_configured = false;
+        wl_surface_commit(window->body->surface);
+        wl_display_roundtrip(application.display);
     }
 #endif
 #if LV_WAYLAND_WL_SHELL
@@ -2566,6 +2568,9 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("failed to create wayland window");
         return NULL;
     }
+#if LV_WAYLAND_XDG_SHELL
+    LV_ASSERT_MSG(window->body->surface_configured, "Failed to receive the xdg_surface configuration event");
+#endif
 
     window->close_cb = close_cb;
 
@@ -2851,13 +2856,6 @@ bool lv_wayland_timer_handler(void)
             /* Resume lvgl on the next cycle */
             return false;
 
-        }
-        else if(window != NULL && window->body->surface_configured == false) {
-            /* Initial commit to trigger the configure event */
-            /* Manually dispatching the queue is necessary, */
-            /* to emit the configure event straight away */
-            wl_surface_commit(window->body->surface);
-            wl_display_dispatch(application.display);
         }
         else if(window != NULL && window->resize_pending) {
             if(resize_window(window, window->resize_width, window->resize_height)) {
