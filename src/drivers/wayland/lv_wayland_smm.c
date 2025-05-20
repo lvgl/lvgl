@@ -144,7 +144,7 @@ static struct {
 } smm_instance;
 
 
-void smm_init(struct smm_events * evs)
+void smm_init(const struct smm_events * evs)
 {
     memcpy(&smm_instance.cbs, evs, sizeof(struct smm_events));
     srand((unsigned int)clock());
