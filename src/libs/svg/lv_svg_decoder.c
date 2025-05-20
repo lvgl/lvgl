@@ -108,7 +108,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             lv_fs_res_t res;
             uint32_t file_size = 0;
             res = lv_fs_seek(&src->file, 0, LV_FS_SEEK_END);
-            if (res == LV_FS_RES_OK) {
+            if(res == LV_FS_RES_OK) {
                 lv_fs_tell(&src->file, &file_size);
                 lv_fs_seek(&src->file, 0, LV_FS_SEEK_SET); /* Reset position to start */
             }
