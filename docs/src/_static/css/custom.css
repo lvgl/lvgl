@@ -38,10 +38,9 @@ body {
   --header-padding: 1rem;
 
   --color-link: var(--color-text-base);
-  --color-link-underline: var(--color-text-base);
   --color-link--hover: var(--color-accent);
   --color-link--visited: var(--color-link-visited);
-  --color-link--visited--underline: var(--color-link-visited);
+  --color-link--visited--underline: var(--color-link-visited-underline);
   --color-link--visited--hover: var(--color-accent);
   --color-link-underline--hover: var(--color-accent);
   --color-background-border: var(--color-border-primary) !important;
@@ -59,7 +58,9 @@ body,
 body[data-theme="light"] {
   --color-accent-rgb: 125, 69, 237;
   --color-accent: #7d45ed;
+  --color-link-underline: #1f222244;
   --color-link-visited: #1f2222;
+  --color-link-visited-underline: #7d45ed;
   --color-text-on-accent: #ffffff;
   --color-text-on-accent-rgb: 255, 255, 255;
   --color-text-base: #1f2222;
@@ -80,7 +81,9 @@ body[data-theme="light"] {
 body[data-theme="dark"] {
   --color-accent-rgb: 168, 131, 243;
   --color-accent: #a883f3;
+  --color-link-underline: #ffffff55;
   --color-link-visited: #ffffffee;
+  --color-link-visited-underline: #ffffff44;
   --color-text-on-accent: #0e0e0e;
   --color-text-on-accent-rgb: 0, 0, 0;
   --color-text-base: #ffffffee;
@@ -102,7 +105,9 @@ body[data-theme="dark"] {
   body {
     --color-accent-rgb: 168, 131, 243;
     --color-accent: #a883f3;
-    --color-link-visited: #ffffffee;
+    --color-link-underline: #ffffff55;
+    --color-link-visited: #ffffff44;
+    --color-link-visited-underline: #a883f3;
     --color-text-on-accent: #0e0e0e;
     --color-text-on-accent-rgb: 0, 0, 0;
     --color-text-base: #ebeeee;
@@ -441,7 +446,6 @@ code.literal {
 #furo-main-content .toctree-l1 > a {
   font-weight: 800;
   font-size: 1.25rem;
-  text-decoration: none;
   line-height: 1.25;
 }
 
@@ -465,7 +469,6 @@ code.literal {
 
 #furo-main-content .toctree-l2 > a {
   font-weight: 550;
-  text-decoration: none;
 }
 
 #furo-main-content .toctree-l2 > a:hover {
@@ -474,7 +477,6 @@ code.literal {
 
 #furo-main-content .toctree-l3 > a {
   color: var(--color-text-base);
-  text-decoration: none;
 }
 
 #furo-main-content .toctree-l2 ul:has(.toctree-l3) {
@@ -493,7 +495,6 @@ code.literal {
 
 #furo-main-content .toctree-l3 > a:hover {
   color: var(--color-accent);
-  text-decoration: underline;
 }
 
 #furo-main-content dt {
