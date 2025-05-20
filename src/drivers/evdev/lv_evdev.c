@@ -179,8 +179,8 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
         goto err_after_open;
     }
 
-     /* Detect the minimum and maximum values of the input device for calibration. */
-     if(indev_type == LV_INDEV_TYPE_POINTER) {
+    /* Detect the minimum and maximum values of the input device for calibration. */
+    if(indev_type == LV_INDEV_TYPE_POINTER) {
         struct input_absinfo absinfo;
         if(ioctl(dsc->fd, EVIOCGABS(ABS_X), &absinfo) == 0) {
             dsc->min_x = absinfo.minimum;
