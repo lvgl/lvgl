@@ -169,8 +169,6 @@ struct application {
     struct xdg_wm_base * xdg_wm;
 #endif
 
-    const char * xdg_runtime_dir;
-
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
 #endif
@@ -1226,24 +1224,9 @@ static void xdg_toplevel_handle_close(void * data, struct xdg_toplevel * xdg_top
     LV_UNUSED(xdg_toplevel);
 }
 
-static void xdg_toplevel_handle_configure_bounds(void * data, struct xdg_toplevel * xdg_toplevel,
-                                                 int32_t width, int32_t height)
-{
-
-    LV_UNUSED(width);
-    LV_UNUSED(height);
-    LV_UNUSED(data);
-    LV_UNUSED(xdg_toplevel);
-
-    /* Optional: Could set window width/height upper bounds, however, currently
-     *           we'll honor the set width/height.
-     */
-}
-
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
     .configure = xdg_toplevel_handle_configure,
     .close = xdg_toplevel_handle_close,
-    .configure_bounds = xdg_toplevel_handle_configure_bounds
 };
 
 static void xdg_wm_base_ping(void * data, struct xdg_wm_base * xdg_wm_base, uint32_t serial)
@@ -1291,8 +1274,8 @@ static void handle_global(void * data, struct wl_registry * registry,
 #endif
 #if LV_WAYLAND_XDG_SHELL
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
-        /* Explicitly support version 4 of the xdg protocol */
-        app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 4);
+        /* supporting version 2 of the XDG protocol - ensures greater compatibility */
+        app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, &xdg_wm_base_listener, app);
     }
 #endif
@@ -2419,9 +2402,6 @@ static void wayland_init(void)
         sme_init_buffer,
         sme_free_buffer
     };
-
-    application.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    LV_ASSERT_MSG(application.xdg_runtime_dir, "cannot get XDG_RUNTIME_DIR");
 
     // Create XKB context
     application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);

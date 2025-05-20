@@ -207,6 +207,23 @@ menu "LVGL configuration"
 			help
 				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
+		config LV_DRAW_THREAD_PRIO
+			int "Thread priority for the drawing thread"
+			range 0 4
+			default 3
+			depends on LV_USE_OS > 0
+			help
+				Thread priority controls the relative importance of the drawing threads.
+				Values correspond to lv_thread_prio_t enum in lv_os.h:
+				0: LV_THREAD_PRIO_LOWEST
+				1: LV_THREAD_PRIO_LOW
+				2: LV_THREAD_PRIO_MID (default)
+				3: LV_THREAD_PRIO_HIGH
+				4: LV_THREAD_PRIO_HIGHEST
+
+				Higher priority can improve rendering performance but might cause
+				starvation of lower priority tasks.
+
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
 			default y
@@ -454,7 +471,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_USE_BOX_SHADOW
 			bool "Enable border to simulate shadow"
-			default n
+			default y
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				which usually improves performance,

@@ -3,13 +3,13 @@
 
 static void anim_x_cb(void * var, int32_t v)
 {
-    lv_obj_set_x(var, v);
+    lv_obj_set_x((lv_obj_t *) var, v);
 }
 
 static void sw_event_cb(lv_event_t * e)
 {
-    lv_obj_t * sw = lv_event_get_target(e);
-    lv_obj_t * label = lv_event_get_user_data(e);
+    lv_obj_t * sw = lv_event_get_target_obj(e);
+    lv_obj_t * label = (lv_obj_t *) lv_event_get_user_data(e);
 
     if(lv_obj_has_state(sw, LV_STATE_CHECKED)) {
         lv_anim_t a;

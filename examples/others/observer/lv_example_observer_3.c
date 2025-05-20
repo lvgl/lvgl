@@ -68,7 +68,7 @@ void lv_example_observer_3(void)
 
 static void set_btn_clicked_event_cb(lv_event_t * e)
 {
-    lv_obj_t * set_btn = lv_event_get_target(e);
+    lv_obj_t * set_btn = lv_event_get_target_obj(e);
     lv_obj_add_state(set_btn, LV_STATE_DISABLED);
 
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
@@ -110,8 +110,8 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
 
 static void close_clicked_event_cb(lv_event_t * e)
 {
-    lv_obj_t * set_btn = lv_event_get_user_data(e);
-    lv_obj_t * close_btn = lv_event_get_target(e);
+    lv_obj_t * set_btn = (lv_obj_t *) lv_event_get_user_data(e);
+    lv_obj_t * close_btn = lv_event_get_target_obj(e);
     lv_obj_t * cont = lv_obj_get_parent(close_btn);
     lv_obj_remove_state(set_btn, LV_STATE_DISABLED);
     lv_obj_delete(cont);
@@ -125,20 +125,20 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     int32_t format = lv_subject_get_int(lv_subject_get_group_element(subject, 2));
     int32_t am_pm = lv_subject_get_int(lv_subject_get_group_element(subject, 3));
 
-    lv_obj_t * label = lv_observer_get_target(observer);
+    lv_obj_t * label = (lv_obj_t *) lv_observer_get_target(observer);
 
     if(format == TIME_FORMAT_24) {
         lv_label_set_text_fmt(label, "%" LV_PRId32 ":%02" LV_PRId32, hour, minute);
     }
     else {
-        lv_label_set_text_fmt(label, "%"LV_PRId32":%02"LV_PRId32" %s", hour + 1, minute, am_pm == TIME_AM ? "am" : "pm");
+        lv_label_set_text_fmt(label, "%" LV_PRId32":%02" LV_PRId32" %s", hour + 1, minute, am_pm == TIME_AM ? "am" : "pm");
     }
 }
 
 /*Change the hour options on format change*/
 static void hour_roller_options_update(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * roller = lv_observer_get_target(observer);
+    lv_obj_t * roller = (lv_obj_t *) lv_observer_get_target(observer);
     int32_t prev_selected = lv_roller_get_selected(roller);
     int32_t v = lv_subject_get_int(subject);
     if(v == TIME_FORMAT_12) {

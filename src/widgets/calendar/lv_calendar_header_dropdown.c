@@ -61,7 +61,7 @@ static const char * year_list = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent)
+lv_obj_t * lv_calendar_add_header_dropdown(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_calendar_header_dropdown_class, parent);
     lv_obj_class_init_obj(obj);

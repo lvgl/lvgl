@@ -1,16 +1,4 @@
-#ifdef __has_include
-    #if __has_include("lvgl.h")
-        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
-            #define LV_LVGL_H_INCLUDE_SIMPLE
-        #endif
-    #endif
-#endif
-
-#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
-    #include "lvgl.h"
-#else
-    #include "lvgl/lvgl.h"
-#endif
+#include "../../lvgl.h"
 
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
@@ -54,11 +42,13 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_STA
 };
 
 const lv_image_dsc_t img_star = {
-  .header.cf = LV_COLOR_FORMAT_ARGB8888,
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
-  .header.w = 30,
-  .header.h = 29,
-  .header.stride = 120,
-  .data_size = 870 * 4,
+  .header = {
+    .magic = LV_IMAGE_HEADER_MAGIC,
+    .cf = LV_COLOR_FORMAT_ARGB8888,
+    .w = 30,
+    .h = 29,
+    .stride = 120,
+  },
+  .data_size = sizeof(img_star_map),
   .data = img_star_map,
 };

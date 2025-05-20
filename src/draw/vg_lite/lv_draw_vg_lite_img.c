@@ -33,6 +33,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -96,8 +98,8 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vg_lite_matrix_t matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&matrix, &image_matrix);
 
-    bool no_transform = lv_matrix_is_identity_or_translation((const lv_matrix_t *)&matrix);
-    vg_lite_filter_t filter = no_transform ? VG_LITE_FILTER_POINT : VG_LITE_FILTER_BI_LINEAR;
+    bool has_transform = matrix_has_transform(&matrix);
+    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_tf_area, &t->clip_area, false) && dsc->clip_radius <= 0) {
@@ -125,7 +127,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
          * When the image is transformed or rounded, create a path around
          * the image and follow the image_matrix for coordinate transformation
          */
-        if(!no_transform || dsc->clip_radius) {
+        if(has_transform || dsc->clip_radius) {
             /* apply the image transform to the path */
             lv_vg_lite_path_set_transform(path, &image_matrix);
             lv_vg_lite_path_append_rect(
@@ -172,5 +174,20 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix)
+{
+    /**
+     * When the rotation angle is 0 or 180 degrees,
+     * it is considered that there is no transformation.
+     */
+    return !((matrix->m[0][0] == 1.0f || matrix->m[0][0] == -1.0f) &&
+             matrix->m[0][1] == 0.0f &&
+             matrix->m[1][0] == 0.0f &&
+             (matrix->m[1][1] == 1.0f || matrix->m[1][1] == -1.0f) &&
+             matrix->m[2][0] == 0.0f &&
+             matrix->m[2][1] == 0.0f &&
+             matrix->m[2][2] == 1.0f);
+}
 
 #endif /*LV_USE_DRAW_VG_LITE*/

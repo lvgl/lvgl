@@ -464,13 +464,65 @@ void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(obj->spec_attr && obj->spec_attr->name) {
-        lv_strlcpy(buf, obj->spec_attr->name, buf_size);
+    const char * name = lv_obj_get_name(obj);
+    /*Use a default name which auto-indexing*/
+    char name_buf[LV_OBJ_NAME_MAX_LEN];
+    if(name == NULL) {
+        lv_snprintf(name_buf, sizeof(name_buf), "%s_#", obj->class_p->name);
+        name = name_buf;
     }
-    /*Craft a name if not set. E.g. "lv_button_1"*/
+
+    size_t name_len = lv_strlen(name);
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    /*If the last character is # automatically index the children with the same name start*/
+    if(parent && name_len > 0 && name[name_len - 1] == '#') {
+        uint32_t child_cnt = lv_obj_get_child_count(parent);
+        uint32_t cnt = 0;
+        uint32_t i;
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = lv_obj_get_child(parent, i);
+            /*All siblings older siblings are checked, craft the name of this widget*/
+            if(child == obj) {
+                char num_buf[8];
+                size_t num_len;
+                num_len = lv_snprintf(num_buf, sizeof(num_buf), "%d", cnt);
+                /*Is there enough space for the name and the index?*/
+                if(buf_size > name_len + num_len) {
+                    /*E.g. buf = "some_name_", so trim the # from the end*/
+                    lv_strncpy(buf, name, name_len - 1);
+                    lv_strcpy(&buf[name_len - 1], num_buf);
+                }
+                else {
+                    /*Use the name as it is as a fallback*/
+                    lv_strlcpy(buf, obj->spec_attr->name, buf_size);
+                }
+                break;
+            }
+            /*Check the older siblings. IF they start with the same name count them*/
+            else {
+                const char * child_name = lv_obj_get_name(child);
+                if(child_name == NULL) {
+                    /*If the name we are looking for start with the child's class name
+                     *increment the index. E.g. <class_name>_#*/
+                    size_t class_name_len = lv_strlen(child->class_p->name);
+                    if(name_len > 3 && class_name_len == name_len - 2 &&
+                       lv_strncmp(child->class_p->name, name, class_name_len) == 0) {
+                        cnt++;
+                    }
+                }
+                /*The name is set, check if it's e.g. <some_name>#*/
+                else {
+                    if(lv_strcmp(child->spec_attr->name, name) == 0) {
+                        cnt++;
+                    }
+                }
+            }
+        }
+    }
     else {
-        uint32_t idx = lv_obj_get_index_by_type(obj, obj->class_p);
-        lv_snprintf(buf, buf_size, "%s_%"LV_PRIu32, obj->class_p->name, idx);
+        /*Just use the set name*/
+        lv_strlcpy(buf, obj->spec_attr->name, buf_size);
     }
 }
 
@@ -746,7 +798,7 @@ static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 #endif
 
     /*id of `obj0` is an invalid id for builtin id*/
-    LV_LOG_USER("%*sobj:%p, id:%s;", 2 * depth, "", (void *)obj, id);
+    LV_LOG_USER("%*sobj:%p, id:%s;", (int)(2 * depth), "", (void *)obj, id);
 #endif /*LV_USE_LOG*/
 
     if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {

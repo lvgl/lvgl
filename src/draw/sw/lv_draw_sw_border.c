@@ -283,6 +283,14 @@ void draw_border_complex(lv_draw_task_t * t, const lv_area_t * outer_area, const
     if(rout > 0) lv_draw_sw_mask_free_param(&mask_rout_param);
     lv_free(mask_buf);
 
+#else
+    LV_UNUSED(t);
+    LV_UNUSED(outer_area);
+    LV_UNUSED(inner_area);
+    LV_UNUSED(rout);
+    LV_UNUSED(rin);
+    LV_UNUSED(color);
+    LV_UNUSED(opa);
 #endif /*LV_DRAW_SW_COMPLEX*/
 }
 static void draw_border_simple(lv_draw_task_t * t, const lv_area_t * outer_area, const lv_area_t * inner_area,
