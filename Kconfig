@@ -2071,79 +2071,81 @@ menu "LVGL configuration"
 			bool "Build demos"
 			default y if !LV_CONF_MINIMAL
 
-		config LV_USE_DEMO_WIDGETS
-			bool "Show some widget"
-			default n
+		if LV_BUILD_DEMOS
+			config LV_USE_DEMO_WIDGETS
+				bool "Show some widget"
+				default n
 
-		config LV_USE_DEMO_KEYPAD_AND_ENCODER
-			bool "Demonstrate the usage of encoder and keyboard"
-			default n
+			config LV_USE_DEMO_KEYPAD_AND_ENCODER
+				bool "Demonstrate the usage of encoder and keyboard"
+				default n
 
-		config LV_USE_DEMO_BENCHMARK
-			bool "Benchmark your system"
-			default n
-			select LV_FONT_MONTSERRAT_14
-			select LV_FONT_MONTSERRAT_20
-			select LV_FONT_MONTSERRAT_24
-			select LV_FONT_MONTSERRAT_26
-			select LV_USE_DEMO_WIDGETS
-		config LV_USE_DEMO_RENDER
-			bool "Render test for each primitives. Requires at least 480x272 display"
-			default n
+			config LV_USE_DEMO_BENCHMARK
+				bool "Benchmark your system"
+				default n
+				select LV_FONT_MONTSERRAT_14
+				select LV_FONT_MONTSERRAT_20
+				select LV_FONT_MONTSERRAT_24
+				select LV_FONT_MONTSERRAT_26
+				select LV_USE_DEMO_WIDGETS
+			config LV_USE_DEMO_RENDER
+				bool "Render test for each primitives. Requires at least 480x272 display"
+				default n
 
-		config LV_USE_DEMO_SCROLL
-			bool "Scroll settings test for LVGL"
-			default n
+			config LV_USE_DEMO_SCROLL
+				bool "Scroll settings test for LVGL"
+				default n
 
-		config LV_USE_DEMO_STRESS
-			bool "Stress test for LVGL"
-			default n
+			config LV_USE_DEMO_STRESS
+				bool "Stress test for LVGL"
+				default n
 
-		config LV_USE_DEMO_TRANSFORM
-			bool "Transform test for LVGL"
-			default n
-			depends on LV_FONT_MONTSERRAT_18
+			config LV_USE_DEMO_TRANSFORM
+				bool "Transform test for LVGL"
+				default n
+				depends on LV_FONT_MONTSERRAT_18
 
-		config LV_USE_DEMO_MUSIC
-			bool "Music player demo"
-			default n
-		config LV_DEMO_MUSIC_SQUARE
-			bool "Enable Square"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_LANDSCAPE
-			bool "Enable Landscape"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_ROUND
-			bool "Enable Round"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_LARGE
-			bool "Enable Large"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_AUTO_PLAY
-			bool "Enable Auto play"
-			depends on LV_USE_DEMO_MUSIC
-			default n
+			config LV_USE_DEMO_MUSIC
+				bool "Music player demo"
+				default n
+			config LV_DEMO_MUSIC_SQUARE
+				bool "Enable Square"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_LANDSCAPE
+				bool "Enable Landscape"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_ROUND
+				bool "Enable Round"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_LARGE
+				bool "Enable Large"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_AUTO_PLAY
+				bool "Enable Auto play"
+				depends on LV_USE_DEMO_MUSIC
+				default n
 
-		config LV_USE_DEMO_FLEX_LAYOUT
-			bool "Flex layout previewer"
-			default n
-		config LV_USE_DEMO_MULTILANG
-			bool "multi-language demo"
-			default n
-		config LV_USE_DEMO_VECTOR_GRAPHIC
-			bool "vector graphic demo"
-			default n
-			depends on LV_USE_VECTOR_GRAPHIC
-		config LV_USE_DEMO_SMARTWATCH
-			bool "Smartwatch demo"
-		config LV_USE_DEMO_EBIKE
-			bool "Ebike demo"
-		config LV_USE_DEMO_HIGH_RES
+			config LV_USE_DEMO_FLEX_LAYOUT
+				bool "Flex layout previewer"
+				default n
+			config LV_USE_DEMO_MULTILANG
+				bool "multi-language demo"
+				default n
+			config LV_USE_DEMO_VECTOR_GRAPHIC
+				bool "vector graphic demo"
+				default n
+				depends on LV_USE_VECTOR_GRAPHIC
+			config LV_USE_DEMO_SMARTWATCH
+				bool "Smartwatch demo"
+			config LV_USE_DEMO_EBIKE
+				bool "Ebike demo"
+			config LV_USE_DEMO_HIGH_RES
 			bool "High resolution demo"
+		endif
 	endmenu
 
 endmenu
