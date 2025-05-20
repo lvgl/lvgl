@@ -573,14 +573,8 @@ static void lv_obj_draw(lv_event_t * e)
         int32_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
         int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        if(LV_COORD_IS_PCT(w)) {
-            int32_t pct = LV_COORD_GET_PCT(w);
-            w = lv_obj_get_width(obj) * pct / 100;
-        }
-        if(LV_COORD_IS_PCT(h)) {
-            int32_t pct = LV_COORD_GET_PCT(h);
-            h = lv_obj_get_height(obj) * pct / 100;
-        }
+        w = lv_pct_to_px(w, lv_obj_get_width(obj));
+        h = lv_pct_to_px(h, lv_obj_get_height(obj));
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
@@ -633,14 +627,8 @@ static void lv_obj_draw(lv_event_t * e)
 
         int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        if(LV_COORD_IS_PCT(w)) {
-            int32_t pct = LV_COORD_GET_PCT(w);
-            w = lv_obj_get_width(obj) * pct / 100;
-        }
-        if(LV_COORD_IS_PCT(h)) {
-            int32_t pct = LV_COORD_GET_PCT(h);
-            h = lv_obj_get_height(obj) * pct / 100;
-        }
+        w = lv_pct_to_px(w, lv_obj_get_width(obj));
+        h = lv_pct_to_px(h, lv_obj_get_height(obj));
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
@@ -665,14 +653,8 @@ static void lv_obj_draw(lv_event_t * e)
 
             int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
             int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-            if(LV_COORD_IS_PCT(w)) {
-                int32_t pct = LV_COORD_GET_PCT(w);
-                w = lv_obj_get_width(obj) * pct / 100;
-            }
-            if(LV_COORD_IS_PCT(h)) {
-                int32_t pct = LV_COORD_GET_PCT(h);
-                h = lv_obj_get_height(obj) * pct / 100;
-            }
+            w = lv_pct_to_px(w, lv_obj_get_width(obj));
+            h = lv_pct_to_px(h, lv_obj_get_height(obj));
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             lv_area_increase(&coords, w, h);

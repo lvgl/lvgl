@@ -947,13 +947,9 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 if((tr->prop == LV_STYLE_TRANSFORM_HEIGHT  || tr->prop == LV_STYLE_TRANSFORM_WIDTH)) {
                     int32_t wh = (tr->prop == LV_STYLE_TRANSFORM_WIDTH ||
                                   tr->prop == LV_STYLE_TRANSLATE_X) ? lv_obj_get_width(obj) : lv_obj_get_height(obj);
-                    if(LV_COORD_IS_PCT(tr->start_value.num)) {
-                        tr_start = LV_COORD_GET_PCT(tr->start_value.num) * wh / 100;
-                    }
-
-                    if(LV_COORD_IS_PCT(tr->end_value.num)) {
-                        tr_end = LV_COORD_GET_PCT(tr->end_value.num) * wh / 100;
-                    }
+                    
+                    tr_start = lv_pct_to_px(tr->start_value.num, wh);
+                    tr_end = lv_pct_to_px(tr->end_value.num, wh);
                 }
                 if(v == 0) value_final.num = tr_start;
                 else if(v == 255) value_final.num = tr_end;
