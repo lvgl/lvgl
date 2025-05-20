@@ -181,7 +181,7 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
         u32_cnt--;
     }
 
-    /*PRocess the last pixel if needed*/
+    /*Process the last pixel if needed*/
     if(buf_size_px & 0x1) {
         uint32_t e = buf_size_px - 1;
         buf16[e] = ((buf16[e] & 0xff00) >> 8) | ((buf16[e] & 0x00ff) << 8);
