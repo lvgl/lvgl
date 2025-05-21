@@ -366,6 +366,11 @@ so the driver needs to implement more callbacks when the cache is enabled.
              --> P["copy the required bytes
                     to the destination buffer"]
 
+.. container:: lvgl-figure-caption
+
+    (Use mouse wheel to zoom in, and drag image to pan it.)
+
+
 ``lv_fs_write`` :sub:`(behavior when cache is enabled)`
 -------------------------------------------------------
 

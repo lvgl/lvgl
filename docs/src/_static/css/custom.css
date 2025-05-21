@@ -285,3 +285,34 @@ html[data-theme="dark"] .highlight {
   background: #ffffff; color: #bfbfbf
 }
 
+/*-------------------------------------------------------------------------
+ * Additional Whitespace Over Headerings
+ * Base `margin-bottom` for RTD theme is effectively 1 `line-height` (24px),
+ * so the `margin-top` top has to exceed that so that margin-overlapping
+ * will make use of it.  24px == 1.5em.
+ *-------------------------------------------------------------------------*/
+h2 {
+  margin-top: 2.4em;
+}
+h3 {
+  margin-top: 2.3em;
+}
+h4 {
+  margin-top: 2.2em;
+}
+h5 {
+  margin-top: 2.0em;
+}
+h6 {
+  margin-top: 1.8em;
+}
+
+/*-------------------------------------------------------------------------
+ * Special Features for LVGL
+ *-------------------------------------------------------------------------*/
+div .lvgl-figure-caption p {
+  font-size: 0.8rem;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
