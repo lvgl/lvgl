@@ -5,7 +5,7 @@ EVE External GPU Renderer
 EVE is a type of external GPU IC which accepts high-level drawing commands over SPI
 and outputs the rendered graphics to a display over parallel RGB.
 
-The advantage of using an EVE chip that the rendering responsibility is removed
+The advantage of using an EVE chip is that the rendering responsibility is removed
 from the driving MCU so it can be a lower-spec part or dedicate more of its
 processing time to other tasks. The SPI interface is simpler to connect than
 parallel RGB especially if the EVE chip is integrated into a display assembly.
