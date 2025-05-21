@@ -563,7 +563,7 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
                              const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-    LV_ASSERT(path != NULL);
+    LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
     int16_t start_angle = dsc->start_angle;
     int16_t end_angle = dsc->end_angle;
@@ -576,7 +576,7 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
     vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     int32_t * arc_path = lv_malloc_zeroed(ARC_PATH_DATA_MAX_SIZE * sizeof(int32_t));
-    LV_ASSERT(arc_path != NULL);
+    LV_ASSERT_MALLOC(arc_path);
     vglite_task->path_data = arc_path;
 
     /*** Init path ***/

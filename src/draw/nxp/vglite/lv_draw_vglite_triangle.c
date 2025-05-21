@@ -35,8 +35,20 @@
  **********************/
 
 /**
+ * Set triangle path data
+ *
+ * @param[in/out] path_data Coordinates of the triangle
+ * @param[in/out] path_data_size Size of path_data (bytes)
+ * @param[in] p Points of the triangle
+ *
+ */
+static void _vglite_set_triangle(int32_t * path_data, uint32_t * path_data_size,
+                                 const lv_point_precise_t * p);
+
+/**
  * Draw triangle shape with effects (opacity, gradient)
  *
+ * @param[in] vglite_task The current vglite task
  * @param[in] coords Coordinates of the triangle (relative to dest buff)
  * @param[in] clip_area Clipping area with relative coordinates to dest buff
  * @param[in] dsc Description of the triangle
@@ -127,13 +139,13 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
     /* Init path */
     uint32_t path_data_size;
     int32_t * triangle_path = lv_malloc_zeroed(13 * sizeof(int32_t));
-    LV_ASSERT(triangle_path != NULL);
+    LV_ASSERT_MALLOC(triangle_path);
     vglite_task->path_data = triangle_path;
     _vglite_set_triangle(triangle_path, &path_data_size, dsc->p);
 
 
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-    LV_ASSERT(path != NULL);
+    LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
     VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, path_data_size, triangle_path,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
@@ -150,7 +162,7 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
     /* Init Gradient*/
     if(has_gradient) {
         gradient = lv_malloc_zeroed(sizeof(vg_lite_linear_gradient_t));
-        LV_ASSERT(gradient != NULL);
+        LV_ASSERT_MALLOC(gradient);
         vglite_task->gradient = gradient;
 
         vg_lite_matrix_t * grad_matrix;

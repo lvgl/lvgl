@@ -32,6 +32,18 @@
  **********************/
 
 /**
+ * Set line path data
+ *
+ * @param[in/out] line_path Coordinates of the line
+ * @param[in/out] path_data_size Size of path_data (bytes)
+ * @param[in] p1 First point of the line
+ * @patam[in] p2 Second point of the line
+ *
+ */
+static void _vglite_set_line(int32_t * line_path, uint32_t * path_data_size,
+                             const lv_point_t * point1, const lv_point_t * point2);
+
+/**
  * Draw line shape with effects
  *
  * @param[in] point1 Starting point with relative coordinates
@@ -98,7 +110,7 @@ static void _vglite_set_line(int32_t * line_path, uint32_t * path_data_size, con
     line_path[pidx++] = VLC_OP_LINE;
     line_path[pidx++] = point2->x;
     line_path[pidx++] = point2->y;
-    line_path[pidx] = VLC_OP_END;
+    line_path[pidx++] = VLC_OP_END;
 
     *path_data_size = pidx * sizeof(int32_t);
 }
@@ -107,7 +119,7 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
                               const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc)
 {
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-    LV_ASSERT(path != NULL);
+    LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
     vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
     vg_lite_cap_style_t cap_style = (dsc->round_start || dsc->round_end) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
@@ -130,7 +142,7 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
 
     uint32_t path_data_size = 0;
     int32_t * line_path = lv_malloc_zeroed(7 * sizeof(int32_t));
-    LV_ASSERT(line_path != NULL);
+    LV_ASSERT_MALLOC(line_path);
     vglite_task->path_data = line_path;
     _vglite_set_line(line_path, &path_data_size, point1, point2);
 

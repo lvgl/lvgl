@@ -323,7 +323,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
     }
     vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
-    LV_ASSERT(vglite_task != NULL);
+    LV_ASSERT_MALLOC(vglite_task);
 
     vglite_task->t = t;
 
