@@ -205,6 +205,7 @@ struct application {
 #endif
 #if LV_WAYLAND_USE_DMABUF
     struct zwp_linux_dmabuf_v1 * dmabuf;
+    uint32_t drm_format;
 #endif
     uint32_t shm_format;
 
@@ -1283,17 +1284,62 @@ dmabuf_modifiers(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dmabuf,
                  uint32_t format, uint32_t modifier_hi, uint32_t modifier_lo)
 {
     struct application * app = data;
+
+    LV_UNUSED(zwp_linux_dmabuf);
+
+    if(LV_COLOR_DEPTH == 32 && format == DRM_FORMAT_ARGB8888) {
+
+        /* Wayland compositors MUST support ARGB8888 */
+        app->drm_format = format;
+
+    }
+    else if(LV_COLOR_DEPTH == 32 &&
+            format == DRM_FORMAT_XRGB8888 &&
+            app->drm_format != DRM_FORMAT_ARGB8888) {
+
+        /* Select XRGB only if the compositor doesn't support transprancy */
+        app->drm_format = format;
+
+    }
+    else if(LV_COLOR_DEPTH == 16 && format == DRM_FORMAT_RGB565) {
+
+        app->drm_format = format;
+    }
 }
 
 static void
 dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dmabuf, uint32_t format)
 {
-    /* XXX: deprecated */
+    struct application * app = data;
+
+    LV_UNUSED(zwp_linux_dmabuf);
+
+    if(LV_COLOR_DEPTH == 32 && format == DRM_FORMAT_ARGB8888) {
+
+        /* Wayland compositors MUST support ARGB8888 */
+        app->drm_format = format;
+
+    }
+    else if(LV_COLOR_DEPTH == 32 &&
+            format == DRM_FORMAT_XRGB8888 &&
+            app->drm_format != DRM_FORMAT_ARGB8888) {
+
+        /* Select XRGB only if the compositor doesn't support transprancy */
+        app->drm_format = format;
+
+    }
+    else if(LV_COLOR_DEPTH == 16 && format == DRM_FORMAT_RGB565) {
+
+        app->drm_format = format;
+    }
 }
 
-static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener = {
+static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener_v3 = {
     dmabuf_format,
     dmabuf_modifiers
+};
+static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener = {
+    dmabuf_format
 };
 #endif
 
@@ -1334,11 +1380,15 @@ static void handle_global(void * data, struct wl_registry * registry,
 #endif
 #if LV_WAYLAND_USE_DMABUF
     else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
-        if(version < 3)
+        if(version > 3) {
+            LV_LOG_WARN("Version for xwp_linux_dmabuf_v1_interface not supported.\n");
             return;
-        app->dmabuf = wl_registry_bind(app->registry,
-                                       name, &zwp_linux_dmabuf_v1_interface, 3);
-        zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener, app);
+        }
+        app->dmabuf = wl_registry_bind(app->registry, name, &zwp_linux_dmabuf_v1_interface, version);
+        if(version == 3) zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener_v3, app);
+        else zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener, app);
+
+        wl_display_roundtrip(app->display);
     }
 #endif
 }
@@ -2697,7 +2747,11 @@ static void wayland_init(void)
     }
 
     /* Add registry listener and wait for registry reception */
+#if LV_WAYLAND_USE_DMABUF
+    application.drm_format = DRM_FORMAT_INVALID;
+#else
     application.shm_format = SHM_FORMAT_UNKNOWN;
+#endif
     application.registry = wl_display_get_registry(application.display);
     wl_registry_add_listener(application.registry, &registry_listener, &application);
     wl_display_dispatch(application.display);
@@ -2708,6 +2762,13 @@ static void wayland_init(void)
         return;
     }
 
+#if LV_WAYLAND_USE_DMABUF
+    LV_ASSERT_MSG((application.drm_format != DRM_FORMAT_INVALID), "DRM_FORMAT not available");
+    if(application.drm_format == DRM_FORMAT_INVALID) {
+        LV_LOG_TRACE("Unable to match a suitable DRM format for selected LVGL color depth");
+        return;
+    }
+#else
     LV_ASSERT_MSG(application.shm, "Wayland SHM not available");
     if(application.shm == NULL) {
         return;
@@ -2718,6 +2779,7 @@ static void wayland_init(void)
         LV_LOG_TRACE("Unable to match a suitable SHM format for selected LVGL color depth");
         return;
     }
+#endif
 
     smm_init(&evs);
     smm_setctx(&application);
