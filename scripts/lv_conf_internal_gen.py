@@ -214,6 +214,22 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_MEM_MONITOR 0
 #endif /*LV_USE_SYSMON*/
 
+#if LV_BUILD_DEMOS == 0
+    #define LV_USE_DEMO_WIDGETS 0
+    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+    #define LV_USE_DEMO_BENCHMARK 0
+    #define LV_USE_DEMO_RENDER 0
+    #define LV_USE_DEMO_STRESS 0
+    #define LV_USE_DEMO_MUSIC 0
+    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #define LV_USE_DEMO_FLEX_LAYOUT     0
+    #define LV_USE_DEMO_MULTILANG       0
+    #define LV_USE_DEMO_TRANSFORM       0
+    #define LV_USE_DEMO_SCROLL          0
+    #define LV_USE_DEMO_EBIKE           0
+    #define LV_USE_DEMO_HIGH_RES        0
+    #define LV_USE_DEMO_SMARTWATCH      0
+#endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
     #if (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Generate the cmake variables CONFIG_LV_USE_* from the
+# Generate the cmake variables CONFIG_LV_USE_* or CONFIG_LV_BUILD_* from the
 # preprocessed lv_conf_internal.h
 #
 # Author: David TRUAN (david.truan@edgemtech.ch)
@@ -20,7 +20,7 @@ def fatal(msg):
 def get_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=""
                                      "Convert the expanded lv_conf_internal.h to cmake variables."
-                                     "It converts all LV_USE_* configurations."
+                                     "It converts all LV_USE_*, LV_BUILD_* configurations."
                                     )
 
     parser.add_argument('--input', type=str, required=True, nargs='?',
@@ -55,13 +55,14 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
     fin = open(path_input)
     fout = open(path_output, "w", newline='')
 
-    # If we use Kconfig, we must check the CONFIG_LV_USE_* defines
+    # If we use Kconfig, we must check the CONFIG_LV_USE_* and 
+    # CONFIG_LV_BUILD_* defines
     if kconfig:
-        CONFIG_PATTERN="#define CONFIG_LV_USE"
+        CONFIG_PATTERN="^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD)"
         CONFIG_PREFIX=""
-    # Otherwise check the LV_USE_* defines
+    # Otherwise check the LV_USE_* and LV_BUILD_* defines
     else:
-        CONFIG_PATTERN="#define LV_USE"
+        CONFIG_PATTERN="^#define +(LV_USE|LV_BUILD)"
         CONFIG_PREFIX="CONFIG_"
 
 
@@ -71,7 +72,7 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
 
         # Treat the LV_USE_STDLIB_* configs in a special way, as we need
         # to convert the define to full config with 1 value when enabled
-        if line.startswith(f'{CONFIG_PATTERN}_STDLIB'):
+        if re.search(f'{CONFIG_PATTERN}_STDLIB', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -88,7 +89,7 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
 
         # Treat the LV_USE_OS config in a special way, as we need
         # to convert the define to full config with 1 value when enabled
-        if line.startswith(f'{CONFIG_PATTERN}_OS'):
+        if re.search(f'{CONFIG_PATTERN}_OS', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -104,7 +105,8 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
             write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
 
         # For the rest of the configs, simply add CONFIG_ and write the name of the define
-        # all LV_USE_* configs where the value is 0 or 1, as these are the one needed in cmake
+        # all LV_USE_* or LV_BUILD_* configs where the value is 0 or 1,
+        # as these are the ones that are needed in cmake
         # To detect the configuration of LVGL to perform conditional compilation/linking
         elif re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
 
