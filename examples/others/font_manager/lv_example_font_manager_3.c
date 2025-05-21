@@ -34,7 +34,7 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
 
 static lv_font_t * imgfont_create_cb(const lv_font_info_t * info, const void * src)
 {
-    const imgfont_src_t * imgfont_src = src;
+    const imgfont_src_t * imgfont_src = (imgfont_src_t *) src;
 
     if(info->size < imgfont_src->match_size_min
        || info->size > imgfont_src->match_size_max) {
@@ -51,7 +51,7 @@ static void imgfont_delete_cb(lv_font_t * font)
 
 static void * imgfont_dup_src_cb(const void * src)
 {
-    imgfont_src_t * imgfont_src = lv_malloc(sizeof(imgfont_src_t));
+    imgfont_src_t * imgfont_src = (imgfont_src_t *) lv_malloc(sizeof(imgfont_src_t));
     LV_ASSERT_MALLOC(imgfont_src);
     lv_memcpy(imgfont_src, src, sizeof(imgfont_src_t));
     return imgfont_src;

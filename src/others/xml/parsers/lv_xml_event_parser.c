@@ -58,7 +58,7 @@ void * lv_xml_event_call_function_create(lv_xml_parser_state_t * state, const ch
     }
 
     lv_obj_t * obj = lv_xml_state_get_parent(state);
-    lv_event_cb_t cb = lv_xml_get_event_cb(&state->ctx, cb_txt);
+    lv_event_cb_t cb = lv_xml_get_event_cb(&state->scope, cb_txt);
     if(cb == NULL) {
         LV_LOG_WARN("Couldn't add call function event because \"%s\" callback is not found.", cb_txt);
         /*Don't return NULL.

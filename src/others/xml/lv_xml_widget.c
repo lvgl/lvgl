@@ -70,6 +70,30 @@ lv_widget_processor_t * lv_xml_widget_get_processor(const char * name)
     return NULL;
 }
 
+lv_widget_processor_t * lv_xml_widget_get_extended_widget_processor(const char * extends)
+{
+    lv_widget_processor_t * proc = NULL;
+    while(extends) {
+        proc = lv_xml_widget_get_processor(extends);
+        if(proc) break;
+
+        lv_xml_component_scope_t * extended_component = lv_xml_component_get_scope(extends);
+        if(extended_component) {
+            extends = extended_component->extends;
+        }
+        else {
+            /*Not extending a known component or widget.*/
+            break;
+        }
+    }
+
+    if(proc == NULL) {
+        LV_LOG_WARN("The 'extend'ed widget is not found, using `lv_obj` as a fall back");
+        proc = lv_xml_widget_get_processor("lv_obj");
+    }
+
+    return proc;
+}
 
 /**********************
  *   STATIC FUNCTIONS
