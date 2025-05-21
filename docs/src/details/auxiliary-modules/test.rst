@@ -153,7 +153,7 @@ To read and decode PNG images and to store the converted rendered image, a few M
 (not :cpp:expr:`lv_malloc`).
 
 
-The screenshot comparison uses `lodepng` which is built-in to LVGL and just needs to be ebnabled with
+The screenshot comparison uses `lodepng` which is built-in to LVGL and just needs to be enabled with
 ``LV_USE_LODEPNG``.
 
 To avoid making the entire Test module dependent on `lodepng`, screenshot comparison can be individually enabled by
