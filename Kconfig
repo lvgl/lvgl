@@ -1001,7 +1001,7 @@ menu "LVGL configuration"
 			config LV_DEMO_BENCHMARK_ALIGNED_FONTS
 				depends on LV_USE_DEMO_BENCHMARK
 				bool "Use static aligned fonts"
-				default y
+				default n
 		endmenu
 	endmenu
 

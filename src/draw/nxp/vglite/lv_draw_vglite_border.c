@@ -183,7 +183,7 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
 
     /*** Init path ***/
     int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
-    LV_ASSERT(path_data != NULL);
+    LV_ASSERT_MALLOC(path_data);
     vglite_task->path_data = path_data;
 
     uint32_t path_data_size;
@@ -191,7 +191,7 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
     vg_lite_quality_t path_quality = radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-    LV_ASSERT(path != NULL);
+    LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
     VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,

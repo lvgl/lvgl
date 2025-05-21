@@ -98,7 +98,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 #if LV_USE_FONT_PLACEHOLDER
                     /* Draw a placeholder rectangle*/
                     vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
-                    LV_ASSERT(vglite_task != NULL);
+                    LV_ASSERT_MALLOC(vglite_task);
 
                     lv_draw_border_dsc_t border_draw_dsc;
 
@@ -152,7 +152,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     else {
                         glyph_draw_dsc->g->req_raw_bitmap = 1;
                         mask_buf = lv_font_get_glyph_static_bitmap(glyph_draw_dsc->g);
-                        mask_stride = lv_draw_buf_width_to_stride(glyph_draw_dsc->g->box_w, LV_COLOR_FORMAT_A8);
+                        mask_stride = glyph_draw_dsc->g->stride;
                     }
 
                     uint32_t mask_width = lv_area_get_width(glyph_draw_dsc->letter_coords);
@@ -180,7 +180,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 #if LV_USE_IMGFONT
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
-                    LV_ASSERT(vglite_task != NULL);
+                    LV_ASSERT_MALLOC(vglite_task);
 
                     lv_draw_image_dsc_t img_dsc;
                     lv_draw_image_dsc_init(&img_dsc);
@@ -217,7 +217,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
     if(fill_draw_dsc && fill_area) {
         vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
-        LV_ASSERT(vglite_task != NULL);
+        LV_ASSERT_MALLOC(vglite_task);
 
         t->draw_dsc = fill_draw_dsc;
         t->area = *fill_area;

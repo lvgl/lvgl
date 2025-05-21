@@ -35,6 +35,17 @@
  **********************/
 
 /**
+ * Set rectangle path data
+ *
+ * @param[in/out] path_data Coordinates of the rectangle
+ * @param[in/out] path_data_size Size of path_data (bytes)
+ * @param[in] p Points of the rectangle
+ *
+ */
+static void _vglite_set_rectangle(int32_t * path_data, uint32_t * path_data_size,
+                                  const lv_area_t * dest_area);
+
+/**
  * Fill area, with optional opacity.
  *
  * @param[in] dest_area Area with relative coordinates of destination buffer
@@ -119,7 +130,7 @@ static void _vglite_set_rectangle(int32_t * path_data, uint32_t * path_data_size
     path_data[pidx++] = VLC_OP_LINE;
     path_data[pidx++] = dest_area->x1;
     path_data[pidx++] = dest_area->y1;
-    path_data[pidx] = VLC_OP_END;
+    path_data[pidx++] = VLC_OP_END;
 
     *path_data_size = pidx * sizeof(int32_t);
 }
@@ -147,12 +158,12 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
     else {   /*fill with transparency*/
 
         vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-        LV_ASSERT(path != NULL);
+        LV_ASSERT_MALLOC(path);
         vglite_task->path = path;
 
         uint32_t path_data_size;
         int32_t * path_data = lv_malloc_zeroed(16 * sizeof(int32_t));
-        LV_ASSERT(path_data != NULL);
+        LV_ASSERT_MALLOC(path_data);
         vglite_task->path_data = path_data;
         _vglite_set_rectangle(path_data, &path_data_size, dest_area);
 
@@ -181,7 +192,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
 
     /*** Init path ***/
     int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
-    LV_ASSERT(path_data != NULL);
+    LV_ASSERT_MALLOC(path_data);
     vglite_task->path_data = path_data;
 
     uint32_t path_data_size;
@@ -189,7 +200,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
-    LV_ASSERT(path != NULL);
+    LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
     VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
@@ -205,7 +216,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
     /*** Init Gradient ***/
     if(has_gradient) {
         gradient = lv_malloc_zeroed(sizeof(vg_lite_linear_gradient_t));
-        LV_ASSERT(gradient != NULL);
+        LV_ASSERT_MALLOC(gradient);
         vglite_task->gradient = gradient;
 
         vg_lite_matrix_t * grad_matrix;
