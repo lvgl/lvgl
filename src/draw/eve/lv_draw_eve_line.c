@@ -36,8 +36,8 @@ void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     lv_eve_color_opa(dsc->opa);
     lv_eve_color(dsc->color);
 
-    if(dsc->dash_gap && dsc->dash_width) {
-        /*TODO*/
+    if(dsc->dash_gap || dsc->dash_width) {
+        LV_LOG_WARN("line dash_gap and dash_width not implemented by EVE yet.");
     }
     /* Check if it's a vertical or horizontal line without rounding */
     bool is_vertical = (dsc->p1.x == dsc->p2.x);
@@ -46,16 +46,8 @@ void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     if((is_vertical || is_horizontal) && no_round) {
         lv_eve_primitive(LV_EVE_PRIMITIVE_RECTS);
-        if(is_vertical) {
-            /* Draw vertical line */
-            lv_eve_vertex_2f(dsc->p1.x, dsc->p1.y);
-            lv_eve_vertex_2f(dsc->p2.x, dsc->p2.y);
-        }
-        else {
-            /* Draw horizontal line */
-            lv_eve_vertex_2f(dsc->p1.x, dsc->p1.y);
-            lv_eve_vertex_2f(dsc->p2.x, dsc->p2.y);
-        }
+        lv_eve_vertex_2f(dsc->p1.x, dsc->p1.y);
+        lv_eve_vertex_2f(dsc->p2.x, dsc->p2.y);
     }
     else {
         /* Draw inclined line or line with rounding (not possible without rounding)*/

@@ -40,6 +40,7 @@ static uint32_t ramGptr = EVE_RAM_G;
 
 uint32_t lv_draw_eve_get_bitmap_addr(uint8_t id)
 {
+    LV_ASSERT(id < MAX_BLOCKS);
     return blocks[id].address;
 }
 
@@ -56,7 +57,7 @@ uint32_t lv_draw_eve_get_ramg_ptr(void)
 
 }
 
-void lv_draw_eve_init_eve_ramg()
+void lv_draw_eve_init_eve_ramg(void)
 {
     for(int i = 0; i < MAX_BLOCKS; i++) {
         blocks[i].address = 0;
@@ -93,39 +94,34 @@ uint32_t lv_draw_eve_next_free_ramg_block(lv_draw_eve_ram_g_datatype_t data)
 }
 
 
-void lv_draw_eve_set_size_ramg_block(uint8_t Id, uint32_t sz)
+void lv_draw_eve_set_size_ramg_block(uint8_t id, uint32_t sz)
 {
-
-    blocks[Id].size = sz;
-
+    LV_ASSERT(id < MAX_BLOCKS);
+    blocks[id].size = sz;
 }
 
-void lv_draw_eve_set_source_ramg_block(uint8_t Id, const uint8_t * src)
+void lv_draw_eve_set_source_ramg_block(uint8_t id, const uint8_t * src)
 {
 
-    if(Id < MAX_BLOCKS) {
-        blocks[Id].source = (uint8_t *)src;
-    }
-
+    LV_ASSERT(id < MAX_BLOCKS);
+    blocks[id].source = (uint8_t *)src;
 }
 
-
-void lv_draw_eve_set_addr_ramg_block(uint8_t Id, uint32_t addr)
+void lv_draw_eve_set_addr_ramg_block(uint8_t id, uint32_t addr)
 {
-
-    blocks[Id].address = addr;
-
+    LV_ASSERT(id < MAX_BLOCKS);
+    blocks[id].address = addr;
 }
 
-void lv_draw_eve_set_state_ramg_block(uint8_t Id, bool state)
+void lv_draw_eve_set_state_ramg_block(uint8_t id, bool state)
 {
-
-    blocks[Id].loaded = state;
-
+    LV_ASSERT(id < MAX_BLOCKS);
+    blocks[id].loaded = state;
 }
 
 bool lv_draw_eve_update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uint32_t sz)
 {
+    LV_ASSERT(id < MAX_BLOCKS);
     blocks[id].source = src;
     blocks[id].address = addr;
     blocks[id].size = sz;
@@ -142,11 +138,11 @@ bool lv_draw_eve_update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uin
 }
 
 
-uint32_t lv_draw_eve_find_ramg_image(const uint8_t * imageSource)
+uint32_t lv_draw_eve_find_ramg_image(const uint8_t * image_source)
 {
 
     for(uint32_t i = IMAGE_BLOCK_START; i < MAX_IMAGE; i++) {
-        if(blocks[i].source == imageSource) {
+        if(blocks[i].source == image_source) {
             return i;
         }
     }
@@ -155,11 +151,11 @@ uint32_t lv_draw_eve_find_ramg_image(const uint8_t * imageSource)
 }
 
 
-uint32_t lv_draw_eve_find_ramg_font(const uint8_t * fontSource)
+uint32_t lv_draw_eve_find_ramg_font(const uint8_t * font_source)
 {
 
     for(uint32_t i = FONT_BLOCK_START; i < MAX_FONT; i++) {
-        if(blocks[i].source == fontSource) {
+        if(blocks[i].source == font_source) {
             return i;
         }
     }

@@ -31,7 +31,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void convert_RGB565A8_to_ARGB4444(const uint8_t * src, uint8_t * dst_argb4444, uint16_t width, uint16_t height);
 static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height);
 static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height);
 
@@ -69,13 +68,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     if(img_eveId == NOT_FOUND_BLOCK) { /* New image to load  */
 
-        uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_IMAGE);
-        uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
-
-
-        /* Load image to RAM_G */
-        EVE_end_cmd_burst();
-
         LV_ATTRIBUTE_MEM_ALIGN uint8_t * temp_buff = lv_malloc_zeroed(img_size);
         LV_ASSERT_MALLOC(temp_buff);
 
@@ -98,8 +90,15 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 buffer_converted = temp_buff;
                 break;
             default :
-                break;
+                lv_free(temp_buff);
+                return;
         }
+
+        uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_IMAGE);
+        uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
+
+        /* Load image to RAM_G */
+        EVE_end_cmd_burst();
 
         EVE_memWrite_flash_buffer(start_addr_ramg, buffer_converted, (uint32_t)img_size);
 
@@ -179,29 +178,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void convert_RGB565A8_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height)
-{
-    int pixel_count = width * height;
-    uint16_t * src_rgb565 = (uint16_t *) src;
-    uint8_t * src_alpha = (uint8_t *)src + 2 * pixel_count;
-
-    for(int i = 0; i < pixel_count; i++) {
-        uint16_t rgb565 = src_rgb565[i];
-        uint8_t alpha = src_alpha[i];
-        uint8_t r5 = (rgb565 >> 11) & 0x1F;
-        uint8_t g6 = (rgb565 >> 5) & 0x3F;
-        uint8_t b5 = rgb565 & 0x1F;
-        uint8_t r4 = r5 >> 1;
-        uint8_t g4 = g6 >> 2;
-        uint8_t b4 = b5 >> 1;
-        uint8_t a4 = alpha >> 4;
-        uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
-
-        dst[2 * i] = argb4444 & 0xFF;
-        dst[2 * i + 1] = (argb4444 >> 8) & 0xFF;
-    }
-}
 
 static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height)
 {

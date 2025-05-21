@@ -73,7 +73,7 @@ void lv_draw_eve_update_ramg_ptr(uint32_t size);
 uint32_t lv_draw_eve_get_ramg_ptr(void);
 
 /* Init Memory blocks */
-void lv_draw_eve_init_eve_ramg();
+void lv_draw_eve_init_eve_ramg(void);
 
 /* Searches for the next free memory block */
 uint32_t lv_draw_eve_next_free_ramg_block(lv_draw_eve_ram_g_datatype_t data);
