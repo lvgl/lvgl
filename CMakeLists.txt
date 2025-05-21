@@ -39,3 +39,47 @@ if (MSVC)
     PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
   )
 endif()
+
+if(LV_GENERATE_XDG)
+  # Locate wayland-scanner tool
+  find_program(WAYLAND_SCANNER_EXECUTABLE wayland-scanner REQUIRED)
+
+  # Set the path to the xdg-shell.xml (allow override via cache)
+  set(XDG_SHELL_XML_PATH
+    "${CMAKE_SYSROOT}/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml"
+    CACHE FILEPATH "Path to the xdg-shell.xml protocol definition")
+
+  # Output path for generated files
+  set(GENERATED_WAYLAND_DIR "${CMAKE_BINARY_DIR}/generated-wayland")
+  file(MAKE_DIRECTORY "${GENERATED_WAYLAND_DIR}")
+
+  # Generated files
+  set(XDG_SHELL_HEADER "${GENERATED_WAYLAND_DIR}/xdg-shell-client-protocol.h")
+  set(XDG_SHELL_CODE   "${GENERATED_WAYLAND_DIR}/xdg-shell-protocol.c")
+
+  # Generate header
+  add_custom_command(
+    OUTPUT ${XDG_SHELL_HEADER}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} client-header ${XDG_SHELL_XML_PATH} ${XDG_SHELL_HEADER}
+    DEPENDS ${XDG_SHELL_XML_PATH}
+    COMMENT "Generating xdg-shell-client-protocol.h"
+  )
+
+  # Generate code
+  add_custom_command(
+    OUTPUT ${XDG_SHELL_CODE}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} private-code ${XDG_SHELL_XML_PATH} ${XDG_SHELL_CODE}
+    DEPENDS ${XDG_SHELL_XML_PATH}
+    COMMENT "Generating xdg-shell-protocol.c"
+  )
+
+  # Mark files as generated
+  set_source_files_properties(${XDG_SHELL_HEADER} ${XDG_SHELL_CODE} PROPERTIES GENERATED TRUE)
+
+  # Build a static library for the generated files
+  add_library(lv_xdg_shell STATIC ${XDG_SHELL_HEADER} ${XDG_SHELL_CODE})
+
+  target_include_directories(lv_xdg_shell INTERFACE ${GENERATED_WAYLAND_DIR})
+  target_link_libraries(lvgl PRIVATE lv_xdg_shell)
+
+endif()
