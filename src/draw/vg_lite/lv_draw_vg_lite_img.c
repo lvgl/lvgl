@@ -86,8 +86,10 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     const bool has_transform = matrix_has_transform(&matrix);
     const vg_lite_filter_t filter = has_transform ?  VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
-    const uint32_t img_w = dsc->header.w;
-    const uint32_t img_h = dsc->header.h;
+
+    /* Use coords as the fallback image width and height */
+    const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
+    const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&t->_real_area, &t->clip_area, false) && dsc->clip_radius <= 0 && !dsc->tile) {
