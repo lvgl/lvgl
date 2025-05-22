@@ -1,15 +1,15 @@
 <component>
 	<consts>
 		<px name="size" value="100"/>
-		<color name="orange" value="0xffa020"/>
 	</consts>
 
 	<api>
 		<prop name="btn_text" type="string"/>
+		<color name="color" value="0xffa020"/>
 	</api>
 
-	<view extends="lv_button" width="#size">
-		<my_h3 text="$btn_text" align="center" color="#orange"/>
+	<view extends="lv_button" width="#size" style_bg_color="$color">
+		<my_h3 text="$btn_text" align="center" />
 	</view>
 </component>
 

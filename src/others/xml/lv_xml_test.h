@@ -20,36 +20,39 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef enum {
-	LV_XML_TEST_STEP_TYPE_CLICK,
-	LV_XML_TEST_STEP_TYPE_WAIT,
-	LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE,
-}lv_xml_test_step_type_t;
+    LV_XML_TEST_STEP_TYPE_CLICK_AT,
+    LV_XML_TEST_STEP_TYPE_WAIT,
+    LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE,
+} lv_xml_test_step_type_t;
 
 typedef struct {
-	lv_xml_test_step_type_t type;
-	union {
-		struct {
-			int32_t x;
-			int32_t y;
-		}click;
+    lv_xml_test_step_type_t type;
+    union {
+        struct {
+            int32_t x;
+            int32_t y;
+        } click;
 
-		struct {
-			int32_t ms;
-		}wait;
+        struct {
+            int32_t ms;
+        } wait;
 
-		struct {
-			const char * path;
-		}screenshot_compare;
-	}param;
-}lv_xml_test_step_t;
+        struct {
+            const char * path;
+        } screenshot_compare;
+    } param;
+    uint32_t passed : 1;
+} lv_xml_test_step_t;
 
 typedef struct {
-	const char * name;
-	uint32_t step_cnt;
-	uint32_t step_act;
-	lv_xml_test_step_t * steps;
-	uint32_t processing_steps :1;
-}lv_xml_test_t;
+    const char * name;
+    uint32_t step_cnt;
+    uint32_t step_act;
+    lv_xml_test_step_t * steps;
+    int32_t screen_width;
+    int32_t screen_height;
+    uint32_t processing_steps : 1;
+} lv_xml_test_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -69,6 +72,8 @@ lv_xml_test_t * lv_xml_test_register_from_data(const char * name, const char * x
  * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_xml_test_t * lv_xml_test_register_from_file(const char * path);
+
+bool lv_xml_test_play(lv_xml_test_t * test) ;
 
 /**********************
  *      MACROS
