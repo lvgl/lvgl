@@ -22,6 +22,7 @@ extern "C" {
 typedef enum {
     LV_XML_TEST_STEP_TYPE_CLICK_AT,
     LV_XML_TEST_STEP_TYPE_WAIT,
+    LV_XML_TEST_STEP_TYPE_FREEZE,
     LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE,
 } lv_xml_test_step_type_t;
 
@@ -36,6 +37,10 @@ typedef struct {
         struct {
             int32_t ms;
         } wait;
+
+        struct {
+            int32_t ms;
+        } freeze;
 
         struct {
             const char * path;
