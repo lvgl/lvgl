@@ -48,6 +48,13 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
 void lv_glfw_window_delete(lv_glfw_window_t * window);
 
 /**
+ * Get the GLFW window handle for an lv_glfw_window
+ * @param window        GLFW window to return the handle of
+ * @return              the GLFW window handle
+ */
+void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window);
+
+/**
  * Add a texture to the GLFW window. It can be an LVGL display texture, or any OpenGL texture
  * @param window        GLFW window
  * @param texture_id    OpenGL texture ID

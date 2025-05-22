@@ -34,10 +34,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_SKE
 };
 
 const lv_image_dsc_t img_skew_strip = {
-    .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.magic = LV_IMAGE_HEADER_MAGIC,
-    .header.w = 80,
-    .header.h = 20,
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_ARGB8888,
+        .w = 80,
+        .h = 20,
+    },
     .data_size = 1600 * 4,
     .data = img_skew_strip_map,
   };

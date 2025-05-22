@@ -11,4 +11,5 @@ Renesas
     ra_family
     rx_family
     rzg_family
+    rza_family
     supported_boards

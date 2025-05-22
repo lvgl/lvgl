@@ -92,3 +92,21 @@ Supported Boards
            <iframe width="320" height="180" src="https://www.youtube.com/embed/VnynDLR36Xc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit>`__
+   * - **RZ/A3M**
+     -
+         | 1.0 GHz
+         | Arm Cortex-A55
+     -
+         | 128MB internal DDR3L-SDRAM
+         | 128KB internal SRAM
+         | 128MB external QSPI NAND flash
+         | 32MB external QSPI NOR flash
+     -
+         | 4.3”
+         | 1280x720
+         | MIPI
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/IEjBGgrR_mk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - `Demo repository <https://github.com/lvgl/lv_port_renesas-ek-rz_a3m>`__

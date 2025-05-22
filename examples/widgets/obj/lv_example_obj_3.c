@@ -4,7 +4,7 @@
 
 static void timer_cb(lv_timer_t * timer)
 {
-    lv_obj_t * obj = lv_timer_get_user_data(timer);
+    lv_obj_t * obj = (lv_obj_t *) lv_timer_get_user_data(timer);
 
     static float value = 0.1f;
     lv_matrix_t matrix;

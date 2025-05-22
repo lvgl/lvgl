@@ -196,36 +196,55 @@ uint32_t lv_obj_get_child_count_by_type(const lv_obj_t * obj, const lv_obj_class
 #if LV_USE_OBJ_NAME
 
 /**
- * Set a name for a widget. The name will be allocated.
+ * Set a name for a widget. The name will be allocated and freed when the
+ * widget is deleted or a new name is set.
  * @param obj       pointer to an object
- * @param name      the name to set
+ * @param name      the name to set. If set to `NULL` the default "<widget_type>_#"
+ *                  name will be used.
+ * @note If the name ends with a `#`, older siblings with the same name
+ * will be counted, and the `#` will be replaced by the index of the
+ * given widget. For example, creating multiple widgets with the name
+ * "mybtn_#" will result in resolved names like "mybtn_0", "mybtn_1",
+ * "mybtn_2", etc.  The name is resolved when `lv_obj_get_name_resolved`
+ * is called, so the result reflects the currently existing widgets at
+ * that time.
  */
 void lv_obj_set_name(lv_obj_t * obj, const char * name);
 
 /**
  * Set a name for a widget. Only a pointer will be saved.
  * @param obj       pointer to an object
- * @param name      the name to set
+ * @param name      the name to set. If set to `NULL` the default "<widget_type>_#"
+ *                  name will be used.
+ * @note If the name ends with a `#`, older siblings with the same name
+ * will be counted, and the `#` will be replaced by the index of the
+ * given widget. For example, creating multiple widgets with the name
+ * "mybtn_#" will result in resolved names like "mybtn_0", "mybtn_1",
+ * "mybtn_2", etc.  The name is resolved when `lv_obj_get_name_resolved`
+ * is called, so the result reflects the currently existing widgets at
+ * that time.
  */
 void lv_obj_set_name_static(lv_obj_t * obj, const char * name);
 
 /**
- * Get the set name as it was set
+ * Get the set name as it was set.
  * @param obj       pointer to an object
  * @return          get the set name or NULL if it wasn't set yet
  */
 const char * lv_obj_get_name(const lv_obj_t * obj);
 
 /**
- * Get the set name or craft a name automatically if there is no set name.
- * The crafted names are built like <widget type> + "_" + <index of the given type>
- * For example if a parent has two button and two label children the names will be
- * "lv_button_0", "lv_button1", "lv_label_0", "lv_label_1"
- * The <widget name> comes from the `class->name` field.
- * The index is 0 based.
+ * Get the set name or craft a name automatically.
  * @param obj       pointer to an object
  * @param buf       buffer to store the name
  * @param buf_size  the size of the buffer in bytes
+ * @note If the name ends with a `#`, older siblings with the same name
+ * will be counted, and the `#` will be replaced by the index of the
+ * given widget. For example, creating multiple widgets with the name
+ * "mybtn_#" will result in resolved names like "mybtn_0", "mybtn_1",
+ * "mybtn_2", etc.  The name is resolved when `lv_obj_get_name_resolved`
+ * is called, so the result reflects the currently existing widgets at
+ * that time.
  */
 void lv_obj_get_name_resolved(const lv_obj_t * obj, char buf[], size_t buf_size);
 

@@ -44,7 +44,7 @@ static char * extract_view_content(const char * xml_definition);
  *  STATIC VARIABLES
  **********************/
 
-static lv_ll_t component_ctx_ll;
+static lv_ll_t component_scope_ll;
 
 /**********************
  *      MACROS
@@ -56,33 +56,33 @@ static lv_ll_t component_ctx_ll;
 
 void lv_xml_component_init(void)
 {
-    lv_ll_init(&component_ctx_ll, sizeof(lv_xml_component_ctx_t));
+    lv_ll_init(&component_scope_ll, sizeof(lv_xml_component_scope_t));
 
-    lv_xml_component_ctx_t * global_ctx = lv_ll_ins_head(&component_ctx_ll);
-    lv_memzero(global_ctx, sizeof(lv_xml_component_ctx_t));
-    lv_xml_component_ctx_init(global_ctx);
-    global_ctx->name = lv_strdup("globals");
+    lv_xml_component_scope_t * global_scope = lv_ll_ins_head(&component_scope_ll);
+    lv_memzero(global_scope, sizeof(lv_xml_component_scope_t));
+    lv_xml_component_scope_init(global_scope);
+    global_scope->name = lv_strdup("globals");
 
 }
 
-void lv_xml_component_ctx_init(lv_xml_component_ctx_t * ctx)
+void lv_xml_component_scope_init(lv_xml_component_scope_t * scope)
 {
-    lv_ll_init(&ctx->style_ll, sizeof(lv_xml_style_t));
-    lv_ll_init(&ctx->const_ll, sizeof(lv_xml_const_t));
-    lv_ll_init(&ctx->param_ll, sizeof(lv_xml_param_t));
-    lv_ll_init(&ctx->gradient_ll, sizeof(lv_xml_grad_t));
-    lv_ll_init(&ctx->subjects_ll, sizeof(lv_xml_subject_t));
-    lv_ll_init(&ctx->event_ll, sizeof(lv_xml_event_cb_t));
-    lv_ll_init(&ctx->image_ll, sizeof(lv_xml_image_t));
-    lv_ll_init(&ctx->font_ll, sizeof(lv_xml_font_t));
+    lv_ll_init(&scope->style_ll, sizeof(lv_xml_style_t));
+    lv_ll_init(&scope->const_ll, sizeof(lv_xml_const_t));
+    lv_ll_init(&scope->param_ll, sizeof(lv_xml_param_t));
+    lv_ll_init(&scope->gradient_ll, sizeof(lv_xml_grad_t));
+    lv_ll_init(&scope->subjects_ll, sizeof(lv_xml_subject_t));
+    lv_ll_init(&scope->event_ll, sizeof(lv_xml_event_cb_t));
+    lv_ll_init(&scope->image_ll, sizeof(lv_xml_image_t));
+    lv_ll_init(&scope->font_ll, sizeof(lv_xml_font_t));
 }
 
 
 lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * name, const char ** attrs)
 {
-    lv_xml_component_ctx_t * ctx = lv_xml_component_get_ctx(name);
-    if(ctx == NULL) return NULL;
-    lv_obj_t * item = lv_xml_create_from_ctx(state->parent, &state->ctx, ctx, attrs);
+    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
+    if(scope == NULL) return NULL;
+    lv_obj_t * item = lv_xml_create_in_scope(state->parent, &state->scope, scope, attrs);
     if(item == NULL) {
         LV_LOG_WARN("Couldn't create component '%s'", name);
         return NULL;
@@ -90,16 +90,30 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
 
     /* Apply the properties of the component, e.g. <my_button x="20" styles="red"/> */
     state->item = item;
-    ctx->root_widget->apply_cb(state, attrs);
+    lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(scope->extends);
+    extended_proc->apply_cb(state, attrs);
 
+
+#if LV_USE_OBJ_NAME
+    /*Set a default indexed name*/
+    if(state->item) {
+        const char * value_of_name = lv_xml_get_value_of(attrs, "name");
+        if(value_of_name) lv_obj_set_name(item, value_of_name);
+        else {
+            char name_buf[128];
+            lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
+            lv_obj_set_name(state->item, name_buf);
+        }
+    }
+#endif
     return item;
 }
 
-lv_xml_component_ctx_t * lv_xml_component_get_ctx(const char * component_name)
+lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_name)
 {
-    lv_xml_component_ctx_t * ctx;
-    LV_LL_READ(&component_ctx_ll, ctx) {
-        if(lv_streq(ctx->name, component_name)) return ctx;
+    lv_xml_component_scope_t * scope;
+    LV_LL_READ(&component_scope_ll, scope) {
+        if(lv_streq(scope->name, component_name)) return scope;
     }
 
     return NULL;
@@ -113,16 +127,20 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
     /* Create a temporary parser state to extract styles/params/consts */
     lv_xml_parser_state_t state;
     if(globals) {
-        lv_xml_component_ctx_t * global_ctx = lv_xml_component_get_ctx("globals");
-        state.ctx = *global_ctx;
+        lv_xml_component_scope_t * global_scope = lv_xml_component_get_scope("globals");
+        state.scope = *global_scope;
     }
     else {
         lv_xml_parser_state_init(&state);
-        state.ctx.name = name;
+        state.scope.name = name;
     }
 
     /* Parse the XML to extract metadata */
-    XML_Parser parser = XML_ParserCreate(NULL);
+    XML_Memory_Handling_Suite mem_handlers;
+    mem_handlers.malloc_fcn = lv_malloc;
+    mem_handlers.realloc_fcn = lv_realloc;
+    mem_handlers.free_fcn = lv_free;
+    XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
     XML_SetUserData(parser, &state);
     XML_SetElementHandler(parser, start_metadata_handler, end_metadata_handler);
 
@@ -131,6 +149,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
                      XML_ErrorString(XML_GetErrorCode(parser)),
                      (unsigned long)XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
+        lv_free((char *)state.scope.extends);
         return LV_RESULT_INVALID;
     }
 
@@ -139,21 +158,21 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
 
     /* Copy extracted metadata to component processor */
     if(globals) {
-        lv_xml_component_ctx_t * global_ctx = lv_xml_component_get_ctx("globals");
-        lv_memcpy(global_ctx, &state.ctx, sizeof(lv_xml_component_ctx_t));
+        lv_xml_component_scope_t * global_scope = lv_xml_component_get_scope("globals");
+        lv_memcpy(global_scope, &state.scope, sizeof(lv_xml_component_scope_t));
     }
     else {
-        lv_xml_component_ctx_t * ctx = lv_ll_ins_head(&component_ctx_ll);
-        lv_memzero(ctx, sizeof(lv_xml_component_ctx_t));
-        lv_memcpy(ctx, &state.ctx, sizeof(lv_xml_component_ctx_t));
+        lv_xml_component_scope_t * scope = lv_ll_ins_head(&component_scope_ll);
+        lv_memzero(scope, sizeof(lv_xml_component_scope_t));
+        lv_memcpy(scope, &state.scope, sizeof(lv_xml_component_scope_t));
 
         /* Extract view content directly instead of using XML parser */
-        ctx->view_def = extract_view_content(xml_def);
-        ctx->name = lv_strdup(name);
-        if(!ctx->view_def) {
+        scope->view_def = extract_view_content(xml_def);
+        scope->name = lv_strdup(name);
+        if(!scope->view_def) {
             LV_LOG_WARN("Failed to extract view content");
             /* Clean up and return error */
-            lv_free(ctx);
+            lv_free(scope);
             return LV_RESULT_INVALID;
         }
     }
@@ -221,60 +240,61 @@ lv_result_t lv_xml_component_register_from_file(const char * path)
 
 lv_result_t lv_xml_component_unregister(const char * name)
 {
-    lv_xml_component_ctx_t * ctx = lv_xml_component_get_ctx(name);
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
+    if(scope == NULL) return LV_RESULT_INVALID;
 
-    lv_ll_remove(&component_ctx_ll, ctx);
+    lv_ll_remove(&component_scope_ll, scope);
 
-    lv_free((char *)ctx->name);
-    lv_free((char *)ctx->view_def);
+    lv_free((char *)scope->name);
+    lv_free((char *)scope->view_def);
+    lv_free((char *)scope->extends);
 
     lv_xml_const_t * cnst;
-    LV_LL_READ(&ctx->const_ll, cnst) {
+    LV_LL_READ(&scope->const_ll, cnst) {
         lv_free((char *)cnst->name);
         lv_free((char *)cnst->value);
     }
-    lv_ll_clear(&ctx->const_ll);
+    lv_ll_clear(&scope->const_ll);
 
     lv_xml_param_t * param;
-    LV_LL_READ(&ctx->param_ll, param) {
+    LV_LL_READ(&scope->param_ll, param) {
         lv_free((char *)param->name);
         lv_free((char *)param->def);
         lv_free((char *)param->type);
     }
-    lv_ll_clear(&ctx->param_ll);
+    lv_ll_clear(&scope->param_ll);
 
 
     lv_xml_font_t * font;
-    LV_LL_READ(&ctx->font_ll, font) {
+    LV_LL_READ(&scope->font_ll, font) {
         lv_free((char *)font->name);
     }
-    lv_ll_clear(&ctx->font_ll);
+    lv_ll_clear(&scope->font_ll);
 
     lv_xml_image_t * image;
-    LV_LL_READ(&ctx->image_ll, image) {
+    LV_LL_READ(&scope->image_ll, image) {
         lv_free((char *)image->name);
         lv_free((char *)image->src);
     }
-    lv_ll_clear(&ctx->image_ll);
+    lv_ll_clear(&scope->image_ll);
 
     lv_xml_style_t * style;
-    LV_LL_READ(&ctx->style_ll, style) {
+    LV_LL_READ(&scope->style_ll, style) {
         lv_free((char *)style->name);
         lv_free((char *)style->long_name);
         lv_style_reset(&style->style);
     }
-    lv_ll_clear(&ctx->style_ll);
+    lv_ll_clear(&scope->style_ll);
 
 
     lv_xml_grad_t * grad;
-    LV_LL_READ(&ctx->gradient_ll, grad) {
+    LV_LL_READ(&scope->gradient_ll, grad) {
         lv_free((char *)grad->name);
     }
-    lv_ll_clear(&ctx->gradient_ll);
+    lv_ll_clear(&scope->gradient_ll);
 
     lv_xml_subject_t * subject;
-    LV_LL_READ(&ctx->subjects_ll, subject) {
+    LV_LL_READ(&scope->subjects_ll, subject) {
         lv_free((char *)subject->name);
         if(subject->subject->type == LV_SUBJECT_TYPE_STRING) {
             lv_free((char *)subject->subject->prev_value.pointer);
@@ -282,9 +302,9 @@ lv_result_t lv_xml_component_unregister(const char * name)
         }
         lv_free(subject->subject);
     }
-    lv_ll_clear(&ctx->subjects_ll);
+    lv_ll_clear(&scope->subjects_ll);
 
-    lv_free(ctx);
+    lv_free(scope);
 
     return LV_RESULT_OK;
 }
@@ -307,7 +327,7 @@ static void process_const_element(lv_xml_parser_state_t * state, const char ** a
         return;
     }
 
-    lv_xml_register_const(&state->ctx, name, value);
+    lv_xml_register_const(&state->scope, name, value);
 }
 
 static void process_font_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
@@ -331,7 +351,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
     }
 
     lv_xml_font_t * f;
-    LV_LL_READ(&state->ctx.font_ll, f) {
+    LV_LL_READ(&state->scope.font_ll, f) {
         if(lv_streq(f->name, name)) {
             LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
             return;
@@ -351,7 +371,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
             LV_LOG_WARN("Couldn't load  `%s` tiny_ttf font", name);
             return;
         }
-        lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
+        lv_result_t res = lv_xml_register_font(&state->scope, name, font);
         if(res == LV_RESULT_INVALID) {
             LV_LOG_WARN("Failed to register `%s` tiny_ttf font", name);
             lv_tiny_ttf_destroy(font);
@@ -360,7 +380,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
 
         /*Get the font which was just created and add a destroy_cb*/
         lv_xml_font_t * new_font;
-        LV_LL_READ(&state->ctx.font_ll, new_font) {
+        LV_LL_READ(&state->scope.font_ll, new_font) {
             if(lv_streq(new_font->name, name))  {
                 new_font->font_destroy_cb = lv_tiny_ttf_destroy;
                 break;
@@ -379,7 +399,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
             return;
         }
 
-        lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
+        lv_result_t res = lv_xml_register_font(&state->scope, name, font);
         if(res == LV_RESULT_INVALID) {
             LV_LOG_WARN("Failed to register `%s` bin font", name);
             lv_binfont_destroy(font);
@@ -387,7 +407,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         }
 
         lv_xml_font_t * new_font;
-        LV_LL_READ(&state->ctx.font_ll, new_font) {
+        LV_LL_READ(&state->scope.font_ll, new_font) {
             if(lv_streq(new_font->name, name))  {
                 new_font->font_destroy_cb = lv_binfont_destroy;
                 break;
@@ -415,7 +435,7 @@ static void process_image_element(lv_xml_parser_state_t * state, const char * ty
 
     /* E.g. <file name="avatar" src_path="avatar1.png">*/
     if(lv_streq(type, "file")) {
-        lv_xml_register_image(&state->ctx, name, src_path);
+        lv_xml_register_image(&state->scope, name, src_path);
     }
     else {
         LV_LOG_INFO("Ignore non-file image `%s`", name);
@@ -447,12 +467,12 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
         lv_subject_init_string(subject, buf_act, buf_prev, 256, value);
     }
 
-    lv_xml_register_subject(&state->ctx, name, subject);
+    lv_xml_register_subject(&state->scope, name, subject);
 }
 
 static void process_grad_element(lv_xml_parser_state_t * state, const char * tag_name, const char ** attrs)
 {
-    lv_xml_grad_t * grad = lv_ll_ins_tail(&state->ctx.gradient_ll);
+    lv_xml_grad_t * grad = lv_ll_ins_tail(&state->scope.gradient_ll);
     grad->name = lv_strdup(lv_xml_get_value_of(attrs, "name"));
     lv_grad_dsc_t * dsc = &grad->grad_dsc;
     lv_memzero(dsc, sizeof(lv_grad_dsc_t));
@@ -584,7 +604,7 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
 static void process_grad_stop_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
     /*Add the stop to the last gradient*/
-    lv_xml_grad_t * grad = lv_ll_get_tail(&state->ctx.gradient_ll);
+    lv_xml_grad_t * grad = lv_ll_get_tail(&state->scope.gradient_ll);
     lv_grad_dsc_t * dsc = &grad->grad_dsc;
 
     uint32_t idx = dsc->stops_count;
@@ -606,7 +626,7 @@ static void process_grad_stop_element(lv_xml_parser_state_t * state, const char 
 
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
-    lv_xml_param_t * prop = lv_ll_ins_tail(&state->ctx.param_ll);
+    lv_xml_param_t * prop = lv_ll_ins_tail(&state->scope.param_ll);
     prop->name = lv_strdup(lv_xml_get_value_of(attrs, "name"));
     const char * def = lv_xml_get_value_of(attrs, "default");
     if(def) prop->def = lv_strdup(def);
@@ -628,21 +648,10 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         if(extends == NULL) extends = "lv_obj";
 
-        state->ctx.root_widget = lv_xml_widget_get_processor(extends);
-        if(state->ctx.root_widget == NULL) {
-            lv_xml_component_ctx_t * extended_component = lv_xml_component_get_ctx(extends);
-            if(extended_component) {
-                state->ctx.root_widget = extended_component->root_widget;
-            }
-            else {
-                LV_LOG_WARN("The 'extend'ed widget is not found, using `lv_obj` as a fall back");
-                state->ctx.root_widget = lv_xml_widget_get_processor("lv_obj");
-            }
-        }
+        state->scope.extends = lv_strdup(extends);
     }
 
-    if(lv_streq(name, "widget")) state->ctx.is_widget = 1;
-
+    if(lv_streq(name, "widget")) state->scope.is_widget = 1;
 
     /* Process elements based on current context */
     switch(state->section) {
@@ -655,22 +664,26 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <consts>*/
             process_const_element(state, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_GRAD:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <gradients>*/
             process_grad_element(state, name, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_GRAD_STOP:
             process_grad_stop_element(state, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_STYLES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
-            lv_xml_style_register(&state->ctx, attrs);
+            lv_xml_style_register(&state->scope, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_FONTS:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             process_font_element(state, name, attrs);
             break;
+
         case LV_XML_PARSER_SECTION_IMAGES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             process_image_element(state, name, attrs);

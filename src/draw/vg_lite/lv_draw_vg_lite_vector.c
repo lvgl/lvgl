@@ -246,7 +246,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
-    const lv_area_t scissor_area = lv_matrix_is_identity_or_translation((lv_matrix_t *)&matrix)
+    const lv_area_t scissor_area = lv_matrix_is_identity((lv_matrix_t *)&matrix)
                                    ? dsc->scissor_area
                                    : lv_matrix_transform_area((lv_matrix_t *)&matrix, &dsc->scissor_area);
 

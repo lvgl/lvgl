@@ -66,19 +66,19 @@ void lv_example_observer_4(void)
 
 static int32_t anim_get_x_cb(lv_anim_t * a)
 {
-    return lv_obj_get_x_aligned(a->var);
+    return lv_obj_get_x_aligned((lv_obj_t *) a->var);
 }
 
 static void anim_set_x_cb(void * obj, int32_t v)
 {
-    lv_obj_set_x(obj, v);
+    lv_obj_set_x((lv_obj_t *) obj, v);
 }
 
 static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
-    lv_obj_t * cont = lv_observer_get_target(observer);
+    lv_obj_t * cont = (lv_obj_t *) lv_observer_get_target(observer);
 
     /*Animate out the previous content*/
     lv_anim_t a;
@@ -165,7 +165,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
 
 static void btn_click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_target_obj(e);
     uint32_t idx = lv_obj_get_index(btn);
     lv_subject_set_int(&current_tab_subject, idx);
 }
@@ -175,7 +175,7 @@ static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
 
-    lv_obj_t * btn = lv_observer_get_target(observer);
+    lv_obj_t * btn = (lv_obj_t *) lv_observer_get_target(observer);
     int32_t idx = (int32_t)lv_obj_get_index(btn);
 
     if(idx == prev_v) lv_obj_remove_state(btn, LV_STATE_CHECKED);
@@ -185,7 +185,7 @@ static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t cur_v = lv_subject_get_int(subject);
-    lv_obj_t * indicator = lv_observer_get_target(observer);
+    lv_obj_t * indicator = (lv_obj_t *) lv_observer_get_target(observer);
 
     lv_obj_t * footer = lv_obj_get_parent(indicator);
     lv_obj_t * btn_act = lv_obj_get_child(footer, cur_v);

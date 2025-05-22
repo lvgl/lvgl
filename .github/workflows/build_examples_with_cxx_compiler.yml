@@ -1,0 +1,27 @@
+name: Build Examples with C++ Compiler
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  build-examples:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate lv_conf.h
+        run: |
+          cp lv_conf_template.h lv_conf.h
+          python ./scripts/generate_lv_conf.py \
+            --template lv_conf_template.h \
+            --config lv_conf.h \
+            --defaults configs/ci/examples/lv_conf_examples.defaults
+      - name: Build Examples with C++ compiler
+        run: g++ -DLV_CONF_PATH="\"$(pwd)/lv_conf.h\"" -Werror -c $(find examples -type f \( -name '*.cpp' -o -name '*.c' \))
+

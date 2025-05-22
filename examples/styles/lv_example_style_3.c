@@ -18,7 +18,7 @@ void lv_example_style_3(void)
     lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_border_width(&style, 5);
     lv_style_set_border_opa(&style, LV_OPA_50);
-    lv_style_set_border_side(&style, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
+    lv_style_set_border_side(&style, (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT));
 
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_obj_create(lv_screen_active());

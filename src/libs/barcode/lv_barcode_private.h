@@ -35,6 +35,7 @@ struct _lv_barcode_t {
     uint16_t scale;
     lv_dir_t direction;
     bool tiled;
+    lv_barcode_encoding_t encoding;
 };
 
 

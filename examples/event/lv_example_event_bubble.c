@@ -4,10 +4,10 @@
 static void event_cb(lv_event_t * e)
 {
     /*The original target of the event. Can be the buttons or the container*/
-    lv_obj_t * target = lv_event_get_target(e);
+    lv_obj_t * target = lv_event_get_target_obj(e);
 
     /*The current target is always the container as the event is added to it*/
-    lv_obj_t * cont = lv_event_get_current_target(e);
+    lv_obj_t * cont = lv_event_get_current_target_obj(e);
 
     /*If container was clicked do nothing*/
     if(target == cont) return;
@@ -34,7 +34,7 @@ void lv_example_event_bubble(void)
         lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "%"LV_PRIu32, i);
+        lv_label_set_text_fmt(label, "%" LV_PRIu32, i);
         lv_obj_center(label);
     }
 

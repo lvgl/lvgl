@@ -106,10 +106,23 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
 
             uint32_t rn;
             lv_fs_res_t res;
-            buf = (uint8_t *)lv_zalloc(256);
+            uint32_t file_size = 0;
+            res = lv_fs_seek(&src->file, 0, LV_FS_SEEK_END);
+            if(res == LV_FS_RES_OK) {
+                lv_fs_tell(&src->file, &file_size);
+                lv_fs_seek(&src->file, 0, LV_FS_SEEK_SET); /* Reset position to start */
+            }
+#ifdef LV_USE_SVG_DEBUG
+            LV_LOG_INFO("LVGL file_size = %d.", file_size);
+
+#endif
+            if(file_size > 512)
+                file_size = 512;
+
+            buf = (uint8_t *)lv_zalloc(file_size);
             LV_ASSERT_NULL(buf);
-            /* read 256 bytes for searching svg header */
-            res = lv_fs_read(&src->file, buf, 256, &rn);
+            /* read some bytes for searching svg header */
+            res = lv_fs_read(&src->file, buf, file_size, &rn);
             if(res != LV_FS_RES_OK) {
                 LV_LOG_WARN("can't open %s", (char *)src_data);
                 lv_free(buf);
@@ -127,7 +140,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             uint8_t * svg_start = NULL;
             uint8_t * svg_end = NULL;
             uint8_t * ptr = buf;
-            uint8_t * ptr_end = buf + 255;
+            uint8_t * ptr_end = buf + file_size - 1;
             while(ptr < ptr_end) {
                 if(*ptr == '<') {
                     if(lv_strncmp((char *)(ptr + 1), "svg", 3) == 0) {
@@ -153,6 +166,9 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 lv_svg_render_delete(svg_header);
                 lv_svg_node_delete(svg_doc);
             }
+            else
+                LV_LOG_WARN("can't find svg viewport tag end");
+
             lv_free(buf);
         }
         else {

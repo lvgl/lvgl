@@ -1,8 +1,8 @@
-.. _observer:
+.. _observer_how_to_use:
 
-========
-Observer
-========
+==========
+How to Use
+==========
 
 .. _observer_overview:
 
@@ -537,15 +537,6 @@ user's direct interaction with the Drop-Down Widget updates the Subject's value 
 vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
 
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
-
-
-
-.. _observer_example:
-
-Examples
-********
-
-.. include:: ../../examples/others/observer/index.rst
 
 
 

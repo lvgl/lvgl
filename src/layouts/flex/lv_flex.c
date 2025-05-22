@@ -395,6 +395,10 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             item = get_next_item(cont, f->rev, &item_first_id);
             continue;
         }
+
+        uint16_t item_w_layout = item->w_layout;
+        uint16_t item_h_layout = item->h_layout;
+
         int32_t grow_size = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
         if(grow_size) {
             int32_t s = 0;
@@ -428,6 +432,10 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         else {
             item->w_layout = 0;
             item->h_layout = 0;
+        }
+
+        if(item->w_layout != item_w_layout || item->h_layout != item_h_layout) {
+            lv_obj_mark_layout_as_dirty(item);
         }
 
         int32_t cross_pos = 0;

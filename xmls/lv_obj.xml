@@ -48,6 +48,8 @@ Example
 	    <prop name="align" type="enum:lv_align"/>
 	    <prop name="styles"  type="styles[]"/>
 
+        <prop name="ext_click_area" type="int"/>
+
         <prop name="style_x" type="coords"/>
         <prop name="style_y" type="coords"/>
         <prop name="style_height" type="coords"/>
@@ -84,7 +86,7 @@ Example
         <prop name="style_base_dir" type="enum:lv_base_dir"/>
 
         <prop name="style_bg_color" type="color"/>
-        <prop name="style_bg_opa" type="int"/>
+        <prop name="style_bg_opa" type="opa"/>
         <prop name="style_bg_grad_dir" type="enum:lv_grad_dir"/>
         <prop name="style_bg_main_stop" type="int"/>
         <prop name="style_bg_grad_stop" type="int"/>
@@ -93,48 +95,48 @@ Example
         <prop name="style_bg_image_src" type="image"/>
         <prop name="style_bg_image_tiled" type="bool"/>
         <prop name="style_bg_image_recolor" type="color"/>
-        <prop name="style_bg_image_recolor_opa" type="int"/>
+        <prop name="style_bg_image_recolor_opa" type="opa"/>
 
         <prop name="style_border_color" type="color"/>
         <prop name="style_border_width" type="int"/>
-        <prop name="style_border_opa" type="int"/>
+        <prop name="style_border_opa" type="opa"/>
         <prop name="style_border_side" type="enum:lv_border_side"/>
         <prop name="style_border_post" type="bool"/>
 
         <prop name="style_outline_color" type="color"/>
         <prop name="style_outline_width" type="int"/>
-        <prop name="style_outline_opa" type="int"/>
+        <prop name="style_outline_opa" type="opa"/>
         <prop name="style_outline_pad" type="int"/>
 
         <prop name="style_style_shadow_width" type="int"/>
         <prop name="style_shadow_color" type="color"/>
-        <prop name="style_shadow_opa" type="int"/>
+        <prop name="style_shadow_opa" type="opa"/>
         <prop name="style_shadow_offset_x" type="int"/>
         <prop name="style_shadow_offset_y" type="int"/>
         <prop name="style_shadow_spread" type="int"/>
 
         <prop name="style_text_color" type="color"/>
-        <prop name="style_text_opa" type="int"/>
+        <prop name="style_text_opa" type="opa"/>
         <prop name="style_text_font" type="font"/>
         <prop name="style_text_align" type="enum:lv_text_align"/>
         <prop name="style_text_letter_space" type="int"/>
         <prop name="style_text_line_space" type="int"/>
         <prop name="style_text_decor" type="enum:lv_text_decor"/>
 
-        <prop name="style_image_opa" type="int"/>
+        <prop name="style_image_opa" type="opa"/>
         <prop name="style_image_recolor" type="color"/>
-        <prop name="style_image_recolor_opa" type="int"/>
+        <prop name="style_image_recolor_opa" type="opa"/>
 
         <prop name="style_line_width" type="int"/>
         <prop name="style_line_color" type="color"/>
-        <prop name="style_line_opa" type="int"/>
+        <prop name="style_line_opa" type="opa"/>
         <prop name="style_line_dash_width" type="int"/>
         <prop name="style_line_dash_gap" type="int"/>
         <prop name="style_line_rounded" type="bool"/>
 
         <prop name="style_arc_width" type="int"/>
         <prop name="style_arc_color" type="color"/>
-        <prop name="style_arc_opa" type="int"/>
+        <prop name="style_arc_opa" type="opa"/>
         <prop name="style_arc_rounded" type="bool"/>
         <prop name="style_arc_image_src" type="image"/>
 
@@ -155,9 +157,9 @@ Example
         <prop name="style_grid_cell_row_span" type="int"/>
         <prop name="style_grid_cell_y_align" type="enum:lv_grid_align"/>
 
-        <prop name="style_opa" type="int"/>
-        <prop name="style_opa_layered" type="int"/>
-        <prop name="style_color_filter_opa" type="int"/>
+        <prop name="style_opa" type="opa"/>
+        <prop name="style_opa_layered" type="opa"/>
+        <prop name="style_color_filter_opa" type="opa"/>
         <prop name="style_anim_duration" type="int"/>
         <prop name="style_blend_mode" type="enum:lv_blend_mode"/>
         <prop name="style_transform_width" type="int"/>

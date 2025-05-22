@@ -64,7 +64,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
             lv_bar_set_value(item, v1, v2);
         }
         if(lv_streq("bind_value", name)) {
-            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject) {
                 lv_slider_bind_value(item, subject);
             }

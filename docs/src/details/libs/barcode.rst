@@ -23,7 +23,14 @@ Use :cpp:func:`lv_barcode_create` to create a barcode object, and use
 Call :cpp:func:`lv_barcode_set_scale` to adjust scaling,
 call :cpp:func:`lv_barcode_set_dark_color` and :cpp:func:`lv_barcode_set_light_color`
 adjust colors.  Call :cpp:func:`lv_barcode_set_direction` to set the bar code's
-orientation.  After any of a bar code's settings have changed, call
+orientation.
+
+By default, :cpp:enumerator:`LV_BARCODE_ENCODING_CODE128_GS1` encoding is used
+and strips ``[FCN1]`` and spaces. Optionally use
+:cpp:func:`lv_barcode_set_encoding` to set
+:cpp:enumerator:`LV_BARCODE_ENCODING_CODE128_RAW`.
+
+After any of a bar code's settings have changed, call
 :cpp:func:`lv_barcode_update` again to regenerate it.
 
 

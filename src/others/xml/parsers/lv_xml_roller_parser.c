@@ -90,7 +90,7 @@ void lv_xml_roller_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
         }
         else if(lv_streq("bind_value", name)) {
-            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject) {
                 lv_roller_bind_value(item, subject);
             }
