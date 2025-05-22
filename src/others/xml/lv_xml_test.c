@@ -12,6 +12,7 @@
 #include "../../lvgl.h"
 #include "lv_xml.h"
 #include "lv_xml_utils.h"
+#include "lv_xml_component_private.h"
 #include "../../misc/lv_fs.h"
 #include "../../libs/expat/expat.h"
 #include "../../display/lv_display_private.h"
@@ -28,19 +29,16 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_obj_t * create_cursor(void);
-static bool execute_step(lv_xml_test_step_t * step, uint32_t step_delay, bool visalize);
+static lv_obj_t * create_cursor(lv_obj_t * parent);
+static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown);
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs);
 static void end_metadata_handler(void * user_data, const char * name);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_display_t * normal_display;
 static lv_display_t * test_display;
-static lv_tick_get_cb_t tick_cb_original;
-static lv_obj_t  * canvas;
-static lv_obj_t  * cursor;
+static lv_obj_t * cursor;
 
 /**********************
  *      MACROS
@@ -146,76 +144,66 @@ lv_xml_test_t * lv_xml_test_register_from_file(const char * path)
     return test;
 }
 
-void lv_xml_test_play_init(lv_xml_test_t * test)
+uint32_t lv_xml_test_play_all(lv_xml_test_t * test, uint32_t slowdown, bool stop_on_error)
 {
-    normal_display = lv_display_get_default();
-    test_display = lv_test_display_create(test->screen_width, test->screen_height);
-    lv_obj_t * test_screen = lv_display_get_screen_active(test_display);
-    lv_display_set_default(test_display);
+    lv_display_t * normal_display = lv_display_get_default();
+    test_display = lv_test_display_create(normal_display->hor_res, normal_display->ver_res);
 
-    lv_draw_buf_t * draw_buf_rendered = test_display->buf_act;
-    canvas = lv_canvas_create(lv_display_get_screen_active(normal_display));
-    lv_canvas_set_draw_buf(canvas, draw_buf_rendered);
-
-    tick_cb_original = lv_tick_get_cb();
+    /*The test will control the ticks*/
+    lv_tick_get_cb_t tick_cb_original = lv_tick_get_cb();
     lv_tick_set_cb(NULL);
+
+    lv_test_indev_create_all();
+    cursor = create_cursor(lv_display_get_layer_sys(normal_display));
 
     lv_sysmon_hide_performance(NULL);
     lv_sysmon_hide_memory(NULL);
 
-    lv_test_indev_create_all();
-
-    cursor = create_cursor();
-
-    lv_xml_create(test_screen, test->name, NULL);
-    lv_refr_now(test_display);
-    lv_obj_invalidate(canvas);
+    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(test->name);
+    lv_xml_component_scope_t * extends_scope = lv_xml_component_get_scope(scope->extends);
+    lv_obj_t * act_screen = lv_screen_active();
+    if(extends_scope && extends_scope->is_screen) {
+        lv_obj_t * test_screen = lv_xml_create(NULL, test->name, NULL);
+        lv_screen_load(test_screen);
+        lv_obj_delete(act_screen);
+    }
+    else {
+        lv_obj_clean(act_screen);
+        lv_xml_create(act_screen, test->name, NULL);
+    }
     lv_refr_now(normal_display);
 
     test->step_act = 0;
-}
 
-uint32_t lv_xml_test_play_all(lv_xml_test_t * test, uint32_t step_delay, bool visalize, bool stop_on_error)
-{
     uint32_t failed_cnt = 0;
-    lv_xml_test_play_init(test);
     uint32_t i;
     for(i = 0; i < test->step_cnt; i++) {
-        test->steps[i].passed = execute_step(&test->steps[i], step_delay, visalize);
+        test->steps[i].passed = execute_step(&test->steps[i], slowdown);
         if(!test->steps[i].passed) {
             failed_cnt++;
             if(stop_on_error) break;
         }
-
-        if(visalize) {
-            if(test->steps[i].type != LV_XML_TEST_STEP_TYPE_CLICK_AT) {
-                lv_delay_ms(step_delay);
-            }
-
-            lv_obj_invalidate(canvas);
-            lv_refr_now(normal_display);
-        }
     }
 
-    lv_xml_test_play_close(test);
+    lv_obj_delete(cursor);
+    lv_tick_set_cb(tick_cb_original);
+    lv_display_delete(test_display);
+
     return failed_cnt;
 }
 
-void lv_xml_test_play_close(lv_xml_test_t * test)
-{
-
-    lv_obj_delete(cursor);
-    lv_obj_delete(canvas);
-    lv_tick_set_cb(tick_cb_original);
-    lv_display_set_default(normal_display);
-    lv_display_delete(test_display);
-}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static bool execute_step(lv_xml_test_step_t * step, uint32_t step_delay, bool visalize)
+void lv_xml_test_wait(uint32_t ms, uint32_t slowdown)
+{
+    lv_test_wait(ms);
+    lv_delay_ms(ms * slowdown);
+}
+
+static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
 {
     bool res = true;
 
@@ -223,40 +211,45 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t step_delay, bool vi
         int32_t x = step->param.click.x;
         int32_t y = step->param.click.y;
 
-        lv_test_mouse_click_at(x, y);
+        lv_obj_remove_state(cursor, LV_STATE_PRESSED);
+        lv_test_mouse_release();
+        lv_xml_test_wait(50, slowdown);
+        lv_test_mouse_move_to(x, y);
+        lv_test_mouse_press();
+        lv_obj_set_pos(cursor, x, y);
+        lv_obj_add_state(cursor, LV_STATE_PRESSED);
+        lv_xml_test_wait(100, slowdown);
+        lv_test_mouse_release();
+        lv_xml_test_wait(50, slowdown);
+        lv_obj_remove_state(cursor, LV_STATE_PRESSED);
 
-        if(visalize) {
-            lv_obj_set_pos(cursor, x, y);
-            lv_obj_remove_state(cursor, LV_STATE_PRESSED);
-            lv_refr_now(normal_display);
-            lv_delay_ms(step_delay / 3);
-
-            lv_obj_add_state(cursor, LV_STATE_PRESSED);
-            lv_refr_now(normal_display);
-            lv_delay_ms(step_delay / 3);
-
-            lv_obj_remove_state(cursor, LV_STATE_PRESSED);
-            lv_refr_now(normal_display);
-            lv_delay_ms(step_delay / 3);
-        }
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
+        lv_obj_t * act_screen_original = test_display->act_scr;
+        test_display->act_scr = lv_screen_active();
+        lv_obj_add_flag(cursor, LV_OBJ_FLAG_HIDDEN);
         res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
+        test_display->act_scr = act_screen_original;
+        lv_obj_remove_flag(cursor, LV_OBJ_FLAG_HIDDEN);
         if(!res) {
             LV_LOG_WARN("screenshot compare of `%s` failed", step->param.screenshot_compare.path);
             return res;
         }
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_WAIT) {
-        lv_test_wait(step->param.wait.ms);
+        lv_xml_test_wait(step->param.wait.ms, slowdown);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_FREEZE) {
+        lv_delay_ms(step->param.freeze.ms * slowdown);
     }
     return res;
 }
 
-static lv_obj_t * create_cursor(void)
+static lv_obj_t * create_cursor(lv_obj_t * parent)
 {
-    lv_obj_t * obj = lv_obj_create(lv_display_get_layer_sys(normal_display));
+    lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_size(obj, 30, 30);
     lv_obj_set_style_opa(obj, LV_OPA_50, 0);
     lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_ORANGE), 0);
@@ -279,10 +272,12 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     if(lv_streq(name, "test")) {
         const char * w = lv_xml_get_value_of(attrs, "width");
         const char * h = lv_xml_get_value_of(attrs, "height");
-        if(w == NULL) w = "320";
-        if(h == NULL) h = "240";
-        test->screen_width = lv_xml_atoi(w);
-        test->screen_height = lv_xml_atoi(h);
+
+        if(w) test->screen_width = lv_xml_atoi(w);
+        else test->screen_width = lv_display_get_horizontal_resolution(NULL);
+
+        if(h) test->screen_height = lv_xml_atoi(h);
+        else test->screen_height = lv_display_get_vertical_resolution(NULL);
         return;
     }
 
@@ -303,7 +298,6 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test->steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_AT;
         test->steps[idx].param.click.x = lv_xml_atoi(x);
         test->steps[idx].param.click.y = lv_xml_atoi(y);
-
     }
     else if(lv_streq(name, "screenshot_compare")) {
         test->step_cnt++;
@@ -320,6 +314,14 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         uint32_t idx = test->step_cnt - 1;
         test->steps[idx].type = LV_XML_TEST_STEP_TYPE_WAIT;
         test->steps[idx].param.wait.ms = lv_xml_atoi(ms);
+    }
+    else if(lv_streq(name, "freeze")) {
+        test->step_cnt++;
+        const char * ms = lv_xml_get_value_of(attrs, "ms");
+        test->steps = lv_realloc(test->steps, sizeof(lv_xml_test_step_t) * test->step_cnt);
+        uint32_t idx = test->step_cnt - 1;
+        test->steps[idx].type = LV_XML_TEST_STEP_TYPE_FREEZE;
+        test->steps[idx].param.freeze.ms = lv_xml_atoi(ms);
     }
 }
 

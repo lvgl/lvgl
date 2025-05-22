@@ -81,6 +81,7 @@ bool lv_test_screenshot_compare(const char * fn_ref)
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
+    lv_refr_now(NULL);
 
     pass = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
     if(!pass) return false;
@@ -103,8 +104,6 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 
     create_folders_if_needed(fn_ref_full);
-
-    lv_refr_now(NULL);
 
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);

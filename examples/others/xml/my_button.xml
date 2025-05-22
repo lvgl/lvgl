@@ -8,7 +8,7 @@
 		<color name="color" value="0xffa020"/>
 	</api>
 
-	<view extends="lv_button" width="#size" style_bg_color="$color">
+	<view extends="lv_button" width="#size" style_bg_color="$color" style_bg_color:pressed="0x00ff00">
 		<my_h3 text="$btn_text" align="center" />
 	</view>
 </component>

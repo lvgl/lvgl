@@ -100,7 +100,6 @@ static void delete_event_cb(lv_event_t * e)
 
 static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
-    printf("dummy flush\n");
     LV_UNUSED(area);
     LV_UNUSED(color_p);
     lv_display_flush_ready(disp);
