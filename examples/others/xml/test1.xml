@@ -1,15 +1,22 @@
-<test>
-	<view width="300" height="400" fley_flow="column">
-        <lv_chekckbox text="First one!"/>
-		<my_button btn_text="Hey, yoo not red!" align="center" color="0x114488"/>
-        <my_button btn_text="Hey, yoo reder!" align="center" color="0x664488"/>
-        <my_button btn_text="Hey, yoo very red!" align="center" color="0xcc4488"/>
+<test width="300" height="400">
+	<view width="300" height="400" flex_flow="column">
+        <lv_checkbox text="First one!"/>
+		<my_button btn_text="Hey, yoo not red!" width="content" align="center" color="0x114488"/>
+        <my_button btn_text="Hey, yoo reder!" width="content" align="center" color="0x664488"/>
+        <my_button btn_text="Hey, yoo very red!" width="content" align="center" color="0xcc4488"/>
 	</view>
-    
+
     <steps>
-        <screensot_compare path="before.png"/>
-        <click x="20" y="15"/>
-        <screensot_compare path="after.png"/>
+        <screenshot_compare path="A:before.png"/>
+        <click_at x="32" y="32"/>
+        <click_at x="100" y="80"/>
+        <click_at x="100" y="130"/>
+        <click_at x="100" y="180"/>
+        <wait ms="50"/>
+        <wait ms="50"/>
+        <wait ms="50"/>
+        <wait ms="50"/>
+        <screenshot_compare path="A:after.png"/>
     </steps>
 </test>
 

@@ -14,11 +14,14 @@ void lv_example_xml_2(void)
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_card.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/view.xml");
-    lv_xml_test_register_from_file("A:lvgl/examples/others/xml/test1.xml");
+    lv_xml_test_t * test1 = lv_xml_test_register_from_file("A:lvgl/examples/others/xml/test1.xml");
 
     lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
 
-    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "test1", NULL);
-    lv_obj_set_pos(obj, 10, 10);
+    lv_xml_test_play_all(test1, 500, true, false);
+
+    //    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "test1", NULL);
+    //    lv_obj_set_pos(obj, 10, 10);
+
 }
 #endif
