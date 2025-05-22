@@ -46,7 +46,7 @@
 #define SHM_FORMAT_UNKNOWN 0xFFFFFF
 
 #if (LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1)
-    #error[wayland] Unsupported LV_COLOR_DEPTH
+#error[wayland] Unsupported LV_COLOR_DEPTH
 #endif
 
 /**********************
@@ -71,10 +71,8 @@ static uint32_t tick_get_cb(void);
  *  STATIC VARIABLES
  **********************/
 
-static const struct wl_registry_listener registry_listener = {
-    .global        = handle_global,
-    .global_remove = handle_global_remove
-};
+static const struct wl_registry_listener registry_listener = {.global        = handle_global,
+                                                              .global_remove = handle_global_remove};
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -97,7 +95,8 @@ bool lv_wayland_timer_handler(void)
     handle_input();
 
     /* Ready input timers (to probe for any input received) */
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window)
+    {
         LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
         if(window != NULL && window->frame_done == false && window->frame_counter > 0) {
@@ -110,27 +109,23 @@ bool lv_wayland_timer_handler(void)
             /* Resume lvgl on the next cycle */
             return false;
 
-        }
-        else if(window != NULL && window->body->surface_configured == false) {
+        } else if(window != NULL && window->body->surface_configured == false) {
             /* Initial commit to trigger the configure event */
             /* Manually dispatching the queue is necessary, */
             /* to emit the configure event straight away */
             wl_surface_commit(window->body->surface);
             wl_display_dispatch(application.display);
-        }
-        else if(window != NULL && window->resize_pending) {
+        } else if(window != NULL && window->resize_pending) {
             if(lv_wayland_window_resize(window, window->resize_width, window->resize_height)) {
                 window->resize_width   = window->width;
                 window->resize_height  = window->height;
                 window->resize_pending = false;
 
-            }
-            else {
+            } else {
 
                 LV_LOG_TRACE("Failed to resize window frame: %d", window->frame_counter);
             }
-        }
-        else if(window->shall_close == true) {
+        } else if(window->shall_close == true) {
 
             /* Destroy graphical context and execute close_cb */
             handle_output();
@@ -149,7 +144,8 @@ bool lv_wayland_timer_handler(void)
      * be sent to the compositor, but the compositor pipe/connection is unable
      * to take more data at this time).
      */
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window)
+    {
         if(window->flush_pending) {
             errno = EAGAIN;
             break;
@@ -223,7 +219,8 @@ void lv_wayland_deinit(void)
 {
     struct window * window = NULL;
 
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window)
+    {
         if(!window->closed) {
             lv_wayland_window_destroy(window);
         }
@@ -284,16 +281,13 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
 
     if(strcmp(interface, wl_compositor_interface.name) == 0) {
         app->compositor = wl_registry_bind(registry, name, &wl_compositor_interface, 1);
-    }
-    else if(strcmp(interface, wl_subcompositor_interface.name) == 0) {
+    } else if(strcmp(interface, wl_subcompositor_interface.name) == 0) {
         app->subcompositor = wl_registry_bind(registry, name, &wl_subcompositor_interface, 1);
-    }
-    else if(strcmp(interface, wl_shm_interface.name) == 0) {
+    } else if(strcmp(interface, wl_shm_interface.name) == 0) {
         app->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
         wl_shm_add_listener(app->shm, lv_wayland_shm_get_listener(), app);
         app->cursor_theme = wl_cursor_theme_load(NULL, 32, app->shm);
-    }
-    else if(strcmp(interface, wl_seat_interface.name) == 0) {
+    } else if(strcmp(interface, wl_seat_interface.name) == 0) {
         app->wl_seat = wl_registry_bind(app->registry, name, &wl_seat_interface, 1);
         wl_seat_add_listener(app->wl_seat, lv_wayland_seat_get_listener(), app);
     }
@@ -336,15 +330,15 @@ static void handle_output(void)
     struct window * window;
     bool shall_flush = application.cursor_flush_pending;
 
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window)
+    {
         if((window->shall_close) && (window->close_cb != NULL)) {
             window->shall_close = window->close_cb(window->lv_disp);
         }
 
         if(window->closed) {
             continue;
-        }
-        else if(window->shall_close) {
+        } else if(window->shall_close) {
             window->closed      = true;
             window->shall_close = false;
             shall_flush         = true;
@@ -375,11 +369,11 @@ static void handle_output(void)
             if(errno != EAGAIN) {
                 LV_LOG_ERROR("failed to flush wayland display");
             }
-        }
-        else {
+        } else {
             /* All data flushed */
             application.cursor_flush_pending = false;
-            LV_LL_READ(&application.window_ll, window) {
+            LV_LL_READ(&application.window_ll, window)
+            {
                 window->flush_pending = false;
             }
         }
