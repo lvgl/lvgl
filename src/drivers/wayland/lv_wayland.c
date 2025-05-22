@@ -1341,6 +1341,54 @@ static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener_v3 = {
 static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener = {
     dmabuf_format
 };
+
+struct format_entry {
+    uint32_t format;
+    uint32_t padding;
+    uint64_t modifier;
+};
+
+static void handle_format_table(void * data, struct zwp_linux_dmabuf_feedback_v1 * zwp_linux_dmabuf_feedback_v1,
+                                int32_t fd, uint32_t size)
+{
+    struct application * app = data;
+
+    void * map = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+    if(map == MAP_FAILED) {
+        perror("mmap failed");
+        return;
+    }
+
+    size_t count = size / sizeof(struct format_entry);
+    struct format_entry * entries = (struct format_entry *)map;
+
+    for(size_t i = 0; i < count; ++i) {
+        if(LV_COLOR_DEPTH == 32 && entries[i].format == DRM_FORMAT_ARGB8888) {
+
+            /* Wayland compositors MUST support ARGB8888 */
+            app->drm_format = entries[i].format;
+
+        }
+        else if(LV_COLOR_DEPTH == 32 &&
+                entries[i].format == DRM_FORMAT_XRGB8888 &&
+                app->drm_format != DRM_FORMAT_ARGB8888) {
+
+            /* Select XRGB only if the compositor doesn't support transprancy */
+            app->drm_format = entries[i].format;
+
+        }
+        else if(LV_COLOR_DEPTH == 16 && entries[i].format == DRM_FORMAT_RGB565) {
+
+            app->drm_format = entries[i].format;
+        }
+    }
+
+    munmap(map, size);
+}
+
+static const struct zwp_linux_dmabuf_feedback_v1_listener dmabuf_feedback_listener = {
+    .format_table = handle_format_table
+};
 #endif
 
 static void handle_global(void * data, struct wl_registry * registry,
@@ -1380,13 +1428,18 @@ static void handle_global(void * data, struct wl_registry * registry,
 #endif
 #if LV_WAYLAND_USE_DMABUF
     else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
-        if(version > 3) {
-            LV_LOG_WARN("Version for xwp_linux_dmabuf_v1_interface not supported.\n");
-            return;
-        }
         app->dmabuf = wl_registry_bind(app->registry, name, &zwp_linux_dmabuf_v1_interface, version);
-        if(version == 3) zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener_v3, app);
-        else zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener, app);
+
+        if(version < 3) {
+            zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener, app);
+        }
+        else if(version == 3) {
+            zwp_linux_dmabuf_v1_add_listener(app->dmabuf, &dmabuf_listener_v3, app);
+        }
+        else {
+            struct zwp_linux_dmabuf_feedback_v1 * feedback = zwp_linux_dmabuf_v1_get_default_feedback(app->dmabuf);
+            zwp_linux_dmabuf_feedback_v1_add_listener(feedback, &dmabuf_feedback_listener, app);
+        }
 
         wl_display_roundtrip(app->display);
     }
