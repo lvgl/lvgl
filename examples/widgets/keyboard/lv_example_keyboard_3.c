@@ -14,7 +14,7 @@ static void event_cb(lv_event_t * e)
     /*When the keyboard draws the buttons...*/
     if(base_dsc->part == LV_PART_ITEMS) {
         /*Get a color based on the button's index*/
-        lv_palette_t palette = base_dsc->id1 % LV_PALETTE_LAST;
+        lv_palette_t palette = (lv_palette_t)(base_dsc->id1 % LV_PALETTE_LAST);
         lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
         if(fill_draw_dsc) {
             fill_draw_dsc->color = pressed ? lv_palette_darken(palette, 3) : lv_palette_main(palette);

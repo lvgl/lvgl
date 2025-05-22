@@ -100,15 +100,15 @@ void lv_xml_scale_section_apply(lv_xml_parser_state_t * state, const char ** att
             lv_scale_set_section_range(scale, section, value1, value2);
         }
         else if(lv_streq("style_main", name)) {
-            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->ctx, value);
+            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_scale_set_section_style_main(scale, section, &style_dsc->style);
         }
         else if(lv_streq("style_indicator", name)) {
-            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->ctx, value);
+            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_scale_set_section_style_indicator(scale, section, &style_dsc->style);
         }
         else if(lv_streq("style_items", name)) {
-            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->ctx, value);
+            lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_scale_set_section_style_items(scale, section, &style_dsc->style);
         }
     }

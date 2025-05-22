@@ -120,7 +120,7 @@ static void label_swipe(lv_event_t * gesture_event)
 
     lv_dir_t dir;
     lv_indev_gesture_state_t state;
-    char * text;
+    const char * text;
 
     if(lv_event_get_gesture_type(gesture_event) != LV_INDEV_GESTURE_TWO_FINGERS_SWIPE) {
         return;

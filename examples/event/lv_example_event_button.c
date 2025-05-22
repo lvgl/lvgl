@@ -4,7 +4,7 @@
 static void event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * label = lv_event_get_user_data(e);
+    lv_obj_t * label = (lv_obj_t *) lv_event_get_user_data(e);
 
     switch(code) {
         case LV_EVENT_PRESSED:

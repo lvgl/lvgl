@@ -161,8 +161,8 @@ def _add_startswith_matches(strings: [str], genned_link_set, editor_link_set):
             for key in symbol_dict:
                 if key is None:
                     # Dictionary `enums` has a key `None` which contains
-                    # all enumvalues from all unnamed enums, and each
-                    # enumvalue has a `file_name` field.
+                    # all enum values from all unnamed enums, and each
+                    # enum value has a `file_name` field.
                     enum_values_list = symbol_dict[None].members
                     for enum_val in enum_values_list:
                         if enum_val.name.startswith(partial_symbol):
@@ -397,7 +397,7 @@ def _build_one_local_dictionary(local_dict, remote_dict):
     """
     for symbol in remote_dict:
         # Note:  symbol `None` is actually a valid symbol in the
-        # `enums` dictionary, containing all enumvalue symbols
+        # `enums` dictionary, containing all enum-value symbols
         # for enums without names.
         if symbol is None or not symbol.startswith('_lv'):
             loc_symbol = symbol
@@ -587,7 +587,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
         f.write(subdir_stem + '\n')
         f.write(section_line)
         f.write('\n')
-        f.write('.. toctree::\n    :maxdepth: 2\n\n')
+        f.write('.. toctree::\n    :maxdepth: 1\n\n')
 
         # One entry per `.rst` file
         for h_file in elig_h_files:

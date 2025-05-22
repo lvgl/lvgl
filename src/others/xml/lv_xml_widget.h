@@ -42,6 +42,7 @@ lv_result_t lv_xml_widget_register(const char * name, lv_xml_widget_create_cb_t 
 
 lv_widget_processor_t * lv_xml_widget_get_processor(const char * name);
 
+lv_widget_processor_t * lv_xml_widget_get_extended_widget_processor(const char * extends);
 /**********************
  *      MACROS
  **********************/

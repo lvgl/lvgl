@@ -17,7 +17,7 @@ void lv_example_xml_2(void)
 
     lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
 
-    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "view", NULL);
+    lv_obj_t * obj = (lv_obj_t *) lv_xml_create(lv_screen_active(), "view", NULL);
     lv_obj_set_pos(obj, 10, 10);
 
     const char * my_button_attrs[] = {
@@ -40,7 +40,7 @@ void lv_example_xml_2(void)
         NULL, NULL,
     };
 
-    lv_obj_t * slider = lv_xml_create(lv_screen_active(), "lv_slider", slider_attrs);
+    lv_obj_t * slider = (lv_obj_t *) lv_xml_create(lv_screen_active(), "lv_slider", slider_attrs);
     lv_obj_set_width(slider, 100);
 }
 #endif

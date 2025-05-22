@@ -47,12 +47,14 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_CAR
 };
 
 const lv_image_dsc_t img_caret_down = {
-    .header.w = 13,
-    .header.h = 8,
-    .header.stride = 52,
-    .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .data = img_caret_down_map,
+    .header = {
+        .cf = LV_COLOR_FORMAT_ARGB8888,
+        .w = 13,
+        .h = 8,
+        .stride = 52,
+    },
     .data_size = sizeof(img_caret_down_map),
+    .data = img_caret_down_map,
 };
 
 #endif /* LV_BUILD_EXAMPLES */
