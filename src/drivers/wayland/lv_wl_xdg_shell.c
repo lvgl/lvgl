@@ -53,6 +53,7 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
 };
 
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {.ping = xdg_wm_base_ping};
+static bool is_window_configured                              = false;
 
 /**********************
  *      MACROS
@@ -170,7 +171,10 @@ lv_result_t lv_wayland_xdg_shell_create_window(struct application * app, struct 
     // XDG surfaces need to be configured before a buffer can be attached.
     // An (XDG) surface commit (without an attached buffer) triggers this
     // configure event
-    window->body->surface_configured = false;
+    is_window_configured = false;
+    wl_surface_commit(window->body->surface);
+    wl_display_roundtrip(application.display);
+    LV_ASSERT_MSG(is_window_configured, "Failed to receive the xdg_surface configuration event");
     return LV_RESULT_OK;
 }
 
@@ -198,12 +202,12 @@ lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window)
  *   Shell Input
  **********************/
 
-void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_t serial,
-                                               uint32_t button, uint32_t state)
+void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_t serial, uint32_t button,
+                                               uint32_t state)
 {
     struct window * window = app->pointer_obj->window;
-    int pos_x         = (int)app->pointer_obj->input.pointer.x;
-    int pos_y         = (int)app->pointer_obj->input.pointer.y;
+    int pos_x              = (int)app->pointer_obj->input.pointer.x;
+    int pos_y              = (int)app->pointer_obj->input.pointer.y;
 
     switch(app->pointer_obj->type) {
         case OBJECT_TITLEBAR:
@@ -393,9 +397,9 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
 
     xdg_surface_ack_configure(xdg_surface, serial);
 
-    if(window->body->surface_configured == false) {
+    if(!is_window_configured) {
         /* This branch is executed at launch */
-        if(window->resize_pending == false) {
+        if(!window->resize_pending) {
             /* Use the size passed to the create_window function */
             lv_wayland_window_draw(window, window->width, window->height);
         }
@@ -410,7 +414,7 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
             window->resize_pending = false;
         }
     }
-    window->body->surface_configured = true;
+    is_window_configured = true;
 }
 
 static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg_toplevel, int32_t width,
@@ -420,15 +424,13 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
 
     LV_UNUSED(xdg_toplevel);
     LV_UNUSED(states);
-    LV_UNUSED(width);
-    LV_UNUSED(height);
 
-    LV_LOG_TRACE("w:%d h:%d", width, height);
-    LV_LOG_TRACE("current body w:%d h:%d", window->body->width, window->body->height);
-    LV_LOG_TRACE("window w:%d h:%d", window->width, window->height);
+    LV_LOG_USER("w:%d h:%d", width, height);
+    LV_LOG_USER("current body w:%d h:%d", window->body->width, window->body->height);
+    LV_LOG_USER("window w:%d h:%d", window->width, window->height);
 
     if((width <= 0) || (height <= 0)) {
-        LV_LOG_TRACE("will not resize to w:%d h:%d", width, height);
+        LV_LOG_USER("will not resize to w:%d h:%d", width, height);
         return;
     }
 
@@ -436,10 +438,10 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
         window->resize_width   = width;
         window->resize_height  = height;
         window->resize_pending = true;
-        LV_LOG_TRACE("resize_pending is set, will resize to w:%d h:%d", width, height);
+        LV_LOG_USER("resize_pending is set, will resize to w:%d h:%d", width, height);
     }
     else {
-        LV_LOG_TRACE("resize_pending not set w:%d h:%d", width, height);
+        LV_LOG_USER("resize_pending not set w:%d h:%d", width, height);
     }
 }
 
