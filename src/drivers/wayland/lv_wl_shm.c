@@ -145,8 +145,8 @@ lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * wi
     smm_release(body_buf1);
     smm_release(body_buf2);
 
-    LV_LOG_TRACE("resize window:%dx%d body:%dx%d frame: %d rendered: %d", window->width, window->height,
-                 window->body->width, window->body->height, window->frame_counter, window->frame_done);
+    LV_LOG_TRACE("resize window:%dx%d body:%dx%d frame: %d", window->width, window->height, window->body->width,
+                 window->body->height, window->frame_counter);
 
     width  = window->body->width;
     height = window->body->height;
@@ -250,16 +250,15 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
         wl_surface_attach(window->body->surface, wl_buf, 0, 0);
         wl_surface_commit(window->body->surface);
         window->body->pending_buffer = NULL;
-        window->frame_done           = false;
 
         struct wl_callback * cb = wl_surface_frame(window->body->surface);
         wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);
         LV_LOG_TRACE("last flush frame: %d", window->frame_counter);
 
         window->flush_pending = true;
+        /* Return early here, the lv_display_flush_ready will get called in the frame_listener callback */
+        return;
     }
-
-    /* TODO: This should probably be done in the wl_surface_frame_listener callback */
     lv_display_flush_ready(disp);
     return;
 skip:

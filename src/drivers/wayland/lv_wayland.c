@@ -117,18 +117,7 @@ bool lv_wayland_timer_handler(void)
     LV_LL_READ(&application.window_ll, window) {
         LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
-        if(window != NULL && window->frame_done == false && window->frame_counter > 0) {
-            /* The last frame was not rendered */
-            LV_LOG_TRACE("The window is hidden or minimized");
-
-            /* Simply blocks until a frame done message arrives */
-            poll(&application.wayland_pfd, 1, -1);
-
-            /* Resume lvgl on the next cycle */
-            return false;
-
-        }
-        else if(window != NULL && window->resize_pending) {
+        if(window != NULL && window->resize_pending) {
             if(lv_wayland_window_resize(window, window->resize_width, window->resize_height) == LV_RESULT_OK) {
                 window->resize_width   = window->width;
                 window->resize_height  = window->height;
@@ -292,6 +281,20 @@ void lv_wayland_deinit(void)
     wl_display_disconnect(application.display);
 
     lv_ll_clear(&application.window_ll);
+}
+
+void lv_wayland_wait_flush_cb(lv_display_t * disp)
+{
+    struct window * window = lv_display_get_user_data(disp);
+    /* TODO: Figure out why we need this */
+    if(window->frame_counter == 0) {
+        return;
+    }
+    uint32_t initial_frame_counter = window->frame_counter;
+    while(initial_frame_counter == window->frame_counter) {
+        poll(&application.wayland_pfd, 1, -1);
+        handle_input();
+    }
 }
 
 /**********************

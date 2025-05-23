@@ -222,7 +222,6 @@ struct window {
     bool maximized;
     bool fullscreen;
     uint32_t frame_counter;
-    bool frame_done;
 };
 
 /**********************
@@ -241,7 +240,7 @@ extern struct application application;
 
 void lv_wayland_init(void);
 void lv_wayland_deinit(void);
-
+void lv_wayland_wait_flush_cb(lv_display_t * disp);
 /**********************
  *      Window
  **********************/

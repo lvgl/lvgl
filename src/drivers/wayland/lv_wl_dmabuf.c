@@ -161,7 +161,6 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
     /* Finally, attach buffer and commit to surface */
     wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
     wl_surface_commit(window->body->surface);
-    window->frame_done = false;
 
     struct wl_callback * cb = wl_surface_frame(window->body->surface);
     wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);

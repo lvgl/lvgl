@@ -126,6 +126,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_user_data(window->lv_disp, window);
 
     lv_display_set_render_mode(window->lv_disp, LV_WAYLAND_RENDER_MODE);
+    lv_display_set_flush_wait_cb(window->lv_disp, lv_wayland_wait_flush_cb);
 
 #if LV_WAYLAND_USE_DMABUF
     lv_wayland_dmabuf_set_draw_buffers(&application.dmabuf_ctx, window->lv_disp);
@@ -484,7 +485,7 @@ static void lv_window_graphic_obj_flush_done(void * data, struct wl_callback * c
 
     LV_LOG_TRACE("frame: %d done, new frame: %d", window->frame_counter - 1, window->frame_counter);
 
-    window->frame_done = true;
+    lv_display_flush_ready(window->lv_disp);
 }
 
 #endif /* LV_USE_WAYLAND */
