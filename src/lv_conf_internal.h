@@ -17,6 +17,7 @@
 #define LV_OS_WINDOWS       5
 #define LV_OS_MQX           6
 #define LV_OS_SDL2          7
+#define LV_OS_THREADX       9
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -265,6 +266,7 @@
  * - LV_OS_WINDOWS
  * - LV_OS_MQX
  * - LV_OS_SDL2
+ * - LV_OS_THREADX
  * - LV_OS_CUSTOM */
 #ifndef LV_USE_OS
     #ifdef CONFIG_LV_USE_OS
