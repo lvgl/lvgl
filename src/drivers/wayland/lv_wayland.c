@@ -7,8 +7,6 @@
  *********************/
 
 #include "lv_wayland.h"
-#include <src/misc/lv_log.h>
-#include <src/misc/lv_types.h>
 
 #if LV_USE_WAYLAND
 

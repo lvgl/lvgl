@@ -8,7 +8,6 @@ typedef int dummy_t;     /* Make GCC on windows happy, avoid empty translation u
 #ifndef _WIN32
 
 #include "lv_wayland_smm.h"
-#include "../../display/lv_display.h"
 
 #if LV_USE_WAYLAND
 

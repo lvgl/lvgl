@@ -4,7 +4,6 @@
  */
 
 #include "lv_wayland.h"
-#include <src/lv_conf_internal.h>
 
 #if LV_WAYLAND_USE_DMABUF
 

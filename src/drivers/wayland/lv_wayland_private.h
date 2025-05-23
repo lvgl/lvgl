@@ -6,9 +6,6 @@
 #ifndef LV_WAYLAND_PRIVATE_H
 #define LV_WAYLAND_PRIVATE_H
 
-#include <src/misc/lv_types.h>
-#include <sys/poll.h>
-#include <wayland-client-protocol.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,10 +15,12 @@ extern "C" {
  *********************/
 
 #include "lv_wayland.h"
-#include "lv_wayland_smm.h"
-
 #if LV_USE_WAYLAND
 
+
+#include "lv_wayland_smm.h"
+#include <sys/poll.h>
+#include <wayland-client-protocol.h>
 #if !LV_WAYLAND_WL_SHELL
 #include "wayland_xdg_shell.h"
 #define LV_WAYLAND_XDG_SHELL 1

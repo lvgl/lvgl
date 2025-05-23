@@ -7,12 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_wl_window.h"
-#include <src/misc/lv_types.h>
 
 #if LV_USE_WAYLAND
 
-#include "lv_wayland_private.h"
 #include <string.h>
+#include "lv_wayland_private.h"
 #include "lv_wayland_private.h"
 #include "lv_wl_pointer.h"
 #include "lv_wl_pointer_axis.h"
