@@ -1,4 +1,4 @@
-
+<!-- filepath: /Users/edwardnepo/lvgl/README.md -->
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
 
 <p align="right">
@@ -8,17 +8,29 @@
 <br>
 
 <p align="center">
-  <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
+  <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
 </p>
 
-  <h1 align="center">Light and Versatile Graphics Library</h1>
-  <br>
+<h1 align="center">Light and Versatile Graphics Library</h1>
+
+<p align="center">
+  <a href="https://github.com/lvgl/lvgl/releases">
+    <img src="https://img.shields.io/github/v/release/lvgl/lvgl" alt="Version">
+  </a>
+  <a href="https://github.com/lvgl/lvgl/blob/master/LICENCE.txt">
+    <img src="https://img.shields.io/github/license/lvgl/lvgl" alt="License">
+  </a>
+  <a href="https://github.com/lvgl/lvgl/stargazers">
+    <img src="https://img.shields.io/github/stars/lvgl/lvgl" alt="Stars">
+  </a>
+</p>
+
 <div align="center">
   <img src="https://lvgl.io/github-assets/smartwatch-demo.gif">
   &nbsp;
-  <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
+  <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
-<br>
+
 <p align="center">
 <a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
@@ -26,6 +38,33 @@
 <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
 <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a>
 </p>
+
+## :rocket: Quick Start
+
+### Using LVGL in Your Project
+
+#### Arduino
+1. Open **Arduino IDE**
+2. Go to **Sketch > Include Library > Manage Libraries**
+3. Search for `"LVGL"` and click **Install**
+
+#### PlatformIO
+In your `platformio.ini`, add:
+```ini
+lib_deps = lvgl/lvgl@^8.0.0
+```
+
+---
+
+### Cloning the Source (for contributors and advanced users)
+
+If you want to contribute to LVGL or explore the source code:
+
+```bash
+git clone https://github.com/lvgl/lvgl.git
+cd lvgl
+```
+
 <br>
 
 ## :ledger: Overview
@@ -70,6 +109,23 @@ Our team is ready to help you with graphics design, UI implementation and consul
 **Docs, Tools, and Services**
   - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/examples.html)
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
+
+## :handshake: Contributing
+
+We welcome all contributions to LVGL! Here are some ways you can help:
+
+- **Report bugs**: Open an issue describing the bug and how to reproduce it
+- **Suggest features**: Open an issue describing the new feature and its benefits
+- **Write code**: Take a look at our open issues and see if you can help solve them
+- **Review code**: Review pull requests from other contributors
+- **Write documentation**: Help improve our documentation or write blog posts
+- **Share LVGL**: Star us on GitHub, share our project on social media
+
+Before contributing, please read our [Contributing Guide](https://docs.lvgl.io/master/details/contributing.html) for guidelines about:
+- Coding style
+- How to open issues
+- How to make pull requests
+- Developer certification of origin (DCO)
 
 ## :heart: Sponsor
 
@@ -221,6 +277,7 @@ cb = lv_checkbox_create(lv_screen_active());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+
 ```
 
 </details>
