@@ -392,6 +392,11 @@ menu "LVGL configuration"
 			bool "Enable VGLite asserts"
 			depends on LV_USE_DRAW_VGLITE
 			default n
+			
+		config LV_USE_VGLITE_CHECK_ERROR
+			bool "Enable VGLite error checks"
+			depends on LV_USE_DRAW_VGLITE
+			default n
 
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"

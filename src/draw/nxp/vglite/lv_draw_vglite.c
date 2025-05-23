@@ -500,11 +500,11 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 static inline void _vglite_cleanup_task(vglite_draw_task_t * task)
 {
     if(task->path != NULL) {
-        vg_lite_clear_path(task->path);
+        VGLITE_CHECK_ERROR(vg_lite_clear_path(task->path));
         lv_free(task->path);
     }
     if(task->gradient != NULL) {
-        vg_lite_clear_grad(task->gradient);
+        VGLITE_CHECK_ERROR(vg_lite_clear_grad(task->gradient));
         lv_free(task->gradient);
     }
     if(task->path_data != NULL)

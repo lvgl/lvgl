@@ -190,15 +190,15 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
         VGLITE_CHECK_ERROR(vg_lite_update_grad(gradient));
 
         grad_matrix = vg_lite_get_grad_matrix(gradient);
-        vg_lite_identity(grad_matrix);
-        vg_lite_translate((float)coords->x1, (float)coords->y1, grad_matrix);
+        VGLITE_CHECK_ERROR(vg_lite_identity(grad_matrix));
+        VGLITE_CHECK_ERROR(vg_lite_translate((float)coords->x1, (float)coords->y1, grad_matrix));
 
         if(dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_VER) {
-            vg_lite_scale(1.0f, (float)height / 256.0f, grad_matrix);
-            vg_lite_rotate(90.0f, grad_matrix);
+            VGLITE_CHECK_ERROR(vg_lite_scale(1.0f, (float)height / 256.0f, grad_matrix));
+            VGLITE_CHECK_ERROR(vg_lite_rotate(90.0f, grad_matrix));
         }
         else { /*LV_GRAD_DIR_HOR*/
-            vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
+            VGLITE_CHECK_ERROR(vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix));
         }
 
         VGLITE_CHECK_ERROR(vg_lite_draw_gradient(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
