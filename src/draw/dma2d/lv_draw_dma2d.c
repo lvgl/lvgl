@@ -211,72 +211,18 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
 #if LV_DRAW_DMA2D_CACHE
 void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
-    if((SCB->CCR & SCB_CCR_DC_Msk) == 0) return; /* data cache is disabled */
-
-    uint32_t rows_remaining = mem_area->height;
-    uint32_t row_addr = (uint32_t)(uintptr_t) mem_area->first_byte;
-    uint32_t row_end_addr = 0;
-
-    __DSB();
-
-    while(rows_remaining) {
-        uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
-                                __SCB_DCACHE_LINE_SIZE) + 1;
-
-        if(addr == row_end_addr) {
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        while(cache_lines) {
-            SCB->DCIMVAC = addr;
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        row_end_addr = addr - __SCB_DCACHE_LINE_SIZE;
-        row_addr += mem_area->stride;
-        rows_remaining--;
-    };
-
-    __DSB();
-    __ISB();
+    if (SCB->CCR & SCB_CCR_DC_Msk)
+    {
+        SCB_CleanInvalidateDCache();
+    }
 }
 
 void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
-    if((SCB->CCR & SCB_CCR_DC_Msk) == 0) return;  /* data cache is disabled */
-
-    uint32_t rows_remaining = mem_area->height;
-    uint32_t row_addr = (uint32_t)(uintptr_t) mem_area->first_byte;
-    uint32_t row_end_addr = 0;
-
-    __DSB();
-
-    while(rows_remaining) {
-        uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
-                                __SCB_DCACHE_LINE_SIZE) + 1;
-
-        if(addr == row_end_addr) {
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        while(cache_lines) {
-            SCB->DCCMVAC = addr;
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        row_end_addr = addr - __SCB_DCACHE_LINE_SIZE;
-        row_addr += mem_area->stride;
-        rows_remaining--;
-    };
-
-    __DSB();
-    __ISB();
+    if (SCB->CCR & SCB_CCR_DC_Msk)
+    {
+        SCB_CleanInvalidateDCache();
+    }
 }
 #endif
 
