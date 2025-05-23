@@ -9,7 +9,6 @@
 
 #include "lv_wayland_private.h"
 #include <wayland_linux_dmabuf.h>
-#include <wayland_linux_explicit_synchronization.h>
 #include <drm/drm_fourcc.h>
 #include <stdlib.h>
 #include <src/misc/lv_types.h>
@@ -40,8 +39,6 @@ struct buffer {
     uint32_t strides[MAX_BUFFER_PLANES];
     uint32_t offsets[MAX_BUFFER_PLANES];
     struct wl_buffer * buffer;
-
-    struct zwp_linux_buffer_release_v1 * buffer_release;
 #endif
 
     void * buf_base[MAX_BUFFER_PLANES];
@@ -299,8 +296,6 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
 
 static void buffer_free(struct buffer * buf)
 {
-    if(buf->buffer_release) zwp_linux_buffer_release_v1_destroy(buf->buffer_release);
-
     if(buf->buffer) wl_buffer_destroy(buf->buffer);
 
     if(buf->lv_draw_buf) lv_draw_buf_destroy(buf->lv_draw_buf);
