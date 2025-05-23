@@ -114,9 +114,9 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     lv_draw_vglite_border(vglite_task);
 
                     /** Cleanup for vglite_task */
-                    vg_lite_finish();
+                    VGLITE_CHECK_ERROR(vg_lite_finish());
                     if(vglite_task->path) {
-                        vg_lite_clear_path(vglite_task->path);
+                        VGLITE_CHECK_ERROR(vg_lite_clear_path(vglite_task->path));
                         lv_free(vglite_task->path_data);
                         lv_free(vglite_task->path);
                     }
@@ -199,7 +199,7 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     /** Cleanup for vglite_task */
                     vg_lite_finish();
                     if(vglite_task->path) {
-                        vg_lite_clear_path(vglite_task->path);
+                        VGLITE_CHECK_ERROR(vg_lite_clear_path(vglite_task->path));
                         lv_free(vglite_task->path_data);
                         lv_free(vglite_task->path);
                     }
@@ -228,12 +228,12 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
         /** Cleanup for vglite_task */
         vg_lite_finish();
         if(vglite_task->path) {
-            vg_lite_clear_path(vglite_task->path);
+            VGLITE_CHECK_ERROR(vg_lite_clear_path(vglite_task->path));
             lv_free(vglite_task->path_data);
             lv_free(vglite_task->path);
         }
         if(vglite_task->gradient) {
-            vg_lite_clear_grad(vglite_task->gradient);
+            VGLITE_CHECK_ERROR(vg_lite_clear_grad(vglite_task->gradient));
             lv_free(vglite_task->gradient);
         }
         lv_free(vglite_task);

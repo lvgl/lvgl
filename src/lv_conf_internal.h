@@ -747,6 +747,15 @@
             #define LV_USE_VGLITE_ASSERT 0
         #endif
     #endif
+
+    /** Enable VGLite error checks. */
+    #ifndef LV_USE_VGLITE_CHECK_ERROR
+        #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
+            #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
+        #else
+            #define LV_USE_VGLITE_CHECK_ERROR 0
+        #endif
+    #endif
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
