@@ -11,7 +11,8 @@
 
 #if LV_WAYLAND_WL_SHELL
 
-/* TODO: WL_SHELL has been deprecated for 3 years now. LV_WAYLAND_WL_SHELL should probably be deprecated soon */
+/* WL_SHELL has been deprecated for 3 years now */
+#warning LV_WAYLAND_WL_SHELL is deprecated and will be removed in a future release
 
 #include "lv_wayland_private.h"
 #include <linux/input-event-codes.h>
