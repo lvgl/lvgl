@@ -1,7 +1,7 @@
 
 
 /**
- * @file lv_wayland_touch.h
+ * @file lv_wl_touch.h
  *
  */
 

@@ -1,20 +1,6 @@
-/*******************************************************************
- *
- * @file lv_wayland.c - The Wayland client for LVGL applications
- * Based on the original file from the repository.
- *
- * Porting to LVGL 9.1
- * EDGEMTech Ltd. by Erik Tagirov (erik.tagirov@edgemtech.ch)
- *
- * See LICENCE.txt for details
- *
- ******************************************************************/
-
-#include <src/misc/lv_types.h>
-#include <sys/stat.h>
-typedef int dummy_t; /* Make GCC on windows happy, avoid empty translation unit */
-
-#ifndef _WIN32
+/**
+ * @file lv_wayland.c
+ */
 
 /*********************
  *      INCLUDES

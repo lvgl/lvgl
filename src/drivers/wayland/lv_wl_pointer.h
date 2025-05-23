@@ -1,6 +1,6 @@
 
 /**
- * @file lv_wayland_pointer.h
+ * @file lv_wl_pointer.h
  *
  */
 

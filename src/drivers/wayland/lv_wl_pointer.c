@@ -1,5 +1,5 @@
 /**
- * @file lv_wayland_pointer.c
+ * @file lv_wl_pointer.c
  *
  */
 

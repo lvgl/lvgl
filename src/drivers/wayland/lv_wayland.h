@@ -1,17 +1,7 @@
-/*******************************************************************
- *
- * @file lv_wayland.h - Public functions of the LVGL Wayland client
- *
- * Based on the original file from the repository.
- *
- * Porting to LVGL 9.1
- * 2024 EDGEMTech Ltd.
- *
- * See LICENCE.txt for details
- *
- * Author(s): EDGEMTech Ltd, Erik Tagirov (erik.tagirov@edgemtech.ch)
- *
- ******************************************************************/
+/**
+ * @file lv_wayland.h
+ */
+
 #ifndef LV_WAYLAND_H
 #define LV_WAYLAND_H
 

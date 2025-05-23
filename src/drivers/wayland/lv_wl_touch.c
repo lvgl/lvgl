@@ -1,5 +1,5 @@
 /**
- * @file lv_wayland_touch.c
+ * @file lv_wl_touch.c
  *
  */
 

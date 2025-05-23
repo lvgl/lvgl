@@ -1,5 +1,5 @@
 /**
- * @file lv_wayland_keyboard.c
+ * @file lv_wl_keyboard.c
  *
  */
 
