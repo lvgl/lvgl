@@ -705,6 +705,8 @@
 
 #define LV_USE_ARC        1
 
+#define LV_USE_ARC_LABEL  1
+
 #define LV_USE_BAR        1
 
 #define LV_USE_BUTTON        1
