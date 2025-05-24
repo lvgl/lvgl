@@ -747,6 +747,7 @@ def run(args):
     # ---------------------------------------------------------------------
     t_end = datetime.now()
     announce(__file__, 'Total run time:  ' + str(t_end - t0))
+    announce(__file__, '\n\nNote: warnings about `details/index.rst` and `intro/index.rst` not being in any toctree are expected and okay.\n')
     announce(__file__, 'Done.')
 
 
