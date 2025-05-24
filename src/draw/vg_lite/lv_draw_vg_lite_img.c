@@ -118,12 +118,19 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
 
-    /**
-     * When the image is transformed or rounded or tiled, create a path around
-     * the image and follow the image_matrix for coordinate transformation
-     */
-    if(has_transform || dsc->clip_radius || dsc->tile) {
-        /* Apply the image transformation to the path */
+    if(dsc->tile) {
+        /* When the image is tiled, use coords as the tile area and create a path around it */
+        lv_vg_lite_path_append_rect(
+            path,
+            coords->x1, coords->y1,
+            lv_area_get_width(coords), lv_area_get_height(coords),
+            dsc->clip_radius);
+    }
+    else if(has_transform || dsc->clip_radius) {
+        /**
+         * When the image is transformed or rounded, create a path around
+         * the image and follow the image_matrix for coordinate transformation
+         */
         lv_vg_lite_path_set_transform(path, &image_matrix);
 
         /* Each point will be transformed accordingly. */
@@ -132,9 +139,6 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             dsc->image_area.x1 - coords->x1, dsc->image_area.y1 - coords->y1,
             lv_area_get_width(&dsc->image_area), lv_area_get_height(&dsc->image_area),
             dsc->clip_radius);
-
-        /* Disable transform for the path */
-        lv_vg_lite_path_set_transform(path, NULL);
     }
     else {
         /* append normal rect to the path */
