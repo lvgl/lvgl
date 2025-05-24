@@ -34,9 +34,32 @@ typedef struct {
     flag_cond_t cond : 3;
 } flag_and_cond_t;
 
+typedef struct {
+    lv_subject_t * subject;
+    int32_t value;
+} subject_set_int_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    const char * value;
+} subject_set_string_user_data_t;
+
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t step;
+    int32_t min;
+    int32_t max;
+} subject_increment_user_data_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void subject_set_int_cb(lv_event_t * e);
+static void subject_set_string_cb(lv_event_t * e);
+static void subject_increment_cb(lv_event_t * e);
+
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
@@ -70,6 +93,9 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void dropdown_value_changed_event_cb(lv_event_t * e);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
+
+static void free_user_data_event_cb(lv_event_t * e);
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -461,6 +487,56 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
+void lv_obj_add_subject_increment(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                  int32_t min, int32_t max)
+{
+    subject_increment_user_data_t * user_data = lv_malloc(sizeof(subject_increment_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data in in <lv_obj-subject_increment>");
+        return;
+    }
+
+    user_data->step = step;
+    user_data->min = min;
+    user_data->max = max;
+    user_data->subject = subject;
+    lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+void lv_obj_add_subject_set_int(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
+{
+    subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = value;
+
+    lv_obj_add_event_cb(obj, subject_set_int_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+void lv_obj_add_subject_set_string(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, const char * value)
+{
+    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = lv_strdup(value);
+
+    lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
@@ -673,6 +749,31 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+
+static void subject_set_int_cb(lv_event_t * e)
+{
+    subject_set_int_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_set_int(user_data->subject, user_data->value);
+}
+
+static void subject_set_string_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_copy_string(user_data->subject, user_data->value);
+}
+
+static void subject_increment_cb(lv_event_t * e)
+{
+    subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
+    int32_t value = lv_subject_get_int(user_data->subject);
+
+    value += user_data->step;
+    value = LV_CLAMP(user_data->min, value, user_data->max);
+
+    lv_subject_set_int(user_data->subject, value);
+}
+
 
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
@@ -902,5 +1003,18 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 }
 
 #endif /*LV_USE_DROPDOWN*/
+
+static void free_user_data_event_cb(lv_event_t * e)
+{
+    lv_free(lv_event_get_user_data(e));
+}
+
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_free((void *)user_data->value);
+    lv_free(user_data);
+}
+
 
 #endif /*LV_USE_OBSERVER*/
