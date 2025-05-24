@@ -245,6 +245,29 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
     }
 }
 
+static void draw_rect(lv_draw_vg_lite_unit_t * u, float x, float y, float w, float h, lv_color_t color)
+{
+    lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+    lv_vg_lite_path_append_rect(path, x, y, w, h, 0);
+    lv_vg_lite_path_set_bounding_box(path, x, y, x + w, y + h);
+    lv_vg_lite_path_end(path);
+
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(path),
+        VG_LITE_FILL_NON_ZERO,
+        &u->global_matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(color, LV_OPA_COVER, true));
+
+    lv_vg_lite_path_drop(u, path);
+}
+
+static void draw_area(lv_draw_vg_lite_unit_t * u, const lv_area_t * area, lv_color_t color)
+{
+    draw_rect(u, area->x1, area->y1, lv_area_get_width(area), lv_area_get_height(area), color);
+}
+
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, vg_lite_buffer_t * src_buf)
 {
     lv_area_t clip_area;
@@ -252,6 +275,8 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
     if(!lv_area_intersect(&clip_area, &t->clip_area, dsc->letter_coords)) {
         return;
     }
+
+    draw_area(u, &clip_area, lv_palette_main(LV_PALETTE_BLUE));
 
     LV_PROFILER_DRAW_BEGIN;
 
@@ -325,6 +350,8 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         return;
     }
 
+    draw_area(u, &path_clip_area, lv_palette_main(LV_PALETTE_GREY));
+
     LV_PROFILER_DRAW_BEGIN;
 
     /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
@@ -343,23 +370,23 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
     vg_lite_scale(scale, scale, &matrix);
 
+    /* matrix for drawing, different from matrix for calculating the bounding box */
+    vg_lite_matrix_t draw_matrix = u->global_matrix;
+    lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
+
     /* calc inverse matrix */
     vg_lite_matrix_t result;
     if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
         LV_LOG_ERROR("no inverse matrix");
+        lv_vg_lite_matrix_dump_info(&matrix);
         LV_PROFILER_DRAW_END;
         return;
     }
 
     const lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
     const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
-
     const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
     const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
-
-    /* matrix for drawing, different from matrix for calculating the bounding box */
-    vg_lite_matrix_t draw_matrix = u->global_matrix;
-    lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
 
     if(is_rotated) {
         vg_lite_matrix_t internal_matrix;
@@ -368,31 +395,33 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         vg_lite_rotate(dsc->rotation / 10.0f, &internal_matrix);
         vg_lite_translate(-dsc->pivot.x, 0, &internal_matrix);
 
-        lv_vg_lite_path_t * outline_dup = lv_vg_lite_path_get(u, VG_LITE_FP32);
-        lv_vg_lite_path_set_transform(outline_dup, &internal_matrix);
-        lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(outline), outline_iter_cb, outline_dup);
-        lv_vg_lite_path_set_bounding_box(outline_dup, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+        lv_vg_lite_path_t * outline_transformed = lv_vg_lite_path_get(u, VG_LITE_FP32);
+        lv_vg_lite_path_set_transform(outline_transformed, &internal_matrix);
+        lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(outline), outline_iter_cb, outline_transformed);
+        lv_vg_lite_path_set_bounding_box(outline_transformed, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
 
         lv_vg_lite_draw(
             &u->target_buffer,
-            lv_vg_lite_path_get_path(outline_dup),
+            lv_vg_lite_path_get_path(outline_transformed),
             VG_LITE_FILL_NON_ZERO,
             &draw_matrix,
             VG_LITE_BLEND_SRC_OVER,
             lv_vg_lite_color(dsc->color, dsc->opa, true));
 
-        lv_vg_lite_path_drop(u, outline_dup);
+        lv_vg_lite_path_drop(u, outline_transformed);
+
+        LV_PROFILER_DRAW_END;
+        return;
     }
-    else {
-        lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
-        lv_vg_lite_draw(
-            &u->target_buffer,
-            lv_vg_lite_path_get_path(outline),
-            VG_LITE_FILL_NON_ZERO,
-            &draw_matrix,
-            VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->color, dsc->opa, true));
-    }
+
+    lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(outline),
+        VG_LITE_FILL_NON_ZERO,
+        &draw_matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(dsc->color, dsc->opa, true));
 
     LV_PROFILER_DRAW_END;
 }
