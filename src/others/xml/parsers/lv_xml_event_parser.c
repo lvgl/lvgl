@@ -42,7 +42,6 @@ void * lv_xml_event_call_function_create(lv_xml_parser_state_t * state, const ch
 {
     LV_UNUSED(attrs);
 
-
     const char * trigger = lv_xml_get_value_of(attrs, "trigger");
     lv_event_code_t code = LV_EVENT_CLICKED;
     if(trigger) code = trigger_text_to_enum_value(trigger);

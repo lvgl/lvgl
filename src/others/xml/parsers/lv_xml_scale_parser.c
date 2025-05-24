@@ -70,7 +70,7 @@ void lv_xml_scale_apply(lv_xml_parser_state_t * state, const char ** attrs)
             int32_t value2 = lv_xml_atoi_split(&value, ' ');
             lv_scale_set_range(item, value1, value2);
         }
-        else if(lv_streq("angle_range", name)) lv_scale_set_angle_range(item, lv_xml_to_bool(value));
+        else if(lv_streq("angle_range", name)) lv_scale_set_angle_range(item, lv_xml_atoi(value));
         else if(lv_streq("rotation", name)) lv_scale_set_rotation(item, lv_xml_to_bool(value));
     }
 }

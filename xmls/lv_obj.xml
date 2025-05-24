@@ -39,6 +39,78 @@ Example
 		    <enum name="user_4"          help="Custom flag, free to use by user"/>
 		</enumdef>
 
+        <element name="bind_flag_if_eq" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_not_eq" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_gt" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_ge" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_lt" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_le" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_eq" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_not_eq" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_gt" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_ge" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_lt" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_le" access="bind" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
 	    <prop name="name" type="string"/>
 	    <prop name="store" type="bool"/>
 	    <prop name="x" type="coords"/>
@@ -216,65 +288,5 @@ Example
 	    <prop name="flex_in_new_track" 	type="flag:flag lv_obj_flag"/>
 
 	    <prop name="bind_checked" type="subject"/>
-	    <prop name="bind_flag_if_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_not_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_gt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_ge">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_lt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_le">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_not_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_gt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_ge">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_lt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_le">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
 	</api>
 </widget>

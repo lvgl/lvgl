@@ -283,3 +283,55 @@ And this is the related C file where the item properties are set:
 
     my_widget_set_item_icon(parent, index, image1);
     my_widget_set_item_color(parent, index, color);
+
+
+``access="bind"``
+-----------------
+
+The ``"bind"`` access type is similar to ``"set"``, but instead of directly setting a property, it binds a subject with other optional parameters.
+
+"Bind" elements are used in cases where multiple properties need to be bound to subjects.
+For example, binding subjects to flags such as ``hidden``, ``checkable``, etc. These can't be normal properties, as XML doesn't allow using the same property name more than once.
+For example, the following is invalid:
+
+.. code-block:: xml
+
+    <lv_button bind_flag_if_eq="subject1 hidden 1" bind_flag_if_eq="subject2 checkable 5"/>
+
+In ``"bind"`` elements, only ``<arg>``s can be defined. The ``type`` attribute is not allowed, as these functions do not have return values.
+
+Example:
+
+.. code-block:: xml
+
+    <!-- my_widget.xml -->
+    <api>
+        <element name="color" access="bind" help="Change the color if a value matches">
+            <arg name="subject" type="subject" help="Bind this subject"/>
+            <arg name="new_color" type="color" help="The color to apply"/>
+            <arg name="ref_value" type="int" help="Apply the color if the subject value equals this"/>
+        </element>
+    </api>
+
+In a view:
+
+.. code-block:: xml
+
+    <!-- complex_widget.xml -->
+    <view>
+        <my_widget width="100px">
+            <my_widget-bind_color subject="subject_1" color="0xff0000" ref_value="15"/>
+        </my_widget>
+    </view>
+
+This is the generated header file:
+
+.. code-block:: c
+
+    void my_widget_bind_color(lv_obj_t * parent, lv_subject_t * subject, lv_color_t color, int32_t ref_value);
+
+And this is the related C file where the item properties are set:
+
+.. code-block:: c
+
+    my_widget_bind_color(obj, &subject_1, lv_color_hex(0xff0000), 15);

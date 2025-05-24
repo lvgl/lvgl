@@ -42,6 +42,7 @@ typedef enum {
 } lv_xml_parser_section_t;
 
 struct _lv_xml_parser_state_t {
+    const char * tag_name;
     lv_xml_component_scope_t scope;
     lv_ll_t parent_ll;
     lv_obj_t * parent;
