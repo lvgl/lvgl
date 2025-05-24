@@ -92,10 +92,10 @@ lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maxim
 {
 
     if(!window->wl_shell_surface) {
+        return LV_RESULT_INVALID;
     }
     if(maximized) {
-        /* The wl_shell has been deprecated */
-        // wl_shell_surface_set_maximized(window->wl_shell_surface);
+        LV_LOG_ERROR("WL_SHELL - Unsupported operation - Maximization");
         return LV_RESULT_INVALID;
     }
     else {
@@ -105,7 +105,10 @@ lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maxim
 }
 
 lv_result_t lv_wayland_wl_shell_set_minimized(struct window * window)
-{}
+{
+    LV_LOG_ERROR("WL_SHELL - Unsupported operation - Minization");
+    return LV_RESULT_INVALID;
+}
 lv_result_t lv_wayland_wl_shell_set_fullscreen(struct window * window, bool fullscreen)
 {
     if(!window->wl_shell_surface) {
