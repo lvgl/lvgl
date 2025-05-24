@@ -275,8 +275,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     /* clear area */
     if(!path) {
-        /* clear color needs to ignore fill_dsc.opa */
-        vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, u->task_act->target_layer->opa));
+        vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, u->task_act->opa));
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &scissor_area);
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
@@ -336,7 +335,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         lv_vg_lite_path_set_bounding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
     }
 
-    const lv_opa_t layer_opa = u->task_act->target_layer->opa;
+    const lv_opa_t layer_opa = u->task_act->opa;
 
     if(dsc->fill_dsc.opa) {
         draw_fill(u, lv_vg_path, dsc, &matrix, &offset, layer_opa);
