@@ -345,7 +345,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_draw_buf_set_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE);
 
         /* Empty handlers to avoid decoder asserts */
-        lv_draw_buf_handlers_init(&ffmpeg_ctx->draw_buf_handlers, NULL, NULL, NULL, NULL, NULL, NULL);
+        lv_draw_buf_handlers_init(&ffmpeg_ctx->draw_buf_handlers, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
         decoded->handlers = &ffmpeg_ctx->draw_buf_handlers;
 
         if(dsc->args.premultiply && ffmpeg_ctx->has_alpha) {
