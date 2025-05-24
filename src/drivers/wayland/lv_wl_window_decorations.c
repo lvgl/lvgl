@@ -121,7 +121,7 @@ bool lv_wayland_window_decoration_attach(struct window * window, struct graphic_
         /* Create the subsurface only once */
 
         decoration->subsurface =
-            wl_subcompositor_get_subsurface(window->application->subcompositor, decoration->surface, parent->surface);
+            wl_subcompositor_get_subsurface(window->wl_ctx->subcompositor, decoration->surface, parent->surface);
         if(!decoration->subsurface) {
             LV_LOG_ERROR("cannot get subsurface for decoration");
             goto err_destroy_surface;
@@ -318,7 +318,7 @@ void lv_wayland_window_decoration_detach(struct window * window, struct graphic_
 static void color_fill(void * pixels, lv_color_t color, uint32_t width, uint32_t height)
 {
 
-    switch(application.shm_ctx.format) {
+    switch(lv_wl_ctx.shm_ctx.format) {
         case WL_SHM_FORMAT_ARGB8888:
             color_fill_XRGB8888(pixels, color, width, height);
             break;

@@ -143,7 +143,7 @@ void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, s
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
     struct window * window = lv_display_get_user_data(disp);
-    struct buffer * buf    = dmabuf_acquire_buffer(&window->application->dmabuf_ctx, color_p);
+    struct buffer * buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
         return;
@@ -265,7 +265,7 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
         buffers[i].strides[0]    = stride;
         buffers[i].dmabuf_fds[0] = lv_draw_buf_get_fd(buffers[i].lv_draw_buf);
         buffers[i].buf_base[0]   = buffers[i].lv_draw_buf->data;
-        params                   = zwp_linux_dmabuf_v1_create_params(window->application->dmabuf_ctx.handler);
+        params                   = zwp_linux_dmabuf_v1_create_params(window->wl_ctx->dmabuf_ctx.handler);
 
         switch(lv_display_get_color_format(window->lv_disp)) {
             case LV_COLOR_FORMAT_XRGB8888:
@@ -288,7 +288,7 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
         zwp_linux_buffer_params_v1_create(params, window->width, window->height, drmcf, flags);
     }
 
-    wl_display_roundtrip(application.display);
+    wl_display_roundtrip(lv_wl_ctx.display);
 
     return buffers;
 }
@@ -341,7 +341,7 @@ static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned ch
     }
 
     while(1) {
-        wl_display_roundtrip(application.display);
+        wl_display_roundtrip(lv_wl_ctx.display);
 
         for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
             struct buffer * buffer = &context->buffers[i];

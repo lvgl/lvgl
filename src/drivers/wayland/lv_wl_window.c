@@ -42,7 +42,7 @@ static void destroy_graphic_obj(struct window * window, struct graphic_object * 
  * @param width the height of the window w/decorations
  * @param height the width of the window w/decorations
  */
-static struct window * create_window(struct application * app, int width, int height, const char * title);
+static struct window * create_window(struct lv_wayland_context * app, int width, int height, const char * title);
 
 /**
  * The frame callback called when the compositor has finished rendering
@@ -90,13 +90,13 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     window_height = ver_res;
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
-    if(!application.opt_disable_decorations) {
+    if(!lv_wl_ctx.opt_disable_decorations) {
         window_width  = hor_res + (2 * BORDER_SIZE);
         window_height = ver_res + (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
 #endif
 
-    window = create_window(&application, window_width, window_height, title);
+    window = create_window(&lv_wl_ctx, window_width, window_height, title);
     if(!window) {
         LV_LOG_ERROR("failed to create wayland window");
         return NULL;
@@ -112,12 +112,12 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     }
 
 #if LV_WAYLAND_USE_DMABUF
-    if(lv_wayland_dmabuf_create_draw_buffers(&application.dmabuf_ctx, window) != LV_RESULT_OK) {
+    if(lv_wayland_dmabuf_create_draw_buffers(&lv_wl_ctx.dmabuf_ctx, window) != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create draw buffers");
         return NULL;
     }
 #else
-    if(lv_wayland_shm_create_draw_buffers(&application.shm_ctx, window) != LV_RESULT_OK) {
+    if(lv_wayland_shm_create_draw_buffers(&lv_wl_ctx.shm_ctx, window) != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create window buffers");
         return NULL;
     }
@@ -129,10 +129,10 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_flush_wait_cb(window->lv_disp, lv_wayland_wait_flush_cb);
 
 #if LV_WAYLAND_USE_DMABUF
-    lv_wayland_dmabuf_set_draw_buffers(&application.dmabuf_ctx, window->lv_disp);
+    lv_wayland_dmabuf_set_draw_buffers(&lv_wl_ctx.dmabuf_ctx, window->lv_disp);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_dmabuf_flush_full_mode);
 #else
-    lv_wayland_shm_set_draw_buffers(&application.shm_ctx, window->lv_disp);
+    lv_wayland_shm_set_draw_buffers(&lv_wl_ctx.shm_ctx, window->lv_disp);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_shm_flush_partial_mode);
 #endif
 
@@ -189,7 +189,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
     bool open = false;
 
     if(disp == NULL) {
-        LV_LL_READ(&application.window_ll, window) {
+        LV_LL_READ(&lv_wl_ctx.window_ll, window) {
             if(!window->closed) {
                 open = true;
                 break;
@@ -263,7 +263,7 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
 {
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
-    if(application.opt_disable_decorations == false) {
+    if(lv_wl_ctx.opt_disable_decorations == false) {
         for(size_t i = 0; i < NUM_DECORATIONS; i++) {
             window->decoration[i] = create_graphic_obj(window, (FIRST_DECORATION + i), window->body);
             if(!window->decoration[i]) {
@@ -291,7 +291,7 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
     uint32_t stride;
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
-    if(!window->application->opt_disable_decorations && !window->fullscreen) {
+    if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
         width -= (2 * BORDER_SIZE);
         height -= (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
@@ -299,14 +299,14 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 
 #if LV_WAYLAND_USE_DMABUF
     {
-        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->application->dmabuf_ctx, window, width, height);
+        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
     }
 #else
     {
-        lv_result_t err = lv_wayland_shm_resize_window(&window->application->shm_ctx, window, width, height);
+        lv_result_t err = lv_wayland_shm_resize_window(&window->wl_ctx->shm_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
@@ -314,10 +314,10 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 #endif
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
-    if(!window->application->opt_disable_decorations && !window->fullscreen) {
+    if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
         lv_wayland_window_decoration_create_all(window);
     }
-    else if(!window->application->opt_disable_decorations) {
+    else if(!window->wl_ctx->opt_disable_decorations) {
         /* Entering fullscreen, detach decorations to prevent xdg_wm_base error 4 */
         /* requested geometry larger than the configured fullscreen state */
         lv_wayland_window_decoration_detach_all(window);
@@ -368,7 +368,7 @@ const struct wl_callback_listener * lv_wayland_window_get_wl_surface_frame_liste
  *   STATIC FUNCTIONS
  **********************/
 
-static struct window * create_window(struct application * app, int width, int height, const char * title)
+static struct window * create_window(struct lv_wayland_context * app, int width, int height, const char * title)
 {
     struct window * window;
 
@@ -380,7 +380,7 @@ static struct window * create_window(struct application * app, int width, int he
 
     lv_memset(window, 0x00, sizeof(struct window));
 
-    window->application = app;
+    window->wl_ctx = app;
 
     // Create wayland buffer and surface
     window->body   = create_graphic_obj(window, OBJECT_WINDOW, NULL);
@@ -436,7 +436,7 @@ static struct graphic_object * create_graphic_obj(struct window * window, enum o
 
     lv_memset(obj, 0, sizeof(*obj));
 
-    obj->surface = wl_compositor_create_surface(window->application->compositor);
+    obj->surface = wl_compositor_create_surface(window->wl_ctx->compositor);
     if(!obj->surface) {
         LV_LOG_ERROR("Failed to create surface for graphic object");
         lv_free(obj);
@@ -448,9 +448,9 @@ static struct graphic_object * create_graphic_obj(struct window * window, enum o
     obj->type   = type;
 
 #if LV_WAYLAND_USE_DMABUF
-    return lv_wayland_dmabuf_on_graphical_object_creation(&window->application->dmabuf_ctx, obj);
+    return lv_wayland_dmabuf_on_graphical_object_creation(&window->wl_ctx->dmabuf_ctx, obj);
 #else
-    return lv_wayland_shm_on_graphical_object_creation(&window->application->shm_ctx, obj);
+    return lv_wayland_shm_on_graphical_object_creation(&window->wl_ctx->shm_ctx, obj);
 #endif
 }
 
@@ -463,9 +463,9 @@ static void destroy_graphic_obj(struct window * window, struct graphic_object * 
     wl_surface_destroy(obj->surface);
 
 #if LV_WAYLAND_USE_DMABUF
-    lv_wayland_dmabuf_on_graphical_object_destruction(&window->application->dmabuf_ctx, obj);
+    lv_wayland_dmabuf_on_graphical_object_destruction(&window->wl_ctx->dmabuf_ctx, obj);
 #else
-    lv_wayland_shm_on_graphical_object_destruction(&window->application->shm_ctx, obj);
+    lv_wayland_shm_on_graphical_object_destruction(&window->wl_ctx->shm_ctx, obj);
 #endif
     lv_free(obj);
 }

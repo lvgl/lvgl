@@ -117,7 +117,7 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time,
                               struct wl_surface * surface, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     uint8_t i;
 
     LV_UNUSED(id);
@@ -166,7 +166,7 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
 
 static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time, int32_t id)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     uint8_t i;
 
     LV_UNUSED(serial);
@@ -220,7 +220,7 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_t time, int32_t id, wl_fixed_t x_w,
                                 wl_fixed_t y_w)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     lv_indev_touch_data_t * touch;
     lv_indev_touch_data_t * cur;
     uint8_t i;

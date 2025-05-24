@@ -112,7 +112,7 @@ static void keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 
 static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, uint32_t format, int fd, uint32_t size)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     struct xkb_keymap * keymap;
     struct xkb_state * state;
@@ -158,7 +158,7 @@ static void keyboard_handle_keymap(void * data, struct wl_keyboard * keyboard, u
 static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, uint32_t serial,
                                   struct wl_surface * surface, struct wl_array * keys)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(keyboard);
     LV_UNUSED(serial);
@@ -175,7 +175,7 @@ static void keyboard_handle_enter(void * data, struct wl_keyboard * keyboard, ui
 static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, uint32_t serial,
                                   struct wl_surface * surface)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(serial);
     LV_UNUSED(keyboard);
@@ -188,7 +188,7 @@ static void keyboard_handle_leave(void * data, struct wl_keyboard * keyboard, ui
 static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint32_t serial, uint32_t time,
                                 uint32_t key, uint32_t state)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     const uint32_t code      = (key + 8);
     const xkb_keysym_t * syms;
     xkb_keysym_t sym = XKB_KEY_NoSymbol;
@@ -219,7 +219,7 @@ static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard
                                       uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked,
                                       uint32_t group)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(serial);
     LV_UNUSED(keyboard);

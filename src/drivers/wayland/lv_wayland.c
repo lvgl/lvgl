@@ -70,7 +70,7 @@
  *      TYPEDEFS
  **********************/
 
-struct application application;
+struct lv_wayland_context lv_wl_ctx;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -103,7 +103,7 @@ static const struct wl_registry_listener registry_listener = {.global        = h
  */
 int lv_wayland_get_fd(void)
 {
-    return wl_display_get_fd(application.display);
+    return wl_display_get_fd(lv_wl_ctx.display);
 }
 
 bool lv_wayland_timer_handler(void)
@@ -114,7 +114,7 @@ bool lv_wayland_timer_handler(void)
     handle_input();
 
     /* Ready input timers (to probe for any input received) */
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
         LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
         if(window != NULL && window->resize_pending) {
@@ -148,7 +148,7 @@ bool lv_wayland_timer_handler(void)
      * be sent to the compositor, but the compositor pipe/connection is unable
      * to take more data at this time).
      */
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
         if(window->flush_pending) {
             errno = EAGAIN;
             break;
@@ -170,48 +170,48 @@ void lv_wayland_init(void)
     }
 
     // Create XKB context
-    application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
-    LV_ASSERT_MSG(application.xkb_context, "failed to create XKB context");
-    if(application.xkb_context == NULL) {
+    lv_wl_ctx.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    LV_ASSERT_MSG(lv_wl_ctx.xkb_context, "failed to create XKB context");
+    if(lv_wl_ctx.xkb_context == NULL) {
         return;
     }
 
     // Connect to Wayland display
-    application.display = wl_display_connect(NULL);
-    LV_ASSERT_MSG(application.display, "failed to connect to Wayland server");
-    if(application.display == NULL) {
+    lv_wl_ctx.display = wl_display_connect(NULL);
+    LV_ASSERT_MSG(lv_wl_ctx.display, "failed to connect to Wayland server");
+    if(lv_wl_ctx.display == NULL) {
         return;
     }
 
 #if LV_WAYLAND_USE_DMABUF
-    lv_wayland_dmabuf_initalize_context(&application.dmabuf_ctx);
+    lv_wayland_dmabuf_initalize_context(&lv_wl_ctx.dmabuf_ctx);
 #endif
-    lv_wayland_shm_initalize_context(&application.shm_ctx);
+    lv_wayland_shm_initalize_context(&lv_wl_ctx.shm_ctx);
 
     /* Add registry listener and wait for registry reception */
-    application.registry = wl_display_get_registry(application.display);
-    wl_registry_add_listener(application.registry, &registry_listener, &application);
-    wl_display_dispatch(application.display);
-    wl_display_roundtrip(application.display);
+    lv_wl_ctx.registry = wl_display_get_registry(lv_wl_ctx.display);
+    wl_registry_add_listener(lv_wl_ctx.registry, &registry_listener, &lv_wl_ctx);
+    wl_display_dispatch(lv_wl_ctx.display);
+    wl_display_roundtrip(lv_wl_ctx.display);
 
-    LV_ASSERT_MSG(application.compositor, "Wayland compositor not available");
-    if(application.compositor == NULL) {
+    LV_ASSERT_MSG(lv_wl_ctx.compositor, "Wayland compositor not available");
+    if(lv_wl_ctx.compositor == NULL) {
         return;
     }
 
-    bool shm_ready = lv_wayland_shm_is_ready(&application.shm_ctx);
+    bool shm_ready = lv_wayland_shm_is_ready(&lv_wl_ctx.shm_ctx);
     LV_ASSERT_MSG(shm_ready, "Couldn't initialize wayland SHM");
     if(!shm_ready) {
         LV_LOG_ERROR("Couldn't initialize wayland SHM");
         return;
     }
-    application.cursor_theme = lv_wayland_shm_load_cursor_theme(&application.shm_ctx);
-    if(!application.cursor_theme) {
+    lv_wl_ctx.cursor_theme = lv_wayland_shm_load_cursor_theme(&lv_wl_ctx.shm_ctx);
+    if(!lv_wl_ctx.cursor_theme) {
         LV_LOG_WARN("Failed to initialize the cursor theme");
     }
 
 #if LV_WAYLAND_USE_DMABUF
-    bool dmabuf_ready = lv_wayland_dmabuf_is_ready(&application.dmabuf_ctx);
+    bool dmabuf_ready = lv_wayland_dmabuf_is_ready(&lv_wl_ctx.dmabuf_ctx);
     LV_ASSERT_MSG(dmabuf_ready, "Couldn't initialize wayland DMABUF");
     if(!dmabuf_ready) {
         LV_LOG_ERROR("Couldn't initialize wayland DMABUF");
@@ -221,16 +221,16 @@ void lv_wayland_init(void)
 
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     const char * env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
-    application.opt_disable_decorations  = ((env_disable_decorations != NULL) && (env_disable_decorations[0] != '0'));
+    lv_wl_ctx.opt_disable_decorations  = ((env_disable_decorations != NULL) && (env_disable_decorations[0] != '0'));
 #endif
 
-    lv_ll_init(&application.window_ll, sizeof(struct window));
+    lv_ll_init(&lv_wl_ctx.window_ll, sizeof(struct window));
 
     lv_tick_set_cb(tick_get_cb);
 
     /* Used to wait for events when the window is minimized or hidden */
-    application.wayland_pfd.fd     = wl_display_get_fd(application.display);
-    application.wayland_pfd.events = POLLIN;
+    lv_wl_ctx.wayland_pfd.fd     = wl_display_get_fd(lv_wl_ctx.display);
+    lv_wl_ctx.wayland_pfd.events = POLLIN;
 
     is_wayland_initialized = true;
 }
@@ -239,23 +239,23 @@ void lv_wayland_deinit(void)
 {
     struct window * window = NULL;
 
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
         if(!window->closed) {
             lv_wayland_window_destroy(window);
         }
 
         /* TODO: This should probably be moved inside lv_wayland_window_destroy but not sure about the if condition */
 #if LV_WAYLAND_USE_DMABUF
-        lv_wayland_dmabuf_destroy_draw_buffers(&application.dmabuf_ctx, window);
+        lv_wayland_dmabuf_destroy_draw_buffers(&lv_wl_ctx.dmabuf_ctx, window);
 #else
-        lv_wayland_shm_delete_draw_buffers(&application.shm_ctx, window);
+        lv_wayland_shm_delete_draw_buffers(&lv_wl_ctx.shm_ctx, window);
 #endif
         lv_display_delete(window->lv_disp);
     }
 
-    lv_wayland_shm_deinit(&application.shm_ctx);
+    lv_wayland_shm_deinit(&lv_wl_ctx.shm_ctx);
 #if LV_WAYLAND_USE_DMABUF
-    lv_wayland_dmabuf_deinit(&application.dmabuf_ctx);
+    lv_wayland_dmabuf_deinit(&lv_wl_ctx.dmabuf_ctx);
 #endif
 
 #if LV_WAYLAND_WL_SHELL
@@ -264,23 +264,23 @@ void lv_wayland_deinit(void)
     lv_wayland_xdg_shell_deinit();
 #endif
 
-    if(application.wl_seat) {
-        wl_seat_destroy(application.wl_seat);
+    if(lv_wl_ctx.wl_seat) {
+        wl_seat_destroy(lv_wl_ctx.wl_seat);
     }
 
-    if(application.subcompositor) {
-        wl_subcompositor_destroy(application.subcompositor);
+    if(lv_wl_ctx.subcompositor) {
+        wl_subcompositor_destroy(lv_wl_ctx.subcompositor);
     }
 
-    if(application.compositor) {
-        wl_compositor_destroy(application.compositor);
+    if(lv_wl_ctx.compositor) {
+        wl_compositor_destroy(lv_wl_ctx.compositor);
     }
 
-    wl_registry_destroy(application.registry);
-    wl_display_flush(application.display);
-    wl_display_disconnect(application.display);
+    wl_registry_destroy(lv_wl_ctx.registry);
+    wl_display_flush(lv_wl_ctx.display);
+    wl_display_disconnect(lv_wl_ctx.display);
 
-    lv_ll_clear(&application.window_ll);
+    lv_ll_clear(&lv_wl_ctx.window_ll);
 }
 
 void lv_wayland_wait_flush_cb(lv_display_t * disp)
@@ -292,7 +292,7 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp)
     }
     uint32_t initial_frame_counter = window->frame_counter;
     while(initial_frame_counter == window->frame_counter) {
-        poll(&application.wayland_pfd, 1, -1);
+        poll(&lv_wl_ctx.wayland_pfd, 1, -1);
         handle_input();
     }
 }
@@ -311,7 +311,7 @@ static uint32_t tick_get_cb(void)
 static void handle_global(void * data, struct wl_registry * registry, uint32_t name, const char * interface,
                           uint32_t version)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(version);
     LV_UNUSED(data);
@@ -365,19 +365,19 @@ static void handle_input(void)
     int prepare_read = -1;
 
     while(prepare_read != 0) {
-        wl_display_dispatch_pending(application.display);
-        prepare_read = wl_display_prepare_read(application.display);
+        wl_display_dispatch_pending(lv_wl_ctx.display);
+        prepare_read = wl_display_prepare_read(lv_wl_ctx.display);
     }
-    wl_display_read_events(application.display);
-    wl_display_dispatch_pending(application.display);
+    wl_display_read_events(lv_wl_ctx.display);
+    wl_display_dispatch_pending(lv_wl_ctx.display);
 }
 
 static void handle_output(void)
 {
     struct window * window;
-    bool shall_flush = application.cursor_flush_pending;
+    bool shall_flush = lv_wl_ctx.cursor_flush_pending;
 
-    LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
         if((window->shall_close) && (window->close_cb != NULL)) {
             window->shall_close = window->close_cb(window->lv_disp);
         }
@@ -396,14 +396,14 @@ static void handle_output(void)
             window->body->input.pointer.right_button = LV_INDEV_STATE_RELEASED;
             window->body->input.pointer.wheel_button = LV_INDEV_STATE_RELEASED;
             window->body->input.pointer.wheel_diff   = 0;
-            if(window->application->pointer_obj == window->body) {
-                window->application->pointer_obj = NULL;
+            if(window->wl_ctx->pointer_obj == window->body) {
+                window->wl_ctx->pointer_obj = NULL;
             }
 
             window->body->input.keyboard.key   = 0;
             window->body->input.keyboard.state = LV_INDEV_STATE_RELEASED;
-            if(window->application->keyboard_obj == window->body) {
-                window->application->keyboard_obj = NULL;
+            if(window->wl_ctx->keyboard_obj == window->body) {
+                window->wl_ctx->keyboard_obj = NULL;
             }
             lv_wayland_window_destroy(window);
         }
@@ -412,15 +412,15 @@ static void handle_output(void)
     }
 
     if(shall_flush) {
-        if(wl_display_flush(application.display) == -1) {
+        if(wl_display_flush(lv_wl_ctx.display) == -1) {
             if(errno != EAGAIN) {
                 LV_LOG_ERROR("failed to flush wayland display");
             }
         }
         else {
             /* All data flushed */
-            application.cursor_flush_pending = false;
-            LV_LL_READ(&application.window_ll, window) {
+            lv_wl_ctx.cursor_flush_pending = false;
+            LV_LL_READ(&lv_wl_ctx.window_ll, window) {
                 window->flush_pending = false;
             }
         }

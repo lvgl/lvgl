@@ -56,8 +56,8 @@ static const struct wl_shell_surface_listener shell_surface_listener = {
 
 void lv_wayland_wl_shell_deinit(void)
 {
-    if(application.wl_shell) {
-        wl_shell_destroy(application.wl_shell);
+    if(lv_wl_ctx.wl_shell) {
+        wl_shell_destroy(lv_wl_ctx.wl_shell);
     }
 }
 
@@ -66,13 +66,14 @@ const struct wl_shell_surface_listener * lv_wayland_wl_shell_get_listener(void)
     return &shell_surface_listener;
 }
 
-lv_result_t lv_wayland_wl_shell_create_window(struct application * app, struct window * window, const char * title)
+lv_result_t lv_wayland_wl_shell_create_window(struct lv_wayland_context * ctx, struct window * window,
+                                              const char * title)
 {
-    if(!app->wl_shell) {
+    if(!ctx->wl_shell) {
         return LV_RESULT_INVALID;
     }
 
-    window->wl_shell_surface = wl_shell_get_shell_surface(app->wl_shell, window->body->surface);
+    window->wl_shell_surface = wl_shell_get_shell_surface(ctx->wl_shell, window->body->surface);
     if(!window->wl_shell_surface) {
         LV_LOG_ERROR("cannot create WL shell surface");
         return LV_RESULT_INVALID;
@@ -128,15 +129,15 @@ lv_result_t lv_wayland_wl_shell_destroy_window(struct window * window)
     return LV_RESULT_OK;
 }
 
-void lv_wayland_wl_shell_handle_pointer_event(struct application * app, uint32_t serial, uint32_t button,
+void lv_wayland_wl_shell_handle_pointer_event(struct lv_wayland_context * ctx, uint32_t serial, uint32_t button,
                                               uint32_t state)
 {
-    struct window * window = app->pointer_obj->window;
-    switch(app->pointer_obj->type) {
+    struct window * window = ctx->pointer_obj->window;
+    switch(ctx->pointer_obj->type) {
         case OBJECT_TITLEBAR:
             if((button == BTN_LEFT) && (state == WL_POINTER_BUTTON_STATE_PRESSED)) {
                 if(window->wl_shell_surface) {
-                    wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
+                    wl_shell_surface_move(window->wl_shell_surface, ctx->wl_seat, serial);
                     window->flush_pending = true;
                 }
             }

@@ -114,7 +114,7 @@ static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface,
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     const char * cursor      = LV_WAYLAND_DEFAULT_CURSOR_NAME;
     int pos_x                = wl_fixed_to_int(sx);
     int pos_y                = wl_fixed_to_int(sy);
@@ -145,7 +145,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
 
 static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(pointer);
     LV_UNUSED(serial);
@@ -157,7 +157,7 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
 
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(pointer);
     LV_UNUSED(time);
@@ -173,7 +173,7 @@ static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint
 static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, uint32_t serial, uint32_t time,
                                   uint32_t button, uint32_t state)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
 
     LV_UNUSED(serial);
     LV_UNUSED(wl_pointer);
@@ -222,7 +222,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
 static void pointer_handle_axis(void * data, struct wl_pointer * wl_pointer, uint32_t time, uint32_t axis,
                                 wl_fixed_t value)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     const int diff           = wl_fixed_to_int(value);
 
     LV_UNUSED(time);

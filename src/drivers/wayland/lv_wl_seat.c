@@ -57,7 +57,7 @@ const struct wl_seat_listener * lv_wayland_seat_get_listener(void)
 
 static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum wl_seat_capability caps)
 {
-    struct application * app = data;
+    struct lv_wayland_context * app = data;
     struct seat * seat       = &app->seat;
 
     if((caps & WL_SEAT_CAPABILITY_POINTER) && !seat->wl_pointer) {

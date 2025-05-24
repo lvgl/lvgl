@@ -74,8 +74,8 @@ static bool is_window_configured                              = false;
 void lv_wayland_xdg_shell_deinit(void)
 {
 
-    if(application.xdg_wm) {
-        xdg_wm_base_destroy(application.xdg_wm);
+    if(lv_wl_ctx.xdg_wm) {
+        xdg_wm_base_destroy(lv_wl_ctx.xdg_wm);
     }
 }
 
@@ -143,7 +143,8 @@ lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window)
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_wayland_xdg_shell_create_window(struct application * app, struct window * window, const char * title)
+lv_result_t lv_wayland_xdg_shell_create_window(struct lv_wayland_context * app, struct window * window,
+                                               const char * title)
 {
     if(!app->xdg_wm) {
         return LV_RESULT_INVALID;
@@ -173,7 +174,7 @@ lv_result_t lv_wayland_xdg_shell_create_window(struct application * app, struct 
     // configure event
     is_window_configured = false;
     wl_surface_commit(window->body->surface);
-    wl_display_roundtrip(application.display);
+    wl_display_roundtrip(lv_wl_ctx.display);
     LV_ASSERT_MSG(is_window_configured, "Failed to receive the xdg_surface configuration event");
     return LV_RESULT_OK;
 }
@@ -202,7 +203,7 @@ lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window)
  *   Shell Input
  **********************/
 
-void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_t serial, uint32_t button,
+void lv_wayland_xdg_shell_handle_pointer_event(struct lv_wayland_context * app, uint32_t serial, uint32_t button,
                                                uint32_t state)
 {
     struct window * window = app->pointer_obj->window;
@@ -246,7 +247,7 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->wl_ctx->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -264,7 +265,7 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->wl_ctx->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -282,7 +283,7 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->wl_ctx->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -300,7 +301,7 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
                     else {
                         edge = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
                     }
-                    xdg_toplevel_resize(window->xdg_toplevel, window->application->wl_seat, serial, edge);
+                    xdg_toplevel_resize(window->xdg_toplevel, window->wl_ctx->wl_seat, serial, edge);
                     window->flush_pending = true;
                 }
             }
@@ -312,7 +313,7 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct application * app, uint32_
     }
 }
 
-const char * lv_wayland_xdg_shell_get_cursor_name(const struct application * app)
+const char * lv_wayland_xdg_shell_get_cursor_name(const struct lv_wayland_context * app)
 {
 
     if(!app->pointer_obj->window->xdg_toplevel || app->opt_disable_decorations) {
