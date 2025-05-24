@@ -19,12 +19,24 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_subject_t * subject;
+    int32_t v;
+} subject_set_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t step;
+    int32_t range_min;
+    int32_t range_max;
+} subject_increment_user_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
+static void free_user_data_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -132,45 +144,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
                 LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj bind_checked", value);
             }
         }
-        else if(name_len >= 15 && lv_memcmp("bind_flag_if_", name, 13) == 0) {
-            lv_observer_t * (*cb)(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value) = NULL;
-            if(name[13] == 'e' && name[14] == 'q') cb = lv_obj_bind_flag_if_eq;
-            else if(name[13] == 'n' && name[14] == 'o') cb = lv_obj_bind_flag_if_not_eq;
-            else if(name[13] == 'g' && name[14] == 't') cb = lv_obj_bind_flag_if_gt;
-            else if(name[13] == 'g' && name[14] == 'e') cb = lv_obj_bind_flag_if_ge;
-            else if(name[13] == 'l' && name[14] == 't') cb = lv_obj_bind_flag_if_lt;
-            else if(name[13] == 'l' && name[14] == 'e') cb = lv_obj_bind_flag_if_le;
 
-            if(cb) {
-                char buf[128];
-                lv_strlcpy(buf, value, sizeof(buf));
-                char * bufp = buf;
-                const char * subject_str =  lv_xml_split_str(&bufp, ' ');
-                const char * flag_str =  lv_xml_split_str(&bufp, ' ');
-                const char * ref_value_str =  lv_xml_split_str(&bufp, ' ');
-
-                if(subject_str == NULL) {
-                    LV_LOG_WARN("Subject is missing in lv_obj bind_flag");
-                }
-                else if(flag_str == NULL) {
-                    LV_LOG_WARN("Flag is missing in lv_obj bind_flag");
-                }
-                else if(ref_value_str == NULL) {
-                    LV_LOG_WARN("Reference value is missing in lv_obj bind_flag");
-                }
-                else {
-                    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
-                    if(subject == NULL) {
-                        LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj bind_flag", value);
-                    }
-                    else {
-                        lv_obj_flag_t flag = flag_to_enum(flag_str);
-                        int32_t ref_value = lv_xml_atoi(ref_value_str);
-                        cb(item, subject, flag, ref_value);
-                    }
-                }
-            }
-        }
         else if(name_len >= 16 && lv_memcmp("bind_state_if_", name, 14) == 0) {
             lv_observer_t * (*cb)(lv_obj_t * obj, lv_subject_t * subject, lv_state_t flag, int32_t ref_value) = NULL;
             if(name[14] == 'e' && name[15] == 'q') cb = lv_obj_bind_state_if_eq;
@@ -216,6 +190,239 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         }
     }
 }
+
+
+void * lv_obj_xml_style_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * name = lv_xml_get_value_of(attrs, "name");
+    if(name == NULL) {
+        LV_LOG_WARN("`name` is missing from <style>");
+        return;
+    }
+    lv_xml_style_t * xml_style = lv_xml_get_style_by_name(state->parent_scope, name);
+
+
+    lv_style_selector_t selector = 0;
+    const char * selector_str = lv_xml_get_value_of(attrs, "selector");
+    if(selector_str) {
+        char buf[256];
+        lv_strncpy(buf, selector_str, sizeof(buf));
+        char * bufp = buf;
+        const char * selector_cur = lv_xml_split_str(&bufp, ' ');
+
+        while(buf != NULL) {
+            /* Handle different states and parts */
+            selector |= lv_xml_style_state_to_enum(selector_cur);
+            selector |= lv_xml_style_part_to_enum(selector_cur);
+
+            /* Move to the next token */
+            selector_cur = lv_xml_split_str(&bufp, ' ');
+        }
+    }
+
+    void * item = lv_xml_state_get_parent(state);
+    lv_obj_add_style(item, xml_style->style, selector);
+}
+
+void * lv_obj_xml_event_cb_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * trigger = lv_xml_get_value_of(attrs, "trigger");
+    lv_event_code_t code = LV_EVENT_CLICKED;
+    if(trigger) code = trigger_text_to_enum_value(trigger);
+    if(code == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't add call function event because \"%s\" trigger is invalid.", trigger);
+        return;
+    }
+
+    const char * cb_txt = lv_xml_get_value_of(attrs, "callback");
+    if(cb_txt == NULL) {
+        LV_LOG_WARN("callback is mandatory for event-call_function");
+        return;
+    }
+
+    lv_obj_t * obj = lv_xml_state_get_parent(state);
+    lv_event_cb_t cb = lv_xml_get_event_cb(&state->scope, cb_txt);
+    if(cb == NULL) {
+        LV_LOG_WARN("Couldn't add call function event because \"%s\" callback is not found.", cb_txt);
+        return;
+    }
+
+    const char * user_data_xml = lv_xml_get_value_of(attrs, "user_data");
+    char * user_data = NULL;
+    if(user_data_xml) user_data = lv_strdup(user_data_xml);
+
+    lv_obj_add_event_cb(obj, cb, code, user_data);
+    if(user_data) lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+
+void * lv_obj_xml_subject_set_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_subject_set_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
+    const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
+    const char * value_str =  lv_xml_get_value_of(attrs, "value");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in <lv_obj-subject_set_event>");
+        return;
+    }
+
+    if(value_str == NULL) {
+        LV_LOG_WARN("`value` is missing in <lv_obj-subject_set_event>");
+        return;
+    }
+
+    lv_event_code_t code = LV_EVENT_CLICKED;
+    const char * trigger = lv_xml_get_value_of(attrs, "trigger");
+    if(trigger) code = trigger_text_to_enum_value(trigger);
+    if(code == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't apply <subject_set_event> because \"%s\" trigger is invalid.", trigger);
+        return;
+    }
+
+    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+    if(subject == NULL) {
+        LV_LOG_WARN("Subject \"%s\" doesn't exist in <lv_obj-subject_set>", subject_str);
+        return;
+    }
+
+    int32_t value = lv_xml_atoi(value_str);
+    void * item = lv_xml_state_get_item(state);
+
+    //   subject_increment_user_data_t
+
+    lv_obj_add_event_cb(item, subject_set_cb, code, (void *)(lv_uintptr_t) value);
+}
+
+lv_xml_widget_register("lv_obj-subject_set", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
+                       lv_obj_xml_subject_increment_apply)
+lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+                       lv_obj_xml_sscreen_load_event_apply);
+
+
+void * lv_obj_xml_bind_flag_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_bind_flag_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * op = state->tag_name;
+
+    /*If starts with "lv_obj-" skip that part*/
+    if(op[0] == 'l') op += 7;
+
+    lv_observer_t * (*cb)(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value) = NULL;
+    if(lv_streq(op, "bind_flag_if_eq")) cb = lv_obj_bind_flag_if_eq;
+    else if(lv_streq(op, "bind_flag_if_not_eq")) cb = lv_obj_bind_flag_if_not_eq;
+    else if(lv_streq(op, "bind_flag_if_gt")) cb = lv_obj_bind_flag_if_gt;
+    else if(lv_streq(op, "bind_flag_if_ge")) cb = lv_obj_bind_flag_if_ge;
+    else if(lv_streq(op, "bind_flag_if_lt")) cb = lv_obj_bind_flag_if_lt;
+    else if(lv_streq(op, "bind_flag_if_le")) cb = lv_obj_bind_flag_if_le;
+    else {
+        LV_LOG_WARN("`%s` is not known", op);
+        return;
+    }
+
+    const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
+    const char * flag_str =  lv_xml_get_value_of(attrs, "flag");
+    const char * ref_value_str = lv_xml_get_value_of(attrs, "ref_value");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in lv_obj bind_flag");
+    }
+    else if(flag_str == NULL) {
+        LV_LOG_WARN("`flag` is missing in lv_obj bind_flag");
+    }
+    else if(ref_value_str == NULL) {
+        LV_LOG_WARN("`ref_value` is missing in lv_obj bind_flag");
+    }
+    else {
+        lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+        if(subject == NULL) {
+            LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj bind_flag", subject_str);
+        }
+        else {
+            lv_obj_flag_t flag = flag_to_enum(flag_str);
+            int32_t ref_value = lv_xml_atoi(ref_value_str);
+            void * item = lv_xml_state_get_item(state);
+            cb(item, subject, flag, ref_value);
+        }
+    }
+}
+
+void * lv_obj_xml_bind_state_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_bind_state_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * op = state->tag_name;
+
+    /*If starts with "lv_obj-" skip that part*/
+    if(op[0] == 'l') op += 7;
+
+    lv_observer_t * (*cb)(lv_obj_t * obj, lv_subject_t * subject, lv_state_t flag, int32_t ref_value) = NULL;
+    if(lv_streq(op, "bind_state_if_eq")) cb = lv_obj_bind_state_if_eq;
+    else if(lv_streq(op, "bind_state_if_not_eq")) cb = lv_obj_bind_state_if_not_eq;
+    else if(lv_streq(op, "bind_state_if_gt")) cb = lv_obj_bind_state_if_gt;
+    else if(lv_streq(op, "bind_state_if_ge")) cb = lv_obj_bind_state_if_ge;
+    else if(lv_streq(op, "bind_state_if_lt")) cb = lv_obj_bind_state_if_lt;
+    else if(lv_streq(op, "bind_state_if_le")) cb = lv_obj_bind_state_if_le;
+    else {
+        LV_LOG_WARN("`%s` is not known", op);
+        return;
+    }
+
+    const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
+    const char * state_str =  lv_xml_get_value_of(attrs, "state");
+    const char * ref_value_str = lv_xml_get_value_of(attrs, "ref_value");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in lv_obj state_flag");
+    }
+    else if(state_str == NULL) {
+        LV_LOG_WARN("`state` is missing in lv_obj state_flag");
+    }
+    else if(ref_value_str == NULL) {
+        LV_LOG_WARN("`ref_value` is missing in lv_obj state_flag");
+    }
+    else {
+        lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+        if(subject == NULL) {
+            LV_LOG_WARN("Subject \"%s\" doesn't exist in lv_obj_bind_state", subject_str);
+        }
+        else {
+            lv_state_t s = lv_xml_state_to_enum(state_str);
+            int32_t ref_value = lv_xml_atoi(ref_value_str);
+            void * item = lv_xml_state_get_item(state);
+            cb(item, subject, s, ref_value);
+        }
+    }
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -395,5 +602,16 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
 }
 
+static void subject_set_cb(lv_event_t * e)
+{
+    int32_t v
+}
+
+
+static void free_user_data_event_cb(lv_event_t * e)
+{
+    char * user_data = lv_event_get_user_data(e);
+    lv_free(user_data);
+}
 
 #endif /* LV_USE_XML */

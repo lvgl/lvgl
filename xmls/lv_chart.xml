@@ -30,12 +30,8 @@
 
 	    <prop name="type" type="enum:lv_chart_type" help=""/>
 
-	    <prop name="point_count" help="">
-	    	<param name="count" type="int" help=""/>
-	    </prop>
-	    <prop name="update_mode" help="">
-	    	<param name="mode" type="enum:lv_chart_chart_update_mode" help=""/>
-	    </prop>
+	    <prop name="point_count" type="int" help=""/>
+	    <prop name="update_mode" type="enum:lv_chart_chart_update_mode" help=""/>
 	    <prop name="div_line_count" help="">
 	    	<param name="hdiv" type="int" help=""/>
 	    	<param name="vdiv" type="int" help=""/>

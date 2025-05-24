@@ -111,6 +111,27 @@ void lv_xml_init(void)
                            lv_xml_calendar_header_dropdown_apply);
 
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
+
+    lv_xml_widget_register("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
+    lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
+    lv_xml_widget_register("lv_obj-subject_set", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
+                           lv_obj_xml_subject_increment_apply);
+    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+                           lv_obj_xml_sscreen_load_event_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_lt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_ge", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_le", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+
+    lv_xml_widget_register("lv_obj-bind_state_if_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_not_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_gt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_lt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
 }
 
 void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * parent_scope,
@@ -553,6 +574,7 @@ static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * 
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs)
 {
     lv_xml_parser_state_t * state = (lv_xml_parser_state_t *)user_data;
+    state->tag_name = name;
     bool is_view = false;
 
     if(lv_streq(name, "view")) {

@@ -186,9 +186,15 @@ Simple Subscription
 ~~~~~~~~~~~~~~~~~~~
 
 To subscribe to a Subject one of the ``lv_subject_add_observer...()`` functions are
-used.  Alternately, if you want to bind a Subject's value to a Widget's property, one
-of the ``lv_<widget_type>_bind_...()`` functions can be used.  The former are covered
-below.  The latter are covered in the :ref:`observer_widget_binding` section.
+used. This is covered below.
+
+Alternately, if you want to bind a Subject's value to a Widget's property, one
+of the ``lv_<widget_type>_bind_...()`` functions can be used.  See
+:ref:`observer_widget_binding` for more details.
+
+By using  ``lv_obj_add_subject_...()`` it's also possible to change a subject's value
+on a trigger. It's covered in :ref:`change_subject_on_event`
+
 
 For the most basic use case, subscribe to a Subject by using the following function:
 
@@ -539,6 +545,38 @@ vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
 
+.. _change_subject_on_event
+Change Subject on Event
+-----------------------
+
+It's a common requirement to update a subject based on a user action (trigger).
+To simplify this, *subject set* and *increment* actions can be attached directly to any widget.
+
+Internally, these are implemented as special event callbacks.
+Note: these callbacks are **not** automatically removed when a subject is deinited.
+
+Increment
+~~~~~~~~~
+
+:cpp:expr:`lv_obj_add_subject_increment(obj, subject, step, min, max)`
+Increments the subject's value by `step`, clamped between `min` and `max`.
+
+For example:
+
+:cpp:expr:`lv_obj_add_subject_increment(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80);`
+
+This will increment `subject1` by 5 when `button1` is clicked.
+The resulting value will be constrained to the range -10 to 80.
+
+Using a negative `step` will decrement the value instead.
+
+Set to a Value
+~~~~~~~~~~~~~~
+
+- :cpp:expr:`lv_obj_add_subject_set_int(obj, subject, trigger, value)`
+- :cpp:expr:`lv_obj_add_subject_set_string(obj, subject, trigger, text)`
+
+These functions set the given subject (integer or string) to a fixed value when the specified trigger event occurs.
 
 .. _observer_api:
 
