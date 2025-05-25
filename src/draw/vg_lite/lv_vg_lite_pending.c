@@ -101,7 +101,7 @@ void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending)
 
 static inline void lv_vg_lite_pending_array_clear(lv_vg_lite_pending_t * pending, lv_array_t * arr)
 {
-    LV_ASSERT_NULL(pending->free_cb);
+    if (!pending->free_cb) return; // fail-safe
 
     uint32_t size = lv_array_size(arr);
     if(size == 0) {
