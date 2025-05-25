@@ -253,8 +253,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     uint16_t color16 = lv_color_to_u16(dsc->color); /* Normal color */
-    uint16_t color16_swapped = lv_color_swap_16(
-                                   color16); /* Swapped color, save directly to buffer if no mixing is needed */
+    uint16_t color16_swapped = lv_color_swap_16(color16);  /* Swapped color, use directly if no mixing is needed */
     lv_opa_t opa = dsc->opa;
     const lv_opa_t * mask = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
@@ -318,62 +317,20 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_SWAPPED_WITH_OPA(dsc)) {
-            uint32_t last_dest32_color = 0xFFFFFFFF; /* unlikely initial value */
-            uint32_t last_res32_color = 0;
-
             for(y = 0; y < h; y++) {
-                x = 0;
-
-                /* Align to 32-bit if needed */
-                if((lv_uintptr_t)&dest_buf_u16[0] & 0x3) {
-                    uint16_t px = dest_buf_u16[0];
-                    px = lv_color_swap_16(px); /* Swap destination */
-                    px = lv_color_16_16_mix(color16, px, opa); /* Color mix */
-                    dest_buf_u16[0] = lv_color_swap_16(px); /* Write back swapped */
-                    x = 1;
-                }
-
-                for(; x < w - 1; x += 2) {
-                    uint16_t px0 = dest_buf_u16[x];
-                    uint16_t px1 = dest_buf_u16[x + 1];
-
-                    px0 = lv_color_swap_16(px0); /* Swap destination so it becomes unswapped now */
-                    px1 = lv_color_swap_16(px1); /* Swap destination so it becomes unswapped now */
-
-                    if(px0 != px1) {
-                        px0 = lv_color_16_16_mix(color16, px0, opa); /* Color mix of unswapped colors */
-                        px1 = lv_color_16_16_mix(color16, px1, opa); /* Color mix of unswapped colors */
-
-                        dest_buf_u16[x]     = lv_color_swap_16(px0); /* Write back as swapped */
-                        dest_buf_u16[x + 1] = lv_color_swap_16(px1); /* Write back as swapped */
+                /*Make sue the last dest_color doesn't match the first one so that it will be calculated*/
+                uint16_t last_dest_color =  dest_buf_u16[x] - 1;
+                uint16_t last_res_color = 0;
+                for(x = 0; x < w; x++) {
+                    if(last_dest_color != dest_buf_u16[x]) {
+                        uint16_t px = lv_color_swap_16(dest_buf_u16[x]); /* Swap destination so it becomes unswapped now */
+                        last_res_color = lv_color_16_16_mix(color16, px, opa); /* Color mix of unswapped colors */
+                        last_res_color = lv_color_swap_16(last_res_color);
+                        last_dest_color = dest_buf_u16[x];
                     }
-                    else {
-                        uint32_t native32 = ((uint32_t)px0 << 16) | px1;
-                        volatile uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
 
-                        if(last_dest32_color == native32) {
-                            *dest32 = last_res32_color;
-                        }
-                        else {
-                            last_dest32_color = native32;
-
-                            uint16_t mixed = lv_color_16_16_mix(color16, px0, opa);
-                            uint16_t mixed_swapped = lv_color_swap_16(mixed);
-                            *dest32 = ((uint32_t)mixed_swapped << 16) | mixed_swapped;
-
-                            last_res32_color = *dest32;
-                        }
-                    }
+                    dest_buf_u16[x] = last_res_color;
                 }
-
-                /* Finish remaining pixel if width is odd */
-                for(; x < w; x++) {
-                    uint16_t px = dest_buf_u16[x];
-                    px = lv_color_swap_16(px); /* Swap destination */
-                    px = lv_color_16_16_mix(color16, px, opa); /* Color mix */
-                    dest_buf_u16[x] = lv_color_swap_16(px); /* Write back swapped */
-                }
-
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             }
         }
