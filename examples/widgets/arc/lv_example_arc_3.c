@@ -135,7 +135,7 @@ static void create_slice(lv_obj_t * parent, int percentage, lv_color_t color)
 
     lv_obj_align(label, LV_ALIGN_CENTER, x_offset, y_offset);
 
-    slice_info_t * info = lv_malloc(sizeof(slice_info_t));
+    slice_info_t * info = (slice_info_t *) lv_malloc(sizeof(slice_info_t));
     info->start_angle = start;
     info->end_angle = end;
     info->mid_angle = mid_angle;
