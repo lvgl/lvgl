@@ -6,7 +6,7 @@ Monkey
 
 The Monkey module provides LVGL applications with a simple monkey test.  Monkey
 Testing is a technique where the user tests the application or system by providing
-random inputs and checking the behavior or seeing whether the aplication or system
+random inputs and checking the behavior or seeing whether the application or system
 will crash.  This module provides this service as simulated random input to stress
 test an LVGL application.
 

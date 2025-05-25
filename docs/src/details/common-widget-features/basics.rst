@@ -38,7 +38,7 @@ All Widget types share some basic attributes:
 - Parent
 - Styles
 - Events it emits
-- Flags like *Clickable*, *Scollable*, etc.
+- Flags like *Clickable*, *Scrollable*, etc.
 - Etc.
 
 You can set/get these attributes with ``lv_obj_set_...`` and

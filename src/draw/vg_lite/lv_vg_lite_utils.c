@@ -158,7 +158,7 @@ const char * lv_vg_lite_error_string(vg_lite_error_t error)
         default:
             break;
     }
-    return "UNKNOW_ERROR";
+    return "UNKNOWN_ERROR";
 }
 
 const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
@@ -213,7 +213,7 @@ const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
         default:
             break;
     }
-    return "UNKNOW_FEATURE";
+    return "UNKNOWN_FEATURE";
 }
 
 const char * lv_vg_lite_buffer_format_string(vg_lite_buffer_format_t format)
@@ -271,7 +271,7 @@ const char * lv_vg_lite_buffer_format_string(vg_lite_buffer_format_t format)
         default:
             break;
     }
-    return "UNKNOW_BUFFER_FORMAT";
+    return "UNKNOWN_BUFFER_FORMAT";
 }
 
 const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
@@ -299,7 +299,7 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
         default:
             break;
     }
-    return "UNKNOW_VLC_OP";
+    return "UNKNOWN_VLC_OP";
 }
 
 static void path_data_print_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)

@@ -1065,11 +1065,11 @@ class LVGLImage:
                     self.rgb565_dither and
                     cf in (ColorFormat.RGB565, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
                 ):
-                    treshold_id = ((y & 7) << 3) + (x & 7)
+                    threshold_id = ((y & 7) << 3) + (x & 7)
 
-                    r = min(r + red_thresh[treshold_id], 0xFF) & 0xF8
-                    g = min(g + green_thresh[treshold_id], 0xFF) & 0xFC
-                    b = min(b + blue_thresh[treshold_id], 0xFF) & 0xF8
+                    r = min(r + red_thresh[threshold_id], 0xFF) & 0xF8
+                    g = min(g + green_thresh[threshold_id], 0xFF) & 0xFC
+                    b = min(b + blue_thresh[threshold_id], 0xFF) & 0xF8
 
                 rawdata += pack(r, g, b, a)
 

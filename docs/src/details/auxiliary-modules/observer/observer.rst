@@ -11,7 +11,7 @@ Overview
 
 .. _observer pattern:  https://en.wikipedia.org/wiki/Observer_pattern
 
-The ``lv_observer`` module is an implemention of the `Observer Pattern`_.
+The ``lv_observer`` module is an implementation of the `Observer Pattern`_.
 
 This implementation consists of:
 
@@ -228,7 +228,7 @@ both unsubscribes it from the Subject and deletes it from the LVGL heap.
 Subscribing While Associating Observer with a Widget
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The function below assocates a Widget with an Observer while subscribing to a
+The function below associates a Widget with an Observer while subscribing to a
 Subject.  A copy of the pointer to that Widget is saved in the Observer's ``target``
 field.  This works exactly like the above method except that when the Widget is
 deleted, the Observer thus created will be automatically unsubscribed from the
