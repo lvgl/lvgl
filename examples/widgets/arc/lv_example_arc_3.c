@@ -27,7 +27,7 @@ static lv_obj_t * active_arc = NULL;
 
 static void anim_move_cb(void * var, int32_t v)
 {
-    slice_anim_data_t * d = var;
+    slice_anim_data_t * d = (slice_anim_data_t *) var;
 
     int32_t x = d->start_x + ((d->end_x - d->start_x) * v) / 100;
     int32_t y = d->start_y + ((d->end_y - d->start_y) * v) / 100;
