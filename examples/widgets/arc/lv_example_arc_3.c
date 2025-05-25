@@ -41,7 +41,7 @@ static void anim_cleanup_cb(lv_anim_t * a)
 
 static void arc_click_cb(lv_event_t * e)
 {
-    lv_obj_t * arc  = lv_event_get_target(e);
+    lv_obj_t * arc  = lv_event_get_target_obj(e);
     slice_info_t * info = (slice_info_t *)lv_event_get_user_data(e);
 
     int32_t x_off = (SLICE_OFFSET * lv_trigo_cos(info->mid_angle)) >> LV_TRIGO_SHIFT;
