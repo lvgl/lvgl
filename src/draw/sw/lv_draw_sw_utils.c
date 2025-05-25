@@ -150,9 +150,17 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 {
     if(LV_DRAW_SW_RGB565_SWAP(buf, buf_size_px) == LV_RESULT_OK) return;
 
-    uint32_t u32_cnt = buf_size_px / 2;
     uint16_t * buf16 = buf;
-    uint32_t * buf32 = buf;
+
+    /*2 pixels will be processed later, so handle 1 pixel alignment*/
+    if((lv_uintptr_t)buf16 & 0x2) {
+        buf16[0] = ((buf16[0] & 0xff00) >> 8) | ((buf16[0] & 0x00ff) << 8);
+        buf16++;
+        buf_size_px--;
+    }
+
+    uint32_t * buf32 = (uint32_t *)buf16;
+    uint32_t u32_cnt = buf_size_px / 2;
 
     while(u32_cnt >= 8) {
         buf32[0] = ((buf32[0] & 0xff00ff00) >> 8) | ((buf32[0] & 0x00ff00ff) << 8);
@@ -173,6 +181,7 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
         u32_cnt--;
     }
 
+    /*Process the last pixel if needed*/
     if(buf_size_px & 0x1) {
         uint32_t e = buf_size_px - 1;
         buf16[e] = ((buf16[e] & 0xff00) >> 8) | ((buf16[e] & 0x00ff) << 8);
