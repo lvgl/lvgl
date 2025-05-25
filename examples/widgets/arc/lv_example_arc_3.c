@@ -83,7 +83,7 @@ static void arc_click_cb(lv_event_t * e)
         active_arc = arc;
     }
 
-    slice_anim_data_t * anim_data = lv_malloc(sizeof(slice_anim_data_t));
+    slice_anim_data_t * anim_data = (slice_anim_data_t *) lv_malloc(sizeof(slice_anim_data_t));
     anim_data->obj     = arc;
     anim_data->start_x = lv_obj_get_x(arc) - SLICE_OFFSET;
     anim_data->start_y = lv_obj_get_y(arc) - SLICE_OFFSET;
