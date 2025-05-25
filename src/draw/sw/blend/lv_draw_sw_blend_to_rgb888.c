@@ -667,7 +667,6 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
-
                     for(src_x = 0, dest_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
                         dest_buf_u8[dest_x + 2] = (src_buf_c16[src_x].red * 2106) >> 8;  /*To make it rounded*/
                         dest_buf_u8[dest_x + 1] = (src_buf_c16[src_x].green * 1037) >> 8;

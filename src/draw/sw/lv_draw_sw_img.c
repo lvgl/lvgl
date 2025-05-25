@@ -79,7 +79,6 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
                          const lv_image_decoder_dsc_t * decoder_dsc,
                          const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 
-
 static void transform_and_recolor(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                   const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                   const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
