@@ -48,7 +48,7 @@ static void arc_click_cb(lv_event_t * e)
     int32_t y_off = (SLICE_OFFSET * lv_trigo_sin(info->mid_angle)) >> LV_TRIGO_SHIFT;
 
     if(active_info && active_info != info && active_info->out) {
-        slice_anim_data_t * anim_back = lv_malloc(sizeof(slice_anim_data_t));
+        slice_anim_data_t * anim_back = (slice_anim_data_t *) lv_malloc(sizeof(slice_anim_data_t));
         anim_back->obj = active_arc;
         anim_back->start_x = lv_obj_get_x(active_arc) - SLICE_OFFSET;
         anim_back->start_y = lv_obj_get_y(active_arc) - SLICE_OFFSET;
