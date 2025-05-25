@@ -46,8 +46,6 @@ static inline bool matrix_has_transform(const vg_lite_matrix_t * matrix);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-#include <stdio.h>
-
 void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * coords, bool no_cache)
 {
