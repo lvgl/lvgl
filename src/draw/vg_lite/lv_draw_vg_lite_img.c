@@ -212,7 +212,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             &src_buf,
             &matrix,
             blend,
-            dsc->tile ? VG_LITE_PATTERN_COLOR : VG_LITE_PATTERN_REPEAT,
+            dsc->tile ? VG_LITE_PATTERN_REPEAT : VG_LITE_PATTERN_COLOR,
             0,
             color,
             filter);
