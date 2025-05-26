@@ -130,7 +130,8 @@ void test_xml_style_same_name(void)
         "    <style name=\"hello\" figma_node_id=\"1234\" bg_opa=\"20\" border_side=\"right\"/>"
         "  </styles>"
         ""
-        "  <view styles=\"hello\">"
+        "  <view>"
+        "     <style name=\"hello\"/>"
         "  </view>"
         "</component>";
 
