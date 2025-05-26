@@ -174,6 +174,53 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_MAX_OF(t) ((unsigned long)(LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
 
+/**
+ * Fast Euclidean modulo operation.
+ *
+ * @param dividend The number to be divided (any int32)
+ * @param divisor  The modulus (any non-zero int32)
+ * @return         Remainder in range [0, divisor-1]
+ */
+static inline int32_t lv_euclidean_mod_fast(int32_t dividend, int32_t divisor)
+{
+    const int32_t abs_divisor = LV_ABS(divisor);
+
+    // Positive and already in range [0, abs_divisor)
+    if(dividend >= 0 && dividend < abs_divisor) {
+        return dividend;
+    }
+
+    // Positive and already in range [0, abs_divisor)
+    if(dividend < 0 && dividend >= -abs_divisor) {
+        return dividend + abs_divisor;
+    }
+
+    // Power-of-two divisors
+    if((abs_divisor & (abs_divisor - 1)) == 0) {
+        return dividend & (abs_divisor - 1);
+    }
+
+    // General case
+    int32_t rem = dividend % abs_divisor;
+    return rem + (rem < 0 ? abs_divisor : 0);
+}
+
+/**
+ * Safe Euclidean modulo operation with zero-divisor protection
+ *
+ * @param dividend The number to be divided (any int32)
+ * @param divisor  The modulus (if zero, returns 0 as fallback)
+ * @return         Remainder in range [0, divisor-1], or 0 if divisor=0
+ *
+ * @note Wraps lv_euclidean_mod_fast with an additional zero check.
+ *       For critical applications, consider asserting divisor != 0 before calling.
+ */
+static inline int32_t lv_euclidean_mod(int32_t dividend, int32_t divisor)
+{
+    if(divisor == 0) return 0;
+    return lv_euclidean_mod_fast(dividend, divisor);
+}
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
