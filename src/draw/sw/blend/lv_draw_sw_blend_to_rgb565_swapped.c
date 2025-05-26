@@ -318,8 +318,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565_swapped(lv_draw_sw_b
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_SWAPPED_WITH_OPA(dsc)) {
             for(y = 0; y < h; y++) {
-                /*Make sue the last dest_color doesn't match the first one so that it will be calculated*/
-                uint16_t last_dest_color =  dest_buf_u16[x] - 1;
+                /*Make sure the last dest_color doesn't match the first one so that it will be calculated*/
+                uint16_t last_dest_color =  dest_buf_u16[0] - 1;
                 uint16_t last_res_color = 0;
                 for(x = 0; x < w; x++) {
                     if(last_dest_color != dest_buf_u16[x]) {
