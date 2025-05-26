@@ -189,6 +189,8 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
     if(!data->draw_buf) {
         LV_LOG_WARN("Could not create draw buffer");
+        FT_Done_Glyph(glyph);
+        LV_PROFILER_FONT_END;
         return false;
     }
     lv_draw_buf_clear(data->draw_buf, NULL);
