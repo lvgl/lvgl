@@ -146,7 +146,7 @@ Example:
 
     <!-- my_widget.xml -->
     <api>
-        <element name="indicator" type="obj" help="The indicator of my_widget" access="add">
+        <element name="indicator" type="lv_obj" help="The indicator of my_widget" access="add">
             <arg name="color" type="color" help="Help for color"/>
             <arg name="max_value" type="int" help="Help for max_value"/>
             <prop name="value" help="Set a new value for the indicator">
@@ -201,7 +201,7 @@ Example:
 
     <!-- my_widget.xml -->
     <api>
-        <element name="control_button" type="obj" help="A control button of my_widget" access="get">
+        <element name="control_button" type="lv_obj" help="A control button of my_widget" access="get">
             <arg name="index" type="int" help="Zero-based index of the control button"/>
             <prop name="title">
                 <param name="text" type="string"/>
@@ -247,7 +247,7 @@ Example:
 
     <!-- my_widget.xml -->
     <api>
-        <element name="item" type="obj" help="An item on my_widget" access="set">
+        <element name="item" type="lv_obj" help="An item on my_widget" access="set">
             <arg name="index" type="int" help="The zero-based index of the item"/>
             <prop name="icon" help="Set the icon of an item">
                 <param name="icon_src" type="img_src" help="The image to set as an icon."/>
