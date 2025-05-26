@@ -4,50 +4,79 @@
 Subjects
 ========
 
-To connect values of the Widget internally or to external data, :ref:`Subjects
-<observer_subject>` can be used. For example, an internally connected value could be
-a slider's value mapped to a label. Externally connected data could be the current
-number of users shown on a label.
+Overview
+********
 
-To handle internal connections, local Subjects can be created like this:
+With the help of :ref:`Subjects <observer_subject>`, the interface of the UI can be created.
 
-.. code-block::  xml
+A subject is a global data item whose value can be set either from the application or the UI, and whose value
+can be bound to widget properties.
 
-    <subjects>
-        <int name="a" value="20"/>
-        <string name="b" value="Hello"/>
-        <group name="a_and_b" value="a b"/>
-    </subjects>
+For example, a ``room1_temperature`` subject's value can be set in the application when the temperature
+is measured, and can be bound to a label like this:
 
-These Subjects can be used in Widget APIs like:
+.. code-block:: xml
 
-.. code-block::  xml
+    <lv_label bind_text="room1_temperature"/>
 
-    <view>
-        <label bind_text="a 'Progress: %d'"/>
-    </view>
+Defining subjects
+*****************
 
-When generating code, the Subjects are saved in the Widget's data and are used like this:
+Subjects can be created in ``globals.xml`` like this:
 
-.. code-block::  c
+.. code-block:: xml
 
-    lv_subject_init_int(&my_widget->subject_a, 20);
-    lv_subject_init_string(&my_widget->subject_b, "Hello");
+    <globals>
+        <subjects>
+            <int name="battery_power" value="32"/>
+            <string name="user_name" value="John"/>
+        </subjects>
+    </globals>
 
-    my_widget->subject_a_and_b_list = lv_malloc(sizeof(lv_subject_t *) * 2);
-    my_widget->subject_a_and_b_list[0] = &my_widget->subject_a;
-    my_widget->subject_a_and_b_list[1] = &my_widget->subject_b;
-    lv_subject_init_group(&my_widget->subject_a_and_b, my_widget->subject_a_and_b_list);
+As the example shows, a subject consists of a type, name, and initial value.
+Currently, only integer and string types are supported.
 
-If the connection is more complex and not supported out of the box, it can be handled from code.
+Simple binding
+**************
 
-External Subjects are defined in the API of the Widget:
+Some widgets (e.g., label, slider) support binding the subject's value directly to the widget.
+These bindings use attributes that start with ``bind_*`` and reference a subject.
 
-.. code-block::  xml
+.. code-block:: xml
 
-    <api>
-        <prop name="bind_value" help="">
-            <param name="subject" type="subject" help=""/>
-            <param name="max_value" type="int" help="Just another parameter, e.g., to limit the value"/>
-        </prop>
-    </api>
+    <lv_slider bind_value="some_subject"/>
+    <lv_label bind_text="some_subject"/>
+
+Once a binding is created, if the subject's value changes (e.g., by adjusting the slider),
+all bound widgets will be updated automatically.
+
+Complex binding
+***************
+
+In more complex cases—when a binding requires multiple parameters—the binding can be added as a child element of a widget.
+This allows binding multiple subjects with different parameters. For example:
+
+.. code-block:: xml
+
+    <lv_label text="Hello world">
+        <lv_obj-bind_flag_if_eq subject="subject1" flag="hidden" ref_value="10"/>
+        <lv_obj-bind_flag_if_gt subject="subject1" flag="clickable" ref_value="20"/>
+    </lv_label>
+
+Explanation of complex bindings:
+
+- ``<lv_obj-bind_flag_if_eq>`` — Set a flag if the subject's value **equals** the reference value.
+- ``<lv_obj-bind_flag_if_not_eq>`` — Set a flag if the subject's value **does not equal** the reference value.
+- ``<lv_obj-bind_flag_if_gt>`` — Set a flag if the subject's value is **greater than** the reference value.
+- ``<lv_obj-bind_flag_if_ge>`` — Set a flag if the subject's value is **greater than or equal to** the reference value.
+- ``<lv_obj-bind_flag_if_lt>`` — Set a flag if the subject's value is **less than** the reference value.
+- ``<lv_obj-bind_flag_if_le>`` — Set a flag if the subject's value is **less than or equal to** the reference value.
+
+- ``<lv_obj-bind_state_if_eq>`` — Set a state if the subject's value **equals** the reference value.
+- ``<lv_obj-bind_state_if_not_eq>`` — Set a state if the subject's value **does not equal** the reference value.
+- ``<lv_obj-bind_state_if_gt>`` — Set a state if the subject's value is **greater than** the reference value.
+- ``<lv_obj-bind_state_if_ge>`` — Set a state if the subject's value is **greater than or equal to** the reference value.
+- ``<lv_obj-bind_state_if_lt>`` — Set a state if the subject's value is **less than** the reference value.
+- ``<lv_obj-bind_state_if_le>`` — Set a state if the subject's value is **less than or equal to** the reference value.
+
+Note: The ``lv_obj-`` prefix can be omitted. For example, you can simply write ``<bind_state_if_gt>`` instead.

@@ -125,6 +125,13 @@ lv_layout_t lv_xml_layout_to_enum(const char * txt);
  */
 lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt);
 
+/**
+ * Convert a an event trigger string to enum
+ * @param txt       e.g. "clicked"
+ * @return          the related enum, e.g. `LV_EVENT_CLICKED`
+ */
+lv_event_code_t lv_xml_trigger_text_to_enum_value(const char * txt);
+
 /**********************
  *      MACROS
  **********************/

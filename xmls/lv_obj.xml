@@ -39,6 +39,33 @@ Example
 		    <enum name="user_4"          help="Custom flag, free to use by user"/>
 		</enumdef>
 
+        <element name="style" access="add" type="void">
+            <arg name="name" type="style"/>
+            <arg name="selector" type="selector+"/>
+        </element>
+
+        <element name="event_cb" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event"/>
+            <arg name="cb" type="event_cb"/>
+        </element>
+
+        <element name="subject_set" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event"/>
+            <arg name="subject" type="subject"/>
+            <arg name="value" type="int"/>
+        </element>
+
+        <element name="subject_increment" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event"/>
+            <arg name="subject" type="subject"/>
+            <arg name="step" type="int"/>
+            <arg name="min" type="int" default="-2000000"/>
+            <arg name="max" type="int" default="2000000"/>
+        </element>
+
         <element name="bind_flag_if_eq" access="bind" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
@@ -118,7 +145,6 @@ Example
 	    <prop name="height" type="coords"/>
 	    <prop name="width" type="coords"/>
 	    <prop name="align" type="enum:lv_align"/>
-	    <prop name="styles"  type="styles[]"/>
 
         <prop name="ext_click_area" type="int"/>
 
