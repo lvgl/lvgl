@@ -1208,6 +1208,37 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
+void lv_dispaly_pause(lv_display_t * disp)
+{
+    if(disp == NULL || disp->pause == true)
+        return;
+
+    disp->pause = true;
+    if(disp->refr_timer)
+        lv_timer_pause(disp->refr_timer);
+    lv_display_enable_invalidation(disp, false);
+    lv_display_send_event(disp, LV_EVENT_DISPLAY_PAUSE, NULL);
+}
+
+void lv_display_resume(lv_display_t * disp)
+{
+    if(disp == NULL || disp->pause == false)
+        return;
+
+    disp->pause = false;
+    if(disp->refr_timer)
+        lv_timer_resume(disp->refr_timer);
+    lv_display_enable_invalidation(disp, true);
+    lv_display_send_event(disp, LV_EVENT_DISPLAY_RESUME, NULL);
+}
+
+bool lv_display_is_paused(lv_display_t * disp)
+{
+    LV_ASSERT_NULL(disp);
+    return disp->pause;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

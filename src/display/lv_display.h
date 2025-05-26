@@ -645,6 +645,25 @@ uint32_t lv_display_get_draw_buf_size(lv_display_t * disp);
  */
 uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t width, uint32_t height);
 
+/**
+ * Set the display to paused state. The display will not be refreshed.
+ * @param disp      pointer to a display
+ */
+void lv_dispaly_pause(lv_display_t * disp);
+
+/**
+ * Resume the display from paused state. The display will be refreshed.
+ * @param disp      pointer to a display
+ */
+void lv_display_resume(lv_display_t * disp);
+
+/**
+ * Get if the display is paused.
+ * @param disp      pointer to a display
+ * @return         true: the display is paused; false: the display is not paused
+ */
+bool lv_display_is_paused(lv_display_t * disp);
+
 /**********************
  *      MACROS
  **********************/

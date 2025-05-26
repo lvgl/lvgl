@@ -205,4 +205,49 @@ void test_display_triple_buffer(void)
     lv_draw_buf_destroy(buf3);
 }
 
+static void display_pause_event_cb(lv_event_t * e)
+{
+    int * i = (int *)lv_event_get_user_data(e);
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_DISPLAY_PAUSE) {
+        *i += 1;
+    }
+    else if(code == LV_EVENT_DISPLAY_RESUME) {
+        *i -= 1;
+    }
+    else if(code == LV_EVENT_REFR_START) {
+        *i = 0;
+    }
+}
+
+void test_display_pause_and_resume(void)
+{
+    int pause_count = 1;
+    int resume_count = 1;
+    int refr_start = 1;
+    lv_display_t * disp = lv_display_create(480, 320);
+    lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_draw_buf_t * buf2 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buffers(disp, buf1, buf2);
+    lv_display_add_event_cb(disp, display_pause_event_cb, LV_EVENT_DISPLAY_PAUSE, &pause_count);
+    lv_display_add_event_cb(disp, display_pause_event_cb, LV_EVENT_DISPLAY_RESUME, &resume_count);
+    lv_display_add_event_cb(disp, display_pause_event_cb, LV_EVENT_REFR_START, &refr_start);
+
+    TEST_ASSERT_FALSE(lv_display_is_paused(disp));
+    lv_dispaly_pause(disp);
+    TEST_ASSERT_TRUE(lv_display_is_paused(disp));
+    TEST_ASSERT_EQUAL_INT(pause_count, 2);
+
+    lv_refr_now(disp);
+    TEST_ASSERT_EQUAL_INT(refr_start, 1);
+
+    lv_display_resume(disp);
+    TEST_ASSERT_FALSE(lv_display_is_paused(disp));
+    TEST_ASSERT_EQUAL_INT(resume_count, 0);
+
+    lv_display_delete(disp);
+    lv_draw_buf_destroy(buf1);
+    lv_draw_buf_destroy(buf2);
+}
 #endif

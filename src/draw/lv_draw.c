@@ -215,6 +215,11 @@ void lv_draw_dispatch(void)
     bool task_dispatched = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
+        if(disp->pause && disp != lv_refr_get_disp_refreshing()) {
+            disp = lv_display_get_next(disp);
+            continue;
+        }
+
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
             if(lv_draw_dispatch_layer(disp, layer))

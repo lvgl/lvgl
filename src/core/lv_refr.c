@@ -371,6 +371,11 @@ void lv_display_refr_timer(lv_timer_t * tmr)
         LV_PROFILER_REFR_END;
         return;
     }
+    else if(disp_refr->pause) {
+        LV_LOG_TRACE("Display is paused");
+        LV_PROFILER_REFR_END;
+        return;
+    }
 
     lv_draw_buf_t * buf_act = disp_refr->buf_act;
     if(!(buf_act && buf_act->data && buf_act->data_size)) {
