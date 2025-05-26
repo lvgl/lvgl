@@ -28,6 +28,7 @@
 #define LV_DRAW_SW_ASM_NONE         0
 #define LV_DRAW_SW_ASM_NEON         1
 #define LV_DRAW_SW_ASM_HELIUM       2
+#define LV_DRAW_SW_ASM_NEON64       3
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
 #define LV_NEMA_HAL_CUSTOM          0
