@@ -9,9 +9,6 @@ Overview
 
 In XML files, both style sheets (:cpp:expr:`lv_style_t`) and local styles can be used.
 
-Style variants are also supported to change style properties at runtime.
-
-
 
 Style Sheets
 ************
@@ -30,11 +27,14 @@ Styles can be referenced like this in the ``<view>``:
 .. code-block:: xml
 
     <view>
-        <slider styles="main red:indicator red:knob:focused"/>
+        <lv_slider value="20">
+             <style name="main"/>
+             <style name="red" selector"knob"/>
+             <style name="blue" selector="knob focused"/>
+        </lv_slider>
     </view>
 
-As shown in the example, parts and states are appended after a ``:`` to the style's name.
-
+As shown in the example, parts and states can be set as ``selector``.
 
 
 Local Styles
@@ -45,7 +45,6 @@ Local styles can be used directly in a Widget, for example:
 .. code-block:: xml
 
     <lv_label style_bg_opa="200" style_bg_opa:disabled="100"/>
-
 
 
 Gradients

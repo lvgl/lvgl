@@ -20,8 +20,9 @@
         </lv_spangroup>
 
         <lv_scale total_tick_count="31" show_label="true" major_tick_every="6"
-        		  range="10 110" width="300"
-        		  styles="scale_main scale_indic:indicator">
+        		  range="10 110" width="300">
+            <style name="scale_main"/>
+            <style name="scale_indic" selector="indicator"/>
 	        <lv_scale-section range="30 60" style_indicator="scale_sectoion_indic"/>
         </lv_scale>
 

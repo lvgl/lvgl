@@ -39,7 +39,6 @@
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
-#include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -110,15 +109,14 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
                            lv_xml_calendar_header_dropdown_apply);
 
-    lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
-
     lv_xml_widget_register("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
     lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
-    lv_xml_widget_register("lv_obj-subject_set", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_set_int", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
     lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
                            lv_obj_xml_subject_increment_apply);
-    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
-                           lv_obj_xml_sscreen_load_event_apply);
+    //    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+    //                           lv_obj_xml_sscreen_load_event_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
@@ -508,9 +506,8 @@ static void resolve_params(lv_xml_component_scope_t * item_scope, lv_xml_compone
 {
     uint32_t i;
     for(i = 0; item_attrs[i]; i += 2) {
-        const char * name = item_attrs[i];
         const char * value = item_attrs[i + 1];
-        if(lv_streq(name, "styles")) continue; /*Styles will handle it themselves*/
+
         if(value[0] == '$') {
             /*E.g. the ${my_color} value is the my_color attribute name on the parent*/
             const char * name_clean = &value[1]; /*skips `$`*/
