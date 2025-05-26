@@ -1208,7 +1208,7 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
-void lv_dispaly_pause(lv_display_t * disp)
+void lv_display_pause(lv_display_t * disp)
 {
     if(disp == NULL || disp->pause == true)
         return;

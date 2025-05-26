@@ -235,7 +235,7 @@ void test_display_pause_and_resume(void)
     lv_display_add_event_cb(disp, display_pause_event_cb, LV_EVENT_REFR_START, &refr_start);
 
     TEST_ASSERT_FALSE(lv_display_is_paused(disp));
-    lv_dispaly_pause(disp);
+    lv_display_pause(disp);
     TEST_ASSERT_TRUE(lv_display_is_paused(disp));
     TEST_ASSERT_EQUAL_INT(pause_count, 2);
 
