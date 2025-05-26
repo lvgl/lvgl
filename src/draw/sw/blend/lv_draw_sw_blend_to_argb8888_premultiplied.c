@@ -297,7 +297,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                             color_argb.alpha = 0xff;
                             dest_buf_c32[x] = color_argb;
                         }
-                        else if(color_argb.alpha >= LV_OPA_MIN) {
+                        else if(color_argb.alpha > LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
                              *darker color when blending the same color to the background.*/
                             if(dest_buf_c32[x].red != color_argb.red ||
@@ -329,7 +329,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                             color_argb.alpha = 0xff;
                             dest_buf_c32[x] = color_argb;
                         }
-                        else if(alpha >= LV_OPA_MIN) {
+                        else if(alpha > LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
                              *darker color when blending the same color to the background.*/
                             if(dest_buf_c32[x].red != color_argb.red ||
@@ -361,7 +361,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                             color_argb.alpha = 0xff;
                             dest_buf_c32[x] = color_argb;
                         }
-                        else if(alpha >= LV_OPA_MIN) {
+                        else if(alpha > LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
                              *darker color when blending the same color to the background.*/
                             if(dest_buf_c32[x].red != color_argb.red ||
@@ -394,7 +394,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
                             color_argb.alpha = 0xff;
                             dest_buf_c32[x] = color_argb;
                         }
-                        else if(alpha >= LV_OPA_MIN) {
+                        else if(alpha > LV_OPA_MIN) {
                             /*Premultiplication can cause loss of precision which can result slightly
                              *darker color when blending the same color to the background.*/
                             if(dest_buf_c32[x].red != color_argb.red ||
