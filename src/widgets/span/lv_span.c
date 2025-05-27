@@ -595,13 +595,17 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
 lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * span)
 {
+    if(obj == NULL) return (lv_span_coords_t) {
+        0
+    };
+
     /* find previous span */
     const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
     const lv_ll_t * spans = &spangroup->child_ll;
     const int32_t width = lv_obj_get_content_width(obj);
     const int32_t indent = lv_spangroup_get_indent(obj);
 
-    if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
+    if(span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
         0
     };
 
