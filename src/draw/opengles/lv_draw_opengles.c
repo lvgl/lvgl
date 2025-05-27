@@ -432,8 +432,8 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
     bool h_flip = false;
     bool v_flip = true;
-    if (t->type == LV_DRAW_TASK_TYPE_3D) {
-        lv_draw_3d_dsc_t* _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
+    if(t->type == LV_DRAW_TASK_TYPE_3D) {
+        lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
     }

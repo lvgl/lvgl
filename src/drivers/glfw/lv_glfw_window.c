@@ -9,6 +9,7 @@
 #include "lv_glfw_window_private.h"
 #if LV_USE_OPENGLES
 #include <stdlib.h>
+#include <stdio.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -68,17 +69,19 @@ static lv_ll_t glfw_window_ll;
  **********************/
 
 // Note: to enable taskbar window icon on Linux Wayland desktops, the window_title must match the
-// name of the applications/my_app.desktop file, minus the .desktop extension, at the time the 
+// name of the applications/my_app.desktop file, minus the .desktop extension, at the time the
 // window is created (then it can be changed to whatever).  so 'my_app', in this example.
-lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip, bool v_flip,  const char* window_title, const char* desktop_file_name)
+lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
+                                            bool v_flip,  const char * window_title, const char * desktop_file_name)
 {
     const char * _defaultTitle = "";
     const char * _defaultSuffix = "[ LVGL Simulator ]";
     const char * _default_desktop_file = "lvgl_simulator";
-    char * _title = (char*)_default_desktop_file;
+    char * _title = (char *)_default_desktop_file;
 
-    if (desktop_file_name != NULL) {
-        _title = (char *)desktop_file_name; }
+    if(desktop_file_name != NULL) {
+        _title = (char *)desktop_file_name;
+    }
 
     if(lv_glfw_init() != 0) {
         return NULL;
@@ -100,13 +103,14 @@ lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bo
         return NULL;
     }
 
-    _title = (window_title != NULL) ? (char *)window_title : (char*)_defaultTitle;
-    if (desktop_file_name == NULL) {
-        const char buffer[256];
+    _title = (window_title != NULL) ? (char *)window_title : (char *)_defaultTitle;
+    if(desktop_file_name == NULL) {
+        char buffer[256];
         sprintf(buffer, "%s %s", _title, _defaultSuffix);
-        glfwSetWindowTitle(window->window, buffer );
-    } else {
-        glfwSetWindowTitle(window->window, _title );
+        glfwSetWindowTitle(window->window, buffer);
+    }
+    else {
+        glfwSetWindowTitle(window->window, _title);
     }
 
     window->h_flip = h_flip;
@@ -129,6 +133,11 @@ lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bo
 lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev)
 {
     return lv_glfw_window_create_ex(hor_res, ver_res, use_mouse_indev, false, false, NULL, NULL);
+}
+
+void lv_glfw_window_set_title(lv_glfw_window_t * window, const char * new_title)
+{
+    glfwSetWindowTitle(window->window, new_title);
 }
 
 void lv_glfw_window_delete(lv_glfw_window_t * window)
@@ -154,7 +163,8 @@ void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window)
     return (void *)(window->window);
 }
 
-void lv_glfw_window_set_flip(lv_glfw_window_t * window, bool h_flip, bool v_flip) {
+void lv_glfw_window_set_flip(lv_glfw_window_t * window, bool h_flip, bool v_flip)
+{
     window->h_flip = h_flip;
     window->v_flip = v_flip;
 }
@@ -340,7 +350,7 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
 #if LV_USE_DRAW_OPENGLES
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip );
+                                       &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip);
 #else
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
                                        &clip_area, window->h_flip, window->v_flip);
@@ -403,8 +413,10 @@ static void proc_mouse(lv_glfw_window_t * window)
     LV_LL_READ_BACK(&window->textures, texture) {
         if(lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
             /* adjust the mouse pointer coordinates so that they are relative to the texture */
-            texture->indev_last_point.x = window->h_flip ? ( texture->area.x2 - window->mouse_last_point.x  ) : ( window->mouse_last_point.x - texture->area.x1 );
-            texture->indev_last_point.y = window->v_flip ? ( texture->area.y2 - window->mouse_last_point.y ) : ( window->mouse_last_point.y - texture->area.y1 );
+            texture->indev_last_point.x = window->h_flip ? (texture->area.x2 - window->mouse_last_point.x) :
+                                          (window->mouse_last_point.x - texture->area.x1);
+            texture->indev_last_point.y = window->v_flip ? (texture->area.y2 - window->mouse_last_point.y) :
+                                          (window->mouse_last_point.y - texture->area.y1);
             texture->indev_last_state = window->mouse_last_state;
             lv_indev_read(texture->indev);
             break;
