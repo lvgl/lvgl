@@ -108,7 +108,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
  * Example:
  * @code
  * va_list args;
- * va_start(args, fmt);    
+ * va_start(args, fmt);
  * lv_label_set_text_vfmt(label1, fmt, args);
  * va_end(args);
  * @endcode

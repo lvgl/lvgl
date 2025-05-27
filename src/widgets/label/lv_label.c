@@ -177,7 +177,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     va_list args;
     va_start(args, fmt);
     lv_label_set_text_vfmt(obj,fmt, args);
-    va_end(args);    
+    va_end(args);
 }
 
 void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
@@ -199,7 +199,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
         label->text = NULL;
     }
 
-    label->text = lv_text_set_text_vfmt(fmt, args);    
+    label->text = lv_text_set_text_vfmt(fmt, args);
     label->static_txt = 0; /*Now the text is dynamically allocated*/
 
     lv_label_refr_text(obj);
