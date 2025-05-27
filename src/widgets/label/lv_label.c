@@ -176,7 +176,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    lv_label_set_text_vfmt(obj,fmt, args);
+    lv_label_set_text_vfmt(obj, fmt, args);
     va_end(args);
 }
 
