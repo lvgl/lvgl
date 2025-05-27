@@ -298,7 +298,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
                                                   img_coords,       /* src_h, src_w, src_x1, src_y1 */
                                                   img_stride,       /* image stride */
                                                   clipped_img_area, /* blend area */
-                                                  draw_unit,        /* target buffer, buffer width, buffer height, buffer stride */
+                                                  t,                /* draw task*/
                                                   draw_dsc)) {      /* opa, recolour_opa and colour */
         /*In the other cases every pixel need to be checked one-by-one*/
         transform_and_recolor(t, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area);
