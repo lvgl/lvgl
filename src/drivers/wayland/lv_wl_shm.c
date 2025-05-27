@@ -121,7 +121,6 @@ void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct 
 
 lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * window, int32_t width, int32_t height)
 {
-    LV_LOG_USER("lv_wayland_shm_resize_window");
     const uint8_t bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
     /* Update size for newly allocated buffers */
@@ -136,7 +135,6 @@ lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * wi
 
     if(smm_map(body_buf2) == NULL) {
         LV_LOG_ERROR("Cannot pre-allocate backing buffers for window body");
-        LV_LOG_USER("Cannot pre-allocate backing buffers for window body");
         wl_surface_destroy(window->body->surface);
         return LV_RESULT_INVALID;
     }

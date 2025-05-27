@@ -426,12 +426,12 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
     LV_UNUSED(xdg_toplevel);
     LV_UNUSED(states);
 
-    LV_LOG_USER("w:%d h:%d", width, height);
-    LV_LOG_USER("current body w:%d h:%d", window->body->width, window->body->height);
-    LV_LOG_USER("window w:%d h:%d", window->width, window->height);
+    LV_LOG_TRACE("w:%d h:%d", width, height);
+    LV_LOG_TRACE("current body w:%d h:%d", window->body->width, window->body->height);
+    LV_LOG_TRACE("window w:%d h:%d", window->width, window->height);
 
     if((width <= 0) || (height <= 0)) {
-        LV_LOG_USER("will not resize to w:%d h:%d", width, height);
+        LV_LOG_TRACE("will not resize to w:%d h:%d", width, height);
         return;
     }
 
@@ -439,10 +439,10 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
         window->resize_width   = width;
         window->resize_height  = height;
         window->resize_pending = true;
-        LV_LOG_USER("resize_pending is set, will resize to w:%d h:%d", width, height);
+        LV_LOG_TRACE("resize_pending is set, will resize to w:%d h:%d", width, height);
     }
     else {
-        LV_LOG_USER("resize_pending not set w:%d h:%d", width, height);
+        LV_LOG_TRACE("resize_pending not set w:%d h:%d", width, height);
     }
 }
 

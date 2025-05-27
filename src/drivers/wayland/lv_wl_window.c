@@ -273,7 +273,7 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
     }
 #endif
 
-    LV_LOG_USER("Resizing to %d %d", width, height);
+    LV_LOG_TRACE("Resizing to %d %d", width, height);
     /* First resize */
     if(lv_wayland_window_resize(window, width, height) != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to resize window");
