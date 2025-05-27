@@ -293,19 +293,20 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
         .unicode = unicode_letter,
     };
 
+
     int adv_w;
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(dsc->glyph_cache, &search_key, (void *)dsc);
 
     if(entry == NULL) {
         if(!dsc->cache_size) {  /* no cache, do everything directly */
-            uint32_t g1 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter);
+            int g1 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter);
             tiny_ttf_glyph_cache_create_cb(&search_key, dsc);
             *dsc_out = search_key.glyph_dsc;
             adv_w = search_key.adv_w;
 
             /*Kerning correction*/
             if(font->kerning == LV_FONT_KERNING_NORMAL &&
-               unicode_letter_next != 0) {
+                unicode_letter_next != 0) {
                 int g2 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter_next); /* not using cache, only do glyph id lookup */
                 if(g2) {
                     dsc_out->adv_w = ttf_get_glyph_pair_kerning_width(dsc, g1, g2, adv_w);
@@ -326,15 +327,16 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 
     /*Kerning correction*/
     if(font->kerning == LV_FONT_KERNING_NORMAL &&
-       unicode_letter_next != 0) { /* check if we need to do any kerning calculations */
+        unicode_letter_next != 0) { /* check if we need to do any kerning calculations */
         uint32_t g1 = dsc_out->gid.index;
 
         int g2 = 0;
         search_key.unicode = unicode_letter_next; /* reuse search key */
         lv_cache_entry_t * entry_next = lv_cache_acquire_or_create(dsc->glyph_cache, &search_key, (void *)dsc);
 
-        if(entry_next == NULL)
+        if(entry_next == NULL) {
             g2 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter_next);
+        }
         else {
             tiny_ttf_glyph_cache_data_t * data_next = lv_cache_entry_get_data(entry_next);
             g2 = data_next->glyph_dsc.gid.index;
