@@ -53,29 +53,27 @@ static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position);
  **********************/
 
 typedef struct ttf_font_desc {
+    lv_cache_t * glyph_cache;
+    lv_cache_t * draw_data_cache;
     lv_cache_t * kerning_cache; 
+    stbtt_fontinfo info;
     lv_fs_file_t file;
 #if LV_TINY_TTF_FILE_SUPPORT != 0
     ttf_cb_stream_t stream;
 #else
     const uint8_t * stream;
 #endif
-    stbtt_fontinfo info;
     float scale;
     int ascent;
     int descent;
-
-    lv_font_kerning_t kerning;
-
     int cache_size;
-    lv_cache_t * glyph_cache;
-    lv_cache_t * draw_data_cache;
+    lv_font_kerning_t kerning;
 } ttf_font_desc_t;
 
 typedef struct _tiny_ttf_glyph_cache_data_t {
+    lv_font_glyph_dsc_t glyph_dsc;
     uint32_t unicode;
     int adv_w;
-    lv_font_glyph_dsc_t glyph_dsc;
 } tiny_ttf_glyph_cache_data_t;
 
 typedef struct  {
@@ -90,9 +88,9 @@ typedef struct {
 } tiny_ttf_kerning_cache_create_data_t;
 
 typedef struct _lv_tiny_ttf_cache_data_t {
+    lv_draw_buf_t * draw_buf;
     uint32_t glyph_index;
     uint32_t size;
-    lv_draw_buf_t * draw_buf;
 } tiny_ttf_cache_data_t;
 
 /**********************
