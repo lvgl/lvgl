@@ -102,8 +102,8 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
- * @param fmt           printf`-like format
-*  @param args          variadic argments list
+ * @param fmt           `printf`-like format
+ * @param args          variadic argments list
  *
  * Example:
  * @code
