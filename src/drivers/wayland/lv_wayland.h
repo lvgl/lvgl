@@ -39,10 +39,9 @@ extern "C" {
  * Wrapper around lv_timer_handler
  * @note Must be called in the application run loop instead of the
  * regular lv_timer_handler provided by LVGL
- * @return true: if the cycle was completed, false if the application
- * went to sleep because the last frame wasn't completed
+ * @return time till it needs to be run next (in ms)
  */
-bool lv_wayland_timer_handler(void);
+uint32_t lv_wayland_timer_handler(void);
 
 /**
  * Retrieves the file descriptor of the wayland socket

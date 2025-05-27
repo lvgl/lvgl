@@ -106,7 +106,7 @@ int lv_wayland_get_fd(void)
     return wl_display_get_fd(lv_wl_ctx.display);
 }
 
-bool lv_wayland_timer_handler(void)
+uint32_t lv_wayland_timer_handler(void)
 {
     struct window * window;
 
@@ -134,12 +134,12 @@ bool lv_wayland_timer_handler(void)
             /* Destroy graphical context and execute close_cb */
             handle_output();
             lv_wayland_deinit();
-            return false;
+            return 0;
         }
     }
 
     /* LVGL handling */
-    lv_timer_handler();
+    uint32_t idle_time = lv_timer_handler();
 
     /* Wayland output handling */
     handle_output();
@@ -155,7 +155,7 @@ bool lv_wayland_timer_handler(void)
         }
     }
 
-    return true;
+    return idle_time;
 }
 
 /**********************
