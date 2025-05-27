@@ -48,12 +48,11 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
  * @param use_mouse_indev    send pointer indev input to LVGL display textures
  * @param h_flip             Should the window contents be horizontally mirrored?
  * @param v_flip             Should the window contents be vertically mirrored?
- * @param window_title       NULL or, user window title (default suffix applied if next parameter is null)
- * @param desktop_file_name  NULL or, to enable taskbar window icon on Linux Wayland desktops, this parameter must match the name of the applications/my_app.desktop file, minus the .desktop extension.
+ * @param title              The window title
  * @return                   the new GLFW window handle
  */
 lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
-                                            bool v_flip, const char * window_title, const char * desktop_file_name);
+                                            bool v_flip,  const char * title);
 
 /**
  * Set the window's title text

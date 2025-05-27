@@ -8,6 +8,7 @@
  *********************/
 #include "../../display/lv_display.h"
 #include "../../misc/lv_area_private.h"
+#include <src/misc/lv_types.h>
 
 #if LV_USE_OPENGLES
 
@@ -179,15 +180,7 @@ void lv_opengles_deinit(void)
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area, bool v_flip)
-{
-    lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, false, v_flip,
-                                lv_color_black());
-}
-
-void lv_opengles_render_texture_dualflip(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                         int32_t disp_w,
-                                         int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
                                 lv_color_black());
@@ -237,24 +230,24 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     };
 
     if(texture != 0) {
-        float x_co = 1.0f / (float)(2 * lv_area_get_width(texture_area));
-        float y_co = 1.0f / (float)(2 * lv_area_get_height(texture_area));
-        float ix_co = 1.0f - x_co;
-        float iy_co = 1.0f - y_co;
-        float _clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, x_co, ix_co)
-                         : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, x_co, ix_co);
-        float _clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, x_co, ix_co)
-                         : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, x_co, ix_co);
-        float _clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_co, iy_co)
-                         : lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_co, iy_co);
-        float _clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_co, iy_co)
-                         : lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_co, iy_co);
+        float x_coef = 1.0f / (float)(2 * lv_area_get_width(texture_area));
+        float y_coef = 1.0f / (float)(2 * lv_area_get_height(texture_area));
+        float ix_co = 1.0f - x_coef;
+        float iy_co = 1.0f - y_coef;
+        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, x_coef, ix_co)
+            : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, x_coef, ix_co);
+        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, x_coef, ix_co)
+            : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, x_coef, ix_co);
+        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co)
+            : lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co);
+        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co)
+            : lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co);
 
         float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-            -1.f,  1.0f, _clip_x1, _clip_y2,
-            1.0f,  1.0f, _clip_x2, _clip_y2,
-            1.0f, -1.0f, _clip_x2, _clip_y1,
-            -1.f, -1.0f, _clip_x1, _clip_y1
+            -1.f,  1.0f, clip_x1, clip_y2,
+            1.0f,  1.0f, clip_x2, clip_y2,
+            1.0f, -1.0f, clip_x2, clip_y1,
+            -1.f, -1.0f, clip_x1, clip_y1
         };
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }

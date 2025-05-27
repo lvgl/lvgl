@@ -416,7 +416,7 @@ static void blend_texture_layer(lv_draw_task_t * t)
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     // TODO rotation
-    lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, false);
+    lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, false, false);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
