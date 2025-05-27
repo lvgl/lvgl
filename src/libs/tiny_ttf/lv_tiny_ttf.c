@@ -479,8 +479,10 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     }
 
     /* check if font  has kerning tables to use, else disable kerning automatically. */
-    if(stbtt_KernTableCheck(&dsc->info) == 0) {
-        kerning = LV_FONT_KERNING_NONE; /* disable kerning if font has no tables. */
+    if(kerning != LV_FONT_KERNING_NONE && stbtt_KernTableCheck(&dsc->info) == 0) {
+        /* disable kerning if font has no tables. */
+        LV_LOG_INFO("Disabling kerning as font doesn't support it.");
+        kerning = LV_FONT_KERNING_NONE; 
     }
 
     dsc->kerning = kerning;
