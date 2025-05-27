@@ -571,7 +571,7 @@ static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
     if(!text_in || len_in == 0 || *text_in == '\0') return NULL;
 
     const char * text = text_in;
-    const char * text_end = text_in + len_in;
+    uint32_t proc_len = 0;
     bool has_cmd = false;
 
     if(*text == LV_TXT_COLOR_CMD[0]) {
@@ -603,17 +603,26 @@ static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
                                        color_buf[2] << 4 | color_buf[3],
                                        color_buf[4] << 4 | color_buf[5]);
 
-        while(text < text_end && *text && *text++ != ' ') { }
+        proc_len = text - text_in;
+        while(proc_len < len_in && *text && *text++ != ' ') {
+            proc_len++;
+        }
     }
 
     const char * text_segment_start = text;
-    while(text < text_end && *text && *text != LV_TXT_COLOR_CMD[0]) text++;
+    while(proc_len < len_in && *text && *text != LV_TXT_COLOR_CMD[0]) {
+        text++;
+        proc_len++;
+    };
     if(text_out) *text_out = text_segment_start;
     if(len_out)  *len_out = text - text_segment_start;
     if(*text == '\0')  return NULL;
-    if(has_cmd && *text == LV_TXT_COLOR_CMD[0]) text++;
+    if(has_cmd && *text == LV_TXT_COLOR_CMD[0]) {
+        text++;
+        proc_len++;
+    };
 
-    return text < text_end && *text ? text : NULL;
+    return proc_len < len_in && *text ? text : NULL;
 }
 
 static lv_value_precise_t deg_to_rad(lv_value_precise_t deg, int32_t radius)
