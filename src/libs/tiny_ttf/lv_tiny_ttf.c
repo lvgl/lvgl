@@ -421,7 +421,7 @@ static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc)
     });
     lv_cache_set_name(dsc->draw_data_cache, "TINY_TTF_DRAW_DATA");
 
-    dsc->kerning_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t),
+    dsc->kerning_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_kerning_cache_data_t),
                                          LV_TINY_TTF_CACHE_KERNING_CNT,
     (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_kerning_cache_compare_cb,
