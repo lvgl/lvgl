@@ -61,7 +61,7 @@ static void buffer_free(struct buffer * buf);
  **********************/
 
 static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener_v3 = {.format   = dmabuf_format,
-                                                                           .modifier = dmabuf_modifiers
+           .modifier = dmabuf_modifiers
 };
 static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener    = {.format = dmabuf_format};
 
@@ -158,15 +158,15 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
     wl_surface_damage(window->body->surface, area->x1, area->y1, src_width, src_height);
 
     if(lv_display_flush_is_last(disp)) {
-    /* Finally, attach buffer and commit to surface */
-    wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
-    wl_surface_commit(window->body->surface);
+        /* Finally, attach buffer and commit to surface */
+        wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
+        wl_surface_commit(window->body->surface);
 
-    struct wl_callback * cb = wl_surface_frame(window->body->surface);
-    wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);
+        struct wl_callback * cb = wl_surface_frame(window->body->surface);
+        wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);
 
-    buf->busy             = 1;
-    window->flush_pending = true;
+        buf->busy             = 1;
+        window->flush_pending = true;
     }
 
     return;
@@ -205,7 +205,7 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
 }
 
 static const struct zwp_linux_buffer_params_v1_listener params_listener = {.created = create_succeeded,
-                                                                               .failed  = create_failed
+           .failed  = create_failed
 };
 
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int32_t width,
