@@ -28,4 +28,3 @@ XML - Declarative UI
     animations
     translations
     license
-
