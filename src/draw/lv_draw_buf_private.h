@@ -31,7 +31,6 @@ struct _lv_draw_buf_handlers_t {
     lv_draw_buf_cache_operation_cb invalidate_cache_cb;
     lv_draw_buf_cache_operation_cb flush_cache_cb;
     lv_draw_buf_width_to_stride_cb width_to_stride_cb;
-    lv_draw_buf_get_fd_cb get_buf_fd_cb;
 };
 
 /**********************

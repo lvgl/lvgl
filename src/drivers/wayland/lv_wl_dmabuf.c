@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <src/misc/lv_types.h>
 #include <string.h>
+#include "../../draw/nxp/g2d/lv_g2d_utils.h"
 
 /*********************
  *      INCLUDES
@@ -262,7 +263,7 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
         buffers[i].lv_draw_buf =
             lv_draw_buf_create(window->width, window->height, lv_display_get_color_format(window->lv_disp), stride);
         buffers[i].strides[0]    = stride;
-        buffers[i].dmabuf_fds[0] = lv_draw_buf_get_fd(buffers[i].lv_draw_buf);
+        buffers[i].dmabuf_fds[0] = g2d_get_buf_fd(buffers[i].lv_draw_buf);
         buffers[i].buf_base[0]   = buffers[i].lv_draw_buf->data;
         params                   = zwp_linux_dmabuf_v1_create_params(window->wl_ctx->dmabuf_ctx.handler);
 
