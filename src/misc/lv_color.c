@@ -67,6 +67,7 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
             return 12;
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
         case LV_COLOR_FORMAT_YUY2:
         case LV_COLOR_FORMAT_AL88:
         case LV_COLOR_FORMAT_ARGB1555:
@@ -393,6 +394,7 @@ uint8_t lv_color32_luminance(lv_color32_t c)
 {
     return (uint8_t)((uint16_t)(77u * c.red + 151u * c.green + 28u * c.blue) >> 8);
 }
+
 
 /**********************
  *   STATIC FUNCTIONS

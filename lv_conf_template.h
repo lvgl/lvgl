@@ -174,6 +174,7 @@
      * - bitmaps with transparency may use ARGB8888
      */
     #define LV_DRAW_SW_SUPPORT_RGB565       1
+    #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
     #define LV_DRAW_SW_SUPPORT_RGB565A8     1
     #define LV_DRAW_SW_SUPPORT_RGB888       1
     #define LV_DRAW_SW_SUPPORT_XRGB8888     1
@@ -268,6 +269,9 @@
 
     /** Enable VGLite asserts. */
     #define LV_USE_VGLITE_ASSERT 0
+
+    /** Enable VGLite error checks. */
+    #define LV_USE_VGLITE_CHECK_ERROR 0
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -1330,7 +1334,12 @@
     
     /** Benchmark your system */
     #define LV_USE_DEMO_BENCHMARK 0
-    
+
+    #if LV_USE_DEMO_BENCHMARK
+        /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
+        #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
+    #endif
+
     /** Render test for each primitive.
      *  - Requires at least 480x272 display. */
     #define LV_USE_DEMO_RENDER 0

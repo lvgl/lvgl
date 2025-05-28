@@ -604,8 +604,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
             if(draw_buf == NULL) {
                 if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
 
-                uint32_t h = g.box_h;
-                if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
+                uint32_t h = LV_ROUND_UP(g.box_h, 32); /*Assume a larger size to avoid many reallocations*/
                 draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
                 draw_buf->header.h = g.box_h;

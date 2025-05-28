@@ -29,8 +29,8 @@ void test_render_to_l8(void)
 
             /*Skip test with transformed indexed images if they are not loaded to RAM*/
             if(LV_BIN_DECODER_RAM_LOAD == 0 &&
-               (i == LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_2 ||
-                i == LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_2)) continue;
+               (i == LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_3 ||
+                i == LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_3)) continue;
 
             char buf[128];
             lv_snprintf(buf, sizeof(buf), "draw/render/l8/demo_render_%s_opa_%d.png",

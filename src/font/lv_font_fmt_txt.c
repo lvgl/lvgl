@@ -90,7 +90,6 @@ const lv_font_class_t lv_builtin_font_class = {
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
-    uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = g_dsc->gid.index;
@@ -100,19 +99,21 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
 
+    uint8_t * bitmap_out = draw_buf->data;
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
-    bool byte_aligned = fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED;
+    uint16_t stride_in = g_dsc->stride;
 
-    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN || fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
+    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
         uint8_t * bitmap_out_tmp = bitmap_out;
         int32_t i = 0;
         int32_t x, y;
-        uint32_t stride = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
+        uint32_t stride_out = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
         if(fdsc->bpp == 1) {
             for(y = 0; y < gdsc->box_h; y ++) {
+                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
                 for(x = 0; x < gdsc->box_w; x++, i++) {
                     i = i & 0x7;
                     if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
@@ -124,20 +125,21 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                     else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
                     else if(i == 7) {
                         bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                        line_rem--;
                         bitmap_in++;
                     }
                 }
-                /*Go to the next byte if stopped in the middle of a byte and
-                 *the next line is byte aligned*/
-                if(byte_aligned && i != 0) {
-                    i = 0;
-                    bitmap_in++;
+                /*Handle stride*/
+                if(stride_in) {
+                    i = 0;  /*If there is a stride start from the next byte in the next line*/
+                    bitmap_in += line_rem;
                 }
-                bitmap_out_tmp += stride;
+                bitmap_out_tmp += stride_out;
             }
         }
         else if(fdsc->bpp == 2) {
             for(y = 0; y < gdsc->box_h; y ++) {
+                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
                 for(x = 0; x < gdsc->box_w; x++, i++) {
                     i = i & 0x3;
                     if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
@@ -145,23 +147,23 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                     else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
                     else if(i == 3) {
                         bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                        line_rem--;
                         bitmap_in++;
                     }
                 }
 
-                /*Go to the next byte if stopped in the middle of a byte and
-                 *the next line is byte aligned*/
-                if(byte_aligned && i != 0) {
-                    i = 0;
-                    bitmap_in++;
+                /*Handle stride*/
+                if(stride_in) {
+                    i = 0;  /*If there is a stride start from the next byte in the next line*/
+                    bitmap_in += line_rem;
                 }
-
-                bitmap_out_tmp += stride;
+                bitmap_out_tmp += stride_out;
             }
 
         }
         else if(fdsc->bpp == 4) {
             for(y = 0; y < gdsc->box_h; y ++) {
+                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
                 for(x = 0; x < gdsc->box_w; x++, i++) {
                     i = i & 0x1;
                     if(i == 0) {
@@ -169,27 +171,29 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                     }
                     else if(i == 1) {
                         bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
+                        line_rem--;
                         bitmap_in++;
                     }
                 }
 
-                /*Go to the next byte if stopped in the middle of a byte and
-                 *the next line is byte aligned*/
-                if(byte_aligned && i != 0) {
-                    i = 0;
-                    bitmap_in++;
+                /*Handle stride*/
+                if(stride_in) {
+                    i = 0;  /*If there is a stride start from the next byte in the next line*/
+                    bitmap_in += line_rem;
                 }
-
-                bitmap_out_tmp += stride;
+                bitmap_out_tmp += stride_out;
             }
         }
         else if(fdsc->bpp == 8) {
             for(y = 0; y < gdsc->box_h; y ++) {
+                uint16_t line_rem = stride_in != 0 ? stride_in : gdsc->box_w;
                 for(x = 0; x < gdsc->box_w; x++, i++) {
                     bitmap_out_tmp[x] = *bitmap_in;
+                    line_rem--;
                     bitmap_in++;
                 }
-                bitmap_out_tmp += stride;
+                bitmap_out_tmp += stride_out;
+                bitmap_in += line_rem;
             }
         }
 
@@ -250,11 +254,15 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->format = (uint8_t)fdsc->bpp;
-    if(fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
-        /*Offset in the enum to the ALIGNED values */
-        dsc_out->format += LV_FONT_GLYPH_FORMAT_A1_ALIGNED - LV_FONT_GLYPH_FORMAT_A1;
+
+    if(fdsc->stride == 0) dsc_out->stride = 0;
+    else {
+        /*e.g. font_dsc stride ==  4 means align to 4 byte boundary.
+         *In glyph_dsc store the actual line length in bytes*/
+        dsc_out->stride = LV_ROUND_UP(dsc_out->box_w, fdsc->stride);
     }
+
+    dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
     dsc_out->gid.index = gid;
 

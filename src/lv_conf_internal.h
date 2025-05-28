@@ -421,6 +421,17 @@
             #define LV_DRAW_SW_SUPPORT_RGB565       1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+            #else
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
+        #endif
+    #endif
     #ifndef LV_DRAW_SW_SUPPORT_RGB565A8
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
@@ -745,6 +756,15 @@
             #define LV_USE_VGLITE_ASSERT CONFIG_LV_USE_VGLITE_ASSERT
         #else
             #define LV_USE_VGLITE_ASSERT 0
+        #endif
+    #endif
+
+    /** Enable VGLite error checks. */
+    #ifndef LV_USE_VGLITE_CHECK_ERROR
+        #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
+            #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
+        #else
+            #define LV_USE_VGLITE_CHECK_ERROR 0
         #endif
     #endif
 #endif
@@ -4291,7 +4311,18 @@
             #define LV_USE_DEMO_BENCHMARK 0
         #endif
     #endif
-    
+
+    #if LV_USE_DEMO_BENCHMARK
+        /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
+        #ifndef LV_DEMO_BENCHMARK_ALIGNED_FONTS
+            #ifdef CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+            #else
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
+            #endif
+        #endif
+    #endif
+
     /** Render test for each primitive.
      *  - Requires at least 480x272 display. */
     #ifndef LV_USE_DEMO_RENDER

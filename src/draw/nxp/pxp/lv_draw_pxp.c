@@ -111,19 +111,26 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 {
     lv_pxp_reset();
 
-    /* convert rotation angle */
+    /* Convert rotation angle
+     * To be in sync with CPU, the received angle is counterclockwise
+     * and the PXP constants are for clockwise rotation
+     *
+     *    counterclockwise          clockwise
+     * LV_DISPLAY_ROTATION_90  -> kPXP_Rotate270
+     * LV_DISPLAY_ROTATION_270 -> kPXP_Rotate90
+     */
     pxp_rotate_degree_t pxp_rotation;
     switch(rotation) {
         case LV_DISPLAY_ROTATION_0:
             pxp_rotation = kPXP_Rotate0;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
             pxp_rotation = kPXP_Rotate90;
             break;
         case LV_DISPLAY_ROTATION_180:
             pxp_rotation = kPXP_Rotate180;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_DISPLAY_ROTATION_90:
             pxp_rotation = kPXP_Rotate270;
             break;
         default:
@@ -377,7 +384,6 @@ static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
 static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
@@ -397,13 +403,13 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_pxp_fill(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_fill(t);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_pxp_img(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_img(t);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_pxp_layer(t, t->draw_dsc, &t->area);
+            lv_draw_pxp_layer(t);
             break;
         default:
             break;
