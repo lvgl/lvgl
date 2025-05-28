@@ -608,7 +608,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
         }
     }
     else if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
-        if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_SWAPPED_RECOLOR(dest_buf, blend_area, color, mix)) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_SWAPPED_RECOLOR(dest_buf, relative_area, color, mix)) {
             const uint8_t * src_buf_tmp = src_buf + src_stride * relative_area.y1 + relative_area.x1 * 2;
             int32_t img_stride_px = src_stride / 2;
 
@@ -688,7 +688,7 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
         }
     }
     else if(cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
-        if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR(dest_buf, relative_area, color, mix, cf_final)) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR(dest_buf, relative_area, color, mix, cf)) {
             uint32_t px_size = lv_color_format_get_size(cf);
             src_buf += src_stride * relative_area.y1 + relative_area.x1 * px_size;
 
