@@ -7,7 +7,7 @@ Translation
 Overview
 ********
 
-LVGL supports two ways to handle translations:
+LVGL supports two ways of handling translations:
 
 - `lv_i18n <https://github.com/lvgl/lv_i18n>`_: A comprehensive tool that extracts translatable strings from C files into YAML files, and generates C translation files from them. It also supports plural forms. See its README for details.
 
@@ -33,7 +33,7 @@ If most translations are known at compile time, they can be defined using string
 
     lv_translation_add_static(languages, tags, translations);
 
-This method has a minimal memory footprint, as only the pointers to the strings are stored.
+This method uses only a little extra RAM, as only the pointers to the strings are stored.
 
 Dynamic Translations
 --------------------
@@ -68,12 +68,10 @@ These return a translated string which can be used with widgets:
 Fallbacks
 ---------
 
-If a tag exists but the translation for the selected language is missing:
+If a tag exists but the translation for the selected language is missing
+the tag itself will be returned.
 
-1. The translation from the first language in the list will be used.
-2. If that is also missing, the tag itself will be returned.
-
-If the tag is not found at all, the tag itself will be used as a fallback.
+If the tag is not found at all, the tag itself will be used as a fallback as well.
 
 .. _lv_translation_example:
 

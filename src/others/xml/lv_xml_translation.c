@@ -9,6 +9,7 @@
 #include "../../lvgl.h"
 #if LV_USE_XML && LV_USE_TRANSLATION
 
+#include "../translation/lv_translation_private.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_parser.h"
 #include "../../others/translation/lv_translation.h"
@@ -58,6 +59,7 @@ lv_result_t lv_xml_translation_register_from_file(const char * path)
 
     /* Create the buffer */
     char * xml_buf = lv_malloc(file_size + 1);
+    LV_ASSERT_MALLOC(xml_buf);
     if(xml_buf == NULL) {
         LV_LOG_WARN("Memory allocation failed for file %s (%d bytes)", path, file_size + 1);
         lv_fs_close(&f);
@@ -118,24 +120,22 @@ static void start_handler(void * user_data, const char * name, const char ** att
 
     if(lv_streq(name, "translations")) {
         const char * languages = lv_xml_get_value_of(attrs, "languages");
-        char buf[256];
-        lv_strlcpy(buf, languages, sizeof(buf));
-        char * bufp = buf;
-
-        while(bufp[0]) {
-            lv_xml_split_str(&bufp, ' ');
-            pack->language_cnt++;
+        if(languages == NULL) {
+            LV_LOG_WARN("`languages` are not set in `translations`");
+            return;
         }
-
-        pack->languages = lv_malloc(pack->language_cnt * sizeof(const char *));
-
+        char buf[512];
+        char * bufp = buf;
         lv_strlcpy(buf, languages, sizeof(buf));
         bufp = buf;
-        uint32_t i = 0;
+        lv_result_t res = LV_RESULT_OK;
         while(bufp[0]) {
             const char * lang = lv_xml_split_str(&bufp, ' ');
-            pack->languages[i] = lv_strdup(lang);
-            i++;
+            res = lv_translation_add_language(pack, lang);
+            if(res != LV_RESULT_OK) {
+                LV_LOG_WARN("Couldn't add language `%s`", lang);
+                return;
+            }
         }
     }
     else if(lv_streq(name, "translation")) {
@@ -149,20 +149,24 @@ static void start_handler(void * user_data, const char * name, const char ** att
             return;
         }
 
-        lv_translation_tag_dsc_t tag;
-        tag.tag = lv_strdup(tag_name);
-        tag.translations = lv_malloc(pack->language_cnt * sizeof(const char *));
-        lv_array_push_back(&pack->translation_array, &tag);
-
+        lv_translation_tag_dsc_t * tag = lv_translation_add_tag(pack, tag_name);
+        LV_ASSERT_NULL(tag);
+        if(tag == NULL) {
+            LV_LOG_WARN("Couldn't add tag `%s`", tag_name);
+            return;
+        }
         uint32_t i;
         for(i = 0; i < pack->language_cnt; i++) {
             const char * trans = lv_xml_get_value_of(attrs, pack->languages[i]);
             if(trans == NULL) {
-                tag.translations[i] = NULL;
                 LV_LOG_WARN("`%s` language is missing from tag `%s`", pack->languages[i], tag_name);
                 continue;
             }
-            tag.translations[i] = lv_strdup(trans);
+            lv_result_t res = lv_translation_set_tag_translation(pack, tag, i, trans);
+            if(res != LV_RESULT_OK) {
+                LV_LOG_WARN("Couldn't set translation `%s` in tag `%s`", trans, tag_name);
+                return;
+            }
         }
     }
 }

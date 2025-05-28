@@ -44,17 +44,15 @@ void test_xml_translation(void)
     TEST_ASSERT_EQUAL_STRING("Der Hund", lv_translation_get("dog"));
     TEST_ASSERT_EQUAL_STRING("Der Löwe", lv_translation_get("lion"));
 
-    /*The 1st language is the fallback*/
-    TEST_ASSERT_EQUAL_STRING("The cat", lv_translation_get("cat"));
+    /*The tag the fallback if not defined for the selected language*/
+    TEST_ASSERT_EQUAL_STRING("cat", lv_translation_get("cat"));
 
-    /*Use the tag if not found*/
+    /*Use the tag if the tag is not found*/
     TEST_ASSERT_EQUAL_STRING("foo", lv_tr("foo"));
-
 
     lv_translation_set_language("es");
 
     TEST_ASSERT_EQUAL_STRING("El Conejo", lv_tr("rabbit"));
-
 }
 
 #endif

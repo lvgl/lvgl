@@ -383,6 +383,12 @@ typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
 typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #endif
 
+#if LV_USE_TRANSLATION
+typedef struct _lv_translation_tag_dsc_t lv_translation_tag_dsc_t;
+
+typedef struct _lv_translation_pack_t lv_translation_pack_t;
+#endif
+
 #endif /*__ASSEMBLY__*/
 
 /**********************

@@ -28,20 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    const char * tag;
-    const char ** translations; /**< Translations for each language*/
-} lv_translation_tag_dsc_t;
-
-typedef struct {
-    const char ** languages;
-    uint32_t language_cnt;
-    uint32_t is_static; /*In the union translations_p is used*/
-    const char ** tag_p;
-    const char ** translation_p; /*E.g. {{"a", "b"}, {"c", "d"}}*/
-    lv_array_t translation_array;
-} lv_translation_pack_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -103,6 +89,36 @@ static inline const char * lv_tr(const char * tag)
 {
     return lv_translation_get(tag);
 }
+
+/**
+ * Add a new language to a dynamic language pack.
+ * All languages should be added before adding tags
+ * @param pack      pointer to a dynamic translation pack
+ * @param lang      language to add, e.g. "en", or "de"
+ * @return          LV_RESULT_OK: success, LV_RESULT_INVALID: failed
+ */
+lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char * lang);
+
+/**
+ * Add a new tag to a dynamic language pack.
+ * Once the tag is added the translations for each language can be added too by using
+ * `lv_translation_set_tag_translation`
+ * @param pack      pointer to a dynamic translation pack
+ * @param tag_name  name of the tag, e.g. "dog", or "house"
+ * @return          pointer to the allocated tag descriptor
+ */
+lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, const char * tag_name);
+
+/**
+ * Add a translation to a tag in a dynamic translation pack
+ * @param pack      pointer to a dynamic translation pack
+ * @param tag       return value of `lv_translation_add_tag`
+ * @param lang_idx  index of the language for which translation should be set
+ * @param trans     the translation on the given language
+ * @return          LV_RESULT_OK: success, LV_RESULT_INVALID: failed
+ */
+lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_translation_tag_dsc_t * tag,
+                                               uint32_t lang_idx, const char * trans);
 
 /**********************
  *      MACROS

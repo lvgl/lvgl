@@ -18,24 +18,17 @@ static void add_static(void)
 static void add_dynamic(void)
 {
     lv_translation_pack_t * pack = lv_translation_add_dynamic();
-    pack->language_cnt = 2;
-    pack->languages = lv_malloc(pack->language_cnt * sizeof(const char *));
-    pack->languages[0] = lv_strdup("en");
-    pack->languages[1] = lv_strdup("de");
+    lv_translation_add_language(pack, "en");
+    lv_translation_add_language(pack, "de");
 
-    lv_translation_tag_dsc_t tag1;
-    tag1.tag = lv_strdup("table");
-    tag1.translations = lv_malloc(2 * sizeof(const char *) * pack->language_cnt);
-    tag1.translations[0] = lv_strdup("It's a table");
-    tag1.translations[1] = lv_strdup("Das is ein Tish");
-    lv_array_push_back(&pack->translation_array, &tag1);
+    lv_translation_tag_dsc_t * tag;
+    tag = lv_translation_add_tag(pack, "table");
+    lv_translation_set_tag_translation(pack, tag, 0, "It's a table");
+    lv_translation_set_tag_translation(pack, tag, 1, "Das is ein Tish");
 
-    lv_translation_tag_dsc_t tag2;
-    tag2.tag = lv_strdup("chair");
-    tag2.translations = lv_malloc(2 * sizeof(const char *) * pack->language_cnt);
-    tag2.translations[0] = lv_strdup("It's a chair");
-    tag2.translations[1] = lv_strdup("Das ist ein Stuhl");
-    lv_array_push_back(&pack->translation_array, &tag2);
+    tag = lv_translation_add_tag(pack, "chair");
+    lv_translation_set_tag_translation(pack, tag, 0, "It's a chair");
+    lv_translation_set_tag_translation(pack, tag, 1, "Das ist ein Stuhl");
 }
 
 /**
