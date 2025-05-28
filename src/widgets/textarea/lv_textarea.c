@@ -1224,11 +1224,12 @@ static void refr_cursor_area(lv_obj_t * obj)
     int32_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR) + border_width;
     int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
     int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR) + border_width;
+    int32_t letter_space_w = lv_obj_get_style_text_letter_space(ta->label, LV_PART_MAIN);
 
     lv_area_t cur_area;
-    cur_area.x1 = letter_pos.x - left;
+    cur_area.x1 = letter_pos.x - left - letter_space_w / 2;
     cur_area.y1 = letter_pos.y - top;
-    cur_area.x2 = letter_pos.x + right + letter_w - 1;
+    cur_area.x2 = letter_pos.x + right + letter_w - 1 + (letter_space_w + 1) / 2;
     cur_area.y2 = letter_pos.y + bottom + letter_h - 1;
 
     /*Save the new area*/

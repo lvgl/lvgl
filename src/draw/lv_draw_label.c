@@ -458,9 +458,9 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Always set the bg_coordinates for placeholder drawing*/
-            bg_coords.x1 = pos.x;
+            bg_coords.x1 = pos.x - dsc->letter_space / 2;
             bg_coords.y1 = pos.y;
-            bg_coords.x2 = pos.x + letter_w - 1;
+            bg_coords.x2 = pos.x + letter_w - 1 + (dsc->letter_space + 1) / 2;
             bg_coords.y2 = pos.y + line_height - 1;
 
             if(next_char_offset >= line_end - line_start) {
