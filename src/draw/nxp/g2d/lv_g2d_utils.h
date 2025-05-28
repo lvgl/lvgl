@@ -54,6 +54,7 @@ enum g2d_format g2d_get_buf_format(lv_color_format_t cf);
 
 uint32_t g2d_rgba_to_u32(lv_color_t color);
 
+int32_t g2d_get_buf_fd(const lv_draw_buf_t * draw_buf);
 /**********************
  *      MACROS
  **********************/
