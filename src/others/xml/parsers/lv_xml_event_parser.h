@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EVENT_XML_PARSER_H
-#define LV_EVENT_XML_PARSER_H
+#ifndef LV_XML_EVENT_PARSER_H
+#define LV_XML_EVENT_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ void lv_xml_event_call_function_apply(lv_xml_parser_state_t * state, const char 
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EVENT_XML_PARSE_H*/
+#endif /*LV_XML_EVENT_PARSER_H*/

@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EX_IME_PINYIN_H
-#define LV_EX_IME_PINYIN_H
+#ifndef LV_EXAMPLE_IME_PINYIN_H
+#define LV_EXAMPLE_IME_PINYIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ void lv_example_ime_pinyin_2(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_IME_PINYIN_H*/
+#endif /*LV_EXAMPLE_IME_PINYIN_H*/

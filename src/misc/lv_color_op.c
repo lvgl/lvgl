@@ -1,5 +1,5 @@
 /**
- * @file lv_color.c
+ * @file lv_color_op.c
  *
  */
 

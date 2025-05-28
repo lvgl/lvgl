@@ -118,4 +118,4 @@ const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_USE_IME_PINYIN*/
+#endif /*LV_IME_PINYIN_H*/

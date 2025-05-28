@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_nema_gfx_hal.c
+ * @file lv_draw_nema_gfx_stm32_hal.c
  *
  * Global functions that implement some HAL functionality
  * which Nema will call directly.
