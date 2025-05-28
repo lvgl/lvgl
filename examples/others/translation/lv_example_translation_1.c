@@ -19,7 +19,7 @@ static void add_dynamic(void)
 {
     lv_translation_pack_t * pack = lv_translation_add_dynamic();
     pack->language_cnt = 2;
-    pack->languages = lv_malloc(pack->language_cnt * sizeof(const char *));
+    pack->languages = (const char **) lv_malloc(pack->language_cnt * sizeof(const char *));
     pack->languages[0] = lv_strdup("en");
     pack->languages[1] = lv_strdup("de");
 
