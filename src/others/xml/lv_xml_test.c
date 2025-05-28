@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_test.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_TEST
 
 #include "../../lvgl.h"
 #include "lv_xml.h"
