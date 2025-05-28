@@ -58,4 +58,4 @@ void lv_example_translation_1(void)
     lv_obj_set_y(label, 50);
 }
 
-#endif
+#endif /*LV_USE_TRANSLATION && LV_BUILD_EXAMPLES*/
