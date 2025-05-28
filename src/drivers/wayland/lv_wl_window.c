@@ -82,7 +82,6 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     struct window * window;
     int32_t window_width;
     int32_t window_height;
-    int32_t stride;
 
     lv_wayland_init();
 
@@ -288,7 +287,6 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
 lv_result_t lv_wayland_window_resize(struct window * window, int width, int height)
 {
 
-    uint32_t stride;
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
@@ -362,7 +360,7 @@ void lv_wayland_window_destroy(struct window * window)
 const struct wl_callback_listener * lv_wayland_window_get_wl_surface_frame_listener(void)
 {
     return &wl_surface_frame_listener;
-};
+}
 
 /**********************
  *   STATIC FUNCTIONS
