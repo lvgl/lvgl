@@ -99,8 +99,8 @@ static void event_handler_swap(lv_event_t * e)
         uint32_t cnt = lv_obj_get_child_count(list1);
         for(int i = 0; i < cnt; i++)
             if(cnt > 1) {
-                lv_obj_t * obj = lv_obj_get_child(list1, (int32_t)lv_rand(0, cnt-1));
-                lv_obj_move_to_index(obj, (int32_t)lv_rand(0, cnt-1));
+                lv_obj_t * obj = lv_obj_get_child(list1, (int32_t)lv_rand(0, cnt - 1));
+                lv_obj_move_to_index(obj, (int32_t)lv_rand(0, cnt - 1));
                 if(currentButton != NULL) {
                     lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
                 }
