@@ -51,9 +51,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arc_label_class;
  **********************/
 
 /**
- * Create an arc object
- * @param parent    pointer to an object, it will be the parent of the new arc
- * @return          pointer to the created arc
+ * Create an arc label object
+ * @param parent    pointer to an object, it will be the parent of the new arc label
+ * @return          pointer to the created arc label
  */
 lv_obj_t * lv_arc_label_create(lv_obj_t * parent);
 
@@ -98,35 +98,35 @@ void lv_arc_label_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
  * Set the start angle of an arc. 0 deg: right, 90 bottom, etc.
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @param start     the start angle. (if `LV_USE_FLOAT` is enabled it can be fractional too.)
  */
 void lv_arc_label_set_angle_start(lv_obj_t * obj, lv_value_precise_t start);
 
 /**
  * Set the end angle of an arc. 0 deg: right, 90 bottom, etc.
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @param size      the angle size (if `LV_USE_FLOAT` is enabled it can be fractional too.)
  */
 void lv_arc_label_set_angle_size(lv_obj_t * obj, lv_value_precise_t size);
 
 /**
  * Set the rotation for the whole arc
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @param offset    rotation angle
  */
 void lv_arc_label_set_offset(lv_obj_t * obj, int32_t offset);
 
 /**
  * Set the type of arc.
- * @param obj       pointer to arc object
+ * @param obj       pointer to and arc label object
  * @param dir      arc label's direction
  */
 void lv_arc_label_set_dir(lv_obj_t * obj, lv_arc_label_dir_t dir);
 
 /**
  * Enable the recoloring by in-line commands
- * @param obj       pointer to a label object
+ * @param obj       pointer to an arc label object
  * @param en        true: enable recoloring, false: disable
  * Example: "This is a #ff0000 red# word"
  */
@@ -174,21 +174,21 @@ void lv_arc_label_set_text_horizontal_align(lv_obj_t * obj, lv_arc_label_text_al
 
 /**
  * Get the start angle of an arc label.
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @return          the start angle [0..360]  (if `LV_USE_FLOAT` is enabled it can be fractional too.)
  */
 lv_value_precise_t lv_arc_label_get_angle_start(lv_obj_t * obj);
 
 /**
  * Get the angle size of an arc label.
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @return          the end angle [0..360]  (if `LV_USE_FLOAT` is enabled it can be fractional too.)
  */
 lv_value_precise_t lv_arc_label_get_angle_size(lv_obj_t * obj);
 
 /**
- * Get whether the arc is type or not.
- * @param obj       pointer to an arc object
+ * Get whether the arc label is type or not.
+ * @param obj       pointer to an arc label object
  * @return          arc label's direction
  */
 lv_arc_label_dir_t lv_arc_label_get_dir(const lv_obj_t * obj);
@@ -205,7 +205,7 @@ bool lv_arc_label_get_recolor(lv_obj_t * obj);
 
 /**
  * Get the text of the arc label.
- * @param obj       pointer to an arc object
+ * @param obj       pointer to an arc label object
  * @return          the radius of the arc label
  */
 uint32_t lv_arc_label_get_radius(lv_obj_t * obj);

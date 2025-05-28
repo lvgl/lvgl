@@ -16,7 +16,7 @@
     #define EXT_NAME ".lp32.png"
 #endif
 
-const char * ARC_LABEL_TEXT =
+static const char * ARC_LABEL_TEXT =
     "I'm on an #FA7C45 ARC#! Centered with #12c2E9 C##8B68E8 O##c471ed L##B654E5 O##C84AB2 R##DB417A F##f64659 U##ff8888 L# 特性! \n";
 
 static lv_font_t * font;

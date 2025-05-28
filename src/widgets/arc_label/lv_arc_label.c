@@ -137,7 +137,6 @@ void lv_arc_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(fmt);
 
-    lv_obj_invalidate(obj);
     lv_arc_label_t * arc_label = (lv_arc_label_t *)obj;
 
     /*If text is NULL then refresh*/
@@ -346,11 +345,9 @@ static void lv_arc_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     arc->dir = LV_ARC_LABEL_DIR_CLOCKWISE;
     arc->recolor = false;
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_arc_label_set_text(obj, LV_ARC_LABEL_DEFAULT_TEXT);
+    lv_arc_label_set_text_static(obj, LV_ARC_LABEL_DEFAULT_TEXT);
 
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
