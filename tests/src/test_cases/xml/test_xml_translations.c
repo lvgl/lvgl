@@ -36,10 +36,10 @@ void test_xml_translation(void)
         "The Elephant", "Der Elefant", "El Elefante",
     };
 
-    lv_xml_translation_register_from_array(languages, tags, translations);
+    lv_translation_add_static(languages, tags, translations);
 
 
-    lv_xml_set_language("de");
+    lv_translation_set_language("de");
 
     TEST_ASSERT_EQUAL_STRING("Der Hund", lv_xml_get_translation("dog"));
     TEST_ASSERT_EQUAL_STRING("Der Löwe", lv_xml_get_translation("lion"));
@@ -48,10 +48,10 @@ void test_xml_translation(void)
     TEST_ASSERT_EQUAL_STRING("The cat", lv_xml_get_translation("cat"));
 
     /*Use the tag if not found*/
-    TEST_ASSERT_EQUAL_STRING("foo", lv_xml_get_translation("foo"));
+    TEST_ASSERT_EQUAL_STRING("foo", lv_translation_get_translation("foo"));
 
 
-    lv_xml_set_language("es");
+    lv_translation_set_language("es");
 
     TEST_ASSERT_EQUAL_STRING("El Conejo", lv_xml_get_translation("rabbit"));
 

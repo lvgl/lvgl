@@ -72,8 +72,6 @@ static void view_end_element_handler(void * user_data, const char * name);
 
 void lv_xml_init(void)
 {
-    lv_xml_translation_init();
-
     lv_xml_component_init();
 
     lv_xml_register_font(NULL, "lv_font_default", lv_font_get_default());
