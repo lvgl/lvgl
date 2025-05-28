@@ -12,6 +12,8 @@ COMPONENT_SRCDIRS := . \
                   src/osal \
                   src/misc \
                   src/misc/cache \
+                  src/misc/cache/class \
+                  src/misc/cache/instance \
                   src/draw \
                   src/draw/arm2d \
                   src/draw/nxp \
@@ -51,6 +53,8 @@ COMPONENT_SRCDIRS := . \
                   src/others/snapshot \
                   src/others/sysmon \
                   src/others/test \
+                  src/others/xml \
+                  src/others/xml/parsers \
                   src/themes \
                   src/themes/basic \
                   src/themes/default \

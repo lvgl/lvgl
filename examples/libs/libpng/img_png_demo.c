@@ -1305,12 +1305,14 @@ uint8_t img_png_demo_map[] = {
 };
 
 const lv_image_dsc_t img_png_demo = {
-    .header.magic = LV_IMAGE_HEADER_MAGIC,
-    .header.cf = LV_COLOR_FORMAT_RAW_ALPHA,
-    .header.flags = 0,
-    .header.w = 160,
-    .header.h = 120,
-    .header.stride = 0,
+    .header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = LV_COLOR_FORMAT_RAW_ALPHA,
+        .flags = 0,
+        .w = 160,
+        .h = 120,
+        .stride = 0,
+    },
     .data_size = sizeof(img_png_demo_map),
     .data = img_png_demo_map,
 };

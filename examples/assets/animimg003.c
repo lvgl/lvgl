@@ -184,12 +184,14 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_ANIMIMG
 };
 
 const lv_image_dsc_t animimg003 = {
-    .header.w = 130,
-    .header.h = 170,
-    .header.stride = 520,
-    .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .data = animimg003_map,
+    .header = {
+        .cf = LV_COLOR_FORMAT_ARGB8888,
+        .w = 130,
+        .h = 170,
+        .stride = 520,
+    },
     .data_size = sizeof(animimg003_map),
+    .data = animimg003_map,
 };
 
 #endif /* LV_BUILD_EXAMPLES */

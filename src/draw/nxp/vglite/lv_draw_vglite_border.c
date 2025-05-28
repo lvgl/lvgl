@@ -54,8 +54,8 @@ typedef struct scissoring_rects {
  * @param[in] dsc Description of the rectangle border/outline
  *
  */
-static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip_area,
-                                const lv_draw_border_dsc_t * dsc);
+static void _vglite_draw_border(vglite_draw_task_t * task, const lv_area_t * coords,
+                                const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc);
 
 /**
  * Create scissor area based on the border side
@@ -84,9 +84,11 @@ static void _border_set_scissoring(const lv_area_t * coords, int32_t line_width,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
-                           const lv_area_t * coords)
+void lv_draw_vglite_border(vglite_draw_task_t * vglite_task)
 {
+    const lv_draw_border_dsc_t * dsc = vglite_task->t->draw_dsc;
+    const lv_area_t * coords = &vglite_task->t->area;
+
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
     if(dsc->width == 0)
@@ -94,7 +96,7 @@ void lv_draw_vglite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
     if(dsc->side == (lv_border_side_t)LV_BORDER_SIDE_NONE)
         return;
 
-    lv_layer_t * layer = t->target_layer;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     lv_area_t inward_coords;
     int32_t width = dsc->width;
 
@@ -107,14 +109,14 @@ void lv_draw_vglite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
     lv_area_move(&inward_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
     if(!lv_area_intersect(&clipped_coords, &inward_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    _vglite_draw_border(&inward_coords, &clip_area, dsc);
+    _vglite_draw_border(vglite_task, &inward_coords, &clip_area, dsc);
 }
 
 /**********************
@@ -163,11 +165,11 @@ static void _border_set_scissoring(const lv_area_t * coords, int32_t line_width,
     }
 }
 
-static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip_area,
-                                const lv_draw_border_dsc_t * dsc)
+static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_t * coords,
+                                const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc)
 {
     int32_t radius = dsc->radius;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * buf = vglite_get_dest_buf();
 
     if(radius < 0)
         return;
@@ -180,13 +182,18 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     vg_lite_join_style_t join_style = (radius) ? VG_LITE_JOIN_ROUND : VG_LITE_JOIN_MITER;
 
     /*** Init path ***/
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
+    int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT_MALLOC(path_data);
+    vglite_task->path_data = path_data;
+
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
-    vg_lite_path_t path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT_MALLOC(path);
+    vglite_task->path = path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -201,11 +208,11 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
 
     bool has_vg_mask_feat = vg_lite_query_feature(gcFEATURE_BIT_VG_MASK);
 
-    VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH));
+    VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(path, VG_LITE_DRAW_STROKE_PATH));
 
-    VGLITE_CHECK_ERROR(vg_lite_set_stroke(&path, cap_style, join_style, line_width, 8, NULL, 0, 0, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_set_stroke(path, cap_style, join_style, line_width, 8, NULL, 0, 0, vgcol));
 
-    VGLITE_CHECK_ERROR(vg_lite_update_stroke(&path));
+    VGLITE_CHECK_ERROR(vg_lite_update_stroke(path));
 
     if(border_side != LV_BORDER_SIDE_FULL) {
         _border_set_scissoring(coords, line_width, border_side, radius, &scissoring_rects);
@@ -213,32 +220,29 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
         if(has_vg_mask_feat) {
             /*** Enable scissor and apply scissor rects ***/
             VGLITE_CHECK_ERROR(vg_lite_enable_scissor());
-            VGLITE_CHECK_ERROR(vg_lite_scissor_rects(vgbuf, scissoring_rects.num_rect, scissoring_rects.rect));
+            VGLITE_CHECK_ERROR(vg_lite_scissor_rects(buf, scissoring_rects.num_rect, scissoring_rects.rect));
 
             /*** Draw border ***/
-            VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
             /*** Disable scissor ***/
             VGLITE_CHECK_ERROR(vg_lite_disable_scissor());
         }
         else {
-            for(int i = 0; i < scissoring_rects.num_rect; i++) {
+            for(uint32_t i = 0; i < scissoring_rects.num_rect; i++) {
                 VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
                                                        scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
                                                        scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
-                VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+                VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
             }
         }
     }
     else {
         /*** Draw border ***/
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
-
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

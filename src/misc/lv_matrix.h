@@ -110,6 +110,13 @@ lv_point_precise_t lv_matrix_transform_precise_point(const lv_matrix_t * matrix,
 lv_area_t lv_matrix_transform_area(const lv_matrix_t * matrix, const lv_area_t * area);
 
 /**
+ * Check if the matrix is identity
+ * @param matrix           pointer to a matrix
+ * @return true: the matrix is identity , false: the matrix is not identity
+ */
+bool lv_matrix_is_identity(const lv_matrix_t * matrix);
+
+/**
  * Check if the matrix is identity or translation matrix
  * @param matrix           pointer to a matrix
  * @return true: the matrix is identity or translation matrix, false: the matrix is not identity or translation matrix

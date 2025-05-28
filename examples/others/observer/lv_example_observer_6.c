@@ -4,7 +4,7 @@
 typedef enum {
     THEME_MODE_LIGHT,
     THEME_MODE_DARK,
-} theme_mode_t;
+} lv_theme_mode_t;
 
 static lv_obj_t * my_panel_create(lv_obj_t * parent);
 static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_event_cb_t event_cb);
@@ -54,15 +54,15 @@ static void switch_theme_event_cb(lv_event_t * e)
 typedef struct {
     lv_style_t style_main;
     lv_style_t style_scrollbar;
-} my_panel_styles_t;
+} lv_panel_styles_t;
 
 static void my_panel_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     LV_UNUSED(observer);
 
-    theme_mode_t m = lv_subject_get_int(&theme_subject);
-    my_panel_styles_t * styles = lv_observer_get_target(observer);
+    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
+    lv_panel_styles_t * styles = (lv_panel_styles_t *) lv_observer_get_target(observer);
     if(m == THEME_MODE_LIGHT) {
         lv_style_set_bg_color(&styles->style_main, lv_color_hex3(0xfff));
         lv_style_set_shadow_color(&styles->style_main, lv_color_hex3(0x888));
@@ -83,7 +83,7 @@ static void my_panel_style_observer_cb(lv_observer_t * observer, lv_subject_t * 
 static lv_obj_t * my_panel_create(lv_obj_t * parent)
 {
     static bool inited = false;
-    static my_panel_styles_t styles;
+    static lv_panel_styles_t styles;
     if(!inited) {
         inited = true;
 
@@ -124,15 +124,15 @@ static lv_obj_t * my_panel_create(lv_obj_t * parent)
 typedef struct {
     lv_style_t style_main;
     lv_style_t style_pressed;
-} my_button_styles_t;
+} lv_button_styles_t;
 
 static void my_button_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     LV_UNUSED(observer);
 
-    theme_mode_t m = lv_subject_get_int(&theme_subject);
-    my_button_styles_t * styles = lv_observer_get_target(observer);
+    lv_theme_mode_t m = (lv_theme_mode_t) lv_subject_get_int(&theme_subject);
+    lv_button_styles_t * styles = (lv_button_styles_t *) lv_observer_get_target(observer);
     if(m == THEME_MODE_LIGHT) {
         lv_style_set_bg_color(&styles->style_main, lv_color_hex(0x3379de));
         lv_style_set_bg_grad_color(&styles->style_main, lv_color_hex(0xd249a5));
@@ -157,7 +157,7 @@ static void my_button_style_observer_cb(lv_observer_t * observer, lv_subject_t *
 static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_event_cb_t event_cb)
 {
     static bool inited = false;
-    static my_button_styles_t styles;
+    static lv_button_styles_t styles;
     if(!inited) {
         inited = true;
 

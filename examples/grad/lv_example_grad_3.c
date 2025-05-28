@@ -5,10 +5,10 @@
 
 static void position_bullet(lv_event_t * e, lv_point_t * p)
 {
-    lv_indev_t * indev = lv_event_get_param(e);
+    lv_indev_t * indev = (lv_indev_t *) lv_event_get_param(e);
     lv_indev_get_point(indev, p);
 
-    lv_obj_t * bullet = lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
 
     p->x -= lv_obj_get_x(parent);
@@ -21,7 +21,7 @@ static void position_bullet(lv_event_t * e, lv_point_t * p)
 
 static void focal_event_cb(lv_event_t * e)
 {
-    lv_style_t * style = lv_event_get_user_data(e);
+    lv_style_t * style = (lv_style_t *) lv_event_get_user_data(e);
     lv_style_value_t v;
     lv_style_get_prop(style, LV_STYLE_BG_GRAD, &v);
     lv_grad_dsc_t * dsc = (lv_grad_dsc_t *)v.ptr;
@@ -34,14 +34,14 @@ static void focal_event_cb(lv_event_t * e)
     dsc->params.radial.focal_extent.x = p.x + 10;
     dsc->params.radial.focal_extent.y = p.y;
 
-    lv_obj_t * bullet = lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
     lv_obj_invalidate(parent);
 }
 
 static void end_event_cb(lv_event_t * e)
 {
-    lv_style_t * style = lv_event_get_user_data(e);
+    lv_style_t * style = (lv_style_t *) lv_event_get_user_data(e);
     lv_style_value_t v;
     lv_style_get_prop(style, LV_STYLE_BG_GRAD, &v);
     lv_grad_dsc_t * dsc = (lv_grad_dsc_t *)v.ptr;
@@ -53,7 +53,7 @@ static void end_event_cb(lv_event_t * e)
     dsc->params.radial.end.y = p.y;
     dsc->params.radial.end_extent.x = p.x + 100;
     dsc->params.radial.end_extent.y = p.y;
-    lv_obj_t * bullet = lv_event_get_target(e);
+    lv_obj_t * bullet = lv_event_get_target_obj(e);
     lv_obj_t * parent = lv_obj_get_parent(bullet);
     lv_obj_invalidate(parent);
 }

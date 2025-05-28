@@ -33,13 +33,13 @@ void lv_example_fragment_1(void)
     /* Clean up the fragment manager before objects in containers got deleted */
     lv_obj_add_event_cb(root, sample_container_delete, LV_EVENT_DELETE, manager);
 
-    lv_fragment_t * fragment = lv_fragment_create(&sample_cls, "Fragment");
+    lv_fragment_t * fragment = lv_fragment_create(&sample_cls, (void *) "Fragment");
     lv_fragment_manager_replace(manager, fragment, &root);
 }
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
 {
-    ((struct sample_fragment_t *) self)->name = args;
+    ((struct sample_fragment_t *) self)->name = (const char *) args;
 }
 
 static lv_obj_t * sample_fragment_create_obj(lv_fragment_t * self, lv_obj_t * parent)

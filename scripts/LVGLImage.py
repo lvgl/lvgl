@@ -26,6 +26,8 @@ def uint8_t(val) -> bytes:
 def uint16_t(val) -> bytes:
     return val.to_bytes(2, byteorder='little')
 
+def swap_uint16_t(val) -> bytes:
+    return val.to_bytes(2, byteorder='big')
 
 def uint24_t(val) -> bytes:
     return val.to_bytes(3, byteorder='little')
@@ -118,6 +120,7 @@ class ColorFormat(Enum):
     ARGB8888 = 0x10
     XRGB8888 = 0x11
     RGB565 = 0x12
+    RGB565_SWAPPED = 0x1B
     ARGB8565 = 0x13
     RGB565A8 = 0x14
     RGB888 = 0x0F
@@ -141,6 +144,7 @@ class ColorFormat(Enum):
             ColorFormat.ARGB8888: 32,
             ColorFormat.XRGB8888: 32,
             ColorFormat.RGB565: 16,
+            ColorFormat.RGB565_SWAPPED: 16,
             ColorFormat.RGB565A8: 16,  # 16bpp + a8 map
             ColorFormat.ARGB8565: 24,
             ColorFormat.RGB888: 24,
@@ -189,6 +193,7 @@ class ColorFormat(Enum):
         return self in (ColorFormat.ARGB8888, ColorFormat.RGB888,
                         ColorFormat.XRGB8888, ColorFormat.RGB565A8,
                         ColorFormat.ARGB8565, ColorFormat.RGB565,
+                        ColorFormat.RGB565_SWAPPED,
                         ColorFormat.ARGB8888_PREMULTIPLIED)
 
     @property
@@ -255,14 +260,23 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
                 if len(ret) % w == 0:
                     break
     elif bpp == 16:
-        #  This is RGB565
-        pixels = [(data[2 * i + 1] << 8) | data[2 * i]
-                  for i in range(len(data) // 2)]
-
-        for p in pixels:
-            ret.append(bit_extend((p >> 11) & 0x1f, 5))  # R
-            ret.append(bit_extend((p >> 5) & 0x3f, 6))  # G
-            ret.append(bit_extend((p >> 0) & 0x1f, 5))  # B
+        if cf == ColorFormat.RGB565:
+            #  This is RGB565
+            pixels = [(data[2 * i + 1] << 8) | data[2 * i]
+                    for i in range(len(data) // 2)]
+            for p in pixels:
+                ret.append(bit_extend((p >> 11) & 0x1f, 5))  # R
+                ret.append(bit_extend((p >> 5) & 0x3f, 6))  # G
+                ret.append(bit_extend((p >> 0) & 0x1f, 5))  # B
+        elif cf == ColorFormat.RGB565_SWAPPED:
+            #  This is RGB565_SWAPPED
+            pixels = [(data[2 * i] << 8) | data[2 * i + 1]
+                    for i in range(len(data) // 2)]
+            for p in pixels:
+                ret.append(bit_extend((p >> 11) & 0x1f, 5))  # R
+                ret.append(bit_extend((p >> 5) & 0x3f, 6))  # G
+                ret.append(bit_extend((p >> 0) & 0x1f, 5))  # B
+        
     elif bpp == 24:
         if cf == ColorFormat.RGB888:
             B = data[0::3]
@@ -335,12 +349,13 @@ def write_c_array_file(
     header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
+#elif defined(LV_LVGL_H_INCLUDE_SYSTEM)
+#include <lvgl.h>
 #elif defined(LV_BUILD_TEST)
 #include "../lvgl.h"
 #else
 #include "lvgl/lvgl.h"
 #endif
-
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
@@ -359,13 +374,15 @@ uint8_t {varname}_map[] = {{
 }};
 
 const lv_image_dsc_t {varname} = {{
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
-  .header.cf = LV_COLOR_FORMAT_{cf.name},
-  .header.flags = {flags},
-  .header.w = {w},
-  .header.h = {h},
-  .header.stride = {stride},
-  .header.reserved_2 = 0,
+  .header = {{
+    .magic = LV_IMAGE_HEADER_MAGIC,
+    .cf = LV_COLOR_FORMAT_{cf.name},
+    .flags = {flags},
+    .w = {w},
+    .h = {h},
+    .stride = {stride},
+    .reserved_2 = 0,
+  }},
   .data_size = sizeof({varname}_map),
   .data = {varname}_map,
   .reserved = NULL,
@@ -1027,6 +1044,14 @@ class LVGLImage:
                 color |= (g >> 2) << 5
                 color |= (b >> 3) << 0
                 return uint16_t(color)
+        elif cf == ColorFormat.RGB565_SWAPPED:
+
+            def pack(r, g, b, a):
+                r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
+                color = (r >> 3) << 11
+                color |= (g >> 2) << 5
+                color |= (b >> 3) << 0
+                return swap_uint16_t(color)
 
         elif cf == ColorFormat.RGB565A8:
 
@@ -1060,7 +1085,7 @@ class LVGLImage:
 
                 if (
                     self.rgb565_dither and
-                    cf in (ColorFormat.RGB565, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
+                    cf in (ColorFormat.RGB565, ColorFormat.RGB565_SWAPPED, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
                 ):
                     treshold_id = ((y & 7) << 3) + (x & 7)
 
@@ -1363,7 +1388,7 @@ def main():
         default="I8",
         choices=[
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "ARGB8888",
-            "XRGB8888", "RGB565", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
+            "XRGB8888", "RGB565", "RGB565_SWAPPED", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
             "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED"
         ])
 

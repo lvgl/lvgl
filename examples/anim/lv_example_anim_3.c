@@ -85,7 +85,7 @@ static void refer_chart_cubic_bezier(void)
 
 static void anim_x_cb(void * var, int32_t v)
 {
-    lv_obj_set_style_translate_x(var, v, LV_PART_MAIN);
+    lv_obj_set_style_translate_x((lv_obj_t *)var, v, LV_PART_MAIN);
 }
 
 static void run_button_event_handler(lv_event_t * e)
@@ -100,7 +100,7 @@ static void slider_event_cb(lv_event_t * e)
 {
     char buf[16];
     lv_obj_t * label;
-    lv_obj_t * slider = lv_event_get_target(e);
+    lv_obj_t * slider = lv_event_get_target_obj(e);
 
     if(slider == ginfo.p1_slider) {
         label = ginfo.p1_label;

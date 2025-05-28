@@ -218,6 +218,11 @@ lv_area_t lv_matrix_transform_area(const lv_matrix_t * matrix, const lv_area_t *
     return res;
 }
 
+bool lv_matrix_is_identity(const lv_matrix_t * matrix)
+{
+    return (matrix->m[0][2] == 0.0f && matrix->m[1][2] == 0.0f && lv_matrix_is_identity_or_translation(matrix));
+}
+
 bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix)
 {
     return (matrix->m[0][0] == 1.0f &&

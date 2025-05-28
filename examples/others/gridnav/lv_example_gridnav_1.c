@@ -31,7 +31,7 @@ void lv_example_gridnav_1(void)
         lv_group_remove_obj(obj);   /*Not needed, we use the gridnav instead*/
 
         label = lv_label_create(obj);
-        lv_label_set_text_fmt(label, "%"LV_PRIu32"", i);
+        lv_label_set_text_fmt(label, "%" LV_PRIu32"", i);
         lv_obj_center(label);
     }
 

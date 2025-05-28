@@ -275,6 +275,10 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     }
 
+    lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
+    cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
+    lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
+
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
                 lv_draw_fill_dsc_t * fill_dsc = task->draw_dsc;
@@ -355,6 +359,8 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
                 break;
             }
         default:
+            /*The malloced cache_data->draw_dsc will be freed automatically on failure
+            *in opengles_texture_cache_free_cb*/
             return false;
     }
 
@@ -367,10 +373,6 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 
     unsigned int texture = create_texture(texture_w, texture_h, u->render_draw_buf.data);
 
-    lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
-
-    cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
-    lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
     cache_data->w = texture_w;
     cache_data->h = texture_h;
     cache_data->texture = texture;

@@ -5,7 +5,6 @@
       "name": "_base",
       "hidden": true,
       "cacheVariables": {
-        "LV_CONF_SKIP": true
       }
     },
     {
@@ -71,7 +70,7 @@
       },
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "ON",
-        "LV_USE_KCONFIG": "ON"
+        "BUILD_LV_USE_KCONFIG": "ON"
       }
     },
     {
@@ -84,7 +83,7 @@
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
         "BUILD_SHARED_LIBS": "ON",
-        "LV_USE_KCONFIG": "ON"
+        "LV_BUILD_USE_KCONFIG": "ON"
       },
       "condition": {
         "type": "equals",

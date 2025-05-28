@@ -4,7 +4,7 @@
 static void cont_sub_event_cb(lv_event_t * e)
 {
     uint32_t k = lv_event_get_key(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     if(k == LV_KEY_ENTER) {
         lv_group_focus_obj(obj);
     }
@@ -23,7 +23,7 @@ void lv_example_gridnav_3(void)
      *there is a keyboard indev*/
 
     lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
-    lv_gridnav_add(cont_main, LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST);
+    lv_gridnav_add(cont_main, (lv_gridnav_ctrl_t)(LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST));
 
     /*Only the container needs to be in a group*/
     lv_group_add_obj(lv_group_get_default(), cont_main);

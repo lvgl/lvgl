@@ -3,7 +3,7 @@
 
 static void event_handler(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_obj_t * list = lv_obj_get_parent(obj);
     LV_UNUSED(list); /*If logging is disabled*/
     LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list, obj));

@@ -14,8 +14,8 @@ static void scroll_update_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
 
-    LV_LOG("scroll info: x:%3"LV_PRId32", y:%3"LV_PRId32", top:%3"LV_PRId32", "
-           "bottom:%3"LV_PRId32", left:%3"LV_PRId32", right:%3"LV_PRId32"\n",
+    LV_LOG("scroll info: x:%3" LV_PRId32", y:%3" LV_PRId32", top:%3" LV_PRId32", "
+           "bottom:%3" LV_PRId32", left:%3" LV_PRId32", right:%3" LV_PRId32"\n",
            lv_obj_get_scroll_x(panel),
            lv_obj_get_scroll_y(panel),
            lv_obj_get_scroll_top(panel),

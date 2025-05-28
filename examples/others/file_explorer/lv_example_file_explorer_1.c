@@ -9,7 +9,7 @@
 static void file_explorer_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
@@ -51,7 +51,7 @@ void lv_example_file_explorer_1(void)
     lv_file_explorer_open_dir(file_explorer, "A:/");
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-    char * envvar = "HOME";
+    const char * envvar = "HOME";
     char home_dir[LV_FS_MAX_PATH_LENGTH];
     strcpy(home_dir, "A:");
     /* get the user's home directory from the HOME environment variable*/

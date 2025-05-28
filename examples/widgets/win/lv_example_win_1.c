@@ -38,7 +38,6 @@ void lv_example_win_1(void)
                       "text to be\n"
                       "sure it\n"
                       "overflows. :)");
-
 }
 
 #endif

@@ -8,7 +8,7 @@ typedef enum {
     FW_UPDATE_STATE_DOWNLOADING,
     FW_UPDATE_STATE_CANCEL,
     FW_UPDATE_STATE_READY,
-} fw_update_state_t;
+} lv_fw_update_state_t;
 
 static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void fw_update_btn_clicked_event_cb(lv_event_t * e);
@@ -68,16 +68,16 @@ static void fw_update_close_event_cb(lv_event_t * e)
 
 static void restart_btn_click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * win = lv_event_get_user_data(e);
+    lv_obj_t * win = (lv_obj_t *) lv_event_get_user_data(e);
     lv_obj_delete(win);
     lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 }
 
 static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * win = lv_observer_get_target(observer);
+    lv_obj_t * win = (lv_obj_t *) lv_observer_get_target(observer);
     lv_obj_t * cont = lv_win_get_content(win);
-    fw_update_state_t status = lv_subject_get_int(&fw_update_status_subject);
+    lv_fw_update_state_t status = (lv_fw_update_state_t) lv_subject_get_int(&fw_update_status_subject);
     if(status == FW_UPDATE_STATE_IDLE) {
         lv_obj_clean(cont);
         lv_obj_t * spinner = lv_spinner_create(cont);
@@ -153,7 +153,7 @@ static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t
     LV_UNUSED(subject);
     LV_UNUSED(observer);
 
-    fw_update_state_t state = lv_subject_get_int(&fw_update_status_subject);
+    lv_fw_update_state_t state = (lv_fw_update_state_t) lv_subject_get_int(&fw_update_status_subject);
     if(state == FW_UPDATE_STATE_CONNECTING) {
         lv_timer_create(connect_timer_cb, 2000, NULL);
     }
