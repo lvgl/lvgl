@@ -26,6 +26,11 @@
     #error "LV_WAYLAND_USE_DMABUF doesn't support LV_WAYLAND_WINDOW_DECORATIONS"
 #endif
 
+#ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
+    /* FIXME: Hacky fix else building fails with -Wundef=error*/
+    #define LV_DISPLAY_RENDER_MODE_PARTIAL 0
+#endif
+
 #if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL
     #error "LV_WAYLAND_USE_DMABUF doesn't support LV_DISPLAY_RENDER_MODE_PARTIAL"
 #endif
