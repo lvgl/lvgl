@@ -21,10 +21,44 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_TEST_NAME    "__test__"
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    lv_xml_test_step_type_t type;
+    union {
+        struct {
+            int32_t x;
+            int32_t y;
+        } click;
+
+        struct {
+            int32_t ms;
+        } wait;
+
+        struct {
+            int32_t ms;
+        } freeze;
+
+        struct {
+            const char * path;
+        } screenshot_compare;
+    } param;
+    uint32_t passed : 1;
+} lv_xml_test_step_t;
+
+typedef struct {
+    const char * ref_image_path_prefix;
+    uint32_t step_cnt;
+    uint32_t step_act;
+    lv_xml_test_step_t * steps;
+    int32_t screen_width;
+    int32_t screen_height;
+    uint32_t processing_steps : 1;
+} lv_xml_test_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -37,6 +71,7 @@ static void end_metadata_handler(void * user_data, const char * name);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_xml_test_t test;
 static lv_display_t * test_display;
 static lv_obj_t * cursor;
 
@@ -48,23 +83,20 @@ static lv_obj_t * cursor;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_xml_test_init(void)
-{
 
-}
-
-lv_xml_test_t * lv_xml_test_register_from_data(const char * name, const char * xml_def)
+lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * ref_image_path_prefix)
 {
+    /*Cleanup the previous test*/
+    lv_xml_test_unregister();
+
+    test.ref_image_path_prefix = ref_image_path_prefix;
 
     /*Register as a component first to allow creating the view of the test later*/
-    lv_result_t res = lv_xml_component_register_from_data(name, xml_def);
+    lv_result_t res = lv_xml_component_register_from_data(LV_TEST_NAME, xml_def);
     if(res != LV_RESULT_OK) {
-        LV_LOG_WARN("Couldn't register test `%s` as a component");
-        return NULL;
+        LV_LOG_WARN("Couldn't register the test as a component");
+        return LV_RESULT_INVALID;
     }
-
-    lv_xml_test_t * test = lv_zalloc(sizeof(lv_xml_test_t));
-    test->name = lv_strdup(name);
 
     /* Parse the XML to extract metadata */
     XML_Memory_Handling_Suite mem_handlers;
@@ -72,40 +104,34 @@ lv_xml_test_t * lv_xml_test_register_from_data(const char * name, const char * x
     mem_handlers.realloc_fcn = lv_realloc;
     mem_handlers.free_fcn = lv_free;
     XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
-    XML_SetUserData(parser, test);
     XML_SetElementHandler(parser, start_metadata_handler, end_metadata_handler);
+
 
     if(XML_Parse(parser, xml_def, lv_strlen(xml_def), XML_TRUE) == XML_STATUS_ERROR) {
         LV_LOG_ERROR("XML parsing error: %s on line %lu",
                      XML_ErrorString(XML_GetErrorCode(parser)),
                      (unsigned long)XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
+        test.ref_image_path_prefix = NULL;
         return LV_RESULT_INVALID;
     }
 
     XML_ParserFree(parser);
+    test.ref_image_path_prefix = NULL;
 
-    return test;
+    return LV_RESULT_OK;
 }
 
 
-lv_xml_test_t * lv_xml_test_register_from_file(const char * path)
+lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_image_path_prefix)
 {
-    /* Extract component name from path */
-    /* Create a copy of the filename to modify */
-    char * filename = lv_strdup(lv_fs_get_last(path));
-    const char * ext = lv_fs_get_ext(filename);
-    filename[lv_strlen(filename) - lv_strlen(ext) - 1] = '\0'; /*Trim the extension*/
-
     lv_fs_res_t fs_res;
     lv_fs_file_t f;
     fs_res = lv_fs_open(&f, path, LV_FS_MODE_RD);
     if(fs_res != LV_FS_RES_OK) {
-        LV_LOG_WARN("Couldn't open %s", path);
-        lv_free(filename);
+        LV_LOG_WARN("Failed to open %s", path);
         return LV_RESULT_INVALID;
     }
-
 
     /* Determine file size */
     lv_fs_seek(&f, 0, LV_FS_SEEK_END);
@@ -135,16 +161,33 @@ lv_xml_test_t * lv_xml_test_register_from_file(const char * path)
     xml_buf[rn] = '\0';
 
     /* Register the test */
-    lv_xml_test_t * test = lv_xml_test_register_from_data(filename, xml_buf);
+    lv_result_t res = lv_xml_test_register_from_data(xml_buf, ref_image_path_prefix);
 
     /* Housekeeping */
     lv_free(xml_buf);
     lv_fs_close(&f);
 
-    return test;
+    return res;
 }
 
-uint32_t lv_xml_test_play_all(lv_xml_test_t * test, uint32_t slowdown, bool stop_on_error)
+void lv_xml_test_unregister(void)
+{
+    uint32_t i;
+    for(i = 0; i < test.step_cnt; i++) {
+        lv_xml_test_step_type_t type = test.steps[i].type;
+        if(type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
+            lv_free((void *)test.steps[i].param.screenshot_compare.path);
+        }
+    }
+    lv_free(test.steps);
+    test.steps = NULL;
+    test.step_cnt = 0;
+
+    lv_xml_component_unregister(LV_TEST_NAME);
+}
+
+
+uint32_t lv_xml_test_run(uint32_t slowdown)
 {
     lv_display_t * normal_display = lv_display_get_default();
     test_display = lv_test_display_create(normal_display->hor_res, normal_display->ver_res);
@@ -156,48 +199,64 @@ uint32_t lv_xml_test_play_all(lv_xml_test_t * test, uint32_t slowdown, bool stop
     lv_test_indev_create_all();
     cursor = create_cursor(lv_display_get_layer_sys(normal_display));
 
-    lv_sysmon_hide_performance(NULL);
-    lv_sysmon_hide_memory(NULL);
-
-    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(test->name);
+    lv_xml_component_scope_t * scope = lv_xml_component_get_scope(LV_TEST_NAME);
     lv_xml_component_scope_t * extends_scope = lv_xml_component_get_scope(scope->extends);
     lv_obj_t * act_screen = lv_screen_active();
     if(extends_scope && extends_scope->is_screen) {
-        lv_obj_t * test_screen = lv_xml_create(NULL, test->name, NULL);
+        lv_obj_t * test_screen = lv_xml_create(NULL, LV_TEST_NAME, NULL);
         lv_screen_load(test_screen);
         lv_obj_delete(act_screen);
     }
     else {
         lv_obj_clean(act_screen);
-        lv_xml_create(act_screen, test->name, NULL);
+        lv_xml_create(act_screen, LV_TEST_NAME, NULL);
     }
     lv_refr_now(normal_display);
 
-    test->step_act = 0;
+    test.step_act = 0;
 
     uint32_t failed_cnt = 0;
     uint32_t i;
-    for(i = 0; i < test->step_cnt; i++) {
-        test->steps[i].passed = execute_step(&test->steps[i], slowdown);
-        if(!test->steps[i].passed) {
+    for(i = 0; i < test.step_cnt; i++) {
+        test.steps[i].passed = execute_step(&test.steps[i], slowdown);
+        if(!test.steps[i].passed) {
             failed_cnt++;
-            if(stop_on_error) break;
         }
     }
 
     lv_obj_delete(cursor);
     lv_tick_set_cb(tick_cb_original);
     lv_display_delete(test_display);
+    lv_test_indev_delete_all();
 
     return failed_cnt;
 }
 
+uint32_t lv_xml_test_get_step_count(void)
+{
+    return test.step_cnt;
+}
+
+lv_xml_test_step_type_t lv_xml_test_get_step_type(uint32_t idx)
+{
+    if(idx >= test.step_cnt) return LV_XML_TEST_STEP_TYPE_NONE;
+
+    return test.steps[idx].type;
+
+}
+
+bool lv_xml_test_get_status(uint32_t idx)
+{
+    if(idx >= test.step_cnt) return LV_XML_TEST_STEP_TYPE_NONE;
+
+    return test.steps[idx].passed;
+}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-void lv_xml_test_wait(uint32_t ms, uint32_t slowdown)
+static void lv_xml_test_wait(uint32_t ms, uint32_t slowdown)
 {
     lv_test_wait(ms);
     lv_delay_ms(ms * slowdown);
@@ -266,71 +325,73 @@ static lv_obj_t * create_cursor(lv_obj_t * parent)
 
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs)
 {
-
-    lv_xml_test_t * test = (lv_xml_test_t *)user_data;
+    LV_UNUSED(user_data);
 
     if(lv_streq(name, "test")) {
         const char * w = lv_xml_get_value_of(attrs, "width");
         const char * h = lv_xml_get_value_of(attrs, "height");
 
-        if(w) test->screen_width = lv_xml_atoi(w);
-        else test->screen_width = lv_display_get_horizontal_resolution(NULL);
+        if(w) test.screen_width = lv_xml_atoi(w);
+        else test.screen_width = lv_display_get_horizontal_resolution(NULL);
 
-        if(h) test->screen_height = lv_xml_atoi(h);
-        else test->screen_height = lv_display_get_vertical_resolution(NULL);
+        if(h) test.screen_height = lv_xml_atoi(h);
+        else test.screen_height = lv_display_get_vertical_resolution(NULL);
         return;
     }
 
     if(lv_streq(name, "steps")) {
-        test->processing_steps = 1;
+        test.processing_steps = 1;
         return;
     }
 
     /*Process the steps only*/
-    if(test->processing_steps == 0) return;
+    if(test.processing_steps == 0) return;
 
     if(lv_streq(name, "click_at")) {
-        test->step_cnt++;
+        test.step_cnt++;
         const char * x = lv_xml_get_value_of(attrs, "x");
         const char * y = lv_xml_get_value_of(attrs, "y");
-        test->steps = lv_realloc(test->steps, sizeof(lv_xml_test_step_t) * test->step_cnt);
-        uint32_t idx = test->step_cnt - 1;
-        test->steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_AT;
-        test->steps[idx].param.click.x = lv_xml_atoi(x);
-        test->steps[idx].param.click.y = lv_xml_atoi(y);
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_AT;
+        test.steps[idx].param.click.x = lv_xml_atoi(x);
+        test.steps[idx].param.click.y = lv_xml_atoi(y);
     }
     else if(lv_streq(name, "screenshot_compare")) {
-        test->step_cnt++;
+        test.step_cnt++;
         const char * path = lv_xml_get_value_of(attrs, "path");
-        test->steps = lv_realloc(test->steps, sizeof(lv_xml_test_step_t) * test->step_cnt);
-        uint32_t idx = test->step_cnt - 1;
-        test->steps[idx].type = LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE;
-        test->steps[idx].param.screenshot_compare.path = lv_strdup(path);
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE;
+
+        char buf[256];
+        lv_snprintf(buf, sizeof(buf), "%s%s", test.ref_image_path_prefix, path);
+
+        test.steps[idx].param.screenshot_compare.path = lv_strdup(buf);
     }
     else if(lv_streq(name, "wait")) {
-        test->step_cnt++;
+        test.step_cnt++;
         const char * ms = lv_xml_get_value_of(attrs, "ms");
-        test->steps = lv_realloc(test->steps, sizeof(lv_xml_test_step_t) * test->step_cnt);
-        uint32_t idx = test->step_cnt - 1;
-        test->steps[idx].type = LV_XML_TEST_STEP_TYPE_WAIT;
-        test->steps[idx].param.wait.ms = lv_xml_atoi(ms);
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_WAIT;
+        test.steps[idx].param.wait.ms = lv_xml_atoi(ms);
     }
     else if(lv_streq(name, "freeze")) {
-        test->step_cnt++;
+        test.step_cnt++;
         const char * ms = lv_xml_get_value_of(attrs, "ms");
-        test->steps = lv_realloc(test->steps, sizeof(lv_xml_test_step_t) * test->step_cnt);
-        uint32_t idx = test->step_cnt - 1;
-        test->steps[idx].type = LV_XML_TEST_STEP_TYPE_FREEZE;
-        test->steps[idx].param.freeze.ms = lv_xml_atoi(ms);
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_FREEZE;
+        test.steps[idx].param.freeze.ms = lv_xml_atoi(ms);
     }
 }
 
 static void end_metadata_handler(void * user_data, const char * name)
 {
-    lv_xml_test_t * test = (lv_xml_test_t *)user_data;
-
+    LV_UNUSED(user_data);
     if(lv_streq(name, "steps")) {
-        test->processing_steps = 0;
+        test.processing_steps = 0;
         return;
     }
 }
