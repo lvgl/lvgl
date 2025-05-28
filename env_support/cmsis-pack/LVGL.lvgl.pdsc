@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-05-16" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
+    <release date="2025-05-29" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
       - LVGL 9.3.0
       - See Change Log
     </release>
@@ -503,6 +503,7 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_l8.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_al88.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565_swapped.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="NEON GNU Assembler"/>
                 <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
@@ -519,6 +520,7 @@
                 <file category="sourceC"            name="src/font/lv_font_montserrat_10.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_12.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_14.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_14_aligned.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_16.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_18.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_20.c" />
@@ -1758,6 +1760,7 @@
                 <file category="sourceC"    name="src/others/xml/lv_xml_parser.c" />
                 <file category="sourceC"    name="src/others/xml/lv_xml_style.c" />
                 <file category="sourceC"    name="src/others/xml/lv_xml_utils.c" />
+                <file category="sourceC"    name="src/others/xml/lv_xml_update.c" />
                 <file category="sourceC"    name="src/others/xml/lv_xml_widget.c" />
                 
                 <!-- src/others/xml/parsers -->
@@ -1959,9 +1962,13 @@
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_lvgl_logo_rgb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_avatar.c" />
 
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_16_compr_az.c.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_28_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_14_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_16_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_18_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_20_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_24_aligned.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_26_aligned.c" />
                 
                 <!-- demos/music -->
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_top_large.c" />
@@ -2024,6 +2031,7 @@
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888_premultiplied.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_l8.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565_swapped.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565a8.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
