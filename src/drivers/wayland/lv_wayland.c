@@ -34,6 +34,10 @@
     #error "Wayland without DMABUF only supports LV_DISPLAY_RENDER_MODE_PARTIAL"
 #endif
 
+#if (LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1)
+    #error[wayland] Unsupported LV_COLOR_DEPTH
+#endif
+
 #include "lv_wayland_private.h"
 #include <stddef.h>
 #include <stdbool.h>
@@ -62,9 +66,6 @@
  *      DEFINES
  *********************/
 
-#if (LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1)
-    #error[wayland] Unsupported LV_COLOR_DEPTH
-#endif
 
 /**********************
  *      TYPEDEFS
