@@ -85,7 +85,7 @@ typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, c
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
-typedef uint32_t (*lv_draw_buf_get_fd_cb)(const lv_draw_buf_t * draw_buf);
+typedef int32_t (*lv_draw_buf_get_fd_cb)(const lv_draw_buf_t * draw_buf);
 
 struct _lv_draw_buf_t {
     lv_image_header_t header;
@@ -166,7 +166,7 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
  * Get buffer handle
  * @param draw_buf     the draw buffer handle
  */
-uint32_t lv_draw_buf_get_fd(const lv_draw_buf_t * draw_buf);
+int32_t lv_draw_buf_get_fd(const lv_draw_buf_t * draw_buf);
 
 /**
  * Flush the cache of the buffer

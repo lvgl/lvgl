@@ -140,14 +140,14 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
     LV_PROFILER_DRAW_END;
 }
 
-uint32_t lv_draw_buf_get_fd(const lv_draw_buf_t * draw_buf)
+int32_t lv_draw_buf_get_fd(const lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(draw_buf);
     LV_ASSERT_NULL(draw_buf->handlers);
 
     const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
     if(!handlers->get_buf_fd_cb) {
-        return 0;
+        return -1;
     }
 
     return handlers->get_buf_fd_cb(draw_buf);

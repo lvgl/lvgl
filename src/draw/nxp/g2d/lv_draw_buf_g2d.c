@@ -41,7 +41,7 @@ static void _buf_free(void * buf);
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
-static uint32_t _get_buf_fd(const lv_draw_buf_t * draw_buf);
+static int32_t _get_buf_fd(const lv_draw_buf_t * draw_buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -93,7 +93,7 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     g2d_cache_op(buf, G2D_CACHE_FLUSH);
 }
 
-static uint32_t _get_buf_fd(const lv_draw_buf_t * draw_buf)
+static int32_t _get_buf_fd(const lv_draw_buf_t * draw_buf)
 {
     struct g2d_buf * buf = g2d_search_buf_map(draw_buf->data);
     G2D_ASSERT_MSG(buf, "Failed to find buffer in map.");
