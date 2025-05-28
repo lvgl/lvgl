@@ -63,6 +63,12 @@ uint32_t lv_tick_elaps(uint32_t prev_tick);
 void lv_delay_ms(uint32_t ms);
 
 /**
+ * Set a callback for a blocking delay
+ * @param cb        pointer to a callback
+ */
+void lv_delay_set_cb(lv_delay_cb_t cb);
+
+/**
  * Set the custom callback for 'lv_tick_get'
  * @param cb        call this callback on 'lv_tick_get'
  */
@@ -74,6 +80,7 @@ void lv_tick_set_cb(lv_tick_get_cb_t cb);
  * @return      call this callback on 'lv_tick_get'
  */
 lv_tick_get_cb_t lv_tick_get_cb(void);
+
 
 
 /**********************
