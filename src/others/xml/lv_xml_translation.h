@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../misc/lv_types.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_TRANSLATION
 
 /**********************
  *      TYPEDEFS
@@ -36,10 +36,6 @@ void lv_xml_translation_init(void);
  * @param tags          Tags to identify the translations, e.g. {"dog", "cat", "bird", NULL}
  * @param translations  `languages x tags` string, e.g. {"Dog", "Hund", "Cat", "Katze", "Bird", "Vogel"}
  * @return          LV_RES_OK: no error
- */
-/**
- *
- * @return
  */
 lv_result_t lv_xml_translation_register_from_array(const char * languages[], const char * tags[],
                                                    const char * translations[]);
