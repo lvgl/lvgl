@@ -231,9 +231,9 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
     }
 
     /* Modify specified area in buffer */
-    for(size_t y = 0; y < src_height; ++y) {
+    for(int32_t y = 0; y < src_height; ++y) {
         if(format == WL_SHM_FORMAT_ARGB8888) {
-            for(size_t x = 0; x < src_width; ++x) {
+            for(int32_t x = 0; x < src_width; ++x) {
                 lv_color_premultiply((lv_color32_t *)color_p + x);
             }
         }
