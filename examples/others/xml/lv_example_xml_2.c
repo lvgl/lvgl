@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_XML
+#if LV_BUILD_EXAMPLES && LV_USE_XML && LV_USE_TRANSLATION
 
 void lv_example_xml_2(void)
 {
@@ -14,7 +14,7 @@ void lv_example_xml_2(void)
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_card.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/view.xml");
-    //    lv_xml_translation_register_from_file("A:lvgl/examples/others/xml/translations.xml");
+    lv_xml_translation_register_from_file("A:lvgl/examples/others/xml/translations.xml");
 
     lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
 
