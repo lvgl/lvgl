@@ -169,7 +169,6 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
     window->flush_pending = true;
     }
 
-    lv_display_flush_ready(disp);
     return;
 }
 /**********************
