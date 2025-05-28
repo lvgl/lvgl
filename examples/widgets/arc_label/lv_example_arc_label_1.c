@@ -2,7 +2,7 @@
 
 #if LV_USE_ARC_LABEL && LV_BUILD_EXAMPLES
 
-const char * ARC_LABEL_TEXT =
+static const char * ARC_LABEL_TEXT =
     "I'm on an #FA7C45 ARC#! Centered with #12c2E9 C##8B68E8 O##c471ed L##B654E5 O##C84AB2 R##DB417A F##f64659 U##ff8888 L# feature!\n";
 
 void lv_example_arc_label_1(void)
