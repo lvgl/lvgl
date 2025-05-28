@@ -81,6 +81,8 @@ void lv_wayland_shm_initalize_context(shm_ctx_t * context)
 void lv_wayland_shm_set_interface(shm_ctx_t * context, struct wl_registry * registry, uint32_t name,
                                   const char * interface, uint32_t version)
 {
+    LV_UNUSED(version);
+    LV_UNUSED(interface);
     context->handler = wl_registry_bind(registry, name, &wl_shm_interface, 1);
     wl_shm_add_listener(context->handler, &shm_listener, context);
 }
@@ -104,6 +106,7 @@ void lv_wayland_shm_deinit(shm_ctx_t * context)
 
 struct graphic_object * lv_wayland_shm_on_graphical_object_creation(shm_ctx_t * context, struct graphic_object * obj)
 {
+    LV_UNUSED(context);
     obj->pending_buffer = NULL;
     obj->buffer_group   = smm_create();
     if(obj->buffer_group == NULL) {
@@ -116,6 +119,7 @@ struct graphic_object * lv_wayland_shm_on_graphical_object_creation(shm_ctx_t * 
 }
 void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct graphic_object * obj)
 {
+    LV_UNUSED(context);
     smm_destroy(obj->buffer_group);
 }
 
@@ -180,7 +184,7 @@ lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * 
 
 void lv_wayland_shm_delete_draw_buffers(shm_ctx_t * context, struct window * window)
 {
-
+    LV_UNUSED(window);
     lv_draw_buf_destroy(context->lv_draw_buf);
 }
 void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
