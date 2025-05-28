@@ -25,14 +25,14 @@ static void add_dynamic(void)
 
     lv_translation_tag_dsc_t tag1;
     tag1.tag = lv_strdup("table");
-    tag1.translations = lv_malloc(2 * sizeof(const char *) * pack->language_cnt);
+    tag1.translations = (const char **) lv_malloc(sizeof(const char *) * pack->language_cnt);
     tag1.translations[0] = lv_strdup("It's a table");
     tag1.translations[1] = lv_strdup("Das is ein Tish");
     lv_array_push_back(&pack->translation_array, &tag1);
 
     lv_translation_tag_dsc_t tag2;
     tag2.tag = lv_strdup("chair");
-    tag2.translations = lv_malloc(2 * sizeof(const char *) * pack->language_cnt);
+    tag2.translations = (const char **) lv_malloc(sizeof(const char *) * pack->language_cnt);
     tag2.translations[0] = lv_strdup("It's a chair");
     tag2.translations[1] = lv_strdup("Das ist ein Stuhl");
     lv_array_push_back(&pack->translation_array, &tag2);
