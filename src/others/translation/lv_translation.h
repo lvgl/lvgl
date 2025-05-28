@@ -1,5 +1,5 @@
 /**
- * @file lv_gridnav.h
+ * @file lv_translation.h
  *
  */
 

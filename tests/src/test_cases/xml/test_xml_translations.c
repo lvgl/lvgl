@@ -41,19 +41,19 @@ void test_xml_translation(void)
 
     lv_translation_set_language("de");
 
-    TEST_ASSERT_EQUAL_STRING("Der Hund", lv_xml_get_translation("dog"));
-    TEST_ASSERT_EQUAL_STRING("Der Löwe", lv_xml_get_translation("lion"));
+    TEST_ASSERT_EQUAL_STRING("Der Hund", lv_translation_get("dog"));
+    TEST_ASSERT_EQUAL_STRING("Der Löwe", lv_translation_get("lion"));
 
     /*The 1st language is the fallback*/
-    TEST_ASSERT_EQUAL_STRING("The cat", lv_xml_get_translation("cat"));
+    TEST_ASSERT_EQUAL_STRING("The cat", lv_translation_get("cat"));
 
     /*Use the tag if not found*/
-    TEST_ASSERT_EQUAL_STRING("foo", lv_translation_get_translation("foo"));
+    TEST_ASSERT_EQUAL_STRING("foo", lv_tr("foo"));
 
 
     lv_translation_set_language("es");
 
-    TEST_ASSERT_EQUAL_STRING("El Conejo", lv_xml_get_translation("rabbit"));
+    TEST_ASSERT_EQUAL_STRING("El Conejo", lv_tr("rabbit"));
 
 }
 

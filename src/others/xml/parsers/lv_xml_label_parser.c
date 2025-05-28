@@ -57,7 +57,9 @@ void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("text", name)) lv_label_set_text(item, value);
+#if LV_USE_TRANSLATION
         if(lv_streq("text-translated", name)) lv_label_set_text(item, lv_tr(value));
+#endif
         if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
         if(lv_streq("bind_text", name)) {
             char buf[256];
