@@ -3830,7 +3830,7 @@
             #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
         #endif
     #endif
-                                                                             /**< When not using DMABUF, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
+                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
     #ifndef LV_WAYLAND_WINDOW_DECORATIONS
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
