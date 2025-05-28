@@ -1,4 +1,4 @@
-<screen>
+<component>
 	<consts>
 		<color name="light_blue" value="0xbbbbff"/>
 		<color name="dark_blue" value="0x000080"/>
@@ -36,4 +36,4 @@
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 	</view>
-</screen>
+</component>
