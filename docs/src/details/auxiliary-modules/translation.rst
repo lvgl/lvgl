@@ -33,7 +33,7 @@ If most translations are known at compile time, they can be defined using string
 
     lv_translation_add_static(languages, tags, translations);
 
-This method has a minimal memory footprint, as only the pointers to the strings are stored.
+This method uses only a little extra RAM, as only the pointers to the strings are stored.
 
 Dynamic Translations
 --------------------
