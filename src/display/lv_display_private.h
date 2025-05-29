@@ -149,6 +149,8 @@ struct _lv_display_t {
 
     uint32_t matrix_rotation : 1; /**< 1: Use matrix for display rotation*/
 
+    uint32_t pause : 1; /**< 1: The display is paused. No refresh will be done*/
+
     lv_theme_t * theme;     /**< The theme assigned to the screen*/
 
     /** A timer which periodically checks the dirty areas and refreshes them*/

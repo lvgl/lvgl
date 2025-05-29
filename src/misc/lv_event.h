@@ -93,6 +93,8 @@ typedef enum {
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed */
     LV_EVENT_LAYOUT_CHANGED,      /**< A child's position position has changed due to a layout recalculation */
     LV_EVENT_GET_SELF_SIZE,       /**< Get internal size of a widget */
+    LV_EVENT_DISPLAY_PAUSE,       /**< Pause the display*/
+    LV_EVENT_DISPLAY_RESUME,      /**< Resume the display*/
 
     /** Events of optional LVGL components */
     LV_EVENT_INVALIDATE_AREA,     /**< An area is invalidated (marked for redraw). `lv_event_get_param(e)`
