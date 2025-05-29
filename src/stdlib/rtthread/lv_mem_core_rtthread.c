@@ -1,5 +1,5 @@
 /**
- * @file lv_malloc_core_rtthread.c
+ * @file lv_mem_core_rtthread.c
  */
 
 /*********************

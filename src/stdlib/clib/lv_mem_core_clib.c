@@ -1,5 +1,5 @@
 /**
- * @file lv_malloc_core.c
+ * @file lv_mem_core_clib.c
  */
 
 /*********************

@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_CALENDAR_XML_PARSER_H
-#define LV_CALENDAR_XML_PARSER_H
+#ifndef LV_XML_CALENDAR_PARSER_H
+#define LV_XML_CALENDAR_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +40,4 @@ void lv_xml_calendar_header_dropdown_apply(lv_xml_parser_state_t * state, const 
 } /*extern "C"*/
 #endif
 
-#endif /*LV_CHART_XML_PARSE_H*/
+#endif /*LV_XML_CALENDAR_PARSER_H*/

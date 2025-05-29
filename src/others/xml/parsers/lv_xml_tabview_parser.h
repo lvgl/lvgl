@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_TABVIEW_XML_PARSER_H
-#define LV_TABVIEW_XML_PARSER_H
+#ifndef LV_XML_TABVIEW_PARSER_H
+#define LV_XML_TABVIEW_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +41,4 @@ void lv_xml_tabview_tab_apply(lv_xml_parser_state_t * state, const char ** attrs
 } /*extern "C"*/
 #endif
 
-#endif /*LV_TABVIEW_XML_PARSE_H*/
+#endif /*LV_XML_TABVIEW_PARSER_H*/

@@ -102,4 +102,4 @@ lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_COLOR_H*/
+#endif /*LV_COLOR_OP_H*/

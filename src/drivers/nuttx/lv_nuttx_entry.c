@@ -1,5 +1,5 @@
 /**
- * @file lv_nuttx_entry.h
+ * @file lv_nuttx_entry.c
  *
  */
 

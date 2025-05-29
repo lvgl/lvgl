@@ -1,5 +1,5 @@
 /**
- * @file lv_xml_ptivate.h
+ * @file lv_xml_private.h
  *
  */
 
