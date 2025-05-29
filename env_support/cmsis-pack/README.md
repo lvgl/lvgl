@@ -34,7 +34,9 @@ remove the misleading guide above this code segment.
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
+#if defined(_RTE_)
 #include "RTE_Components.h"
+#endif
 ...
 ```
 4. Remove macro definitions for
@@ -56,6 +58,8 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_SCROLL
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DEMO_EBIKE
+   - LV_USE_DEMO_HIGH_RES
+   - LV_USE_DEMO_SMARTWATCH
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
@@ -78,6 +82,7 @@ remove the misleading guide above this code segment.
    - LV_USE_ST7789
    - LV_USE_ST7796
    - LV_USE_ST_LTDC
+   - LV_USE_FT81X
    - LV_USE_ILI9341
    - LV_USE_RENESAS_GLCDC   
    - LV_USE_NEMA_GFX
@@ -120,6 +125,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
     - #define LV_USE_FONT_MANAGER 0
+    - #define LV_USE_XML 0
 
 9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
 
