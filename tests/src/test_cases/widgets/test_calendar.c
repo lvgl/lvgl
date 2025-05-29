@@ -171,6 +171,27 @@ void test_calendar_header_dropdown_create_gui(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_05.png");
 }
 
+void test_calendar_header_dropdown_ascending_year_order(void)
+{
+    const char * years =  "2020\n2021\n2022\n2023\n2024\n";
+    lv_calendar_header_dropdown_create(g_calendar);
+    lv_calendar_header_dropdown_set_year_list(g_calendar, years);
+    lv_calendar_set_month_shown(g_calendar, 2022, 9);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_05.png");
+}
+
+void test_calendar_header_dropdown_descending_year_order(void)
+{
+    const char * years =  "2024\n2023\n2022\n2021\n2020\n";
+    lv_calendar_header_dropdown_create(g_calendar);
+    lv_calendar_header_dropdown_set_year_list(g_calendar, years);
+    lv_calendar_set_month_shown(g_calendar, 2022, 9);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_05.png");
+}
+
+
 void test_calendar_header_arrow_create_gui(void)
 {
     lv_calendar_add_header_arrow(g_calendar);
