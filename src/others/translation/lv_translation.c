@@ -51,7 +51,7 @@ void lv_translation_deinit(void)
 {
     lv_translation_pack_t * pack;
     LV_LL_READ(&packs_ll, pack) {
-        if(pack->is_static == 0) {
+        if(pack->is_static == false) {
             size_t i;
             size_t trans_cnt = lv_array_size(&pack->translation_array);
             for(i = 0; i < trans_cnt; i++) {
