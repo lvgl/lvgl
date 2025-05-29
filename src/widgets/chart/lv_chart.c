@@ -880,13 +880,20 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     /*If there are at least as many points as pixels then draw only vertical lines*/
     bool crowded_mode = (int32_t)chart->point_cnt >= w;
 
-    line_dsc.base.id1 = lv_ll_get_len(&chart->series_ll) - 1;
+    uint32_t ser_cnt = lv_ll_get_len(&chart->series_ll);
+    if(ser_cnt == 0) {
+        return;
+    }
+
+    line_dsc.base.id1 = ser_cnt - 1;
     point_dsc_default.base.id1 = line_dsc.base.id1;
     /*Go through all data lines*/
     LV_LL_READ_BACK(&chart->series_ll, ser) {
         if(ser->hidden) {
-            line_dsc.base.id1--;
-            point_dsc_default.base.id1--;
+            if(line_dsc.base.id1 > 0) {
+                line_dsc.base.id1--;
+                point_dsc_default.base.id1--;
+            }
             continue;
         }
         line_dsc.color = ser->color;
@@ -983,8 +990,10 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             }
         }
 
-        point_dsc_default.base.id1--;
-        line_dsc.base.id1--;
+        if(line_dsc.base.id1 > 0) {
+            point_dsc_default.base.id1--;
+            line_dsc.base.id1--;
+        }
     }
 
     layer->_clip_area = clip_area_ori;
