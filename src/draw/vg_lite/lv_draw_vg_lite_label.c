@@ -20,6 +20,7 @@
 #include "../../misc/lv_area_private.h"
 #include "../../libs/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
+#include "../lv_draw_image_private.h"
 
 
 /*********************
@@ -270,21 +271,26 @@ static void draw_area(lv_draw_vg_lite_unit_t * u, const lv_area_t * area, lv_col
 
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, vg_lite_buffer_t * src_buf)
 {
+    LV_PROFILER_DRAW_BEGIN;
+
+    lv_area_t image_area = *dsc->letter_coords;
+
+    const bool is_rotated = dsc->rotation != 0;
+    if(is_rotated) {
+        convert_letter_transformed_area(&image_area, dsc);
+    }
+
     lv_area_t clip_area;
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
-    if(!lv_area_intersect(&clip_area, &t->clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&clip_area, &t->clip_area, &image_area)) {
+        LV_PROFILER_DRAW_END;
         return;
     }
 
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+
     draw_area(u, &clip_area, lv_palette_main(LV_PALETTE_BLUE));
 
-    LV_PROFILER_DRAW_BEGIN;
-
-    const lv_area_t image_area = *dsc->letter_coords;
-
     vg_lite_matrix_t matrix = u->global_matrix;
-
-    const bool is_rotated = dsc->rotation % 3600 != 0;
 
     if(!is_rotated) {
         vg_lite_translate(image_area.x1, image_area.y1, &matrix);
@@ -343,16 +349,23 @@ static void bitmap_cache_release_cb(void * entry, void * user_data)
 
 static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
-    /* get clip area */
+    LV_PROFILER_DRAW_BEGIN;
+
+    lv_area_t letter_area = *dsc->letter_coords;
+
+    const bool is_rotated = dsc->rotation != 0;
+    if(is_rotated) {
+        convert_letter_transformed_area(&letter_area, dsc);
+    }
+
     lv_area_t path_clip_area;
-    if(!lv_area_intersect(&path_clip_area, &t->clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&path_clip_area, &t->clip_area, &letter_area)) {
+        LV_PROFILER_DRAW_END;
         return;
     }
 
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
     draw_area(u, &path_clip_area, lv_palette_main(LV_PALETTE_GREY));
-
-    LV_PROFILER_DRAW_BEGIN;
 
     /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
     path_clip_area.x2++;
@@ -362,7 +375,6 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     const lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
     /* scale size */
     const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
-    const bool is_rotated = dsc->rotation % 3600 != 0;
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
