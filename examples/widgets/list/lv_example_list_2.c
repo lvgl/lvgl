@@ -103,7 +103,7 @@ static void event_handler_swap(lv_event_t * e)
             if(currentButton != NULL) {
                 lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
             }
-		}
+        }
     }
 }
 
