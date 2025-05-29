@@ -19,10 +19,14 @@ Step Types
 
 The following step types are currently supported (with example parameters):
 
-- `<click_at x="10" y="30"/>`: Simulates a click at the specified screen coordinates.
-- `<wait ms="100"/>`: Waits for the given number of milliseconds. LVGL continues running, including animations and timers.
-- `<freeze ms="100"/>`: Pauses the UI and LVGL's internal time. Useful for visual debugging.
-- `<screenshot_compare path="path/to/image.png"/>`: Compares the current screen with a reference image.
+- ``<click_at x="10" y="30"/>``: Simulates a click at the specified screen coordinates.
+- ``<wait ms="100"/>``: Waits for the given number of milliseconds. LVGL continues running, including animations and timers.
+- ``<freeze ms="100"/>``: Pauses the UI and LVGL's internal time. Useful for visual debugging.
+- ``<subject_set_int subject="subject1" value="10">`` Set an integer subject's value.
+- ``<subject_set_string subject="subject1" value="Hi!>`` Set string subject's value.
+- ``<subject_compare_int subject="subject1" value="10">`` Compare an integer subject's value against a reference value.
+- ``<subject_compare_string subject="subject1" value="Hi!>`` Compare a string subject's value against a reference value.
+- ``<screenshot_compare path="path/to/image.png"/>``: Compares the current screen with a reference image.
   - If the image doesn't exist, it is created.
   - If the comparison fails, an image with `_err` suffix is saved for inspection.
 
