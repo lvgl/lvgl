@@ -159,6 +159,13 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
         if(in.type == EV_REL) {
             if(in.code == REL_X) dsc->root_x += in.value;
             else if(in.code == REL_Y) dsc->root_y += in.value;
+            lv_display_t * disp = lv_indev_get_display(indev);
+            int width = disp->hor_res;
+            int height = disp->ver_res;
+            if(dsc->root_x < 0) dsc->root_x = 0;
+            else if(dsc->root_x > width) dsc->root_x = width;
+            if(dsc->root_y < 0) dsc->root_y = 0;
+            else if(dsc->root_y > height) dsc->root_y = height;
         }
         else if(in.type == EV_ABS) {
             if(in.code == ABS_X || in.code == ABS_MT_POSITION_X) dsc->root_x = in.value;
