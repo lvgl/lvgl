@@ -69,7 +69,7 @@ struct smm_group_properties {
     void * tag[SMM_GROUP_TAGS];
 };
 
-void smm_init(struct smm_events * evs);
+void smm_init(const struct smm_events * evs);
 void smm_setctx(void * ctx);
 void smm_deinit(void);
 smm_group_t * smm_create(void);

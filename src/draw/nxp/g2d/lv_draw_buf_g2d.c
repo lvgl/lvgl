@@ -83,7 +83,6 @@ static void _buf_free(void * buf)
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-
     LV_UNUSED(area);
     struct g2d_buf * buf = g2d_search_buf_map(draw_buf->data);
     G2D_ASSERT_MSG(buf, "Failed to find buffer in map.");
