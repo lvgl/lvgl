@@ -17,6 +17,7 @@ All Widgets
     3dtexture
     animimg
     arc
+    arc_label
     bar
     button
     buttonmatrix
