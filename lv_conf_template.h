@@ -958,7 +958,8 @@
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
-    #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+    #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+    #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 #endif
 
 /** Rlottie library */
