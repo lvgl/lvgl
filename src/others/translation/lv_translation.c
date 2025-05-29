@@ -190,11 +190,86 @@ const char * lv_translation_get(const char * tag)
     return tag;
 }
 
+lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char * lang)
+{
+    if(pack->is_static) {
+        LV_LOG_WARN("Can't add language `%s` to static translation pack `%p`", lang, pack);
+        return LV_RESULT_INVALID;
+    }
+
+    pack->language_cnt++;
+    pack->languages = lv_realloc(pack->languages, sizeof(const char *) * pack->language_cnt);
+    LV_ASSERT_MALLOC(pack->languages);
+    if(pack->languages == NULL) {
+        LV_LOG_WARN("Couldn't allocate languages in `%p`", pack);
+        return LV_RESULT_INVALID;
+    }
+
+    pack->languages[pack->language_cnt - 1] = lv_strdup(lang);
+    LV_ASSERT_MALLOC(pack->languages[pack->language_cnt - 1]);
+    if(pack->languages[pack->language_cnt - 1] == NULL) {
+        LV_LOG_WARN("Couldn't allocate the new language in `%p`", pack);
+        return LV_RESULT_INVALID;
+    }
+
+    return LV_RESULT_OK;
+}
+
+
+lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, const char * tag_name)
+{
+    if(pack->is_static) {
+        LV_LOG_WARN("Can't add tag `%s` to static translation pack `%p`", tag_name, pack);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_translation_tag_dsc_t tag;
+    tag.tag = lv_strdup(tag_name);
+    LV_ASSERT_MALLOC(tag.tag);
+    tag.translations = lv_zalloc(pack->language_cnt * sizeof(const char *));
+    LV_ASSERT_MALLOC(tag.translations);
+
+    if(tag.tag == NULL || tag.translations == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory for the tag's data in `%p`", pack);
+        return NULL;
+    }
+
+    lv_result_t res = lv_array_push_back(&pack->translation_array, &tag);
+
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Couldn't add the tag in `%p`", pack);
+        lv_free(tag.tag);
+        lv_free(tag.translations);
+        return NULL;
+    }
+
+    return lv_array_back(&pack->translation_array);
+}
+
+lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_translation_tag_dsc_t * tag,
+                                               uint32_t lang_idx, const char * trans)
+{
+    if(pack->is_static) {
+        LV_LOG_WARN("Can't set tag translation`%s` in static translation pack `%p`", trans, pack);
+        return LV_RESULT_INVALID;
+    }
+
+    if(lang_idx >= pack->language_cnt) {
+        LV_LOG_WARN("Can't set the translation for language %d as there are only %d languages defined in %p",
+                    lang_idx, pack->language_cnt, pack);
+        return LV_RESULT_INVALID;
+    }
+
+    tag->translations[lang_idx] = lv_strdup(trans);
+    if(tag->translations[lang_idx] == NULL) {
+        LV_LOG_WARN("Couldn't allocate the new translation in tag `%p` in pack `%p`", tag, pack);
+        return LV_RESULT_INVALID;
+    }
+    return LV_RESULT_OK;
+}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-
 
 #endif /*LV_USE_TRANSLATION*/
