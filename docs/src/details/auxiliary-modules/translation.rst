@@ -7,7 +7,7 @@ Translation
 Overview
 ********
 
-LVGL supports two ways to handle translations:
+LVGL supports two ways of handling translations:
 
 - `lv_i18n <https://github.com/lvgl/lv_i18n>`_: A comprehensive tool that extracts translatable strings from C files into YAML files, and generates C translation files from them. It also supports plural forms. See its README for details.
 
