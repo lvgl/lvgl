@@ -172,7 +172,7 @@ void testSvgElement(void)
     lv_svg_node_delete(svg_node_ar);
 
     const char * svg_ar3 = \
-                           "<svg preserveAspectRatio=\"xMaxYMin unknow\"></svg>";
+                           "<svg preserveAspectRatio=\"xMaxYMin unknown\"></svg>";
     svg_node_ar = lv_svg_load_data(svg_ar3, lv_strlen(svg_ar3));
     TEST_ASSERT_EQUAL((LV_ARRAY_GET(&svg_node_ar->attrs, 0, lv_svg_attr_t))->value.uval, 6);
     lv_svg_node_delete(svg_node_ar);

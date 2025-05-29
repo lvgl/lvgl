@@ -57,7 +57,7 @@ typedef struct {
     void * user_data;                    /**< Additional parameter, can be used freely by user */
     uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
     uint32_t size                 : 24;  /**< String buffer size or group length */
-    uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notifcation,
+    uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
                                           * start notifying from the beginning. */
 } lv_subject_t;
 
@@ -239,7 +239,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * When the Widget is deleted, Observer will be unsubscribed from Subject automatically.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param obj           pinter to Widget
+ * @param obj           printer to Widget
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
  * @note                Do not call `lv_observer_remove()` on Observers created this way.

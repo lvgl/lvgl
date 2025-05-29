@@ -242,7 +242,7 @@ Once a *live running* Animation has been started, it runs until it has completed
 or until it is deleted (see below), whichever comes first.  An Animation has
 completed when:
 
-- its "value" has reached the desginated ``end`` value;
+- its "value" has reached the designated ``end`` value;
 - if the Animation has a non-zero *reverse* duration value, then its value
   has run from the ``end`` value back to the ``start`` value again;
 - if a non-zero repeat count has been set, it has repeated the Animation
