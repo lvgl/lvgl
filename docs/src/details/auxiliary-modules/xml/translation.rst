@@ -26,7 +26,7 @@ e.g., ``languages="en de hu"``. Language codes are free-form, but ISO-style code
 
 Each `<translation>` defines a `tag`, which acts as the lookup key, and attributes for each language.
 
-Translations may be omitted—:ref:`Fallbacks <xml_translations_fallback>` will apply when needed.
+Translations may be omitted—:ref:`Fallbacks <xml_translations_fallback>` will be applied when needed.
 
 To register XML translations:
 
