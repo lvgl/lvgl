@@ -46,6 +46,15 @@ typedef struct {
         struct {
             const char * path;
         } screenshot_compare;
+
+        struct {
+            lv_subject_t * subject;
+            int32_t value;
+        } subject_int;
+        struct {
+            lv_subject_t * subject;
+            const char * value;
+        } subject_string;
     } param;
     uint32_t passed : 1;
 } lv_xml_test_step_t;
@@ -178,6 +187,12 @@ void lv_xml_test_unregister(void)
         if(type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
             lv_free((void *)test.steps[i].param.screenshot_compare.path);
         }
+        if(type == LV_XML_TEST_STEP_TYPE_SUBJECT_SET_STRING) {
+            lv_free((void *)test.steps[i].param.subject_string.value);
+        }
+        if(type == LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_STRING) {
+            lv_free((void *)test.steps[i].param.subject_string.value);
+        }
     }
     lv_free(test.steps);
     test.steps = NULL;
@@ -220,6 +235,7 @@ uint32_t lv_xml_test_run(uint32_t slowdown)
     for(i = 0; i < test.step_cnt; i++) {
         test.steps[i].passed = execute_step(&test.steps[i], slowdown);
         if(!test.steps[i].passed) {
+            LV_LOG_WARN("Step %d failed", i);
             failed_cnt++;
         }
     }
@@ -300,6 +316,20 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_FREEZE) {
         lv_delay_ms(step->param.freeze.ms * slowdown);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_SUBJECT_SET_INT) {
+        lv_subject_set_int(step->param.subject_int.subject, step->param.subject_int.value);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_INT) {
+        int32_t v =  lv_subject_get_int(step->param.subject_int.subject);
+        if(v != step->param.subject_int.value) res = false;
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_SUBJECT_SET_STRING) {
+        lv_subject_copy_string(step->param.subject_string.subject, step->param.subject_string.value);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_STRING) {
+        const char * v =  lv_subject_get_string(step->param.subject_string.subject);
+        if(lv_streq(v, step->param.subject_string.value) == 0) res = false;
     }
     return res;
 }
@@ -384,6 +414,51 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_FREEZE;
         test.steps[idx].param.freeze.ms = lv_xml_atoi(ms);
+    }
+    else if(lv_streq(name, "subject_set_int") || lv_streq(name, "subject_compare_int")) {
+        const char * subject_str = lv_xml_get_value_of(attrs, "subject");
+        const char * value_str = lv_xml_get_value_of(attrs, "value");
+        if(subject_str == NULL) {
+            LV_LOG_WARN("subject_str is not set in `%s`", name);
+            return;
+        }
+        lv_subject_t * subject = lv_xml_get_subject(NULL, subject_str);
+        if(subject == NULL) {
+            LV_LOG_WARN("`%s` subject is not found in `%s`", subject_str, name);
+            return;
+        }
+
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = lv_streq(name, "subject_set_int") ?
+                               LV_XML_TEST_STEP_TYPE_SUBJECT_SET_INT :
+                               LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_INT;
+        ;
+        test.steps[idx].param.subject_int.subject = subject;
+        test.steps[idx].param.subject_int.value = lv_xml_atoi(value_str);
+    }
+    else if(lv_streq(name, "subject_set_string") || lv_streq(name, "subject_compare_string")) {
+        const char * subject_str = lv_xml_get_value_of(attrs, "subject");
+        const char * value_str = lv_xml_get_value_of(attrs, "value");
+        if(subject_str == NULL) {
+            LV_LOG_WARN("subject_str is not set in `%s`", name);
+            return;
+        }
+        lv_subject_t * subject = lv_xml_get_subject(NULL, subject_str);
+        if(subject == NULL) {
+            LV_LOG_WARN("`%s` subject is not found `%s`", subject_str, name);
+            return;
+        }
+
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].param.subject_string.subject = subject;
+        test.steps[idx].param.subject_string.value = lv_strdup(value_str);
+        test.steps[idx].type = lv_streq(name, "subject_set_string") ?
+                               LV_XML_TEST_STEP_TYPE_SUBJECT_SET_STRING :
+                               LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_STRING;
     }
 }
 
