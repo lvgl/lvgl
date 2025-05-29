@@ -119,7 +119,11 @@ static void start_handler(void * user_data, const char * name, const char ** att
 
     if(lv_streq(name, "translations")) {
         const char * languages = lv_xml_get_value_of(attrs, "languages");
-        char buf[256];
+        if(languages == NULL) {
+            LV_LOG_WARN("`languages` are not set in `translations`");
+            return;
+        }
+        char buf[512];
         char * bufp = buf;
         lv_strlcpy(buf, languages, sizeof(buf));
         bufp = buf;
