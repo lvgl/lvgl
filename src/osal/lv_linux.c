@@ -29,6 +29,9 @@
 #define LV_PROC_STAT_VAR_FORMAT        " %" PRIu32
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
 
+#define LV_PROC_STAT_VAR_FORMAT        " %" SCNu64
+#define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" SCNu64
+
 #define last_proc_stat LV_GLOBAL_DEFAULT()->linux_last_proc_stat
 #define last_self_ticks LV_GLOBAL_DEFAULT()->linux_last_self_proc_time_ticks
 #define last_system_total_ticks_stat LV_GLOBAL_DEFAULT()->linux_last_system_total_ticks_stat
@@ -133,7 +136,7 @@ uint32_t lv_os_get_self_cpu_percent(void)
                                "%*d %*d %*d %*d %*d " /* skip ppid, pgrp, session, tty_nr, tpgid (fields 4-8) */
                                "%*u "         /* skip flags (field 9) */
                                "%*lu %*lu %*lu %*lu " /* skip minflt, cminflt, majflt, cmajflt (fields 10-13) */
-                               "%lu %lu",     /* read utime (field 14), stime (field 15) */
+                               LV_PROC_STAT_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT,     /* read utime (field 14), stime (field 15) */
                                &utime, &stime);
 
     if(scanned_items != 2) {
