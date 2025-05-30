@@ -31,8 +31,8 @@ void test_xml_widget_direct_create(void)
 
     /*Use attributes*/
     const char * attrs[] = {
-        "range_min", "-100",
-        "range_max", "100",
+        "min_value", "-100",
+        "max_value", "100",
         "mode", "symmetrical",
         "value", "50",
         "name", "my_slider",
@@ -72,8 +72,8 @@ void test_xml_widget_create_from_component(void)
 
     /*Use attributes*/
     const char * attrs[] = {
-        "range_min", "-100",
-        "range_max", "100",
+        "min_value", "-100",
+        "max_value", "100",
         "mode", "symmetrical",
         "value", "50",
         NULL, NULL,

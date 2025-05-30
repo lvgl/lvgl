@@ -104,6 +104,28 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
     highlight_update(obj);
 }
 
+void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, year, calendar->today.month, calendar->today.day);
+
+}
+
+void lv_calendar_set_today_month(lv_obj_t * obj, uint32_t month)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, calendar->today.year, month, calendar->today.day);
+}
+
+void lv_calendar_set_today_day(lv_obj_t * obj, uint32_t day)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, day);
+}
+
 void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
 {
     LV_ASSERT_NULL(highlighted);
@@ -210,6 +232,21 @@ void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
         if(child == calendar->btnm) continue;
         lv_obj_send_event(child, LV_EVENT_VALUE_CHANGED, obj);
     }
+}
+
+void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_month_shown(obj, year, calendar->showed_date.month);
+
+}
+
+void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_month_shown(obj, calendar->showed_date.year, month);
 }
 
 /*=====================
