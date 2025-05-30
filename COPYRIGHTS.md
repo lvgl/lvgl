@@ -52,3 +52,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 - Path: src/stdlib/builtin
 - Source: https://github.com/mpaland/printf
 
+**FT800-FT813 (EVE GPU driver)**
+- Path src/libs/FT800-FT813
+- Source: https://github.com/RudolphRiedel/FT800-FT813
+
