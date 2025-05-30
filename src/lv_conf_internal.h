@@ -2030,7 +2030,7 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
- *  - lv_arc_label_t   :  Text set to "Arced Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
     #ifdef LV_KCONFIG_PRESENT
@@ -2068,15 +2068,15 @@
     #endif
 #endif
 
-#ifndef LV_USE_ARC_LABEL
+#ifndef LV_USE_ARCLABEL
     #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ARC_LABEL
-            #define LV_USE_ARC_LABEL CONFIG_LV_USE_ARC_LABEL
+        #ifdef CONFIG_LV_USE_ARCLABEL
+            #define LV_USE_ARCLABEL CONFIG_LV_USE_ARCLABEL
         #else
-            #define LV_USE_ARC_LABEL 0
+            #define LV_USE_ARCLABEL 0
         #endif
     #else
-        #define LV_USE_ARC_LABEL  1
+        #define LV_USE_ARCLABEL  1
     #endif
 #endif
 
