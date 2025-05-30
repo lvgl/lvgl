@@ -4004,6 +4004,14 @@
             #define LV_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
+
+    #ifndef LV_LINUX_DRM_USE_EGL
+        #ifdef CONFIG_LV_LINUX_DRM_USE_EGL
+            #define LV_LINUX_DRM_USE_EGL CONFIG_LV_LINUX_DRM_USE_EGL
+        #else
+            #define LV_LINUX_DRM_USE_EGL     0
+        #endif
+    #endif
 #endif
 
 /** Interface for TFT_eSPI */
