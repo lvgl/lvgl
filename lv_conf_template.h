@@ -699,7 +699,7 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
- *  - lv_arc_label_t   :  Text set to "Arced Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
 
@@ -707,7 +707,7 @@
 
 #define LV_USE_ARC        1
 
-#define LV_USE_ARC_LABEL  1
+#define LV_USE_ARCLABEL  1
 
 #define LV_USE_BAR        1
 

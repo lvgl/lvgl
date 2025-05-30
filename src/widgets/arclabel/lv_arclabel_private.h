@@ -1,10 +1,10 @@
 /**
- * @file lv_arc_label_private.h
+ * @file lv_arclabel_private.h
  *
  */
 
-#ifndef LV_ARC_LABEL_PRIVATE_H
-#define LV_ARC_LABEL_PRIVATE_H
+#ifndef LV_ARCLABEL_PRIVATE_H
+#define LV_ARCLABEL_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,8 +15,8 @@ extern "C" {
  *********************/
 #include "../../core/lv_obj_private.h"
 
-#if LV_USE_ARC_LABEL != 0
-#include "lv_arc_label.h"
+#if LV_USE_ARCLABEL != 0
+#include "lv_arclabel.h"
 
 /*********************
  *      DEFINES
@@ -26,11 +26,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_arc_label_t {
+struct _lv_arclabel_t {
     lv_obj_t obj;
 
     char * text;
-    char dot[LV_ARC_LABEL_DOT_NUM + 1]; /**< Bytes that have been replaced with dots */
+    char dot[LV_ARCLABEL_DOT_NUM + 1]; /**< Bytes that have been replaced with dots */
     uint32_t dot_begin;                 /**< Offset where bytes have been replaced with dots */
 
     /**
@@ -53,9 +53,9 @@ struct _lv_arc_label_t {
     uint32_t offset;
     uint32_t radius;
     lv_point_t center_offset;
-    lv_arc_label_dir_t dir;
-    lv_arc_label_text_align_t text_align_v; /**< Vertical text alignment */
-    lv_arc_label_text_align_t text_align_h; /**< Horizontal text alignment */
+    lv_arclabel_dir_t dir;
+    lv_arclabel_text_align_t text_align_v; /**< Vertical text alignment */
+    lv_arclabel_text_align_t text_align_h; /**< Horizontal text alignment */
     uint8_t static_txt : 1;             /**< Flag to indicate the text is static */
     uint8_t recolor    : 1;             /**< Enable in-line letter re-coloring */
 };
@@ -68,10 +68,10 @@ struct _lv_arc_label_t {
  *      MACROS
  **********************/
 
-#endif /* LV_USE_ARC_LABEL != 0 */
+#endif /* LV_USE_ARCLABEL != 0 */
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_ARC_LABEL_PRIVATE_H*/
+#endif /*LV_ARCLABEL_PRIVATE_H*/
