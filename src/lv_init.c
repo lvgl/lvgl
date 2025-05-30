@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -323,6 +327,10 @@ void lv_init(void)
 
 #if LV_USE_FS_FATFS != '\0'
     lv_fs_fatfs_init();
+#endif
+
+#if LV_USE_FS_RAWFS
+    lv_fs_rawfs_init();
 #endif
 
 #if LV_USE_FS_STDIO != '\0'

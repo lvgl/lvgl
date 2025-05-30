@@ -2797,6 +2797,40 @@
     #endif
 #endif
 
+/** API for NXP RAWFS. */
+#ifndef LV_USE_FS_RAWFS
+    #ifdef CONFIG_LV_USE_FS_RAWFS
+        #define LV_USE_FS_RAWFS CONFIG_LV_USE_FS_RAWFS
+    #else
+        #define LV_USE_FS_RAWFS 0
+    #endif
+#endif
+#if LV_USE_FS_RAWFS
+    #ifndef LV_FS_RAWFS_LETTER
+        #ifdef CONFIG_LV_FS_RAWFS_LETTER
+            #define LV_FS_RAWFS_LETTER CONFIG_LV_FS_RAWFS_LETTER
+        #else
+            #define LV_FS_RAWFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_RAWFS_XIP
+        #ifdef CONFIG_LV_FS_RAWFS_XIP
+            #define LV_FS_RAWFS_XIP CONFIG_LV_FS_RAWFS_XIP
+        #else
+            #define LV_FS_RAWFS_XIP 0
+        #endif
+    #endif
+    #if LV_FS_RAWFS_XIP
+        #ifndef LV_FS_RAWFS_XIP_BASE_ADDR
+            #ifdef CONFIG_LV_FS_RAWFS_XIP_BASE_ADDR
+                #define LV_FS_RAWFS_XIP_BASE_ADDR CONFIG_LV_FS_RAWFS_XIP_BASE_ADDR
+            #else
+                #define LV_FS_RAWFS_XIP_BASE_ADDR 0xFFFFFFFF
+            #endif
+        #endif
+    #endif
+#endif
+
 /** API for memory-mapped file access. */
 #ifndef LV_USE_FS_MEMFS
     #ifdef CONFIG_LV_USE_FS_MEMFS

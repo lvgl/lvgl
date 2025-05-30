@@ -1348,6 +1348,20 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_FATFS
 
+		config LV_USE_FS_RAWFS
+			bool "File system on top of Raw binary"
+		config LV_FS_RAWFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_RAWFS
+		config LV_FS_RAWFS_XIP
+			bool "RAW binaries can be copied directly"
+			depends on LV_USE_FS_RAWFS
+		config LV_FS_RAWFS_XIP_BASE_ADDR
+			hex "Base address from where raw binaries can be copied directly"
+			default 0xFFFFFFFF
+			depends on LV_FS_RAWFS_XIP
+
 		config LV_USE_FS_MEMFS
 			bool "File system on top of memory-mapped API"
 		config LV_FS_MEMFS_LETTER
