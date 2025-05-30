@@ -33,6 +33,7 @@
 #include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
 #include "../../widgets/image/lv_image.h"
+#include "../../indev/lv_indev_gesture.h"
 
 /*********************
  *      DEFINES
@@ -43,6 +44,7 @@
 #define EVDEV_DISCOVERY_PATH_BUF_SIZE 32
 #define REL_XY_MASK ((1 << REL_X) | (1 << REL_Y))
 #define ABS_XY_MASK ((1 << ABS_X) | (1 << ABS_Y))
+#define MAX_TOUCH_POINTS 5
 
 /**********************
  *      TYPEDEFS
@@ -66,6 +68,12 @@ typedef struct {
     int key;
     lv_indev_state_t state;
     bool deleting;
+    /* Multi-touch support */
+#if LV_USE_GESTURE_RECOGNITION
+    lv_indev_touch_data_t touch_data[MAX_TOUCH_POINTS]; /* Array of touch points for gesture recognition */
+    uint8_t touch_count; /* Number of valid touch points */
+    uint8_t current_slot; /* Current touch point slot */
+#endif
 } lv_evdev_t;
 
 #ifndef BSD
@@ -161,12 +169,54 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
             else if(in.code == REL_Y) dsc->root_y += in.value;
         }
         else if(in.type == EV_ABS) {
-            if(in.code == ABS_X || in.code == ABS_MT_POSITION_X) dsc->root_x = in.value;
-            else if(in.code == ABS_Y || in.code == ABS_MT_POSITION_Y) dsc->root_y = in.value;
-            else if(in.code == ABS_MT_TRACKING_ID) {
-                if(in.value == -1) dsc->state = LV_INDEV_STATE_RELEASED;
-                else if(in.value == 0) dsc->state = LV_INDEV_STATE_PRESSED;
+#if LV_USE_GESTURE_RECOGNITION
+            if(in.code == ABS_MT_SLOT) {
+                if(in.value >= MAX_TOUCH_POINTS) {
+                    dsc->current_slot = MAX_TOUCH_POINTS - 1;
+                    dsc->touch_count = MAX_TOUCH_POINTS;
+                    LV_LOG_WARN("Touch point slot out of range, setting to max: %d", MAX_TOUCH_POINTS - 1);
+                }
+                else {
+                    dsc->current_slot = in.value;
+                    dsc->touch_count = LV_MAX(dsc->touch_count, dsc->current_slot + 1);
+                }
             }
+            else
+#endif
+                if(in.code == ABS_X || in.code == ABS_MT_POSITION_X) {
+                    dsc->root_x = in.value;
+#if LV_USE_GESTURE_RECOGNITION
+                    if(dsc->touch_count > 0) {
+                        dsc->touch_data[dsc->current_slot].point.x = in.value;
+                    }
+#endif
+                }
+                else if(in.code == ABS_Y || in.code == ABS_MT_POSITION_Y) {
+                    dsc->root_y = in.value;
+#if LV_USE_GESTURE_RECOGNITION
+                    if(dsc->touch_count > 0) {
+                        dsc->touch_data[dsc->current_slot].point.y = in.value;
+                    }
+#endif
+                }
+                else if(in.code == ABS_MT_TRACKING_ID) {
+                    if(in.value == -1) dsc->state = LV_INDEV_STATE_RELEASED;
+                    else if(in.value == 0) dsc->state = LV_INDEV_STATE_PRESSED;
+#if LV_USE_GESTURE_RECOGNITION
+                    if(dsc->touch_count > 0) {
+                        if(in.value == -1) {
+                            dsc->touch_data[dsc->current_slot].state = LV_INDEV_STATE_RELEASED;
+                            while(dsc->touch_count > 0 && dsc->touch_data[dsc->touch_count - 1].state == LV_INDEV_STATE_RELEASED) {
+                                dsc->touch_count--;
+                            }
+                        }
+                        else {
+                            dsc->touch_data[dsc->current_slot].state = LV_INDEV_STATE_PRESSED;
+                            dsc->touch_data[dsc->current_slot].id = dsc->current_slot;
+                        }
+                    }
+#endif
+                }
         }
         else if(in.type == EV_KEY) {
             if(in.code == BTN_MOUSE || in.code == BTN_TOUCH) {
@@ -182,7 +232,25 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 }
             }
         }
+#if LV_USE_GESTURE_RECOGNITION
+        else if(in.type == EV_SYN && in.code == SYN_REPORT) {
+            /* Handle gesture recognition at sync event */
+            if(dsc->touch_count > 0) {
+                /* Calibrate touch point coordinates */
+                for(int i = 0; i < dsc->touch_count; i++) {
+                    if(dsc->touch_data[i].state == LV_INDEV_STATE_PRESSED) {
+                        lv_point_t calib_point = _evdev_process_pointer(indev, dsc->touch_data[i].point.x, dsc->touch_data[i].point.y);
+                        dsc->touch_data[i].point = calib_point;
+                    }
+                }
+                /* Update gesture recognizers */
+                lv_indev_gesture_recognizers_update(indev, dsc->touch_data, dsc->touch_count);
+                lv_indev_gesture_recognizers_set_data(indev, data);
+            }
+        }
+#endif
     }
+
     if(!dsc->deleting && br == -1 && errno != EAGAIN) {
         if(errno == ENODEV) {
             LV_LOG_INFO("evdev device was removed");
@@ -201,8 +269,19 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
             data->key = dsc->key;
             break;
         case LV_INDEV_TYPE_POINTER:
+#if LV_USE_GESTURE_RECOGNITION
+            if(dsc->touch_count > 0) {
+                data->state = dsc->touch_data[0].state;
+                data->point = _evdev_process_pointer(indev, dsc->touch_data[0].point.x, dsc->touch_data[0].point.y);
+            }
+            else {
+                data->state = dsc->state;
+                data->point = _evdev_process_pointer(indev, dsc->root_x, dsc->root_y);
+            }
+#else
             data->state = dsc->state;
             data->point = _evdev_process_pointer(indev, dsc->root_x, dsc->root_y);
+#endif
             break;
         default:
             break;
