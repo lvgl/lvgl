@@ -266,7 +266,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
             dropdown->options = lv_strdup(static_options);
         }
         else {
-            dropdown->options = lv_calloc(1); /*Allocate at least 1 byte for the NULL terminator*/
+            dropdown->options = lv_calloc(1, 1); /*Allocate at least 1 byte for the NULL terminator*/
         }
         LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
