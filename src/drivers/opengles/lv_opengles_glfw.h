@@ -45,7 +45,7 @@ lv_opengles_window_t * lv_opengles_glfw_window_create(int32_t hor_res, int32_t v
  * @param window        GLFW window to return the handle of
  * @return              the GLFW window handle
  */
-void * lv_opengles_glfw_window_get_glfw_window(lv_glfw_window_t * window);
+void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window);
 
 /**********************
  *      MACROS

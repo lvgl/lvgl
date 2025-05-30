@@ -145,7 +145,7 @@ void lv_opengles_window_delete(lv_opengles_window_t * window)
     }
 }
 
-void * lv_opengles_glfw_window_get_glfw_window(lv_glfw_window_t * window)
+void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window)
 {
     return (void *)(window->window);
 }
