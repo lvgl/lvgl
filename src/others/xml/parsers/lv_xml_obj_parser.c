@@ -167,7 +167,7 @@ void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
         lv_strncpy(buf, selector_str, sizeof(buf));
 
         char * bufp = buf;
-        const char * next = lv_xml_split_str(&bufp, ' ');
+        const char * next = lv_xml_split_str(&bufp, '|');
 
         while(next) {
             /* Handle different states and parts */
@@ -175,7 +175,7 @@ void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
             selector |= lv_xml_style_part_to_enum(next);
 
             /* Move to the next token */
-            next = lv_xml_split_str(&bufp, ' ');
+            next = lv_xml_split_str(&bufp, '|');
         }
     }
 

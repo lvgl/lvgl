@@ -16,7 +16,7 @@ Example
 
 	    <prop name="selected" help="">
 	    	<param name="selected" type="int"/>
-	    	<param name="anim" type="bool" default="false"/>
+	    	<param name="animated" type="bool" default="false"/>
 	    </prop>
 
 	    <prop name="visible_row_count" type="int" help=""/>
