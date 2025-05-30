@@ -36,7 +36,8 @@ void test_xml_label_with_attrs(void)
     lv_xml_register_subject(NULL, "s1", &s1);
 
     const char * label2_attrs[] = {
-        "bind_text", "s1 'We have %d users'",
+        "bind_text", "s1",
+        "bind_text-fmt", "We have %d users",
         "y", "10",
         "x", "5",
         NULL, NULL,

@@ -19,8 +19,10 @@ void test_arc_with_attrs(void)
     lv_obj_t * scr = lv_screen_active();
 
     const char * attrs_1[] = {
-        "bg_angles", "0 100",
-        "range", "-20 20",
+        "bg_start_angle", "0",
+        "bg_end_angle", "100",
+        "min_value", "-20",
+        "max_value", "20",
         "value", "10",
         "mode", "reverse",
         "align", "center",
