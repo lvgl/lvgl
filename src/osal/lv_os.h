@@ -65,6 +65,8 @@ typedef enum {
  * @return the idle percentage since the last call
  */
 uint32_t lv_os_get_idle_percent(void);
+uint32_t lv_os_get_self_cpu_percent(void)
+
 
 #if LV_USE_OS != LV_OS_NONE
 
