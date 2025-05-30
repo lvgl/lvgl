@@ -42,8 +42,8 @@ struct _lv_draw_label_hint_t {
 };
 
 struct _lv_draw_glyph_dsc_t {
-    const void *
-    glyph_data;  /**< Depends on `format` field, it could be image source or draw buf of bitmap or vector data. */
+    /** Depends on `format` field, it could be image source or draw buf of bitmap or vector data. */
+    const void * glyph_data;
     lv_font_glyph_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;

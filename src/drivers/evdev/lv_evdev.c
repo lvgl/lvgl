@@ -294,6 +294,7 @@ static bool _evdev_discovery_inotify_try_init_watcher(int inotify_fd)
 
 static void _evdev_discovery_timer_cb(lv_timer_t * tim)
 {
+    LV_UNUSED(tim);
     lv_evdev_discovery_t * ed = evdev_discovery;
     LV_ASSERT_NULL(ed);
 

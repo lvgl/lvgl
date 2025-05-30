@@ -117,7 +117,7 @@ void test_dropdown_set_options(void)
 void test_dropdown_select(void)
 {
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
-    lv_dropdown_set_selected(dd1, 2, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd1, 2);
 
     TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
 
@@ -131,7 +131,7 @@ void test_dropdown_select(void)
     TEST_ASSERT_EQUAL_STRING("Opt", buf);
 
     /*Out of range*/
-    lv_dropdown_set_selected(dd1, 3, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd1, 3);
     TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
 }
 
@@ -323,12 +323,12 @@ void test_dropdown_render_1(void)
 
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd1, 10, 10);
-    lv_dropdown_set_selected(dd1, 1, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd1, 1);
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 200, 10);
     lv_obj_set_width(dd2, 200);
-    lv_dropdown_set_selected(dd2, 2, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd2, 2);
     lv_dropdown_open(dd2);
     TEST_ASSERT_TRUE(lv_dropdown_get_selected_highlight(dd2));
     lv_dropdown_set_selected_highlight(dd2, false);
@@ -342,7 +342,7 @@ void test_dropdown_render_1(void)
     lv_dropdown_set_text(dd3, "A text");
     TEST_ASSERT_EQUAL_STRING("A text", lv_dropdown_get_text(dd3));
 
-    lv_dropdown_set_selected(dd3, 2, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd3, 2);
 
     TEST_ASSERT_EQUAL(LV_DIR_BOTTOM, lv_dropdown_get_dir(dd3));
     lv_dropdown_set_dir(dd3, LV_DIR_LEFT);
@@ -357,7 +357,7 @@ void test_dropdown_render_1(void)
     lv_obj_t * list = lv_dropdown_get_list(dd3);
     lv_obj_set_style_text_line_space(list, 5, 0);
     lv_obj_set_style_bg_color(list, lv_color_hex3(0xf00), LV_PART_SELECTED | LV_STATE_CHECKED);
-    lv_dropdown_set_selected(dd3, 3, LV_ANIM_OFF);
+    lv_dropdown_set_selected(dd3, 3);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_1.png");
 }
@@ -474,8 +474,7 @@ void test_dropdown_properties(void)
     TEST_ASSERT_EQUAL(2, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTION_COUNT).num);
 
     prop.id = LV_PROPERTY_DROPDOWN_SELECTED;
-    prop.arg1.num = 1;
-    prop.arg2.enable = LV_ANIM_OFF;
+    prop.num = 1;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_selected(obj));
     TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED).num);
