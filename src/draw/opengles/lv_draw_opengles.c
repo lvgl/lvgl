@@ -592,7 +592,7 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
     /* LV_COLOR_DEPTH 32, 24, 16 are supported but the cached textures will always
      * have full ARGB pixels since the alpha channel is required for blending.
      */
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, data));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
 
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));

@@ -68,6 +68,7 @@ static lv_ll_t egl_window_ll;
 static EGLDisplay egl_display;
 static EGLContext egl_config;
 static EGLContext egl_context;
+static void * backend_device;
 
 static EGLint const attribute_list[] = {
     EGL_RED_SIZE, 1,
@@ -90,10 +91,11 @@ static EGLint const context_attribute_list[] = {
  **********************/
 
 lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle,
+                                                     void * device,
                                                      lv_opengles_egl_window_cb_t pre,
                                                      lv_opengles_egl_window_cb_t post1,
-                                                     lv_opengles_egl_window_cb_t post2)
-{
+                                                     lv_opengles_egl_window_cb_t post2){
+    backend_device = device;
     if(lv_egl_init() == LV_RESULT_INVALID) {
         return NULL;
     }
@@ -116,6 +118,7 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
     window->hor_res = hor_res;
     window->ver_res = ver_res;
     lv_ll_init(&window->textures, sizeof(lv_opengles_window_texture_t));
+
     window->pre = pre;
     window->post1 = post1;
     window->post2 = post2;
@@ -199,7 +202,12 @@ static lv_result_t lv_egl_init(void)
     }
 
     /* get an EGL display connection */
-    egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (backend_device) {
+        egl_display = eglGetDisplay(backend_device);
+    } else {
+        egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    }
+
     if(egl_display == EGL_NO_DISPLAY) {
         LV_LOG_ERROR("eglGetDisplay failed.");
         return LV_RESULT_INVALID;
@@ -245,13 +253,12 @@ static void lv_egl_timer_init(void)
 static void window_update_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
-
+    int count = 0;
     lv_opengles_window_t * window;
+    if(window->pre) window->pre(window);
 
     /* render each window */
     LV_LL_READ(&egl_window_ll, window) {
-
-        if(window->pre) window->pre(window);
 
         eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
@@ -282,6 +289,7 @@ static void window_update_handler(lv_timer_t * t)
         eglSwapBuffers(egl_display, window->surface);
 
         if(window->post2) window->post2(window);
+
     }
 }
 
