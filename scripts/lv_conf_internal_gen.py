@@ -55,6 +55,7 @@ fout.write(
 #define LV_OS_WINDOWS       5
 #define LV_OS_MQX           6
 #define LV_OS_SDL2          7
+#define LV_OS_CHIBIOS       8
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
