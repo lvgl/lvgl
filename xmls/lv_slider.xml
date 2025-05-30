@@ -11,10 +11,8 @@ Example
 	        <enum name="symmetrical" help="The indicaror is grwing from zero"/>
 	    </enumdef>
 
-	    <prop name="range">
-	    	<param name="range_min" type="int"/>
-	    	<param name="range_max" type="int"/>
-	    </prop>
+        <prop name="min_value" type="int"/>
+        <prop name="max_value" type="int"/>
 
 	    <prop name="value">
 	    	<param name="value" type="int"/>
@@ -22,7 +20,7 @@ Example
 	    </prop>
 
 	    <prop name="start_value">
-	    	<param name="range_min" type="int"/>
+	    	<param name="start_value" type="int"/>
 	    	<param name="anim" type="bool" default="false"/>
 	    </prop>
 
