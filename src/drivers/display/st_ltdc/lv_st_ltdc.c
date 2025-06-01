@@ -158,7 +158,7 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
 #if LV_USE_OS != LV_OS_CHIBIOS
             HAL_LTDC_RegisterCallback(&hltdc, HAL_LTDC_RELOAD_EVENT_CB_ID, reload_event_callback);
 #elif LV_USE_OS == LV_OS_CHIBIOS
-            nvicEnableVector(LTDC_IRQn, 11);
+            nvicEnableVector(LTDC_IRQn, STM32_LTDC_EV_IRQ_PRIORITY);
             LTDC->IER |= LTDC_IER_RRIE;
 #endif
             SYNC_INIT(layer_idx);
@@ -171,7 +171,7 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
 #if LV_USE_OS != LV_OS_CHIBIOS
         hdma2d.XferCpltCallback = transfer_complete_callback;
 #elif LV_USE_OS == LV_OS_CHIBIOS
-        nvicEnableVector(DMA2D_IRQn, 11);
+        nvicEnableVector(DMA2D_IRQn, STM32_DMA2D_IRQ_PRIORITY);
 #endif
         SYNC_INIT(layer_idx);
 #endif
