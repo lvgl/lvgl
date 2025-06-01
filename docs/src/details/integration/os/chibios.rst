@@ -1,16 +1,15 @@
-========
+=======
 ChibiOS
-========
+=======
 
 How to integrate LVGL with ChibiOS
-========================================
+**********************************
 
 1. Create a thread for the lv_timer_handler
-========================================
+*******************************************
 
-.. line-block::
-    This thread is responsible for calling the lv_timer_handler() function at the calculated interval.
-    The interval is determined by the LVGL library based on the current state of the GUI and the timers that are running.
+This thread is responsible for calling the lv_timer_handler() function at the calculated interval.
+The interval is determined by the LVGL library based on the current state of the GUI and the timers that are running.
 
 .. code-block:: c
 
@@ -34,17 +33,15 @@ How to integrate LVGL with ChibiOS
     }
 
 2. Timer for acurate tick measurement
-========================================
+*************************************
 
-.. line-block::
-    This tells LVGL how often ticks happen in the system.
-    Its best to use a timer since those are not affected by the CPU load or thread priorites.
-    The two safest options would to use a virtual timer that is based on the internal systick or a dedicated hardware timer.
+This tells LVGL how often ticks happen in the system.
+Its best to use a timer since those are not affected by the CPU load or thread priorites.
+The two safest options would to use a virtual timer that is based on the internal systick or a dedicated hardware timer.
 
 
-.. line-block::
-    Using hardware timers via the GPT driver.
-    Most accurate way, but requires a dedicated timer.
+Using hardware timers via the GPT driver.
+Most accurate way, but requires a dedicated timer.
 
 .. code-block:: c
 
@@ -62,8 +59,7 @@ How to integrate LVGL with ChibiOS
     gptStart(&GPTD1, &gptcfg);
     gptStartContinuous(&GPTD1, 100);
 
-.. line-block::
-    Using virtual timers which are based on the systems systick.
+Using virtual timers which are based on the systems systick.
 
 .. code-block:: c
 
@@ -80,13 +76,12 @@ How to integrate LVGL with ChibiOS
     chVTSetContinuous(&vt, TIME_MS2I(1), tick_inc_callback, NULL);
 
 3. LTDC driver initialization and start
-========================================
+***************************************
 
-.. line-block::
-    This is the LTDC driver initialization and start.
-    Configure the configs according to your display, create the required framebuffers.
-    Please note that if you are using direct mode (see the LVGL LTDC Driver wiki page) , you can use a single framebuffer.
-    When using partial mode, you will need atleast one fullsize framebuffer and one partial draw buffer. The size of the draw buffer is usually best at 1/10th the size of the framebuffer, but it can be smaller if no performance regression is noticed.
+This is the LTDC driver initialization and start.
+Configure the configs according to your display, create the required framebuffers.
+Please note that if you are using direct mode (see the LVGL LTDC Driver wiki page) , you can use a single framebuffer.
+When using partial mode, you will need atleast one fullsize framebuffer and one partial draw buffer. The size of the draw buffer is usually best at 1/10th the size of the framebuffer, but it can be smaller if no performance regression is noticed.
 
 
 .. code-block:: c
@@ -154,11 +149,10 @@ How to integrate LVGL with ChibiOS
     ltdcStart(&LTDCD1, &ltdc_cfg);
 
 4. DMA2D driver initialization and start
-========================================
+****************************************
 
-.. line-block::
-    This is the DMA2D driver initialization and start.
-    The principal of initialization is the same as for LTDC.
+This is the DMA2D driver initialization and start.
+The principal of initialization is the same as for LTDC.
 
 .. code-block:: c
 
@@ -179,14 +173,13 @@ How to integrate LVGL with ChibiOS
     dma2dStart(&DMA2DD1, &dma2d_cfg);
 
 5. Create the display using direct or partial mode
-========================================
+**************************************************
 
-.. line-block::
-    This is the display creation using direct or partial mode.
-    The principal of creation is the same as for LTDC.
+This is the display creation using direct or partial mode.
+The principal of creation is the same as for LTDC.
 
 Partial mode
-============
+~~~~~~~~~~~~
 
     .. code-block:: c
 
@@ -196,7 +189,7 @@ Partial mode
         lv_display_t *disp = lv_st_ltdc_create_partial(draw_buffer, draw_buffer_optional, sizeof(draw_buffer), 0);
 
 Direct mode
-============
+~~~~~~~~~~~
 
     .. code-block:: c
 
@@ -206,10 +199,9 @@ Direct mode
         lv_display_t *disp = lv_st_ltdc_create_direct(frame_buffer1, frame_buffer_optional, 0);
 
 6. Mutex handling
-========================================
+*****************
 
-.. line-block::
-    When using a different thread for hadling ui elements, use the LVGL mutex to ensure the main lvgl thread is not accessing the same element at the same time.
+When using a different thread for hadling ui elements, use the LVGL mutex to ensure the main lvgl thread is not accessing the same element at the same time.
 
 .. code-block:: c
 
@@ -231,18 +223,17 @@ Direct mode
     }
 
 7. Using delegates instead of mutexes
-========================================
+*************************************
 
-.. line-block::
-    If you are using a different thread for handling UI elements, you can use the delegates to handle the UI elements.
-    This is a more efficient way of handling the UI elements, but requires more work to implement.
-    Currently the way to use delegate functions on ChibiOS is chDelegateCallDirectX() where X is the number of arguments passed to the delegated function.
-    X can be a number from 0 to 4
+If you are using a different thread for handling UI elements, you can use the delegates to handle the UI elements.
+This is a more efficient way of handling the UI elements, but requires more work to implement.
+Currently the way to use delegate functions on ChibiOS is chDelegateCallDirectX() where X is the number of arguments passed to the delegated function.
+X can be a number from 0 to 4
 
 
 
 Main thread
-============
+~~~~~~~~~~~
 
 .. code-block:: c
 
@@ -273,7 +264,7 @@ Main thread
 
 
 Updater thread
-================
+~~~~~~~~~~~~~~
 
 .. code-block:: c
 
@@ -297,7 +288,7 @@ Updater thread
 
 
 Create the delegate thread
-================
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c
 
