@@ -160,6 +160,41 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t 
     return LV_RESULT_OK;
 }
 
+lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+
+    LV_ASSERT(dsc->opa >= LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    int32_t w                    = dsc->dest_w;
+    int32_t h                    = dsc->dest_h;
+    uint16_t * dest_buf_u16      = dsc->dest_buf;
+    int32_t dest_stride          = dsc->dest_stride;
+    const uint16_t * src_buf_u16 = dsc->src_buf;
+    int32_t src_stride           = dsc->src_stride;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * dest_row      = dest_buf_u16;
+        const uint16_t * src_row = (const uint16_t *)src_buf_u16;
+        int32_t x                = 0;
+
+        for(; x < w - 7; x += 8) {
+            vst1q_u16(&dest_row[x], vld1q_u16(&src_row[x]));
+        }
+        for(; x < w - 3; x += 4) {
+            vst1_u16(&dest_row[x], vld1_u16(&src_row[x]));
+        }
+        for(; x < w - 1; x += 2) {
+            *(uint32_t *)&dest_row[x] = *(uint32_t *)&src_row[x];
+        }
+        for(; x < w - 0; x += 1) {
+            dest_row[x] = src_row[x];
+        }
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        src_buf_u16  = drawbuf_next_row(src_buf_u16, src_stride);
+    }
+    return LV_RESULT_OK;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
