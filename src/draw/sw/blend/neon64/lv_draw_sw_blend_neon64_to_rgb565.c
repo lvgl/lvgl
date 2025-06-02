@@ -72,10 +72,10 @@ static inline uint16_t lv_color_24_16_mix_1_with_opa_mask(const uint8_t * src, c
 static inline uint16_t lv_color_24_16_mix_1_internal(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
-static inline uint16x8_t lv_color_24_16_mix_premult_8(const uint8_t * src, const uint16_t * dst);
-static inline uint16x4_t lv_color_24_16_mix_premult_4(const uint8_t * src, const uint16_t * dst);
-static inline uint32_t lv_color_24_16_mix_premult_2(const uint8_t * src, const uint16_t * dst);
-static inline uint16_t lv_color_24_16_mix_premult_1(const uint8_t * src, const uint16_t * dst);
+    static inline uint16x8_t lv_color_24_16_mix_premult_8(const uint8_t * src, const uint16_t * dst);
+    static inline uint16x4_t lv_color_24_16_mix_premult_4(const uint8_t * src, const uint16_t * dst);
+    static inline uint32_t lv_color_24_16_mix_premult_2(const uint8_t * src, const uint16_t * dst);
+    static inline uint16_t lv_color_24_16_mix_premult_1(const uint8_t * src, const uint16_t * dst);
 #endif
 
 static inline uint16x8_t rgb888_to_rgb565_8(const uint8_t * src, uint8_t src_px_size);
@@ -591,9 +591,11 @@ static inline uint16_t lv_color_8_16_mix_1(const uint16_t * src, const uint16_t 
 
     if(mix == 0) {
         return c2;
-    } else if(mix == 255) {
+    }
+    else if(mix == 255) {
         return ((c1 & 0xF8) << 8) + ((c1 & 0xFC) << 3) + ((c1 & 0xF8) >> 3);
-    } else {
+    }
+    else {
         uint8_t mix_inv = 255 - mix;
         return ((((c1 >> 3) * mix + ((c2 >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
                ((((c1 >> 2) * mix + ((c2 >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
@@ -709,7 +711,7 @@ static inline uint16x8_t lv_color_24_16_mix_8_with_opa_mask(const uint8_t * src,
     const uint32x4_t opa_vec_high   = vmovl_u16(vget_high_u16(opa_vec));
     const uint32x4_t mask_vec_low   = vmovl_u16(vget_low_u16(mask_vec));
     const uint32x4_t mask_vec_high  = vmovl_u16(vget_high_u16(mask_vec));
-    
+
     const uint32x4_t mul_low  = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_low, opa_vec_low), mask_vec_low), 16);
     const uint32x4_t mul_high = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_high, opa_vec_high), mask_vec_high), 16);
     const uint16x8_t mask_opa_a_mul = vcombine_u16(vmovn_u32(mul_low), vmovn_u32(mul_high));
@@ -736,7 +738,7 @@ static inline uint16x4_t lv_color_24_16_mix_4_with_opa_mask(const uint8_t * src,
     const uint32x4_t a_pixels_low   = vmovl_u16(a_pixels);
     const uint32x4_t opa_vec_low    = vmovl_u16(opa_vec);
     const uint32x4_t mask_vec_low   = vmovl_u16(mask_vec);
-    
+
     const uint32x4_t mul_result  = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_low, opa_vec_low), mask_vec_low), 16);
     const uint16x4_t mask_opa_a_mul = vmovn_u32(mul_result);
 
@@ -847,7 +849,7 @@ static inline uint32_t lv_color_24_16_mix_1(const uint8_t * src, const uint16_t 
 static inline uint16_t lv_color_24_16_mix_1_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
                                                           const uint8_t * mask)
 {
-    return lv_color_24_16_mix_1_internal(src, dst, LV_OPA_MIX3(src[3],opa, *mask));
+    return lv_color_24_16_mix_1_internal(src, dst, LV_OPA_MIX3(src[3], opa, *mask));
 }
 
 static inline uint16_t lv_color_24_16_mix_1_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa)
@@ -864,9 +866,11 @@ static inline uint16_t lv_color_24_16_mix_1_internal(const uint8_t * src, const 
 {
     if(mix == 0) {
         return *dst;
-    } else if(mix == 255) {
+    }
+    else if(mix == 255) {
         return ((src[2] & 0xF8) << 8) + ((src[1] & 0xFC) << 3) + ((src[0] & 0xF8) >> 3);
-    } else {
+    }
+    else {
         lv_opa_t mix_inv = 255 - mix;
 
         return ((((src[2] >> 3) * mix + ((*dst >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
@@ -972,9 +976,11 @@ static inline uint16_t lv_color_24_16_mix_premult_1(const uint8_t * src, const u
     const uint8_t mix = src[3];
     if(mix == 0) {
         return *dst;
-    } else if(mix == 255) {
+    }
+    else if(mix == 255) {
         return ((src[2] & 0xF8) << 8) + ((src[1] & 0xFC) << 3) + ((src[0] & 0xF8) >> 3);
-    } else {
+    }
+    else {
         lv_opa_t mix_inv = 255 - mix;
 
         return (((src[2] >> 3) + ((((*dst >> 11) & 0x1F) * mix_inv) >> 8)) << 11) +
