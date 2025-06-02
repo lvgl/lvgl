@@ -271,10 +271,10 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
 
     void * item = lv_xml_state_get_item(state);
     if(int_subject) {
-        lv_obj_add_subject_set_int(item, subject, trigger, lv_xml_atoi(value_str));
+        lv_obj_add_subject_set_int_event(item, subject, trigger, lv_xml_atoi(value_str));
     }
     else {
-        lv_obj_add_subject_set_string(item, subject, trigger, value_str);
+        lv_obj_add_subject_set_string_event(item, subject, trigger, value_str);
     }
 }
 
@@ -326,7 +326,7 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     int32_t step = step_str ? lv_xml_atoi(step_str) : 1;
     int32_t min_v = min_str ? lv_xml_atoi(min_str) : INT32_MIN;
     int32_t max_v = max_str ? lv_xml_atoi(max_str) : INT32_MAX;
-    lv_obj_add_subject_increment(item, subject, trigger, step, min_v, max_v);
+    lv_obj_add_subject_increment_event(item, subject, trigger, step, min_v, max_v);
 }
 
 void * lv_obj_xml_bind_flag_create(lv_xml_parser_state_t * state, const char ** attrs)
