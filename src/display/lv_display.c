@@ -127,6 +127,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     else {
         disp->theme = lv_theme_simple_get();
     }
+#elif LV_USE_THEME_MONO
+    if(lv_theme_mono_is_inited() == false) {
+        disp->theme = lv_theme_mono_init(disp, false, LV_FONT_DEFAULT);
+    }
+    else {
+        disp->theme = lv_theme_mono_get();
+    }
 #endif
 
     disp->bottom_layer = lv_obj_create(NULL); /*Create bottom layer on the display*/
