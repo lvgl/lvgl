@@ -179,8 +179,8 @@ struct _my_theme_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
 static void style_init_reset(lv_style_t * style);
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -651,7 +651,6 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
        (theme->base.flags == (dark ? MODE_DARK : 0)) &&
        theme->base.font_small == font) {
         return (lv_theme_t *) theme;
-
     }
 
     theme->disp_size = new_size;
@@ -667,11 +666,29 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     style_init(theme);
 
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) lv_obj_report_style_change(NULL);
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+        lv_obj_report_style_change(NULL);
+    }
 
     theme->inited = true;
 
     return (lv_theme_t *) theme;
+}
+
+bool lv_theme_default_is_inited(void)
+{
+    my_theme_t * theme = theme_def;
+    if(theme == NULL) return false;
+    return theme->inited;
+}
+
+lv_theme_t * lv_theme_default_get(void)
+{
+    if(!lv_theme_default_is_inited()) {
+        return NULL;
+    }
+
+    return (lv_theme_t *)theme_def;
 }
 
 void lv_theme_default_deinit(void)
@@ -684,28 +701,15 @@ void lv_theme_default_deinit(void)
             for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
                 lv_style_reset(theme_styles + i);
             }
-
         }
         lv_free(theme_def);
         theme_def = NULL;
     }
 }
 
-lv_theme_t * lv_theme_default_get(void)
-{
-    if(!lv_theme_default_is_inited()) {
-        return NULL;
-    }
-
-    return (lv_theme_t *)theme_def;
-}
-
-bool lv_theme_default_is_inited(void)
-{
-    my_theme_t * theme = theme_def;
-    if(theme == NULL) return false;
-    return theme->inited;
-}
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
@@ -788,7 +792,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
                 return;
             }
         }
-
 #endif
         lv_obj_add_style(obj, &theme->styles.btn, 0);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, 0);
@@ -1069,7 +1072,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.list_item_grow, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.list_item_grow, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
-
     }
 #endif
 #if LV_USE_MENU
@@ -1148,7 +1150,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
         return;
     }
-
 #endif
 
 #if LV_USE_SPINBOX
@@ -1200,13 +1201,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 static void style_init_reset(lv_style_t * style)
 {
-    if(theme_def->inited) {
+    if(lv_theme_default_is_inited()) {
         lv_style_reset(style);
     }
     else {
