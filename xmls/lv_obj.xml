@@ -41,7 +41,7 @@ Example
 
         <element name="style" access="add" type="void">
             <arg name="name" type="style"/>
-            <arg name="selector" type="selector+"/>
+            <arg name="selector" type="selector+" default="0"/>
         </element>
 
         <element name="event_cb" access="add">
@@ -50,14 +50,21 @@ Example
             <arg name="cb" type="event_cb"/>
         </element>
 
-        <element name="subject_set" access="add">
+        <element name="subject_set_int_event" access="add">
             <arg name="name" type="string"/>
             <arg name="trigger" type="lv_event"/>
             <arg name="subject" type="subject"/>
             <arg name="value" type="int"/>
         </element>
 
-        <element name="subject_increment" access="add">
+        <element name="subject_set_string_event" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event"/>
+            <arg name="subject" type="subject"/>
+            <arg name="value" type="int"/>
+        </element>
+
+        <element name="subject_increment_event" access="add">
             <arg name="name" type="string"/>
             <arg name="trigger" type="lv_event"/>
             <arg name="subject" type="subject"/>

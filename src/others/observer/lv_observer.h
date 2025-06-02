@@ -315,8 +315,8 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param min       the minimum value
  * @param max       the maximum value
  */
-void lv_obj_add_subject_increment(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value,
-                                  int32_t min, int32_t max);
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value,
+                                        int32_t min, int32_t max);
 
 /**
  * Set the value of an integer subject.
@@ -325,7 +325,7 @@ void lv_obj_add_subject_increment(lv_obj_t * obj, lv_subject_t * subject, lv_eve
  * @param trigger   the trigger on which the subject should be changed
  * @param value     the value to set
  */
-void lv_obj_add_subject_set_int(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value);
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value);
 
 /**
  * Set the value of a string subject.
@@ -334,7 +334,8 @@ void lv_obj_add_subject_set_int(lv_obj_t * obj, lv_subject_t * subject, lv_event
  * @param trigger   the trigger on which the subject should be changed
  * @param value     the value to set
  */
-void lv_obj_add_subject_set_string(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, const char * value);
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value);
 
 /**
  * Set Widget's flag(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.

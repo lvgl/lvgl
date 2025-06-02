@@ -487,8 +487,8 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
-void lv_obj_add_subject_increment(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
-                                  int32_t min, int32_t max)
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        int32_t min, int32_t max)
 {
     subject_increment_user_data_t * user_data = lv_malloc(sizeof(subject_increment_user_data_t));
     if(user_data == NULL) {
@@ -505,7 +505,7 @@ void lv_obj_add_subject_increment(lv_obj_t * obj, lv_subject_t * subject, lv_eve
     lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 }
 
-void lv_obj_add_subject_set_int(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
 {
     subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
@@ -521,7 +521,8 @@ void lv_obj_add_subject_set_int(lv_obj_t * obj, lv_subject_t * subject, lv_event
     lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 }
 
-void lv_obj_add_subject_set_string(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, const char * value)
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value)
 {
     subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
