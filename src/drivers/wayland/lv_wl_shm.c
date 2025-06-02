@@ -313,6 +313,9 @@ static void handle_wl_buffer_release(void * data, struct wl_buffer * wl_buffer)
     struct graphic_object * obj;
     struct window * window;
     smm_buffer_t * buf;
+    /* window is unused when LV_LOG level is not set to trace */
+    LV_UNUSED(window);
+    LV_UNUSED(wl_buffer);
 
     buf    = (smm_buffer_t *)data;
     props  = SMM_BUFFER_PROPERTIES(buf);

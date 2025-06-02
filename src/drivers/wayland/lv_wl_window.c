@@ -297,7 +297,7 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 
 #if LV_WAYLAND_USE_DMABUF
     {
-        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
+        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window);
         if(err != LV_RESULT_OK) {
             return err;
         }

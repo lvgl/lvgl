@@ -328,8 +328,7 @@ struct graphic_object * lv_wayland_dmabuf_on_graphical_object_creation(dmabuf_ct
 void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, struct graphic_object * obj);
 lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_display_t * display);
 lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct window * window);
-lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int32_t width,
-                                            int32_t height);
+lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
 
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);

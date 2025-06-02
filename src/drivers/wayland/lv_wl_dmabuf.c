@@ -99,7 +99,7 @@ lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_displa
 void lv_wayland_dmabuf_set_interface(dmabuf_ctx_t * context, struct wl_registry * registry, uint32_t name,
                                      const char * interface, uint32_t version)
 {
-
+    LV_UNUSED(interface);
     if(version > 3) {
         LV_LOG_WARN("Unsupported DMABUF version %d. Using version 3 instead", version);
         version = 3;
@@ -120,7 +120,10 @@ lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context)
 }
 
 void lv_wayland_dmabuf_destroy_window(dmabuf_ctx_t * context, struct window * window)
-{}
+{
+    LV_UNUSED(context);
+    LV_ASSERT_NULL(window);
+}
 
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context)
 {
@@ -178,6 +181,7 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
 
 static void buffer_release(void * data, struct wl_buffer * buffer)
 {
+    LV_UNUSED(buffer);
     struct buffer * buf = data;
     buf->busy           = 0;
 }
@@ -209,8 +213,7 @@ static const struct zwp_linux_buffer_params_v1_listener params_listener = {.crea
            .failed  = create_failed
 };
 
-lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int32_t width,
-                                            int32_t height)
+lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window)
 {
     struct buffer * buffers = lv_wayland_dmabuf_create_draw_buffers_internal(window);
     if(!buffers) {
@@ -236,7 +239,7 @@ lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct
 
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window)
 {
-
+    LV_UNUSED(window);
     if(context->buffers == NULL) {
         return;
     }
