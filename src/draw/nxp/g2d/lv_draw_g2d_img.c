@@ -44,8 +44,7 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
                               int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
-static void _g2d_blit(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_surface * dst_surf,
-                      struct g2d_buf * src_buf, struct g2d_surface * src_surf);
+static void _g2d_blit(void * g2d_handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
 
 /**********************
  *  STATIC VARIABLES
@@ -111,7 +110,7 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
     _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
 
-    _g2d_blit(u->g2d_handle, dst_buf, &dst_surf, src_buf, &src_surf);
+    _g2d_blit(u->g2d_handle, &dst_surf, &src_surf);
 }
 
 /**********************
@@ -203,8 +202,7 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     dst_surf->blendfunc = G2D_ONE_MINUS_SRC_ALPHA | G2D_PRE_MULTIPLIED_ALPHA;
 }
 
-static void _g2d_blit(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_surface * dst_surf,
-                      struct g2d_buf * src_buf, struct g2d_surface * src_surf)
+static void _g2d_blit(void * g2d_handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf)
 {
     g2d_enable(g2d_handle, G2D_BLEND);
     g2d_enable(g2d_handle, G2D_GLOBAL_ALPHA);

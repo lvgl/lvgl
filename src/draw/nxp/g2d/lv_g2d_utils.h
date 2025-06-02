@@ -23,6 +23,8 @@ extern "C" {
 
 #if LV_USE_DRAW_G2D
 #include "../../sw/lv_draw_sw_private.h"
+#include "g2d.h"
+#include "g2dExt.h"
 
 /*********************
  *      DEFINES
@@ -46,11 +48,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum g2d_format g2d_format_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-enum g2d_format g2d_get_buf_format(lv_color_format_t cf);
+g2d_format_t g2d_get_buf_format(lv_color_format_t cf);
 
 uint32_t g2d_rgba_to_u32(lv_color_t color);
 

@@ -16,8 +16,6 @@
 #include "lv_g2d_utils.h"
 
 #if LV_USE_DRAW_G2D
-#include"g2d.h"
-#include "g2dExt.h"
 #include "lv_g2d_buf_map.h"
 #include "lv_draw_g2d.h"
 
@@ -41,9 +39,9 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-enum g2d_format g2d_get_buf_format(lv_color_format_t cf)
+g2d_format_t g2d_get_buf_format(lv_color_format_t cf)
 {
-    enum g2d_format color_f = G2D_RGB565;
+    g2d_format_t color_f = G2D_RGB565;
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
