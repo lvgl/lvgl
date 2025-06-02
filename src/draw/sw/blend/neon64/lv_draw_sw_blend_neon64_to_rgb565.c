@@ -43,20 +43,32 @@ static inline uint16x8_t lv_color_24_16_mix_8(const uint8_t * src, const uint16_
 static inline uint16x8_t lv_color_24_16_mix_8_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 static inline uint16x8_t lv_color_24_16_mix_8_with_mask(const uint8_t * src, const uint16_t * dst,
                                                         const uint8_t * mask);
+static inline uint16x8_t lv_color_24_16_mix_8_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                            const uint8_t * mask);
+
 static inline uint16x8_t lv_color_24_16_mix_8_internal(uint16x8_t g_pixels, uint16x8_t r_pixels, uint16x8_t b_pixels,
                                                        uint16x8_t a_pixels, uint16x8_t dst_pixels);
+
 static inline uint16x4_t lv_color_24_16_mix_4(const uint8_t * src, const uint16_t * dst);
 static inline uint16x4_t lv_color_24_16_mix_4_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 static inline uint16x4_t lv_color_24_16_mix_4_with_mask(const uint8_t * src, const uint16_t * dst,
                                                         const uint8_t * mask);
+static inline uint16x4_t lv_color_24_16_mix_4_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                            const uint8_t * mask);
 static inline uint16x4_t lv_color_24_16_mix_4_internal(uint16x4_t g_pixels, uint16x4_t r_pixels, uint16x4_t b_pixels,
                                                        uint16x4_t a_pixels, uint16x4_t dst_pixels);
+
 static inline uint32_t lv_color_24_16_mix_2(const uint8_t * src, const uint16_t * dst);
 static inline uint32_t lv_color_24_16_mix_2_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 static inline uint32_t lv_color_24_16_mix_2_with_mask(const uint8_t * src, const uint16_t * dst, const uint8_t * mask);
+static inline uint32_t lv_color_24_16_mix_2_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                          const uint8_t * mask);
+
 static inline uint32_t lv_color_24_16_mix_1(const uint8_t * src, const uint16_t * dst);
 static inline uint16_t lv_color_24_16_mix_1_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 static inline uint16_t lv_color_24_16_mix_1_with_mask(const uint8_t * src, const uint16_t * dst, const uint8_t * mask);
+static inline uint16_t lv_color_24_16_mix_1_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                          const uint8_t * mask);
 static inline uint16_t lv_color_24_16_mix_1_internal(const uint8_t * src, const uint16_t * dst, uint8_t opa);
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
@@ -370,6 +382,50 @@ lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_mask(lv_draw_sw_blend
     }
     return LV_RESULT_OK;
 }
+lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf != NULL);
+    const int32_t w             = dsc->dest_w;
+    const int32_t h             = dsc->dest_h;
+    uint16_t * dest_buf_u16     = dsc->dest_buf;
+    const int32_t dest_stride   = dsc->dest_stride;
+    const uint8_t * src_buf_u8  = dsc->src_buf;
+    const int32_t src_stride    = dsc->src_stride;
+    const uint8_t opa           = dsc->opa;
+    const uint8_t * mask_buf_u8 = dsc->mask_buf;
+    const int32_t mask_stride   = dsc->mask_stride;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * dest_row      = dest_buf_u16;
+        const uint8_t * mask_row = mask_buf_u8;
+        const uint8_t * src_row  = (const uint8_t *)src_buf_u8;
+        int32_t x                = 0;
+        int32_t src_x            = 0;
+
+        for(; x < w - 7; x += 8, src_x += 32) {
+            vst1q_u16(&dest_row[x],
+                      lv_color_24_16_mix_8_with_opa_mask(&src_row[src_x], &dest_row[x], opa, &mask_row[x]));
+        }
+        for(; x < w - 3; x += 4, src_x += 16) {
+            vst1_u16(&dest_row[x],
+                     lv_color_24_16_mix_4_with_opa_mask(&src_row[src_x], &dest_row[x], opa, &mask_row[x]));
+        }
+        for(; x < w - 1; x += 2, src_x += 8) {
+            *(uint32_t *)&dest_row[x] =
+                lv_color_24_16_mix_2_with_opa_mask(&src_row[src_x], &dest_row[x], opa, &mask_row[x]);
+        }
+
+        for(; x < w - 0; x += 1, src_x += 4) {
+            dest_row[x] = lv_color_24_16_mix_1_with_opa_mask(&src_row[src_x], &dest_row[x], opa, &mask_row[x]);
+        }
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        src_buf_u8 += src_stride;
+        mask_buf_u8 += mask_stride;
+    }
+    return LV_RESULT_OK;
+}
+
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 lv_result_t lv_draw_sw_blend_neon64_argb888_premultiplied_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
@@ -633,6 +689,60 @@ static inline uint16x4_t lv_color_24_16_mix_4_with_mask(const uint8_t * src, con
     const uint16x4_t mask_a_mul = vshr_n_u16(vmul_u16(a_pixels, mask_vec), 8);
     return lv_color_24_16_mix_4_internal(r_pixels, g_pixels, b_pixels, mask_a_mul, dst_pixels);
 }
+static inline uint16x8_t lv_color_24_16_mix_8_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                            const uint8_t * mask)
+{
+    const uint16x8_t dst_pixels = vld1q_u16(dst);
+
+    const uint8x8x4_t rgba          = vld4_u8(src);
+    const uint16x8_t b_pixels       = vmovl_u8(rgba.val[0]);
+    const uint16x8_t g_pixels       = vmovl_u8(rgba.val[1]);
+    const uint16x8_t r_pixels       = vmovl_u8(rgba.val[2]);
+    const uint16x8_t a_pixels       = vmovl_u8(rgba.val[3]);
+    const uint16x8_t mask_vec       = vmovl_u8(vld1_u8(mask));
+    const uint16x8_t opa_vec        = vmovq_n_u16(opa);
+
+    /* Use uint32 for intermediate multiplication results to avoid 16bit overflows */
+    const uint32x4_t a_pixels_low   = vmovl_u16(vget_low_u16(a_pixels));
+    const uint32x4_t a_pixels_high  = vmovl_u16(vget_high_u16(a_pixels));
+    const uint32x4_t opa_vec_low    = vmovl_u16(vget_low_u16(opa_vec));
+    const uint32x4_t opa_vec_high   = vmovl_u16(vget_high_u16(opa_vec));
+    const uint32x4_t mask_vec_low   = vmovl_u16(vget_low_u16(mask_vec));
+    const uint32x4_t mask_vec_high  = vmovl_u16(vget_high_u16(mask_vec));
+    
+    const uint32x4_t mul_low  = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_low, opa_vec_low), mask_vec_low), 16);
+    const uint32x4_t mul_high = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_high, opa_vec_high), mask_vec_high), 16);
+    const uint16x8_t mask_opa_a_mul = vcombine_u16(vmovn_u32(mul_low), vmovn_u32(mul_high));
+
+    return lv_color_24_16_mix_8_internal(r_pixels, g_pixels, b_pixels, mask_opa_a_mul, dst_pixels);
+}
+static inline uint16x4_t lv_color_24_16_mix_4_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                            const uint8_t * mask)
+{
+
+    const uint16x4_t dst_pixels     = vld1_u16(dst);
+    uint8_t b_array[8]              = {src[0], src[4], src[8], src[12], 0, 0, 0, 0};
+    uint8_t g_array[8]              = {src[1], src[5], src[9], src[13], 0, 0, 0, 0};
+    uint8_t r_array[8]              = {src[2], src[6], src[10], src[14], 0, 0, 0, 0};
+    uint8_t a_array[8]              = {src[3], src[7], src[11], src[15], 0, 0, 0, 0};
+    uint8_t mask_array[8]           = {mask[0], mask[1], mask[2], mask[3], 0, 0, 0, 0};
+    const uint16x4_t b_pixels       = vget_low_u16(vmovl_u8(vld1_u8(b_array)));
+    const uint16x4_t g_pixels       = vget_low_u16(vmovl_u8(vld1_u8(g_array)));
+    const uint16x4_t r_pixels       = vget_low_u16(vmovl_u8(vld1_u8(r_array)));
+    const uint16x4_t a_pixels       = vget_low_u16(vmovl_u8(vld1_u8(a_array)));
+    const uint16x4_t mask_vec       = vget_low_u16(vmovl_u8(vld1_u8(mask_array)));
+    const uint16x4_t opa_vec        = vmov_n_u16(opa);
+
+    const uint32x4_t a_pixels_low   = vmovl_u16(a_pixels);
+    const uint32x4_t opa_vec_low    = vmovl_u16(opa_vec);
+    const uint32x4_t mask_vec_low   = vmovl_u16(mask_vec);
+    
+    const uint32x4_t mul_result  = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_low, opa_vec_low), mask_vec_low), 16);
+    const uint16x4_t mask_opa_a_mul = vmovn_u32(mul_result);
+
+    return lv_color_24_16_mix_4_internal(r_pixels, g_pixels, b_pixels, mask_opa_a_mul, dst_pixels);
+}
+
 static inline uint16x8_t lv_color_24_16_mix_8_internal(uint16x8_t r_pixels, uint16x8_t g_pixels, uint16x8_t b_pixels,
                                                        uint16x8_t a_pixels, uint16x8_t dst_pixels)
 {
@@ -712,6 +822,13 @@ static inline uint32_t lv_color_24_16_mix_2_with_opa(const uint8_t * src, const 
 {
     return (lv_color_24_16_mix_1_with_opa(src + 4, dst + 1, opa) << 16) | lv_color_24_16_mix_1_with_opa(src, dst, opa);
 }
+static inline uint32_t lv_color_24_16_mix_2_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                          const uint8_t * mask)
+{
+    return (lv_color_24_16_mix_1_with_opa_mask(src + 4, dst + 1, opa, &mask[1]) << 16) |
+           lv_color_24_16_mix_1_with_opa_mask(src, dst, opa, &mask[0]);
+}
+
 static inline uint32_t lv_color_24_16_mix_2_with_mask(const uint8_t * src, const uint16_t * dst, const uint8_t * mask)
 {
     return (lv_color_24_16_mix_1_with_mask(src + 4, dst + 1, mask + 1) << 16) |
@@ -725,6 +842,12 @@ static inline uint32_t lv_color_24_16_mix_2(const uint8_t * src, const uint16_t 
 static inline uint32_t lv_color_24_16_mix_1(const uint8_t * src, const uint16_t * dst)
 {
     return lv_color_24_16_mix_1_internal(src, dst, src[3]);
+}
+
+static inline uint16_t lv_color_24_16_mix_1_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                          const uint8_t * mask)
+{
+    return lv_color_24_16_mix_1_internal(src, dst, LV_OPA_MIX3(src[3],opa, *mask));
 }
 
 static inline uint16_t lv_color_24_16_mix_1_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa)
