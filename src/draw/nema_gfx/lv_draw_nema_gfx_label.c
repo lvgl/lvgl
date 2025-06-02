@@ -825,7 +825,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             }
         }
 
-        dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, draw_buf);
+        dsc->glyph_data = g.resolved_font->get_glyph_bitmap(&g, draw_buf);
 
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
