@@ -37,7 +37,7 @@
 
 	    <element name="series" type="lv_chart_series" access="add">
 	        <arg name="color" type="color" help=""/>
-	        <arg name="axis" type="enum:lv_chart_axis+" help="The axis"/>
+	        <arg name="axis" type="enum:lv_chart_axis+" default="primary_y" help="The axis"/>
 	    	<prop name="values"  type="int[count]" help="set values from an array"/>
 	    </element>
 

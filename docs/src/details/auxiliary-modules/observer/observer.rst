@@ -558,12 +558,12 @@ Note: these callbacks are **not** automatically removed when a subject is deinit
 Increment
 ~~~~~~~~~
 
-:cpp:expr:`lv_obj_add_subject_increment(obj, subject, step, min, max)`
+:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, step, min, max)`
 Increments the subject's value by `step`, clamped between `min` and `max`.
 
 For example:
 
-:cpp:expr:`lv_obj_add_subject_increment(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80);`
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80);`
 
 This will increment `subject1` by 5 when `button1` is clicked.
 The resulting value will be constrained to the range -10 to 80.
@@ -573,8 +573,8 @@ Using a negative `step` will decrement the value instead.
 Set to a Value
 ~~~~~~~~~~~~~~
 
-- :cpp:expr:`lv_obj_add_subject_set_int(obj, subject, trigger, value)`
-- :cpp:expr:`lv_obj_add_subject_set_string(obj, subject, trigger, text)`
+- :cpp:expr:`lv_obj_add_subject_set_int_event(obj, subject, trigger, value)`
+- :cpp:expr:`lv_obj_add_subject_set_string_event(obj, subject, trigger, text)`
 
 These functions set the given subject (integer or string) to a fixed value when the specified trigger event occurs.
 
