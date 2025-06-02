@@ -113,7 +113,8 @@ extern "C" {
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)       LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc)                                                      \
+    lv_draw_sw_blend_neon64_argb888_to_rgb565_with_mask(dsc)
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
@@ -169,6 +170,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565(lv_draw_sw_blend_image_dsc_
 lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_argb888_premultiplied_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc);
+lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc);
 
 /**********************
  *      MACROS
