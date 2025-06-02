@@ -812,16 +812,20 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             }
         }
 
-        /* always request raw bitmaps */
+        /* Performance Optimization for lv_font_fmt_txt_dsc_t fonts, always request raw bitmaps */
         /*Exception for w*h >= NEMA_COORD_LIMIT due to HW limitation on data handling*/
-        is_raw_bitmap = g.box_h * g.box_w <= NEMA_COORD_LIMIT && lv_font_has_static_bitmap(font);
+        is_raw_bitmap = false;
+        if(g.box_h * g.box_w <= NEMA_COORD_LIMIT) {
+            g.req_raw_bitmap = 1;
+            if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+                lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+                if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+                    is_raw_bitmap = true;
+                }
+            }
+        }
 
-        if(is_raw_bitmap) {
-            dsc->glyph_data = (void *)lv_font_get_glyph_static_bitmap(&g);
-        }
-        else {
-            dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, draw_buf);
-        }
+        dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, draw_buf);
 
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
