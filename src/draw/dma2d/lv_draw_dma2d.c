@@ -40,6 +40,11 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
 #if !LV_DRAW_DMA2D_ASYNC
     static bool check_transfer_completion(void);
 #endif
+
+#if defined(__ZEPHYR__)
+    static void lv_dma2d_isr_entry(const void * arg);
+#endif
+
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 
 /**********************
@@ -69,7 +74,7 @@ void lv_draw_dma2d_init(void)
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
 
-    lv_result_t res = lv_thread_init(&draw_dma2d_unit->thread, "dma2d", LV_DRAW_THREAD_PRIO, thread_cb, 2 * 1024,
+    lv_result_t res = lv_thread_init(&draw_dma2d_unit->thread, "dma2d", LV_THREAD_PRIO_HIGH, thread_cb, 2 * 1024,
                                      draw_dma2d_unit);
     LV_ASSERT(res == LV_RESULT_OK);
 #endif
@@ -79,31 +84,35 @@ void lv_draw_dma2d_init(void)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
-    RCC->AHB5ENR |= RCC_AHB5ENR_DMA2DEN;
+
 #else
 #warning "LVGL can't enable the clock for DMA2D"
 #endif
-
     /* disable dead time */
     DMA2D->AMTCR = 0;
 
+#if defined(__ZEPHYR__)
+    IRQ_CONNECT(DMA2D_IRQn, 0, lv_dma2d_isr_entry, NULL, 0);
+    irq_enable(DMA2D_IRQn);
+#else
     /* enable the interrupt */
     NVIC_EnableIRQ(DMA2D_IRQn);
+#endif
 }
 
 void lv_draw_dma2d_deinit(void)
 {
+#if defined(__ZEPHYR__)
+    irq_disable(DMA2D_IRQn);
+#else
     /* disable the interrupt */
     NVIC_DisableIRQ(DMA2D_IRQn);
-
+#endif
     /* disable the DMA2D clock */
 #if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
     RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR &= ~RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
-    RCC->AHB5ENR &= ~RCC_AHB5ENR_DMA2DEN;
 #endif
 
 #if LV_DRAW_DMA2D_ASYNC
@@ -284,6 +293,17 @@ void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
  *   STATIC FUNCTIONS
  **********************/
 
+#if defined(__ZEPHYR__)
+static void lv_dma2d_isr_entry(const void * arg)
+{
+    LV_UNUSED(arg);
+#if LV_USE_DRAW_DMA2D_INTERRUPT
+    lv_draw_dma2d_transfer_complete_interrupt_handler();
+#endif
+}
+#endif
+
+
 static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     switch(task->type) {
@@ -353,7 +373,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #endif
     }
 
-    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DMA2D);
+    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DMA2D);
     if(t == NULL) {
         return LV_DRAW_UNIT_IDLE;
     }

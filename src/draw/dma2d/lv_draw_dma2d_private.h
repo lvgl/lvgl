@@ -19,7 +19,14 @@ extern "C" {
 
 #include "../lv_draw_private.h"
 #include "../sw/lv_draw_sw.h"
+#if defined(__ZEPHYR__)
+#include <zephyr/kernel.h>
+#include <zephyr/irq.h>
+#include <soc.h>
+#else
 #include LV_DRAW_DMA2D_HAL_INCLUDE
+#endif
+
 
 /*********************
  *      DEFINES
