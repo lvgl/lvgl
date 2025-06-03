@@ -274,7 +274,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     }
 
     /*Allocate space for the new option*/
-    size_t old_len = (dropdown->options == NULL) ? 0 : lv_strlen(dropdown->options);
+    size_t old_len = lv_strlen(dropdown->options);
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t ins_len = lv_strlen(option) + 1;
 #else
@@ -334,7 +334,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
         lv_free(dropdown->options);
 
     dropdown->options = NULL;
-    dropdown->static_txt = 0;
+    dropdown->static_txt = 1;
     dropdown->option_cnt = 0;
 
     lv_obj_invalidate(obj);
