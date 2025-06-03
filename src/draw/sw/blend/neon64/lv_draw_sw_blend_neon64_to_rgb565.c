@@ -162,12 +162,14 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t 
 
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
-    const int32_t w            = dsc->dest_w;
-    const int32_t h            = dsc->dest_h;
-    const int32_t dest_stride  = dsc->dest_stride;
-    const uint16_t color16     = lv_color_to_u16(dsc->color);
-    const uint16x8_t color_vec = vdupq_n_u16(color16);
-    uint16_t * dest_buf_u16    = dsc->dest_buf;
+    const int32_t w              = dsc->dest_w;
+    const int32_t h              = dsc->dest_h;
+    const int32_t dest_stride    = dsc->dest_stride;
+    const uint16_t color16       = lv_color_to_u16(dsc->color);
+    const uint16x8_t color_vec_8 = vdupq_n_u16(color16);
+    const uint16x4_t color_vec_4 = vdup_n_u16(color16);
+    const uint32_t color_vec_2   = color16 << 16 | color16;
+    uint16_t * dest_buf_u16      = dsc->dest_buf;
 
     for(int32_t y = 0; y < h; y++) {
         uint16_t * row_ptr = dest_buf_u16;
@@ -181,18 +183,178 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t 
                 row_ptr[x] = color16;
             }
         }
-
-        /* Process 8 pixels at a time */
         for(; x < w - 7; x += 8) {
-            vst1q_u16(&row_ptr[x], color_vec);
+            vst1q_u16(&row_ptr[x], color_vec_8);
         }
-
-        /* Handle remaining pixels */
+        for(; x < w - 3; x += 4) {
+            vst1_u16(&row_ptr[x], color_vec_4);
+        }
+        for(; x < w - 1; x += 2) {
+            *(uint32_t *)&row_ptr[x] = color_vec_2;
+        }
         for(; x < w; x++) {
             row_ptr[x] = color16;
         }
 
         dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+    }
+
+    return LV_RESULT_OK;
+}
+lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    const int32_t w              = dsc->dest_w;
+    const int32_t h              = dsc->dest_h;
+    const int32_t dest_stride    = dsc->dest_stride;
+    const uint16_t color16       = lv_color_to_u16(dsc->color);
+    const uint32_t color32       = color16 << 16 | color16;
+    const uint16x8_t color_vec_8 = vdupq_n_u16(color16);
+    const uint16x4_t color_vec_4 = vdup_n_u16(color16);
+    const uint8_t opa            = dsc->opa;
+    const uint16x8_t opa_vec_8   = vmovq_n_u16(opa);
+    const uint16x4_t opa_vec_4   = vmov_n_u16(opa);
+    uint16_t * dest_buf_u16      = dsc->dest_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * row_ptr = dest_buf_u16;
+        int32_t x          = 0;
+        /* Handle unaligned pixels at the beginning */
+        const size_t offset = ((size_t)row_ptr) & 0xF;
+        if(offset != 0) {
+            int32_t pixel_alignment = (16 - offset) >> 1;
+            pixel_alignment         = (pixel_alignment > w) ? w : pixel_alignment;
+            for(; x < pixel_alignment; x++) {
+                row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], opa);
+            }
+        }
+        for(; x < w - 7; x += 8) {
+            const uint16x8_t src = vld1q_u16(&row_ptr[x]);
+            vst1q_u16(&row_ptr[x], lv_color_16_16_mix_8_internal(color_vec_8, src, opa_vec_8));
+        }
+        for(; x < w - 3; x += 4) {
+            const uint16x4_t src = vld1_u16(&row_ptr[x]);
+            vst1_u16(&row_ptr[x], lv_color_16_16_mix_4_internal(color_vec_4, src, opa_vec_4));
+        }
+        for(; x < w - 1; x += 2) {
+            *(uint32_t *)&row_ptr[x] = lv_color_16_16_mix_2_with_opa((const uint16_t *)&color32, &row_ptr[x], opa);
+        }
+        for(; x < w; x++) {
+            row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], opa);
+        }
+
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+    }
+
+    return LV_RESULT_OK;
+}
+lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa >= LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf != NULL);
+    const int32_t w              = dsc->dest_w;
+    const int32_t h              = dsc->dest_h;
+    const int32_t dest_stride    = dsc->dest_stride;
+    const uint16_t color16       = lv_color_to_u16(dsc->color);
+    const uint32_t color32       = color16 << 16 | color16;
+    const uint16x8_t color_vec_8 = vdupq_n_u16(color16);
+    const uint16x4_t color_vec_4 = vdup_n_u16(color16);
+    uint16_t * dest_buf_u16      = dsc->dest_buf;
+    const uint8_t * mask_buf_u8  = dsc->mask_buf;
+    const int32_t mask_stride    = dsc->mask_stride;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * row_ptr       = dest_buf_u16;
+        const uint8_t * mask_row = mask_buf_u8;
+        int32_t x                = 0;
+        /* Handle unaligned pixels at the beginning */
+        const size_t offset = ((size_t)row_ptr) & 0xF;
+        if(offset != 0) {
+            int32_t pixel_alignment = (16 - offset) >> 1;
+            pixel_alignment         = (pixel_alignment > w) ? w : pixel_alignment;
+            for(; x < pixel_alignment; x++) {
+                row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], mask_row[x]);
+            }
+        }
+        for(; x < w - 7; x += 8) {
+            const uint16x8_t src  = vld1q_u16(&row_ptr[x]);
+            const uint16x8_t mask = vmovl_u8(vld1_u8(&mask_row[x]));
+            vst1q_u16(&row_ptr[x], lv_color_16_16_mix_8_internal(color_vec_8, src, mask));
+        }
+        for(; x < w - 3; x += 4) {
+            const uint16x4_t src      = vld1_u16(&row_ptr[x]);
+            const uint16x4_t mask_vec = vget_low_u16(vmovl_u8(vld1_u8(&mask_row[x])));
+            vst1_u16(&row_ptr[x], lv_color_16_16_mix_4_internal(color_vec_4, src, mask_vec));
+        }
+        for(; x < w - 1; x += 2) {
+            *(uint32_t *)&row_ptr[x] =
+                lv_color_16_16_mix_2_with_mask((const uint16_t *)&color32, &row_ptr[x], &mask_row[x]);
+        }
+        for(; x < w; x++) {
+            row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], mask_row[x]);
+        }
+
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        mask_buf_u8 += mask_stride;
+    }
+
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf != NULL);
+    const int32_t w              = dsc->dest_w;
+    const int32_t h              = dsc->dest_h;
+    const int32_t dest_stride    = dsc->dest_stride;
+    const uint16_t color16       = lv_color_to_u16(dsc->color);
+    const uint32_t color32       = color16 << 16 | color16;
+    const uint16x8_t color_vec_8 = vdupq_n_u16(color16);
+    const uint16x4_t color_vec_4 = vdup_n_u16(color16);
+    const uint8_t opa            = dsc->opa;
+    const uint16x8_t opa_vec_8   = vmovq_n_u16(opa);
+    const uint16x4_t opa_vec_4   = vmov_n_u16(opa);
+
+    uint16_t * dest_buf_u16     = dsc->dest_buf;
+    const uint8_t * mask_buf_u8 = dsc->mask_buf;
+    const int32_t mask_stride   = dsc->mask_stride;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * row_ptr       = dest_buf_u16;
+        const uint8_t * mask_row = mask_buf_u8;
+        int32_t x                = 0;
+        /* Handle unaligned pixels at the beginning */
+        const size_t offset = ((size_t)row_ptr) & 0xF;
+        if(offset != 0) {
+            int32_t pixel_alignment = (16 - offset) >> 1;
+            pixel_alignment         = (pixel_alignment > w) ? w : pixel_alignment;
+            for(; x < pixel_alignment; x++) {
+                row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], LV_OPA_MIX2(opa, mask_row[x]));
+            }
+        }
+        for(; x < w - 7; x += 8) {
+            const uint16x8_t src = vld1q_u16(&row_ptr[x]);
+            const uint16x8_t mix = vshrq_n_u16(vmulq_u16(opa_vec_8, vmovl_u8(vld1_u8(&mask_row[x]))), 8);
+            vst1q_u16(&row_ptr[x], lv_color_16_16_mix_8_internal(color_vec_8, src, mix));
+        }
+        for(; x < w - 3; x += 4) {
+            const uint16x4_t src = vld1_u16(&row_ptr[x]);
+            const uint16x4_t mix = vshr_n_u16(vmul_u16(opa_vec_4, vget_low_u16(vmovl_u8(vld1_u8(&mask_row[x])))), 8);
+            vst1_u16(&row_ptr[x], lv_color_16_16_mix_4_internal(color_vec_4, src, mix));
+        }
+        for(; x < w - 1; x += 2) {
+            *(uint32_t *)&row_ptr[x] =
+                lv_color_16_16_mix_2_with_opa_mask((const uint16_t *)&color32, &row_ptr[x], opa, &mask_row[x]);
+        }
+        for(; x < w; x++) {
+            row_ptr[x] = lv_color_16_16_mix(color16, row_ptr[x], LV_OPA_MIX2(opa, mask_row[x]));
+        }
+
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        mask_buf_u8 += mask_stride;
     }
 
     return LV_RESULT_OK;
