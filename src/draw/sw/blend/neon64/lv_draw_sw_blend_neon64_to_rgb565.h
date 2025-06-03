@@ -129,6 +129,10 @@ extern "C" {
     lv_draw_sw_blend_neon64_argb888_premultiplied_to_rgb565(dsc)
 #endif
 
+/*
+ * Bleding operations with premultiplied argb8888 require division.
+ * As division is not supported for integer values in neon we don't define these functions
+ */
 #ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_RGB565_WITH_OPA
 #define LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_RGB565_WITH_OPA(...) LV_RESULT_INVALID
 #endif
