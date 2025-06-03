@@ -90,7 +90,7 @@ remove the misleading guide above this code segment.
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 
-6. Set `LV_FONT_MONTSERRAT_12`, ``LV_FONT_MONTSERRAT_20`, `LV_FONT_MONTSERRAT_24`, `LV_FONT_MONTSERRAT_26` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
+6. Set `LV_FONT_MONTSERRAT_12`, `LV_FONT_MONTSERRAT_20`, `LV_FONT_MONTSERRAT_24`, `LV_FONT_MONTSERRAT_26` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
 
 
 7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
@@ -107,16 +107,16 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_FS_POSIX 0
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
-    - #define LV_USE_FS_LITTLEFS 0
-    - #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
-    - #define LV_USE_FS_ARDUINO_SD 0
-    - #define LV_USE_FS_MEMFS 0
+    - \#define LV_USE_FS_LITTLEFS 0
+    - \#define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
+    - \#define LV_USE_FS_ARDUINO_SD 0
+    - \#define LV_USE_FS_MEMFS 0
     - \#define LV_USE_LODEPNG 0
-    - #define LV_USE_LIBPNG 0
+    - \#define LV_USE_LIBPNG 0
     - \#define LV_USE_BMP 0
     - \#define LV_USE_RLE 0
-    - #define LV_USE_TJPGD 0
-    - #define LV_USE_LIBJPEG_TURBO 0
+    - \#define LV_USE_TJPGD 0
+    - \#define LV_USE_LIBJPEG_TURBO 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
     - \#define LV_USE_QRCODE 0
@@ -124,8 +124,8 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_TINY_TTF 0
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
-    - #define LV_USE_FONT_MANAGER 0
-    - #define LV_USE_XML 0
+    - \#define LV_USE_FONT_MANAGER 0
+    - \#define LV_USE_XML 0
 
 9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
 
