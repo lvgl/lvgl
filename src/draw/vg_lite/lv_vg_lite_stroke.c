@@ -229,6 +229,7 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
         /* mark dash pattern has been duped */
         item->dash_pattern_type = DASH_PATTERN_TYPE_VG;
         vg_dash_pattern = lv_array_front(&item->vg.dash_pattern);
+        LV_ASSERT_NULL(vg_dash_pattern);
     }
 
     /* update parameters */
