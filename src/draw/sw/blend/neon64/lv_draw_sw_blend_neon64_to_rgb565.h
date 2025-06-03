@@ -61,15 +61,19 @@ extern "C" {
 #endif
 
 #ifndef LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_OPA
-#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_OPA(...) LV_RESULT_INVALID
+#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc) lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa(dsc)
 #endif
 
+#if 0 /* Disabled as it's missing testing */
 #ifndef LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_MASK
-#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_MASK(...) LV_RESULT_INVALID
+#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc) lv_draw_sw_blend_neon64_al88_to_rgb565_with_mask(dsc)
+
 #endif
 
 #ifndef LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
-#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...) LV_RESULT_INVALID
+#define LV_DRAW_SW_AL88_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc)                                                       \
+    lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa_mask(dsc)
+#endif
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565
@@ -159,6 +163,10 @@ extern "C" {
 lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_l8_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc);
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc);
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc);
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc);
+
 lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc);
 lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc);

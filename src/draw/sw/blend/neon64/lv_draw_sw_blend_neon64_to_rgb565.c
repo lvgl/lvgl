@@ -36,8 +36,30 @@ static inline uint16_t l8_to_rgb565_1(const uint8_t * src);
 
 static inline uint16x8_t lv_color_8_16_mix_8(const uint16_t * src, const uint16_t * dst);
 static inline uint16x4_t lv_color_8_16_mix_4(const uint16_t * src, const uint16_t * dst);
-static inline uint32_t lv_color_8_16_mix_2(const uint16_t * src, const uint16_t * dst);
-static inline uint16_t lv_color_8_16_mix_1(const uint16_t * src, const uint16_t * dst);
+
+static inline uint16x8_t lv_color_8_16_mix_8_with_opa(const uint16_t * src, const uint16_t * dst, uint8_t opa);
+static inline uint16x4_t lv_color_8_16_mix_4_with_opa(const uint16_t * src, const uint16_t * dst, uint8_t opa);
+static inline uint16x8_t lv_color_8_16_mix_8_with_mask(const uint16_t * src, const uint16_t * dst,
+                                                       const uint8_t * mask);
+static inline uint16x4_t lv_color_8_16_mix_4_with_mask(const uint16_t * src, const uint16_t * dst,
+                                                       const uint8_t * mask);
+static inline uint16x8_t lv_color_8_16_mix_8_with_opa_mask(const uint16_t * src, const uint16_t * dst, uint8_t opa,
+                                                           const uint8_t * mask);
+static inline uint16x4_t lv_color_8_16_mix_4_with_opa_mask(const uint16_t * src, const uint16_t * dst, uint8_t opa,
+                                                           const uint8_t * mask);
+
+static inline uint16x8_t lv_color_8_16_mix_8_internal(uint16x8_t dst_pixels, uint16x8_t src_pixels,
+                                                      uint16x8_t mix_pixels);
+static inline uint16x4_t lv_color_8_16_mix_4_internal(uint16x4_t dst_pixels, uint16x4_t src_pixels,
+                                                      uint16x4_t mix_pixels);
+
+static inline uint32_t lv_color_8_16_mix_2(const uint8_t * src, const uint16_t * dst);
+static inline uint32_t lv_color_8_16_mix_2_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
+static inline uint32_t lv_color_8_16_mix_2_with_mask(const uint8_t * src, const uint16_t * dst, const uint8_t * mask);
+static inline uint32_t lv_color_8_16_mix_2_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t,
+                                                         const uint8_t * mask);
+
+static inline uint16_t lv_color_8_16_mix_1_internal(uint8_t src, uint16_t dst, uint8_t mix);
 
 static inline uint16x8_t lv_color_32_16_mix_8(const uint8_t * src, const uint16_t * dst);
 static inline uint16x8_t lv_color_32_16_mix_8_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa);
@@ -214,32 +236,153 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t 
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
-    int32_t w                          = dsc->dest_w;
-    int32_t h                          = dsc->dest_h;
-    uint16_t * dest_buf_u16            = dsc->dest_buf;
-    int32_t dest_stride                = dsc->dest_stride;
-    const lv_color16a_t * src_buf_al88 = dsc->src_buf;
-    int32_t src_stride                 = dsc->src_stride;
+    int32_t w                  = dsc->dest_w;
+    int32_t h                  = dsc->dest_h;
+    uint16_t * dest_buf_u16    = dsc->dest_buf;
+    int32_t dest_stride        = dsc->dest_stride;
+    const uint8_t * src_buf_u8 = dsc->src_buf;
+    int32_t src_stride         = dsc->src_stride;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * dest_row     = dest_buf_u16;
+        const uint8_t * src_row = (const uint8_t *)src_buf_u8;
+        int32_t x               = 0;
+        int32_t src_x           = 0;
+
+        for(; x < w - 7; x += 8, src_x += 16) {
+            vst1q_u16(&dest_row[x], lv_color_8_16_mix_8((const uint16_t *)&src_row[src_x], &dest_row[x]));
+        }
+        for(; x < w - 3; x += 4, src_x += 8) {
+            vst1_u16(&dest_row[x], lv_color_8_16_mix_4((const uint16_t *)&src_row[src_x], &dest_row[x]));
+        }
+        for(; x < w - 1; x += 2, src_x += 4) {
+            *(uint32_t *)&dest_row[x] = lv_color_8_16_mix_2(&src_row[src_x], &dest_row[x]);
+        }
+        for(; x < w - 0; x += 1, src_x += 2) {
+            dest_row[x] = lv_color_8_16_mix_1_internal(src_row[src_x], dest_row[x], src_row[src_x + 1]);
+        }
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        src_buf_u8 += src_stride;
+    }
+    return LV_RESULT_OK;
+}
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf == NULL);
+    const int32_t w            = dsc->dest_w;
+    const int32_t h            = dsc->dest_h;
+    uint16_t * dest_buf_u16    = dsc->dest_buf;
+    const int32_t dest_stride  = dsc->dest_stride;
+    const uint8_t * src_buf_u8 = dsc->src_buf;
+    const int32_t src_stride   = dsc->src_stride;
+    const uint8_t opa          = dsc->opa;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * dest_row     = dest_buf_u16;
+        const uint8_t * src_row = (const uint8_t *)src_buf_u8;
+        int32_t x               = 0;
+        int32_t src_x           = 0;
+
+        for(; x < w - 7; x += 8, src_x += 16) {
+            vst1q_u16(&dest_row[x], lv_color_8_16_mix_8_with_opa((const uint16_t *)&src_row[src_x], &dest_row[x], opa));
+        }
+        for(; x < w - 3; x += 4, src_x += 8) {
+            vst1_u16(&dest_row[x], lv_color_8_16_mix_4_with_opa((const uint16_t *)&src_row[src_x], &dest_row[x], opa));
+        }
+        for(; x < w - 1; x += 2, src_x += 4) {
+            *(uint32_t *)&dest_row[x] = lv_color_8_16_mix_2_with_opa(&src_row[src_x], &dest_row[x], opa);
+        }
+        for(; x < w - 0; x += 1, src_x += 2) {
+            dest_row[x] =
+                lv_color_8_16_mix_1_internal(src_row[src_x], dest_row[x], LV_OPA_MIX2(src_row[src_x + 1], opa));
+        }
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        src_buf_u8 += src_stride;
+    }
+    return LV_RESULT_OK;
+}
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa >= LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf != NULL);
+    const int32_t w             = dsc->dest_w;
+    const int32_t h             = dsc->dest_h;
+    uint16_t * dest_buf_u16     = dsc->dest_buf;
+    const int32_t dest_stride   = dsc->dest_stride;
+    const uint8_t * src_buf_u8  = dsc->src_buf;
+    const int32_t src_stride    = dsc->src_stride;
+    const uint8_t * mask_buf_u8 = dsc->mask_buf;
+    const int32_t mask_stride   = dsc->mask_stride;
 
     for(int32_t y = 0; y < h; y++) {
         uint16_t * dest_row      = dest_buf_u16;
-        const uint16_t * src_row = (const uint16_t *)src_buf_al88;
+        const uint8_t * src_row  = (const uint8_t *)src_buf_u8;
+        const uint8_t * mask_row = (const uint8_t *)mask_buf_u8;
         int32_t x                = 0;
+        int32_t src_x            = 0;
 
-        for(; x < w - 7; x += 8) {
-            vst1q_u16(&dest_row[x], lv_color_8_16_mix_8(&src_row[x], &dest_row[x]));
+        for(; x < w - 7; x += 8, src_x += 16) {
+            vst1q_u16(&dest_row[x],
+                      lv_color_8_16_mix_8_with_mask((const uint16_t *)&src_row[src_x], &dest_row[x], &mask_row[x]));
         }
-        for(; x < w - 3; x += 4) {
-            vst1_u16(&dest_row[x], lv_color_8_16_mix_4(&src_row[x], &dest_row[x]));
+        for(; x < w - 3; x += 4, src_x += 8) {
+            vst1_u16(&dest_row[x],
+                     lv_color_8_16_mix_4_with_mask((const uint16_t *)&src_row[src_x], &dest_row[x], &mask_row[x]));
         }
-        for(; x < w - 1; x += 2) {
-            *(uint32_t *)&dest_row[x] = lv_color_8_16_mix_2(&src_row[x], &dest_row[x]);
+        for(; x < w - 1; x += 2, src_x += 4) {
+            *(uint32_t *)&dest_row[x] = lv_color_8_16_mix_2_with_mask(&src_row[src_x], &dest_row[x], &mask_row[x]);
         }
-        for(; x < w - 0; x += 1) {
-            dest_row[x] = lv_color_8_16_mix_1(&src_row[x], &dest_row[x]);
+        for(; x < w - 0; x += 1, src_x += 2) {
+            dest_row[x] =
+                lv_color_8_16_mix_1_internal(src_row[src_x], dest_row[x], LV_OPA_MIX2(src_row[src_x + 1], mask_row[x]));
         }
         dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
-        src_buf_al88 = drawbuf_next_row(src_buf_al88, src_stride);
+        src_buf_u8 += src_stride;
+        mask_buf_u8 += mask_stride;
+    }
+    return LV_RESULT_OK;
+}
+lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    LV_ASSERT(dsc->opa < LV_OPA_MAX);
+    LV_ASSERT(dsc->mask_buf != NULL);
+    const int32_t w             = dsc->dest_w;
+    const int32_t h             = dsc->dest_h;
+    uint16_t * dest_buf_u16     = dsc->dest_buf;
+    const int32_t dest_stride   = dsc->dest_stride;
+    const uint8_t * src_buf_u8  = dsc->src_buf;
+    const int32_t src_stride    = dsc->src_stride;
+    const uint8_t * mask_buf_u8 = dsc->mask_buf;
+    const int32_t mask_stride   = dsc->mask_stride;
+    const uint8_t opa           = dsc->opa;
+
+    for(int32_t y = 0; y < h; y++) {
+        uint16_t * dest_row      = dest_buf_u16;
+        const uint8_t * src_row  = (const uint8_t *)src_buf_u8;
+        const uint8_t * mask_row = (const uint8_t *)mask_buf_u8;
+        int32_t x                = 0;
+        int32_t src_x            = 0;
+
+        for(; x < w - 7; x += 8, src_x += 16) {
+            vst1q_u16(&dest_row[x], lv_color_8_16_mix_8_with_opa_mask((const uint16_t *)&src_row[src_x], &dest_row[x],
+                                                                      opa, &mask_row[x]));
+        }
+        for(; x < w - 3; x += 4, src_x += 8) {
+            vst1_u16(&dest_row[x], lv_color_8_16_mix_4_with_opa_mask((const uint16_t *)&src_row[src_x], &dest_row[x],
+                                                                     opa, &mask_row[x]));
+        }
+        for(; x < w - 1; x += 2, src_x += 4) {
+            *(uint32_t *)&dest_row[x] =
+                lv_color_8_16_mix_2_with_opa_mask(&src_row[src_x], &dest_row[x], opa, &mask_row[x]);
+        }
+        for(; x < w - 0; x += 1, src_x += 2) {
+            dest_row[x] = lv_color_8_16_mix_1_internal(src_row[src_x], dest_row[x],
+                                                       LV_OPA_MIX3(src_row[src_x + 1], mask_row[x], opa));
+        }
+        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+        src_buf_u8 += src_stride;
+        mask_buf_u8 += mask_stride;
     }
     return LV_RESULT_OK;
 }
@@ -777,6 +920,97 @@ static inline uint16x8_t lv_color_8_16_mix_8(const uint16_t * src, const uint16_
     const uint16x8_t src_pixels     = vandq_u16(src_mix_pixels, vdupq_n_u16(0xFF));
     const uint16x8_t mix_pixels     = vshrq_n_u16(src_mix_pixels, 8);
 
+    return lv_color_8_16_mix_8_internal(src_pixels, dst_pixels, mix_pixels);
+}
+
+static inline uint16x8_t lv_color_8_16_mix_8_with_opa(const uint16_t * src, const uint16_t * dst, uint8_t opa)
+{
+    const uint16x8_t src_mix_pixels = vld1q_u16(src);
+    const uint16x8_t dst_pixels     = vld1q_u16(dst);
+    const uint16x8_t src_pixels     = vandq_u16(src_mix_pixels, vdupq_n_u16(0xFF));
+    const uint16x8_t mix_pixels     = vshrq_n_u16(src_mix_pixels, 8);
+    const uint16x8_t opa_vec        = vmovq_n_u16(opa);
+    const uint16x8_t mix_vec        = vshrq_n_u16(vmulq_u16(opa_vec, mix_pixels), 8);
+    return lv_color_8_16_mix_8_internal(src_pixels, dst_pixels, mix_vec);
+}
+
+static inline uint16x4_t lv_color_8_16_mix_4_with_opa(const uint16_t * src, const uint16_t * dst, uint8_t opa)
+{
+    const uint16x4_t src_mix_pixels = vld1_u16(src);
+    const uint16x4_t dst_pixels     = vld1_u16(dst);
+    const uint16x4_t src_pixels     = vand_u16(src_mix_pixels, vdup_n_u16(0xFF));
+    const uint16x4_t mix_pixels     = vshr_n_u16(src_mix_pixels, 8);
+    const uint16x4_t opa_vec        = vmov_n_u16(opa);
+    const uint16x4_t mix_vec        = vshr_n_u16(vmul_u16(opa_vec, mix_pixels), 8);
+    return lv_color_8_16_mix_4_internal(src_pixels, dst_pixels, mix_vec);
+}
+static inline uint16x8_t lv_color_8_16_mix_8_with_mask(const uint16_t * src, const uint16_t * dst, const uint8_t * mask)
+{
+    const uint16x8_t src_mix_pixels = vld1q_u16(src);
+    const uint16x8_t dst_pixels     = vld1q_u16(dst);
+    const uint16x8_t src_pixels     = vandq_u16(src_mix_pixels, vdupq_n_u16(0xFF));
+    const uint16x8_t mix_pixels     = vshrq_n_u16(src_mix_pixels, 8);
+    const uint16x8_t mask_vec       = vmovl_u8(vld1_u8(mask));
+    const uint16x8_t mix_vec        = vshrq_n_u16(vmulq_u16(mask_vec, mix_pixels), 8);
+    return lv_color_8_16_mix_8_internal(src_pixels, dst_pixels, mix_vec);
+}
+
+static inline uint16x4_t lv_color_8_16_mix_4_with_mask(const uint16_t * src, const uint16_t * dst, const uint8_t * mask)
+{
+    const uint16x4_t src_mix_pixels = vld1_u16(src);
+    const uint16x4_t dst_pixels     = vld1_u16(dst);
+    const uint16x4_t src_pixels     = vand_u16(src_mix_pixels, vdup_n_u16(0xFF));
+    const uint16x4_t mix_pixels     = vshr_n_u16(src_mix_pixels, 8);
+    const uint16x4_t mask_vec       = vget_low_u16(vmovl_u8(vld1_u8(mask)));
+    const uint16x4_t mix_vec        = vshr_n_u16(vmul_u16(mask_vec, mix_pixels), 8);
+    return lv_color_8_16_mix_4_internal(src_pixels, dst_pixels, mix_vec);
+}
+static inline uint16x8_t lv_color_8_16_mix_8_with_opa_mask(const uint16_t * src, const uint16_t * dst, uint8_t opa,
+                                                           const uint8_t * mask)
+{
+    const uint16x8_t src_mix_pixels = vld1q_u16(src);
+    const uint16x8_t dst_pixels     = vld1q_u16(dst);
+    const uint16x8_t src_pixels     = vandq_u16(src_mix_pixels, vdupq_n_u16(0xFF));
+    const uint16x8_t mix_pixels     = vshrq_n_u16(src_mix_pixels, 8);
+    const uint16x8_t mask_vec       = vmovl_u8(vld1_u8(mask));
+    const uint16x8_t opa_vec        = vmovq_n_u16(opa);
+
+    /* Use uint32 for intermediate multiplication results to avoid 16bit overflows */
+    const uint32x4_t mix_pixels_low  = vmovl_u16(vget_low_u16(mix_pixels));
+    const uint32x4_t mix_pixels_high = vmovl_u16(vget_high_u16(mix_pixels));
+    const uint32x4_t opa_vec_low     = vmovl_u16(vget_low_u16(opa_vec));
+    const uint32x4_t opa_vec_high    = vmovl_u16(vget_high_u16(opa_vec));
+    const uint32x4_t mask_vec_low    = vmovl_u16(vget_low_u16(mask_vec));
+    const uint32x4_t mask_vec_high   = vmovl_u16(vget_high_u16(mask_vec));
+
+    const uint32x4_t mul_low  = vshrq_n_u32(vmulq_u32(vmulq_u32(mix_pixels_low, opa_vec_low), mask_vec_low), 16);
+    const uint32x4_t mul_high = vshrq_n_u32(vmulq_u32(vmulq_u32(mix_pixels_high, opa_vec_high), mask_vec_high), 16);
+    const uint16x8_t mix_vec  = vcombine_u16(vmovn_u32(mul_low), vmovn_u32(mul_high));
+    return lv_color_8_16_mix_8_internal(src_pixels, dst_pixels, mix_vec);
+}
+
+static inline uint16x4_t lv_color_8_16_mix_4_with_opa_mask(const uint16_t * src, const uint16_t * dst, uint8_t opa,
+                                                           const uint8_t * mask)
+{
+
+    const uint16x4_t src_mix_pixels = vld1_u16(src);
+    const uint16x4_t dst_pixels     = vld1_u16(dst);
+    const uint16x4_t src_pixels     = vand_u16(src_mix_pixels, vdup_n_u16(0xFF));
+    const uint16x4_t mix_pixels     = vshr_n_u16(src_mix_pixels, 8);
+    const uint16x4_t opa_vec        = vmov_n_u16(opa);
+    const uint16x4_t mask_vec       = vget_low_u16(vmovl_u8(vld1_u8(mask)));
+    const uint32x4_t a_pixels_low   = vmovl_u16(mix_pixels);
+    const uint32x4_t opa_vec_low    = vmovl_u16(opa_vec);
+    const uint32x4_t mask_vec_low   = vmovl_u16(mask_vec);
+
+    const uint32x4_t mul_result = vshrq_n_u32(vmulq_u32(vmulq_u32(a_pixels_low, opa_vec_low), mask_vec_low), 16);
+    const uint16x4_t mix_vec    = vmovn_u32(mul_result);
+    return lv_color_8_16_mix_4_internal(src_pixels, dst_pixels, mix_vec);
+}
+
+static inline uint16x8_t lv_color_8_16_mix_8_internal(uint16x8_t src_pixels, uint16x8_t dst_pixels,
+                                                      uint16x8_t mix_pixels)
+{
     const uint16x8_t mix_zero_mask = vceqq_u16(mix_pixels, vdupq_n_u16(0));
     const uint16x8_t mix_full_mask = vceqq_u16(mix_pixels, vdupq_n_u16(255));
     /* Prepare result in case mix == 255 */
@@ -811,16 +1045,12 @@ static inline uint16x8_t lv_color_8_16_mix_8(const uint16_t * src, const uint16_
     const uint16x8_t result         = vbslq_u16(mix_zero_mask, dst_pixels, blended_result);
     return vbslq_u16(mix_full_mask, src_rgb565, result);
 }
-
-static inline uint16x4_t lv_color_8_16_mix_4(const uint16_t * src, const uint16_t * dst)
+static inline uint16x4_t lv_color_8_16_mix_4_internal(uint16x4_t src_pixels, uint16x4_t dst_pixels,
+                                                      uint16x4_t mix_pixels)
 {
-    const uint16x4_t src_mix_pixels = vld1_u16(src);
-    const uint16x4_t dst_pixels     = vld1_u16(dst);
-    const uint16x4_t src_pixels     = vand_u16(src_mix_pixels, vdup_n_u16(0xFF));
-    const uint16x4_t mix_pixels     = vshr_n_u16(src_mix_pixels, 8);
-    const uint16x4_t mix_zero_mask  = vceq_u16(mix_pixels, vdup_n_u16(0));
-    const uint16x4_t mix_full_mask  = vceq_u16(mix_pixels, vdup_n_u16(255));
 
+    const uint16x4_t mix_zero_mask = vceq_u16(mix_pixels, vdup_n_u16(0));
+    const uint16x4_t mix_full_mask = vceq_u16(mix_pixels, vdup_n_u16(255));
     /* Prepare result in case mix == 255 */
     const uint16x4_t src_r565   = vshl_n_u16(vand_u16(src_pixels, vdup_n_u16(0xF8)), 8);
     const uint16x4_t src_g565   = vshl_n_u16(vand_u16(src_pixels, vdup_n_u16(0xFC)), 3);
@@ -851,16 +1081,45 @@ static inline uint16x4_t lv_color_8_16_mix_4(const uint16_t * src, const uint16_
     return vbsl_u16(mix_full_mask, src_rgb565, result);
 }
 
-static inline uint32_t lv_color_8_16_mix_2(const uint16_t * src, const uint16_t * dst)
+static inline uint16x4_t lv_color_8_16_mix_4(const uint16_t * src, const uint16_t * dst)
 {
-    return ((uint32_t)lv_color_8_16_mix_1(src + 1, dst + 1) << 16) | lv_color_8_16_mix_1(src, dst);
+    const uint16x4_t src_mix_pixels = vld1_u16(src);
+    const uint16x4_t dst_pixels     = vld1_u16(dst);
+    const uint16x4_t src_pixels     = vand_u16(src_mix_pixels, vdup_n_u16(0xFF));
+    const uint16x4_t mix_pixels     = vshr_n_u16(src_mix_pixels, 8);
+    return lv_color_8_16_mix_4_internal(src_pixels, dst_pixels, mix_pixels);
 }
 
-static inline uint16_t lv_color_8_16_mix_1(const uint16_t * src, const uint16_t * dst)
+static inline uint32_t lv_color_8_16_mix_2(const uint8_t * src, const uint16_t * dst)
 {
-    const uint8_t c1  = *src & 0xFF;
-    const uint8_t mix = (*src & 0xFF00) >> 8;
-    const uint16_t c2 = *dst;
+    return ((uint32_t)lv_color_8_16_mix_1_internal(src[2], dst[1], src[3]) << 16) |
+           lv_color_8_16_mix_1_internal(src[0], dst[0], src[1]);
+}
+
+static inline uint32_t lv_color_8_16_mix_2_with_opa(const uint8_t * src, const uint16_t * dst, uint8_t opa)
+{
+    return ((uint32_t)lv_color_8_16_mix_1_internal(src[2], dst[1], LV_OPA_MIX2(src[3], opa)) << 16) |
+           lv_color_8_16_mix_1_internal(src[0], dst[0], LV_OPA_MIX2(src[1], opa));
+}
+
+static inline uint32_t lv_color_8_16_mix_2_with_mask(const uint8_t * src, const uint16_t * dst, const uint8_t * mask)
+{
+
+    return ((uint32_t)lv_color_8_16_mix_1_internal(src[2], dst[1], LV_OPA_MIX2(src[3], mask[1])) << 16) |
+           lv_color_8_16_mix_1_internal(src[0], dst[0], LV_OPA_MIX2(src[3], mask[0]));
+}
+static inline uint32_t lv_color_8_16_mix_2_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
+                                                         const uint8_t * mask)
+{
+
+    return ((uint32_t)lv_color_8_16_mix_1_internal(src[2], dst[1], LV_OPA_MIX3(src[3], mask[1], opa)) << 16) |
+           lv_color_8_16_mix_1_internal(src[0], dst[0], LV_OPA_MIX3(src[3], mask[0], opa));
+}
+
+static inline uint16_t lv_color_8_16_mix_1_internal(uint8_t src, uint16_t dst, uint8_t mix)
+{
+    const uint8_t c1  = src;
+    const uint16_t c2 = dst;
 
     if(mix == 0) {
         return c2;
