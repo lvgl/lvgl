@@ -172,6 +172,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
         if(!scope->view_def) {
             LV_LOG_WARN("Failed to extract view content");
             /* Clean up and return error */
+            lv_ll_remove(&component_scope_ll, scope);
             lv_free(scope);
             return LV_RESULT_INVALID;
         }
