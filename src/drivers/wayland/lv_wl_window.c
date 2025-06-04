@@ -122,6 +122,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     }
 #endif
 
+    lv_wayland_xdg_shell_configure_surface(window);
+
     lv_display_set_user_data(window->lv_disp, window);
 
     lv_display_set_render_mode(window->lv_disp, LV_WAYLAND_RENDER_MODE);
@@ -287,7 +289,6 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
 lv_result_t lv_wayland_window_resize(struct window * window, int width, int height)
 {
 
-
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
         width -= (2 * BORDER_SIZE);
@@ -297,7 +298,7 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 
 #if LV_WAYLAND_USE_DMABUF
     {
-        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window);
+        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
