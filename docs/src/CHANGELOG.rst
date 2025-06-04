@@ -40,7 +40,7 @@ To support our partners, we've added numerous new drivers and documentation:
 
 And finally, some other important additions:
 - New color formats: ``RGB565_SWAPPED`` (commonly used with SPI-based display controllers) and ``ARGB8888_REMULTIPLED`` (required for `Wayland <https://docs.lvgl.io/master/details/integration/driver/wayland.html>`_ and `Lottie animations <https://docs.lvgl.io/master/details/widgets/lottie.html>`_)
-- `SVG support <https://docs.lvgl.io/master/details/libs/svg.htmll>`_
+- `SVG support <https://docs.lvgl.io/master/details/libs/svg.html>`_
 - `Double and triple click detection <https://github.com/lvgl/lvgl/blob/1f5bb602a6774a29e85063c0c7fec6196da35c0d/src/misc/lv_event.h#L43-L44>`_
 - Tiled rendering to better utilize multiple CPU cores
 - `Multi-touch gestures <https://docs.lvgl.io/master/details/main-modules/indev.html#multi-touch-gestures>`_ (swipe, pinch, rotate)
