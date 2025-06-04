@@ -67,7 +67,7 @@ New Features
 - **feat(test): add Dockerfile support with CI env** `8209 <https://github.com/kisvegabor/lvgl_upstream/pull/8209>`__
 - **feat(image): support symbol images with inner alignment** `8182 <https://github.com/kisvegabor/lvgl_upstream/pull/8182>`__
 - **feat(disp): allow rotation with `FULL` render mode** `8107 <https://github.com/kisvegabor/lvgl_upstream/pull/8107>`__
-- **feat(display): add triple buffer support ** `8158 <https://github.com/kisvegabor/lvgl_upstream/pull/8158>`__
+- **feat(display): add triple buffer support** `8158 <https://github.com/kisvegabor/lvgl_upstream/pull/8158>`__
 - **feat(svg): add API for getting original width and height** `8180 <https://github.com/kisvegabor/lvgl_upstream/pull/8180>`__
 - **feat(cache): add new `lv_cache_lru_ll` module** `8155 <https://github.com/kisvegabor/lvgl_upstream/pull/8155>`__
 - **feat(cmake): disable PCPP by default** `8126 <https://github.com/kisvegabor/lvgl_upstream/pull/8126>`__
@@ -94,7 +94,7 @@ New Features
 - **feat(chart): implement get_index_from_x() for LV_CHART_TYPE_SCATTER** `7824 <https://github.com/kisvegabor/lvgl_upstream/pull/7824>`__
 - **feat(demo): New smartwatch demo** `7883 <https://github.com/kisvegabor/lvgl_upstream/pull/7883>`__
 - **feat(indev): Add rotation and two fingers swipe gestures support** `7865 <https://github.com/kisvegabor/lvgl_upstream/pull/7865>`__
-- **feat(obj_tree): indent printed object data according to its depth ** `7852 <https://github.com/kisvegabor/lvgl_upstream/pull/7852>`__
+- **feat(obj_tree): indent printed object data according to its depth** `7852 <https://github.com/kisvegabor/lvgl_upstream/pull/7852>`__
 - **feat(draw_sw): have only one SW draw unit with multiple threads internally** `7899 <https://github.com/kisvegabor/lvgl_upstream/pull/7899>`__
 - **feat(dma2d): add support for DMA2D on STM32H7RS** `7850 <https://github.com/kisvegabor/lvgl_upstream/pull/7850>`__
 - **feat(benchmark): add on benchmark end callback** `7814 <https://github.com/kisvegabor/lvgl_upstream/pull/7814>`__
@@ -118,7 +118,7 @@ New Features
 - **feat(fs):  clarify rest of docs on driver-identifier letters.** `7710 <https://github.com/kisvegabor/lvgl_upstream/pull/7710>`__
 - **feat(vg_lite): enhanced the automatic diagnosis function of GPU errors** `7751 <https://github.com/kisvegabor/lvgl_upstream/pull/7751>`__
 - **feat(demos): add new card to high resolution demo** `7699 <https://github.com/kisvegabor/lvgl_upstream/pull/7699>`__
-- **feat(observer): add bind_XXX ge/gt/le/lt and notify only when value changes ** `7678 <https://github.com/kisvegabor/lvgl_upstream/pull/7678>`__
+- **feat(observer): add bind_XXX ge/gt/le/lt and notify only when value changes** `7678 <https://github.com/kisvegabor/lvgl_upstream/pull/7678>`__
 - **feat(drm): add support for GBM buffer object to increase performance** `7464 <https://github.com/kisvegabor/lvgl_upstream/pull/7464>`__
 - **feat(draw/sw): make I1 luminance threshold configurable** `7616 <https://github.com/kisvegabor/lvgl_upstream/pull/7616>`__
 - **feat(drivers): add evdev discovery** `7481 <https://github.com/kisvegabor/lvgl_upstream/pull/7481>`__
@@ -386,7 +386,7 @@ Fixes
 - **fix(makefile): Extend component.mk with missing elements** `8118 <https://github.com/kisvegabor/lvgl_upstream/pull/8118>`__
 - **fix(tabview):fix example lv_example_tabview_2** `8084 <https://github.com/kisvegabor/lvgl_upstream/pull/8084>`__
 - **fix(vg_lite): fix vector drawing not handling global matrix** `8115 <https://github.com/kisvegabor/lvgl_upstream/pull/8115>`__
-- **fix: var redeclaration ** `8109 <https://github.com/kisvegabor/lvgl_upstream/pull/8109>`__
+- **fix: var redeclaration** `8109 <https://github.com/kisvegabor/lvgl_upstream/pull/8109>`__
 - **fix(cmake): fix LV_CONF_PATH quoting consistency issue** `8079 <https://github.com/kisvegabor/lvgl_upstream/pull/8079>`__
 - **fix(sdl): fix access fb2 NULL pointer** `8096 <https://github.com/kisvegabor/lvgl_upstream/pull/8096>`__
 - **fix: table get cell area error** `8047 <https://github.com/kisvegabor/lvgl_upstream/pull/8047>`__
@@ -464,7 +464,7 @@ Fixes
 - **fix(profiler_builtin): fix uint32_t storage nanosecond time overflow** `7818 <https://github.com/kisvegabor/lvgl_upstream/pull/7818>`__
 - **fix(demos/smartwatch): fix image color format error** `7819 <https://github.com/kisvegabor/lvgl_upstream/pull/7819>`__
 - **fix(nema): Broken build after draw unit refactoring, draw_label changes** `7759 <https://github.com/kisvegabor/lvgl_upstream/pull/7759>`__
-- **fix(release_updater): minor fixes and addition of new boards ** `7726 <https://github.com/kisvegabor/lvgl_upstream/pull/7726>`__
+- **fix(release_updater): minor fixes and addition of new boards** `7726 <https://github.com/kisvegabor/lvgl_upstream/pull/7726>`__
 - **fix(examples): add casts** `7831 <https://github.com/kisvegabor/lvgl_upstream/pull/7831>`__
 - **fix(indev): fix scroll_obj not send LV_EVENT_INDEV_RESET** `7767 <https://github.com/kisvegabor/lvgl_upstream/pull/7767>`__
 - **fix(kconfig): add LIBUV dependency to prevent missing configurations** `7798 <https://github.com/kisvegabor/lvgl_upstream/pull/7798>`__
@@ -841,7 +841,7 @@ Docs
 - **docs: clarify what C functions are used in storage operations** `7627 <https://github.com/kisvegabor/lvgl_upstream/pull/7627>`__
 - **docs(timer): fix usage of timer user data** `7575 <https://github.com/kisvegabor/lvgl_upstream/pull/7575>`__
 - **docs(arduino): add Arduino Giga Display Shield reference** `7584 <https://github.com/kisvegabor/lvgl_upstream/pull/7584>`__
-- **docs(layer): fix layer rst function error ** `7541 <https://github.com/kisvegabor/lvgl_upstream/pull/7541>`__
+- **docs(layer): fix layer rst function error** `7541 <https://github.com/kisvegabor/lvgl_upstream/pull/7541>`__
 - **docs(label): add documentation and example for text recolor** `7460 <https://github.com/kisvegabor/lvgl_upstream/pull/7460>`__
 - **docs(intro): fix typos** `7485 <https://github.com/kisvegabor/lvgl_upstream/pull/7485>`__
 - **docs(details): fix typos** `7484 <https://github.com/kisvegabor/lvgl_upstream/pull/7484>`__
@@ -882,7 +882,7 @@ CI and tests
 ~~~~~~~~~~~~
 
 - **test(screenshot): use lodepng instead of libpng** `8275 <https://github.com/kisvegabor/lvgl_upstream/pull/8275>`__
-- **ci: build examples with c++ compiler ** `8261 <https://github.com/kisvegabor/lvgl_upstream/pull/8261>`__
+- **ci: build examples with c++ compiler** `8261 <https://github.com/kisvegabor/lvgl_upstream/pull/8261>`__
 - **ci: move docs build config to main repo** `8137 <https://github.com/kisvegabor/lvgl_upstream/pull/8137>`__
 - **ci(release_updater): Add bi-weekly schedule. Only update master branches on schedule** `8074 <https://github.com/kisvegabor/lvgl_upstream/pull/8074>`__
 - **ci(docs): remove concurrency clause** `8102 <https://github.com/kisvegabor/lvgl_upstream/pull/8102>`__
@@ -964,7 +964,7 @@ Others
 - **chore(deps): bump arduino/arduino-lint-action from 1 to 2** `7209 <https://github.com/kisvegabor/lvgl_upstream/pull/7209>`__
 - **chore(deps): bump actions/upload-artifact from 3 to 4** `7210 <https://github.com/kisvegabor/lvgl_upstream/pull/7210>`__
 - **chore(cmsis-pack): ensure the v9.2.2 cmsis-pack is visible on keil.arm.com** `7201 <https://github.com/kisvegabor/lvgl_upstream/pull/7201>`__
-- **chore(fs): treat '/' as valid driver letter ** `6986 <https://github.com/kisvegabor/lvgl_upstream/pull/6986>`__
+- **chore(fs): treat '/' as valid driver letter** `6986 <https://github.com/kisvegabor/lvgl_upstream/pull/6986>`__
 - **chore(obj_scroll): improve function documentation** `7150 <https://github.com/kisvegabor/lvgl_upstream/pull/7150>`__
 - **chore(svg): LV_USE_SVG: document and enforce dependency on LV_USE_VECTOR_GRAPHIC** `7120 <https://github.com/kisvegabor/lvgl_upstream/pull/7120>`__
 - **refactor(gdb): refactor gdb Debugger to be a gdb command** `7140 <https://github.com/kisvegabor/lvgl_upstream/pull/7140>`__
