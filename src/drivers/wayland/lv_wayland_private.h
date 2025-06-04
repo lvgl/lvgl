@@ -28,6 +28,11 @@ extern "C" {
 #define LV_WAYLAND_XDG_SHELL 0
 #endif
 
+#if LV_WAYLAND_USE_DMABUF
+#include <sys/mman.h>
+#include <string.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -76,6 +81,10 @@ enum object_type {
 #define FIRST_DECORATION (OBJECT_TITLEBAR)
 #define LAST_DECORATION (OBJECT_BORDER_RIGHT)
 #define NUM_DECORATIONS (LAST_DECORATION - FIRST_DECORATION + 1)
+
+#if LV_WAYLAND_USE_DMABUF
+#define MAX_BUFFER_PLANES 4
+#endif
 
 struct window;
 struct input {
@@ -222,7 +231,34 @@ struct window {
     bool maximized;
     bool fullscreen;
     uint32_t frame_counter;
+
+#if LV_WAYLAND_USE_DMABUF
+    /* XDG/DMABUF synchronization fields */
+    bool dmabuf_resize_pending;
+    bool surface_configured;
+    bool configure_acknowledged;
+    uint32_t configure_serial;
+#if LV_WAYLAND_WINDOW_DECORATIONS
+    struct buffer * decorators_buf[8];
+#endif
+#endif
 };
+
+#if LV_WAYLAND_USE_DMABUF
+struct buffer {
+    int busy;
+    struct window * window;
+    int plane_count;
+    int dmabuf_fds[MAX_BUFFER_PLANES];
+    uint32_t strides[MAX_BUFFER_PLANES];
+    uint32_t offsets[MAX_BUFFER_PLANES];
+    struct wl_buffer * buffer;
+    uint32_t width;
+    uint32_t height;
+    void * buf_base[MAX_BUFFER_PLANES];
+    lv_draw_buf_t * lv_draw_buf;
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -256,7 +292,7 @@ void lv_wayland_window_decoration_detach_all(struct window * window);
 bool lv_wayland_window_decoration_create(struct window * window, struct graphic_object * decoration, int window_width,
                                          int window_height);
 bool lv_wayland_window_decoration_attach(struct window * window, struct graphic_object * decoration,
-                                         smm_buffer_t * decoration_buffer, struct graphic_object * parent);
+                                         void * decoration_buffer, struct graphic_object * parent);
 void lv_wayland_window_decoration_detach(struct window * window, struct graphic_object * decoration);
 #endif
 
@@ -283,8 +319,12 @@ const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(vo
 lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maximized);
 lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window);
 lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen);
+#if LV_WAYLAND_USE_DMABUF
+void lv_wayland_xdg_shell_ack_configure(struct window * window, uint32_t serial);
+#endif
 lv_result_t lv_wayland_xdg_shell_create_window(struct lv_wayland_context * app, struct window * window,
                                                const char * title);
+void lv_wayland_xdg_shell_configure_surface(struct window * window);
 lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window);
 lv_result_t lv_wayland_xdg_shell_destroy_window_surface(struct window * window);
 void lv_wayland_xdg_shell_handle_pointer_event(struct lv_wayland_context * app, uint32_t serial, uint32_t button,
@@ -328,9 +368,10 @@ struct graphic_object * lv_wayland_dmabuf_on_graphical_object_creation(dmabuf_ct
 void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, struct graphic_object * obj);
 lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_display_t * display);
 lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct window * window);
-lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window);
+lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int width, int height);
 lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
-
+struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
+void destroy_decorators_buf(struct window * window, struct graphic_object * decoration);
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
