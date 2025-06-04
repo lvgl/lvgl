@@ -296,3 +296,34 @@ document.addEventListener("DOMContentLoaded", (event) => {
       console.error("Fetch error: " + error.message);
     });
 });
+
+/*---------------------------------------------------------------------
+ * This listener adds a click handler to all .toggle elements.
+ * When a .toggle is clicked, all children are hidden except .header.
+ * When .header is clicked, all children are toggled.
+ *---------------------------------------------------------------------*/
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".toggle").forEach(function (toggle) {
+    Array.from(toggle.children).forEach(function (child) {
+      if (!child.classList.contains("header")) {
+        child.style.display = "none";
+      }
+    });
+    var header = toggle.querySelector(".header");
+    if (header) {
+      header.addEventListener("click", function (e) {
+        const toggle = e.target.closest(".toggle");
+        Array.from(toggle.children).forEach(function (child) {
+          if (!child.classList.contains("header")) {
+            if (child.style.display === "none") {
+              child.style.display = "";
+            } else {
+              child.style.display = "none";
+            }
+          }
+        });
+        header.classList.toggle("open");
+      });
+    }
+  });
+});
