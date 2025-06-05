@@ -82,7 +82,7 @@ def main() -> bool:
 
     is_error = False
     for option_name in options:
-        if "generate" or "build" or "test" in args.actions:
+        if any(action in args.actions for action in ("generate", "build", "test")):
             if args.clean:
                 clean(option_name)
             generate_files(option_name, args.test_suite)
