@@ -1211,7 +1211,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
                                                          label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
                 a.x2 = a.x1 + pinfo->txt_w;
-                label_draw_dsc.text_length = next_ofs + 1;
+                label_draw_dsc.text_length = next_ofs;
 #if LV_USE_BIDI
                 if(base_dir == LV_BASE_DIR_RTL) {
                     if(txt_bytes > label_draw_dsc.text_length) {
