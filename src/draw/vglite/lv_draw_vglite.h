@@ -32,7 +32,13 @@ extern "C" {
 #include "../lv_draw_image.h"
 #include "../lv_draw_line.h"
 #include "../lv_draw_arc.h"
+
+#if LV_USE_VG_LITE_THORVG
+#include "../../others/vg_lite_tvg/vg_lite.h"
+#else
 #include "vg_lite.h"
+#include "vg_lite_options.h"
+#endif
 
 /*********************
  *      DEFINES
