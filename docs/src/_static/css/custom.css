@@ -999,5 +999,5 @@ div .lvgl-figure-caption p {
  *-------------------------------------------------------------------------*/
 /* Pygments .p = Punctuation */
 body[data-theme="dark"] .highlight .p {
-  color: #9f7ddf
+  color: #a883f3;
 }
