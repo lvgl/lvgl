@@ -284,10 +284,6 @@ void lv_init(void)
     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
-#if LV_USE_DRAW_VG_LITE
-    lv_draw_vg_lite_init();
-#endif
-
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
 
@@ -465,10 +461,6 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_G2D
     lv_draw_g2d_deinit();
-#endif
-
-#if LV_USE_DRAW_VG_LITE
-    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_DMA2D
