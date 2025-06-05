@@ -288,6 +288,7 @@
     /** VG-Lite stroke maximum cache number. */
     #define LV_VGLITE_STROKE_CACHE_CNT 32
 
+    #define LV_USE_VGLITE_CHECK_ERROR 0
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -494,26 +495,26 @@
 
 /* Use VG-Lite Simulator.
  * - Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-#define LV_USE_VGLITE_THORVG  0
+#define LV_USE_VG_LITE_THORVG  0
 
-#if LV_USE_VGLITE_THORVG
+#if LV_USE_VG_LITE_THORVG
     /** Enable LVGL's blend mode support */
-    #define LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT 0
+    #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
 
     /** Enable YUV color format support */
-    #define LV_VGLITE_THORVG_YUV_SUPPORT 0
+    #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
 
     /** Enable Linear gradient extension support */
-    #define LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+    #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
 
     /** Enable alignment on 16 pixels */
-    #define LV_VGLITE_THORVG_16PIXELS_ALIGN 1
+    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
 
     /** Buffer address alignment */
-    #define LV_VGLITE_THORVG_BUF_ADDR_ALIGN 64
+    #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
 
     /** Enable multi-thread render */
-    #define LV_VGLITE_THORVG_THREAD_RENDER 0
+    #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 #endif
 
 /* Enable the multi-touch gesture recognition feature */

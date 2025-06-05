@@ -20,7 +20,9 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
 
-#include "lvgl_support.h"
+#if !LV_USE_VG_LITE_THORVG
+    #include "lvgl_support.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -71,6 +73,8 @@ void lv_draw_buf_vglite_init_handlers(void)
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
+
+#if !LV_USE_VG_LITE_THORVG
     const lv_image_header_t * header = &draw_buf->header;
     uint32_t stride = header->stride;
     lv_color_format_t cf = header->cf;
@@ -116,6 +120,8 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 
         DEMO_CleanInvalidateCacheByAddr((void *)line_addr, line_size);
     }
+#endif
+
 }
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)

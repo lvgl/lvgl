@@ -1232,7 +1232,7 @@ typedef unsigned int        vg_lite_color_t;
     vg_lite_error_t vg_lite_set_scissor(vg_lite_int32_t x, vg_lite_int32_t y, vg_lite_int32_t right, vg_lite_int32_t bottom);
 
     /* Set scissor rectangles on mask layer. Scissor rects are enabled/disabled by following APIs. */
-    vg_lite_error_t vg_lite_scissor_rects(vg_lite_uint32_t nums, vg_lite_rectangle_t rect[]);
+    vg_lite_error_t vg_lite_scissor_rects(vg_lite_buffer_t *target, vg_lite_uint32_t nums, vg_lite_rectangle_t rect[]);
 
     /* Enable scissor rects defined on mask layer. */
     vg_lite_error_t vg_lite_enable_scissor(void);

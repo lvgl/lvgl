@@ -23,11 +23,12 @@ extern "C" {
 
 #if LV_USE_DRAW_VGLITE
 #include "../lv_draw.h"
-#include "vg_lite.h"
-#include "vg_lite_options.h"
 
 #if LV_USE_VG_LITE_THORVG
-#include "../others/vg_lite_tvg/vg_lite.h"
+#include "../../others/vg_lite_tvg/vg_lite.h"
+#else
+#include "vg_lite.h"
+#include "vg_lite_options.h"
 #endif
 
 /*********************
@@ -83,16 +84,15 @@ extern "C" {
 #define VGLITE_ASSERT_DEST_BUFFER(buffer) VGLITE_ASSERT(VGLITE_buffer_check(buffer, false))
 #define VGLITE_ASSERT_MATRIX(matrix) VGLITE_ASSERT(VGLITE_matrix_check(matrix))
 
-#define VGLITE_ALIGN(number, align_bytes) \
-    (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
-#define VGLITE_IS_ALIGNED(num, align) (((uintptr_t)(num) & ((align)-1)) == 0)
-
 #define VGLITE_IS_INDEX_FMT(fmt) \
     ((fmt) == VG_LITE_INDEX_1        \
      || (fmt) == VG_LITE_INDEX_2  \
      || (fmt) == VG_LITE_INDEX_4  \
      || (fmt) == VG_LITE_INDEX_8)
 
+#define VGLITE_ALIGN(number, align_bytes) \
+    (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
+#define VGLITE_IS_ALIGNED(num, align) (((uintptr_t)(num) & ((align)-1)) == 0)
 
 /**********************
  *      TYPEDEFS
