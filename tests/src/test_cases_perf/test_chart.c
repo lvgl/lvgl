@@ -17,7 +17,7 @@ void setUp(void)
 void test_chart(void)
 {
     lv_chart_add_series(chart, red_color,
-                                     LV_CHART_AXIS_SECONDARY_Y);
+                        LV_CHART_AXIS_SECONDARY_Y);
 
     TEST_ASSERT_MAX_TIME(lv_chart_add_series, 1, chart, red_color,
                          LV_CHART_AXIS_SECONDARY_Y);
