@@ -23,9 +23,12 @@ extern "C" {
 
 #if LV_USE_DRAW_VGLITE
 #include "../lv_draw.h"
-
 #include "vg_lite.h"
 #include "vg_lite_options.h"
+
+#if LV_USE_VG_LITE_THORVG
+#include "../others/vg_lite_tvg/vg_lite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -33,6 +36,18 @@ extern "C" {
 
 #define ENUM_TO_STRING(e) \
     case (e):             \
+    return #e
+
+#define VGLITE_ENUM_TO_STRING(e) \
+    case (VG_LITE_##e):           \
+    return #e
+
+#define VLC_OP_ENUM_TO_STRING(e) \
+    case (VLC_OP_##e):           \
+    return #e
+
+#define FEATURE_ENUM_TO_STRING(e) \
+    case (gcFEATURE_BIT_VG_##e):  \
     return #e
 
 #if LV_USE_VGLITE_ASSERT
@@ -62,6 +77,22 @@ extern "C" {
 #else
 #define VGLITE_CHECK_ERROR(function) function
 #endif
+
+#define VGLITE_ASSERT_PATH(path) VGLITE_ASSERT(VGLITE_path_check(path))
+#define VGLITE_ASSERT_SRC_BUFFER(buffer) VGLITE_ASSERT(VGLITE_buffer_check(buffer, true))
+#define VGLITE_ASSERT_DEST_BUFFER(buffer) VGLITE_ASSERT(VGLITE_buffer_check(buffer, false))
+#define VGLITE_ASSERT_MATRIX(matrix) VGLITE_ASSERT(VGLITE_matrix_check(matrix))
+
+#define VGLITE_ALIGN(number, align_bytes) \
+    (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
+#define VGLITE_IS_ALIGNED(num, align) (((uintptr_t)(num) & ((align)-1)) == 0)
+
+#define VGLITE_IS_INDEX_FMT(fmt) \
+    ((fmt) == VG_LITE_INDEX_1        \
+     || (fmt) == VG_LITE_INDEX_2  \
+     || (fmt) == VG_LITE_INDEX_4  \
+     || (fmt) == VG_LITE_INDEX_8)
+
 
 /**********************
  *      TYPEDEFS
@@ -161,6 +192,17 @@ uint8_t vglite_get_stride_alignment(lv_color_format_t cf);
  */
 bool vglite_src_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf);
 
+
+/** Error and parameter dump functions */
+void vglite_dump_info(void);
+const char * vglite_error_string(vg_lite_error_t error);
+const char * vglite_feature_string(vg_lite_feature_t feature);
+const char * vglite_vlc_op_string(uint8_t vlc_op);
+void vglite_path_dump_info(const vg_lite_path_t * path);
+void vglite_stroke_dump_info(const vg_lite_stroke_t * stroke);
+void vglite_buffer_dump_info(const vg_lite_buffer_t * buffer);
+void vglite_matrix_dump_info(const vg_lite_matrix_t * matrix);
+
 /**********************
  *      MACROS
  **********************/
@@ -173,6 +215,19 @@ static inline void vglite_set_scissor(const lv_area_t * clip_area)
 {
     vg_lite_set_scissor(clip_area->x1, clip_area->y1, clip_area->x2 + 1, clip_area->y2 + 1);
 }
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+struct lv_draw_vg_lite_unit_t;
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+
+
 
 #endif /*LV_USE_DRAW_VGLITE*/
 
