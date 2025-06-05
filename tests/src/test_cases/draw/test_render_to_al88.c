@@ -18,7 +18,7 @@ void tearDown(void)
 
 void test_render_to_al88(void)
 {
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VGLITE
     TEST_PASS();
 #else
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_AL88);

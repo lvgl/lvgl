@@ -24,7 +24,7 @@ static void draw_event_cb(lv_event_t * e)
 
 static void canvas_draw_buf_reshape(lv_draw_buf_t * draw_buf)
 {
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VGLITE
     /* VG-Lite requires automatic stride calculation */
     lv_draw_buf_t * buf = lv_draw_buf_reshape(draw_buf,
                                               draw_buf->header.cf,
