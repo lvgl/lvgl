@@ -122,6 +122,8 @@ extern "C" {
 #define lv_calendar_header_arrow_create     lv_calendar_add_header_arrow
 #define lv_calendar_header_dropdown_create  lv_calendar_add_header_dropdown
 
+#define lv_ft81x_spi_operation lv_ft81x_spi_operation_t
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
