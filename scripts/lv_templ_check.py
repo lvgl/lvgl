@@ -5,6 +5,7 @@ import traceback
 
 ignored_file_prefixes = {
     "lv_conf_template.h",
+    "lv_conf_cmsis.h",
     "lv_font_"
 }
 
@@ -18,7 +19,7 @@ h_pattern = re.compile(
     r"\s*/\*\*.+?"
     r"@file +(\S*).+?"
     r"\*/\s+?#ifndef +(\w+_H)\s+#define +(\w+_H).+"
-    r"#endif */\* *([^* ]+) *\*/\s*",
+    r"#endif */\* *([^*]+?) *\*/\s*",
     flags=re.DOTALL
 )
 
