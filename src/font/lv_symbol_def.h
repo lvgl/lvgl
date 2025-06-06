@@ -348,7 +348,7 @@ typedef enum {
     LV_STR_SYMBOL_SD_CARD,
     LV_STR_SYMBOL_NEW_LINE,
     LV_STR_SYMBOL_DUMMY,
-} _lv_str_symbol_id_t;
+} lv_str_symbol_id_t;
 
 #ifdef __cplusplus
 } /*extern "C"*/

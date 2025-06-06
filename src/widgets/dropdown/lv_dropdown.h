@@ -44,7 +44,7 @@ typedef enum {
     LV_PROPERTY_ID(DROPDOWN, LIST,                LV_PROPERTY_TYPE_OBJ,   8),
     LV_PROPERTY_ID(DROPDOWN, IS_OPEN,             LV_PROPERTY_TYPE_BOOL,  9),
     LV_PROPERTY_DROPDOWN_END,
-} _lv_property_dropdown_id_t;
+} lv_property_dropdown_id_t;
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdown_class;
