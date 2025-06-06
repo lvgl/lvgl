@@ -42,7 +42,7 @@ typedef enum {
     LV_PROPERTY_ID(ANIMIMAGE, REPEAT_COUNT, LV_PROPERTY_TYPE_INT,   2),
     LV_PROPERTY_ID(ANIMIMAGE, SRC_COUNT,    LV_PROPERTY_TYPE_INT,   3),
     LV_PROPERTY_ANIMIMAGE_END,
-} _lv_property_animimage_id_t;
+} lv_property_animimage_id_t;
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
