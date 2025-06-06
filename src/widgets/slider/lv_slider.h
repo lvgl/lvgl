@@ -44,7 +44,7 @@ typedef enum {
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_slider_class;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+typedef enum {
     LV_PROPERTY_ID2(SLIDER, VALUE,          LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_BOOL,  0),
     LV_PROPERTY_ID2(SLIDER, LEFT_VALUE,     LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_BOOL,  1),
     LV_PROPERTY_ID2(SLIDER, RANGE,          LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_INT,   2),
@@ -54,7 +54,7 @@ enum {
     LV_PROPERTY_ID(SLIDER, IS_DRAGGED,      LV_PROPERTY_TYPE_BOOL,      7),
     LV_PROPERTY_ID(SLIDER, IS_SYMMETRICAL,  LV_PROPERTY_TYPE_BOOL,      8),
     LV_PROPERTY_SLIDER_END,
-};
+} _lv_property_slider_id_t;
 #endif
 /**********************
  * GLOBAL PROTOTYPES
