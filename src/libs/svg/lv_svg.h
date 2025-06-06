@@ -192,7 +192,7 @@ typedef enum {
 typedef enum {
     LV_SVG_ASPECT_RATIO_OPT_MEET = 0,
     LV_SVG_ASPECT_RATIO_OPT_SLICE,
-} _lv_svg_aspect_ratio_t;
+} _lv_svg_aspect_ratio_opt_t;
 typedef uint32_t lv_svg_aspect_ratio_t;
 
 typedef struct {
