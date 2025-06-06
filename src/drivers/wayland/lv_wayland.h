@@ -140,4 +140,4 @@ bool lv_wayland_timer_handler(void);
 #endif
 
 #endif /* _WIN32 */
-#endif /* WAYLAND_H */
+#endif /* LV_WAYLAND_H */
