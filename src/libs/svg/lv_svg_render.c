@@ -918,6 +918,17 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
         mtx = &dsc->stroke_dsc.matrix;
     }
 
+    if(grad->units == LV_SVG_GRADIENT_UNITS_USER_SPACE) {
+        lv_svg_render_obj_t * list = obj->head;
+        while(list) {
+            if(list->tag == LV_SVG_TAG_SVG) {
+                target_obj = list; /* viewport */
+                break;
+            }
+            list = list->next;
+        }
+    }
+
     lv_memcpy(grad_dsc, &grad->dsc, sizeof(lv_vector_gradient_t));
 
     lv_area_t bounds = {0, 0, 0, 0};
@@ -926,19 +937,19 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
     int32_t w = bounds.x2 - bounds.x1;
     int32_t h = bounds.y2 - bounds.y1;
     if(grad->dsc.style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
+        grad_dsc->cx = PCT_TO_PX(grad_dsc->cx, w);
+        grad_dsc->cy = PCT_TO_PX(grad_dsc->cy, h);
+        grad_dsc->cr = PCT_TO_PX(grad_dsc->cr, MAX(w, h));
         if(grad->units == LV_SVG_GRADIENT_UNITS_OBJECT) {
-            grad_dsc->cx = PCT_TO_PX(grad_dsc->cx, w);
-            grad_dsc->cy = PCT_TO_PX(grad_dsc->cy, h);
-            grad_dsc->cr = PCT_TO_PX(grad_dsc->cr, MAX(w, h));
             lv_matrix_translate(mtx, bounds.x1, bounds.y1);
         }
     }
     else {   // LV_VECTOR_GRADIENT_STYLE_LINEAR
+        grad_dsc->x1 = PCT_TO_PX(grad_dsc->x1, w);
+        grad_dsc->y1 = PCT_TO_PX(grad_dsc->y1, h);
+        grad_dsc->x2 = PCT_TO_PX(grad_dsc->x2, w);
+        grad_dsc->y2 = PCT_TO_PX(grad_dsc->y2, h);
         if(grad->units == LV_SVG_GRADIENT_UNITS_OBJECT) {
-            grad_dsc->x1 = PCT_TO_PX(grad_dsc->x1, w);
-            grad_dsc->y1 = PCT_TO_PX(grad_dsc->y1, h);
-            grad_dsc->x2 = PCT_TO_PX(grad_dsc->x2, w);
-            grad_dsc->y2 = PCT_TO_PX(grad_dsc->y2, h);
             lv_matrix_translate(mtx, bounds.x1, bounds.y1);
         }
     }
@@ -1084,7 +1095,7 @@ static void _init_poly(lv_svg_render_obj_t * obj, const lv_svg_node_t * node)
     _init_obj(obj, node);
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
     poly->path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-    lv_area_set(&poly->bounds, 0, 0, 0, 0);
+    lv_area_set(&poly->bounds, INT_MAX, INT_MAX, INT_MIN, INT_MIN);
 }
 
 #if LV_USE_FREETYPE
@@ -1134,6 +1145,13 @@ static void _init_tspan(lv_svg_render_obj_t * obj, const lv_svg_node_t * node)
     _init_content(obj, content_node);
 }
 #endif
+
+static void _init_solid(lv_svg_render_obj_t * obj, const lv_svg_node_t * node)
+{
+    _init_obj(obj, node);
+    lv_svg_render_solid_t * solid = (lv_svg_render_solid_t *)obj;
+    solid->opacity = 1.0f;
+}
 
 static void _init_gradient(lv_svg_render_obj_t * obj, const lv_svg_node_t * node)
 {
@@ -1268,7 +1286,10 @@ static void _render_viewport(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * 
     lv_matrix_multiply(&dsc->current_dsc.matrix, &obj->matrix);
     if(view->viewport_fill) {
         lv_area_t rc = {0, 0, (int32_t)view->width, (int32_t)view->height};
-        lv_vector_clear_area(dsc, &rc);
+        lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+        lv_vector_path_append_rect(path, &rc, 0, 0);
+        lv_vector_dsc_add_path(dsc, path);
+        lv_vector_path_delete(path);
     }
 }
 
@@ -1528,6 +1549,7 @@ static void _render_use(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, 
                 if(list->clz->render) {
                     _prepare_render(list, dsc);
                     _special_render(obj, dsc);
+                    _copy_draw_dsc_from_ref(dsc, obj);
                     list->clz->render(list, dsc, &mtx);
                 }
                 break;
@@ -1540,6 +1562,11 @@ static void _render_use(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, 
 }
 
 #if LV_USE_FREETYPE
+static bool _is_control_character(uint32_t ch)
+{
+    return ch == '\n' || ch == '\t' || ch == '\r';
+}
+
 static void _render_text(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
     lv_svg_render_text_t * text = (lv_svg_render_text_t *)obj;
@@ -1567,23 +1594,32 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
         lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
     }
 
+    bool build_path = false;
     if(lv_array_size(&text->path->ops) == 0) { /* empty path */
-        lv_vector_path_t * glyph_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-        // draw text contents and spans
-        lv_matrix_t mtx;
-        lv_matrix_identity(&mtx);
-        lv_matrix_translate(&mtx, text->x, text->y);
-        for(uint32_t i = 0; i < lv_array_size(&text->contents); i++) {
-            lv_svg_render_obj_t * ptext = *((lv_svg_render_obj_t **)lv_array_at(&text->contents, i));
-            lv_svg_render_content_t * content = (lv_svg_render_content_t *)ptext;
+        build_path = true;
+    }
 
-            if(content->render_content) {
-                content->render_content(content, dsc, &mtx);
-            }
-            else {
+    // draw text contents and spans
+    lv_matrix_t mtx;
+    lv_matrix_identity(&mtx);
+    lv_matrix_translate(&mtx, text->x, text->y);
+    for(uint32_t i = 0; i < lv_array_size(&text->contents); i++) {
+        lv_svg_render_obj_t * ptext = *((lv_svg_render_obj_t **)lv_array_at(&text->contents, i));
+        lv_svg_render_content_t * content = (lv_svg_render_content_t *)ptext;
+
+        if(content->render_content) {
+            content->render_content(content, dsc, &mtx);
+        }
+        else {
+            if(build_path) {
+                lv_vector_path_t * glyph_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+
                 float scale = text->size / 128.0f;
                 for(uint32_t j = 0; j < content->count; j++) {
                     uint32_t letter = content->letters[j];
+                    if(_is_control_character(letter)) {
+                        continue;
+                    }
                     lv_font_glyph_dsc_t g;
                     lv_font_get_glyph_dsc(text->font, &g, letter, '\0');
                     lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
@@ -1600,10 +1636,11 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
                     text->font->release_glyph(text->font, &g);
                     lv_matrix_translate(&mtx, letter_w, 0);
                 }
+
+                lv_vector_path_delete(glyph_path);
+                lv_vector_path_get_bounding(text->path, &text->bounds);
             }
         }
-        lv_vector_path_delete(glyph_path);
-        lv_vector_path_get_bounding(text->path, &text->bounds);
     }
 
     _copy_draw_dsc_from_ref(dsc, obj);
@@ -1648,6 +1685,9 @@ static void _render_span(const lv_svg_render_content_t * content, lv_vector_dsc_
         float scale = span->size / 128.0f;
         for(uint32_t j = 0; j < content->count; j++) {
             uint32_t letter = content->letters[j];
+            if(_is_control_character(letter)) {
+                continue;
+            }
             lv_font_glyph_dsc_t g;
             lv_font_get_glyph_dsc(span->font, &g, letter, '\0');
             lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
@@ -1725,6 +1765,51 @@ static void _get_poly_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
     lv_area_copy(area, &poly->bounds);
+}
+
+static void _get_group_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
+{
+    lv_svg_render_group_t * group = (lv_svg_render_group_t *)obj;
+
+    float x1 = 0;
+    float y1 = 0;
+    float x2 = 0;
+    float y2 = 0;
+
+    for(uint32_t i = 0; i < group->items.size; i++) {
+        lv_svg_render_obj_t * list = *((lv_svg_render_obj_t **)lv_array_at(&group->items, i));
+
+        lv_area_t tc = {0};
+        if(list->clz->get_bounds) {
+            list->clz->get_bounds(list, &tc);
+
+            x1 = MIN(tc.x1, x1);
+            y1 = MIN(tc.y1, y1);
+            x2 = MAX(tc.x2, x2);
+            y2 = MAX(tc.y2, y2);
+        }
+    }
+
+    area->x1 = x1;
+    area->y1 = y1;
+    area->x2 = x2;
+    area->y2 = y2;
+}
+
+static void _get_use_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
+{
+    lv_svg_render_use_t * use = (lv_svg_render_use_t *)obj;
+
+    lv_svg_render_obj_t * list = obj->head;
+    while(list) {
+        if(list->id && strcmp(use->xlink, list->id) == 0) {
+            if(list->clz->get_bounds) {
+                list->clz->get_bounds(list, area);
+            }
+            break;
+        }
+        list = list->next;
+    }
 }
 
 #if LV_USE_FREETYPE
@@ -2055,11 +2140,12 @@ static lv_svg_render_class svg_use_class = {
     .set_attr = _set_use_attr,
     .render = _render_use,
     .destroy = _destroy_use,
+    .get_bounds = _get_use_bounds,
     .get_size = _get_use_size,
 };
 
 static lv_svg_render_class svg_solid_class = {
-    .init = _init_obj,
+    .init = _init_solid,
     .set_attr = _set_solid_attr,
     .set_paint_ref = _set_solid_ref,
     .get_size = _get_solid_size,
@@ -2077,6 +2163,7 @@ static lv_svg_render_class svg_group_class = {
     .set_attr = _set_attr,
     .render = _render_group,
     .destroy = _destroy_group,
+    .get_bounds = _get_group_bounds,
     .get_size = _get_group_size,
 };
 
