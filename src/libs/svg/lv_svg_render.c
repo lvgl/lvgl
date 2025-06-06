@@ -1771,10 +1771,10 @@ static void _get_group_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_group_t * group = (lv_svg_render_group_t *)obj;
 
-    float x1 = 0;
-    float y1 = 0;
-    float x2 = 0;
-    float y2 = 0;
+    int32_t x1 = 0;
+    int32_t y1 = 0;
+    int32_t x2 = 0;
+    int32_t y2 = 0;
 
     for(uint32_t i = 0; i < group->items.size; i++) {
         lv_svg_render_obj_t * list = *((lv_svg_render_obj_t **)lv_array_at(&group->items, i));
