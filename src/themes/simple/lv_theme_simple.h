@@ -32,7 +32,7 @@ extern "C" {
 
 /**
  * Initialize the theme
- * @param disp pointer to display to attach the theme
+ * @param disp pointer to display
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_simple_init(lv_display_t * disp);
