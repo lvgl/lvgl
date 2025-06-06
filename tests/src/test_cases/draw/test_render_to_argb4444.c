@@ -22,7 +22,7 @@ void test_render_to_argb4444(void)
      * The deviation will be amplified when using lower precision color formats.
      * Only 64-bit platforms are tested here.
      */
-#if LV_USE_DRAW_VG_LITE && LV_USE_SNAPSHOT && !defined(NON_AMD64_BUILD)
+#if LV_USE_DRAW_VGLITE && LV_USE_SNAPSHOT && !defined(NON_AMD64_BUILD)
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
     uint32_t opa;

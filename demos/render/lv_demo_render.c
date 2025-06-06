@@ -793,7 +793,7 @@ static lv_obj_t * create_blend_mode_obj(lv_obj_t * parent, int32_t col, int32_t 
 
 static void canvas_draw_buf_reshape(lv_draw_buf_t * draw_buf)
 {
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VGLITE
     /* VG-Lite requires automatic stride calculation */
     lv_draw_buf_t * buf = lv_draw_buf_reshape(draw_buf,
                                               draw_buf->header.cf,
