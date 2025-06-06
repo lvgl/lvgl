@@ -247,6 +247,7 @@ lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * 
     }
 
     f = lv_ll_ins_head(&scope->font_ll);
+    lv_memzero(f, sizeof(*f));
     f->name = lv_strdup(name);
     f->font = font;
 
@@ -294,6 +295,7 @@ lv_result_t lv_xml_register_subject(lv_xml_component_scope_t * scope, const char
     }
 
     s = lv_ll_ins_head(&scope->subjects_ll);
+    lv_memzero(s, sizeof(*s));
     s->name = lv_strdup(name);
     s->subject = subject;
 
@@ -340,6 +342,7 @@ lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char *
     }
 
     cnst = lv_ll_ins_head(&scope->const_ll);
+    lv_memzero(cnst, sizeof(*cnst));
 
     cnst->name = lv_strdup(name);
     cnst->value = lv_strdup(value);
@@ -392,6 +395,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_scope_t * scope, const char *
     }
 
     img = lv_ll_ins_head(&scope->image_ll);
+    lv_memzero(img, sizeof(*img));
     img->name = lv_strdup(name);
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         img->src = lv_strdup(src);
@@ -446,6 +450,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const cha
     }
 
     e = lv_ll_ins_head(&scope->event_ll);
+    lv_memzero(e, sizeof(*e));
     e->name = lv_strdup(name);
     e->cb = cb;
 
