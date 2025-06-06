@@ -80,7 +80,7 @@ typedef enum {
     LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
-} lv_obj_part_t;
+} lv_part_t;
 
 /**
  * On/Off features controlling the object's behavior.
