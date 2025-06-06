@@ -32,6 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
+static void flush_partial_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static lv_color_format_t lv_nxp_elcdif_to_lvgl_color_converter(elcdif_rgb_mode_config_t * config);
 
 /**********************
@@ -59,7 +60,6 @@ lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcd
     lv_color_format_t color_format = lv_nxp_elcdif_to_lvgl_color_converter((elcdif_rgb_mode_config_t *)config);
     lv_display_set_color_format(disp, color_format);
     lv_display_set_buffers(disp, frame_buffer1, frame_buffer2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-    lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_user_data(disp, base);
 
     ELCDIF_EnableInterrupts(base, kELCDIF_CurFrameDoneInterruptEnable);
@@ -80,6 +80,7 @@ lv_display_t * lv_nxp_display_elcdif_create_partial(LCDIF_Type * base, const elc
     ELCDIF_DisableInterrupts(base, kELCDIF_CurFrameDoneInterruptEnable);
     NVIC_DisableIRQ(eLCDIF_IRQn);
 
+    lv_display_set_flush_cb(disp, flush_partial_cb);
     lv_display_set_buffers(disp, frame_buffer1, frame_buffer2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     ELCDIF_EnableInterrupts(base, kELCDIF_CurFrameDoneInterruptEnable);
@@ -121,35 +122,34 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
     DCACHE_CleanInvalidateByRange((uint32_t)color_p, lv_display_get_draw_buf_size(disp));
 
-    if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
-        if(!lv_display_flush_is_last(disp)) {
-            lv_disp_flush_ready(disp);
-            return;
-        }
-        ELCDIF_SetNextBufferAddr(base, (uint32_t)color_p);
-
-    }
-    else if(disp->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        uint8_t * fb = (uint8_t *)ELCDIF_ADDR_IP_2_CPU(base->CUR_BUF);
-        int32_t w = lv_area_get_width(area);
-        int32_t h = lv_area_get_height(area);
-        int32_t disp_w = lv_display_get_horizontal_resolution(disp);
-        int32_t disp_h = lv_display_get_vertical_resolution(disp);
-        int32_t bytes_per_pixel = LV_COLOR_FORMAT_GET_SIZE(lv_display_get_color_format(disp));
-        int32_t i;
-
-        fb = fb + area->y1 * disp_h;
-        fb = fb + area->x1;
-
-        for(i = 0; i < h; i++) {
-            lv_memcpy(fb, color_p, w * bytes_per_pixel);
-            fb += disp_h;
-            color_p += w;
-        }
-    }
-    else {
-        LV_LOG_WARN("Display %p rendering mode not supported, ignoring", disp);
+    if(!lv_display_flush_is_last(disp)) {
         lv_disp_flush_ready(disp);
+        return;
+    }
+    ELCDIF_SetNextBufferAddr(base, (uint32_t)color_p);
+}
+
+static void flush_partial_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LCDIF_Type * base = (LCDIF_Type *)lv_display_get_user_data(disp);
+
+    DCACHE_CleanInvalidateByRange((uint32_t)color_p, lv_display_get_draw_buf_size(disp));
+
+    uint8_t * fb = (uint8_t *)ELCDIF_ADDR_IP_2_CPU(base->CUR_BUF);
+    int32_t w = lv_area_get_width(area);
+    int32_t h = lv_area_get_height(area);
+    int32_t disp_w = lv_display_get_horizontal_resolution(disp);
+    int32_t disp_h = lv_display_get_vertical_resolution(disp);
+    int32_t bytes_per_pixel = LV_COLOR_FORMAT_GET_SIZE(lv_display_get_color_format(disp));
+    int32_t i;
+
+    fb = fb + area->y1 * disp_h;
+    fb = fb + area->x1;
+
+    for(i = 0; i < h; i++) {
+        lv_memcpy(fb, color_p, w * bytes_per_pixel);
+        fb += disp_h;
+        color_p += w;
     }
 }
 
