@@ -1,5 +1,5 @@
 /**
- * @file lv_vg_lite_draw.c
+ * @file lv_draw_vg_lite.c
  *
  */
 

@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sw_blend_al88.c
+ * @file lv_draw_sw_blend_to_al88.c
  *
  */
 

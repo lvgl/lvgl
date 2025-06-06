@@ -94,4 +94,4 @@ struct lv_indev_gesture_configuration {
 } /*extern "C"*/
 #endif
 
-#endif /* END LV_INDEV_GESTURE_PRIVATE_H */
+#endif /* LV_INDEV_GESTURE_PRIVATE_H */

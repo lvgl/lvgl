@@ -34,4 +34,4 @@ void lv_example_fragment_2(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_fragment_H*/
+#endif /*LV_EXAMPLE_FRAGMENT_H*/
