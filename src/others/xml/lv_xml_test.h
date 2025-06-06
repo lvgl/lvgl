@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_LABEL_XML_TEST_H
-#define LV_LABEL_XML_TEST_H
+#ifndef LV_XML_TEST_H
+#define LV_XML_TEST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,10 +26,8 @@ typedef enum {
     LV_XML_TEST_STEP_TYPE_WAIT,
     LV_XML_TEST_STEP_TYPE_FREEZE,
     LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE,
-    LV_XML_TEST_STEP_TYPE_SUBJECT_SET_INT,
-    LV_XML_TEST_STEP_TYPE_SUBJECT_SET_STRING,
-    LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_INT,
-    LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE_STRING,
+    LV_XML_TEST_STEP_TYPE_SUBJECT_SET,
+    LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE,
 } lv_xml_test_step_type_t;
 
 /**********************
@@ -38,7 +36,6 @@ typedef enum {
 
 /**
  * Load the styles, constants, another data of the test. It needs to be called only once for each test.
- * @param name                      the name as the test will be referenced later in other tests
  * @param xml_def                   the XML definition of the test as a NULL terminated string
  * @param ref_image_path_prefix     prefix for the path of reference images
  * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
