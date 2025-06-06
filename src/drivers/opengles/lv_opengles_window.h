@@ -48,6 +48,10 @@ void lv_opengles_window_delete(lv_opengles_window_t * window);
 lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id,
                                                               int32_t w, int32_t h);
 
+lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, int32_t w, int32_t h);
+
+lv_opengles_window_texture_t * lv_opengles_window_display_get_window_texture(lv_display_t * window_display);
+
 /**
  * Remove a texture from its OpenGL window and delete it
  * @param texture    handle of an OpenGL window texture

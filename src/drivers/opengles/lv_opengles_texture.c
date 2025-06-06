@@ -61,14 +61,22 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
         lv_display_delete(disp);
         return NULL;
     }
+
+#if LV_USE_DRAW_OPENGLES
+    static uint8_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    lv_display_set_buffers(disp, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+#else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
     uint32_t buf_size = stride * h;
     dsc->fb1 = malloc(buf_size);
+    LV_ASSERT_MALLOC(dsc->fb1);
     if(dsc->fb1 == NULL) {
         lv_free(dsc);
         lv_display_delete(disp);
         return NULL;
     }
+    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+#endif
 
     GL_CALL(glGenTextures(1, &dsc->texture_id));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
@@ -98,7 +106,6 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
-    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_driver_data(disp, dsc);
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
