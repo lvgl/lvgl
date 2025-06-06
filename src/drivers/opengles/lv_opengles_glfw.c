@@ -508,7 +508,14 @@ static void window_update_handler(lv_timer_t * t)
             else {
                 /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
                 if(texture->disp != NULL) {
+#if LV_USE_DRAW_OPENGLES
+                    lv_display_t * default_save = lv_display_get_default();
+                    lv_display_set_default(texture->disp);
+                    lv_display_refr_timer(NULL);
+                    lv_display_set_default(default_save);
+#else
                     lv_refr_now(texture->disp);
+#endif
                 }
 
 #if LV_USE_DRAW_OPENGLES

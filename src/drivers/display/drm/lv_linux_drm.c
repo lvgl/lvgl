@@ -268,15 +268,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
 #if LV_LINUX_DRM_USE_EGL
     lv_opengles_window_t * window = lv_opengles_egl_window_create(hor_res, ver_res, drm_dev->surface, gbm_device, NULL, NULL, drm_gbm_egl_post2);
-    
-    /* create a display that flushes to a texture */
-    lv_display_t * texture = lv_opengles_texture_create(hor_res, ver_res);
-    lv_display_set_default(texture);
-
-    /* add the texture to the window */
-    unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
-    lv_opengles_window_texture_t * window_texture = lv_opengles_window_add_texture(window, texture_id, hor_res, ver_res);
-
+    lv_opengles_window_display_create(window, hor_res, ver_res);
 #endif
 
 #if !LV_LINUX_DRM_USE_EGL
