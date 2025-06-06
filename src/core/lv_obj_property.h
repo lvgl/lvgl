@@ -38,7 +38,19 @@ extern "C" {
 
 #define LV_PROPERTY_TYPE_SHIFT          28
 #define LV_PROPERTY_TYPE2_SHIFT         24
+
+/* Example:
+ * LV_PROPERTY_ID(OBJ, FLAG_CLICKABLE, LV_PROPERTY_TYPE_INT, 1),
+ * produces
+ * LV_PROPERTY_OBJ_FLAG_CLICKABLE = (LV_PROPERTY_OBJ_START + (1)) | ((LV_PROPERTY_TYPE_INT) << LV_PROPERTY_TYPE_SHIFT)
+ */
 #define LV_PROPERTY_ID(clz, name, type, index)          LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
+
+/* Example:
+ * LV_PROPERTY_ID2(SLIDER, VALUE, LV_PROPERTY_TYPE_INT, LV_PROPERTY_TYPE_BOOL, 0)
+ * produces
+ * LV_PROPERTY_SLIDER_VALUE = (LV_PROPERTY_SLIDER_START + (0)) | ((LV_PROPERTY_TYPE_INT) << LV_PROPERTY_TYPE_SHIFT) | ((LV_PROPERTY_TYPE_BOOL) << LV_PROPERTY_TYPE2_SHIFT)
+ */
 #define LV_PROPERTY_ID2(clz, name, type, type2, index)  LV_PROPERTY_ID(clz, name, type, index) | ((type2) << LV_PROPERTY_TYPE2_SHIFT)
 
 #define LV_PROPERTY_ID_TYPE(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
@@ -56,7 +68,7 @@ extern "C" {
 /**
  * Group of predefined widget ID start value.
  */
-enum {
+typedef enum {
     LV_PROPERTY_ID_INVALID      = 0,
 
     /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
@@ -78,7 +90,7 @@ enum {
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
 
     LV_PROPERTY_ID_ANY          = 0x7ffffffe, /*Special ID used by lvgl to intercept all setter/getter call.*/
-};
+} lv_prop_id_range_boundary_t;
 
 struct _lv_property_name_t {
     const char * name;
