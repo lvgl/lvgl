@@ -41,7 +41,7 @@
  *      DEFINES
  *********************/
 #if LV_COLOR_DEPTH == 32
-    #define DRM_FOURCC DRM_FORMAT_XRGB8888
+    #define DRM_FOURCC DRM_FORMAT_ARGB8888
 #elif LV_COLOR_DEPTH == 16
     #define DRM_FOURCC DRM_FORMAT_RGB565
 #else
@@ -929,7 +929,7 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
 
     /* Add support to create a surface with modifiers */
     drm_dev->surface = gbm_surface_create(gbm_device,
-                                drm_dev->width, drm_dev->height, GBM_BO_FORMAT_XRGB8888,
+                                drm_dev->width, drm_dev->height, GBM_BO_FORMAT_ARGB8888,
                                 GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
     if (!drm_dev->surface) {
         LV_LOG_ERROR("failed to create gbm surface");
@@ -1024,7 +1024,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 #if !LV_LINUX_DRM_USE_EGL
 
     if(!(buf->gbm_bo = gbm_bo_create(gbm_device,
-                                drm_dev->width, drm_dev->height, GBM_BO_FORMAT_XRGB8888,
+                                drm_dev->width, drm_dev->height, GBM_BO_FORMAT_ARGB8888,
                                 GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR)))     
 #endif        
     {      

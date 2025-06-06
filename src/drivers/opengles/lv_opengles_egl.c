@@ -72,9 +72,10 @@ static EGLContext egl_context;
 static void * backend_device;
 
 static EGLint const attribute_list[] = {
-    EGL_RED_SIZE, 1,
-    EGL_GREEN_SIZE, 1,
-    EGL_BLUE_SIZE, 1,
+    EGL_RED_SIZE, 8,
+    EGL_GREEN_SIZE, 8,
+    EGL_BLUE_SIZE, 8,
+    EGL_ALPHA_SIZE, 8,        // ← important!
     EGL_NONE
 };
 

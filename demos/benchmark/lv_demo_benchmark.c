@@ -511,11 +511,11 @@ void lv_demo_benchmark(void)
     lv_obj_set_style_pad_top(lv_screen_active(), HEADER_HEIGHT, 0);
     lv_obj_set_style_pad_gap(lv_screen_active(), 8, 0);
 
-    lv_obj_t * title = lv_label_create(lv_layer_top());
-    lv_obj_set_style_bg_opa(title, LV_OPA_COVER, 0);
-    lv_obj_set_style_bg_color(title, lv_color_white(), 0);
-    lv_obj_set_style_text_color(title, lv_color_black(), 0);
-    lv_obj_set_width(title, lv_pct(100));
+    // lv_obj_t * title = lv_label_create(lv_layer_top());
+    // lv_obj_set_style_bg_opa(title, LV_OPA_COVER, 0);
+    // lv_obj_set_style_bg_color(title, lv_color_white(), 0);
+    // lv_obj_set_style_text_color(title, lv_color_black(), 0);
+    // lv_obj_set_width(title, lv_pct(100));
 
     load_scene(scene_act);
 
@@ -523,7 +523,7 @@ void lv_demo_benchmark(void)
 
 #if LV_USE_PERF_MONITOR
     lv_display_t * disp = lv_display_get_default();
-    lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
+    lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, NULL, NULL);
 #if LV_USE_PERF_MONITOR_LOG_MODE
     lv_obj_add_flag(title, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -685,28 +685,28 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
-    char scene_name[64];
+//     char scene_name[64];
 
-    if(scenes[scene_act].name[0] != '\0') {
-        lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
-    }
-    else {
-        scene_name[0] = '\0';
-    }
+//     if(scenes[scene_act].name[0] != '\0') {
+//         lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
+//     }
+//     else {
+//         scene_name[0] = '\0';
+//     }
 
-#if !LV_USE_PERF_MONITOR_LOG_MODE
-    lv_obj_t * label = lv_observer_get_target(observer);
-    lv_label_set_text_fmt(label,
-                          "%s"
-                          "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
-                          "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
-                          scene_name,
-                          info->calculated.fps, info->calculated.cpu,
-                          info->calculated.render_avg_time + info->calculated.flush_avg_time,
-                          info->calculated.render_avg_time, info->calculated.flush_avg_time);
-#else
-    LV_UNUSED(observer);
-#endif
+// #if !LV_USE_PERF_MONITOR_LOG_MODE
+//     lv_obj_t * label = lv_observer_get_target(observer);
+//     lv_label_set_text_fmt(label,
+//                           "%s"
+//                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
+//                           "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
+//                           scene_name,
+//                           info->calculated.fps, info->calculated.cpu,
+//                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
+//                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
+// #else
+//     LV_UNUSED(observer);
+// #endif
 
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {
