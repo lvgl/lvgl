@@ -126,11 +126,18 @@ lv_layout_t lv_xml_layout_to_enum(const char * txt);
 lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt);
 
 /**
- * Convert a an event trigger string to enum
+ * Convert an event trigger string to enum
  * @param txt       e.g. "clicked"
  * @return          the related enum, e.g. `LV_EVENT_CLICKED`
  */
 lv_event_code_t lv_xml_trigger_text_to_enum_value(const char * txt);
+
+/**
+ * Convert a screen animation type string to enum
+ * @param txt       e.g. "over_right"
+ * @return          the related enum, e.g. `LV_SCREEN_LOAD_ANIM_OVER_RIGHT`
+ */
+lv_screen_load_anim_t lv_xml_screen_load_anim_text_to_enum_value(const char * txt);
 
 /**********************
  *      MACROS

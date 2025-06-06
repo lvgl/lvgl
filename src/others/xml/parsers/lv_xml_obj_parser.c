@@ -20,12 +20,25 @@
  *      TYPEDEFS
  **********************/
 
+/*Duplication from lv_obj.c as lv_obj_add_screen_create_event needs to be
+ * reimplemented here slightly differently */
+typedef struct {
+    lv_screen_load_anim_t anim_type;
+    uint32_t duration;
+    uint32_t delay;
+    const char * screen_name;
+} screen_load_anim_dsc_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
 static void free_user_data_event_cb(lv_event_t * e);
+static void screen_create_on_trigger_event_cb(lv_event_t * e);
+static void screen_load_on_trigger_event_cb(lv_event_t * e);
+static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
+static void free_screen_create_user_data_on_delete_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -435,6 +448,103 @@ void lv_obj_xml_bind_state_apply(lv_xml_parser_state_t * state, const char ** at
     }
 }
 
+void * lv_obj_xml_screen_load_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_screen_load_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * screen_str = lv_xml_get_value_of(attrs, "screen");
+    const char * duration_str = lv_xml_get_value_of(attrs, "duration");
+    const char * delay_str = lv_xml_get_value_of(attrs, "delay");
+    const char * anim_type_str = lv_xml_get_value_of(attrs, "anim_type");
+    const char * trigger_str = lv_xml_get_value_of(attrs, "trigger");
+
+    if(screen_str == NULL) {
+        LV_LOG_WARN("`screen` is missing in <lv_obj-screen_load_event>");
+        return;
+    }
+
+    if(duration_str == NULL) duration_str = "0";
+    if(delay_str == NULL) delay_str = "0";
+    if(anim_type_str == NULL) anim_type_str = "none";
+    if(trigger_str == NULL) trigger_str = "clicked";
+
+    lv_event_code_t trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
+    if(trigger == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't apply <screen_load_event> because `%s` trigger is invalid.", trigger_str);
+        return;
+    }
+
+    int32_t duration = lv_xml_atoi(duration_str);
+    int32_t delay = lv_xml_atoi(delay_str);
+    lv_screen_load_anim_t anim_type = lv_xml_screen_load_anim_text_to_enum_value(anim_type_str);
+
+    void * item = lv_xml_state_get_item(state);
+
+    screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(screen_load_anim_dsc_t));
+    dsc->anim_type = anim_type;
+    dsc->duration = duration;
+    dsc->delay = delay;
+    dsc->screen_name = lv_strdup(screen_str);
+
+    lv_obj_add_event_cb(item, screen_load_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(item, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
+
+
+void * lv_obj_xml_screen_create_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * screen_str = lv_xml_get_value_of(attrs, "screen");
+    const char * duration_str = lv_xml_get_value_of(attrs, "duration");
+    const char * delay_str = lv_xml_get_value_of(attrs, "delay");
+    const char * anim_type_str = lv_xml_get_value_of(attrs, "anim_type");
+    const char * trigger_str = lv_xml_get_value_of(attrs, "trigger");
+
+    if(screen_str == NULL) {
+        LV_LOG_WARN("`screen` is missing in <lv_obj-screen_load_event>");
+        return;
+    }
+
+    if(duration_str == NULL) duration_str = "0";
+    if(delay_str == NULL) delay_str = "0";
+    if(anim_type_str == NULL) anim_type_str = "none";
+    if(trigger_str == NULL) trigger_str = "clicked";
+
+    lv_event_code_t trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
+    if(trigger == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't apply <screen_load_event> because `%s` trigger is invalid.", trigger_str);
+        return;
+    }
+
+    int32_t duration = lv_xml_atoi(duration_str);
+    int32_t delay = lv_xml_atoi(delay_str);
+    lv_screen_load_anim_t anim_type = lv_xml_screen_load_anim_text_to_enum_value(anim_type_str);
+
+    screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(screen_load_anim_dsc_t));
+    dsc->anim_type = anim_type;
+    dsc->duration = duration;
+    dsc->delay = delay;
+    dsc->screen_name = lv_strdup(screen_str);
+
+    void * item = lv_xml_state_get_item(state);
+    lv_obj_add_event_cb(item, screen_create_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(item, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -618,4 +728,46 @@ static void free_user_data_event_cb(lv_event_t * e)
 {
     lv_free(lv_event_get_user_data(e));
 }
+
+static void screen_create_on_trigger_event_cb(lv_event_t * e)
+{
+    screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+
+    lv_obj_t * screen = lv_xml_create(NULL, dsc->screen_name, NULL);
+    if(screen == NULL) {
+        LV_LOG_WARN("Couldn't create screen `%s`", dsc->screen_name);
+        return;
+    }
+    lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+    lv_obj_add_event_cb(screen, delete_on_screen_unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_obj_add_event_cb(screen, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+}
+
+static void screen_load_on_trigger_event_cb(lv_event_t * e)
+{
+    screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+
+    lv_obj_t * screen = lv_display_get_screen_by_name(NULL, dsc->screen_name);
+    if(screen == NULL) {
+        LV_LOG_WARN("No screen is found with `%s` name", dsc->screen_name);
+        return;
+    }
+
+    lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+}
+
+static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
+{
+    lv_obj_delete(lv_event_get_target_obj(e));
+}
+
+static void free_screen_create_user_data_on_delete_event_cb(lv_event_t * e)
+{
+    screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    lv_free((void *)dsc->screen_name);
+    lv_free(dsc);
+}
+
 #endif /* LV_USE_XML */

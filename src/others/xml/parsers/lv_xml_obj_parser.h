@@ -45,6 +45,12 @@ void lv_obj_xml_bind_flag_apply(lv_xml_parser_state_t * state, const char ** att
 void * lv_obj_xml_bind_state_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_bind_state_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
+void * lv_obj_xml_screen_load_event_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_screen_load_event_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
+void * lv_obj_xml_screen_create_event_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
 /**********************
  *      MACROS
  **********************/

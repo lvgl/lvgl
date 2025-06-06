@@ -347,11 +347,11 @@ allowing the caller to specify:
 :cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`.  The
 following transition types exist:
 
-- :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
-- :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction
-- :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_BOTTOM`: Move out the old screen over the current towards the given direction
-- :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_BOTTOM`: Move both the current and new screens towards the given direction
-- :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
+- :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
+- :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OVER_LEFT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OVER_RIGHT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OVER_TOP` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction
+- :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OUT_LEFT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OUT_RIGHT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OUT_TOP` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_OUT_BOTTOM`: Move out the old screen over the current towards the given direction
+- :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_LEFT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_RIGHT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_TOP` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM`: Move both the current and new screens towards the given direction
+- :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
 
 Setting ``auto_del`` to ``true`` will automatically delete the old
 screen when the animation (if any) is finished.

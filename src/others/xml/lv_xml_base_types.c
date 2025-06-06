@@ -291,6 +291,30 @@ lv_event_code_t lv_xml_trigger_text_to_enum_value(const char * txt)
     return LV_EVENT_LAST; /*Indicate error*/
 }
 
+
+lv_screen_load_anim_t lv_xml_screen_load_anim_text_to_enum_value(const char * txt)
+{
+    if(lv_streq("none", txt)) return LV_SCREEN_LOAD_ANIM_NONE;
+    if(lv_streq("over_left", txt)) return LV_SCREEN_LOAD_ANIM_OVER_LEFT;
+    if(lv_streq("over_right", txt)) return LV_SCREEN_LOAD_ANIM_OVER_RIGHT;
+    if(lv_streq("over_top", txt)) return LV_SCREEN_LOAD_ANIM_OVER_TOP;
+    if(lv_streq("over_bottom", txt)) return LV_SCREEN_LOAD_ANIM_OVER_BOTTOM;
+    if(lv_streq("move_left", txt)) return LV_SCREEN_LOAD_ANIM_MOVE_LEFT;
+    if(lv_streq("move_right", txt)) return LV_SCREEN_LOAD_ANIM_MOVE_RIGHT;
+    if(lv_streq("move_top", txt)) return LV_SCREEN_LOAD_ANIM_MOVE_TOP;
+    if(lv_streq("move_bottom", txt)) return LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM;
+    if(lv_streq("fade_in", txt)) return LV_SCREEN_LOAD_ANIM_FADE_IN;
+    if(lv_streq("fade_on", txt)) return LV_SCREEN_LOAD_ANIM_FADE_ON;
+    if(lv_streq("fade_out", txt)) return LV_SCREEN_LOAD_ANIM_FADE_OUT;
+    if(lv_streq("out_left", txt)) return LV_SCREEN_LOAD_ANIM_OUT_LEFT;
+    if(lv_streq("out_right", txt)) return LV_SCREEN_LOAD_ANIM_OUT_RIGHT;
+    if(lv_streq("out_top", txt)) return LV_SCREEN_LOAD_ANIM_OUT_TOP;
+    if(lv_streq("out_bottom", txt)) return LV_SCREEN_LOAD_ANIM_OUT_BOTTOM;
+
+    LV_LOG_WARN("%s is an unknown value for screen_load_anim", txt);
+    return LV_SCREEN_LOAD_ANIM_NONE;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
