@@ -1,5 +1,8 @@
-<component>
-    <styles>
-        <style name="ads" bg_opa="123" />
-    </styles>
-</component>
+<screen>
+    <view style_bg_color="0xff7788" name="main_screen">
+        <lv_button>
+            <lv_label text="Load"/>
+            <screen_create_event screen="my_button" anim_type="over_right" duration="500" delay="1000"/>
+        </lv_button>
+    </view>
+</screen>

@@ -15,8 +15,8 @@ void test_screen_load_no_crash(void)
     /*Consecutively loading multiple screens with transition animations should not crash*/
     lv_obj_t * screen_with_anim_1 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_2 = lv_obj_create(NULL);
-    lv_screen_load_anim(screen_with_anim_1, LV_SCR_LOAD_ANIM_OVER_LEFT, 2000, 0, false);
-    lv_screen_load_anim(screen_with_anim_2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 1000, 500, false);
+    lv_screen_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 2000, 0, false);
+    lv_screen_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 500, false);
 }
 
 void test_screen_load_with_delete_no_crash(void)
@@ -32,13 +32,13 @@ void test_screen_load_with_delete_no_crash(void)
     lv_obj_t * screen_with_anim_2 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
 
-    lv_scr_load_anim(screen_with_anim_1, LV_SCR_LOAD_ANIM_OVER_LEFT, 0, 0, false);
-    lv_scr_load_anim(screen_with_anim_2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
+    lv_scr_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
+    lv_scr_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
 
     /*Wait to trigger the animation start callbacks*/
     lv_test_wait(100);
 
-    lv_scr_load_anim(screen_with_anim_3, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0, true);
+    lv_scr_load_anim(screen_with_anim_3, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 200, 0, true);
 
     /*The active screen should be immediately replaced*/
     TEST_ASSERT_EQUAL(lv_screen_active(), screen_with_anim_2);
@@ -65,14 +65,14 @@ void test_screen_load_with_delete_no_crash2(void)
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_4 = lv_obj_create(NULL);
 
-    lv_scr_load_anim(screen_with_anim_1, LV_SCR_LOAD_ANIM_OVER_LEFT, 0, 0, false);
-    lv_scr_load_anim(screen_with_anim_2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
-    lv_scr_load_anim(screen_with_anim_3, LV_SCR_LOAD_ANIM_OVER_LEFT, 0, 0, true);
+    lv_scr_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
+    lv_scr_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
+    lv_scr_load_anim(screen_with_anim_3, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, true);
 
     /*Wait to trigger the animation start callbacks*/
     lv_test_wait(100);
 
-    lv_scr_load_anim(screen_with_anim_4, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0, true);
+    lv_scr_load_anim(screen_with_anim_4, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 200, 0, true);
 
     /*The active screen should be immediately replaced*/
     TEST_ASSERT_EQUAL(lv_screen_active(), screen_with_anim_3);
@@ -108,17 +108,17 @@ void test_screen_load_with_delete_event(void)
     lv_obj_t * screen_with_anim_3 = lv_obj_create(NULL);
     lv_obj_t * screen_with_anim_4 = lv_obj_create(NULL);
 
-    lv_scr_load_anim(screen_with_anim_1, LV_SCR_LOAD_ANIM_OVER_LEFT, 0, 0, false);
+    lv_scr_load_anim(screen_with_anim_1, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, false);
     lv_obj_add_event_cb(screen_with_anim_1, screen_with_anim_1_unloaded_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
-    lv_scr_load_anim(screen_with_anim_2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
-    lv_scr_load_anim(screen_with_anim_3, LV_SCR_LOAD_ANIM_OVER_LEFT, 0, 0, true);
+    lv_scr_load_anim(screen_with_anim_2, LV_SCREEN_LOAD_ANIM_OVER_RIGHT, 1000, 0, true);
+    lv_scr_load_anim(screen_with_anim_3, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 0, 0, true);
 
     /*Wait to trigger the animation start callbacks*/
     lv_test_wait(100);
 
     TEST_ASSERT_EQUAL(screen_1_unloaded_called, true);
 
-    lv_scr_load_anim(screen_with_anim_4, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 0, true);
+    lv_scr_load_anim(screen_with_anim_4, LV_SCREEN_LOAD_ANIM_OVER_LEFT, 200, 0, true);
 
     /*The active screen should be immediately replaced*/
     TEST_ASSERT_EQUAL(lv_screen_active(), screen_with_anim_3);

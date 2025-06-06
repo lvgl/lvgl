@@ -115,8 +115,10 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
     lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
                            lv_obj_xml_subject_increment_apply);
-    //    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
-    //                           lv_obj_xml_sscreen_load_event_apply);
+    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+                           lv_obj_xml_screen_load_event_apply);
+    lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
+                           lv_obj_xml_screen_create_event_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);

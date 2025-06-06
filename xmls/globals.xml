@@ -176,6 +176,7 @@
             <enum name="hor"    help=""/>
             <enum name="ver"    help=""/>
     </enumdef>
+
     <enumdef name="lv_border_side">
             <enum name="none"  		help=""/>
             <enum name="left"    	help=""/>
@@ -183,6 +184,25 @@
             <enum name="top"    	help=""/>
             <enum name="bottom"    	help=""/>
             <enum name="full"    	help=""/>
+    </enumdef>
+
+    <enumdef name="lv_screen_load_anim">
+        <enum name="none" help=""/>
+        <enum name="over_left" help=""/>
+        <enum name="over_right" help=""/>
+        <enum name="over_top" help=""/>
+        <enum name="over_bottom" help=""/>
+        <enum name="move_left" help=""/>
+        <enum name="move_right" help=""/>
+        <enum name="move_top" help=""/>
+        <enum name="move_bottom" help=""/>
+        <enum name="fade_in" help=""/>
+        <enum name="fade_on" help=""/>
+        <enum name="fade_out" help=""/>
+        <enum name="out_left" help=""/>
+        <enum name="out_right" help=""/>
+        <enum name="out_top" help=""/>
+        <enum name="out_bottom" help=""/>
     </enumdef>
 
    	<styledef>
