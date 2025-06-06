@@ -150,30 +150,30 @@ typedef uint8_t lv_svg_transform_type_t;
 typedef enum {
     LV_SVG_ANIM_REMOVE = 0,
     LV_SVG_ANIM_FREEZE,
-} _lv_svg_anim_action_t;
+} lv_svg_anim_action_t;
 
 typedef enum {
     LV_SVG_ANIM_RESTART_ALWAYS = 0,
     LV_SVG_ANIM_RESTART_WHEN_NOT_ACTIVE,
     LV_SVG_ANIM_RESTART_NEVER,
-} _lv_svg_restart_type_t;
+} lv_svg_restart_type_t;
 
 typedef enum {
     LV_SVG_ANIM_CALC_MODE_LINEAR = 0,
     LV_SVG_ANIM_CALC_MODE_PACED,
     LV_SVG_ANIM_CALC_MODE_SPLINE,
     LV_SVG_ANIM_CALC_MODE_DISCRETE,
-} _lv_svg_anim_calc_mode_t;
+} lv_svg_anim_calc_mode_t;
 
 typedef enum {
     LV_SVG_ANIM_ADDITIVE_REPLACE = 0,
     LV_SVG_ANIM_ADDITIVE_SUM,
-} _lv_svg_anim_additive_type_t;
+} lv_svg_anim_additive_type_t;
 
 typedef enum {
     LV_SVG_ANIM_ACCUMULATE_NONE = 0,
     LV_SVG_ANIM_ACCUMULATE_SUM,
-} _lv_svg_accumulate_type_t;
+} lv_svg_accumulate_type_t;
 #endif
 
 typedef enum {
@@ -188,12 +188,12 @@ typedef enum {
     LV_SVG_ASPECT_RATIO_XMID_YMAX = (8 << 1),
     LV_SVG_ASPECT_RATIO_XMAX_YMAX = (9 << 1),
 } _lv_svg_aspect_ratio_t;
+typedef uint32_t lv_svg_aspect_ratio_t;
 
 typedef enum {
     LV_SVG_ASPECT_RATIO_OPT_MEET = 0,
     LV_SVG_ASPECT_RATIO_OPT_SLICE,
-} _lv_svg_aspect_ratio_opt_t;
-typedef uint32_t lv_svg_aspect_ratio_t;
+} lv_svg_aspect_ratio_opt_t;
 
 typedef struct {
     float x;
@@ -256,7 +256,7 @@ typedef enum {
     LV_SVG_PATH_CMD_CURVE_TO = 67,
     LV_SVG_PATH_CMD_QUAD_TO = 81,
     LV_SVG_PATH_CMD_CLOSE = 90,
-} _lv_svg_path_cmd_t;
+} lv_svg_path_cmd_t;
 
 /*
  * to simplify list buffer management, allocate enough memory for all path data and cmd.

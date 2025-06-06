@@ -290,7 +290,7 @@ typedef enum {
 
     LV_STYLE_PROP_ANY                = 0xFF,
     LV_STYLE_PROP_CONST             = 0xFF /* magic value for const styles */
-} _lv_style_id_t;
+} lv_style_id_t;
 
 typedef enum {
     LV_STYLE_RES_NOT_FOUND,
