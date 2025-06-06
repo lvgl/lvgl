@@ -33,11 +33,19 @@ Overview of LVGL's Data Flow
 
     Overview of LVGL Data Flow
 
-You :ref:`add LVGL to your project <adding_lvgl_to_your_project>`, provide it with
-inputs and the method for pixels to flow to the display panel(s), connect the
-:ref:`tick_interface` so LVGL can tell what time is it, periodically call
-:ref:`timer_handler`, build one or more :ref:`Widget Trees <widget_overview>` for
-LVGL to render the interactive UI,  and let LVGL do the rest.
+Project Setup Overview
+----------------------
+
+To integrate LVLG into your project:
+
+- :ref:`add LVGL to your project <adding_lvgl_to_your_project>`,
+- provide it with :ref:`inputs <indev_interface>`,
+- provide it with the :ref:`method for pixels to flow <display_interface>` to the display panel(s),
+- connect the :ref:`tick_interface` so LVGL can tell what time is it,
+- periodically call :ref:`timer_handler`,
+- build one or more :ref:`Widget Trees <widget_overview>` for LVGL to render the
+  interactive UI, and
+- let LVGL do the rest.
 
 The :ref:`timer_handler` function drives LVGL's timers which, in turn, perform a
 number of periodic tasks:
@@ -140,6 +148,11 @@ Each child Widget becomes "part of" its parent Widget.  Because of this relation
 - when the parent Widget is deleted, its children are deleted with it;
 - a child Widget is only visible within its parent's boundaries; any part of a child
   outside its parent's boundaries is clipped (i.e. not rendered).
+
+You can control layout of a Widget's children manually via a variety of flexible
+methods including absolute coordinates, coordinates relative to a variety of anchors,
+or let a CSS-like Flex- or Grid-layout engine do the layout work for you, or mix and
+match these methods.  See :ref:`coord` for more details.
 
 Screens (and their child Widgets) can be created and deleted at any time *except*
 when the Screen is the :ref:`active_screen`.  If you want to delete the current Screen

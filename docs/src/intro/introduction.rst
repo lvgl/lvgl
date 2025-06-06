@@ -49,14 +49,16 @@ run LVGL.  The minimal requirements are:
 * > 16 MHz clock speed is recommended
 * Flash/ROM: > 64 kB for the very essential components (> 180 kB is recommended)
 * RAM:
+
     * Static RAM usage: ~2 kB depending on the used features and Widget types
     * stack: > 2kB (> 8 kB recommended)
     * Dynamic data (heap): > 2 KB (> 48 kB is recommended if using many GUI Widgets).
-        Set by :c:macro:`LV_MEM_SIZE` in ``lv_conf.h``.
+      Set by :c:macro:`LV_MEM_SIZE` in ``lv_conf.h``.
     * Display buffer:  > *"Horizontal resolution"* pixels (> 10 X *"Horizontal resolution"* is recommended)
     * One frame buffer in the MCU or in an external display controller
 * C99 or newer compiler
 * Basic C (or C++) knowledge:
+
     * `pointers <https://www.tutorialspoint.com/cprogramming/c_pointers.htm>`__.
     * `structs <https://www.tutorialspoint.com/cprogramming/c_structures.htm>`__.
     * `callbacks <https://www.geeksforgeeks.org/callbacks-in-c/>`__.
@@ -127,19 +129,20 @@ Some examples of the supported display types:
 * Small monochrome displays
 * Gray-scale displays
 * even LED matrices
-* or any other display where you can control the color/state of the pixels
+* or any other display where you can control the color/state of the pixels.
 
 See the :ref:`display` section to learn more.
 
 
-LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
--------------------------------------------------------------------------------------------------
+LVGL doesn't start, randomly crashes or nothing is drawn on the display. What might be the problem?
+---------------------------------------------------------------------------------------------------
 
 * Try increasing :c:macro:`LV_MEM_SIZE`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
 * Enable :ref:`logging`.
 * Enable assertions in ``lv_conf.h`` (``LV_USE_ASSERT_...``).
 * If you use an RTOS:
+
    * Increase the stack size of the task that calls :cpp:func:`lv_timer_handler`.
    * Be sure you are using one of the methods for thread management as described in :ref:`threading`.
 
@@ -158,7 +161,7 @@ Why is the display driver called only once? Only the upper part of the display i
 --------------------------------------------------------------------------------------------
 
 Be sure you are calling :cpp:expr:`lv_display_flush_ready(drv)` at the end of your
-"*display flush callback*" as per :ref:`flush_callback` section.
+"*display flush callback*" as per the :ref:`flush_callback` section.
 
 
 Why do I see only garbage on the screen?
@@ -207,6 +210,10 @@ How do I speed up my UI?
 - Increase the clock speed of the SPI or parallel port if you use them to drive the display.
 - If your display has an SPI port consider changing to a model with a parallel interface because it has much higher throughput.
 - Keep the display buffer in internal RAM (not in external SRAM) because LVGL uses it a lot and it should have fast access time.
+- Consider minimizing LVGL CPU overhead by updating Widgets:
+
+  - only when it will change what the end user sees, and
+  - only once just before each display refresh.
 
 
 How do I reduce flash/ROM usage?
@@ -222,7 +229,7 @@ How do I reduce RAM usage?
 
 * Lower the size of the *Display buffer*.
 * Reduce :c:macro:`LV_MEM_SIZE` in *lv_conf.h*. This memory is used when you create Widgets like buttons, labels, etc.
-* To work with lower :c:macro:`LV_MEM_SIZE` you can create Widgets only when required and delete them when they are not needed anymore.
+* To work with lower :c:macro:`LV_MEM_SIZE` you can create Widgets only when required and delete them when they are no longer needed.
 
 
 How do I use LVGL with an operating system?
@@ -244,13 +251,13 @@ Repository layout
 
 All repositories of the LVGL project are hosted on `GitHub <https://github.com/lvgl>`_.
 
-You will find these repositories there:
+You will find these repositories at the following locations:
 
 * `lvgl <https://github.com/lvgl/lvgl>`__: The library itself with many `examples <https://github.com/lvgl/lvgl/blob/master/examples/>`_ and `demos <https://github.com/lvgl/lvgl/blob/master/demos/>`__.
 * `lv_drivers <https://github.com/lvgl/lv_drivers>`__: Display and input device drivers
 * `blog <https://github.com/lvgl/blog>`__: Source of the `blog's site <https://blog.lvgl.io>`__
 * `sim <https://github.com/lvgl/sim>`__: Source of the `online simulator's site <https://sim.lvgl.io>`__
-* `lv_port_* <https://github.com/lvgl?q=lv_port&type=&language=>`__: LVGL ports to development boards or environments
+* `lv_port_* <https://github.com/lvgl?q=lv_port&type=&language=>`__: LVGL ports to development boards and other platforms
 * `lv_binding_* <https://github.com/lvgl?q=lv_binding&type=&language=l>`__: Bindings to other languages
 
 
