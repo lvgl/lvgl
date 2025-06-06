@@ -32,6 +32,13 @@ typedef enum {
     LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /**< The differences can be shown with a simple redraw */
 } lv_style_state_cmp_t;
 
+/**
+ * A joint type for `lv_part_t` and `lv_state_t`. Example values
+ * - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ * - `LV_STATE_PRSSED`
+ * - `LV_PART_KNOB`
+ * - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
 typedef uint32_t lv_style_selector_t;
 
 /**********************
