@@ -1,10 +1,10 @@
 /**
- * @file lv_example_snapshot.h
+ * @file lv_example_translation.h
  *
  */
 
-#ifndef LV_EX_SNAPSHOT_H
-#define LV_EX_SNAPSHOT_H
+#ifndef LV_EX_TRANSLATION_H
+#define LV_EX_TRANSLATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_snapshot_1(void);
+void lv_example_translation_1(void);
 
 /**********************
  *      MACROS
@@ -35,4 +35,4 @@ void lv_example_snapshot_1(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_SNAPSHOT_H*/
+#endif /*LV_EX_TRANSLATION_H*/

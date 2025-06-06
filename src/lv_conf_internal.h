@@ -3693,6 +3693,15 @@
     #endif
 #endif
 
+/** 1: Enable text translation support */
+#ifndef LV_USE_TRANSLATION
+    #ifdef CONFIG_LV_USE_TRANSLATION
+        #define LV_USE_TRANSLATION CONFIG_LV_USE_TRANSLATION
+    #else
+        #define LV_USE_TRANSLATION 0
+    #endif
+#endif
+
 /*1: Enable color filter style*/
 #ifndef LV_USE_COLOR_FILTER
     #ifdef CONFIG_LV_USE_COLOR_FILTER
@@ -3701,6 +3710,7 @@
         #define LV_USE_COLOR_FILTER     0
     #endif
 #endif
+
 /*==================
  * DEVICES
  *==================*/
@@ -4313,7 +4323,7 @@
             #define LV_USE_DEMO_WIDGETS 0
         #endif
     #endif
-    
+
     /** Demonstrate usage of encoder and keyboard. */
     #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
         #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
@@ -4322,7 +4332,7 @@
             #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
         #endif
     #endif
-    
+
     /** Benchmark your system */
     #ifndef LV_USE_DEMO_BENCHMARK
         #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
@@ -4352,7 +4362,7 @@
             #define LV_USE_DEMO_RENDER 0
         #endif
     #endif
-    
+
     /** Stress test for LVGL */
     #ifndef LV_USE_DEMO_STRESS
         #ifdef CONFIG_LV_USE_DEMO_STRESS
@@ -4361,7 +4371,7 @@
             #define LV_USE_DEMO_STRESS 0
         #endif
     #endif
-    
+
     /** Music player demo */
     #ifndef LV_USE_DEMO_MUSIC
         #ifdef CONFIG_LV_USE_DEMO_MUSIC
@@ -4407,7 +4417,7 @@
             #endif
         #endif
     #endif
-    
+
     /** Vector graphic demo */
     #ifndef LV_USE_DEMO_VECTOR_GRAPHIC
         #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
@@ -4416,11 +4426,11 @@
             #define LV_USE_DEMO_VECTOR_GRAPHIC  0
         #endif
     #endif
-    
+
     /*---------------------------
      * Demos from lvgl/lv_demos
       ---------------------------*/
-    
+
     /** Flex layout demo */
     #ifndef LV_USE_DEMO_FLEX_LAYOUT
         #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
@@ -4429,7 +4439,7 @@
             #define LV_USE_DEMO_FLEX_LAYOUT     0
         #endif
     #endif
-    
+
     /** Smart-phone like multi-language demo */
     #ifndef LV_USE_DEMO_MULTILANG
         #ifdef CONFIG_LV_USE_DEMO_MULTILANG
@@ -4438,7 +4448,7 @@
             #define LV_USE_DEMO_MULTILANG       0
         #endif
     #endif
-    
+
     /** Widget transformation demo */
     #ifndef LV_USE_DEMO_TRANSFORM
         #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
@@ -4447,7 +4457,7 @@
             #define LV_USE_DEMO_TRANSFORM       0
         #endif
     #endif
-    
+
     /** Demonstrate scroll settings */
     #ifndef LV_USE_DEMO_SCROLL
         #ifdef CONFIG_LV_USE_DEMO_SCROLL
@@ -4456,7 +4466,7 @@
             #define LV_USE_DEMO_SCROLL          0
         #endif
     #endif
-    
+
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #ifndef LV_USE_DEMO_EBIKE
         #ifdef CONFIG_LV_USE_DEMO_EBIKE
@@ -4474,7 +4484,7 @@
             #endif
         #endif
     #endif
-    
+
     /** High-resolution demo */
     #ifndef LV_USE_DEMO_HIGH_RES
         #ifdef CONFIG_LV_USE_DEMO_HIGH_RES
@@ -4483,7 +4493,7 @@
             #define LV_USE_DEMO_HIGH_RES        0
         #endif
     #endif
-    
+
     /* Smart watch demo */
     #ifndef LV_USE_DEMO_SMARTWATCH
         #ifdef CONFIG_LV_USE_DEMO_SMARTWATCH
@@ -4492,7 +4502,7 @@
             #define LV_USE_DEMO_SMARTWATCH      0
         #endif
     #endif
-#endif /* LV_BUILD_DEMOS */ 
+#endif /* LV_BUILD_DEMOS */
 
 
 
