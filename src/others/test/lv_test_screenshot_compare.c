@@ -102,8 +102,6 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
 {
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
-    printf("%s\n", fn_ref_full);
-
 
     create_folders_if_needed(fn_ref_full);
 

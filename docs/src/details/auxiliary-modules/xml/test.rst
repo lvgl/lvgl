@@ -22,10 +22,8 @@ The following step types are currently supported (with example parameters):
 - ``<click_at x="10" y="30"/>``: Simulates a click at the specified screen coordinates.
 - ``<wait ms="100"/>``: Waits for the given number of milliseconds. LVGL continues running, including animations and timers.
 - ``<freeze ms="100"/>``: Pauses the UI and LVGL's internal time. Useful for visual debugging.
-- ``<subject_set_int subject="subject1" value="10">`` Set an integer subject's value.
-- ``<subject_set_string subject="subject1" value="Hi!>`` Set string subject's value.
-- ``<subject_compare_int subject="subject1" value="10">`` Compare an integer subject's value against a reference value.
-- ``<subject_compare_string subject="subject1" value="Hi!>`` Compare a string subject's value against a reference value.
+- ``<subject_set subject="subject1" value="5>`` Set an integer or string subject's value.
+- ``<subject_compare subject="subject1" value="10">`` Compare an integer or strings subject's value against a reference value.
 - ``<screenshot_compare path="path/to/image.png"/>``: Compares the current screen with a reference image.
   - If the image doesn't exist, it is created.
   - If the comparison fails, an image with `_err` suffix is saved for inspection.
@@ -43,7 +41,9 @@ Example:
         <steps>
             <screenshot_compare path="imgs/before.png"/>
             <click_at x="32" y="32"/>
+            <subject_compare subject="subject2" value="50"/>
             <click_at x="50" y="64"/>
+            <subject_set subject="subject2" value="10"/>
             <wait ms="300"/>
             <screenshot_compare path="imgs/after.png"/>
         </steps>
