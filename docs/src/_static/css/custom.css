@@ -988,8 +988,7 @@ dl.field-list > dd {
 /*-------------------------------------------------------------------------
  * Special Features for LVGL
  *-------------------------------------------------------------------------*/
-div .lvgl-figure-caption p,
-.caption-text {
+div .lvgl-figure-caption p {
   font-size: 0.8rem;
   text-align: center;
   margin-bottom: 32px;
@@ -1010,4 +1009,3 @@ article figure {
 body[data-theme="dark"] .highlight .p {
   color: #a883f3;
 }
-
