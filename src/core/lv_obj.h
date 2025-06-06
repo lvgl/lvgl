@@ -59,7 +59,7 @@ typedef enum {
     LV_STATE_USER_4      =  0x8000,
 
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
-} lv_obj_state_t;
+} lv_state_t;
 
 /**
  * The possible parts of widgets.
