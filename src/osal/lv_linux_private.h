@@ -45,6 +45,8 @@ typedef union {
  * GLOBAL PROTOTYPES
  **********************/
 
+uint32_t lv_os_get_self_cpu_percent(void);
+
 /**********************
  *      MACROS
  **********************/
