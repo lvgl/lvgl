@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.3.0-dev
+# Kconfig file for LVGL v9.3.0
 
 menu "LVGL configuration"
 
@@ -1090,6 +1090,9 @@ menu "LVGL configuration"
 		config LV_USE_ARC
 			bool "Arc"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_ARCLABEL
+			bool "Arc Label"
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_BAR
 			bool "Bar"
 			default y if !LV_CONF_MINIMAL
@@ -1455,6 +1458,11 @@ menu "LVGL configuration"
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
 			bool "Tiny ttf cache entries count"
+			default 128
+			depends on LV_USE_TINY_TTF
+
+		config LV_TINY_TTF_CACHE_KERNING_CNT
+			bool "Tiny ttf kerning cache entries count"
 			default 256
 			depends on LV_USE_TINY_TTF
 
@@ -1853,6 +1861,31 @@ menu "LVGL configuration"
 			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
 			depends on LV_USE_WAYLAND
 			default n
+		config LV_WAYLAND_BUF_COUNT
+			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
+			depends on LV_USE_WAYLAND
+			default 1
+		choice
+			prompt "Wayland rendering mode"
+			depends on LV_USE_WAYLAND
+			default LV_WAYLAND_RENDER_MODE_PARTIAL
+
+			config LV_WAYLAND_RENDER_MODE_PARTIAL
+				bool "Use the buffer(s) to render the screen is smaller parts"
+				depends on !LV_WAYLAND_USE_DMABUF
+
+			config LV_WAYLAND_RENDER_MODE_DIRECT
+				bool "Only the changed areas will be updated with 2 screen sized buffers"
+				depends on LV_WAYLAND_USE_DMABUF
+
+			config LV_WAYLAND_RENDER_MODE_FULL
+				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
+				depends on LV_WAYLAND_USE_DMABUF
+		endchoice
+
+		config LV_WAYLAND_USE_DMABUF
+			bool "Use DMA buffers for frame buffers"
+			depends on LV_USE_WAYLAND && LV_USE_DRAW_G2D
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"

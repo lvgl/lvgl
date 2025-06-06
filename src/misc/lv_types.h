@@ -197,6 +197,8 @@ typedef struct _lv_animimg_t lv_animimg_t;
 
 typedef struct _lv_arc_t lv_arc_t;
 
+typedef struct _lv_arclabel_t lv_arclabel_t;
+
 typedef struct _lv_label_t lv_label_t;
 
 typedef struct _lv_bar_anim_t lv_bar_anim_t;

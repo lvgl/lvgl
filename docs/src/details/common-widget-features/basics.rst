@@ -132,7 +132,6 @@ of children.  There is no limitation for the type of the parent but there are Wi
 which are typically a parent (e.g. button) or a child (e.g. label).
 
 
-
 Moving together
 ---------------
 
@@ -160,6 +159,7 @@ Modify the position of the parent:
 (For simplicity the adjusting of colors of the Widgets is not shown in
 the example.)
 
+
 Visibility only on the parent
 -----------------------------
 
@@ -173,8 +173,8 @@ outside will not be visible.
    lv_obj_set_x(widget1, -30);    /* Move the child a little bit off the parent */
 
 This behavior can be overwritten with
-:cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
-children to be drawn out of the parent. In addition to this, you must register
+:cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allows the
+children to be drawn outside of the parent.  In addition to this, you must register
 the following event callback (this was not required in previous versions).
 
 Note: ``ext_width`` should be the maximum absolute width the children will be
@@ -184,8 +184,9 @@ drawn within.
 
     static void ext_draw_size_event_cb(lv_event_t * e)
     {
-        lv_event_set_ext_draw_size(e, 30); /*Set 30px extra draw area around the widget*/
+        lv_event_set_ext_draw_size(e, 30); /* Set 30px extra draw area around the widget */
     }
+
 
 Creating and deleting Widgets
 -----------------------------
@@ -577,6 +578,8 @@ more on encoder behaviors and the edit mode.
 
     Learn more about :ref:`indev_keys`.
 
+
+
 .. _widget_names:
 
 Names
@@ -589,6 +592,7 @@ as a function parameter or made a global variable. However, this approach has so
 - Using global variables is not clean and generally not recommended.
 - It's not scalable. Passing references to 20 widgets as function parameters is not ideal.
 - It's hard to track whether a widget still exists or has been deleted.
+
 
 Setting names
 -------------
@@ -605,14 +609,18 @@ If a name ends with ``#``, LVGL will automatically replace it with an index base
 number of siblings with the same base name. If no name is provided, the default is
 ``<widget_type>_#``.
 
-Below is an example showing how manually and automatically assigned names are resolved:
+Below is an example showing how manually- and automatically-assigned names are resolved:
 
 - Main ``lv_obj`` container named ``"cont"``: "cont"
+
   - ``lv_obj`` container named ``"header"``: "header"
+
     - ``lv_label`` with no name: "lv_label_0"
     - ``lv_label`` named ``"title"``: "title"
     - ``lv_label`` with no name: "lv_label_1" (It's the third label, but custom-named widgets are not counted)
+
   - ``lv_obj`` container named ``"buttons"``:
+
     - ``lv_button`` with no name: "lv_button_0"
     - ``lv_button`` named ``"second_button"``: "second_button"
     - ``lv_button`` with no name: "lv_button_1"
@@ -623,21 +631,22 @@ Below is an example showing how manually and automatically assigned names are re
     - ``lv_button`` named ``mybtn_#``: "mybtn_2"
     - ``lv_button`` named ``mybtn_#``: "mybtn_3"
 
+
 Finding widgets
 ---------------
 
 Widgets can be found by name in two ways:
 
-1. **Get a direct child by name** using :cpp:func:`lv_obj_get_child_by_name(parent, "child_name")`.
+1. **Get a direct child by name** using :cpp:expr:`lv_obj_get_child_by_name(parent, "child_name")`.
    Example:
-   ``lv_obj_get_child_by_name(header, "title")``
+   :cpp:expr:`lv_obj_get_child_by_name(header, "title")`
    You can also use a "path" to find nested children:
-   ``lv_obj_get_child_by_name(cont, "buttons/mybtn_2")``
+   :cpp:expr:`lv_obj_get_child_by_name(cont, "buttons/mybtn_2")`
 
-2. **Find a descendant at any level** using :cpp:func:`lv_obj_find_by_name(parent, "child_name")`.
+2. **Find a descendant at any level** using :cpp:expr:`lv_obj_find_by_name(parent, "child_name")`.
    Example:
-   ``lv_obj_find_by_name(cont, "mybtn_1")``
-   Note that ``"mybtn_1"`` is a child of ``"buttons"``, not directly of ``"cont"``.
+   :cpp:expr:`lv_obj_find_by_name(cont, "mybtn_1")`
+   Note that ``"mybtn_1"`` is a child of ``buttons``, not a direct child of ``cont``.
    This is useful when you want to ignore hierarchy and search by name alone.
 
 Since both functions start searching from a specific parent, it’s possible to have multiple widget
@@ -658,6 +667,8 @@ and it's called 10 times, a specific ``"ok_button"`` can be found like this:
 Names are resolved **when they are retrieved**, not when they are set.
 This means the indices always reflect the current state of the widget tree
 at the time the name is used.
+
+
 
 .. _widget_snapshot:
 
@@ -680,3 +691,7 @@ Example
 
 API
 ***
+
+.. API equals:  lv_screen_load
+
+.. API startswith:  lv_obj_
