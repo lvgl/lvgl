@@ -34,7 +34,7 @@ LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+typedef enum {
     LV_PROPERTY_ID(TEXTAREA, TEXT,              LV_PROPERTY_TYPE_TEXT,  0),
     LV_PROPERTY_ID(TEXTAREA, PLACEHOLDER_TEXT,  LV_PROPERTY_TYPE_TEXT,  1),
     LV_PROPERTY_ID(TEXTAREA, CURSOR_POS,        LV_PROPERTY_TYPE_INT,   2),
@@ -51,14 +51,14 @@ enum {
     LV_PROPERTY_ID(TEXTAREA, TEXT_IS_SELECTED,  LV_PROPERTY_TYPE_INT,   13),
     LV_PROPERTY_ID(TEXTAREA, CURRENT_CHAR,      LV_PROPERTY_TYPE_INT,   14),
     LV_PROPERTY_TEXTAREA_END,
-};
+} _lv_property_textarea_id_t;
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
 
-enum {
+typedef enum {
     LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,
-};
+} _lv_textarea_part_id_t;
 
 /**********************
  * GLOBAL PROTOTYPES
