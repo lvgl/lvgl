@@ -1605,6 +1605,7 @@ class DoxygenXml(object):
             'LV_ATTRIBUTE_LARGE_RAM_ARRAY=',
             'LV_ATTRIBUTE_FAST_MEM=',
             'LV_ATTRIBUTE_EXTERN_DATA=',
+            'LV_FORMAT_ATTRIBUTE=',
         ]
 
         cfg.set('PREDEFINED', predefined_symbols)
