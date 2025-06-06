@@ -357,6 +357,11 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
+/** Draw using espressif PPA accelerator */
+#define LV_USE_PPA  0
+#if LV_USE_PPA
+    #define LV_USE_PPA_IMG 0
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

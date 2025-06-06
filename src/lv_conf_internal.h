@@ -1000,6 +1000,23 @@
     #endif
 #endif
 
+/** Draw using espressif PPA accelerator */
+#ifndef LV_USE_PPA
+    #ifdef CONFIG_LV_USE_PPA
+        #define LV_USE_PPA CONFIG_LV_USE_PPA
+    #else
+        #define LV_USE_PPA  0
+    #endif
+#endif
+#if LV_USE_PPA
+    #ifndef LV_USE_PPA_IMG
+        #ifdef CONFIG_LV_USE_PPA_IMG
+            #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
+        #else
+            #define LV_USE_PPA_IMG 0
+        #endif
+    #endif
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
