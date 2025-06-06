@@ -184,7 +184,7 @@ typedef enum {{
                 f"    LV_PROPERTY_ID(STYLE, {name.upper() + ',' :25} {id_type+',' :28} LV_STYLE_{name.upper()}),\n"
             )
 
-        f.write('} _lv_property_style_id_t;\n\n')
+        f.write('} lv_property_style_id_t;\n\n')
         f.write('#endif\n')
         f.write('#endif\n')
 

@@ -71,7 +71,7 @@ typedef enum {
     LV_PROPERTY_ID(IMAGE, ANTIALIAS,    LV_PROPERTY_TYPE_INT,       9),
     LV_PROPERTY_ID(IMAGE, INNER_ALIGN,  LV_PROPERTY_TYPE_INT,       10),
     LV_PROPERTY_IMAGE_END,
-} _lv_property_image_id_t;
+} lv_property_image_id_t;
 #endif
 
 /**********************

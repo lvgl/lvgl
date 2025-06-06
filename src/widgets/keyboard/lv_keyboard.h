@@ -57,7 +57,7 @@ typedef enum {
     LV_PROPERTY_ID(KEYBOARD, POPOVERS,            LV_PROPERTY_TYPE_INT,   2),
     LV_PROPERTY_ID(KEYBOARD, SELECTED_BUTTON,     LV_PROPERTY_TYPE_INT,   3),
     LV_PROPERTY_KEYBOARD_END,
-} _lv_property_keyboard_id_t;
+} lv_property_keyboard_id_t;
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_keyboard_class;

@@ -54,7 +54,7 @@ typedef enum {
     LV_PROPERTY_ID(SLIDER, IS_DRAGGED,      LV_PROPERTY_TYPE_BOOL,      7),
     LV_PROPERTY_ID(SLIDER, IS_SYMMETRICAL,  LV_PROPERTY_TYPE_BOOL,      8),
     LV_PROPERTY_SLIDER_END,
-} _lv_property_slider_id_t;
+} lv_property_slider_id_t;
 #endif
 /**********************
  * GLOBAL PROTOTYPES
