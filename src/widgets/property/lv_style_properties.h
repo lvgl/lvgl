@@ -132,7 +132,7 @@ typedef enum {
     LV_PROPERTY_ID(STYLE, WIDTH,                    LV_PROPERTY_TYPE_INT,        LV_STYLE_WIDTH),
     LV_PROPERTY_ID(STYLE, X,                        LV_PROPERTY_TYPE_INT,        LV_STYLE_X),
     LV_PROPERTY_ID(STYLE, Y,                        LV_PROPERTY_TYPE_INT,        LV_STYLE_Y),
-} _lv_property_style_id_t;
+} lv_property_style_id_t;
 
 #endif
 #endif
