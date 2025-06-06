@@ -37,7 +37,7 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
  * Opacity percentages.
  */
 
-enum {
+typedef enum {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,
     LV_OPA_10     = 25,
@@ -51,7 +51,7 @@ enum {
     LV_OPA_90     = 229,
     LV_OPA_100    = 255,
     LV_OPA_COVER  = 255,
-};
+} lv_opacity_level_t;
 
 #define LV_OPA_MIN 2    /**< Fully transparent if opa <= LV_OPA_MIN */
 #define LV_OPA_MAX 253  /**< Fully cover if opa >= LV_OPA_MAX */

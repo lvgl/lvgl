@@ -32,7 +32,7 @@ extern "C" {
 LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+typedef enum {
     LV_PROPERTY_ID(DROPDOWN, TEXT,                LV_PROPERTY_TYPE_TEXT,  0),
     LV_PROPERTY_ID(DROPDOWN, OPTIONS,             LV_PROPERTY_TYPE_TEXT,  1),
     LV_PROPERTY_ID(DROPDOWN, OPTION_COUNT,        LV_PROPERTY_TYPE_INT,   2),
@@ -44,7 +44,7 @@ enum {
     LV_PROPERTY_ID(DROPDOWN, LIST,                LV_PROPERTY_TYPE_OBJ,   8),
     LV_PROPERTY_ID(DROPDOWN, IS_OPEN,             LV_PROPERTY_TYPE_BOOL,  9),
     LV_PROPERTY_DROPDOWN_END,
-};
+} _lv_property_dropdown_id_t;
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdown_class;

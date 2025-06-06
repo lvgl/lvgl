@@ -43,7 +43,7 @@ extern "C" {
  * Possible states of a widget.
  * OR-ed values are possible
  */
-enum {
+typedef enum {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
     LV_STATE_FOCUSED     =  0x0002,
@@ -59,7 +59,7 @@ enum {
     LV_STATE_USER_4      =  0x8000,
 
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
-};
+} lv_obj_state_t;
 
 /**
  * The possible parts of widgets.
@@ -68,7 +68,7 @@ enum {
  * Not all parts are used by every widget
  */
 
-enum {
+typedef enum {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
@@ -80,7 +80,7 @@ enum {
     LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
-};
+} lv_obj_part_t;
 
 /**
  * On/Off features controlling the object's behavior.
@@ -128,7 +128,7 @@ typedef enum {
 } lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+typedef enum {
     /*OBJ flag properties */
     LV_PROPERTY_ID(OBJ, FLAG_START,                 LV_PROPERTY_TYPE_INT,       0),
     LV_PROPERTY_ID(OBJ, FLAG_HIDDEN,                LV_PROPERTY_TYPE_INT,       0),
@@ -209,7 +209,7 @@ enum {
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
     LV_PROPERTY_OBJ_END,
-};
+} _lv_signed_prop_id_t;
 #endif
 
 /**
