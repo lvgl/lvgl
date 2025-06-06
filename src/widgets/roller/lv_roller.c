@@ -800,8 +800,13 @@ static lv_result_t release_handler(lv_obj_t * obj)
             int32_t label_y1 = label->coords.y1 + sum;
             int32_t id = (mid - label_y1) / label_unit;
 
-            if(id < 0) id = 0;
-            if(id >= (int32_t)roller->option_cnt) id = roller->option_cnt - 1;
+            if(roller->option_cnt == 0) {
+                id = 0;
+            }
+            else {
+                if(id < 0) id = 0;
+                if(id >= (int32_t)roller->option_cnt) id = roller->option_cnt - 1;
+            }
 
             new_opt = id;
         }
