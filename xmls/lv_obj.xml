@@ -89,73 +89,73 @@ Example
             <arg name="max" type="int" default="2000000"/>
         </element>
 
-        <element name="bind_flag_if_eq" access="bind" >
+        <element name="bind_flag_if_eq" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_not_eq" access="bind" >
+        <element name="bind_flag_if_not_eq" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_gt" access="bind" >
+        <element name="bind_flag_if_gt" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_ge" access="bind" >
+        <element name="bind_flag_if_ge" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_lt" access="bind" >
+        <element name="bind_flag_if_lt" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_le" access="bind" >
+        <element name="bind_flag_if_le" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_eq" access="bind" >
+        <element name="bind_state_if_eq" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_not_eq" access="bind" >
+        <element name="bind_state_if_not_eq" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_gt" access="bind" >
+        <element name="bind_state_if_gt" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_ge" access="bind" >
+        <element name="bind_state_if_ge" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_lt" access="bind" >
+        <element name="bind_state_if_lt" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_state_if_le" access="bind" >
+        <element name="bind_state_if_le" access="custom" >
             <arg name="subject" type="subject"/>
             <arg name="state" type="enum:lv_state"/>
             <arg name="ref_value" type="int"/>
