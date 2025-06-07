@@ -615,7 +615,9 @@ class LVGLImage:
 
         if self.cf.is_indexed:
 
-            def multiply(r, g, b, a):
+            def multiply(b, g, r, a):
+                # The precision is reduced, the correct way would be to divide by 255,
+                # but this is consistent with the premultiply function in the code.
                 r, g, b = (r * a) >> 8, (g * a) >> 8, (b * a) >> 8
                 return uint8_t(b) + uint8_t(g) + uint8_t(r) + uint8_t(a)
 
