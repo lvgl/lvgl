@@ -581,7 +581,7 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
             lv_color32_t px_hor = src_c32[x_next];
             lv_color32_t px_ver = *(const lv_color32_t *)((uint8_t *)src_c32 + y_next * src_stride);
 
-            /*Have the non-premultipled colors first, mix them as needed,
+            /*Have the non-premultiplied colors first, mix them as needed,
              *and premultiply again*/
             dest_c32[x] = unpremultiply(dest_c32[x]);
             px_hor = unpremultiply(px_hor);

@@ -75,7 +75,7 @@ void * lv_realloc_core(void * p, size_t new_size)
     p_address -= sizeof(mem_header_t);
     p_header = (mem_header_t *) p_address;
 
-    // UEFI supportes no realloc, if the size grows a new memory block has to be allocated
+    // UEFI supports no realloc, if the size grows a new memory block has to be allocated
     if(p_header->size > new_size) return p;
 
     p_new = lv_malloc_core(new_size);

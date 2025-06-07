@@ -26,7 +26,7 @@
  **********************/
 
 /**********************
- *  GOLBAL VARIABLES
+ *  GLOBAL VARIABLES
  **********************/
 EFI_HANDLE gLvEfiImageHandle = NULL;
 EFI_SYSTEM_TABLE * gLvEfiST = NULL;
