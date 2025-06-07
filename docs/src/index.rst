@@ -61,8 +61,8 @@ Introduction
     :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
-    intro/introduction
-    intro/getting_started
+    intro/introduction/index
+    intro/getting_started/index
 
 
 Details
