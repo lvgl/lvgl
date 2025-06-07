@@ -124,6 +124,51 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject)
     return subject->prev_value.num;
 }
 
+#if LV_USE_FLOAT
+
+void lv_subject_init_float(lv_subject_t * subject, float value)
+{
+    lv_memzero(subject, sizeof(lv_subject_t));
+    subject->type = LV_SUBJECT_TYPE_FLOAT;
+    subject->value.float_v = value;
+    subject->prev_value.float_v = value;
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+}
+
+void lv_subject_set_float(lv_subject_t * subject, float value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
+
+    subject->prev_value.float_v = subject->value.float_v;
+    subject->value.float_v = value;
+    lv_subject_notify_if_changed(subject);
+}
+
+float lv_subject_get_float(lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
+
+    return subject->value.float_v;
+}
+
+float lv_subject_get_previous_float(lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
+
+    return subject->prev_value.float_v;
+}
+
+#endif /*LV_USE_FLOAT*/
+
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     lv_memzero(subject, sizeof(lv_subject_t));
@@ -568,6 +613,11 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
         if(subject->type == LV_SUBJECT_TYPE_INT) {
             fmt = "%d";
         }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
         else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
             return NULL;
@@ -575,7 +625,7 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
     }
     else {
         if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
-           subject->type != LV_SUBJECT_TYPE_INT) {
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
             return NULL;
         }
@@ -592,7 +642,7 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
 
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
     }
@@ -610,7 +660,7 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
 
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
     }
@@ -788,6 +838,13 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject)
                 lv_subject_notify(subject);
             }
             break;
+#if LV_USE_FLOAT
+        case LV_SUBJECT_TYPE_FLOAT :
+            if(subject->value.float_v != subject->prev_value.float_v) {
+                lv_subject_notify(subject);
+            }
+            break;
+#endif
         case LV_SUBJECT_TYPE_GROUP :
         case LV_SUBJECT_TYPE_POINTER :
             /* Always notify as we don't know how to compare this */
@@ -821,6 +878,11 @@ static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subj
             case LV_SUBJECT_TYPE_INT:
                 lv_label_set_text_fmt(observer->target, fmt, subject->value.num);
                 break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.float_v);
+                break;
+#endif
             case LV_SUBJECT_TYPE_STRING:
             case LV_SUBJECT_TYPE_POINTER:
                 lv_label_set_text_fmt(observer->target, fmt, subject->value.pointer);
@@ -840,12 +902,26 @@ static void arc_value_changed_event_cb(lv_event_t * e)
     lv_obj_t * arc = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
 
-    lv_subject_set_int(subject, lv_arc_get_value(arc));
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_arc_get_value(arc));
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_arc_get_value(arc));
+    }
+#endif
 }
 
 static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_arc_set_value(observer->target, subject->value.num);
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_arc_set_value(observer->target, subject->value.num);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_arc_set_value(observer->target, (int32_t)subject->value.float_v);
+    }
+#endif
 }
 
 #endif /*LV_USE_ARC*/
@@ -857,12 +933,26 @@ static void slider_value_changed_event_cb(lv_event_t * e)
     lv_obj_t * slider = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
 
-    lv_subject_set_int(subject, lv_slider_get_value(slider));
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_slider_get_value(slider));
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_slider_get_value(slider));
+    }
+#endif
 }
 
 static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_slider_set_value(observer->target, (int32_t)subject->value.float_v, LV_ANIM_OFF);
+    }
+#endif
 }
 
 #endif /*LV_USE_SLIDER*/
