@@ -487,7 +487,7 @@ void test_spangroup_set_right_align_on_overflow(void)
     lv_obj_set_style_outline_width(spangroup, 1, 0);
 
     lv_obj_set_width(spangroup, 180);
-    lv_obj_set_height(spangroup, 20);
+    lv_obj_set_height(spangroup, 30);
 
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_RIGHT);
 
