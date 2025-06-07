@@ -14,7 +14,7 @@ heavy lifting in between.
 
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     key_features
     requirements
