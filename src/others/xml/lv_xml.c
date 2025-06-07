@@ -110,6 +110,10 @@ void lv_xml_init(void)
                            lv_xml_calendar_header_dropdown_apply);
 
     lv_xml_widget_register("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
+    lv_xml_widget_register("lv_obj-remove_style", lv_obj_xml_remove_style_create, lv_obj_xml_remove_style_apply);
+    lv_xml_widget_register("lv_obj-remove_style_all", lv_obj_xml_remove_style_all_create,
+                           lv_obj_xml_remove_style_all_apply);
+
     lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
     lv_xml_widget_register("lv_obj-subject_set_int", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
     lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
@@ -119,6 +123,7 @@ void lv_xml_init(void)
                            lv_obj_xml_screen_load_event_apply);
     lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
                            lv_obj_xml_screen_create_event_apply);
+
     lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
