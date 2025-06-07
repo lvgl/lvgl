@@ -33,6 +33,11 @@ extern "C" {
 #  define TEST_ASSERT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_TRUE(lv_color32_eq(c1, c2))
 #  define TEST_ASSERT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_TRUE(lv_color32_eq(c1, c2), msg)
 
+#  define TEST_ASSERT_NOT_EQUAL_COLOR(c1, c2)                   TEST_ASSERT_FALSE(lv_color_eq(c1, c2))
+#  define TEST_ASSERT_NOT_EQUAL_COLOR_MESSAGE(c1, c2, msg)      TEST_ASSERT_FALSE(lv_color_eq(c1, c2), msg)
+
+#  define TEST_ASSERT_NOT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_FALSE(lv_color32_eq(c1, c2))
+#  define TEST_ASSERT_NOT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_FALSE(lv_color32_eq(c1, c2), msg)
 
 #  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)  TEST_ASSERT_LESS_OR_EQUAL(threshold, LV_ABS((int64_t)(prev_usage) - (int64_t)lv_test_get_free_mem()));
 
