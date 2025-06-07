@@ -11,13 +11,13 @@ Overview
 
 .. _observer pattern:  https://en.wikipedia.org/wiki/Observer_pattern
 
-The ``lv_observer`` module is an implemention of the `Observer Pattern`_.
+The ``lv_observer`` module is an implementation of the `Observer Pattern`_.
 
 This implementation consists of:
 
 :Subjects:   (in global memory or heap) are "logic packages", each containing the
              value being "observed" and its type (integer (``int32_t``), a string, a
-             pointer, an :cpp:type:`lv_color_t`, or a group);
+             pointer, an :cpp:type:`lv_color_t`, a :cpp_type:`float`, or a group);
 
 :Observers:  (zero or more per Subject, always dynamically-allocated) are always
              attached to exactly one Subject, and provide user-defined notifications
@@ -114,6 +114,7 @@ To initialize a Subject use ``lv_subject_init_<type>(&subject, params, init_valu
 The following initialization functions exist, one for each of the Subject types:
 
 :Integer: void :cpp:expr:`lv_subject_init_int(subject, int_value)`
+:Float:   void :cpp:expr:`lv_subject_init_float(subject, int_value)`
 :String:  void :cpp:expr:`lv_subject_init_string(subject, buf, prev_buf, buf_size, initial_string)`
 :Pointer: void :cpp:expr:`lv_subject_init_pointer(subject, ptr)`
 :Color:   void :cpp:expr:`lv_subject_init_color(subject, color)`
@@ -141,6 +142,7 @@ The following functions are used to get a Subject's current value:
 
 
 :Integer: int32_t      :cpp:expr:`lv_subject_get_int(subject)`
+:Float:   float        :cpp:expr:`lv_subject_get_float(subject)`
 :String:  const char * :cpp:expr:`lv_subject_get_string(subject)`
 :Pointer: const void * :cpp:expr:`lv_subject_get_pointer(subject)`
 :Color:   lv_color_t   :cpp:expr:`lv_subject_get_color(subject)`
@@ -153,6 +155,7 @@ The following functions are used to get a Subject's previous value:
 
 
 :Integer: int32_t      :cpp:expr:`lv_subject_get_previous_int(subject)`
+:Float:   float        :cpp:expr:`lv_subject_get_previous_float(subject)`
 :String:  const char * :cpp:expr:`lv_subject_get_previous_string(subject)`
 :Pointer: const void * :cpp:expr:`lv_subject_get_previous_pointer(subject)`
 :Color:   lv_color_t   :cpp:expr:`lv_subject_get_previous_color(subject)`
@@ -228,7 +231,7 @@ both unsubscribes it from the Subject and deletes it from the LVGL heap.
 Subscribing While Associating Observer with a Widget
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The function below assocates a Widget with an Observer while subscribing to a
+The function below associates a Widget with an Observer while subscribing to a
 Subject.  A copy of the pointer to that Widget is saved in the Observer's ``target``
 field.  This works exactly like the above method except that when the Widget is
 deleted, the Observer thus created will be automatically unsubscribed from the
@@ -486,11 +489,14 @@ printf-like format specifier and be one of the following:
                              cross-platform equivalent where ``xx`` can be ``8``,
                              ``16``, ``32`` or ``64``, depending on the platform).
 
-If NULL is passed for the ``format_string`` argument:
+:float Subject:              "%f" format specifier, or e.g. "%0.2f" to display two digits after the decimal point.
+
+
+If ``NULL`` is passed for the ``format_string`` argument:
 
 :string or pointer Subject:  Updates expect the pointer to point to a NUL-terminated string.
-
-:integer Subject:            The Label will display an empty string (i.e. nothing).
+:integer Subject:            The Label will simply display the number. Equivalent to "%d".
+:integer Subject:            The Label will display the value with "%0.1f" format string.
 
 **Example:**  "%d |deg|\C"
 
@@ -503,6 +509,9 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Arc Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_ARC` to be configured to ``1``.)
 
+It support integer and float subjects.
+
+
 - :cpp:expr:`lv_arc_bind_value(arc, &subject)`
 
 
@@ -513,6 +522,8 @@ This method of subscribing to an integer Subject affects a Slider Widget's integ
 value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
 user's direct interaction with the Slider Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_SLIDER` to be configured to ``1``.)
+
+It support integer and float subjects.
 
 - :cpp:expr:`lv_slider_bind_value(slider, &subject)`
 
@@ -525,6 +536,8 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Slider Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_ROLLER` to be configured to ``1``.)
 
+It support only integer subjects.
+
 - :cpp:expr:`lv_roller_bind_value(roller, &subject)`
 
 
@@ -535,6 +548,8 @@ This method of subscribing to an integer Subject affects a Drop-Down Widget's in
 value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
 user's direct interaction with the Drop-Down Widget updates the Subject's value and
 vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
+
+It support only integer subjects.
 
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
