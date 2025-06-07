@@ -25,6 +25,11 @@ extern "C" {
 #define LV_IMAGE_HEADER_MAGIC (0x19)
 LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);
 
+/**
+ * Flags reserved for user, lvgl won't use these bits.
+ */
+#define LV_IMAGE_FLAGS_USER_MASK (0xFF00)
+
 /**********************
  *      TYPEDEFS
  **********************/
