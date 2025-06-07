@@ -30,6 +30,12 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs);
 void * lv_obj_xml_style_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
+void * lv_obj_xml_remove_style_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_remove_style_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
+void * lv_obj_xml_remove_style_all_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_remove_style_all_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
 void * lv_obj_xml_event_cb_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attrs);
 

@@ -8,11 +8,8 @@
 		<prop name="btn_text" type="string"/>
 	</api>
 
-	<view width="#size">
-		<lv_button align="center">
-            <lv_label text="$btn_text" align="center" color="#orange"/>
-            <screen_load_event screen="main_screen"/>
-        </lv_button>
+	<view extends="lv_button" width="#size">
+		<my_h3 text="$btn_text" align="center" color="#orange"/>
 	</view>
 </component>
 

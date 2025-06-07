@@ -34,6 +34,7 @@ typedef struct {
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
+static lv_style_selector_t get_selector(const char * str);
 static void free_user_data_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
@@ -173,27 +174,54 @@ void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
         return;
     }
 
-    lv_style_selector_t selector = 0;
     const char * selector_str = lv_xml_get_value_of(attrs, "selector");
-    if(selector_str) {
-        char buf[256];
-        lv_strncpy(buf, selector_str, sizeof(buf));
-
-        char * bufp = buf;
-        const char * next = lv_xml_split_str(&bufp, '|');
-
-        while(next) {
-            /* Handle different states and parts */
-            selector |= lv_xml_style_state_to_enum(next);
-            selector |= lv_xml_style_part_to_enum(next);
-
-            /* Move to the next token */
-            next = lv_xml_split_str(&bufp, '|');
-        }
-    }
+    lv_style_selector_t selector = get_selector(selector_str);
 
     void * item = lv_xml_state_get_parent(state);
     lv_obj_add_style(item, &xml_style->style, selector);
+}
+
+void * lv_obj_xml_remove_style_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_remove_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+
+    const char * style_str = lv_xml_get_value_of(attrs, "name");
+    const char * selector_str = lv_xml_get_value_of(attrs, "selector");
+
+    lv_style_t * style = NULL;
+    if(style_str) {
+        lv_xml_style_t * xml_style = lv_xml_get_style_by_name(&state->scope, style_str);
+        if(xml_style == NULL) {
+            LV_LOG_WARN("No style found with name `%s`", style_str);
+            return;
+        }
+        style = &xml_style->style;
+    }
+
+    lv_style_selector_t selector = get_selector(selector_str);
+
+    void * item = lv_xml_state_get_item(state);
+    lv_obj_remove_style(item, style, selector);
+}
+
+void * lv_obj_xml_remove_style_all_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_remove_style_all_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_item(state);
+    lv_obj_remove_style_all(item);
 }
 
 void * lv_obj_xml_event_cb_create(lv_xml_parser_state_t * state, const char ** attrs)
@@ -722,6 +750,28 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
     else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
+}
+
+static lv_style_selector_t get_selector(const char * str)
+{
+    if(str == NULL) return 0;
+    lv_style_selector_t selector = 0;
+    char buf[256];
+    lv_strncpy(buf, str, sizeof(buf));
+
+    char * bufp = buf;
+    const char * next = lv_xml_split_str(&bufp, '|');
+
+    while(next) {
+        /* Handle different states and parts */
+        selector |= lv_xml_style_state_to_enum(next);
+        selector |= lv_xml_style_part_to_enum(next);
+
+        /* Move to the next token */
+        next = lv_xml_split_str(&bufp, '|');
+    }
+
+    return selector;
 }
 
 static void free_user_data_event_cb(lv_event_t * e)
