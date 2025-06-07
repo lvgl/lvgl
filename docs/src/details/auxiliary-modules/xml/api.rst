@@ -289,14 +289,15 @@ Generates:
     void my_widget_set_item_icon(lv_obj_t * parent, int32_t index, const void * icon_src);
     void my_widget_set_item_color(lv_obj_t * parent, int32_t index, lv_color_t color);
 
-access="bind"
+access="custom"
 ~~~~~~~~~~~~~
 
-Used to bind subjects to widget logic.
+Used to describe any custom API functions with a custom name.
+"custom" elements can have only arguments and no `type` so they are pure setters.
 
 .. code-block:: xml
 
-    <element name="color" access="bind">
+    <element name="bind_color" access="custom">
         <arg name="subject" type="subject"/>
         <arg name="new_color" type="color"/>
         <arg name="ref_value" type="int"/>
