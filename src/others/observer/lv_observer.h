@@ -239,7 +239,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * When the Widget is deleted, Observer will be unsubscribed from Subject automatically.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param obj           pinter to Widget
+ * @param obj           pointer to Widget
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
  * @note                Do not call `lv_observer_remove()` on Observers created this way.
