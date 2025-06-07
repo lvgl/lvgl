@@ -24,8 +24,11 @@ void test_xml_calendar_with_attrs(void)
         "height", "200",
         "x", "10",
         "y", "10",
-        "today_date", "2025 05 06",
-        "shown_month", "2025 05",
+        "today_year", "2025",
+        "today_month", "05",
+        "today_day", "06",
+        "shown_year", "2025",
+        "shown_month", "05",
         NULL, NULL,
     };
     lv_obj_t * calendar;

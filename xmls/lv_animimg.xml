@@ -5,14 +5,8 @@ Example
 <widget>
 	<api>
 	    <const name="infinite" help="Repeat the animation infinite times"/>
-	    <prop name="src"  help="Image sources">
-	        <param name="src_array" type="image_src[count]"/>
-	    </prop>
-	    <prop name="duration" help="Length of the animation in milliseconds">
-	        <param name="time_ms" type="int"/>
-	    </prop>
-	    <prop name="repeat_count">
-	        <param name="cnt" type="int"/>
-	    </prop>
+	    <prop name="src" type="image_src[count]"  help="Image sources" />
+	    <prop name="duration" type="int" help="Length of the animation in milliseconds"/>
+	    <prop name="repeat_count"  type="int"/>
 	</api>
 </widget>

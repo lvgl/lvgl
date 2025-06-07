@@ -13,19 +13,11 @@ Example
 	        <enum name="dots" help=""/>
 	    </enumdef>
 
-	    <prop name="text">
-	    	<param name="text" type="string" />
-	   	</prop>
-	    <prop name="text_fmt">
-	    	<param name="fmt" type="string" />
-	    	<param name="params" type="arglist" />
-	   	</prop>
-	    <prop name="long_mode">
-	    	<param name="mode" type="enum:lv_label_long_mode" />
-	   	</prop>
+	    <prop name="text" type="string" />
+	    <prop name="long_mode" type="enum:lv_label_long_mode" />
 	    <prop name="bind_text">
-	    	<param name="subject" type="subject" />
-	    	<param name="string" type="fmt" default="NULL"/>
+	    	<param name="bind_text" type="subject" />
+	    	<param name="fmt" type="string" default="NULL"/>
 	   	</prop>
 	</api>
 </widget>

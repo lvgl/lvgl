@@ -16,13 +16,14 @@ void tearDown(void)
 
 void test_xml_roller_with_attrs(void)
 {
-
     lv_obj_t * scr = lv_screen_active();
 
     const char * roller_attrs[] = {
         "width", "200",
-        "options", "'a\nb\nc\nd\ne' infinite",
-        "selected", "2 true",
+        "options", "a\nb\nc\nd\ne",
+        "options-mode", "infinite",
+        "selected", "2",
+        "selected-animated", "true",
         "visible_line_count", "3",
         NULL, NULL,
     };

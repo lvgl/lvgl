@@ -65,12 +65,9 @@ void lv_xml_scale_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("label_show", name)) lv_scale_set_label_show(item, lv_xml_to_bool(value));
         else if(lv_streq("post_draw", name)) lv_scale_set_post_draw(item, lv_xml_to_bool(value));
         else if(lv_streq("draw_ticks_on_top", name)) lv_scale_set_draw_ticks_on_top(item, lv_xml_to_bool(value));
-        else if(lv_streq("range", name)) {
-            int32_t value1 = lv_xml_atoi_split(&value, ' ');
-            int32_t value2 = lv_xml_atoi_split(&value, ' ');
-            lv_scale_set_range(item, value1, value2);
-        }
-        else if(lv_streq("angle_range", name)) lv_scale_set_angle_range(item, lv_xml_to_bool(value));
+        else if(lv_streq("min_value", name)) lv_scale_set_min_value(item, lv_xml_atoi(value));
+        else if(lv_streq("max_value", name)) lv_scale_set_max_value(item, lv_xml_atoi(value));
+        else if(lv_streq("angle_range", name)) lv_scale_set_angle_range(item, lv_xml_atoi(value));
         else if(lv_streq("rotation", name)) lv_scale_set_rotation(item, lv_xml_to_bool(value));
     }
 }
@@ -94,11 +91,8 @@ void lv_xml_scale_section_apply(lv_xml_parser_state_t * state, const char ** att
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("range", name)) {
-            int32_t value1 = lv_xml_atoi_split(&value, ' ');
-            int32_t value2 = lv_xml_atoi_split(&value, ' ');
-            lv_scale_set_section_range(scale, section, value1, value2);
-        }
+        if(lv_streq("min_value", name)) lv_scale_set_section_min_value(scale, section, lv_xml_atoi(value));
+        else if(lv_streq("max_value", name)) lv_scale_set_section_max_value(scale, section, lv_xml_atoi(value));
         else if(lv_streq("style_main", name)) {
             lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_scale_set_section_style_main(scale, section, &style_dsc->style);

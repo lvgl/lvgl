@@ -55,39 +55,19 @@ void lv_xml_roller_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("selected", name)) {
-            char buf[64];
-            lv_strlcpy(buf, value, sizeof(buf));
-            char * buf_p = buf;
-            int32_t v1 = lv_xml_atoi(lv_xml_split_str(&buf_p, ' '));
-            bool v2 = lv_xml_to_bool(buf_p);
-            lv_roller_set_selected(item, v1, v2);
+            int32_t v = lv_xml_atoi(value);
+            const char * anim_str = lv_xml_get_value_of(attrs, "value-animated");
+            bool anim = anim_str ? lv_xml_to_bool(anim_str) : false;
+            lv_roller_set_selected(item, v, anim);
         }
         if(lv_streq("visible_row_count", name)) {
             lv_roller_set_visible_row_count(item, lv_xml_atoi(value));
         }
 
         if(lv_streq("options", name)) {
-            /*E.g. 'a\nb\nc' true'*/
-            size_t opts_len = lv_strlen(value);
-            char * opts_buf = lv_malloc(opts_len + 1);
-            lv_memcpy(opts_buf, value, opts_len + 1);
-            LV_ASSERT_MALLOC(opts_buf);
-
-            /*Find the last space and trim the rest*/
-            uint32_t space_pos_from_back = 1;
-            while(space_pos_from_back < opts_len && value[opts_len - space_pos_from_back] != ' ') {
-                space_pos_from_back++;
-            }
-
-            opts_buf[opts_len - space_pos_from_back - 1] = '\0'; /*Also trim the `'`*/
-
-            lv_roller_mode_t mode = mode_text_to_enum_value(&opts_buf[opts_len - space_pos_from_back + 1]);
-
-            /*Also skip the leading `'`*/
-            lv_roller_set_options(item, opts_buf + 1, mode);
-
-            lv_free(opts_buf);
-
+            const char * mode_str = lv_xml_get_value_of(attrs, "options-mode");
+            lv_roller_mode_t mode = mode_str ? mode_text_to_enum_value(mode_str) : LV_ROLLER_MODE_NORMAL;
+            lv_roller_set_options(item, value, mode);
         }
         else if(lv_streq("bind_value", name)) {
             lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);

@@ -53,6 +53,7 @@ lv_result_t lv_xml_widget_register(const char * name, lv_xml_widget_create_cb_t 
         p->next = widget_processor_head;
         widget_processor_head = p;
     }
+
     return LV_RESULT_OK;
 }
 
@@ -61,12 +62,19 @@ lv_widget_processor_t * lv_xml_widget_get_processor(const char * name)
     /* Select the widget specific parser type based on the name */
     lv_widget_processor_t * p = widget_processor_head;
     while(p) {
-        if(lv_streq(p->name, name)) {
-            return p;
-        }
-
+        if(lv_streq(p->name, name)) return p;
         p = p->next;
     }
+
+    /* If not found try with "lv_obj-" prefix, as lv_obj elements works without explicit prefix too*/
+    char buf[256];
+    lv_snprintf(buf, sizeof(buf), "lv_obj-%s", name);
+    p = widget_processor_head;
+    while(p) {
+        if(lv_streq(p->name, buf)) return p;
+        p = p->next;
+    }
+
     return NULL;
 }
 

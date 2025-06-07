@@ -31,8 +31,8 @@ void test_xml_widget_direct_create(void)
 
     /*Use attributes*/
     const char * attrs[] = {
-        "range_min", "-100",
-        "range_max", "100",
+        "min_value", "-100",
+        "max_value", "100",
         "mode", "symmetrical",
         "value", "50",
         "name", "my_slider",
@@ -72,8 +72,8 @@ void test_xml_widget_create_from_component(void)
 
     /*Use attributes*/
     const char * attrs[] = {
-        "range_min", "-100",
-        "range_max", "100",
+        "min_value", "-100",
+        "max_value", "100",
         "mode", "symmetrical",
         "value", "50",
         NULL, NULL,
@@ -127,36 +127,39 @@ void test_xml_component_params(void)
 {
     const char * h3_xml =
         "<component>"
-        "<api>"
-        "<prop name=\"style\" type=\"style\"/>"
-        "</api>"
-        "<view extends=\"lv_label\" styles=\"$style\">"
-        "</view>"
+        "  <api>"
+        "    <prop name=\"style\" type=\"style\"/>"
+        "  </api>"
+        "  <view extends=\"lv_label\">"
+        "    <style name=\"$style\"/>"
+        "  </view>"
         "</component>";
 
     const char * red_button_xml =
         "<component>"
-        "<api>"
-        "<prop type=\"string\" name=\"btn_text\"/>"
-        "<prop type=\"style\" name=\"label_style\"/>"
-        "</api>"
-        "<view extends=\"lv_button\" style_radius=\"0\" style_bg_color=\"0xff0000\">"
-        "<h3 text=\"$btn_text\" style=\"$label_style\"/>"
-        "</view>"
+        "  <api>"
+        "    <prop type=\"string\" name=\"btn_text\"/>"
+        "    <prop type=\"style\" name=\"label_style\"/>"
+        "  </api>"
+        "  <view extends=\"lv_button\" style_radius=\"0\" style_bg_color=\"0xff0000\">"
+        "    <h3 text=\"$btn_text\"> "
+        "      <style name=\"$label_style\"/>"
+        "    </h3>"
+        "  </view>"
         "</component>";
 
     const char * card_xml =
         "<component>"
-        "<api>"
-        "<prop type=\"string\" name=\"action\" default=\"Default\"/>"
-        "</api>"
-        "<styles>"
-        "<style name=\"style1\" text_color=\"0xffff00\"/>"
-        "</styles>"
-        "<view width=\"200\" height=\"content\">"
-        "<h3 text=\"Title\" align=\"top_mid\" style_text_color=\"0xff0000\"/>"
-        "<red_button btn_text=\"$action\" label_style=\"style1\" y=\"20\"/>"
-        "</view>"
+        "  <api>"
+        "    <prop type=\"string\" name=\"action\" default=\"Default\"/>"
+        "  </api>"
+        "  <styles>"
+        "    <style name=\"style1\" text_color=\"0xffff00\"/>"
+        "  </styles>"
+        "  <view width=\"200\" height=\"content\">"
+        "    <h3 text=\"Title\" align=\"top_mid\" style_text_color=\"0xff0000\"/>"
+        "    <red_button btn_text=\"$action\" label_style=\"style1\" y=\"20\"/>"
+        "  </view>"
         "</component>";
 
     lv_xml_component_register_from_data("h3", h3_xml);
@@ -180,17 +183,20 @@ void test_xml_component_consts(void)
 {
     const char * h3_xml =
         "<component>"
-        "<consts>"
-        "<string name=\"action\" value=\"Log in\"/>"
-        "<color name=\"dark_color\" value=\"0x804000\"/>"
-        "<color name=\"accent_color\" value=\"0xff8000\"/>"
-        "<int name=\"size\" value=\"200\"/>"
-        "</consts>"
-        "<styles>"
-        "<style name=\"style1\" bg_color=\"#dark_color\" bg_opa=\"255\"/>"
-        "</styles>"
-        "<view extends=\"lv_label\" width=\"#size\" style_text_color=\"#accent_color\" text=\"#action\" styles=\"style1\">"
-        "</view>"
+        "  <consts>"
+        "    <string name=\"action\" value=\"Log in\"/>"
+        "    <color name=\"dark_color\" value=\"0x804000\"/>"
+        "    <color name=\"accent_color\" value=\"0xff8000\"/>"
+        "    <int name=\"size\" value=\"200\"/>"
+        "  </consts>"
+        ""
+        "  <styles>"
+        "    <style name=\"style1\" bg_color=\"#dark_color\" bg_opa=\"255\"/>"
+        "  </styles>"
+        ""
+        "  <view extends=\"lv_label\" width=\"#size\" style_text_color=\"#accent_color\" text=\"#action\">"
+        "  	<style name=\"style1\"/>"
+        "  </view>"
         "</component>";
 
     lv_xml_component_register_from_data("h3", h3_xml);
@@ -204,13 +210,15 @@ void test_xml_component_styles(void)
 {
     const char * my_btn_xml =
         "<component>"
-        "<styles>"
-        "<style name=\"rel_style\" bg_color=\"0xff0000\"/>"
-        "<style name=\"pr_style\" bg_color=\"0x800000\"/>"
-        "</styles>"
-        "<view extends=\"lv_button\" style_text_color=\"0x0000ff\" style_text_color:checked=\"0xa0a0ff\" styles=\"rel_style pr_style:checked\">"
-        "<lv_label/>"
-        "</view>"
+        "  <styles>"
+        "    <style name=\"rel_style\" bg_color=\"0xff0000\"/>"
+        "    <style name=\"pr_style\" bg_color=\"0x800000\"/>"
+        "  </styles>"
+        "  <view extends=\"lv_button\" style_text_color=\"0x0000ff\" style_text_color:checked=\"0xa0a0ff\">"
+        "    <style name=\"rel_style\"/>"
+        "    <style name=\"pr_style\" selector=\"checked\"/>"
+        "    <lv_label/>"
+        "  </view>"
         "</component>";
 
     lv_xml_component_register_from_data("my_btn", my_btn_xml);
@@ -236,12 +244,12 @@ void test_xml_error_resilience_syntax_ok(void)
         "  </consts>"
         ""
         "  <styles>"
-        "      <style name=\"rel_style\" bg_color=\"0xff0000\" not_a_prop=\"0xff0000\"/>"
-        "      <inv_style name=\"rel_style\" bg_color=\"0x800000\"/>"
+        "    <style name=\"rel_style\" bg_color=\"0xff0000\" not_a_prop=\"0xff0000\"/>"
+        "    <inv_style name=\"rel_style\" bg_color=\"0x800000\"/>"
         "    <style bg_color=\"0x800000\"/>"
         "  </styles>"
         ""
-        "  <view extends=\"not_a_widget\" style_text_color=\"0x0000ff\" style_text_color:checked=\"0x8080ff\" styles=\"rel_style pr_style:checked\">"
+        "  <view extends=\"not_a_widget\" style_text_color=\"0x0000ff\" style_text_color:checked=\"0x8080ff\">"
         "    <unknown/>"
         "    <lv_label not_an_attr=\"40\"/>"
         "  </view>"
@@ -257,17 +265,21 @@ void test_xml_image_and_font(void)
 {
     const char * btn_xml =
         "<component>"
-        "<consts>"
-        "<font name=\"font1\" value=\"lv_montserrat_18\"/>"
-        "<image name=\"image1\" value=\"test_img1\"/>"
-        "</consts>"
-        "<styles>"
-        "<style name=\"style_rel\" text_font=\"#font1\" text_color=\"0xffffff\" bg_image_src=\"#image1\" bg_image_tiled=\"true\" radius=\"0\"/>"
-        "<style name=\"style_chk\" text_font=\"lv_montserrat_16\" text_color=\"0xffff00\" bg_image_src=\"test_img2\"/>"
-        "</styles>"
-        "<view extends=\"lv_obj\" width=\"100\" height=\"70\" styles=\"style_rel style_chk:checked\" >"
-        "<lv_label text=\"hello\" align=\"center\" style_bg_color=\"0x888888\" style_bg_opa=\"200\"/>"
-        "</view>"
+        "  <consts>"
+        "    <font name=\"font1\" value=\"lv_montserrat_18\"/>"
+        "    <image name=\"image1\" value=\"test_img1\"/>"
+        "  </consts>"
+        ""
+        "  <styles>"
+        "    <style name=\"style_rel\" text_font=\"#font1\" text_color=\"0xffffff\" bg_image_src=\"#image1\" bg_image_tiled=\"true\" radius=\"0\"/>"
+        "    <style name=\"style_chk\" text_font=\"lv_montserrat_16\" text_color=\"0xffff00\" bg_image_src=\"test_img2\"/>"
+        "  </styles>"
+        ""
+        "  <view extends=\"lv_obj\" width=\"100\" height=\"70\">"
+        "    <style name=\"style_rel\"/>"
+        "    <style name=\"style_chk\" selector=\"checked\"/>"
+        "    <lv_label text=\"hello\" align=\"center\" style_bg_color=\"0x888888\" style_bg_opa=\"200\"/>"
+        "  </view>"
         "</component>";
 
     /*Monstserrat fonts are registered by LVGL */
