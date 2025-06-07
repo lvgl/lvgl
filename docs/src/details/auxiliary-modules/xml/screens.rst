@@ -20,6 +20,8 @@ Screens work very similarly to Components. Both can be:
 
 However, Screens **cannot** have an ``<api>``.
 
+It's also possible to define ``<screen permanent="true">`` which
+will make the screen created automatically.
 
 
 Usage
