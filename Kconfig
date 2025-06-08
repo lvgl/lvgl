@@ -203,7 +203,7 @@ menu "LVGL configuration"
 		config LV_DRAW_THREAD_STACK_SIZE
 			int "Stack size of draw thread in bytes"
 			default 8192
-			depends on LV_USE_OS > 0
+			depends on !LV_OS_NONE
 			help
 				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
@@ -211,7 +211,7 @@ menu "LVGL configuration"
 			int "Thread priority for the drawing thread"
 			range 0 4
 			default 3
-			depends on LV_USE_OS > 0
+			depends on !LV_OS_NONE
 			help
 				Thread priority controls the relative importance of the drawing threads.
 				Values correspond to lv_thread_prio_t enum in lv_os.h:
@@ -378,7 +378,7 @@ menu "LVGL configuration"
 
 		config LV_USE_VGLITE_DRAW_THREAD
 			bool "Use additional draw thread for VG-Lite processing"
-			depends on LV_USE_DRAW_VGLITE && LV_USE_OS > 0
+			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE
 			default y
 
 		config LV_USE_VGLITE_DRAW_ASYNC
@@ -414,7 +414,7 @@ menu "LVGL configuration"
 
 		config LV_USE_PXP_DRAW_THREAD
 			bool "Use additional draw thread for PXP processing"
-			depends on LV_USE_DRAW_PXP && LV_USE_OS > 0
+			depends on LV_USE_DRAW_PXP && !LV_OS_NONE
 			default y
 
 		config LV_USE_PXP_ASSERT
@@ -434,7 +434,7 @@ menu "LVGL configuration"
 
 		config LV_USE_G2D_DRAW_THREAD
 			bool "Use additional draw thread for G2D processing"
-			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0
+			depends on LV_USE_DRAW_G2D && !LV_OS_NONE
 			default y
 
 		config LV_USE_G2D_ASSERT
@@ -1968,7 +1968,7 @@ menu "LVGL configuration"
 
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
-			depends on LV_USE_NUTTX && LIBUV
+			depends on LV_USE_NUTTX
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT
