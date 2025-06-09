@@ -39,7 +39,7 @@ extern "C" {
  * @param config            NXP eLCD config object
  * @param frame_buffer1     pointer the first frame buffers
  * @param frame_buffer2     pointer the second frame buffers
- * @param buf_size          size of a buffer in bytes
+ * @param buf_size          size of a buffer in bytes (must be at least as large as the screen)
  * @return                  a display object initialized and registerd on the LVGL runtime
  */
 lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcdif_rgb_mode_config_t * config,
