@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_bar_orientation_t orentation_text_to_enum_value(const char * txt);
+static lv_bar_orientation_t orientation_text_to_enum_value(const char * txt);
 static lv_bar_mode_t mode_text_to_enum_value(const char * txt);
 
 /**********************
@@ -71,7 +71,7 @@ void lv_xml_bar_apply(lv_xml_parser_state_t * state, const char ** attrs)
             bool v2 = lv_xml_to_bool(buf_p);
             lv_bar_set_start_value(item, v1, v2);
         }
-        if(lv_streq("orientation", name)) lv_bar_set_orientation(item, orentation_text_to_enum_value(value));
+        if(lv_streq("orientation", name)) lv_bar_set_orientation(item, orientation_text_to_enum_value(value));
         if(lv_streq("mode", name)) lv_bar_set_mode(item, mode_text_to_enum_value(value));
         if(lv_streq("range", name)) {
             char buf[64];
@@ -88,7 +88,7 @@ void lv_xml_bar_apply(lv_xml_parser_state_t * state, const char ** attrs)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_bar_orientation_t orentation_text_to_enum_value(const char * txt)
+static lv_bar_orientation_t orientation_text_to_enum_value(const char * txt)
 {
     if(lv_streq("auto", txt)) return LV_BAR_ORIENTATION_AUTO;
     if(lv_streq("horizontal", txt)) return LV_BAR_ORIENTATION_HORIZONTAL;

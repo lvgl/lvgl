@@ -32,7 +32,7 @@ Identifier Letters
 ******************
 
 As mentioned above, a file system is identified by an assigned identifier letter.
-This identifier is merely a way for the LVGL File System abtraction logic to look up
+This identifier is merely a way for the LVGL File System abstraction logic to look up
 the appropriate registered file-system driver for a given path.
 
 **How it Works:**

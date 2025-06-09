@@ -446,7 +446,7 @@ static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
         }
     }
 
-    /* Check the recorded font resources created by font creater */
+    /* Check the recorded font resources created by font creator */
     lv_ll_t * refer_ll = &manager->refer_ll;
     uint32_t refer_ll_len = lv_ll_get_len(refer_ll);
     if(refer_ll_len) {
@@ -533,7 +533,7 @@ static lv_font_t * lv_font_manager_create_font_wrapper(lv_font_manager_t * manag
     return font;
 }
 
-static void lv_font_manager_delete_font_warpper(lv_font_manager_t * manager, lv_font_refer_node_t * refer_node)
+static void lv_font_manager_delete_font_wrapper(lv_font_manager_t * manager, lv_font_refer_node_t * refer_node)
 {
     LV_ASSERT_NULL(manager);
     LV_ASSERT_NULL(refer_node);
@@ -606,7 +606,7 @@ static bool lv_font_manager_drop_font(lv_font_manager_t * manager, const lv_font
     }
 
     /* if ref_cnt is about to be 0, free font resource */
-    lv_font_manager_delete_font_warpper(manager, refer_node);
+    lv_font_manager_delete_font_wrapper(manager, refer_node);
 
     /* free refer_node */
     lv_ll_remove(&manager->refer_ll, refer_node);

@@ -971,7 +971,7 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_RGB888(dsc, dest_px_size)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; src_x < w; dest_x += dest_px_size, src_x++) {
-                        /*For the trivial case use the premultipled image as it is.
+                        /*For the trivial case use the premultiplied image as it is.
                          *For the other cases unpremultiply as another alpha also needs to be applied.*/
                         lv_color_24_24_mix_premult((const uint8_t *)&src_buf_c32[src_x], &dest_buf[dest_x], src_buf_c32[src_x].alpha);
                     }

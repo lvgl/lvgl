@@ -35,7 +35,7 @@ Configure UEFI driver
 
     #define LV_UEFI_USE_MEMORY_SERVICES  1
 
-- You can enable file system support for the file system from which the appliation got loaded (default letter 'E')
+- You can enable file system support for the file system from which the application got loaded (default letter 'E')
 
 .. code-block:: c
 

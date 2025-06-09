@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt);
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt);
 static lv_slider_mode_t mode_text_to_enum_value(const char * txt);
 
 /**********************
@@ -80,7 +80,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
             bool v2 = lv_xml_to_bool(buf_p);
             lv_bar_set_start_value(item, v1, v2);
         }
-        if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orentation_text_to_enum_value(value));
+        if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orientation_text_to_enum_value(value));
         if(lv_streq("mode", name)) lv_slider_set_mode(item, mode_text_to_enum_value(value));
         if(lv_streq("range_min", name)) lv_slider_set_range(item, lv_xml_atoi(value), lv_slider_get_max_value(item));
         if(lv_streq("range_max", name)) lv_slider_set_range(item, lv_slider_get_min_value(item), lv_xml_atoi(value));
@@ -99,7 +99,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt)
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt)
 {
     if(lv_streq("auto", txt)) return LV_SLIDER_ORIENTATION_AUTO;
     if(lv_streq("horizontal", txt)) return LV_SLIDER_ORIENTATION_HORIZONTAL;

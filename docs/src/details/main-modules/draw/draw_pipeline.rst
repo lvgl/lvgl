@@ -109,7 +109,7 @@ create and initialize it (after :cpp:func:`lv_init`) as above.  This will includ
 several things, but setting its ``evaluate_cb`` and ``dispatch_cb`` callbacks
 (mentioned later) are two of them.
 
-For an example of how draw-unit cration and initialization is done, see
+For an example of how draw-unit creation and initialization is done, see
 :cpp:func:`lv_draw_sw_init` in lv_draw_sw.c_ or the other draw units whose ``init``
 functions are optionally called in :cpp:func:`lv_init`.
 
