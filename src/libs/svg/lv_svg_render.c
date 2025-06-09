@@ -726,7 +726,7 @@ static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, con
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) {
                         obj->fill_ref = lv_strdup(attr->value.sval);
                     }
-                    else {   // color
+                    else {   /* color */
                         dsc->fill_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
                         dsc->fill_dsc.color = lv_color_to_32(lv_color_hex(attr->value.uval), 0xFF);
                     }
@@ -757,7 +757,7 @@ static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, con
                     if(attr->val_type == LV_SVG_ATTR_VALUE_PTR) {
                         obj->stroke_ref = lv_strdup(attr->value.sval);
                     }
-                    else {   // color
+                    else {   /* color */
                         dsc->stroke_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
                         dsc->stroke_dsc.color = lv_color_to_32(lv_color_hex(attr->value.uval), 0xFF);
                     }
@@ -874,7 +874,7 @@ static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, con
             }
             break;
         case LV_SVG_ATTR_STROKE_DASH_OFFSET:
-            // not support yet
+            /* not support yet */
             break;
     }
 }
@@ -944,7 +944,7 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
             lv_matrix_translate(mtx, bounds.x1, bounds.y1);
         }
     }
-    else {   // LV_VECTOR_GRADIENT_STYLE_LINEAR
+    else {   /* LV_VECTOR_GRADIENT_STYLE_LINEAR */
         grad_dsc->x1 = PCT_TO_PX(grad_dsc->x1, w);
         grad_dsc->y1 = PCT_TO_PX(grad_dsc->y1, h);
         grad_dsc->x2 = PCT_TO_PX(grad_dsc->x2, w);
@@ -962,20 +962,20 @@ static void _init_draw_dsc(lv_vector_draw_dsc_t * dsc)
     fill_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
     fill_dsc->opa = LV_OPA_COVER;
     fill_dsc->fill_rule = LV_VECTOR_FILL_NONZERO;
-    lv_matrix_identity(&(fill_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(fill_dsc->matrix)); /* identity matrix */
 
     lv_vector_stroke_dsc_t * stroke_dsc = &(dsc->stroke_dsc);
     stroke_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
     stroke_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
-    stroke_dsc->opa = LV_OPA_0; // default no stroke
+    stroke_dsc->opa = LV_OPA_0; /* default no stroke */
     stroke_dsc->width = 1.0f;
     stroke_dsc->cap = LV_VECTOR_STROKE_CAP_BUTT;
     stroke_dsc->join = LV_VECTOR_STROKE_JOIN_MITER;
     stroke_dsc->miter_limit = 4.0f;
-    lv_matrix_identity(&(stroke_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(stroke_dsc->matrix));
 
     dsc->blend_mode = LV_VECTOR_BLEND_SRC_OVER;
-    lv_matrix_identity(&(dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(dsc->matrix));
 }
 
 static void _deinit_draw_dsc(lv_vector_draw_dsc_t * dsc)
@@ -1053,14 +1053,14 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
         lv_svg_attr_t * attr = lv_array_at(&node->attrs, i);
         obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
     }
-    if(node->type == LV_SVG_TAG_G) { // only <g> need store it
+    if(node->type == LV_SVG_TAG_G) { /* only <g> need store it */
         state->draw_dsc->fill_ref = obj->fill_ref;
         state->draw_dsc->stroke_ref = obj->stroke_ref;
     }
     obj->head = state->list;
 }
 
-// init functions
+/* init functions */
 
 static void _init_obj(lv_svg_render_obj_t * obj, const lv_svg_node_t * node)
 {
@@ -1277,7 +1277,7 @@ static void _special_render(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * d
     }
 }
 
-// render functions
+/* render functions */
 static void _render_viewport(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
     LV_UNUSED(matrix);
@@ -1599,7 +1599,7 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
         build_path = true;
     }
 
-    // draw text contents and spans
+    /* draw text contents and spans */
     lv_matrix_t mtx;
     lv_matrix_identity(&mtx);
     lv_matrix_translate(&mtx, text->x, text->y);
@@ -1679,7 +1679,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_vector_dsc_
 
     if(lv_array_size(&span->path->ops) == 0) { /* empty path */
         lv_vector_path_t * glyph_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-        // draw text contents and spans
+        /* draw text contents and spans */
         lv_matrix_t * mtx = matrix;
 
         float scale = span->size / 128.0f;
@@ -1714,7 +1714,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_vector_dsc_
 }
 #endif
 
-// get bounds functions
+/* get bounds functions */
 
 static void _get_viewport_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
@@ -1826,7 +1826,7 @@ static void _get_tspan_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 }
 #endif
 
-// get size fucctions
+/* get size fucctions */
 static uint32_t _calc_path_data_size(lv_vector_path_t * path)
 {
     uint32_t size = 0;
@@ -1976,7 +1976,7 @@ static void _get_group_size(const struct _lv_svg_render_obj * obj, uint32_t * si
     *size += lv_array_capacity(&group->items) * sizeof(void *);
 }
 
-// destroy functions
+/* destroy functions */
 static void _destroy_poly(lv_svg_render_obj_t * obj)
 {
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
@@ -2281,7 +2281,7 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
                 if(node->type == LV_SVG_TAG_LINEAR_GRADIENT) {
                     grad->dsc.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
                 }
-                else {   // radial gradient
+                else {   /* radial gradient */
                     grad->dsc.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
                 }
                 _set_render_attrs(LV_SVG_RENDER_OBJ(grad), node, state);
@@ -2376,7 +2376,7 @@ static void _lv_svg_doc_walk_after_cb(const lv_tree_node_t * node, void * data)
         uint32_t count = LV_TREE_NODE(node)->child_cnt;
         for(uint32_t i = 0; i < count; i++) {
             lv_svg_node_t * child = LV_SVG_NODE_CHILD(node, i);
-            if(child->render_obj) { // not defs
+            if(child->render_obj) { /* not defs */
                 lv_array_push_back(&group->items, (uint8_t *)(&child->render_obj));
             }
         }
