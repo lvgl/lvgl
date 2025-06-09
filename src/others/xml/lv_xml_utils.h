@@ -25,7 +25,7 @@ extern "C" {
 const char * lv_xml_get_value_of(const char ** attrs, const char * name);
 
 int32_t lv_xml_atoi(const char * str);
-
+float lv_xml_atof(const char * str);
 
 /**
  * Convert sections of a string to int.
@@ -35,6 +35,15 @@ int32_t lv_xml_atoi(const char * str);
  * @return          the int before the next delimiter
  */
 int32_t lv_xml_atoi_split(const char ** str, char delimiter);
+
+/**
+ * Convert sections of a string to float.
+ * The end of the string is indicated by the `delimiter`.
+ * @param str       pointer to a string, it will point to the character after the delimiter
+ * @param delimiter a character to indicate the end of the float
+ * @return          the float before the next delimiter
+ */
+float lv_xml_atof_split(const char ** str, char delimiter);
 
 lv_color_t lv_xml_to_color(const char * str);
 
