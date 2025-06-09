@@ -39,11 +39,14 @@ typedef struct {
 
     void * mem;
     void * mem2;
+    void * mem3;
     void * mem_off_screen;
     uint32_t mem2_yoffset;
+    uint32_t mem3_yoffset;
 
     lv_draw_buf_t buf1;
     lv_draw_buf_t buf2;
+    lv_draw_buf_t buf3;
 } lv_nuttx_fb_t;
 
 /**********************
@@ -54,6 +57,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 static lv_color_format_t fb_fmt_to_color_format(int fmt);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
+static int fbdev_init_mem3(lv_nuttx_fb_t * dsc);
 static void display_refr_timer_cb(lv_timer_t * tmr);
 static void display_release_cb(lv_event_t * e);
 #if defined(CONFIG_FB_UPDATE)
@@ -143,7 +147,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, dsc->mem, data_size);
 
     /* Check buffer mode */
-    bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
+    bool double_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 2);
     if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
@@ -151,6 +155,16 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
         lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem2, data_size);
         lv_display_set_draw_buffers(disp, &dsc->buf1, &dsc->buf2);
+
+        bool triple_buffer = dsc->pinfo.yres_virtual >= (dsc->vinfo.yres * 3);
+        if(triple_buffer) {
+            if((ret = fbdev_init_mem3(dsc)) < 0) {
+                goto errout;
+            }
+
+            lv_draw_buf_init(&dsc->buf3, w, h, color_format, stride, dsc->mem3, data_size);
+            lv_display_set_3rd_draw_buffer(disp, &dsc->buf3);
+        }
     }
     else {
         dsc->mem_off_screen = malloc(data_size);
@@ -258,9 +272,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 #if defined(CONFIG_FB_UPDATE)
     /*May be some direct update command is required*/
-    int yoffset = disp->buf_act == disp->buf_1 ?
-                  0 : dsc->mem2_yoffset;
-
+    int yoffset = 0;
+    if(disp->buf_act == disp->buf_2) {
+        yoffset = dsc->mem2_yoffset;
+    }
+    else if(disp->buf_act == disp->buf_3) {
+        yoffset = dsc->mem3_yoffset;
+    }
     /* Join the areas to update */
     lv_area_t final_inv_area;
     lv_memzero(&final_inv_area, sizeof(final_inv_area));
@@ -282,8 +300,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         if(disp->buf_act == disp->buf_1) {
             dsc->pinfo.yoffset = 0;
         }
-        else {
+        else if(disp->buf_act == disp->buf_2) {
             dsc->pinfo.yoffset = dsc->mem2_yoffset;
+        }
+        else if(disp->buf_act == disp->buf_3) {
+            dsc->pinfo.yoffset = dsc->mem3_yoffset;
         }
 
         if(ioctl(dsc->fd, FBIOPAN_DISPLAY, (unsigned long)((uintptr_t) & (dsc->pinfo))) < 0) {
@@ -391,6 +412,60 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
 
     LV_LOG_USER("Use of %sconsecutive mem2 = %p, yoffset = %" LV_PRIu32, is_consecutive ? "" : "non-", dsc->mem2,
                 dsc->mem2_yoffset);
+
+    return 0;
+}
+
+static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
+{
+    uintptr_t buf_offset;
+    struct fb_planeinfo_s pinfo;
+    int ret;
+
+    lv_memzero(&pinfo, sizeof(pinfo));
+
+    /* Get display[2] planeinfo */
+
+    pinfo.display = dsc->pinfo.display + 2;
+
+    if((ret = fbdev_get_pinfo(dsc->fd, &pinfo)) < 0) {
+        return ret;
+    }
+
+    /* Check bpp */
+
+    if(pinfo.bpp != dsc->pinfo.bpp) {
+        LV_LOG_WARN("mem3 is incorrect");
+        return -EINVAL;
+    }
+
+    /* Check the buffer address offset,
+     * It needs to be divisible by pinfo.stride
+     */
+
+    buf_offset = pinfo.fbmem - dsc->mem;
+
+    if((buf_offset % dsc->pinfo.stride) != 0) {
+        LV_LOG_WARN("It is detected that buf_offset(%" PRIuPTR ") "
+                    "and stride(%d) are not divisible, please ensure "
+                    "that the driver handles the address offset by itself.",
+                    buf_offset, dsc->pinfo.stride);
+    }
+
+    /* Calculate the address and yoffset of mem3 */
+
+    if(buf_offset == 0) {
+        dsc->mem3_yoffset = dsc->vinfo.yres * 2;
+        dsc->mem3 = pinfo.fbmem + dsc->mem3_yoffset * pinfo.stride;
+        LV_LOG_USER("Use consecutive mem3 = %p, yoffset = %" LV_PRIu32,
+                    dsc->mem3, dsc->mem3_yoffset);
+    }
+    else {
+        dsc->mem3_yoffset = buf_offset / dsc->pinfo.stride;
+        dsc->mem3 = pinfo.fbmem;
+        LV_LOG_USER("Use non-consecutive mem3 = %p, yoffset = %" LV_PRIu32,
+                    dsc->mem3, dsc->mem3_yoffset);
+    }
 
     return 0;
 }

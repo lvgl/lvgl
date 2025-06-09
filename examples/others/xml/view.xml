@@ -7,12 +7,15 @@
 	<styles>
 		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
 		<style name="btn_pr_style" bg_opa="255"/>
+        <style name="red_border" border_color="0xff0000"></style>
+
 	</styles>
 
-	<view extends="lv_obj" width="280" height="content" style_bg_color="#light_blue">
+	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
 		<lv_label text="Hello"/>
-		<my_card title="Card 1"
+		<my_card title="Card 1" name="card1"
 				 y="0"
+                 styles="red_border"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 

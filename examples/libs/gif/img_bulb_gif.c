@@ -1118,9 +1118,11 @@ static const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_
 };
 
 const lv_image_dsc_t img_bulb_gif = {
-    .header.w = 0,
-    .header.h = 0,
-    .header.cf = LV_COLOR_FORMAT_RAW,
-    .data = img_blub_gif_map,
+    .header = {
+        .cf = LV_COLOR_FORMAT_RAW,
+        .w = 0,
+        .h = 0,
+    },
     .data_size = sizeof(img_blub_gif_map),
+    .data = img_blub_gif_map,
 };

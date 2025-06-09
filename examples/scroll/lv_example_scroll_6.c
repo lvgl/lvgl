@@ -3,7 +3,7 @@
 
 static void scroll_event_cb(lv_event_t * e)
 {
-    lv_obj_t * cont = lv_event_get_target(e);
+    lv_obj_t * cont = lv_event_get_target_obj(e);
 
     lv_area_t cont_a;
     lv_obj_get_coords(cont, &cont_a);
@@ -67,7 +67,7 @@ void lv_example_scroll_6(void)
         lv_obj_set_width(btn, lv_pct(100));
 
         lv_obj_t * label = lv_label_create(btn);
-        lv_label_set_text_fmt(label, "Button %"LV_PRIu32, i);
+        lv_label_set_text_fmt(label, "Button %" LV_PRIu32, i);
     }
 
     /*Update the buttons position manually for first*/

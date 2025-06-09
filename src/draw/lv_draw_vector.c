@@ -732,6 +732,11 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
         return;
     }
 
+    lv_area_t final_rect;
+    if(!lv_area_intersect(&final_rect, &r, rect)) {
+        return;
+    }
+
     if(!dsc->tasks.task_list) {
         dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
         LV_ASSERT_MALLOC(dsc->tasks.task_list);
@@ -743,7 +748,7 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 
     new_task->dsc.fill_dsc.color = dsc->current_dsc.fill_dsc.color;
     new_task->dsc.fill_dsc.opa = dsc->current_dsc.fill_dsc.opa;
-    lv_area_copy(&(new_task->dsc.scissor_area), rect);
+    lv_area_copy(&(new_task->dsc.scissor_area), &final_rect);
 }
 
 void lv_draw_vector(lv_vector_dsc_t * dsc)

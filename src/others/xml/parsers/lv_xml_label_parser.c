@@ -24,6 +24,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_label_long_mode_t long_mode_text_to_enum_value(const char * txt);
+static void free_fmt_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,12 +59,27 @@ void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
         if(lv_streq("text", name)) lv_label_set_text(item, value);
         if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
         if(lv_streq("bind_text", name)) {
-            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
-            if(subject) {
-                lv_label_bind_text(item, subject, NULL);
-            }
-            else {
-                LV_LOG_WARN("Subject \"%s\" doesn't exist in label bind_text", value);
+            char buf[256];
+            lv_strncpy(buf, value, sizeof(buf));
+            char * bufp = buf;
+            char * subject_name = lv_xml_split_str(&bufp, ' ');
+            if(subject_name) {
+                lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_name);
+                if(subject) {
+                    char * fmt = bufp; /*The second part is the format text*/
+                    if(fmt && fmt[0] == '\0') fmt = NULL;
+                    if(fmt) {
+                        if(fmt[0] == '\'') fmt++;
+                        size_t fmt_len = lv_strlen(fmt);
+                        if(fmt_len != 0 && fmt[fmt_len - 1] == '\'') fmt[fmt_len - 1] = '\0';
+                        fmt = lv_strdup(fmt);
+                        lv_obj_add_event_cb(item, free_fmt_event_cb, LV_EVENT_DELETE, fmt);
+                    }
+                    lv_label_bind_text(item, subject, fmt);
+                }
+                else {
+                    LV_LOG_WARN("Subject \"%s\" doesn't exist in label bind_text", value);
+                }
             }
         }
     }
@@ -83,6 +99,12 @@ static lv_label_long_mode_t long_mode_text_to_enum_value(const char * txt)
 
     LV_LOG_WARN("%s is an unknown value for label's long_mode", txt);
     return 0; /*Return 0 in lack of a better option. */
+}
+
+static void free_fmt_event_cb(lv_event_t * e)
+{
+    void * fmt = lv_event_get_user_data(e);
+    lv_free(fmt);
 }
 
 #endif /* LV_USE_XML */

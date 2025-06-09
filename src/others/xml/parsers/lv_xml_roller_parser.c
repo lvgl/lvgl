@@ -89,6 +89,15 @@ void lv_xml_roller_apply(lv_xml_parser_state_t * state, const char ** attrs)
             lv_free(opts_buf);
 
         }
+        else if(lv_streq("bind_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_roller_bind_value(item, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in roller bind_value", value);
+            }
+        }
     }
 }
 

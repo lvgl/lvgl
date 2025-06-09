@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 #
-# Generate the cmake variables CONFIG_LV_USE_* from the
+# Generate the cmake variables CONFIG_LV_USE_* or CONFIG_LV_BUILD_* from the
 # preprocessed lv_conf_internal.h
 #
 # Author: David TRUAN (david.truan@edgemtech.ch)
+# Author: Erik Tagirov (erik.tagirov@edgemtech.ch)
 #
 
 import os
 import argparse
+import re
 
 def fatal(msg):
     print()
@@ -18,7 +20,7 @@ def fatal(msg):
 def get_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=""
                                      "Convert the expanded lv_conf_internal.h to cmake variables."
-                                     "It converts all LV_USE_* configurations."
+                                     "It converts all LV_USE_*, LV_BUILD_* configurations."
                                     )
 
     parser.add_argument('--input', type=str, required=True, nargs='?',
@@ -29,6 +31,10 @@ def get_args():
 
     parser.add_argument("--kconfig", action="store_true", help="Enable kconfig flag")
 
+    parser.add_argument("--debug", action="store_true", required=False, help="Show unhandled expressions")
+
+    parser.add_argument("--parentscope", action="store_true", required=False, help="Additionaly set the variables in the parent scope")
+
     args = parser.parse_args()
 
     # The input must exist
@@ -37,17 +43,26 @@ def get_args():
 
     return args
 
-def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
+def write_set_cmd(fout, expr, is_parent_scope):
+
+    fout.write(f'set({expr})\n')
+
+    # This makes the variable usable from the top level directory
+    if is_parent_scope == True:
+        fout.write(f'set({expr} PARENT_SCOPE)\n')
+
+def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, debug: bool, is_parent_scope: bool):
     fin = open(path_input)
     fout = open(path_output, "w", newline='')
 
-    # If we use Kconfig, we must check the CONFIG_LV_USE_* defines
+    # If we use Kconfig, we must check the CONFIG_LV_USE_* and 
+    # CONFIG_LV_BUILD_* defines
     if kconfig:
-        CONFIG_PATTERN="#define CONFIG_LV_USE"
+        CONFIG_PATTERN="^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD)"
         CONFIG_PREFIX=""
-    # Otherwise check the LV_USE_* defines
+    # Otherwise check the LV_USE_* and LV_BUILD_* defines
     else:
-        CONFIG_PATTERN="#define LV_USE"
+        CONFIG_PATTERN="^#define +(LV_USE|LV_BUILD)"
         CONFIG_PREFIX="CONFIG_"
 
 
@@ -57,7 +72,7 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
 
         # Treat the LV_USE_STDLIB_* configs in a special way, as we need
         # to convert the define to full config with 1 value when enabled
-        if line.startswith(f'{CONFIG_PATTERN}_STDLIB'):
+        if re.search(f'{CONFIG_PATTERN}_STDLIB', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -70,11 +85,11 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
 
             name = name.replace("STDLIB", type)
 
-            fout.write(f'set({CONFIG_PREFIX}{name} 1)\n')
+            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
 
         # Treat the LV_USE_OS config in a special way, as we need
         # to convert the define to full config with 1 value when enabled
-        if line.startswith(f'{CONFIG_PATTERN}_OS'):
+        if re.search(f'{CONFIG_PATTERN}_OS', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -87,11 +102,13 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
 
             name += type
 
-            fout.write(f'set({CONFIG_PREFIX}{name} 1)\n')
+            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} 1', is_parent_scope)
 
-        # For the rest of config, simply add CONFIG_ and write
-        # all LV_USE_* configs, as these are the one needed in cmake
-        elif line.startswith(f'{CONFIG_PATTERN}'):
+        # For the rest of the configs, simply add CONFIG_ and write the name of the define
+        # all LV_USE_* or LV_BUILD_* configs where the value is 0 or 1,
+        # as these are the ones that are needed in cmake
+        # To detect the configuration of LVGL to perform conditional compilation/linking
+        elif re.search(f'{CONFIG_PATTERN}.* +[01] *$', line):
 
             parts = line.split()
             if len(parts) < 3:
@@ -100,10 +117,16 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
             name = parts[1]
             value = parts[2].strip()
 
-            fout.write(f'set({CONFIG_PREFIX}{name} {value})\n')
+            write_set_cmd(fout, f'{CONFIG_PREFIX}{name} {value}', is_parent_scope)
+
+        else:
+            # Useful for debugging expressions that are unhandled,
+            # if the script fails in 'unexpected ways'
+            if debug == True:
+                print(f"DBG: Skipping expression: '{line} - not handled'")
 
 
 if __name__ == '__main__':
     args = get_args()
 
-    generate_cmake_variables(args.input, args.output, args.kconfig)
+    generate_cmake_variables(args.input, args.output, args.kconfig, args.debug, args.parentscope)

@@ -2,7 +2,6 @@ Sphinx
 breathe
 imagesize
 importlib-metadata
-sphinx-rtd-theme
 sphinx-sitemap
 sphinxcontrib-applehelp
 sphinxcontrib-devhelp
@@ -11,8 +10,10 @@ sphinxcontrib-jsmath
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
 sphinxcontrib-mermaid==0.9.2
+sphinx-copybutton
 sphinx-design
-sphinx-rtd-dark-mode
 typing-extensions
 sphinx-reredirects
 dirsync
+furo
+accessible-pygments

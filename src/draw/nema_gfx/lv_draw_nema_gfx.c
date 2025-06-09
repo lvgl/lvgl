@@ -119,7 +119,7 @@ void lv_draw_nema_gfx_init(void)
 
 
 #if LV_USE_OS
-    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_THREAD_PRIO_HIGH, nema_gfx_render_thread_cb, 2 * 1024,
+    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_DRAW_THREAD_PRIO, nema_gfx_render_thread_cb, 2 * 1024,
                    draw_nema_gfx_unit);
 #endif
 }
@@ -177,7 +177,7 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
             }
         case LV_DRAW_TASK_TYPE_TRIANGLE: {
                 lv_draw_triangle_dsc_t * draw_triangle_dsc = (lv_draw_triangle_dsc_t *) task->draw_dsc;
-                if((draw_triangle_dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
+                if((draw_triangle_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
                     if(task->preference_score > 80) {
                         task->preference_score = 80;
                         task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;

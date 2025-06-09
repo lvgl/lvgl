@@ -5,15 +5,11 @@
 # here, such as MicroPython and PC simulator packages.
 #
 # Note: This script is run by the CI workflows.
+SCRIPT_PATH=$(readlink -f $0)
+SCRIPT_DIR=$(dirname $SCRIPT_PATH)
+
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install gcc gcc-multilib g++-multilib ninja-build \
-    libpng-dev libjpeg-turbo8-dev libfreetype6-dev \
-    libglew-dev libglfw3-dev libsdl2-dev \
-    libpng-dev:i386 libjpeg-dev:i386 libfreetype6-dev:i386 \
-    ruby-full gcovr cmake  python3 libinput-dev libxkbcommon-dev \
-    libdrm-dev pkg-config wayland-protocols libwayland-dev libwayland-bin \
-    libwayland-dev:i386 libxkbcommon-dev:i386 libudev-dev \
-    libavformat-dev libavcodec-dev libswscale-dev libavutil-dev \
-    libavformat-dev:i386 libavcodec-dev:i386 libswscale-dev:i386 libavutil-dev:i386
-pip3 install pypng lz4 kconfiglib
+
+cat $SCRIPT_DIR/prerequisites-apt.txt | xargs sudo apt install -y
+pip3 install --user -r $SCRIPT_DIR/prerequisites-pip.txt

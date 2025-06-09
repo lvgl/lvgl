@@ -50,7 +50,31 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
-    return font_p->get_glyph_bitmap(g_dsc, draw_buf);
+
+    const uint8_t save_req = g_dsc->req_raw_bitmap;
+    g_dsc->req_raw_bitmap = 0;
+    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, draw_buf);
+    g_dsc->req_raw_bitmap = save_req;
+
+    return bitmap;
+}
+
+const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc)
+{
+    const lv_font_t * font_p = g_dsc->resolved_font;
+    LV_ASSERT_NULL(font_p);
+
+    if(font_p->static_bitmap == 0) {
+        LV_LOG_WARN("Requesting static bitmap of a non-static bitmap of %p font", (void *)font_p);
+        return NULL;
+    }
+
+    const uint8_t save_req = g_dsc->req_raw_bitmap;
+    g_dsc->req_raw_bitmap = 1;
+    const void * bitmap = font_p->get_glyph_bitmap(g_dsc, NULL);
+    g_dsc->req_raw_bitmap = save_req;
+
+    return bitmap;
 }
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
@@ -115,12 +139,14 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->adv_w = 0;
 #endif
 
+    dsc_out->stride = 0;
     dsc_out->resolved_font = NULL;
     dsc_out->box_h = font_p->line_height;
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;
     dsc_out->format = LV_FONT_GLYPH_FORMAT_A1;
     dsc_out->is_placeholder = true;
+
 
     return false;
 }
@@ -166,6 +192,11 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
                      && lv_strcmp(ft_info_1->name, ft_info_2->name) == 0);
 
     return is_equal;
+}
+
+bool lv_font_has_static_bitmap(const lv_font_t * font)
+{
+    return font->static_bitmap;
 }
 
 /**********************

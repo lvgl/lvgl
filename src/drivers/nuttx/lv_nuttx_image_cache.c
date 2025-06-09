@@ -97,6 +97,8 @@ void lv_nuttx_image_cache_init(bool use_independent_image_heap)
 
 void lv_nuttx_image_cache_deinit(void)
 {
+    lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
+
     if(ctx->independent_image_heap == false) goto FREE_CONTEXT;
     if(ctx->initialized == false) goto FREE_CONTEXT;
 
@@ -104,7 +106,6 @@ void lv_nuttx_image_cache_deinit(void)
     free(ctx->mem);
 
 FREE_CONTEXT:
-    lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
     handlers->buf_malloc_cb = ctx->malloc_cb;
     handlers->buf_free_cb = ctx->free_cb;
 

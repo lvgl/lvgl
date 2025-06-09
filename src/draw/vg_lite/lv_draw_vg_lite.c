@@ -74,7 +74,7 @@ void lv_draw_vg_lite_init(void)
 
     lv_vg_lite_image_dsc_init(unit);
 #if LV_USE_VECTOR_GRAPHIC
-    lv_vg_lite_grad_init(unit, LV_VG_LITE_GRAD_CACHE_CNT);
+    unit->grad_ctx = lv_vg_lite_grad_ctx_create(LV_VG_LITE_GRAD_CACHE_CNT, unit);
     lv_vg_lite_stroke_init(unit, LV_VG_LITE_STROKE_CACHE_CNT);
 #endif
     lv_vg_lite_path_init(unit);
@@ -135,12 +135,14 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
 
     /* Crop out extra pixels drawn due to scaling accuracy issues */
+    lv_area_t scissor_area = layer->phy_clip_area;
+#else
+    lv_area_t scissor_area = layer->_clip_area;
+#endif
+    lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
-        lv_area_t scissor_area = layer->phy_clip_area;
-        lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
         lv_vg_lite_set_scissor_area(&scissor_area);
     }
-#endif
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LETTER:
@@ -292,7 +294,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 
     lv_vg_lite_image_dsc_deinit(unit);
 #if LV_USE_VECTOR_GRAPHIC
-    lv_vg_lite_grad_deinit(unit);
+    lv_vg_lite_grad_ctx_delete(unit->grad_ctx);
     lv_vg_lite_stroke_deinit(unit);
 #endif
     lv_vg_lite_path_deinit(unit);

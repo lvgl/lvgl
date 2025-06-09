@@ -84,6 +84,15 @@ void lv_xml_arc_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("mode", name)) {
             lv_arc_set_mode(item, mode_text_to_enum_value(value));
         }
+        else if(lv_streq("bind_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_arc_bind_value(item, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in arc bind_value", value);
+            }
+        }
     }
 }
 

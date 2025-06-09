@@ -377,6 +377,21 @@
     #endif
 #endif
 
+/** Thread priority of the drawing task.
+ *  Higher values mean higher priority.
+ *  Can use values from lv_thread_prio_t enum in lv_os.h: LV_THREAD_PRIO_LOWEST,
+ *  LV_THREAD_PRIO_LOW, LV_THREAD_PRIO_MID, LV_THREAD_PRIO_HIGH, LV_THREAD_PRIO_HIGHEST
+ *  Make sure the priority value aligns with the OS-specific priority levels.
+ *  On systems with limited priority levels (e.g., FreeRTOS), a higher value can improve
+ *  rendering performance but might cause other tasks to starve. */
+#ifndef LV_DRAW_THREAD_PRIO
+    #ifdef CONFIG_LV_DRAW_THREAD_PRIO
+        #define LV_DRAW_THREAD_PRIO CONFIG_LV_DRAW_THREAD_PRIO
+    #else
+        #define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -404,6 +419,17 @@
             #endif
         #else
             #define LV_DRAW_SW_SUPPORT_RGB565       1
+        #endif
+    #endif
+    #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+            #else
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
         #endif
     #endif
     #ifndef LV_DRAW_SW_SUPPORT_RGB565A8
@@ -732,6 +758,15 @@
             #define LV_USE_VGLITE_ASSERT 0
         #endif
     #endif
+
+    /** Enable VGLite error checks. */
+    #ifndef LV_USE_VGLITE_CHECK_ERROR
+        #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
+            #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
+        #else
+            #define LV_USE_VGLITE_CHECK_ERROR 0
+        #endif
+    #endif
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -895,10 +930,14 @@
      *  NOTE: which usually improves performance,
      *  but does not guarantee the same rendering quality as the software. */
     #ifndef LV_VG_LITE_USE_BOX_SHADOW
-        #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-            #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+                #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+            #else
+                #define LV_VG_LITE_USE_BOX_SHADOW 0
+            #endif
         #else
-            #define LV_VG_LITE_USE_BOX_SHADOW 0
+            #define LV_VG_LITE_USE_BOX_SHADOW 1
         #endif
     #endif
 
@@ -1794,14 +1833,14 @@
     #ifdef CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
         #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
     #else
-        #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1000 most common CJK radicals */
+        #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1338 most common CJK radicals */
     #endif
 #endif
 #ifndef LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
     #ifdef CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
         #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
     #else
-        #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1000 most common CJK radicals */
+        #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1338 most common CJK radicals */
     #endif
 #endif
 
@@ -1991,6 +2030,7 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
     #ifdef LV_KCONFIG_PRESENT
@@ -2025,6 +2065,18 @@
         #endif
     #else
         #define LV_USE_ARC        1
+    #endif
+#endif
+
+#ifndef LV_USE_ARCLABEL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ARCLABEL
+            #define LV_USE_ARCLABEL CONFIG_LV_USE_ARCLABEL
+        #else
+            #define LV_USE_ARCLABEL 0
+        #endif
+    #else
+        #define LV_USE_ARCLABEL  1
     #endif
 #endif
 
@@ -3022,7 +3074,14 @@
         #ifdef CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
             #define LV_TINY_TTF_CACHE_GLYPH_CNT CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
         #else
-            #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+            #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+        #endif
+    #endif
+    #ifndef LV_TINY_TTF_CACHE_KERNING_CNT
+        #ifdef CONFIG_LV_TINY_TTF_CACHE_KERNING_CNT
+            #define LV_TINY_TTF_CACHE_KERNING_CNT CONFIG_LV_TINY_TTF_CACHE_KERNING_CNT
+        #else
+            #define LV_TINY_TTF_CACHE_KERNING_CNT 256
         #endif
     #endif
 #endif
@@ -3786,18 +3845,44 @@
     #endif
 #endif
 #if LV_USE_WAYLAND
+    #ifndef LV_WAYLAND_BUF_COUNT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_WAYLAND_BUF_COUNT
+                #define LV_WAYLAND_BUF_COUNT CONFIG_LV_WAYLAND_BUF_COUNT
+            #else
+                #define LV_WAYLAND_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
+        #endif
+    #endif
+    #ifndef LV_WAYLAND_USE_DMABUF
+        #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+            #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
+        #else
+            #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_DRAW_USE_G2D */
+        #endif
+    #endif
+    #ifndef LV_WAYLAND_RENDER_MODE
+        #ifdef CONFIG_LV_WAYLAND_RENDER_MODE
+            #define LV_WAYLAND_RENDER_MODE CONFIG_LV_WAYLAND_RENDER_MODE
+        #else
+            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
+        #endif
+    #endif
+                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
     #ifndef LV_WAYLAND_WINDOW_DECORATIONS
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
+            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
         #endif
     #endif
     #ifndef LV_WAYLAND_WL_SHELL
         #ifdef CONFIG_LV_WAYLAND_WL_SHELL
             #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
         #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
+            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
         #endif
     #endif
 #endif
@@ -3955,11 +4040,11 @@
      * shared across sub-systems and libraries using the Linux DMA-BUF API.
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
-    #ifndef LV_LINUX_DRM_GBM_BUFFERS
-        #ifdef CONFIG_LV_LINUX_DRM_GBM_BUFFERS
-            #define LV_LINUX_DRM_GBM_BUFFERS CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
+        #ifdef CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
+            #define LV_USE_LINUX_DRM_GBM_BUFFERS CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
         #else
-            #define LV_LINUX_DRM_GBM_BUFFERS 0
+            #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
 #endif
@@ -4047,6 +4132,13 @@
         #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
     #else
         #define LV_USE_ILI9341       0
+    #endif
+#endif
+#ifndef LV_USE_FT81X
+    #ifdef CONFIG_LV_USE_FT81X
+        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
+    #else
+        #define LV_USE_FT81X         0
     #endif
 #endif
 
@@ -4178,9 +4270,9 @@
     #endif
 #endif
 
-/*==================
-* EXAMPLES
-*==================*/
+/*=====================
+* BUILD OPTIONS
+*======================*/
 
 /** Enable examples to be built with the library. */
 #ifndef LV_BUILD_EXAMPLES
@@ -4195,186 +4287,212 @@
     #endif
 #endif
 
+/** Build the demos */
+#ifndef LV_BUILD_DEMOS
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_BUILD_DEMOS
+            #define LV_BUILD_DEMOS CONFIG_LV_BUILD_DEMOS
+        #else
+            #define LV_BUILD_DEMOS 0
+        #endif
+    #else
+        #define LV_BUILD_DEMOS 1
+    #endif
+#endif
+
 /*===================
  * DEMO USAGE
  ====================*/
 
-/** Show some widgets. This might be required to increase `LV_MEM_SIZE`. */
-#ifndef LV_USE_DEMO_WIDGETS
-    #ifdef CONFIG_LV_USE_DEMO_WIDGETS
-        #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
-    #else
-        #define LV_USE_DEMO_WIDGETS 0
-    #endif
-#endif
-
-/** Demonstrate usage of encoder and keyboard. */
-#ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
-    #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-    #else
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-    #endif
-#endif
-
-/** Benchmark your system */
-#ifndef LV_USE_DEMO_BENCHMARK
-    #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
-        #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
-    #else
-        #define LV_USE_DEMO_BENCHMARK 0
-    #endif
-#endif
-
-/** Render test for each primitive.
- *  - Requires at least 480x272 display. */
-#ifndef LV_USE_DEMO_RENDER
-    #ifdef CONFIG_LV_USE_DEMO_RENDER
-        #define LV_USE_DEMO_RENDER CONFIG_LV_USE_DEMO_RENDER
-    #else
-        #define LV_USE_DEMO_RENDER 0
-    #endif
-#endif
-
-/** Stress test for LVGL */
-#ifndef LV_USE_DEMO_STRESS
-    #ifdef CONFIG_LV_USE_DEMO_STRESS
-        #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
-    #else
-        #define LV_USE_DEMO_STRESS 0
-    #endif
-#endif
-
-/** Music player demo */
-#ifndef LV_USE_DEMO_MUSIC
-    #ifdef CONFIG_LV_USE_DEMO_MUSIC
-        #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
-    #else
-        #define LV_USE_DEMO_MUSIC 0
-    #endif
-#endif
-#if LV_USE_DEMO_MUSIC
-    #ifndef LV_DEMO_MUSIC_SQUARE
-        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+#if LV_BUILD_DEMOS
+    /** Show some widgets. This might be required to increase `LV_MEM_SIZE`. */
+    #ifndef LV_USE_DEMO_WIDGETS
+        #ifdef CONFIG_LV_USE_DEMO_WIDGETS
+            #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
         #else
-            #define LV_DEMO_MUSIC_SQUARE    0
+            #define LV_USE_DEMO_WIDGETS 0
         #endif
     #endif
-    #ifndef LV_DEMO_MUSIC_LANDSCAPE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+    
+    /** Demonstrate usage of encoder and keyboard. */
+    #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
+        #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+            #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
         #else
-            #define LV_DEMO_MUSIC_LANDSCAPE 0
+            #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
         #endif
     #endif
-    #ifndef LV_DEMO_MUSIC_ROUND
-        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+    
+    /** Benchmark your system */
+    #ifndef LV_USE_DEMO_BENCHMARK
+        #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
+            #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
         #else
-            #define LV_DEMO_MUSIC_ROUND     0
+            #define LV_USE_DEMO_BENCHMARK 0
         #endif
     #endif
-    #ifndef LV_DEMO_MUSIC_LARGE
-        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-        #else
-            #define LV_DEMO_MUSIC_LARGE     0
+
+    #if LV_USE_DEMO_BENCHMARK
+        /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
+        #ifndef LV_DEMO_BENCHMARK_ALIGNED_FONTS
+            #ifdef CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS CONFIG_LV_DEMO_BENCHMARK_ALIGNED_FONTS
+            #else
+                #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
+            #endif
         #endif
     #endif
-    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
-        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+
+    /** Render test for each primitive.
+     *  - Requires at least 480x272 display. */
+    #ifndef LV_USE_DEMO_RENDER
+        #ifdef CONFIG_LV_USE_DEMO_RENDER
+            #define LV_USE_DEMO_RENDER CONFIG_LV_USE_DEMO_RENDER
         #else
-            #define LV_DEMO_MUSIC_AUTO_PLAY 0
+            #define LV_USE_DEMO_RENDER 0
         #endif
     #endif
-#endif
-
-/** Vector graphic demo */
-#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-    #else
-        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
-    #endif
-#endif
-
-/*---------------------------
- * Demos from lvgl/lv_demos
-  ---------------------------*/
-
-/** Flex layout demo */
-#ifndef LV_USE_DEMO_FLEX_LAYOUT
-    #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
-        #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
-    #else
-        #define LV_USE_DEMO_FLEX_LAYOUT     0
-    #endif
-#endif
-
-/** Smart-phone like multi-language demo */
-#ifndef LV_USE_DEMO_MULTILANG
-    #ifdef CONFIG_LV_USE_DEMO_MULTILANG
-        #define LV_USE_DEMO_MULTILANG CONFIG_LV_USE_DEMO_MULTILANG
-    #else
-        #define LV_USE_DEMO_MULTILANG       0
-    #endif
-#endif
-
-/** Widget transformation demo */
-#ifndef LV_USE_DEMO_TRANSFORM
-    #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
-        #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
-    #else
-        #define LV_USE_DEMO_TRANSFORM       0
-    #endif
-#endif
-
-/** Demonstrate scroll settings */
-#ifndef LV_USE_DEMO_SCROLL
-    #ifdef CONFIG_LV_USE_DEMO_SCROLL
-        #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
-    #else
-        #define LV_USE_DEMO_SCROLL          0
-    #endif
-#endif
-
-/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
-#ifndef LV_USE_DEMO_EBIKE
-    #ifdef CONFIG_LV_USE_DEMO_EBIKE
-        #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
-    #else
-        #define LV_USE_DEMO_EBIKE           0
-    #endif
-#endif
-#if LV_USE_DEMO_EBIKE
-    #ifndef LV_DEMO_EBIKE_PORTRAIT
-        #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
-            #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+    
+    /** Stress test for LVGL */
+    #ifndef LV_USE_DEMO_STRESS
+        #ifdef CONFIG_LV_USE_DEMO_STRESS
+            #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
         #else
-            #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+            #define LV_USE_DEMO_STRESS 0
         #endif
     #endif
-#endif
-
-/** High-resolution demo */
-#ifndef LV_USE_DEMO_HIGH_RES
-    #ifdef CONFIG_LV_USE_DEMO_HIGH_RES
-        #define LV_USE_DEMO_HIGH_RES CONFIG_LV_USE_DEMO_HIGH_RES
-    #else
-        #define LV_USE_DEMO_HIGH_RES        0
+    
+    /** Music player demo */
+    #ifndef LV_USE_DEMO_MUSIC
+        #ifdef CONFIG_LV_USE_DEMO_MUSIC
+            #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
+        #else
+            #define LV_USE_DEMO_MUSIC 0
+        #endif
     #endif
-#endif
-
-/* Smart watch demo */
-#ifndef LV_USE_DEMO_SMARTWATCH
-    #ifdef CONFIG_LV_USE_DEMO_SMARTWATCH
-        #define LV_USE_DEMO_SMARTWATCH CONFIG_LV_USE_DEMO_SMARTWATCH
-    #else
-        #define LV_USE_DEMO_SMARTWATCH      0
+    #if LV_USE_DEMO_MUSIC
+        #ifndef LV_DEMO_MUSIC_SQUARE
+            #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+                #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+            #else
+                #define LV_DEMO_MUSIC_SQUARE    0
+            #endif
+        #endif
+        #ifndef LV_DEMO_MUSIC_LANDSCAPE
+            #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+                #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #else
+                #define LV_DEMO_MUSIC_LANDSCAPE 0
+            #endif
+        #endif
+        #ifndef LV_DEMO_MUSIC_ROUND
+            #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+                #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+            #else
+                #define LV_DEMO_MUSIC_ROUND     0
+            #endif
+        #endif
+        #ifndef LV_DEMO_MUSIC_LARGE
+            #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+                #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+            #else
+                #define LV_DEMO_MUSIC_LARGE     0
+            #endif
+        #endif
+        #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+            #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+                #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #else
+                #define LV_DEMO_MUSIC_AUTO_PLAY 0
+            #endif
+        #endif
     #endif
-#endif
+    
+    /** Vector graphic demo */
+    #ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+        #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+            #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+        #else
+            #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+        #endif
+    #endif
+    
+    /*---------------------------
+     * Demos from lvgl/lv_demos
+      ---------------------------*/
+    
+    /** Flex layout demo */
+    #ifndef LV_USE_DEMO_FLEX_LAYOUT
+        #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+            #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+        #else
+            #define LV_USE_DEMO_FLEX_LAYOUT     0
+        #endif
+    #endif
+    
+    /** Smart-phone like multi-language demo */
+    #ifndef LV_USE_DEMO_MULTILANG
+        #ifdef CONFIG_LV_USE_DEMO_MULTILANG
+            #define LV_USE_DEMO_MULTILANG CONFIG_LV_USE_DEMO_MULTILANG
+        #else
+            #define LV_USE_DEMO_MULTILANG       0
+        #endif
+    #endif
+    
+    /** Widget transformation demo */
+    #ifndef LV_USE_DEMO_TRANSFORM
+        #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
+            #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
+        #else
+            #define LV_USE_DEMO_TRANSFORM       0
+        #endif
+    #endif
+    
+    /** Demonstrate scroll settings */
+    #ifndef LV_USE_DEMO_SCROLL
+        #ifdef CONFIG_LV_USE_DEMO_SCROLL
+            #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
+        #else
+            #define LV_USE_DEMO_SCROLL          0
+        #endif
+    #endif
+    
+    /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
+    #ifndef LV_USE_DEMO_EBIKE
+        #ifdef CONFIG_LV_USE_DEMO_EBIKE
+            #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
+        #else
+            #define LV_USE_DEMO_EBIKE           0
+        #endif
+    #endif
+    #if LV_USE_DEMO_EBIKE
+        #ifndef LV_DEMO_EBIKE_PORTRAIT
+            #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
+                #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+            #else
+                #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+            #endif
+        #endif
+    #endif
+    
+    /** High-resolution demo */
+    #ifndef LV_USE_DEMO_HIGH_RES
+        #ifdef CONFIG_LV_USE_DEMO_HIGH_RES
+            #define LV_USE_DEMO_HIGH_RES CONFIG_LV_USE_DEMO_HIGH_RES
+        #else
+            #define LV_USE_DEMO_HIGH_RES        0
+        #endif
+    #endif
+    
+    /* Smart watch demo */
+    #ifndef LV_USE_DEMO_SMARTWATCH
+        #ifdef CONFIG_LV_USE_DEMO_SMARTWATCH
+            #define LV_USE_DEMO_SMARTWATCH CONFIG_LV_USE_DEMO_SMARTWATCH
+        #else
+            #define LV_USE_DEMO_SMARTWATCH      0
+        #endif
+    #endif
+#endif /* LV_BUILD_DEMOS */ 
 
 
 
@@ -4406,11 +4524,37 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#if LV_USE_WAYLAND == 0
+    #define LV_WAYLAND_USE_DMABUF           0
+    #define LV_WAYLAND_WINDOW_DECORATIONS   0
+    #define LV_WAYLAND_WL_SHELL             0
+#endif /* LV_USE_WAYLAND */
+
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
 #endif /*LV_USE_SYSMON*/
 
+#if LV_USE_PERF_MONITOR == 0
+    #define LV_USE_PERF_MONITOR_LOG_MODE 0
+#endif /*LV_USE_PERF_MONITOR*/
+
+#if LV_BUILD_DEMOS == 0
+    #define LV_USE_DEMO_WIDGETS 0
+    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+    #define LV_USE_DEMO_BENCHMARK 0
+    #define LV_USE_DEMO_RENDER 0
+    #define LV_USE_DEMO_STRESS 0
+    #define LV_USE_DEMO_MUSIC 0
+    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #define LV_USE_DEMO_FLEX_LAYOUT     0
+    #define LV_USE_DEMO_MULTILANG       0
+    #define LV_USE_DEMO_TRANSFORM       0
+    #define LV_USE_DEMO_SCROLL          0
+    #define LV_USE_DEMO_EBIKE           0
+    #define LV_USE_DEMO_HIGH_RES        0
+    #define LV_USE_DEMO_SMARTWATCH      0
+#endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
     #if (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)

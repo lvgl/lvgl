@@ -35,9 +35,10 @@ static void timer_cb(lv_timer_t * timer)
             letter_dsc.unicode = (uint32_t)string[i % string_len];
             letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
             letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-            lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
+            lv_point_t p = (lv_point_t) {
                 .x = x, .y = y
-            });
+            };
+            lv_draw_letter(&layer, &letter_dsc, &p);
 
             pre_x = x;
             pre_y = y;

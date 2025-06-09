@@ -60,7 +60,7 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("src", name)) lv_image_set_src(item, lv_xml_get_image(&state->ctx, value));
+        if(lv_streq("src", name)) lv_image_set_src(item, lv_xml_get_image(&state->scope, value));
         if(lv_streq("inner_align", name)) lv_image_set_inner_align(item, image_align_to_enum(value));
         if(lv_streq("rotation", name)) lv_image_set_rotation(item, lv_xml_atoi(value));
         if(lv_streq("scale_x", name)) lv_image_set_scale_x(item, lv_xml_atoi(value));
@@ -70,9 +70,7 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
             int32_t y = lv_xml_atoi_split(&value, ' ');
             lv_image_set_pivot(item, x, y);
         }
-
     }
-
 }
 
 /**********************

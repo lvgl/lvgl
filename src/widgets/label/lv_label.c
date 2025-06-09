@@ -823,6 +823,7 @@ static void draw_main(lv_event_t * e)
     label_draw_dsc.text_static = label->static_txt;
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
+    label_draw_dsc.text_size = label->text_size;
 #if LV_LABEL_LONG_TXT_HINT
     if(label->long_mode != LV_LABEL_LONG_MODE_SCROLL_CIRCULAR &&
        lv_area_get_height(&txt_coords) >= LV_LABEL_HINT_HEIGHT_LIMIT) {
@@ -852,9 +853,7 @@ static void draw_main(lv_event_t * e)
      * (In addition, they will create misalignment in this situation)*/
     if((label->long_mode == LV_LABEL_LONG_MODE_SCROLL || label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) &&
        (label_draw_dsc.align == LV_TEXT_ALIGN_CENTER || label_draw_dsc.align == LV_TEXT_ALIGN_RIGHT)) {
-        lv_point_t size;
-        lv_text_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                         LV_COORD_MAX, flag);
+        lv_point_t size = label->text_size;
         if(size.x > lv_area_get_width(&txt_coords)) {
 #if LV_USE_BIDI
             const lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
@@ -892,9 +891,7 @@ static void draw_main(lv_event_t * e)
     layer->_clip_area = txt_clip;
 
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) {
-        lv_point_t size;
-        lv_text_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                         LV_COORD_MAX, flag);
+        lv_point_t size = label->text_size;
 
         /*Draw the text again on label to the original to make a circular effect */
         if(size.x > lv_area_get_width(&txt_coords)) {
@@ -968,6 +965,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
     lv_label_revert_dots(obj);
     lv_text_get_size(&size, label->text, font, letter_space, line_space, max_w, flag);
+    label->text_size = size;
 
     lv_obj_refresh_self_size(obj);
 

@@ -56,9 +56,18 @@ void lv_xml_dropdown_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("options", name)) lv_dropdown_set_options(item, value);
-        if(lv_streq("text", name)) lv_dropdown_set_text(item, value);
-        if(lv_streq("selected", name)) lv_dropdown_set_selected(item, lv_xml_atoi(value), LV_ANIM_OFF);
-        if(lv_streq("symbol", name)) lv_dropdown_set_symbol(item, lv_xml_get_image(&state->ctx, value));
+        else if(lv_streq("text", name)) lv_dropdown_set_text(item, value);
+        else if(lv_streq("selected", name)) lv_dropdown_set_selected(item, lv_xml_atoi(value));
+        else if(lv_streq("symbol", name)) lv_dropdown_set_symbol(item, lv_xml_get_image(&state->scope, value));
+        else if(lv_streq("bind_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_dropdown_bind_value(item, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in dropdown bind_value", value);
+            }
+        }
     }
 }
 

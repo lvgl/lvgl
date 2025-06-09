@@ -57,6 +57,29 @@ void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t si
  */
 lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char * path);
 
+/**
+ * Reverse the order of the bytes in a 32-bit value.
+ * @param x     a 32-bit value.
+ * @return      the value `x` with reversed byte-order.
+ */
+static inline uint32_t lv_swap_bytes_32(uint32_t x)
+{
+    return (x << 24)
+           | ((x & 0x0000ff00U) <<  8)
+           | ((x & 0x00ff0000U) >>  8)
+           | (x >> 24);
+}
+
+/**
+ * Reverse the order of the bytes in a 16-bit value.
+ * @param x     a 16-bit value.
+ * @return      the value `x` with reversed byte-order.
+ */
+static inline uint16_t lv_swap_bytes_16(uint16_t x)
+{
+    return (x << 8) | (x >> 8);
+}
+
 /**********************
  *      MACROS
  **********************/

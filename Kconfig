@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.3.0-dev
+# Kconfig file for LVGL v9.3.0
 
 menu "LVGL configuration"
 
@@ -203,9 +203,26 @@ menu "LVGL configuration"
 		config LV_DRAW_THREAD_STACK_SIZE
 			int "Stack size of draw thread in bytes"
 			default 8192
-			depends on LV_USE_OS > 0
+			depends on !LV_OS_NONE
 			help
 				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+
+		config LV_DRAW_THREAD_PRIO
+			int "Thread priority for the drawing thread"
+			range 0 4
+			default 3
+			depends on !LV_OS_NONE
+			help
+				Thread priority controls the relative importance of the drawing threads.
+				Values correspond to lv_thread_prio_t enum in lv_os.h:
+				0: LV_THREAD_PRIO_LOWEST
+				1: LV_THREAD_PRIO_LOW
+				2: LV_THREAD_PRIO_MID (default)
+				3: LV_THREAD_PRIO_HIGH
+				4: LV_THREAD_PRIO_HIGHEST
+
+				Higher priority can improve rendering performance but might cause
+				starvation of lower priority tasks.
 
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
@@ -361,7 +378,7 @@ menu "LVGL configuration"
 
 		config LV_USE_VGLITE_DRAW_THREAD
 			bool "Use additional draw thread for VG-Lite processing"
-			depends on LV_USE_DRAW_VGLITE && LV_USE_OS > 0
+			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE
 			default y
 
 		config LV_USE_VGLITE_DRAW_ASYNC
@@ -373,6 +390,11 @@ menu "LVGL configuration"
 
 		config LV_USE_VGLITE_ASSERT
 			bool "Enable VGLite asserts"
+			depends on LV_USE_DRAW_VGLITE
+			default n
+			
+		config LV_USE_VGLITE_CHECK_ERROR
+			bool "Enable VGLite error checks"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
@@ -392,7 +414,7 @@ menu "LVGL configuration"
 
 		config LV_USE_PXP_DRAW_THREAD
 			bool "Use additional draw thread for PXP processing"
-			depends on LV_USE_DRAW_PXP && LV_USE_OS > 0
+			depends on LV_USE_DRAW_PXP && !LV_OS_NONE
 			default y
 
 		config LV_USE_PXP_ASSERT
@@ -412,7 +434,7 @@ menu "LVGL configuration"
 
 		config LV_USE_G2D_DRAW_THREAD
 			bool "Use additional draw thread for G2D processing"
-			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0
+			depends on LV_USE_DRAW_G2D && !LV_OS_NONE
 			default y
 
 		config LV_USE_G2D_ASSERT
@@ -454,7 +476,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_USE_BOX_SHADOW
 			bool "Enable border to simulate shadow"
-			default n
+			default y
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				which usually improves performance,
@@ -979,6 +1001,13 @@ menu "LVGL configuration"
 		config LV_USE_FONT_PLACEHOLDER
 			bool "Enable drawing placeholders when glyph dsc is not found"
 			default y
+
+		menu "Enable static fonts"
+			config LV_DEMO_BENCHMARK_ALIGNED_FONTS
+				depends on LV_USE_DEMO_BENCHMARK
+				bool "Use static aligned fonts"
+				default n
+		endmenu
 	endmenu
 
 	menu "Text Settings"
@@ -1060,6 +1089,9 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_ARC
 			bool "Arc"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_ARCLABEL
+			bool "Arc Label"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_BAR
 			bool "Bar"
@@ -1426,6 +1458,11 @@ menu "LVGL configuration"
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
 			bool "Tiny ttf cache entries count"
+			default 128
+			depends on LV_USE_TINY_TTF
+
+		config LV_TINY_TTF_CACHE_KERNING_CNT
+			bool "Tiny ttf kerning cache entries count"
 			default 256
 			depends on LV_USE_TINY_TTF
 
@@ -1824,6 +1861,31 @@ menu "LVGL configuration"
 			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
 			depends on LV_USE_WAYLAND
 			default n
+		config LV_WAYLAND_BUF_COUNT
+			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
+			depends on LV_USE_WAYLAND
+			default 1
+		choice
+			prompt "Wayland rendering mode"
+			depends on LV_USE_WAYLAND
+			default LV_WAYLAND_RENDER_MODE_PARTIAL
+
+			config LV_WAYLAND_RENDER_MODE_PARTIAL
+				bool "Use the buffer(s) to render the screen is smaller parts"
+				depends on !LV_WAYLAND_USE_DMABUF
+
+			config LV_WAYLAND_RENDER_MODE_DIRECT
+				bool "Only the changed areas will be updated with 2 screen sized buffers"
+				depends on LV_WAYLAND_USE_DMABUF
+
+			config LV_WAYLAND_RENDER_MODE_FULL
+				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
+				depends on LV_WAYLAND_USE_DMABUF
+		endchoice
+
+		config LV_WAYLAND_USE_DMABUF
+			bool "Use DMA buffers for frame buffers"
+			depends on LV_USE_WAYLAND && LV_USE_DRAW_G2D
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
@@ -1906,7 +1968,7 @@ menu "LVGL configuration"
 
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
-			depends on LV_USE_NUTTX && LIBUV
+			depends on LV_USE_NUTTX
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT
@@ -2018,6 +2080,10 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
 
+		config LV_USE_FT81X
+			bool "Use ft81x EVE driver"
+			default n
+
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
@@ -2063,79 +2129,85 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Demos"
-		config LV_USE_DEMO_WIDGETS
-			bool "Show some widget"
-			default n
+		config LV_BUILD_DEMOS
+			bool "Build demos"
+			default y if !LV_CONF_MINIMAL
 
-		config LV_USE_DEMO_KEYPAD_AND_ENCODER
-			bool "Demonstrate the usage of encoder and keyboard"
-			default n
+		if LV_BUILD_DEMOS
+			config LV_USE_DEMO_WIDGETS
+				bool "Show some widget"
+				default n
 
-		config LV_USE_DEMO_BENCHMARK
-			bool "Benchmark your system"
-			default n
-			select LV_FONT_MONTSERRAT_14
-			select LV_FONT_MONTSERRAT_20
-			select LV_FONT_MONTSERRAT_24
-			select LV_FONT_MONTSERRAT_26
-			select LV_USE_DEMO_WIDGETS
-		config LV_USE_DEMO_RENDER
-			bool "Render test for each primitives. Requires at least 480x272 display"
-			default n
+			config LV_USE_DEMO_KEYPAD_AND_ENCODER
+				bool "Demonstrate the usage of encoder and keyboard"
+				default n
 
-		config LV_USE_DEMO_SCROLL
-			bool "Scroll settings test for LVGL"
-			default n
+			config LV_USE_DEMO_BENCHMARK
+				bool "Benchmark your system"
+				default n
+				select LV_FONT_MONTSERRAT_14
+				select LV_FONT_MONTSERRAT_20
+				select LV_FONT_MONTSERRAT_24
+				select LV_FONT_MONTSERRAT_26
+				select LV_USE_DEMO_WIDGETS
+			config LV_USE_DEMO_RENDER
+				bool "Render test for each primitives. Requires at least 480x272 display"
+				default n
 
-		config LV_USE_DEMO_STRESS
-			bool "Stress test for LVGL"
-			default n
+			config LV_USE_DEMO_SCROLL
+				bool "Scroll settings test for LVGL"
+				default n
 
-		config LV_USE_DEMO_TRANSFORM
-			bool "Transform test for LVGL"
-			default n
-			depends on LV_FONT_MONTSERRAT_18
+			config LV_USE_DEMO_STRESS
+				bool "Stress test for LVGL"
+				default n
 
-		config LV_USE_DEMO_MUSIC
-			bool "Music player demo"
-			default n
-		config LV_DEMO_MUSIC_SQUARE
-			bool "Enable Square"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_LANDSCAPE
-			bool "Enable Landscape"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_ROUND
-			bool "Enable Round"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_LARGE
-			bool "Enable Large"
-			depends on LV_USE_DEMO_MUSIC
-			default n
-		config LV_DEMO_MUSIC_AUTO_PLAY
-			bool "Enable Auto play"
-			depends on LV_USE_DEMO_MUSIC
-			default n
+			config LV_USE_DEMO_TRANSFORM
+				bool "Transform test for LVGL"
+				default n
+				depends on LV_FONT_MONTSERRAT_18
 
-		config LV_USE_DEMO_FLEX_LAYOUT
-			bool "Flex layout previewer"
-			default n
-		config LV_USE_DEMO_MULTILANG
-			bool "multi-language demo"
-			default n
-		config LV_USE_DEMO_VECTOR_GRAPHIC
-			bool "vector graphic demo"
-			default n
-			depends on LV_USE_VECTOR_GRAPHIC
-		config LV_USE_DEMO_SMARTWATCH
-			bool "Smartwatch demo"
-		config LV_USE_DEMO_EBIKE
-			bool "Ebike demo"
-		config LV_USE_DEMO_HIGH_RES
+			config LV_USE_DEMO_MUSIC
+				bool "Music player demo"
+				default n
+			config LV_DEMO_MUSIC_SQUARE
+				bool "Enable Square"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_LANDSCAPE
+				bool "Enable Landscape"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_ROUND
+				bool "Enable Round"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_LARGE
+				bool "Enable Large"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+			config LV_DEMO_MUSIC_AUTO_PLAY
+				bool "Enable Auto play"
+				depends on LV_USE_DEMO_MUSIC
+				default n
+
+			config LV_USE_DEMO_FLEX_LAYOUT
+				bool "Flex layout previewer"
+				default n
+			config LV_USE_DEMO_MULTILANG
+				bool "multi-language demo"
+				default n
+			config LV_USE_DEMO_VECTOR_GRAPHIC
+				bool "vector graphic demo"
+				default n
+				depends on LV_USE_VECTOR_GRAPHIC
+			config LV_USE_DEMO_SMARTWATCH
+				bool "Smartwatch demo"
+			config LV_USE_DEMO_EBIKE
+				bool "Ebike demo"
+			config LV_USE_DEMO_HIGH_RES
 			bool "High resolution demo"
+		endif
 	endmenu
 
 endmenu

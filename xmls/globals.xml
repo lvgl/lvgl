@@ -1,15 +1,30 @@
 <api>
-    <enumdef name="lv_style_state">
+    <enumdef name="lv_state">
         <enum name="default" help="Some help"/>
         <enum name="pressed" help="Some help"/>
         <enum name="checked" help="Some help"/>
+        <enum name="hovered" help="Some help"/>
+        <enum name="scrolled" help="Some help"/>
+        <enum name="disabled" help="Some help"/>
+        <enum name="focused" help="Some help"/>
+        <enum name="focus_key" help="Some help"/>
+        <enum name="edited" help="Some help"/>
+        <enum name="user_1" help="Some help"/>
+        <enum name="user_2" help="Some help"/>
+        <enum name="user_3" help="Some help"/>
+        <enum name="user_4" help="Some help"/>
     </enumdef>
-    <enumdef name="lv_style_part">
+
+    <enumdef name="lv_part">
         <enum name="main" help="Some help"/>
         <enum name="scrollbar" help="Some help"/>
         <enum name="indicator" help="Some help"/>
         <enum name="knob" help="Some help"/>
+        <enum name="selected" help="Some help"/>
+        <enum name="cursor" help="Some help"/>
+        <enum name="items" help="Some help"/>
     </enumdef>
+
     <enumdef name="lv_align">
         <enum name="default" help="Some help"/>
         <enum name="top_left" help="Some help"/>
@@ -28,6 +43,9 @@
         <enum name="bottom" help="Some help"/>
         <enum name="left" help="Some help"/>
         <enum name="right" help="Some help"/>
+        <enum name="hor" help="Some help"/>
+        <enum name="ver" help="Some help"/>
+        <enum name="all" help="Some help"/>
     </enumdef>
     <enumdef name="lv_layout">
         <enum name="none" help="Some help"/>
@@ -102,7 +120,11 @@
 	    <prop name="x" type="coords"/>
 	    <prop name="y" type="coords"/>
 	    <prop name="height" type="coords"/>
+	    <prop name="min_height" type="coords"/>
+	    <prop name="max_height" type="coords"/>
 	    <prop name="width" type="coords"/>
+	    <prop name="min_width" type="coords"/>
+	    <prop name="max_width" type="coords"/>
 	    <prop name="length" type="coords"/>
 
 	    <prop name="pad_top" type="int"/>
@@ -131,7 +153,7 @@
 	    <prop name="base_dir" type="enum:lv_base_dir"/>
 
 	    <prop name="bg_color" type="color"/>
-	    <prop name="bg_opa" type="int"/>
+	    <prop name="bg_opa" type="opa"/>
 	    <prop name="bg_grad_dir" type="enum:lv_grad_dir"/>
 	    <prop name="bg_main_stop" type="int"/>
 	    <prop name="bg_grad_stop" type="int"/>
@@ -140,48 +162,48 @@
 	    <prop name="bg_image_src" type="image"/>
 	    <prop name="bg_image_tiled" type="bool"/>
 	    <prop name="bg_image_recolor" type="color"/>
-	    <prop name="bg_image_recolor_opa" type="int"/>
+	    <prop name="bg_image_recolor_opa" type="opa"/>
 
 	    <prop name="border_color" type="color"/>
 	    <prop name="border_width" type="int"/>
-	    <prop name="border_opa" type="int"/>
+	    <prop name="border_opa" type="opa"/>
 	    <prop name="border_side" type="enum:lv_border_side"/>
 	    <prop name="border_post" type="bool"/>
 
 	    <prop name="outline_color" type="color"/>
 	    <prop name="outline_width" type="int"/>
-	    <prop name="outline_opa" type="int"/>
+	    <prop name="outline_opa" type="opa"/>
 	    <prop name="outline_pad" type="int"/>
 
 	    <prop name="shadow_width" type="int"/>
 	    <prop name="shadow_color" type="color"/>
-	    <prop name="shadow_opa" type="int"/>
+	    <prop name="shadow_opa" type="opa"/>
 	    <prop name="shadow_offset_x" type="int"/>
 	    <prop name="shadow_offset_y" type="int"/>
 	    <prop name="shadow_spread" type="int"/>
 
 	    <prop name="text_color" type="color"/>
-	    <prop name="text_opa" type="int"/>
+	    <prop name="text_opa" type="opa"/>
 	    <prop name="text_font" type="font"/>
 	    <prop name="text_align" type="enum:lv_text_align"/>
 	    <prop name="text_letter_space" type="int"/>
 	    <prop name="text_line_space" type="int"/>
 	    <prop name="text_decor" type="enum:lv_text_decor"/>
 
-	    <prop name="image_opa" type="int"/>
+	    <prop name="image_opa" type="opa"/>
 	    <prop name="image_recolor" type="color"/>
-	    <prop name="image_recolor_opa" type="int"/>
+	    <prop name="image_recolor_opa" type="opa"/>
 
 	    <prop name="line_width" type="int"/>
 	    <prop name="line_color" type="color"/>
-	    <prop name="line_opa" type="int"/>
+	    <prop name="line_opa" type="opa"/>
 	    <prop name="line_dash_width" type="int"/>
 	    <prop name="line_dash_gap" type="int"/>
 	    <prop name="line_rounded" type="bool"/>
 
 	    <prop name="arc_width" type="int"/>
 	    <prop name="arc_color" type="color"/>
-	    <prop name="arc_opa" type="int"/>
+	    <prop name="arc_opa" type="opa"/>
 	    <prop name="arc_rounded" type="bool"/>
 	    <prop name="arc_image_src" type="image"/>
 
@@ -202,9 +224,9 @@
 	    <prop name="grid_cell_row_span" type="int"/>
 	    <prop name="grid_cell_y_align" type="enum:lv_grid_align"/>
 
-	    <prop name="opa" type="int"/>
-	    <prop name="opa_layered" type="int"/>
-	    <prop name="color_filter_opa" type="int"/>
+	    <prop name="opa" type="opa"/>
+	    <prop name="opa_layered" type="opa"/>
+	    <prop name="color_filter_opa" type="opa"/>
 	    <prop name="anim_duration" type="int"/>
 	    <prop name="blend_mode" type="enum:lv_blend_mode"/>
 	    <prop name="transform_width" type="int"/>
@@ -221,5 +243,7 @@
 	    <prop name="transform_skew_y" type="int"/>
 	    <prop name="bitmap_mask_src" type="image"/>
 	    <prop name="rotary_sensitivity" type="int"/>
+	    <prop name="recolor" type="color"/>
+	    <prop name="recolor_opa" type="opa"/>
 	</styledef>
 </api>

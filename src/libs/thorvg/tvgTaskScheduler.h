@@ -26,11 +26,23 @@
 #ifndef _TVG_TASK_SCHEDULER_H_
 #define _TVG_TASK_SCHEDULER_H_
 
+#ifdef THORVG_THREAD_SUPPORT
 #include <mutex>
 #include <condition_variable>
+#include <thread>
+#endif
 
 #include "tvgCommon.h"
 #include "tvgInlist.h"
+
+#ifdef THORVG_THREAD_SUPPORT
+using std::mutex;
+using std::condition_variable;
+using std::unique_lock;
+using std::thread;
+using std::atomic;
+using std::try_to_lock;
+#endif
 
 namespace tvg {
 

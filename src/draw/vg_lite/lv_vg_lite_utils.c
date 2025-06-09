@@ -570,6 +570,9 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
 
+        case LV_COLOR_FORMAT_RGB565_SWAPPED:
+            return VG_LITE_RGB565;
+
         case LV_COLOR_FORMAT_ARGB8565:
             return VG_LITE_BGRA5658;
 
@@ -1176,7 +1179,7 @@ bool lv_vg_lite_16px_align(void)
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
 {
-    vg_lite_matrix_t temp;
+    lv_matrix_t temp;
     int row, column;
     vg_lite_float_t (*m)[3] = matrix->m;
 
@@ -1191,8 +1194,8 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
         }
     }
 
-    /* Copy temporary matrix into result. */
-    *matrix = temp;
+    /* Copy temporary 3x3 matrix into result. */
+    *(lv_matrix_t *)matrix = temp;
 }
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
@@ -1329,10 +1332,10 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush(), {});
 
-    /* Rremove all old caches reference and swap new caches reference */
-    if(u->grad_pending) {
-        lv_vg_lite_pending_swap(u->grad_pending);
-    }
+    /* Remove all old caches reference and swap new caches reference */
+#if LV_USE_VECTOR_GRAPHIC
+    lv_vg_lite_pending_swap(lv_vg_lite_grad_ctx_get_pending(u->grad_ctx));
+#endif
 
     lv_vg_lite_pending_swap(u->image_dsc_pending);
 
@@ -1349,10 +1352,10 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish(), {});
 
+#if LV_USE_VECTOR_GRAPHIC
     /* Clear all gradient caches reference */
-    if(u->grad_pending) {
-        lv_vg_lite_pending_remove_all(u->grad_pending);
-    }
+    lv_vg_lite_pending_remove_all(lv_vg_lite_grad_ctx_get_pending(u->grad_ctx));
+#endif
 
     /* Clear image decoder dsc reference */
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);

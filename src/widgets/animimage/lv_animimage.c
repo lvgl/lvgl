@@ -43,6 +43,7 @@
  **********************/
 static void index_change(lv_obj_t * obj, int32_t idx);
 static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse);
 
 /**********************
  *  STATIC VARIABLES
@@ -107,18 +108,14 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)
+void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_animimg_t * animimg = (lv_animimg_t *)obj;
-    animimg->dsc = dsc;
-    animimg->pic_count = num;
-    if(reverse) {
-        lv_anim_set_values(&animimg->anim, (int32_t)num, 0);
-    }
-    else {
-        lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
-    }
+    lv_animimg_set_src_inner(obj, dsc, num, false);
+}
+
+void lv_animimg_set_src_reverse(lv_obj_t * obj, const void * dsc[], size_t num)
+{
+    lv_animimg_set_src_inner(obj, dsc, num, true);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
@@ -256,6 +253,20 @@ static void index_change(lv_obj_t * obj, int32_t idx)
     if(idx >= animimg->pic_count) idx =  animimg->pic_count - 1;
 
     lv_image_set_src(obj, animimg->dsc[idx]);
+}
+
+static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    animimg->dsc = dsc;
+    animimg->pic_count = num;
+    if(reverse) {
+        lv_anim_set_values(&animimg->anim, (int32_t)num, 0);
+    }
+    else {
+        lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
+    }
 }
 
 #endif

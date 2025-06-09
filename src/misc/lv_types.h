@@ -197,6 +197,8 @@ typedef struct _lv_animimg_t lv_animimg_t;
 
 typedef struct _lv_arc_t lv_arc_t;
 
+typedef struct _lv_arclabel_t lv_arclabel_t;
+
 typedef struct _lv_label_t lv_label_t;
 
 typedef struct _lv_bar_anim_t lv_bar_anim_t;
@@ -371,7 +373,7 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_SYSMON*/
 
 
-typedef struct _lv_xml_component_ctx_t lv_xml_component_ctx_t;
+typedef struct _lv_xml_component_scope_t lv_xml_component_scope_t;
 
 typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
 

@@ -71,7 +71,7 @@ void lv_vg_lite_pending_add(lv_vg_lite_pending_t * pending, void * obj);
 void lv_vg_lite_pending_remove_all(lv_vg_lite_pending_t * pending);
 
 /**
- * Rremove all old objects reference and swap new objects reference
+ * Remove all old objects reference and swap new objects reference
  * @param pending pointer to the pending list
  */
 void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending);
