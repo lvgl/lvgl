@@ -26,6 +26,8 @@
  *      DEFINES
  *********************/
 
+#define OPA_MIX(opa1, opa2) LV_UDIV255((opa1) * (opa2))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -90,11 +92,12 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                       lv_vg_lite_path_t * lv_vg_path,
                       const lv_vector_draw_dsc_t * dsc,
                       vg_lite_matrix_t * matrix,
-                      const lv_fpoint_t * offset)
+                      const lv_fpoint_t * offset,
+                      const lv_opa_t opa)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    const vg_lite_color_t vg_color = lv_color32_to_vg(dsc->fill_dsc.color, dsc->fill_dsc.opa);
+    const vg_lite_color_t vg_color = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, opa));
     const vg_lite_blend_t blend = lv_blend_to_vg(dsc->blend_mode);
     const vg_lite_fill_t fill = lv_fill_to_vg(dsc->fill_dsc.fill_rule);
 
@@ -133,7 +136,15 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                     lv_vg_lite_matrix(&fill_matrix, &dsc->fill_dsc.matrix);
                     lv_vg_lite_matrix_multiply(&pattern_matrix, &fill_matrix);
 
-                    vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, &dsc->fill_dsc.img_dsc);
+                    const lv_draw_image_dsc_t * img_dsc = &dsc->fill_dsc.img_dsc;
+                    lv_draw_image_dsc_t tmp_dsc;
+                    if(opa < LV_OPA_COVER) {
+                        tmp_dsc = dsc->fill_dsc.img_dsc;
+                        tmp_dsc.opa = OPA_MIX(tmp_dsc.opa, opa);
+                        img_dsc = &tmp_dsc;
+                    }
+
+                    vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, img_dsc);
 
                     lv_vg_lite_draw_pattern(
                         &u->target_buffer,
@@ -167,11 +178,22 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                 lv_vg_lite_matrix(&fill_matrix, &dsc->fill_dsc.matrix);
                 lv_vg_lite_matrix_multiply(&grad_matrix, &fill_matrix);
 
+                const lv_vector_gradient_t * gradient = &dsc->fill_dsc.gradient;
+                lv_vector_gradient_t tmp_gradient;
+                if(opa < LV_OPA_COVER) {
+                    tmp_gradient = dsc->fill_dsc.gradient;
+                    for(uint16_t i = 0; i < tmp_gradient.stops_count; i++) {
+                        tmp_gradient.stops[i].opa = OPA_MIX(tmp_gradient.stops[i].opa, opa);
+                    }
+
+                    gradient = &tmp_gradient;
+                }
+
                 lv_vg_lite_draw_grad(
                     u->grad_ctx,
                     &u->target_buffer,
                     vg_path,
-                    &dsc->fill_dsc.gradient,
+                    gradient,
                     &grad_matrix,
                     matrix,
                     fill,
@@ -190,7 +212,8 @@ static void draw_stroke(lv_draw_vg_lite_unit_t * u,
                         const lv_vector_path_t * path,
                         lv_vg_lite_path_t * lv_vg_path,
                         const lv_vector_draw_dsc_t * dsc,
-                        vg_lite_matrix_t * matrix)
+                        vg_lite_matrix_t * matrix,
+                        const lv_opa_t opa)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -208,7 +231,7 @@ static void draw_stroke(lv_draw_vg_lite_unit_t * u,
 
     /* set stroke params */
     vg_stroke_path->quality = vg_path->quality;
-    vg_stroke_path->stroke_color = lv_color32_to_vg(dsc->stroke_dsc.color, dsc->stroke_dsc.opa);
+    vg_stroke_path->stroke_color = lv_color32_to_vg(dsc->stroke_dsc.color, OPA_MIX(dsc->stroke_dsc.opa, opa));
     const vg_lite_color_t vg_color = 0;
 
     /* set stroke path bounding box */
@@ -252,8 +275,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     /* clear area */
     if(!path) {
-        /* clear color needs to ignore fill_dsc.opa */
-        vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, dsc->fill_dsc.opa);
+        vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, u->task_act->opa));
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &scissor_area);
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
@@ -313,12 +335,14 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         lv_vg_lite_path_set_bounding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
     }
 
+    const lv_opa_t layer_opa = u->task_act->opa;
+
     if(dsc->fill_dsc.opa) {
-        draw_fill(u, lv_vg_path, dsc, &matrix, &offset);
+        draw_fill(u, lv_vg_path, dsc, &matrix, &offset, layer_opa);
     }
 
     if(dsc->stroke_dsc.opa) {
-        draw_stroke(u, path, lv_vg_path, dsc, &matrix);
+        draw_stroke(u, path, lv_vg_path, dsc, &matrix, layer_opa);
     }
 
     /* drop path */

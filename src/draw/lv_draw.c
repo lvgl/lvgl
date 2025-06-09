@@ -110,6 +110,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     new_task->matrix = layer->matrix;
 #endif
+    new_task->opa = layer->opa;
     new_task->type = type;
     new_task->draw_dsc = (uint8_t *)new_task + LV_ALIGN_UP(sizeof(lv_draw_task_t), 8);
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
