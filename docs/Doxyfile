@@ -2070,7 +2070,7 @@ PREDEFINED             = DOXYGEN                         \
                          LV_ATTRIBUTE_LARGE_RAM_ARRAY=   \
                          LV_ATTRIBUTE_FAST_MEM=          \
                          LV_ATTRIBUTE_EXTERN_DATA=       \
-                         LV_FORMAT_ATTRIBUTE
+                         LV_FORMAT_ATTRIBUTE=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
