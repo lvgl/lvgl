@@ -37,8 +37,15 @@ typedef enum {
 
 /** States for input devices*/
 typedef enum {
-    LV_INDEV_STATE_RELEASED = 0,
-    LV_INDEV_STATE_PRESSED
+    LV_INDEV_STATE_RELEASED = 0x00,
+    LV_INDEV_STATE_PRESSED = 0x01,
+    LV_INDEV_STATE_EX_MOUSE_LEFT = 0x00,
+    LV_INDEV_STATE_EX_MOUSE_RIGHT = 0x10,
+    LV_INDEV_STATE_EX_MOUSE_MIDDLE = 0x20,
+    LV_INDEV_STATE_EX_MOUSE_4 = 0x30,
+    LV_INDEV_STATE_EX_MOUSE_5 = 0x40,
+    LV_INDEV_STATE_EX_MOUSE_6 = 0x50,
+    LV_INDEV_STATE_EX_UNSUPPORTED = 0xF0
 } lv_indev_state_t;
 
 typedef enum {
