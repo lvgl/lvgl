@@ -120,6 +120,7 @@ int32_t lv_xml_atoi(const char * str)
     return lv_xml_atoi_split(&str, '\0');
 }
 
+#if LV_USE_FLOAT
 float lv_xml_atof_split(const char ** str, char delimiter)
 {
     const char * s = *str;
@@ -182,7 +183,7 @@ float lv_xml_atof(const char * str)
 {
     return lv_xml_atof_split(&str, '\0');
 }
-
+#endif
 
 int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
 {
