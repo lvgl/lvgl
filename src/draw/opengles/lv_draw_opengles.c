@@ -416,7 +416,14 @@ static void blend_texture_layer(lv_draw_task_t * t)
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     // TODO rotation
-    lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, false);
+    bool h_flip = false;
+    bool v_flip = true;
+    if(t->type == LV_DRAW_TASK_TYPE_3D) {
+        lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
+        h_flip = _3d_dsc->h_flip;
+        v_flip = _3d_dsc->v_flip;
+    }
+    lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
