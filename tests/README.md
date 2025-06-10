@@ -106,3 +106,33 @@ There are some custom, LVGL specific asserts:
    - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
 - `TEST_ASSERT_EQUAL_COLOR(color1, color2)` Compare two colors.
 
+## Performance tests
+
+In addition to unit tests, LVGL includes automated performance tests to prevent unintentional slowdowns.
+These tests are run in a consistent, emulated environment through CI. You can also run them locally as described below.
+
+### ARM32 emulated environment
+
+1. Build the config
+
+```bash
+# From the LVGL repository
+cp lv_conf_template.h lv_conf_perf32b.h
+python scripts/generate_lv_conf.py \
+   --template lv_conf_template.h \
+   --config lv_conf_perf32b.h \
+   --defaults configs/ci/perf/lv_conf_perf32b.defaults
+```
+
+2. Run the benchmark demo
+
+```bash
+docker run -t --privileged \
+   --name lv_perf_test_32b \
+   -v /dev:/dev \
+   -v $(pwd)/lv_conf_perf32b.h:/so3/usr/lib/lv_conf.h \
+   -v $(pwd):/so3/usr/lib/lvgl \
+   ghcr.io/smartobjectoriented/so3-lvperf32b:main
+```
+
+To test in an ARM64 environment, replace 32b with 64b in the steps above.
