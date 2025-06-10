@@ -45,6 +45,7 @@
 void lv_translation_init(void)
 {
     lv_ll_init(&packs_ll, sizeof(lv_translation_pack_t));
+    selected_lang = NULL;
 }
 
 void lv_translation_deinit(void)
@@ -75,6 +76,8 @@ void lv_translation_deinit(void)
     }
 
     lv_ll_clear(&packs_ll);
+
+    lv_free(selected_lang);
 }
 
 lv_translation_pack_t * lv_translation_add_static(const char * languages[], const char * tags[],
@@ -123,6 +126,11 @@ void lv_translation_set_language(const char * lang)
 
 const char * lv_translation_get(const char * tag)
 {
+    if(selected_lang == NULL) {
+        LV_LOG_WARN("No language is selected to get the translation of `%s`", tag);
+        return tag;
+    }
+
     lv_translation_pack_t * pack;
     bool lang_found = false;
     LV_LL_READ(&packs_ll, pack) {
@@ -231,6 +239,8 @@ lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, 
 
     if(tag.tag == NULL || tag.translations == NULL) {
         LV_LOG_WARN("Couldn't allocate memory for the tag's data in `%p`", (void *)pack);
+        lv_free((void *)tag.tag);
+        lv_free((void *)tag.translations);
         return NULL;
     }
 
@@ -255,11 +265,13 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
     }
 
     if(lang_idx >= pack->language_cnt) {
-        LV_LOG_WARN("Can't set the translation for language %d as there are only %d languages defined in %p",
+        LV_LOG_WARN("Can't set the translation for language " LV_PRIu32 " as there are only " LV_PRIu32
+                    " languages defined in %p",
                     lang_idx, pack->language_cnt, (void *)pack);
         return LV_RESULT_INVALID;
     }
 
+    lv_free(tag->translations[lang_idx]); /*Free the earlier set language if any*/
     tag->translations[lang_idx] = lv_strdup(trans);
     if(tag->translations[lang_idx] == NULL) {
         LV_LOG_WARN("Couldn't allocate the new translation in tag `%p` in pack `%p`", (void *)tag, (void *) pack);
