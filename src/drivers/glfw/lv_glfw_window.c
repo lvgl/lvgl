@@ -405,6 +405,14 @@ static void mouse_button_callback(GLFWwindow * window, int button, int action, i
     }
 }
 
+static void mouse_move_callback(GLFWwindow * window, double xpos, double ypos)
+{
+    lv_glfw_window_t * lv_window = lv_glfw_get_lv_window_from_window(window);
+    lv_window->mouse_last_point.x = (int32_t)xpos;
+    lv_window->mouse_last_point.y = (int32_t)ypos;
+    proc_mouse(lv_window);
+}
+
 static void proc_mouse(lv_glfw_window_t * window)
 {
     /* mouse activity will affect the topmost LVGL display texture */
