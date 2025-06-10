@@ -17,6 +17,12 @@ void tearDown(void)
     lv_anim_delete_all();
 }
 
+static void start_cb(lv_anim_t * anim)
+{
+
+    (*(int *)lv_anim_get_user_data(anim))++;
+}
+
 static void exec_cb(void * var, int32_t v)
 {
     int32_t * var_i32 = var;
@@ -192,5 +198,27 @@ void test_scroll_anim_delete(void)
 
     TEST_ASSERT_EQUAL(1, var);
 }
+void test_anim_start_cb_is_called(void)
+{
+    int32_t var;
+    int start_cb_call_count = 0;
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_user_data(&a, (void *)&start_cb_call_count);
+    lv_anim_set_start_cb(&a, start_cb);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_exec_cb(&a, exec_cb);
+    lv_anim_set_duration(&a, 100);
+    lv_anim_set_repeat_count(&a, 2);
+    lv_anim_start(&a);
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL(1, start_cb_call_count);
+    lv_test_wait(100);
+    TEST_ASSERT_EQUAL(2, start_cb_call_count);
+    lv_test_wait(50);
+    /*Delete the animation to avoid accessing it after return*/
+    lv_anim_delete(&var, exec_cb);
 
+}
 #endif

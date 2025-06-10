@@ -584,6 +584,7 @@ void test_anim_timeline_without_exec_cb_but_anim_start_cb_and_completed_cb(void)
     anim_timeline = lv_anim_timeline_create();
     lv_anim_timeline_add(anim_timeline, 200, &anim1);
     lv_anim_timeline_set_progress(anim_timeline, 0);
+    lv_anim_timeline_set_repeat_count(anim_timeline, 2);
     lv_anim_timeline_start(anim_timeline);
 
     lv_refr_now(NULL);
@@ -605,6 +606,14 @@ void test_anim_timeline_without_exec_cb_but_anim_start_cb_and_completed_cb(void)
     lv_test_wait(300); /*Now we are at 520ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
     TEST_ASSERT_EQUAL(1, anim1_completed_called);
+
+    lv_test_wait(200); /*Now we are at 720ms */
+    TEST_ASSERT_EQUAL(2, anim1_start_called);
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
+
+    lv_test_wait(300); /*Now we are at 1020ms */
+    TEST_ASSERT_EQUAL(2, anim1_start_called);
+    TEST_ASSERT_EQUAL(2, anim1_completed_called);
 }
 
 #endif
