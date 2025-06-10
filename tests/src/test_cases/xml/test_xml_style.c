@@ -182,4 +182,30 @@ void test_xml_style_remove(void)
     lv_xml_component_unregister("comp1");
 }
 
+void test_xml_style_binding(void)
+{
+    const char * comp1_xml = {
+        "<component>"
+        " 	<subjects>"
+        " 		<int name=\"subject1\" value=\"3\"/>"
+        " 	</subjects>"
+        " 	<styles>"
+        " 		<style name=\"style1\" bg_color=\"0xff0000\"/>"
+        " 	</styles>"
+        " 	<view>"
+        " 		<bind_style name=\"style1\" selector=\"scrollbar\" subject=\"subject1\" ref_value=\"5\"/>"
+        " 	</view>"
+        "</component>"
+    };
+
+    lv_xml_component_register_from_data("comp1", comp1_xml);
+
+    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
+
+    TEST_ASSERT_NOT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR));
+
+    lv_subject_t * subject = lv_xml_get_subject(lv_xml_component_get_scope("comp1"), "subject1");
+    lv_subject_set_int(subject, 5);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR));
+}
 #endif

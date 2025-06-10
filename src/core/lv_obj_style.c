@@ -322,6 +322,37 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     LV_PROFILER_STYLE_END;
 }
 
+void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis)
+{
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].style == style && obj->styles[i].selector == selector) {
+            if(dis == obj->styles[i].is_disabled) {
+                return; /*Already in the right state*/
+            }
+            obj->styles[i].is_disabled = dis;
+            full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
+            lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
+            return;
+        }
+    }
+    LV_LOG_WARN("%p style was not found on %p widget with %6x selector", (void *)style, (void *)obj, selector);
+}
+
+bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
+{
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        if(obj->styles[i].style == style && obj->styles[i].selector == selector) {
+            return obj->styles[i].is_disabled;
+        }
+    }
+
+    LV_LOG_WARN("%p style was not found on %p widget with %6x selector", (void *)style, (void *)obj, selector);
+    return false;
+}
+
+
 void lv_obj_enable_style_refresh(bool en)
 {
     style_refr = en;
@@ -773,6 +804,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
         lv_obj_style_t * obj_style = &obj->styles[i];
         if(obj_style->is_trans == false) break;
         if(skip_trans) continue;
+        if(obj_style->is_disabled) continue;
 
         lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
 
@@ -786,6 +818,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
 
     for(; i < obj->style_cnt; i++) {
         if((obj->styles[i].style->has_group & group) == 0) continue;
+        if(obj->styles[i].is_disabled) continue;
         lv_obj_style_t * obj_style = &obj->styles[i];
         lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
         if(part_act != part) continue;
@@ -1045,6 +1078,7 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
         obj->style_main_prop_is_set = 0;
         for(i = 0; i < obj->style_cnt; i++) {
             if(lv_obj_style_get_selector_part(obj->styles[i].selector) != LV_PART_MAIN) continue;
+            if(obj->styles[i].is_disabled) continue;
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
             if(lv_style_is_const(style)) {
@@ -1065,6 +1099,8 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
         obj->style_other_prop_is_set = 0;
         for(i = 0; i < obj->style_cnt; i++) {
             if(lv_obj_style_get_selector_part(obj->styles[i].selector) == LV_PART_MAIN) continue;
+            if(obj->styles[i].is_disabled) continue;
+
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
             if(lv_style_is_const(style)) {

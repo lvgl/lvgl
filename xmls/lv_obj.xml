@@ -51,6 +51,13 @@ Example
 
         <element name="remove_style_all" access="custom" type="void"/>
 
+        <element name="bind_style" access="custom">
+            <arg name="name" type="style"/>
+            <arg name="selector" type="selector+" default="0"/>
+            <arg name="subject" type="subject"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
         <element name="event_cb" access="add">
             <arg name="name" type="string"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
