@@ -35,6 +35,12 @@ typedef struct {
 } flag_and_cond_t;
 
 typedef struct {
+    const lv_style_t * style;
+    lv_style_selector_t selector;
+    int32_t value;
+} bind_style_t;
+
+typedef struct {
     lv_subject_t * subject;
     int32_t value;
 } subject_set_int_user_data_t;
@@ -64,6 +70,8 @@ static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond);
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
@@ -538,6 +546,34 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
     lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 }
 
+lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
+                                  lv_subject_t * subject, int32_t ref_value)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_style(obj, style, selector);
+
+    bind_style_t * p = lv_malloc(sizeof(bind_style_t));
+    if(p == NULL) {
+        LV_LOG_WARN("Out of memory");
+        return NULL;
+    }
+
+    p->style = style;
+    p->selector = selector;
+    p->value = ref_value;
+
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, bind_style_observer_cb, obj, p);
+    observable->auto_free_user_data = 1;
+    return observable;
+}
+
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
@@ -814,6 +850,15 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
     return observable;
+}
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_style_t * p = observer->user_data;
+
+    int32_t current_v = lv_subject_get_int(subject);
+    bool dis = current_v != p->value;
+    lv_obj_style_set_disabled(observer->target, p->style, p->selector, dis);
 }
 
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)

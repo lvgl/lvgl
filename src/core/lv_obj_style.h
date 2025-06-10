@@ -118,6 +118,24 @@ void lv_obj_report_style_change(lv_style_t * style);
 void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 
 /**
+ * Temporary disable a style for a selector. It will look like is the style wasn't added
+ * @param obj       pointer to an object
+ * @param style     pointer to a style
+ * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
+ * @param dis       true: disable the style, false: enable the style
+ */
+void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis);
+
+/**
+ * Get if a given style is disabled on an object.
+ * @param obj       pointer to an object
+ * @param style     pointer to a style
+ * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
+ * @return          true: disable the style, false: enable the style
+ */
+bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
+
+/**
  * Enable or disable automatic style refreshing when a new style is added/removed to/from an object
  * or any other style change happens.
  * @param en        true: enable refreshing; false: disable refreshing

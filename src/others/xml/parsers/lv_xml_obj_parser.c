@@ -164,8 +164,8 @@ void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
 {
     const char * name = lv_xml_get_value_of(attrs, "name");
     if(name == NULL) {
-        /*Silently ignore this issue, as it might valid the name is not resolved during
-         *parameter replacement if there is no default value.*/
+        /*Silently ignore this issue.
+         *The name set to NULL if there there was no default value when resolving params*/
         return;
     }
     lv_xml_style_t * xml_style = lv_xml_get_style_by_name(&state->scope, name);
@@ -368,6 +368,54 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     int32_t min_v = min_str ? lv_xml_atoi(min_str) : INT32_MIN;
     int32_t max_v = max_str ? lv_xml_atoi(max_str) : INT32_MAX;
     lv_obj_add_subject_increment_event(item, subject, trigger, step, min_v, max_v);
+}
+
+void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_bind_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * name = lv_xml_get_value_of(attrs, "name");
+    if(name == NULL) {
+        /*Silently ignore this issue.
+         *The name set to NULL if there there was no default value when resolving params*/
+        return;
+    }
+    lv_xml_style_t * xml_style = lv_xml_get_style_by_name(&state->scope, name);
+    if(xml_style == NULL) {
+        LV_LOG_WARN("`%s` style is not found", name);
+        return;
+    }
+    const char * subject_str = lv_xml_get_value_of(attrs, "subject");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in lv_obj bind_style");
+        return;
+    }
+
+    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+    if(subject == NULL) {
+        LV_LOG_WARN("Subject `%s` doesn't exist in lv_obj bind_style", subject_str);
+        return;
+    }
+
+    const char * ref_value_str = lv_xml_get_value_of(attrs, "ref_value");
+    if(ref_value_str == NULL) {
+        LV_LOG_WARN("`ref_value` is missing in lv_obj bind_style");
+        return;
+    }
+
+    int32_t ref_value = lv_xml_atoi(ref_value_str);
+
+    const char * selector_str = lv_xml_get_value_of(attrs, "selector");
+    lv_style_selector_t selector = get_selector(selector_str);
+
+    void * item = lv_xml_state_get_parent(state);
+    lv_obj_bind_style(item, &xml_style->style, selector, subject, ref_value);
 }
 
 void * lv_obj_xml_bind_flag_create(lv_xml_parser_state_t * state, const char ** attrs)
