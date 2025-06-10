@@ -482,10 +482,10 @@ static void _add_arc_path(int32_t * arc_path, uint32_t * pidx, uint32_t radius,
 {
     /* set number of arcs to draw */
     vg_arc q_arc;
-    uint32_t start_arc_angle = start_angle % 90;
-    uint32_t end_arc_angle = end_angle % 90;
-    uint32_t inv_start_arc_angle = (start_arc_angle > 0) ? (90 - start_arc_angle) : 0;
-    uint32_t nbarc = (end_angle - start_angle - inv_start_arc_angle - end_arc_angle) / 90;
+    int32_t start_arc_angle = start_angle % 90;
+    int32_t end_arc_angle = end_angle % 90;
+    int32_t inv_start_arc_angle = (start_arc_angle > 0) ? (90 - start_arc_angle) : 0;
+    int32_t nbarc = (end_angle - start_angle - inv_start_arc_angle - end_arc_angle) / 90;
     q_arc.rad = radius;
 
     /* handle special case of start & end point in the same quarter */
