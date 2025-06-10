@@ -391,16 +391,6 @@ static void key_callback(GLFWwindow * window, int key, int scancode, int action,
 static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
 {
     LV_UNUSED(mods);
-    if(button == GLFW_MOUSE_BUTTON_LEFT) {
-        lv_glfw_window_t * lv_window = lv_glfw_get_lv_window_from_window(window);
-        lv_window->mouse_last_state = action == GLFW_PRESS ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
-        proc_mouse(lv_window);
-    }
-}
-
-static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
-{
-    LV_UNUSED(mods);
     lv_glfw_window_t * lv_window = lv_glfw_get_lv_window_from_window(window);
     lv_window->mouse_last_state = LV_INDEV_STATE_EX_UNSUPPORTED;
     if (button == GLFW_MOUSE_BUTTON_LEFT) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_LEFT;
