@@ -21,8 +21,8 @@
  *      DEFINES
  *********************/
 
-#define LV_UPTIME_MONITOR_FILE         "/proc/stat"
-#define LV_UPTIME_MONITOR_SELF         "/proc/self/stat"
+#define LV_UPTIME_MONITOR_FILE              "/proc/stat"
+#define LV_UPTIME_MONITOR_SELF_FILE         "/proc/self/stat"
 
 #define LV_PROC_STAT_VAR_FORMAT        " %" PRIu32
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
@@ -85,15 +85,15 @@ uint32_t lv_os_get_idle_percent(void)
     return (proc_stat.fields.idle * 100) / total;
 }
 
-uint32_t lv_os_get_self_cpu_percent(void)
+uint32_t lv_os_get_self_idle_percent(void)
 {
     uint64_t self_current_time_ticks = 0;
     lv_proc_stat_t stat_current_system_total_ticks;
     lv_proc_stat_t stat_delta_system_ticks;
 
-    FILE * self = fopen(LV_UPTIME_MONITOR_SELF, "r");
+    FILE * self = fopen(LV_UPTIME_MONITOR_SELF_FILE, "r");
     if(!self) {
-        LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_SELF);
+        LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_SELF_FILE);
         return LV_RESULT_INVALID;
     }
 
@@ -101,7 +101,7 @@ uint32_t lv_os_get_self_cpu_percent(void)
 
     if(!fgets(self_stat_buffer, sizeof(self_stat_buffer), self)) {
         fclose(self);
-        LV_LOG_ERROR("Failed to read /proc/self/stat");
+        LV_LOG_ERROR("Failed to read " LV_UPTIME_MONITOR_SELF_FILE);
         return UINT32_MAX;
     }
 
@@ -111,14 +111,14 @@ uint32_t lv_os_get_self_cpu_percent(void)
      * Skip the whitespace after finding the last ')' */
     char * p = strrchr(self_stat_buffer, ')');
     if(!p) {
-        LV_LOG_ERROR("/proc/self/stat is missing the closing ')'");
+        LV_LOG_ERROR(LV_UPTIME_MONITOR_SELF_FILE " is missing the closing ')'");
         return UINT32_MAX;
     }
     p++; /* move past the ')' */
     while(*p && (*p == ' ' || *p == '\t'))
         p++; /* skip whitespace after ')' */
     if(!*p) {
-        LV_LOG_ERROR("/proc/self/stat unexpectedly ends after the closing ')'");
+        LV_LOG_ERROR(LV_UPTIME_MONITOR_SELF_FILE " unexpectedly ends after the closing ')'");
         return UINT32_MAX;
     }
 
@@ -126,11 +126,11 @@ uint32_t lv_os_get_self_cpu_percent(void)
     uint64_t stime = 0;
 
     int scanned_items = sscanf(p,
-                               "%*c "                          // state (field 3)
+                               "%*c "                         // state (field 3)
                                "%*d %*d %*d %*d %*d "         // ppid, pgrp, session, tty_nr, tpgid (fields 4-8)
                                "%*u "                         // flags (field 9)
-                               "%*" SCNu64 " %*" SCNu64 " %*" SCNu64 " %*" SCNu64 // minflt, cminflt, majflt, cmajflt (fields 10-13)
-                               " %" SCNu64 "  %" SCNu64,        // utime, stime (fields 14-15)
+                               "%*u %*u %*u %*u "             // minflt, cminflt, majflt, cmajflt (fields 10-13)
+                               "%" SCNu64 " %" SCNu64,        // utime, stime (fields 14-15)
                                &utime, &stime);
 
     if(scanned_items != 2) {
@@ -150,7 +150,7 @@ uint32_t lv_os_get_self_cpu_percent(void)
         last_self_ticks = self_current_time_ticks;
         last_system_total_ticks_stat = stat_current_system_total_ticks;
 
-        return 0;
+        return 100; /* 100% idle = 0% CPU usage*/
     }
 
     uint64_t delta_self_proc_ticks = self_current_time_ticks - last_self_ticks;
@@ -164,11 +164,11 @@ uint32_t lv_os_get_self_cpu_percent(void)
     last_self_ticks = self_current_time_ticks;
     last_system_total_ticks_stat = stat_current_system_total_ticks;
 
-    if(delta_total_system_ticks == 0) return 0;
+    if(delta_total_system_ticks == 0) return 100;
 
-    uint32_t cpu_percent = (uint32_t)((delta_self_proc_ticks * 100ULL) / delta_total_system_ticks);
+    uint32_t cpu_usage_percent = (uint32_t)((delta_self_proc_ticks * 100ULL) / delta_total_system_ticks);
 
-    return cpu_percent;
+    return 100 - cpu_usage_percent;
 }
 
 /**********************

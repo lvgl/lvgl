@@ -1011,6 +1011,15 @@
 #if LV_USE_SYSMON
     /** Get the idle percentage. E.g. uint32_t my_get_idle(void); */
     #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
+    #if LV_USE_OS == LV_OS_PTHREAD
+        /** Get the applications idle percentage.
+         * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_self_idle_percent
+        #define LV_SYSMON_PROC_IDLE_AVAILABLE 1
+    #else
+        /** A separate application idle percentage function is not available on bare metal as it's the same*/
+        #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
+    #endif
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
