@@ -152,8 +152,8 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     /* Init Color */
-    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
-    vg_lite_color_t vgcol = vglite_get_color(col32, false);
+    lv_color32_t color32 = lv_color_to_32(dsc->color, dsc->opa);
+    vg_lite_color_t vgcol = vglite_get_color(color32, false);
 
     vg_lite_linear_gradient_t * gradient;
 
