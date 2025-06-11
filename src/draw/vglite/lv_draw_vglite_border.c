@@ -101,10 +101,10 @@ void lv_draw_vglite_border(vglite_draw_task_t * vglite_task)
     int32_t width = dsc->width;
 
     /* Move border inwards to align with software rendered border */
-    inward_coords.x1 = coords->x1 + ceil(width / 2.0f);
-    inward_coords.x2 = coords->x2 - floor(width / 2.0f);
-    inward_coords.y1 = coords->y1 + ceil(width / 2.0f);
-    inward_coords.y2 = coords->y2 - floor(width / 2.0f);
+    inward_coords.x1 = (int32_t)(coords->x1 + ceil(width / 2.0f));
+    inward_coords.x2 = (int32_t)(coords->x2 - floor(width / 2.0f));
+    inward_coords.y1 = (int32_t)(coords->y1 + ceil(width / 2.0f));
+    inward_coords.y2 = (int32_t)(coords->y2 - floor(width / 2.0f));
 
     lv_area_move(&inward_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
@@ -133,34 +133,34 @@ static void _border_set_scissoring(const lv_area_t * coords, int32_t line_width,
     int32_t final_radius = LV_MIN(radius, shortest_side / 2);
 
     if(border_side & LV_BORDER_SIDE_TOP) {
-        scissoring_rects->rect[scissoring_rects->num_rect].x = coords->x1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].y = coords->y1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].width = coords->x2 - coords->x1 + line_width;
-        scissoring_rects->rect[scissoring_rects->num_rect].height = final_radius + ceil(line_width / 2.0f);
+        scissoring_rects->rect[scissoring_rects->num_rect].x = (int32_t)(coords->x1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].y = (int32_t)(coords->y1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].width = (int32_t)(coords->x2 - coords->x1 + line_width);
+        scissoring_rects->rect[scissoring_rects->num_rect].height = (int32_t)(final_radius + ceil(line_width / 2.0f));
         scissoring_rects->num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_LEFT) {
-        scissoring_rects->rect[scissoring_rects->num_rect].x = coords->x1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].y = coords->y1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].width = final_radius + ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].height = coords->y2 - coords->y1 + line_width + 1;
+        scissoring_rects->rect[scissoring_rects->num_rect].x = (int32_t)(coords->x1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].y = (int32_t)(coords->y1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].width = (int32_t)(final_radius + ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].height = (int32_t)(coords->y2 - coords->y1 + line_width + 1);
         scissoring_rects->num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_RIGHT) {
-        scissoring_rects->rect[scissoring_rects->num_rect].x = coords->x2 - final_radius + 1;
-        scissoring_rects->rect[scissoring_rects->num_rect].y = coords->y1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].width = final_radius + ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].height = coords->y2 - coords->y1 + line_width + 1;
+        scissoring_rects->rect[scissoring_rects->num_rect].x = (int32_t)(coords->x2 - final_radius + 1);
+        scissoring_rects->rect[scissoring_rects->num_rect].y = (int32_t)(coords->y1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].width = (int32_t)(final_radius + ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].height = (int32_t)(coords->y2 - coords->y1 + line_width + 1);
         scissoring_rects->num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_BOTTOM) {
-        scissoring_rects->rect[scissoring_rects->num_rect].x = coords->x1 - ceil(line_width / 2.0f);
-        scissoring_rects->rect[scissoring_rects->num_rect].y = coords->y2 - final_radius + 1;
-        scissoring_rects->rect[scissoring_rects->num_rect].width = coords->x2 - coords->x1 + line_width;
-        scissoring_rects->rect[scissoring_rects->num_rect].height = final_radius + ceil(line_width / 2.0f);
+        scissoring_rects->rect[scissoring_rects->num_rect].x = (int32_t)(coords->x1 - ceil(line_width / 2.0f));
+        scissoring_rects->rect[scissoring_rects->num_rect].y = (int32_t)(coords->y2 - final_radius + 1);
+        scissoring_rects->rect[scissoring_rects->num_rect].width = (int32_t)(coords->x2 - coords->x1 + line_width);
+        scissoring_rects->rect[scissoring_rects->num_rect].height = (int32_t)(final_radius + ceil(line_width / 2.0f));
         scissoring_rects->num_rect++;
     }
 }

@@ -140,8 +140,8 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
 {
     vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
-    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
-    vg_lite_color_t vgcol = vglite_get_color(col32, false);
+    lv_color32_t color32 = lv_color_to_32(dsc->color, dsc->opa);
+    vg_lite_color_t vgcol = vglite_get_color(color32, false);
 
     if(dsc->opa >= (lv_opa_t)LV_OPA_MAX) {   /*Opaque fill*/
         vg_lite_rectangle_t rect = {
@@ -184,7 +184,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
     int32_t width = lv_area_get_width(coords);
     int32_t height = lv_area_get_height(coords);
     int32_t radius = dsc->radius;
-    lv_opa_t opa = dsc->opa;
+    lv_opa_t dsc_opa = dsc->opa;
     vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     if(dsc->radius < 0)
@@ -207,8 +207,8 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     /*** Init Color ***/
-    lv_color32_t col32 = lv_color_to_32(dsc->color, opa);
-    vg_lite_color_t vgcol = vglite_get_color(col32, false);
+    lv_color32_t color32 = lv_color_to_32(dsc->color, dsc_opa);
+    vg_lite_color_t vgcol = vglite_get_color(color32, false);
 
     vg_lite_linear_gradient_t * gradient;
     bool has_gradient = (dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
