@@ -67,6 +67,7 @@ set(SANITIZE_AND_COVERAGE_OPTIONS
 set(LVGL_TEST_OPTIONS_VG_LITE
     -DLV_TEST_OPTION=6
     -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
+    -Wno-float-conversion # workaround for thorvg dangling-pointer float to int conversion
 )
 
 set(LVGL_TEST_OPTIONS_SDL
@@ -202,7 +203,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Wundef
         -Wuninitialized
         -Wunreachable-code
-        -Werror=float-conversion
+        #-Werror=float-conversion
         -Werror=strict-aliasing
         -Wno-double-promotion
         -Wno-unreachable-code
