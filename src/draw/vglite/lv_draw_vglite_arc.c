@@ -565,8 +565,8 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
     LV_ASSERT_MALLOC(path);
     vglite_task->path = path;
-    int16_t start_angle = dsc->start_angle;
-    int16_t end_angle = dsc->end_angle;
+    int32_t start_angle = (int32_t)dsc->start_angle;
+    int32_t end_angle = (int32_t)dsc->end_angle;
 
     /* be sure end_angle > start_angle */
     if(end_angle < start_angle)
