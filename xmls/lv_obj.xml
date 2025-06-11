@@ -184,6 +184,8 @@ Example
 	    <prop name="align" type="enum:lv_align"/>
 
         <prop name="ext_click_area" type="int"/>
+        <prop name="scroll_snap_x" type="enum:lv_scroll_snap"/>
+        <prop name="scroll_snap_y" type="enum:lv_scroll_snap"/>
 
         <prop name="style_x" type="coords"/>
         <prop name="style_y" type="coords"/>
