@@ -123,7 +123,10 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 #endif
                 }
                 break;
-            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A1:
+            case LV_FONT_GLYPH_FORMAT_A3:
+            case LV_FONT_GLYPH_FORMAT_A4:
+            case LV_FONT_GLYPH_FORMAT_A8: {
                     /*Do not draw transparent things*/
                     if(glyph_draw_dsc->opa <= LV_OPA_MIN)
                         return;
