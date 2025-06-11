@@ -748,6 +748,21 @@
                 #endif
             #endif
         #endif
+    #else 
+        #ifndef LV_USE_VGLITE_DRAW_THREAD
+            #ifdef CONFIG_LV_USE_VGLITE_DRAW_THREAD
+                #define LV_USE_VGLITE_DRAW_THREAD CONFIG_LV_USE_VGLITE_DRAW_THREAD
+            #else
+                #define LV_USE_VGLITE_DRAW_THREAD 0
+            #endif
+        #endif
+        #ifndef LV_USE_VGLITE_DRAW_ASYNC
+            #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+            #else
+                #define LV_USE_VGLITE_DRAW_ASYNC  0
+            #endif
+        #endif
     #endif
 
     /** Enable VGLite asserts. */
