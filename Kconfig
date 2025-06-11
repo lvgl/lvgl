@@ -527,6 +527,16 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
+		
+		config LV_USE_PPA
+		bool "Use Espressif's PPA accelerator for ESP SoCs"
+		default n
+
+		config LV_USE_PPA_IMG
+		bool "Use Espressif's PPA accelerator for Image draw"
+		default n
+		depends on LV_USE_PPA
+
 	endmenu
 
 	menu "Feature Configuration"
