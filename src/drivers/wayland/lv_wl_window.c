@@ -115,6 +115,14 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("Failed to create draw buffers");
         return NULL;
     }
+    else {
+#if LV_WAYLAND_WINDOW_DECORATIONS
+        if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen
+           && lv_wl_ctx.dmabuf_ctx.is_initialized) {
+            lv_wayland_window_decoration_create_all(window);
+        }
+#endif
+    }
 #else
     if(lv_wayland_shm_create_draw_buffers(&lv_wl_ctx.shm_ctx, window) != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create window buffers");
@@ -287,17 +295,22 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
 lv_result_t lv_wayland_window_resize(struct window * window, int width, int height)
 {
 
-
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
         width -= (2 * BORDER_SIZE);
         height -= (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
+#if LV_WAYLAND_USE_DMABUF
+    if(window->wl_ctx->dmabuf_ctx.is_initialized) {
+        /* If the window is using dmabuf, we need to resize the window body */
+        lv_wayland_window_decoration_detach_all(window);
+    }
+#endif
 #endif
 
 #if LV_WAYLAND_USE_DMABUF
     {
-        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window);
+        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
@@ -312,13 +325,12 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 #endif
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
-    if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
+    if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen
+#if LV_WAYLAND_USE_DMABUF
+       && window->wl_ctx->dmabuf_ctx.is_initialized
+#endif
+      ) {
         lv_wayland_window_decoration_create_all(window);
-    }
-    else if(!window->wl_ctx->opt_disable_decorations) {
-        /* Entering fullscreen, detach decorations to prevent xdg_wm_base error 4 */
-        /* requested geometry larger than the configured fullscreen state */
-        lv_wayland_window_decoration_detach_all(window);
     }
 #endif
 
