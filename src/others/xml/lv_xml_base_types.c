@@ -153,6 +153,17 @@ lv_text_decor_t lv_xml_text_decor_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
+lv_scroll_snap_t lv_xml_scroll_snap_to_enum(const char * txt)
+{
+    if(lv_streq("none", txt)) return LV_SCROLL_SNAP_NONE;
+    if(lv_streq("start", txt)) return LV_SCROLL_SNAP_START;
+    if(lv_streq("center", txt)) return LV_SCROLL_SNAP_CENTER;
+    if(lv_streq("end", txt)) return LV_SCROLL_SNAP_END;
+
+    LV_LOG_WARN("%s is an unknown value for scroll_snap", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 lv_flex_flow_t lv_xml_flex_flow_to_enum(const char * txt)
 {
     if(lv_streq("column", txt)) return LV_FLEX_FLOW_COLUMN;

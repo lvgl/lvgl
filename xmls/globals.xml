@@ -186,6 +186,13 @@
             <enum name="full"    	help=""/>
     </enumdef>
 
+    <enumdef name="lv_scroll_snap">
+            <enum name="none"  		help=""/>
+            <enum name="start"    	help=""/>
+            <enum name="end"    	help=""/>
+            <enum name="center"    	help=""/>
+    </enumdef>
+
     <enumdef name="lv_screen_load_anim">
         <enum name="none" help=""/>
         <enum name="over_left" help=""/>

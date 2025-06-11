@@ -91,6 +91,13 @@ lv_text_align_t lv_xml_text_align_to_enum(const char * txt);
 lv_text_decor_t lv_xml_text_decor_to_enum(const char * txt);
 
 /**
+ * Convert a scroll snap string to enum
+ * @param txt       e.g. "start"
+ * @return          the related enum, e.g. `LV_SCROLL_SNAP_START`
+ */
+lv_scroll_snap_t lv_xml_scroll_snap_to_enum(const char * txt);
+
+/**
  * Convert a flex flow string to enum
  * @param txt       e.g. "row_wrap"
  * @return          the related enum, e.g. `LV_FLEX_FLOW_ROW_WRAP`
