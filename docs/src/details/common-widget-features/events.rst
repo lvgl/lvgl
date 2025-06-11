@@ -265,6 +265,25 @@ The *target* parameter of the event is always the current target Widget,
 not the original Widget. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
 
+.. _event_trickle:
+
+Event Trickle
+******************
+
+If :cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_TRICKLE)` is enabled all
+events will be sent to the Widget's children as well. This is the opposite
+of event bubbling - instead of propagating up the parent, events propagate
+down to the children.
+
+The trickle mechanism only affects immediate children, not grandchildren or
+deeper descendants. If you need events to propagate to deeper levels, each child
+would need to have the :cpp:enumerator:`LV_OBJ_FLAG_EVENT_TRICKLE` flag enabled.
+
+Like with bubbling, the *target* parameter of the event is always the current target Widget,
+not the original Widget. To get the original target call
+:cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
+
+
 .. _events_examples:
 
 

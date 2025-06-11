@@ -40,6 +40,7 @@ struct _lv_event_t {
     uint8_t deleted : 1;
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
+    uint8_t stop_trickling : 1;
 };
 
 

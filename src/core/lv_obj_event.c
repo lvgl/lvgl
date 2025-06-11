@@ -27,6 +27,7 @@
  **********************/
 static lv_result_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_t * e);
+static bool event_is_trickled(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,6 +61,7 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
     e.deleted = 0;
     e.stop_bubbling = 0;
     e.stop_processing = 0;
+    e.stop_trickling = 0;
 
     lv_event_push(&e);
 
@@ -378,6 +380,23 @@ static lv_result_t event_send_core(lv_event_t * e)
         res = event_send_core(e);
     }
 
+    /*Trickle down to children if enabled*/
+    if(event_is_trickled(e)) {
+        uint32_t child_count = lv_obj_get_child_count(target);
+
+        /* we don't want the event to bubble up again when trickling down */
+        e->stop_bubbling = 1;
+
+        for(uint32_t i = 0; i < child_count && res == LV_RESULT_OK && !e->stop_processing; i++) {
+            lv_obj_t * child = lv_obj_get_child(target, i);
+            if(child) {
+                e->current_target = child;
+                res = event_send_core(e);
+                if(res != LV_RESULT_OK) break;
+            }
+        }
+    }
+
     return res;
 }
 
@@ -396,6 +415,38 @@ static bool event_is_bubbled(lv_event_t * e)
 
     /*Check other codes only if bubbling is enabled*/
     if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
+
+    switch(e->code) {
+        case LV_EVENT_HIT_TEST:
+        case LV_EVENT_COVER_CHECK:
+        case LV_EVENT_REFR_EXT_DRAW_SIZE:
+        case LV_EVENT_DRAW_MAIN_BEGIN:
+        case LV_EVENT_DRAW_MAIN:
+        case LV_EVENT_DRAW_MAIN_END:
+        case LV_EVENT_DRAW_POST_BEGIN:
+        case LV_EVENT_DRAW_POST:
+        case LV_EVENT_DRAW_POST_END:
+        case LV_EVENT_DRAW_TASK_ADDED:
+        case LV_EVENT_REFRESH:
+        case LV_EVENT_DELETE:
+        case LV_EVENT_CHILD_CREATED:
+        case LV_EVENT_CHILD_DELETED:
+        case LV_EVENT_CHILD_CHANGED:
+        case LV_EVENT_SIZE_CHANGED:
+        case LV_EVENT_STYLE_CHANGED:
+        case LV_EVENT_GET_SELF_SIZE:
+            return false;
+        default:
+            return true;
+    }
+}
+
+static bool event_is_trickled(lv_event_t * e)
+{
+    if(e->stop_trickling) return false;
+
+    /*Check other codes only if trickle is enabled*/
+    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_TRICKLE) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:

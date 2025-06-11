@@ -467,6 +467,7 @@ There are some Widget attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_SNAPPABLE` If scroll snap is enabled on the parent it can snap to this Widget
 -  :cpp:enumerator:`LV_OBJ_FLAG_PRESS_LOCK` Keep the Widget pressed even if the press slid from the Widget
 -  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_BUBBLE` Propagate the events to the parent as well
+-  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_TRICKLE` Propagate the events to the children as well
 -  :cpp:enumerator:`LV_OBJ_FLAG_GESTURE_BUBBLE` Propagate the gestures to the parent
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 -  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the Widget not positioned by the layouts
