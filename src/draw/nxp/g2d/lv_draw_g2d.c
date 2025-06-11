@@ -57,6 +57,8 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
  *  STATIC VARIABLES
  **********************/
 
+static int32_t is_hw_pxp = 0;
+
 /**********************
  *      MACROS
  **********************/
@@ -78,6 +80,8 @@ void lv_draw_g2d_init(void)
     if(g2d_open(&draw_g2d_unit->g2d_handle)) {
         LV_LOG_ERROR("g2d_open fail.\n");
     }
+    g2d_query_hardware(draw_g2d_unit->g2d_handle, G2D_HARDWARE_PXP, &is_hw_pxp);
+
 #if LV_USE_G2D_DRAW_THREAD
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
     thread_dsc->idx = 0;
@@ -105,6 +109,12 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
+        case LV_COLOR_FORMAT_RGB565: {
+                if(!is_hw_pxp) {
+                    is_cf_supported = true;
+                }
+            }
+            break;
         default:
             break;
     }
@@ -122,10 +132,7 @@ static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_for
             is_cf_supported = true;
             break;
         case LV_COLOR_FORMAT_RGB565: {
-                int32_t hw_pxp = 0;
-                lv_draw_g2d_unit_t * u = (lv_draw_g2d_unit_t *)drawunit;
-                g2d_query_hardware(u->g2d_handle, G2D_HARDWARE_PXP, &hw_pxp);
-                if(!hw_pxp) {
+                if(!is_hw_pxp) {
                     is_cf_supported = true;
                 }
             }

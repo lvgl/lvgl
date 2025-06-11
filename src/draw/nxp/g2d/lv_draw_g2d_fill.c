@@ -39,10 +39,10 @@ static void _g2d_fill(void * g2d_handle, struct g2d_surface * dst_surf);
 static void _g2d_fill_with_opa(void * g2d_handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              lv_color_t color, lv_opa_t opa);
+                              lv_color_t color, lv_opa_t opa, lv_color_format_t cf);
 
 static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_t color);
+                              int32_t stride, lv_color_t color, lv_color_format_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -88,14 +88,14 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
 
     bool has_opa = (dsc->opa < (lv_opa_t)LV_OPA_MAX);
     struct g2d_surface dst_surf;
-    _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, stride, dsc->color);
+    _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, stride, dsc->color, draw_buf->header.cf);
 
     if(has_opa) {
         struct g2d_buf * tmp_buf = g2d_alloc(lv_area_get_width(&blend_area) * lv_area_get_height(&blend_area) * sizeof(
                                                  lv_color32_t), 1);
         G2D_ASSERT_MSG(tmp_buf, "Failed to alloc temporary buffer.");
         struct g2d_surface src_surf;
-        _g2d_set_src_surf(&src_surf, tmp_buf, &blend_area, dsc->color, dsc->opa);
+        _g2d_set_src_surf(&src_surf, tmp_buf, &blend_area, dsc->color, dsc->opa, draw_buf->header.cf);
         _g2d_fill_with_opa(u->g2d_handle, &dst_surf, &src_surf);
         g2d_free(tmp_buf);
     }
@@ -109,12 +109,12 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
  **********************/
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              lv_color_t color, lv_opa_t opa)
+                              lv_color_t color, lv_opa_t opa, lv_color_format_t cf)
 {
     int32_t width  = lv_area_get_width(area);
     int32_t height = lv_area_get_height(area);
 
-    src_surf->format = G2D_RGBA8888;
+    src_surf->format = g2d_get_buf_format(cf);
 
     src_surf->left   = 0;
     src_surf->top    = 0;
@@ -133,12 +133,12 @@ static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * bu
 }
 
 static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_t color)
+                              int32_t stride, lv_color_t color, lv_color_format_t cf)
 {
     int32_t width  = lv_area_get_width(area);
     int32_t height = lv_area_get_height(area);
 
-    dst_surf->format = G2D_RGBA8888;
+    dst_surf->format = g2d_get_buf_format(cf);
 
     dst_surf->left   = area->x1;
     dst_surf->top    = area->y1;
