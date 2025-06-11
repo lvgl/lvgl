@@ -268,12 +268,11 @@ not the original Widget. To get the original target call
 .. _event_trickle:
 
 Event Trickle
-******************
+*************
 
-If :cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_TRICKLE)` is enabled all
-events will be sent to the Widget's children as well. This is the opposite
-of event bubbling - instead of propagating up the parent, events propagate
-down to the children.
+Also known as Event Capturing, if :cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_TRICKLE)`
+is enabled all events will be sent to the Widget's children as well. This is the opposite of
+event bubbling - instead of propagating up the parent, events propagate down to the children.
 
 The trickle mechanism only affects immediate children, not grandchildren or
 deeper descendants. If you need events to propagate to deeper levels, each child
