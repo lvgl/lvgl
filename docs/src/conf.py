@@ -1,3 +1,4 @@
+# #########################################################################
 # Configuration file for the Sphinx documentation builder.
 # Created by sphinx-quickstart on Wed Jun 12 16:38:40 2019.
 #
@@ -17,6 +18,7 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath() to make it absolute, as shown here.
+# #########################################################################
 import os
 import sys
 from sphinx.builders.html import StandaloneHTMLBuilder
@@ -29,6 +31,8 @@ sys.path.insert(0, os.path.abspath('./_ext'))
 sys.path.insert(0, base_path)
 from lvgl_version import lvgl_version #NoQA
 
+cfg_lv_version_file = 'lv_version.h'
+
 
 
 # *************************************************************************
@@ -36,13 +40,21 @@ from lvgl_version import lvgl_version #NoQA
 # *************************************************************************
 
 project = 'LVGL'
-copyright = '2024-%Y, LVGL Kft'
+copyright = '2021-%Y, LVGL Kft'
 author = 'LVGL Community'
+
 if __name__ == '__main__':
     version_src_path = os.path.join(base_path, '../../lv_version.h')
 else:
-    version_src_path = os.path.join(base_path, 'lv_version.h')
-version = lvgl_version(version_src_path)
+    version_src_path = os.path.join(base_path, cfg_lv_version_file)
+
+if os.path.isfile(version_src_path):
+    # We have lv_version.h.  Use it.
+    version = lvgl_version(version_src_path)
+else:
+    # We have to guess.
+    version = '9.3'
+
 release = version
 # Notes about `version` here:
 # ---------------------------
@@ -74,15 +86,16 @@ release = version
 # As of 6-Jan-2025, `link_roles` is being commented out because it is being
 # replaced by a manually-installed translation link in ./docs/index.rst.
 extensions = [
-    'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
+    'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.viewcode',      # Eye icon at top of page to view page source code on GitHub.
+    'sphinx_copybutton',        # Copy-to-clipboard button in code blocks & code examples.
     'breathe',
     'sphinx_sitemap',
     'lv_example',
     'sphinx_design',
-    'sphinx_rtd_dark_mode',
     # 'link_roles',
     'sphinxcontrib.mermaid',
 ]
@@ -116,7 +129,8 @@ del add_redirects
 highlight_language = 'c'
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'github-light'
+pygments_dark_style = 'github-dark'
 
 # -------------------------------------------------------------------------
 # Options for Internationalisation
@@ -141,8 +155,8 @@ primary_domain = 'c'      # Default:  'py'
 # List of glob-style patterns, relative to source directory, that
 # match files and directories to ignore when looking for source files.
 # These patterns also effect html_static_path and html_extra_path.
-exclude_patterns = ['build', 'doxygen', 'Thumbs.db', '.DS_Store',
-                    'README.md', 'README_*', 'lv_examples', 'out_html', 'env', '_ext', 'examples']
+exclude_patterns = ['build', 'doxygen', 'intermediate', 'doxygen_html', 'Thumbs.db', '.DS_Store',
+                    'README.md', 'README_*', 'lv_examples', 'env', '_ext', 'examples']
 
 # The master toctree document.  (Root of TOC tree.)
 master_doc = 'index'
@@ -189,7 +203,7 @@ templates_path = ['_templates']
 # Options for HTML Builder
 # -------------------------------------------------------------------------
 # The theme for HTML output.  See https://www.sphinx-doc.org/en/master/usage/theming.html
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -202,18 +216,28 @@ html_theme = 'sphinx_rtd_theme'
 # version of sphinx-rtd-theme (upgraded for Sphinx v8.x).  The removed line
 # is preserved by commenting it out in case it is ever needed again.
 html_theme_options = {
-    # 'display_version': True,
-    'prev_next_buttons_location': 'both',
-    'style_external_links': False,
-    # 'vcs_pageview_mode': '',
-    # 'style_nav_header_background': 'white',
-    # Toc options
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': False,
-    'titles_only': False,
-    'collapse_navigation': False,
-    'logo_only': True,
+    "sidebar_hide_name": True,      # True when the logo carries project name
+    "light_logo": "images/logo-light.svg",
+    "dark_logo": "images/logo-dark.svg",
+    "top_of_page_buttons": ["view"],
+    # The below 3 direct the "top_of_page_buttons" to github for view and edit buttons.
+    "source_repository": "https://github.com/lvgl/lvgl/",
+    "source_branch": "master",
+    "source_directory": "docs/src/",
+    # "announcement": "<em>Semi-permanent announcement</em> from <code>conf.py</code>.",
+}
+
+html_sidebars = {
+    "**": [
+        "sidebar/brand.html",
+        "sidebar/version-selector.html",
+        "sidebar/search.html",
+        "sidebar/scroll-start.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+        "sidebar/variant-selector.html"
+    ]
 }
 
 # For site map generation
@@ -243,12 +267,14 @@ html_context = {
     'conf_py_path': '/docs/src/'
 }
 
-html_logo = '_static/images/logo_lvgl.png'
+html_logo = ''
 html_favicon = '_static/images/favicon.png'
 
 html_css_files = [
-    'css/custom.css',
-    'css/fontawesome.min.css'
+    'css/fontawesome.min.css',
+    'css/solid.min.css',
+    'css/brands.min.css',
+    'css/custom.css'
 ]
 
 html_js_files = [
@@ -261,12 +287,13 @@ html_last_updated_fmt = ''          # Empty string uses default format:  '%b %d,
 html_last_updated_use_utc = False   # False = use generating system's local date, not GMT.
 html_permalinks = True              # Default = True, add link anchor for each heading and description environment.
 
-html_sidebars = {
-    '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-    ]
-}
+# 10-Mar-2025 16:21 -- commented out for Furo theme.
+# html_sidebars = {
+#     '**': [
+#         'relations.html',  # needs 'show_related': True theme option to display
+#         'searchbox.html',
+#     ]
+# }
 
 # html_domain_indices
 # html_use_index = True            # Default = True
@@ -279,7 +306,7 @@ html_sidebars = {
 # html_link_suffix = html_file_suffix
 html_show_copyright = True         # Default = True; shows copyright notice in footer.
 # html_show_search_summary = True  # Default = True
-# html_show_sphinx = True          # Default = True; adds "Created using Sphinx" to footer.
+html_show_sphinx = False          # Default = True; adds "Created using Sphinx" to footer.
 # html_output_encoding = 'utf-8'   # Default = 'utf-8'
 # html_compact_lists = True        # Default = True
 # html_secnumber_suffix = '. '     # Default = '. '; set to ' ' to suppress final dot on section numbers.

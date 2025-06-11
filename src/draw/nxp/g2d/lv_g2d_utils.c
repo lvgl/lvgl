@@ -16,7 +16,7 @@
 #include "lv_g2d_utils.h"
 
 #if LV_USE_DRAW_G2D
-#include"g2d.h"
+#include "lv_g2d_buf_map.h"
 #include "lv_draw_g2d.h"
 
 /*********************
@@ -39,9 +39,9 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-enum g2d_format g2d_get_buf_format(lv_color_format_t cf)
+g2d_format_t g2d_get_buf_format(lv_color_format_t cf)
 {
-    enum g2d_format color_f = G2D_RGB565;
+    g2d_format_t color_f = G2D_RGB565;
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
@@ -81,6 +81,13 @@ enum g2d_format g2d_get_buf_format(lv_color_format_t cf)
 uint32_t g2d_rgba_to_u32(lv_color_t color)
 {
     return (uint32_t)((color.red) + (color.green << 8) + (color.blue << 16) + ((uint32_t)0xff << 24));
+}
+
+int32_t g2d_get_buf_fd(const lv_draw_buf_t * draw_buf)
+{
+    struct g2d_buf * buf = g2d_search_buf_map(draw_buf->data);
+    G2D_ASSERT_MSG(buf, "Failed to find buffer in map.");
+    return g2d_buf_export_fd(buf);
 }
 
 /**********************

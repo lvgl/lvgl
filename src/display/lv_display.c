@@ -127,6 +127,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     else {
         disp->theme = lv_theme_simple_get();
     }
+#elif LV_USE_THEME_MONO
+    if(lv_theme_mono_is_inited() == false) {
+        disp->theme = lv_theme_mono_init(disp, false, LV_FONT_DEFAULT);
+    }
+    else {
+        disp->theme = lv_theme_mono_get();
+    }
 #endif
 
     disp->bottom_layer = lv_obj_create(NULL); /*Create bottom layer on the display*/
@@ -469,6 +476,7 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
 
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        LV_ASSERT_FORMAT_MSG(stride != 0, "stride is 0, check your color format %d and width: %" LV_PRIu32, cf, w);
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
         LV_ASSERT_MSG(h != 0, "the buffer is too small");

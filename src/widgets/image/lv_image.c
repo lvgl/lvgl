@@ -820,6 +820,11 @@ static void draw_image(lv_event_t * e)
 
         if(img->h == 0 || img->w == 0) return;
         if(img->scale_x == 0 || img->scale_y == 0) return;
+        if(img->src == NULL) {
+            /*Do not need to draw image when src is NULL*/
+            LV_LOG_TRACE("image source is NULL");
+            return;
+        }
 
         lv_layer_t * layer = lv_event_get_layer(e);
 
@@ -904,10 +909,6 @@ static void draw_image(lv_event_t * e)
                 coords = &obj->coords;
             }
             lv_draw_label(layer, &label_dsc, coords);
-        }
-        else if(img->src == NULL) {
-            /*Do not need to draw image when src is NULL*/
-            LV_LOG_WARN("image source is NULL");
         }
         else {
             /*Trigger the error handler of image draw*/

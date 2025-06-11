@@ -348,11 +348,12 @@ static void event_cb(lv_event_t * e)
     draw_cb(layer, &matrix);
 }
 
-static void draw_during_rendering(const char * name, draw_cb_t draw_cb)
+static void draw_during_rendering(const char * name, draw_cb_t draw_cb, lv_opa_t opa)
 {
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, lv_pct(90), lv_pct(90));
     lv_obj_center(obj);
+    lv_obj_set_style_opa(obj, opa, 0);
     lv_obj_add_event_cb(obj, event_cb, LV_EVENT_DRAW_MAIN, (void *)(lv_uintptr_t)draw_cb);
 
     char fn_buf[128];
@@ -365,8 +366,10 @@ static void draw_during_rendering(const char * name, draw_cb_t draw_cb)
 
 void test_draw_during_rendering(void)
 {
-    draw_during_rendering("shapes", draw_shapes);
-    draw_during_rendering("lines", draw_lines);
+    draw_during_rendering("shapes", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines", draw_lines, LV_OPA_COVER);
+    draw_during_rendering("shapes_opa_50", draw_shapes, LV_OPA_50);
+    draw_during_rendering("lines_opa_50", draw_lines, LV_OPA_50);
 }
 
 void test_draw_display_matrix_rotation(void)
@@ -377,26 +380,26 @@ void test_draw_display_matrix_rotation(void)
     TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
 
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
-    draw_during_rendering("shapes_disp_rotation_0", draw_shapes);
-    draw_during_rendering("lines_disp_rotation_0", draw_lines);
+    draw_during_rendering("shapes_disp_rotation_0", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines_disp_rotation_0", draw_lines, LV_OPA_COVER);
 
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
-    draw_during_rendering("shapes_disp_rotation_90", draw_shapes);
-    draw_during_rendering("lines_disp_rotation_90", draw_lines);
+    draw_during_rendering("shapes_disp_rotation_90", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines_disp_rotation_90", draw_lines, LV_OPA_COVER);
 
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
-    draw_during_rendering("shapes_disp_rotation_180", draw_shapes);
-    draw_during_rendering("lines_disp_rotation_180", draw_lines);
+    draw_during_rendering("shapes_disp_rotation_180", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines_disp_rotation_180", draw_lines, LV_OPA_COVER);
 
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
-    draw_during_rendering("shapes_disp_rotation_270", draw_shapes);
-    draw_during_rendering("lines_disp_rotation_270", draw_lines);
+    draw_during_rendering("shapes_disp_rotation_270", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines_disp_rotation_270", draw_lines, LV_OPA_COVER);
 
     lv_display_set_matrix_rotation(disp, false);
     TEST_ASSERT_FALSE(lv_display_get_matrix_rotation(disp));
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
-    draw_during_rendering("shapes_disp_rotation_0", draw_shapes);
-    draw_during_rendering("lines_disp_rotation_0", draw_lines);
+    draw_during_rendering("shapes_disp_rotation_0", draw_shapes, LV_OPA_COVER);
+    draw_during_rendering("lines_disp_rotation_0", draw_lines, LV_OPA_COVER);
 #else
     TEST_PASS();
 #endif

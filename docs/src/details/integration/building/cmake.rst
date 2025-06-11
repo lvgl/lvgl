@@ -175,7 +175,7 @@ Below is a list of the available options/variables
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 70
+   :widths: 20 10 50
 
    * - Variable/Option
      - Type
@@ -209,18 +209,18 @@ Below is a list of the available options/variables
        ``CONFIG_LV_BUILD_*`` CMake variables based on the contents of ``lv_conf_internal.h``.
        This requires python3 with ``venv`` and ``pip`` or access to a working ``pcpp``.
        If KConfig is used, this is enabled automatically.
-    * - CONFIG_LV_BUILD_DEMOS
-      - BOOLEAN
-      - When enabled builds the demos
-    * - CONFIG_LV_BUILD_EXAMPLES
-      - BOOLEAN
-      - When enabled builds the examples
-    * - CONFIG_LV_USE_THORVG_INTERNAL
-      - BOOLEAN
-      - When enabled the in-tree LVGL version of ThorVG is compiled
-    * - CONFIG_LV_USE_PRIVATE_API
-      - BOOLEAN
-      - When enabled the private headers ``*_private.h`` are installed on the system
+   * - CONFIG_LV_BUILD_DEMOS
+     - BOOLEAN
+     - When enabled builds the demos
+   * - CONFIG_LV_BUILD_EXAMPLES
+     - BOOLEAN
+     - When enabled builds the examples
+   * - CONFIG_LV_USE_THORVG_INTERNAL
+     - BOOLEAN
+     - When enabled the in-tree LVGL version of ThorVG is compiled
+   * - CONFIG_LV_USE_PRIVATE_API
+     - BOOLEAN
+     - When enabled the private headers ``*_private.h`` are installed on the system
 
 .. note::
 

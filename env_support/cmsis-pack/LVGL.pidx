@@ -2,8 +2,8 @@
 <index schemaVersion="1.0.0" xs:noNamespaceSchemaLocation="PackIndex.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
   <vendor>LVGL</vendor>
   <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
-  <timestamp>2024-10-31</timestamp>
+  <timestamp>2025-06-02</timestamp>
   <pindex>
-    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="9.3.0-dev2"/>
+    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="9.3.0"/>
   </pindex>
 </index>

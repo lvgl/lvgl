@@ -515,6 +515,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 }
 
+lv_theme_t * lv_theme_mono_get(void)
+{
+    if(!lv_theme_mono_is_inited()) {
+        return NULL;
+    }
+    return (lv_theme_t *)theme_def;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

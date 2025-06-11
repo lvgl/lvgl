@@ -110,6 +110,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     new_task->matrix = layer->matrix;
 #endif
+    new_task->opa = layer->opa;
     new_task->type = type;
     new_task->draw_dsc = (uint8_t *)new_task + LV_ALIGN_UP(sizeof(lv_draw_task_t), 8);
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
@@ -213,19 +214,18 @@ void lv_draw_dispatch(void)
 {
     LV_PROFILER_DRAW_BEGIN;
     bool task_dispatched = false;
-    lv_display_t * disp = lv_display_get_next(NULL);
-    while(disp) {
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
+    if(disp != NULL) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
             if(lv_draw_dispatch_layer(disp, layer))
                 task_dispatched = true;
             layer = layer->next;
         }
-        if(!task_dispatched) {
-            lv_draw_wait_for_finish();
-            lv_draw_dispatch_request();
-        }
-        disp = lv_display_get_next(disp);
+    }
+    if(!task_dispatched) {
+        lv_draw_wait_for_finish();
+        lv_draw_dispatch_request();
     }
     LV_PROFILER_DRAW_END;
 }

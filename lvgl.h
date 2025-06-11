@@ -53,6 +53,7 @@ extern "C" {
 
 #include "src/widgets/animimage/lv_animimage.h"
 #include "src/widgets/arc/lv_arc.h"
+#include "src/widgets/arclabel/lv_arclabel.h"
 #include "src/widgets/bar/lv_bar.h"
 #include "src/widgets/button/lv_button.h"
 #include "src/widgets/buttonmatrix/lv_buttonmatrix.h"

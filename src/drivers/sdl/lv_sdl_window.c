@@ -430,6 +430,7 @@ static void texture_resize(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
 
     dsc->fb1 = sdl_draw_buf_realloc_aligned(dsc->fb1, stride * disp->ver_res);
+    LV_ASSERT_MALLOC(dsc->fb1);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {

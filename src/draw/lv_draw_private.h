@@ -68,6 +68,9 @@ struct _lv_draw_task_t {
 
     void * draw_dsc;
 
+    /** Opacity of the layer */
+    lv_opa_t opa;
+
     /**
      * The ID of the draw_unit which should take this task
      */
