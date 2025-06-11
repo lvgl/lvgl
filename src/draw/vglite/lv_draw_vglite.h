@@ -43,7 +43,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#if LV_USE_VG_LITE_THORVG
+#define CHIPID 0x265
+#endif
 /**********************
  *      TYPEDEFS
  **********************/

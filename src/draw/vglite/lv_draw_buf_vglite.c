@@ -120,6 +120,9 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 
         DEMO_CleanInvalidateCacheByAddr((void *)line_addr, line_size);
     }
+#else
+    LV_UNUSED(draw_buf);
+    LV_UNUSED(area);
 #endif
 
 }

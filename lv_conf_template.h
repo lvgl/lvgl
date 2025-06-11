@@ -265,6 +265,9 @@
             /** Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
             #define LV_USE_VGLITE_DRAW_ASYNC 1
         #endif
+    #else 
+        #define LV_USE_VGLITE_DRAW_THREAD 0
+        #define LV_USE_VGLITE_DRAW_ASYNC  0
     #endif
 
     /** Enable VGLite asserts. */
