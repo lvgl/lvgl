@@ -26,7 +26,7 @@ Usage
 Color
 -----
 
-You set the color of the LED with
+You can set the color of the LED with
 :cpp:expr:`lv_led_set_color(led, lv_color_hex(0xff0080))`. This will be used as its
 background color, border color, and shadow color.
 

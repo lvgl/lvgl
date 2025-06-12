@@ -9,7 +9,7 @@ Overview
 ********
 
 Scale Widgets show linear or circular scales with configurable ranges, tick counts,
-placement, labeling, and sub-sections (:ref:`scale_sections`) with custom styling.
+placement, labeling, and subsections (:ref:`scale_sections`) with custom styling.
 
 
 
