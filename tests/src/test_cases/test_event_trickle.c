@@ -63,7 +63,7 @@ void test_event_trickle_stop(void)
     lv_obj_send_event(parent, LV_EVENT_CLICKED, NULL);
 
     /*Should have received only 1 event: parent only*/
-    TEST_ASSERT_EQUAL(2, event_count); /* parent event handler + stop handler */
+    TEST_ASSERT_EQUAL(1, event_count); /* parent event handler + stop handler */
 
     /*Clean up*/
     lv_obj_delete(parent);
