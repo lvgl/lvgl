@@ -106,6 +106,7 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     create_folders_if_needed(fn_ref_full);
 
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
+
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
     buf_to_xrgb8888(draw_buf, screen_buf_xrgb8888);
 

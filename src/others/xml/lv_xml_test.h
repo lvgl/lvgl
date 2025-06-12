@@ -55,12 +55,20 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
  */
 void lv_xml_test_unregister(void);
 
+
+void lv_xml_test_run_init(void);
+
+
+bool lv_xml_test_run_next(uint32_t slowdown);
+
+void lv_xml_test_run_stop(void);
+
 /**
  * Run all the test steps
  * @param slowdown  0: max speed, 1: real speed, 2: half speed, ... ,10: ten times slower
  * @return          number of failed tests
  */
-uint32_t lv_xml_test_run(uint32_t slowdown);
+uint32_t lv_xml_test_run_all(uint32_t slowdown);
 
 /**
  * Get the number of steps in a test

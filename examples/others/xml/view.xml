@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <component>
 	<consts>
 		<color name="light_blue" value="0xbbbbff"/>
@@ -37,16 +36,5 @@
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 	</view>
-    <steps>
-        <wait ms="500"/>
-        <screenshot_compare path="1.png"/>
-        <subject_set_string subject="subject1" value="Hellooo"/>
-        <subject_set_int subject="subject2" value="30"/>
-        <subject_compare_string subject="subject1" value="Hellooo"/>
-        <subject_compare_int subject="subject2" value="30"/>
-        <subject_compare_string subject="subject1" value="Hellooo!!!!!!!!!!!!"/>
-        <subject_compare_int subject="subject2" value="222222"/>
-        <wait ms="500"/>
-        <screenshot_compare path="2.png"/>
-    </steps>
-</test>
+</component>
+

@@ -61,6 +61,7 @@ typedef struct {
 typedef struct {
     const char * ref_image_path_prefix;
     uint32_t step_cnt;
+    uint32_t step_act;
     lv_xml_test_step_t * steps;
     uint32_t processing_steps : 1;
 } lv_xml_test_t;
@@ -79,6 +80,7 @@ static void end_metadata_handler(void * user_data, const char * name);
 static lv_xml_test_t test;
 static lv_display_t * test_display;
 static lv_obj_t * cursor;
+static lv_tick_get_cb_t tick_cb_original;
 
 /**********************
  *      MACROS
@@ -197,14 +199,13 @@ void lv_xml_test_unregister(void)
     lv_xml_component_unregister(LV_TEST_NAME);
 }
 
-
-uint32_t lv_xml_test_run(uint32_t slowdown)
+void lv_xml_test_run_init(void)
 {
     lv_display_t * normal_display = lv_display_get_default();
     test_display = lv_test_display_create(normal_display->hor_res, normal_display->ver_res);
 
     /*The test will control the ticks*/
-    lv_tick_get_cb_t tick_cb_original = lv_tick_get_cb();
+    tick_cb_original = lv_tick_get_cb();
     lv_tick_set_cb(NULL);
 
     lv_test_indev_create_all();
@@ -223,24 +224,47 @@ uint32_t lv_xml_test_run(uint32_t slowdown)
         lv_xml_create(act_screen, LV_TEST_NAME, NULL);
     }
     lv_refr_now(normal_display);
+    test.step_act = 0;
+}
 
-    uint32_t failed_cnt = 0;
-    uint32_t i;
-    for(i = 0; i < test.step_cnt; i++) {
-        test.steps[i].passed = execute_step(&test.steps[i], slowdown);
-        if(!test.steps[i].passed) {
-            LV_LOG_WARN("Step %d failed", i);
-            failed_cnt++;
-        }
+bool lv_xml_test_run_next(uint32_t slowdown)
+{
+
+    bool passed = execute_step(&test.steps[test.step_act], slowdown);
+    test.steps[test.step_act].passed = passed;
+    if(!test.steps[test.step_act].passed) {
+        LV_LOG_WARN("Step %d failed", test.steps[test.step_act].passed);
     }
 
+    test.step_act++;
+    return passed;
+}
+
+void lv_xml_test_run_stop(void)
+{
     lv_obj_delete(cursor);
     lv_tick_set_cb(tick_cb_original);
     lv_display_delete(test_display);
     lv_test_indev_delete_all();
+}
+
+
+uint32_t lv_xml_test_run_all(uint32_t slowdown)
+{
+    lv_xml_test_run_init();
+
+    uint32_t failed_cnt = 0;
+    uint32_t i;
+    for(i = 0; i < test.step_cnt; i++) {
+        bool passed = lv_xml_test_run_next(slowdown);
+        if(!passed) failed_cnt++;
+    }
+
+    lv_xml_test_run_stop();
 
     return failed_cnt;
 }
+
 
 uint32_t lv_xml_test_get_step_count(void)
 {
@@ -294,16 +318,30 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
 
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
+
+        printf("1: %p\n", (void *)lv_display_get_default());
+        /*Set the act_screen's pointer to for the test display so that it will render it
+         *for screenshot compare*/
         lv_obj_t * act_screen_original = test_display->act_scr;
         test_display->act_scr = lv_screen_active();
-        lv_obj_add_flag(cursor, LV_OBJ_FLAG_HIDDEN);
+
+        /*lv_test_screenshot_compare assumes that the default display is test_display*/
+        lv_display_t * default_display = lv_display_get_default();
+        lv_display_set_default(test_display);
+
+        lv_obj_invalidate(test_display->act_scr);
+        lv_obj_invalidate(default_display->act_scr);
+        /*Do the actual screenshot compare*/
         res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
-        test_display->act_scr = act_screen_original;
-        lv_obj_remove_flag(cursor, LV_OBJ_FLAG_HIDDEN);
         if(!res) {
             LV_LOG_WARN("screenshot compare of `%s` failed", step->param.screenshot_compare.path);
-            return res;
         }
+
+        /*Restore*/
+        lv_display_set_default(default_display);
+        test_display->act_scr = act_screen_original;
+        printf("2: %p\n", (void *)lv_display_get_default());
+
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_WAIT) {
         lv_xml_test_wait(step->param.wait.ms, slowdown);
