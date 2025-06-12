@@ -241,4 +241,4 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
 } /*extern "C"*/
 #endif
 
-#endif /* END LV_INDEV_GESTURE_H */
+#endif /* LV_INDEV_GESTURE_H */

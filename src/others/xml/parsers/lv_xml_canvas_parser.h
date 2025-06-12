@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_CANVAS_XML_PARSER_H
-#define LV_CANVAS_XML_PARSER_H
+#ifndef LV_XML_CANVAS_PARSER_H
+#define LV_XML_CANVAS_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ void lv_xml_canvas_apply(lv_xml_parser_state_t * state, const char ** attrs);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_BUTTON_XML_PARSE_H*/
+#endif /*LV_XML_CANVAS_PARSER_H*/

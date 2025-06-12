@@ -1,5 +1,5 @@
 /**
- * @file lv_test_assert.c
+ * @file lv_test_screenshot_compare.c
  *
  * Copyright 2002-2010 Guillaume Cottenceau.
  *

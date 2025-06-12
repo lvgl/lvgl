@@ -32,6 +32,16 @@ repos:
               tests/test_images
            )
         types_or: ["c", "header"]
+    # If a file seems to match lv_templ.c/lv_templ.h, ensure that the parts
+    # that depend on the file name are correct.
+    -   id: template-check
+        name: Comparing file templates with file names
+        entry: python scripts/lv_templ_check.py --fix --quiet
+        stages: [ commit ]
+        language: system
+        pass_filenames: false
+        verbose: true
+        types_or: ["c", "header"]
 -   repo: https://github.com/crate-ci/typos
     rev: v1.16.20
     hooks:

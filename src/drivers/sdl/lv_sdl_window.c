@@ -1,5 +1,5 @@
 /**
- * @file lv_sdl_window.h
+ * @file lv_sdl_window.c
  *
  */
 

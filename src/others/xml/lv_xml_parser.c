@@ -1,5 +1,5 @@
 /**
- * @file lv_xml.c
+ * @file lv_xml_parser.c
  *
  */
 
