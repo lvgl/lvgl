@@ -25,9 +25,6 @@ void lv_example_xml_2(void)
     lv_xml_register_subject(NULL, "subject1", &s1);
     lv_xml_register_subject(NULL, "subject2", &s2);
 
-
-    printf("0: %p\n", (void *)lv_display_get_default());
-
     lv_xml_test_register_from_file("A:lvgl/examples/others/xml/view.xml", "A:");
 
     lv_xml_test_run_all(1);

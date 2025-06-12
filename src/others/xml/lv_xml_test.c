@@ -328,8 +328,11 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         lv_display_t * default_display = lv_display_get_default();
         lv_display_set_default(test_display);
 
-        lv_obj_invalidate(test_display->act_scr);
-        lv_obj_invalidate(default_display->act_scr);
+        /*Make sure that both displays will be updated. Don't invalidate by
+         *using the act_screen as now it belongs to both displays.*/
+        lv_obj_invalidate(lv_display_get_layer_sys(default_display));
+        lv_obj_invalidate(lv_display_get_layer_sys(test_display));
+
         /*Do the actual screenshot compare*/
         res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
         if(!res) {
