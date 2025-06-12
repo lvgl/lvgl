@@ -20,13 +20,13 @@ void lv_example_xml_2(void)
     lv_subject_t s2;
     static char buf[200];
     lv_subject_init_string(&s1, buf, NULL, 200, "Waaaa");
-    lv_subject_init_int(&s2, 10);
+    lv_subject_init_int(&s2, 25);
 
-    lv_xml_register_subject(NULL, "subject1", &s1);
-    lv_xml_register_subject(NULL, "subject2", &s2);
+    lv_xml_register_subject(NULL, "s1", &s2);
 
     lv_xml_test_register_from_file("A:lvgl/examples/others/xml/view.xml", "A:");
 
     lv_xml_test_run_all(1);
+
 }
 #endif

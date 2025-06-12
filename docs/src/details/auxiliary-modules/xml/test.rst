@@ -68,9 +68,12 @@ This is called automatically when registering a new test, so manual calls are us
 Running Tests
 -------------
 
-To execute the registered test, use:
+All steps
+^^^^^^^^^
 
-- :cpp:expr:`lv_xml_test_run(slowdown)`
+To execute the registered test, use :cpp:expr:`lv_xml_test_run_all(slowdown)`.
+
+It will clean the screen and create a fresh instance of the ``view`` to be tested.
 
 The `slowdown` parameter controls playback speed:
 
@@ -80,7 +83,25 @@ The `slowdown` parameter controls playback speed:
 - `10`: 10× slower
 - ...and so on
 
-`lv_xml_test_run()` blocks until all steps are completed. It is safe to call multiple times.
+`lv_xml_test_run_all()` blocks until all steps are completed. It is safe to call it multiple times.
+
+The return value is the number of failed tests.
+
+Step-by-step
+^^^^^^^^^^^^
+
+It's also possible to run each step separately, one after another.
+
+First, call :cpp:expr:`lv_xml_test_run_init()` to prepare for executing the steps.
+It will clean the screen and create a fresh instance of the ``view`` to be tested.
+
+Get the number of steps using :cpp:expr:`lv_xml_test_get_step_count()`
+and then call :cpp:expr:`lv_xml_test_run_next(slowdown)` as many times.
+
+:cpp:expr:`lv_xml_test_run_next()` returns ``true`` if the given step passed, or ``false`` if it failed.
+
+Finally, call :cpp:expr:`lv_xml_test_run_stop();` to clean up and exit testing mode.
+
 
 Getting the Test Results
 ------------------------

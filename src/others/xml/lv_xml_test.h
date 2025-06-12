@@ -55,16 +55,27 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
  */
 void lv_xml_test_unregister(void);
 
-
+/**
+ * Switch to testing mode. Needs to be called to use `lv_xml_test_run_next()`
+ */
 void lv_xml_test_run_init(void);
 
-
+/**
+ * Run the next test step.
+ * @param slowdown  0: max speed, 1: real speed, 2: half speed, ... ,10: ten times slower
+ * @return  true: the step passed; false: the step failed
+ */
 bool lv_xml_test_run_next(uint32_t slowdown);
 
+/**
+ * Leave testing mode.
+ */
 void lv_xml_test_run_stop(void);
 
 /**
- * Run all the test steps
+ * Run all the test steps.
+ * It calls `lv_xml_test_run_init()`, `lv_xml_test_run_next()`, and `lv_xml_test_run_stop`
+ * internally so no further preparation or cleanup is needed.
  * @param slowdown  0: max speed, 1: real speed, 2: half speed, ... ,10: ten times slower
  * @return          number of failed tests
  */
