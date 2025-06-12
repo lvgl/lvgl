@@ -319,7 +319,6 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
 
-        printf("1: %p\n", (void *)lv_display_get_default());
         /*Set the act_screen's pointer to for the test display so that it will render it
          *for screenshot compare*/
         lv_obj_t * act_screen_original = test_display->act_scr;
@@ -340,7 +339,6 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         /*Restore*/
         lv_display_set_default(default_display);
         test_display->act_scr = act_screen_original;
-        printf("2: %p\n", (void *)lv_display_get_default());
 
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_WAIT) {
