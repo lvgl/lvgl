@@ -25,7 +25,7 @@ void lv_example_event_trickle(void)
     for(i = 0; i < 9; i++) {
         lv_obj_t * subcont = lv_obj_create(cont);
         lv_obj_set_size(subcont, 70, 50);
-       
+
         lv_obj_t * label = lv_label_create(subcont);
         lv_label_set_text_fmt(label, "%" LV_PRIu32, i);
 
