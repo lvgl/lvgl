@@ -60,8 +60,8 @@ Introduction
 .. toctree::
     :maxdepth: 1
 
-    intro/introduction
-    intro/getting_started
+    intro/introduction/index
+    intro/getting_started/index
 
 
 Details
