@@ -80,7 +80,7 @@ Connect to Debugger
 
 This command provides the ability to connect and debug GDB Python Script using IDE.
 
-Connect to ``PyCharm`` / ``VSCode`` / ``Eclipse(not support yet)``
+Connect to ``PyCharm`` / ``VSCode`` / ``Eclipse (not supported yet)``
 
 ``debugger -t pycharm``
 

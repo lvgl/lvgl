@@ -53,7 +53,7 @@ This creates a Menu Widget with this object hierarchy:
                     - Back button icon: :ref:`lv_image`
                 - Main header title: :ref:`lv_label` (default hidden)
 
-Note that no sidebar is created.  You can create one later if you wish.
+Note that no sidebar is created. You can create one later if you wish.
 
 
 Header mode

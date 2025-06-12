@@ -18,7 +18,7 @@ main Makefile:
     LVGL_DIR ?= ${shell pwd}  #The path where the lvgl folder is
     include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 
-For integration with CMake take a look this section of the
+For integration with CMake, take a look at this section of the
 :ref:`Documentation <integrating_lvgl_cmake>`.
 
 

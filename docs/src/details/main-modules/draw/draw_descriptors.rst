@@ -59,7 +59,7 @@ descriptor are very useful to identify the Draw Task.  For example:
                        Required when a new Draw Tasks are also created */
 
 
-Simple Initilialzation
+Simple Initialization
 ----------------------
 
 Before using a draw descriptor it needs to be initialized with
@@ -83,7 +83,7 @@ For example:
     lv_draw_label(lv_event_get_layer(e), &my_label_draw_dsc, &a);
 
 
-Initilialzation for Widgets
+Initialization for Widgets
 ---------------------------
 
 When rendering a part of a Widget, helper functions can initialize draw
@@ -273,7 +273,7 @@ descriptor.
 Linear Gradients
 ----------------
 
-The liniear (or skew) gradinet are similar to horizontal or vertical gradient but the
+The linear (or skew) gradient are similar to horizontal or vertical gradient but the
 angle of the gradient can be controlled.
 
 The linear gradient will be rendered along a line defined by 2 points.

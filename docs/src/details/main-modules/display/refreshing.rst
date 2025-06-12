@@ -45,8 +45,8 @@ select the display to refresh before :cpp:expr:`lv_display_refr_timer(NULL)`.
 .. note:: :cpp:func:`lv_timer_handler` and :cpp:func:`lv_display_refr_timer` must not run at the same time.
 
 
-If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set to be
-consistent with the refresh period of the display to ensure that the statistical results are correct.
+If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set
+to match the refresh period of the display to ensure that the statistical results are correct.
 
 
 

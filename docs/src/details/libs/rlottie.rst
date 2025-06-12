@@ -61,7 +61,7 @@ function, and the animation will be scaled accordingly.
 Use Rlottie from File
 ---------------------
 
-To create a Lottie animation from a file use:
+To create a Lottie animation from a file, use:
 
 .. code-block:: c
 

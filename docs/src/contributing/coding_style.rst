@@ -254,7 +254,7 @@ Supported Doxygen Commands
    by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
    add additional paragraphs to notes as indicated in the Doxygen documentation.
 -  ``@see  text``
-   generates a "See also" pagraph in a highlighted section, helpful when additional
+   generates a "See also" paragraph in a highlighted section, helpful when additional
    information about a topic can be found elsewhere.
 
 

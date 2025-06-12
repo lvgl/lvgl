@@ -13,7 +13,7 @@ with a helper to add text, an optional header (which can have
 a title, a close button, and other buttons), and an optional footer
 with buttons.
 
-The text will be broken into multiple lines and the height
+The text will be broken into multiple lines, and the height
 will be set automatically. If the height
 is set programmatically, the content will become scrollable.
 

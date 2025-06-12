@@ -34,7 +34,7 @@ The Canvas needs a buffer in which to store the drawn image. To assign a
 buffer to a Canvas, use
 :cpp:expr:`lv_canvas_set_buffer(canvas, buffer, width, height, LV_COLOR_FORMAT_...)`.
 Where ``buffer`` is a static buffer (not just a local variable) to hold
-the image of the Canvas. For example for a 100x50 ARGB8888 buffer:
+the image of the Canvas. For example, for a 100x50 ARGB8888 buffer:
 ``static uint8_t buffer[100 * 50 * 4]``.
 
 Or you can use

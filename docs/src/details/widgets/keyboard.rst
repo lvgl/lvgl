@@ -18,7 +18,7 @@ to write text into a :ref:`lv_textarea`.
 Parts and Styles
 ****************
 
-Similar to Button Matrix, the Keyboard Widget consist of 2 part:
+Similar to Button Matrix, the Keyboard Widget consists of 2 parts:
 
 - :cpp:enumerator:`LV_PART_MAIN` The main part. Uses the :ref:`typical background
   style properties <typical bg props>`

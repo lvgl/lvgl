@@ -36,7 +36,7 @@ The following style properties trigger the creation of a "Simple Layer":
 - ``bitmap_mask_src``
 - ``blend_mode``
 
-In this case the Widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE``
+In this case, the Widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE``
 sized chunks.
 
 If there is no memory for a new chunk, LVGL will try allocating the layer after
