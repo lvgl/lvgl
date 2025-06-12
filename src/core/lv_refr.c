@@ -44,7 +44,6 @@ static void refr_invalid_areas(void);
 static void refr_sync_areas(void);
 static void refr_area(const lv_area_t * area_p, int32_t y_offset);
 static void refr_configured_layer(lv_layer_t * layer);
-static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj);
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h);
@@ -431,6 +430,49 @@ refr_finish:
     LV_TRACE_REFR("finished");
     LV_PROFILER_REFR_END;
 }
+
+/**
+ * Search the most top object which fully covers an area
+ * @param area_p pointer to an area
+ * @param obj the first object to start the searching (typically a screen)
+ * @return
+ */
+lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
+{
+    lv_obj_t * found_p = NULL;
+
+    if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
+    if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
+    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
+
+    /*If this object is fully cover the draw area then check the children too*/
+    lv_cover_check_info_t info;
+    info.res = LV_COVER_RES_COVER;
+    info.area = area_p;
+    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
+    if(info.res == LV_COVER_RES_MASKED) return NULL;
+
+    int32_t i;
+    int32_t child_cnt = lv_obj_get_child_count(obj);
+    for(i = child_cnt - 1; i >= 0; i--) {
+        lv_obj_t * child = obj->spec_attr->children[i];
+        found_p = lv_refr_get_top_obj(area_p, child);
+
+        /*If a children is ok then break*/
+        if(found_p != NULL) {
+            break;
+        }
+    }
+
+    /*If no better children use this object*/
+    if(found_p == NULL && info.res == LV_COVER_RES_COVER) {
+        found_p = obj;
+    }
+
+    return found_p;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -900,48 +942,6 @@ static void refr_configured_layer(lv_layer_t * layer)
     refr_obj_and_children(layer, lv_display_get_layer_sys(disp_refr));
 
     LV_PROFILER_REFR_END;
-}
-
-/**
- * Search the most top object which fully covers an area
- * @param area_p pointer to an area
- * @param obj the first object to start the searching (typically a screen)
- * @return
- */
-static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
-{
-    lv_obj_t * found_p = NULL;
-
-    if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
-    if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
-    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
-
-    /*If this object is fully cover the draw area then check the children too*/
-    lv_cover_check_info_t info;
-    info.res = LV_COVER_RES_COVER;
-    info.area = area_p;
-    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
-    if(info.res == LV_COVER_RES_MASKED) return NULL;
-
-    int32_t i;
-    int32_t child_cnt = lv_obj_get_child_count(obj);
-    for(i = child_cnt - 1; i >= 0; i--) {
-        lv_obj_t * child = obj->spec_attr->children[i];
-        found_p = lv_refr_get_top_obj(area_p, child);
-
-        /*If a children is ok then break*/
-        if(found_p != NULL) {
-            break;
-        }
-    }
-
-    /*If no better children use this object*/
-    if(found_p == NULL && info.res == LV_COVER_RES_COVER) {
-        found_p = obj;
-    }
-
-    return found_p;
 }
 
 /**
