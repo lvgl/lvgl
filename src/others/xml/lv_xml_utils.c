@@ -113,9 +113,7 @@ int32_t lv_xml_atoi_split(const char ** str, char delimiter)
     if(*s != '\0') s++; /*Skip the delimiter*/
     *str = s;
     return result;
-
 }
-
 
 int32_t lv_xml_atoi(const char * str)
 {
@@ -123,6 +121,71 @@ int32_t lv_xml_atoi(const char * str)
     return lv_xml_atoi_split(&str, '\0');
 
 }
+
+#if LV_USE_FLOAT
+float lv_xml_atof_split(const char ** str, char delimiter)
+{
+    const char * s = *str;
+    float result = 0.0f;
+    int sign = 1;
+
+    /* Skip leading whitespace */
+    while(*s == ' ' || *s == '\t') s++;
+
+    /* Handle optional sign */
+    if(*s == '-') {
+        sign = -1;
+        s++;
+    }
+    else if(*s == '+') {
+        s++;
+    }
+
+    /* Convert the integer part */
+    while(*s != delimiter && *s != '.' && *s != '\0') {
+        if(*s >= '0' && *s <= '9') {
+            float digit = *s - '0';
+            result = result * 10.0f + digit;
+            s++;
+        }
+        else {
+            break; /* Non-digit character */
+        }
+    }
+
+    /* Convert the fractional part */
+    if(*s == '.') {
+        s++; /* Skip the decimal point */
+        float fraction = 0.0f;
+        float divisor = 10.0f;
+
+        while(*s != delimiter && *s != '\0') {
+            if(*s >= '0' && *s <= '9') {
+                float digit = *s - '0';
+                fraction += digit / divisor;
+                divisor *= 10.0f;
+                s++;
+            }
+            else {
+                break; /* Non-digit character */
+            }
+        }
+        result += fraction;
+    }
+
+    result = result * sign;
+
+    if(*s != '\0') s++; /*Skip the delimiter*/
+    *str = s;
+    return result;
+}
+
+
+float lv_xml_atof(const char * str)
+{
+    return lv_xml_atof_split(&str, '\0');
+}
+#endif
 
 int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
 {

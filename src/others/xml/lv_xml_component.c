@@ -459,6 +459,9 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     lv_subject_t * subject = lv_malloc(sizeof(lv_subject_t));
 
     if(lv_streq(type, "int")) lv_subject_init_int(subject, lv_xml_atoi(value));
+#if LV_USE_FLOAT
+    else if(lv_streq(type, "float")) lv_subject_init_float(subject, lv_xml_atof(value));
+#endif
     else if(lv_streq(type, "color")) lv_subject_init_color(subject, lv_xml_to_color(value));
     else if(lv_streq(type, "string")) {
         /*Simple solution for now. Will be improved later*/
