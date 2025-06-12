@@ -14,7 +14,6 @@
 #include "lv_opengles_driver.h"
 #include "lv_opengles_texture.h"
 #include "lv_opengles_private.h"
-#include "lv_opengles_debug.h"
 
 #include "../../core/lv_refr_private.h"
 #include "../../stdlib/lv_string.h"
@@ -296,8 +295,6 @@ static void window_update_handler(lv_timer_t * t)
 
         /* Swap front and back buffers */
         eglSwapBuffers(egl_display, window->surface);
-
-        GL_CALL(glFinish());
 
         if(window->post2) window->post2(window);
 

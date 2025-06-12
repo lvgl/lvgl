@@ -1202,7 +1202,7 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
 {
     drm_buffer_t *fb;
 	uint32_t i = 0;
-	uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
+	uint32_t flags = 0;
 	int64_t start_time, report_time, cur_time;
 	int ret;
 
