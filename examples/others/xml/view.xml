@@ -1,15 +1,23 @@
 <test>
+
         <view width="100%" height="100%" flex_flow="column">
             <lv_checkbox text="Second one!"/>
-            <lv_slider />
+            <lv_slider bind_value="s1"/>
+            <lv_label bind_text="s1 'users:%d'"/>
         </view>
+
+
         <steps>
+            <subject_compare subject="s1" value="25" />
             <screenshot_compare path="images/before.png"/>
-            <click_at x="32" y="32"/>
+            <click_at x="32" y="33"/>
+            <subject_set subject="s1" value="50" />
             <wait ms="500"/>
             <screenshot_compare path="images/mid.png"/>
             <click_at x="50" y="54"/>
             <wait ms="500"/>
+            <subject_compare subject="s1" value="13" />
             <screenshot_compare path="images/after.png"/>
+            <wait ms="500"/>
         </steps>
     </test>

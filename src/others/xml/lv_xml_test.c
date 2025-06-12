@@ -229,11 +229,10 @@ void lv_xml_test_run_init(void)
 
 bool lv_xml_test_run_next(uint32_t slowdown)
 {
-
     bool passed = execute_step(&test.steps[test.step_act], slowdown);
     test.steps[test.step_act].passed = passed;
     if(!test.steps[test.step_act].passed) {
-        LV_LOG_WARN("Step %d failed", test.steps[test.step_act].passed);
+        LV_LOG_WARN("Step %d failed", test.step_act);
     }
 
     test.step_act++;
@@ -315,7 +314,7 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         lv_test_mouse_release();
         lv_xml_test_wait(50, slowdown);
         lv_obj_remove_state(cursor, LV_STATE_PRESSED);
-
+        lv_refr_now(NULL);
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
 
@@ -363,14 +362,20 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         }
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE) {
-        lv_subject_type_t type = step->param.subject_set.subject->type;
+        lv_subject_type_t type = step->param.subject_compare.subject->type;
         if(type == LV_SUBJECT_TYPE_INT) {
             int32_t v =  lv_subject_get_int(step->param.subject_compare.subject);
-            if(v != lv_xml_atoi(step->param.subject_compare.value)) res = false;
+            if(v != lv_xml_atoi(step->param.subject_compare.value)) {
+                LV_LOG_WARN("Subject compare failed. Expected: %s, Actual: %d", step->param.subject_compare.value, v);
+                res = false;
+            }
         }
         else if(type == LV_SUBJECT_TYPE_STRING) {
             const char * v =  lv_subject_get_string(step->param.subject_compare.subject);
-            if(lv_streq(v, step->param.subject_compare.value) == 0) res = false;
+            if(lv_streq(v, step->param.subject_compare.value) == 0) {
+                LV_LOG_WARN("Subject compare failed. Expected: %s, Actual: %s", step->param.subject_compare.value, v);
+                res = false;
+            }
         }
         else {
             LV_LOG_WARN("Not supported subject type %d", type);
@@ -453,11 +458,11 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_FREEZE;
         test.steps[idx].param.freeze.ms = lv_xml_atoi(ms);
     }
-    else if(lv_streq(name, "subject_set") || lv_streq(name, "subject_compare")) {
+    else if(lv_streq(name, "subject_set")) {
         const char * subject_str = lv_xml_get_value_of(attrs, "subject");
         const char * value_str = lv_xml_get_value_of(attrs, "value");
         if(subject_str == NULL) {
-            LV_LOG_WARN("subject_str is not set in `%s`", name);
+            LV_LOG_WARN("subject is not set in `%s`", name);
             return;
         }
         lv_subject_t * subject = lv_xml_get_subject(NULL, subject_str);
@@ -472,6 +477,26 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SUBJECT_SET;
         test.steps[idx].param.subject_set.subject = subject;
         test.steps[idx].param.subject_set.value = lv_strdup(value_str);
+    }
+    else if(lv_streq(name, "subject_compare")) {
+        const char * subject_str = lv_xml_get_value_of(attrs, "subject");
+        const char * value_str = lv_xml_get_value_of(attrs, "value");
+        if(subject_str == NULL) {
+            LV_LOG_WARN("subject is not set in `%s`", name);
+            return;
+        }
+        lv_subject_t * subject = lv_xml_get_subject(NULL, subject_str);
+        if(subject == NULL) {
+            LV_LOG_WARN("`%s` subject is not found in `%s`", subject_str, name);
+            return;
+        }
+
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE;
+        test.steps[idx].param.subject_compare.subject = subject;
+        test.steps[idx].param.subject_compare.value = lv_strdup(value_str);
     }
 }
 
