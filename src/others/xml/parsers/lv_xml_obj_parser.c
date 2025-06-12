@@ -99,6 +99,8 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("press_lock", name))           lv_obj_set_flag(item, LV_OBJ_FLAG_PRESS_LOCK, lv_xml_to_bool(value));
         else if(lv_streq("event_bubble", name))         lv_obj_set_flag(item, LV_OBJ_FLAG_EVENT_BUBBLE,
                                                                             lv_xml_to_bool(value));
+        else if(lv_streq("event_trickle", name))        lv_obj_set_flag(item, LV_OBJ_FLAG_EVENT_TRICKLE,
+                                                                            lv_xml_to_bool(value));
         else if(lv_streq("gesture_bubble", name))       lv_obj_set_flag(item, LV_OBJ_FLAG_GESTURE_BUBBLE,
                                                                             lv_xml_to_bool(value));
         else if(lv_streq("adv_hittest", name))          lv_obj_set_flag(item, LV_OBJ_FLAG_ADV_HITTEST,
@@ -239,6 +241,7 @@ static lv_obj_flag_t flag_to_enum(const char * txt)
     if(lv_streq("snappable", txt)) return LV_OBJ_FLAG_SNAPPABLE;
     if(lv_streq("press_lock", txt)) return LV_OBJ_FLAG_PRESS_LOCK;
     if(lv_streq("event_bubble", txt)) return LV_OBJ_FLAG_EVENT_BUBBLE;
+    if(lv_streq("event_trickle", txt)) return LV_OBJ_FLAG_EVENT_TRICKLE;
     if(lv_streq("gesture_bubble", txt)) return LV_OBJ_FLAG_GESTURE_BUBBLE;
     if(lv_streq("adv_hittest", txt)) return LV_OBJ_FLAG_ADV_HITTEST;
     if(lv_streq("ignore_layout", txt)) return LV_OBJ_FLAG_IGNORE_LAYOUT;
