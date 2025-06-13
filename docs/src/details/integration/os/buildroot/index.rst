@@ -11,6 +11,7 @@ platforms on a single Linux-based development system.
 
 
 .. toctree::
+   :class:    toctree-1-deep
    :titlesonly:
    :maxdepth: 1
 

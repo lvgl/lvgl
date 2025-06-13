@@ -5,6 +5,7 @@ All Widgets
 ===========
 
 .. toctree::
+    :class:    toctree-1-deep
     :maxdepth: 1
 
     base_widget
@@ -12,6 +13,7 @@ All Widgets
 |hr_left_250|
 
 .. toctree::
+    :class:    toctree-1-deep
     :maxdepth: 1
 
     3dtexture
