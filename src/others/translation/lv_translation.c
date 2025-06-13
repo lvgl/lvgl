@@ -77,7 +77,7 @@ void lv_translation_deinit(void)
 
     lv_ll_clear(&packs_ll);
 
-    lv_free(selected_lang);
+    lv_free((void *)selected_lang);
 }
 
 lv_translation_pack_t * lv_translation_add_static(const char * languages[], const char * tags[],
@@ -265,13 +265,14 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
     }
 
     if(lang_idx >= pack->language_cnt) {
-        LV_LOG_WARN("Can't set the translation for language " LV_PRIu32 " as there are only " LV_PRIu32
+
+        LV_LOG_WARN("Can't set the translation for language %" LV_PRIu32 " as there are only %" LV_PRIu32
                     " languages defined in %p",
                     lang_idx, pack->language_cnt, (void *)pack);
         return LV_RESULT_INVALID;
     }
 
-    lv_free(tag->translations[lang_idx]); /*Free the earlier set language if any*/
+    lv_free((void *)tag->translations[lang_idx]); /*Free the earlier set language if any*/
     tag->translations[lang_idx] = lv_strdup(trans);
     if(tag->translations[lang_idx] == NULL) {
         LV_LOG_WARN("Couldn't allocate the new translation in tag `%p` in pack `%p`", (void *)tag, (void *) pack);
