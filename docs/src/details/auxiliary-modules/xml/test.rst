@@ -19,7 +19,10 @@ Step Types
 
 The following step types are currently supported (with example parameters):
 
+- ``<move_to x="10" y="30"/>``: Move the mouse to the specified screen coordinates.
 - ``<click_at x="10" y="30"/>``: Simulates a click at the specified screen coordinates.
+- ``<press/>``: Press on the current screen coordinate.
+- ``<release/>``: Release on the current screen coordinate.
 - ``<wait ms="100"/>``: Waits for the given number of milliseconds. LVGL continues running, including animations and timers.
 - ``<freeze ms="100"/>``: Pauses the UI and LVGL's internal time. Useful for visual debugging.
 - ``<subject_set subject="subject1" value="5>`` Set an integer or string subject's value.
