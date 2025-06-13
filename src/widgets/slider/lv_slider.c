@@ -155,6 +155,16 @@ void lv_slider_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     lv_bar_set_range(obj, min, max);
 }
 
+void lv_slider_set_min_value(lv_obj_t * obj, int32_t min)
+{
+    lv_bar_set_min_value(obj, min);
+}
+
+void lv_slider_set_max_value(lv_obj_t * obj, int32_t min)
+{
+    lv_bar_set_max_value(obj, min);
+}
+
 void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
 {
     lv_bar_set_mode(obj, (lv_bar_mode_t)mode);

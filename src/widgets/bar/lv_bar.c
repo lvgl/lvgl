@@ -155,6 +155,16 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     lv_obj_invalidate(obj);
 }
 
+void lv_bar_set_min_value(lv_obj_t * obj, int32_t min)
+{
+    lv_bar_set_range(obj, min, lv_bar_get_max_value(obj));
+}
+
+void lv_bar_set_max_value(lv_obj_t * obj, int32_t max)
+{
+    lv_bar_set_range(obj, lv_bar_get_min_value(obj), max);
+}
+
 void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

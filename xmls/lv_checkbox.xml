@@ -5,8 +5,6 @@ Example
 
 <widget>
 	<api>
-	    <prop name="text" help="The text of the checkbox">
-	    	<param name="text" type="string" help=""/>
-	    </prop>
+	    <prop name="text" type="string" help="The text of the checkbox"/>
 	</api>
 </widget>

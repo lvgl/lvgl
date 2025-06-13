@@ -32,7 +32,8 @@ static void test_with_attrs(const char * name)
     lv_xml_create(scr, name, attrs_1);
 
     const char * attrs_2[] = {
-        "range", "-100 100",
+        "min_value", "-100",
+        "max_value", "100",
         "mode", "symmetrical",
         "value", "50",
         NULL, NULL,
