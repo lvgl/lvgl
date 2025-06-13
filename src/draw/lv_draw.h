@@ -130,7 +130,7 @@ typedef struct {
     lv_obj_t * obj;
 
     /**The widget part for which draw descriptor was created */
-    lv_part_t part;
+    uint32_t part;
 
     /**A widget type specific ID (e.g. table row index). See the docs of the given widget.*/
     uint32_t id1;

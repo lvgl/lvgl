@@ -104,9 +104,6 @@ typedef unsigned int lv_3dtexture_id_t;
 
 typedef struct _lv_obj_t lv_obj_t;
 
-typedef uint16_t lv_state_t;
-typedef uint32_t lv_part_t;
-
 typedef uint8_t lv_opa_t;
 
 typedef uint8_t lv_style_prop_t;
