@@ -9,6 +9,13 @@
 		<style name="btn_pr_style" bg_opa="255"/>
 	</styles>
 
+    <animations>
+        <timeline>
+            <anim prop="x" target="obj1" start="10" end="20" duration="2000" delay="1000" easing="ease_out"/>
+            <anim prop="x" start="10" end="20" duration="2000" delay="1000" easing="ease_out" early_apply="true"/>
+        </timeline>
+    </animations>
+
 	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
 		<lv_label text-translated="tiger"/>
 		<my_card title="Card 1" name="card1"
