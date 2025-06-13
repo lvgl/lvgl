@@ -16,6 +16,11 @@ is a ready-to-use port for the Riverdi STM32 5.0" Embedded Display
 (STM32U599NJH6Q or STM32U5A9NJH6Q) which has Nema enabled.
 Follow the instructions in the readme to get started.
 
+`lv_port_stm32u5g9j-dk2 <https://github.com/lvgl/lv_port_stm32u5g9j-dk2>`__
+is a ready-to-use port for the STM32U5G9J-DK2 devkit with a 5.0" display
+and a NeoChrom VG GPU.
+Follow the instructions in the readme to get started.
+
 Usage and Configuration
 ***********************
 
@@ -26,9 +31,17 @@ to the size of the display you will be using so that enough static
 memory will be reserved for VG. Without VG, more task types will be
 performed by the software renderer.
 
-"libs/nema_gfx" contains pre-compiled binaries for the Nema GPU
-drivers. In `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
-the project is already configured to link the binaries when building.
+"libs/nema_gfx" contains pre-compiled binaries for the Nema GPU drivers.
+
+`lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
+is already configured to link the "cortex_m33_revC" binaries when building
+and `lv_port_stm32u5g9j-dk2 <https://github.com/lvgl/lv_port_stm32u5g9j-dk2>`__
+is configured to link the "cortex_m33_NemaPVG" binaries when building.
+
+"cortex_m33_revC" works on all STM32 m33 devices with a Nema core while "cortex_m33_NemaPVG"
+additionally supports the tesselation and matrix multiplication acceleration that
+the STM32 U5F and U5G Nema cores are capable of.
+
 With a different STM32CubeIDE project, you can configure the libraries to be linked
 by right-clicking the project in the "Project Explorer" sidebar, clicking
 "Properties", navigating to "C/C++ Build", "Settings", "MCU G++ Linker", and then
