@@ -32,7 +32,7 @@ typedef struct {
         struct {
             int32_t x;
             int32_t y;
-        } click;
+        } mouse_pos;
 
         struct {
             int32_t ms;
@@ -300,8 +300,8 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
     bool res = true;
 
     if(step->type == LV_XML_TEST_STEP_TYPE_CLICK_AT) {
-        int32_t x = step->param.click.x;
-        int32_t y = step->param.click.y;
+        int32_t x = step->param.mouse_pos.x;
+        int32_t y = step->param.mouse_pos.y;
 
         lv_obj_remove_state(cursor, LV_STATE_PRESSED);
         lv_test_mouse_release();
@@ -315,6 +315,20 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         lv_xml_test_wait(50, slowdown);
         lv_obj_remove_state(cursor, LV_STATE_PRESSED);
         lv_refr_now(NULL);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_PRESS) {
+        lv_obj_add_state(cursor, LV_STATE_PRESSED);
+        lv_test_mouse_press();
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_RELEASE) {
+        lv_obj_remove_state(cursor, LV_STATE_PRESSED);
+        lv_test_mouse_release();
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_MOVE_TO) {
+        int32_t x = step->param.mouse_pos.x;
+        int32_t y = step->param.mouse_pos.y;
+        lv_test_mouse_move_to(x, y);
+        lv_obj_set_pos(cursor, x, y);
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
 
@@ -427,8 +441,30 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_AT;
-        test.steps[idx].param.click.x = lv_xml_atoi(x);
-        test.steps[idx].param.click.y = lv_xml_atoi(y);
+        test.steps[idx].param.mouse_pos.x = lv_xml_atoi(x);
+        test.steps[idx].param.mouse_pos.y = lv_xml_atoi(y);
+    }
+    else if(lv_streq(name, "move_to")) {
+        test.step_cnt++;
+        const char * x = lv_xml_get_value_of(attrs, "x");
+        const char * y = lv_xml_get_value_of(attrs, "y");
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_MOVE_TO;
+        test.steps[idx].param.mouse_pos.x = lv_xml_atoi(x);
+        test.steps[idx].param.mouse_pos.y = lv_xml_atoi(y);
+    }
+    else if(lv_streq(name, "press")) {
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_PRESS;
+    }
+    else if(lv_streq(name, "release")) {
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_RELEASE;
     }
     else if(lv_streq(name, "screenshot_compare")) {
         test.step_cnt++;
