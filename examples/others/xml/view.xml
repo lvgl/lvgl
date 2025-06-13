@@ -1,28 +1,23 @@
-<component>
-	<consts>
-		<color name="light_blue" value="0xbbbbff"/>
-		<color name="dark_blue" value="0x000080"/>
-	</consts>
+<test>
 
-	<styles>
-		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
-		<style name="btn_pr_style" bg_opa="255"/>
-        <style name="red_border" border_color="0xff0000"></style>
+        <view width="100%" height="100%" flex_flow="column">
+            <lv_checkbox text="Second one!"/>
+            <lv_slider bind_value="s1"/>
+            <lv_label bind_text="s1 'users:%d'"/>
+        </view>
 
-	</styles>
 
-	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label text="Hello"/>
-		<my_card title="Card 1" name="card1"
-				 y="0"
-                 styles="red_border"
-				 btn_rel_style="btn_style"
-				 btn_pr_style="btn_pr_style"/>
-
-		<my_card y="85"
-				 bg_color="0xffaaaa"
-				 action="Apply"
-				 btn_rel_style="btn_style"
-				 btn_pr_style="btn_pr_style"/>
-	</view>
-</component>
+        <steps>
+            <subject_compare subject="s1" value="25" />
+            <screenshot_compare path="images/before.png"/>
+            <click_at x="32" y="33"/>
+            <subject_set subject="s1" value="50" />
+            <wait ms="500"/>
+            <screenshot_compare path="images/mid.png"/>
+            <click_at x="50" y="54"/>
+            <wait ms="500"/>
+            <subject_compare subject="s1" value="13" />
+            <screenshot_compare path="images/after.png"/>
+            <wait ms="500"/>
+        </steps>
+    </test>
