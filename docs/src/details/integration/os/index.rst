@@ -4,6 +4,7 @@
 
 .. toctree:: :maxdepth: 2
 
+    chibios
     freertos
     mqx
     nuttx
@@ -14,3 +15,4 @@
     buildroot/index
     zephyr
     torizon_os
+    
