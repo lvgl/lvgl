@@ -58,6 +58,7 @@ Introduction
 ------------
 
 .. toctree::
+    :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
     intro/introduction
@@ -68,6 +69,7 @@ Details
 -------
 
 .. toctree::
+    :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
     examples
@@ -84,6 +86,7 @@ Appendix
 --------
 
 .. toctree::
+    :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
     contributing/index

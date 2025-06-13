@@ -587,7 +587,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
         f.write(subdir_stem + '\n')
         f.write(section_line)
         f.write('\n')
-        f.write('.. toctree::\n    :maxdepth: 1\n\n')
+        f.write('.. toctree::\n    :maxdepth: 1\n    :class:    toctree-1-deep\n\n')
 
         # One entry per `.rst` file
         for h_file in elig_h_files:
