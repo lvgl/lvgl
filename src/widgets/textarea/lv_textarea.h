@@ -29,6 +29,9 @@ extern "C" {
 
 LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
 
+#define LV_PART_TEXTAREA_PLACEHOLDER LV_PART_CUSTOM_FIRST
+LV_EXPORT_CONST_INT(LV_PART_TEXTAREA_PLACEHOLDER);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -55,10 +58,6 @@ typedef enum {
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
-
-typedef enum {
-    LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,
-} lv_textarea_part_id_t;
 
 /**********************
  * GLOBAL PROTOTYPES
