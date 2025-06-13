@@ -64,11 +64,11 @@ The following simple built-in types are supported:
 
 :screen:    Pointer to a screen (also :cpp:expr:`lv_obj_t *`).
 
-:point:     A point with ``x`` and ``y`` values (:cpp:expr:`lv_point_t`).
+:time_ms:   Means some time in milliseconds unit
 
-:arglist:   List all parameters as arguments.  Supports only ``int`` and
-            ``string``.  E.g. ``foo="1 23 'hello' 'a'"``.
+:deg_0.1:   Degrees with 0.1 resolution
 
+:scale_1/256:   Scale/Zoom, where 256 means 100%, 128 means 50%, 512 means 200% etc.
 
 Name-based types
 ----------------
