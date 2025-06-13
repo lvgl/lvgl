@@ -156,7 +156,7 @@ typedef enum {
     LV_SVG_ANIM_RESTART_ALWAYS = 0,
     LV_SVG_ANIM_RESTART_WHEN_NOT_ACTIVE,
     LV_SVG_ANIM_RESTART_NEVER,
-} lv_svg_restart_type_t;
+} lv_svg_anim_restart_type_t;
 
 typedef enum {
     LV_SVG_ANIM_CALC_MODE_LINEAR = 0,
@@ -173,7 +173,7 @@ typedef enum {
 typedef enum {
     LV_SVG_ANIM_ACCUMULATE_NONE = 0,
     LV_SVG_ANIM_ACCUMULATE_SUM,
-} lv_svg_accumulate_type_t;
+} lv_svg_anim_accumulate_type_t;
 #endif
 
 typedef enum {
