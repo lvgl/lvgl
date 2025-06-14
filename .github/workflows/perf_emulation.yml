@@ -45,11 +45,11 @@ jobs:
         include:
         - image_type: 32b
           image_version : |
-            main@sha256:0c4880924a58faa8a4326cd8e5a6fbeb892ce2cef69bbf34eb26201855fdc7c4
+            main@sha256:9c4587f5852be856aed4548fcb8b505290410de837bb87fb2ba8e1b778f10bec
           config : lv_conf_perf32b
         - image_type: 64b
           image_version: |
-            main@sha256:2609ccf298640570bc0303ba7716017c56fb93e8cae4a81f2d19df2219a6ffcc
+            main@sha256:7e4c0a883dec21e2e9c027fe21188b2b009e46a1b3eb9f02499ca02ed7914e4a
           config : lv_conf_perf64b
     steps:
       - name: Checkout
@@ -65,43 +65,15 @@ jobs:
             --defaults configs/ci/perf/${{matrix.config}}.defaults
       - name: Run Benchmark Demo
         run: |
-          # Retry logic is added here to work around rare loop device mount failures.
-          # Occasionally, mounting the emulated partition fails due to a timing/race condition,
-          # where the /dev/loopXpY device isn't fully initialized yet.
-          # Retrying usually succeeds on the next attempt.
-          attempts=0
-          max_attempts=3
-
-          while [ "$attempts" -lt "$max_attempts" ];
-          do
-            # Mounts the current lvgl source code into the container and runs the demo benchmark
-            # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
-            docker run -t --privileged \
-              --name so3-lvperf \
-              -v /dev:/dev \
-              -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
-              -v $(pwd):/so3/usr/lib/lvgl \
-              -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
-              ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
-
-            if [ $? -eq 0 ]; then
-              break
-            fi
-
-            attempts=$((attempts+1))
-            echo "Docker run failed (attempt $attempts/$max_attempts)."
-
-            echo "--- dmesg output ---"
-            sudo dmesg | tail -n 50
-
-            if [ "$attempts" -lt "$max_attempts" ]; then
-              echo "Retrying in 5 seconds..."
-              sleep 5
-            else
-              echo "All attempts failed."
-              exit 1
-            fi
-          done
+          # Mounts the current lvgl source code into the container and runs the demo benchmark
+          # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
+          docker run -t --privileged \
+            --name so3-lvperf \
+            -v /dev:/dev \
+            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
+            -v $(pwd):/so3/usr/lib/lvgl \
+            -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
+            ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
 
       - name: Collect Logs
         run: |
