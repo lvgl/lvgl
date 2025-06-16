@@ -545,7 +545,8 @@ vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
 
-.. _change_subject_on_event
+.. _change_subject_on_event:
+
 Change Subject on Event
 -----------------------
 

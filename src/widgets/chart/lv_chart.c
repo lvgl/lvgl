@@ -137,15 +137,19 @@ void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
 
     switch(axis) {
         case LV_CHART_AXIS_PRIMARY_Y:
+            if(chart->ymin[0] == min) return;
             chart->ymin[0] = min;
             break;
         case LV_CHART_AXIS_SECONDARY_Y:
+            if(chart->ymin[1] == min) return;
             chart->ymin[1] = min;
             break;
         case LV_CHART_AXIS_PRIMARY_X:
+            if(chart->xmin[0] == min) return;
             chart->xmin[0] = min;
             break;
         case LV_CHART_AXIS_SECONDARY_X:
+            if(chart->xmin[1] == min) return;
             chart->xmin[1] = min;
             break;
         default:
@@ -163,15 +167,19 @@ void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t m
     lv_chart_t * chart  = (lv_chart_t *)obj;
     switch(axis) {
         case LV_CHART_AXIS_PRIMARY_Y:
+            if(chart->ymax[0] == max) return;
             chart->ymax[0] = max;
             break;
         case LV_CHART_AXIS_SECONDARY_Y:
+            if(chart->ymax[1] == max) return;
             chart->ymax[1] = max;
             break;
         case LV_CHART_AXIS_PRIMARY_X:
+            if(chart->xmax[0] == max) return;
             chart->xmax[0] = max;
             break;
         case LV_CHART_AXIS_SECONDARY_X:
+            if(chart->xmax[1] == max) return;
             chart->xmax[1] = max;
             break;
         default:

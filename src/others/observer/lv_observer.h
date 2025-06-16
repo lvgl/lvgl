@@ -315,7 +315,7 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param min       the minimum value
  * @param max       the maximum value
  */
-void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value,
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
                                         int32_t min, int32_t max);
 
 /**
