@@ -43,8 +43,10 @@ typedef struct {
     lv_screen_load_anim_t anim_type;
     uint32_t duration;
     uint32_t delay;
-    lv_obj_t * screen;
-    lv_screen_create_cb_t create_cb;
+    union {
+        lv_obj_t * screen;
+        lv_screen_create_cb_t create_cb;
+    } target;
 } screen_load_anim_dsc_t;
 
 /**********************
@@ -487,7 +489,7 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
     dsc->anim_type = anim_type;
     dsc->duration = duration;
     dsc->delay = delay;
-    dsc->screen = screen;
+    dsc->target.screen = screen;
 
     lv_obj_add_event_cb(obj, screen_load_on_trigger_event_cb, trigger, dsc);
     lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
@@ -502,7 +504,7 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
     dsc->anim_type = anim_type;
     dsc->duration = duration;
     dsc->delay = delay;
-    dsc->create_cb = screen_create_cb;
+    dsc->target.create_cb = screen_create_cb;
 
     lv_obj_add_event_cb(obj, screen_create_on_trigger_event_cb, trigger, dsc);
     lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
@@ -1060,7 +1062,7 @@ static void screen_load_on_trigger_event_cb(lv_event_t * e)
 {
     screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
     LV_ASSERT_NULL(dsc);
-    lv_screen_load_anim(dsc->screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+    lv_screen_load_anim(dsc->target.screen, dsc->anim_type, dsc->duration, dsc->delay, false);
 }
 
 static void screen_create_on_trigger_event_cb(lv_event_t * e)
@@ -1068,7 +1070,7 @@ static void screen_create_on_trigger_event_cb(lv_event_t * e)
     screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
     LV_ASSERT_NULL(dsc);
 
-    lv_obj_t * screen = dsc->create_cb();
+    lv_obj_t * screen = dsc->target.create_cb();
     lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
     lv_obj_add_event_cb(screen, delete_on_screen_unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
 }

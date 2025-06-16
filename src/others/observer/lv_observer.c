@@ -541,6 +541,7 @@ void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject,
 
     user_data->subject = subject;
     user_data->value = lv_strdup(value);
+    LV_ASSERT_MALLOC(user_data->value);
 
     lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
     lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
@@ -560,6 +561,7 @@ lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_s
     lv_obj_add_style(obj, style, selector);
 
     bind_style_t * p = lv_malloc(sizeof(bind_style_t));
+    LV_ASSERT_MALLOC(p);
     if(p == NULL) {
         LV_LOG_WARN("Out of memory");
         return NULL;
