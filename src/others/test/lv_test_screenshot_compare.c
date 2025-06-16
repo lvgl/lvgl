@@ -122,7 +122,7 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     }
 
     if(ref_img_width != draw_buf->header.w || ref_img_height != draw_buf->header.h) {
-        LV_LOG_WARN("The dimensions of the rendered and the %s reference image doesn't match", fn_ref);
+        LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
         return false;
     }
 
