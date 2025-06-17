@@ -258,7 +258,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(dest_buf, path, VG_LITE_FILL_EVEN_ODD, vglite_get_identity_matrix(), gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
