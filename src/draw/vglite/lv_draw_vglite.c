@@ -18,6 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_decoder.h"
 
 #include "../../core/lv_global.h"
 
@@ -118,6 +119,8 @@ void lv_draw_vglite_init(void)
 #endif
     draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
     draw_vglite_unit->base_unit.name = "NXP_VGLITE";
+
+    lv_vglite_decoder_init();
 
 #if LV_USE_VGLITE_DRAW_THREAD
     lv_thread_init(&draw_vglite_unit->thread, "vglitedraw", LV_DRAW_THREAD_PRIO, _vglite_render_thread_cb, 4 * 1024,
@@ -369,6 +372,8 @@ static int32_t _vglite_wait_for_finish(lv_draw_unit_t * draw_unit)
 
 static int32_t _vglite_delete(lv_draw_unit_t * draw_unit)
 {
+    lv_vglite_decoder_deinit();
+
 #if LV_USE_VGLITE_DRAW_THREAD
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
 
