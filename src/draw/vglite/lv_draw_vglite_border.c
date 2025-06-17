@@ -206,7 +206,9 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
     scissoring_rects_t scissoring_rects;
     scissoring_rects.num_rect = 0;
 
+#if !LV_USE_VG_LITE_THORVG
     bool has_vg_mask_feat = vg_lite_query_feature(gcFEATURE_BIT_VG_MASK);
+#endif
 
     VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(path, VG_LITE_DRAW_STROKE_PATH));
 
@@ -217,6 +219,7 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
     if(border_side != LV_BORDER_SIDE_FULL) {
         _border_set_scissoring(coords, line_width, border_side, radius, &scissoring_rects);
 
+#if !LV_USE_VG_LITE_THORVG
         if(has_vg_mask_feat) {
             /*** Enable scissor and apply scissor rects ***/
             VGLITE_CHECK_ERROR(vg_lite_enable_scissor());
@@ -236,6 +239,14 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
                 VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
             }
         }
+#else
+        for(uint32_t i = 0; i < scissoring_rects.num_rect; i++) {
+            VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
+                                                   scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
+                                                   scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
+            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        }
+#endif
     }
     else {
         /*** Draw border ***/
