@@ -31,8 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height);
-static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height);
+static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride);
+static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -53,46 +53,70 @@ static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uin
 
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
-    const uint8_t * img_src = img_dsc->data;
 
-    int32_t img_w = img_dsc->header.w;
-    int32_t img_h = img_dsc->header.h;
     int32_t clip_w = lv_area_get_width(&t->clip_area);
     int32_t clip_h = lv_area_get_height(&t->clip_area);
-    uint16_t color_f = img_dsc->header.cf;
-    uint16_t img_stride = img_dsc->header.stride;
-    int32_t stride_px_w = img_stride / lv_color_format_get_size(color_f);
-    int32_t img_size = stride_px_w * img_h * 2;
 
-    uint32_t img_eveId = lv_draw_eve_find_ramg_image(img_src);
+    const uint8_t * src_buf = img_dsc->data;
+    int32_t src_w = img_dsc->header.w;
+    int32_t src_h = img_dsc->header.h;
+    int32_t src_stride = img_dsc->header.stride;
+    lv_color_format_t src_cf = img_dsc->header.cf;
 
-    if(img_eveId == NOT_FOUND_BLOCK) { /* New image to load  */
+    uint8_t eve_format;
+    int32_t eve_stride;
 
-        LV_ATTRIBUTE_MEM_ALIGN uint8_t * temp_buff = lv_malloc_zeroed(img_size);
-        LV_ASSERT_MALLOC(temp_buff);
+    switch(src_cf) {
+        case LV_COLOR_FORMAT_L8:
+            eve_format = EVE_L8;
+            eve_stride = src_stride;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            eve_format = EVE_RGB565;
+            eve_stride = src_stride;
+            break;
+        case LV_COLOR_FORMAT_RGB565A8:
+            eve_format = EVE_ARGB1555;
+            eve_stride = src_w * 2;
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+            eve_format = EVE_ARGB4;
+            eve_stride = src_w * 2;
+            break;
+        default :
+            return;
+    }
 
-        uint8_t * buffer_converted = NULL;
+    int32_t eve_size = eve_stride * src_h;
 
-        switch(color_f) {
+    uint32_t img_eve_id = lv_draw_eve_find_ramg_image(src_buf);
+
+    if(img_eve_id == NOT_FOUND_BLOCK) { /* New image to load  */
+
+        const uint8_t * eve_buf;
+        uint8_t * tmp_buf = NULL;
+
+        switch(src_cf) {
             case LV_COLOR_FORMAT_L8 :
-                buffer_converted = (uint8_t *)img_src;
-                img_size = img_size / 2;
+                eve_buf = src_buf;
                 break;
             case LV_COLOR_FORMAT_RGB565 :
-                buffer_converted = (uint8_t *)img_src;
+                eve_buf = src_buf;
                 break;
             case LV_COLOR_FORMAT_RGB565A8 :
-                convert_RGB565A8_to_ARGB1555(img_src, temp_buff, stride_px_w, img_h);
-                buffer_converted = temp_buff;
+                tmp_buf = lv_malloc(eve_size);
+                LV_ASSERT_MALLOC(tmp_buf);
+                convert_RGB565A8_to_ARGB1555(src_buf, tmp_buf, src_w, src_h, src_stride);
+                eve_buf = tmp_buf;
                 break;
             case LV_COLOR_FORMAT_ARGB8888 :
-                convert_ARGB8888_to_ARGB4444(img_src, temp_buff, stride_px_w, img_h);
-                buffer_converted = temp_buff;
+                tmp_buf = lv_malloc(eve_size);
+                LV_ASSERT_MALLOC(tmp_buf);
+                convert_ARGB8888_to_ARGB4444(src_buf, tmp_buf, src_w, src_h, src_stride);
+                eve_buf = tmp_buf;
                 break;
             default :
-                lv_free(temp_buff);
                 return;
         }
 
@@ -102,11 +126,11 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         /* Load image to RAM_G */
         EVE_end_cmd_burst();
 
-        EVE_memWrite_flash_buffer(start_addr_ramg, buffer_converted, (uint32_t)img_size);
+        EVE_memWrite_flash_buffer(start_addr_ramg, eve_buf, eve_size);
 
-        lv_free(temp_buff);
+        lv_free(tmp_buf);
         /* Save RAM_G Memory Block ID info */
-        lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)img_src, start_addr_ramg, img_size);
+        lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)src_buf, start_addr_ramg, eve_size);
 
         EVE_start_cmd_burst();
     }
@@ -120,34 +144,14 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         lv_eve_color(draw_dsc->recolor);
     }
 
-    uint32_t img_addr = lv_draw_eve_get_bitmap_addr(img_eveId);
+    uint32_t img_addr = lv_draw_eve_get_bitmap_addr(img_eve_id);
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
     EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
     /*real height and width is mandatory for rotation and scale (Clip Area)*/
     EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, clip_w, clip_h));
 
-    uint8_t eve_format = EVE_ARGB4;
-    switch(color_f) {
-        case LV_COLOR_FORMAT_L8 :
-            eve_format = EVE_L8;
-            break;
-        case LV_COLOR_FORMAT_RGB565 :
-            eve_format = EVE_RGB565;
-            break;
-        case LV_COLOR_FORMAT_RGB565A8 :
-            eve_format = EVE_ARGB1555;
-            break;
-        case LV_COLOR_FORMAT_ARGB8888 :
-            eve_format = EVE_ARGB4;
-            break;
-        default :
-            break;
-    }
-
-    img_stride /= 2;
-
-    EVE_cmd_dl_burst(BITMAP_LAYOUT(eve_format, img_stride, img_h));
+    EVE_cmd_dl_burst(BITMAP_LAYOUT(eve_format, eve_stride, src_h));
 
     if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
@@ -181,46 +185,76 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height)
+/**
+ * Converts RGB565A8 with stride `src_stride` to ARGB1555 with stride `width * 2`
+ * @param src RGB565A8 with stride `src_stride`
+ * @param dst ARGB1555 with stride `width` * 2
+ * @param width width in pixels
+ * @param height height in pixels
+ * @param src_stride the stride of the `src` parameter
+ */
+static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride)
 {
-    int pixel_count = width * height;
-    uint16_t * src_rgb565 = (uint16_t *) src;
-    uint8_t * src_alpha = (uint8_t *)src + 2 * pixel_count;
+    const uint8_t * src_alpha = src + src_stride * height;
+    uint32_t src_alpha_stride = src_stride / 2;
 
-    for(int i = 0; i < pixel_count; i++) {
+    for(uint32_t y = 0; y < height; y++) {
 
-        uint16_t rgb565 = src_rgb565[i];
-        uint8_t alpha = src_alpha[i];
-        uint8_t r5 = (rgb565 >> 11) & 0x1F;
-        uint8_t g6 = (rgb565 >> 5) & 0x3F;
-        uint8_t b5 = rgb565 & 0x1F;
-        uint8_t a1 = alpha >= 128 ? 1 : 0;
+        const uint16_t * src_row = (const uint16_t *) src;
 
-        uint16_t argb1555 = (a1 << 15) | (r5 << 10) | ((g6 >> 1) << 5) | b5;
+        for(uint32_t x = 0; x < width; x++) {
 
-        dst[2 * i] = argb1555 & 0xFF;
-        dst[2 * i + 1] = (argb1555 >> 8) & 0xFF;
+            uint16_t rgb565 = src_row[x];
+            uint8_t alpha = src_alpha[x];
 
+            uint8_t r5 = (rgb565 >> 11) & 0x1F;
+            uint8_t g6 = (rgb565 >> 5) & 0x3F;
+            uint8_t b5 = rgb565 & 0x1F;
+            uint8_t a1 = alpha >= 128 ? 1 : 0;
+
+            uint16_t argb1555 = (a1 << 15) | (r5 << 10) | ((g6 >> 1) << 5) | b5;
+
+            dst[0] = argb1555 & 0xFF;
+            dst[1] = (argb1555 >> 8) & 0xFF;
+            dst += 2;
+        }
+
+        src += src_stride;
+        src_alpha += src_alpha_stride;
     }
 }
 
-static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint16_t width, uint16_t height)
+/**
+ * Converts ARGB8888 with stride `src_stride` to ARGB4444 with stride `width * 2`
+ * @param src ARGB8888 with stride `src_stride`
+ * @param dst ARGB4444 with stride `width` * 2
+ * @param width width in pixels
+ * @param height height in pixels
+ * @param src_stride the stride of the `src` parameter
+ */
+static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride)
 {
-    int pixel_count = width * height;
+    for(uint32_t y = 0; y < height; y++) {
+        for(uint32_t x = 0; x < width; x++) {
 
-    for(int i = 0; i < pixel_count; i++) {
-        uint8_t blue = src[4 * i];
-        uint8_t green = src[4 * i + 1];
-        uint8_t red = src[4 * i + 2];
-        uint8_t alpha = src[4 * i + 3];
-        uint8_t r4 = red >> 4;
-        uint8_t g4 = green >> 4;
-        uint8_t b4 = blue >> 4;
-        uint8_t a4 = alpha >> 4;
-        uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
+            uint8_t blue = src[4 * x];
+            uint8_t green = src[4 * x + 1];
+            uint8_t red = src[4 * x + 2];
+            uint8_t alpha = src[4 * x + 3];
 
-        dst[2 * i] = argb4444 & 0xFF;
-        dst[2 * i + 1] = (argb4444 >> 8) & 0xFF;
+            uint8_t r4 = red >> 4;
+            uint8_t g4 = green >> 4;
+            uint8_t b4 = blue >> 4;
+            uint8_t a4 = alpha >> 4;
+
+            uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
+
+            dst[0] = argb4444 & 0xFF;
+            dst[1] = (argb4444 >> 8) & 0xFF;
+            dst += 2;
+        }
+
+        src += src_stride;
     }
 }
 
