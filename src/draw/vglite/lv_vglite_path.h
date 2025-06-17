@@ -22,6 +22,14 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VGLITE
+
+#if LV_USE_VG_LITE_THORVG
+#include "../../others/vg_lite_tvg/vg_lite.h"
+#else
+#include "vg_lite.h"
+#include "vg_lite_options.h"
+#endif
+
 #include "../lv_draw.h"
 #include "../lv_draw_triangle.h"
 
