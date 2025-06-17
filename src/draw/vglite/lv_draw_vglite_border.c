@@ -19,6 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_path.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_matrix.h"
 
 #include <math.h>
 
@@ -226,7 +227,8 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
             VGLITE_CHECK_ERROR(vg_lite_scissor_rects(buf, scissoring_rects.num_rect, scissoring_rects.rect));
 
             /*** Draw border ***/
-            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(), VG_LITE_BLEND_SRC_OVER,
+                                            vgcol));
 
             /*** Disable scissor ***/
             VGLITE_CHECK_ERROR(vg_lite_disable_scissor());
@@ -236,7 +238,8 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
                 VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
                                                        scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
                                                        scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
-                VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+                VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(), VG_LITE_BLEND_SRC_OVER,
+                                                vgcol));
             }
         }
 #else
@@ -244,13 +247,15 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
             VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
                                                    scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
                                                    scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
-            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(), VG_LITE_BLEND_SRC_OVER,
+                                            vgcol));
         }
 #endif
     }
     else {
         /*** Draw border ***/
-        VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(), VG_LITE_BLEND_SRC_OVER,
+                                        vgcol));
     }
 
     vglite_run();
