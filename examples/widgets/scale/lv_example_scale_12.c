@@ -4,7 +4,7 @@
 static lv_obj_t * scale;
 static lv_obj_t * label;
 
-const char * heading_to_cardinal(int32_t heading)
+static const char * heading_to_cardinal(int32_t heading)
 {
     /* Normalize heading to range [0, 360) */
     while(heading < 0) heading += 360;
@@ -24,13 +24,13 @@ const char * heading_to_cardinal(int32_t heading)
 
 static void set_heading_value(void * obj, int32_t v)
 {
+    LV_UNUSED(obj);
     lv_scale_set_rotation(scale, 270 - v);
     lv_label_set_text_fmt(label, "%d°\n%s", v, heading_to_cardinal(v));
 }
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
     lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
