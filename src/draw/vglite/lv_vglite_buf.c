@@ -99,7 +99,7 @@ void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
     lv_memzero(&vgbuf->yuv, sizeof(vgbuf->yuv));
 
     vgbuf->memory = buf;
-    vgbuf->address = (uint32_t)vgbuf->memory;
+    vgbuf->address = (uintptr_t)vgbuf->memory;
     vgbuf->handle = NULL;
 }
 
@@ -110,7 +110,7 @@ void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
 static inline void _set_vgbuf_ptr(vg_lite_buffer_t * vgbuf, void * buf)
 {
     vgbuf->memory = buf;
-    vgbuf->address = (uint32_t)vgbuf->memory;
+    vgbuf->address = (uintptr_t)vgbuf->memory;
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

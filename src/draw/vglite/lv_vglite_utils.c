@@ -14,6 +14,8 @@
  *********************/
 
 #include "lv_vglite_utils.h"
+#include "lv_vglite_path.h"
+
 
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
