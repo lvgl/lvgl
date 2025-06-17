@@ -64,6 +64,10 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 
+    if(src_stride == 0) {
+        src_stride = src_w * lv_color_format_get_size(src_cf);
+    }
+
     uint8_t eve_format;
     int32_t eve_stride;
 
