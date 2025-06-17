@@ -30,6 +30,8 @@ extern "C" {
 #include "vg_lite_options.h"
 #endif
 
+#include "lv_vglite_utils.h"
+
 #include "../lv_draw.h"
 #include "../lv_draw_triangle.h"
 
@@ -67,6 +69,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef void (*lv_vglite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -88,6 +91,10 @@ extern "C" {
 void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
                                   int32_t radius,
                                   const lv_area_t * coords);
+
+uint8_t lv_vglite_vlc_op_arg_len(uint8_t vlc_op);
+uint8_t lv_vglite_path_format_len(vg_lite_format_t format);
+void lv_vglite_path_for_each_data(const vg_lite_path_t * path, lv_vglite_path_iter_cb_t cb, void * user_data);
 
 /**********************
  *      MACROS
