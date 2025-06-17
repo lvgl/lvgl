@@ -187,6 +187,32 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv
                                           lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb);
 
 /**
+ * Create a MIPI DCS compatible LCD display without initializing the controller.
+ * This is useful if the user needs to set user_data before the controller is initialized.
+ * @param hor_res       horizontal resolution
+ * @param ver_res       vertical resolution
+ * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+ * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer).
+ *                      `lv_display_flush_ready` must be called after the transfer has finished.
+ * @return              pointer to the created display
+ */
+lv_display_t * lv_lcd_generic_mipi_create_display_no_init(uint32_t hor_res, uint32_t ver_res);
+
+/**
+ * Initialize a MIPI DCS compatible LCD controller after the display object has been created.
+ * This function is used to initialize the controller after the display object has been created using lv_lcd_generic_mipi_create_display_no_init.
+ * @param disp          pointer to the display object
+ * @param flags         default configuration settings (mirror, RGB ordering, etc.)
+ * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+ * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer).
+ *                      `lv_display_flush_ready` must be called after the transfer has finished.
+ */
+void lv_lcd_generic_mipi_controller_init(lv_display_t * disp, lv_lcd_flag_t flags, lv_lcd_send_cmd_cb_t send_cmd_cb,
+                                         lv_lcd_send_color_cb_t send_color_cb);
+
+
+
+/**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM
  * @param disp          display object
  * @param x             x offset
