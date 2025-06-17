@@ -19,6 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_path.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_matrix.h"
 
 #include "../../stdlib/lv_string.h"
 
@@ -172,7 +173,8 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
                                              ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
         /*Draw rectangle*/
-        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, vglite_get_identity_matrix(),
+                                        VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
     }
@@ -260,7 +262,8 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, vglite_get_identity_matrix(),
+                                        VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();

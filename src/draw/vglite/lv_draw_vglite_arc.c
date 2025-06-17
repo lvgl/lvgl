@@ -19,6 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_path.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_matrix.h"
 
 #include "../../stdlib/lv_string.h"
 #include <math.h>
@@ -676,7 +677,8 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(),
+                                    VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 }

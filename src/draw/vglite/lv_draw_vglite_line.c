@@ -18,6 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_matrix.h"
 
 /*********************
  *      DEFINES
@@ -161,7 +162,8 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
 
     VGLITE_CHECK_ERROR(vg_lite_update_stroke(path));
 
-    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, vglite_get_identity_matrix(),
+                                    VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 }
