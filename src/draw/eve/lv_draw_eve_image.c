@@ -31,8 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride);
-static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride);
+static void convert_row_RGB565A8_to_ARGB4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst, uint32_t width);
+static void convert_row_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width);
 
 /**********************
  *  STATIC VARIABLES
@@ -81,9 +81,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
             eve_stride = src_stride;
             break;
         case LV_COLOR_FORMAT_RGB565A8:
-            eve_format = EVE_ARGB1555;
-            eve_stride = src_w * 2;
-            break;
         case LV_COLOR_FORMAT_ARGB8888:
             eve_format = EVE_ARGB4;
             eve_stride = src_w * 2;
@@ -98,41 +95,42 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     if(img_eve_id == NOT_FOUND_BLOCK) { /* New image to load  */
 
-        const uint8_t * eve_buf;
-        uint8_t * tmp_buf = NULL;
-
-        switch(src_cf) {
-            case LV_COLOR_FORMAT_L8 :
-                eve_buf = src_buf;
-                break;
-            case LV_COLOR_FORMAT_RGB565 :
-                eve_buf = src_buf;
-                break;
-            case LV_COLOR_FORMAT_RGB565A8 :
-                tmp_buf = lv_malloc(eve_size);
-                LV_ASSERT_MALLOC(tmp_buf);
-                convert_RGB565A8_to_ARGB1555(src_buf, tmp_buf, src_w, src_h, src_stride);
-                eve_buf = tmp_buf;
-                break;
-            case LV_COLOR_FORMAT_ARGB8888 :
-                tmp_buf = lv_malloc(eve_size);
-                LV_ASSERT_MALLOC(tmp_buf);
-                convert_ARGB8888_to_ARGB4444(src_buf, tmp_buf, src_w, src_h, src_stride);
-                eve_buf = tmp_buf;
-                break;
-            default :
-                return;
-        }
-
         uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_IMAGE);
         uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
 
         /* Load image to RAM_G */
         EVE_end_cmd_burst();
 
-        EVE_memWrite_flash_buffer(start_addr_ramg, eve_buf, eve_size);
+        switch(src_cf) {
+            case LV_COLOR_FORMAT_L8 :
+            case LV_COLOR_FORMAT_RGB565 :
+                EVE_memWrite_flash_buffer(start_addr_ramg, src_buf, eve_size);
+                break;
+            case LV_COLOR_FORMAT_RGB565A8 : {
+                uint8_t * tmp_buf = lv_malloc(eve_stride);
+                LV_ASSERT_MALLOC(tmp_buf);
+                const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
+                int32_t src_alpha_stride = src_stride / 2;
+                for(uint32_t y = 0; y < src_h; y++) {
+                    convert_row_RGB565A8_to_ARGB4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
+                    EVE_memWrite_flash_buffer(start_addr_ramg + y * eve_stride, tmp_buf, eve_stride);
+                }
+                lv_free(tmp_buf);
+                break;
+            }
+            case LV_COLOR_FORMAT_ARGB8888 :
+                uint8_t * tmp_buf = lv_malloc(eve_stride);
+                LV_ASSERT_MALLOC(tmp_buf);
+                for(uint32_t y = 0; y < src_h; y++) {
+                    convert_row_ARGB8888_to_ARGB4444(src_buf + y * src_stride, tmp_buf, src_w);
+                    EVE_memWrite_flash_buffer(start_addr_ramg + y * eve_stride, tmp_buf, eve_stride);
+                }
+                lv_free(tmp_buf);
+                break;
+            default :
+                return;
+        }
 
-        lv_free(tmp_buf);
         /* Save RAM_G Memory Block ID info */
         lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)src_buf, start_addr_ramg, eve_size);
 
@@ -189,76 +187,45 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Converts RGB565A8 with stride `src_stride` to ARGB1555 with stride `width * 2`
- * @param src RGB565A8 with stride `src_stride`
- * @param dst ARGB1555 with stride `width` * 2
- * @param width width in pixels
- * @param height height in pixels
- * @param src_stride the stride of the `src` parameter
- */
-static void convert_RGB565A8_to_ARGB1555(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride)
+static void convert_row_RGB565A8_to_ARGB4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst, uint32_t width)
 {
-    const uint8_t * src_alpha = src + src_stride * height;
-    uint32_t src_alpha_stride = src_stride / 2;
+    for(uint32_t x = 0; x < width; x++) {
+        uint16_t rgb565 = ((const uint16_t *) src)[x];
 
-    for(uint32_t y = 0; y < height; y++) {
+        uint8_t r5 = (rgb565 >> 11) & 0x1F;
+        uint8_t g6 = (rgb565 >> 5) & 0x3F;
+        uint8_t b5 = rgb565 & 0x1F;
+        uint8_t alpha = src_alpha[x];
 
-        const uint16_t * src_row = (const uint16_t *) src;
+        uint8_t r4 = r5 >> 1;
+        uint8_t g4 = g6 >> 2;
+        uint8_t b4 = b5 >> 1;
+        uint8_t a4 = alpha >> 4;
 
-        for(uint32_t x = 0; x < width; x++) {
+        uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
 
-            uint16_t rgb565 = src_row[x];
-            uint8_t alpha = src_alpha[x];
-
-            uint8_t r5 = (rgb565 >> 11) & 0x1F;
-            uint8_t g6 = (rgb565 >> 5) & 0x3F;
-            uint8_t b5 = rgb565 & 0x1F;
-            uint8_t a1 = alpha >= 128 ? 1 : 0;
-
-            uint16_t argb1555 = (a1 << 15) | (r5 << 10) | ((g6 >> 1) << 5) | b5;
-
-            dst[0] = argb1555 & 0xFF;
-            dst[1] = (argb1555 >> 8) & 0xFF;
-            dst += 2;
-        }
-
-        src += src_stride;
-        src_alpha += src_alpha_stride;
+        dst[2 * x] = argb4444 & 0xFF;
+        dst[2 * x + 1] = (argb4444 >> 8) & 0xFF;
     }
 }
 
-/**
- * Converts ARGB8888 with stride `src_stride` to ARGB4444 with stride `width * 2`
- * @param src ARGB8888 with stride `src_stride`
- * @param dst ARGB4444 with stride `width` * 2
- * @param width width in pixels
- * @param height height in pixels
- * @param src_stride the stride of the `src` parameter
- */
-static void convert_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width, uint32_t height, uint32_t src_stride)
+static void convert_row_ARGB8888_to_ARGB4444(const uint8_t * src, uint8_t * dst, uint32_t width)
 {
-    for(uint32_t y = 0; y < height; y++) {
-        for(uint32_t x = 0; x < width; x++) {
+    for(uint32_t x = 0; x < width; x++) {
+        uint8_t blue = src[4 * x];
+        uint8_t green = src[4 * x + 1];
+        uint8_t red = src[4 * x + 2];
+        uint8_t alpha = src[4 * x + 3];
 
-            uint8_t blue = src[4 * x];
-            uint8_t green = src[4 * x + 1];
-            uint8_t red = src[4 * x + 2];
-            uint8_t alpha = src[4 * x + 3];
+        uint8_t r4 = red >> 4;
+        uint8_t g4 = green >> 4;
+        uint8_t b4 = blue >> 4;
+        uint8_t a4 = alpha >> 4;
 
-            uint8_t r4 = red >> 4;
-            uint8_t g4 = green >> 4;
-            uint8_t b4 = blue >> 4;
-            uint8_t a4 = alpha >> 4;
+        uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
 
-            uint16_t argb4444 = (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
-
-            dst[0] = argb4444 & 0xFF;
-            dst[1] = (argb4444 >> 8) & 0xFF;
-            dst += 2;
-        }
-
-        src += src_stride;
+        dst[2 * x] = argb4444 & 0xFF;
+        dst[2 * x + 1] = (argb4444 >> 8) & 0xFF;
     }
 }
 
