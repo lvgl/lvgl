@@ -20,6 +20,9 @@
 /*********************
  *      DEFINES
  *********************/
+#define VLC_OP_ARG_LEN(OP, LEN) \
+    case VLC_OP_##OP:           \
+    return (LEN)
 
 /**********************
  *      TYPEDEFS
@@ -207,6 +210,104 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
 
     /* Resulting path size */
     *path_data_size = pidx * sizeof(int32_t);
+}
+uint8_t lv_vglite_vlc_op_arg_len(uint8_t vlc_op)
+{
+    switch(vlc_op) {
+            VLC_OP_ARG_LEN(END, 0);
+            VLC_OP_ARG_LEN(CLOSE, 0);
+            VLC_OP_ARG_LEN(MOVE, 2);
+            VLC_OP_ARG_LEN(MOVE_REL, 2);
+            VLC_OP_ARG_LEN(LINE, 2);
+            VLC_OP_ARG_LEN(LINE_REL, 2);
+            VLC_OP_ARG_LEN(QUAD, 4);
+            VLC_OP_ARG_LEN(QUAD_REL, 4);
+            VLC_OP_ARG_LEN(CUBIC, 6);
+            VLC_OP_ARG_LEN(CUBIC_REL, 6);
+            VLC_OP_ARG_LEN(SCCWARC, 5);
+            VLC_OP_ARG_LEN(SCCWARC_REL, 5);
+            VLC_OP_ARG_LEN(SCWARC, 5);
+            VLC_OP_ARG_LEN(SCWARC_REL, 5);
+            VLC_OP_ARG_LEN(LCCWARC, 5);
+            VLC_OP_ARG_LEN(LCCWARC_REL, 5);
+            VLC_OP_ARG_LEN(LCWARC, 5);
+            VLC_OP_ARG_LEN(LCWARC_REL, 5);
+        default:
+            break;
+    }
+
+    LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
+    LV_ASSERT(false);
+    return 0;
+}
+
+
+uint8_t lv_vglite_path_format_len(vg_lite_format_t format)
+{
+    switch(format) {
+        case VG_LITE_S8:
+            return 1;
+        case VG_LITE_S16:
+            return 2;
+        case VG_LITE_S32:
+            return 4;
+        case VG_LITE_FP32:
+            return 4;
+        default:
+            break;
+    }
+
+    LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
+    LV_ASSERT(false);
+    return 0;
+}
+
+void lv_vglite_path_for_each_data(const vg_lite_path_t * path, lv_vglite_path_iter_cb_t cb, void * user_data)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(cb);
+
+    uint8_t fmt_len = lv_vglite_path_format_len(path->format);
+    uint8_t * cur = path->path;
+    uint8_t * end = cur + path->path_length;
+    float tmp_data[8];
+
+    while(cur < end) {
+        /* get op code */
+        uint8_t op_code = VLC_GET_OP_CODE(cur);
+
+        /* get arguments length */
+        uint8_t arg_len = lv_vglite_vlc_op_arg_len(op_code);
+
+        /* skip op code */
+        cur += fmt_len;
+
+        /* print arguments */
+        for(uint8_t i = 0; i < arg_len; i++) {
+            switch(path->format) {
+                case VG_LITE_S8:
+                    tmp_data[i] = *((int8_t *)cur);
+                    break;
+                case VG_LITE_S16:
+                    tmp_data[i] = *((int16_t *)cur);
+                    break;
+                case VG_LITE_S32:
+                    tmp_data[i] = *((int32_t *)cur);
+                    break;
+                case VG_LITE_FP32:
+                    tmp_data[i] = *((float *)cur);
+                    break;
+                default:
+                    LV_LOG_ERROR("UNKNOW_FORMAT(%d)", path->format);
+                    LV_ASSERT(false);
+                    break;
+            }
+
+            cur += fmt_len;
+        }
+
+        cb(user_data, op_code, tmp_data, arg_len);
+    }
 }
 
 /**********************

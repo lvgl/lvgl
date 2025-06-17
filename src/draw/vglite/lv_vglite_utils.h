@@ -34,6 +34,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))
 
 #define ENUM_TO_STRING(e) \
     case (e):             \

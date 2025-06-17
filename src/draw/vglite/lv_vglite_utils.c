@@ -201,7 +201,7 @@ void vglite_path_dump_info(const vg_lite_path_t * path)
 {
     LV_ASSERT(path != NULL);
     LV_ASSERT(path->path != NULL);
-    uint8_t fmt_len = vglite_path_format_len(path->format);
+    uint8_t fmt_len = lv_vglite_path_format_len(path->format);
     size_t len = path->path_length / fmt_len;
 
     LV_ASSERT(len > 0);
@@ -218,7 +218,7 @@ void vglite_path_dump_info(const vg_lite_path_t * path)
     LV_LOG_USER("type: %d", (int)path->path_type);
     LV_LOG_USER("add_end: %d", (int)path->add_end);
 
-    vglite_path_for_each_data(path, path_data_print_cb, NULL);
+    lv_vglite_path_for_each_data(path, path_data_print_cb, NULL);
 
     if(path->stroke) {
         LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
@@ -310,9 +310,6 @@ void vglite_buffer_dump_info(const vg_lite_buffer_t * buffer)
     LV_LOG_USER("address: 0x%08x", (int)(buffer)->address);
     LV_LOG_USER("size: W%d x H%d", (int)((buffer)->width), (int)((buffer)->height));
     LV_LOG_USER("stride: %d", (int)((buffer)->stride));
-    LV_LOG_USER("format: %d (%s)",
-                (int)((buffer)->format),
-                vglite_buffer_format_string((buffer)->format));
     LV_LOG_USER("tiled: %d", (int)((buffer)->tiled));
 }
 
