@@ -104,6 +104,8 @@ typedef unsigned int lv_3dtexture_id_t;
 
 typedef struct _lv_obj_t lv_obj_t;
 
+typedef lv_obj_t * (*lv_screen_create_cb_t)(void);
+
 typedef uint16_t lv_state_t;
 typedef uint32_t lv_part_t;
 
@@ -196,6 +198,8 @@ typedef struct _lv_image_t lv_image_t;
 typedef struct _lv_animimg_t lv_animimg_t;
 
 typedef struct _lv_arc_t lv_arc_t;
+
+typedef struct _lv_arclabel_t lv_arclabel_t;
 
 typedef struct _lv_label_t lv_label_t;
 

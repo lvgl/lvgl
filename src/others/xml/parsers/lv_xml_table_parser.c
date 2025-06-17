@@ -58,12 +58,6 @@ void lv_xml_table_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
         if(lv_streq("column_count", name)) lv_table_set_column_count(item, lv_xml_atoi(value));
         else if(lv_streq("row_count", name)) lv_table_set_row_count(item, lv_xml_atoi(value));
-        else if(lv_streq("selected_cell", name)) {
-
-            int32_t value1 = lv_xml_atoi_split(&value, ' ');
-            int32_t value2 = lv_xml_atoi_split(&value, ' ');
-            lv_table_set_selected_cell(item, value1, value2);
-        }
     }
 }
 

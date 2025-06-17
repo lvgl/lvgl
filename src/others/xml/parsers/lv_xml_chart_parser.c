@@ -68,11 +68,11 @@ void lv_xml_chart_apply(lv_xml_parser_state_t * state, const char ** attrs)
         }
         else if(lv_streq("type", name)) lv_chart_set_type(item, chart_type_to_enum(value));
         else if(lv_streq("update_mode", name)) lv_chart_set_update_mode(item, chart_update_mode_to_enum(value));
-        else if(lv_streq("div_line_count", name)) {
-
-            int32_t value1 = lv_xml_atoi_split(&value, ' ');
-            int32_t value2 = lv_xml_atoi_split(&value, ' ');
-            lv_chart_set_div_line_count(item, value1, value2);
+        else if(lv_streq("hor_div_line_count", name)) {
+            lv_chart_set_hor_div_line_count(item, lv_xml_atoi(value));
+        }
+        else if(lv_streq("ver_div_line_count", name)) {
+            lv_chart_set_ver_div_line_count(item, lv_xml_atoi(value));
         }
     }
 }
@@ -160,11 +160,8 @@ void lv_xml_chart_axis_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("range", name)) {
-            int32_t min_val = lv_xml_atoi_split(&value, ' ');
-            int32_t max_val = lv_xml_atoi_split(&value, ' ');
-            lv_chart_set_axis_range(chart, axis, min_val, max_val);
-        }
+        if(lv_streq("min_value", name)) lv_chart_set_axis_min_value(chart, axis, lv_xml_atoi(value));
+        if(lv_streq("max_value", name)) lv_chart_set_axis_max_value(chart, axis, lv_xml_atoi(value));
     }
 }
 

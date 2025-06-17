@@ -40,6 +40,8 @@
     case (gcFEATURE_BIT_VG_##e):  \
     return #e
 
+#define LV_VG_LITE_IMAGE_FLAGS_TILED LV_IMAGE_FLAGS_USER1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -783,7 +785,9 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
     width = lv_vg_lite_width_align(width);
 
-    lv_vg_lite_buffer_init(buffer, ptr, width, height, stride, format, false);
+    lv_vg_lite_buffer_init(buffer, ptr,
+                           width, height, stride, format,
+                           lv_draw_buf_has_flag(draw_buf, LV_VG_LITE_IMAGE_FLAGS_TILED));
 
     /* Alpha image need to be multiplied by color */
     if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {

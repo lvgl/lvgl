@@ -383,6 +383,31 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
  */
 void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
 
+/**
+ * Add an event handler to a widget that will load a screen on a trigger.
+ * @param obj           pointer to widget which should load the screen
+ * @param trigger       an event code, e.g. `LV_EVENT_CLICKED`
+ * @param screen        the screen to load (must be a valid widget)
+ * @param anim_type     element of `lv_screen_load_anim_t` the screen load animation
+ * @param duration      duration of the animation in milliseconds
+ * @param delay         delay before the screen load in milliseconds
+ */
+void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_obj_t * screen,
+                                  lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay);
+
+/**
+ * Add an event handler to a widget that will create a screen on a trigger.
+ * The created screen will be deleted when it's unloaded
+ * @param obj               pointer to widget which should load the screen
+ * @param trigger           an event code, e.g. `LV_EVENT_CLICKED`
+ * @param screen_create_cb  a callback to create the screen, e.g. `lv_obj_t * myscreen_create(void)`
+ * @param anim_type         element of `lv_screen_load_anim_t` the screen load animation
+ * @param duration          duration of the animation in milliseconds
+ * @param delay             delay before the screen load in milliseconds
+ */
+void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
+                                    lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay);
+
 #if LV_USE_OBJ_ID
 /**
  * Set an id for an object.

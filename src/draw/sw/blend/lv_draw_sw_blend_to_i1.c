@@ -78,7 +78,9 @@ static inline uint8_t /* LV_ATTRIBUTE_FAST_MEM */ get_bit(const uint8_t * buf, i
 
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
-static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+    static inline lv_color16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color16_from_u16(uint16_t raw);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -1271,6 +1273,7 @@ static inline uint8_t LV_ATTRIBUTE_FAST_MEM get_bit(const uint8_t * buf, int32_t
     return (buf[bit_idx / 8] >> (7 - (bit_idx % 8))) & 1;
 }
 
+#if LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
 static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t raw)
 {
     lv_color16_t c;
@@ -1279,5 +1282,6 @@ static inline lv_color16_t LV_ATTRIBUTE_FAST_MEM lv_color16_from_u16(uint16_t ra
     c.blue = raw & 0x1F;
     return c;
 }
+#endif
 
 #endif

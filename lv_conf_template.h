@@ -357,6 +357,11 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
+/** Draw using espressif PPA accelerator */
+#define LV_USE_PPA  0
+#if LV_USE_PPA
+    #define LV_USE_PPA_IMG 0
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -699,12 +704,15 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
 
 #define LV_USE_ANIMIMG    1
 
 #define LV_USE_ARC        1
+
+#define LV_USE_ARCLABEL  1
 
 #define LV_USE_BAR        1
 
@@ -958,7 +966,8 @@
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
-    #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+    #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+    #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 #endif
 
 /** Rlottie library */
@@ -1243,7 +1252,7 @@
      * shared across sub-systems and libraries using the Linux DMA-BUF API.
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
-    #define LV_LINUX_DRM_GBM_BUFFERS 0
+    #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
 #endif
 
 /** Interface for TFT_eSPI */
@@ -1288,6 +1297,9 @@
     /* Only used for partial. */
     #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
 #endif
+
+/** Driver for NXP ELCDIF */
+#define LV_USE_NXP_ELCDIF   0
 
 /** LVGL Windows backend */
 #define LV_USE_WINDOWS    0

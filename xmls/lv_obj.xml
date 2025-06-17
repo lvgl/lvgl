@@ -39,6 +39,142 @@ Example
 		    <enum name="user_4"          help="Custom flag, free to use by user"/>
 		</enumdef>
 
+        <element name="style" access="add" type="void">
+            <arg name="name" type="style"/>
+            <arg name="selector" type="selector+" default="0"/>
+        </element>
+
+        <element name="remove_style" access="custom" type="void">
+            <arg name="name" type="style" default="NULL"/>
+            <arg name="selector" type="selector+" default="0"/>
+        </element>
+
+        <element name="remove_style_all" access="custom" type="void"/>
+
+        <element name="bind_style" access="custom">
+            <arg name="name" type="style"/>
+            <arg name="selector" type="selector+" default="0"/>
+            <arg name="subject" type="subject"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="event_cb" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="cb" type="event_cb"/>
+        </element>
+
+        <element name="screen_load_event" access="add">
+            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="screen" type="screen"/>
+            <arg name="duration" type="int"  default="0"/>
+            <arg name="delay" type="int"  default="0"/>
+            <arg name="anim_type" type="enum:lv_screen_load_anim"   default="none"/>
+        </element>
+
+        <element name="screen_create_event" access="add">
+            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="screen" type="screen_create_cb"/>
+            <arg name="duration" type="int" default="0"/>
+            <arg name="delay" type="int" default="0"/>
+            <arg name="anim_type" type="enum:lv_screen_load_anim"  default="none"/>
+        </element>
+
+        <element name="subject_set_int_event" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="subject" type="subject"/>
+            <arg name="value" type="int"/>
+        </element>
+
+        <element name="subject_set_string_event" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="subject" type="subject"/>
+            <arg name="value" type="int"/>
+        </element>
+
+        <element name="subject_increment_event" access="add">
+            <arg name="name" type="string"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="subject" type="subject"/>
+            <arg name="step" type="int" default="1"/>
+            <arg name="min" type="int" default="-2000000"/>
+            <arg name="max" type="int" default="2000000"/>
+        </element>
+
+        <element name="bind_flag_if_eq" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_not_eq" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_gt" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_ge" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_lt" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_flag_if_le" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="flag" type="enum:lv_obj_flag"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_eq" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_not_eq" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_gt" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_ge" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_lt" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
+        <element name="bind_state_if_le" access="custom" >
+            <arg name="subject" type="subject"/>
+            <arg name="state" type="enum:lv_state"/>
+            <arg name="ref_value" type="int"/>
+        </element>
+
 	    <prop name="name" type="string"/>
 	    <prop name="store" type="bool"/>
 	    <prop name="x" type="coords"/>
@@ -46,9 +182,10 @@ Example
 	    <prop name="height" type="coords"/>
 	    <prop name="width" type="coords"/>
 	    <prop name="align" type="enum:lv_align"/>
-	    <prop name="styles"  type="styles[]"/>
 
         <prop name="ext_click_area" type="int"/>
+        <prop name="scroll_snap_x" type="enum:lv_scroll_snap"/>
+        <prop name="scroll_snap_y" type="enum:lv_scroll_snap"/>
 
         <prop name="style_x" type="coords"/>
         <prop name="style_y" type="coords"/>
@@ -216,65 +353,5 @@ Example
 	    <prop name="flex_in_new_track" 	type="flag:flag lv_obj_flag"/>
 
 	    <prop name="bind_checked" type="subject"/>
-	    <prop name="bind_flag_if_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_not_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_gt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_ge">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_lt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_flag_if_le">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_not_eq">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_gt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_ge">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_lt">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
-	    <prop name="bind_state_if_le">
-	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_state"/>
-	    	<param name="ref_value" type="int"/>
-	    </prop>
 	</api>
 </widget>
