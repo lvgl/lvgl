@@ -19,6 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_path.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_matrix.h"
 
 #include "../../stdlib/lv_string.h"
 
@@ -205,7 +206,8 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, vglite_get_identity_matrix(),
+                                        VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
