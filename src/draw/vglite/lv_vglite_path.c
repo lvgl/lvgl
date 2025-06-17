@@ -16,7 +16,6 @@
 #include "lv_vglite_path.h"
 
 #if LV_USE_DRAW_VGLITE
-#include "vg_lite.h"
 
 /*********************
  *      DEFINES
