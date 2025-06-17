@@ -231,10 +231,6 @@ void lv_init(void)
     lv_draw_nema_gfx_init();
 #endif
 
-#if LV_USE_DRAW_VGLITE
-    lv_draw_vglite_init();
-#endif
-
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_init();
@@ -284,6 +280,13 @@ void lv_init(void)
 
     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
+
+    /* VGLite draw unit supports image decode, so we need to initialize it after the
+     * the LVGL built-in image decoder has been initialized
+     */
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_init();
+#endif
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";

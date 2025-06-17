@@ -47,6 +47,8 @@ extern "C" {
 /* Draw lines for control points of Bezier curves */
 #define BEZIER_DBG_CONTROL_POINTS   0
 
+
+#if !LV_USE_VG_LITE_THORVG
 /* Path data sizes for different elements */
 #define CUBIC_PATH_DATA_SIZE 7 /* 1 opcode, 6 arguments */
 #define LINE_PATH_DATA_SIZE 3  /* 1 opcode, 2 arguments */
@@ -66,7 +68,12 @@ extern "C" {
  * - 16 cubics for the arc (5 inner, 5 outer) and corners (3 per corner)
  * - 1 end for the path end */
 #define ARC_PATH_DATA_MAX_SIZE (1 * MOVE_PATH_DATA_SIZE + 16 * CUBIC_PATH_DATA_SIZE + 1 * END_PATH_DATA_SIZE)
+#else
+#define RECT_PATH_DATA_MAX_SIZE 1024
+#define ARC_PATH_DATA_MAX_SIZE 	1024
+#endif
 /**********************
+ *
  *      TYPEDEFS
  **********************/
 typedef void (*lv_vglite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
