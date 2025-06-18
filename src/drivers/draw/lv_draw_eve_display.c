@@ -28,6 +28,7 @@
  **********************/
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+static void resolution_changed_cb(lv_event_t * e);
 static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
@@ -56,6 +57,7 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_draw_buffers(disp, &draw_buf, NULL);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
+    lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_set_driver_data(disp, user_data);
 
     lv_draw_eve_set_display_data(disp, params, op_cb);
@@ -106,6 +108,34 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
 
     lv_display_flush_ready(disp);
+}
+
+static void resolution_changed_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    uint32_t cmd_value;
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_0:
+            cmd_value = 0;
+            break;
+        case LV_DISPLAY_ROTATION_90:
+            cmd_value = 2;
+            break;
+        case LV_DISPLAY_ROTATION_180:
+            cmd_value = 1;
+            break;
+        case LV_DISPLAY_ROTATION_270:
+            cmd_value = 3;
+            break;
+        default:
+            return;
+    }
+
+    EVE_end_cmd_burst();
+    EVE_cmd_setrotate(cmd_value);
+    EVE_start_cmd_burst();
 }
 
 static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
