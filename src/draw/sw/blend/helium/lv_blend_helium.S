@@ -671,15 +671,15 @@ BITMASK     .req q6
 
 .macro export_set src, dst, src_bpp, dst_bpp, mode
 .ifc \src, color
-    export lv_\src\()_blend_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
-    export lv_\src\()_blend_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
-    export lv_\src\()_blend_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
-    export lv_\src\()_blend_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
+    export _lv_\src\()_blend_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
+    export _lv_\src\()_blend_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
+    export _lv_\src\()_blend_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
+    export _lv_\src\()_blend_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
 .else
-    export lv_\src\()_blend_\mode\()_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
-    export lv_\src\()_blend_\mode\()_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
-    export lv_\src\()_blend_\mode\()_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
-    export lv_\src\()_blend_\mode\()_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
+    export _lv_\src\()_blend_\mode\()_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
+    export _lv_\src\()_blend_\mode\()_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
+    export _lv_\src\()_blend_\mode\()_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
+    export _lv_\src\()_blend_\mode\()_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
 .endif
 .endm
 
