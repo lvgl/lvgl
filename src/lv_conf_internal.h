@@ -1000,6 +1000,23 @@
     #endif
 #endif
 
+/** Draw using espressif PPA accelerator */
+#ifndef LV_USE_PPA
+    #ifdef CONFIG_LV_USE_PPA
+        #define LV_USE_PPA CONFIG_LV_USE_PPA
+    #else
+        #define LV_USE_PPA  0
+    #endif
+#endif
+#if LV_USE_PPA
+    #ifndef LV_USE_PPA_IMG
+        #ifdef CONFIG_LV_USE_PPA_IMG
+            #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
+        #else
+            #define LV_USE_PPA_IMG 0
+        #endif
+    #endif
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -4189,6 +4206,15 @@
         #else
             #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
         #endif
+    #endif
+#endif
+
+/** Driver for NXP ELCDIF */
+#ifndef LV_USE_NXP_ELCDIF
+    #ifdef CONFIG_LV_USE_NXP_ELCDIF
+        #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
+    #else
+        #define LV_USE_NXP_ELCDIF   0
     #endif
 #endif
 

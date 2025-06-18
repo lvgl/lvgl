@@ -129,28 +129,57 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
     lv_chart_refresh(obj);
 }
 
-void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max)
+void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    max = max == min ? max + 1 : max;
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+
+    switch(axis) {
+        case LV_CHART_AXIS_PRIMARY_Y:
+            if(chart->ymin[0] == min) return;
+            chart->ymin[0] = min;
+            break;
+        case LV_CHART_AXIS_SECONDARY_Y:
+            if(chart->ymin[1] == min) return;
+            chart->ymin[1] = min;
+            break;
+        case LV_CHART_AXIS_PRIMARY_X:
+            if(chart->xmin[0] == min) return;
+            chart->xmin[0] = min;
+            break;
+        case LV_CHART_AXIS_SECONDARY_X:
+            if(chart->xmin[1] == min) return;
+            chart->xmin[1] = min;
+            break;
+        default:
+            LV_LOG_WARN("Invalid axis: %d", axis);
+            return;
+    }
+
+    lv_chart_refresh(obj);
+}
+
+void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t max)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     switch(axis) {
         case LV_CHART_AXIS_PRIMARY_Y:
-            chart->ymin[0] = min;
+            if(chart->ymax[0] == max) return;
             chart->ymax[0] = max;
             break;
         case LV_CHART_AXIS_SECONDARY_Y:
-            chart->ymin[1] = min;
+            if(chart->ymax[1] == max) return;
             chart->ymax[1] = max;
             break;
         case LV_CHART_AXIS_PRIMARY_X:
-            chart->xmin[0] = min;
+            if(chart->xmax[0] == max) return;
             chart->xmax[0] = max;
             break;
         case LV_CHART_AXIS_SECONDARY_X:
-            chart->xmin[1] = min;
+            if(chart->xmax[1] == max) return;
             chart->xmax[1] = max;
             break;
         default:
@@ -159,6 +188,14 @@ void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, 
     }
 
     lv_chart_refresh(obj);
+}
+
+void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_set_axis_min_value(obj, axis, min);
+    lv_chart_set_axis_max_value(obj, axis, max);
 }
 
 void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode)
@@ -172,7 +209,7 @@ void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode
     lv_obj_invalidate(obj);
 }
 
-void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv)
+void lv_chart_set_div_line_count(lv_obj_t * obj, uint32_t hdiv, uint32_t vdiv)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -182,6 +219,26 @@ void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv)
     chart->hdiv_cnt = hdiv;
     chart->vdiv_cnt = vdiv;
 
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_hor_div_line_count(lv_obj_t * obj, uint32_t cnt)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->hdiv_cnt == cnt) return;
+    chart->hdiv_cnt = cnt;
+    lv_obj_invalidate(obj);
+}
+
+void lv_chart_set_ver_div_line_count(lv_obj_t * obj, uint32_t cnt)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    if(chart->vdiv_cnt == cnt) return;
+    chart->vdiv_cnt = cnt;
     lv_obj_invalidate(obj);
 }
 

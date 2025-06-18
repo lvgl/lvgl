@@ -34,13 +34,44 @@ typedef struct {
     flag_cond_t cond : 3;
 } flag_and_cond_t;
 
+typedef struct {
+    const lv_style_t * style;
+    lv_style_selector_t selector;
+    int32_t value;
+} bind_style_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t value;
+} subject_set_int_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    const char * value;
+} subject_set_string_user_data_t;
+
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t step;
+    int32_t min;
+    int32_t max;
+} subject_increment_user_data_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void subject_set_int_cb(lv_event_t * e);
+static void subject_set_string_cb(lv_event_t * e);
+static void subject_increment_cb(lv_event_t * e);
+
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond);
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
@@ -70,6 +101,9 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void dropdown_value_changed_event_cb(lv_event_t * e);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
+
+static void free_user_data_event_cb(lv_event_t * e);
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -461,6 +495,87 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        int32_t min, int32_t max)
+{
+    subject_increment_user_data_t * user_data = lv_malloc(sizeof(subject_increment_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data in in <lv_obj-subject_increment>");
+        return;
+    }
+
+    user_data->step = step;
+    user_data->min = min;
+    user_data->max = max;
+    user_data->subject = subject;
+    lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
+{
+    subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = value;
+
+    lv_obj_add_event_cb(obj, subject_set_int_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value)
+{
+    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = lv_strdup(value);
+    LV_ASSERT_MALLOC(user_data->value);
+
+    lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
+                                  lv_subject_t * subject, int32_t ref_value)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_style(obj, style, selector);
+
+    bind_style_t * p = lv_malloc(sizeof(bind_style_t));
+    LV_ASSERT_MALLOC(p);
+    if(p == NULL) {
+        LV_LOG_WARN("Out of memory");
+        return NULL;
+    }
+
+    p->style = style;
+    p->selector = selector;
+    p->value = ref_value;
+
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, bind_style_observer_cb, obj, p);
+    observable->auto_free_user_data = 1;
+    return observable;
+}
+
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
@@ -674,6 +789,31 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
  *   STATIC FUNCTIONS
  **********************/
 
+
+static void subject_set_int_cb(lv_event_t * e)
+{
+    subject_set_int_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_set_int(user_data->subject, user_data->value);
+}
+
+static void subject_set_string_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_copy_string(user_data->subject, user_data->value);
+}
+
+static void subject_increment_cb(lv_event_t * e)
+{
+    subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
+    int32_t value = lv_subject_get_int(user_data->subject);
+
+    value += user_data->step;
+    value = LV_CLAMP(user_data->min, value, user_data->max);
+
+    lv_subject_set_int(user_data->subject, value);
+}
+
+
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
@@ -712,6 +852,15 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
     return observable;
+}
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_style_t * p = observer->user_data;
+
+    int32_t current_v = lv_subject_get_int(subject);
+    bool dis = current_v != p->value;
+    lv_obj_style_set_disabled(observer->target, p->style, p->selector, dis);
 }
 
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -902,5 +1051,18 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 }
 
 #endif /*LV_USE_DROPDOWN*/
+
+static void free_user_data_event_cb(lv_event_t * e)
+{
+    lv_free(lv_event_get_user_data(e));
+}
+
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_free((void *)user_data->value);
+    lv_free(user_data);
+}
+
 
 #endif /*LV_USE_OBSERVER*/

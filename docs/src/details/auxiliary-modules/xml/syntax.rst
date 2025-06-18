@@ -62,11 +62,13 @@ The following simple built-in types are supported:
 
 :lv_obj:    Pointer to a Widget (:cpp:expr:`lv_obj_t *`).
 
-:point:     A point with ``x`` and ``y`` values (:cpp:expr:`lv_point_t`).
+:screen:    Pointer to a screen (also :cpp:expr:`lv_obj_t *`).
 
-:arglist:   List all parameters as arguments.  Supports only ``int`` and
-            ``string``.  E.g. ``foo="1 23 'hello' 'a'"``.
+:time_ms:   Means some time in milliseconds unit
 
+:deg_0.1:   Degrees with 0.1 resolution
+
+:scale_1/256:   Scale/Zoom, where 256 means 100%, 128 means 50%, 512 means 200% etc.
 
 Name-based types
 ----------------
@@ -108,7 +110,7 @@ can be used.  Later, a pointer to the object can be retrieved by
 :subject:   Name of a :ref:`Subject <observer_subject>`. :cpp:expr:`lv_xml_get_subject(&ctx, name)` returns an :cpp:expr:`lv_subject_t *`.
 :grad:      Name of a gradient. :cpp:expr:`lv_xml_get_grad(&ctx, name)` returns an :cpp:expr:`lv_grad_dsc_t *`.
 :event_cb:  Name of an event callback. :cpp:expr:`lv_xml_get_event_cb(&ctx, name)` returns an :cpp:expr:`lv_event_cb_t`.
-
+:screen_create_cb:  In XML it's the name of a screen XML file. In exported code it's a function like ``lv_obj_t * my_screen_create(void)``
 
 Arrays
 ------

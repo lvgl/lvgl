@@ -357,6 +357,11 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
+/** Draw using espressif PPA accelerator */
+#define LV_USE_PPA  0
+#if LV_USE_PPA
+    #define LV_USE_PPA_IMG 0
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -1292,6 +1297,9 @@
     /* Only used for partial. */
     #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
 #endif
+
+/** Driver for NXP ELCDIF */
+#define LV_USE_NXP_ELCDIF   0
 
 /** LVGL Windows backend */
 #define LV_USE_WINDOWS    0

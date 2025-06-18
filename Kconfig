@@ -527,6 +527,16 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
+		
+		config LV_USE_PPA
+		bool "Use Espressif's PPA accelerator for ESP SoCs"
+		default n
+
+		config LV_USE_PPA_IMG
+		bool "Use Espressif's PPA accelerator for Image draw"
+		default n
+		depends on LV_USE_PPA
+
 	endmenu
 
 	menu "Feature Configuration"
@@ -2066,6 +2076,10 @@ menu "LVGL configuration"
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
 			default y if LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341
+
+		config LV_USE_NXP_ELCDIF
+			bool "Use NXP ELCDIF to generate display"
+			default n
 
 		config LV_USE_RENESAS_GLCDC
 			bool "Use Renesas GLCDC driver"

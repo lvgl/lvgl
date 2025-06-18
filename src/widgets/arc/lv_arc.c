@@ -273,6 +273,16 @@ void lv_arc_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     value_update(obj); /*value has changed relative to the new range*/
 }
 
+void lv_arc_set_min_value(lv_obj_t * obj, int32_t min)
+{
+    lv_arc_set_range(obj, min, lv_arc_get_max_value(obj));
+}
+
+void lv_arc_set_max_value(lv_obj_t * obj, int32_t max)
+{
+    lv_arc_set_range(obj, lv_arc_get_min_value(obj), max);
+}
+
 void lv_arc_set_change_rate(lv_obj_t * obj, uint32_t rate)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
