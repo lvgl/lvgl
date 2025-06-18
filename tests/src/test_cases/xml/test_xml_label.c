@@ -51,7 +51,8 @@ void test_xml_label_with_attrs(void)
     lv_xml_register_subject(NULL, "s2", &s2);
 
     const char * label3_attrs[] = {
-        "bind_text", "s2 'We have measured: %0.3f mW'",
+        "bind_text", "s2",
+        "bind_text-fmt", "We have measured: %0.3f mW",
         "y", "30",
         "x", "5",
         NULL, NULL,
