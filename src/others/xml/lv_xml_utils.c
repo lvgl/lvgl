@@ -113,15 +113,11 @@ int32_t lv_xml_atoi_split(const char ** str, char delimiter)
     if(*s != '\0') s++; /*Skip the delimiter*/
     *str = s;
     return result;
-
 }
-
 
 int32_t lv_xml_atoi(const char * str)
 {
-
     return lv_xml_atoi_split(&str, '\0');
-
 }
 
 int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)

@@ -44,6 +44,40 @@ docker run --rm -it -v $(pwd):/work lvgl_test_env "./tests/main.py"
 
 This ensures you are testing in a consistent environment with the same dependencies as the CI pipeline.
 
+## Performance Tests
+
+### Requirements
+
+- **Docker**
+- **Linux host machine** (WSL *may* work but is untested)
+
+### Running Tests
+
+The performance tests are run inside a Docker container that launches an ARM emulated environment using QEMU to ensure consistent timing across machines. Each test runs on a lightweight ARM-based OS ([SO3](https://github.com/smartobjectoriented/so3)) within this emulated environment.
+
+To run the tests:
+
+```bash
+./perf.py [--clean] [--auto-clean] [--test-suite <suite>] [--build-options <option>] [build|generate|test]
+```
+
+- `build` and `generate`: generates all necessary build and configuration files
+- `test`: launches Docker with the appropriate volume mounts and runs the tests inside the container
+
+
+> [!NOTE]
+> Building doesn't actually build the source files because the current docker image doesn't separate the building and running. Instead, it does both
+
+You can specify different build configurations via `--build-options`, and optionally filter tests using `--test-suite`.
+
+For full usage options, run:
+
+```sh
+./perf.py --help
+```
+
+You can also run this script by passing a performance test config to the `main.py` script. The performance tests configs can be found inside the [`perf.py`](./perf.py) file
+
 ## Running automatically
 
 GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `releasev8.*` branches.
@@ -51,6 +85,7 @@ GitHub's CI automatically runs these tests on pushes and pull requests to `maste
 ## Directory structure
 - `src` Source files of the tests
     - `test_cases` The written tests,
+    - `test_cases_perf` The performance tests,
     - `test_runners` Generated automatically from the files in `test_cases`.
     - other miscellaneous files and folders
 - `ref_imgs` - Reference images for screenshot compare

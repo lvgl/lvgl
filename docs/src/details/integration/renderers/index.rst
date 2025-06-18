@@ -7,6 +7,7 @@ Renderers and GPUs
 
     sw
     arm2d
+    espressif_ppa
     nema_gfx
     nxp_pxp
     nxp_vglite_gpu

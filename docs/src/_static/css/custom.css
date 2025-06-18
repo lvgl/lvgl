@@ -993,3 +993,11 @@ div .lvgl-figure-caption p {
   text-align: center;
   margin-bottom: 32px;
 }
+
+/*-------------------------------------------------------------------------
+ * Code Highlighting
+ *-------------------------------------------------------------------------*/
+/* Pygments .p = Punctuation */
+body[data-theme="dark"] .highlight .p {
+  color: #a883f3;
+}

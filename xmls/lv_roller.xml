@@ -10,13 +10,13 @@ Example
 	        <enum name="infinite" help=""/>
 	    </enumdef>
 	    <prop name="options">
-	    	<param name="values" type="string"/>
+	    	<param name="options" type="string"/>
 	    	<param name="mode" type="enum:lv_roller_mode" default="normal"/>
 	    </prop>
 
 	    <prop name="selected" help="">
-	    	<param name="idx" type="int"/>
-	    	<param name="anim" type="bool" default="false"/>
+	    	<param name="selected" type="int"/>
+	    	<param name="animated" type="bool" default="false"/>
 	    </prop>
 
 	    <prop name="visible_row_count" type="int" help=""/>

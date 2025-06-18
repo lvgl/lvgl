@@ -11,7 +11,7 @@ Overview
 
 .. _observer pattern:  https://en.wikipedia.org/wiki/Observer_pattern
 
-The ``lv_observer`` module is an implemention of the `Observer Pattern`_.
+The ``lv_observer`` module is an implementation of the `Observer Pattern`_.
 
 This implementation consists of:
 
@@ -69,7 +69,7 @@ A typical use case looks like this:
      * some_module.c
      *--------------*/
 
-    extern lv_subject_t some_subject;
+    extern lv_subject_t my_subject;
 
     // Will be called when Subject's value changes
     static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -81,19 +81,19 @@ A typical use case looks like this:
     void some_module_init(void)
     {
         // Subscribe to Subject as an Observer.
-        lv_subject_add_observer(&some_subject, some_observer_cb, NULL);
+        lv_subject_add_observer(&my_subject, some_observer_cb, NULL);
     }
 
     /*--------------
      * some_system.c
      *--------------*/
 
-    extern lv_subject_t some_subject;
+    extern lv_subject_t my_subject;
 
     void some_event(void)
     {
         // The below call sets Subject's value to 30 and notifies current Observers.
-        lv_subject_set_int(&some_subject, 30);
+        lv_subject_set_int(&my_subject, 30);
     }
 
 
@@ -186,9 +186,15 @@ Simple Subscription
 ~~~~~~~~~~~~~~~~~~~
 
 To subscribe to a Subject one of the ``lv_subject_add_observer...()`` functions are
-used.  Alternately, if you want to bind a Subject's value to a Widget's property, one
-of the ``lv_<widget_type>_bind_...()`` functions can be used.  The former are covered
-below.  The latter are covered in the :ref:`observer_widget_binding` section.
+used. This is covered below.
+
+Alternately, if you want to bind a Subject's value to a Widget's property, one
+of the ``lv_<widget_type>_bind_...()`` functions can be used.  See
+:ref:`observer_widget_binding` for more details.
+
+By using  ``lv_obj_add_subject_...()`` it's also possible to change a subject's value
+on a trigger. It's covered in :ref:`change_subject_on_event`
+
 
 For the most basic use case, subscribe to a Subject by using the following function:
 
@@ -228,7 +234,7 @@ both unsubscribes it from the Subject and deletes it from the LVGL heap.
 Subscribing While Associating Observer with a Widget
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The function below assocates a Widget with an Observer while subscribing to a
+The function below associates a Widget with an Observer while subscribing to a
 Subject.  A copy of the pointer to that Widget is saved in the Observer's ``target``
 field.  This works exactly like the above method except that when the Widget is
 deleted, the Observer thus created will be automatically unsubscribed from the
@@ -539,6 +545,39 @@ vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
 
+.. _change_subject_on_event:
+
+Change Subject on Event
+-----------------------
+
+It's a common requirement to update a subject based on a user action (trigger).
+To simplify this, *subject set* and *increment* actions can be attached directly to any widget.
+
+Internally, these are implemented as special event callbacks.
+Note: these callbacks are **not** automatically removed when a subject is deinited.
+
+Increment
+~~~~~~~~~
+
+:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, step, min, max)`
+Increments the subject's value by `step`, clamped between `min` and `max`.
+
+For example:
+
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80);`
+
+This will increment `subject1` by 5 when `button1` is clicked.
+The resulting value will be constrained to the range -10 to 80.
+
+Using a negative `step` will decrement the value instead.
+
+Set to a Value
+~~~~~~~~~~~~~~
+
+- :cpp:expr:`lv_obj_add_subject_set_int_event(obj, subject, trigger, value)`
+- :cpp:expr:`lv_obj_add_subject_set_string_event(obj, subject, trigger, text)`
+
+These functions set the given subject (integer or string) to a fixed value when the specified trigger event occurs.
 
 .. _observer_api:
 
