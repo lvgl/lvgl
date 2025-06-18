@@ -118,7 +118,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 lv_free(tmp_buf);
                 break;
             }
-            case LV_COLOR_FORMAT_ARGB8888 :
+            case LV_COLOR_FORMAT_ARGB8888 : {
                 uint8_t * tmp_buf = lv_malloc(eve_stride);
                 LV_ASSERT_MALLOC(tmp_buf);
                 for(uint32_t y = 0; y < src_h; y++) {
@@ -127,6 +127,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 }
                 lv_free(tmp_buf);
                 break;
+            }
             default :
                 return;
         }
