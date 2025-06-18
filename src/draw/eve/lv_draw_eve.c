@@ -131,6 +131,8 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
+    EVE_start_cmd_burst();
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_eve_line(t, t->draw_dsc);
@@ -151,12 +153,13 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
             lv_draw_eve_arc(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            return;
             lv_draw_eve_triangle(t, t->draw_dsc);
             break;
         default:
             break;
     }
+
+    EVE_end_cmd_burst();
 }
 
 static void disp_delete_cb(lv_event_t * e)

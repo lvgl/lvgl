@@ -73,6 +73,7 @@ lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * param
     EVE_cmd_dl_burst(DL_CLEAR_COLOR_RGB | 0x000000);
     EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
     EVE_cmd_dl_burst(VERTEX_FORMAT(0));
+    EVE_end_cmd_burst();
 
     return disp;
 }
@@ -135,15 +136,18 @@ void lv_draw_eve_memwrite32(lv_display_t * disp, uint32_t address, uint32_t data
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     if(lv_display_flush_is_last(disp)) {
+        EVE_start_cmd_burst();
         EVE_cmd_dl_burst(DL_DISPLAY); /* instruct the co-processor to show the list */
         EVE_cmd_dl_burst(CMD_SWAP);   /* make this list active */
         EVE_end_cmd_burst();
+
         EVE_execute_cmd();
 
         EVE_start_cmd_burst();
         EVE_cmd_dl_burst(CMD_DLSTART);
         EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
         EVE_cmd_dl_burst(VERTEX_FORMAT(0));
+        EVE_end_cmd_burst();
     }
 
     lv_display_flush_ready(disp);
@@ -172,9 +176,7 @@ static void resolution_changed_cb(lv_event_t * e)
             return;
     }
 
-    EVE_end_cmd_burst();
     EVE_cmd_setrotate(cmd_value);
-    EVE_start_cmd_burst();
 }
 
 static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
@@ -182,8 +184,6 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     lv_display_t * disp = lv_indev_get_display(indev);
 
     if(disp == NULL || disp->flush_cb != flush_cb) return;
-
-    EVE_end_cmd_burst();
 
     uint32_t xy = EVE_memRead32(REG_TOUCH_SCREEN_XY);
     uint16_t x = xy >> 16;
@@ -200,8 +200,6 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     else {
         data->state = LV_INDEV_STATE_RELEASED;
     }
-
-    EVE_start_cmd_burst();
 }
 
 #endif /*LV_USE_DRAW_EVE*/
