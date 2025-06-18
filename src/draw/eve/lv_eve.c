@@ -43,12 +43,12 @@ static lv_eve_drawing_context_t ct = {
     .primitive = LV_EVE_PRIMITIVE_ZERO_VALUE,
     .color = {0xff, 0xff, 0xff},
     .opa = 255,
-    .lineWidth = 1,  /* for format(0) */
-    .pointSize = 1,
-    .colorMask = {1, 1, 1, 1},
-    .stencilFunc = {EVE_ALWAYS, 0, 255},
-    .stencilOp = {EVE_KEEP, EVE_KEEP},
-    .blendFunc = {EVE_SRC_ALPHA, EVE_ONE_MINUS_SRC_ALPHA},
+    .line_width = 1,  /* for format(0) */
+    .point_size = 1,
+    .color_mask = {1, 1, 1, 1},
+    .stencil_func = {EVE_ALWAYS, 0, 255},
+    .stencil_op = {EVE_KEEP, EVE_KEEP},
+    .blend_func = {EVE_SRC_ALPHA, EVE_ONE_MINUS_SRC_ALPHA},
     .scx = 0,
     .scy = 0,
 };
@@ -113,46 +113,46 @@ void lv_eve_color(lv_color_t color)
 
 void lv_eve_color_mask(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-    if((ct.colorMask[0] != r) ||
-       (ct.colorMask[1] != g) ||
-       (ct.colorMask[2] != b) ||
-       (ct.colorMask[3] != a)) {
+    if((ct.color_mask[0] != r) ||
+       (ct.color_mask[1] != g) ||
+       (ct.color_mask[2] != b) ||
+       (ct.color_mask[3] != a)) {
 
         EVE_cmd_dl_burst(COLOR_MASK(r, g, b, a));
-        ct.colorMask[0] = r;
-        ct.colorMask[1] = g;
-        ct.colorMask[2] = b;
-        ct.colorMask[3] = a;
+        ct.color_mask[0] = r;
+        ct.color_mask[1] = g;
+        ct.color_mask[2] = b;
+        ct.color_mask[3] = a;
     }
 }
 
 void lv_eve_stencil_func(uint8_t func, uint8_t ref, uint8_t mask)
 {
-    if(func != ct.stencilFunc[0] || ref != ct.stencilFunc[1] || mask != ct.stencilFunc[2]) {
+    if(func != ct.stencil_func[0] || ref != ct.stencil_func[1] || mask != ct.stencil_func[2]) {
 
         EVE_cmd_dl_burst(STENCIL_FUNC(func, ref, mask));
-        ct.stencilFunc[0] = func;
-        ct.stencilFunc[1] = ref;
-        ct.stencilFunc[2] = mask;
+        ct.stencil_func[0] = func;
+        ct.stencil_func[1] = ref;
+        ct.stencil_func[2] = mask;
     }
 }
 
 void lv_eve_stencil_op(uint8_t sfail, uint8_t spass)
 {
-    if(sfail != ct.stencilOp[0] || spass != ct.stencilOp[1]) {
+    if(sfail != ct.stencil_op[0] || spass != ct.stencil_op[1]) {
         EVE_cmd_dl_burst(STENCIL_OP(sfail, spass));
-        ct.stencilOp[0] = sfail;
-        ct.stencilOp[1] = spass;
+        ct.stencil_op[0] = sfail;
+        ct.stencil_op[1] = spass;
 
     }
 }
 
 void lv_eve_blend_func(uint8_t src, uint8_t dst)
 {
-    if(src != ct.blendFunc[0] || dst != ct.blendFunc[1]) {
+    if(src != ct.blend_func[0] || dst != ct.blend_func[1]) {
         EVE_cmd_dl_burst(BLEND_FUNC(src, dst));
-        ct.blendFunc[0] = src;
-        ct.blendFunc[1] = dst;
+        ct.blend_func[0] = src;
+        ct.blend_func[1] = dst;
     }
 }
 
@@ -166,17 +166,17 @@ void lv_eve_color_opa(lv_opa_t opa)
 
 void lv_eve_line_width(int32_t width)
 {
-    if(width != ct.lineWidth) {
+    if(width != ct.line_width) {
         EVE_cmd_dl_burst(LINE_WIDTH(width));
-        ct.lineWidth = width;
+        ct.line_width = width;
     }
 }
 
 void lv_eve_point_size(uint16_t radius)
 {
-    if(radius != ct.pointSize) {
+    if(radius != ct.point_size) {
         EVE_cmd_dl_burst(POINT_SIZE(radius * 16));
-        ct.pointSize = radius;
+        ct.point_size = radius;
     }
 }
 

@@ -27,12 +27,12 @@
  **********************/
 
 static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
-static bool is_same_quadrant(int16_t startAngle, int16_t endAngle) ;
+static bool is_same_quadrant(int16_t start_angle, int16_t end_angle) ;
 static void draw_rounded_end(lv_point_t center, int32_t radius, int32_t angle, int32_t width);
 static void lv_draw_eve_mask_angle(const lv_draw_arc_dsc_t * dsc, int32_t vertex_x, int32_t vertex_y,
                                    int32_t start_angle, int32_t end_angle);
 static lv_eve_primitive_t get_mask_direction(int16_t angle);
-static int32_t chord_length(int16_t radius, int16_t angleDegrees);
+static int32_t chord_length(int16_t radius, int16_t angle_degrees);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -48,13 +48,13 @@ void lv_draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv
  **********************/
 
 
-static int32_t chord_length(int16_t radius, int16_t angleDegrees)
+static int32_t chord_length(int16_t radius, int16_t angle_degrees)
 {
-    angleDegrees %= 360;
-    if(angleDegrees < 0) angleDegrees += 360;
-    int32_t sin_value = lv_trigo_sin(angleDegrees / 2);
-    int64_t chordLength = 2 * radius * sin_value / 32768.0;
-    return (int32_t)chordLength ;
+    angle_degrees %= 360;
+    if(angle_degrees < 0) angle_degrees += 360;
+    int32_t sin_value = lv_trigo_sin(angle_degrees / 2);
+    int64_t chord_length = 2 * radius * sin_value / 32768.0;
+    return (int32_t)chord_length ;
 }
 
 
@@ -85,19 +85,19 @@ static void draw_rounded_end(lv_point_t center, int32_t radius, int32_t angle, i
 
 
 
-static bool is_same_quadrant(int16_t startAngle, int16_t endAngle)
+static bool is_same_quadrant(int16_t start_angle, int16_t end_angle)
 {
-    if(startAngle > endAngle) {
-        if((startAngle >= 0 && startAngle < 90) && (endAngle >= 0 && endAngle < 90)) {
+    if(start_angle > end_angle) {
+        if((start_angle >= 0 && start_angle < 90) && (end_angle >= 0 && end_angle < 90)) {
             return true;
         }
-        else if((startAngle >= 90 && startAngle < 180) && (endAngle >= 90 && endAngle < 180)) {
+        else if((start_angle >= 90 && start_angle < 180) && (end_angle >= 90 && end_angle < 180)) {
             return true;
         }
-        else if((startAngle >= 180 && startAngle < 270) && (endAngle >= 180 && endAngle < 270)) {
+        else if((start_angle >= 180 && start_angle < 270) && (end_angle >= 180 && end_angle < 270)) {
             return true;
         }
-        else if((startAngle >= 270 && startAngle < 360) && (endAngle >= 270 && endAngle < 360)) {
+        else if((start_angle >= 270 && start_angle < 360) && (end_angle >= 270 && end_angle < 360)) {
             return true;
         }
         else {

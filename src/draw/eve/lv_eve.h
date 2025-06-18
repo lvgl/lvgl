@@ -53,12 +53,12 @@ typedef struct {
     lv_eve_primitive_t primitive;
     lv_color_t color;
     lv_opa_t opa;
-    int32_t lineWidth;
-    uint16_t pointSize;
-    uint8_t colorMask[4];
-    uint8_t stencilFunc[3];
-    uint8_t stencilOp[2];
-    uint8_t blendFunc[2];
+    int32_t line_width;
+    uint16_t point_size;
+    uint8_t color_mask[4];
+    uint8_t stencil_func[3];
+    uint8_t stencil_op[2];
+    uint8_t blend_func[2];
     uint16_t scx;
     uint16_t scy;
 } lv_eve_drawing_context_t;

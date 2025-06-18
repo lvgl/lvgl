@@ -81,12 +81,12 @@ uint32_t lv_draw_eve_next_free_ramg_block(lv_draw_eve_ram_g_datatype_t data);
 /* This function checks if the image has already been loaded into ram_g. If it hasn't been loaded, it returns 'NOT FOUND',
  * otherwise it returns the ID of the block where it is located."
  */
-uint32_t lv_draw_eve_find_ramg_image(const uint8_t * imageSource);
+uint32_t lv_draw_eve_find_ramg_image(const uint8_t * image_source);
 
 /* "This function checks if the font has already been loaded into ram_g. If it hasn't been loaded, it returns 'NOT FOUND',
  * otherwise it returns the ID of the block where it is located."
  */
-uint32_t lv_draw_eve_find_ramg_font(const uint8_t * fontSource);
+uint32_t lv_draw_eve_find_ramg_font(const uint8_t * font_source);
 
 uint32_t lv_draw_eve_get_bitmap_addr(uint8_t id);
 

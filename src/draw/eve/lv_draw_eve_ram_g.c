@@ -31,7 +31,7 @@
  *  This structure is designed to speed up the search process, eliminating the need to traverse the entire array of blocks.
  */
 static lv_draw_eve_ram_g_mem_block_t blocks[MAX_BLOCKS];
-static uint32_t ramGptr = EVE_RAM_G;
+static uint32_t ram_gptr = EVE_RAM_G;
 
 
 /**********************
@@ -46,14 +46,14 @@ uint32_t lv_draw_eve_get_bitmap_addr(uint8_t id)
 
 void lv_draw_eve_update_ramg_ptr(uint32_t size)
 {
-    ramGptr += size;
+    ram_gptr += size;
     uint32_t alignment = 4;
-    ramGptr = (ramGptr + alignment - 1) & ~(alignment - 1); /*RamG Aligned*/
+    ram_gptr = (ram_gptr + alignment - 1) & ~(alignment - 1); /*RamG Aligned*/
 }
 
 uint32_t lv_draw_eve_get_ramg_ptr(void)
 {
-    return ramGptr;
+    return ram_gptr;
 
 }
 
@@ -129,7 +129,7 @@ bool lv_draw_eve_update_ramg_block(uint8_t id, uint8_t * src, uint32_t addr, uin
     blocks[id].id = id;
     lv_draw_eve_update_ramg_ptr(sz);
 
-    if(ramGptr > EVE_RAM_G_SIZE) {
+    if(ram_gptr > EVE_RAM_G_SIZE) {
         return true;
     }
     else {

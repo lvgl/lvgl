@@ -47,9 +47,9 @@
 
 static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
-static void bitmap_to_evenWidth(uint32_t addr, const uint8_t * img_in, uint8_t * img_out, uint16_t width,
+static void bitmap_to_even_width(uint32_t addr, const uint8_t * img_in, uint8_t * img_out, uint16_t width,
                                 uint16_t height);
-static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eveId, uint32_t ad);
+static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eve_id, uint32_t ad);
 
 /**********************
  *  STATIC VARIABLES
@@ -120,10 +120,10 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
 
     const uint8_t * font_src = (const uint8_t *)font_in_use; /* font location pointer */
 
-    uint32_t font_eveId;
-    font_eveId = lv_draw_eve_find_ramg_font(font_src);
+    uint32_t font_eve_id;
+    font_eve_id = lv_draw_eve_find_ramg_font(font_src);
 
-    if(font_eveId == NOT_FOUND_BLOCK) { /* If the font is not yet loaded in ramG, load it */
+    if(font_eve_id == NOT_FOUND_BLOCK) { /* If the font is not yet loaded in ramG, load it */
         uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_FONT);
         if(free_ramg_block == NOT_FOUND_BLOCK) {
             LV_LOG_WARN("NOT_FOUND_BLOCK");
@@ -135,7 +135,7 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
                                                        start_addr_ramg); /* load font to ramG (The block Id is updated in this function) */
 
         lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)font_src, start_addr_ramg, total_font_size);
-        font_eveId = free_ramg_block;
+        font_eve_id = free_ramg_block;
 
     }
 
@@ -143,7 +143,7 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     lv_eve_color_opa(glyph_draw_dsc->opa);
     lv_eve_color(glyph_draw_dsc->color);
 
-    EVE_cmd_dl_burst(BITMAP_SOURCE(addr_font[font_eveId][gid_index]));
+    EVE_cmd_dl_burst(BITMAP_SOURCE(addr_font[font_eve_id][gid_index]));
 
     EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, g_box_w, g_box_h));
     EVE_cmd_dl_burst(BITMAP_LAYOUT(bpp_eve, g_box_w / 2, g_box_h));
@@ -156,7 +156,7 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
  *   STATIC FUNCTIONS
  **********************/
 
-static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eveId, uint32_t ad)
+static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eve_id, uint32_t ad)
 {
 
     EVE_end_cmd_burst();
@@ -191,11 +191,11 @@ static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eveId
 
             if(font_dsc->glyph_dsc[id].box_w != 0 && g_box_h != 0) {
 
-                addr_font[font_eveId][id] = addr; /*Store the address of the glyph in the address table*/
+                addr_font[font_eve_id][id] = addr; /*Store the address of the glyph in the address table*/
 
                 uint32_t buffer_size;/* = (g_box_w * g_box_h) / 2; Calculate buffer size based on glyph dimensions */
                 if(g_box_w % 2 != 0) {
-                    bitmap_to_evenWidth(0, map_p, temp_buff, g_box_w, g_box_h); /*Adjust bitmap width to even width if necessary*/
+                    bitmap_to_even_width(0, map_p, temp_buff, g_box_w, g_box_h); /*Adjust bitmap width to even width if necessary*/
                     buffer_size = ((g_box_w + 1) * g_box_h) / 2;
 
                     EVE_memWrite_sram_buffer(addr, temp_buff, buffer_size);
@@ -217,7 +217,7 @@ static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eveId
 
 }
 
-static void bitmap_to_evenWidth(uint32_t addr, const uint8_t * img_in, uint8_t * img_out, uint16_t width,
+static void bitmap_to_even_width(uint32_t addr, const uint8_t * img_in, uint8_t * img_out, uint16_t width,
                                 uint16_t height)
 {
     uint32_t addr_it = addr;
