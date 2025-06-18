@@ -109,6 +109,7 @@ int32_t lv_xml_atoi_split(const char ** str, char delimiter)
     }
 
     result = result * sign;
+    while(*s != delimiter && *s != '\0') s++; /*Make sure to find the delimiter*/
 
     if(*s != '\0') s++; /*Skip the delimiter*/
     *str = s;
@@ -172,6 +173,7 @@ float lv_xml_atof_split(const char ** str, char delimiter)
     }
 
     result = result * sign;
+    while(*s != delimiter && *s != '\0') s++; /*Make sure to find the delimiter*/
 
     if(*s != '\0') s++; /*Skip the delimiter*/
     *str = s;
