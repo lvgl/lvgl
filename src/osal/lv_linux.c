@@ -31,7 +31,7 @@
 #define last_self_ticks LV_GLOBAL_DEFAULT()->linux_last_self_proc_time_ticks
 #define last_system_total_ticks_stat LV_GLOBAL_DEFAULT()->linux_last_system_total_ticks_stat
 
-#define LV_SELF_PROC_STAT_BUFFER_SIZE 1024
+#define LV_SELF_PROC_STAT_BUFFER_SIZE 512
 /**********************
  *      TYPEDEFS
  **********************/
@@ -85,7 +85,7 @@ uint32_t lv_os_get_idle_percent(void)
     return (proc_stat.fields.idle * 100) / total;
 }
 
-uint32_t lv_os_get_self_idle_percent(void)
+uint32_t lv_os_get_proc_idle_percent(void)
 {
     uint64_t self_current_time_ticks = 0;
     lv_proc_stat_t stat_current_system_total_ticks;
@@ -94,7 +94,7 @@ uint32_t lv_os_get_self_idle_percent(void)
     FILE * self = fopen(LV_UPTIME_MONITOR_SELF_FILE, "r");
     if(!self) {
         LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_SELF_FILE);
-        return LV_RESULT_INVALID;
+        return UINT32_MAX;
     }
 
     char self_stat_buffer[LV_SELF_PROC_STAT_BUFFER_SIZE];
