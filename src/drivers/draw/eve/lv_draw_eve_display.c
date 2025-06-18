@@ -10,10 +10,13 @@
 #include "lv_draw_eve_display.h"
 #if LV_USE_DRAW_EVE
 
-#include "../../draw/eve/lv_eve.h"
-#include "../../draw/eve/lv_draw_eve.h"
-#include "../../display/lv_display_private.h"
-#include "../../draw/lv_draw_buf.h"
+#include "../../../draw/eve/lv_eve.h"
+#include "../../../draw/eve/lv_draw_eve.h"
+#include "../../../display/lv_display_private.h"
+#include "../../../draw/lv_draw_buf.h"
+
+#include "../../../libs/FT800-FT813/EVE_commands.h"
+
 
 /*********************
  *      DEFINES
@@ -87,6 +90,42 @@ lv_indev_t * lv_draw_eve_touch_create(void)
     lv_indev_set_read_cb(indev, touch_read_cb);
 
     return indev;
+}
+
+uint8_t lv_draw_eve_memread8(lv_display_t * disp, uint32_t address)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command without a draw_eve display");
+    return EVE_memRead8(address);
+}
+
+uint16_t lv_draw_eve_memread16(lv_display_t * disp, uint32_t address)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
+    return EVE_memRead16(address);
+}
+
+uint32_t lv_draw_eve_memread32(lv_display_t * disp, uint32_t address)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
+    return EVE_memRead32(address);
+}
+
+void lv_draw_eve_memwrite8(lv_display_t * disp, uint32_t address, uint8_t data)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
+    EVE_memWrite8(address, data);
+}
+
+void lv_draw_eve_memwrite16(lv_display_t * disp, uint32_t address, uint16_t data)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
+    EVE_memWrite16(address, data);
+}
+
+void lv_draw_eve_memwrite32(lv_display_t * disp, uint32_t address, uint32_t data)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to use an LVGL EVE command with a non-draw_eve display");
+    EVE_memWrite32(address, data);
 }
 
 /**********************
