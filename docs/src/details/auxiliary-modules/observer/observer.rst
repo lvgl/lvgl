@@ -114,7 +114,7 @@ To initialize a Subject use ``lv_subject_init_<type>(&subject, params, init_valu
 The following initialization functions exist, one for each of the Subject types:
 
 :Integer: void :cpp:expr:`lv_subject_init_int(subject, int_value)`
-:Float:   void :cpp:expr:`lv_subject_init_float(subject, int_value)`
+:Float:   void :cpp:expr:`lv_subject_init_float(subject, float_value)`
 :String:  void :cpp:expr:`lv_subject_init_string(subject, buf, prev_buf, buf_size, initial_string)`
 :Pointer: void :cpp:expr:`lv_subject_init_pointer(subject, ptr)`
 :Color:   void :cpp:expr:`lv_subject_init_color(subject, color)`
@@ -502,7 +502,7 @@ If ``NULL`` is passed for the ``format_string`` argument:
 
 :string or pointer Subject:  Updates expect the pointer to point to a NUL-terminated string.
 :integer Subject:            The Label will simply display the number. Equivalent to "%d".
-:integer Subject:            The Label will display the value with "%0.1f" format string.
+:float Subject:            The Label will display the value with "%0.1f" format string.
 
 **Example:**  "%d |deg|\C"
 
