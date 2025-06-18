@@ -28,6 +28,5 @@ XML - Declarative UI
     subjects
     animations
     translation
-    license
-
+    test
     license
