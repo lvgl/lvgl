@@ -58,10 +58,6 @@ void lv_example_scale_12(void)
 
     lv_obj_set_size(scale, 200, 200);
     lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
-    lv_obj_set_style_bg_opa(scale, LV_OPA_COVER, 0);
-    lv_obj_set_style_bg_color(scale, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
-    lv_obj_set_style_radius(scale, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_clip_corner(scale, true, 0);
     lv_obj_set_align(scale, LV_ALIGN_CENTER);
 
     lv_scale_set_total_tick_count(scale, 61);
