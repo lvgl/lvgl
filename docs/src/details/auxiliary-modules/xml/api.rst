@@ -21,7 +21,7 @@ Overview
 While Widgets can have complex ``set``/``get`` APIs, Components are very simple.
 
 When their XML is converted to a C file, only a ``create`` function is generated,
-where all the ``<prop>``s are arguments. For example:
+where all the ``<prop>``\ s are arguments. For example:
 
 .. code-block:: xml
 
@@ -43,7 +43,7 @@ used to modify any widget in the component, but no dedicated API functions are g
 Referencing properties
 ----------------------
 
-``<prop>``s are simply forwarded to widget or component APIs.
+``<prop>``\ s are simply forwarded to widget or component APIs.
 For example, if a component has ``<prop name="button_label" type="string"/>``,
 it can be used in a label as ``<lv_label text="$button_label"/>``.
 
@@ -109,7 +109,7 @@ Parameters
 ----------
 
 Some properties take multiple parameters. For example:
-:cpp:expr:`lv_label_set_bind_text(label, subject, "%d °C");`
+:cpp:expr:`lv_label_set_bind_text(label, subject, "%d °C")`
 
 It's described as:
 
@@ -168,15 +168,15 @@ Enum values are ignored in export; the names are used and resolved by the compil
 XML parsers must handle mapping enum names to C enums.
 
 <element>
---------
+---------
 
 Also exclusive to Widgets, elements define sub-widgets or internal structures
 (e.g., chart series, dropdown list, tab views).
 
 They support ``<arg>`` and ``<prop>``:
 
-- ``<arg>``s are required and used for creation.
-- ``<prop>``s are optional and mapped to setters.
+- ``<arg>``\ s are required and used for creation.
+- ``<prop>``\ s are optional and mapped to setters.
 
 Elements are referenced as ``<widget-element>`` in views.
 
@@ -290,7 +290,7 @@ Generates:
     void my_widget_set_item_color(lv_obj_t * parent, int32_t index, lv_color_t color);
 
 access="custom"
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Used to describe any custom API functions with a custom name.
 "custom" elements can have only arguments and no `type` so they are pure setters.
