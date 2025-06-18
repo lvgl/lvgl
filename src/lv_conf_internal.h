@@ -3206,7 +3206,7 @@
             #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
         #endif
     #endif
-    /** 1: Enable usage of lv_os_get_proc_idle_percent which gets the applications idle percentage.*/
+    /** 1: Enable usage of lv_os_get_proc_idle_percent.*/
     #ifndef LV_SYSMON_PROC_IDLE_AVAILABLE
         #ifdef CONFIG_LV_SYSMON_PROC_IDLE_AVAILABLE
             #define LV_SYSMON_PROC_IDLE_AVAILABLE CONFIG_LV_SYSMON_PROC_IDLE_AVAILABLE
