@@ -16,6 +16,8 @@ extern "C" {
 
 #include "../../../../lv_conf_internal.h"
 
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
+
 #ifdef LV_DRAW_SW_NEON_CUSTOM_INCLUDE
 #include LV_DRAW_SW_NEON_CUSTOM_INCLUDE
 #endif
@@ -1293,6 +1295,8 @@ static inline lv_result_t lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_neon
 /**********************
  *      MACROS
  **********************/
+
+#endif /* #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON */
 
 #ifdef __cplusplus
 } /*extern "C"*/
