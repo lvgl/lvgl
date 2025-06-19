@@ -660,6 +660,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     }
 
     if(lv_streq(name, "widget")) state->scope.is_widget = 1;
+    else if(lv_streq(name, "screen")) state->scope.is_screen = 1;
 
     /* Process elements based on current context */
     switch(state->section) {

@@ -506,6 +506,10 @@ void lv_deinit(void)
     lv_objid_builtin_destroy();
 #endif
 
+#if LV_USE_XML
+    lv_xml_test_unregister();
+#endif
+
     lv_mem_deinit();
 
     lv_initialized = false;

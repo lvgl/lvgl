@@ -103,6 +103,11 @@ void lv_tick_set_cb(lv_tick_get_cb_t cb)
     state.tick_get_cb = cb;
 }
 
+lv_tick_get_cb_t lv_tick_get_cb(void)
+{
+    return state.tick_get_cb;
+}
+
 void lv_delay_set_cb(lv_delay_cb_t cb)
 {
     state.delay_cb = cb;
