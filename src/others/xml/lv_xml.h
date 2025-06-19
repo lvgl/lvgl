@@ -16,14 +16,11 @@ extern "C" {
 #include "../../misc/lv_types.h"
 
 #if LV_USE_XML
-<<<<<<< HEAD
-#include "lv_xml_test.h"
-=======
 #include "../../misc/lv_event.h"
 #include "../../others/observer/lv_observer.h"
+#include "lv_xml_test.h"
 #include "lv_xml_translation.h"
 #include "lv_xml_component.h"
->>>>>>> 8040ebf9d (feat(xml): add translation support)
 
 /*********************
  *      DEFINES

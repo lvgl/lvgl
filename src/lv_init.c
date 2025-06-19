@@ -513,6 +513,7 @@ void lv_deinit(void)
 
 #if LV_USE_XML
     lv_xml_test_unregister();
+#endif
 
 #if LV_USE_TRANSLATION
     lv_translation_deinit();

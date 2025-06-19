@@ -1,5 +1,5 @@
 /**
- * @file lv_translations.c
+ * @file lv_translation.c
  *
  */
 
