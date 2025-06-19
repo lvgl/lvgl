@@ -24,8 +24,8 @@ the rendered image on the display. This callback function is the main interface
 between LVGL and the display. Most of the porting-related work is focused on
 writing such a callback in an effective way.
 
-This chapter will show the basics to give an idea about how LVGL works and can be used.
-For more details about each feature visit their dedicated documentation page.
+This chapter will show the basics to give an idea about how LVGL works and how it can be used.
+For more details about each feature visit that feature's dedicated documentation page.
 
 .. _basic_data_flow:
 
@@ -47,7 +47,7 @@ Integration example
 -------------------
 
 This is just a brief example of how to add LVGL to a new project. For more details
-check out :ref:`add LVGL to your project <adding_lvgl_to_your_project>`.
+check out :ref:`adding_lvgl_to_your_project`.
 
 .. code-block:: c
 
