@@ -5,7 +5,7 @@ Example
 
 <widget>
 	<api>
-		<enumdef name="lv_buttonamtrix_ctrl" multi="true" help="control flags for the buttons">
+		<enumdef name="lv_buttonmatrix_ctrl" multi="true" help="control flags for the buttons">
 			<enum name="none"      help="No special control"/>
 			<enum name="width_1"   help="Relative width is 1 in its row"/>
 			<enum name="width_2"   help="Relative width is 2 in its row"/>

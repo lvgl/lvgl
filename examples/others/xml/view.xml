@@ -7,30 +7,16 @@
 	<styles>
 		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
 		<style name="btn_pr_style" bg_opa="255"/>
-        <style name="red_border" border_width="2" border_side="full" border_color="0xff0000"></style>
 	</styles>
 
-    <subjects>
-        <int name="subject1" value="10"/>
-    </subjects>
-
-
-	<view extends="lv_obj" flex_flow="column" name="main" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label bind_text="subject1" styles="btn_style:disabled red_border:checked">
-            <bind_flag_if_gt subject="subject1" flag="hidden" ref_value="60"/>
-            <bind_state_if_lt subject="subject1" state="checked" ref_value="40"/>
-            <bind_state_if_lt subject="subject1" state="disabled" ref_value="20"/>
-            <style name="btn_style" selector="disabled"/>
-            <style name="red_border" selector="knob checked"/>
-        </lv_label>
-		<lv_slider bind_value="subject1" />
-        <my_card title="Card 1" name="card1"
-				 y="100"
-                 styles="red_border"
+	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
+		<lv_label text-translated="tiger"/>
+		<my_card title="Card 1" name="card1"
+				 y="30"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 
-		<my_card y="185"
+		<my_card y="125"
 				 bg_color="0xffaaaa"
 				 action="Apply"
 				 btn_rel_style="btn_style"

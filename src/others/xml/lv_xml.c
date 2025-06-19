@@ -10,13 +10,14 @@
 #include "lv_xml.h"
 #if LV_USE_XML
 
+#include "lv_xml.h"
 #include "lv_xml_base_types.h"
 #include "lv_xml_parser.h"
 #include "lv_xml_component.h"
 #include "lv_xml_component_private.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_style.h"
-#include "lv_xml.h"
+#include "lv_xml_translation.h"
 #include "lv_xml_utils.h"
 #include "lv_xml_private.h"
 #include "parsers/lv_xml_obj_parser.h"
