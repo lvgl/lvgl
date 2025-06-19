@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EX_FILE_EXPLORER_H
-#define LV_EX_FILE_EXPLORER_H
+#ifndef LV_EXAMPLE_FILE_EXPLORER_H
+#define LV_EXAMPLE_FILE_EXPLORER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ void lv_example_file_explorer_3(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_FILE_EXPLORER_H*/
+#endif /*LV_EXAMPLE_FILE_EXPLORER_H*/

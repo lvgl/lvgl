@@ -1,5 +1,5 @@
 /**
- * @file vg_lite_utils.c
+ * @file lv_vg_lite_utils.c
  *
  */
 

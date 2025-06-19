@@ -1,6 +1,6 @@
 
 /**
- * @file lv_wl_display.h
+ * @file lv_wl_window.h
  *
  */
 
