@@ -26,7 +26,7 @@ Example
 		    <enum name="adv_hittest"     help="Allow performing more accurate hit (click) test. E.g. consider rounded corners."/>
 		    <enum name="ignore_layout"   help="Make the object not positioned by the layouts"/>
 		    <enum name="floating"        help="Do not scroll the object when the parent scrolls and ignore layout"/>
-		    <enum name="send_draw_task_evenTS" help="Send `LV_EVENT_DRAW_TASK_ADDED` events"/>
+		    <enum name="send_draw_task_events" help="Send `LV_EVENT_DRAW_TASK_ADDED` events"/>
 		    <enum name="overflow_visible" help="Do not clip the children to the parent's ext draw size"/>
 		    <enum name="flex_in_new_track" help="Start a new flex track on this item"/>
 		    <enum name="layout_1"        help="Custom flag, free to use by layouts"/>
@@ -61,7 +61,8 @@ Example
         <element name="event_cb" access="add">
             <arg name="name" type="string"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
-            <arg name="cb" type="event_cb"/>
+            <arg name="callback" type="event_cb"/>
+            <arg name="user_data" type="string" default="NULL"/>
         </element>
 
         <element name="screen_load_event" access="add">
