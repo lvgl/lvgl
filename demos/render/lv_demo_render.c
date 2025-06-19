@@ -10,6 +10,7 @@
 
 #if LV_USE_DEMO_RENDER
 
+#include <stdio.h>
 #include "../../lvgl_private.h"
 
 /*********************
@@ -327,7 +328,6 @@ static lv_obj_t * image_obj_create(lv_obj_t * parent, int32_t col, int32_t row, 
     return obj;
 
 }
-#include <stdio.h>
 
 static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
 {
