@@ -3243,6 +3243,25 @@
             #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
         #endif
     #endif
+    /** 1: Enable usage of lv_os_get_proc_idle_percent.*/
+    #ifndef LV_SYSMON_PROC_IDLE_AVAILABLE
+        #ifdef CONFIG_LV_SYSMON_PROC_IDLE_AVAILABLE
+            #define LV_SYSMON_PROC_IDLE_AVAILABLE CONFIG_LV_SYSMON_PROC_IDLE_AVAILABLE
+        #else
+            #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
+        #endif
+    #endif
+    #if LV_SYSMON_PROC_IDLE_AVAILABLE
+        /** Get the applications idle percentage.
+         * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
+        #ifndef LV_SYSMON_GET_PROC_IDLE
+            #ifdef CONFIG_LV_SYSMON_GET_PROC_IDLE
+                #define LV_SYSMON_GET_PROC_IDLE CONFIG_LV_SYSMON_GET_PROC_IDLE
+            #else
+                #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
+            #endif
+        #endif
+    #endif 
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
