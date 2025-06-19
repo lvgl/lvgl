@@ -627,6 +627,9 @@ static void refr_invalid_areas(void)
     if(disp_refr->inv_p == 0) return;
     LV_PROFILER_REFR_BEGIN;
 
+    /*Notify the display driven rendering has started*/
+    lv_display_send_event(disp_refr, LV_EVENT_RENDER_START, NULL);
+
     /*Find the last area which will be drawn*/
     int32_t i;
     int32_t last_i = 0;
@@ -636,9 +639,6 @@ static void refr_invalid_areas(void)
             break;
         }
     }
-
-    /*Notify the display driven rendering has started*/
-    lv_display_send_event(disp_refr, LV_EVENT_RENDER_START, NULL);
 
     disp_refr->last_area = 0;
     disp_refr->last_part = 0;
