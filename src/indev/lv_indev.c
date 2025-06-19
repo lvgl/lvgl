@@ -683,6 +683,13 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
     return res;
 }
 
+void lv_indev_nav_map(lv_indev_t * indev, uint8_t map)
+{
+    LV_ASSERT_NULL(indev);
+
+    indev->nav_map = map;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -755,6 +762,24 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_point.y = i->pointer.act_point.y;
 }
 
+static inline bool indev_keypad_key_is_next(lv_indev_t * indev, uint32_t key)
+{
+    return key == LV_KEY_NEXT ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_HOR) && (key == LV_KEY_RIGHT)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_HOR_REV) && (key == LV_KEY_LEFT)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_VER) && (key == LV_KEY_UP)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_VER_REV) && (key == LV_KEY_DOWN));
+}
+
+static inline bool indev_keypad_key_is_prev(lv_indev_t * indev, uint32_t key)
+{
+    return key == LV_KEY_PREV ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_HOR) && (key == LV_KEY_LEFT)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_HOR_REV) && (key == LV_KEY_RIGHT)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_VER) && (key == LV_KEY_DOWN)) ||
+           ((indev->nav_map & LV_INDEV_NAV_MAP_VER_REV) && (key == LV_KEY_UP));
+}
+
 /**
  * Process a new point from LV_INDEV_TYPE_KEYPAD input device
  * @param i pointer to an input device
@@ -795,13 +820,13 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->pr_timestamp = lv_tick_get();
 
         /*Move the focus on NEXT*/
-        if(data->key == LV_KEY_NEXT) {
+        if(indev_keypad_key_is_next(i, data->key)) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(indev_reset_check(i)) return;
         }
         /*Move the focus on PREV*/
-        else if(data->key == LV_KEY_PREV) {
+        else if(indev_keypad_key_is_prev(i, data->key)) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_prev(g);
             if(indev_reset_check(i)) return;
