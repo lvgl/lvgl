@@ -137,6 +137,7 @@ void lv_example_scale_8(void);
 void lv_example_scale_9(void);
 void lv_example_scale_10(void);
 void lv_example_scale_11(void);
+void lv_example_scale_12(void);
 
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);
