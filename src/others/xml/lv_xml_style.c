@@ -59,6 +59,7 @@ lv_state_t lv_xml_style_state_to_enum(const char * txt)
     else if(lv_streq("focus_key", txt)) return LV_STATE_FOCUS_KEY;
     else if(lv_streq("edited", txt)) return LV_STATE_EDITED;
     else if(lv_streq("hovered", txt)) return LV_STATE_HOVERED;
+    else if(lv_streq("disabled", txt)) return LV_STATE_DISABLED;
     else if(lv_streq("user_1", txt)) return LV_STATE_USER_1;
     else if(lv_streq("user_2", txt)) return LV_STATE_USER_2;
     else if(lv_streq("user_3", txt)) return LV_STATE_USER_3;
