@@ -98,7 +98,7 @@ debug(f'ignore dirs [{ignored_top_dirs}]')
 
 ok = True
 
-for root, dirs, basenames in list(os.walk(project_dir)):
+for root, dirs, basenames in os.walk(project_dir):
     if ignore_dir(root):
         continue
 
