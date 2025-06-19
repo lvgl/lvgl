@@ -1,6 +1,21 @@
 # Tests for LVGL
 
-The tests in the folder can be run locally and automatically by GitHub CI.
+## Test types available
+
+- **Unit Tests**: Standard functional tests in `src/test_cases/` with screenshot comparison capabilities
+- **Performance Tests**: ARM-emulated benchmarks in `src/test_cases_perf/` running on QEMU/SO3 environment
+- **Emulated Benchmarks**: Automated `lv_demo_benchmark` runs in ARM emulation to prevent performance regressions
+
+All of the tests are automatically ran in LVGL's CI.
+
+## Quick start
+
+- **Local Testing**: Run `./tests/main.py test` (after `scripts/install-prerequisites.sh`)
+- **Docker Testing**: Build with `docker build . -f tests/Dockerfile -t lvgl_test_env` then run
+- **Performance Testing**: Use `./tests/perf.py test` (requires Docker + Linux)
+- **Benchmark Testing**: Use `./tests/benchmark_emu.py run` for emulated performance benchmarks (requires Docker + Linux)
+
+---
 
 ## Running locally
 
