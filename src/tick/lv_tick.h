@@ -55,6 +55,14 @@ uint32_t lv_tick_get(void);
 uint32_t lv_tick_elaps(uint32_t prev_tick);
 
 /**
+ * Get the elapsed milliseconds between two time stamps
+ * @param tick          a time stamp
+ * @param prev_tick     a time stamp before `tick`
+ * @return              the elapsed milliseconds between `prev_tick` and `tick`
+ */
+uint32_t lv_tick_diff(uint32_t tick, uint32_t prev_tick);
+
+/**
  * Delay for the given milliseconds.
  * By default it's a blocking delay, but with `lv_delay_set_cb()`
  * a custom delay function can be set too
