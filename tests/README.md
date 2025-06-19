@@ -107,36 +107,31 @@ For full usage options, run:
 
 You can also run this script by passing a performance test config to the `main.py` script. The performance tests configs can be found inside the [`perf.py`](./perf.py) file
 
-## Emulated performance tests
+## Emulated benchmarks
 
 In addition to unit and performance tests, LVGL automatically runs the `lv_demo_benchmark` inside the same ARM emulated
 environment mentionned in the previous section through CI to prevent unintentional slowdowns.
-You can also run them locally as described below.
 
-### ARM32 emulated environment
+### Requirements
 
-1. Build the config
+- **Docker**
+- **Linux host machine** (WSL *may* work but is untested)
 
-```bash
-# From the LVGL repository
-cp lv_conf_template.h lv_conf_perf32b.h
-python scripts/generate_lv_conf.py \
-   --template lv_conf_template.h \
-   --config lv_conf_perf32b.h \
-   --defaults configs/ci/perf/lv_conf_perf32b.defaults
+To run the these benchmarks in the emulated setup described above, you can use the provided python script:
+
+```sh
+./benchmark_emu.py [-h] [--config {perf32b,perf64b}] [--pull] [--clean] [--auto-clean]
+                        [{generate,run} ...]
 ```
 
-2. Run the benchmark demo
+The following command runs all available configurations:
 
-```bash
-docker run -t --privileged \
-   --name lv_perf_test_32b \
-   -v /dev:/dev \
-   -v $(pwd)/lv_conf_perf32b.h:/so3/usr/lib/lv_conf.h \
-   -v $(pwd):/so3/usr/lib/lvgl \
-   ghcr.io/smartobjectoriented/so3-lvperf32b:main
+```sh
+./benchmark_emu.py run 
 ```
 
-### ARM64 emulated environment
+You can also request a specific configuration:
 
-To test in an ARM64 environment, replace 32b with 64b in the steps above.
+```sh
+./benchmark_emu.py --config perf32b run 
+```
