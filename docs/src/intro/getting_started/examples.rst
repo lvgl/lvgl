@@ -8,6 +8,6 @@ the Widget Tree needed to make LVGL render the examples shown.  Each example ass
 a LVGL has undergone normal initialization, meaning that a ``lv_display_t`` object
 was created and therefore has an :ref:`active_screen`.
 
-.. include:: ../examples/get_started/index.rst
+.. include:: ../../examples/get_started/index.rst
 
 
