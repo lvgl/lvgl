@@ -54,7 +54,7 @@ lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag
  * @param flags         default configuration settings (mirror, RGB ordering, etc.)
  * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
  * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
- * @param user_data     user data to be passed to the send_cmd and send_color functions
+ * @param user_data     user data to be set for the display. It can be accessed in send_cmd and send_color functions with `lv_display_get_user_data`
  * @return              pointer to the created display
  */
 lv_display_t * lv_ili9341_create_with_user_data(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
