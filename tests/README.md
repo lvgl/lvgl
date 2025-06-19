@@ -46,7 +46,7 @@ This ensures you are testing in a consistent environment with the same dependenc
 
 ## Running automatically
 
-GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `releasev8.*` branches.
+GitHub's CI automatically runs these tests on pushes and pull requests to `master` and `release/v8.*` branches.
 
 ## Directory structure
 - `src` Source files of the tests
