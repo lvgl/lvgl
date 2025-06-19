@@ -41,8 +41,8 @@ value is interpreted in a range (minimum and maximum values) which can
 be modified with :cpp:expr:`lv_arc_set_range(arc, min, max)`. The default range
 is 0..100.
 
-The indicator Arc is drawn on the main part's Arc. This if the value is
-set to maximum the indicator Arc will cover the entire "background" Arc.
+The indicator Arc is drawn on the main part's Arc. Thus, if the value is
+set to maximum, the indicator Arc will cover the entire "background" Arc.
 To set the start and end angle of the background Arc use any of these functions:
 
 - :cpp:expr:`lv_arc_set_bg_start_angle(arc, angle)`

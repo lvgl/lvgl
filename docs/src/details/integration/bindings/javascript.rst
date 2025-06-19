@@ -15,11 +15,11 @@ experience to users.
 Features
 ********
 
-- Support all lvgl built-in components
-- Fully support lvgl flex and grid style
-- support most lvgl style, just write like html5 css
-- support dynamic load image
-- Fully support lvgl animation
+- Support all LVGL built-in components
+- Fully support LVGL flex and grid styles
+- Support most LVGL styles, just write like HTML5 CSS
+- Support dynamic image loading
+- Fully support LVGL animations
 
 
 Demo

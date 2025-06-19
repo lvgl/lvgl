@@ -9,7 +9,7 @@ Overview
 
 The Lottie Widget is capable of parsing, rasterizing, and playing `Lottie animations <https://lottiefiles.com>`__.
 
-The Lottie animations are vector based animation. Think of it as the modern combination of SVG and GIF.
+The Lottie animations are vector-based animations. Think of them as the modern combination of SVG and GIF.
 
 The animations can be downloaded from various sources, such as `https://lottiefiles.com/ <https://lottiefiles.com/>`__
 or you can create your own animations using, for example, Adobe After Effects.
@@ -34,7 +34,7 @@ Dependencies
 
 The Lottie Widget uses the `ThorVG <https://github.com/thorvg/thorvg>`__ library which is `integrated into LVGL <https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg>`__.
 In order to use Lottie animations :c:macro:`LV_USE_THORVG_INTERNAL` (to use the built-in ThorVG) or
-:c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to enabled in ``lv_conf.h``. For vector graphics in general
+:c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to be enabled in ``lv_conf.h``. For vector graphics in general
 :c:macro:`LV_USE_VECTOR_GRAPHIC` also needs to be enabled.
 
 As ThorVG is written in C++, when using :c:macro:`LV_USE_THORVG_INTERNAL` be sure that you

@@ -14,7 +14,7 @@ The Table Widget is very lightweight because only the text strings are stored.
 No real Widgets are created for cells --- they are just drawn on the fly.
 
 The Table is added to the default group (if one is set).
-Table is an editable Widget, allow selecting a cell with encoder and keyboard
+Table is an editable Widget, allowing selection of a cell with encoder and keyboard
 navigation as well.
 
 

@@ -12,7 +12,7 @@ It has a growing set of software libraries that can be used
 across various applications and industry sectors such as
 Industrial IoT, wearables, machine learning and more.
 Zephyr is built with an emphasis on broad chipset support,
-security, dependability, longterm support releases and a
+security, dependability, long-term support releases and a
 growing open source ecosystem.
 
 Highlights of Zephyr
@@ -36,7 +36,7 @@ Highlights of Zephyr
 How to run LVGL on Zephyr?
 --------------------------
 
-To setup your development environment refer to the
+To set up your development environment refer to the
 `getting started guide <https://docs.zephyrproject.org/latest/develop/getting_started/index.html>`__.
 
 After you completed the setup above you can check out all of the `provided samples <https://docs.zephyrproject.org/latest/samples/>`__ for various boards.
@@ -143,7 +143,7 @@ Example with the encoder device to assign a :code:`lv_group_t`:
 Kconfig
 ~~~~~~~~
 
-Aside from enabling the shell you can also use Kconfig to finetune
+Aside from enabling the shell you can also use Kconfig to fine-tune
 the footprint of your application.
 
 .. code-block::
@@ -188,7 +188,7 @@ Where can I find more information?
 ----------------------------------
 
 -  Zephyr Documentation: `Zephyr Documentation <https://docs.zephyrproject.org/latest/index.html>`__
--  Zephyr mailing list: `Zepyhr Mailing
+-  Zephyr mailing list: `Zephyr Mailing
    List <https://lists.zephyrproject.org/g/main>`__
--  Zephyr Discord server: `Zepyhr Discord
+-  Zephyr Discord server: `Zephyr Discord
    server <https://chat.zephyrproject.org/>`__

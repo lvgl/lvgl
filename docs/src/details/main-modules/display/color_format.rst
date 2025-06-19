@@ -15,8 +15,7 @@ The default color format of the display is set according to :c:macro:`LV_COLOR_D
 
 The ``color_format`` can be changed with
 :cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
-Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888` can be
-used as a well.
+Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888`, other formats can be used as well.
 
 It's very important that draw buffer(s) should be large enough for the
 selected color format.
@@ -31,7 +30,7 @@ Swapping Endian-ness
 In case of RGB565 color format it might be required to swap the 2 bytes
 because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
 
-The ideal solution is configure the hardware to handle the 16 bit data with different byte order,
+The ideal solution is to configure the hardware to handle the 16-bit data with a different byte order,
 however if this is not possible :cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)`
 can be called in the :ref:`flush_callback` to swap the bytes.
 

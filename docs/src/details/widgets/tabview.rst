@@ -16,7 +16,7 @@ View is built from other Widgets:
 - Container for the tabs: :ref:`base_widget`
 - Content of the tabs: :ref:`base_widget`
 
-The tab buttons can be positioned on the top, bottom, left and right
+The tab buttons can be positioned on the top, bottom, left, and right
 side of the Tab View.
 
 A new tab can be selected either by clicking on a tab button or by

@@ -9,9 +9,9 @@ The most fundamental of all Widgets is the Base Widget, on which all other widge
 are based.  From an Object-Oriented perspective, think of the Base Widget as the
 Widget class from which all other Widgets inherit.
 
-By this mechanisms, all Widgets carry :ref:`the features of the Base Widget
-<common_widget_features>`.  Therefore, the functions and functionalities of the Base
-Widget can be used with other widgets as well.  For example
+By this mechanism, all Widgets carry :ref:`the features of the Base Widget
+<common_widget_features>`. Therefore, the functions and functionalities of the Base
+Widget can be used with other widgets as well. For example
 :cpp:expr:`lv_obj_set_width(slider, 100)`.
 
 The Base Widget can be used directly as a simple widget.  While it is a simple

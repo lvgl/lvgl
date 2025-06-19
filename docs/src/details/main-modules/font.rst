@@ -22,7 +22,7 @@ For example:
     lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /* Set a larger font */
 
 Fonts have a **format** property. It describes how the glyph data is stored.
-At this writing there are 12 possible values that this field can take, and those
+At the time of writing, there are 12 possible values that this field can take, and those
 values fall into 2 categories:
 
 :Legacy simple: 1, 2, 4 or 8-bpp (aligned or unaligned) and image format, and

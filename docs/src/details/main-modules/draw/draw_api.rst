@@ -9,7 +9,7 @@ Where to Use the Drawing API
 
 In most cases you use LVGL's Drawing API through the API of Widgets:  by creating
 buttons, labels, etc., and setting the their styles, positions, and other properties.
-In these cases rendering (drawing) is handled internally and you doen't see the
+In these cases rendering (drawing) is handled internally and you don't see the
 :ref:`Drawing Pipeline <draw_pipeline>` at all.
 
 However there are three places where you can use LVGL's Drawing API directly.

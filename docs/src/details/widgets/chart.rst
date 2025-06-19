@@ -8,7 +8,7 @@ Chart (lv_chart)
 Overview
 ********
 
-Charts Widget are used to visualize data.
+Chart Widgets are used to visualize data.
 
 Charts have:
 
@@ -38,7 +38,7 @@ Each chart has the following attributes (over and above attributes found in
 
 Type (governs how a chart's data series are drawn)
     - Can be LINE (default), BAR, SCATTER, or none.
-    - You can change the chart's type at any point during it's life.
+    - You can change the chart's type at any point during its life.
 
 Horizontal and Vertical division lines
     - default 3 and 5 respectively

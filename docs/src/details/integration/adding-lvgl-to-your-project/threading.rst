@@ -34,8 +34,8 @@ Atomic Operation
     If other threads can see the operation in a partially performed state, or
     interfere with it, then operation X is not atomic.
 
-    If an atomic operation can fail, its implementation must return the the resource
-    back to the state before the operation was started.  To other threads it must
+    If an atomic operation can fail, its implementation must return the resource
+    back to the state before the operation was started. To other threads, it must
     appear as though the operation had not yet started.
 
 .. _atomic data:

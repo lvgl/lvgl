@@ -113,7 +113,7 @@ At this point, the ``menuconfig`` command should be available:
     menuconfig
 
 Make changes to the config and exit using `Esc` or `Q`, and save your configuration. The ``.config`` file is
-now created and list the configuration values.
+now created and lists the configuration values.
 
 
 Configuring with cmake

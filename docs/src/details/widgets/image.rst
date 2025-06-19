@@ -10,7 +10,7 @@ Overview
 .. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Images are Widgets that display images from flash (as arrays) or
-from files. Images can display symbols (``LV_SYMBOL_...``) as well.
+from files. Images can also display symbols (``LV_SYMBOL_...``).
 
 Using the :ref:`Image decoder interface <overview_image_decoder>`, custom image formats
 can be supported as well.
@@ -76,7 +76,7 @@ The internal (pixel array) and external images support 2 transparency
 handling methods:
 
 -  **Alpha byte**: An alpha channel is added to every pixel that contains
-   its opacity, typically a byte.  It is the 'A' in the the various color formats
+   its opacity, typically a byte.  It is the 'A' in the various color formats
    that contain an alpha channel, such as ARGB8888, ARGB8565, ARGB1555, etc.
 -  **Indexed transparent color**:  a specific index in a color palette serves to
    signal transparency for each pixel that uses it.
