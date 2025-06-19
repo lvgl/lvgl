@@ -36,8 +36,10 @@ void test_xml_translation(void)
         "The Elephant", "Der Elefant", "El Elefante",
     };
 
-    lv_translation_add_static(languages, tags, translations);
+    lv_translation_pack_t * pack = lv_translation_add_static(languages, tags, translations);
 
+    TEST_ASSERT_EQUAL_INT(1, lv_translation_get_language_index(pack, "de"));
+    TEST_ASSERT_EQUAL_INT(-1, lv_translation_get_language_index(pack, "none"));
 
     lv_translation_set_language("de");
 

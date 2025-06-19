@@ -208,6 +208,16 @@ lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char
     return LV_RESULT_OK;
 }
 
+int32_t lv_translation_get_language_index(lv_translation_pack_t * pack, const char * lang_name)
+{
+    uint32_t i;
+    for(i = 0; i < pack->language_cnt; i++) {
+        if(lv_streq(pack->languages[i], lang_name)) return (int32_t)i;
+    }
+
+    return -1;
+}
+
 
 lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, const char * tag_name)
 {

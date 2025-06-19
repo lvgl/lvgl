@@ -100,6 +100,14 @@ static inline const char * lv_tr(const char * tag)
 lv_result_t lv_translation_add_language(lv_translation_pack_t * pack, const char * lang);
 
 /**
+ * Get the index of a language in a pack.
+ * @param pack      pointer to a static or dynamic language pack
+ * @param lang_name name of the language to find
+ * @return          index of the language or -1 if not found.
+ */
+int32_t lv_translation_get_language_index(lv_translation_pack_t * pack, const char * lang_name);
+
+/**
  * Add a new tag to a dynamic language pack.
  * Once the tag is added the translations for each language can be added too by using
  * `lv_translation_set_tag_translation`
