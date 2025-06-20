@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vg_lite_mask_rect.c
+ * @file lv_draw_vglite_mask_rect.c
  *
  */
 

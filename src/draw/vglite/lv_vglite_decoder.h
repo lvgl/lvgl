@@ -1,10 +1,10 @@
 /**
- * @file lv_vg_lite_decoder.h
+ * @file lv_vglite_decoder.h
  *
  */
 
-#ifndef LV_VG_LITE_DECODER_H
-#define LV_VG_LITE_DECODER_H
+#ifndef LV_VGLITE_DECODER_H
+#define LV_VGLITE_DECODER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +43,4 @@ void lv_vglite_decoder_deinit(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_VG_LITE_DECODER_H*/
+#endif /*LV_VGLITE_DECODER_H*/
