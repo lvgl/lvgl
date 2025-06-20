@@ -468,9 +468,7 @@ void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, 
         return;
     }
 
-    int32_t angle_limited = angle;
-    if(angle_limited > 3600) angle_limited -= 3600;
-    if(angle_limited < 0) angle_limited += 3600;
+    int32_t angle_limited = lv_euclidean_mod_fast(angle, 3600);
 
     int32_t angle_low = angle_limited / 10;
     int32_t angle_high = angle_low + 1;
