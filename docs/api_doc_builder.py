@@ -698,6 +698,12 @@ def _recursively_create_api_rst_files(depth: int,
             elig_h_file_count += subdir_eligible_h_file_count
 
     if elig_h_file_count > 0:
+        # Sort both lists.
+        # Evidently the Linux-Python's implementation of `listdir()` does not
+        # automatically produce a sorted list.
+        elig_sub_dirs.sort()
+        elig_h_files.sort()
+
         # Create index.rst plus .RST files for any direct .H files in dir.
         _create_rst_files_for_dir(src_root_len,
                                   src_dir_bep,
