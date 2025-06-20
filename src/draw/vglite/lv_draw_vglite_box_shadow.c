@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vg_lite_box_shadow.c
+ * @file lv_draw_vglite_box_shadow.c
  *
  */
 
