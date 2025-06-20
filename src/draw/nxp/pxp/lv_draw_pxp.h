@@ -36,7 +36,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_draw_pxp_unit_t {
+typedef struct _lv_draw_pxp_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
 #if LV_USE_OS
