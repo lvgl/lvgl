@@ -131,6 +131,11 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
+    uint8_t coprocessor_status;
+    do {
+        coprocessor_status = EVE_busy();
+    } while(coprocessor_status != E_OK && coprocessor_status != EVE_FIFO_HALF_EMPTY);
+
     EVE_start_cmd_burst();
 
     switch(t->type) {
