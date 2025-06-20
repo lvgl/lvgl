@@ -49,19 +49,19 @@ extern "C" {
 
 /*  VGLite API Constants *******************************************************************************************************************/
 
-#define VGLITE_HEADER_VERSION       7
+#define VG_LITE_HEADER_VERSION       7
 
-#ifndef VGLITE_VERSION_3_0
-#define VGLITE_VERSION_3_0          1
+#ifndef VG_LITE_VERSION_3_0
+#define VG_LITE_VERSION_3_0          1
 
-#define VGLITE_MAKE_VERSION(major, minor, patch) (((major) << 16) | ((minor) << 8) | (patch))
-#define VGLITE_VERSION_MAJOR(version) (((uint32_t)(version) >> 16) & 0xff)
-#define VGLITE_VERSION_MINOR(version) (((uint32_t)(version) >> 8) & 0xff)
-#define VGLITE_VERSION_PATCH(version) ((uint32_t)(version) & 0xff)
+#define VG_LITE_MAKE_VERSION(major, minor, patch) (((major) << 16) | ((minor) << 8) | (patch))
+#define VG_LITE_VERSION_MAJOR(version) (((uint32_t)(version) >> 16) & 0xff)
+#define VG_LITE_VERSION_MINOR(version) (((uint32_t)(version) >> 8) & 0xff)
+#define VG_LITE_VERSION_PATCH(version) ((uint32_t)(version) & 0xff)
 
-#define VGLITE_API_VERSION_3_0      VGLITE_MAKE_VERSION(3, 0, 0)
+#define VG_LITE_API_VERSION_3_0      VG_LITE_MAKE_VERSION(3, 0, 0)
 
-#define VGLITE_RELEASE_VERSION      VGLITE_MAKE_VERSION(4,0,47)
+#define VG_LITE_RELEASE_VERSION      VG_LITE_MAKE_VERSION(4,0,47)
 
 #define VGL_FALSE                   0
 #define VGL_TRUE                    1
@@ -1232,7 +1232,7 @@ typedef unsigned int        vg_lite_color_t;
     vg_lite_error_t vg_lite_set_scissor(vg_lite_int32_t x, vg_lite_int32_t y, vg_lite_int32_t right, vg_lite_int32_t bottom);
 
     /* Set scissor rectangles on mask layer. Scissor rects are enabled/disabled by following APIs. */
-    vg_lite_error_t vg_lite_scissor_rects(vg_lite_uint32_t nums, vg_lite_rectangle_t rect[]);
+    vg_lite_error_t vg_lite_scissor_rects(vg_lite_buffer_t *target, vg_lite_uint32_t nums, vg_lite_rectangle_t rect[]);
 
     /* Enable scissor rects defined on mask layer. */
     vg_lite_error_t vg_lite_enable_scissor(void);
@@ -1379,7 +1379,7 @@ typedef unsigned int        vg_lite_color_t;
                                     vg_lite_int32_t count,
                                     vg_lite_float_t* params);
 
-#endif /* VGLITE_VERSION_3_0 */
+#endif /* VG_LITE_VERSION_3_0 */
 
 #ifdef __cplusplus
 }
