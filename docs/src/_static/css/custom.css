@@ -136,7 +136,8 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   transition: background-color 0.15s ease-in-out;
   color: var(--color-text-base);
   font-weight: 800;
@@ -156,15 +157,23 @@ h3 {
   font-size: 20px;
 }
 
+h4 {
+  font-size: 16px;
+}
+
 a {
   text-underline-position: under;
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--color-border-secondary);
+  border-top: 1px solid var(--color-border-primary);
   margin: 2rem 0;
   max-width: 30rem;
+}
+
+.lv-example-container + hr {
+  max-width: none;
 }
 
 a:visited {
@@ -183,15 +192,15 @@ a:visited:hover {
   }
 }
 
-section:has(h2):not(:first-child) {
+section:has(> h2):not(:first-child) {
   margin-top: 4rem;
 }
 
-section:has(h3):not(:first-child) {
+section:has(> h3):not(:first-child) {
   margin-top: 3rem;
 }
 
-section:has(h4):not(:first-child) {
+section:has(> h4):not(:first-child) {
   margin-top: 2rem;
 }
 
@@ -333,10 +342,11 @@ span.pre:first-child {
 
 .content .reference {
   transition: color 0.15s ease-in-out;
-  font-weight: 600;
 }
 
 .content a {
+  color: var(--color-accent);
+  font-weight: 500;
   transition: color 0.15s ease-in-out;
 }
 
