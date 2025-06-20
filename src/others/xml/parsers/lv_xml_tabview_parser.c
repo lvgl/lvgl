@@ -57,6 +57,12 @@ void lv_xml_tabview_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
         if(lv_streq("active", name)) lv_tabview_set_active(item, lv_xml_atoi(value), 0);
         if(lv_streq("tab_bar_position", name)) lv_tabview_set_tab_bar_position(item, lv_xml_dir_to_enum(value));
+        if(lv_streq("event_bubble", name)) {
+			 lv_obj_t * cont = lv_tabview_get_content(item);
+			 if (cont) {
+				lv_obj_update_flag(cont, LV_OBJ_FLAG_EVENT_BUBBLE, lv_xml_to_bool(value));
+			 }
+		}
     }
 }
 
