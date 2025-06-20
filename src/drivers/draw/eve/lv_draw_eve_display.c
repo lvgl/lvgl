@@ -176,7 +176,10 @@ static void resolution_changed_cb(lv_event_t * e)
             return;
     }
 
-    EVE_cmd_setrotate(cmd_value);
+    /* no need to rotate the touch coordinates with CMD_SETROTATE, as LVGL
+     * already rotates the input coordinates.
+     */
+    EVE_memWrite8(REG_ROTATE, cmd_value);
 }
 
 static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
