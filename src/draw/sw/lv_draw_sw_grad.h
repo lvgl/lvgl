@@ -144,4 +144,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_grad_conical_get_line(lv_grad_dsc_t 
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_GRADIENT_H*/
+#endif /*LV_DRAW_SW_GRAD_H*/

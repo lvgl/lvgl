@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_LABEL_XML_COMPONENT_H
-#define LV_LABEL_XML_COMPONENT_H
+#ifndef LV_XML_COMPONENT_H
+#define LV_XML_COMPONENT_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -37,6 +37,8 @@ extern "C" {
  *
  * @param fn_ref    path to the reference image. Will be appended toREF_IMGS_PATH if set.
  * @return          true: the reference image and the display are the same; false: they are different (`<image_name>_err.png` is created).
+ * @note            This function assumes that the default display is the test display that was created by
+ *                  `lv_test_display_create()`
  */
 bool lv_test_screenshot_compare(const char * fn_ref);
 

@@ -30,20 +30,14 @@
 
 	    <prop name="type" type="enum:lv_chart_type" help=""/>
 
-	    <prop name="point_count" help="">
-	    	<param name="count" type="int" help=""/>
-	    </prop>
-	    <prop name="update_mode" help="">
-	    	<param name="mode" type="enum:lv_chart_chart_update_mode" help=""/>
-	    </prop>
-	    <prop name="div_line_count" help="">
-	    	<param name="hdiv" type="int" help=""/>
-	    	<param name="vdiv" type="int" help=""/>
-	    </prop>
+	    <prop name="point_count" type="int" help=""/>
+	    <prop name="update_mode" type="enum:lv_chart_update_mode" help=""/>
+	    <prop name="nor_div_line_count" help=""/>
+	    <prop name="ver_div_line_count" help=""/>
 
 	    <element name="series" type="lv_chart_series" access="add">
 	        <arg name="color" type="color" help=""/>
-	        <arg name="axis" type="enum:lv_chart_axis+" help="The axis"/>
+	        <arg name="axis" type="enum:lv_chart_axis+" default="primary_y" help="The axis"/>
 	    	<prop name="values"  type="int[count]" help="set values from an array"/>
 	    </element>
 
@@ -56,10 +50,8 @@
 
 	    <element name="axis" access="set">
 	    	<arg name="axis" type="enum:lv_chart_axis"/>
-	    	<prop name="range">
-	    		<param name="min" type="int" help="the min value"/>
-	    		<param name="max" type="int" help="the max value"/>
-	    	</prop>
+	    	<prop name="min_value" type="int"/>
+	    	<prop name="max_value" type="int"/>
 	    </element>
 	</api>
 </widget>

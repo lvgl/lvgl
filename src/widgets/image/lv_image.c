@@ -1,5 +1,5 @@
 /**
- * @file lv_img.c
+ * @file lv_image.c
  *
  */
 
@@ -365,6 +365,22 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     a.x2 += obj->coords.x1;
     a.y2 += obj->coords.y1;
     lv_obj_invalidate_area(obj, &a);
+}
+
+void lv_image_set_pivot_x(lv_obj_t * obj, int32_t x)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+    lv_image_set_pivot(obj, x, img->pivot.y);
+}
+
+void lv_image_set_pivot_y(lv_obj_t * obj, int32_t y)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+    lv_image_set_pivot(obj, img->pivot.x, y);
 }
 
 void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)

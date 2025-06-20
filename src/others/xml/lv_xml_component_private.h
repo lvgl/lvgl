@@ -39,7 +39,8 @@ struct _lv_xml_component_scope_t {
     lv_ll_t event_ll;
     const char * view_def;
     const char * extends;
-    uint32_t is_widget : 1;                         /*1: not component but widget registered as a component for preview*/
+    uint32_t is_widget : 1;
+    uint32_t is_screen : 1;
     struct _lv_xml_component_scope_t * next;
 };
 

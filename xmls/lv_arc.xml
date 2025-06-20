@@ -10,24 +10,15 @@ Example
 	        <enum name="symmetrical" help="sym"/>
 	        <enum name="reverse" help="reverse"/>
 	    </enumdef>
-	    <prop name="angles" help="Start and end angles of the indicator">
-	        <param name ="start_angle" type="deg" help="The start angle"/>
-	        <param name ="end_angle" type="deg" help="The end angle"/>
-	    </prop>
-	    <prop name="bg_angles" help="Start and end angles of the background">
-	        <param name ="start_angle" type="deg" help="The start angle"/>
-	        <param name ="end_angle" type="deg" help="The end angle"/>
-	    </prop>
-	    <prop name="range" help="The range">
-	        <param name ="min" type="int" help="The min range"/>
-	        <param name ="max" type="int" help="The max range"/>
-	    </prop>
-	    <prop name="value" help="The current value">
-	        <param name="value" type="int"/>
-	    </prop>
-	    <prop name="mode" help="The mode">
-	        <param name="mode" type="enum:lv_arc_mode"/>
-	    </prop>
+
+	    <prop name="start_angle" help="Start angles of the indicator"/>
+	    <prop name="end_angle" help="End angles of the indicator"/>
+	    <prop name="bg_angle_start" help="Start angles of the background"/>
+	    <prop name="bg_angle_end" help="End angles of the background"/>
+	    <prop name="min_value" type="int"/>
+	    <prop name="max_value" type="int"/>
+	    <prop name="value" type="int" help="The current value"/>
+	    <prop name="mode" type="enum:lv_arc_mode" help="The mode"/>
 	    <prop name="bind_value" type="subject" help="Connect a subject to the arc's value"/>
 	</api>
 </widget>

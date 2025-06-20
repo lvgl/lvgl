@@ -1,5 +1,5 @@
 /**
- * @file lv_ppa_private.h
+ * @file lv_draw_ppa_private.h
  *
  */
 
@@ -182,4 +182,4 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
 } /*extern "C"*/
 #endif
 
-#endif /* LV_PPA_PRIVATE_H */
+#endif /* LV_DRAW_PPA_PRIVATE_H */

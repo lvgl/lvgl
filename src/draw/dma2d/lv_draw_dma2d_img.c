@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_dma2d_image.c
+ * @file lv_draw_dma2d_img.c
  *
  */
 

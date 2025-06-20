@@ -127,6 +127,20 @@ void lv_arc_set_value(lv_obj_t * obj, int32_t value);
 void lv_arc_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
 /**
+ * Set the minimum values of an arc
+ * @param obj       pointer to the arc object
+ * @param min       minimum value
+ */
+void lv_arc_set_min_value(lv_obj_t * obj, int32_t min);
+
+/**
+ * Set the maximum values of an arc
+ * @param obj       pointer to the arc object
+ * @param max       maximum value
+ */
+void lv_arc_set_max_value(lv_obj_t * obj, int32_t max);
+
+/**
  * Set a change rate to limit the speed how fast the arc should reach the pressed point.
  * @param obj       pointer to an arc object
  * @param rate      the change rate

@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EXAMPLE_PNG_H
-#define LV_EXAMPLE_PNG_H
+#ifndef LV_EXAMPLE_LODEPNG_H
+#define LV_EXAMPLE_LODEPNG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ void lv_example_lodepng_1(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_PNG_H*/
+#endif /*LV_EXAMPLE_LODEPNG_H*/

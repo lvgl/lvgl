@@ -19,21 +19,17 @@
 
 	    <prop name="row_count" type="int" help=""/>
 	    <prop name="column_count" type="int" help=""/>
-	    <prop name="selected cell" help="">
-	    	<param name="row" type="int" help=""/>
-	    	<param name="column" type="int" help=""/>
-	    </prop>
 
 	    <element name="column" access="set">
 	        <arg name="column" type="int" help=""/>
-	    	<prop name="width" type="px" help="width of the column"/>
+	    	<arg name="width" type="px" help="width of the column"/>
 	    </element>
 
 	    <element name="cell" access="set">
 	        <arg name="row" type="int" help=""/>
 	        <arg name="column" type="int" help=""/>
-	    	<prop name="value"  type="string"  help=""/>
-	    	<prop name="ctrl" type="enum:lv_table_cell_ctrl+" help=""/>
+	    	<arg name="value"  type="string"  help=""/>
+	    	<arg name="ctrl" type="enum:lv_table_cell_ctrl+" help=""/>
 	    </element>
 	</api>
 </widget>

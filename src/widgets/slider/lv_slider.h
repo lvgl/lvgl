@@ -88,12 +88,26 @@ void lv_slider_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 void lv_slider_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
- * Set minimum and the maximum values of a bar
+ * Set the minimum and the maximum values of a bar
  * @param obj       pointer to the slider object
  * @param min       minimum value
  * @param max       maximum value
  */
 void lv_slider_set_range(lv_obj_t * obj, int32_t min, int32_t max);
+
+/**
+ * Set the minimum values of a bar
+ * @param obj       pointer to the slider object
+ * @param min       minimum value
+ */
+void lv_slider_set_min_value(lv_obj_t * obj, int32_t min);
+
+/**
+ * Set the maximum values of a bar
+ * @param obj       pointer to the slider object
+ * @param max       maximum value
+ */
+void lv_slider_set_max_value(lv_obj_t * obj, int32_t max);
 
 /**
  * Set the mode of slider.

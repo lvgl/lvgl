@@ -112,4 +112,4 @@ void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font);
 } /* extern "C" */
 #endif
 
-#endif /* FONT_MANAGER_MANAGER_H */
+#endif /* LV_FONT_MANAGER_H */

@@ -25,6 +25,75 @@
         <enum name="items" help="Some help"/>
     </enumdef>
 
+    <enumdef name="lv_event">
+        <enum name="all" help=""/>
+        <enum name="pressed" help=""/>
+        <enum name="pressing" help=""/>
+        <enum name="press_lost" help=""/>
+        <enum name="short_clicked" help=""/>
+        <enum name="single_clicked" help=""/>
+        <enum name="double_clicked" help=""/>
+        <enum name="triple_clicked" help=""/>
+        <enum name="long_pressed" help=""/>
+        <enum name="long_pressed_repeat" help=""/>
+        <enum name="clicked" help=""/>
+        <enum name="released" help=""/>
+        <enum name="scroll_begin" help=""/>
+        <enum name="scroll_throw_begin" help=""/>
+        <enum name="scroll_end" help=""/>
+        <enum name="scroll" help=""/>
+        <enum name="gesture" help=""/>
+        <enum name="key" help=""/>
+        <enum name="rotary" help=""/>
+        <enum name="focused" help=""/>
+        <enum name="defocused" help=""/>
+        <enum name="leave" help=""/>
+        <enum name="hit_test" help=""/>
+        <enum name="indev_reset" help=""/>
+        <enum name="hover_over" help=""/>
+        <enum name="hover_leave" help=""/>
+        <enum name="cover_check" help=""/>
+        <enum name="refr_ext_draw_size" help=""/>
+        <enum name="draw_main_begin" help=""/>
+        <enum name="draw_main" help=""/>
+        <enum name="draw_main_end" help=""/>
+        <enum name="draw_post_begin" help=""/>
+        <enum name="draw_post" help=""/>
+        <enum name="draw_post_end" help=""/>
+        <enum name="draw_task_added" help=""/>
+        <enum name="value_changed" help=""/>
+        <enum name="insert" help=""/>
+        <enum name="refresh" help=""/>
+        <enum name="ready" help=""/>
+        <enum name="cancel" help=""/>
+        <enum name="create" help=""/>
+        <enum name="delete" help=""/>
+        <enum name="child_changed" help=""/>
+        <enum name="child_created" help=""/>
+        <enum name="child_deleted" help=""/>
+        <enum name="screen_unload_start" help=""/>
+        <enum name="screen_load_start" help=""/>
+        <enum name="screen_loaded" help=""/>
+        <enum name="screen_unloaded" help=""/>
+        <enum name="size_changed" help=""/>
+        <enum name="style_changed" help=""/>
+        <enum name="layout_changed" help=""/>
+        <enum name="get_self_size" help=""/>
+        <enum name="invalidate_area" help=""/>
+        <enum name="resolution_changed" help=""/>
+        <enum name="color_format_changed" help=""/>
+        <enum name="refr_request" help=""/>
+        <enum name="refr_start" help=""/>
+        <enum name="refr_ready" help=""/>
+        <enum name="render_start" help=""/>
+        <enum name="render_ready" help=""/>
+        <enum name="flush_start" help=""/>
+        <enum name="flush_finish" help=""/>
+        <enum name="flush_wait_start" help=""/>
+        <enum name="flush_wait_finish" help=""/>
+        <enum name="vsync" help=""/>
+    </enumdef>
+
     <enumdef name="lv_align">
         <enum name="default" help="Some help"/>
         <enum name="top_left" help="Some help"/>
@@ -107,6 +176,7 @@
             <enum name="hor"    help=""/>
             <enum name="ver"    help=""/>
     </enumdef>
+
     <enumdef name="lv_border_side">
             <enum name="none"  		help=""/>
             <enum name="left"    	help=""/>
@@ -114,6 +184,32 @@
             <enum name="top"    	help=""/>
             <enum name="bottom"    	help=""/>
             <enum name="full"    	help=""/>
+    </enumdef>
+
+    <enumdef name="lv_scroll_snap">
+            <enum name="none"  		help=""/>
+            <enum name="start"    	help=""/>
+            <enum name="end"    	help=""/>
+            <enum name="center"    	help=""/>
+    </enumdef>
+
+    <enumdef name="lv_screen_load_anim">
+        <enum name="none" help=""/>
+        <enum name="over_left" help=""/>
+        <enum name="over_right" help=""/>
+        <enum name="over_top" help=""/>
+        <enum name="over_bottom" help=""/>
+        <enum name="move_left" help=""/>
+        <enum name="move_right" help=""/>
+        <enum name="move_top" help=""/>
+        <enum name="move_bottom" help=""/>
+        <enum name="fade_in" help=""/>
+        <enum name="fade_on" help=""/>
+        <enum name="fade_out" help=""/>
+        <enum name="out_left" help=""/>
+        <enum name="out_right" help=""/>
+        <enum name="out_top" help=""/>
+        <enum name="out_bottom" help=""/>
     </enumdef>
 
    	<styledef>

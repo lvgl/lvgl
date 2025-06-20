@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EX_SNAPSHOT_H
-#define LV_EX_SNAPSHOT_H
+#ifndef LV_EXAMPLE_SNAPSHOT_H
+#define LV_EXAMPLE_SNAPSHOT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ void lv_example_snapshot_1(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_GET_STARTED_H*/
+#endif /*LV_EXAMPLE_SNAPSHOT_H*/

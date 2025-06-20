@@ -1,5 +1,5 @@
 /**
- * @file lv_animimg.c
+ * @file lv_animimage.c
  *
  */
 

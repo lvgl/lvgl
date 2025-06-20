@@ -17,19 +17,17 @@ Example
 			<enum name="vertical" help=""/>
 		</enumdef>
 
-	    <prop name="range" help="The range">
-	    	<param name ="min" type="int" help="The min range"/>
-	    	<param name ="max" type="int" help="The max range"/>
-	   	</prop>
+	    <prop name="min_value" type="int"/>
+	    <prop name="max_value" type="int"/>
 
 	    <prop name="value" help="The current value">
 	    	<param name ="value" type="int" help="The current value"/>
-	    	<param name ="animated" type="bool" help="Set the value with animation" optional="true" default="false"/>
+	    	<param name ="animated" type="bool" help="Set the value with animation" default="false"/>
 	   	</prop>
 
 	    <prop name="start_value" help="The current left value in case of range mode">
-	    	<param name ="value" type="int" help="The current value"/>
-	    	<param name ="animated" type="bool" help="Set the value with animation" optional="true" default="false"/>
+	    	<param name ="start_value" type="int" help="The current value"/>
+	    	<param name ="animated" type="bool" help="Set the value with animation" default="false"/>
 	   	</prop>
 
 	    <prop name="mode" type="enum:lv_bar_mode"/>
