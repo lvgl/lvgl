@@ -48,28 +48,28 @@ void test_keyboard_properties(void)
     lv_obj_t * test_area = lv_textarea_create(lv_screen_active());
 
     prop.id = LV_PROPERTY_KEYBOARD_TEXTAREA;
-    prop.ptr = test_area;
+    prop.value.ptr = test_area;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_PTR(test_area, lv_keyboard_get_textarea(obj));
-    TEST_ASSERT_EQUAL_PTR(test_area, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_TEXTAREA).ptr);
+    TEST_ASSERT_EQUAL_PTR(test_area, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_TEXTAREA).value.ptr);
 
     prop.id = LV_PROPERTY_KEYBOARD_MODE;
-    prop.num = LV_KEYBOARD_MODE_TEXT_UPPER;
+    prop.value.num = LV_KEYBOARD_MODE_TEXT_UPPER;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(LV_KEYBOARD_MODE_TEXT_UPPER, lv_keyboard_get_mode(obj));
-    TEST_ASSERT_EQUAL_INT(LV_KEYBOARD_MODE_TEXT_UPPER, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_MODE).num);
+    TEST_ASSERT_EQUAL_INT(LV_KEYBOARD_MODE_TEXT_UPPER, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_MODE).value.num);
 
     prop.id = LV_PROPERTY_KEYBOARD_POPOVERS;
-    prop.num = 1;
+    prop.value.num = 1;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_keyboard_get_popovers(obj));
-    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_POPOVERS).num);
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_POPOVERS).value.num);
 
     prop.id = LV_PROPERTY_KEYBOARD_SELECTED_BUTTON;
-    prop.num = 1;
+    prop.value.num = 1;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_keyboard_get_selected_button(obj));
-    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_SELECTED_BUTTON).num);
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_KEYBOARD_SELECTED_BUTTON).value.num);
 #endif
 }
 

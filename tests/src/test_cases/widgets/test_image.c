@@ -589,74 +589,74 @@ void test_image_properties(void)
     lv_property_t prop = { };
 
     prop.id = LV_PROPERTY_IMAGE_SRC;
-    prop.ptr = &test_arc_bg;
+    prop.value.ptr = &test_arc_bg;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_PTR(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SRC).ptr, &test_arc_bg);
+    TEST_ASSERT_EQUAL_PTR(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SRC).value.ptr, &test_arc_bg);
     TEST_ASSERT_EQUAL_PTR(lv_image_get_src(obj), &test_arc_bg);
 
     prop.id = LV_PROPERTY_IMAGE_OFFSET_X;
-    prop.num = 10;
+    prop.value.num = 10;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_OFFSET_X).num, 10);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_OFFSET_X).value.num, 10);
     TEST_ASSERT_EQUAL_INT(lv_image_get_offset_x(obj), 10);
 
     prop.id = LV_PROPERTY_IMAGE_OFFSET_Y;
-    prop.num = 20;
+    prop.value.num = 20;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_OFFSET_Y).num, 20);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_OFFSET_Y).value.num, 20);
     TEST_ASSERT_EQUAL_INT(lv_image_get_offset_y(obj), 20);
 
     prop.id = LV_PROPERTY_IMAGE_ROTATION;
-    prop.num = 30;
+    prop.value.num = 30;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_ROTATION).num, 30);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_ROTATION).value.num, 30);
     TEST_ASSERT_EQUAL_INT(lv_image_get_rotation(obj), 30);
 
     prop.id = LV_PROPERTY_IMAGE_PIVOT;
-    prop.point.x = 40;
-    prop.point.y = 50;
+    prop.value.point.x = 40;
+    prop.value.point.y = 50;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT).point.x, 40);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT).point.y, 50);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT).value.point.x, 40);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT).value.point.y, 50);
     lv_point_t pivot;
     lv_image_get_pivot(obj, &pivot);
     TEST_ASSERT_EQUAL_INT(pivot.x, 40);
     TEST_ASSERT_EQUAL_INT(pivot.y, 50);
 
     prop.id = LV_PROPERTY_IMAGE_SCALE;
-    prop.num = 60;
+    prop.value.num = 60;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE).num, 60);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE).value.num, 60);
     TEST_ASSERT_EQUAL_INT(lv_image_get_scale(obj), 60);
 
     prop.id = LV_PROPERTY_IMAGE_SCALE_X;
-    prop.num = 70;
+    prop.value.num = 70;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE_X).num, 70);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE_X).value.num, 70);
     TEST_ASSERT_EQUAL_INT(lv_image_get_scale_x(obj), 70);
 
     prop.id = LV_PROPERTY_IMAGE_SCALE_Y;
-    prop.num = 80;
+    prop.value.num = 80;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE_Y).num, 80);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_SCALE_Y).value.num, 80);
     TEST_ASSERT_EQUAL_INT(lv_image_get_scale_y(obj), 80);
 
     prop.id = LV_PROPERTY_IMAGE_BLEND_MODE;
-    prop.num = LV_BLEND_MODE_ADDITIVE;
+    prop.value.num = LV_BLEND_MODE_ADDITIVE;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_BLEND_MODE).num, LV_BLEND_MODE_ADDITIVE);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_BLEND_MODE).value.num, LV_BLEND_MODE_ADDITIVE);
     TEST_ASSERT_EQUAL_INT(lv_image_get_blend_mode(obj), LV_BLEND_MODE_ADDITIVE);
 
     prop.id = LV_PROPERTY_IMAGE_ANTIALIAS;
-    prop.num = 0;
+    prop.value.num = 0;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_ANTIALIAS).num, 0);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_ANTIALIAS).value.num, 0);
     TEST_ASSERT_EQUAL_INT(lv_image_get_antialias(obj), 0);
 
     prop.id = LV_PROPERTY_IMAGE_INNER_ALIGN;
-    prop.num = LV_IMAGE_ALIGN_TOP_MID;
+    prop.value.num = LV_IMAGE_ALIGN_TOP_MID;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_INNER_ALIGN).num, LV_IMAGE_ALIGN_TOP_MID);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_IMAGE_INNER_ALIGN).value.num, LV_IMAGE_ALIGN_TOP_MID);
     TEST_ASSERT_EQUAL_INT(lv_image_get_inner_align(obj), LV_IMAGE_ALIGN_TOP_MID);
 #endif
 }

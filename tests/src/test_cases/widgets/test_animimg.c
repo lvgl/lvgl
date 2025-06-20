@@ -118,25 +118,26 @@ void test_animimg_property(void)
     lv_obj_t * obj = lv_animimg_create(lv_screen_active());
 
     prop.id = LV_PROPERTY_ANIMIMAGE_SRC;
-    prop.arg1.ptr = anim_imgs;
-    prop.arg2.num = 3;
+    prop.value.two_arg_value.arg1.ptr = anim_imgs;
+    prop.value.two_arg_value.arg2.num = 3;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_PTR(lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_SRC).ptr, anim_imgs);
+    TEST_ASSERT_EQUAL_PTR(lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_SRC).value.ptr, anim_imgs);
     TEST_ASSERT_EQUAL_PTR(lv_animimg_get_src(obj), anim_imgs);
     TEST_ASSERT_EQUAL_INT(lv_animimg_get_src_count(obj), 3);
-    TEST_ASSERT_EQUAL_INT(3, lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_SRC_COUNT).num);
+    TEST_ASSERT_EQUAL_INT(3, lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_SRC_COUNT).value.num);
 
     prop.id = LV_PROPERTY_ANIMIMAGE_DURATION;
-    prop.num = 1000;
+    prop.value.num = 1000;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1000, lv_animimg_get_duration(obj));
-    TEST_ASSERT_EQUAL_INT(1000, lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_DURATION).num);
+    TEST_ASSERT_EQUAL_INT(1000, lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_DURATION).value.num);
 
     prop.id = LV_PROPERTY_ANIMIMAGE_REPEAT_COUNT;
-    prop.num = LV_ANIM_REPEAT_INFINITE;
+    prop.value.num = LV_ANIM_REPEAT_INFINITE;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(LV_ANIM_REPEAT_INFINITE, lv_animimg_get_repeat_count(obj));
-    TEST_ASSERT_EQUAL_INT(LV_ANIM_REPEAT_INFINITE, lv_obj_get_property(obj, LV_PROPERTY_ANIMIMAGE_REPEAT_COUNT).num_u);
+    TEST_ASSERT_EQUAL_INT(LV_ANIM_REPEAT_INFINITE, lv_obj_get_property(obj,
+                                                                       LV_PROPERTY_ANIMIMAGE_REPEAT_COUNT).value.num_u);
 #endif
 }
 
