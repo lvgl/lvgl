@@ -70,7 +70,7 @@ extern "C" {
 #define ARC_PATH_DATA_MAX_SIZE (1 * MOVE_PATH_DATA_SIZE + 16 * CUBIC_PATH_DATA_SIZE + 1 * END_PATH_DATA_SIZE)
 #else
 #define RECT_PATH_DATA_MAX_SIZE 1024
-#define ARC_PATH_DATA_MAX_SIZE 	1024
+#define ARC_PATH_DATA_MAX_SIZE  1024
 #endif
 /**********************
  *
