@@ -119,7 +119,7 @@ typedef struct {
              */
             lv_style_value_t style; /**< Make sure it's the first element in struct. */
             uint32_t selector;      /**< Style selector, lv_part_t | lv_state_t */
-        };
+        } style_selector;
 
         /**
          * For some properties like slider range, it contains two simple (4-byte) values
@@ -134,8 +134,8 @@ typedef struct {
                 lv_color_t color;
                 lv_value_precise_t precise;
             } arg1, arg2;
-        };
-    };
+        } two_arg_value;
+    } value;
 } lv_property_t;
 
 typedef struct {

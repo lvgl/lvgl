@@ -24,6 +24,7 @@ It's also possible to define ``<screen permanent="true">`` which
 will make the screen created automatically.
 
 
+
 Usage
 *****
 
@@ -60,6 +61,9 @@ This example illustrates a screen in XML:
             </selector_container>
         </view>
     </screen>
+
+
+
 Screen Load and Create events
 *****************************
 

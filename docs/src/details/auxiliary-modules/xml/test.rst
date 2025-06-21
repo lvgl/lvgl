@@ -9,10 +9,10 @@ Overview
 
 The XML test module is a powerful and flexible way to define functional UI tests.
 
-Test XML files are similar to components but are wrapped in a `<test>` tag and consist of two main parts:
+Test XML files are similar to components but are wrapped in a ``<test>`` tag and consist of two main parts:
 
-- **UI Definition**: Use `<styles>`, `<consts>`, and `<view>` to define how the UI should look. This is identical to how `<component>`s are structured.
-- **Test Steps**: Encapsulated in a `<steps>` tag, these define the actions and assertions for the test.
+- **UI Definition**: Use ``<styles>``, ``<consts>``, and ``<view>`` to define how the UI should look. This is identical to how ``<component>``\ s are structured.
+- **Test Steps**: Encapsulated in a ``<steps>`` tag, these define the actions and assertions for the test.
 
 Step Types
 ----------
@@ -103,7 +103,7 @@ and then call :cpp:expr:`lv_xml_test_run_next(slowdown)` as many times.
 
 :cpp:expr:`lv_xml_test_run_next()` returns ``true`` if the given step passed, or ``false`` if it failed.
 
-Finally, call :cpp:expr:`lv_xml_test_run_stop();` to clean up and exit testing mode.
+Finally, call :cpp:expr:`lv_xml_test_run_stop()` to clean up and exit testing mode.
 
 
 Getting the Test Results
