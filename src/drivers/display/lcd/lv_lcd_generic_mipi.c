@@ -45,8 +45,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb)
+lv_display_t * lv_lcd_generic_mipi_create_ex(
+    uint32_t hor_res, 
+    uint32_t ver_res, 
+    lv_lcd_flag_t flags,
+    lv_lcd_send_cmd_cb_t send_cmd_cb, 
+    lv_lcd_send_color_cb_t send_color_cb,
+    void *user_data)
 {
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
@@ -58,6 +63,9 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv
         lv_display_delete(disp);
         return NULL;
     }
+
+    /* Assigning user data. This will allow you to do something during initialization. Unnecessary global variables can be avoided. */
+    lv_display_set_user_data(disp, user_data);
 
     /* init driver struct */
     drv->disp = disp;
@@ -75,6 +83,16 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv
     lv_display_set_flush_cb(disp, flush_cb);
 
     return disp;
+}
+
+lv_display_t * lv_lcd_generic_mipi_create(
+    uint32_t hor_res, 
+    uint32_t ver_res, 
+    lv_lcd_flag_t flags,
+    lv_lcd_send_cmd_cb_t send_cmd_cb, 
+    lv_lcd_send_color_cb_t send_color_cb)
+{
+    return lv_lcd_generic_mipi_create_ex(hor_res, ver_res, flags, send_cmd_cb, send_color_cb, NULL);
 }
 
 void lv_lcd_generic_mipi_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
