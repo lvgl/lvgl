@@ -29,6 +29,7 @@ void lv_example_event_click(void);
 void lv_example_event_streak(void);
 void lv_example_event_button(void);
 void lv_example_event_bubble(void);
+void lv_example_event_trickle(void);
 void lv_example_event_draw(void);
 
 /**********************
