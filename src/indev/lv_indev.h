@@ -59,6 +59,13 @@ typedef enum {
     LV_INDEV_GESTURE_CNT,               /* Total number of gestures types */
 } lv_indev_gesture_type_t;
 
+typedef enum {
+    LV_INDEV_NAV_MAP_HOR = 1 << 0,
+    LV_INDEV_NAV_MAP_HOR_REV = 1 << 1,
+    LV_INDEV_NAV_MAP_VER = 1 << 2,
+    LV_INDEV_NAV_MAP_VER_REV = 1 << 3,
+} lv_indev_nav_map_t;
+
 /** Data structure passed to an input driver to fill*/
 typedef struct {
     lv_indev_gesture_type_t gesture_type[LV_INDEV_GESTURE_CNT]; /* Current gesture types, per gesture */
@@ -440,6 +447,13 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
  * @return              LV_RESULT_OK: indev wasn't deleted in the event.
  */
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param);
+
+/**
+ * Map directional keys to group navigation events
+ * @param indev pointer to a keypad input device
+ * @param map mapping bitfield (see lv_indev_nav_map_t), use 0 to disable mapping
+ */
+void lv_indev_nav_map(lv_indev_t * indev, uint8_t map);
 
 /**********************
  *      MACROS
