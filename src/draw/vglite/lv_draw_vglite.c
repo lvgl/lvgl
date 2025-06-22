@@ -82,10 +82,6 @@ static int32_t _vglite_delete(lv_draw_unit_t * draw_unit);
 
 static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
 
-static bool _vglite_dest_cf_supported(lv_color_format_t cf);
-
-static bool _vglite_src_cf_supported(lv_color_format_t cf);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -131,7 +127,7 @@ void lv_draw_vglite_init(void)
     draw_vglite_unit->base_unit.wait_for_finish_cb = _vglite_wait_for_finish;
 #endif
     draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
-    draw_vglite_unit->base_unit.name = "NXP_VGLITE";
+    draw_vglite_unit->base_unit.name = "VGLITE";
 
     lv_vglite_decoder_init();
 

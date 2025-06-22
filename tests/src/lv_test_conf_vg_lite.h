@@ -8,6 +8,11 @@
 
 #define LV_VGLITE_VECTOR 0
 
+/* Make the VGLite pipeline run to completion */
+#define LV_USE_VGLITE_DRAW_THREAD 0
+
+#define LV_USE_VGLITE_DRAW_ASYNC 0
+
 /* Disable 16 pixels alignment */
 #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
 
@@ -30,5 +35,6 @@
 
 #define LV_LOG_USE_FILE_LINE 1
 
+#define LV_DRAW_SW_DRAW_UNIT_CNT 1
 
 #endif /* LV_TEST_CONF_VG_LITE_H */
