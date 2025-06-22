@@ -7,7 +7,14 @@
  *      INCLUDES
  *********************/
 
-#if 0 && LV_USE_VECTOR_GRAPHIC
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_VGLITE
+
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+#if LV_VGLITE_VECTOR
+    #error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
+#endif
 
 #include "lv_vg_lite_stroke.h"
 
@@ -381,3 +388,4 @@ static lv_cache_compare_res_t stroke_compare_cb(const stroke_item_t * lhs, const
 }
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
+#endif

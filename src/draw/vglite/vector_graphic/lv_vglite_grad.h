@@ -1,13 +1,22 @@
 /**
- * @file lv_vg_lite_grad.h
+ * @file lv_vglite_grad.h
  *
  */
 
-#ifndef LV_VG_LITE_GRAD_H
-#define LV_VG_LITE_GRAD_H
+#ifndef LV_VGLITE_GRAD_H
+#define LV_VGLITE_GRAD_H
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_VGLITE
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+
+#if LV_VGLITE_VECTOR
+#error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
 #endif
 
 /*********************
@@ -15,8 +24,6 @@ extern "C" {
  *********************/
 
 #include "../lvgl.h"
-
-#if 0 && LV_USE_VECTOR_GRAPHIC
 
 #include "lv_vg_lite_utils.h"
 
@@ -100,9 +107,10 @@ bool lv_vg_lite_draw_grad_helper(
  **********************/
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
+#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_VG_LITE_GRAD_H*/
+#endif /*LV_VGLITE_GRAD_H*/

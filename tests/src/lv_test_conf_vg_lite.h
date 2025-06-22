@@ -2,9 +2,11 @@
 #define LV_TEST_CONF_VG_LITE_H
 
 /* Use VG-Lite GPU. */
-#define LV_USE_DRAW_VGLITE 1
+#define LV_USE_DRAW_VGLITE 0
 
 #define LV_VGLITE_USE_GPU_INIT 1
+
+#define LV_VGLITE_VECTOR 0
 
 /* Disable 16 pixels alignment */
 #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0

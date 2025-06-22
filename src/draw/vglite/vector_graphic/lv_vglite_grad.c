@@ -1,7 +1,16 @@
 /**
- * @file lv_vg_lite_grad.c
+ * @file lv_vglite_grad.c
  *
  */
+
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_VGLITE
+
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+#if LV_VGLITE_VECTOR
+    #error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
+#endif
 
 /*********************
  *      INCLUDES
@@ -9,7 +18,6 @@
 
 #include "../../lv_draw_vector_private.h"
 
-#if 0 && LV_USE_VECTOR_GRAPHIC
 #include "lv_vg_lite_grad.h"
 
 #include "lv_draw_vg_lite_type.h"
@@ -883,3 +891,4 @@ static void lv_vg_lite_radial_gradient_dump_info(const vg_lite_radial_gradient_t
 }
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
+#endif

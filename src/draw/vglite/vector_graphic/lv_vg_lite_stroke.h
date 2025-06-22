@@ -10,11 +10,19 @@
 extern "C" {
 #endif
 
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_VGLITE
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+
+#if LV_VGLITE_VECTOR
+#error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
+#endif
+
+
 /*********************
  *      INCLUDES
  *********************/
-
-#if 0 && LV_USE_VECTOR_GRAPHIC
 
 #include "lv_vg_lite_utils.h"
 
@@ -76,6 +84,7 @@ void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_cache_entr
  **********************/
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
+#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/
