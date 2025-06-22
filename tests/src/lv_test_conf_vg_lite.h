@@ -4,8 +4,10 @@
 /* Use VG-Lite GPU. */
 #define LV_USE_DRAW_VGLITE 1
 
+#define LV_VGLITE_USE_GPU_INIT 1
+
 /* Disable 16 pixels alignment */
-#define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+#define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
 
 /* Enable ThorVG internal rendering engine */
 #define LV_USE_THORVG_INTERNAL      1
