@@ -6,7 +6,7 @@ on:
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each push
 concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }} 
+  group: ${{ github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
@@ -24,5 +24,5 @@ jobs:
         with:
           python-version: 3.12
       - name: Run font_license_verify.py
-        run: python3 -m pip install fonttools && python font_license_verify.py --no-strict
+        run: python3 -m pip install fonttools && python3 -m pip install brotli && python font_license_verify.py --no-strict
         working-directory: scripts

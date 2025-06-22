@@ -74,6 +74,9 @@
 #if LV_USE_DRAW_OPENGLES
     #include "draw/opengles/lv_draw_opengles.h"
 #endif
+#if LV_USE_PPA
+    #include "draw/espressif/ppa/lv_draw_ppa.h"
+#endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
@@ -258,6 +261,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_OPENGLES
     lv_draw_opengles_init();
+#endif
+
+#if LV_USE_PPA
+    lv_draw_ppa_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -497,6 +504,10 @@ void lv_deinit(void)
 
 #if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
+#endif
+
+#if LV_USE_XML
+    lv_xml_test_unregister();
 #endif
 
     lv_mem_deinit();

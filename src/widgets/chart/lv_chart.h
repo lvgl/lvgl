@@ -95,6 +95,23 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt);
 void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max);
 
 /**
+ * Set the minimal values on an axis
+ * @param obj       pointer to a chart object
+ * @param axis      `LV_CHART_AXIS_PRIMARY_Y` or `LV_CHART_AXIS_SECONDARY_Y`
+ * @param min       minimal value of the y axis
+ */
+void lv_chart_set_axis_min_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min);
+
+/**
+ * Set the maximal y values on an axis
+ * @param obj       pointer to a chart object
+ * @param axis      `LV_CHART_AXIS_PRIMARY_Y` or `LV_CHART_AXIS_SECONDARY_Y`
+ * @param max       maximum value of the y axis
+ */
+void lv_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t max);
+
+
+/**
  * Set update mode of the chart object. Affects
  * @param obj              pointer to a chart object
  * @param update_mode      the update mode
@@ -107,7 +124,21 @@ void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode
  * @param hdiv      number of horizontal division lines
  * @param vdiv      number of vertical division lines
  */
-void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv);
+void lv_chart_set_div_line_count(lv_obj_t * obj, uint32_t hdiv, uint32_t vdiv);
+
+/**
+ * Set the number of horizontal division lines
+ * @param obj       pointer to a chart object
+ * @param cnt       number of horizontal division lines
+ */
+void lv_chart_set_hor_div_line_count(lv_obj_t * obj, uint32_t cnt);
+
+/**
+ * Set the number of vertical division lines
+ * @param obj       pointer to a chart object
+ * @param cnt       number of vertical division lines
+ */
+void lv_chart_set_ver_div_line_count(lv_obj_t * obj, uint32_t cnt);
 
 /**
  * Get the type of a chart

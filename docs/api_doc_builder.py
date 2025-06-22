@@ -25,10 +25,10 @@ rst_section_line_char = '='
 _re_api_section_sep = re.compile(r'(?mi)^API *\r?\n^\*\*\*\s*')
 
 # Regex to identify '.. API equals: lv_obj_t, lv_array_t' directives.
-_re_api_equals = re.compile(r'(?mi)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)\r\n\s*')
+_re_api_equals = re.compile(r'(?mi)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)')
 
 # Regex to identify '.. API startswith: lv_obj, lv_array' directives.
-_re_api_startswith = re.compile(r'(?mi)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)\r\n\s*')
+_re_api_startswith = re.compile(r'(?mi)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)')
 
 # Regex to match comma and whitespace list-item separators on multiple lines.
 _re_multi_line_comma_sep = re.compile(r'(?m)[,\s]+')

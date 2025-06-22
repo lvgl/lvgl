@@ -76,4 +76,4 @@ void lv_demos_show_help(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_DEMO_H*/
+#endif /*LV_DEMOS_H*/

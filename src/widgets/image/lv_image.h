@@ -136,6 +136,20 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
 void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
+ * Set the rotation horizontal center of the image.
+ * @param obj       pointer to an image object
+ * @param x         rotation center x of the image, or lv_pct()
+ */
+void lv_image_set_pivot_x(lv_obj_t * obj, int32_t x);
+
+/**
+ * Set the rotation vertical center of the image.
+ * @param obj       pointer to an image object
+ * @param y         rotation center y of the image, or lv_pct()
+ */
+void lv_image_set_pivot_y(lv_obj_t * obj, int32_t y);
+
+/**
  * Set the zoom factor of the image.
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object

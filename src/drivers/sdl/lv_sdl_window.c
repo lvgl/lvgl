@@ -1,5 +1,5 @@
 /**
- * @file lv_sdl_window.h
+ * @file lv_sdl_window.c
  *
  */
 
@@ -235,6 +235,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     uint32_t * argb_px_map = NULL;
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+
+        if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
+            uint32_t width = lv_area_get_width(area);
+            uint32_t height = lv_area_get_height(area);
+            lv_draw_sw_rgb565_swap(px_map, width * height);
+        }
         /*Update values in a special OLED I1 --> ARGB8888 case
           We render everything in I1, but display it in ARGB8888*/
         if(cf == LV_COLOR_FORMAT_I1) {
@@ -424,6 +430,7 @@ static void texture_resize(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
 
     dsc->fb1 = sdl_draw_buf_realloc_aligned(dsc->fb1, stride * disp->ver_res);
+    LV_ASSERT_MALLOC(dsc->fb1);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {

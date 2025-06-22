@@ -421,6 +421,17 @@
             #define LV_DRAW_SW_SUPPORT_RGB565       1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED CONFIG_LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+            #else
+                #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_RGB565_SWAPPED       1
+        #endif
+    #endif
     #ifndef LV_DRAW_SW_SUPPORT_RGB565A8
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
@@ -989,6 +1000,23 @@
     #endif
 #endif
 
+/** Draw using espressif PPA accelerator */
+#ifndef LV_USE_PPA
+    #ifdef CONFIG_LV_USE_PPA
+        #define LV_USE_PPA CONFIG_LV_USE_PPA
+    #else
+        #define LV_USE_PPA  0
+    #endif
+#endif
+#if LV_USE_PPA
+    #ifndef LV_USE_PPA_IMG
+        #ifdef CONFIG_LV_USE_PPA_IMG
+            #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
+        #else
+            #define LV_USE_PPA_IMG 0
+        #endif
+    #endif
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -2019,6 +2047,7 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
     #ifdef LV_KCONFIG_PRESENT
@@ -2053,6 +2082,18 @@
         #endif
     #else
         #define LV_USE_ARC        1
+    #endif
+#endif
+
+#ifndef LV_USE_ARCLABEL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ARCLABEL
+            #define LV_USE_ARCLABEL CONFIG_LV_USE_ARCLABEL
+        #else
+            #define LV_USE_ARCLABEL 0
+        #endif
+    #else
+        #define LV_USE_ARCLABEL  1
     #endif
 #endif
 
@@ -3050,7 +3091,14 @@
         #ifdef CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
             #define LV_TINY_TTF_CACHE_GLYPH_CNT CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
         #else
-            #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+            #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+        #endif
+    #endif
+    #ifndef LV_TINY_TTF_CACHE_KERNING_CNT
+        #ifdef CONFIG_LV_TINY_TTF_CACHE_KERNING_CNT
+            #define LV_TINY_TTF_CACHE_KERNING_CNT CONFIG_LV_TINY_TTF_CACHE_KERNING_CNT
+        #else
+            #define LV_TINY_TTF_CACHE_KERNING_CNT 256
         #endif
     #endif
 #endif
@@ -3814,18 +3862,44 @@
     #endif
 #endif
 #if LV_USE_WAYLAND
+    #ifndef LV_WAYLAND_BUF_COUNT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_WAYLAND_BUF_COUNT
+                #define LV_WAYLAND_BUF_COUNT CONFIG_LV_WAYLAND_BUF_COUNT
+            #else
+                #define LV_WAYLAND_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
+        #endif
+    #endif
+    #ifndef LV_WAYLAND_USE_DMABUF
+        #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+            #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
+        #else
+            #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_DRAW_USE_G2D */
+        #endif
+    #endif
+    #ifndef LV_WAYLAND_RENDER_MODE
+        #ifdef CONFIG_LV_WAYLAND_RENDER_MODE
+            #define LV_WAYLAND_RENDER_MODE CONFIG_LV_WAYLAND_RENDER_MODE
+        #else
+            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
+        #endif
+    #endif
+                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
     #ifndef LV_WAYLAND_WINDOW_DECORATIONS
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
+            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
         #endif
     #endif
     #ifndef LV_WAYLAND_WL_SHELL
         #ifdef CONFIG_LV_WAYLAND_WL_SHELL
             #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
         #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
+            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
         #endif
     #endif
 #endif
@@ -3983,11 +4057,11 @@
      * shared across sub-systems and libraries using the Linux DMA-BUF API.
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
-    #ifndef LV_LINUX_DRM_GBM_BUFFERS
-        #ifdef CONFIG_LV_LINUX_DRM_GBM_BUFFERS
-            #define LV_LINUX_DRM_GBM_BUFFERS CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+    #ifndef LV_USE_LINUX_DRM_GBM_BUFFERS
+        #ifdef CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
+            #define LV_USE_LINUX_DRM_GBM_BUFFERS CONFIG_LV_USE_LINUX_DRM_GBM_BUFFERS
         #else
-            #define LV_LINUX_DRM_GBM_BUFFERS 0
+            #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
 #endif
@@ -4132,6 +4206,15 @@
         #else
             #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
         #endif
+    #endif
+#endif
+
+/** Driver for NXP ELCDIF */
+#ifndef LV_USE_NXP_ELCDIF
+    #ifdef CONFIG_LV_USE_NXP_ELCDIF
+        #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
+    #else
+        #define LV_USE_NXP_ELCDIF   0
     #endif
 #endif
 
@@ -4467,10 +4550,20 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#if LV_USE_WAYLAND == 0
+    #define LV_WAYLAND_USE_DMABUF           0
+    #define LV_WAYLAND_WINDOW_DECORATIONS   0
+    #define LV_WAYLAND_WL_SHELL             0
+#endif /* LV_USE_WAYLAND */
+
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
 #endif /*LV_USE_SYSMON*/
+
+#if LV_USE_PERF_MONITOR == 0
+    #define LV_USE_PERF_MONITOR_LOG_MODE 0
+#endif /*LV_USE_PERF_MONITOR*/
 
 #if LV_BUILD_DEMOS == 0
     #define LV_USE_DEMO_WIDGETS 0

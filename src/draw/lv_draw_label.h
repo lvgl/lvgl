@@ -74,15 +74,18 @@ typedef struct {
     /**The number of characters to render. 0: means render until reaching the `\0` termination.*/
     uint32_t text_length;
 
-    /**Opacity of the text in 0...255 range.
-     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
-    lv_opa_t opa;
-
     /**The alignment of the text `LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`*/
     lv_text_align_t align;
 
     /**The base direction. Used when type setting Right-to-left (e.g. Arabic) texts*/
     lv_base_dir_t bidi_dir;
+
+    /**Opacity of the text in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
+    lv_opa_t opa;
+
+    /**Letter outline stroke opacity */
+    lv_opa_t outline_stroke_opa;
 
     /**Text decoration, e.g. underline*/
     lv_text_decor_t decor : 3;
@@ -105,7 +108,6 @@ typedef struct {
     lv_draw_label_hint_t * hint;
 
     /* Properties of the letter outlines */
-    lv_opa_t outline_stroke_opa;
     lv_color_t outline_stroke_color;
     int32_t outline_stroke_width;
 

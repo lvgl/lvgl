@@ -45,6 +45,12 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
 bool lv_theme_mono_is_inited(void);
 
 /**
+ * Get mono theme
+ * @return a pointer to mono theme, or NULL if this is not initialized
+ */
+lv_theme_t * lv_theme_mono_get(void);
+
+/**
  * Deinitialize the mono theme
  */
 void lv_theme_mono_deinit(void);

@@ -25,7 +25,7 @@
  */
 
 /**
- * @file lv_draw_nema_gfx_fill.c
+ * @file lv_draw_nema_gfx_label.c
  *
  */
 
@@ -279,16 +279,12 @@ static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
 
     switch(format) {
         case LV_FONT_GLYPH_FORMAT_A1:
-        case LV_FONT_GLYPH_FORMAT_A1_ALIGNED:
             return NEMA_A1;
         case LV_FONT_GLYPH_FORMAT_A2:
-        case LV_FONT_GLYPH_FORMAT_A2_ALIGNED:
             return NEMA_A2;
         case LV_FONT_GLYPH_FORMAT_A4:
-        case LV_FONT_GLYPH_FORMAT_A4_ALIGNED:
             return NEMA_A4;
         case LV_FONT_GLYPH_FORMAT_A8:
-        case LV_FONT_GLYPH_FORMAT_A8_ALIGNED:
         default:
             return NEMA_A8;
     }
@@ -310,7 +306,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
-                glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A8_ALIGNED) {
+                glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A8) {
             /*Do not draw transparent things*/
             if(glyph_draw_dsc->opa <= LV_OPA_MIN)
                 return;
@@ -320,7 +316,6 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             lv_area_t blend_area;
             if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, &t->clip_area))
                 return;
-            lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
             const void * mask_buf;
@@ -355,7 +350,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             }
 
             if(is_raw_bitmap && (glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A4)) {
-                nema_bind_src_tex((uintptr_t)(mask_buf), w * h, 1, src_cf, 0, NEMA_FILTER_PS);
+                nema_bind_src_tex((uintptr_t)(mask_buf), w * h, 1, src_cf, glyph_draw_dsc->g->stride, NEMA_FILTER_PS);
                 nema_matrix3x3_t m = {
                     {1,    w,   -x - (y * w) - (0.5 * w)},
                     {0,    1,                   0},
@@ -366,7 +361,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             }
             else {
                 nema_bind_src_tex((uintptr_t)(mask_buf), lv_area_get_width(&mask_area), lv_area_get_height(&mask_area), src_cf,
-                                  lv_area_get_width(&mask_area),
+                                  glyph_draw_dsc->g->stride ? glyph_draw_dsc->g->stride : lv_area_get_width(&mask_area),
                                   NEMA_FILTER_BL);
                 nema_blit_rect(x, y, w, h);
                 lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
@@ -809,8 +804,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             if(draw_buf == NULL) {
                 if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
 
-                uint32_t h = g.box_h;
-                if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
+                uint32_t h = LV_ROUND_UP(g.box_h, 32); /*Assume a larger size to avoid many reallocations*/
                 draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
                 draw_buf->header.h = g.box_h;
@@ -831,7 +825,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
             }
         }
 
-        dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, draw_buf);
+        dsc->glyph_data = g.resolved_font->get_glyph_bitmap(&g, draw_buf);
 
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }

@@ -31,7 +31,7 @@ extern "C" {
 #define LV_DRAW_DMA2D_ASYNC 0
 #endif
 
-#if defined(__CORTEX_M) && (__CORTEX_M == 7)
+#if defined(__CORTEX_M) && ((__CORTEX_M == 7) || (__CORTEX_M == 55))
 #define LV_DRAW_DMA2D_CACHE 1
 #else
 #define LV_DRAW_DMA2D_CACHE 0

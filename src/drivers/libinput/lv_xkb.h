@@ -55,10 +55,10 @@ uint32_t lv_xkb_process_key(lv_xkb_t * dsc, uint32_t scancode, bool down);
  *      MACROS
  **********************/
 
-#endif /* LV_LIBINPUT_XKB */
+#endif /* defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB */
+#endif /* LV_XKB_H */

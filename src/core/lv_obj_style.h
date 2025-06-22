@@ -32,6 +32,13 @@ typedef enum {
     LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /**< The differences can be shown with a simple redraw */
 } lv_style_state_cmp_t;
 
+/**
+ * A joint type for `lv_part_t` and `lv_state_t`. Example values
+ * - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
+ * - `LV_STATE_PRSSED`
+ * - `LV_PART_KNOB`
+ * - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
+ */
 typedef uint32_t lv_style_selector_t;
 
 /**********************
@@ -109,6 +116,24 @@ void lv_obj_report_style_change(lv_style_t * style);
  *                  `LV_STYLE_PROP_INV` to perform only a style cache update
  */
 void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
+
+/**
+ * Temporary disable a style for a selector. It will look like is the style wasn't added
+ * @param obj       pointer to an object
+ * @param style     pointer to a style
+ * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
+ * @param dis       true: disable the style, false: enable the style
+ */
+void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector, bool dis);
+
+/**
+ * Get if a given style is disabled on an object.
+ * @param obj       pointer to an object
+ * @param style     pointer to a style
+ * @param selector  the selector of a style (e.g. LV_STATE_PRESSED | LV_PART_KNOB)
+ * @return          true: disable the style, false: enable the style
+ */
+bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
  * Enable or disable automatic style refreshing when a new style is added/removed to/from an object

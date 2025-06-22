@@ -3,7 +3,7 @@
     Copyright (c) 2007-21 Mike Karlesky, Mark VanderVoord, Greg Williams
     [Released under MIT License. Please refer to license.txt for details]
 ========================================== */
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || LV_BUILD_TEST_PERF
 
 #ifndef UNITY_INTERNALS_H
 #define UNITY_INTERNALS_H

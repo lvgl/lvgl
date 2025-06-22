@@ -29,6 +29,7 @@ struct _lv_obj_style_t {
     uint32_t selector : 24;
     uint32_t is_local : 1;
     uint32_t is_trans : 1;
+    uint32_t is_disabled : 1;
 };
 
 struct _lv_obj_style_transition_dsc_t {

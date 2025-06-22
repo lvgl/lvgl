@@ -14,6 +14,26 @@ Synopsis
     Build Arguments and Clean Arguments can be used one at a time
     or be freely mixed and combined.
 
+Data Flow
+---------
+
+.. code-block:: text
+
+    Inputs              Generated Source Files             Output
+    -----------         ----------------------       ----------------------
+    ./docs/src/   \
+    ./src/         >===> ./docs/intermediate/  ===>  ./docs/build/<format>/
+    ./examples/   /
+
+    Once ./docs/intermediate/ is built, you can use all the Sphinx output
+    formats, e.g.
+
+    - make html
+    - make latex
+    - make man
+    - make htmlhelp
+    - etc.
+
 Description
 -----------
     Copy source files to an intermediate directory and modify them there before
@@ -747,6 +767,7 @@ def run(args):
     # ---------------------------------------------------------------------
     t_end = datetime.now()
     announce(__file__, 'Total run time:  ' + str(t_end - t0))
+    announce(__file__, '\n\nNote: warnings about `details/index.rst` and `intro/index.rst` not being in any toctree are expected and okay.\n')
     announce(__file__, 'Done.')
 
 

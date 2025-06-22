@@ -30,8 +30,8 @@ extern "C" {
  */
 typedef struct {
     uint16_t year;
-    int8_t month;  /**< 1..12 */
-    int8_t day;    /**< 1..31 */
+    uint8_t month;  /**< 1..12 */
+    uint8_t day;    /**< 1..31 */
 } lv_calendar_date_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
@@ -56,7 +56,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * parent);
  *====================*/
 
 /**
- * Set the today's date
+ * Set the today's year, month and day at once
  * @param obj  pointer to a calendar object
  * @param year      today's year
  * @param month     today's month [1..12]
@@ -65,12 +65,47 @@ lv_obj_t * lv_calendar_create(lv_obj_t * parent);
 void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, uint32_t day);
 
 /**
- * Set the currently showed
+ * Set the today's year
+ * @param obj  pointer to a calendar object
+ * @param year      today's year
+ */
+void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year);
+
+/**
+ * Set the today's year
+ * @param obj  pointer to a calendar object
+ * @param month     today's month [1..12]
+ */
+void lv_calendar_set_today_month(lv_obj_t * obj, uint32_t month);
+
+/**
+ * Set the today's year
+ * @param obj  pointer to a calendar object
+ * @param day       today's day [1..31]
+ */
+void lv_calendar_set_today_day(lv_obj_t * obj, uint32_t day);
+
+/**
+ * Set the currently shown year and month at once
  * @param obj           pointer to a calendar object
- * @param year          today's year
- * @param month         today's month [1..12]
+ * @param year          shown year
+ * @param month         shown month [1..12]
  */
 void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month);
+
+/**
+ * Set the currently shown year
+ * @param obj           pointer to a calendar object
+ * @param year          shown year
+ */
+void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year);
+
+/**
+ * Set the currently shown month
+ * @param obj           pointer to a calendar object
+ * @param month         shown month [1..12]
+ */
+void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month);
 
 /**
  * Set the highlighted dates

@@ -121,6 +121,20 @@ void lv_scale_set_label_show(lv_obj_t * obj, bool show_label);
 void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
 /**
+ * Set minimum values on Scale.
+ * @param obj       pointer to Scale Widget
+ * @param min       minimum value of Scale
+ */
+void lv_scale_set_min_value(lv_obj_t * obj, int32_t min);
+
+/**
+ * Set maximum values on Scale.
+ * @param obj       pointer to Scale Widget
+ * @param min       minimum value of Scale
+ */
+void lv_scale_set_max_value(lv_obj_t * obj, int32_t max);
+
+/**
  * Set angle between the low end and the high end of the Scale.
  * (Applies only to round Scales.)
  * @param obj         pointer to Scale Widget
@@ -204,7 +218,7 @@ void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
- * DEPRECATED, use lv_scale_set_section_rangeinstead.
+ * DEPRECATED, use lv_scale_set_section_range instead.
  * Set range for specified Scale Section
  * @param section       pointer to Section
  * @param range_min     Section new minimum value
@@ -216,10 +230,26 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
  * Set the range of a scale section
  * @param scale         pointer to scale
  * @param section       pointer to section
- * @param range_min     section new minimum value
- * @param range_max     section new maximum value
+ * @param range_min     the section's new minimum value
+ * @param range_max     the section's new maximum value
  */
 void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max);
+
+/**
+ * Set the minimum value of a scale section
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param min           the section's new minimum value
+ */
+void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t min);
+
+/**
+ * Set the maximum value of a scale section
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param max           the section's new maximum value
+ */
+void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t max);
 
 /**
  * DEPRECATED, use lv_scale_set_section_style_main/indicator/items instead.

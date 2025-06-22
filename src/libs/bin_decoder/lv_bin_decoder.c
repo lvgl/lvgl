@@ -1,5 +1,5 @@
 /**
- * @file lv_image_decoder.c
+ * @file lv_bin_decoder.c
  *
  */
 
@@ -240,6 +240,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 || cf == LV_COLOR_FORMAT_XRGB8888   \
                 || cf == LV_COLOR_FORMAT_RGB888     \
                 || cf == LV_COLOR_FORMAT_RGB565     \
+                || cf == LV_COLOR_FORMAT_RGB565_SWAPPED     \
                 || cf == LV_COLOR_FORMAT_RGB565A8   \
                 || cf == LV_COLOR_FORMAT_ARGB8565) {
             res = decode_rgb(decoder, dsc);
@@ -350,7 +351,18 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     dsc->decoded = adjusted;
 
-    if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
+    /* Copy user flags to the decoded image */
+    if(dsc->header.flags & LV_IMAGE_FLAGS_USER_MASK) {
+        lv_draw_buf_set_flag((lv_draw_buf_t *)dsc->decoded, dsc->header.flags & LV_IMAGE_FLAGS_USER_MASK);
+    }
+
+    /*Do not put image to cache if it can be used directly.*/
+    if(use_directly || dsc->args.no_cache) {
+        if(dsc->args.flush_cache && use_directly) {
+            dsc->args.flush_cache = false;
+        }
+        return LV_RESULT_OK;
+    }
 
     /*If the image cache is disabled, just return the decoded image*/
     if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
@@ -399,6 +411,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
                      || cf == LV_COLOR_FORMAT_XRGB8888  \
                      || cf == LV_COLOR_FORMAT_RGB888    \
                      || cf == LV_COLOR_FORMAT_RGB565    \
+                     || cf == LV_COLOR_FORMAT_RGB565_SWAPPED    \
                      || cf == LV_COLOR_FORMAT_ARGB8565  \
                      || cf == LV_COLOR_FORMAT_RGB565A8;
     if(!supported) {
@@ -484,7 +497,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     }
 
     if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_RGB888
-       || cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_ARGB8565) {
+       || cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_RGB565_SWAPPED || cf == LV_COLOR_FORMAT_ARGB8565) {
         uint32_t len = (w_px * bpp) / 8;
         offset += decoded_area->y1 * dsc->header.stride;
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/

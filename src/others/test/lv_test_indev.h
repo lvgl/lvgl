@@ -38,6 +38,11 @@ extern "C" {
 void lv_test_indev_create_all(void);
 
 /**
+ * Delete all test input devices
+ */
+void lv_test_indev_delete_all(void);
+
+/**
  * Get one of the indev created in `lv_test_indev_create_all`
  * @param type  type of the indev to get
  * @return      the indev

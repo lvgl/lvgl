@@ -83,6 +83,20 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
 /**
+ * Set minimum value of a bar
+ * @param obj       pointer to the bar object
+ * @param min       minimum value
+ */
+void lv_bar_set_min_value(lv_obj_t * obj, int32_t min);
+
+/**
+ * Set maximum value of a bar
+ * @param obj       pointer to the bar object
+ * @param max       maximum value
+ */
+void lv_bar_set_max_value(lv_obj_t * obj, int32_t max);
+
+/**
  * Set the type of bar.
  * @param obj       pointer to bar object
  * @param mode      bar type from `lv_bar_mode_t`

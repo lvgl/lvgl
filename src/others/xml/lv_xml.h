@@ -18,6 +18,7 @@ extern "C" {
 #include "../../others/observer/lv_observer.h"
 
 #if LV_USE_XML
+#include "lv_xml_test.h"
 
 /*********************
  *      DEFINES
