@@ -82,6 +82,10 @@ static int32_t _vglite_delete(lv_draw_unit_t * draw_unit);
 
 static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
 
+static bool _vglite_dest_cf_supported(lv_color_format_t cf);
+
+static bool _vglite_src_cf_supported(lv_color_format_t cf);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -145,7 +149,7 @@ void lv_draw_vglite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
-bool _vglite_dest_cf_supported(lv_color_format_t cf)
+static bool _vglite_dest_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
@@ -164,7 +168,7 @@ bool _vglite_dest_cf_supported(lv_color_format_t cf)
     return false;
 }
 
-bool _vglite_src_cf_supported(lv_color_format_t cf)
+static bool _vglite_src_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
