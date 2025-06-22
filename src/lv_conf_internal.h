@@ -845,6 +845,22 @@
             #define LV_VGLITE_VECTOR 0
         #endif
     #endif
+
+    #ifndef LV_USE_VGLITE_BOX_SHADOW
+        #ifdef CONFIG_LV_USE_VGLITE_BOX_SHADOW
+            #define LV_USE_VGLITE_BOX_SHADOW CONFIG_LV_USE_VGLITE_BOX_SHADOW
+        #else
+            #define LV_USE_VGLITE_BOX_SHADOW 0
+        #endif
+    #endif
+
+    #ifndef LV_USE_VGLITE_MASK_RECT
+        #ifdef CONFIG_LV_USE_VGLITE_MASK_RECT
+            #define LV_USE_VGLITE_MASK_RECT CONFIG_LV_USE_VGLITE_MASK_RECT
+        #else
+            #define LV_USE_VGLITE_MASK_RECT 0
+        #endif
+    #endif
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */

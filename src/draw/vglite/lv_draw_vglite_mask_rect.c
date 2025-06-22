@@ -11,8 +11,13 @@
 #include "../sw/lv_draw_sw_mask_private.h"
 #include "../lv_draw_mask_private.h"
 
-#if 0
-#include "lv_draw_vg_lite.h"
+#include "lv_draw_vglite.h"
+
+#if LV_USE_DRAW_VGLITE
+#if LV_USE_VGLITE_MASK_RECT
+#error "VGLite mask rectangle is currently not available, please make LV_USE_VGLITE_MASK_RECT 0 on lv_conf.h"
+
+
 #include "lv_vg_lite_utils.h"
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_path.h"
@@ -161,4 +166,5 @@ void lv_draw_vg_lite_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t
  *   STATIC FUNCTIONS
  **********************/
 
+#endif
 #endif /*LV_USE_DRAW_VG_LITE*/
