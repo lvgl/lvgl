@@ -9,8 +9,12 @@
 
 #include "../../misc/lv_area_private.h"
 
-#if 0
-#include "lv_draw_vg_lite.h"
+#include "lv_draw_vglite.h"
+
+#if LV_USE_DRAW_VGLITE
+#if LV_USE_VGLITE_BOX_SHADOW
+#error "VGLite box shadow is currently not available, please make LV_USE_VGLITE_BOX_SHADOW 0 on lv_conf.h"
+
 #include "lv_draw_vg_lite_type.h"
 
 /*********************
@@ -95,4 +99,5 @@ void lv_draw_vg_lite_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc
  *   STATIC FUNCTIONS
  **********************/
 
+#endif
 #endif /*LV_USE_DRAW_VG_LITE*/

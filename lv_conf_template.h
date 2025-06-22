@@ -296,6 +296,10 @@
     #define LV_VGLITE_USE_GPU_INIT 0
 
     #define LV_VGLITE_VECTOR 0
+
+    #define LV_USE_VGLITE_BOX_SHADOW 0
+
+    #define LV_USE_VGLITE_MASK_RECT 0
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
