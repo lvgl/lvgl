@@ -145,59 +145,65 @@ void lv_draw_vglite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool _vglite_src_cf_supported(lv_color_format_t cf)
+bool _vglite_dest_cf_supported(lv_color_format_t cf)
 {
-    bool is_cf_supported = false;
-
     switch(cf) {
-#if CHIPID == 0x255 || CHIPID == 0x555
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+
+        case LV_COLOR_FORMAT_ARGB8565:
+        case LV_COLOR_FORMAT_RGB888:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
+
+        default:
+            break;
+    }
+
+    return false;
+}
+
+bool _vglite_src_cf_supported(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
-#endif
-        case LV_COLOR_FORMAT_A4:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_L8:
-        case LV_COLOR_FORMAT_RGB565:
-#if CHIPID == 0x555
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT) ? true : false;
+
         case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
-#endif
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-            is_cf_supported = true;
-            break;
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
+
+        case LV_COLOR_FORMAT_NV12:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_YUV_INPUT) ? true : false;
+
         default:
             break;
     }
 
-    return is_cf_supported;
+    return false;
 }
 
-static inline bool _vglite_dest_cf_supported(lv_color_format_t cf)
+static bool check_image_is_supported(const lv_draw_image_dsc_t * dsc)
 {
-    bool is_cf_supported = false;
-
-    switch(cf) {
-        case LV_COLOR_FORMAT_A8:
-#if CHIPID == 0x255 || CHIPID == 0x555
-        case LV_COLOR_FORMAT_L8:
-#endif
-        case LV_COLOR_FORMAT_RGB565:
-#if CHIPID == 0x555
-        case LV_COLOR_FORMAT_ARGB8565:
-        case LV_COLOR_FORMAT_RGB888:
-#endif
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-            is_cf_supported = true;
-            break;
-        default:
-            break;
+    lv_image_header_t header;
+    lv_result_t res = lv_image_decoder_get_info(dsc->src, &header);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_TRACE("get image info failed");
+        return false;
     }
 
-    return is_cf_supported;
+    return _vglite_src_cf_supported(header.cf);
 }
 
 static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
@@ -266,6 +272,10 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
+
+                if(!check_image_is_supported(draw_dsc)) {
+                    return 0;
+                }
 
                 if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
                     return 0;
