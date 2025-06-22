@@ -109,6 +109,15 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
 
 void lv_draw_vglite_init(void)
 {
+#if LV_VGLITE_USE_GPU_INIT
+    extern void gpu_init(void);
+    static bool inited = false;
+    if(!inited) {
+        gpu_init();
+        inited = true;
+    }
+#endif
+
     lv_draw_buf_vglite_init_handlers();
 
     lv_draw_vglite_unit_t * draw_vglite_unit = lv_draw_create_unit(sizeof(lv_draw_vglite_unit_t));

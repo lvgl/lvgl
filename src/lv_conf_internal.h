@@ -829,6 +829,14 @@
             #define LV_USE_VGLITE_CHECK_ERROR 0
         #endif
     #endif
+
+    #ifndef LV_VGLITE_USE_GPU_INIT
+        #ifdef CONFIG_LV_VGLITE_USE_GPU_INIT
+            #define LV_VGLITE_USE_GPU_INIT CONFIG_LV_VGLITE_USE_GPU_INIT
+        #else
+            #define LV_VGLITE_USE_GPU_INIT 0
+        #endif
+    #endif
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
