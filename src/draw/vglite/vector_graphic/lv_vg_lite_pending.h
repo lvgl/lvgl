@@ -10,13 +10,21 @@
 extern "C" {
 #endif
 
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_VGLITE
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+
+#if LV_VGLITE_VECTOR
+#error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
+#endif
+
+
 /*********************
  *      INCLUDES
  *********************/
 
 #include "../../../lvgl.h"
-
-#if 0
 
 /*********************
  *      DEFINES
@@ -81,6 +89,7 @@ void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending);
  **********************/
 
 #endif /*LV_USE_DRAW_VG_LITE*/
+#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/

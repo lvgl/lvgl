@@ -145,7 +145,7 @@ elseif (OPTIONS_TEST_VG_LITE)
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
     set (ENABLE_TESTS ON)
-    add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 
     # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
     if ($ENV{NON_AMD64_BUILD})

@@ -837,6 +837,14 @@
             #define LV_VGLITE_USE_GPU_INIT 0
         #endif
     #endif
+
+    #ifndef LV_VGLITE_VECTOR
+        #ifdef CONFIG_LV_VGLITE_VECTOR
+            #define LV_VGLITE_VECTOR CONFIG_LV_VGLITE_VECTOR
+        #else
+            #define LV_VGLITE_VECTOR 0
+        #endif
+    #endif
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */

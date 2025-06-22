@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vg_lite_vector.c
+ * @file lv_draw_vglite_vector.c
  *
  */
 
@@ -7,8 +7,14 @@
  *      INCLUDES
  *********************/
 
+#include "../../../lv_conf_internal.h"
 
-#if 0 && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_DRAW_VGLITE
+#if LV_VGLITE_VECTOR && LV_USE_VECTOR_GRAPHIC
+
+#if LV_VGLITE_VECTOR
+    #error "VGLITE Vector support is currently not available, please disable this option in lv_conf.h"
+#endif
 
 #include "lv_draw_vg_lite.h"
 #include "lv_draw_vg_lite_type.h"
@@ -494,4 +500,6 @@ static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule)
 }
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
+#endif
+
 
