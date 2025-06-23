@@ -50,7 +50,11 @@ extern "C" {
  **********************/
 
 vg_lite_matrix_t * vglite_get_matrix(void);
+#if LV_USE_VG_LITE_THORVG
 vg_lite_matrix_t * vglite_get_identity_matrix(void);
+#else
+#define vglite_get_identity_matrix() (NULL)
+#endif
 
 /**
  * Creates matrix that translates to origin of given destination area.

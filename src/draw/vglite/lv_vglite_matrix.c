@@ -48,11 +48,13 @@ vg_lite_matrix_t * vglite_get_matrix(void)
     return &_matrix;
 }
 
+#if LV_USE_VG_LITE_THORVG
 vg_lite_matrix_t * vglite_get_identity_matrix(void)
 {
     vg_lite_identity(&_matrix);
     return &_matrix;
 }
+#endif
 
 void vglite_set_translation_matrix(const lv_area_t * dest_area)
 {
