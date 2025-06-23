@@ -134,7 +134,7 @@ Events
 Keys
 ****
 
--  ``LV_KEY_RIGHT/UP/LEFT/RIGHT`` To navigate among the buttons to dates
+-  ``LV_KEY_DOWN/UP/LEFT/RIGHT`` To navigate among the buttons to dates
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected date
 
 .. admonition::  Further Reading
