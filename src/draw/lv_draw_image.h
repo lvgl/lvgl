@@ -73,7 +73,7 @@ struct _lv_draw_image_dsc_t {
      */
     lv_blend_mode_t blend_mode : 4;
 
-    /**1: perform the transformation with anti-alaising */
+    /**1: perform the transformation with anti-aliasing */
     uint16_t antialias          : 1;
 
     /**If the image is smaller than the `image_area` field of `lv_draw_image_dsc_t`

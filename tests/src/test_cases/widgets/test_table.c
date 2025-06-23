@@ -234,7 +234,7 @@ void test_table_rendering(void)
      * which can be solved by expanding the redrawing area.
      * lv_area_increase(&area_tmp, 5, 5);
      *
-     * This accomodates for this specific calculation.
+     * This accommodates for this specific calculation.
      */
     TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
 #else

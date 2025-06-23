@@ -116,7 +116,7 @@ Always call ``lv_wayland_timer_handler()`` in your timer loop instead of the reg
 This allows the wayland client to work on well on weston, resizing shared memory buffers during
 a commit does not work well on weston.
 
-Wrapping the call to ``lv_timer_hander()`` is a necessity to have more control over
+Wrapping the call to ``lv_timer_handler()`` is a necessity to have more control over
 when the LVGL flush callback is called.
 
 The custom timer handler returns ``false`` if the frame from previous cycle is not rendered.

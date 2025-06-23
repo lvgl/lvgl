@@ -42,7 +42,7 @@ extern "C" {
 #define CLR_STN              0x2
 #define CLR_TAG              0x1
 
-/* SPI SIO/DIO/QIO tranfer widths */
+/* SPI SIO/DIO/QIO transfer widths */
 #define SPI_WIDTH_SIO       0x0
 #define SPI_WIDTH_DIO       0x1
 #define SPI_WIDTH_QIO       0x2
@@ -168,7 +168,7 @@ extern "C" {
 
 /* Defines related to inbuilt font */
 #define EVE_NUMCHAR_PERFONT         (128L)  /* number of font characters per bitmap handle */
-#define EVE_FONT_TABLE_SIZE         (148L)  /* size of the font table - utilized for loopup by the graphics engine */
+#define EVE_FONT_TABLE_SIZE         (148L)  /* size of the font table - utilized for lookup by the graphics engine */
 #define EVE_FONT_TABLE_POINTER  (0xFFFFCUL) /* pointer to the inbuilt font tables starting from bitmap handle 16 */
 
 

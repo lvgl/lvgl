@@ -312,7 +312,7 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj);
 /**
  * Get angular location of low end of Scale.
  * @param obj   pointer to Scale Widget
- * @return      Scale low end anglular location
+ * @return      Scale low end angular location
  */
 int32_t lv_scale_get_rotation(lv_obj_t * obj);
 

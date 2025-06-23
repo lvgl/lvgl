@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt);
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt);
 static lv_slider_mode_t mode_text_to_enum_value(const char * txt);
 
 /**********************
@@ -87,7 +87,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt)
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt)
 {
     if(lv_streq("auto", txt)) return LV_SLIDER_ORIENTATION_AUTO;
     if(lv_streq("horizontal", txt)) return LV_SLIDER_ORIENTATION_HORIZONTAL;

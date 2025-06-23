@@ -87,25 +87,25 @@ void test_recolor_1(void)
     lv_obj_set_style_recolor(img3, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_recolor_opa(img3, LV_OPA_50, 0);
 
-    lv_obj_t * lable = lv_label_create(lv_screen_active());
-    lv_label_set_text(lable, "Hello World Hello World");
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello World Hello World");
 
-    lv_obj_t * lable1 = lv_label_create(lv_screen_active());
-    lv_label_set_text(lable1, "Hello World Hello World");
-    lv_obj_set_style_text_color(lable1, lv_color_hex(0xff0000), 0);
-    lv_obj_set_style_text_opa(lable1, LV_OPA_50, 0);
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_label_set_text(label1, "Hello World Hello World");
+    lv_obj_set_style_text_color(label1, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_text_opa(label1, LV_OPA_50, 0);
 
-    lv_obj_t * lable2 = lv_label_create(lv_screen_active());
-    lv_label_set_text(lable2, "Hello World Hello World");
-    lv_obj_set_style_recolor(lable2, lv_color_hex(0xff0000), 0);
-    lv_obj_set_style_recolor_opa(lable2, LV_OPA_50, 0);
+    lv_obj_t * label2 = lv_label_create(lv_screen_active());
+    lv_label_set_text(label2, "Hello World Hello World");
+    lv_obj_set_style_recolor(label2, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_recolor_opa(label2, LV_OPA_50, 0);
 
-    lv_obj_t * lable3 = lv_label_create(lv_screen_active());
-    lv_label_set_text(lable3, "Hello World Hello World");
-    lv_obj_set_style_recolor(lable3, lv_color_hex(0xff0000), 0);
-    lv_obj_set_style_recolor_opa(lable3, LV_OPA_50, 0);
-    lv_obj_set_style_text_color(lable3, lv_color_hex(0xff00), 0);
-    lv_obj_set_style_text_opa(lable3, LV_OPA_50, 0);
+    lv_obj_t * label3 = lv_label_create(lv_screen_active());
+    lv_label_set_text(label3, "Hello World Hello World");
+    lv_obj_set_style_recolor(label3, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_recolor_opa(label3, LV_OPA_50, 0);
+    lv_obj_set_style_text_color(label3, lv_color_hex(0xff00), 0);
+    lv_obj_set_style_text_opa(label3, LV_OPA_50, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("recolor_1.png");
 }
