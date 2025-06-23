@@ -58,7 +58,7 @@ or can be generated dynamically into a buffer as well.
 Learn more about [Events](/overview/event).
 
 ## Keys
-- `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons to dates
+- `LV_KEY_DOWN/UP/LEFT/RIGHT` To navigate among the buttons to dates
 - `LV_KEY_ENTER` To press/release the selected date
 
 Learn more about [Keys](/overview/indev).
