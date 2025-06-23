@@ -3,13 +3,14 @@
 
 static void click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * spans = lv_event_get_target_obj(e);
     lv_indev_t * indev = lv_event_get_indev(e);
     lv_point_t point;
     lv_indev_get_point(indev, &point);
+#if LV_USE_LOG
+    lv_obj_t * spans = lv_event_get_target_obj(e);
     lv_span_t * span = lv_spangroup_get_span_by_point(spans, &point);
-
     LV_LOG_USER("%s", span ? lv_span_get_text(span) : "NULL");
+#endif
 }
 
 /**
