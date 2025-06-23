@@ -34,7 +34,7 @@ Basic Data Flow
 
 1. **Driver Initialization**: It's the user's responsibility to set up the clock, timers, peripherals, etc.
 2. **Call lv_init()**: It initializes LVGL itself
-3. **Create display and input devices**: Create display(s) and input device(s) and set up their callbacks
+3. **Create display and input devices**: Create display(s) (:cpp:type:`lv_display_t`) and input device(s)  (:cpp:type:`lv_indev_t`) and set up their callbacks
 4. **Create the UI**: Call LVGL functions to create screens, widgets, styles, animations, events, etc.
 5. **Call lv_timer_handler() in a loop**: It handles all the LVGL-related tasks:
     - refresh display(s),
