@@ -190,7 +190,7 @@ void lv_wayland_shm_delete_draw_buffers(shm_ctx_t * context, struct window * win
 void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
     struct window * window    = lv_display_get_user_data(disp);
-    uint32_t format           = window->wl_ctx->shm_ctx.format;
+    const uint32_t buf_format = window->wl_ctx->shm_ctx.format;
     smm_buffer_t * buf        = window->body->pending_buffer;
     int32_t src_width         = lv_area_get_width(area);
     int32_t src_height        = lv_area_get_height(area);
@@ -198,6 +198,7 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
     lv_display_rotation_t rot = lv_display_get_rotation(disp);
     int32_t w                 = lv_display_get_horizontal_resolution(disp);
     int32_t h                 = lv_display_get_vertical_resolution(disp);
+    const uint8_t cf          = lv_display_get_color_format(disp);
 
     /* TODO actually test what happens if the rotation is 90 or 270 or 180 ? */
     int32_t hres = (rot == LV_DISPLAY_ROTATION_0) ? w : h;
@@ -232,7 +233,8 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
 
     /* Modify specified area in buffer */
     for(int32_t y = 0; y < src_height; ++y) {
-        if(format == WL_SHM_FORMAT_ARGB8888) {
+        if(buf_format == WL_SHM_FORMAT_ARGB8888 &&
+           cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
             for(int32_t x = 0; x < src_width; ++x) {
                 lv_color_premultiply((lv_color32_t *)color_p + x);
             }
