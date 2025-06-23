@@ -10,7 +10,7 @@ Overview
 Buttons have no new features compared to the :ref:`base_widget`.
 They are useful for semantic purposes and have slightly different default settings.
 
-Buttons, by default, differ from Base Widget in the following ways:
+Buttons, by default, differ from the Base Widget in the following ways:
 
 - Not scrollable
 - Added to the default group

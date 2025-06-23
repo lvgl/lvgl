@@ -11,7 +11,7 @@ Overview
 Switch Widgets look like little sliders and are used to display, and optionally
 modify, a value that can be "on" or "off".
 
-By default, a Switch is oriented horizontally.  It's orientation will be vertical
+By default, a Switch is oriented horizontally. Its orientation will be vertical
 if you set ``width`` < ``height``.
 
 
@@ -45,7 +45,7 @@ Change state
 
 The Switch uses the standard :cpp:enumerator:`LV_STATE_CHECKED` state.
 
-To get the current state of the Switch (with ``true`` being on), use
+To get the current state of the Switch (with ``true`` being ON), use
 :cpp:expr:`lv_obj_has_state(widget, LV_STATE_CHECKED)`.
 
 Call :cpp:expr:`lv_obj_add_state(widget, LV_STATE_CHECKED)` to turn it on, or

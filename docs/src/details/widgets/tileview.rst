@@ -61,7 +61,7 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent after a new tile is displayed by scrolling.
-   :cpp:expr:`lv_tileview_get_tile_active(tabview)` can be used within the event to
+   :cpp:expr:`lv_tileview_get_tile_active(tileview)` can be used within the event to
    get a pointer to the newly-displayed tile.
 
 .. admonition::  Further Reading

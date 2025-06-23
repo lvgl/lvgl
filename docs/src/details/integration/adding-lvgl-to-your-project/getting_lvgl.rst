@@ -19,7 +19,7 @@ Demos and Examples
 ------------------
 
 The ``lvgl`` directory also contains an ``examples`` and a ``demos``
-directory.  If your project needs examples and/or demos, add the these
-directories to your project.  If ``make`` or :ref:`build_cmake` handle the
+directory. If your project needs examples and/or demos, add these
+directories to your project. If ``make`` or :ref:`build_cmake` handles the
 examples and demos directories, no extra action is required.
 

@@ -47,7 +47,7 @@ To set a Screen you create to be the :ref:`active_screen`, call
 Top and System Layers
 *********************
 
-LVGL uses the Top Layer and System Layer two empower you to ensure that certain
+LVGL uses the Top Layer and System Layer to empower you to ensure that certain
 :ref:`widgets` are *always* on top of other layers.
 
 You can add "pop-up windows" to the *Top Layer* freely.  The Top Layer was meant to
