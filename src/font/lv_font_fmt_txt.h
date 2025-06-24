@@ -17,6 +17,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_font.h"
+#include "../misc/lv_fs.h"
 
 /*********************
  *      DEFINES
@@ -156,6 +157,31 @@ typedef struct {
     uint32_t last_glyph_id;
 } lv_font_fmt_txt_glyph_cache_t;
 
+#if LV_USE_FONT_DYNAMIC_LOAD
+typedef struct {
+    /* Callback to get the glyph bitmap */
+    uint8_t * (*get_glyph_bitmap_cb)(void * fmt_dsc, void * glyph_dsc);
+
+    /* File pointer for font file */
+    lv_fs_file_t * fp;
+
+    /* Number of glyphs */
+    uint32_t loca_count;
+
+    /* Array of glyph offsets */
+    uint32_t * glyph_offset;
+
+    /* Start offset of glyph data */
+    uint32_t glyph_start;
+
+    /* Length of glyph data */
+    uint32_t glyph_length;
+
+    /* Total bits per glyph */
+    uint32_t glyph_per_bits;
+} lv_font_fmt_txt_glyph_loader_t;
+#endif
+
 /*Describe store additional data for fonts*/
 typedef struct {
     /*The bitmaps of all glyphs*/
@@ -195,6 +221,11 @@ typedef struct {
 
     /*Cache the last letter and is glyph id*/
     lv_font_fmt_txt_glyph_cache_t * cache;
+
+#if LV_USE_FONT_DYNAMIC_LOAD
+    /* Glyph loader for dynamic bitmap loading */
+    lv_font_fmt_txt_glyph_loader_t * loader;
+#endif
 } lv_font_fmt_txt_dsc_t;
 
 /**********************
