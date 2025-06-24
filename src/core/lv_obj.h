@@ -209,7 +209,7 @@ typedef enum {
     LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
     LV_PROPERTY_OBJ_END,
-} _lv_signed_prop_id_t;
+} lv_signed_prop_id_t;
 #endif
 
 /**
