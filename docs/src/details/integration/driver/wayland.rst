@@ -41,18 +41,42 @@ Configuring the wayland driver
 
 2. Optional configuration options:
 
-- Enable window decorations, only required on GNOME because out of all the available wayland compositors
-  **only** Mutter/GNOME enforces the use of client side decorations
+Some optional settings depend on whether DMA buffer support is enabled (`LV_WAYLAND_USE_DMABUF`). The table below summarizes valid combinations and limitations:
 
-.. code:: c
+.. list-table:: Configuration possibilities
+   :widths: 50 25 25
+   :header-rows: 1
 
-   #define LV_WAYLAND_WINDOW_DECORATIONS 1
+   * - Configuration Option
+     - Without DMABUF
+     - With DMABUF
 
-- Enable support for the deprecated 'wl_shell', Only useful when the BSP on the target has weston ``9.x``
+   * - `LV_DRAW_USE_G2D`
+     - Not required
+     - **Required**
 
-.. code:: c
+   * - `LV_WAYLAND_BUF_COUNT`
+     - `1`
+     - `1` or `2`
 
-   #define LV_WAYLAND_WL_SHELL  1
+   * - `LV_WAYLAND_RENDER_MODE`
+     - `LV_DISPLAY_RENDER_MODE_PARTIAL`
+     - `LV_DISPLAY_RENDER_MODE_DIRECT` or `LV_DISPLAY_RENDER_MODE_FULL`
+
+   * - `LV_WAYLAND_WINDOW_DECORATIONS`
+     - `1` or `0`
+     - `0`
+
+   * - `LV_WAYLAND_WL_SHELL` (**Deprecated**)
+     - Optional (`1` or `0`)
+     - Optional (`1` or `0`)
+
+
+Additional notes
+
+* DMABUF support (`LV_WAYLAND_USE_DMABUF`) improves performance and enables more render modes but has specific requirements and restrictions.
+* `LV_WAYLAND_WINDOW_DECORATIONS` is only required for some compositors (e.g., GNOME/Mutter or Weston).
+* `LV_WAYLAND_WL_SHELL` Enables support for the deprecated `wl_shell`. Only useful when the BSP on the target has weston ``9.x``. (**Deprecated** and will be removed in a future release)
 
 Example
 -------
@@ -113,15 +137,11 @@ Always call ``lv_wayland_timer_handler()`` in your timer loop instead of the reg
 
 **Note:** ``lv_wayland_timer_handler()`` internally calls ``lv_timer_handler()``
 
-This allows the wayland client to work on well on weston, resizing shared memory buffers during
+This allows the wayland client to work well on weston, resizing shared memory buffers during
 a commit does not work well on weston.
 
 Wrapping the call to ``lv_timer_hander()`` is a necessity to have more control over
 when the LVGL flush callback is called.
-
-The custom timer handler returns ``false`` if the frame from previous cycle is not rendered.
-When this happens, it usually means that the application is minimized or hidden behind another window.
-Causing the driver to wait until the arrival of any message on the wayland socket, the process is in interruptible sleep.
 
 Building the wayland driver
 ---------------------------
@@ -131,7 +151,7 @@ An example simulator is available in this `repo <https://github.com/lvgl/lv_port
 If there is a need to use driver with another build system. The source and header files for the XDG shell
 must be generated from the definitions for the XDG shell protocol.
 
-In the example Cmake is used to perform the operation by invoking the ``wayland-scanner`` utility
+In the example CMake is used to perform the operation by invoking the ``wayland-scanner`` utility
 
 To achieve this manually,
 
@@ -143,13 +163,20 @@ To generate the required files run the following commands:
 
 .. code-block:: sh
 
-   wayland-scanner client-header </usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml > wayland_xdg_shell.h
-   wayland-scanner private-code </usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml > wayland_xdg_shell.c
+   wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml wayland_xdg_shell.h
+   wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml wayland_xdg_shell.c
+
+When `LV_WAYLAND_USE_DMABUF` is set to `1`, the following protocols must also be generated:
+
+.. code-block:: sh
+
+   wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.h
+   wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.c
+
 
 The resulting files can then be integrated into the project, it's better to re-run ``wayland-scanner`` on
 each build to ensure that the correct versions are generated, they must match the version of the ``wayland-client``
 dynamically linked library installed on the system.
-
 
 Current state and objectives
 ----------------------------
@@ -165,7 +192,7 @@ Current state and objectives
 Bug reports
 -----------
 
-The wayland driver is currently under construction, bug reports, contributions and feedback is always welcome.
+The wayland driver is currently under construction, bug reports, contributions and feedback are always welcome.
 
 It is however important to create detailed issues when a problem is encountered, logs and screenshots of the problem are of great help.
 
