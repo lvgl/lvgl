@@ -84,20 +84,20 @@ LVGL.  You should see a square with red-blue gradient.
 
 .. code-block:: c
 
-#define BUF_WIDTH 255
-uint16_t buf[BUF_WIDTH]; /*For RGB565*/
-uint32_t i;
-for(i = 0; i < BUF_WIDTH; i++) {
-  lv_color_t c = lv_color_mix(lv_color_hex(0xff0000), lv_color_hex(0x00ff00), i);
-  buf[i] = lv_color_to_u16(c);
-
-  lv_area_t a;
-  a.x1 = 5;
-  a.x2 = a.x1 + BUF_WIDTH - 1;
-  a.y1 = 10 + i;
-  a.y2 = 10 + i;
-  my_flush_cb(NULL, &a, (void*) buf);
-}
+    #define BUF_WIDTH 255
+    uint16_t buf[BUF_WIDTH];
+    uint32_t i;
+    for(i = 0; i < BUF_WIDTH; i++) {
+      lv_color_t c = lv_color_mix(lv_color_hex(0xff0000), lv_color_hex(0x00ff00), i);
+      buf[i] = lv_color_to_u16(c);
+    
+      lv_area_t a;
+      a.x1 = 5;
+      a.x2 = a.x1 + BUF_WIDTH - 1;
+      a.y1 = 10 + i;
+      a.y2 = 10 + i;
+      my_flush_cb(NULL, &a, (void*) buf);
+    }
 
 
 Why do I see nonsense colors on the screen?
