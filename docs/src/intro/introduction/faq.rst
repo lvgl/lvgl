@@ -129,7 +129,7 @@ How do I reduce flash/ROM usage?
 
 You can disable unused features (such as animations, file system, GPU etc.) and widget types in *lv_conf.h*.
 
-If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG.
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG and newer GCC versions.
 
 
 How do I reduce RAM usage?

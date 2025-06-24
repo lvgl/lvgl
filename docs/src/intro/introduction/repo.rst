@@ -13,7 +13,6 @@ All repositories of the LVGL project are hosted on `GitHub <https://github.com/l
 You will find these repositories there:
 
 * `lvgl <https://github.com/lvgl/lvgl>`__: The library itself with many `examples <https://github.com/lvgl/lvgl/blob/master/examples/>`_ and `demos <https://github.com/lvgl/lvgl/blob/master/demos/>`__.
-* `lv_drivers <https://github.com/lvgl/lv_drivers>`__: Display and input device drivers
 * `blog <https://github.com/lvgl/blog>`__: Source of the `blog's site <https://blog.lvgl.io>`__
 * `sim <https://github.com/lvgl/sim>`__: Source of the `online simulator's site <https://sim.lvgl.io>`__
 * `lv_port_* <https://github.com/lvgl?q=lv_port&type=&language=>`__: LVGL ports to development boards or environments

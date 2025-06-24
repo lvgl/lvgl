@@ -166,7 +166,7 @@ Here is an example that also shows some non-pixel units for sizes:
     /*Set parent-sized width, and content-sized height*/
     lv_obj_set_size(my_button1, lv_pct(100), LV_SIZE_CONTENT);
     /*Align to the right center with 20px offset horizontally*/
-    lv_obj_align(my_button1, LV_ALIGN_RIGHT_MIN, -20, 0);
+    lv_obj_align(my_button1, LV_ALIGN_RIGHT_MID, -20, 0);
 
     lv_obj_t * my_label1 = lv_label_create(my_button1);
     lv_label_set_text_fmt(my_label1, "Click me!");
