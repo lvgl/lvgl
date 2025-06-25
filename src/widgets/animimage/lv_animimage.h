@@ -36,13 +36,13 @@ extern "C" {
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-typedef enum {
+enum _lv_property_animimage_id_t {
     LV_PROPERTY_ID2(ANIMIMAGE, SRC,         LV_PROPERTY_TYPE_POINTER,  LV_PROPERTY_TYPE_INT,  0),
     LV_PROPERTY_ID(ANIMIMAGE, DURATION,     LV_PROPERTY_TYPE_INT,   1),
     LV_PROPERTY_ID(ANIMIMAGE, REPEAT_COUNT, LV_PROPERTY_TYPE_INT,   2),
     LV_PROPERTY_ID(ANIMIMAGE, SRC_COUNT,    LV_PROPERTY_TYPE_INT,   3),
     LV_PROPERTY_ANIMIMAGE_END,
-} lv_property_animimage_id_t;
+};
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;

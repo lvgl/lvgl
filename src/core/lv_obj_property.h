@@ -68,7 +68,7 @@ extern "C" {
 /**
  * Group of predefined widget ID start value.
  */
-typedef enum {
+enum _lv_prop_id_range_boundary_t {
     LV_PROPERTY_ID_INVALID      = 0,
 
     /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
@@ -90,7 +90,7 @@ typedef enum {
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
 
     LV_PROPERTY_ID_ANY          = 0x7ffffffe, /*Special ID used by lvgl to intercept all setter/getter call.*/
-} lv_prop_id_range_boundary_t;
+};
 
 struct _lv_property_name_t {
     const char * name;
