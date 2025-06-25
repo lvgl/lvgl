@@ -59,31 +59,30 @@ Example
         </element>
 
         <element name="event_cb" access="add">
-            <arg name="name" type="string"/>
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="callback" type="event_cb"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="user_data" type="string" default="NULL"/>
         </element>
 
         <element name="screen_load_event" access="add">
-            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen"/>
-            <arg name="duration" type="int"  default="0"/>
-            <arg name="delay" type="int"  default="0"/>
-            <arg name="anim_type" type="enum:lv_screen_load_anim"   default="none"/>
+            <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
+            <arg name="duration" type="int" default="0"/>
+            <arg name="delay" type="int" default="0"/>
         </element>
 
         <element name="screen_create_event" access="add">
-            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen_create_cb"/>
+            <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
             <arg name="duration" type="int" default="0"/>
             <arg name="delay" type="int" default="0"/>
-            <arg name="anim_type" type="enum:lv_screen_load_anim"  default="none"/>
         </element>
 
         <element name="subject_set_int_event" access="add">
             <arg name="name" type="string"/>
-            <arg name="trigger" type="lv_event"  default="clicked"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
             <arg name="value" type="int"/>
         </element>
@@ -96,9 +95,8 @@ Example
         </element>
 
         <element name="subject_increment_event" access="add">
-            <arg name="name" type="string"/>
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="step" type="int" default="1"/>
             <arg name="min" type="int" default="-2000000"/>
             <arg name="max" type="int" default="2000000"/>
