@@ -1209,7 +1209,7 @@ static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radiu
     while(i < cir_size) {
         c->opa_start_on_y[y] = i;
         c->x_start_on_y[y] = cir_x[i];
-        for(; cir_y[i] == y && i < (int32_t)cir_size; i++) {
+        for(; i < (int32_t)cir_size && cir_y[i] == y; i++) {
             c->x_start_on_y[y] = LV_MIN(c->x_start_on_y[y], cir_x[i]);
         }
         y++;
