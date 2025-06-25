@@ -285,7 +285,7 @@ extern "C" {
  * The following list is generated using
  * cat src/font/lv_symbol_def.h | sed -E -n 's/^#define\s+LV_(SYMBOL_\w+).*".*$/    LV_STR_\1,/p'
  */
-typedef enum {
+enum _lv_str_symbol_id_t {
     LV_STR_SYMBOL_BULLET,
     LV_STR_SYMBOL_AUDIO,
     LV_STR_SYMBOL_VIDEO,
@@ -348,7 +348,7 @@ typedef enum {
     LV_STR_SYMBOL_SD_CARD,
     LV_STR_SYMBOL_NEW_LINE,
     LV_STR_SYMBOL_DUMMY,
-} lv_str_symbol_id_t;
+};
 
 #ifdef __cplusplus
 } /*extern "C"*/

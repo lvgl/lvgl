@@ -47,10 +47,10 @@ typedef struct _lv_tree_node_t {
     const struct _lv_tree_class_t * class_p;
 } lv_tree_node_t;
 
-typedef enum {
+enum _lv_tree_walk_mode_t {
     LV_TREE_WALK_PRE_ORDER = 0,
     LV_TREE_WALK_POST_ORDER,
-} _lv_tree_walk_mode_t;
+};
 typedef uint8_t lv_tree_walk_mode_t;
 
 typedef bool (*lv_tree_traverse_cb_t)(const lv_tree_node_t * node, void * user_data);
