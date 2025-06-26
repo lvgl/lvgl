@@ -46,11 +46,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Results
+      - name: Download Results from master
+        if: ${{ github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'master' }}
         uses: dawidd6/action-download-artifact@v9
         with:
           workflow: perf_emulation.yml
           path: artifacts
+          allow_forks: false
+
+
+      - name: Download Results from PR
+        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+        uses: dawidd6/action-download-artifact@v9
+        with:
+          workflow: perf_emulation.yml
+          path: artifacts
+          # The artifact needs to be downloaded from a PR run that comes from a forked repository
+          allow_forks: true 
 
       - name: Move JSON files to a single folder
         run: |
