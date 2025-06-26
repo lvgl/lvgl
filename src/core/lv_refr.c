@@ -482,6 +482,8 @@ lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
 void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
 {
+    LV_ASSERT_NULL(layer);
+    LV_ASSERT_NULL(obj);
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/

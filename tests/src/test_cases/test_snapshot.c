@@ -115,7 +115,7 @@ void test_snapshot_take_snapshot_with_transform(void)
 void test_snapshot_take_snapshot_multiple_widgets(void)
 {
     lv_obj_t * obj_1 = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(obj_1, 100, 100);
+    lv_obj_set_size(obj_1, 200, 200);
     lv_obj_set_style_border_width(obj_1, 0, 0);
     lv_obj_set_style_bg_color(obj_1, lv_color_hex3(0xff0), 0);
     lv_obj_center(obj_1);
