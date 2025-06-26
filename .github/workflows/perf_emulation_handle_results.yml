@@ -130,4 +130,5 @@ jobs:
           files: output/results*.mpk
           tag_name: emulated-benchmark-latest
           prerelease: true
+          body: This pre-release is automatically generated and serves as a repository for benchmark results.
 
