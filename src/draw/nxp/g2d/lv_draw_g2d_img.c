@@ -176,6 +176,38 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     int32_t dest_w;
     int32_t dest_h;
 
+    bool has_rotation = (dsc->rotation != 0);
+    enum g2d_rotation g2d_angle = G2D_ROTATION_0;
+
+    if(has_rotation) {
+        switch(dsc->rotation) {
+            case 0:
+                g2d_angle = G2D_ROTATION_0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
+                break;
+            case 900:
+                g2d_angle = G2D_ROTATION_90;
+                piv_offset_x = pivot.x + pivot.y - height;
+                piv_offset_y = pivot.y - pivot.x;
+                break;
+            case 1800:
+                g2d_angle = G2D_ROTATION_180;
+                piv_offset_x = 2 * pivot.x - width;
+                piv_offset_y = 2 * pivot.y - height;
+                break;
+            case 2700:
+                g2d_angle = G2D_ROTATION_270;
+                piv_offset_x = pivot.x - pivot.y;
+                piv_offset_y = pivot.x + pivot.y - width;
+                break;
+            default:
+                g2d_angle = G2D_ROTATION_0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
+        }
+    }
+
     float fp_scale_x = (float)dsc->scale_x / LV_SCALE_NONE;
     float fp_scale_y = (float)dsc->scale_y / LV_SCALE_NONE;
     int32_t int_scale_x = (int32_t)fp_scale_x;
@@ -203,7 +235,7 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     dst_surf->height = dest_h - trim_y;
 
     dst_surf->planes[0] = buf->buf_paddr;
-    dst_surf->rot = G2D_ROTATION_0;
+    dst_surf->rot = g2d_angle;
 
     dst_surf->clrcolor = g2d_rgba_to_u32(lv_color_black());
     dst_surf->global_alpha = 0xff;
