@@ -155,6 +155,10 @@ struct _lv_anim_t {
                                                * time animation timer executes), indicates this animation needs to be updated. */
     uint8_t start_cb_called : 1;              /**< Indicates that `start_cb` was already called */
     uint8_t early_apply  : 1;                 /**< 1: Apply start value immediately even is there is a `delay` */
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 /**********************
@@ -554,6 +558,32 @@ int32_t lv_anim_path_step(const lv_anim_t * a);
  * @return      the current value to set
  */
 int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+
+/**
+ * Get the currently running animation.
+ * @return      pointer to an animation that is currently being processed.
+ */
+lv_anim_t * lv_anim_get_running_anim(void);
+
+/**
+ * @brief Associates external user data with an animation instance
+ *
+ * Attaches arbitrary user-defined data to an LVGL animation object along with an optional
+ * destructor callback that will be automatically invoked when the animation completes
+ * or is deleted, enabling proper resource cleanup.
+ *
+ * @param anim Pointer to the animation object to configure (must not be NULL)
+ * @param ext_data User-defined data pointer to associate (may be NULL)
+ * @param destructor Cleanup callback that receives ext_data when:
+ *                   - Animation completes naturally
+ *                   - Animation is deleted prematurely
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_anim_set_external_data(lv_anim_t * anim, void * ext_data, void (*destructor)(void * ext_data));
+#endif
 
 /**********************
  *   GLOBAL VARIABLES
