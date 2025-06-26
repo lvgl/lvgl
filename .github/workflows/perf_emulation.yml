@@ -45,11 +45,11 @@ jobs:
         include:
         - image_type: 32b
           image_version : |
-            main@sha256:9c4587f5852be856aed4548fcb8b505290410de837bb87fb2ba8e1b778f10bec
+            main@sha256:61e287d63b19a503cc4505c13bd93f5e05e19513a947feb048d75662c398c862
           config : lv_conf_perf32b
         - image_type: 64b
           image_version: |
-            main@sha256:7e4c0a883dec21e2e9c027fe21188b2b009e46a1b3eb9f02499ca02ed7914e4a
+            main@sha256:e8663d9c138e98b78d12cc8ad056b7d4b0cc4ad233c6f54202e40ce7606c2670
           config : lv_conf_perf64b
     steps:
       - name: Checkout
