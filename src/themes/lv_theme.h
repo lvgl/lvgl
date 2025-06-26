@@ -93,6 +93,22 @@ lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+/**
+ * @brief Attaches external user data and destructor callback to the theme
+ *
+ * Associates custom user data with an LVGL theme and specifies a destructor function
+ * that will be automatically invoked when the theme is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param theme      Pointer to theme which callback should be set (must not be NULL)
+ * @param ext_data   User-defined data pointer to associate with the theme (may be NULL)
+ * @param destructor Callback function for cleaning up ext_data when theme is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_theme_set_external_data(lv_theme_t * theme, void * ext_data, void (* destructor)(void * ext_data));
+#endif
+
 /**********************
  *    MACROS
  **********************/

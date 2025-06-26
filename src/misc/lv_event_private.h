@@ -28,6 +28,10 @@ struct _lv_event_dsc_t {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 struct _lv_event_t {
@@ -41,6 +45,10 @@ struct _lv_event_t {
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
     uint8_t stop_trickling : 1;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 

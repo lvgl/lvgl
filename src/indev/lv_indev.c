@@ -141,6 +141,10 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    indev->destructor = NULL;
+    indev->ext_data = NULL;
+#endif
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -162,6 +166,14 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    if(indev->destructor && indev->ext_data) {
+        indev->destructor(indev->ext_data);
+        indev->ext_data = NULL;
+    }
+#endif
+
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -674,6 +686,16 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
 {
     return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_indev_set_external_data(lv_indev_t * indev, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(indev);
+
+    indev->ext_data = ext_data;
+    indev->destructor = destructor;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

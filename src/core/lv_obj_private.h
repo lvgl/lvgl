@@ -76,6 +76,10 @@ struct _lv_obj_t {
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t is_deleting : 1;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data[LV_EXT_DATA_MAX_NUM];
+#endif
 };
 
 /**********************

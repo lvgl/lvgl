@@ -93,6 +93,16 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj)
     return th ? th->color_secondary : lv_palette_main(LV_PALETTE_BLUE);
 }
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_theme_set_external_data(lv_theme_t * theme, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(theme);
+
+    theme->ext_data = ext_data;
+    theme->destructor = destructor;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

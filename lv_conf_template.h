@@ -1378,6 +1378,15 @@
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
 
+/** Enable or disable for external data and destructor function */
+#define LV_EXTERNAL_DATA_AND_DESTRUCTOR   0
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    #define LV_EXT_DATA_MAX_NUM 3
+    #if (LV_EXT_DATA_MAX_NUM < 1)
+        #error "LV_EXT_DATA_MAX_NUM must be larger than 0"
+    #endif
+#endif
+
 /*=====================
 * BUILD OPTIONS
 *======================*/

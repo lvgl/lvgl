@@ -663,6 +663,10 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     theme->base.font_large = font;
     theme->base.apply_cb = theme_apply;
     theme->base.flags = dark ? MODE_DARK : 0;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    theme->base.destructor = NULL;
+    theme->base.ext_data = NULL;
+#endif
 
     style_init(theme);
 
@@ -702,6 +706,12 @@ void lv_theme_default_deinit(void)
                 lv_style_reset(theme_styles + i);
             }
         }
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+        if(theme->base.destructor && theme->base.ext_data) {
+            theme->base.destructor(theme->base.ext_data);
+            theme->base.ext_data = NULL;
+        }
+#endif
         lv_free(theme_def);
         theme_def = NULL;
     }

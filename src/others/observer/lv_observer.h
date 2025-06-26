@@ -65,6 +65,10 @@ typedef struct {
     uint32_t size                 : 24;  /**< String buffer size or group length */
     uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
                                           * start notifying from the beginning. */
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 } lv_subject_t;
 
 /**
@@ -77,6 +81,27 @@ typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subjec
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+/**
+ * @brief Attaches external user data to an integer Subject with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param observer Pointer to the observer object (must not be NULL)
+ * @param ext_data User-defined data pointer to associate (may be NULL)
+ * @param destructor Cleanup function called when:
+ *                  - Observer is explicitly deleted
+ *                  - Observed object is deleted
+ *                  - New data replaces current association
+ *                  NULL indicates no cleanup required
+ */
+void lv_subject_set_external_data(lv_subject_t * subject, void * ext_data, void (* destructor)(void * ext_data));
+#endif
 
 /**
  * Initialize an integer-type Subject.

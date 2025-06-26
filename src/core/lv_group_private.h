@@ -45,6 +45,10 @@ struct _lv_group_t {
                                    deletion.*/
     uint8_t wrap : 1;           /**< 1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end
                                    of list.*/
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 

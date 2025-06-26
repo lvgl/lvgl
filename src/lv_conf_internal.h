@@ -4449,6 +4449,27 @@
     #endif
 #endif
 
+/** Enable or disable for external data and destructor function */
+#ifndef LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    #ifdef CONFIG_LV_EXTERNAL_DATA_AND_DESTRUCTOR
+        #define LV_EXTERNAL_DATA_AND_DESTRUCTOR CONFIG_LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    #else
+        #define LV_EXTERNAL_DATA_AND_DESTRUCTOR   0
+    #endif
+#endif
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    #ifndef LV_EXT_DATA_MAX_NUM
+        #ifdef CONFIG_LV_EXT_DATA_MAX_NUM
+            #define LV_EXT_DATA_MAX_NUM CONFIG_LV_EXT_DATA_MAX_NUM
+        #else
+            #define LV_EXT_DATA_MAX_NUM 3
+        #endif
+    #endif
+    #if (LV_EXT_DATA_MAX_NUM < 1)
+        #error "LV_EXT_DATA_MAX_NUM must be larger than 0"
+    #endif
+#endif
+
 /*=====================
 * BUILD OPTIONS
 *======================*/

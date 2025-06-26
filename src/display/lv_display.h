@@ -724,6 +724,22 @@ int32_t lv_dpx(int32_t n);
  */
 int32_t lv_display_dpx(const lv_display_t * disp, int32_t n);
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+/**
+ * @brief Attaches external user data and destructor callback to a display
+ *
+ * Associates custom user data with an LVGL display and specifies a destructor function
+ * that will be automatically invoked when the display is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param disp      Pointer to a display (must not be NULL)
+ * @param ext_data   User-defined data pointer to associate with the display (may be NULL)
+ * @param destructor Callback function for cleaning up ext_data when display is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_display_set_external_data(lv_display_t * disp, void * ext_data, void (* destructor)(void * ext_data));
+#endif
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

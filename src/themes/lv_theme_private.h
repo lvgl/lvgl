@@ -35,6 +35,10 @@ struct _lv_theme_t {
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
     uint32_t flags;                 /**< Any custom flag used by the theme */
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 

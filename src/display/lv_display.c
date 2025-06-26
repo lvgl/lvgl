@@ -76,7 +76,10 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
-
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    disp->destructor = NULL;
+    disp->ext_data = NULL;
+#endif
 
 #if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
     disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
@@ -219,6 +222,13 @@ void lv_display_delete(lv_display_t * disp)
 
     if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
     lv_free(disp->layer_head);
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    if(disp->destructor && disp->ext_data) {
+        disp->destructor(disp->ext_data);
+        disp->ext_data = NULL;
+    }
+#endif
 
     lv_free(disp);
 
@@ -1235,6 +1245,16 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
 {
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_display_set_external_data(lv_display_t * disp, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(disp);
+
+    disp->ext_data = ext_data;
+    disp->destructor = destructor;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

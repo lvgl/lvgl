@@ -67,6 +67,10 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
     group->user_data      = NULL;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    group->destructor = NULL;
+    group->ext_data = NULL;
+#endif
 
     return group;
 }
@@ -100,6 +104,12 @@ void lv_group_delete(lv_group_t * group)
 
     lv_ll_clear(&(group->obj_ll));
     lv_ll_remove(group_ll_p, group);
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    if(group->destructor && group->ext_data) {
+        group->destructor(group->ext_data);
+        group->ext_data = NULL;
+    }
+#endif
     lv_free(group);
 }
 
@@ -410,6 +420,17 @@ lv_group_t  * lv_group_by_index(uint32_t index)
 
     return NULL;
 }
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_group_set_external_data(lv_group_t * group, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(group);
+
+    group->ext_data = ext_data;
+    group->destructor = destructor;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
