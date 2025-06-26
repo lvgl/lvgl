@@ -80,7 +80,7 @@ void lv_draw_g2d_init(void)
     if(g2d_open(&draw_g2d_unit->g2d_handle)) {
         LV_LOG_ERROR("g2d_open fail.\n");
     }
-    g2d_query_hardware(draw_g2d_unit->g2d_handle, G2D_HARDWARE_PXP, &is_hw_pxp);
+    g2d_query_hardware(draw_g2d_unit->g2d_handle, G2D_HARDWARE_PXP_V1, &is_hw_pxp);
 
 #if LV_USE_G2D_DRAW_THREAD
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
