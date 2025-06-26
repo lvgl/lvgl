@@ -6,7 +6,7 @@
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 BUILDDIR      = build
-SOURCEDIR     = intermediatex
+SOURCEDIR     = intermediate
 
 # SOURCEDIR can be overridden by LVGL_DOC_BUILD_INTERMEDIATE_DIR
 LEN           := $(shell printf '%s' '$(LVGL_DOC_BUILD_INTERMEDIATE_DIR)' | wc -c)
