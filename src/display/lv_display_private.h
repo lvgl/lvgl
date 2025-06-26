@@ -33,8 +33,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t {
+#if LV_USE_EXT_DATA
+typedef struct {
+    void * data;
+    void (* free_cb)(void * data);
+} lv_display_ext_data_t;
+#endif
 
+struct _lv_display_t {
+#if LV_USE_EXT_DATA
+    lv_display_ext_data_t ext_data;
+#endif
     /*---------------------
      * Resolution
      *--------------------*/
@@ -170,7 +179,6 @@ struct _lv_display_t {
 #if LV_USE_MEM_MONITOR
     lv_obj_t * mem_label;
 #endif
-
 };
 
 /**********************
