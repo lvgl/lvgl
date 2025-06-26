@@ -152,10 +152,13 @@ static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
         return false;
 
     bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
-    bool has_rotation = (draw_dsc->rotation != 0);
+    /* Recolor is not supported. */
+    if(has_recolor)
+        return false;
 
-    /* Recolor or rotation are not supported. */
-    if(has_recolor || has_rotation)
+    bool has_rotation = (draw_dsc->rotation != 0);
+    /* Rotation is not supported for PXP hardware. */
+    if(has_rotation && is_hw_pxp)
         return false;
 
     return true;
