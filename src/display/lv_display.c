@@ -76,7 +76,10 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
-
+#if LV_USE_EXT_DATA
+    disp->ext_data.free_cb = NULL;
+    disp->ext_data.data = NULL;
+#endif
 
 #if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
     disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
@@ -219,6 +222,13 @@ void lv_display_delete(lv_display_t * disp)
 
     if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
     lv_free(disp->layer_head);
+
+#if LV_USE_EXT_DATA
+    if(disp->ext_data.free_cb) {
+        disp->ext_data.free_cb(disp->ext_data.data);
+        disp->ext_data.data = NULL;
+    }
+#endif
 
     lv_free(disp);
 
@@ -1237,6 +1247,19 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
 {
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
+
+#if LV_USE_EXT_DATA
+void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free_cb)(void * data))
+{
+    if(!disp) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL display");
+        return;
+    }
+
+    disp->ext_data.data = data;
+    disp->ext_data.free_cb = free_cb;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

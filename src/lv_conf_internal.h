@@ -4480,6 +4480,15 @@
     #endif
 #endif
 
+/** Enable or disable for external data and destructor function */
+#ifndef LV_USE_EXT_DATA
+    #ifdef CONFIG_LV_USE_EXT_DATA
+        #define LV_USE_EXT_DATA CONFIG_LV_USE_EXT_DATA
+    #else
+        #define LV_USE_EXT_DATA   0
+    #endif
+#endif
+
 /*=====================
 * BUILD OPTIONS
 *======================*/

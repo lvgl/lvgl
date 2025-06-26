@@ -141,6 +141,10 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+#if LV_USE_EXT_DATA
+    indev->ext_data.free_cb = NULL;
+    indev->ext_data.data = NULL;
+#endif
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -162,6 +166,14 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
+
+#if LV_USE_EXT_DATA
+    if(indev->ext_data.free_cb) {
+        indev->ext_data.free_cb(indev->ext_data.data);
+        indev->ext_data.data = NULL;
+    }
+#endif
+
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -673,6 +685,19 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
 {
     return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
+
+#if LV_USE_EXT_DATA
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't attach external user data and free_cb callback to a NULL indev");
+        return;
+    }
+
+    indev->ext_data.data = data;
+    indev->ext_data.free_cb = free_cb;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
