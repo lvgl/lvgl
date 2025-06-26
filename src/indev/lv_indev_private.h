@@ -18,6 +18,10 @@ extern "C" {
 #include "lv_indev_scroll.h"
 #include "lv_indev_gesture.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,9 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     /** Input device type*/
     lv_indev_type_t type;
 
