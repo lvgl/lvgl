@@ -423,25 +423,27 @@ static grad_item_t * grad_item_pool_alloc(lv_vg_lite_grad_ctx_t * ctx, grad_type
 
     grad_item_t * item = lv_ll_get_head(&ctx->item_pool);
 
-    /* Always get free nodes from the head */
+    /* Try to obtain a free node from the head */
     if(item && item->type == GRAD_TYPE_FREE) {
-        item->type = type;
         lv_ll_move_before(&ctx->item_pool, item, NULL);
         LV_LOG_TRACE("reuse item: %p, type: %d", (void *)item, type);
-        return item;
+    }
+    else {
+        /* Allocate a new node if the pool is empty or all nodes are in use */
+        item = lv_ll_ins_tail(&ctx->item_pool);
+        LV_ASSERT_MALLOC(item);
+        if(!item) {
+            LV_LOG_ERROR("alloc grad item failed");
+            return NULL;
+        }
+
+        LV_LOG_TRACE("alloc new item: %p, type: %d, pool size: %" LV_PRIu32,
+                     (void *)item, type, lv_ll_get_len(&ctx->item_pool));
     }
 
-    item = lv_ll_ins_tail(&ctx->item_pool);
-    LV_ASSERT_MALLOC(item);
-    if(!item) {
-        LV_LOG_ERROR("alloc grad item failed");
-        return NULL;
-    }
-
+    lv_memzero(item, sizeof(grad_item_t));
     item->ctx = ctx;
     item->type = type;
-    LV_LOG_TRACE("alloc new item: %p, type: %d, pool size: %" LV_PRIu32,
-                 (void *)item, type, lv_ll_get_len(&ctx->item_pool));
     return item;
 }
 
