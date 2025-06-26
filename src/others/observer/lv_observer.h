@@ -573,6 +573,27 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 #endif
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+/**
+ * @brief Attaches external user data to an observer object with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param observer Pointer to the observer object (must not be NULL)
+ * @param ext_data User-defined data pointer to associate (may be NULL)
+ * @param destructor Cleanup function called when:
+ *                  - Observer is explicitly deleted
+ *                  - Observed object is deleted
+ *                  - New data replaces current association
+ *                  NULL indicates no cleanup required
+ */
+void lv_observer_set_external_data(lv_observer_t * observer, void * ext_data, void (* destructor)(void * ext_data));
+#endif
+
 /**********************
  *      MACROS
  **********************/
