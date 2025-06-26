@@ -38,8 +38,8 @@ Example
 
 	    <prop name="map"  type="string[NULL]" help=""/>
 	    <prop name="ctrl_map" type="enum:lv_buttonmatrix_ctrl[]+" help=""/>
-	    <prop name="one_checked" type="bool" help=""/>
-	    <prop name="selected_button" type="int" help=""/>
+	    <prop name="one_checked" type="bool" help="" default=""/>
+	    <prop name="selected_button" type="int" help=""  default=""/>
 
 
 	</api>

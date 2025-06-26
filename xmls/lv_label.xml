@@ -13,10 +13,10 @@ Example
 	        <enum name="dots" help=""/>
 	    </enumdef>
 
-	    <prop name="text"  type="string" />
-	    <prop name="text-translated"  type="string" />
-	    <prop name="long_mode" type="enum:lv_label_long_mode" />
-	    <prop name="bind_text">
+	    <prop name="text" type="string" default="" />
+	    <prop name="text-translated"  type="string" default="" />
+	<prop name="long_mode" type="enum:lv_label_long_mode" default="" />
+	    <prop name="bind_text" default="NULL NULL">
 	    	<param name="bind_text" type="subject" />
 	    	<param name="fmt" type="string" default="NULL"/>
 	   	</prop>

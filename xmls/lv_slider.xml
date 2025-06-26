@@ -11,21 +11,21 @@ Example
 	        <enum name="symmetrical" help="The indicaror is grwing from zero"/>
 	    </enumdef>
 
-        <prop name="min_value" type="int"/>
-        <prop name="max_value" type="int"/>
+        <prop name="min_value" type="int" default=""/>
+        <prop name="max_value" type="int" default=""/>
 
-	    <prop name="value">
+	    <prop name="value" default="0 false">
 	    	<param name="value" type="int"/>
 	    	<param name="anim" type="bool" default="false"/>
 	    </prop>
 
-	    <prop name="start_value">
+	    <prop name="start_value" default="0 false">
 	    	<param name="start_value" type="int"/>
 	    	<param name="anim" type="bool" default="false"/>
 	    </prop>
 
-	    <prop name="mode" type="enum:lv_slider_mode"/>
+	    <prop name="mode" type="enum:lv_slider_mode" default=""/>
 
-	    <prop name="bind_value" type="subject" />
+	    <prop name="bind_value" type="subject" default="" />
 	</api>
 </widget>

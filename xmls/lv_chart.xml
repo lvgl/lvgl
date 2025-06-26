@@ -28,12 +28,12 @@
 	        <enum name="secondary_y"/>
 	    </enumdef>
 
-	    <prop name="type" type="enum:lv_chart_type" help=""/>
+	    <prop name="type" type="enum:lv_chart_type" help="" default=""/>
 
-	    <prop name="point_count" type="int" help=""/>
-	    <prop name="update_mode" type="enum:lv_chart_update_mode" help=""/>
-	    <prop name="nor_div_line_count" help=""/>
-	    <prop name="ver_div_line_count" help=""/>
+	    <prop name="point_count" type="int" help="" default=""/>
+	    <prop name="update_mode" type="enum:lv_chart_update_mode" help="" default=""/>
+	    <prop name="nor_div_line_count" help="" default=""/>
+	    <prop name="ver_div_line_count" help="" default=""/>
 
 	    <element name="series" type="lv_chart_series" access="add">
 	        <arg name="color" type="color" help=""/>

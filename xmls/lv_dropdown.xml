@@ -7,15 +7,15 @@ Example
 
 <widget>
 	<api>
-	    <prop name="text" type="string" help="Show it instead of the selected options"/>
-	    <prop name="options" type="string" help="The options as a \n separated string"/>
-	    <prop name="selected" help="The index of the selected option">
+	    <prop name="text" type="string" help="Show it instead of the selected options" default=""/>
+	    <prop name="options" type="string" help="The options as a \n separated string" default=""/>
+	    <prop name="selected" help="The index of the selected option" default="">
 	    	<param name="selected" type="int" help="The index of the selected option"/>
 	    	<param name="anim" type="bool" help="Move to the option with animation" default="false"/>
 	    </prop>
-	    <prop name="symbol" type="string" help="The symbol, usually a caret"/>
-	    <prop name="bind_value" type="subject" help=""/>
+	    <prop name="symbol" type="string" help="The symbol, usually a caret" default=""/>
+	    <prop name="bind_value" type="subject" help="" default=""/>
 
-	    <element name="list" access="get" type="lv_obj" help=""/>
+	    <element name="list" access="get" type="lv_obj" help="" default=""/>
 	</api>
 </widget>

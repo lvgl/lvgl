@@ -23,11 +23,11 @@ Example
 		</enumdef>
 
 	    <prop name="src" type="image" help=""/>
-	    <prop name="inner_align" type="enum:lv_image_align" help=""/>
-	    <prop name="rotation" type="int" help=""/>
-	    <prop name="scale_x" type="int" help=""/>
-	    <prop name="scale_y" type="int" help=""/>
-    	<prop name="pivot_x" type="int" help=""/>
-    	<prop name="pivot_y" type="int" help=""/>
+	    <prop name="inner_align" type="enum:lv_image_align" help="" default="default"/>
+	    <prop name="rotation" type="int" help="" default="0"/>
+	    <prop name="scale_x" type="int" help="" default="0"/>
+	    <prop name="scale_y" type="int" help="" default="0"/>
+    	<prop name="pivot_x" type="int" help="" default="0"/>
+    	<prop name="pivot_y" type="int" help="" default="0"/>
 	</api>
 </widget>

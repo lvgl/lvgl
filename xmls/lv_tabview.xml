@@ -9,8 +9,8 @@ Example
 
 <widget>
     <api>
-        <prop name="active" type="int" help="Zero based index of the tab to select"/>
-        <prop name="tab_bar_position" type="enum:lv_dir" help=""/>
+        <prop name="active" type="int" help="Zero based index of the tab to select" default=""/>
+        <prop name="tab_bar_position" type="enum:lv_dir" help="" default=""/>
         <element name="tab_bar" type="lv_obj" access="get">
         </element>
         <element name="tab" type="lv_obj" access="add">

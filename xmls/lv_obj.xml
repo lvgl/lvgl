@@ -58,7 +58,7 @@ Example
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="event_cb" access="add">
+        <element name="event_cb" access="add" type="void">
             <arg name="callback" type="event_cb"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="user_data" type="string" default="NULL"/>
