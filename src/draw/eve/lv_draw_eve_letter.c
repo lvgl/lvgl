@@ -150,11 +150,6 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     lv_eve_vertex_2f(glyph_draw_dsc->letter_coords->x1, glyph_draw_dsc->letter_coords->y1);
 }
 
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eve_id, uint32_t ad)
 {
 
@@ -163,20 +158,21 @@ static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eve_i
     uint32_t addr = ad;
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *) font_p->dsc;
 
-    uint8_t * temp_buff = lv_malloc(font_p->line_height * font_p->line_height * font_dsc->bpp); /*Extra mem*/
+    uint8_t * temp_buff = NULL;
+    uint32_t temp_buff_size = 0;
     uint32_t cmap_max = font_dsc->cmap_num;
     uint32_t range_max = 0;
     uint32_t range_init = 0;
     uint32_t cmap;
     for(cmap = 0; cmap < cmap_max; ++cmap) {
 
+        /* until support is added */
+        if(font_dsc->cmaps[cmap].type != LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
+            continue;
+        }
+
         range_init = font_dsc->cmaps[cmap].glyph_id_start;
         range_max = font_dsc->cmaps[cmap].range_length + range_init;
-
-        if(font_dsc->cmaps[cmap].unicode_list || font_dsc->cmaps[cmap].glyph_id_ofs_list) {
-            range_max = font_dsc->cmaps[cmap].list_length + range_init;
-
-        }
 
         uint32_t id;
         for(id = range_init; id < range_max; ++id) { /*Iterate through each character range*/
@@ -194,8 +190,14 @@ static uint32_t eve_lv_font_to_ramg(const lv_font_t * font_p, uint8_t font_eve_i
 
                 uint32_t buffer_size;/* = (g_box_w * g_box_h) / 2; Calculate buffer size based on glyph dimensions */
                 if(g_box_w % 2 != 0) {
-                    bitmap_to_even_width(0, map_p, temp_buff, g_box_w, g_box_h); /*Adjust bitmap width to even width if necessary*/
                     buffer_size = ((g_box_w + 1) * g_box_h) / 2;
+                    if(temp_buff_size < buffer_size + 2) {
+                        temp_buff_size = buffer_size + 2;
+                        lv_free(temp_buff);
+                        temp_buff = lv_malloc(temp_buff_size);
+                        LV_ASSERT_MALLOC(temp_buff);
+                    }
+                    bitmap_to_even_width(0, map_p, temp_buff, g_box_w, g_box_h); /*Adjust bitmap width to even width if necessary*/
 
                     EVE_memWrite_sram_buffer(addr, temp_buff, buffer_size);
                 }
@@ -226,7 +228,7 @@ static void bitmap_to_even_width(uint32_t addr, const uint8_t * img_in, uint8_t 
     uint16_t j = 0;
 
     /* Iterate through each row of the bitmap*/
-    for(int i = 0; i <= height; i++) {
+    for(int i = 0; i < height; i++) {
         /* Iterate through each byte of the row*/
         for(int var = 0; var < (width / 2); ++var) {
             /*Get the two nibbles from the current byte*/
