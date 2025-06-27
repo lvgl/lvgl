@@ -176,22 +176,27 @@ Also exclusive to Widgets, elements define sub-widgets or internal structures
 
 They support ``<arg>`` and ``<prop>``:
 
-- ``<arg>``\ s are required and used for creation.
+- ``<arg>``\ s are required and used when creating/getting the element.
 - ``<prop>``\ s are optional and mapped to setters.
 
 Elements are referenced as ``<widget-element>`` in views.
 
-Name parts are separated by `-` (not allowed inside names).
+Name parts are separated by `-` ( as `-` is not allowed inside names).
 
 Element `access` types:
 
 - ``add``: Create multiple elements dynamically.
 - ``get``: Access implicitly created elements.
 - ``set``: Access indexed parts (e.g., table cells).
+- ``custom``: Map custom C function to XML.
 
-``type="obj"`` allows children; custom types do not.
+As ``add`` and ``get`` elements return an object they also have a type.
+This type can be any custom type, for example, `type="my_data"`. In the exported the
+return value will be saved in a ``my_data_t *`` variable.
 
-Only the API can be defined in XML for elements; implementations must be in C.
+If the type is ``type="lv_obj"`` it allows the element to have children wdgets or components.
+
+Note that, only the API can be defined in XML for elements; implementations must be in C.
 
 access="add"
 ~~~~~~~~~~~~
@@ -235,9 +240,7 @@ Used for internal/implicit elements:
     <api>
         <element name="control_button" type="obj" help="A control button of my_widget" access="get">
             <arg name="index" type="int"/>
-            <prop name="title">
-                <param name="text" type="string"/>
-            </prop>
+            <prop name="title" type="string"/>
         </element>
     </api>
 
@@ -266,12 +269,8 @@ Used for indexed access, like setting values in a table:
     <api>
         <element name="item" type="obj" access="set">
             <arg name="index" type="int"/>
-            <prop name="icon">
-                <param name="icon_src" type="img_src"/>
-            </prop>
-            <prop name="color">
-                <param name="color" type="color"/>
-            </prop>
+            <prop name="icon" type="img_src"/>
+            <prop name="color"type="color"/>
         </element>
     </api>
 
