@@ -357,6 +357,10 @@ void lv_init(void)
     lv_fs_arduino_esp_littlefs_init();
 #endif
 
+#if LV_USE_FS_ARDUINO_ESP_FFAT
+    lv_fs_arduino_esp_ffat_init();
+#endif
+
 #if LV_USE_FS_ARDUINO_SD
     lv_fs_arduino_sd_init();
 #endif

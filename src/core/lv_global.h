@@ -187,6 +187,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t arduino_esp_littlefs_fs_drv;
 #endif
 
+#if LV_USE_FS_ARDUINO_ESP_FFAT
+    lv_fs_drv_t arduino_esp_ffat_fs_drv;
+#endif
+
 #if LV_USE_FS_ARDUINO_SD
     lv_fs_drv_t arduino_sd_fs_drv;
 #endif

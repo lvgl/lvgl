@@ -22,6 +22,8 @@
 #include "my_include.h"
 #endif
 
+#define LV_USE_CUSTOM_MIPI 0
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -899,6 +901,14 @@
     #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
+
+/** API for Arduino FFat. */
+#define LV_USE_FS_ARDUINO_ESP_FFAT 0
+#if LV_USE_FS_ARDUINO_ESP_FFAT
+    #define LV_FS_ARDUINO_ESP_FFAT_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_ARDUINO_ESP_FFAT_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
+#endif
+
 
 /** API for Arduino Sd. */
 #define LV_USE_FS_ARDUINO_SD 0
