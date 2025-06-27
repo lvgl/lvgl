@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_XML
+#if LV_BUILD_EXAMPLES && LV_USE_XML && LV_USE_TRANSLATION
 
 void lv_example_xml_2(void)
 {
@@ -14,23 +14,16 @@ void lv_example_xml_2(void)
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_card.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/view.xml");
+    lv_xml_translation_register_from_file("A:lvgl/examples/others/xml/translations.xml");
 
     lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
+
+    lv_translation_set_language("de");
 
     lv_obj_t * obj = (lv_obj_t *) lv_xml_create(lv_screen_active(), "view", NULL);
     lv_obj_set_pos(obj, 10, 10);
 
-    const char * my_button_attrs[] = {
-        "x", "10",
-        "y", "-10",
-        "align", "bottom_left",
-        "btn_text", "New button",
-        NULL, NULL,
-    };
-
     lv_xml_component_unregister("my_button");
-
-    lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
     const char * slider_attrs[] = {
         "x", "200",

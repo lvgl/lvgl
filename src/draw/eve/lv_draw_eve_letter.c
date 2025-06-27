@@ -100,8 +100,7 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     if(glyph_draw_dsc == NULL)
         return;  /* Important */
 
-    if(glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_A4
-       && glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_A4_ALIGNED) {
+    if(glyph_draw_dsc->format != LV_FONT_GLYPH_FORMAT_A4) {
         LV_LOG_WARN("lv_draw_eve currently can only render 4 BPP fonts.");
         return;
     }

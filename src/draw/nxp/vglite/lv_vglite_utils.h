@@ -49,6 +49,7 @@ extern "C" {
         }                                                            \
     } while(0)
 
+#if LV_USE_VGLITE_CHECK_ERROR
 #define VGLITE_CHECK_ERROR(function)                                 \
     do {                                                             \
         vg_lite_error_t error = function;                            \
@@ -58,6 +59,9 @@ extern "C" {
             VGLITE_ASSERT(false);                                    \
         }                                                            \
     } while (0)
+#else
+#define VGLITE_CHECK_ERROR(function) function
+#endif
 
 /**********************
  *      TYPEDEFS

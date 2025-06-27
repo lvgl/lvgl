@@ -78,7 +78,7 @@ Each button's behavior can be customized with the following control flags:
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Do not emit :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` events while button is long-pressed.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Disables button like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of :cpp:enumerator:`LV_STATE_CHECKED` when clicked.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECKED` styles.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``PRESS``.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show button text in a pop-over while being pressed.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with ``#color``
@@ -108,7 +108,7 @@ To set a control map for a Button Matrix (similar to `Button map`_), use
 - :cpp:expr:`lv_buttonmatrix_set_ctrl_map(btn_matrix, ctrl_map)`.
 
 An element of ``ctrl_map`` should look like
-:cpp:expr:`ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECHKABLE`.
+:cpp:expr:`ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECKABLE`.
 The number of elements must be equal to the number of buttons.
 
 One checked

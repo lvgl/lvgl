@@ -133,7 +133,7 @@ First line indent
 -----------------
 
 Use :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
-first line.  All modes support pixel units.  In addition, :cpp:enumerator:`LV_SPAN_MODE_FIXED`
+first line. All modes support pixel units. In addition, :cpp:enumerator:`LV_SPAN_MODE_FIXED`
 and :cpp:enumerator:`LV_SPAN_MODE_BREAK` modes support :ref:`percentage units <coord_units>`.
 as well.
 
@@ -142,7 +142,7 @@ Lines
 -----
 
 Use :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum number
-of lines to be displayed in :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode.  A negative
+of lines to be displayed in :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode. A negative
 value indicates no limit.
 
 

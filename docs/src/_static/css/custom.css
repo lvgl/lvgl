@@ -1,10 +1,211 @@
-table, th, td {
-  border: 1px solid #bbb;
-  padding: 10px;
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap");
+
+/*-------------------------------------------------------------------------
+ * Connect FontAwesome file with FontAwesome family name.  Supplements
+ * fontawesome.min.css.  Without this, the codes like `fa-github` don't
+ # work in the Furo theme as they did with RTD theme.
+ *-------------------------------------------------------------------------*/
+@font-face {
+  font-family: FontAwesome;
+  src: url("../fonts/fontawesome-webfont.woff2") format("woff2"),
+    url("../fonts/fontawesome-webfont.woff") format("woff");
+}
+
+.fa {
+  font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+}
+
+/*-------------------------------------------------------------------------
+ * Custom CSS Variables
+/*------------------------------------------------------------------------ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  --font-stack: "Inter", sans-serif;
+  --font-stack--monospace: "Geist Mono", monospace;
+  --sidebar-item-font-size: 0.875rem;
+  --sidebar-item-spacing-horizontal: 0.75rem;
+  --sidebar-item-spacing-vertical: 0.5rem;
+  --toc-font-size: 0.75rem;
+  --icon-search: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="4.25" stroke="%230E0E0E" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="%230E0E0E" stroke-width="1.5" stroke-linecap="round"/></svg>');
+  --sidebar-search-icon-size: 1.25rem;
+  --sidebar-item-spacing-horizontal: 0.5rem;
+  --header-padding: 1rem;
+
+  --color-link: var(--color-text-base);
+  --color-link--hover: var(--color-accent);
+  --color-link--visited: var(--color-link-visited);
+  --color-link--visited--underline: var(--color-link-visited-underline);
+  --color-link--visited--hover: var(--color-accent);
+  --color-link-underline--hover: var(--color-accent);
+  --color-background-border: var(--color-border-primary) !important;
+  --color-sidebar-link-text--top-level: var(--color-text-tertiary);
+  --color-sidebar-item-background--hover: var(--color-background-primary);
+  --color-sidebar-item-expander-background--hover: rgba(var(--color-background-base-rgb), 0.04);
+  --color-toc-item-text: var(--color-text-tertiary);
+  --color-toc-item-text--active: var(--color-text-base);
+  --color-sidebar-background: var(--color-background-primary);
+  --color-sidebar-background-border: var(--color-border-primary);
+  --color-content-foreground: var(--color-text-secondary);
+}
+
+body,
+body[data-theme="light"] {
+  --color-accent-rgb: 125, 69, 237;
+  --color-accent: #7d45ed;
+  --color-link-underline: #1f222244;
+  --color-link-visited: #1f2222;
+  --color-link-visited-underline: #7d45ed;
+  --color-text-on-accent: #ffffff;
+  --color-text-on-accent-rgb: 255, 255, 255;
+  --color-text-base: #1f2222;
+  --color-text-primary: #1f2222cc;
+  --color-text-secondary: #1f2222aa;
+  --color-text-tertiary: #1f222299;
+  --color-text-quaternary: #1f222266;
+  --color-background-base-rgb: 0, 0, 0;
+  --color-background-primary: #fff;
+  --color-background-secondary: #00000012;
+  --color-border-primary: #00000016;
+  --color-border-secondary: #00000032;
+  --color-border-tertiary: #00000048;
+  --color-border-quaternary: #00000064;
+  --color-highlight-on-target: #e5dafb;
+}
+
+body[data-theme="dark"] {
+  --color-accent-rgb: 168, 131, 243;
+  --color-accent: #a883f3;
+  --color-link-underline: #ffffff55;
+  --color-link-visited: #ffffffee;
+  --color-link-visited-underline: #ffffff44;
+  --color-text-on-accent: #0e0e0e;
+  --color-text-on-accent-rgb: 0, 0, 0;
+  --color-text-base: #ffffffee;
+  --color-text-primary: #ffffffcc;
+  --color-text-secondary: #ffffffaa;
+  --color-text-tertiary: #ffffff99;
+  --color-text-quaternary: #ffffff88;
+  --color-background-base-rgb: 255, 255, 255;
+  --color-background-primary: #0e0e0e;
+  --color-background-secondary: #ffffff12;
+  --color-border-primary: #ffffff16;
+  --color-border-secondary: #ffffff24;
+  --color-border-tertiary: #ffffff32;
+  --color-border-quaternary: #ffffff40;
+  --color-highlight-on-target: #2a174f;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --color-accent-rgb: 168, 131, 243;
+    --color-accent: #a883f3;
+    --color-link-underline: #ffffff55;
+    --color-link-visited: #ffffff44;
+    --color-link-visited-underline: #a883f3;
+    --color-text-on-accent: #0e0e0e;
+    --color-text-on-accent-rgb: 0, 0, 0;
+    --color-text-base: #ebeeee;
+    --color-text-primary: #dee2e3;
+    --color-text-secondary: #ced4d5;
+    --color-text-tertiary: #b0c0c5;
+    --color-text-quaternary: #838d8e;
+    --color-background-base-rgb: 255, 255, 255;
+    --color-background-primary: #0e0e0e;
+    --color-background-secondary: #ffffff12;
+    --color-border-primary: #ffffff16;
+    --color-border-secondary: #ffffff32;
+    --color-border-tertiary: #ffffff48;
+    --color-border-quaternary: #ffffff64;
+    --color-highlight-on-target: #2a174f;
+  }
+}
+
+/*-------------------------------------------------------------------------
+ * Element Overrides
+ *-------------------------------------------------------------------------*/
+
+body {
+  font-size: 1rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  transition: background-color 0.15s ease-in-out;
+  color: var(--color-text-base);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: 3rem;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+a {
+  text-underline-position: under;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border-primary);
+  margin: 2rem 0;
+  max-width: 30rem;
+}
+
+.lv-example-container + hr {
+  max-width: none;
+}
+
+a:visited {
+  color: var(--color-link-visited);
+  text-decoration-color: var(--color-link-visited);
+}
+
+a:visited:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+
+@media (min-width: 97em) {
+  html {
+    font-size: 100%;
+  }
+}
+
+section:has(> h2):not(:first-child) {
+  margin-top: 4rem;
+}
+
+section:has(> h3):not(:first-child) {
+  margin-top: 3rem;
+}
+
+section:has(> h4):not(:first-child) {
+  margin-top: 2rem;
 }
 
 span.pre {
-  padding-right:8px;
+  padding-right: 8px;
 }
 
 span.pre {
@@ -15,56 +216,537 @@ span.pre:first-child {
   padding-right: 0px;
 }
 
-code.sig-name {
-  /*margin-left:8px;*/
+.sidebar-search-container {
+  transition: background-color 0.15s ease-in-out;
+  background-color: var(--color-background-primary);
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 1px var(--color-border-secondary), 0px 2px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.sidebar-search-container:has(.sidebar-search:focus-within) {
+  box-shadow: 0 0 0 2px var(--color-accent), 0px 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-search {
+  border: none;
+  color: var(--color-text-base);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 450;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+}
+
+.sidebar-search::placeholder {
+  font-weight: 450;
+  font-size: 0.75rem;
+  color: var(--color-text-quaternary);
+}
+
+.sidebar-drawer {
+  width: 17.5rem;
+  padding: 0.75rem;
+  background-clip: padding-box;
+}
+
+@media (max-width: 63em) {
+  .sidebar-drawer {
+    left: -17.5rem;
+  }
+}
+
+.sidebar-tree .reference {
+  border-radius: 0.5rem;
+  font-weight: 450;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.sidebar-tree .current-page > .reference {
+  color: var(--color-text-base);
+  font-weight: 550;
+}
+
+.sidebar-tree .reference:hover {
+  color: var(--color-text-base);
+  background-color: var(--color-background-primary);
+}
+
+.sidebar-tree label {
+  transition: background-color 0.15s ease-in-out;
+  border-radius: 0.5rem;
+}
+
+.sidebar-tree label .icon {
+  opacity: 0.4;
+}
+
+.header-left {
+  min-width: 4rem;
+  justify-content: flex-start;
+}
+
+.header-right {
+  gap: 0.5rem;
+}
+
+@media (max-width: 63em) {
+  .mobile-header .header-left label,
+  .mobile-header .header-right label {
+    width: auto;
+  }
+}
+
+.theme-toggle {
+  color: var(--color-text-primary);
+}
+
+.theme-toggle:hover {
+  color: var(--color-accent);
+}
+
+.nav-overlay-icon .icon,
+.toc-overlay-icon .icon,
+.theme-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: inherit;
+  transition: color 0.15s ease-in-out;
+}
+
+@media (max-width: 63em) {
+  .nav-overlay-icon .icon,
+  .toc-overlay-icon .icon,
+  .theme-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.main {
+  justify-content: center;
+  width: 100%;
+  max-width: 1136px;
+  margin: 0 auto;
+}
+
+.content {
+  padding: 0 6rem 0 3rem;
+  flex: 1;
+}
+
+@media (max-width: 63em) {
+  .content {
+    padding: 0 1.5rem;
+  }
+}
+
+.content .reference {
+  transition: color 0.15s ease-in-out;
+}
+
+.content a {
+  color: var(--color-accent);
+  font-weight: 500;
+  transition: color 0.15s ease-in-out;
+}
+
+.content strong {
+  font-weight: 600;
+  color: var(--color-text-base);
+}
+
+.sig-inline,
+code.literal {
+  font-weight: 500;
+  font-size: 80%;
+}
+
+.highlight {
+  border-radius: 0.5rem;
+  background-color: var(--color-background-primary);
+
+  box-shadow: 0px 0px 0px 1px var(--color-border-primary), 0px 100px 80px rgba(0, 0, 0, 0.04),
+    0px 41.778px 33.422px rgba(0, 0, 0, 0.03), 0px 22.336px 17.869px rgba(0, 0, 0, 0.02),
+    0px 12.522px 10.017px rgba(0, 0, 0, 0.02), 0px 6.65px 5.32px rgba(0, 0, 0, 0.02),
+    0px 2.767px 2.214px rgba(0, 0, 0, 0.01);
+
+  font-weight: 450;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.highlight pre {
+  padding: 1.5rem;
+}
+
+[data-theme="dark"] .highlight {
+  background-color: var(--color-background-secondary) !important;
+}
+
+.toc-tree {
+  line-height: 1.4;
+}
+
+.toc-tree li.scroll-current > .reference {
+  font-weight: 600;
+}
+
+.toc-tree li a:hover {
+  color: var(--color-accent);
+}
+
+.toc-tree-container {
+  padding-right: 1.5rem;
+}
+
+.headerlink {
+  opacity: 0.32;
+  display: inline-block;
+  overflow: hidden;
+  text-indent: -0.85ch;
+  font-weight: 800;
+  text-decoration: none;
+  vertical-align: top;
+  padding-right: 0.25ch;
+}
+
+.headerlink:hover {
+  transition: opacity 0.15s ease-in-out, color 0.15s ease-in-out;
+  opacity: 1;
+}
+
+.headerlink::after {
+  content: "#";
+}
+
+.admonition-title {
+  font-weight: 600;
+  color: var(--color-text-base);
+}
+
+.sidebar-container {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.toc-drawer {
+  flex-shrink: 0;
+  width: 17.5rem;
+  padding-right: 0;
+}
+
+@media (max-width: 82em) {
+  .toc-drawer {
+    right: -17.5rem;
+    border-left: 1px solid var(--color-border-primary);
+    background-clip: padding-box;
+  }
+
+  .toc-drawer .toc-tree {
+    border-left: none;
+  }
+}
+
+#furo-main-content {
+  padding-top: 4rem;
 }
 
 /*-------------------------------------------------------------------------
- * `home-img` class is (at this writing) exclusively used for the large
- * buttons on the landing page.  The rules below provide their hover
- * movement behavior.
- *-------------------------------------------------------------------------
- */
-.home-img {
-  width: 32%;
-  transition: transform .3s ease-out;
+ * TOC Level 1
+ *-------------------------------------------------------------------------*/
+
+#furo-main-content ul:has(.toctree-l1) {
+  max-width: 50%;
+  list-style-type: none;
+  padding: 0;
 }
 
-.home-img:hover {
-  transform: translate(0, -10px);
+#furo-main-content .toctree-l1 > a {
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+#furo-main-content .toctree-l1 > a:hover {
+  text-decoration: underline;
+}
+
+#furo-main-content .toctree-l1 + .toctree-l1 {
+  margin-top: 2rem;
+}
+
+/* Special Case:  1-level-deep TOCs.
+ * Note:  `...:not(:has(.toctree-l2))` won't do it because it ALSO selects
+ *        .toctree-l1 elements in more complex TOCs, some of which simply don't have
+ *        .toctree-l2 children!  Instead, we want the special case where the TOC
+ *        is limited by design to 1 level.  Example:  Widgets overview TOC.
+ */
+
+#furo-main-content .toctree-1-deep .toctree-l1 + .toctree-l1 {
+  margin-top: 0.65rem;
+}
+
+/*
+ * Welcome to LVGL Docs (home page) table of contents
+ *-------------------------------------------------------------------------
+ */
+
+#furo-main-content .toctree-landing-page .toctree-l1 > a {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+#furo-main-content .toctree-landing-page .toctree-l1 + .toctree-l1 {
+  margin-top: 0.125rem;
 }
 
 /*-------------------------------------------------------------------------
- * All `wy-...` and `rst-content` classes are classes from
- * `sphinx_rtd_theme` `layout.html` template.
+ * TOC Level 2
+ *-------------------------------------------------------------------------*/
+
+#furo-main-content ul:has(.toctree-l2) {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+#furo-main-content .toctree-l2 + .toctree-l2 {
+  margin-top: 0.25rem;
+}
+
+#furo-main-content .toctree-l2 > a {
+  font-weight: 550;
+}
+
+#furo-main-content .toctree-l2 > a:hover {
+  text-decoration: underline;
+}
+
+/*-------------------------------------------------------------------------
+ * TOC Level 3
+ *-------------------------------------------------------------------------*/
+
+#furo-main-content .toctree-l3 > a {
+  color: var(--color-text-base);
+}
+
+#furo-main-content .toctree-l2 ul:has(.toctree-l3) {
+  margin: 0.25rem 0;
+  padding-left: 1rem;
+  list-style-type: none;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+#furo-main-content .toctree-l3 > a {
+  font-weight: 450;
+}
+
+#furo-main-content .toctree-l3 > a:hover {
+  color: var(--color-accent);
+}
+
+#furo-main-content dt {
+  color: var(--color-text-base);
+  font-weight: 700;
+}
+
+#furo-main-content dd {
+  margin-inline-start: 0;
+}
+
+#furo-main-content blockquote {
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.nav-overlay-icon .icon,
+.toc-overlay-icon .icon {
+  color: inherit;
+  transition: color 0.15s ease-in-out;
+}
+
+.nav-overlay-icon .icon:hover,
+.toc-overlay-icon .icon:hover {
+  color: var(--color-accent);
+}
+
+.page-info .title {
+  font-weight: 600;
+}
+
+.admonition,
+.topic {
+  margin: 1.5rem auto;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 1px var(--color-border-primary), 0px 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+table.docutils {
+  width: 100%;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 1px var(--color-border-primary), 0px 2px 6px rgba(0, 0, 0, 0.08);
+  font-size: 0.8125rem;
+  border: none;
+  overflow: hidden;
+}
+
+table.docutils th {
+  font-weight: 600;
+  color: var(--color-text-base);
+  background-color: var(--color-background-secondary);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+table.docutils td p,
+table.docutils th p {
+  margin: 0.5rem;
+}
+
+.mobile-header.scrolled {
+  box-shadow: 0 0 0 1px var(--color-border-primary), 0px 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/*-------------------------------------------------------------------------
+ * `home-card` class is (at this writing) exclusively used for the cards 
+ * on the landing page. The rules below provide their hover behavior.
  *-------------------------------------------------------------------------
- * `wy-side-nav-search` class adorns the <div> element in the upper left
- * corner of each page that contains:
- * - the LVGL logo
- * - documentation-version selector drop-down (matches LVGL release versions)
- * - search TextBox
  */
-.wy-side-nav-search {
-  background-color: #f5f5f5;
+
+.home-cards-container {
+  display: block;
+  container-type: inline-size;
 }
 
-.wy-side-nav-search > div.version {
-  color: #333;
-  display: none;                               /*replaced by dropdown*/
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  margin-top: 3rem;
 }
 
-/* `rst-content` class marks the <div> element that contains the whole
- * visible part of the right panel where the page content is shown. */
-/*Let `code` wrap*/
-.rst-content code, .rst-content tt, code {
-  white-space: normal;
+@container (max-width: 720px) {
+  .home-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.wy-nav-content {
-  padding: 1.618em 3.236em;
-  height: 100%;
-  max-width: 1920px;
-  margin: auto
+@container (max-width: 480px) {
+  .home-cards {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-decoration: none;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease-out !important;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border-primary);
+}
+
+.home-card h3 {
+  margin-top: 1rem;
+}
+
+.home-card svg {
+  color: var(--color-accent);
+  width: 2rem;
+  height: 2rem;
+}
+
+.home-card:hover {
+  background-color: rgba(var(--color-background-base-rgb), 0.04);
+}
+
+/*
+ * Language selector (home page)
+ *-------------------------------------------------------------------------
+ */
+
+.language-selector {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  background-color: var(--color-background-secondary);
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  vertical-align: top;
+}
+
+.language-selector span {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
+.language-selector:hover {
+  color: var(--color-accent);
+}
+
+/*-------------------------------------------------------------------------
+ * Version Dropdown Styling
+ *-------------------------------------------------------------------------*/
+.version-selector {
+  background-color: var(--color-background-secondary);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.version-selector label {
+  font-size: 0.6175rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+#version_dropdown {
+  appearance: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-base);
+  border: 0;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-background-primary);
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  width: 100%;
+  outline: none;
+  box-shadow: 0 0 0 1px var(--color-border-secondary), 0px 2px 4px rgba(0, 0, 0, 0.08);
+  background-image: url('data:image/svg+xml,<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 10L8.00001 13L5.00001 10" stroke="%230E0E0E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 6L8.00001 3.00001L5.00001 5.99999" stroke="%230E0E0E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  background-position: right 0.5rem center;
+}
+
+[data-theme="dark"] #version_dropdown {
+  box-shadow: 0 0 0 1px var(--color-border-secondary), 0px 2px 4px rgba(0, 0, 0, 0.08);
+  background-image: url('data:image/svg+xml,<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 10L8.00001 13L5.00001 10" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 6L8.00001 3.00001L5.00001 5.99999" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 }
 
 /*-------------------------------------------------------------------------
@@ -128,7 +810,7 @@ code.sig-name {
  * Places "disclosure triangle" icon + non-breaking space to its left.*/
 .toggle .header:before {
   font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-  content: "\f0da \00a0 Show ";        /* \f0da = "closed" disclosure triangle; \f00a0 = non-breaking space */
+  content: "\f0da \00a0 Show "; /* \f0da = "closed" disclosure triangle; \f00a0 = non-breaking space */
   display: inline-block;
   font-size: 1.1em;
 }
@@ -136,7 +818,7 @@ code.sig-name {
 /* Selects <div class="header docutils container" ...> element when it also contains
  * `open` class, which class is toggled by JS code in `page.html` template. */
 .toggle .header.open:before {
-  content: "\f0d7 \00a0 Hide ";        /* \f0d7 = "open" disclosure triangle; \f00a0 = non-breaking space */
+  content: "\f0d7 \00a0 Hide "; /* \f0d7 = "open" disclosure triangle; \f00a0 = non-breaking space */
 }
 
 /* Selects the [> C code] "button". */
@@ -147,7 +829,8 @@ code.sig-name {
 }
 
 /* Selects web-assembly example <div> and child <iframe> elements. */
-.lv-example, .lv-example > iframe {
+.lv-example,
+.lv-example > iframe {
   border: none;
   outline: none;
   padding: 0;
@@ -200,14 +883,6 @@ code.sig-name {
 }
 
 /*-------------------------------------------------------------------------
- * This doesn't select anything at this writing (29-Mar-2025).
- *-------------------------------------------------------------------------
- */
-dl.cpp.unexpanded dd {
-  display: none;
-}
-
-/*-------------------------------------------------------------------------
  * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
  *-------------------------------------------------------------------------
  */
@@ -232,6 +907,13 @@ dl.cpp.unexpanded dd {
   content: "\f0d7 \00a0";
 }
 
+/* This hides the <dd> elements that contain a code-element's documentation
+ * when it has class "unexpanded".  "expanded" and "unexpanded" classes in the
+ * <dl> elements are added and managed dynamically via code in `custom.js`. */
+dl.cpp.unexpanded dd {
+  display: none;
+}
+
 /* Selects all <div> elements with "body" class.
  * There are no elements that this selects at this writing (29-Mar-2025). */
 div.body {
@@ -242,46 +924,113 @@ div.body {
 /* Selects CPP-expression content <span> elements generated from
  * :cpp:expr:`...` Interpreted-Text-Role expressions in the `.rst` source files. */
 .cpp-expr {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Courier, monospace;
-  color: #e74c3c;
+  font-family: var(--font-stack--monospace);
+  font-weight: 500;
   padding: 2px 5px;
-  border: 1px solid #e1e4e5;
-  font-size: 75%;
+  font-size: 80%;
 }
 
-/* These replace colors present in `pygments.css` which is used in code highlighting.
- * These are too dark to be readlable in DARK mode.  They include:
- * .highlight .nf -- function names
- * .highlight .nl -- code labels
- * .descname  .n  -- API documentation function names
- * .highlight .p  -- Punctuation
- * .highlight     -- Plain text in a `.. code-block:: none` block
- * The first 2 were created by lightening the `pygments.css` colors without changing their
- * angle on the color wheel.  The added attribute "conditional" also limits this change to
- * DARK MODE only instead of both light and dark modes.
- */
-/* Name.Function */
-html[data-theme="dark"] .highlight .nf {
-  color: #ccd285;
+/*-------------------------------------------------------------------------
+ * Custom Banners...
+ *
+ * ...are inserted between these two elements at the top of the page:
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+<div class="lv-custom-banner-list">
+  <p class="lv-custom-banner highest-priority">
+     Highest-priority announcement!
+  </p>
+  <p class="lv-custom-banner high-priority">
+     We are hiring a Front-End Developer in our Editor Team (Electron, React, Node.JS)!
+  </p>
+  <a href="specified_url" class="lv-custom-banner normal-priority">
+    <p>
+      Normal-priority announcement.
+    </p>
+  </a>
+</div>
+
+<div class="page">
+  ...page content...
+ *-------------------------------------------------------------------------*/
+.lv-custom-banner-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 450;
+  text-decoration: none;
+  text-align: center;
 }
 
-/* Name.Label */
-html[data-theme="dark"] .highlight .nl {
-  color: #0043e2;
+.lv-custom-banner {
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  min-width: 100%;
+  margin: 0;
+  background-color: var(--color-accent);
+  color: rgba(var(--color-text-on-accent-rgb), 0.9);
 }
 
-/* Name */
-html[data-theme="dark"] .descname .n {
-  color: #0a44de;
+/* Hyperlinks within banners (when banner label had a hyperlink in it) */
+.lv-custom-banner-list a {
+  color: rgba(var(--color-text-on-accent-rgb), 0.9);
+  text-decoration: none;
 }
 
-/* Punctuation */
-html[data-theme="dark"] .highlight .p {
-  color: #5c7c72
+.lv-custom-banner-list a:hover {
+  color: rgba(var(--color-text-on-accent-rgb), 1);
 }
 
-/* Plain text. */
-html[data-theme="dark"] .highlight {
-  background: #ffffff; color: #bfbfbf
+/* Paragraphs within banner HTML (when Banners text contains <p> elements). */
+.lv-custom-banner-list p {
+  margin: 0;
 }
 
+/*-------------------------------------------------------------------------
+ * Field Lists
+ *-------------------------------------------------------------------------*/
+.field-list ul {
+  margin: 0;
+  padding-left: 1em;
+}
+
+.field-list p {
+  margin: 0;
+}
+
+dl.field-list {
+  display: grid;
+  grid-template-columns: auto minmax(70%, 95%);
+  margin-bottom: 1.5rem; /* Up from 16 */
+  gap: 1.5rem;
+}
+
+dl.field-list > dt {
+  font-weight: 600;
+  word-break: break-word;
+  margin-bottom: 0;
+  display: inline-grid;
+  grid-template-columns: max-content auto;
+}
+
+dl.field-list > dd {
+  margin: 0;
+}
+
+/*-------------------------------------------------------------------------
+ * Special Features for LVGL
+ *-------------------------------------------------------------------------*/
+div .lvgl-figure-caption p {
+  font-size: 0.8rem;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/*-------------------------------------------------------------------------
+ * Code Highlighting
+ *-------------------------------------------------------------------------*/
+/* Pygments .p = Punctuation */
+body[data-theme="dark"] .highlight .p {
+  color: #a883f3;
+}

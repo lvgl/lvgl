@@ -73,15 +73,26 @@ typedef enum {
 } lv_draw_task_state_t;
 
 struct _lv_layer_t  {
-
-    /** Target draw buffer of the layer*/
+    /** Target draw buffer of the layer */
     lv_draw_buf_t * draw_buf;
+
+    /** Linked list of draw tasks */
+    lv_draw_task_t * draw_task_head;
+
+    /** Parent layer */
+    lv_layer_t * parent;
+
+    /** Next layer */
+    lv_layer_t * next;
+
+    /** User data */
+    void * user_data;
 
     /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
 
-    /** The color format of the layer. LV_COLOR_FORMAT_...  */
-    lv_color_format_t color_format;
+    /** The physical clipping area relative to the display */
+    lv_area_t phy_clip_area;
 
     /**
      * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
@@ -93,32 +104,25 @@ struct _lv_layer_t  {
      */
     lv_area_t _clip_area;
 
-    /**
-     * The physical clipping area relative to the display.
-     */
-    lv_area_t phy_clip_area;
-
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /** Transform matrix to be applied when rendering the layer */
     lv_matrix_t matrix;
 #endif
 
-    /** Opacity of the layer */
-    lv_opa_t opa;
-
-    /*Recolor of the layer*/
-    lv_color32_t recolor;
-
     /** Partial y offset */
     int32_t partial_y_offset;
 
-    /** Linked list of draw tasks */
-    lv_draw_task_t * draw_task_head;
+    /** Recolor of the layer */
+    lv_color32_t recolor;
 
-    lv_layer_t * parent;
-    lv_layer_t * next;
+    /** The color format of the layer. LV_COLOR_FORMAT_... */
+    lv_color_format_t color_format;
+
+    /** Flag indicating all tasks are added */
     bool all_tasks_added;
-    void * user_data;
+
+    /** Opacity of the layer */
+    lv_opa_t opa;
 };
 
 typedef struct {

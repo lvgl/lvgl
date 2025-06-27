@@ -10,13 +10,14 @@
 #include "lv_xml.h"
 #if LV_USE_XML
 
+#include "lv_xml.h"
 #include "lv_xml_base_types.h"
 #include "lv_xml_parser.h"
 #include "lv_xml_component.h"
 #include "lv_xml_component_private.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_style.h"
-#include "lv_xml.h"
+#include "lv_xml_translation.h"
 #include "lv_xml_utils.h"
 #include "lv_xml_private.h"
 #include "parsers/lv_xml_obj_parser.h"
@@ -39,7 +40,6 @@
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
-#include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -110,7 +110,35 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
                            lv_xml_calendar_header_dropdown_apply);
 
-    lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
+    lv_xml_widget_register("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
+    lv_xml_widget_register("lv_obj-remove_style", lv_obj_xml_remove_style_create, lv_obj_xml_remove_style_apply);
+    lv_xml_widget_register("lv_obj-remove_style_all", lv_obj_xml_remove_style_all_create,
+                           lv_obj_xml_remove_style_all_apply);
+
+    lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
+    lv_xml_widget_register("lv_obj-subject_set_int", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
+                           lv_obj_xml_subject_increment_apply);
+    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+                           lv_obj_xml_screen_load_event_apply);
+    lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
+                           lv_obj_xml_screen_create_event_apply);
+
+    lv_xml_widget_register("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_lt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_ge", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_widget_register("lv_obj-bind_flag_if_le", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+
+    lv_xml_widget_register("lv_obj-bind_state_if_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_not_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_gt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_lt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_widget_register("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
 }
 
 void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * parent_scope,
@@ -228,6 +256,7 @@ lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * 
     }
 
     f = lv_ll_ins_head(&scope->font_ll);
+    lv_memzero(f, sizeof(*f));
     f->name = lv_strdup(name);
     f->font = font;
 
@@ -275,6 +304,7 @@ lv_result_t lv_xml_register_subject(lv_xml_component_scope_t * scope, const char
     }
 
     s = lv_ll_ins_head(&scope->subjects_ll);
+    lv_memzero(s, sizeof(*s));
     s->name = lv_strdup(name);
     s->subject = subject;
 
@@ -321,6 +351,7 @@ lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char *
     }
 
     cnst = lv_ll_ins_head(&scope->const_ll);
+    lv_memzero(cnst, sizeof(*cnst));
 
     cnst->name = lv_strdup(name);
     cnst->value = lv_strdup(value);
@@ -373,6 +404,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_scope_t * scope, const char *
     }
 
     img = lv_ll_ins_head(&scope->image_ll);
+    lv_memzero(img, sizeof(*img));
     img->name = lv_strdup(name);
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         img->src = lv_strdup(src);
@@ -427,6 +459,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const cha
     }
 
     e = lv_ll_ins_head(&scope->event_ll);
+    lv_memzero(e, sizeof(*e));
     e->name = lv_strdup(name);
     e->cb = cb;
 
@@ -487,9 +520,8 @@ static void resolve_params(lv_xml_component_scope_t * item_scope, lv_xml_compone
 {
     uint32_t i;
     for(i = 0; item_attrs[i]; i += 2) {
-        const char * name = item_attrs[i];
         const char * value = item_attrs[i + 1];
-        if(lv_streq(name, "styles")) continue; /*Styles will handle it themselves*/
+
         if(value[0] == '$') {
             /*E.g. the ${my_color} value is the my_color attribute name on the parent*/
             const char * name_clean = &value[1]; /*skips `$`*/
@@ -553,6 +585,7 @@ static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * 
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs)
 {
     lv_xml_parser_state_t * state = (lv_xml_parser_state_t *)user_data;
+    state->tag_name = name;
     bool is_view = false;
 
     if(lv_streq(name, "view")) {

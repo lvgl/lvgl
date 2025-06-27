@@ -38,7 +38,7 @@ To set the image in a state, use the
 :cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_mid, src_right)`.
 
 The image sources work the same as described in the :ref:`Image Widget <lv_image>`
-except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
+except that "Symbols" are not supported by the Image Button. Any of the sources can be ``NULL``.
 Typically the middle image should be one of the set image sources.
 
 If only ``src_mid`` is specified, the width of the widget will be set automatically to the

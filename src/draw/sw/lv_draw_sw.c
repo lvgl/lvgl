@@ -83,7 +83,11 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
+#if LV_USE_DRAW_ARM2D_SYNC
+    draw_sw_unit->base_unit.name = "SW_ARM2D";
+#else
     draw_sw_unit->base_unit.name = "SW";
+#endif
 
 #if LV_USE_OS
     uint32_t i;

@@ -504,7 +504,7 @@ especially useful if the size is set by percentage or
 
    static lv_style_t style_max_height;
    lv_style_init(&style_max_height);
-   lv_style_set_y(&style_max_height, 200);
+   lv_style_set_max_height(&style_max_height, 200);
 
    lv_obj_set_height(widget, lv_pct(100));
    lv_obj_add_style(widget, &style_max_height, LV_STATE_DEFAULT); //Limit the  height to 200 px
@@ -516,7 +516,7 @@ the parent's content area.
 
    static lv_style_t style_max_height;
    lv_style_init(&style_max_height);
-   lv_style_set_y(&style_max_height, lv_pct(50));
+   lv_style_set_max_height(&style_max_height, lv_pct(50));
 
    lv_obj_set_height(widget, lv_pct(100));
    lv_obj_add_style(widget, &style_max_height, LV_STATE_DEFAULT); //Limit the height to half parent height

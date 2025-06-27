@@ -48,6 +48,15 @@ It is based on ESP-IDF and uses the ESP32-S3 microcontroller.
 
 - `Viewe ESP32 S3 Smart Display <https://viewedisplay.com/product/esp32-7-inch-800x480-rgb-ips-tft-display-touch-screen-arduino-lvgl-uart/>`_
 
+lv_port_viewe_knob_15_espidf
+----------------------------
+
+`lv_port_viewe_knob_15_espidf <https://github.com/lvgl/lv_port_viewe_knob_15_espidf>`_
+is a port repo of LVGL which supports Viewe AMOLED Touch Knob Display. 
+It is based on ESP-IDF and uses the ESP32-S3 microcontroller.
+
+- `Viewe AMOLED Touch Knob Display <https://viewedisplay.com/product/esp32-1-5-inch-466x466-round-amoled-knob-display-touch-screen-arduino-lvgl/>`_
+
 UART Smart Displays
 *******************
 

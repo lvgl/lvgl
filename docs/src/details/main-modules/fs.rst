@@ -32,7 +32,7 @@ Identifier Letters
 ******************
 
 As mentioned above, a file system is identified by an assigned identifier letter.
-This identifier is merely a way for the LVGL File System abtraction logic to look up
+This identifier is merely a way for the LVGL File System abstraction logic to look up
 the appropriate registered file-system driver for a given path.
 
 **How it Works:**
@@ -365,6 +365,11 @@ so the driver needs to implement more callbacks when the cache is enabled.
                     read call can"]
              --> P["copy the required bytes
                     to the destination buffer"]
+
+.. container:: lvgl-figure-caption
+
+    (Use mouse wheel to zoom in, and drag image to pan it.)
+
 
 ``lv_fs_write`` :sub:`(behavior when cache is enabled)`
 -------------------------------------------------------

@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_img.c
+ * @file lv_draw_sw_vector.c
  *
  */
 
@@ -46,6 +46,9 @@ typedef struct {
 typedef struct {
     Tvg_Canvas * canvas;
     int32_t partial_y_offset;
+    int32_t translate_x;
+    int32_t translate_y;
+    lv_opa_t opa;
 } _tvg_draw_state;
 /**********************
  *  STATIC PROTOTYPES
@@ -279,7 +282,7 @@ static void _set_paint_fill_gradient(Tvg_Paint * obj, const lv_vector_gradient_t
 }
 
 static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_draw_image_dsc_t * p,
-                                    const lv_matrix_t * m)
+                                    const lv_matrix_t * m, const lv_opa_t opa)
 {
     lv_image_decoder_dsc_t decoder_dsc;
     lv_image_decoder_args_t args = { 0 };
@@ -310,7 +313,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, true);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
-    tvg_paint_set_opacity(img, p->opa);
+    tvg_paint_set_opacity(img, LV_UDIV255(p->opa * opa));
 
     Tvg_Matrix mtx;
     lv_matrix_to_tvg(&mtx, m);
@@ -320,7 +323,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
 }
 
 static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vector_fill_dsc_t * dsc,
-                            const lv_matrix_t * matrix)
+                            const lv_matrix_t * matrix, const lv_opa_t opa)
 {
     tvg_shape_set_fill_rule(obj, lv_fill_rule_to_tvg(dsc->fill_rule));
 
@@ -341,7 +344,7 @@ static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vecto
 
         lv_matrix_multiply(&imx, &dsc->matrix);
 
-        _set_paint_fill_pattern(obj, canvas, &dsc->img_dsc, &imx);
+        _set_paint_fill_pattern(obj, canvas, &dsc->img_dsc, &imx, opa);
     }
     else if(dsc->style == LV_VECTOR_DRAW_STYLE_GRADIENT) {
         _set_paint_fill_gradient(obj, &dsc->gradient, &dsc->matrix);
@@ -436,23 +439,29 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         };
         _set_paint_matrix(obj, &mtx);
         mtx.e23 -= (float)(y_offset);
-        tvg_shape_append_rect(obj, rc.x, rc.y, rc.w, rc.h, 0, 0);
+        tvg_shape_append_rect(obj, rc.x + state->translate_x, rc.y + state->translate_y, rc.w, rc.h, 0, 0);
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else {
-        tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - y_offset), (int32_t)rc.w, (int32_t)rc.h);
+        tvg_canvas_set_viewport(canvas, (int32_t)rc.x + state->translate_x, (int32_t)(rc.y - y_offset) + state->translate_y,
+                                (int32_t)rc.w, (int32_t)rc.h);
 
+        lv_matrix_t matrix;
+        lv_matrix_identity(&matrix);
+        lv_matrix_translate(&matrix, state->translate_x, state->translate_y);
+        lv_matrix_multiply(&matrix, &dsc->matrix);
         Tvg_Matrix mtx;
-        lv_matrix_to_tvg(&mtx, &dsc->matrix);
+        lv_matrix_to_tvg(&mtx, &matrix);
         mtx.e23 -= (float)(y_offset);
         _set_paint_matrix(obj, &mtx);
 
         _set_paint_shape(obj, path);
 
-        _set_paint_fill(obj, canvas, &dsc->fill_dsc, &dsc->matrix);
+        _set_paint_fill(obj, canvas, &dsc->fill_dsc, &matrix, state->opa);
         _set_paint_stroke(obj, &dsc->stroke_dsc);
         _set_paint_blend_mode(obj, dsc->blend_mode);
     }
+    tvg_paint_set_opacity(obj, state->opa);
     tvg_canvas_push(canvas, obj);
 }
 
@@ -495,7 +504,7 @@ void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_task_dsc_t * dsc)
     lv_area_to_tvg(&rc, &t->clip_area);
     tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - layer->partial_y_offset), (int32_t)rc.w, (int32_t)rc.h);
 
-    _tvg_draw_state state = {canvas, layer->partial_y_offset};
+    _tvg_draw_state state = {canvas, layer->partial_y_offset, -layer->buf_area.x1, -layer->buf_area.y1, t->opa};
 
     lv_ll_t * task_list = dsc->task_list;
     lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);

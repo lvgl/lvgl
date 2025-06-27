@@ -228,6 +228,11 @@ typedef struct _lv_global_t {
     lv_test_state_t test_state;
 #endif
 
+#if LV_USE_TRANSLATION
+    lv_ll_t translation_packs_ll;
+    const char * translation_selected_lang;
+#endif
+
 #if LV_USE_NUTTX
     struct _lv_nuttx_ctx_t * nuttx_ctx;
 #endif

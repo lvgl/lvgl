@@ -125,9 +125,6 @@ Screenshot Comparison
 ``bool lv_test_screenshot_compare(const char * fn_ref)`` is a useful function
 to compare the content of the emulated display with reference PNG images.
 
-The screenshot comparison uses `libpng`, so it needs to be linked to LVGL when this feature is required.
-To avoid making the entire Test module dependent on `libpng`, screenshot comparison can be individually enabled by
-``LV_USE_TEST_SCREENSHOT_COMPARE``.
 
 This function works in a practical way:
 
@@ -144,8 +141,10 @@ format in this list):
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED`
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565_SWAPPED`
 - :cpp:enumerator:`LV_COLOR_FORMAT_L8`
 - :cpp:enumerator:`LV_COLOR_FORMAT_AL88`
 - :cpp:enumerator:`LV_COLOR_FORMAT_I1`
@@ -154,6 +153,11 @@ To read and decode PNG images and to store the converted rendered image, a few M
 (not :cpp:expr:`lv_malloc`).
 
 
+The screenshot comparison uses ``lodepng`` which is built-in to LVGL and just needs to be ebnabled with
+``LV_USE_LODEPNG``.
+
+To avoid making the entire Test module dependent on ``lodepng``, screenshot comparison can be individually enabled by
+``LV_USE_TEST_SCREENSHOT_COMPARE``.
 
 API
 ***

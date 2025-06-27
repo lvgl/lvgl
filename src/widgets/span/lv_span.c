@@ -595,13 +595,17 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
 lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * span)
 {
+    if(obj == NULL) return (lv_span_coords_t) {
+        0
+    };
+
     /* find previous span */
     const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
     const lv_ll_t * spans = &spangroup->child_ll;
     const int32_t width = lv_obj_get_content_width(obj);
     const int32_t indent = lv_spangroup_get_indent(obj);
 
-    if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
+    if(span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
         0
     };
 
@@ -1207,7 +1211,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
                                                          label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
                 a.x2 = a.x1 + pinfo->txt_w;
-                label_draw_dsc.text_length = next_ofs + 1;
+                label_draw_dsc.text_length = next_ofs;
 #if LV_USE_BIDI
                 if(base_dir == LV_BASE_DIR_RTL) {
                     if(txt_bytes > label_draw_dsc.text_length) {

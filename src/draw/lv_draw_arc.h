@@ -45,11 +45,11 @@ typedef struct {
     /**The center point of the arc. */
     lv_point_t center;
 
-    /**The outer radius of the arc*/
-    uint16_t radius;
-
     /**An image source to be used instead of `color`. `NULL` if unused*/
     const void * img_src;
+
+    /**The outer radius of the arc*/
+    uint16_t radius;
 
     /**Opacity of the arc in 0...255 range.
      * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/

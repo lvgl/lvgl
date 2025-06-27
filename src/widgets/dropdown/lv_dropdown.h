@@ -32,12 +32,12 @@ extern "C" {
 LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_dropdown_id_t {
     LV_PROPERTY_ID(DROPDOWN, TEXT,                LV_PROPERTY_TYPE_TEXT,  0),
     LV_PROPERTY_ID(DROPDOWN, OPTIONS,             LV_PROPERTY_TYPE_TEXT,  1),
     LV_PROPERTY_ID(DROPDOWN, OPTION_COUNT,        LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(DROPDOWN, SELECTED,            LV_PROPERTY_TYPE_INT,   3),
     // LV_PROPERTY_ID(DROPDOWN, SELECTED_STR,        LV_PROPERTY_TYPE_TEXT,  4),
-    LV_PROPERTY_ID2(DROPDOWN, SELECTED,           LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_BOOL, 3),
     LV_PROPERTY_ID(DROPDOWN, DIR,                 LV_PROPERTY_TYPE_INT,   5),
     LV_PROPERTY_ID(DROPDOWN, SYMBOL,              LV_PROPERTY_TYPE_TEXT,  6),
     LV_PROPERTY_ID(DROPDOWN, SELECTED_HIGHLIGHT,  LV_PROPERTY_TYPE_INT,   7),
@@ -108,9 +108,8 @@ void lv_dropdown_clear_options(lv_obj_t * obj);
  * Set the selected option
  * @param obj       pointer to drop-down list object
  * @param sel_opt   id of the selected option (0 ... number of option - 1);
- * @param anim      LV_ANIM_ON: set the selected option with an animation; LV_ANIM_OFF: set the option immediately
  */
-void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim);
+void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt);
 
 /**
  * Set the direction of the a drop-down list

@@ -51,7 +51,7 @@ typedef enum {
 } lv_keyboard_mode_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_keyboard_id_t {
     LV_PROPERTY_ID(KEYBOARD, TEXTAREA,            LV_PROPERTY_TYPE_OBJ,   0),
     LV_PROPERTY_ID(KEYBOARD, MODE,                LV_PROPERTY_TYPE_INT,   1),
     LV_PROPERTY_ID(KEYBOARD, POPOVERS,            LV_PROPERTY_TYPE_INT,   2),

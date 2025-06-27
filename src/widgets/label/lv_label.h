@@ -54,7 +54,7 @@ typedef enum {
 } lv_label_long_mode_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_label_id_t {
     LV_PROPERTY_ID(LABEL, TEXT,                   LV_PROPERTY_TYPE_TEXT,      0),
     LV_PROPERTY_ID(LABEL, LONG_MODE,              LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       2),

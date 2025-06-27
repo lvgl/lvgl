@@ -33,11 +33,6 @@ typedef struct {
 
     int32_t radius;
 
-    /*Background*/
-    lv_opa_t bg_opa;
-    lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
-    lv_grad_dsc_t bg_grad;
-
     /*Background img*/
     const void * bg_image_src;
     const void * bg_image_symbol_font;
@@ -45,11 +40,22 @@ typedef struct {
     lv_opa_t bg_image_opa;
     lv_opa_t bg_image_recolor_opa;
     uint8_t bg_image_tiled;
+    /*Background*/
+    lv_opa_t bg_opa;
+    /*Border*/
+    lv_opa_t border_opa;
+    /*Outline */
+    lv_opa_t outline_opa;
+    /*Shadow*/
+    lv_opa_t shadow_opa;
+
+    /*Background*/
+    lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
+    lv_grad_dsc_t bg_grad;
 
     /*Border*/
     lv_color_t border_color;
     int32_t border_width;
-    lv_opa_t border_opa;
     lv_border_side_t border_side : 5;
     uint8_t border_post : 1; /*The border will be drawn later*/
 
@@ -57,7 +63,6 @@ typedef struct {
     lv_color_t outline_color;
     int32_t outline_width;
     int32_t outline_pad;
-    lv_opa_t outline_opa;
 
     /*Shadow*/
     lv_color_t shadow_color;
@@ -65,7 +70,6 @@ typedef struct {
     int32_t shadow_offset_x;
     int32_t shadow_offset_y;
     int32_t shadow_spread;
-    lv_opa_t shadow_opa;
 } lv_draw_rect_dsc_t;
 
 typedef struct {

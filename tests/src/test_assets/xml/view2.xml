@@ -20,9 +20,10 @@
         </lv_spangroup>
 
         <lv_scale total_tick_count="31" show_label="true" major_tick_every="6"
-        		  range="10 110" width="300"
-        		  styles="scale_main scale_indic:indicator">
-	        <lv_scale-section range="30 60" style_indicator="scale_sectoion_indic"/>
+        		  min_value="10" max_value="110" width="300">
+            <style name="scale_main"/>
+            <style name="scale_indic" selector="indicator"/>
+	        <lv_scale-section min_value="30" max_value="60" style_indicator="scale_sectoion_indic"/>
         </lv_scale>
 
         <lv_table column_count="4" style_border_side:items="full">

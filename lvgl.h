@@ -53,6 +53,7 @@ extern "C" {
 
 #include "src/widgets/animimage/lv_animimage.h"
 #include "src/widgets/arc/lv_arc.h"
+#include "src/widgets/arclabel/lv_arclabel.h"
 #include "src/widgets/bar/lv_bar.h"
 #include "src/widgets/button/lv_button.h"
 #include "src/widgets/buttonmatrix/lv_buttonmatrix.h"
@@ -95,8 +96,8 @@ extern "C" {
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
 #include "src/others/font_manager/lv_font_manager.h"
+#include "src/others/translation/lv_translation.h"
 #include "src/others/xml/lv_xml.h"
-#include "src/others/xml/lv_xml_component.h"
 #include "src/others/test/lv_test.h"
 
 #include "src/libs/barcode/lv_barcode.h"
@@ -131,6 +132,7 @@ extern "C" {
 #include "src/lv_api_map_v8.h"
 #include "src/lv_api_map_v9_0.h"
 #include "src/lv_api_map_v9_1.h"
+#include "src/lv_api_map_v9_2.h"
 
 #if LV_USE_PRIVATE_API
 #include "src/lvgl_private.h"

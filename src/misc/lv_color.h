@@ -37,7 +37,7 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
  * Opacity percentages.
  */
 
-enum {
+enum _lv_opacity_level_t {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,
     LV_OPA_10     = 25,
@@ -81,6 +81,7 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_NEMA_TSC12A ? 12 : \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
+                                            (cf) == LV_COLOR_FORMAT_RGB565_SWAPPED ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
                                             (cf) == LV_COLOR_FORMAT_YUY2 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_ARGB1555 ? 16 : \
@@ -154,6 +155,7 @@ typedef enum {
     LV_COLOR_FORMAT_ARGB8565          = 0x13,   /**< Not supported by sw renderer yet. */
     LV_COLOR_FORMAT_RGB565A8          = 0x14,   /**< Color array followed by Alpha array*/
     LV_COLOR_FORMAT_AL88              = 0x15,   /**< L8 with alpha >*/
+    LV_COLOR_FORMAT_RGB565_SWAPPED    = 0x1B,
 
     /*3 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB888            = 0x0F,
@@ -437,6 +439,17 @@ uint8_t lv_color24_luminance(const uint8_t * c);
  * @return the brightness [0..255]
  */
 uint8_t lv_color32_luminance(lv_color32_t c);
+
+
+/**
+ * Swap the endianness of an rgb565 color
+ * @param c a color
+ * @return the swapped color
+ */
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_swap_16(uint16_t c)
+{
+    return (c >> 8) | (c << 8);
+}
 
 /**********************
  *      MACROS

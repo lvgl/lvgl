@@ -1,0 +1,4 @@
+<translations languages="en de hu">
+  <translation tag="Card 1"    en="Card 1"     de="Karte 1" hu="Egy kártya"/>
+  <translation tag="No title"  en="No title"   de="Kein Title"/>
+</translations>

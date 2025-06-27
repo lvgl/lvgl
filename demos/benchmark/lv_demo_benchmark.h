@@ -20,6 +20,29 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_14_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_18_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_20_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_24_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_26_aligned)
+
+#else
+
+/** Make sure that the aligned fonts are not built when not used */
+#define LV_FONT_BENCHMARK_MONTSERRAT_12_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_14_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_16_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_18_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_20_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_22_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_24_ALIGNED 0
+#define LV_FONT_BENCHMARK_MONTSERRAT_26_ALIGNED 0
+
+#endif /*LV_DEMO_BENCHMARK_ALIGNED_FONTS*/
 
 /**********************
  *      TYPEDEFS

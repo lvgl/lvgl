@@ -5,7 +5,7 @@ Auxiliary Modules
 =================
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     file_explorer
     font_manager
@@ -16,7 +16,8 @@ Auxiliary Modules
     monkey
     obj_id
     obj_property
-    observer
+    observer/index
     snapshot
     test
+    translation
     xml/index

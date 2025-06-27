@@ -133,9 +133,9 @@ for line in fin.read().splitlines():
     indent = r[1]
 
     name = r[3]
-    name = re.sub(r'\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
+    name = re.sub(r'\(.*?\)', '', name, count=1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
-    line = re.sub(r'[\s]*', '', line, 1)
+    line = re.sub(r'[\s]*', '', line, count=1)
 
     #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because
     #if a not defined CONFIG_... value should be interpreted as 0 and not the LVGL default
@@ -209,11 +209,37 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#if LV_USE_WAYLAND == 0
+    #define LV_WAYLAND_USE_DMABUF           0
+    #define LV_WAYLAND_WINDOW_DECORATIONS   0
+    #define LV_WAYLAND_WL_SHELL             0
+#endif /* LV_USE_WAYLAND */
+
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
 #endif /*LV_USE_SYSMON*/
 
+#if LV_USE_PERF_MONITOR == 0
+    #define LV_USE_PERF_MONITOR_LOG_MODE 0
+#endif /*LV_USE_PERF_MONITOR*/
+
+#if LV_BUILD_DEMOS == 0
+    #define LV_USE_DEMO_WIDGETS 0
+    #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+    #define LV_USE_DEMO_BENCHMARK 0
+    #define LV_USE_DEMO_RENDER 0
+    #define LV_USE_DEMO_STRESS 0
+    #define LV_USE_DEMO_MUSIC 0
+    #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #define LV_USE_DEMO_FLEX_LAYOUT     0
+    #define LV_USE_DEMO_MULTILANG       0
+    #define LV_USE_DEMO_TRANSFORM       0
+    #define LV_USE_DEMO_SCROLL          0
+    #define LV_USE_DEMO_EBIKE           0
+    #define LV_USE_DEMO_HIGH_RES        0
+    #define LV_USE_DEMO_SMARTWATCH      0
+#endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
     #if (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)

@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_blend.c
+ * @file lv_draw_vglite_img.c
  *
  */
 
@@ -70,7 +70,7 @@
 static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf);
 
 /**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
+ * BLock Image Transfer - copy rectangular image from src_buf to dest_buf with effects.
  * By default, image is copied directly, with optional opacity.
  *
  * @param dest_buf Destination buffer
@@ -99,11 +99,12 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
  * @param[in] dsc Image descriptor
  *
  */
-static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+static void _vglite_draw_pattern(vglite_draw_task_t * vglite_task, const lv_area_t * clip_area,
+                                 const lv_area_t * coords,
                                  const lv_draw_image_dsc_t * dsc);
 
 /**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with or without effects.
+ * BLock Image Transfer - copy rectangular image from src_buf to dest_buf with or without effects.
  *
  * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] dsc Image descriptor
@@ -125,13 +126,15 @@ static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                        const lv_area_t * coords)
+void lv_draw_vglite_img(vglite_draw_task_t * vglite_task)
 {
+    const lv_draw_image_dsc_t * dsc = vglite_task->t->draw_dsc;
+    const lv_area_t * coords = &vglite_task->t->area;
+
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = t->target_layer;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t relative_coords;
@@ -139,7 +142,7 @@ void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
@@ -160,7 +163,7 @@ void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     lv_color_format_t src_cf = img_dsc->header.cf;
     uint32_t src_stride = img_dsc->header.stride;
 
-    /* Set src_vgbuf structure. */
+    /* Set src_buf structure. */
     vglite_set_src_buf(src_buf, img_dsc->header.w, img_dsc->header.h, src_stride, src_cf);
 
 #if LV_USE_VGLITE_BLIT_SPLIT
@@ -175,7 +178,7 @@ void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vglite_set_transformation_matrix(&blend_area, dsc);
     bool is_tiled = dsc->tile;
     if(is_tiled)
-        _vglite_draw_pattern(&clip_area, &relative_coords, dsc);
+        _vglite_draw_pattern(vglite_task, &clip_area, &relative_coords, dsc);
     else
         _vglite_blit(&src_area, dsc);
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
@@ -186,8 +189,8 @@ void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
  **********************/
 static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc)
 {
-    vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
-    vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
+    vg_lite_buffer_t * src_buf = vglite_get_src_buf();
 
     vg_lite_rectangle_t rect = {
         .x = (vg_lite_int32_t)src_area->x1,
@@ -196,15 +199,15 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
         .height = (vg_lite_int32_t)lv_area_get_height(src_area)
     };
 
-    src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+    src_buf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    src_buf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     vg_lite_color_t vgcol = _vglite_recolor(dsc);
 
-    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+    vg_lite_matrix_t * matrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
-    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT));
+    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dest_buf, src_buf, &rect, matrix, vgblend, vgcol, VG_LITE_FILTER_POINT));
 
     vglite_run();
 }
@@ -260,7 +263,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     if((src_area->x2 < VGLITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < VGLITE_BLIT_SPLIT_THR)) {
 
-        /* Set new dest_vgbuf and src_vgbuf memory addresses */
+        /* Set new dest_buf and src_buf memory addresses */
         vglite_set_dest_buf_ptr(dest_buf);
         vglite_set_src_buf_ptr(src_buf);
 
@@ -350,7 +353,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
             tile_src_area.x2 += shift_src_x;
             tile_dest_area.x2 += shift_dest_x;
 
-            /* Set new dest_vgbuf and src_vgbuf memory addresses */
+            /* Set new dest_buf and src_buf memory addresses */
             vglite_set_dest_buf_ptr(tile_dest_buf);
             vglite_set_src_buf_ptr(tile_src_buf);
 
@@ -372,32 +375,38 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
 }
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 
-static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+static void _vglite_draw_pattern(vglite_draw_task_t * vglite_task, const lv_area_t * clip_area,
+                                 const lv_area_t * coords,
                                  const lv_draw_image_dsc_t * dsc)
 {
     /* Target buffer */
-    vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     /* Path to draw */
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
+    int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT_MALLOC(path_data);
+    vglite_task->path_data = path_data;
+
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
 
-    vg_lite_path_t path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT_MALLOC(path);
+    vglite_task->path = path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     /* Pattern Image */
-    vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
-    src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+    vg_lite_buffer_t * src_buf = vglite_get_src_buf();
+    src_buf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    src_buf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     /* Pattern matrix */
-    vg_lite_matrix_t vgmatrix;
-    vg_lite_identity(&vgmatrix);
-    vg_lite_translate((vg_lite_float_t)dsc->image_area.x1, (vg_lite_float_t)dsc->image_area.y1, &vgmatrix);
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+    vg_lite_translate((vg_lite_float_t)dsc->image_area.x1, (vg_lite_float_t)dsc->image_area.y1, &matrix);
 
     /* Blend mode */
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
@@ -409,9 +418,10 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
-    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL,
-                                            src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
+    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL,
+                                            src_buf, &matrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
+    vglite_run();
 }
 
 static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc)

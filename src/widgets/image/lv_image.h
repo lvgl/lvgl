@@ -58,7 +58,7 @@ typedef enum {
 } lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_image_id_t {
     LV_PROPERTY_ID(IMAGE, SRC,          LV_PROPERTY_TYPE_IMGSRC,    0),
     LV_PROPERTY_ID(IMAGE, OFFSET_X,     LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,     LV_PROPERTY_TYPE_INT,       2),
@@ -134,6 +134,20 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
  * @param y         rotation center y of the image
  */
 void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
+
+/**
+ * Set the rotation horizontal center of the image.
+ * @param obj       pointer to an image object
+ * @param x         rotation center x of the image, or lv_pct()
+ */
+void lv_image_set_pivot_x(lv_obj_t * obj, int32_t x);
+
+/**
+ * Set the rotation vertical center of the image.
+ * @param obj       pointer to an image object
+ * @param y         rotation center y of the image, or lv_pct()
+ */
+void lv_image_set_pivot_y(lv_obj_t * obj, int32_t y);
 
 /**
  * Set the zoom factor of the image.

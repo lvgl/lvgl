@@ -49,7 +49,7 @@ static const uint16_t TperDegree[90] = {
 
 /* intermediate arc params */
 typedef struct _vg_arc {
-    int32_t angle;   /* angle <90deg */
+    uint32_t angle;   /* angle <90deg */
     int32_t quarter; /* 0-3 counter-clockwise */
     int32_t rad;     /* radius */
     int32_t p0x;       /* point P0 */
@@ -81,8 +81,8 @@ typedef struct _cubic_cont_pt {
  * @param[in] dsc Arc description structure (width, rounded ending, opacity)
  *
  */
-static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
-                             const lv_draw_arc_dsc_t * dsc);
+static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t * center,
+                             const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -96,10 +96,10 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
-                        const lv_area_t * coords)
+void lv_draw_vglite_arc(vglite_draw_task_t * vglite_task)
 {
-    LV_UNUSED(coords);
+    lv_draw_task_t * t = vglite_task->t;
+    const lv_draw_arc_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
@@ -115,7 +115,7 @@ void lv_draw_vglite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
     lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    _vglite_draw_arc(&center, &clip_area, dsc);
+    _vglite_draw_arc(vglite_task, &center, &clip_area, dsc);
 }
 
 /**********************
@@ -140,11 +140,11 @@ static void _copy_arc(vg_arc * dst, vg_arc * src)
 /**
  * Rotate the point according given rotation angle rotation center is 0,0
  */
-static void _rotate_point(int32_t angle, int32_t * x, int32_t * y)
+static void _rotate_point(int16_t angle, int32_t * x, int32_t * y)
 {
     int32_t ori_x = *x;
     int32_t ori_y = *y;
-    int16_t alpha = (int16_t)angle;
+    int16_t alpha = angle;
     *x = ((lv_trigo_cos(alpha) * ori_x) / LV_TRIGO_SIN_MAX) - ((lv_trigo_sin(alpha) * ori_y) / LV_TRIGO_SIN_MAX);
     *y = ((lv_trigo_sin(alpha) * ori_x) / LV_TRIGO_SIN_MAX) + ((lv_trigo_cos(alpha) * ori_y) / LV_TRIGO_SIN_MAX);
 }
@@ -269,7 +269,7 @@ static uint16_t _get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
  * Gives relative coords of the control points
  * for the sub-arc starting at angle with given angle span
  */
-static void _get_subarc_control_points(vg_arc * arc, int32_t span)
+static void _get_subarc_control_points(vg_arc * arc, uint32_t span)
 {
     vg_arc fullarc = {0};
     fullarc.angle = arc->angle;
@@ -427,10 +427,10 @@ static void _get_arc_control_points(vg_arc * arc, bool start)
  * center: (in) the center of the circle in draw coordinates
  * cw: (in) true if arc is clockwise
  */
-static void _add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, const lv_point_t * center, bool cw)
+static void _add_split_arc_path(int32_t * arc_path, uint32_t * pidx, vg_arc * q_arc, const lv_point_t * center, bool cw)
 {
     /* assumes first control point already in array arc_path[] */
-    int idx = *pidx;
+    uint32_t idx = *pidx;
     if(cw) {
 #if BEZIER_DBG_CONTROL_POINTS
         arc_path[idx++] = VLC_OP_LINE;
@@ -477,15 +477,15 @@ static void _add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, 
     *pidx = idx;
 }
 
-static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
+static void _add_arc_path(int32_t * arc_path, uint32_t * pidx, uint32_t radius,
                           int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw)
 {
     /* set number of arcs to draw */
     vg_arc q_arc;
-    int32_t start_arc_angle = start_angle % 90;
-    int32_t end_arc_angle = end_angle % 90;
-    int32_t inv_start_arc_angle = (start_arc_angle > 0) ? (90 - start_arc_angle) : 0;
-    int32_t nbarc = (end_angle - start_angle - inv_start_arc_angle - end_arc_angle) / 90;
+    uint32_t start_arc_angle = start_angle % 90;
+    uint32_t end_arc_angle = end_angle % 90;
+    uint32_t inv_start_arc_angle = (start_arc_angle > 0) ? (90 - start_arc_angle) : 0;
+    uint32_t nbarc = (end_angle - start_angle - inv_start_arc_angle - end_arc_angle) / 90;
     q_arc.rad = radius;
 
     /* handle special case of start & end point in the same quarter */
@@ -508,7 +508,7 @@ static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
             _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
         /* full arcs */
-        for(int32_t q = 0; q < nbarc ; q++) {
+        for(uint32_t q = 0; q < nbarc ; q++) {
             q_arc.quarter = (q + ((start_angle + 89) / 90)) % 4;
             q_arc.angle = 90;
             /* get cubic points relative to center */
@@ -559,22 +559,25 @@ static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
     }
 }
 
-static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
-                             const lv_draw_arc_dsc_t * dsc)
+static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t * center,
+                             const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
-    vg_lite_path_t path;
-    uint16_t start_angle = dsc->start_angle;
-    uint16_t end_angle = dsc->end_angle;
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT_MALLOC(path);
+    vglite_task->path = path;
+    int16_t start_angle = dsc->start_angle;
+    int16_t end_angle = dsc->end_angle;
 
     /* be sure end_angle > start_angle */
     if(end_angle < start_angle)
         end_angle += 360;
 
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
-    int32_t arc_path[ARC_PATH_DATA_MAX_SIZE];
-    lv_memzero(arc_path, sizeof(arc_path));
+    int32_t * arc_path = lv_malloc_zeroed(ARC_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT_MALLOC(arc_path);
+    vglite_task->path_data = arc_path;
 
     /*** Init path ***/
     int32_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
@@ -583,7 +586,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     if(width > radius)
         width = radius;
 
-    int pidx = 0;
+    uint32_t pidx = 0;
     int32_t cp_x, cp_y; /* control point coords */
 
     /* first control point of curve */
@@ -665,7 +668,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
 
     arc_path[pidx++] = VLC_OP_END;
 
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -673,11 +676,9 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

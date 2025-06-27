@@ -28,6 +28,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+    /**
+     * Code 128 with GS1 encoding. Strips `[FCN1]` and spaces.
+     */
+    LV_BARCODE_ENCODING_CODE128_GS1,
+    /**
+     * Code 128 with raw encoding.
+     */
+    LV_BARCODE_ENCODING_CODE128_RAW,
+} lv_barcode_encoding_t;
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_barcode_class;
 
 /**********************
@@ -77,6 +88,13 @@ void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction);
 void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled);
 
 /**
+ * Set the encoding of a barcode object
+ * @param obj pointer to barcode object
+ * @param encoding encoding (default is `LV_BARCODE_CODE128_GS1`)
+ */
+void lv_barcode_set_encoding(lv_obj_t * obj, lv_barcode_encoding_t encoding);
+
+/**
  * Set the data of a barcode object
  * @param obj pointer to barcode object
  * @param data data to display
@@ -104,6 +122,13 @@ lv_color_t lv_barcode_get_light_color(lv_obj_t * obj);
  * @return scale factor
  */
 uint16_t lv_barcode_get_scale(lv_obj_t * obj);
+
+/**
+ * Get the encoding of a barcode object
+ * @param obj pointer to barcode object
+ * @return encoding
+ */
+lv_barcode_encoding_t lv_barcode_get_encoding(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

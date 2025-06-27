@@ -8,11 +8,10 @@ CMake
 Overview
 ********
 CMake is a cross-platform build system generator. It is used to easily integrate a project/library into another project.
-It also offer the possibility to configure the build with different options, to enable or disable components, or to
+It also offers the possibility to configure the build with different options, to enable or disable components, or to
 integrate custom scripts executions during the configuration/build phase.
 
-LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into an higher
-level cmake build.
+LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into a higher level cmake build.
 
 This project uses CMakePresets to ensure an easy build.
 Find out more on Cmake Presets here: https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
@@ -23,8 +22,7 @@ Prerequisites
 
 You need to install
 
-- CMake
-- Ninja (for Linux builds). Be sure to Add ninja to your PATH!
+- CMake with GNU make or Ninja (for Linux builds). Be sure to add ninja/make to your PATH!
 - The prerequisites listed in ``scripts/install-prerequisites.sh/bat``
 - A python3 interpreter if you wish to use KConfig.
 
@@ -56,7 +54,7 @@ The simplest way to build LVGL using cmake is to use the command line calls:
 Build with cmake presets
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another way to build this project is to use the provided CMakePresets.json or passing option using the command line.
+Another way to build this project is to use the provided CMakePresets.json or pass options using the command line.
 The CMakePresets.json file describes some cmake configurations and build phase. It is a way to quickly use a set of
 predefined cmake options.
 
@@ -107,7 +105,7 @@ CMake will create solution files (for VS) or Ninja Files (for Linux Ninja Build)
 The following targets are available.
 
 - lvgl (the actual library, required)
-- lvgl_thorvg (an vector graphics extension, optional)
+- lvgl_thorvg (a vector graphics extension, optional)
 - lvgl_examples (example usages, optional)
 - lvgl_demos (some demos, optional)
 
@@ -132,58 +130,101 @@ This snippet adds LVGL and needs an ``lv_conf.h`` file present next to the lvgl 
 
 .. code-block:: cmake
 
-    set(LV_CONF_INCLUDE_SIMPLE OFF)
     add_subdirectory(lvgl)
 
-
-This snippet adds LVGL and needs an ``lv_conf.h`` file present in lvgl/src folder:
+This snippet sets up LVGL and tells it which ``lv_conf.h`` file to use:
 
 .. code-block:: cmake
 
+    set(LV_BUILD_CONF_PATH path/to/my_lv_conf.h)
     add_subdirectory(lvgl)
 
-
-This snippet adds LVGL and specify a ``lv_conf.h`` to use:
+This snippet sets up LVGL and points to the folder where ``lv_conf.h`` is located:
 
 .. code-block:: cmake
 
-    set(LV_CONF_PATH path/to/my_lv_conf.h)
+    set(LV_BUILD_CONF_DIR path/to/directory)
     add_subdirectory(lvgl)
 
 
-This snippet adds LVGL and specify to use Kconfig as the configuration system:
+This snippet adds LVGL and specifies to use Kconfig as the configuration system:
 
 .. code-block:: cmake
 
-    set(LV_USE_KCONFIG ON)
+    set(LV_BUILD_USE_KCONFIG ON)
     add_subdirectory(lvgl)
 
-This snippet adds LVGL and specify to use Kconfig as the configuration system and to use a specific defconfig:
+This snippet adds LVGL and specifies to use Kconfig as the configuration system and to use a specific defconfig:
 
 .. code-block:: cmake
 
-    set(LV_USE_KCONFIG ON)
-    set(LV_DEFCONFIG_PATH path/to/my_defconfig)
+    set(LV_BUILD_USE_KCONFIG ON)
+    set(LV_BUILD_DEFCONFIG_PATH path/to/my_defconfig)
     add_subdirectory(lvgl)
 
 
-To disable the demo/example set these options:
+To enable the demos and examples set these options:
 
 .. code-block:: cmake
 
-    set(LV_CONF_BUILD_DISABLE_EXAMPLES ON)
-    set(LV_CONF_BUILD_DISABLE_DEMOS ON)
+    set(CONFIG_LV_BUILD_EXAMPLES ON)
+    set(CONFIG_LV_BUILD_DEMOS ON)
     add_subdirectory(lvgl)
 
+Below is a list of the available options/variables
 
-These cmake options are available to configure LVGL:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 10 50
 
-- ``LV_CONF_PATH`` (STRING): Specify a custom path for ``lv_conf.h``.
-- ``LV_CONF_INCLUDE_SIMPLE`` (BOOLEAN): Use ``#include "lv_conf.h"`` instead of ``#include "../../lv_conf.h"``
-- ``LV_USE_KCONFIG`` (BOOLEAN): Use Kconfig as the configuration source.
-- ``LV_DEFCONFIG_PATH`` (STRING): Specify to use a defconfig file instead of the current .config in a Kconfig setup.
-- ``LV_CONF_BUILD_DISABLE_EXAMPLES`` (BOOLEAN): Disable building the examples if set.
-- ``LV_CONF_BUILD_DISABLE_DEMOS`` (BOOLEAN): Disable building the demos if set.
-- ``LV_CONF_BUILD_DISABLE_THORVG_INTERNAL``: Disable the internal compilation of ThorVG.
-- ``LV_CMAKE_CREATE_CONF_VARS`` (BOOLEAN) : Disable the creation of variables from ``lv_conf_internal.h`` this feature is disabled by default.
-  It is enabled automatically if ``LV_USE_KCONFIG`` is enabled. This feature requires a python3 interpreter with support for the *pip* and *venv* modules
+   * - Variable/Option
+     - Type
+     - Description
+   * - LV_BUILD_CONF_PATH
+     - PATH
+     - Allows to set a custom path for ``lv_conf.h``
+   * - LV_BUILD_CONF_DIR
+     - PATH
+     - Allows to set a directory containing ``lv_conf.h``
+   * - LV_BUILD_USE_KCONFIG
+     - BOOLEAN
+     - When set KConfig is used as the configuration source. This option is disabled by default.
+   * - LV_BUILD_DEFCONFIG_PATH
+     - PATH
+     - Specify to use a .defconfig file instead of the current .config in a Kconfig setup.
+   * - LV_BUILD_LVGL_H_SYSTEM_INCLUDE
+     - BOOLEAN
+     - Enable if LVGL will be installed to the system or your build system uses a sysroot.
+       Turning this option on implies that the resources generated by the image generation script
+       will include ``lvgl.h`` as a system include. i.e: ``#include <lvgl.h>``.
+       This option is disabled by default.
+   * - LV_BUILD_LVGL_H_SIMPLE_INCLUDE
+     - BOOLEAN
+     - When enabled the resources will include ``lvgl.h`` as a simple include, this option
+       is enabled by default.
+   * - LV_BUILD_SET_CONFIG_OPTS
+     - BOOLEAN
+     - When enabled, this option runs a script that processes the ``lv_conf.h``/Kconfig
+       configuration using ``pcpp`` to generate corresponding ``CONFIG_LV_*`` and
+       ``CONFIG_LV_BUILD_*`` CMake variables based on the contents of ``lv_conf_internal.h``.
+       This requires python3 with ``venv`` and ``pip`` or access to a working ``pcpp``.
+       If KConfig is used, this is enabled automatically.
+   * - CONFIG_LV_BUILD_DEMOS
+     - BOOLEAN
+     - When enabled builds the demos
+   * - CONFIG_LV_BUILD_EXAMPLES
+     - BOOLEAN
+     - When enabled builds the examples
+   * - CONFIG_LV_USE_THORVG_INTERNAL
+     - BOOLEAN
+     - When enabled the in-tree LVGL version of ThorVG is compiled
+   * - CONFIG_LV_USE_PRIVATE_API
+     - BOOLEAN
+     - When enabled the private headers ``*_private.h`` are installed on the system
+
+.. note::
+
+   When ``LV_BUILD_SET_CONFIG_OPTS`` or ``LV_BUILD_USE_KCONFIG`` are enabled,
+   the options/variables beginning with the prefix ``CONFIG_*`` are automatically
+   set to the values found in ``lv_conf.h``
+

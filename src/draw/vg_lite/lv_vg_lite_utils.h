@@ -303,4 +303,4 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
 } /*extern "C"*/
 #endif
 
-#endif /*VG_LITE_UTILS_H*/
+#endif /*LV_VG_LITE_UTILS_H*/

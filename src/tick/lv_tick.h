@@ -55,6 +55,14 @@ uint32_t lv_tick_get(void);
 uint32_t lv_tick_elaps(uint32_t prev_tick);
 
 /**
+ * Get the elapsed milliseconds between two time stamps
+ * @param tick          a time stamp
+ * @param prev_tick     a time stamp before `tick`
+ * @return              the elapsed milliseconds between `prev_tick` and `tick`
+ */
+uint32_t lv_tick_diff(uint32_t tick, uint32_t prev_tick);
+
+/**
  * Delay for the given milliseconds.
  * By default it's a blocking delay, but with `lv_delay_set_cb()`
  * a custom delay function can be set too
@@ -63,16 +71,25 @@ uint32_t lv_tick_elaps(uint32_t prev_tick);
 void lv_delay_ms(uint32_t ms);
 
 /**
+ * Set a callback for a blocking delay
+ * @param cb        pointer to a callback
+ */
+void lv_delay_set_cb(lv_delay_cb_t cb);
+
+/**
  * Set the custom callback for 'lv_tick_get'
  * @param cb        call this callback on 'lv_tick_get'
  */
 void lv_tick_set_cb(lv_tick_get_cb_t cb);
 
+
 /**
- * Set a custom callback for 'lv_delay_ms'
- * @param cb        call this callback in 'lv_delay_ms'
+ * Get the custom callback for 'lv_tick_get'
+ * @return      call this callback on 'lv_tick_get'
  */
-void lv_delay_set_cb(lv_delay_cb_t cb);
+lv_tick_get_cb_t lv_tick_get_cb(void);
+
+
 
 /**********************
  *      MACROS

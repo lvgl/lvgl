@@ -272,7 +272,7 @@ the middle of ``apps/graphics/lvgl/Kconfig``. See the "PASTE THE CONTENTS ..." s
 
 ``apps/graphics/lvgl/Kconfig``:
 
-.. code-block::
+.. code-block:: kconfig
 
     #
     # For a description of the syntax of this configuration file,

@@ -5,6 +5,7 @@ XML - Declarative UI
 ====================
 
 .. toctree::
+    :class:    toctree-1-deep
     :maxdepth: 1
 
     intro
@@ -26,6 +27,6 @@ XML - Declarative UI
     events
     subjects
     animations
-
-    translations
-
+    translation
+    test
+    license

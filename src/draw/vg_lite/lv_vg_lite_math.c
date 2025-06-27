@@ -1,5 +1,5 @@
 /**
- * @file lv_vg_lite_math.h
+ * @file lv_vg_lite_math.c
  *
  */
 
@@ -39,19 +39,14 @@
 
 float math_fast_inv_sqrtf(float number)
 {
-    const float threehalfs = 1.5f;
-
-    float x2 = number * 0.5f;
-    float y = number;
-    int32_t i = *(int32_t *)&y; /* evil floating point bit level hacking */
-
-    i = 0x5f3759df /* floating-point representation of an approximation of {\sqrt {2^{127}}}} see https://en.wikipedia.org/wiki/Fast_inverse_square_root. */
-        - (i >>
-           1);
-    y = *(float *)&i;
-    y = y * (threehalfs - (x2 * y * y)); /* 1st iteration */
-
-    return y;
+    /* From https://en.wikipedia.org/wiki/Fast_inverse_square_root#Avoiding_undefined_behavior */
+    union {
+        float   f;
+        int32_t i;
+    } conv = { .f = number };
+    conv.i  = 0x5f3759df - (conv.i >> 1);
+    conv.f *= 1.5F - (number * 0.5F * conv.f * conv.f);
+    return conv.f;
 }
 
 /**********************

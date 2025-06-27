@@ -65,11 +65,8 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
         if(lv_streq("rotation", name)) lv_image_set_rotation(item, lv_xml_atoi(value));
         if(lv_streq("scale_x", name)) lv_image_set_scale_x(item, lv_xml_atoi(value));
         if(lv_streq("scale_y", name)) lv_image_set_scale_y(item, lv_xml_atoi(value));
-        if(lv_streq("pivot", name)) {
-            int32_t x = lv_xml_atoi_split(&value, ' ');
-            int32_t y = lv_xml_atoi_split(&value, ' ');
-            lv_image_set_pivot(item, x, y);
-        }
+        if(lv_streq("pivot_x", name)) lv_image_set_pivot_x(item, lv_xml_to_size(value));
+        if(lv_streq("pivot_y", name)) lv_image_set_pivot_y(item, lv_xml_to_size(value));
     }
 }
 
