@@ -1378,8 +1378,15 @@ static void slider_event_cb(lv_event_t * e)
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
 
+            lv_text_attributes_t attributes = {0};
+
+            attributes.max_width = LV_COORD_MAX;
+            attributes.line_space = 0;
+            attributes.letter_space = 0;
+            attributes.text_flags = LV_TEXT_FLAG_NONE;
+
             lv_point_t text_size;
-            lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&text_size, buf, font_normal, &attributes);
 
             lv_area_t txt_area;
             lv_area_t draw_task_area;
@@ -1514,8 +1521,15 @@ static void chart_event_cb(lv_event_t * e)
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_chart_get_series_y_array(obj, (lv_chart_series_t *)ser)[base_dsc->id2]);
 
+            lv_text_attributes_t attributes = {0};
+
+            attributes.text_flags = LV_TEXT_FLAG_NONE;
+            attributes.max_width = LV_COORD_MAX;
+            attributes.letter_space = 0;
+            attributes.line_space = 0;
+
             lv_point_t text_size;
-            lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&text_size, buf, font_normal, &attributes);
 
             lv_area_t txt_area;
             lv_area_t draw_task_area;

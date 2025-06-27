@@ -51,6 +51,13 @@ typedef enum {
     LV_FONT_GLYPH_FORMAT_CUSTOM = 0xFF, /**< Custom format*/
 } lv_font_glyph_format_t;
 
+/* Used to query the size of a glyph or obtain the glyph dsc */
+typedef struct {
+    const lv_font_t * font;   /**< Font of the glyph*/
+    uint32_t letter;          /**< The letter of the glyph*/
+    uint32_t next_letter;     /**< The next letter used to get the kerning value*/
+} lv_font_glyph_req_t;
+
 /** Describes the properties of a glyph.*/
 typedef struct {
     const lv_font_t *
@@ -68,7 +75,7 @@ typedef struct {
       * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
     uint8_t req_raw_bitmap: 1;
 
-    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
+    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
 
     union {
         uint32_t index;       /**< Unicode code point*/
@@ -113,7 +120,7 @@ struct _lv_font_t {
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
-    const lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
+    const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
 };
 
@@ -163,15 +170,12 @@ const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the descriptor of a glyph
- * @param font          pointer to font
- * @param dsc_out       store the result descriptor here
- * @param letter        a UNICODE letter code
- * @param letter_next   the next letter after `letter`. Used for kerning
+ * @param glyph_req glyph request descriptor
+ * @param dsc_out       out - used to pass the border_width and stores the result descriptor here
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
-                           uint32_t letter_next);
+bool lv_font_get_glyph_dsc(const lv_font_glyph_req_t * glyph_req, lv_font_glyph_dsc_t * dsc_out);
 
 /**
  * Release the bitmap of a font.
@@ -182,12 +186,10 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the width of a glyph with kerning
- * @param font          pointer to a font
- * @param letter        a UNICODE letter
- * @param letter_next   the next letter after `letter`. Used for kerning
+ * @param glyph_req glyph request descriptor
  * @return the width of the glyph
  */
-uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
+uint16_t lv_font_get_glyph_width(const lv_font_glyph_req_t * glyph_req);
 
 /**
  * Get the line height of a font. All characters fit into this height
