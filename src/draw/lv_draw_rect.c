@@ -10,6 +10,7 @@
 #include "lv_draw_private.h"
 #include "../core/lv_obj.h"
 #include "../misc/lv_assert.h"
+#include "../misc/lv_text_private.h"
 #include "../core/lv_obj_event.h"
 #include "../stdlib/lv_string.h"
 
@@ -273,7 +274,14 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
             }
             else {
                 lv_point_t s;
-                lv_text_get_size(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+                lv_text_attributes_t attributes = {0};
+                attributes.text_flags = LV_TEXT_FLAG_NONE;
+                attributes.max_width = LV_COORD_MAX;
+                attributes.line_space = 0;
+                attributes.letter_space = 0;
+
+                lv_text_get_size(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, &attributes);
 
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
