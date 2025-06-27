@@ -1629,12 +1629,17 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
 
                 float scale = text->size / 128.0f;
                 for(uint32_t j = 0; j < content->count; j++) {
-                    uint32_t letter = content->letters[j];
-                    if(_is_control_character(letter)) {
+
+                    lv_font_glyph_req_t g_req = {0};
+                    g_req.letter = content->letters[j];
+                    g_req.next_letter = '\0';
+                    g_req.font = text->font;
+
+                    if(_is_control_character(g_req.letter)) {
                         continue;
                     }
                     lv_font_glyph_dsc_t g;
-                    lv_font_get_glyph_dsc(text->font, &g, letter, '\0');
+                    lv_font_get_glyph_dsc(&g_req, &g);
                     lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
                     lv_vector_path_clear(glyph_path);
                     lv_vector_path_copy(glyph_path, p);
@@ -1697,12 +1702,17 @@ static void _render_span(const lv_svg_render_content_t * content, lv_vector_dsc_
 
         float scale = span->size / 128.0f;
         for(uint32_t j = 0; j < content->count; j++) {
-            uint32_t letter = content->letters[j];
-            if(_is_control_character(letter)) {
+            lv_font_glyph_req_t g_req = {0};
+
+            g_req.font = span->font;
+            g_req.letter = content->letters[j];
+            g_req.next_letter = '\0';
+
+            if(_is_control_character(g_req.letter)) {
                 continue;
             }
             lv_font_glyph_dsc_t g;
-            lv_font_get_glyph_dsc(span->font, &g, letter, '\0');
+            lv_font_get_glyph_dsc(&g_req, &g);
             lv_vector_path_t * p = (lv_vector_path_t *)lv_font_get_glyph_bitmap(&g, NULL);
             lv_vector_path_clear(glyph_path);
             lv_vector_path_copy(glyph_path, p);
