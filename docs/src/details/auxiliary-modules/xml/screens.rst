@@ -120,4 +120,5 @@ This is a simple example of both load and create:
 
     /*Create an instance of screen_1 so that it can loaded from screen2.*/
     lv_obj_t * screen1 = lv_xml_create(NULL, "screen1", NULL);
+    lv_obj_set_name(screen1, "first"); /*Will be reference by this name when loaded*/
     lv_screen_load(screen1);

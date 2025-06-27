@@ -13,28 +13,14 @@ Overview
 An ``<images>`` section can be added to ``globals.xml`` files.  If present, it
 describes how to map images with names.
 
-(Later, it might also be possible in Components and Widgets to define local images to
-keep the global space cleaner.)
-
-Currently ``<file>`` is the only supported child element, and ``<convert>`` is not
-yet implemented.
-
-
-
 Usage
 *****
 
 .. code-block:: xml
 
     <images>
-        <file name="avatar" src_path="avatar1.png">
-            <convert path="raw/avatar.svg" width="100px" color_format="L8"/>
-        </file>
-
-        <data name="logo" src_path="logo1.png" color-format="rgb565" memory="RAM2">
-            <convert path="https://foo.com/image.png" width="50%" height="80%"
-            color_format="RGB565"/>
-        </data>
+        <file name="avatar" src_path="avatar1.png"/>
+        <data name="logo" src_path="logo1.png" color-format="rgb565" />
     </images>
 
 - ``<file>`` means that the image source is used as a file path:
@@ -48,10 +34,11 @@ In :cpp:expr:`lv_image_set_src(image, image_name)` ``image_name`` is used
 instead of the path or :cpp:type:`lv_image_dsc_t` pointer.
 
 
-For simplicity, in the UI |nbsp| Editor preview, images are always loaded as files.
+Registering images
+------------------
 
 If the UI is created from XML at runtime and a ``globals.xml`` is parsed, the ``<data>`` tags are skipped
-because it is assumed that the user manually created the mapping.  This is because the XML parser cannot
+because it is assumed that the user manually created the mapping. This is because the XML parser cannot
 automatically map an image like:
 
 .. code-block:: c
@@ -64,25 +51,26 @@ to
 
    <data name="my_logo"/>
 
+To register an image path or data in the XML engine use:
 
-Constants
----------
+.. code-block:: cpp
 
-Constants can be used with images as well.
+   lv_xml_register_image(scope, "image_name", data)
 
-.. code-block:: xml
+``scope`` is usually ``NULL`` to register the image in the global scope.
+To register an image locally for a component you can get its scope with:
 
-    <consts>
-        <int name="icon_size" value="32">
-            <variant name="size" case="small" value="16"/>
-        </int>
-    </consts>
+.. code-block:: cpp
 
-    <images>
-        <data name="icon_apply" src_path="apply.png">
-            <convert path="raw/apply.png" width="#icon_size"/>
-        </data>
-    </images>
+   lv_xml_component_get_scope("component_name")
+
+After calling this function, when ``"image_name"`` is used as an image source in XML, ``data``
+(can be a path or a pointer to an image descriptor) will be used.
 
 
+Notes for the UI Editor
+-----------------------
+
+For simplicity, in the UI |nbsp| Editor's preview, images are always loaded as files.
+It makes the preview dynamic so no code export and compilation is needed when an image changes.
 

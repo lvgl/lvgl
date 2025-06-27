@@ -17,13 +17,14 @@ A Component Library can be fully self-sufficient, but it can also reference data
 other Component Libraries.
 
 LVGL itself is a Component Library that supplies the built-in Widgets, data types,
-etc., so typically Component Libraries use at least the core LVGL data.  You can
+etc. You can
 find the XML files that describe the LVGL Widgets
 `here <https://github.com/lvgl/lvgl/tree/master/xmls>`__.
 
 A project always has at least 2 Component Libraries:  that of LVGL as mentioned
 above, and its own where the Screens, Components, and Widgets of the project are
 defined.  A project may include additional Component Libraries.
+
 
 
 
@@ -124,22 +125,6 @@ included by all generated header files --- not only in the sub-folders where
 constants, fonts, and other global data are available for all Widgets and new Widgets.
 
 
-Variants
---------
-
-``<const_variant>`` can be used by constants to create variants that can be selected at compile time.
-This can be used to select a different display size, color scheme, etc.
-
-``<style_variant>`` can be used by styles only, to modify styles at runtime.  To
-select the current style variant, an integer :ref:`Subject <observer_subject>` (i.e.
-a Subject containing an integer value in the Observer Pattern implemented in
-``lv_observer.c/.h``) ``<style_variant.name>_variant`` is created.  Styles can
-subscribe to this, and the style properties can be changed according to the selected
-variant's integer value. (See `observer` for details about how to do this.)
-
-All possible variants should be defined in ``globals.xml``.
-
-
 Example
 -------
 
@@ -149,26 +134,6 @@ A ``globals.xml`` file of a Component Library might look like this:
 
     <globals>
         <config name="mylib" help="This is my great Component Library"/>
-        <const_variants>
-            <const_variant name="size" help="Select the size">
-                <case name="small" help="Assets for 320x240 Screen"/>
-                <case name="large" help="Assets for 1280x768 Screen"/>
-            </const_variant>
-        </const_variants>
-
-        <style_variants>
-            <style_variant name="color" help="Select the color of the UI">
-                <case name="red" help="Select a red theme"/>
-                <case name="blue" help="Select a blue theme"/>
-            </style_variant>
-        </style_variants>
-
-        <api>
-            <enumdef name="mode">
-                <enum name="slow"/>
-                <enum name="fast"/>
-            </enumdef>
-        </api>
 
         <consts>
             <px name="small_unit" value="8"/>
@@ -176,8 +141,15 @@ A ``globals.xml`` file of a Component Library might look like this:
         </consts>
 
         <styles>
-            <style name="card" bg_color="0xeee" radius="#small_unit" padding="12px"/>
+            <style name="style_red" bg_color="0xff0000">
         </styles>
+
+        <api>
+            <enumdef name="mode">
+                <enum name="slow"/>
+                <enum name="fast"/>
+            </enumdef>
+        </api>
 
         <images>
             <file name="arrow_left" src="A:/images/arrow_left.png"/>

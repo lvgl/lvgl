@@ -84,26 +84,47 @@ created, and in the initialization function of the Component Library (e.g.,
 In ``lv_style_set_text_font(&style1, <font_name>)``, the created font is referenced.
 
 
-Constants
----------
-
-Constants can also be used with fonts.
-
-.. code-block:: xml
-
-    <consts>
-        <int name="font_size" value="32">
-            <variant name="size" case="small" value="24"/>
-        </int>
-    </consts>
-
-    <fonts>
-        <bin name="medium" src_path="file.ttf" range="0x20-0x7f" symbols="°" size="#font_size"/>
-    </fonts>
-
-
 Default Font
 ------------
 
 ``"lv_font_default"`` can be used to access ``LV_FONT_DEFAULT``.  Other built-in fonts
 are not exposed by default.
+
+
+Registering fonts
+-----------------
+
+If the UI is created from XML at runtime and a ``globals.xml`` is parsed, the ``<... as_file="false">`` tags are skipped
+because it is assumed that the user manually created the mapping.
+This is because the XML parser cannot automatically map fontslike:
+
+.. code-block:: c
+
+   lv_font_t my_font;
+
+to
+
+.. code-block:: xml
+
+   <data name="my_font"/>
+
+To register an font in the XML engine use:
+
+.. code-block:: cpp
+
+   lv_xml_register_font(scope, "font_name", &my_font);
+
+``scope`` is usually ``NULL`` to register the font in the global scope.
+To register a font locally for a component you can get its scope with:
+
+.. code-block:: cpp
+
+   lv_xml_component_get_scope("component_name")
+
+After calling this function, when ``"font_name"`` is used as a font in XML, ``&my_font``   will be used.
+
+Notes for the UI Editor
+-----------------------
+
+For simplicity, in the UI |nbsp| Editor's preview, fonts are always loaded as tinyttf fonts.
+It makes the preview dynamic as no code export and compilation is needed when a font changes.

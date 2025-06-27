@@ -5,6 +5,7 @@ API
 ===
 
 The ``<api>`` tag can be a child of ``<widget>`` and ``<component>`` tags.
+(``<screen>``\ s doesn't support custom APIs.)
 
 The only common point is that both Widgets and Components support having
 ``<prop>`` (properties) in the ``<api>`` tag to describe their interface.
@@ -55,8 +56,8 @@ Default values
 Since each property is passed as an argument to the create function, each must have a value.
 This can be ensured by:
 
-- Setting them in the XML instance
-- Providing a default value, e.g., ``<prop name="foo" type="string" default="bar"/>``
+- Simply setting them in the XML instance
+- Providing a default value in the ``<api>``, e.g., ``<prop name="foo" type="string" default="bar"/>``
 
 Limitations
 -----------
@@ -72,7 +73,7 @@ Example
     <!-- my_button.xml -->
     <component>
         <api>
-            <prop name="button_icon" type="image"/>
+            <prop name="button_icon" type="image" default="NULL"/>
             <prop name="button_label" type="string" default="Label"/>
         </api>
 
