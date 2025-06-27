@@ -357,14 +357,14 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
-/* Use EVE FT81X GPU. */
-#define LV_USE_DRAW_EVE 0
-
 /** Draw using espressif PPA accelerator */
 #define LV_USE_PPA  0
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG 0
 #endif
+
+/* Use EVE FT81X GPU. */
+#define LV_USE_DRAW_EVE 0
 
 #if LV_USE_DRAW_EVE
     /* EVE_GEN value: 2, 3, or 4 */
