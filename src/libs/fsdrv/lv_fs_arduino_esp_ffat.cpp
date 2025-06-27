@@ -41,6 +41,10 @@ extern "C" void lv_fs_arduino_esp_ffat_init(void)
     fs_drv->seek_cb = fs_seek;
     fs_drv->tell_cb = fs_tell;
 
+    QueueHandle_t sem = xSemaphoreCreateBinary();
+    xSemaphoreGive(sem);
+    fs_drv->user_data = sem;
+
     fs_drv->dir_close_cb = NULL;
     fs_drv->dir_open_cb = NULL;
     fs_drv->dir_read_cb = NULL;
@@ -51,6 +55,17 @@ extern "C" void lv_fs_arduino_esp_ffat_init(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+struct lock_t final {
+    lock_t(const lv_fs_drv_t* drv) : sem(static_cast<QueueHandle_t>(drv->user_data)) {
+        while (xSemaphoreTake(sem, portMAX_DELAY) == pdFALSE) ;
+    }
+    ~lock_t() {
+        xSemaphoreGive(sem);
+    }
+private:
+    QueueHandle_t sem;
+};
 
 /*Initialize your Storage device and File system.*/
 static void fs_init(void)
@@ -67,7 +82,7 @@ static void fs_init(void)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    LV_UNUSED(drv);
+    lock_t lock(drv);
 
     const char * flags;
     if(mode == LV_FS_MODE_WR)
@@ -98,7 +113,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    LV_UNUSED(drv);
+    lock_t lock(drv);
 
     ArduinoEspFFatFile * lf = (ArduinoEspFFatFile *)file_p;
     lf->file.close();
@@ -118,7 +133,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    LV_UNUSED(drv); 
+    lock_t lock(drv); 
 
     ArduinoEspFFatFile * lf = (ArduinoEspFFatFile *)file_p;
     *br = lf->file.read((uint8_t *)buf, btr);
@@ -137,7 +152,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
-    LV_UNUSED(drv);
+    lock_t lock(drv);
 
     ArduinoEspFFatFile * lf = (ArduinoEspFFatFile *)file_p;
     *bw = lf->file.write((uint8_t *)buf, btw);
@@ -155,7 +170,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    LV_UNUSED(drv);
+    lock_t lock(drv);
 
     SeekMode mode;
     if(whence == LV_FS_SEEK_SET)
@@ -181,7 +196,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
-    LV_UNUSED(drv);
+    lock_t lock(drv);
 
     ArduinoEspFFatFile * lf = (ArduinoEspFFatFile *)file_p;
 
