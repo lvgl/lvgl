@@ -127,7 +127,7 @@ The most common way to create a screen is by creating a :ref:`Base widget <base_
 
     lv_obj_t * my_screen = lv_obj_create(NULL);
 
-A screen can be loaded like this: :cpp:expr:`lv_screen_load(my_screen);`
+A screen can be loaded like this: :cpp:expr:`lv_screen_load(my_screen)`
 
 .. _basics:widgets:
 
