@@ -182,6 +182,7 @@ If you use more than one, each associated identifier letter you use must be uniq
 - :c:macro:`LV_USE_FS_LITTLEFS`
 - :c:macro:`LV_USE_FS_ARDUINO_ESP_LITTLEFS`
 - :c:macro:`LV_USE_FS_ARDUINO_SD`
+- :c:macro:`LV_USE_FS_RAWFS`
 
 
 
