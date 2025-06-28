@@ -4,6 +4,10 @@
 Fonts
 =====
 
+
+.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
+
 Overview
 ********
 
