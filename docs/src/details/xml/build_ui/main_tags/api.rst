@@ -168,6 +168,8 @@ Only used with Widgets, this tag defines enums for parameter values.
 Enum values are ignored in export; the names are used and resolved by the compiler.
 XML parsers must handle mapping enum names to C enums.
 
+.. _xml_widget_element
+
 <element>
 ---------
 

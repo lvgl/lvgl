@@ -10,28 +10,76 @@ Overview
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
-Widgets are written in C and compiled into the application.
-They can be referenced from Components, and their API can be used via the exposed attributes
-(e.g., label text or slider value).
 
-Using the UI |nbsp| Editor, all the following .C/.H files can be exported from the XML of the Widgets:
+Besides components and Screens, Widgets are the other main the building blocks of UIs.
+The XML file of the Widgets is wrapped to ``<widget>`` XML root element.
+
+
+``<widget>``\s support the following child XML tags:
+
+- :ref:`<consts> <xml_consts>`
+- :ref:`<api> <xml_api>`
+- :ref:`<styles> <xml_styles>`, and
+- :ref:`<view> <xml_view>`.
+- :ref:`<previews> <xml_preview>`.
+
+Just like Components, Widgets also can be the children of other Widgets and Components.
+
+The main difference is that Widgets are written in C and compiled into the application.
+It means unlike Components, Widegets can contain custom C code. For example when a property is set
+any complex C doe can run to set that value.
+
+To connect the C code to XML, XML parser functions needs to be implemented and registered.It's
+pretty simple as LVGL already proveds all the helper functions and the required libraries. Also there
+are `many XML parser examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
+
+Built-in Widgets
+****************
+
+The built-in LVGL widgets (e.g. :ref:`lv_slider`, :ref:`lv_label`, :ref:`lv_chart`, etc.) already
+has XM Lparsers and therefore available in XML.
+
+For example:
+
+.. code-block:: xml
+
+    <view>
+        <lv_label x="10" text="Hello"/>
+    </view>
+
+The built-in widgets are
+
+- pure C code
+(e.g. ` lv_slider.c <https://github.com/lvgl/lvgl/tree/master/src/widgets/slider/lv_slider.c>`__)
+- an XML file to define only the API
+(e.g. ` lv_slider.xml <https://github.com/lvgl/lvgl/blob/master/xmls/lv_slider.xml>`__).
+It used only in the UI |nbsp| Editor to validate and autocomplete properties.
+- an XML parser C file to map the XML attributes to C functions.
+(e.g. `lv_xml_slider_parser.c <https://github.com/lvgl/lvgl/blob/master/src/others/xml/parsers/lv_xml_slider_parser.c>`)
+
+
+Creating New Widgets
+********************
+
+It's possible to create new widgets in the same way as the built-in LVGL widgets are handled.
+
+However, using the UI |nbsp| Editor it's nuch faster and simpler. When an XML file is created and
+the ``<widget>`` root element is used the following .C/.H files are generated automatically:
 
 :<widget_name>_gen.h:           Contains the generated API implementation of the widget
                                 (overwritten on each code export).
 :<widget_name>_private_gen.h:   Contains private API and the data for the widget
                                 (overwritten on each code export).
-:<widget_name>_gen.c:           Contains the internals of the Widget (overwritten on
-                                each code export).
+:<widget_name>_gen.c:           Contains the internals of the Widget, e.g. constructor with the children,
+                                descructors, event handler, etc (overwritten on each code export).
 :<widget_name>.h:               Includes ``<widget_name>_gen.h`` and allows the user to
                                 define custom APIs.  Only a skeleton is exported once.
 :<widget_name>.c:               Contains hooks from ``<widget_name>_gen.c`` and allows
-                                the user to write custom code.  Only a skeleton is
+                                the user to write custom code. Only a skeleton is
                                 exported once.
 :<widget_name>_xml_parser.c:    Processes the XML strings and calls the required
                                 functions according to the set attributes.  Only a
                                 skeleton is exported once.
-
-
 
 Usage
 *****
@@ -66,10 +114,11 @@ registered for each Widget.  The XML parser for the label Widget looks like this
 
             if(lv_streq("text", name)) lv_label_set_text(obj, value);
             if(lv_streq("long_mode", name)) lv_label_set_long_mode(obj, long_mode_text_to_enum(value));
+            /*Process more props here*/
         }
     }
 
-    /* Helper to convert the string to enum values */
+    /* Helper to convert strings to enum values */
     static lv_label_long_mode_t long_mode_text_to_enum(const char * txt)
     {
         if(lv_streq("wrap", txt)) return LV_LABEL_LONG_WRAP;
@@ -85,7 +134,7 @@ A Widget XML processor can be registered like this:
 
     lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply);
 
-After registration, a Widget can be created like this:
+After registration, a Widget can be created like this from C code:
 
 .. code-block:: c
 
@@ -97,8 +146,13 @@ After registration, a Widget can be created like this:
 
     lv_xml_create(lv_screen_active(), "lv_label", attrs);
 
-LVGL automatically registers its built-in Widgets, so only custom Widgets need to be
-registered manually.
+And in XML it can be used like
+
+.. code-block:: xml
+
+    <view>
+        <lv_label width="100" text="I'm a label!" wrap="scroll"/>
+    </view>
 
 
 Adding Custom Code
@@ -118,3 +172,15 @@ implemented.  The declaration of these functions is automatically exported in
 ``<widget_name>_gen.h``.
 
 Besides these, any custom code and functions can be freely implemented in this file.
+
+
+Elements
+--------
+
+Elements are internal parts of the widget that can be accessed and/or created dynamically.
+For example tabs of a tabview, list of a drop down, series of a charts, etc.
+
+Just like any other Widget API properties Elements also can be defined in the ``<api>``
+tag of the Widget's XML.
+
+Learn more about the Elements in the documentation page of :ref:`<api> <xml_widget_element>`.

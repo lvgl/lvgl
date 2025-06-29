@@ -20,7 +20,7 @@ content is specified:
             for each Screen according to the specified displays.
 
 
-In LVGL's Editor the ``folders``, ``memory`` and `` <display color_format="..."/>`` is not supported yet.
+In LVGL's Editor the ``folders``, ``memory`` and `` <display color_format="..."/>`` are not supported yet.
 
 Example
 *******

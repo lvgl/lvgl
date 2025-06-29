@@ -26,8 +26,6 @@ above, and its own where the Screens, Components, and Widgets of the project are
 defined.  A project may include additional Component Libraries.
 
 
-
-
 Structure
 *********
 
@@ -63,7 +61,6 @@ A typical structure for a Component Library looks like this:
   └── images
       ├── image1.png
       └── image2.png
-
 
 
 Visibility
@@ -133,7 +130,12 @@ A ``globals.xml`` file of a Component Library might look like this:
 .. code-block:: xml
 
     <globals>
-        <config name="mylib" help="This is my great Component Library"/>
+        <api>
+            <enumdef name="mode">
+                <enum name="slow"/>
+                <enum name="fast"/>
+            </enumdef>
+        </api>
 
         <consts>
             <px name="small_unit" value="8"/>
@@ -143,13 +145,6 @@ A ``globals.xml`` file of a Component Library might look like this:
         <styles>
             <style name="style_red" bg_color="0xff0000">
         </styles>
-
-        <api>
-            <enumdef name="mode">
-                <enum name="slow"/>
-                <enum name="fast"/>
-            </enumdef>
-        </api>
 
         <images>
             <file name="arrow_left" src="A:/images/arrow_left.png"/>

@@ -77,6 +77,7 @@ Details
     details/common-widget-features/index
     details/widgets/index
     details/main-modules/index
+    details/xml/index
     details/auxiliary-modules/index
     details/libs/index
     details/debugging/index

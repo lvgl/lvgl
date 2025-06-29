@@ -1,8 +1,8 @@
 .. _xml_test:
 
-====
-Test
-====
+==========
+UI Testing
+==========
 
 Overview
 ********
