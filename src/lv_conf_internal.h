@@ -1000,6 +1000,15 @@
     #endif
 #endif
 
+/* Use EVE FT81X GPU. */
+#ifndef LV_USE_DRAW_EVE
+    #ifdef CONFIG_LV_USE_DRAW_EVE
+        #define LV_USE_DRAW_EVE CONFIG_LV_USE_DRAW_EVE
+    #else
+        #define LV_USE_DRAW_EVE 0
+    #endif
+#endif
+
 /** Draw using espressif PPA accelerator */
 #ifndef LV_USE_PPA
     #ifdef CONFIG_LV_USE_PPA
@@ -1017,6 +1026,18 @@
         #endif
     #endif
 #endif
+
+#if LV_USE_DRAW_EVE
+    /* EVE_GEN value: 2, 3, or 4 */
+    #ifndef LV_DRAW_EVE_EVE_GENERATION
+        #ifdef CONFIG_LV_DRAW_EVE_EVE_GENERATION
+            #define LV_DRAW_EVE_EVE_GENERATION CONFIG_LV_DRAW_EVE_EVE_GENERATION
+        #else
+            #define LV_DRAW_EVE_EVE_GENERATION 4
+        #endif
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
