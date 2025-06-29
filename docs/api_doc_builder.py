@@ -240,7 +240,7 @@ def _process_end_of_eligible_doc(b: str, rst_file: str) -> (str, str, int):
     # 4.  Remove `_auto_gen_sep` and everything after it:
     new_b = b.split(_auto_gen_sep, 1)[0]
 
-    # 5.  With `new_B, add any editor-added hyperlinks to set:
+    # 5.  With `new_b`, add any editor-added hyperlinks to set:
     #     `editor_link_set`.
     for line in new_b.splitlines():
         match = _re_editor_added_hyperlink.match(line)

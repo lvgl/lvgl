@@ -28,11 +28,13 @@ will install all the prerequisite packages:
 * sphinxcontrib-qthelp
 * sphinxcontrib-serializinghtml
 * sphinxcontrib-mermaid==0.9.2
+* sphinx-copybutton
 * sphinx-design
-* sphinx-rtd-dark-mode
 * typing-extensions
 * sphinx-reredirects
 * dirsync
+* furo
+* accessible-pygments
 
 Now you are ready to build the documentation:
 
@@ -42,19 +44,19 @@ or if you are on a Unix like OS:
 
     python3 build.py html
 
-Intermediate files are prepared in `./docs/intermediate/` and the final documentation will appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` for details.)
+Intermediate files are normally prepared in `./docs/intermediate/` and the final documentation will normally appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` header comment for details.)
 
 If the list of document source files has changed (names or paths):
 
     python build.py clean html
 
-Will remove the old intermediate and build files and regenerate new ones matching the new structure.
+Will remove the old intermediate and build files and regenerate new ones matching the new structure, eliminating the orphan files that would otherwise result.
 
 To see a list of options available:
 
     python build.py
 
-Read the docstring for `build.py` for detailed documentation on each option.
+Read the header comment in `build.py` for detailed documentation of each option.
 
 
 ## For Developers
@@ -66,7 +68,7 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ### What to Name Your `.rst` File
 
-The directory structure under the `./docs/src/` directory, and the filenames of the `.rst` files govern the eventual URLs that are generated in the HTML output.  These directories are organized so as to reflect the nature of the content.  Example:  the `.rst` files under `./docs/src/intro` contain introductory material—detailed reference material would not go there, but instead in an appropriate subdirectory of `./docs/src/details/`.  It is expected that the content and location of any new documents added would be in alignment with this directory structure, and placed and named according to their content.  Additionally, to be linked into the eventual generated documentation, the stem of the new filename would need to appear in at least one (normally *only one*) `.. toctree::` directive, normally in an `index.rst` file in the directory where it will appear in the table of contents (TOC).
+The directory structure under the `./docs/src/` directory, and the filenames of the `.rst` files govern the eventual URLs that are generated in the HTML output.  These directories are organized so as to reflect the nature of the content.  Example:  the `.rst` files under `./docs/src/intro` contain introductory material—detailed reference material would not go there, but instead in an appropriate subdirectory of `./docs/src/details/`.  It is expected that the content and location of any new documents added would be in alignment with this directory structure, and placed and named according to their content.  Additionally, to be linked into the eventual generated documentation, the stem of the new filename needs to appear in at least one (normally *only one*) `.. toctree::` directive, normally in an `index.rst` file in the directory where it will appear in that page's table of contents (TOC).
 
 Other than that, there are no restrictions on filenames.  Previous linking of filenames to generated API links has been removed and replaced by a better scheme.  For sake of illustration, let's say you are creating (or enhancing) documentation related to the `lv_scale_t` data type (one of the LVGL Widgets):  if you want the doc-build logic to generate appropriate links to LVGL API pages, place an API section at the end of your document (it must be at the end) like this:
 
@@ -100,14 +102,14 @@ Note that the period before the `h` is replaced with an underscore (`_`).  The n
 
 ### Text Format
 
-While with `.md` files, it is important to allow paragraphs to flow off to the right with one long line so that when they are formatted as `.html` files, the paragraphs will word-wrap with the width of the browser, this is not true with reStructuredText (`.rst` files).  [Sphinx](https://www.sphinx-doc.org/en/master/) and its underlying [docutils parsing engine](https://docutils.sourceforge.io/docs/) conveniently combine grouped text into a proper paragraph with that word-wrapping behavior.  This allows the source text documents to be nicely word-wrapped so that they are more readable in text- and code-editors that do not have wide editing windows.  So please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
+With `.md` files, it is important to allow paragraphs to flow off to the right with one long line so that when they are formatted as `.html` files, the paragraphs will word-wrap with the width of the browser.  Thankfully, this liability is not present with reStructuredText (`.rst` files).  [Sphinx](https://www.sphinx-doc.org/en/master/) and its underlying [docutils parsing engine](https://docutils.sourceforge.io/docs/) conveniently combine grouped text into a proper paragraph with that word-wrapping behavior.  This allows the source text documents to be nicely word-wrapped so that they are more readable in text- and code-editors that do not have wide editing windows.  So please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
 
 
 ### index.rst Files
 
-If you create a new directory you MUST have an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
+If you create a new directory you will need an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
 
-Let's take a look at the `index.rst` file that is located in the `docs/layouts` directory.
+Let's take a look at the `index.rst` file that is located in the `docs/src/details/common-widget-features/layouts` directory.
 
 ```
 .. _layouts:
@@ -131,14 +133,15 @@ The below explains the parts of this file.
 .. _layouts:      <=== Creates an explicit link target
                   <=== Empty line -- important!
 =======
-Layouts           <=== Heading seen in documentation
+Layouts           <=== Document title, seen in documentation
 =======
 
+                  <=== any text introducing this topic and the TOC below
 
-.. toctree::      <=== Table of contents
+.. toctree::      <=== Table of contents directive
     :maxdepth: 2  <=== Internal use and needs to always be set this way
 
-    flex          <=== .rst files located in directory with index.rst
+    flex          <=== relative path to .rst files located in the same directory
     grid
 ```
 
@@ -148,22 +151,23 @@ The first line is for the purposes of providing a uniquely-named **link target**
 
 Note that `{LINK NAME}`:
 
-- **must** be preceded by a single underscore, and
+- **must** be preceded by a single underscore,
+- **must** be followed by a single colon, and
 - **must** be followed by at least one blank line for the doc-generation logic to process it correctly.
 
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/src/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
 
 That unique name is then used to provide a link reference elsewhere in the documentation using one of two formats.
 
 
 
-##### When "link text" should be a title or section heading from the target document:
+##### When the "link text" should be a title or section heading from the target document:
 
 ```reStructuredText
 :ref:`{LINK NAME}`
 ```
 
-This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` role) is then replaced with a hyperlink whose "link text" is the name of the section heading just below the **link target**.  For this reason, when using this syntax, `{LINK NAME}` must reference **link target**s that are just above a title or section heading.
+This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` role) is then replaced with a hyperlink whose "link text" is the name of the section heading or document title just below the **link target**.  For this reason, when using this syntax, `{LINK NAME}` must reference **link target**s that are just above a title or section heading.
 
 
 
@@ -182,17 +186,14 @@ Note:  This latter syntax was either added or fixed in Sphinx recently.  It did 
 
 ### Section Headings
 
-[Section headings](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining (and optionally overlining) the section title with a punctuation character, at least as long as the text.  Example:
+[Section headings](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining the section title with a punctuation character, at least as long as the text.  Example:
 
 ```
-=================
 This Is a Heading
-=================
+*****************
 ```
 
-reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  So if you are modifying an existing .RST file, please follow the pattern already in use.
-
-If you are creating a new .RST file, use this convention:
+reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  However, the LVGL docs policy is to use the below heading convention:
 
 ```
 =====
@@ -215,9 +216,14 @@ Sub Sub Sub Section
 '''''''''''''''''''
 ```
 
+Being consistent about this helps the Sphinx/docutils parser to format the tables of contents correctly.
+
 Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
 
-For improved readability in the .RST file, place at least 2 blank lines above section headings.
+For improved readability in the .RST file:
+
+- place 3 blank lines above the 2nd and subsequent chapter titles (see above), and
+- place 2 blank lines above section headings below chapters.
 
 
 ### Code Blocks
@@ -226,7 +232,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
 * Each indentation level use 4 spaces.
 * Include at least 1 empty line after a code block.
 * There must be one empty line between the code block directive and the code.
-* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
+* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only reST and Sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
 * If you want to separate code into easier-to-understand sections you can do so with a single empty line.
 * For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
 
@@ -234,6 +240,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
   - `.. code-block:: cpp`,
   - `.. code-block:: python`,
   - `.. code-block:: shell`,
+  - `.. code-block:: bash`,
   - `.. code-block:: kconfig`,
   - `.. code-block:: json`,
   - `.. code-block:: yaml`,
@@ -245,7 +252,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
   - `.. code-block:: xml`,
   - `.. code-block:: make`.
 
-The full set of supported lexers are listed here:  https://pygments.org/docs/lexers/ .
+The full set of supported lexers are listed in the [Pygments Library documentation](https://pygments.org/docs/lexers/).
 
 
 ### Bulleted Lists
@@ -281,8 +288,8 @@ If you want to reference portions of the LVGL code from the documentation (in .R
     :cpp:func:`lv_init`
     :c:macro:`LV_USE_FLEX`
     :cpp:type:`lv_event_t`
-    :cpp:enum:`_lv_event_t`
-    :cpp:enumerator:`LV_EVENT_ALL`
+    :cpp:enum:`lv_state_t`
+    :cpp:enumerator:`LV_STATE_CHECKED`
     :cpp:struct:`lv_image_dsc_t`
     :cpp:union:`lv_style_value_t`
 
