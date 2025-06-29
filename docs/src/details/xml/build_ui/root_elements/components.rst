@@ -32,34 +32,33 @@ Unlike Widgets (which are always compiled into the application), Components can 
 1. be loaded at runtime from XML, or
 2. be exported to C code and compiled with the application.
 
-Usage from Exported Code
-************************
-
-From each Component XML file, a C and H file is exported with a single function inside:
-
-.. code-block:: c
-
-    lv_obj_t * component_name_create(lv_obj_t * parent, ...api properties...);
-
-where 'component_name' (in the function above) is replaced by the Component's XML
-file name.
-
-When a Component is used in another Component's XML code and the code is exported,
-this ``create`` function will be called. This means that Components do not have a
-detailed set/get API but can be created with a fixed set of parameters.
-
-If the user needs to access or modify values dynamically, it is recommended to use a
-:ref:`Data bindings via Subject  <xml_subjects>`.
-
-The user can also call these ``..._create()`` functions at any time from application code
-to create new components on demand.
-
 Usage from XML
 **************
+
+In XML Files
+------------
+
+Using Components in XMLs is very intuitive. The name of the components can be used as XML tag
+in the ``<view>`` of other Components, Screens, and Widgets.
+
+The Component properties are just XML attributes.
 
 To load Components from file, it's assumed that the XML files are saved to the device
 either as data (byte array) or as file. Once the data is saved, each component
 can be registered, and instances can be created after that.
+
+.. code-block:: xml
+
+    <!-- my_button.xml -->
+    <component>
+        <view extends="lv_button" flex_flow="row">
+            <lv_image src="logo"/>
+            <my_h3 text="Title"/>
+        </view>
+    </component>
+
+:ref:`Styles <xml_styles>`, :ref:`Constants <xml_consts>`, and :ref:`custom API <component_custom_api>`
+can also be described in the XML files.
 
 Registration
 ------------
@@ -99,27 +98,32 @@ The last parameter can be ``NULL`` or an attribute list, like this:
         "x", "10",
         "y", "-10",
         "align", "bottom_left",
-        "btn_text", "New button",
         NULL, NULL,
     };
 
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
-Properties
-**********
+Usage from Exported Code
+************************
 
-The properties of child elements can be adjusted, such as:
+From each Component XML file, a C and H file is exported with a single function inside:
 
-.. code-block:: xml
+.. code-block:: c
 
-    <lv_label x="10" text="Hello"/>
+    lv_obj_t * component_name_create(lv_obj_t * parent, ...api properties...);
 
-These parameters can be set to a fixed value. However, with the help of ``<prop>``
-elements inside the ``<api>`` tag, they can also be passed when an instance is
-created. Only the whole property can be passed, but not individual ``<param>``
-elements.
+where 'component_name' (in the function above) is replaced by the Component's XML
+file name.
 
-See :ref:`<api> <xml_api>` for more details.
+When a Component is used in another Component's XML code and the code is exported,
+this ``create`` function will be called. This means that Components do not have a
+detailed set/get API but can be created with a fixed set of parameters.
+
+If the user needs to access or modify values dynamically, it is recommended to use a
+:ref:`Data bindings via Subject  <xml_subjects>`.
+
+The user can also call these ``..._create()`` functions at any time from application code
+to create new components on demand.
 
 Extending
 *********
@@ -129,17 +133,67 @@ Additionally, when a Component is created, it can use the extended Widget's attr
 
 This means that Components inherit the API of the extended Widget as well.
 
+.. _component_custom_api:
+
+Custom Properties
+*****************
+
+The properties of child elements can be adjusted, such as:
+
+.. code-block:: xml
+
+    <my_button x="10" width="200"/>
+
+However, it's also possible to define custom properties in the ``<api>`` tag.
+The properties then can be passed to any properties of the children by
+referencing them by ``$``. For example:
+
+.. code-block:: xml
+
+    <!-- my_button.xml -->
+    <component>
+        <api>
+            <prop name="btn_text" type="string"/>
+        </api>
+
+        <view extends="lv_button">
+            <lv_label text="$btn_text"/>
+        </view>
+    </component>
+
+And it can be used like
+
+.. code-block:: xml
+
+    <!-- my_list.xml -->
+    <component>
+        <view>
+            <my_button btn_text="First"/>
+            <my_button btn_text="Second"/>
+            <my_button btn_text="Third"/>
+        </view>
+    </component>
+
+In this setup, the ``btn_text`` property is mandatory, however it can be made optional
+by setting a default value:
+
+.. code-block:: xml
+
+    <prop name="btn_text" type="string" default="Title"/>
+
+See :ref:`<api> <xml_api>` for more details and `XML Syntax <xml_syntax>` for all the supported types.
+
 Examples
 ********
 
 The following example demonstrates parameter passing and the use of the
-``text`` label property on a Component:
+``text`` label property on a Component. Styles and Constants are also shown.
 
 .. code-block:: xml
 
     <!-- h3.xml -->
     <component>
-        <view extends="lv_label"/>
+        <view extends="lv_label" style_text_color="0xffff00"/>
     </component>
 
 .. code-block:: xml
@@ -149,7 +203,18 @@ The following example demonstrates parameter passing and the use of the
         <api>
             <prop type="string" name="btn_text" default="None"/>
         </api>
+
+        <consts>
+            <int name="thin" value="2"/>
+        </consts>
+
+        <styles>
+            <style name="pressed_style" border_width="#thin" border_color="0xff0000"/>
+        </styles>
+
         <view extends="lv_button" style_radius="0" style_bg_color="0xff0000">
+            <style name="pressed_style" selector="pressed"/>
+
             <h3 text="Some text"/>
             <h3 text="$btn_text" y="40"/>
         </view>
