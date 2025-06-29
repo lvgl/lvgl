@@ -48,12 +48,12 @@ For example:
 The built-in widgets are
 
 - pure C code
-(e.g. ` lv_slider.c <https://github.com/lvgl/lvgl/tree/master/src/widgets/slider/lv_slider.c>`__)
+  (e.g. `lv_slider.c <https://github.com/lvgl/lvgl/tree/master/src/widgets/slider/lv_slider.c>`__)
 - an XML file to define only the API
-(e.g. ` lv_slider.xml <https://github.com/lvgl/lvgl/blob/master/xmls/lv_slider.xml>`__).
-It is used only in the UI |nbsp| Editor to validate and autocomplete properties.
+  (e.g. `lv_slider.xml <https://github.com/lvgl/lvgl/blob/master/xmls/lv_slider.xml>`__).
+  It is used only in the UI |nbsp| Editor to validate and autocomplete properties.
 - an XML parser C file to map the XML attributes to C functions.
-(e.g. `lv_xml_slider_parser.c <https://github.com/lvgl/lvgl/blob/master/src/others/xml/parsers/lv_xml_slider_parser.c>`)
+  (e.g. `lv_xml_slider_parser.c <https://github.com/lvgl/lvgl/blob/master/src/others/xml/parsers/lv_xml_slider_parser.c>`__)
 
 Creating New Widgets
 ********************

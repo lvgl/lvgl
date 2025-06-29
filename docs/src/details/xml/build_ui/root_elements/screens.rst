@@ -88,6 +88,7 @@ It's very common to load or create Screens on a button click or other events.
 Both are supported by adding special XML tags as children of Components or Widgets:
 
 .. code-block:: xml
+
    <view>
        <lv_button>
            <lv_label text="Click or Long press me"/>
