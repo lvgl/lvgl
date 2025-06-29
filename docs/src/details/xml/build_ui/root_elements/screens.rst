@@ -15,26 +15,25 @@ Screens work very similarly to Components. Both can be:
 - Loaded from XML
 - Contain Widgets and Components as children
 
-Screens are wrapped to the ``<screen>`` XML root element and used to organize
+Screens are wrapped in the ``<screen>`` XML root element and used to organize
 the content of the UI.
 
 Screens can have only the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<styles> <xml_styles>`, and
-- :ref:`<view> <xml_view>`.
+- :ref:`<view> <xml_view>`
 
-That is Screens **cannot** have an :ref:`<api> <xml_api>` and :ref:`<preview> <xml_preview>`.
-
+That is, Screens **cannot** have an :ref:`<api> <xml_api>` or :ref:`<preview> <xml_preview>`.
 
 Usage
 *****
 
-Each XML file describes a :ref:`Screen <screens>`.  The name of the XML file will
+Each XML file describes a :ref:`Screen <screens>`. The name of the XML file will
 also be the name of the Screen.
 
-This example illustrates a screen in XML. In the example a ``<my_header>``
-and a ``<my_main_cont>`` component is used to kept the screen simple.
+This example illustrates a screen in XML. In the example, a ``<my_header>``
+and a ``<my_main_cont>`` component is used to keep the screen simple.
 
 .. code-block:: xml
 
@@ -60,36 +59,33 @@ and a ``<my_main_cont>`` component is used to kept the screen simple.
         </view>
     </screen>
 
-
 Code export
 ***********
 
-When the C code is exported from the UI |nbsp| Editor ``screen_name_gen.c/h`` files are exported
-containing only a single ``lv_obj_t * screen_name_create(void)``create function.
+When the C code is exported from the UI |nbsp| Editor, ``screen_name_gen.c/h`` files are exported,
+containing only a single ``lv_obj_t * screen_name_create(void)`` create function.
 
-By using this functions any number of screen instances an be created and loaded as needed.
-
+By using this function, any number of screen instances can be created and loaded as needed.
 
 Preview
 *******
 
-Screens doesn't support the :ref:`<preview> <xml_preview>` tag because it doesn't make
-sense to preview each screens in different resolutions.
+Screens don't support the :ref:`<preview> <xml_preview>` tag because it doesn't make
+sense to preview each screen in different resolutions.
 
-As Screens are ralted to the target hardwares in the ``project.xml`` file, multiple
+As Screens are related to the target hardware in the ``project.xml`` file, multiple
 ``<display>`` elements can be defined. In the UI |nbsp| Editor, when a Screen is being developed,
 the user can select from all the defined displays in the Preview, and the Screen will be shown with
 the given resolution and color depth.
 
 This is useful for verifying responsive designs.
 
-
 Events
 ******
 
 It's very common to load or create Screens on a button click or other events.
 
-Both are supported by adding special XML tags as child of a Components or Widgets:
+Both are supported by adding special XML tags as children of Components or Widgets:
 
 .. code-block:: xml
    <view>
@@ -108,4 +104,3 @@ Both are supported by adding special XML tags as child of a Components or Widget
    </view>
 
 Learn more on :ref:`XML Events <xml_events_screen>` page.
-

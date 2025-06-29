@@ -4,7 +4,6 @@
 Introduction
 ============
 
-
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
@@ -12,14 +11,14 @@ LVGL is capable of loading UI elements written in XML. The XML file can be writt
 it's highly recommended to use `LVGL's UI |nbsp| Editor <https://lvgl.io/editor>`__ to write the XML files. The UI |nbsp| Editor provides
 features like:
 
-- Instant preview the XML files
+- Instant preview of the XML files
 - Autocomplete and Syntax highlighting
 - Online preview for collaboration and testing
 - `Figma <https://www.figma.com/>`__ integration to easily reimplement the designs
 
 .. warning::
 
-    The UI |nbsp| Editor and the XML loader are still under development and not production ready.
+    The UI |nbsp| Editor and the XML loader are still under development and not production-ready.
     Consider them as an open beta, or experimental features.
 
 Describing the UI in XML in a declarative manner offers several advantages:
@@ -30,7 +29,6 @@ Describing the UI in XML in a declarative manner offers several advantages:
 - XML can be used to generate LVGL code in any language.
 - XML helps to separate the view from the internal logic.
 
-
 Concept
 *******
 
@@ -39,15 +37,15 @@ That is, they are structured in a way to make it easy to create reusable Compone
 
 For example, a company can have a Component Library for the basic Widgets for all its products
 (generic widgets for all smart devices), and create other industry-specific Libraries
-(smart-home specific, smart-watch specific, etc.) containing only a few extra Widgets and Compoennts.
+(smart-home specific, smart-watch specific, etc.) containing only a few extra Widgets and Components.
 
 These Component Libraries are independent, can be reused across many products, and
 can be freely versioned and managed.
 
-Imagine a Component Library as a collection of XML files to describes Widgets, Components, Screens,
+Imagine a Component Library as a collection of XML files that describe Widgets, Components, Screens,
 images, fonts, and other assets stored in a git repository, which can be a submodule in many projects.
 
-If someone finds a bug in the Component Library, they can just fix it in just one
+If someone finds a bug in the Component Library, they can just fix it in one
 place and push it back to the git repository so that other projects can be updated
 from it.
 
@@ -60,12 +58,10 @@ at least 2:
 - LVGL's built-in Widgets, and
 - XML-based definitions of Screen contents, along with other project-specific Components.
 
-
 Widgets, Components, and Screens
 ********************************
 
-It is important to distinguish between :dfn:`Widgets`, :dfn:`Components`, and :dfn:`Screen`.
-
+It is important to distinguish between :dfn:`Widgets`, :dfn:`Components`, and :dfn:`Screens`.
 
 Widgets
 -------
@@ -87,7 +83,6 @@ Any handwritten Widget can be accessed from XML by:
 2. Writing and registering an XML parser for it.
    `See some examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
 
-
 Components
 ----------
 
@@ -107,9 +102,8 @@ of Components can be registered in LVGL, and after that, instances can be create
 In other words, LVGL can just read the XML files, "learn" the Components from them, and
 thereafter create children as part of Screens and other Components.
 
-
-Components
-----------
+Screens
+-------
 
 :dfn:`Screens` are similar to Components:
 
@@ -119,21 +113,20 @@ Components
 - They do not have an API.
 - They can be referenced in Screen load events.
 
-
 Syntax Teaser
 *************
 
-Each Widget, Component, or Screen XML file describes a single UI element.  The root
-element for Widgets, Components, and Screens are ``<widget>``, ``<component>`` and
-``<screen>`` respectively.  Other than that, the contained XML elements are almost
-identical.  This is a high-level overview of the most important XML elements that
+Each Widget, Component, or Screen XML file describes a single UI element. The root
+element for Widgets, Components, and Screens is ``<widget>``, ``<component>``, and
+``<screen>``, respectively. Other than that, the contained XML elements are almost
+identical. This is a high-level overview of the most important XML elements that
 will be children of these root elements:
 
 :<api>:     Describes the properties that can be ``set`` for a Widget or Component.
-            Properties can be referenced by ``$``.  For Widgets, custom enums can
+            Properties can be referenced by ``$``. For Widgets, custom enums can
             also be defined with the ``<enumdef>`` tag.
 :<consts>:  Specifies constants (local to the Widget or Component) for colors, sizes,
-            and other values.  Constant values can be referenced using ``#``.
+            and other values. Constant values can be referenced using ``#``.
 :<styles>:  Describes style (``lv_style_t``) objects that can be referenced (and
             shared) by Widgets and Components later.
 :<view>:    Specifies the appearance of the Widget or Component by describing the
@@ -168,18 +161,16 @@ Note that only the basic features are shown here.
         </view>
     </component>
 
-
 Usage Teaser
 ************
 
 LVGL's UI |nbsp| Editor can be used in two different ways.
 
-
 Export C and H Files
 --------------------
 
 The Widgets, Components, Screens, images, fonts, etc., can be converted to .C/.H files having
-plain LVGL code.  The exported code works the same way as if it was written by the
+plain LVGL code. The exported code works the same way as if it was written by the
 user.
 
 In this case, the XML files are not required anymore to run the C code (unless modifications may
@@ -187,7 +178,6 @@ be made later and code is exported again).
 
 The XML files were used only during editing/implementing the Widgets and Components to save
 recompilation time and optionally leverage other useful UI |nbsp| Editor features.
-
 
 Load the UI from XML
 --------------------
@@ -201,9 +191,9 @@ In the simplest case, a Component can be registered with
 :cpp:expr:`lv_obj_t * obj = lv_xml_create(parent, "my_button", NULL)`.
 
 Note that loading the UI from XML practically has no impact on performance.
-Onec the XML files are registered, and the UI is created, it behaves the same way
-as it were created from C code.
+Once the XML files are registered and the UI is created, it behaves the same way
+as if it were created from C code.
 
-Registering XMLs and creating instances is not memory hungary nor slow. The biggest
-memory overhead is that the ``<view>`` of the components are saved in RAM (typically
-1-2 kB/component)
+Registering XMLs and creating instances is not memory hungry nor slow. The biggest
+memory overhead is that the ``<view>`` of the Components is saved in RAM (typically
+1–2 kB/component).

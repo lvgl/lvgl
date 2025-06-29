@@ -7,32 +7,30 @@ Components
 Overview
 ********
 
-Components are one of the main the building blocks for creating new UI elements.
-
+Components are one of the main building blocks for creating new UI elements.
 
 ``<component>``\s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`
 - :ref:`<styles> <xml_styles>`, and
-- :ref:`<view> <xml_view>`.
-- :ref:`<previews> <xml_preview>`.
+- :ref:`<view> <xml_view>`
+- :ref:`<previews> <xml_preview>`
 
-Although they can't contain C code they are very powerful:
+Although they can't contain C code, they are very powerful:
 
 - They can extend another Component or Widget (the base can be defined)
 - Components can be built from Widgets and other Components
 - A custom API can be defined
 - Local styles can be defined, and the global styles can be used
-- Local constants can be defined, and the global constantscan be used
-- Function call, subjects change or screen load/create events can be added. See :refr:`XML Events <xml_events>`
+- Local constants can be defined, and the global constants can be used
+- Function calls, subject changes, or screen load/create events can be added. See :ref:`XML Events <xml_events>`
 - Previews can be defined to preview the components in various settings
 
 Unlike Widgets (which are always compiled into the application), Components can either:
 
 1. be loaded at runtime from XML, or
 2. be exported to C code and compiled with the application.
-
 
 Usage from Exported Code
 ************************
@@ -47,7 +45,7 @@ where 'component_name' (in the function above) is replaced by the Component's XM
 file name.
 
 When a Component is used in another Component's XML code and the code is exported,
-this ``create`` function will be called.  This means that Components do not have a
+this ``create`` function will be called. This means that Components do not have a
 detailed set/get API but can be created with a fixed set of parameters.
 
 If the user needs to access or modify values dynamically, it is recommended to use a
@@ -56,15 +54,12 @@ If the user needs to access or modify values dynamically, it is recommended to u
 The user can also call these ``..._create()`` functions at any time from application code
 to create new components on demand.
 
-
-
 Usage from XML
 **************
 
-To load Components from file, it's assumed that the XML files are saved to the devices
-either as data (byte array) or as file. Once the data is saved the the each component
-can be registered, and instances can eb created after that.
-
+To load Components from file, it's assumed that the XML files are saved to the device
+either as data (byte array) or as file. Once the data is saved, each component
+can be registered, and instances can be created after that.
 
 Registration
 ------------
@@ -78,11 +73,11 @@ These registration functions process the XML data and store relevant information
 This is required to make LVGL recognize the Component by name.
 
 Note that the "A:" in the above path is a file system "driver identifier letter" from
-:ref:`file_system` and used accordingly.  See that documentation for details.
+:ref:`file_system` and used accordingly. See that documentation for details.
 
 When loaded from a file, the file name is used as the Component name.
 
-During registration the ``<view>`` of the Component is saved in RAM.
+During registration, the ``<view>`` of the Component is saved in RAM.
 
 Instantiation
 -------------
@@ -110,8 +105,6 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
-
-
 Properties
 **********
 
@@ -121,9 +114,9 @@ The properties of child elements can be adjusted, such as:
 
     <lv_label x="10" text="Hello"/>
 
-These parameters can be set to a fixed value.  However, with the help of ``<prop>``
+These parameters can be set to a fixed value. However, with the help of ``<prop>``
 elements inside the ``<api>`` tag, they can also be passed when an instance is
-created.  Only the whole property can be passed, but not individual ``<param>``
+created. Only the whole property can be passed, but not individual ``<param>``
 elements.
 
 See :ref:`<api> <xml_api>` for more details.
@@ -177,14 +170,10 @@ The following example demonstrates parameter passing and the use of the
     };
     lv_xml_create(lv_screen_active(), "red_button", attrs);
 
-
-
 Live Example
 *************
 
 .. include:: ../../../examples/others/xml/index.rst
-
-
 
 API
 ***
