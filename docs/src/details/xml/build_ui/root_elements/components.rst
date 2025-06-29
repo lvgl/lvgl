@@ -65,8 +65,8 @@ Registration
 
 Once a Component is created (e.g., ``my_button``), it can be registered by calling either:
 
-- ``lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");``
-- ``lv_xml_component_register_from_data("my_button", xml_data_of_my_button);``
+- :cpp:expr:`lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml")`
+- :cpp:expr:`lv_xml_component_register_from_data("my_button", xml_data_of_my_button)`
 
 These registration functions process the XML data and store relevant information internally.
 This is required to make LVGL recognize the Component by name.
@@ -181,7 +181,7 @@ by setting a default value:
 
     <prop name="btn_text" type="string" default="Title"/>
 
-See :ref:`<api> <xml_api>` for more details and `XML Syntax <xml_syntax>` for all the supported types.
+See :ref:`<api> <xml_api>` for more details and :ref:`XML Syntax <xml_syntax>` for all the supported types.
 
 Examples
 ********
