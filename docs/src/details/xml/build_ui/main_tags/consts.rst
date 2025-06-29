@@ -18,7 +18,6 @@ The supported types are:
 - ``bool``
 
 
-
 Usage
 *****
 
@@ -41,33 +40,3 @@ And they can be used like this:
     <styles>
         <style name="style1" bg_color="#color1"/>
     </styles>
-
-
-
-Variants
-********
-
-Constants support a ``<variant>`` attribute to change the constants at compile time. For example:
-
-.. code-block:: xml
-
-    <consts>
-        <px name="pad" value="8" help="General padding">
-            <variant name="size" case="small" value="4"/>
-            <variant name="size" case="large" value="12"/>
-        </px>
-    </consts>
-
-from which the following C code can be exported:
-
-.. code-block:: c
-
-    #if SIZE == SMALL
-        #define PAD 4
-    #elif SIZE == LARGE
-        #define PAD 12
-    #else
-        #define PAD 8
-    #endif
-
-Where ``SMALL`` and ``LARGE`` are just preprocessor defines with incremental values.

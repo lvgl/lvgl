@@ -223,7 +223,7 @@ lv_translation_tag_dsc_t * lv_translation_add_tag(lv_translation_pack_t * pack, 
 {
     if(pack->is_static) {
         LV_LOG_WARN("Can't add tag `%s` to static translation pack `%p`", tag_name, (void *)pack);
-        return LV_RESULT_INVALID;
+        return NULL;
     }
 
     lv_translation_tag_dsc_t tag;

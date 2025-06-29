@@ -21,6 +21,7 @@ For example, you might want to:
 - Set margins.
 - Change the size of the preview.
 
+``style_radius`` can be used to set make preview rounded.
 
 
 Usage
@@ -44,9 +45,16 @@ Example
 
     <component>
         <previews>
-            <preview name="small_dark" width="content" height="100" style_bg_color="0x333" style_pad_all="32"/>
-            <preview name="centered" width="200" height="100" flex="row center"/>
-            <preview name="large_light" width="1980" height="1080" style_bg_color="0xeeeeee"/>
+
+            <preview name="small_dark_round"
+                     width="240" height="240"
+                     style_bg_color="0x333" style_pad_all="32"
+                     style_radius="32"/>
+
+            <preview name="large_light"
+                     width="1980" height="1080"
+                     style_bg_color="0xeeeeee"/>
+
         </previews>
 
         <view>

@@ -20,4 +20,3 @@ Auxiliary Modules
     snapshot
     test
     translation
-    xml/index

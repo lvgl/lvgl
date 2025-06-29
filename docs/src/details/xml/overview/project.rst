@@ -20,6 +20,7 @@ content is specified:
             for each Screen according to the specified displays.
 
 
+In LVGL's Editor the ``folders``, ``memory`` and `` <display color_format="..."/>`` are not supported yet.
 
 Example
 *******
@@ -34,8 +35,6 @@ Example
         </folders>
 
         <targets>
-            <renesas-RA8D1-EK gpu="true"/>
-
             <target name="small">
                 <display width="320" height="240" color_format="RGB565"/>
                 <memory name="int_ram" size="128K"/>

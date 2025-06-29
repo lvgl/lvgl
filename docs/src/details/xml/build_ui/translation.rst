@@ -9,6 +9,8 @@ Overview
 
 The XML translation module allows defining and using translated strings directly within XML files.
 
+It's built on top of :ref:`LVGL's translation module <translation>`.
+Check it out to learn more about selecting the active language, retrieving translations, and fallback behavior.
 
 
 Usage
@@ -51,10 +53,3 @@ Some widget properties support a ``*-translated`` suffix to refer to translation
 
 This sets the label's text to the translated string for ``"dog"``.
 
-
-
-More Details
-************
-
-For information on selecting the active language, retrieving translations, and fallback behavior,
-refer to the general :ref:`LVGL translation module <translation>`.

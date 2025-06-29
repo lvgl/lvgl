@@ -90,17 +90,20 @@ to specify which variable a given name refers to.
 
 To create these connections, functions like
 
-- ``lv_xml_register_image(&ctx, name, pointer)``
-- ``lv_xml_register_font(&ctx, name, pointer)``
-- ``lv_xml_register_event_cb(&ctx, name, callback)``
+- ``lv_xml_register_image(scope, name, pointer)``
+- ``lv_xml_register_font(scope, name, pointer)``
+- ``lv_xml_register_event_cb(scope, name, callback)``
 - etc.
 
 can be used.  Later, a pointer to the object can be retrieved by
 
-- ``lv_xml_get_image(&ctx, name)``
-- ``lv_xml_get_font(&ctx, name)``
-- ``lv_xml_get_event_cb(&ctx, name)``
+- ``lv_xml_get_image(scope, name)``
+- ``lv_xml_get_font(scope, name)``
+- ``lv_xml_get_event_cb(scope, name)``
 - etc.
+
+``scope`` can be ``NULL`` to use the global scope or :cpp:expr:`lv_xml_component_get_scope("my_component")`
+returns the a component's local scope.
 
 :style:     Name of a style. :cpp:expr:`lv_xml_get_style_by_name(&ctx, name)` returns an :cpp:expr:`lv_style_t *`.
 :font:      Name of a font. :cpp:expr:`lv_xml_get_font(&ctx, name)` returns an :cpp:expr:`lv_font_t *`.
@@ -118,13 +121,14 @@ Arrays
 An array of any type can be defined in four ways:
 
 :int[N]:            An integer array with ``N`` elements.
+                    In the exported code ``N`` is passed a parameter after the array.
 :string[...NULL]:   An array terminated with a ``NULL`` element. ``NULL`` can be
-                    replaced by any value, e.g., ``grid_template_last``.
-:string[5]:         An array that must have exactly 5 elements.
+                    replaced by any value.
+:string[5]:         An array that must have exactly 5 elements. In the exported code only the array will be passed
+                    as the Widget assumes the given number of elements.
 :string[]:          No ``NULL`` termination and no count parameter, used when the
                     number of elements is not known or delivered via another
                     mechanism, such as via a function parameter.
-
 
 Enums
 -----
@@ -142,9 +146,7 @@ For example:
             <enum name="inverted" help="Inverted mode"/>
         </enumdef>
 
-        <prop name="mode" help="help">
-            <param name="mode" type="enum:my_widget_mode" help="help"/>
-        </prop>
+        <prop name="mode" help="help"type="enum:my_widget_mode" help="help"/>
     </api>
 
 When used as a type, a ``+`` suffix means multiple values can be selected and ORed.
@@ -169,5 +171,5 @@ For example:
 - Colors: ``type="color(0xff0000 0x00ff00 0x0000ff)"``
 - Strings: ``type="string('Ok' 'Cancel')``
 
-These are checked in the UI |nbsp| Editor, and if an invalid option is selected, it
-will be highlighted as an error.
+Limiting accepted values is not supported yet, however in the UI |nbsp| Editor if
+an invalid option is selected, it will be highlighted as an error.

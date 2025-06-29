@@ -1,8 +1,8 @@
 .. _xml_subjects:
 
-========
-Subjects
-========
+=======================
+Data binding (Subjects)
+=======================
 
 Overview
 ********
