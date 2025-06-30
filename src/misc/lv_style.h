@@ -17,7 +17,7 @@ extern "C" {
 #include "lv_color.h"
 #include "lv_area.h"
 #include "lv_anim.h"
-#include "lv_text_private.h"
+#include "lv_text.h"
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"

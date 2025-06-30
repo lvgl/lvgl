@@ -86,6 +86,22 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize the text attributes descriptor
+ * @param attributes the text attributes descriptor to initialize
+ */
+void lv_text_attributes_init(lv_text_attributes_t * attributes);
+
+/**
+ * Get size of a text
+ * @param size_res pointer to a 'point_t' variable to store the result
+ * @param text pointer to a text
+ * @param font pointer to font of the text
+ * @param attributes the text attributes, flags for line break behaviour, spacing etc
+ */
+void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                      lv_text_attributes_t * attributes);
+
 /**********************
  *      MACROS
  **********************/
