@@ -7,9 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_widgets.h"
-#include "../../lvgl_private.h"
 
 #if LV_USE_DEMO_WIDGETS
+#include "lv_demo_widgets_components.h"
+#include "../../lvgl_private.h"
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
@@ -22,18 +23,15 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    DISP_SMALL,
-    DISP_MEDIUM,
-    DISP_LARGE,
-} disp_size_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void profile_create(lv_obj_t * parent);
 static void analytics_create(lv_obj_t * parent);
+static void profile_create(lv_obj_t * parent);
 static void shop_create(lv_obj_t * parent);
+
+
 static void color_changer_create(lv_obj_t * parent);
 
 static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
@@ -63,14 +61,9 @@ static void tabview_delete_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static disp_size_t disp_size;
 
 static lv_obj_t * tv;
 static lv_obj_t * calendar;
-static lv_style_t style_text_muted;
-static lv_style_t style_title;
-static lv_style_t style_icon;
-static lv_style_t style_bullet;
 
 static lv_obj_t * scale1;
 static lv_obj_t * scale2;
@@ -84,9 +77,6 @@ static lv_chart_series_t * ser1;
 static lv_chart_series_t * ser2;
 static lv_chart_series_t * ser3;
 static lv_chart_series_t * ser4;
-
-static const lv_font_t * font_large;
-static const lv_font_t * font_normal;
 
 static uint32_t session_desktop = 1000;
 static uint32_t session_tablet = 1000;
@@ -115,90 +105,12 @@ static lv_obj_t * scale3_mbps_label;
 
 void lv_demo_widgets(void)
 {
-    if(LV_HOR_RES <= 320) disp_size = DISP_SMALL;
-    else if(LV_HOR_RES < 720) disp_size = DISP_MEDIUM;
-    else disp_size = DISP_LARGE;
-
-    font_large = LV_FONT_DEFAULT;
-    font_normal = LV_FONT_DEFAULT;
-
-    int32_t tab_h;
-    if(disp_size == DISP_LARGE) {
-        tab_h = 70;
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_large     = &lv_font_benchmark_montserrat_24_aligned;
-#elif LV_FONT_MONTSERRAT_24
-        font_large     = &lv_font_montserrat_24;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_24 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_normal    = &lv_font_benchmark_montserrat_16_aligned;
-#elif LV_FONT_MONTSERRAT_16
-        font_normal    = &lv_font_montserrat_16;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_16 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-    }
-    else if(disp_size == DISP_MEDIUM) {
-        tab_h = 45;
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_large     = &lv_font_benchmark_montserrat_20_aligned;
-#elif LV_FONT_MONTSERRAT_20
-        font_large     = &lv_font_montserrat_20;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_20 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_normal    = &lv_font_benchmark_montserrat_14_aligned;
-#elif LV_FONT_MONTSERRAT_14
-        font_normal    = &lv_font_montserrat_14;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_14 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-    }
-    else {   /* disp_size == DISP_SMALL */
-        tab_h = 45;
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_large     = &lv_font_benchmark_montserrat_18_aligned;
-#elif LV_FONT_MONTSERRAT_18
-        font_large     = &lv_font_montserrat_18;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_18 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
-        font_normal    = &lv_font_benchmark_montserrat_12_aligned;
-#elif LV_FONT_MONTSERRAT_12
-        font_normal    = &lv_font_montserrat_12;
-#else
-        LV_LOG_WARN("LV_FONT_MONTSERRAT_12 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
-#endif
-    }
-
-#if LV_USE_THEME_DEFAULT
-    lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), LV_THEME_DEFAULT_DARK,
-                          font_normal);
-#endif
-
-    lv_style_init(&style_text_muted);
-    lv_style_set_text_opa(&style_text_muted, LV_OPA_50);
-
-    lv_style_init(&style_title);
-    lv_style_set_text_font(&style_title, font_large);
-
-    lv_style_init(&style_icon);
-    lv_style_set_text_color(&style_icon, lv_theme_get_color_primary(NULL));
-    lv_style_set_text_font(&style_icon, font_large);
-
-    lv_style_init(&style_bullet);
-    lv_style_set_border_width(&style_bullet, 0);
-    lv_style_set_radius(&style_bullet, LV_RADIUS_CIRCLE);
+    lv_demo_widgets_components_init();
 
     tv = lv_tabview_create(lv_screen_active());
-    lv_tabview_set_tab_bar_size(tv, tab_h);
+    lv_tabview_set_tab_bar_size(tv, disp_size == DISP_LARGE ? 75 : 45);
     lv_obj_add_event_cb(tv, tabview_delete_event_cb, LV_EVENT_DELETE, NULL);
 
-    lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
 
     lv_obj_t * t1 = lv_tabview_add_tab(tv, "Profile");
     lv_obj_t * t2 = lv_tabview_add_tab(tv, "Analytics");
@@ -213,8 +125,7 @@ void lv_demo_widgets(void)
         lv_image_set_src(logo, &img_lvgl_logo);
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
-        lv_obj_t * label = lv_label_create(tab_bar);
-        lv_obj_add_style(label, &style_title, 0);
+        lv_obj_t * label = lv_demo_widgets_title_create(tab_bar, "");
         lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
@@ -232,6 +143,7 @@ void lv_demo_widgets(void)
 
     color_changer_create(tv);
 }
+
 
 void lv_demo_widgets_start_slideshow(void)
 {
