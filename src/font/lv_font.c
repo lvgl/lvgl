@@ -91,23 +91,24 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
     }
 }
 
-bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
-                           uint32_t letter_next)
+bool lv_font_get_glyph_dsc(const lv_font_glyph_req_t * glyph_req, lv_font_glyph_dsc_t * dsc_out)
 {
 
-    LV_ASSERT_NULL(font_p);
+    LV_ASSERT_NULL(glyph_req);
+    LV_ASSERT_NULL(glyph_req->font);
     LV_ASSERT_NULL(dsc_out);
 
 #if LV_USE_FONT_PLACEHOLDER
     const lv_font_t * placeholder_font = NULL;
 #endif
-
-    const lv_font_t * f = font_p;
+    const lv_font_t * f = glyph_req->font;
+    const bool has_kerning = f->kerning != LV_FONT_KERNING_NONE;
 
     lv_memzero(dsc_out, sizeof(lv_font_glyph_dsc_t));
 
     while(f) {
-        bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
+        bool found = f->get_glyph_dsc(f, dsc_out, glyph_req->letter,
+                                      has_kerning ? glyph_req->next_letter : 0);
         if(found) {
             if(!dsc_out->is_placeholder) {
                 dsc_out->resolved_font = f;
@@ -124,15 +125,15 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
 #if LV_USE_FONT_PLACEHOLDER
     if(placeholder_font != NULL) {
-        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter,
-                                        placeholder_font->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
+        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, glyph_req->letter,
+                                        has_kerning ? glyph_req->next_letter : 0);
         dsc_out->resolved_font = placeholder_font;
         return true;
     }
 #endif
 
 #if LV_USE_FONT_PLACEHOLDER
-    dsc_out->box_w = font_p->line_height / 2;
+    dsc_out->box_w = glyph_req->font->line_height / 2;
     dsc_out->adv_w = dsc_out->box_w + 2;
 #else
     dsc_out->box_w = 0;
@@ -141,25 +142,26 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
     dsc_out->stride = 0;
     dsc_out->resolved_font = NULL;
-    dsc_out->box_h = font_p->line_height;
+    dsc_out->box_h = glyph_req->font->line_height;
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;
     dsc_out->format = LV_FONT_GLYPH_FORMAT_A1;
     dsc_out->is_placeholder = true;
 
-
     return false;
 }
 
-uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
+uint16_t lv_font_get_glyph_width(const lv_font_glyph_req_t * glyph_req)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NULL(glyph_req);
+    LV_ASSERT_NULL(glyph_req->font);
     lv_font_glyph_dsc_t g;
 
     /*Return zero if letter is marker*/
-    if(lv_text_is_marker(letter)) return 0;
+    if(lv_text_is_marker(glyph_req->letter)) return 0;
 
-    lv_font_get_glyph_dsc(font, &g, letter, letter_next);
+    lv_font_get_glyph_dsc(glyph_req, &g);
+
     return g.adv_w;
 }
 
