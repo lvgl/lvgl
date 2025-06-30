@@ -407,6 +407,9 @@
 /*Enable drawing placeholders when glyph dsc is not found*/
 #define LV_USE_FONT_PLACEHOLDER 1
 
+/* Enable dynamic loading of fonts */
+#define LV_USE_FONT_DYNAMIC_LOAD 0
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
