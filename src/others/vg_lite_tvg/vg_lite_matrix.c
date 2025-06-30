@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+#if LV_USE_DRAW_VGLITE && LV_USE_VG_LITE_THORVG
 
 #include <math.h>
 #include <string.h>
