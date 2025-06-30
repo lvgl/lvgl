@@ -72,30 +72,37 @@ set(LVGL_TEST_OPTIONS_VG_LITE
 
 set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_NORMAL_8BIT
     -DLV_TEST_OPTION=2
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_16BIT
     -DLV_TEST_OPTION=3
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_FULL_24BIT
     -DLV_TEST_OPTION=4
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_TEST_OPTION=5
+    -DLV_USE_DRAW_VGLITE=0
 )
 
 set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     -DLV_TEST_OPTION=5
+    -DLV_USE_DRAW_VGLITE=0
     -DLVGL_CI_USING_SYS_HEAP
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
     ${SANITIZE_AND_COVERAGE_OPTIONS}
@@ -103,6 +110,7 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
+    -DLV_USE_DRAW_VGLITE=0
     -DLV_USE_OBJ_PROPERTY=1      # add obj property test and disable pedantic
     -DLV_USE_OBJ_PROPERTY_NAME=1
     -DLVGL_CI_USING_DEF_HEAP
@@ -146,6 +154,7 @@ elseif (OPTIONS_TEST_VG_LITE)
     set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs/")
+    add_definitions(-DLV_USE_DRAW_VGLITE=1)
 
     # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
     if ($ENV{NON_AMD64_BUILD})

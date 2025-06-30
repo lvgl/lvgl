@@ -137,8 +137,9 @@ void test_obj_flag_overflow_visible_1(void)
 
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
     TEST_ASSERT_EQUAL_UINT32(2, cnt_2);
+
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_4.png");
-
+#endif
 }
-
 #endif

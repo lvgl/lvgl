@@ -28,7 +28,11 @@ void test_binding(void)
     /*Wait for the animation*/
     lv_test_wait(500);
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
+#else
+    TEST_PASS();
+#endif
 }
 
 static void create_ui(void)

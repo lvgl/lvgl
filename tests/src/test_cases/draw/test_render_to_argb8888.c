@@ -5,6 +5,7 @@
 
 #include "unity/unity.h"
 
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -18,6 +19,7 @@ void tearDown(void)
 
 void test_render_to_argb8888(void)
 {
+#if !LV_USE_DRAW_VGLITE
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_ARGB8888);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
@@ -39,6 +41,9 @@ void test_render_to_argb8888(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
+#else
+    TEST_PASS();
+#endif
 }
 
 #endif

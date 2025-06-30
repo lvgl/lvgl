@@ -460,6 +460,15 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             vg_buffer_format = VG_LITE_BGR565;
             break;
+        case LV_COLOR_FORMAT_ARGB2222:
+            vg_buffer_format = VG_LITE_BGRA2222;
+            break;
+        case LV_COLOR_FORMAT_ARGB1555:
+            vg_buffer_format =  VG_LITE_BGRA5551;
+            break;
+        case LV_COLOR_FORMAT_ARGB4444:
+            vg_buffer_format =  VG_LITE_BGRA4444;
+            break;
         case LV_COLOR_FORMAT_ARGB8565:
             vg_buffer_format = VG_LITE_BGRA5658;
             break;
@@ -495,9 +504,12 @@ uint8_t vglite_get_stride_alignment(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_ARGB2222:
             align_bytes = 16;
             break;
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
             align_bytes = 32;
             break;
         case LV_COLOR_FORMAT_ARGB8565:

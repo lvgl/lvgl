@@ -204,5 +204,4 @@ void test_display_triple_buffer(void)
     lv_draw_buf_destroy(buf2);
     lv_draw_buf_destroy(buf3);
 }
-
 #endif

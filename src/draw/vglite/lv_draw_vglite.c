@@ -248,7 +248,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
             return 1;
 
-#if !LV_USE_VG_LITE_THORVG
+#if  !LV_USE_VG_LITE_THORVG
         case LV_DRAW_TASK_TYPE_BORDER: {
                 if(t->preference_score > 90) {
                     t->preference_score = 90;
@@ -257,6 +257,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 return 1;
             }
 #endif
+
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;

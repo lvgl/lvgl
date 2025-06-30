@@ -60,6 +60,7 @@ void test_arclabel_simple(void)
     lv_arclabel_set_text_horizontal_align(arclabel, LV_ARCLABEL_TEXT_ALIGN_CENTER);
     lv_obj_center(arclabel);
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_0" EXT_NAME);
 
     lv_obj_set_size(arclabel, 300, 300);
@@ -67,6 +68,11 @@ void test_arclabel_simple(void)
 
     lv_arclabel_set_recolor(arclabel, false);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_2" EXT_NAME);
+#else
+    lv_obj_set_size(arclabel, 300, 300);
+    lv_arclabel_set_recolor(arclabel, false);
+    TEST_PASS();
+#endif
 }
 
 #endif

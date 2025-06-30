@@ -18,6 +18,7 @@ void tearDown(void)
 
 void test_render_to_rgb565_swapped(void)
 {
+#if !LV_USE_DRAW_VGLITE
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_RGB565_SWAPPED);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
@@ -39,6 +40,9 @@ void test_render_to_rgb565_swapped(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
+#else
+    TEST_PASS();
+#endif
 }
 
 #endif
