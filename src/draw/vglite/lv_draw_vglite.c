@@ -150,7 +150,9 @@ static bool _vglite_dest_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+#if  !LV_USE_VG_LITE_THORVG
         case LV_COLOR_FORMAT_XRGB8888:
+#endif
             return true;
 
         case LV_COLOR_FORMAT_ARGB8565:
@@ -167,18 +169,25 @@ static bool _vglite_dest_cf_supported(lv_color_format_t cf)
 static bool _vglite_src_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
+#if !LV_USE_VG_LITE_THORVG
         case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
+#endif
+
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+#if !LV_USE_VG_LITE_THORVG
         case LV_COLOR_FORMAT_XRGB8888:
+#endif
             return true;
 
+#if !LV_USE_VG_LITE_THORVG
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT) ? true : false;
+#endif
 
         case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
@@ -239,6 +248,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
             return 1;
 
+#if !LV_USE_VG_LITE_THORVG
         case LV_DRAW_TASK_TYPE_BORDER: {
                 if(t->preference_score > 90) {
                     t->preference_score = 90;
@@ -246,7 +256,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 }
                 return 1;
             }
-
+#endif
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
