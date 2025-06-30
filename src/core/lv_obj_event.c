@@ -392,7 +392,10 @@ static lv_result_t event_send_core(lv_event_t * e)
             if(child) {
                 e->current_target = child;
                 res = event_send_core(e);
-                if(res != LV_RESULT_OK) break;
+                if(res != LV_RESULT_OK) {
+                    LV_LOG_WARN("Trickle down event %d to child %p failed", e->code, (void *)child);
+                    break;
+                }
             }
         }
     }
