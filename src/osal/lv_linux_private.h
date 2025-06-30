@@ -45,6 +45,8 @@ typedef union {
  * GLOBAL PROTOTYPES
  **********************/
 
+uint32_t lv_os_get_proc_idle_percent(void);
+
 /**********************
  *      MACROS
  **********************/
