@@ -196,6 +196,13 @@ void * lv_event_get_user_data(lv_event_t * e);
 void lv_event_stop_bubbling(lv_event_t * e);
 
 /**
+ * Stop event from trickling down to children.
+ * This is only valid when called in the middle of an event processing chain.
+ * @param e     pointer to the event descriptor
+ */
+void lv_event_stop_trickling(lv_event_t * e);
+
+/**
  * Stop processing this event.
  * This is only valid when called in the middle of an event processing chain.
  * @param e     pointer to the event descriptor

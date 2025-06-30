@@ -343,6 +343,7 @@ Example
 	    <prop name="snappable" 			type="flag:flag lv_obj_flag"/>
 	    <prop name="press_lock" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="event_bubble" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="event_trickle" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="gesture_bubble" 	type="flag:flag lv_obj_flag"/>
 	    <prop name="adv_hittest" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="ignore_layout" 		type="flag:flag lv_obj_flag"/>

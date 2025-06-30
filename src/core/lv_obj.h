@@ -115,16 +115,18 @@ typedef enum {
 #if LV_USE_FLEX
     LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = (1L << 21),     /**< Start a new flex track on this item*/
 #endif
+    LV_OBJ_FLAG_EVENT_TRICKLE   = (1L << 22), /**< Propagate the events to the children too*/
+    LV_OBJ_FLAG_STATE_TRICKLE   = (1L << 23), /**< Propagate the states to the children too*/
 
-    LV_OBJ_FLAG_LAYOUT_1        = (1L << 23), /**< Custom flag, free to use by layouts*/
-    LV_OBJ_FLAG_LAYOUT_2        = (1L << 24), /**< Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_1        = (1L << 24), /**< Custom flag, free to use by layouts*/
+    LV_OBJ_FLAG_LAYOUT_2        = (1L << 25), /**< Custom flag, free to use by layouts*/
 
-    LV_OBJ_FLAG_WIDGET_1        = (1L << 25), /**< Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_WIDGET_2        = (1L << 26), /**< Custom flag, free to use by widget*/
-    LV_OBJ_FLAG_USER_1          = (1L << 27), /**< Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
-    LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_WIDGET_1        = (1L << 26), /**< Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_WIDGET_2        = (1L << 27), /**< Custom flag, free to use by widget*/
+    LV_OBJ_FLAG_USER_1          = (1L << 28), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_2          = (1L << 29), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1L << 30), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1L << 31), /**< Custom flag, free to use by user*/
 } lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
@@ -153,6 +155,7 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_TASK_EVENTS, LV_PROPERTY_TYPE_INT,       19),
     LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
     LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       21),
+    LV_PROPERTY_ID(OBJ, FLAG_EVENT_TRICKLE,         LV_PROPERTY_TYPE_INT,       22),
     LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       23),
     LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       24),
     LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       25),
