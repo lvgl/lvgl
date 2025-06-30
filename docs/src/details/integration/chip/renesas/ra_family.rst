@@ -10,13 +10,15 @@ RA Family
 Supported boards in the RA Family:
 
 - **EK-RA8D1**
+- **EK-RA8P1**
 - **EK-RA6M3G**
 
 Run the Project
 ***************
 
 - The official IDE of Renesas is called e\ |sup2| studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
-  The RA family requires the latest version with FSP 5.3. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
+  Members of the RA family require certain minimum versions of the FSP. See the individual README.md files in the repos for info.
+  FSPs can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
 - JLink is used for debugging, it can be downloaded `here <https://www.segger.com/downloads/jlink/>`__.
 - Clone the ready-to-use repository for your selected board:
 
@@ -70,7 +72,7 @@ You can disable the LVGL demos (or just comment them out) and call some ``lv_exa
 Configuration
 -------------
 
-``src/lv_conf.h`` contains the most important settings for LVGL. Namely:
+``src/lv_conf.h`` (or ``src/lv_conf_user.h``) contains the most important settings for LVGL. Namely:
 
 - :c:macro:`LV_COLOR_DEPTH` to set LVGL's default color depth
 - :c:macro:`LV_MEM_SIZE` to set the maximum RAM available for LVGL
@@ -78,6 +80,8 @@ Configuration
 
 
 Hardware and software components can be modified in a visual way using the `Configuration Window`.
+
+As of e2studio 2025-04.1 and FSP 6.0.0, LVGL is a managed component.
 
 
 Support
