@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_text_private.h"
+#include "lv_text.h"
 #include "lv_types.h"
 #include "../draw/lv_draw.h"
 

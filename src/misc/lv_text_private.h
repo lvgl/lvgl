@@ -29,33 +29,6 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the text attributes descriptor
- * @param attributes the text attributes descriptor to initialize
- */
-void lv_text_attributes_init(lv_text_attributes_t * attributes);
-
-/**
- * Get size of a text
- * @param size_res pointer to a 'point_t' variable to store the result
- * @param text pointer to a text
- * @param font pointer to font of the text
- * @param attributes the text attributes, flags for line break behaviour, spacing etc
- */
-void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                      lv_text_attributes_t * attributes);
-
-/**
- * Give the length of a text with a given font - kept for backwards compatibity with v8
- * @param txt a '\0' terminate string
- * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
- * UTF-8)
- * @param font pointer to a font
- * @param letter_space letter space
- * @return length of a char_num long text
- */
-int32_t lv_text_get_width_old(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space);
-
-/**
  * Give the length of a text with a given font with text flags
  * @param txt a '\0' terminate string
  * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in

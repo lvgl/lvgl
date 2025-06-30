@@ -12,6 +12,7 @@
 #if LV_USE_CHECKBOX != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"

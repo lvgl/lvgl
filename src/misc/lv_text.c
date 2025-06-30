@@ -414,38 +414,6 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
     return i;
 }
 
-int32_t lv_text_get_width_old(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space)
-{
-    if(txt == NULL) return 0;
-    if(font == NULL) return 0;
-    if(txt[0] == '\0') return 0;
-
-    uint32_t i                = 0;
-    int32_t width             = 0;
-
-    lv_font_glyph_req_t g_req = {0};
-    g_req.font = font;
-
-    if(length != 0) {
-        while(i < length) {
-            lv_text_encoded_letter_next_2(txt, &g_req.letter, &g_req.next_letter, &i);
-
-            int32_t char_width = lv_font_get_glyph_width(&g_req);
-            if(char_width > 0) {
-                width += char_width;
-                width += letter_space;
-            }
-        }
-
-        if(width > 0) {
-            width -= letter_space; /*Trim the last letter space. Important if the text is center
-                                      aligned*/
-        }
-    }
-
-    return width;
-}
-
 int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font,
                           const lv_text_attributes_t * attributes)
 {
