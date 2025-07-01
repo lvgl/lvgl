@@ -157,7 +157,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_color_format_t cf = lv_display_get_color_format(disp);
         int32_t disp_width = disp->hor_res;
 
-        uint8_t * fb = (uint8_t *) layer_cfg->FBStartAddress;
+        uint8_t * fb = (uint8_t *) layer_cfg->FBStartAdress;
         uint32_t px_size = lv_color_format_get_size(cf);
         uint32_t fb_stride = px_size * disp_width;
         lv_area_t rotated_area = *area;
