@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_demo_widgets_components.h"
 #include "lv_demo_widgets_profile.h"
+#if LV_USE_DEMO_BENCHMARK
+
+#include "lv_demo_widgets_components.h"
 
 /*********************
  *      DEFINES
@@ -488,3 +490,5 @@ static void slider_event_cb(lv_event_t * e)
         }
     }
 }
+
+#endif /* LV_USE_DEMO_BENCHMARK */

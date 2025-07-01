@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_widgets_components.h"
+#if LV_USE_DEMO_BENCHMARK
 
 /*********************
  *      DEFINES
@@ -140,3 +141,5 @@ lv_obj_t * lv_demo_widgets_title_create(lv_obj_t * parent, const char * text)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /* LV_USE_DEMO_BENCHMARK */

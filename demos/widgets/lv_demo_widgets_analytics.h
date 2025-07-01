@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_demos.h"
+#include "lv_demo_widgets.h"
+#if LV_USE_DEMO_BENCHMARK
 
 /*********************
  *      DEFINES
@@ -31,6 +32,8 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent);
 /**********************
  *      MACROS
  **********************/
+
+#endif /* LV_USE_DEMO_BENCHMARK */
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -13,7 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_demos.h"
+#include "../../lvgl.h"
+
+#if LV_USE_DEMO_BENCHMARK
 
 /*********************
  *      DEFINES
@@ -54,6 +56,8 @@ extern const lv_font_t * font_normal;
 /**********************
  *      MACROS
  **********************/
+
+#endif /* LV_USE_DEMO_BENCHMARK */
 
 #ifdef __cplusplus
 } /*extern "C"*/
