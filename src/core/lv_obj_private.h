@@ -67,7 +67,7 @@ struct _lv_obj_t {
 #endif
     lv_area_t coords;
     lv_obj_flag_t flags;
-    lv_state_t state;
+    uint16_t state;
     uint16_t layout_inv : 1;
     uint16_t readjust_scroll_after_layout : 1;
     uint16_t scr_layout_inv : 1;

@@ -52,7 +52,7 @@ typedef enum {
  *  STATIC PROTOTYPES
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
-static lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_part_t part);
+static lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_style_selector_t selector);
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
@@ -272,7 +272,7 @@ void lv_obj_report_style_change(lv_style_t * style)
     }
 }
 
-void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
+void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -281,8 +281,6 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     LV_PROFILER_STYLE_BEGIN;
 
     lv_obj_invalidate(obj);
-
-    lv_part_t part = lv_obj_style_get_selector_part(selector);
 
     bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
@@ -829,7 +827,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
         if((state_act & state_inv)) continue;
 
         /*Check only better candidates*/
-        if(state_act <= weight) continue;
+        if((int32_t)state_act <= weight) continue;
 
         found = lv_style_get_prop_inlined(obj_style->style, prop, v);
         if(found == LV_STYLE_RES_FOUND) {

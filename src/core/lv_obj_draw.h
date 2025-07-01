@@ -20,6 +20,7 @@ extern "C" {
 #include "../draw/lv_draw_line.h"
 #include "../draw/lv_draw_arc.h"
 #include "../draw/lv_draw_triangle.h"
+#include "lv_obj_style.h"
 
 /*********************
  *      DEFINES
