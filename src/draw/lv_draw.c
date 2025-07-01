@@ -349,8 +349,6 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
     lv_draw_task_t * t = t_prev ? t_prev->next : layer->draw_task_head;
     while(t) {
-        bool good = false;
-
         /*Find a draw task for this draw unit which is waiting and independent?*/
         if(t->preferred_draw_unit_id == draw_unit_id &&
            t->state == LV_DRAW_TASK_STATE_WAITING &&
