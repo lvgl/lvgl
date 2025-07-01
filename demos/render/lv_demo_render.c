@@ -561,14 +561,14 @@ static void triangle_draw_event_cb(lv_event_t * e)
     dsc.p[2].x = p_rel[2].x + coords.x1 + 8;
     dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
-    lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
-    dsc.grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
-    dsc.grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
-    dsc.grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
-    dsc.grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
-    dsc.grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
-    dsc.grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
-    dsc.grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
+    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    dsc.grad.dir = lv_obj_get_style_bg_grad_dir(obj, LV_PART_MAIN);
+    dsc.grad.stops[0].color = lv_obj_get_style_bg_color(obj, LV_PART_MAIN);
+    dsc.grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, LV_PART_MAIN);
+    dsc.grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, LV_PART_MAIN), opa);
+    dsc.grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, LV_PART_MAIN);
+    dsc.grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, LV_PART_MAIN);
+    dsc.grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, LV_PART_MAIN), opa);
     dsc.grad.stops_count = 2;
 
     dsc.color = dsc.grad.stops[0].color;

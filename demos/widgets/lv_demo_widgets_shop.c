@@ -199,7 +199,8 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
 
     cb = lv_checkbox_create(notifications);
     lv_checkbox_set_text_static(cb, "Milestone reached");
-    lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+    lv_obj_add_state(cb, LV_STATE_CHECKED);
+    lv_obj_add_state(cb, LV_STATE_DISABLED);
 
     cb = lv_checkbox_create(notifications);
     lv_checkbox_set_text_static(cb, "Out of stock");

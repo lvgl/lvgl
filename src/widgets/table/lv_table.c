@@ -1114,12 +1114,12 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
     if(rtl) {
         area->x1 += lv_obj_get_scroll_x(obj);
         int32_t w = lv_obj_get_width(obj);
-        area->x2 = w - area->x1 - lv_obj_get_style_pad_right(obj, 0);
+        area->x2 = w - area->x1 - lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
         area->x1 = area->x2 - (table->col_w[col] + offset);
     }
     else {
         area->x1 -= lv_obj_get_scroll_x(obj);
-        area->x1 += lv_obj_get_style_pad_left(obj, 0);
+        area->x1 += lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
         area->x2 = area->x1 + (table->col_w[col] + offset) - 1;
     }
 
@@ -1129,7 +1129,7 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
         area->y1 += table->row_h[r];
     }
 
-    area->y1 += lv_obj_get_style_pad_top(obj, 0);
+    area->y1 += lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     area->y1 -= lv_obj_get_scroll_y(obj);
     area->y2 = area->y1 + table->row_h[row] - 1;
 
