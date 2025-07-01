@@ -69,7 +69,7 @@ void lv_xml_bar_apply(lv_xml_parser_state_t * state, const char ** attrs)
         }
         if(lv_streq("min_value", name)) lv_bar_set_min_value(item, lv_xml_atoi(value));
         if(lv_streq("max_value", name)) lv_bar_set_max_value(item, lv_xml_atoi(value));
-        if(lv_streq("orientation", name)) lv_bar_set_orientation(item, orentation_text_to_enum_value(value));
+        if(lv_streq("orientation", name)) lv_bar_set_orientation(item, orientation_text_to_enum_value(value));
         if(lv_streq("mode", name)) lv_bar_set_mode(item, mode_text_to_enum_value(value));
     }
 }
