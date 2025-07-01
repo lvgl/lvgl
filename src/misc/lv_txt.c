@@ -167,8 +167,8 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
-                                      int32_t letter_space, int32_t max_width,
-                                      lv_text_flag_t flag, uint32_t * word_w_ptr, lv_text_cmd_state_t * cmd_state)
+                                     int32_t letter_space, int32_t max_width,
+                                     lv_text_flag_t flag, uint32_t * word_w_ptr, lv_text_cmd_state_t * cmd_state)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;

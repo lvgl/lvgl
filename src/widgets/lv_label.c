@@ -418,8 +418,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     const char * txt         = lv_label_get_text(obj);
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
-    int32_t max_w 			 = lv_area_get_width(&txt_coords);
-    int32_t max_h 			 = lv_area_get_height(&txt_coords);
+    int32_t max_w            = lv_area_get_width(&txt_coords);
+    int32_t max_h            = lv_area_get_height(&txt_coords);
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
@@ -544,8 +544,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     lv_label_t * label     = (lv_label_t *)obj;
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
-    const int32_t max_w 	 = lv_area_get_width(&txt_coords);
-    const int32_t max_h 	 = lv_area_get_height(&txt_coords);
+    const int32_t max_w      = lv_area_get_width(&txt_coords);
+    const int32_t max_h      = lv_area_get_height(&txt_coords);
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
