@@ -295,7 +295,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         /*Take the task*/
         all_idle = false;
         taken_cnt++;
-        t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+        t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
         thread_dsc->task_act = t;
 
         /*Let the render thread work*/
@@ -325,7 +325,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->task_act = t;
 
     execute_drawing(t);
