@@ -158,12 +158,12 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                                              SDL_TEXTUREACCESS_TARGET, w, h);
     }
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
     draw_sdl_unit->task_act = t;
 
     execute_drawing(draw_sdl_unit);
 
-    draw_sdl_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_sdl_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_sdl_unit->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
