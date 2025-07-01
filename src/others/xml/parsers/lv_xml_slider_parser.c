@@ -76,7 +76,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
                 LV_LOG_WARN("Subject \"%s\" doesn't exist in slider bind_value", value);
             }
         }
-        else if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orentation_text_to_enum_value(value));
+        else if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orientation_text_to_enum_value(value));
         else if(lv_streq("mode", name)) lv_slider_set_mode(item, mode_text_to_enum_value(value));
         else if(lv_streq("min_value", name)) lv_slider_set_min_value(item, lv_xml_atoi(value));
         else if(lv_streq("max_value", name)) lv_slider_set_max_value(item, lv_xml_atoi(value));
