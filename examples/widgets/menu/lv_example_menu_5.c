@@ -57,12 +57,14 @@ void lv_example_menu_5(void)
     create_slider(section, LV_SYMBOL_SETTINGS, "Brightness", 0, 150, 100);
 
     lv_obj_t * sub_software_info_page = lv_menu_page_create(menu, NULL);
-    lv_obj_set_style_pad_hor(sub_software_info_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_hor(sub_software_info_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), LV_PART_MAIN),
+                             0);
     section = lv_menu_section_create(sub_software_info_page);
     create_text(section, NULL, "Version 1.0", LV_MENU_ITEM_BUILDER_VARIANT_1);
 
     lv_obj_t * sub_legal_info_page = lv_menu_page_create(menu, NULL);
-    lv_obj_set_style_pad_hor(sub_legal_info_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_hor(sub_legal_info_page, lv_obj_get_style_pad_left(lv_menu_get_main_header(menu), LV_PART_MAIN),
+                             0);
     section = lv_menu_section_create(sub_legal_info_page);
     for(uint32_t i = 0; i < 15; i++) {
         create_text(section, NULL,
