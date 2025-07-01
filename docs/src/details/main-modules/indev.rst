@@ -644,8 +644,7 @@ Feedback
 
 Besides ``read_cb`` a ``feedback_cb`` callback can be also specified in
 :cpp:type:`lv_indev_t`. ``feedback_cb`` is called when any type of event is sent
-by input devices (independently of their type).  This allows generating
-feedback for the user, e.g. to play a sound on :cpp:enumerator:`LV_EVENT_CLICKED`.
+by input devices (independently of their type). This allows generating feedback for the user, e.g., to play a sound on :cpp:enumerator:`LV_EVENT_CLICKED`.
 
 Buffered Reading
 ----------------
@@ -659,6 +658,10 @@ that buffers measured data. In ``read_cb`` you can report the buffered
 data instead of directly reading the input device. Setting the
 ``data->continue_reading`` flag will tell LVGL there is more data to
 read and it should call ``read_cb`` again.
+
+If the driver can provide precise timestamps for buffered events, it can
+overwrite ``data->timestamp``. By default, this is initialized to
+:cpp:func:`lv_tick_get()` just before invoking ``read_cb``.
 
 Switching the Input Device to Event-Driven Mode
 -----------------------------------------------

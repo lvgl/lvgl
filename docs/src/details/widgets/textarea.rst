@@ -102,8 +102,8 @@ cursor will jump to the position where the Text Area was clicked.
 Hiding the cursor
 -----------------
 
-The cursor is normally always visible.  It it can be a good idea to style it
-to be visible only in :cpp:enumerator:`LV_STATE_FOCUSED` state.  See :ref:`styles`
+The cursor is normally always visible. It can be a good idea to style it
+to be visible only in :cpp:enumerator:`LV_STATE_FOCUSED` state. See :ref:`styles`
 for more information about how to do this.
 
 One-line mode

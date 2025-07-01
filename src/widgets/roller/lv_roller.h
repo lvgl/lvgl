@@ -39,7 +39,7 @@ typedef enum {
 } lv_roller_mode_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_roller_id_t {
     LV_PROPERTY_ID2(ROLLER, OPTIONS,            LV_PROPERTY_TYPE_TEXT,  LV_PROPERTY_TYPE_INT,   0),
     LV_PROPERTY_ID2(ROLLER, SELECTED,           LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_INT, 1),
     LV_PROPERTY_ID(ROLLER, VISIBLE_ROW_COUNT,   LV_PROPERTY_TYPE_INT,   2),

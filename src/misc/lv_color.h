@@ -37,7 +37,7 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
  * Opacity percentages.
  */
 
-enum {
+enum _lv_opacity_level_t {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,
     LV_OPA_10     = 25,

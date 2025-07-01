@@ -136,7 +136,8 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   transition: background-color 0.15s ease-in-out;
   color: var(--color-text-base);
   font-weight: 800;
@@ -156,15 +157,23 @@ h3 {
   font-size: 20px;
 }
 
+h4 {
+  font-size: 16px;
+}
+
 a {
   text-underline-position: under;
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--color-border-secondary);
+  border-top: 1px solid var(--color-border-primary);
   margin: 2rem 0;
   max-width: 30rem;
+}
+
+.lv-example-container + hr {
+  max-width: none;
 }
 
 a:visited {
@@ -183,15 +192,15 @@ a:visited:hover {
   }
 }
 
-section:has(h2):not(:first-child) {
+section:has(> h2):not(:first-child) {
   margin-top: 4rem;
 }
 
-section:has(h3):not(:first-child) {
+section:has(> h3):not(:first-child) {
   margin-top: 3rem;
 }
 
-section:has(h4):not(:first-child) {
+section:has(> h4):not(:first-child) {
   margin-top: 2rem;
 }
 
@@ -333,10 +342,11 @@ span.pre:first-child {
 
 .content .reference {
   transition: color 0.15s ease-in-out;
-  font-weight: 600;
 }
 
 .content a {
+  color: var(--color-accent);
+  font-weight: 500;
   transition: color 0.15s ease-in-out;
 }
 
@@ -441,6 +451,10 @@ code.literal {
   padding-top: 4rem;
 }
 
+/*-------------------------------------------------------------------------
+ * TOC Level 1
+ *-------------------------------------------------------------------------*/
+
 #furo-main-content ul:has(.toctree-l1) {
   max-width: 50%;
   list-style-type: none;
@@ -461,6 +475,35 @@ code.literal {
   margin-top: 2rem;
 }
 
+/* Special Case:  1-level-deep TOCs.
+ * Note:  `...:not(:has(.toctree-l2))` won't do it because it ALSO selects
+ *        .toctree-l1 elements in more complex TOCs, some of which simply don't have
+ *        .toctree-l2 children!  Instead, we want the special case where the TOC
+ *        is limited by design to 1 level.  Example:  Widgets overview TOC.
+ */
+
+#furo-main-content .toctree-1-deep .toctree-l1 + .toctree-l1 {
+  margin-top: 0.65rem;
+}
+
+/*
+ * Welcome to LVGL Docs (home page) table of contents
+ *-------------------------------------------------------------------------
+ */
+
+#furo-main-content .toctree-landing-page .toctree-l1 > a {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+#furo-main-content .toctree-landing-page .toctree-l1 + .toctree-l1 {
+  margin-top: 0.125rem;
+}
+
+/*-------------------------------------------------------------------------
+ * TOC Level 2
+ *-------------------------------------------------------------------------*/
+
 #furo-main-content ul:has(.toctree-l2) {
   list-style-type: none;
   padding: 0;
@@ -478,6 +521,10 @@ code.literal {
 #furo-main-content .toctree-l2 > a:hover {
   text-decoration: underline;
 }
+
+/*-------------------------------------------------------------------------
+ * TOC Level 3
+ *-------------------------------------------------------------------------*/
 
 #furo-main-content .toctree-l3 > a {
   color: var(--color-text-base);
@@ -620,20 +667,6 @@ table.docutils th p {
 
 .home-card:hover {
   background-color: rgba(var(--color-background-base-rgb), 0.04);
-}
-
-/*
- * Welcome to LVGL Docs (home page) table of contents
- *-------------------------------------------------------------------------
- */
-
-#welcome-to-lvgl-docs .toctree-l1 > a {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-#welcome-to-lvgl-docs .toctree-l1 + .toctree-l1 {
-  margin-top: 0.125rem;
 }
 
 /*

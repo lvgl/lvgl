@@ -23,10 +23,10 @@ Draw-Pipeline Overview
 **********************
 
 On modern computing hardware meant to be used with larger display panels, there are
-sometimes options for different ways drawing can be accomplished.  For example, some
+sometimes options for different ways drawing can be accomplished. For example, some
 MCUs come with hardware that is very good (and fast) at certain types of drawing
-tasks.  Alternatively, you might have access to a drawing library that performs
-certain types of drawing tasks with great efficiency.  To make it possible to utilize
+tasks. Alternatively, you might have access to a drawing library that performs
+certain types of drawing tasks with great efficiency. To make it possible to utilize
 such facilities in the most efficient fashion, LVGL v9 and onwards implements a
 :dfn:`Drawing Pipeline`, like an assembly line, where decisions are made as to which
 drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"

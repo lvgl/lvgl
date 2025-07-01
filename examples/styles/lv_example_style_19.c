@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_SLIDER
+#if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_LOG
 
 /**
  * Test between a full background modal and a recolor modal

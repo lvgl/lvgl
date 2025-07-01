@@ -11,7 +11,7 @@ CMake is a cross-platform build system generator. It is used to easily integrate
 It also offers the possibility to configure the build with different options, to enable or disable components, or to
 integrate custom scripts executions during the configuration/build phase.
 
-LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into an higher level cmake build.
+LVGL includes CMake natively, which means that one can use it to configure and build LVGL directly or integrate it into a higher level cmake build.
 
 This project uses CMakePresets to ensure an easy build.
 Find out more on Cmake Presets here: https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
@@ -54,7 +54,7 @@ The simplest way to build LVGL using cmake is to use the command line calls:
 Build with cmake presets
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another way to build this project is to use the provided CMakePresets.json or passing option using the command line.
+Another way to build this project is to use the provided CMakePresets.json or pass options using the command line.
 The CMakePresets.json file describes some cmake configurations and build phase. It is a way to quickly use a set of
 predefined cmake options.
 
@@ -105,7 +105,7 @@ CMake will create solution files (for VS) or Ninja Files (for Linux Ninja Build)
 The following targets are available.
 
 - lvgl (the actual library, required)
-- lvgl_thorvg (an vector graphics extension, optional)
+- lvgl_thorvg (a vector graphics extension, optional)
 - lvgl_examples (example usages, optional)
 - lvgl_demos (some demos, optional)
 
@@ -154,7 +154,7 @@ This snippet adds LVGL and specifies to use Kconfig as the configuration system:
     set(LV_BUILD_USE_KCONFIG ON)
     add_subdirectory(lvgl)
 
-This snippet adds LVGL and specify to use Kconfig as the configuration system and to use a specific defconfig:
+This snippet adds LVGL and specifies to use Kconfig as the configuration system and to use a specific defconfig:
 
 .. code-block:: cmake
 

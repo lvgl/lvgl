@@ -40,8 +40,8 @@ Value, range and step
   the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to
-the right by default whenever the encoder button is clicked. To change this behaviour to shifting
-to the left, the :cpp:expr:`lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT)` can be used
+the right by default whenever the encoder button is clicked. To change this behavior to shifting
+to the left, the :cpp:expr:`lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT)` can be used.
 
 Format
 ------
@@ -54,7 +54,7 @@ Pass 0 for ``separator_position`` to display no decimal point.
 Rollover
 --------
 
-:cpp:expr:`lv_spinbox_set_rollover(spinbox, true/false)` enables/disabled
+:cpp:expr:`lv_spinbox_set_rollover(spinbox, true/false)` enables/disables
 rollover mode. If either the minimum or maximum value is reached with
 rollover enabled, and the user attempts to continue changing the value in
 the same direction, the value will change to the other limit.  If rollover

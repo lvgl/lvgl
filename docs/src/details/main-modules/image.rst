@@ -4,7 +4,7 @@
 Images (lv_image)
 =================
 
-An image can be a file or a variable which stores the bitmap itself and
+An image can be a file or a variable that stores the bitmap itself and
 some metadata.
 
 Store images

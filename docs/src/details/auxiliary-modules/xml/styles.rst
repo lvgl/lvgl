@@ -22,19 +22,19 @@ In the ``<styles>`` section, styles and their properties can be defined like thi
         border_width="2px"
         border_color="0xff0000"/>
 
-Styles can be referenced like this in the ``<view>``:
+Styles can be referenced like this in the ``<view>``\ :
 
 .. code-block:: xml
 
     <view>
         <lv_slider value="20">
              <style name="main"/>
-             <style name="red" selector"knob"/>
+             <style name="red" selector="knob"/>
              <style name="blue" selector="knob focused"/>
         </lv_slider>
     </view>
 
-As shown in the example, parts and states can be set as ``selector``.
+As shown in the example, parts and states can be set as ``selector``\ .
 
 
 Local Styles

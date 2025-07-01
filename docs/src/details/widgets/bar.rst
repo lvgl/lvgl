@@ -11,8 +11,8 @@ Overview
 The Bar Widget has a background and an indicator. The length of the
 indicator against the background indicates the Bar's current value.
 
-Both the start and end values of the Bar can be set.  Changing the start value to a
-value other than the minimum value in its range changes the start position of the indicator.
+Both the start and end values of the Bar can be set. Changing the start value to a
+value other than the minimum value in its range adjusts the start position of the indicator.
 
 
 

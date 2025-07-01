@@ -35,7 +35,7 @@ User-defined functions can be called like this:
     </view>
 
 When the XML is loaded at runtime, the callback name needs to be mapped to a function using
-:cpp:expr:`lv_xml_register_event_cb("my_callback_1", an_event_handler);`.
+:cpp:expr:`lv_xml_register_event_cb("my_callback_1", an_event_handler)`.
 
 The callback should follow the standard LVGL event callback signature:
 ``void an_event_handler(lv_event_t * e);``

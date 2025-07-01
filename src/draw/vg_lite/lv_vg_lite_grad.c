@@ -40,7 +40,10 @@ typedef enum {
     GRAD_TYPE_UNKNOWN,
 } grad_type_t;
 
+struct _lv_vg_lite_grad_ctx_t;
+
 typedef struct {
+    struct _lv_vg_lite_grad_ctx_t * ctx;
     grad_type_t type;
     lv_vector_gradient_t lv;
     union {
@@ -56,8 +59,7 @@ typedef struct _lv_vg_lite_grad_ctx_t {
     struct _lv_draw_vg_lite_unit_t * unit;
     lv_cache_t * cache;
     struct _lv_vg_lite_pending_t * pending;
-    grad_item_t * item_pool;
-    uint32_t item_pool_size;
+    lv_ll_t item_pool;
 
     /**
      * Temporary reuse of data to reduce the use of
@@ -111,9 +113,7 @@ struct _lv_vg_lite_grad_ctx_t * lv_vg_lite_grad_ctx_create(uint32_t cache_cnt, s
     LV_ASSERT_MALLOC(ctx);
     ctx->unit = unit;
 
-    ctx->item_pool = lv_malloc_zeroed(cache_cnt * sizeof(grad_item_t));
-    LV_ASSERT_MALLOC(ctx->item_pool);
-    ctx->item_pool_size = cache_cnt;
+    lv_ll_init(&ctx->item_pool, sizeof(grad_item_t));
 
     ctx->cache = lv_cache_create(&lv_cache_class_lru_ll_count, sizeof(grad_item_ref_t), cache_cnt, ops);
     lv_cache_set_name(ctx->cache, "VG_GRAD");
@@ -128,7 +128,7 @@ void lv_vg_lite_grad_ctx_delete(struct _lv_vg_lite_grad_ctx_t * ctx)
     LV_ASSERT_NULL(ctx);
     lv_vg_lite_pending_destroy(ctx->pending);
     lv_cache_destroy(ctx->cache, NULL);
-    lv_free(ctx->item_pool);
+    lv_ll_clear(&ctx->item_pool);
 
     lv_memzero(ctx, sizeof(lv_vg_lite_grad_ctx_t));
     lv_free(ctx);
@@ -420,21 +420,42 @@ static grad_item_t * grad_get(lv_vg_lite_grad_ctx_t * ctx, const lv_vector_gradi
 static grad_item_t * grad_item_pool_alloc(lv_vg_lite_grad_ctx_t * ctx, grad_type_t type)
 {
     LV_ASSERT_NULL(ctx);
-    for(uint32_t i = 0; i < ctx->item_pool_size; i++) {
-        if(ctx->item_pool[i].type == GRAD_TYPE_FREE) {
-            ctx->item_pool[i].type = type;
-            return &ctx->item_pool[i];
+
+    grad_item_t * item = lv_ll_get_head(&ctx->item_pool);
+
+    /* Try to obtain a free node from the head */
+    if(item && item->type == GRAD_TYPE_FREE) {
+        lv_ll_move_before(&ctx->item_pool, item, NULL);
+        LV_LOG_TRACE("reuse item: %p, type: %d", (void *)item, type);
+    }
+    else {
+        /* Allocate a new node if the pool is empty or all nodes are in use */
+        item = lv_ll_ins_tail(&ctx->item_pool);
+        LV_ASSERT_MALLOC(item);
+        if(!item) {
+            LV_LOG_ERROR("alloc grad item failed");
+            return NULL;
         }
+
+        LV_LOG_TRACE("alloc new item: %p, type: %d, pool size: %" LV_PRIu32,
+                     (void *)item, type, lv_ll_get_len(&ctx->item_pool));
     }
 
-    LV_LOG_WARN("alloc grad item failed, no free slot");
-    return NULL;
+    lv_memzero(item, sizeof(grad_item_t));
+    item->ctx = ctx;
+    item->type = type;
+    return item;
 }
 
 static void grad_item_pool_free(grad_item_t * item)
 {
     LV_ASSERT_NULL(item);
+    LV_ASSERT_NULL(item->ctx);
+
+    /* Move the free nodes to the head to ensure quick allocation */
     item->type = GRAD_TYPE_FREE;
+    grad_item_t * head = lv_ll_get_head(&item->ctx->item_pool);
+    lv_ll_move_before(&item->ctx->item_pool, item, head);
 }
 
 static void grad_cache_release_cb(void * entry, void * user_data)

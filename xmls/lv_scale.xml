@@ -19,8 +19,8 @@
 	    <prop name="total_tick_count" type="int" help=""/>
 	    <prop name="major_tick_every" type="int" help=""/>
 	    <prop name="label_show" type="bool" help=""/>
-    	<param name="value_min" type="int" help=""/>
-    	<param name="value_max" type="int" help=""/>
+	    <prop name="min_value" type="int" help=""/>
+	    <prop name="max_value" type="int" help=""/>
 	    <prop name="angle_range" type="deg" help=""/>
 	    <prop name="rotation" type="deg" help=""/>
 	    <prop name="text_src" type="string[NULL]" help=""/>

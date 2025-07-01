@@ -71,6 +71,7 @@ typedef struct {
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
+    uint32_t timestamp; /**< Initialized to lv_tick_get(). Driver may provide more accurate timestamp for buffered events*/
     bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 } lv_indev_data_t;
 

@@ -26,8 +26,12 @@ void test_render_to_argb8888_premultiplied(void)
         uint32_t i;
         for(i = 0; i < LV_DEMO_RENDER_SCENE_NUM; i++) {
 
-            /*Skip test with transformed indexed images if they are not loaded to RAM*/
-            if(LV_BIN_DECODER_RAM_LOAD == 0 &&
+            /*
+             * Skip test with transformed indexed images if they are not loaded to RAM
+             * also skip normal_3 and recolor_3 on VGLite
+             * because RGB565A8 and I8 are not supported
+             */
+            if((LV_BIN_DECODER_RAM_LOAD == 0 || LV_USE_DRAW_VGLITE == 0) &&
                (i == LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_3 ||
                 i == LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_3)) continue;
 

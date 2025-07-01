@@ -17,7 +17,7 @@ This implementation consists of:
 
 :Subjects:   (in global memory or heap) are "logic packages", each containing the
              value being "observed" and its type (integer (``int32_t``), a string, a
-             pointer, an :cpp:type:`lv_color_t`, a :cpp_type:`float`, or a group);
+             pointer, an :cpp:type:`lv_color_t`, a ``float``, or a group);
 
 :Observers:  (zero or more per Subject, always dynamically-allocated) are always
              attached to exactly one Subject, and provide user-defined notifications
@@ -579,7 +579,7 @@ Increments the subject's value by `step`, clamped between `min` and `max`.
 
 For example:
 
-:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80);`
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80)`
 
 This will increment `subject1` by 5 when `button1` is clicked.
 The resulting value will be constrained to the range -10 to 80.
