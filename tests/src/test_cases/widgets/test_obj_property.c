@@ -41,7 +41,7 @@ void test_obj_property_set_get_should_match(void)
     prop.id = LV_PROPERTY_STYLE_X;
     prop.num = 0xaabb;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, LV_PART_MAIN));
     TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_property(obj, LV_PROPERTY_STYLE_X).num);
 
     /* color type */
@@ -106,7 +106,7 @@ void test_obj_property_style_selector(void)
     prop.num = 0xaabb;  /* `num` shares same memory with `prop.style.value.num` */
     /* selector is initialed to zero when prop is defined. */
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, LV_PART_MAIN));
     TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_property(obj, LV_PROPERTY_STYLE_X, 0).num);
 
     lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_PRESSED;
