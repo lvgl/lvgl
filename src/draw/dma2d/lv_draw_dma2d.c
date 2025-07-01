@@ -307,7 +307,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     t->draw_unit = draw_unit;
     draw_dma2d_unit->task_act = t;
 

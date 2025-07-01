@@ -74,17 +74,17 @@ typedef enum {
     /** The draw task is added to the layers list and waits to be rendered. */
     LV_DRAW_TASK_STATE_WAITING,
 
-    /** The draw task is being rendered now or added to the command queue of the draw unit.
+    /** The draw task is added to the command queue of the draw unit.
      * As the queued task are executed in order it's possible to queue multiple draw task
      * (for the same draw unit) even if they are depending on each other.
      * Therefore `lv_draw_get_available_task` and `lv_draw_get_next_available_task` can return
      * draw task for the same draw unit even if a dependent draw task is not finished ready yet.*/
-    LV_DRAW_TASK_STATE_IN_PROGRESS,
+    LV_DRAW_TASK_STATE_QUEUED,
 
     /** The draw task is being rendered. This draw task needs to be finished before
      * `lv_draw_get_available_task` and `lv_draw_get_next_available_task` would
      * return any depending draw tasks.*/
-    LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING,
+    LV_DRAW_TASK_STATE_IN_PROGRESS,
 
     /** The draw task is rendered. It will be removed from the draw task list of the layer
      * and freed automatically. */

@@ -229,7 +229,7 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(lv_draw_layer_alloc_buf(layer) == NULL)
         return LV_DRAW_UNIT_IDLE;
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     t->draw_unit = draw_unit;
 
 #if LV_USE_G2D_DRAW_THREAD
