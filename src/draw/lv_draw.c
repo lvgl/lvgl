@@ -34,7 +34,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
+static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id);
 static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
 static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
@@ -349,13 +349,16 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
     lv_draw_task_t * t = t_prev ? t_prev->next : layer->draw_task_head;
     while(t) {
-        /*Find a queued and independent task*/
-        if(t->state == LV_DRAW_TASK_STATE_WAITING &&
-           (t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE || t->preferred_draw_unit_id == draw_unit_id) &&
-           is_independent(layer, t)) {
+        bool good = false;
+
+        /*Find a draw task for this draw unit which is waiting and independent?*/
+        if(t->preferred_draw_unit_id == draw_unit_id &&
+           t->state == LV_DRAW_TASK_STATE_WAITING &&
+           is_independent(layer, t, draw_unit_id)) {
             LV_PROFILER_DRAW_END;
             return t;
         }
+
         t = t->next;
     }
 
@@ -518,23 +521,30 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
 
 /**
  * Check if there are older draw task overlapping the area of `t_check`
- * @param layer      the draw ctx to search in
+ * @param layer         the draw ctx to search in
  * @param t_check       check this task if it overlaps with the older ones
+ * @param draw_unit_id  draw unit ID for which the independence check is called
  * @return              true: `t_check` is not overlapping with older tasks so it's independent
  */
-static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
+static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check, uint8_t draw_unit_id)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = layer->draw_task_head;
 
     /*If t_check is outside of the older tasks then it's independent*/
     while(t && t != t_check) {
-        if(t->state != LV_DRAW_TASK_STATE_FINISHED) {
-            lv_area_t a;
-            if(lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
-                LV_PROFILER_DRAW_END;
-                return false;
-            }
+        /*It's independent of finished draw tasks, and queued draw tasks of the same draw unit,
+         *so no need to check it*/
+        if(t->state == LV_DRAW_TASK_STATE_FINISHED ||
+           (t->state == LV_DRAW_TASK_STATE_QUEUED && t->preferred_draw_unit_id == draw_unit_id)) {
+            t = t->next;
+            continue;
+        }
+
+        lv_area_t a;
+        if(lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
+            LV_PROFILER_DRAW_END;
+            return false;
         }
         t = t->next;
     }
@@ -666,12 +676,12 @@ static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
      * so it can be blended normally.*/
     lv_draw_task_t * t = layer->draw_task_head;
     while(t) {
-        /*Not queued yet, leave this layer while the first task is queued*/
+        /*Not waiting to be rendered, leave this layer while the first task is ready (i.e. not blocked)*/
         if(t->state != LV_DRAW_TASK_STATE_WAITING) {
             t = NULL;
             break;
         }
-        /*It's a supported and queued task, process it*/
+        /*Waiting to be rendered, use it*/
         else {
             break;
         }

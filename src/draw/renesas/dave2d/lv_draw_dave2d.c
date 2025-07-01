@@ -397,7 +397,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     *p_new_list_entry = t;
 #endif
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_dave2d_unit->task_act = t;
 
 #if LV_USE_OS

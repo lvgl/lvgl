@@ -158,7 +158,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                                              SDL_TEXTUREACCESS_TARGET, w, h);
     }
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sdl_unit->task_act = t;
 
     execute_drawing(draw_sdl_unit);

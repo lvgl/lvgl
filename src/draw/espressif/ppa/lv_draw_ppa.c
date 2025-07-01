@@ -183,7 +183,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(!t || t->preferred_draw_unit_id != DRAW_UNIT_ID_PPA) return LV_DRAW_UNIT_IDLE;
     if(!lv_draw_layer_alloc_buf(layer)) return LV_DRAW_UNIT_IDLE;
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS_BLOCKING;
+    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
     u->task_act->draw_unit = draw_unit;
 
