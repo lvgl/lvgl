@@ -639,12 +639,12 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     int32_t pw = lv_obj_get_content_width(parent);
     int32_t ph = lv_obj_get_content_height(parent);
     if(LV_COORD_IS_PCT(x)) {
-        if(lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT) x = 0; /*Avoid circular dependency*/
+        if(lv_obj_get_style_width(parent, LV_PART_MAIN) == LV_SIZE_CONTENT) x = 0; /*Avoid circular dependency*/
         else x = (pw * LV_COORD_GET_PCT(x)) / 100;
     }
 
     if(LV_COORD_IS_PCT(y)) {
-        if(lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT) y = 0; /*Avoid circular dependency*/
+        if(lv_obj_get_style_height(parent, LV_PART_MAIN) == LV_SIZE_CONTENT) y = 0; /*Avoid circular dependency*/
         y = (ph * LV_COORD_GET_PCT(y)) / 100;
     }
 
@@ -1108,7 +1108,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
             if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
             if(!lv_obj_is_layout_positioned(child)) {
-                lv_align_t align = lv_obj_get_style_align(child, 0);
+                lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
                 switch(align) {
                     case LV_ALIGN_DEFAULT:
                     case LV_ALIGN_TOP_RIGHT:
@@ -1120,7 +1120,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
                     default:
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_x(child, 0) == 0) {
+                        if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_right;
                             child_res_tmp += lv_obj_get_style_margin_left(child, LV_PART_MAIN);
                         }
@@ -1144,7 +1144,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
             if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
             if(!lv_obj_is_layout_positioned(child)) {
-                lv_align_t align = lv_obj_get_style_align(child, 0);
+                lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
                 switch(align) {
                     case LV_ALIGN_DEFAULT:
                     case LV_ALIGN_TOP_LEFT:
@@ -1156,7 +1156,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
                     default:
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_x(child, 0) == 0) {
+                        if(lv_obj_get_style_x(child, LV_PART_MAIN) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_left;
                             child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
                         }
@@ -1201,7 +1201,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
         if(!lv_obj_is_layout_positioned(child)) {
-            lv_align_t align = lv_obj_get_style_align(child, 0);
+            lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
             switch(align) {
                 case LV_ALIGN_DEFAULT:
                 case LV_ALIGN_TOP_RIGHT:
@@ -1213,7 +1213,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
                 default:
                     /* Consider other cases only if y=0 and use the height of the object.
                      * With y!=0 circular dependency could occur. */
-                    if(lv_obj_get_style_y(child, 0) == 0) {
+                    if(lv_obj_get_style_y(child, LV_PART_MAIN) == 0) {
                         child_res_tmp = lv_area_get_height(&child->coords) + space_top;
                         child_res_tmp += lv_obj_get_style_margin_top(child, LV_PART_MAIN);
                     }
@@ -1285,17 +1285,17 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
     }
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
-    int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
-    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
-    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);
+    int32_t angle = lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN);
+    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, LV_PART_MAIN);
+    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, LV_PART_MAIN);
     if(scale_x == 0) scale_x = 1;
     if(scale_y == 0) scale_y = 1;
 
     if(angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE) return;
 
     lv_point_t pivot = {
-        .x = lv_obj_get_style_transform_pivot_x(obj, 0),
-        .y = lv_obj_get_style_transform_pivot_y(obj, 0)
+        .x = lv_obj_get_style_transform_pivot_x(obj, LV_PART_MAIN),
+        .y = lv_obj_get_style_transform_pivot_y(obj, LV_PART_MAIN)
     };
 
     if(LV_COORD_IS_PCT(pivot.x)) {

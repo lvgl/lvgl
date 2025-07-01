@@ -290,8 +290,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
            part == LV_PART_MAIN ||
-           lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT ||
-           lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT) {
+           lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT ||
+           lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
             lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
             lv_obj_mark_layout_as_dirty(obj);
         }
@@ -602,7 +602,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_values(&a, lv_obj_get_style_opa(obj, 0), LV_OPA_TRANSP);
+    lv_anim_set_values(&a, lv_obj_get_style_opa(obj, LV_PART_MAIN), LV_OPA_TRANSP);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
     lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
@@ -1057,14 +1057,14 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     if(lv_obj_get_transform(obj) != NULL) return LV_LAYER_TYPE_TRANSFORM;
 #endif
-    if(lv_obj_get_style_transform_rotation(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_scale_x(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_scale_y(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_skew_x(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_skew_y(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_opa_layered(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
-    if(lv_obj_get_style_bitmap_mask_src(obj, 0) != NULL) return LV_LAYER_TYPE_SIMPLE;
-    if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
+    if(lv_obj_get_style_transform_rotation(obj, LV_PART_MAIN) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_scale_x(obj, LV_PART_MAIN) != 256) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_scale_y(obj, LV_PART_MAIN) != 256) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_skew_x(obj, LV_PART_MAIN) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_skew_y(obj, LV_PART_MAIN) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_opa_layered(obj, LV_PART_MAIN) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
+    if(lv_obj_get_style_bitmap_mask_src(obj, LV_PART_MAIN) != NULL) return LV_LAYER_TYPE_SIMPLE;
+    if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;
 }
 
