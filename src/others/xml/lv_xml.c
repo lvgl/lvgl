@@ -116,9 +116,9 @@ void lv_xml_init(void)
                            lv_obj_xml_remove_style_all_apply);
 
     lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
-    lv_xml_widget_register("lv_obj-subject_set_int", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
+    lv_xml_widget_register("lv_obj-subject_set_int_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_set_string_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_increment_event", lv_obj_xml_subject_increment_create,
                            lv_obj_xml_subject_increment_apply);
     lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
                            lv_obj_xml_screen_load_event_apply);
