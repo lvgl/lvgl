@@ -98,6 +98,7 @@ physical hardware. The measurements are intended for comparative analysis only.
 
 import argparse
 import json
+import os
 import msgpack
 
 
@@ -179,13 +180,15 @@ def main():
             with open(results_path, "rb") as f:
                 previousb = f.read()
                 rs: list = msgpack.unpackb(previousb)
-                previous_results_map[results_path] = rs
+                # We store the filename so it's easier to match with the related results
+                previous_results_map[os.path.basename(results_path)] = rs
 
     new_results: dict[str, list[dict]] = {}
     for results_path in results_paths:
         with open(results_path, "r") as f:
             r: list[dict] = json.load(f)
-            new_results[results_path] = r
+            # We store the filename so it's easier to match with the related results
+            new_results[os.path.basename(results_path)] = r
 
     comment = "Hi :wave:, thank you for your PR!\n\n"
     comment += "We've run benchmarks in an emulated environment."
