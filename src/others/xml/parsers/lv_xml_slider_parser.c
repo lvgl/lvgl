@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt);
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt);
 static lv_slider_mode_t mode_text_to_enum_value(const char * txt);
 
 /**********************
@@ -76,7 +76,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
                 LV_LOG_WARN("Subject \"%s\" doesn't exist in slider bind_value", value);
             }
         }
-        else if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orentation_text_to_enum_value(value));
+        else if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orientation_text_to_enum_value(value));
         else if(lv_streq("mode", name)) lv_slider_set_mode(item, mode_text_to_enum_value(value));
         else if(lv_streq("min_value", name)) lv_slider_set_min_value(item, lv_xml_atoi(value));
         else if(lv_streq("max_value", name)) lv_slider_set_max_value(item, lv_xml_atoi(value));
@@ -87,7 +87,7 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_slider_orientation_t orentation_text_to_enum_value(const char * txt)
+static lv_slider_orientation_t orientation_text_to_enum_value(const char * txt)
 {
     if(lv_streq("auto", txt)) return LV_SLIDER_ORIENTATION_AUTO;
     if(lv_streq("horizontal", txt)) return LV_SLIDER_ORIENTATION_HORIZONTAL;

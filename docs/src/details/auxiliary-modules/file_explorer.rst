@@ -180,7 +180,7 @@ Events
   You can use it to, for example, customize the file sort.
 
 - :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent once when any item (file) in the
-  ``Brwoser Panel``\ 's file list is clicked.
+  ``Browser Panel``\ 's file list is clicked.
 
 - :cpp:enumerator:`LV_EVENT_CLICKED` Sent twice when an item in the ``Browser Panel``
   is clicked:  once as a result of the input-device :cpp:enumerator:`LV_EVENT_RELEASED`

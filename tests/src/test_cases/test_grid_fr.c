@@ -17,7 +17,7 @@ void tearDown(void)
 
 /**
  * Tests that green/blue checker pattern of various row and column sizes
- * completely covers underyling screen, no red background visible.
+ * completely covers underlying screen, no red background visible.
  */
 void test_grid_fr(void)
 {

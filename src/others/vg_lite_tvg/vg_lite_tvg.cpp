@@ -2283,7 +2283,7 @@ static float vlc_get_arg(const void * data, vg_lite_format_t format)
             return *((float *)data);
 
         default:
-            LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
+            LV_LOG_ERROR("UNKNOWN_FORMAT: %d", format);
             break;
     }
 
@@ -2302,7 +2302,7 @@ static uint8_t vlc_format_len(vg_lite_format_t format)
         case VG_LITE_FP32:
             return 4;
         default:
-            LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
+            LV_LOG_ERROR("UNKNOWN_FORMAT: %d", format);
             LV_ASSERT(false);
             break;
     }
@@ -2332,7 +2332,7 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
             VLC_OP_ARG_LEN(LCWARC, 5);
             VLC_OP_ARG_LEN(LCWARC_REL, 5);
         default:
-            LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
+            LV_LOG_ERROR("UNKNOWN_VLC_OP: 0x%x", vlc_op);
             LV_ASSERT(false);
             break;
     }

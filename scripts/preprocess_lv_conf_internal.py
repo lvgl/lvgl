@@ -22,7 +22,7 @@ def get_args():
     parser.add_argument("--input", help="Path to the input C header file", required=True)
     parser.add_argument("--tmp_file", help="Path to save the preprocessed output", required=True)
     parser.add_argument("--output", help="Path to save the cleaned output with removed indentation", required=True)
-    parser.add_argument("--workfolder", help="Path used to create a python environnement", required=True)
+    parser.add_argument("--workfolder", help="Path used to create a python environment", required=True)
 
     parser.add_argument(
         "--defs",
