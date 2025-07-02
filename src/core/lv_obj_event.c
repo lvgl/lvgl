@@ -352,7 +352,6 @@ static lv_result_t event_send_core(lv_event_t * e)
 {
     LV_TRACE_EVENT("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
-    /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_active();
     if(indev_act) {
         if(e->stop_processing) return LV_RESULT_OK;
