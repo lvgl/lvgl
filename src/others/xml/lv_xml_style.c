@@ -124,12 +124,30 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
 
         if(value[0] == '#') {
             const char * value_clean = &value[1];
+            bool const_found = false;
             lv_xml_const_t * c;
             LV_LL_READ(&scope->const_ll, c) {
                 if(lv_streq(c->name, value_clean)) {
                     value = c->value;
+                    const_found = true;
                     break;
                 }
+            }
+            if(!const_found) {
+                lv_xml_component_scope_t * global_scope = lv_xml_component_get_scope("globals");
+                if(global_scope) {
+                    LV_LL_READ(&global_scope->const_ll, c) {
+                        if(lv_streq(c->name, value_clean)) {
+                            value = c->value;
+                            const_found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(!const_found) {
+                LV_LOG_WARN("Constant `%s` is not found", value_clean);
+                continue;
             }
         }
 
