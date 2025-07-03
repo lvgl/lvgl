@@ -116,10 +116,6 @@ jobs:
             }
 
             const commentBody = fs.readFileSync(commentPath, 'utf8').trim();
-            if (commentBody.length == 0) {
-              console.log("Not generating a comment as the comment body is empty");
-              process.exit(0);
-            }
             const prNumber = Number(fs.readFileSync(prPath, 'utf8').trim());
 
             github.rest.issues.createComment({
