@@ -14,6 +14,7 @@ import subprocess
 import os
 import argparse
 import re
+import shutil
 import importlib.util
 
 
@@ -158,9 +159,10 @@ def main():
     # Check if PCPP is already present on the system
     # if it's not - create a python venv inside the workfolder directory
     # and install it there
-    res = subprocess.run(["which", "pcpp"], capture_output=True)
-    if res.returncode == 0:
-        pcpp_exe = res.stdout.decode().replace("\n", "")
+    pcpp_path = shutil.which("pcpp")
+
+    if len(pcpp_path) > 0:
+        pcpp_exe = pcpp_path
         print(f"Found PCPP: {pcpp_exe}")
     else:
         print("Failed to locate pcpp - installing it")
