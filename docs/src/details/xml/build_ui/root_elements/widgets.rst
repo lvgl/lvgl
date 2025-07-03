@@ -13,7 +13,7 @@ Overview
 Besides components and Screens, Widgets are the other main building blocks of UIs.
 The XML file of the Widgets is wrapped in a ``<widget>`` XML root element.
 
-``<widget>``\s support the following child XML tags:
+``<widget>``\ s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`
