@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[74] = {
+const lv_property_name_t lv_obj_property_names[75] = {
     {"align",                  LV_PROPERTY_OBJ_ALIGN,},
     {"child_count",            LV_PROPERTY_OBJ_CHILD_COUNT,},
     {"content_height",         LV_PROPERTY_OBJ_CONTENT_HEIGHT,},
@@ -49,6 +49,7 @@ const lv_property_name_t lv_obj_property_names[74] = {
     {"flag_send_draw_task_events", LV_PROPERTY_OBJ_FLAG_SEND_DRAW_TASK_EVENTS,},
     {"flag_snappable",         LV_PROPERTY_OBJ_FLAG_SNAPPABLE,},
     {"flag_start",             LV_PROPERTY_OBJ_FLAG_START,},
+    {"flag_state_trickle",     LV_PROPERTY_OBJ_FLAG_STATE_TRICKLE,},
     {"flag_user_1",            LV_PROPERTY_OBJ_FLAG_USER_1,},
     {"flag_user_2",            LV_PROPERTY_OBJ_FLAG_USER_2,},
     {"flag_user_3",            LV_PROPERTY_OBJ_FLAG_USER_3,},
