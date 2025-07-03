@@ -9,7 +9,7 @@ Overview
 
 Components are one of the main building blocks for creating new UI elements.
 
-``<component>``\s support the following child XML tags:
+``<component>``\ s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`

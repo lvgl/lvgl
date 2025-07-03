@@ -21,7 +21,7 @@ For example, you might want to:
 - Set margins.
 - Change the size of the preview.
 
-``style_radius`` can be used to set make preview rounded.
+``style_radius`` can be used to make preview rounded.
 
 
 Usage

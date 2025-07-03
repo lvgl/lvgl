@@ -9,13 +9,13 @@ Overview
 
 The ``<view>`` tag can be used in:
 
-- ``<component>``\s
-- ``<widget>``\s
-- ``<screen>``\s
-- ``<test>``\s
+- ``<component>``\ s
+- ``<widget>``\ s
+- ``<screen>``\ s
+- ``<test>``\ s
 
 to describe how these items look. Inside ``<view>``, children can be added in a nested way
-using already defined ``widget``\s and ``component``\s. For example:
+using already defined ``widget``\ s and ``component``\ s. For example:
 
 .. code-block:: xml
 
@@ -45,7 +45,7 @@ By adding properties to the ``<view>``, the extended type can be customized. For
 
 Rules for the allowed values of ``extends``:
 
-- ``<component>``: can extend both ``<widget>``\s and ``<component>``\s
-- ``<widget>``: can extend only ``<widget>``\s
+- ``<component>``: can extend both ``<widget>``\ s and ``<component>``\ s
+- ``<widget>``: can extend only ``<widget>``\ s
 - ``<screen>``: cannot extend anything
 - ``<test>``: can extend ``<widget>``, ``<component>``, or ``<screen>``

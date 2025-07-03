@@ -5,7 +5,7 @@ API
 ===
 
 The ``<api>`` tag can be a child of ``<widget>`` and ``<component>`` tags.
-(``<screen>``\ s doesn't support custom APIs.)
+(``<screen>``\ s don't support custom APIs.)
 
 The only common point is that both Widgets and Components support having
 ``<prop>`` (properties) in the ``<api>`` tag to describe their interface.
@@ -193,10 +193,10 @@ Element `access` types:
 - ``custom``: Map custom C function to XML.
 
 As ``add`` and ``get`` elements return an object they also have a type.
-This type can be any custom type, for example, `type="my_data"`. In the exported the
+This type can be any custom type, for example, `type="my_data"`. In the exported code the
 return value will be saved in a ``my_data_t *`` variable.
 
-If the type is ``type="lv_obj"`` it allows the element to have children wdgets or components.
+If the type is ``type="lv_obj"`` it allows the element to have children widgets or components.
 
 Note that, only the API can be defined in XML for elements; implementations must be in C.
 
@@ -272,7 +272,7 @@ Used for indexed access, like setting values in a table:
         <element name="item" type="obj" access="set">
             <arg name="index" type="int"/>
             <prop name="icon" type="img_src"/>
-            <prop name="color"type="color"/>
+            <prop name="color" type="color"/>
         </element>
     </api>
 

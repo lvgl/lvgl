@@ -100,7 +100,7 @@ Registering fonts
 
 If the UI is created from XML at runtime and a ``globals.xml`` is parsed, the ``<... as_file="false">`` tags are skipped
 because it is assumed that the user manually created the mapping.
-This is because the XML parser cannot automatically map fontslike:
+This is because the XML parser cannot automatically map fonts like:
 
 .. code-block:: c
 
@@ -112,18 +112,18 @@ to
 
    <data name="my_font"/>
 
-To register an font in the XML engine use:
+To register a font in the XML engine use:
 
-.. code-block:: cpp
+.. code-block:: c
 
    lv_xml_register_font(scope, "font_name", &my_font);
 
 ``scope`` is usually ``NULL`` to register the font in the global scope.
 To register a font locally for a component you can get its scope with:
 
-.. code-block:: cpp
+.. code-block:: c
 
-   lv_xml_component_get_scope("component_name")
+   lv_xml_component_get_scope("component_name");
 
 After calling this function, when ``"font_name"`` is used as a font in XML, ``&my_font``   will be used.
 
