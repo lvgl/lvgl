@@ -161,7 +161,7 @@ def main():
     # and install it there
     pcpp_path = shutil.which("pcpp")
 
-    if len(pcpp_path) > 0:
+    if pcpp_path:
         pcpp_exe = pcpp_path
         print(f"Found PCPP: {pcpp_exe}")
     else:
