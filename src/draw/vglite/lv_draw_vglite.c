@@ -185,9 +185,10 @@ static bool _vglite_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
+#endif
+
         case LV_COLOR_FORMAT_I8:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT) ? true : false;
-#endif
 
         case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
