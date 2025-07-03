@@ -55,6 +55,7 @@ The ``user_data`` is optional. If omitted, ``NULL`` will be passed.
 .. _xml_events_screen:
 
 
+
 Screen Load and Create events
 *****************************
 
@@ -63,9 +64,9 @@ of a widget or component, screens can be loaded or created on a trigger (e.g. cl
 
 The difference between load and create is that:
 
-- **load**: Just loads an already existing screen. When the screen is left, it remains in memory,
+- **load**: Just loads an already existing screen. After leaving the screen, it remains in memory,
   so all states are preserved.
-- **create**: The screen is created dynamically, and when it's left, it is deleted, so all changes are lost
+- **create**: The screen is created dynamically, and when leaving the screen, it is deleted, so all changes are lost
   (unless they are saved in ``subjects``).
 
 Both tags support the following optional attributes:
@@ -73,7 +74,7 @@ Both tags support the following optional attributes:
 - ``trigger``: Event code that triggers the action (e.g. ``"clicked"``, ``"long_pressed"``, etc). Default: ``"clicked"``.
 - ``anim_type``: Describes how the screen is loaded (e.g. ``"move_right"``, ``"fade_in"``). Default: ``"none"``.
 - ``duration``: Length of the animation in milliseconds. Default: ``0``. Only used if ``anim_type`` is not ``"none"``.
-- ``delay``: Wait time before loading the screen in milliseconds.
+- ``delay``: Wait time before loading the screen in milliseconds. Default: ``0``.
 
 This is a simple example of both load and create:
 
@@ -81,11 +82,10 @@ This is a simple example of both load and create:
 
     <!-- screen1.xml -->
     <screen>
-       <view style_bg_color="0xff7788" name="first">
+       <view style_bg_color="0xff7788">
            <lv_button>
                <lv_label text="Create"/>
-               <!-- Create an instance of "screen2" and load it.
-                    Note that here the name of the XML file is used. -->
+               <!-- Create an instance of "screen2" and load it. -->
                <screen_create_event screen="screen2" anim_type="over_right" duration="500" delay="1000"/>
            </lv_button>
        </view>
@@ -93,13 +93,11 @@ This is a simple example of both load and create:
 
     <!-- screen2.xml -->
     <screen>
-       <view style_bg_color="0x77ff88" name="second">
+       <view style_bg_color="0x77ff88">
            <lv_button>
                <lv_label text="Load"/>
-               <!-- Load an already created screen that has the name "first".
-                    Note that here the name of the instance is used,
-                    and not the name of the XML file. -->
-               <screen_load_event screen="first"/>
+               <!-- Load an already created instance of screen1.-->
+               <screen_load_event screen="screen1"/>
            </lv_button>
        </view>
     </screen>
@@ -111,9 +109,7 @@ This is a simple example of both load and create:
 
     /*Create an instance of screen_1 so that it can loaded from screen2.*/
     lv_obj_t * screen1 = lv_xml_create(NULL, "screen1", NULL);
-    lv_obj_set_name(screen1, "first"); /*Will be referenced by this name when loaded*/
     lv_screen_load(screen1);
-
 
 Set subject value
 *****************

@@ -94,7 +94,6 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
     lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(scope->extends);
     extended_proc->apply_cb(state, attrs);
 
-
 #if LV_USE_OBJ_NAME
     /*Set a default indexed name*/
     if(state->item) {
