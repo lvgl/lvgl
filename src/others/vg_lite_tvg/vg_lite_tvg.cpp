@@ -2603,9 +2603,12 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
     if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
+        LV_LOG_INFO("image_format=VG_LITE_NORMAL_IMAGE_MODE");
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
+        LV_LOG_INFO("image_format=VG_LITE_MULTIPLY_IMAGE_MODE");
+
         vg_lite_uint32_t width = source->width;
         vg_lite_uint32_t height = source->height;
         vg_lite_uint32_t px_size = width * height;

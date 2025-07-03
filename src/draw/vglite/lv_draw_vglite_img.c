@@ -166,6 +166,11 @@ void lv_draw_vglite_img(vglite_draw_task_t * vglite_task)
     /* Set src_buf structure. */
     vglite_set_src_buf(src_buf, img_dsc->header.w, img_dsc->header.h, src_stride, src_cf);
 
+#if LV_USE_VG_LITE_THORVG
+    vg_lite_buffer_t * vgbuf = (vg_lite_buffer_t *)src_buf;
+    vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+#endif
+
 #if LV_USE_VGLITE_BLIT_SPLIT
     void * dest_buf = layer->draw_buf->data;
     uint32_t dest_stride = layer->draw_buf->header.stride;
