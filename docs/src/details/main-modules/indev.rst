@@ -639,13 +639,6 @@ The default value of the following parameters can be changed in :cpp:type:`lv_in
   can be changed by calling ``lv_timer_...()`` functions. :c:macro:`LV_DEF_REFR_PERIOD`
   in ``lv_conf.h`` sets the default read period.
 
-Feedback
---------
-
-Besides ``read_cb`` a ``feedback_cb`` callback can be also specified in
-:cpp:type:`lv_indev_t`. ``feedback_cb`` is called when any type of event is sent
-by input devices (independently of their type). This allows generating feedback for the user, e.g., to play a sound on :cpp:enumerator:`LV_EVENT_CLICKED`.
-
 Buffered Reading
 ----------------
 
