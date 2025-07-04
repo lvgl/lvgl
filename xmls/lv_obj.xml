@@ -81,20 +81,20 @@ Example
         </element>
 
         <element name="subject_set_int_event" access="add">
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="value" type="int"/>
         </element>
 
         <element name="subject_set_float_event" access="add">
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="value" type="float"/>
         </element>
 
         <element name="subject_set_string_event" access="add">
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="value" type="int"/>
         </element>
 
