@@ -284,10 +284,12 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
        lv_streq(state->tag_name, "subject_set_int_event")) {
         subject_type = LV_SUBJECT_TYPE_INT;
     }
+#if LV_USE_FLOAT
     else if(lv_streq(state->tag_name, "lv_obj-subject_set_float_event") ||
             lv_streq(state->tag_name, "subject_set_float_event")) {
         subject_type = LV_SUBJECT_TYPE_FLOAT;
     }
+#endif
     else if(lv_streq(state->tag_name, "lv_obj-subject_set_string_event") ||
             lv_streq(state->tag_name, "subject_set_string_event")) {
         subject_type = LV_SUBJECT_TYPE_STRING;
@@ -333,9 +335,11 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
     if(subject_type == LV_SUBJECT_TYPE_INT) {
         lv_obj_add_subject_set_int_event(item, subject, trigger, lv_xml_atoi(value_str));
     }
+#if LV_USE_FLOAT
     else if(subject_type == LV_SUBJECT_TYPE_FLOAT) {
         lv_obj_add_subject_set_float_event(item, subject, trigger, lv_xml_atof(value_str));
     }
+#endif
     else if(subject_type == LV_SUBJECT_TYPE_STRING) {
         lv_obj_add_subject_set_string_event(item, subject, trigger, value_str);
     }

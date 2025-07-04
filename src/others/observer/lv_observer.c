@@ -213,7 +213,6 @@ float lv_subject_get_previous_float(lv_subject_t * subject)
 
 #endif /*LV_USE_FLOAT*/
 
-
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     lv_memzero(subject, sizeof(lv_subject_t));
