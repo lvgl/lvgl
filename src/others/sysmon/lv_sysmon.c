@@ -148,7 +148,7 @@ void lv_sysmon_dump_performance(lv_display_t * disp)
     perf_dump_info(disp);
 }
 
-void lv_sysmon_set_performance_en(lv_display_t * disp, bool en)
+void lv_sysmon_performance_control(lv_display_t * disp, bool start)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) {
@@ -158,7 +158,7 @@ void lv_sysmon_set_performance_en(lv_display_t * disp, bool en)
 
     if(disp->perf_sysmon_backend.timer == NULL) return;
 
-    if(en) {
+    if(start) {
         lv_timer_resume(disp->perf_sysmon_backend.timer);
     }
     else {
