@@ -67,13 +67,14 @@ void lv_sysmon_hide_performance(lv_display_t * disp);
 void lv_sysmon_dump_performance(lv_display_t * disp);
 
 /**
- * Set the timer enable for the system performance monitor.
+ * Start or stop the system performance monitor.
  * @param disp      target display, NULL: use the default
- * @param en true to enable the timer, false to disable the timer.
- * @note The timer is enabled by default. When disabled, the system monitor timer
- * will be paused. User can call lv_sysmon_dump_performance manually to dump the FPS info.
+ * @param start     true for starting the monitor, false for stopping.
+ * @note start/stop sysmon automatic updates. When the sysmon is stopped you can use
+ * `lv_sysmon_dump_performance` to get performance information. See `lv_sysmon_dump_performance`
+ * for more information.
  */
-void lv_sysmon_set_performance_en(lv_display_t * disp, bool en);
+void lv_sysmon_performance_control(lv_display_t * disp, bool start);
 
 #endif /*LV_USE_PERF_MONITOR*/
 
