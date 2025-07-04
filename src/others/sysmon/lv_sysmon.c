@@ -156,11 +156,12 @@ void lv_sysmon_set_performance_en(lv_display_t * disp, bool en)
         return;
     }
 
-    if (disp->perf_sysmon_backend.timer == NULL) return;
+    if(disp->perf_sysmon_backend.timer == NULL) return;
 
     if(en) {
         lv_timer_resume(disp->perf_sysmon_backend.timer);
-    } else {
+    }
+    else {
         lv_timer_pause(disp->perf_sysmon_backend.timer);
     }
 }
