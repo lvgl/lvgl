@@ -39,9 +39,22 @@ extern "C" {
  **********************/
 
 typedef struct {
+    uintptr_t key;
+    uint32_t addr;
+} lv_draw_eve_ramg_hash_table_cell_t;
+
+typedef struct {
+    uint32_t ramg_addr_end;
+    uint32_t hash_table_cell_count;
+    uint32_t hash_table_cells_occupied;
+    lv_draw_eve_ramg_hash_table_cell_t * hash_table;
+} lv_draw_eve_ramg_t;
+
+typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
     lv_display_t * disp;
+    lv_draw_eve_ramg_t ramg;
     lv_draw_eve_parameters_t params;
     lv_draw_eve_operation_cb_t op_cb;
 } lv_draw_eve_unit_t;

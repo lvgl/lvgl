@@ -69,8 +69,6 @@ void lv_draw_eve_init(void)
     draw_eve_unit->base_unit.evaluate_cb = eve_evaluate;
 
     lv_draw_eve_unit_g = draw_eve_unit;
-
-    lv_draw_eve_init_eve_ramg();
 }
 
 void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_parameters_t * params,

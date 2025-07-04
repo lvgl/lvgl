@@ -53,6 +53,11 @@ static void convert_row_argb8888_to_argb4444(const uint8_t * src, uint8_t * dst,
 
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
+    if(lv_image_src_get_type(draw_dsc->src) != LV_IMAGE_SRC_VARIABLE) {
+        LV_LOG_WARN("v_draw_eve can only render images from variables (not files or symbols) for now.");
+        return;
+    }
+
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
     int32_t clip_w = lv_area_get_width(&t->clip_area);
@@ -70,33 +75,40 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     uint8_t eve_format;
     int32_t eve_stride;
+    uint8_t eve_alignment;
 
     switch(src_cf) {
         case LV_COLOR_FORMAT_L8:
             eve_format = EVE_L8;
             eve_stride = src_stride;
+            eve_alignment = 1;
             break;
         case LV_COLOR_FORMAT_RGB565:
             eve_format = EVE_RGB565;
             eve_stride = src_stride;
+            eve_alignment = 2;
             break;
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_ARGB8888:
             eve_format = EVE_ARGB4;
             eve_stride = src_w * 2;
+            eve_alignment = 2;
             break;
         default :
+            LV_LOG_WARN("v_draw_eve can only render L8, RGB565, RGB565A8, and ARGB8888 images for now.");
             return;
     }
 
     int32_t eve_size = eve_stride * src_h;
 
-    uint32_t img_eve_id = lv_draw_eve_find_ramg_image(src_buf);
+    uint32_t img_addr;
+    bool img_is_loaded = lv_draw_eve_ramg_get_addr(&img_addr, (uintptr_t) src_buf, eve_size, eve_alignment);
 
-    if(img_eve_id == NOT_FOUND_BLOCK) { /* New image to load  */
-
-        uint32_t free_ramg_block = lv_draw_eve_next_free_ramg_block(TYPE_IMAGE);
-        uint32_t start_addr_ramg = lv_draw_eve_get_ramg_ptr();
+    if(!img_is_loaded) { /* New image to load  */
+        if(img_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+            LV_LOG_WARN("Could not load image because space could not be allocated in RAM_G.");
+            return;
+        }
 
         /* Load image to RAM_G */
         EVE_end_cmd_burst();
@@ -104,7 +116,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         switch(src_cf) {
             case LV_COLOR_FORMAT_L8 :
             case LV_COLOR_FORMAT_RGB565 :
-                EVE_memWrite_flash_buffer(start_addr_ramg, src_buf, eve_size);
+                EVE_memWrite_flash_buffer(img_addr, src_buf, eve_size);
                 break;
             case LV_COLOR_FORMAT_RGB565A8 : {
                 uint8_t * tmp_buf = lv_malloc(eve_stride);
@@ -113,7 +125,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 int32_t src_alpha_stride = src_stride / 2;
                 for(uint32_t y = 0; y < src_h; y++) {
                     convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
-                    EVE_memWrite_flash_buffer(start_addr_ramg + y * eve_stride, tmp_buf, eve_stride);
+                    EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
                 }
                 lv_free(tmp_buf);
                 break;
@@ -123,7 +135,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 LV_ASSERT_MALLOC(tmp_buf);
                 for(uint32_t y = 0; y < src_h; y++) {
                     convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
-                    EVE_memWrite_flash_buffer(start_addr_ramg + y * eve_stride, tmp_buf, eve_stride);
+                    EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
                 }
                 lv_free(tmp_buf);
                 break;
@@ -131,9 +143,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
             default :
                 return;
         }
-
-        /* Save RAM_G Memory Block ID info */
-        lv_draw_eve_update_ramg_block(free_ramg_block, (uint8_t *)src_buf, start_addr_ramg, eve_size);
 
         EVE_start_cmd_burst();
     }
@@ -146,8 +155,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
         lv_eve_color_opa(draw_dsc->recolor_opa);
         lv_eve_color(draw_dsc->recolor);
     }
-
-    uint32_t img_addr = lv_draw_eve_get_bitmap_addr(img_eve_id);
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
     EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
