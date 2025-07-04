@@ -305,7 +305,7 @@ static void button_clicked_event_cb(lv_event_t * e)
     lv_obj_t * button = lv_event_get_current_target(e);
 
     lv_obj_t * tv = lv_obj_get_parent(lv_obj_get_parent(button));
-        
+
     if(tv == NULL) return;
 
     /* Remember currently active tab before the click */
