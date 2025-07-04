@@ -335,11 +335,13 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
     if(subject_type == LV_SUBJECT_TYPE_INT) {
         lv_obj_add_subject_set_int_event(item, subject, trigger, lv_xml_atoi(value_str));
     }
-#if LV_USE_FLOAT
     else if(subject_type == LV_SUBJECT_TYPE_FLOAT) {
+#if LV_USE_FLOAT
         lv_obj_add_subject_set_float_event(item, subject, trigger, lv_xml_atof(value_str));
-    }
+#else
+        LV_LOG_ERROR("Tried to add a subject of type float but LV_USE_FLOAT is not enabled");
 #endif
+    }
     else if(subject_type == LV_SUBJECT_TYPE_STRING) {
         lv_obj_add_subject_set_string_event(item, subject, trigger, value_str);
     }
