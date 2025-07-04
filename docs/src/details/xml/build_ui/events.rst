@@ -120,9 +120,10 @@ It's possible to set a :ref:`Subject <observer_subject>` value on user interacti
 
     <view>
         <lv_button width="200" height="100">
-            <subject_set_int trigger="clicked" subject="subject1" value="10"/>
-            <subject_set_string trigger="clicked" subject="subject2" value="Hello"/>
-            <lv_label text="Set to 10"/>
+            <subject_set_int_event    trigger="clicked" subject="subject_int"    value="10"/>
+            <subject_set_float_event  trigger="clicked" subject="subject_float"  value="12.34"/>
+            <subject_set_string_event trigger="clicked" subject="subject_string" value="Hello"/>
+            <lv_label text="Set the values"/>
         </lv_button>
     </view>
 
@@ -137,14 +138,18 @@ Incrementing or decrementing a :ref:`Subject <observer_subject>` value can be de
 
     <view>
         <lv_button width="200" height="100">
-            <subject_increment trigger="clicked" subject="subject1" step="10"/>
-            <subject_increment trigger="clicked" subject="subject2" step="-10" min="0" max="50"/>
+            <subject_increment_event trigger="clicked" subject="subject_int1" step="10"/>
+            <subject_increment_event trigger="clicked" subject="subject_int2" step="-10" min="0" max="50"/>
+            <subject_increment_event trigger="clicked" subject="subject_float1" step="2"/>
         </lv_button>
     </view>
 
-The ``<subject_increment>`` element defines a ``step`` to be added to the subject's current value when the ``trigger`` occurs.
-Optionally, ``min`` and/or ``max`` can be set to limit the subject's value.
+The ``<subject_increment_event>`` element defines a ``step`` to be added to the subject's current value
+when the ``trigger`` occurs. Optionally, ``min`` and/or ``max`` can be set to limit the subject's value.
+
+``subject`` must be an ``int`` or ``float`` subject.
 
 If ``step`` is **negative**, the subject's value will be decremented.
+Only integer ``step`` values are supported now.
 
 **Note:** Only integer subjects are supported by ``<subject_increment>``.
