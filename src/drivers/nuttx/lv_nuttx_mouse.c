@@ -61,14 +61,14 @@ lv_indev_t * lv_nuttx_mouse_create(const char * dev_path)
     int fd;
 
     LV_ASSERT_NULL(dev_path);
-    LV_LOG_USER("mouse %s opening", dev_path);
+    LV_LOG_INFO("mouse %s opening", dev_path);
     fd = open(dev_path, O_RDONLY | O_NONBLOCK);
     if(fd < 0) {
         LV_LOG_ERROR("Error: cannot open mouse device");
         return NULL;
     }
 
-    LV_LOG_USER("mouse %s open success", dev_path);
+    LV_LOG_INFO("mouse %s open success", dev_path);
 
     indev = mouse_init(fd);
 
@@ -145,7 +145,7 @@ static void mouse_delete_cb(lv_event_t * e)
             mouse->fd = -1;
         }
         lv_free(mouse);
-        LV_LOG_USER("done");
+        LV_LOG_INFO("done");
     }
 }
 
