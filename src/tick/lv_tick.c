@@ -66,18 +66,13 @@ uint32_t lv_tick_get(void)
 
 uint32_t lv_tick_elaps(uint32_t prev_tick)
 {
-    uint32_t act_time = lv_tick_get();
+    return lv_tick_diff(lv_tick_get(), prev_tick);
+}
 
-    /*If there is no overflow in sys_time simple subtract*/
-    if(act_time >= prev_tick) {
-        prev_tick = act_time - prev_tick;
-    }
-    else {
-        prev_tick = UINT32_MAX - prev_tick + 1;
-        prev_tick += act_time;
-    }
-
-    return prev_tick;
+uint32_t lv_tick_diff(uint32_t tick, uint32_t prev_tick)
+{
+    /*Unsigned overflow is well-defined and works for a single wrap around*/
+    return tick - prev_tick;
 }
 
 void lv_delay_ms(uint32_t ms)
@@ -101,6 +96,11 @@ void lv_delay_ms(uint32_t ms)
 void lv_tick_set_cb(lv_tick_get_cb_t cb)
 {
     state.tick_get_cb = cb;
+}
+
+lv_tick_get_cb_t lv_tick_get_cb(void)
+{
+    return state.tick_get_cb;
 }
 
 void lv_delay_set_cb(lv_delay_cb_t cb)

@@ -16,6 +16,7 @@
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
@@ -98,15 +99,19 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     res = lv_snapshot_reshape_draw_buf(obj, draw_buf);
     if(res != LV_RESULT_OK) return res;
 
-    /* clear draw buffer*/
-    lv_draw_buf_clear(draw_buf, NULL);
-
     lv_area_t snapshot_area;
     int32_t w = draw_buf->header.w;
     int32_t h = draw_buf->header.h;
     int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     lv_obj_get_coords(obj, &snapshot_area);
     lv_area_increase(&snapshot_area, ext_size, ext_size);
+
+    lv_obj_t * top_obj = lv_refr_get_top_obj(&snapshot_area, obj);
+    if(top_obj == NULL) {
+        /* Clear draw buffer when no top object*/
+        lv_draw_buf_clear(draw_buf, NULL);
+        top_obj = obj;
+    }
 
     lv_layer_t layer;
     lv_layer_init(&layer);
@@ -126,7 +131,44 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     disp_new->layer_head = &layer;
 
     lv_refr_set_disp_refreshing(disp_new);
-    lv_obj_redraw(&layer, obj);
+
+    if(top_obj == obj) {
+        lv_obj_redraw(&layer, top_obj);
+    }
+    else {
+        lv_obj_refr(&layer, top_obj);
+
+        lv_obj_t * parent = lv_obj_get_parent(top_obj);
+        lv_obj_t * border_p = top_obj;
+
+        /*Do until not reach the screen*/
+        while(parent != NULL && border_p != obj) {
+            bool go = false;
+            uint32_t i;
+            uint32_t child_cnt = lv_obj_get_child_count(parent);
+            for(i = 0; i < child_cnt; i++) {
+                lv_obj_t * child = parent->spec_attr->children[i];
+                if(!go) {
+                    if(child == border_p) go = true;
+                }
+                else {
+                    /*Refresh the objects*/
+                    lv_obj_refr(&layer, child);
+                }
+            }
+
+            /*Call the post draw draw function of the parents of the to object*/
+            lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)&layer);
+            lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)&layer);
+            lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)&layer);
+
+            /*The new border will be the last parents,
+            *so the 'younger' brothers of parent will be refreshed*/
+            border_p = parent;
+            /*Go a level deeper*/
+            parent = lv_obj_get_parent(parent);
+        }
+    }
 
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();

@@ -42,4 +42,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_rgb565_swapped(lv_dra
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_BLEND_TO_RGB565_H*/
+#endif /*LV_DRAW_SW_BLEND_TO_RGB565_SWAPPED_H*/

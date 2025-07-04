@@ -94,7 +94,6 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
     lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(scope->extends);
     extended_proc->apply_cb(state, attrs);
 
-
 #if LV_USE_OBJ_NAME
     /*Set a default indexed name*/
     if(state->item) {
@@ -460,6 +459,9 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     lv_subject_t * subject = lv_zalloc(sizeof(lv_subject_t));
 
     if(lv_streq(type, "int")) lv_subject_init_int(subject, lv_xml_atoi(value));
+#if LV_USE_FLOAT
+    else if(lv_streq(type, "float")) lv_subject_init_float(subject, lv_xml_atof(value));
+#endif
     else if(lv_streq(type, "color")) lv_subject_init_color(subject, lv_xml_to_color(value));
     else if(lv_streq(type, "string")) {
         /*Simple solution for now. Will be improved later*/
@@ -657,6 +659,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     }
 
     if(lv_streq(name, "widget")) state->scope.is_widget = 1;
+    else if(lv_streq(name, "screen")) state->scope.is_screen = 1;
 
     /* Process elements based on current context */
     switch(state->section) {

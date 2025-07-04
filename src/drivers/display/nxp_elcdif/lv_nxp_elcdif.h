@@ -3,8 +3,8 @@
  * Driver for NXP's ELCD
  */
 
-#ifndef LV_NXP_ELCDIF_DRIVER_H
-#define LV_NXP_ELCDIF_DRIVER_H
+#ifndef LV_NXP_ELCDIF_H
+#define LV_NXP_ELCDIF_H
 
 #include "../../../lvgl.h"
 #include "../../../display/lv_display.h"
@@ -81,4 +81,4 @@ void lv_nxp_display_elcdif_event_handler(const lv_display_t * disp);
 
 #endif /*LV_USE_NXP_ELCDIF*/
 
-#endif /* LV_NXP_ELCDIF_DRIVER_H */
+#endif /* LV_NXP_ELCDIF_H */

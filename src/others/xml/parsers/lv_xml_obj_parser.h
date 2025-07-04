@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_OBJ_XML_PARSER_H
-#define LV_OBJ_XML_PARSER_H
+#ifndef LV_XML_OBJ_PARSER_H
+#define LV_XML_OBJ_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,4 +70,4 @@ void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const c
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OBJ_XML_PARSE_H*/
+#endif /*LV_XML_OBJ_PARSER_H*/

@@ -42,16 +42,16 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
                                    const lv_font_t * font);
 
 /**
- * Get default theme
- * @return a pointer to default theme, or NULL if this is not initialized
- */
-lv_theme_t * lv_theme_default_get(void);
-
-/**
  * Check if default theme is initialized
  * @return true if default theme is initialized, false otherwise
  */
 bool lv_theme_default_is_inited(void);
+
+/**
+ * Get default theme
+ * @return a pointer to default theme, or NULL if this is not initialized
+ */
+lv_theme_t * lv_theme_default_get(void);
 
 /**
  * Deinitialize the default theme

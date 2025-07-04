@@ -383,6 +383,12 @@ typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
 typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #endif
 
+#if LV_USE_TRANSLATION
+typedef struct _lv_translation_tag_dsc_t lv_translation_tag_dsc_t;
+
+typedef struct _lv_translation_pack_t lv_translation_pack_t;
+#endif
+
 #endif /*__ASSEMBLY__*/
 
 /**********************
@@ -412,6 +418,28 @@ typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #else
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
 #endif
+
+#ifndef LV_NORETURN
+#if defined(PYCPARSER)
+#define LV_NORETURN
+#elif defined(__GNUC__)
+#define LV_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define LV_NORETURN __declspec(noreturn)
+#else
+#define LV_NORETURN
+#endif
+#endif /* LV_NORETURN not defined */
+
+#ifndef LV_UNREACHABLE
+#if defined(__GNUC__)
+#define LV_UNREACHABLE() __builtin_unreachable()
+#elif defined(_MSC_VER)
+#define LV_UNREACHABLE() __assume(0)
+#else
+#define LV_UNREACHABLE() while(1)
+#endif
+#endif /* LV_UNREACHABLE not defined */
 
 #ifdef __cplusplus
 } /*extern "C"*/

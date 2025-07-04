@@ -75,7 +75,7 @@ void lv_draw_dma2d_init(void)
 #endif
 
     /* enable the DMA2D clock */
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
@@ -346,23 +346,11 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             return LV_DRAW_UNIT_IDLE;
         }
 
-        void * dest = lv_draw_layer_go_to_xy(layer,
-                                             clipped_coords.x1 - layer->buf_area.x1,
-                                             clipped_coords.y1 - layer->buf_area.y1);
-
         if(dsc->opa >= LV_OPA_MAX) {
-            lv_draw_dma2d_opaque_image(
-                t,
-                dest,
-                &clipped_coords,
-                lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
+            lv_draw_dma2d_opaque_image(t, dsc, &t->area);
         }
         else {
-            lv_draw_dma2d_image(
-                t,
-                dest,
-                &clipped_coords,
-                lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
+            lv_draw_dma2d_image(t, dsc, &t->area);
         }
     }
 

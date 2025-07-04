@@ -30,7 +30,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_assert_handler(void);
+LV_NORETURN void lv_assert_handler(void);
 
 /**********************
  *      MACROS

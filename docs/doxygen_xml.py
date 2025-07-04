@@ -1605,9 +1605,36 @@ class DoxygenXml(object):
             'LV_ATTRIBUTE_LARGE_RAM_ARRAY=',
             'LV_ATTRIBUTE_FAST_MEM=',
             'LV_ATTRIBUTE_EXTERN_DATA=',
+            'LV_FORMAT_ATTRIBUTE(fmt,va)=',
         ]
 
         cfg.set('PREDEFINED', predefined_symbols)
+
+        # Exclude OSAL `.h` files except for `lv_os_none.h`.  Reason:  they define
+        # lv_mutex_t, lv_thread_t and lv_thread_sync_t in multiple places.  Doxygen
+        # must only see one.
+        osal_dir = 'osal'
+
+        osal_exclude_list = [
+            'lv_cmsis_rtos2.h',
+            'lv_freertos.h',
+            'lv_mqx.h',
+            'lv_pthread.h',
+            'lv_rtthread.h',
+            'lv_sdl2.h',
+            'lv_windows.h',
+        ]
+
+        exclude_paths = []
+
+        for osal_h in osal_exclude_list:
+            full_path = os.path.join(lvgl_src_dir, osal_dir, osal_h)
+            exclude_paths.append(full_path)
+
+        full_path = os.path.join(lvgl_src_dir, 'core', 'lv_obj_property.h')
+        exclude_paths.append(full_path)
+
+        cfg.set('EXCLUDE', exclude_paths)
 
         # Include TAGFILES if requested.
         if doxy_tagfile:

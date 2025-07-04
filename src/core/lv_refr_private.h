@@ -58,6 +58,21 @@ lv_display_t * lv_refr_get_disp_refreshing(void);
  */
 void lv_refr_set_disp_refreshing(lv_display_t * disp);
 
+/**
+ * Search the most top object which fully covers an area
+ * @param area_p pointer to an area
+ * @param obj the first object to start the searching (typically a screen)
+ * @return
+ */
+lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
+
+/**
+ * Render an object to a layer
+ * @param layer target drawing layer
+ * @param obj   object to render
+ */
+void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

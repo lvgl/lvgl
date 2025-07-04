@@ -33,7 +33,7 @@ def get_args():
 
     parser.add_argument("--debug", action="store_true", required=False, help="Show unhandled expressions")
 
-    parser.add_argument("--parentscope", action="store_true", required=False, help="Additionaly set the variables in the parent scope")
+    parser.add_argument("--parentscope", action="store_true", required=False, help="Additionally set the variables in the parent scope")
 
     args = parser.parse_args()
 

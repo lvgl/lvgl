@@ -615,7 +615,9 @@ class LVGLImage:
 
         if self.cf.is_indexed:
 
-            def multiply(r, g, b, a):
+            def multiply(b, g, r, a):
+                # The precision is reduced, the correct way would be to divide by 255,
+                # but this is consistent with the premultiply function in the code.
                 r, g, b = (r * a) >> 8, (g * a) >> 8, (b * a) >> 8
                 return uint8_t(b) + uint8_t(g) + uint8_t(r) + uint8_t(a)
 
@@ -1087,11 +1089,11 @@ class LVGLImage:
                     self.rgb565_dither and
                     cf in (ColorFormat.RGB565, ColorFormat.RGB565_SWAPPED, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
                 ):
-                    treshold_id = ((y & 7) << 3) + (x & 7)
+                    threshold_id = ((y & 7) << 3) + (x & 7)
 
-                    r = min(r + red_thresh[treshold_id], 0xFF) & 0xF8
-                    g = min(g + green_thresh[treshold_id], 0xFF) & 0xFC
-                    b = min(b + blue_thresh[treshold_id], 0xFF) & 0xF8
+                    r = min(r + red_thresh[threshold_id], 0xFF) & 0xF8
+                    g = min(g + green_thresh[threshold_id], 0xFF) & 0xFC
+                    b = min(b + blue_thresh[threshold_id], 0xFF) & 0xF8
 
                 rawdata += pack(r, g, b, a)
 

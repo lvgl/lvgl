@@ -1,5 +1,5 @@
 /**
- * @file lv_image_decoder.c
+ * @file lv_bin_decoder.c
  *
  */
 

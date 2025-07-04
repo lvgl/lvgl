@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_dma2d_image.c
+ * @file lv_draw_dma2d_img.c
  *
  */
 
@@ -9,6 +9,10 @@
 
 #include "lv_draw_dma2d_private.h"
 #if LV_USE_DRAW_DMA2D
+
+#include "../lv_draw_image_private.h"
+#include "../lv_image_decoder_private.h"
+#include "../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -22,6 +26,14 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void lv_draw_dma2d_opaque_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                                            const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                                            const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+
+static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                                     const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -34,25 +46,60 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t * clipped_coords,
-                                int32_t dest_stride)
+void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                                const lv_area_t * coords)
 {
-    int32_t w = lv_area_get_width(clipped_coords);
-    int32_t h = lv_area_get_height(clipped_coords);
+    if(!draw_dsc->tile) {
+        lv_draw_image_normal_helper(t, draw_dsc, coords, lv_draw_dma2d_opaque_image_core);
+    }
+    else {
+        lv_draw_image_tiled_helper(t, draw_dsc, coords, lv_draw_dma2d_opaque_image_core);
+    }
+}
 
-    lv_draw_image_dsc_t * dsc = t->draw_dsc;
-    lv_color_format_t output_cf = dsc->base.layer->color_format;
-    lv_color_format_t image_cf = dsc->header.cf;
+void lv_draw_dma2d_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                         const lv_area_t * coords)
+{
+    if(!draw_dsc->tile) {
+        lv_draw_image_normal_helper(t, draw_dsc, coords, lv_draw_dma2d_image_core);
+    }
+    else {
+        lv_draw_image_tiled_helper(t, draw_dsc, coords, lv_draw_dma2d_image_core);
+    }
+}
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_draw_dma2d_opaque_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                                            const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                                            const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
+{
+    LV_UNUSED(sup);
+    LV_UNUSED(img_coords);
+
+    lv_layer_t * layer = t->target_layer;
+
+    void * dest_first_pixel = lv_draw_layer_go_to_xy(layer,
+                                                     clipped_img_area->x1 - layer->buf_area.x1,
+                                                     clipped_img_area->y1 - layer->buf_area.y1);
+    int32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+
+    int32_t w = lv_area_get_width(clipped_img_area);
+    int32_t h = lv_area_get_height(clipped_img_area);
+
+    lv_color_format_t output_cf = layer->color_format;
+    uint32_t output_cf_size = lv_color_format_get_size(output_cf);
     lv_draw_dma2d_output_cf_t output_cf_dma2d = lv_draw_dma2d_cf_to_dma2d_output_cf(output_cf);
-    uint32_t output_cf_size = LV_COLOR_FORMAT_GET_SIZE(output_cf);
 
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    const uint8_t * src_buf = decoded->data;
+    uint32_t image_stride = decoded->header.stride;
+    lv_color_format_t image_cf = decoded->header.cf;
     lv_draw_dma2d_fgbg_cf_t image_cf_dma2d = (lv_draw_dma2d_fgbg_cf_t) lv_draw_dma2d_cf_to_dma2d_output_cf(image_cf);
     uint32_t image_cf_size = LV_COLOR_FORMAT_GET_SIZE(image_cf);
-
-    const lv_image_dsc_t * img_dsc = dsc->src;
-    uint32_t image_stride = img_dsc->header.stride;
-    if(image_stride == 0) image_stride = image_cf_size * img_dsc->header.w;
+    if(image_stride == 0) image_stride = image_cf_size * decoded->header.w;
 
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t dest_area = {
@@ -69,9 +116,9 @@ void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, void * dest_first_pixel, lv_
     }
 #endif
 
-    const void * image_first_byte = img_dsc->data
-                                    + (image_stride * (clipped_coords->y1 - dsc->image_area.y1))
-                                    + (image_cf_size * (clipped_coords->x1 - dsc->image_area.x1));
+    const void * image_first_byte = src_buf
+                                    + (image_stride * (clipped_img_area->y1 - draw_dsc->image_area.y1))
+                                    + (image_cf_size * (clipped_img_area->x1 - draw_dsc->image_area.x1));
 
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t src_area = {
@@ -121,26 +168,35 @@ void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, void * dest_first_pixel, lv_
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 
-void lv_draw_dma2d_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t * clipped_coords,
-                         int32_t dest_stride)
+static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
+                                     const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                                     const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {
-    int32_t w = lv_area_get_width(clipped_coords);
-    int32_t h = lv_area_get_height(clipped_coords);
+    LV_UNUSED(sup);
+    LV_UNUSED(img_coords);
 
-    lv_draw_image_dsc_t * dsc = t->draw_dsc;
-    lv_color_format_t output_cf = dsc->base.layer->color_format;
-    lv_color_format_t image_cf = dsc->header.cf;
-    lv_opa_t opa = dsc->opa;
+    lv_layer_t * layer = t->target_layer;
 
+    void * dest_first_pixel = lv_draw_layer_go_to_xy(layer,
+                                                     clipped_img_area->x1 - layer->buf_area.x1,
+                                                     clipped_img_area->y1 - layer->buf_area.y1);
+    int32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+
+    int32_t w = lv_area_get_width(clipped_img_area);
+    int32_t h = lv_area_get_height(clipped_img_area);
+
+    lv_color_format_t output_cf = layer->color_format;
+    uint32_t output_cf_size = lv_color_format_get_size(output_cf);
     lv_draw_dma2d_output_cf_t output_cf_dma2d = lv_draw_dma2d_cf_to_dma2d_output_cf(output_cf);
-    uint32_t output_cf_size = LV_COLOR_FORMAT_GET_SIZE(output_cf);
 
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    const uint8_t * src_buf = decoded->data;
+    uint32_t image_stride = decoded->header.stride;
+    lv_color_format_t image_cf = decoded->header.cf;
+    lv_opa_t opa = draw_dsc->opa;
     lv_draw_dma2d_fgbg_cf_t image_cf_dma2d = (lv_draw_dma2d_fgbg_cf_t) lv_draw_dma2d_cf_to_dma2d_output_cf(image_cf);
     uint32_t image_cf_size = LV_COLOR_FORMAT_GET_SIZE(image_cf);
-
-    const lv_image_dsc_t * img_dsc = dsc->src;
-    uint32_t image_stride = img_dsc->header.stride;
-    if(image_stride == 0) image_stride = image_cf_size * img_dsc->header.w;
+    if(image_stride == 0) image_stride = image_cf_size * decoded->header.w;
 
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t dest_area = {
@@ -155,9 +211,9 @@ void lv_draw_dma2d_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t 
     lv_draw_dma2d_clean_cache(&dest_area);
 #endif
 
-    const void * image_first_byte = img_dsc->data
-                                    + (image_stride * (clipped_coords->y1 - dsc->image_area.y1))
-                                    + (image_cf_size * (clipped_coords->x1 - dsc->image_area.x1));
+    const void * image_first_byte = src_buf
+                                    + (image_stride * (clipped_img_area->y1 - draw_dsc->image_area.y1))
+                                    + (image_cf_size * (clipped_img_area->x1 - draw_dsc->image_area.x1));
 
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t src_area = {
@@ -202,9 +258,5 @@ void lv_draw_dma2d_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t 
 
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_DRAW_DMA2D*/

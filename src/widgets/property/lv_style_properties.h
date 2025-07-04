@@ -11,7 +11,7 @@
 
 
 /* *INDENT-OFF* */
-enum {
+enum _lv_property_style_id_t {
     LV_PROPERTY_ID(STYLE, ALIGN,                    LV_PROPERTY_TYPE_INT,        LV_STYLE_ALIGN),
     LV_PROPERTY_ID(STYLE, ANIM,                     LV_PROPERTY_TYPE_INT,        LV_STYLE_ANIM),
     LV_PROPERTY_ID(STYLE, ANIM_DURATION,            LV_PROPERTY_TYPE_INT,        LV_STYLE_ANIM_DURATION),

@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_blend.c
+ * @file lv_draw_vglite_img.c
  *
  */
 

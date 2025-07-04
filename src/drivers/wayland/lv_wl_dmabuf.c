@@ -172,6 +172,11 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
         buf->busy             = 1;
         window->flush_pending = true;
     }
+    else {
+        /* Not the last frame yet, so tell lvgl to keep going
+         * For the last frame, we wait for the compositor instead */
+        lv_display_flush_ready(disp);
+    }
 
     return;
 }

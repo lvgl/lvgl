@@ -46,7 +46,7 @@ def read_widget_properties(directory):
 
     def match_properties(file_path):
         pattern = r'^\s*LV_PROPERTY_ID2?\((\w+),\s*(\w+),\s*(\w+)(,\s*(\w+))?,\s*(\d+)\)'
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             for line in file.readlines():
                 match = re.match(pattern, line)
                 if match:
@@ -58,7 +58,7 @@ def read_widget_properties(directory):
 
     def match_styles(file_path):
         pattern = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             for line in file.readlines():
                 match = re.match(pattern, line)
                 if match:
@@ -173,7 +173,7 @@ def write_style_header(output, properties_by_widget):
 
 
 /* *INDENT-OFF* */
-enum {{
+enum _lv_property_style_id_t {{
 ''')
 
         for property in properties:
@@ -190,6 +190,7 @@ enum {{
 
 
 def main(directory, output):
+    """Generate property names"""
     property = read_widget_properties(directory)
     write_widget_properties(output, property)
     write_style_header(output, property)

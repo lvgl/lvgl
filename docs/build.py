@@ -675,7 +675,7 @@ def run(args):
         # As of 22-Feb-2025, sadly the -D version=xxx is not working as documented.
         # So the version strings applicable to Latex/PDF/man pages/texinfo
         # formats are assembled by `conf.py`.
-        cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu}'
+        cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu} --fail-on-warning --keep-going'
         cmd(cmd_line)
 
         # Generate PDF.
@@ -756,7 +756,7 @@ def run(args):
             # with a -D options.  If it should need to be used in the future,
             # the value after the '=' MUST NOT have quotation marks around it
             # or it won't work.  Correct usage:  f'-D version={ver}' .
-            cmd_line = f'sphinx-build -M html "{src}" "{dst}" -j {cpu} {env_opt}'
+            cmd_line = f'sphinx-build -M html "{src}" "{dst}" -j {cpu} {env_opt} --fail-on-warning --keep-going'
             cmd(cmd_line)
 
         t2 = datetime.now()
@@ -767,7 +767,6 @@ def run(args):
     # ---------------------------------------------------------------------
     t_end = datetime.now()
     announce(__file__, 'Total run time:  ' + str(t_end - t0))
-    announce(__file__, '\n\nNote: warnings about `details/index.rst` and `intro/index.rst` not being in any toctree are expected and okay.\n')
     announce(__file__, 'Done.')
 
 

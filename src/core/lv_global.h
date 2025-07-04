@@ -228,6 +228,11 @@ typedef struct _lv_global_t {
     lv_test_state_t test_state;
 #endif
 
+#if LV_USE_TRANSLATION
+    lv_ll_t translation_packs_ll;
+    const char * translation_selected_lang;
+#endif
+
 #if LV_USE_NUTTX
     struct _lv_nuttx_ctx_t * nuttx_ctx;
 #endif
@@ -236,6 +241,10 @@ typedef struct _lv_global_t {
     lv_mutex_t lv_general_mutex;
 #if defined(__linux__)
     lv_proc_stat_t linux_last_proc_stat;
+#if defined LV_SYSMON_PROC_IDLE_AVAILABLE
+    uint64_t linux_last_self_proc_time_ticks;
+    lv_proc_stat_t linux_last_system_total_ticks_stat;
+#endif
 #endif
 #endif
 

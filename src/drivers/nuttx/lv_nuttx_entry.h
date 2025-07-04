@@ -35,12 +35,14 @@ typedef struct {
     const char * fb_path;
     const char * input_path;
     const char * utouch_path;
+    const char * mouse_path;
 } lv_nuttx_dsc_t;
 
 typedef struct {
     lv_display_t * disp;
     lv_indev_t * indev;
     lv_indev_t * utouch_indev;
+    lv_indev_t * mouse_indev;
 } lv_nuttx_result_t;
 
 typedef struct _lv_nuttx_ctx_t {

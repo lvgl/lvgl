@@ -10,13 +10,14 @@
 #include "lv_xml.h"
 #if LV_USE_XML
 
+#include "lv_xml.h"
 #include "lv_xml_base_types.h"
 #include "lv_xml_parser.h"
 #include "lv_xml_component.h"
 #include "lv_xml_component_private.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_style.h"
-#include "lv_xml.h"
+#include "lv_xml_translation.h"
 #include "lv_xml_utils.h"
 #include "lv_xml_private.h"
 #include "parsers/lv_xml_obj_parser.h"
@@ -115,9 +116,9 @@ void lv_xml_init(void)
                            lv_obj_xml_remove_style_all_apply);
 
     lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
-    lv_xml_widget_register("lv_obj-subject_set_int", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_set_string", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_increment", lv_obj_xml_subject_increment_create,
+    lv_xml_widget_register("lv_obj-subject_set_int_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_set_string_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_widget_register("lv_obj-subject_increment_event", lv_obj_xml_subject_increment_create,
                            lv_obj_xml_subject_increment_apply);
     lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
                            lv_obj_xml_screen_load_event_apply);
@@ -176,10 +177,14 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
 
 #if LV_USE_OBJ_NAME
     /*Set a default indexed name*/
-    if(state.item && lv_obj_get_name(state.item) == NULL) {
-        char name_buf[128];
-        lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
-        lv_obj_set_name(state.item, name_buf);
+    if(state.item) {
+        if(state.scope.is_screen) {
+            lv_obj_set_name(state.item, scope->name);
+        }
+        else if(lv_obj_get_name(state.item) == NULL) {
+            char name_buf[128];
+            lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
+        }
     }
 #endif
 
@@ -205,6 +210,10 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
          * So leave state.scope = NULL which means the global context.*/
 
         state.item = p->create_cb(&state, attrs);
+        if(state.item == NULL) {
+            LV_LOG_WARN("Couldn't create widget.");
+            return NULL;
+        }
         if(attrs) {
             p->apply_cb(&state, attrs);
         }
@@ -214,7 +223,11 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
     if(scope) {
         item = lv_xml_create_in_scope(parent, NULL, scope, attrs);
-
+        if(item == NULL) {
+            LV_LOG_WARN("Couldn't create component.");
+            return NULL;
+        }
+        const char * value_of_name = NULL;
         if(attrs) {
             lv_xml_parser_state_t state;
             lv_xml_parser_state_init(&state);
@@ -227,7 +240,20 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
 
             p = lv_xml_widget_get_extended_widget_processor(scope->extends);
             p->apply_cb(&state, attrs);
+#if LV_USE_OBJ_NAME
+            value_of_name = lv_xml_get_value_of(attrs, "name");
+            if(value_of_name) lv_obj_set_name(item, value_of_name);
+#endif
         }
+
+        /*Set a default indexed name for non screens*/
+#if LV_USE_OBJ_NAME
+        if(lv_obj_get_parent(item) && value_of_name == NULL) {
+            char name_buf[128];
+            lv_snprintf(name_buf, sizeof(name_buf), "%s_#", scope->name);
+            lv_obj_set_name(item, name_buf);
+        }
+#endif
 
         return item;
     }

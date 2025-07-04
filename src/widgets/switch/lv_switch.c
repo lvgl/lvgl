@@ -1,5 +1,5 @@
 /**
- * @file lv_sw.c
+ * @file lv_switch.c
  *
  */
 

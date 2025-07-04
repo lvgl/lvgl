@@ -392,7 +392,7 @@ menu "LVGL configuration"
 			bool "Enable VGLite asserts"
 			depends on LV_USE_DRAW_VGLITE
 			default n
-			
+
 		config LV_USE_VGLITE_CHECK_ERROR
 			bool "Enable VGLite error checks"
 			depends on LV_USE_DRAW_VGLITE
@@ -527,7 +527,7 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
-		
+
 		config LV_USE_PPA
 		bool "Use Espressif's PPA accelerator for ESP SoCs"
 		default n
@@ -1728,6 +1728,8 @@ menu "LVGL configuration"
 		config LV_USE_TEST_SCREENSHOT_COMPARE
 			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
 			depends on LV_USE_TEST
+		config LV_USE_TRANSLATION
+			bool "Enable text translation support"
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
 		config LV_USE_COLOR_FILTER
@@ -1738,7 +1740,7 @@ menu "LVGL configuration"
 			default 9 # LVGL_VERSION_MAJOR
 		config LVGL_VERSION_MINOR
 			int
-			default 3 # LVGL_VERSION_MINOR
+			default 4 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
 			default 0 # LVGL_VERSION_PATCH
@@ -2030,6 +2032,19 @@ menu "LVGL configuration"
 			default 0
 			help
 				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
+
+		config LV_USE_NUTTX_MOUSE
+			bool "Use NuttX mouse driver"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_USE_NUTTX_MOUSE_MOVE_STEP
+			int "Mouse movement step (pixels)"
+			depends on LV_USE_NUTTX_MOUSE
+			range 1 10
+			default 1
+			help
+				Set the step size of the mouse movement in pixels.
 
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
