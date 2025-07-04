@@ -891,12 +891,22 @@ static void subject_set_string_cb(lv_event_t * e)
 static void subject_increment_cb(lv_event_t * e)
 {
     subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
-    int32_t value = lv_subject_get_int(user_data->subject);
 
-    value += user_data->step;
-    value = LV_CLAMP(user_data->min, value, user_data->max);
 
-    lv_subject_set_int(user_data->subject, value);
+    if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
+        int32_t value = lv_subject_get_int(user_data->subject);
+        value += user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_int(user_data->subject, value);
+    }
+#if LV_USE_FLOAT
+    else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
+        float value = lv_subject_get_float(user_data->subject);
+        value += (float)user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_float(user_data->subject, (float)value);
+    }
+#endif
 }
 
 

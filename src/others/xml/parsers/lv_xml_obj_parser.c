@@ -383,7 +383,7 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
         return;
     }
 
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("`%s` subject should have integer type in <lv_obj-subject_increment>", subject_str);
         return;
     }
