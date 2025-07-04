@@ -279,8 +279,23 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
 {
 
     /*If the tag_name is */
-    bool int_subject = lv_streq(state->tag_name, "lv_obj-subject_set_int") ||
-                       lv_streq(state->tag_name, "subject_set_int");
+    lv_subject_type_t subject_type = LV_SUBJECT_TYPE_NONE;
+    if(lv_streq(state->tag_name, "lv_obj-subject_set_int_event") ||
+       lv_streq(state->tag_name, "subject_set_int_event")) {
+        subject_type = LV_SUBJECT_TYPE_INT;
+    }
+    else if(lv_streq(state->tag_name, "lv_obj-subject_set_float_event") ||
+            lv_streq(state->tag_name, "subject_set_float_event")) {
+        subject_type = LV_SUBJECT_TYPE_FLOAT;
+    }
+    else if(lv_streq(state->tag_name, "lv_obj-subject_set_string_event") ||
+            lv_streq(state->tag_name, "subject_set_string_event")) {
+        subject_type = LV_SUBJECT_TYPE_STRING;
+    }
+    else {
+        LV_LOG_WARN("`%s` is not supported in <lv_obj-subject_set_event>", state->tag_name);
+        return;
+    }
 
     const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
     const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
@@ -309,18 +324,19 @@ void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** a
         return;
     }
 
-    bool type_ok = (subject->type == LV_SUBJECT_TYPE_INT && int_subject) ||
-                   (subject->type == LV_SUBJECT_TYPE_STRING && !int_subject);
-    if(!type_ok) {
+    if(subject->type != subject_type) {
         LV_LOG_WARN("`%s` subject has incorrect type in <lv_obj-subject_set>", subject_str);
         return;
     }
 
     void * item = lv_xml_state_get_item(state);
-    if(int_subject) {
+    if(subject_type == LV_SUBJECT_TYPE_INT) {
         lv_obj_add_subject_set_int_event(item, subject, trigger, lv_xml_atoi(value_str));
     }
-    else {
+    else if(subject_type == LV_SUBJECT_TYPE_FLOAT) {
+        lv_obj_add_subject_set_float_event(item, subject, trigger, lv_xml_atof(value_str));
+    }
+    else if(subject_type == LV_SUBJECT_TYPE_STRING) {
         lv_obj_add_subject_set_string_event(item, subject, trigger, value_str);
     }
 }

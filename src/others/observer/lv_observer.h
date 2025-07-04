@@ -363,6 +363,18 @@ void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, 
  */
 void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value);
 
+
+#if LV_USE_FLOAT
+/**
+ * Set the value of a float subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value);
+#endif
+
 /**
  * Set the value of a string subject.
  * @param obj       pointer to a widget
