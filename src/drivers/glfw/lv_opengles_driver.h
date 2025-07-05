@@ -68,9 +68,9 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
  * @param h_flip             should the texture output vertically flipped?
  * @param v_flip             and/or should the texture output horizontally flipped?
  */
-void lv_opengles_render_texture_dualflip(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
-
+void lv_opengles_render_texture_dualflip(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                         int32_t disp_w,
+                                         int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 /**
  * Render a fill
  * @param color          the color of the fill
