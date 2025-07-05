@@ -10,7 +10,7 @@
 #if LV_USE_OPENGLES
 #include <stdlib.h>
 #include "../../core/lv_refr.h"
-#include "../../stdlib/lv_snprintf.h"
+#include "../../stdlib/lv_sprintf.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
