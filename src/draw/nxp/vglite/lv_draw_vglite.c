@@ -315,7 +315,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
         else {
             /* Fake unsupported tasks as ready. */
-            t->state = LV_DRAW_TASK_STATE_READY;
+            t->state = LV_DRAW_TASK_STATE_FINISHED;
             /* Request a new dispatching as it can get a new task. */
             lv_draw_dispatch_request();
 
@@ -339,7 +339,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     _vglite_execute_drawing(draw_vglite_unit);
 
-    draw_vglite_unit->task_act->t->state = LV_DRAW_TASK_STATE_READY;
+    draw_vglite_unit->task_act->t->state = LV_DRAW_TASK_STATE_FINISHED;
     _vglite_cleanup_task(draw_vglite_unit->task_act);
     draw_vglite_unit->task_act = NULL;
 
@@ -526,7 +526,7 @@ static inline void _vglite_queue_task(vglite_draw_task_t * task)
 static inline void _vglite_signal_task_ready(vglite_draw_task_t * task)
 {
     /* Signal the ready state to dispatcher. */
-    task->t->state = LV_DRAW_TASK_STATE_READY;
+    task->t->state = LV_DRAW_TASK_STATE_FINISHED;
     _head = (_head + 1) % VGLITE_TASK_BUF_SIZE;
 
     _vglite_cleanup_task(task);
@@ -611,7 +611,7 @@ static void _vglite_render_thread_cb(void * ptr)
         }
 #else
         /* Signal the ready state to dispatcher. */
-        u->task_act->t->state = LV_DRAW_TASK_STATE_READY;
+        u->task_act->t->state = LV_DRAW_TASK_STATE_FINISHED;
         _vglite_cleanup_task(u->task_act);
 #endif
 
