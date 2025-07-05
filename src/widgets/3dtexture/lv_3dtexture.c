@@ -76,12 +76,12 @@ void lv_3dtexture_set_src_flip(lv_obj_t * obj, bool h_flip, bool v_flip)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_3dtexture_t * tex = (lv_3dtexture_t *)obj;
-    
+
     if(tex->h_flip == h_flip && tex->v_flip == v_flip) return;
-    
+
     tex->h_flip = h_flip;
     tex->v_flip = v_flip;
-    
+
     lv_obj_invalidate(obj);
 }
 
