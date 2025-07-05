@@ -423,7 +423,7 @@ static void blend_texture_layer(lv_draw_task_t * t)
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
     }
-    lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
+    lv_opengles_render_texture_dualflip(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -516,7 +516,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_area_move(&t->clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
     lv_area_t render_area = t->_real_area;
     lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
-    lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
+    lv_opengles_render_texture_dualflip(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
