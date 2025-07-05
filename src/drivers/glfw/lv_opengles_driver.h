@@ -45,16 +45,30 @@ void lv_opengles_init(void);
 void lv_opengles_deinit(void);
 
 /**
- * Render a texture
- * @param texture        OpenGL texture ID
- * @param texture_area   the area in the window to render the texture in
- * @param opa            opacity to blend the texture with existing contents
- * @param disp_w         width of the window/framebuffer being rendered to
- * @param disp_h         height of the window/framebuffer being rendered to
- * @param h_flip         should the texture output vertically flipped?
- * @param v_flip         and/or should the texture output horizontally flipped?
+ * Render a texture with option to flip vertically
+ * @param texture            OpenGL texture ID
+ * @param texture_area       the area in the window to render the texture in
+ * @param opa                opacity to blend the texture with existing contents
+ * @param disp_w             width of the window/framebuffer being rendered to
+ * @param disp_h             height of the window/framebuffer being rendered to
+ * @param texture_clip_area  source area to be rendered into the region defined by texture_area
+ * @param v_flip             and/or should the texture output horizontally flipped?
  */
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool v_flip);
+
+/**
+ * Render a texture with options to flip horizontally and/or vertically
+ * @param texture            OpenGL texture ID
+ * @param texture_area       the area in the window to render the texture in
+ * @param opa                opacity to blend the texture with existing contents
+ * @param disp_w             width of the window/framebuffer being rendered to
+ * @param disp_h             height of the window/framebuffer being rendered to
+ * @param texture_clip_area  source area to be rendered into the region defined by texture_area
+ * @param h_flip             should the texture output vertically flipped?
+ * @param v_flip             and/or should the texture output horizontally flipped?
+ */
+void lv_opengles_render_texture_dualflip(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 
 /**
