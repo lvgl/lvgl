@@ -179,6 +179,13 @@ void lv_opengles_deinit(void)
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool v_flip)
+{
+    lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, false, v_flip,
+                                lv_color_black());
+}
+
+void lv_opengles_render_texture_dualflip(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
