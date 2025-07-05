@@ -9,8 +9,8 @@
 #include "lv_glfw_window_private.h"
 #if LV_USE_OPENGLES
 #include <stdlib.h>
-#include <stdio.h>
 #include "../../core/lv_refr.h"
+#include "../../stdlib/lv_snprintf.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
@@ -106,7 +106,8 @@ lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bo
     title = (window_title != NULL) ? (char *)window_title : (char *)default_title;
     if(desktop_file_name == NULL) {
         char buffer[256];
-        sprintf(buffer, "%s %s", title, default_suffix);
+        lv_snprintf(buffer, 255, "%s %s", title, default_suffix);
+        buffer[255]='\0';
         glfwSetWindowTitle(window->window, buffer);
     }
     else {
@@ -350,10 +351,10 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
 #if LV_USE_DRAW_OPENGLES
             lv_opengles_render_texture_dualflip(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip);
+                                                &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip);
 #else
             lv_opengles_render_texture_dualflip(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, window->h_flip, window->v_flip);
+                                                &clip_area, window->h_flip, window->v_flip);
 #endif
         }
 
