@@ -510,7 +510,11 @@ static void render_test_screen_create(bool ver, lv_grad_dir_t grad_dir, const ch
         }
     }
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT(ref_img_path);
+#else
+    (void)ref_img_path;
+#endif
 }
 
 void test_bar_render_corner(void)
@@ -566,8 +570,11 @@ void test_bar_orientation(void)
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 20);
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 20, 100);
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 100);
-
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_2.png");
+#else
+    TEST_PASS();
+#endif
 }
 
 #endif

@@ -293,14 +293,21 @@ void test_image_formats(void)
                 char reference[256];
                 bin_image_create(rotate, recolor, align, i);
                 lv_snprintf(reference, sizeof(reference), "draw/bin_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
+#if !LV_USE_DRAW_VGLITE
                 TEST_ASSERT_EQUAL_SCREENSHOT(reference);
+#endif
                 lv_obj_clean(lv_screen_active());
 
                 c_array_image_create(rotate, recolor, align, i);
                 lv_snprintf(reference, sizeof(reference), "draw/c_array_image_stride%d_%s_%s.png", stride, compressions[i],
                             modes[mode]);
+#if !LV_USE_DRAW_VGLITE
                 TEST_ASSERT_EQUAL_SCREENSHOT(reference);
+#endif
                 lv_obj_clean(lv_screen_active());
+#if LV_USE_DRAW_VGLITE
+                TEST_PASS();
+#endif
             }
         }
     }

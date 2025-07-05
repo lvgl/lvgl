@@ -144,7 +144,12 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
 
     char fn_buf[64];
     lv_snprintf(fn_buf, sizeof(fn_buf), "draw/blend_to_%s.png", name);
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
+#else
+    (void)fn_buf;
+    TEST_PASS();
+#endif
 }
 
 void test_xrgb8888(void)

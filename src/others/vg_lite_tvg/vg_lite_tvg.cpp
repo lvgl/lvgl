@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+#if LV_USE_DRAW_VGLITE && LV_USE_VG_LITE_THORVG
 
 #include "vg_lite.h"
 #include "../../lvgl.h"
@@ -956,9 +956,9 @@ extern "C" {
 
     vg_lite_error_t vg_lite_get_info(vg_lite_info_t * info)
     {
-        info->api_version = VGLITE_API_VERSION_3_0;
-        info->header_version = VGLITE_HEADER_VERSION;
-        info->release_version = VGLITE_RELEASE_VERSION;
+        info->api_version = VG_LITE_API_VERSION_3_0;
+        info->header_version = VG_LITE_HEADER_VERSION;
+        info->release_version = VG_LITE_RELEASE_VERSION;
         info->reserved = 0;
         return VG_LITE_SUCCESS;
     }
@@ -2603,9 +2603,12 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
     if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
+        LV_LOG_INFO("image_format=VG_LITE_NORMAL_IMAGE_MODE");
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
+        LV_LOG_INFO("image_format=VG_LITE_MULTIPLY_IMAGE_MODE");
+
         vg_lite_uint32_t width = source->width;
         vg_lite_uint32_t height = source->height;
         vg_lite_uint32_t px_size = width * height;

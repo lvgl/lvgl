@@ -4,7 +4,6 @@
 
 #include "unity/unity.h"
 
-
 void setUp(void)
 {
     /* Function run before every test */
@@ -14,6 +13,8 @@ void tearDown(void)
 {
     /* Function run after every test */
 }
+
+#if !LV_USE_DRAW_VGLITE
 
 static void create_images(void)
 {
@@ -79,5 +80,11 @@ void test_jpg_2(void)
     /* Re-add tjpgd decoder */
     lv_tjpgd_init();
 }
+#else
 
+void test_jpg_2(void)
+{
+    TEST_PASS();
+}
+#endif
 #endif

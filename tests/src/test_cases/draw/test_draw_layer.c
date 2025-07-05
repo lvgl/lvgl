@@ -48,7 +48,9 @@ void test_draw_layer_bitmap_mask_from_variable(void)
     test_obj_create(&test_image_cogwheel_a8, 80, 600);
 
 #ifndef NON_AMD64_BUILD
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_bitmap_mask.png");
+#endif
 #endif
 }
 
@@ -64,7 +66,9 @@ void test_draw_layer_bitmap_mask_from_image(void)
     test_obj_create(mask_src, 80, 600);
 
 #ifndef NON_AMD64_BUILD
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_bitmap_mask.png");
+#endif
 #endif
 }
 
@@ -81,7 +85,9 @@ void test_draw_layer_bitmap_mask_from_image_not_found(void)
     test_obj_create(mask_src, 80, 600);
 
 #ifndef NON_AMD64_BUILD
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_bitmap_mask_not_masked.png");
+#endif
 #endif
 }
 

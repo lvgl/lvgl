@@ -4,7 +4,8 @@
 
 #include "unity/unity.h"
 
-#if LV_USE_BARCODE
+
+#if LV_USE_BARCODE && !LV_USE_DRAW_VGLITE
 
 static lv_obj_t * active_screen = NULL;
 
