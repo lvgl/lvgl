@@ -55,7 +55,7 @@ void lv_3dtexture_set_src(lv_obj_t * obj, lv_3dtexture_id_t id);
  * @param h_flip   true to flip horizontally.
  * @param v_flip   true to flip vertically.
  */
-void lv_3dtexture_set_src_flip(lv_obj_t * obj, bool h_flip, bool v_flip);
+void lv_3dtexture_set_flip(lv_obj_t * obj, bool h_flip, bool v_flip);
 
 /*======================
  * Add/remove functions
