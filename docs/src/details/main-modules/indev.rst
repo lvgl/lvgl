@@ -489,7 +489,23 @@ The most important special keys in your :cpp:func:`read_cb` function are:
 - :cpp:enumerator:`LV_KEY_RIGHT`
 
 You should translate some of your keys to these special keys to support navigation
-in a group and interact with selected Widgets.
+in a group and interact with selected Widgets. Translation of direction key events (eg.
+:cpp:enumerator:`LV_KEY_LEFT`) into move focus events (eg. :cpp:enumerator:`LV_KEY_PREV`) can be
+accomplished using the :cpp:expr:`lv_indev_nav_map` function:
+
+.. code-block:: c
+
+  /* Map LV_KEY_LEFT/RIGHT into LV_KEY_PREV/NEXT */
+  lv_indev_nav_map(indev, LV_INDEV_NAV_MAP_HOR);
+
+  /* Map LV_KEY_LEFT/RIGHT into LV_KEY_NEXT/PREV */
+  lv_indev_nav_map(indev, LV_INDEV_NAV_MAP_HOR_REV);
+
+  /* Map LV_KEY_UP/DOWN into LV_KEY_PREV/NEXT */
+  lv_indev_nav_map(indev, LV_INDEV_NAV_MAP_VER);
+
+  /* Disable mamping */
+  lv_indev_nav_map(indev, 0);
 
 Usually, it's enough to use only :cpp:enumerator:`LV_KEY_LEFT` and :cpp:enumerator:`LV_KEY_RIGHT` because most
 Widgets can be fully controlled with them.
