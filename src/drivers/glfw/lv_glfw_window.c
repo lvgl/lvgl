@@ -68,9 +68,9 @@ static lv_ll_t glfw_window_ll;
  *   GLOBAL FUNCTIONS
  **********************/
 
-// Note: to enable taskbar window icon on Linux Wayland desktops, the window_title must match the
-// name of the applications/my_app.desktop file, minus the .desktop extension, at the time the
-// window is created (then it can be changed to whatever).  so 'my_app', in this example.
+/* Note: to enable taskbar window icon on Linux Wayland desktops, the window_title must match the
+   name of the applications/my_app.desktop file, minus the .desktop extension, at the time the
+   window is created (then it can be changed to whatever).  so 'my_app', in this example. */
 lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
                                             bool v_flip,  const char * window_title, const char * desktop_file_name)
 {
