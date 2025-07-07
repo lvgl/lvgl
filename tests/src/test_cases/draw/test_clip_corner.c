@@ -59,11 +59,7 @@ void test_clip_corner_1(void)
     create_panel(30, true);
     create_panel(100, true);
 
-#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/clip_corner_1.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 #endif

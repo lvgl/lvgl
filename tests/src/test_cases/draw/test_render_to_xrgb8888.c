@@ -18,7 +18,6 @@ void tearDown(void)
 
 void test_render_to_xrgb8888(void)
 {
-#if !LV_USE_DRAW_VGLITE
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_XRGB8888);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
@@ -38,12 +37,11 @@ void test_render_to_xrgb8888(void)
             char buf[128];
             lv_snprintf(buf, sizeof(buf), "draw/render/xrgb8888/demo_render_%s_opa_%d.png",
                         lv_demo_render_get_scene_name(i), opa_values[opa]);
+#if !LV_USE_DRAW_VGLITE
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+#endif
         }
     }
-#else
-    TEST_PASS();
-#endif
 }
 
 #endif

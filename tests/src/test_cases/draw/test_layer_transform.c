@@ -45,7 +45,6 @@ void test_no_residual_border_on_scale_down(void)
 void test_update_layer_type_on_state_change(void)
 {
 
-#if !LV_USE_DRAW_VGLITE
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_transform_rotation(&style, 90);
@@ -58,9 +57,6 @@ void test_update_layer_type_on_state_change(void)
 
     lv_obj_add_state(obj, LV_STATE_CHECKED);
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_transform_2.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 #endif
