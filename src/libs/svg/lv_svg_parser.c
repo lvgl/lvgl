@@ -981,6 +981,7 @@ static void _process_path_value(lv_svg_node_t * node, lv_svg_attr_type_t type, c
             ++ptr;
         }
         else {
+            LV_LOG_ERROR("Unsupport path command [%c]", ch);
             break;
         }
 
