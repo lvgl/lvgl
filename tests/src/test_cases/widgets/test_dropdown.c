@@ -358,11 +358,7 @@ void test_dropdown_render_1(void)
     lv_obj_set_style_text_line_space(list, 5, 0);
     lv_obj_set_style_bg_color(list, lv_color_hex3(0xf00), LV_PART_SELECTED | LV_STATE_CHECKED);
     lv_dropdown_set_selected(dd3, 3);
-#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_1.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 void test_dropdown_render_2(void)
@@ -421,11 +417,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_set_symbol(dd7, LV_SYMBOL_LEFT);
     lv_obj_align(dd7, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
     lv_dropdown_open(dd7);
-#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_2.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 /* See #2893 */

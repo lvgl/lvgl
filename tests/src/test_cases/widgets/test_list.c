@@ -59,11 +59,7 @@ void test_list_snapshot(void)
 
     lv_obj_center(snapshot_list);
 
-#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/list_1.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 #endif
