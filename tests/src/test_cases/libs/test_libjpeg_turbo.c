@@ -14,8 +14,6 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-#if !LV_USE_DRAW_VGLITE
-
 static void create_images(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -80,11 +78,4 @@ void test_jpg_2(void)
     /* Re-add tjpgd decoder */
     lv_tjpgd_init();
 }
-#else
-
-void test_jpg_2(void)
-{
-    TEST_PASS();
-}
-#endif
 #endif
