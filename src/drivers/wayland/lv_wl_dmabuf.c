@@ -11,6 +11,7 @@
 #include <wayland_linux_dmabuf.h>
 #include <drm/drm_fourcc.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <src/misc/lv_types.h>
 #include <string.h>
 #include "../../draw/nxp/g2d/lv_g2d_utils.h"
@@ -26,25 +27,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-#define MAX_BUFFER_PLANES 4
-
-struct buffer {
-    int busy;
-
-#if LV_WAYLAND_USE_DMABUF
-    struct window * window;
-    int plane_count;
-
-    int dmabuf_fds[MAX_BUFFER_PLANES];
-    uint32_t strides[MAX_BUFFER_PLANES];
-    uint32_t offsets[MAX_BUFFER_PLANES];
-    struct wl_buffer * buffer;
-#endif
-
-    void * buf_base[MAX_BUFFER_PLANES];
-    lv_draw_buf_t * lv_draw_buf;
-};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -144,6 +126,22 @@ void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, s
     LV_UNUSED(obj);
 }
 
+void lv_wayland_wait_swap_buf_cb(lv_display_t * disp)
+{
+    struct window * window = lv_display_get_user_data(disp);
+
+    if(window->frame_counter == 0) {
+        return;
+    }
+
+    int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % LV_WAYLAND_BUF_COUNT;
+
+    while(window->wl_ctx->dmabuf_ctx.buffers[buf_nr].busy) {
+        wl_display_roundtrip(lv_wl_ctx.display);
+        usleep(500); /* Sleep for 0.5ms to avoid busy waiting */
+    }
+}
+
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
     struct window * window = lv_display_get_user_data(disp);
@@ -169,12 +167,12 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
         struct wl_callback * cb = wl_surface_frame(window->body->surface);
         wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);
 
-        buf->busy             = 1;
         window->flush_pending = true;
     }
     else {
         /* Not the last frame yet, so tell lvgl to keep going
          * For the last frame, we wait for the compositor instead */
+        buf->busy = 0;
         lv_display_flush_ready(disp);
     }
 
@@ -344,6 +342,8 @@ static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned ch
     for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
         struct buffer * buffer = &context->buffers[i];
         if(buffer->buf_base[0] == color_p && buffer->busy == 0) {
+            context->last_used = i;
+            buffer->busy = 1;
             return buffer;
         }
     }
@@ -354,6 +354,8 @@ static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned ch
         for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
             struct buffer * buffer = &context->buffers[i];
             if(buffer->buf_base[0] == color_p && buffer->busy == 0) {
+                context->last_used = i;
+                buffer->busy = 1;
                 return buffer;
             }
         }
