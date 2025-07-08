@@ -133,6 +133,18 @@ extern "C" {
 #include "src/lv_api_map_v9_1.h"
 #include "src/lv_api_map_v9_2.h"
 
+#if LV_USE_DRAW_VGLITE && !LV_USE_VG_LITE_THORVG
+#include "libs/vg_lite_driver/inc/vg_lite.h"
+#include "libs/vg_lite_driver/VGLite/vg_lite_context.h"
+#include "libs/vg_lite_driver/VGLite/vg_lite_options.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_debug.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_hal.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_hw.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_kernel.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_option.h"
+#include "libs/vg_lite_driver/VGLiteKernel/vg_lite_type.h"
+#endif
+
 #if LV_USE_PRIVATE_API
 #include "src/lvgl_private.h"
 #endif
