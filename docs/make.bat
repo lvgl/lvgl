@@ -24,24 +24,17 @@ setlocal ENABLEDELAYEDEXPANSION
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
+
 if "%LVGL_DOC_BUILD_INTERMEDIATE_DIR%" == "" (
 	set SOURCEDIR=intermediate
 ) else (
 	set SOURCEDIR=%LVGL_DOC_BUILD_INTERMEDIATE_DIR%
 )
+
 if "%LVGL_DOC_BUILD_OUTPUT_DIR%" == "" (
 	set BUILDDIR=build
 ) else (
 	set BUILDDIR=%LVGL_DOC_BUILD_OUTPUT_DIR%
-)
-if "%SPHINXOPTS%" == "" (
-	rem python ./src/lvgl_version.py >_version_temp.txt
-	rem set /p VER=<_version_temp.txt
-	rem del _version_temp.txt
-	for /F %%v in ('python lvgl_version.py') do set VER=%%v
-	echo VERSION    [!VER!]
-	set SPHINXOPTS=-D version="!VER!" -j 4
-	set VER=
 )
 
 echo SOURCEDIR  [%SOURCEDIR%]
