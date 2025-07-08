@@ -504,7 +504,7 @@ accomplished using the :cpp:expr:`lv_indev_nav_map` function:
   /* Map LV_KEY_UP/DOWN into LV_KEY_PREV/NEXT */
   lv_indev_nav_map(indev, LV_INDEV_NAV_MAP_VER);
 
-  /* Disable mamping */
+  /* Disable mapping */
   lv_indev_nav_map(indev, 0);
 
 Usually, it's enough to use only :cpp:enumerator:`LV_KEY_LEFT` and :cpp:enumerator:`LV_KEY_RIGHT` because most
