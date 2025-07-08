@@ -1106,6 +1106,14 @@ div .lvgl-figure-caption p {
   margin-bottom: 32px;
 }
 
+figure figcaption .caption-text {
+  font-size: 0.8rem;
+}
+
+article figure {
+  margin-bottom: 32px;
+}
+
 /*-------------------------------------------------------------------------
  * Code Highlighting
  *-------------------------------------------------------------------------*/
