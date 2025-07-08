@@ -145,4 +145,24 @@ void test_label_selection_and_recolor(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/label_selection_and_recolor.png");
 }
 
+void test_label_selection_with_letter_space(void)
+{
+    lv_color_t color = lv_palette_main(LV_PALETTE_BLUE);
+    lv_color_t sel_bg_color = lv_palette_lighten(LV_PALETTE_RED, 4);
+    lv_color_t sel_color = lv_palette_darken(LV_PALETTE_RED, 4);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Testing selection with letter space label.");
+    lv_obj_set_style_text_color(label, color, 0);
+    lv_obj_set_style_text_opa(label, LV_OPA_COVER, 0);
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_set_style_bg_color(label, sel_bg_color, LV_PART_SELECTED);
+    lv_obj_set_style_text_color(label, sel_color, LV_PART_SELECTED);
+    lv_obj_set_style_text_letter_space(label, 10, 0);
+    lv_label_set_text_selection_start(label, 10);
+    lv_label_set_text_selection_end(label, 25);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/label_selection_letter_space.png");
+}
+
 #endif
