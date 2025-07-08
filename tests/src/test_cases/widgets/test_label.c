@@ -632,7 +632,7 @@ void test_label_recolor_with_text_wrap(void)
 
     /* Create a label with recolor enabled and text wrapping */
     lv_obj_t * label_recolor_wrap = lv_label_create(lv_screen_active());
-    
+
     /* Configure the label similar to the bug report */
     lv_obj_set_style_text_font(label_recolor_wrap, &lv_font_montserrat_22, 0);
     lv_obj_set_style_text_color(label_recolor_wrap, lv_color_hex(0x8199f7), 0);
@@ -640,14 +640,14 @@ void test_label_recolor_with_text_wrap(void)
     lv_obj_set_style_text_align(label_recolor_wrap, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_long_mode(label_recolor_wrap, LV_LABEL_LONG_MODE_WRAP);
     lv_label_set_recolor(label_recolor_wrap, true);
-    
+
     /* Test text with recolor commands that should wrap across multiple lines */
-    const char * test_text_with_recolor = 
+    const char * test_text_with_recolor =
         "Before color. #ff0000 This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line# After color.";
-        
+
     lv_label_set_text(label_recolor_wrap, test_text_with_recolor);
     lv_obj_align(label_recolor_wrap, LV_ALIGN_TOP_MID, 0, 20);
-    
+
     /* Create a reference label without recolor for comparison */
     lv_obj_t * label_no_recolor = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label_no_recolor, &lv_font_montserrat_22, 0);
@@ -656,11 +656,11 @@ void test_label_recolor_with_text_wrap(void)
     lv_obj_set_style_text_align(label_no_recolor, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_long_mode(label_no_recolor, LV_LABEL_LONG_MODE_WRAP);
     lv_label_set_recolor(label_no_recolor, false); /* Disabled for comparison */
-    
+
     /* Same text but without recolor commands */
-    const char * test_text_without_recolor = 
+    const char * test_text_without_recolor =
         "Before color. This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line After color.";
-    
+
     lv_label_set_text(label_no_recolor, test_text_without_recolor);
     lv_obj_align(label_no_recolor, LV_ALIGN_BOTTOM_MID, 0, -20);
 

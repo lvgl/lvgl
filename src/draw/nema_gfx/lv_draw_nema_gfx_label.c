@@ -530,7 +530,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     uint32_t next_char_offset;
     uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
-    
+
     /* Recolor state variables moved outside line loop to persist across lines */
     cmd_state_t recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
     lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
