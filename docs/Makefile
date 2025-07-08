@@ -5,8 +5,8 @@
 # from the environment for the first two.
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
-BUILDDIR      = build
 SOURCEDIR     = intermediate
+BUILDDIR      = build
 
 # SOURCEDIR can be overridden by LVGL_DOC_BUILD_INTERMEDIATE_DIR
 LEN           := $(shell printf '%s' '$(LVGL_DOC_BUILD_INTERMEDIATE_DIR)' | wc -c)
