@@ -256,6 +256,7 @@
 #if LV_USE_DRAW_VGLITE
     /** Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
     #define LV_USE_VGLITE_BLIT_SPLIT 0
+    #define LV_USE_VGLITE_DEBUG 0
 
     #if LV_USE_OS
         /** Use additional draw thread for VG-Lite processing. */

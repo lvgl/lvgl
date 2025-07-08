@@ -211,6 +211,8 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
     /* Resulting path size */
     *path_data_size = pidx * sizeof(int32_t);
 }
+
+#if LV_USE_VGLITE_DEBUG
 uint8_t lv_vglite_vlc_op_arg_len(uint8_t vlc_op)
 {
     switch(vlc_op) {
@@ -309,6 +311,7 @@ void lv_vglite_path_for_each_data(const vg_lite_path_t * path, lv_vglite_path_it
         cb(user_data, op_code, tmp_data, arg_len);
     }
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

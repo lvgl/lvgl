@@ -49,6 +49,7 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+#if LV_USE_VGLITE_DEBUG
 
 const char * vglite_error_to_string(vg_lite_error_t error)
 {
@@ -322,6 +323,7 @@ void vglite_matrix_dump_info(const vg_lite_matrix_t * matrix)
                     (matrix)->m[i][0], (matrix)->m[i][1], (matrix)->m[i][2]);
     }
 }
+#endif
 
 #if LV_USE_VGLITE_DRAW_ASYNC
 bool vglite_cmd_buf_is_flushed(void)

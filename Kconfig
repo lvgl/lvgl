@@ -376,6 +376,11 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
+		config LV_USE_VGLITE_DEBUG
+			bool "Enable dump functions to debug VGLite behavior"
+			depends on LV_USE_DRAW_VGLITE
+			default n
+
 		config LV_USE_VGLITE_DRAW_THREAD
 			bool "Use additional draw thread for VG-Lite processing"
 			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE

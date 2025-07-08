@@ -719,6 +719,13 @@
             #define LV_USE_VGLITE_BLIT_SPLIT 0
         #endif
     #endif
+    #ifndef LV_USE_VGLITE_DEBUG
+        #ifdef CONFIG_LV_USE_VGLITE_DEBUG
+            #define LV_USE_VGLITE_DEBUG CONFIG_LV_USE_VGLITE_DEBUG
+        #else
+            #define LV_USE_VGLITE_DEBUG 0
+        #endif
+    #endif
 
     #if LV_USE_OS
         /** Use additional draw thread for VG-Lite processing. */

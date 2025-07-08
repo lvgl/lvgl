@@ -221,8 +221,6 @@ static inline void vglite_set_scissor(const lv_area_t * clip_area)
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_vg_lite_unit_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
