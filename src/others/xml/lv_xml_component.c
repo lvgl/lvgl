@@ -19,11 +19,13 @@
 #include "parsers/lv_xml_obj_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../misc/lv_fs.h"
+#include "../../core/lv_global.h"
 #include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
+#define xml_path_prefix LV_GLOBAL_DEFAULT()->xml_path_prefix
 
 /**********************
  *      TYPEDEFS
@@ -63,7 +65,6 @@ void lv_xml_component_init(void)
 
     lv_xml_component_scope_init(global_scope);
     global_scope->name = lv_strdup("globals");
-
 }
 
 void lv_xml_component_scope_init(lv_xml_component_scope_t * scope)
@@ -350,6 +351,9 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         return;
     }
 
+    char src_path_full[LV_XML_MAX_PATH_LENGTH];
+    lv_snprintf(src_path_full, sizeof(src_path_full), "%s%s", xml_path_prefix, src_path);
+
     lv_xml_font_t * f;
     LV_LL_READ(&state->scope.font_ll, f) {
         if(lv_streq(f->name, name)) {
@@ -366,7 +370,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
             return;
         }
 #if LV_TINY_TTF_FILE_SUPPORT
-        lv_font_t * font = lv_tiny_ttf_create_file(src_path, lv_xml_atoi(size));
+        lv_font_t * font = lv_tiny_ttf_create_file(src_path_full, lv_xml_atoi(size));
         if(font == NULL) {
             LV_LOG_WARN("Couldn't load  `%s` tiny_ttf font", name);
             return;
@@ -393,7 +397,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
 #endif
     }
     else if(lv_streq(type, "bin")) {
-        lv_font_t * font = lv_binfont_create(src_path);
+        lv_font_t * font = lv_binfont_create(src_path_full);
         if(font == NULL) {
             LV_LOG_WARN("Couldn't load `%s` bin font", name);
             return;
