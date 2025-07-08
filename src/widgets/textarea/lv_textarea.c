@@ -63,6 +63,7 @@ static void draw_cursor(lv_event_t * e);
 static void auto_hide_characters(lv_obj_t * obj);
 static void auto_hide_characters_cancel(lv_obj_t * obj);
 static inline bool is_valid_but_non_printable_char(const uint32_t letter);
+static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos);
 
 /**********************
  *  STATIC VARIABLES
@@ -466,38 +467,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_update_layout(obj);
 
-    lv_point_t cur_pos;
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_label_get_letter_pos(ta->label, pos, &cur_pos);
-
-    /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
-
-    /*Check the top*/
-    int32_t font_h = lv_font_get_line_height(font);
-    if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
-        lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
-    }
-    /*Check the bottom*/
-    int32_t h = lv_obj_get_content_height(obj);
-    if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
-        lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
-    }
-
-    /*Check the left*/
-    if(cur_pos.x < lv_obj_get_scroll_left(obj)) {
-        lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
-    }
-    /*Check the right*/
-    int32_t w = lv_obj_get_content_width(obj);
-    if(cur_pos.x + font_h - lv_obj_get_scroll_left(obj) > w) {
-        lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
-    }
-
-    ta->cursor.valid_x = cur_pos.x;
-
-    start_cursor_blink(obj);
-
-    refr_cursor_area(obj);
+    lv_textarea_scroll_to_cusor_pos(obj, pos);
 }
 
 void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en)
@@ -1028,6 +998,10 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
     }
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        lv_textarea_t * ta = (lv_textarea_t *)obj;
+        lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
+    }
 }
 
 static void label_event_cb(lv_event_t * e)
@@ -1501,6 +1475,47 @@ static inline bool is_valid_but_non_printable_char(const uint32_t letter)
     }
 
     return false;
+}
+
+static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos)
+{
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+
+    lv_point_t cur_pos;
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    lv_label_get_letter_pos(ta->label, pos, &cur_pos);
+
+    /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
+
+    /*Check the top*/
+    int32_t font_h = lv_font_get_line_height(font);
+    if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
+        lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
+    }
+    /*Check the bottom*/
+    int32_t h = lv_obj_get_content_height(obj);
+    if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
+        lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
+    }
+
+    /*Check the left*/
+    if(cur_pos.x < lv_obj_get_scroll_left(obj)) {
+        lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
+    }
+    /*Check the right*/
+    int32_t w = lv_obj_get_content_width(obj);
+    if(cur_pos.x + font_h > w) {
+        lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
+    }
+    else {
+        lv_obj_scroll_to_x(obj, 0, LV_ANIM_ON);
+    }
+
+    ta->cursor.valid_x = cur_pos.x;
+
+    start_cursor_blink(obj);
+
+    refr_cursor_area(obj);
 }
 
 #endif
