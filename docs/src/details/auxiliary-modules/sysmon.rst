@@ -10,9 +10,9 @@ metrics directly on your display. It supports both performance monitoring
 
 Dependencies
 ************
-- Requires :cpp:enumerator:`LV_USE_LABEL = 1`
-- Requires :cpp:enumerator:`LV_USE_OBSERVER = 1`
-- Requires :cpp:enumerator:`LV_USE_SYSMON = 1`
+- Requires ``LV_USE_LABEL = 1`` in lv_conf.h
+- Requires ``LV_USE_OBSERVER = 1`` in lv_conf.h
+- Requires ``LV_USE_SYSMON = 1`` in lv_conf.h
 
 .. _sysmon_usage:
 
@@ -97,6 +97,7 @@ Display format:
 Positioning
 -----------
 Configure positions in lv_conf.h:
+
 .. code-block:: c
 
     /* Top-right corner */
@@ -104,6 +105,7 @@ Configure positions in lv_conf.h:
 
     /* Bottom-right corner */
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+
 
 Implementation Details
 **********************
@@ -137,34 +139,3 @@ Timers
 - Performance: ``perf_update_timer_cb``
 - Memory: ``mem_update_timer_cb``
 - Default period: 300ms (``LV_SYSMON_REFR_PERIOD_DEF``)
-
-.. _sysmon_api:
-
-API Reference
-*************
-
-Functions
-=========
-
-Core
-----
-.. doxygenfunction:: lv_sysmon_builtin_init
-.. doxygenfunction:: lv_sysmon_builtin_deinit
-.. doxygenfunction:: lv_sysmon_create
-
-Performance
------------
-.. doxygenfunction:: lv_sysmon_show_performance
-.. doxygenfunction:: lv_sysmon_hide_performance
-.. doxygenfunction:: lv_sysmon_dump_performance
-.. doxygenfunction:: lv_sysmon_performance_control
-
-Memory
-------
-.. doxygenfunction:: lv_sysmon_show_memory
-.. doxygenfunction:: lv_sysmon_hide_memory
-
-Types
-=====
-.. doxygentypedef:: lv_sysmon_perf_info_t
-.. doxygentypedef:: lv_mem_monitor_t
