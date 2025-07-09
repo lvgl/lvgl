@@ -20,17 +20,17 @@ Create beautiful UIs for any MCU, MPU and display type.
 
     <div class="home-cards-container">
         <div class="home-cards">
-            <a href="intro/introduction.html" class="home-card">
+            <a href="intro/introduction/index.html" class="home-card">
                 <svg><use href="#svg-home-intro"></use></svg>
                 <h3>Introduction</h3>
                 <p>Get familiar with LVGL.</p>
             </a>
-            <a href="intro/getting_started.html" class="home-card">
+            <a href="intro/getting_started/index.html" class="home-card">
                 <svg><use href="#svg-home-getting-started"></use></svg>
                 <h3>Getting Started</h3>
                 <p>Learn how LVGL works.</p>
             </a>
-            <a href="intro/getting_started.html#what-s-next" class="home-card">
+            <a href="intro/getting_started/whats_next.html" class="home-card">
                 <svg><use href="#svg-home-play"></use></svg>
                 <h3>Going deeper</h3>
                 <p>Get your feet wet with LVGL.</p>
