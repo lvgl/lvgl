@@ -51,13 +51,6 @@ typedef enum {
     LV_FONT_GLYPH_FORMAT_CUSTOM = 0xFF, /**< Custom format*/
 } lv_font_glyph_format_t;
 
-/* Used to query the size of a glyph or obtain the glyph dsc */
-typedef struct {
-    const lv_font_t * font;   /**< Font of the glyph*/
-    uint32_t letter;          /**< The letter of the glyph*/
-    uint32_t next_letter;     /**< The next letter used to get the kerning value*/
-} lv_font_glyph_req_t;
-
 /** Describes the properties of a glyph.*/
 typedef struct {
     const lv_font_t *
@@ -170,13 +163,15 @@ const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the descriptor of a glyph
- * @param glyph_req glyph request descriptor
- * @param dsc_out       out - used to pass the border_width and stores the result descriptor here
+ * @param font          pointer to font
+ * @param dsc_out       store the result descriptor here
+ * @param letter        a UNICODE letter code
+ * @param letter_next   the next letter after `letter`. Used for kerning
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc(const lv_font_glyph_req_t * glyph_req, lv_font_glyph_dsc_t * dsc_out);
-
+bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
+                           uint32_t letter_next);
 /**
  * Release the bitmap of a font.
  * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t) before you can call this function.
@@ -186,10 +181,12 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the width of a glyph with kerning
- * @param glyph_req glyph request descriptor
+ * @param font          pointer to a font
+ * @param letter        a UNICODE letter
+ * @param letter_next   the next letter after `letter`. Used for kerning
  * @return the width of the glyph
  */
-uint16_t lv_font_get_glyph_width(const lv_font_glyph_req_t * glyph_req);
+uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
 
 /**
  * Get the line height of a font. All characters fit into this height

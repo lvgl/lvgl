@@ -734,14 +734,10 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
     if(ta->pwd_bullet) return ta->pwd_bullet;
 
     lv_font_glyph_dsc_t g;
-    lv_font_glyph_req_t g_req = {0};
-
-    g_req.font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    g_req.letter = LV_TEXTAREA_PWD_BULLET_UNICODE;
-    g_req.next_letter = 0;
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
-    if(lv_font_get_glyph_dsc(&g_req, &g))
+    const lv_font_t * bullet_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    if(lv_font_get_glyph_dsc(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
         return LV_SYMBOL_BULLET;
 
     return "*";
@@ -1185,26 +1181,16 @@ static void refr_cursor_area(lv_obj_t * obj)
     const char * txt = lv_label_get_text(ta->label);
 
     uint32_t byte_pos = lv_text_encoded_get_byte_id(txt, cur_pos);
+    uint32_t letter = lv_text_encoded_next(&txt[byte_pos], NULL);
 
     /* Letter height and width */
     const int32_t letter_h = lv_font_get_line_height(font);
-
-    lv_font_glyph_req_t g_req = {0};
-    g_req.font = font;
-    g_req.letter = lv_text_encoded_next(&txt[byte_pos], NULL);
-    g_req.next_letter = IGNORE_KERNING;
-
-    lv_font_glyph_req_t g_req_space;
-    lv_memcpy(&g_req_space, &g_req, sizeof(lv_font_glyph_req_t));
-    g_req_space.letter = ' ';
-
-    int32_t letter_w = 0;
-    if(is_valid_but_non_printable_char(g_req.letter)) {
-        letter_w = lv_font_get_glyph_width(&g_req_space);
+    /*Set letter_w (set not 0 on non printable but valid chars)*/
+    uint32_t letter_space = letter;
+    if(is_valid_but_non_printable_char(letter)) {
+        letter_space = ' ';
     }
-    else {
-        letter_w = lv_font_get_glyph_width(&g_req);
-    }
+    int32_t letter_w = lv_font_get_glyph_width(font, letter_space, IGNORE_KERNING);
 
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
@@ -1218,18 +1204,17 @@ static void refr_cursor_area(lv_obj_t * obj)
         letter_pos.x = 0;
         letter_pos.y += letter_h + line_space;
 
-        if(g_req.letter != '\0') {
+        if(letter != '\0') {
             byte_pos += lv_text_encoded_size(&txt[byte_pos]);
-            g_req.letter = lv_text_encoded_next(&txt[byte_pos], NULL);
+            letter = lv_text_encoded_next(&txt[byte_pos], NULL);
         }
 
-        if(is_valid_but_non_printable_char(g_req.letter)) {
+        uint32_t tmp = letter;
+        if(is_valid_but_non_printable_char(letter)) {
             /*If non printable get the letter_w of the space char*/
-            letter_w = lv_font_get_glyph_width(&g_req_space);
+            tmp = ' ';
         }
-        else {
-            letter_w = lv_font_get_glyph_width(&g_req);
-        }
+        letter_w = lv_font_get_glyph_width(font, tmp, IGNORE_KERNING);
     }
 
     /*Save the byte position. It is required to draw `LV_CURSOR_BLOCK`*/

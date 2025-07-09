@@ -452,9 +452,9 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
     int32_t letter_space = 0;
     lv_span_t * cur_span;
     LV_LL_READ(&spans->child_ll, cur_span) {
-
-        lv_font_glyph_req_t g_req = {0};
-        g_req.font = lv_span_get_style_text_font(obj, cur_span);
+        uint32_t letter;
+        uint32_t letter_next;
+        const lv_font_t * font = lv_span_get_style_text_font(obj, cur_span);
 
         letter_space = lv_span_get_style_text_letter_space(obj, cur_span);
         uint32_t j = 0;
@@ -464,9 +464,9 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
             if(max_width > 0 && width >= max_width) {
                 return max_width;
             }
-            g_req.letter      = lv_text_encoded_next(cur_txt, &j);
-            g_req.next_letter = lv_text_encoded_next(&cur_txt[j], NULL);
-            uint32_t letter_w = lv_font_get_glyph_width(&g_req);
+            letter      = lv_text_encoded_next(cur_txt, &j);
+            letter_next = lv_text_encoded_next(&cur_txt[j], NULL);
+            uint32_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
             width = width + letter_w + letter_space;
         }
     }
@@ -1209,14 +1209,10 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
             bool need_draw_ellipsis = false;
             uint32_t dot_width = 0;
-            lv_font_glyph_req_t g_req = {0};
-            g_req.font = pinfo->font;
-            g_req.letter = '.';
-            g_req.next_letter = '.';
 
             /* deal overflow */
             if(ellipsis_valid) {
-                uint32_t dot_letter_w = lv_font_get_glyph_width(&g_req);
+                uint32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
 
                 label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;

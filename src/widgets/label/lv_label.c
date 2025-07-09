@@ -491,14 +491,13 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     uint32_t i = 0;
     uint32_t i_act = i;
 
-    lv_font_glyph_req_t g_req = {0};
-    g_req.font = font;
-
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
+            uint32_t letter;
+            uint32_t letter_next;
             /*Get the current letter and the next letter for kerning*/
             /*Be careful 'i' already points to the next character*/
-            lv_text_encoded_letter_next_2(bidi_txt, &g_req.letter, &g_req.next_letter, &i);
+            lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
 
             if((attributes.text_flags & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(lv_text_is_cmd(&cmd_state, bidi_txt[i]) != false) {
@@ -506,7 +505,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
                 }
             }
 
-            int32_t gw = lv_font_get_glyph_width(&g_req);
+            int32_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the next line is reached*/
             if(pos.x < x + gw || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
@@ -597,16 +596,14 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     int32_t last_x = 0;
     uint32_t i           = line_start;
     uint32_t i_current   = i;
-    lv_font_glyph_req_t g_req = {0};
-    g_req.letter      = '\0';
-    g_req.next_letter = '\0';
-    g_req.font = font;
+    uint32_t letter = '\0';
+    uint32_t letter_next = '\0';
 
     if(new_line_start > 0) {
         while(i <= new_line_start - 1) {
             /*Get the current letter and the next letter for kerning*/
             /*Be careful 'i' already points to the next character*/
-            lv_text_encoded_letter_next_2(txt, &g_req.letter, &g_req.next_letter, &i);
+            lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
             if((attributes.text_flags & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(lv_text_is_cmd(&cmd_state, txt[i]) != false) {
@@ -615,7 +612,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
             }
 
             last_x = x;
-            x += lv_font_get_glyph_width(&g_req);
+            x += lv_font_get_glyph_width(font, letter, letter_next);
             if(pos->x < x) {
                 i = i_current;
                 break;
@@ -625,7 +622,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
         }
     }
 
-    const int32_t max_diff = lv_font_get_glyph_width(&g_req) + attributes.letter_space + 1;
+    const int32_t max_diff = lv_font_get_glyph_width(font, letter, letter_next) + attributes.letter_space + 1;
     return (pos->x >= (last_x - attributes.letter_space) && pos->x <= (last_x + max_diff));
 }
 
@@ -914,18 +911,13 @@ static void draw_main(lv_event_t * e)
     lv_area_t clip_area_ori = layer->_clip_area;
     layer->_clip_area = txt_clip;
 
-    lv_font_glyph_req_t g_req = {0};
-    g_req.font = label_draw_dsc.font;
-    g_req.letter = ' ';
-    g_req.next_letter = ' ';
-
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) {
         lv_point_t size = label->text_size;
 
         /*Draw the text again on label to the original to make a circular effect */
         if(size.x > lv_area_get_width(&txt_coords)) {
             label_draw_dsc.ofs_x = label->offset.x + size.x +
-                                   lv_font_get_glyph_width(&g_req) * LV_LABEL_WAIT_CHAR_COUNT;
+                                   lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
             label_draw_dsc.ofs_y = label->offset.y;
 
             lv_draw_label(layer, &label_draw_dsc, &txt_coords);
@@ -1125,10 +1117,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
         bool hor_anim = false;
-        lv_font_glyph_req_t g_req = {0};
-        g_req.font = font;
-        g_req.letter = ' ';
-        g_req.next_letter = ' ';
 
         if(size.x > lv_area_get_width(&txt_coords)) {
 #if LV_USE_BIDI
@@ -1139,17 +1127,17 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 base_dir = lv_bidi_detect_base_dir(label->text);
 
             if(base_dir == LV_BASE_DIR_RTL) {
-                start = -size.x - lv_font_get_glyph_width(&g_req) * LV_LABEL_WAIT_CHAR_COUNT;
+                start = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 end = 0;
             }
             else {
                 start = 0;
-                end = -size.x - lv_font_get_glyph_width(&g_req) * LV_LABEL_WAIT_CHAR_COUNT;
+                end = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
             }
 
             lv_anim_set_values(&a, start, end);
 #else
-            lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(&g_req) * LV_LABEL_WAIT_CHAR_COUNT);
+            lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
 #endif
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
             lv_anim_set_duration(&a, anim_time);
@@ -1204,18 +1192,13 @@ static void lv_label_refr_text(lv_obj_t * obj)
     }
     else if(label->long_mode == LV_LABEL_LONG_MODE_DOTS) {
 
-        lv_font_glyph_req_t g_req = {0};
-        g_req.font = font;
-        g_req.letter = '.';
-        g_req.next_letter = '.';
-
         if(size.y > lv_area_get_height(&txt_coords) && /*Text overflows available area*/
            size.y > lv_font_get_line_height(font) && /*No break requested, so no dots required*/
            lv_text_get_encoded_length(label->text) > LV_LABEL_DOT_NUM) { /*Do not turn all characters into dots*/
             lv_point_t p;
             int32_t y_overed;
             p.x = lv_area_get_width(&txt_coords) -
-                  (lv_font_get_glyph_width(&g_req) + attributes.letter_space) *
+                  (lv_font_get_glyph_width(font, '.', '.') + attributes.letter_space) *
                   LV_LABEL_DOT_NUM; /*Shrink with dots*/
             p.y = lv_area_get_height(&txt_coords);
             y_overed = p.y %
