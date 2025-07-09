@@ -1,8 +1,8 @@
 .. _sysmon:
 
-===================
+=======================
 System Monitor (sysmon)
-===================
+=======================
 
 The System Monitor module provides real-time monitoring of system performance
 metrics directly on your display. It supports both performance monitoring
