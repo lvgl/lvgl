@@ -246,13 +246,7 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
             }
         }
 
-        lv_font_glyph_req_t g_req = {0};
-
-        g_req.font = font;
-        g_req.letter = letter;
-        g_req.next_letter = letter_next;
-
-        letter_w = lv_font_get_glyph_width(&g_req);
+        letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
 
         if(letter_w > 0) {
@@ -394,16 +388,11 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
         }
     }
 
-    lv_font_glyph_req_t g_req = {0};
-
-    g_req.font = font;
-    g_req.next_letter = '\0';
-
     /*Always step at least one to avoid infinite loops*/
     if(i == 0) {
-        g_req.letter = lv_text_encoded_next(txt, &i);
+        uint32_t letter = lv_text_encoded_next(txt, &i);
         if(used_width != NULL) {
-            line_w = lv_font_get_glyph_width(&g_req);
+            line_w = lv_font_get_glyph_width(font, letter, '\0');
         }
     }
 
@@ -425,20 +414,21 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
     int32_t width             = 0;
     lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
-    lv_font_glyph_req_t g_req = {0};
-    g_req.font = font;
-
     if(length != 0) {
         while(txt[i] != '\0' && i < length) {
-            lv_text_encoded_letter_next_2(txt, &g_req.letter, &g_req.next_letter, &i);
+
+            uint32_t letter;
+            uint32_t letter_next;
+
+            lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
             if((attributes->text_flags & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(lv_text_is_cmd(&cmd_state, g_req.letter) != false) {
+                if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
             }
 
-            int32_t char_width = lv_font_get_glyph_width(&g_req);
+            int32_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
             if(char_width > 0) {
                 width += char_width;
                 width += attributes->letter_space;

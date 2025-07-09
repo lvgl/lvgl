@@ -531,13 +531,7 @@ void test_freetype_render_outline(void)
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
 
     lv_font_glyph_dsc_t g;
-    lv_font_glyph_req_t g_req = {0};
-
-    g_req.font = font_italic;
-    g_req.letter = 0x9F98;
-    g_req.next_letter = '\0';
-
-    lv_font_get_glyph_dsc(&g_req, &g);
+    lv_font_get_glyph_dsc(font_italic, &g, 0x9F98, '\0');
 
     const lv_ll_t * outline_data;
     outline_data = (lv_ll_t *) lv_font_get_glyph_bitmap(&g, NULL);

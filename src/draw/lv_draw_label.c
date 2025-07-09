@@ -137,13 +137,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
     LV_PROFILER_DRAW_BEGIN;
 
     lv_font_glyph_dsc_t g;
-    lv_font_glyph_req_t g_req = {0};
 
-    g_req.font = dsc->font;
-    g_req.letter = unicode_letter;
-    g_req.next_letter = 0;
-
-    lv_font_get_glyph_dsc(&g_req, &g);
+    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
 
     lv_area_t a;
     a.x1 = point->x;
@@ -181,12 +176,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
 
     LV_PROFILER_DRAW_BEGIN;
     lv_font_glyph_dsc_t g;
-    lv_font_glyph_req_t g_req = {0};
 
-    g_req.font = font;
-    g_req.letter = dsc->unicode;
-
-    lv_font_get_glyph_dsc(&g_req, &g);
+    lv_font_get_glyph_dsc(font, &g, dsc->unicode, 0);
 
     font = g.resolved_font ? g.resolved_font : dsc->font;
 
@@ -474,12 +465,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
                 logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
             }
 
-            lv_font_glyph_req_t g_req = {0};
-            g_req.font = font;
-            g_req.letter = letter;
-            g_req.next_letter = letter_next;
-
-            lv_font_get_glyph_dsc(&g_req, &glyph_dsc);
+            lv_font_get_glyph_dsc(font, &glyph_dsc, letter, letter_next);
             letter_w = lv_text_is_marker(letter) ? 0 : glyph_dsc.adv_w;
 
             /*Always set the bg_coordinates for placeholder drawing*/
@@ -595,20 +581,15 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
                               const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
 {
     lv_font_glyph_dsc_t g;
-    lv_font_glyph_req_t g_req = {0};
 
     if(lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
         return;
-
-    g_req.letter = letter;
-    g_req.next_letter = '\0';
-    g_req.font = font;
 
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->g == NULL) {
         dsc->g = &g;
         /*If the glyph dsc is not set then get it from the font*/
-        bool g_ret = lv_font_get_glyph_dsc(&g_req, &g);
+        bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, 0);
         if(g_ret == false) {
             /*Add warning if the dsc is not found*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
