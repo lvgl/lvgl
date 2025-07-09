@@ -339,22 +339,18 @@ static void _evdev_discovery_timer_cb(lv_timer_t * tim)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
+lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd)
 {
     lv_evdev_t * dsc = lv_malloc_zeroed(sizeof(lv_evdev_t));
     LV_ASSERT_MALLOC(dsc);
-    if(dsc == NULL) return NULL;
+    if(dsc == NULL) goto err_malloc;
 
-    dsc->fd = open(dev_path, O_RDONLY | O_NOCTTY | O_CLOEXEC);
-    if(dsc->fd < 0) {
-        LV_LOG_WARN("open failed: %s", strerror(errno));
-        goto err_after_malloc;
-    }
+    dsc->fd = fd;
 
     struct stat sb;
     if(0 != fstat(dsc->fd, &sb)) {
         LV_LOG_ERROR("fstat failed: %s", strerror(errno));
-        goto err_after_open;
+        goto err_after_malloc;
     }
     dsc->st_dev = sb.st_dev;
     dsc->st_ino = sb.st_ino;
@@ -405,12 +401,12 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
     }
 
     if(indev_type == LV_INDEV_TYPE_NONE) {
-        goto err_after_open;
+        goto err_after_malloc;
     }
 
     if(fcntl(dsc->fd, F_SETFL, O_NONBLOCK) < 0) {
         LV_LOG_ERROR("fcntl failed: %s", strerror(errno));
-        goto err_after_open;
+        goto err_after_malloc;
     }
 
     /* Detect the minimum and maximum values of the input device for calibration. */
@@ -434,7 +430,7 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
     }
 
     lv_indev_t * indev = lv_indev_create();
-    if(indev == NULL) goto err_after_open;
+    if(indev == NULL) goto err_after_malloc;
     lv_indev_set_type(indev, indev_type);
     lv_indev_set_read_cb(indev, _evdev_read);
     lv_indev_set_driver_data(indev, dsc);
@@ -442,11 +438,22 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
 
     return indev;
 
-err_after_open:
-    close(dsc->fd);
 err_after_malloc:
     lv_free(dsc);
+err_malloc:
+    close(fd);
     return NULL;
+}
+
+lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
+{
+    int fd = open(dev_path, O_RDONLY | O_NOCTTY | O_CLOEXEC);
+    if(fd < 0) {
+        LV_LOG_WARN("open failed: %s", strerror(errno));
+        return NULL;
+    }
+
+    return lv_evdev_create_fd(indev_type, fd);
 }
 
 lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_data)
