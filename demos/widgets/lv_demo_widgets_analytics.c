@@ -703,4 +703,4 @@ static void chart_event_cb(lv_event_t * e)
     }
 }
 
-#endif /* LV_USE_DEMO_BENCHMARK */
+#endif /* LV_USE_DEMO_WIDGETS */

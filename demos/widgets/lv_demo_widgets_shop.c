@@ -247,4 +247,4 @@ static void shop_chart_event_cb(lv_event_t * e)
     LV_UNUSED(e);
 }
 
-#endif /* LV_USE_DEMO_BENCHMARK */
+#endif /* LV_USE_DEMO_WIDGETS */

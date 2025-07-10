@@ -34,7 +34,7 @@ void lv_demo_widgets_profile_create(lv_obj_t * parent);
  *      MACROS
  **********************/
 
-#endif /* LV_USE_DEMO_BENCHMARK */
+#endif /* LV_USE_DEMO_WIDGETS */
 
 #ifdef __cplusplus
 } /*extern "C"*/
