@@ -23,7 +23,7 @@
 #include <drm_fourcc.h>
 
 #include "../../../stdlib/lv_sprintf.h"
-#include "../../../draw/lv_draw_buf.h"
+#include "../../../draw/lv_draw_buf_private.h"
 
 #if LV_LINUX_DRM_USE_EGL && !LV_USE_LINUX_DRM_GBM_BUFFERS
     #error LV_USE_LINUX_DRM_GBM_BUFFERS is required to use LV_LINUX_DRM_USE_EGL
@@ -304,9 +304,51 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
      * to lv_display_create then the buffers aren't big enough for LV_DISPLAY_RENDER_MODE_DIRECT.
      */
     lv_display_set_resolution(disp, hor_res, ver_res);
-    lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                           LV_DISPLAY_RENDER_MODE_DIRECT);
 
+    const lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    if(handlers && handlers->import_cb) {
+        lv_draw_buf_import_dsc_t dsc;
+        lv_memzero(&dsc, sizeof(dsc));
+        dsc.w = hor_res;
+        dsc.h = ver_res;
+        dsc.cf = lv_display_get_color_format(disp);
+
+        const drm_buffer_t * drm_buf0 = &drm_dev->drm_bufs[0];
+        dsc.stride = drm_buf0->pitch;
+        dsc.data = drm_buf0->map;
+        dsc.fd = drm_buf0->prime_fd;
+        lv_draw_buf_t * buf0 = handlers->import_cb(handlers, &dsc);
+        if(!buf0) {
+            LV_LOG_ERROR("Failed to import DRM buffer 0: resolution=%" LV_PRIu32 "x%" LV_PRIu32 ", format=0x%02" LV_PRIx32
+                         ", stride=%" LV_PRIu32 ", DRM PRIME fd=%" LV_PRId32,
+                         dsc.w, dsc.h, dsc.cf, dsc.stride, dsc.fd);
+            close(drm_dev->fd);
+            drm_dev->fd = -1;
+            return;
+        }
+
+        const drm_buffer_t * drm_buf1 = &drm_dev->drm_bufs[1];
+        dsc.stride = drm_buf1->pitch;
+        dsc.data = drm_buf1->map;
+        dsc.fd = drm_buf1->prime_fd;
+        lv_draw_buf_t * buf1 = handlers->import_cb(handlers, &dsc);
+        if(!buf1) {
+            LV_LOG_ERROR("Failed to import DRM buffer 1: resolution=%" LV_PRIu32 "x%" LV_PRIu32 ", format=0x%02" LV_PRIx32
+                         ", stride=%" LV_PRIu32 ", DRM PRIME fd=%" LV_PRId32,
+                         dsc.w, dsc.h, dsc.cf, dsc.stride, dsc.fd);
+            lv_draw_buf_destroy(buf0);
+            close(drm_dev->fd);
+            drm_dev->fd = -1;
+            return;
+        }
+
+        lv_display_set_draw_buffers(disp, buf1, buf0);
+        lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    }
+    else {
+        lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                               LV_DISPLAY_RENDER_MODE_DIRECT);
+    }
 
     /* Set the handler that is called before a redraw occurs to set the active buffer/plane
      * when GBM buffers are used the DMA_BUF_SYNC_START is issued there */
@@ -940,6 +982,7 @@ err:
 #if !LV_USE_LINUX_DRM_GBM_BUFFERS
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
+    struct drm_prime_handle preq;
     struct drm_mode_create_dumb creq;
     struct drm_mode_map_dumb mreq;
     uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
@@ -959,6 +1002,20 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
     buf->handle = creq.handle;
     buf->pitch = creq.pitch;
     buf->size = creq.size;
+
+    /* export buffer by getting a PRIME file descriptor from the handle */
+    const lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    if(handlers && handlers->import_cb) {
+        lv_memzero(&preq, sizeof(preq));
+        preq.handle = creq.handle;
+        ret = drmIoctl(drm_dev->fd, DRM_IOCTL_PRIME_HANDLE_TO_FD, &preq);
+        if(ret < 0) {
+            LV_LOG_ERROR("DRM_IOCTL_PRIME_HANDLE_TO_FD fail");
+            return -1;
+        }
+
+        buf->prime_fd = preq.fd;
+    }
 
     /* prepare buffer for memory mapping */
     lv_memzero(&mreq, sizeof(mreq));
