@@ -1066,6 +1066,14 @@
     #endif
 #endif
 
+/** Use M2D rendering. */
+#ifndef LV_USE_DRAW_M2D
+    #ifdef CONFIG_LV_USE_DRAW_M2D
+        #define LV_USE_DRAW_M2D CONFIG_LV_USE_DRAW_M2D
+    #else
+        #define LV_USE_DRAW_M2D 0
+    #endif
+#endif
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
