@@ -1030,6 +1030,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
 
     /*Draw the selected*/
     lv_obj_t * label = get_label(dropdown_obj);
+    LV_ASSERT_NULL(label);
     lv_area_t rect_area;
     rect_area.y1 = label->coords.y1;
     rect_area.y1 += id * (font_h + line_space);
