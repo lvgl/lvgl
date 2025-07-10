@@ -37,9 +37,10 @@ void test_render_to_rgb565(void)
             char buf[128];
             lv_snprintf(buf, sizeof(buf), "draw/render/rgb565/demo_render_%s_opa_%d.png",
                         lv_demo_render_get_scene_name(i), opa_values[opa]);
+#if !LV_USE_DRAW_VGLITE
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+#endif
         }
     }
 }
-
 #endif

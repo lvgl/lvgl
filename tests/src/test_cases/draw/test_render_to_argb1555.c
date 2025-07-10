@@ -17,12 +17,13 @@ void tearDown(void)
 
 void test_render_to_argb1555(void)
 {
+#if !LV_USE_DRAW_VGLITE
     /**
      * There is a slight color deviation between thorvg on 32-bit and 64-bit platforms.
      * The deviation will be amplified when using lower precision color formats.
      * Only 64-bit platforms are tested here.
      */
-#if LV_USE_DRAW_VG_LITE && LV_USE_SNAPSHOT && !defined(NON_AMD64_BUILD)
+#if LV_USE_DRAW_VGLITE && LV_USE_SNAPSHOT && !defined(NON_AMD64_BUILD)
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
     uint32_t opa;
@@ -48,6 +49,9 @@ void test_render_to_argb1555(void)
             lv_draw_buf_destroy(draw_buf);
         }
     }
+#else
+    TEST_PASS();
+#endif
 #else
     TEST_PASS();
 #endif

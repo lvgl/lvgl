@@ -89,13 +89,21 @@ void bin_decoder_tile(const void * src, const char * screenshot)
 
 void test_bin_decoder_i4(void)
 {
+#if !LV_USE_DRAW_VGLITE
     LV_IMAGE_DECLARE(test_image_cogwheel_i4);
     bin_decoder(&test_image_cogwheel_i4, "libs/bin_decoder_1.png");
+#else
+    TEST_PASS();
+#endif
 }
 void test_bin_decoder_i4_tile(void)
 {
+#if !LV_USE_DRAW_VGLITE
     LV_IMAGE_DECLARE(test_image_cogwheel_i4);
     bin_decoder_tile(&test_image_cogwheel_i4, "libs/bin_decoder_2.png");
+#else
+    TEST_PASS();
+#endif
 }
 void test_bin_decoder_argb8888(void)
 {

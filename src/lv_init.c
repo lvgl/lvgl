@@ -50,7 +50,7 @@
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
 #endif
 #if LV_USE_DRAW_VGLITE
-    #include "draw/nxp/vglite/lv_draw_vglite.h"
+    #include "draw/vglite/lv_draw_vglite.h"
 #endif
 #if LV_USE_PXP
     #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
@@ -65,9 +65,6 @@
 #endif
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
-#endif
-#if LV_USE_DRAW_VG_LITE
-    #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
 #if LV_USE_DRAW_DMA2D
     #include "draw/dma2d/lv_draw_dma2d.h"
@@ -234,10 +231,6 @@ void lv_init(void)
     lv_draw_nema_gfx_init();
 #endif
 
-#if LV_USE_DRAW_VGLITE
-    lv_draw_vglite_init();
-#endif
-
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_init();
@@ -288,8 +281,11 @@ void lv_init(void)
     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
-#if LV_USE_DRAW_VG_LITE
-    lv_draw_vg_lite_init();
+    /* VGLite draw unit supports image decode, so we need to initialize it after the
+     * the LVGL built-in image decoder has been initialized
+     */
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_init();
 #endif
 
     /*Test if the IDE has UTF-8 encoding*/
@@ -473,10 +469,6 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_G2D
     lv_draw_g2d_deinit();
-#endif
-
-#if LV_USE_DRAW_VG_LITE
-    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_DMA2D

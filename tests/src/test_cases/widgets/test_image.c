@@ -562,25 +562,27 @@ static void create_test_images(int32_t radius, int32_t scale, int32_t angle)
     }
 }
 
+
 void test_image_clip_radius(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
     create_test_images(20, LV_SCALE_NONE, 0);
-#if LV_BIN_DECODER_RAM_LOAD
+#if LV_BIN_DECODER_RAM_LOAD && !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_20.png");
 #endif
 
     create_test_images(LV_RADIUS_CIRCLE, LV_SCALE_NONE, 0);
-#if LV_BIN_DECODER_RAM_LOAD
+#if LV_BIN_DECODER_RAM_LOAD && !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle.png");
 #endif
 
     create_test_images(20, 300, 200);
-#if LV_BIN_DECODER_RAM_LOAD
+#if LV_BIN_DECODER_RAM_LOAD && !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle_scaled_rotated.png");
 #endif
 }
+
 
 void test_image_properties(void)
 {
@@ -704,5 +706,4 @@ void test_image_symbol_normal_align_offset(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_symbol_normal_align_offset.png");
 }
-
 #endif

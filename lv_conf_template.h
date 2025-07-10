@@ -250,12 +250,13 @@
     #endif
 #endif
 
-/** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+/** Use VG-Lite GPU  */
 #define LV_USE_DRAW_VGLITE 0
 
 #if LV_USE_DRAW_VGLITE
     /** Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
     #define LV_USE_VGLITE_BLIT_SPLIT 0
+    #define LV_USE_VGLITE_DEBUG 0
 
     #if LV_USE_OS
         /** Use additional draw thread for VG-Lite processing. */
@@ -265,13 +266,41 @@
             /** Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
             #define LV_USE_VGLITE_DRAW_ASYNC 1
         #endif
+    #else 
+        #define LV_USE_VGLITE_DRAW_THREAD 0
+        #define LV_USE_VGLITE_DRAW_ASYNC  0
     #endif
 
     /** Enable VGLite asserts. */
     #define LV_USE_VGLITE_ASSERT 0
 
-    /** Enable VGLite error checks. */
+    /** Enable VG-Lite custom external 'gpu_init()' function */
+    #define LV_VGLITE_USE_GPU_INIT 0
+
+    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #define LV_VGLITE_FLUSH_MAX_COUNT 8
+
+    /** Enable border to simulate shadow.
+     *  NOTE: which usually improves performance,
+     *  but does not guarantee the same rendering quality as the software. */
+    #define LV_VGLITE_USE_BOX_SHADOW 0
+
+    /** VG-Lite gradient maximum cache number.
+     *  @note  The memory usage of a single gradient image is 4K bytes. */
+    #define LV_VGLITE_GRAD_CACHE_CNT 32
+
+    /** VG-Lite stroke maximum cache number. */
+    #define LV_VGLITE_STROKE_CACHE_CNT 32
+
     #define LV_USE_VGLITE_CHECK_ERROR 0
+
+    #define LV_VGLITE_USE_GPU_INIT 0
+
+    #define LV_VGLITE_VECTOR 0
+
+    #define LV_USE_VGLITE_BOX_SHADOW 0
+
+    #define LV_USE_VGLITE_MASK_RECT 0
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -315,32 +344,6 @@
 
 /** Draw using cached SDL textures*/
 #define LV_USE_DRAW_SDL 0
-
-/** Use VG-Lite GPU. */
-#define LV_USE_DRAW_VG_LITE 0
-
-#if LV_USE_DRAW_VG_LITE
-    /** Enable VG-Lite custom external 'gpu_init()' function */
-    #define LV_VG_LITE_USE_GPU_INIT 0
-
-    /** Enable VG-Lite assert. */
-    #define LV_VG_LITE_USE_ASSERT 0
-
-    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-    #define LV_VG_LITE_FLUSH_MAX_COUNT 8
-
-    /** Enable border to simulate shadow.
-     *  NOTE: which usually improves performance,
-     *  but does not guarantee the same rendering quality as the software. */
-    #define LV_VG_LITE_USE_BOX_SHADOW 1
-
-    /** VG-Lite gradient maximum cache number.
-     *  @note  The memory usage of a single gradient image is 4K bytes. */
-    #define LV_VG_LITE_GRAD_CACHE_CNT 32
-
-    /** VG-Lite stroke maximum cache number. */
-    #define LV_VG_LITE_STROKE_CACHE_CNT 32
-#endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
 #define LV_USE_DRAW_DMA2D 0
@@ -546,7 +549,7 @@
 /** Define a custom attribute for `lv_display_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
 
-/** Align VG_LITE buffers on this number of bytes.
+/** Align VGLITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 

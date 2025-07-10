@@ -60,7 +60,6 @@ void test_clip_corner_1(void)
     create_panel(100, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/clip_corner_1.png");
-
 }
 
 #endif

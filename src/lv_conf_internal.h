@@ -701,7 +701,7 @@
     #endif
 #endif
 
-/** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+/** Use VG-Lite GPU  */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
         #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
@@ -717,6 +717,13 @@
             #define LV_USE_VGLITE_BLIT_SPLIT CONFIG_LV_USE_VGLITE_BLIT_SPLIT
         #else
             #define LV_USE_VGLITE_BLIT_SPLIT 0
+        #endif
+    #endif
+    #ifndef LV_USE_VGLITE_DEBUG
+        #ifdef CONFIG_LV_USE_VGLITE_DEBUG
+            #define LV_USE_VGLITE_DEBUG CONFIG_LV_USE_VGLITE_DEBUG
+        #else
+            #define LV_USE_VGLITE_DEBUG 0
         #endif
     #endif
 
@@ -748,6 +755,21 @@
                 #endif
             #endif
         #endif
+    #else 
+        #ifndef LV_USE_VGLITE_DRAW_THREAD
+            #ifdef CONFIG_LV_USE_VGLITE_DRAW_THREAD
+                #define LV_USE_VGLITE_DRAW_THREAD CONFIG_LV_USE_VGLITE_DRAW_THREAD
+            #else
+                #define LV_USE_VGLITE_DRAW_THREAD 0
+            #endif
+        #endif
+        #ifndef LV_USE_VGLITE_DRAW_ASYNC
+            #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+            #else
+                #define LV_USE_VGLITE_DRAW_ASYNC  0
+            #endif
+        #endif
     #endif
 
     /** Enable VGLite asserts. */
@@ -759,12 +781,91 @@
         #endif
     #endif
 
-    /** Enable VGLite error checks. */
+    /** Enable VG-Lite custom external 'gpu_init()' function */
+    #ifndef LV_VGLITE_USE_GPU_INIT
+        #ifdef CONFIG_LV_VGLITE_USE_GPU_INIT
+            #define LV_VGLITE_USE_GPU_INIT CONFIG_LV_VGLITE_USE_GPU_INIT
+        #else
+            #define LV_VGLITE_USE_GPU_INIT 0
+        #endif
+    #endif
+
+    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #ifndef LV_VGLITE_FLUSH_MAX_COUNT
+        #ifdef CONFIG_LV_VGLITE_FLUSH_MAX_COUNT
+            #define LV_VGLITE_FLUSH_MAX_COUNT CONFIG_LV_VGLITE_FLUSH_MAX_COUNT
+        #else
+            #define LV_VGLITE_FLUSH_MAX_COUNT 8
+        #endif
+    #endif
+
+    /** Enable border to simulate shadow.
+     *  NOTE: which usually improves performance,
+     *  but does not guarantee the same rendering quality as the software. */
+    #ifndef LV_VGLITE_USE_BOX_SHADOW
+        #ifdef CONFIG_LV_VGLITE_USE_BOX_SHADOW
+            #define LV_VGLITE_USE_BOX_SHADOW CONFIG_LV_VGLITE_USE_BOX_SHADOW
+        #else
+            #define LV_VGLITE_USE_BOX_SHADOW 0
+        #endif
+    #endif
+
+    /** VG-Lite gradient maximum cache number.
+     *  @note  The memory usage of a single gradient image is 4K bytes. */
+    #ifndef LV_VGLITE_GRAD_CACHE_CNT
+        #ifdef CONFIG_LV_VGLITE_GRAD_CACHE_CNT
+            #define LV_VGLITE_GRAD_CACHE_CNT CONFIG_LV_VGLITE_GRAD_CACHE_CNT
+        #else
+            #define LV_VGLITE_GRAD_CACHE_CNT 32
+        #endif
+    #endif
+
+    /** VG-Lite stroke maximum cache number. */
+    #ifndef LV_VGLITE_STROKE_CACHE_CNT
+        #ifdef CONFIG_LV_VGLITE_STROKE_CACHE_CNT
+            #define LV_VGLITE_STROKE_CACHE_CNT CONFIG_LV_VGLITE_STROKE_CACHE_CNT
+        #else
+            #define LV_VGLITE_STROKE_CACHE_CNT 32
+        #endif
+    #endif
+
     #ifndef LV_USE_VGLITE_CHECK_ERROR
         #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
             #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
         #else
             #define LV_USE_VGLITE_CHECK_ERROR 0
+        #endif
+    #endif
+
+    #ifndef LV_VGLITE_USE_GPU_INIT
+        #ifdef CONFIG_LV_VGLITE_USE_GPU_INIT
+            #define LV_VGLITE_USE_GPU_INIT CONFIG_LV_VGLITE_USE_GPU_INIT
+        #else
+            #define LV_VGLITE_USE_GPU_INIT 0
+        #endif
+    #endif
+
+    #ifndef LV_VGLITE_VECTOR
+        #ifdef CONFIG_LV_VGLITE_VECTOR
+            #define LV_VGLITE_VECTOR CONFIG_LV_VGLITE_VECTOR
+        #else
+            #define LV_VGLITE_VECTOR 0
+        #endif
+    #endif
+
+    #ifndef LV_USE_VGLITE_BOX_SHADOW
+        #ifdef CONFIG_LV_USE_VGLITE_BOX_SHADOW
+            #define LV_USE_VGLITE_BOX_SHADOW CONFIG_LV_USE_VGLITE_BOX_SHADOW
+        #else
+            #define LV_USE_VGLITE_BOX_SHADOW 0
+        #endif
+    #endif
+
+    #ifndef LV_USE_VGLITE_MASK_RECT
+        #ifdef CONFIG_LV_USE_VGLITE_MASK_RECT
+            #define LV_USE_VGLITE_MASK_RECT CONFIG_LV_USE_VGLITE_MASK_RECT
+        #else
+            #define LV_USE_VGLITE_MASK_RECT 0
         #endif
     #endif
 #endif
@@ -886,78 +987,6 @@
         #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
     #else
         #define LV_USE_DRAW_SDL 0
-    #endif
-#endif
-
-/** Use VG-Lite GPU. */
-#ifndef LV_USE_DRAW_VG_LITE
-    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
-        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
-    #else
-        #define LV_USE_DRAW_VG_LITE 0
-    #endif
-#endif
-
-#if LV_USE_DRAW_VG_LITE
-    /** Enable VG-Lite custom external 'gpu_init()' function */
-    #ifndef LV_VG_LITE_USE_GPU_INIT
-        #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
-            #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
-        #else
-            #define LV_VG_LITE_USE_GPU_INIT 0
-        #endif
-    #endif
-
-    /** Enable VG-Lite assert. */
-    #ifndef LV_VG_LITE_USE_ASSERT
-        #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
-            #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
-        #else
-            #define LV_VG_LITE_USE_ASSERT 0
-        #endif
-    #endif
-
-    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-    #ifndef LV_VG_LITE_FLUSH_MAX_COUNT
-        #ifdef CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-            #define LV_VG_LITE_FLUSH_MAX_COUNT CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-        #else
-            #define LV_VG_LITE_FLUSH_MAX_COUNT 8
-        #endif
-    #endif
-
-    /** Enable border to simulate shadow.
-     *  NOTE: which usually improves performance,
-     *  but does not guarantee the same rendering quality as the software. */
-    #ifndef LV_VG_LITE_USE_BOX_SHADOW
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-                #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-            #else
-                #define LV_VG_LITE_USE_BOX_SHADOW 0
-            #endif
-        #else
-            #define LV_VG_LITE_USE_BOX_SHADOW 1
-        #endif
-    #endif
-
-    /** VG-Lite gradient maximum cache number.
-     *  @note  The memory usage of a single gradient image is 4K bytes. */
-    #ifndef LV_VG_LITE_GRAD_CACHE_CNT
-        #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-            #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-        #else
-            #define LV_VG_LITE_GRAD_CACHE_CNT 32
-        #endif
-    #endif
-
-    /** VG-Lite stroke maximum cache number. */
-    #ifndef LV_VG_LITE_STROKE_CACHE_CNT
-        #ifdef CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
-            #define LV_VG_LITE_STROKE_CACHE_CNT CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
-        #else
-            #define LV_VG_LITE_STROKE_CACHE_CNT 32
-        #endif
     #endif
 #endif
 
@@ -1559,7 +1588,7 @@
     #endif
 #endif
 
-/** Align VG_LITE buffers on this number of bytes.
+/** Align VGLITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
     #ifdef LV_KCONFIG_PRESENT

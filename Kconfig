@@ -376,6 +376,11 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
+		config LV_USE_VGLITE_DEBUG
+			bool "Enable dump functions to debug VGLite behavior"
+			depends on LV_USE_DRAW_VGLITE
+			default n
+
 		config LV_USE_VGLITE_DRAW_THREAD
 			bool "Use additional draw thread for VG-Lite processing"
 			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE
@@ -397,6 +402,38 @@ menu "LVGL configuration"
 			bool "Enable VGLite error checks"
 			depends on LV_USE_DRAW_VGLITE
 			default n
+
+		config LV_VGLITE_USE_GPU_INIT
+			bool "Enable VG-Lite custom external 'gpu_init()' function"
+			default n
+			depends on LV_USE_DRAW_VGLITE
+
+		config LV_VGLITE_USE_ASSERT
+			bool "Enable VG-Lite assert"
+			default n
+			depends on LV_USE_DRAW_VGLITE
+
+		config LV_VGLITE_USE_BOX_SHADOW
+			bool "Enable border to simulate shadow"
+			default n
+			depends on LV_USE_DRAW_VGLITE
+			help
+				which usually improves performance,
+				but does not guarantee the same rendering quality as the software.
+
+		config LV_VGLITE_GRAD_CACHE_CNT
+			int "VG-Lite gradient maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VGLITE
+			help
+				The memory usage of a single gradient:
+					linear: 4K bytes.
+					radial: radius * 4K bytes.
+
+		config LV_VGLITE_STROKE_CACHE_CNT
+			int "VG-Lite stroke maximum cache number."
+			default 8
+			depends on LV_USE_DRAW_VGLITE
 
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
@@ -451,50 +488,6 @@ menu "LVGL configuration"
 			default n
 			help
 				Uses SDL renderer API
-
-		config LV_USE_DRAW_VG_LITE
-			bool "Use VG-Lite GPU"
-			default n
-			select LV_USE_MATRIX
-
-		config LV_VG_LITE_USE_GPU_INIT
-			bool "Enable VG-Lite custom external 'gpu_init()' function"
-			default n
-			depends on LV_USE_DRAW_VG_LITE
-
-		config LV_VG_LITE_USE_ASSERT
-			bool "Enable VG-Lite assert"
-			default n
-			depends on LV_USE_DRAW_VG_LITE
-
-		config LV_VG_LITE_FLUSH_MAX_COUNT
-			int "VG-Lite flush commit trigger threshold"
-			default 8
-			depends on LV_USE_DRAW_VG_LITE
-			help
-				GPU will try to batch these many draw tasks
-
-		config LV_VG_LITE_USE_BOX_SHADOW
-			bool "Enable border to simulate shadow"
-			default y
-			depends on LV_USE_DRAW_VG_LITE
-			help
-				which usually improves performance,
-				but does not guarantee the same rendering quality as the software.
-
-		config LV_VG_LITE_GRAD_CACHE_CNT
-			int "VG-Lite gradient maximum cache number."
-			default 32
-			depends on LV_USE_DRAW_VG_LITE
-			help
-				The memory usage of a single gradient:
-					linear: 4K bytes.
-					radial: radius * 4K bytes.
-
-		config LV_VG_LITE_STROKE_CACHE_CNT
-			int "VG-Lite stroke maximum cache number."
-			default 8
-			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
@@ -763,7 +756,7 @@ menu "LVGL configuration"
 					Add a name table to every widget class, so the property can be accessed by name.
 					Note, the const table will increase flash usage.
 
-			config LV_USE_VG_LITE_THORVG
+			config LV_USE_VGLITE_THORVG
 				bool "VG-Lite Simulator"
 				default n
 				depends on LV_USE_THORVG
@@ -772,35 +765,35 @@ menu "LVGL configuration"
 					for debugging and testing on PC simulator. Enable LV_USE_THORVG,
 					Either internal ThorVG or external ThorVG library is required.
 
-			config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+			config LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT
 				bool "Enable LVGL blend mode support"
 				default n
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
-			config LV_VG_LITE_THORVG_YUV_SUPPORT
+			config LV_VGLITE_THORVG_YUV_SUPPORT
 				bool "Enable YUV color format support"
 				default n
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
-			config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+			config LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
 				bool "Enable linear gradient extension support"
 				default n
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
-			config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+			config LV_VGLITE_THORVG_16PIXELS_ALIGN
 				bool "Enable 16 pixels alignment"
 				default y
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
-			config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+			config LV_VGLITE_THORVG_BUF_ADDR_ALIGN
 				int "Buffer address alignment"
 				default 64
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
-			config LV_VG_LITE_THORVG_THREAD_RENDER
+			config LV_VGLITE_THORVG_THREAD_RENDER
 				bool "Enable multi-thread render"
 				default n
-				depends on LV_USE_VG_LITE_THORVG
+				depends on LV_USE_VGLITE_THORVG
 
 			config LV_USE_GESTURE_RECOGNITION
 				bool "Enable the multi-touch gesture recognition feature"

@@ -566,7 +566,6 @@ void test_bar_orientation(void)
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 20);
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 20, 100);
     bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 100);
-
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_2.png");
 }
 

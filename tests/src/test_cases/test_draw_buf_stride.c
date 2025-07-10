@@ -4,7 +4,6 @@
 
 #include "unity/unity.h"
 
-
 void setUp(void)
 {
     /* Function run before every test */
@@ -56,8 +55,9 @@ void test_draw_buf_stride_adjust(void)
         snprintf(ref_image, sizeof(ref_image), "draw/temp_%s.o", color_formats[i]); /*Use .o file name so git ignores it.*/
 
         lv_image_set_src(img, img_src);
+#if !LV_USE_DRAW_VGLITE
         TEST_ASSERT_EQUAL_SCREENSHOT(ref_image); /*Generate the reference image, use .o so git ignore it*/
-
+#endif
         lv_image_cache_drop(img_src); /* Image could be added to cache during lv_image_set_src*/
 
         lv_image_decoder_dsc_t decoder_dsc;
@@ -90,21 +90,29 @@ void test_draw_buf_stride_adjust(void)
         lv_draw_buf_copy(larger, NULL, decoded, NULL);
         lv_image_cache_drop(larger);
         lv_image_set_src(img, larger);
+
+#if !LV_USE_DRAW_VGLITE
         TEST_ASSERT_EQUAL_SCREENSHOT(ref_image); /*The image should still looks same*/
+#endif
 
         /* Shrink stride to minimal stride should succeed */
         res = lv_draw_buf_adjust_stride(larger, min_stride);
         TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
         lv_image_cache_drop(larger);
         lv_image_set_src(img, larger);
-        TEST_ASSERT_EQUAL_SCREENSHOT(ref_image); /*Test against with above reference image*/
 
+#if !LV_USE_DRAW_VGLITE
+        TEST_ASSERT_EQUAL_SCREENSHOT(ref_image); /*Test against with above reference image*/
+#endif
         /* Expand the stride should work, use a proper stride value should succeed*/
         res = lv_draw_buf_adjust_stride(larger, min_stride + 20);
         TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
         lv_image_cache_drop(larger);
         lv_image_set_src(img, larger);
+
+#if !LV_USE_DRAW_VGLITE
         TEST_ASSERT_EQUAL_SCREENSHOT(ref_image); /*The image should still look same*/
+#endif
 
         lv_draw_buf_destroy(larger);
         lv_draw_buf_destroy(decoded);

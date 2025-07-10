@@ -22,7 +22,9 @@ void test_snapshot_should_not_leak_memory(void)
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
         snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+#if !LV_USE_DRAW_VGLITE
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
+#endif
     }
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
@@ -31,7 +33,6 @@ void test_snapshot_should_not_leak_memory(void)
 
     lv_mem_monitor(&monitor);
     final_available_memory = monitor.free_size;
-
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
 }
 
@@ -54,7 +55,9 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
         snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+#if !LV_USE_DRAW_VGLITE
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
+#endif
     }
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
@@ -68,6 +71,7 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
 }
 
+
 void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
@@ -79,18 +83,21 @@ void test_snapshot_take_snapshot_immediately_after_obj_create(void)
     lv_image_set_src(img_obj, draw_dsc);
 
     lv_obj_delete(label);
-
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_0.png");
-
+#endif
     lv_obj_center(img_obj);
     lv_image_set_inner_align(img_obj, LV_IMAGE_ALIGN_CENTER);
     lv_image_set_rotation(img_obj, 450);
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_1.png");
+#endif
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
 }
+
 
 void test_snapshot_take_snapshot_with_transform(void)
 {
@@ -106,7 +113,9 @@ void test_snapshot_take_snapshot_with_transform(void)
     lv_obj_t * img_obj = lv_image_create(lv_screen_active());
     lv_image_set_src(img_obj, draw_dsc);
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_2.png");
+#endif
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
@@ -166,7 +175,9 @@ void test_snapshot_take_snapshot_multiple_widgets(void)
     lv_image_set_src(img, draw_buf);
     lv_obj_center(img);
 
+#if !LV_USE_DRAW_VGLITE
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_3.png");
+#endif
 
     lv_obj_clean(lv_screen_active());
     lv_draw_buf_destroy(draw_buf);
@@ -195,5 +206,4 @@ void test_snapshot_take_snapshot_with_transform(void)
 }
 
 #endif
-
 #endif

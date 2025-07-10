@@ -512,7 +512,7 @@ void test_freetype_render_bitmap(void)
 
 void test_freetype_render_outline(void)
 {
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VGLITE
     /* VG-Lite support rendering outline */
     test_freetype_with_render_mode(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, "libs/freetype_render_outline.png");
     LV_UNUSED(outline_data_U9F98);

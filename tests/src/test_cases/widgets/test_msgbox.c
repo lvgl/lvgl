@@ -44,7 +44,6 @@ void test_msgbox_creation_successful_with_close_button(void)
     lv_msgbox_add_close_button(msgbox);
 
     TEST_ASSERT_NOT_NULL(msgbox);
-
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_with_close_btn.png");
 }
 
@@ -190,5 +189,4 @@ void test_msgbox_content_auto_height(void)
     /* Manual Size : The height of the msgbox's obj-content should also be equal to the total height of the msgbox's element. */
     TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 }
-
 #endif
