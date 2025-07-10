@@ -435,7 +435,7 @@ leave the other states untouched) use
 :cpp:expr:`lv_obj_add_state(widget, LV_STATE_...)` and
 :cpp:expr:`lv_obj_remove_state(widget, LV_STATE_...)`.  In both cases OR-ed state
 values can be used as well. E.g.
-:cpp:expr:`lv_obj_add_state(widget, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
+:cpp:expr:`lv_obj_add_state(widget, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states, read the related section of
 :ref:`styles_overview`.

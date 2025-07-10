@@ -137,7 +137,7 @@ void test_xml_style_same_name(void)
 
     lv_xml_component_register_from_data("comp1", comp1);
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
-    TEST_ASSERT_EQUAL(20, lv_obj_get_style_bg_opa(obj, 0));
+    TEST_ASSERT_EQUAL(20, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
 }
 
 
@@ -165,7 +165,7 @@ void test_xml_style_remove(void)
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
     /*The first remove_style removed the main style, so the radius should be the default 0*/
-    TEST_ASSERT_EQUAL(0, lv_obj_get_style_radius(obj, 0));
+    TEST_ASSERT_EQUAL(0, lv_obj_get_style_radius(obj, LV_PART_MAIN));
 
     /*Styles are removed from the knob in the default state*/
     TEST_ASSERT_EQUAL(0, lv_obj_get_style_radius(obj, LV_PART_KNOB));
