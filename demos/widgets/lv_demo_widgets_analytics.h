@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_demo_widgets.h"
-#if LV_USE_DEMO_BENCHMARK
+#if LV_USE_DEMO_WIDGETS
 
 /*********************
  *      DEFINES
