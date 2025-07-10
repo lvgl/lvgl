@@ -350,7 +350,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     _pxp_execute_drawing(draw_pxp_unit);
 
-    draw_pxp_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_pxp_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_pxp_unit->task_act = NULL;
 
     /* The draw unit is free now. Request a new dispatching as it can get a new task. */
@@ -482,7 +482,7 @@ static void _pxp_render_thread_cb(void * ptr)
         _pxp_execute_drawing(u);
 
         /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
 
         /* Cleanup. */
         u->task_act = NULL;

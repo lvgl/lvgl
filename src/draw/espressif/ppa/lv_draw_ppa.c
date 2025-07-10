@@ -176,7 +176,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     ppa_execute_drawing(u);
 
 #if !LV_PPA_NONBLOCKING_OPS
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
     lv_draw_dispatch_request();
 #endif
@@ -229,7 +229,7 @@ static void ppa_thread(void * arg)
             lv_thread_sync_wait(&u->interrupt_signal);
         } while(u->task_act != NULL);
 
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         u->task_act = NULL;
         lv_draw_dispatch_request();
     }

@@ -223,7 +223,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     draw_execute(u);
 
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/

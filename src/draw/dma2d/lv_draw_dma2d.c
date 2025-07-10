@@ -397,7 +397,7 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_invalidate_cache(&u->writing_area);
 #endif
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 }
 
