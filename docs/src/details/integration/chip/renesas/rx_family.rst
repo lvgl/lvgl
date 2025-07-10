@@ -11,11 +11,14 @@ Supported boards in the RX Family:
 
 - **RX72N Envision Kit**
 
+
+
 Run the Project
 ***************
 
-- The official IDE of Renesas is called e\ |sup2| studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
-  It can be downloaded `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
+- The official IDE of Renesas is called e\ |sup2| studio. Because it's Eclipse-based,
+  it runs on Windows, Linux, and Mac as well.  It can be downloaded
+  `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
 - Download and install the required driver for the debugger
 
    - for Windows: `64 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-tools-v27700-64-bit-version-windows-os?r=488806>`__
@@ -23,15 +26,13 @@ Run the Project
    - for Linux: `here <https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806>`__
 
 - RX72 requires an external compiler for the RXv3 core. A free and open-source version is available
-  `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after a registration.
+  `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after registration.
 
   The compiler must be activated in e\ |sup2| studio:
 
   - Go to go to ``Help`` -> ``Add Renesas Toolchains``
   - Press the ``Add...`` button
-  - Browse the installation folder of the toolchain
-
-  <br/>
+  - Select the installation folder of the toolchain
 
   .. image:: /_static/images/renesas/toolchains.png
      :alt: Toolchains
@@ -47,10 +48,11 @@ Run the Project
 
 - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 - Select the cloned folder and press ``Finish``.
-- Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
+- Double-click on ``RX72N_EnVision_LVGL.scfg`` to activate the ``Configuration Window``.
 
-  Renesas' Smart Configurator (SMC) includes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-  The components will be available via code generation, including the entry point of the application.
+  Renesas' Smart Configurator (SMC) includes BSP and HAL layer support extended with
+  multiple RTOS variants and other middleware stacks.  The components will be
+  available via code generation, including the entry point of the application.
 
   Press ``Generate Code`` in the top right corner.
 
@@ -68,6 +70,7 @@ Run the Project
    Make sure that both channels of ``SW1`` DIP switch (next to ``ECN1``) are OFF.
 
 
+
 Modify the project
 ******************
 
@@ -77,7 +80,8 @@ Open a demo
 
 The entry point of the main task is contained in ``src/LVGL_thread_entry.c``.
 
-You can disable the LVGL demos (or just comment them out) and call some ``lv_example_...()`` functions, or add your custom code.
+You can disable the LVGL demos (or just comment them out) and call some
+``lv_example_...()`` functions, or add your own custom code.
 
 
 Configuration
@@ -86,11 +90,13 @@ Configuration
 ``src/lv_conf.h`` contains the most important settings for LVGL. Namely:
 
 - :c:macro:`LV_COLOR_DEPTH` to set LVGL's default color depth
-- :c:macro:`LV_MEM_SIZE` to set the maximum RAM available for LVGL
+- :c:macro:`LV_MEM_SIZE` to set the maximum RAM available to LVGL
 - :c:macro:`LV_USE_DAVE2D` to enable the GPU
 
 
-Hardware and software components can be modified in a visual way using the `Configuration Window`.
+Hardware and software components can be modified in a visual way using the
+``Configuration Window``.
+
 
 
 Support

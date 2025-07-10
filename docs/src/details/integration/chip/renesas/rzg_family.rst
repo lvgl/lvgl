@@ -7,15 +7,19 @@ Supported boards in the RZ/G Family:
 - **RZ/G2L-EVKIT**
 - **RZ/G2UL-EVKIT**
 
+
+
 Run the Project
 ***************
 
-- The RZ/G boards are MPUs with support for running Linux. Projects are built for them using a cross-compiler
-  CLI toolchain SDK in a Linux PC environment (WSL, Docker, etc. can be used on Windows).
-- The G2L has a Wayland desktop and the project appears as a Wayland window. The G2UL does not have
-  a desktop so the project is fullscreen and uses the ``fbdev`` driver.
-- The SDK currently uses LVGL v8.3 so this project uses this version to mirror the SDK version,
-  even though LVGL is statically linked. You may try using newer versions of LVGL.
+- The RZ/G boards are MPUs with support for running Linux. Projects are built for them
+  using a cross-compiler CLI toolchain SDK in a Linux PC environment (WSL, Docker,
+  etc. can be used on Windows).
+- The G2L has a Wayland desktop and the project appears as a Wayland window. The G2UL
+  does not have a desktop so the project is fullscreen and uses the ``fbdev`` driver.
+- The SDK currently uses LVGL v8.3 so this project uses this version to mirror the SDK
+  version, even though LVGL is statically linked. You may try using newer versions of LVGL.
+  See the `v8-to-v9 Migration Guide <https://docs.lvgl.io/9.0/CHANGELOG.html#migration-guide>`__ for things you will need to address.
 - Clone the ready-to-use repository for your selected board:
 
     .. code-block:: shell
@@ -34,6 +38,7 @@ Run the Project
         ./lvgl_demo_benchmark
 
 
+
 Modify the project
 ******************
 
@@ -44,15 +49,15 @@ Open a demo
 The entry point is contained in ``src/main.c``.
 
 You can disable the LVGL demos (``lv_demo_benchmark()``) (or just comment them out)
-and call some ``lv_example_...()`` functions, or add your custom code.
+and call some ``lv_example_...()`` functions, or add your own custom code.
 
 
 Configuration
 -------------
 
 Edit ``lv_conf.h`` and ``lv_drv_conf.h`` to configure LVGL. The board image
-contains LVGL and lv_drivers as dynamically linkable libraries. This project builds LVGL statically
-for customizability and to port the LVGL v9 benchmark LVGL v8.3.
+contains LVGL and lv_drivers as dynamically linkable libraries. This project builds
+LVGL statically for customizability and to port the LVGL v9 benchmark from LVGL v8.3.
 
 
 Support
