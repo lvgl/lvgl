@@ -259,6 +259,10 @@ typedef struct _lv_global_t {
     lv_evdev_discovery_t * evdev_discovery;
 #endif
 
+#if LV_USE_XML
+    const char * xml_path_prefix;
+#endif
+
     void * user_data;
 } lv_global_t;
 
