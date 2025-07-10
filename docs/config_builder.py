@@ -22,13 +22,9 @@ disabled_option_re = re.compile(r'^\s*#define\s+(LV_(?:USE|FONT)_\w+)\s+(\b0\b)'
 
 leave_disabled_list = [
     'LV_USE_PROFILER',
-    'LV_FONT_SIMSUN_14_CJK',
-    'LV_FONT_SIMSUN_16_CJK',
     'LV_USE_DRAW_ARM2D_SYNC',
     'LV_USE_NATIVE_HELIUM_ASM',
 ]
-# Note:  The 2 LV_FONT_SIMSUN_... fonts have been deprecated in favor of
-# LV_FONT_SOURCE_HAN_SANS_SC_14_CJK and LV_FONT_SOURCE_HAN_SANS_SC_16_CJK.
 
 
 def run(output_cfg_path=None):

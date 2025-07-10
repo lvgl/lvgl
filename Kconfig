@@ -886,10 +886,6 @@ menu "LVGL configuration"
 				bool "Enable Montserrat 28 compressed"
 			config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
-			config LV_FONT_SIMSUN_14_CJK
-				bool "Enable Simsun 14 CJK"
-			config LV_FONT_SIMSUN_16_CJK
-				bool "Enable Simsun 16 CJK"
 			config LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
 				bool "Enable SourceHanSansSC 14 CJK"
 			config LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
@@ -978,12 +974,6 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Dejavu 16 Persian, Hebrew, Arabic letters"
 				select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
-			config LV_FONT_DEFAULT_SIMSUN_14_CJK
-				bool "Simsun 14 CJK"
-				select LV_FONT_SIMSUN_14_CJK
-			config LV_FONT_DEFAULT_SIMSUN_16_CJK
-				bool "Simsun 16 CJK"
-				select LV_FONT_SIMSUN_16_CJK
 			config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
 				bool "SourceHanSansSC 14 CJK"
 				select LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
