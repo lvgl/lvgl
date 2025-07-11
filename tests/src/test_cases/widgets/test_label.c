@@ -691,4 +691,21 @@ void test_label_long_mode_clip(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
 }
 
+void test_label_wrap_mode_clip(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_WRAP);
+    lv_label_set_text(label1, "This is a long text that should be clipped vertically");
+    lv_obj_set_size(label1, 150, 25);
+    lv_obj_set_pos(label1, 10, 10);
+    lv_obj_set_style_border_width(label1, 1, LV_PART_MAIN);
+    lv_obj_set_style_border_color(label1, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
+
+    char buf[128];
+    lv_snprintf(buf, sizeof(buf), "widgets/label_wrap_clip.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+}
+
 #endif
