@@ -24,9 +24,12 @@ struct _lv_cache_entry_t {
     const lv_cache_t * cache;
     int32_t ref_cnt;
     uint32_t node_size;
-
-    bool is_invalid;
+#define LV_CACHE_ENTRY_FLAG_INVALID (1 << 0)
+#define LV_CACHE_ENTRY_FLAG_DISABLE_DELETE (1 << 1)
+#define LV_CACHE_CLASS_FLAG (1 << 7)
+    uint8_t flags;
 };
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -89,13 +92,18 @@ void lv_cache_entry_set_node_size(lv_cache_entry_t * entry, uint32_t node_size)
 void lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid)
 {
     LV_ASSERT_NULL(entry);
-    entry->is_invalid = is_invalid;
+    if(is_invalid) {
+        entry->flags |= LV_CACHE_ENTRY_FLAG_INVALID;
+    }
+    else {
+        entry->flags &= ~LV_CACHE_ENTRY_FLAG_INVALID;
+    }
 }
 
 bool lv_cache_entry_is_invalid(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
-    return entry->is_invalid;
+    return entry->flags & LV_CACHE_ENTRY_FLAG_INVALID;
 }
 
 void * lv_cache_entry_get_data(lv_cache_entry_t * entry)
@@ -169,16 +177,46 @@ void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, con
     entry->cache = cache;
     entry->node_size = node_size;
     entry->ref_cnt = 0;
-    entry->is_invalid = false;
+    entry->flags = 0;
 }
 
 void lv_cache_entry_delete(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
 
+    if(entry->flags & LV_CACHE_ENTRY_FLAG_DISABLE_DELETE) {
+        return;
+    }
+
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);
 }
+
+void lv_cache_entry_set_class_flag(lv_cache_entry_t * entry, bool value)
+{
+
+    LV_ASSERT_NULL(entry);
+    if(value) {
+        entry->flags |= LV_CACHE_CLASS_FLAG;
+    }
+    else {
+        entry->flags &= ~LV_CACHE_CLASS_FLAG;
+    }
+}
+
+bool lv_cache_entry_get_class_flag(lv_cache_entry_t * entry)
+{
+
+    LV_ASSERT_NULL(entry);
+    return entry->flags & LV_CACHE_CLASS_FLAG;
+}
+
+void lv_cache_entry_disable_deleting(lv_cache_entry_t * entry)
+{
+
+    entry->flags |= LV_CACHE_ENTRY_FLAG_DISABLE_DELETE;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

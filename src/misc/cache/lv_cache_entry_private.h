@@ -36,7 +36,9 @@ void   lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid);
 void   lv_cache_entry_set_cache(lv_cache_entry_t * entry, const lv_cache_t * cache);
 void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry);
 void   lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data);
-
+void   lv_cache_entry_set_class_flag(lv_cache_entry_t * entry, bool value);
+bool   lv_cache_entry_get_class_flag(lv_cache_entry_t * entry);
+void lv_cache_entry_disable_deleting(lv_cache_entry_t * entry);
 /*************************
  *    GLOBAL VARIABLES
  *************************/
