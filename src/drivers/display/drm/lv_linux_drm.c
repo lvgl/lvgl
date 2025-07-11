@@ -73,6 +73,7 @@ typedef struct {
     unsigned long int size;
     uint8_t * map;
     uint32_t fb_handle;
+    int prime_fd;
 #if LV_LINUX_DRM_USE_EGL
     uint32_t fb_id;
 #endif
@@ -253,7 +254,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
         sync_req.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_RW;
         int res;
 
-        if((res = ioctl(drm_dev->act_buf->handle, DMA_BUF_IOCTL_SYNC, &sync_req)) != 0) {
+        if((res = ioctl(drm_dev->act_buf->prime_fd, DMA_BUF_IOCTL_SYNC, &sync_req)) != 0) {
             LV_LOG_ERROR("Failed to start DMA-BUF R/W SYNC res: %d", res);
         }
 #endif
@@ -541,7 +542,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     struct dma_buf_sync sync_req;
 
     sync_req.flags = DMA_BUF_SYNC_END | DMA_BUF_SYNC_RW;
-    if(ioctl(buf->handle, DMA_BUF_IOCTL_SYNC, &sync_req) != 0) {
+    if(ioctl(buf->prime_fd, DMA_BUF_IOCTL_SYNC, &sync_req) != 0) {
         LV_LOG_ERROR("Failed to end DMA-BUF R/W SYNC");
     }
 
@@ -1057,10 +1058,10 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     }
 
     /* Used to perform DMA_BUF_SYNC ioctl calls during the rendering cycle */
-    buf->handle = prime_fd;
+    buf->prime_fd = prime_fd;
 
     /* Convert prime fd to a libdrm buffer handle */
-    drmPrimeFDToHandle(drm_dev->fd, buf->handle, &handles[0]);
+    drmPrimeFDToHandle(drm_dev->fd, buf->prime_fd, &handles[0]);
 
     /* create libdrm framebuffer */
     res = drmModeAddFB2(drm_dev->fd, drm_dev->width, drm_dev->height, drm_dev->fourcc,
