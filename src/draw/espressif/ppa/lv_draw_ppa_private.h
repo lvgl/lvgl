@@ -95,7 +95,7 @@ static inline bool ppa_src_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
             is_cf_supported = true;
             break;
         default:
@@ -113,7 +113,6 @@ static inline bool ppa_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
         default:
