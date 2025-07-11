@@ -62,12 +62,8 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         .fg_alpha_fix_val = dsc->opa,
         .bg_ck_en              = false,
         .fg_ck_en              = false,
-#if LV_PPA_NONBLOCKING_OPS
         .mode            = PPA_TRANS_MODE_NON_BLOCKING,
         .user_data       = u,
-#else
-        .mode            = PPA_TRANS_MODE_BLOCKING,
-#endif
     };
 
     esp_err_t ret = ppa_do_blend(u->blend_client, &cfg);
