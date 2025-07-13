@@ -64,7 +64,17 @@ def main() -> bool:
         default=False,
         help="Automatically clean build directories",
     )
-
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Launch QEMU in debug mode allowing you to connect to gdb",
+    )
+    parser.add_argument(
+        "--debug-port",
+        default=5555,
+        help="Port used to connect to QEMU in debug mode",
+    )
     parser.add_argument(
         "actions",
         nargs="*",
@@ -80,6 +90,15 @@ def main() -> bool:
     else:
         options = perf_test_options.keys()
 
+    # Since test suites are run inside a virtual space, debugging them is tricky
+    # because every test suite will be loaded into memory at the same virtual address
+    # this means that when you try to set a breakpoint (e.g: in `main`), gdb will actually
+    # hit that breakpoint for EACH test_suite that runs, which can be very confusing
+    # Instead, only allow debugging if a test_suite is selected as we won't encounter that problem
+    if args.debug and not args.test_suite:
+        print("Please provide the test suite you want to debug")
+        exit(1)
+
     is_error = False
     for option_name in options:
         if any(action in args.actions for action in ("generate", "build", "test")):
@@ -88,7 +107,14 @@ def main() -> bool:
             generate_files(option_name, args.test_suite)
 
         if "test" in args.actions:
-            ret = run_tests(option_name, "lv_test_perf_conf.h", args.pull)
+            ret = run_tests(
+                option_name,
+                "lv_test_perf_conf.h",
+                args.pull,
+                args.debug,
+                args.debug_port,
+                args.test_suite,
+            )
             is_error = is_error or not ret
 
         if args.auto_clean:
@@ -266,6 +292,7 @@ def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> 
         output.append(
             f"target_include_directories({runner_elf_file} PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/../unity)"
         )
+        output.append(f"target_compile_options({runner_elf_file} PRIVATE -ggdb)")
 
     write_lines_to_file(path, output)
 
@@ -456,7 +483,14 @@ def check_for_success(container_name):
     return True
 
 
-def run_tests(options_name: str, lv_conf_name: str, pull: bool) -> bool:
+def run_tests(
+    options_name: str,
+    lv_conf_name: str,
+    pull: bool,
+    debug: bool,
+    debug_port: int,
+    test_suite: Optional[str],
+) -> bool:
     """
     Runs the tests by running the docker image associated with `options_name`
     while mounting the correct volumes from the previous generated files
@@ -517,14 +551,6 @@ def run_tests(options_name: str, lv_conf_name: str, pull: bool) -> bool:
     interactive = "-it" if sys.stdout.isatty() else "-t"
     command = ["docker", "run", "--privileged", "--name", container_name, interactive]
 
-    if pull:
-        command.append("--pull=always")
-
-    for v in volumes:
-        command.extend(v)
-
-    command.append(docker_image_name)
-
     print()
     print()
     label = "Launching: %s: %s" % (
@@ -534,6 +560,20 @@ def run_tests(options_name: str, lv_conf_name: str, pull: bool) -> bool:
     print("=" * len(label))
     print(label)
     print("=" * len(label))
+
+    if pull:
+        command.append("--pull=always")
+
+    if debug:
+        command.append("-e")
+        command.append("SO3_USR_DEBUG=1")
+        command.append("-p")
+        command.append(f"{debug_port}:1234")
+
+    for v in volumes:
+        command.extend(v)
+
+    command.append(docker_image_name)
 
     try:
         subprocess.check_call(command)
