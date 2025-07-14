@@ -20,12 +20,13 @@ static void event_cb(lv_event_t * e)
         LV_LOG_USER("Selected point %d", (int)id);
 
         lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
+        int32_t value = 0;
         while(ser) {
             lv_point_t p;
             lv_chart_get_point_pos_by_id(chart, ser, id, &p);
 
             int32_t * y_array = lv_chart_get_series_y_array(chart, ser);
-            int32_t value = y_array[id];
+            value += y_array[id];
 
             /*Draw a rectangle above the clicked point*/
             lv_layer_t * layer = lv_event_get_layer(e);
@@ -40,8 +41,8 @@ static void event_cb(lv_event_t * e)
             lv_area_t rect_area;
             rect_area.x1 = chart_obj_coords.x1 + p.x - 20;
             rect_area.x2 = chart_obj_coords.x1 + p.x + 20;
-            rect_area.y1 = chart_obj_coords.y1 + p.y - 30;
-            rect_area.y2 = chart_obj_coords.y1 + p.y - 10;
+            rect_area.y1 = chart_obj_coords.y1 + p.y - 10;
+            rect_area.y2 = chart_obj_coords.y1 + p.y + 10;
             lv_draw_rect(layer, &draw_rect_dsc, &rect_area);
 
             /*Draw the value as label to the center of the rectangle*/
@@ -75,22 +76,24 @@ void lv_example_chart_3(void)
     /*Create a chart*/
     lv_obj_t * chart;
     chart = lv_chart_create(lv_screen_active());
-    lv_obj_set_size(chart, 200, 150);
+    lv_obj_set_size(chart, 280, 180);
+    lv_obj_set_style_pad_column(chart, 4, 0);
+    lv_obj_set_style_pad_bottom(chart, 40, 0);
     lv_obj_center(chart);
+    lv_chart_set_type(chart, LV_CHART_TYPE_STACKED);
 
     lv_obj_add_event_cb(chart, event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(chart);
 
-    /*Zoom in a little in X*/
-    //    lv_chart_set_scale_x(chart, 800);
-
     /*Add two data series*/
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser3 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart, ser1, (int32_t)lv_rand(60, 90));
-        lv_chart_set_next_value(chart, ser2, (int32_t)lv_rand(10, 40));
+        lv_chart_set_next_value(chart, ser1, lv_rand(15, 30));
+        lv_chart_set_next_value(chart, ser2, lv_rand(15, 30));
+        lv_chart_set_next_value(chart, ser3, lv_rand(15, 30));
     }
 }
 
