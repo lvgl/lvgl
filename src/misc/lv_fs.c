@@ -125,10 +125,13 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
             lv_fs_path_ex_t * path_ex = (lv_fs_path_ex_t *)path;
-            file_p->cache->buffer = (void *)path_ex->buffer;
+            lv_result_t res = lv_fs_get_buffer_from_path(path_ex, &file_p->cache->buffer, &file_p->cache->end);
+            if(res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("lv_fs_path_ex_t is invalid");
+                return LV_FS_RES_UNKNOWN;
+            }
             file_p->cache->start = 0;
             file_p->cache->file_position = 0;
-            file_p->cache->end = path_ex->size;
         }
         /*Set an invalid range by default*/
         else {
@@ -144,11 +147,41 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
 void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size)
 {
-    path->path[0] = letter;
-    path->path[1] = ':';
-    path->path[2] = 0;
-    path->buffer = buf;
-    path->size = size;
+    /*Make a path the contains both the address and the size.
+     * Also append .bin to make look like a real file path*/
+    lv_snprintf(path->path, sizeof(path->path), "%c:%ld-%ld.bin", letter, (lv_uintptr_t) buf, size);
+}
+
+lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size)
+{
+    LV_ASSERT(path);
+    LV_ASSERT(buffer);
+    LV_ASSERT(size);
+
+    *size = 0;
+    *buffer = NULL;
+
+    if(path->path[0] < 'A' || path->path[0] > 'Z') return LV_RESULT_INVALID;
+    if(path->path[1] != ':') return LV_RESULT_INVALID;
+
+    uint32_t i;
+    lv_uintptr_t adr = 0;
+    for(i = 2; path->path[i] != '-' && path->path[i] != '\0'; i++) {
+        adr = adr * 10;
+        adr += path->path[i] - '0';
+    }
+
+    if(path->path[i] == '\0') return LV_RESULT_INVALID;
+    i++; /*Skip '-'*/
+
+    for(; path->path[i] != '.' && path->path[i] != '\0'; i++) {
+        *size = (*size) * 10;
+        *size += path->path[i] - '0';
+    }
+
+    *buffer = (void *)adr;
+
+    return LV_RESULT_OK;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
