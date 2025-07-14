@@ -78,7 +78,6 @@ void lv_example_chart_3(void)
     chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 280, 180);
     lv_obj_set_style_pad_column(chart, 4, 0);
-    lv_obj_set_style_pad_bottom(chart, 40, 0);
     lv_obj_center(chart);
     lv_chart_set_type(chart, LV_CHART_TYPE_STACKED);
 
