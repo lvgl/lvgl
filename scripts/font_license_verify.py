@@ -22,7 +22,11 @@ _FONT_NAME_MAP = {
     "Montserrat Medium": "Montserrat",
     "Montserrat SemiBold": "Montserrat",
     "Montserrat Bold": "Montserrat",
+    "Montserrat Regular": "Montserrat",
     "Source Han Sans SC Normal": "Source Han Sans SC",
+    "Font Awesome 5 Free Solid": "Font Awesome",
+    "Lato Regular": "Lato",
+    "Noto Sans SC Regular": "Noto Sans SC",
 }
 
 
