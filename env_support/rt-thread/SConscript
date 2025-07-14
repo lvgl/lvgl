@@ -20,7 +20,7 @@ def check_h_hpp_exists(path):
             return True
     return False
 
-lvgl_cwd = cwd + '/../../'
+lvgl_cwd = './../../'
 
 lvgl_src_cwd = lvgl_cwd + 'src/'
 inc = inc + [lvgl_src_cwd]
