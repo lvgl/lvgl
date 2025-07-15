@@ -511,8 +511,8 @@ void lv_deinit(void)
     lv_objid_builtin_destroy();
 #endif
 
-#if LV_USE_XML && LV_USE_TEST
-    lv_xml_test_unregister();
+#if LV_USE_XML
+    lv_xml_deinit();
 #endif
 
 #if LV_USE_TRANSLATION
