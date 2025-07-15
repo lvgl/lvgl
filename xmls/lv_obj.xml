@@ -58,13 +58,13 @@ Example
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="event_cb" access="add">
+        <element name="event_cb" access="add" type="void">
             <arg name="callback" type="event_cb"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="user_data" type="string" default="NULL"/>
         </element>
 
-        <element name="screen_load_event" access="add">
+        <element name="screen_load_event" access="add" type="void">
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen"/>
             <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
@@ -72,7 +72,7 @@ Example
             <arg name="delay" type="int" default="0"/>
         </element>
 
-        <element name="screen_create_event" access="add">
+        <element name="screen_create_event" access="add" type="void">
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen_create_cb"/>
             <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
