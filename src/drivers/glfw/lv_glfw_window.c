@@ -106,8 +106,7 @@ lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bo
     title = (window_title != NULL) ? (char *)window_title : (char *)default_title;
     if(desktop_file_name == NULL) {
         char buffer[256];
-        lv_snprintf(buffer, 255, "%s %s", title, default_suffix);
-        buffer[255] = '\0';
+        lv_snprintf(buffer, sizeof(buffer), "%s %s", title, default_suffix);
         glfwSetWindowTitle(window->window, buffer);
     }
     else {
