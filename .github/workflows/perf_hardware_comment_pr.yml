@@ -45,7 +45,7 @@ jobs:
           ejlv comment-pr \
             --comment-path comment.md \
             --pr-number $(cat pr_number) \
-            --gh-token $GITHUB_TOKEN \
+            --gh-token "${{ secrets.GITHUB_TOKEN }}" \
             --signature "hw_performance_tests"
 
       - name: Remove trigger label
