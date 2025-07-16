@@ -143,10 +143,8 @@ menu "LVGL configuration"
 				bool "5: WINDOWS"
 			config LV_OS_MQX
 				bool "6: MQX"
-			config LV_OS_SDL2
-				bool "7: SDL2"
 			config LV_OS_CHIBIOS
-				bool "8: CHIBIOS"
+				bool "7: CHIBIOS"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -2107,12 +2105,22 @@ menu "LVGL configuration"
 		config LV_USE_ST_LTDC
 			bool "Driver for ST LTDC"
 			default n
+		
+		config LV_ST_LTDC_INCLUDE
+			bool "Default LTDC header"
+			default n
+			depends on LV_USE_ST_LTDC
 
 		config LV_ST_LTDC_USE_DMA2D_FLUSH
 			bool "Only used for created partial mode LTDC displays"
 			default n
 			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
 
+		config LV_ST_LTDC_DMA2D_INCLUDE
+			bool "Default DMA2D header"
+			default n
+			depends on LV_USE_ST_LTDC && LV_ST_LTDC_USE_DMA2D_FLUSH
+			
 		config LV_USE_FT81X
 			bool "Use ft81x EVE driver"
 			default n

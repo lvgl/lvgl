@@ -13,10 +13,8 @@
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
-#if LV_USE_OS != LV_OS_CHIBIOS
-    #include "ltdc.h"
-#elif LV_USE_OS == LV_OS_CHIBIOS
-    #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
+#include LV_ST_LTDC_INCLUDE
+#if LV_USE_OS == LV_OS_CHIBIOS
     #define LTDC_PIXEL_FORMAT_ARGB8888 LTDC_FMT_ARGB8888
     #define LTDC_PIXEL_FORMAT_RGB888  LTDC_FMT_RGB888
     #define LTDC_PIXEL_FORMAT_RGB565  LTDC_FMT_RGB565
@@ -38,10 +36,8 @@
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
     #endif /*LV_USE_DRAW_DMA2D*/
     #if LV_USE_OS != LV_OS_CHIBIOS
-        #include "dma2d.h"
-    #elif LV_USE_OS == LV_OS_CHIBIOS
-        #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
-    #endif /*LV_OS_CHIBIOS*/
+        #include LV_ST_LTDC_DMA2D_INCLUDE
+    #endif
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 
 /*********************

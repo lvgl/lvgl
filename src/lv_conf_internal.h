@@ -4252,12 +4252,48 @@
     #endif
 #endif
 #if LV_USE_ST_LTDC
+    #if LV_USE_OS != LV_OS_CHIBIOS
+        #ifndef LV_ST_LTDC_INCLUDE
+            #ifdef CONFIG_LV_ST_LTDC_INCLUDE
+                #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE
+            #else
+                #define LV_ST_LTDC_INCLUDE "ltdc.h"
+            #endif
+        #endif
+    #else
+        #ifndef LV_ST_LTDC_INCLUDE
+            #ifdef CONFIG_LV_ST_LTDC_INCLUDE
+                #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE
+            #else
+                #define LV_ST_LTDC_INCLUDE "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
+            #endif
+        #endif
+    #endif
     /* Only used for partial. */
     #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
         #ifdef CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
             #define LV_ST_LTDC_USE_DMA2D_FLUSH CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
         #else
             #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
+        #endif
+    #endif
+    #if LV_ST_LTDC_USE_DMA2D_FLUSH
+        #if LV_USE_OS != LV_OS_CHIBIOS
+            #ifndef LV_ST_LTDC_DMA2D_INCLUDE
+                #ifdef CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                    #define LV_ST_LTDC_DMA2D_INCLUDE CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                #else
+                    #define LV_ST_LTDC_DMA2D_INCLUDE "dma2d.h"
+                #endif
+            #endif
+        #else
+            #ifndef LV_ST_LTDC_DMA2D_INCLUDE
+                #ifdef CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                    #define LV_ST_LTDC_DMA2D_INCLUDE CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                #else
+                    #define LV_ST_LTDC_DMA2D_INCLUDE "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
+                #endif
+            #endif
         #endif
     #endif
 #endif
