@@ -202,6 +202,17 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
     }
 #endif
 
+    /*Create the timelines as well*/
+    lv_xml_timeline_t * at_xml;
+    LV_LL_READ(&scope->timeline_ll, at_xml) {
+        lv_anim_timeline_t * at = lv_anim_timeline_create();
+
+        lv_anim_t * a_stored;
+        LV_LL_READ(&at_xml->anims, a_stored) {
+            lv_anim_timeline_add(at, 0, &a_stored);
+        }
+    }
+
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
 
@@ -298,7 +309,7 @@ lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * 
     lv_xml_font_t * f;
     LV_LL_READ(&scope->font_ll, f) {
         if(lv_streq(f->name, name)) {
-            LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Font `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -342,11 +353,10 @@ lv_result_t lv_xml_register_subject(lv_xml_component_scope_t * scope, const char
         return LV_RESULT_INVALID;
     }
 
-
     lv_xml_subject_t * s;
     LV_LL_READ(&scope->subjects_ll, s) {
         if(lv_streq(s->name, name)) {
-            LV_LOG_INFO("Subject %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Subject `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -382,6 +392,54 @@ lv_subject_t * lv_xml_get_subject(lv_xml_component_scope_t * scope, const char *
     return NULL;
 }
 
+
+lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const char * name)
+{
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
+        LV_LOG_WARN("No component found to register subject `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_timeline_t * at;
+    LV_LL_READ(&scope->timeline_ll, at) {
+        if(lv_streq(at->name, name)) {
+            LV_LOG_INFO("Animation timeline `%s` is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    at = lv_ll_ins_head(&scope->timeline_ll);
+    at->name = lv_strdup(name);
+    lv_ll_init(&at->anims, sizeof(lv_xml_timeline_t));
+
+    return LV_RESULT_OK;
+}
+
+lv_xml_timeline_t * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name)
+{
+    lv_xml_timeline_t * at;
+    if(scope) {
+        LV_LL_READ(&scope->timeline_ll, at) {
+            if(lv_streq(at->name, name)) return at;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->timeline_ll, at) {
+                if(lv_streq(at->name, name)) return at;
+            }
+        }
+    }
+
+    LV_LOG_WARN("No timeline was found with name \"%s\".", name);
+    return NULL;
+}
+
+
 lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char * name, const char * value)
 {
     if(scope == NULL) scope = lv_xml_component_get_scope("globals");
@@ -393,7 +451,7 @@ lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char *
     lv_xml_const_t * cnst;
     LV_LL_READ(&scope->const_ll, cnst) {
         if(lv_streq(cnst->name, name)) {
-            LV_LOG_INFO("Const %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Const `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -446,7 +504,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_scope_t * scope, const char *
     lv_xml_image_t * img;
     LV_LL_READ(&scope->image_ll, img) {
         if(lv_streq(img->name, name)) {
-            LV_LOG_INFO("Image %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Image `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -503,7 +561,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const cha
     lv_xml_event_cb_t * e;
     LV_LL_READ(&scope->event_ll, e) {
         if(lv_streq(e->name, name)) {
-            LV_LOG_INFO("Event_cb %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Event_cb `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -609,6 +667,20 @@ static void resolve_params(lv_xml_component_scope_t * item_scope, lv_xml_compone
     }
 }
 
+//0. new anim_timeline feature
+//1. Save the blueprint of anim timelines on register. anim->var = "path/to/obj"
+//2. When an instance is created
+//    2.1. and an event is added, only the blueprints exist. Add a play_anim_event by providing target name, timeline name, and self. self (the view) is also known as it's created first.
+//    2.2. all objects are created, create instances for all timeline blueprints as well.
+//         set at->start_obj to the view obj, so that the a->var = "path" can be resolved
+//         save the timeline instances in special events (name+pointer)
+//3. play_anim_event is triggered, from the event user data
+//    get self obj
+//    get the target by name from self
+//    get the timeline of target
+//    start the animation
+
+
 static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * scope)
 {
     uint32_t i;
@@ -636,8 +708,8 @@ static void view_start_element_handler(void * user_data, const char * name, cons
 {
     lv_xml_parser_state_t * state = (lv_xml_parser_state_t *)user_data;
     state->tag_name = name;
-    bool is_view = false;
 
+    bool is_view = false;
     if(lv_streq(name, "view")) {
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         name = extends ? extends : "lv_obj";
@@ -647,7 +719,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     lv_obj_t ** current_parent_p = lv_ll_get_tail(&state->parent_ll);
     if(current_parent_p == NULL) {
         if(state->parent == NULL) {
-            LV_LOG_ERROR("There is no parent object available for %s. This also should never happen.", name);
+            LV_LOG_ERROR("There is no parent object available for %s. This should never happen.", name);
             return;
         }
         else {

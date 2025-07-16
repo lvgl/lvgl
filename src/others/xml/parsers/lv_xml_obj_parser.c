@@ -804,6 +804,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
+    else SET_STYLE_IF(transform_skew_y, lv_xml_atoi(value));
     else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(&state->scope, value));
     else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
     else SET_STYLE_IF(recolor, lv_xml_to_color(value));
@@ -827,27 +828,6 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
 }
 
-static lv_style_selector_t get_selector(const char * str)
-{
-    if(str == NULL) return 0;
-    lv_style_selector_t selector = 0;
-    char buf[256];
-    lv_strncpy(buf, str, sizeof(buf));
-
-    char * bufp = buf;
-    const char * next = lv_xml_split_str(&bufp, '|');
-
-    while(next) {
-        /* Handle different states and parts */
-        selector |= lv_xml_style_state_to_enum(next);
-        selector |= lv_xml_style_part_to_enum(next);
-
-        /* Move to the next token */
-        next = lv_xml_split_str(&bufp, '|');
-    }
-
-    return selector;
-}
 
 static void free_user_data_event_cb(lv_event_t * e)
 {

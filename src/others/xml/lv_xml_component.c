@@ -30,6 +30,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    STYLE_PROP_TYPE_INT,
+    STYLE_PROP_TYPE_COLOR,
+    STYLE_PROP_TYPE_UNKNOWN
+} style_prop_anim_type_t;
+
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -41,6 +48,8 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
 static void process_image_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs);
 static char * extract_view_content(const char * xml_definition);
+style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop);
+static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_str);
 
 /**********************
  *  STATIC VARIABLES
@@ -146,7 +155,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
     XML_SetElementHandler(parser, start_metadata_handler, end_metadata_handler);
 
     if(XML_Parse(parser, xml_def, lv_strlen(xml_def), XML_TRUE) == XML_STATUS_ERROR) {
-        LV_LOG_ERROR("XML parsing error: %s on line %lu",
+        LV_LOG_ERROR("XML parsing error; %s on line %lu",
                      XML_ErrorString(XML_GetErrorCode(parser)),
                      (unsigned long)XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
@@ -477,6 +486,115 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     lv_xml_register_subject(&state->scope, name, subject);
 }
 
+static void process_timeline_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+{
+    const char * name = lv_xml_get_value_of(attrs, "name");
+
+    if(name == NULL) {
+        LV_LOG_WARN("'name' is missing from a timeline");
+        return;
+    }
+
+    /*If already registered skip all. Don't set state->context
+     *so animations won't be added later either*/
+    if(lv_xml_get_timeline(&state->scope, name)) return;
+
+    lv_xml_register_timeline(&state->scope, name);
+
+    /*Save the created timeline so that animations can be added to it later*/
+    state->context = lv_xml_get_timeline(&state->scope, name);
+}
+
+static void process_animation_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+{
+
+    if(state->context) {
+        LV_LOG_INFO("No parent timeline is set, skipping");
+        return;
+    }
+
+    const char * target_str = lv_xml_get_value_of(attrs, "target");
+    const char * prop_str = lv_xml_get_value_of(attrs, "prop");
+    const char * start_str = lv_xml_get_value_of(attrs, "start");
+    const char * end_str = lv_xml_get_value_of(attrs, "end");
+    const char * duration_str = lv_xml_get_value_of(attrs, "duration");
+    const char * delay_str = lv_xml_get_value_of(attrs, "delay");
+    const char * reverse_delay_str = lv_xml_get_value_of(attrs, "reverse_delay");
+    const char * reverse_duration_str = lv_xml_get_value_of(attrs, "reverse_duration");
+    const char * repeat_count_str = lv_xml_get_value_of(attrs, "repeat_count");
+    const char * easing_str = lv_xml_get_value_of(attrs, "easing");
+    const char * early_apply_str = lv_xml_get_value_of(attrs, "early_apply");
+    const char * selector_str = lv_xml_get_value_of(attrs, "selector");
+
+    if(target_str == NULL) {
+        LV_LOG_WARN("'target' is missing from a animation");
+        return;
+    }
+
+    if(prop_str == NULL) {
+        LV_LOG_WARN("'prop' is missing from a animation");
+        return;
+    }
+
+    lv_style_prop_t prop = lv_xml_style_prop_to_enum(prop_str);
+    if(prop == LV_STYLE_PROP_INV) {
+        LV_LOG_WARN("Unknown style property; '%s'", prop_str);
+        return;
+    }
+
+    style_prop_anim_type_t prop_type = style_prop_anim_get_type(prop);
+    if(prop_type == STYLE_PROP_TYPE_UNKNOWN) {
+        LV_LOG_WARN("Style property '%s' is not animateable", prop_str);
+        return;
+    }
+
+    if(start_str == NULL) {
+        LV_LOG_WARN("'start' is missing from a animation");
+        return;
+    }
+
+    if(end_str == NULL) {
+        LV_LOG_WARN("'end' is missing from a animation");
+        return;
+    }
+
+    if(duration_str == NULL) duration_str = "1000";
+    if(delay_str == NULL) delay_str = "0";
+    if(easing_str == NULL) easing_str = "linear";
+    if(early_apply_str == NULL) early_apply_str = "false";
+    if(selector_str == NULL) selector_str = "";
+    if(reverse_delay_str == NULL) reverse_delay_str = "0";
+    if(reverse_duration_str == NULL) reverse_duration_str = "0";
+    if(repeat_count_str == NULL) repeat_count_str = "1";
+
+    lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
+
+    int32_t start = anim_value_to_int(prop, start_str);
+    int32_t end = anim_value_to_int(prop, end_str);
+
+    lv_xml_timeline_t * at = state->context;
+    if(at == NULL) {
+        LV_LOG_WARN("There was no parent timeline for the animation");
+        return;
+    }
+
+    uint32_t selector_and_prop = ((prop & 0xff) << 24) | selector;
+
+    lv_anim_t * a = lv_ll_ins_tail(&at->anims);
+
+    lv_anim_init(a);
+    lv_anim_set_var(a, lv_strdup(target_str));
+    lv_anim_set_values(a, start, end);
+    lv_anim_set_exec_xcb(a, int_anim_exec_cb);
+    lv_anim_set_duration(a, lv_xml_atoi(duration_str));
+    lv_anim_set_delay(a, lv_xml_atoi(delay_str));
+    lv_anim_set_early_apply(a, lv_xml_to_bool(early_apply_str));
+    lv_anim_set_reverse_delay(a, lv_xml_atoi(reverse_delay_str));
+    lv_anim_set_reverse_duration(a, lv_xml_atoi(reverse_duration_str));
+    lv_anim_set_repeat_count(a, lv_xml_atoi(repeat_count_str));
+    lv_anim_set_user_data(a, (void *)((uintptr_t)selector_and_prop));
+}
+
 static void process_grad_element(lv_xml_parser_state_t * state, const char * tag_name, const char ** attrs)
 {
     lv_xml_grad_t * grad = lv_ll_ins_tail(&state->scope.gradient_ll);
@@ -605,7 +723,7 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
         dsc->dir = LV_GRAD_DIR_VER;
     }
     else {
-        LV_LOG_WARN("Unknown gradient type: %s", tag_name);
+        LV_LOG_WARN("Unknown gradient type; %s", tag_name);
     }
 }
 
@@ -705,7 +823,14 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
             process_subject_element(state, name, attrs);
             break;
-
+        case LV_XML_PARSER_SECTION_TIMELINE:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
+            process_timeline_element(state, name, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_ANIMATION:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
+            process_animations_element(state, name, attrs);
+            break;
         default:
             break;
     }
@@ -747,6 +872,106 @@ static char * extract_view_content(const char * xml_definition)
     view_content[len] = '\0';
 
     return view_content;
+}
+
+
+style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
+{
+    switch(prop) {
+        case LV_STYLE_WIDTH:
+        case LV_STYLE_MIN_WIDTH:
+        case LV_STYLE_MAX_WIDTH:
+        case LV_STYLE_HEIGHT:
+        case LV_STYLE_MIN_HEIGHT:
+        case LV_STYLE_MAX_HEIGHT:
+        case LV_STYLE_LENGTH:
+        case LV_STYLE_RADIUS:
+        case LV_STYLE_PAD_LEFT:
+        case LV_STYLE_PAD_RIGHT:
+        case LV_STYLE_PAD_TOP:
+        case LV_STYLE_PAD_BOTTOM:
+        case LV_STYLE_PAD_ROW:
+        case LV_STYLE_PAD_COLUMN:
+        case LV_STYLE_PAD_RADIAL:
+        case LV_STYLE_MARGIN_LEFT:
+        case LV_STYLE_MARGIN_RIGHT:
+        case LV_STYLE_MARGIN_TOP:
+        case LV_STYLE_MARGIN_BOTTOM:
+        case LV_STYLE_BG_OPA:
+        case LV_STYLE_BG_MAIN_STOP:
+        case LV_STYLE_BG_GRAD_STOP:
+        case LV_STYLE_BG_IMAGE_RECOLOR_OPA:
+        case LV_STYLE_BORDER_WIDTH:
+        case LV_STYLE_BORDER_OPA:
+        case LV_STYLE_OUTLINE_WIDTH:
+        case LV_STYLE_OUTLINE_OPA:
+        case LV_STYLE_OUTLINE_PAD:
+        case LV_STYLE_SHADOW_WIDTH:
+        case LV_STYLE_SHADOW_OFFSET_X:
+        case LV_STYLE_SHADOW_OFFSET_Y:
+        case LV_STYLE_SHADOW_SPREAD:
+        case LV_STYLE_SHADOW_OPA:
+        case LV_STYLE_TEXT_OPA:
+        case LV_STYLE_TEXT_LETTER_SPACE:
+        case LV_STYLE_TEXT_LINE_SPACE:
+        case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_IMAGE_RECOLOR_OPA:
+        case LV_STYLE_LINE_OPA:
+        case LV_STYLE_LINE_WIDTH:
+        case LV_STYLE_LINE_DASH_WIDTH:
+        case LV_STYLE_LINE_DASH_GAP:
+        case LV_STYLE_ARC_OPA:
+        case LV_STYLE_ARC_WIDTH:
+        case LV_STYLE_OPA:
+        case LV_STYLE_OPA_LAYERED:
+        case LV_STYLE_COLOR_FILTER_OPA:
+        case LV_STYLE_TRANSFORM_WIDTH:
+        case LV_STYLE_TRANSFORM_HEIGHT:
+        case LV_STYLE_TRANSLATE_X:
+        case LV_STYLE_TRANSLATE_Y:
+        case LV_STYLE_TRANSLATE_RADIAL:
+        case LV_STYLE_TRANSFORM_SCALE_X:
+        case LV_STYLE_TRANSFORM_SCALE_Y:
+        case LV_STYLE_TRANSFORM_ROTATION:
+        case LV_STYLE_TRANSFORM_PIVOT_X:
+        case LV_STYLE_TRANSFORM_PIVOT_Y:
+        case LV_STYLE_RECOLOR_OPA:
+            return STYLE_PROP_TYPE_INT;
+
+        case LV_STYLE_BG_COLOR:
+        case LV_STYLE_BG_GRAD_COLOR:
+        case LV_STYLE_BORDER_COLOR:
+        case LV_STYLE_OUTLINE_COLOR:
+        case LV_STYLE_SHADOW_COLOR:
+        case LV_STYLE_TEXT_COLOR:
+        case LV_STYLE_LINE_COLOR:
+        case LV_STYLE_ARC_COLOR:
+        case LV_STYLE_IMAGE_RECOLOR:
+        case LV_STYLE_RECOLOR:
+        case STYLE_PROP_TYPE_UNKNOWN: /*Don't support color anims yet*/
+        default:
+            return STYLE_PROP_TYPE_UNKNOWN;
+
+    }
+}
+
+static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_str)
+{
+    if(prop_type == STYLE_PROP_TYPE_INT) {
+        return lv_xml_atoi(value_str);
+    }
+
+    if(prop_type == STYLE_PROP_TYPE_COLOR) {
+        lv_color_t c = lv_xml_to_color(value_str);
+        return (int32_t) lv_color_to_u32(c);
+    }
+
+    return 0;
+}
+
+static void int_anim_exec_cb(lv_anim_t * a)
+{
+
 }
 
 #endif /* LV_USE_XML */

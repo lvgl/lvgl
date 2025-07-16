@@ -34,6 +34,7 @@ struct _lv_xml_component_scope_t {
     lv_ll_t param_ll;
     lv_ll_t gradient_ll;
     lv_ll_t subjects_ll;
+    lv_ll_t timeline_ll;
     lv_ll_t font_ll;
     lv_ll_t image_ll;
     lv_ll_t event_ll;
@@ -53,6 +54,12 @@ typedef struct {
     const char * name;
     lv_subject_t * subject;
 } lv_xml_subject_t;
+
+typedef struct {
+    const char * name;
+    lv_ll_t anims;
+    uint32_t auto_free_at: 1;
+} lv_xml_timeline_t;
 
 typedef struct {
     const char * name;
