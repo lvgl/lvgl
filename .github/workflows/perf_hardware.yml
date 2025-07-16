@@ -42,7 +42,7 @@ jobs:
             --comment-path comment.md \
             --commit-hash $COMMIT_REF \
             --remote-url $REPO_URL \
-            --seconds 600
+            --seconds 900
 
       - name: Upload Comment
         uses: actions/upload-artifact@v4
