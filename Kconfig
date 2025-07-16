@@ -2107,8 +2107,8 @@ menu "LVGL configuration"
 			default n
 		
 		config LV_ST_LTDC_INCLUDE
-			bool "Default LTDC header"
-			default n
+			string "Default LTDC header"
+			default "ltdc.h"
 			depends on LV_USE_ST_LTDC
 
 		config LV_ST_LTDC_USE_DMA2D_FLUSH
@@ -2117,8 +2117,8 @@ menu "LVGL configuration"
 			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
 
 		config LV_ST_LTDC_DMA2D_INCLUDE
-			bool "Default DMA2D header"
-			default n
+			string "Default DMA2D header"
+			default "dma2d.h"
 			depends on LV_USE_ST_LTDC && LV_ST_LTDC_USE_DMA2D_FLUSH
 			
 		config LV_USE_FT81X
