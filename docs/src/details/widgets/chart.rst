@@ -157,8 +157,9 @@ A chart can be one of the following types:
   can also be illustrated if their ``width``, ``height``, ``bg_color`` and ``radius``
   styles (for :cpp:enumerator:`LV_PART_ITEMS`) are set and both ``width`` and
   ``height`` have non-zero values.
-- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
-- :cpp:enumerator:`LV_CHART_TYPE_STACKED`: Draw bars.
+- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw individual vertical bars for each points in each series.
+- :cpp:enumerator:`LV_CHART_TYPE_STACKED`: Draw vertical stacked bars where multiple data series
+  are displayed as segments within a single bar for each data point. Supports only positive values.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and optionally
   lines between the points if line-width style values for
   :cpp:enumerator:`LV_PART_ITEMS` is a non-zero value, and the point's Y-value is

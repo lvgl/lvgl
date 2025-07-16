@@ -46,6 +46,7 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer);
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
 static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, int32_t ** a);
+static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, int32_t h);
 
 /**********************
  *  STATIC VARIABLES
@@ -292,12 +293,12 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         else {
             p_out->x = 0;
         }
-        int32_t temp_y = lv_map(ser->y_points[id], chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+        int32_t temp_y = value_to_y(obj, ser, ser->y_points[id], h);
         p_out->y = h - temp_y;
     }
     else if(chart->type == LV_CHART_TYPE_SCATTER) {
         p_out->x = lv_map(ser->x_points[id], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w);
-        int32_t temp_y = lv_map(ser->y_points[id], chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+        int32_t temp_y = value_to_y(obj, ser, ser->y_points[id], h);
         p_out->y = h - temp_y;
     }
     else if(chart->type == LV_CHART_TYPE_BAR) {
@@ -333,7 +334,8 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         else {
             LV_LOG_WARN("bar chart series count is zero");
         }
-        int32_t temp_y = lv_map(ser->y_points[id], chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+
+        int32_t temp_y = value_to_y(obj, ser, ser->y_points[id], h);
         p_out->y = h - temp_y;
     }
     else if(chart->type == LV_CHART_TYPE_STACKED) {
@@ -359,12 +361,18 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
             int32_t p_act = (start_point + id) % chart->point_cnt;
             int32_t v_act = s->y_points[p_act];
             if(s->y_points[p_act] == LV_CHART_POINT_NONE) continue;
-            if(v_act <= 0) continue;
+
+            /* Skip negative values in stacked charts. Negative values are not supported
+             * in stacked charts as they cannot be visually represented in the stacking logic. */
+            if(v_act <= 0) {
+                LV_LOG_WARN("Stacked chart doesn't support negative values.");
+                continue;
+            }
             v_sum += v_act;
             if(s == ser) break;
         }
 
-        int32_t temp_y = lv_map(v_sum, chart->ymin[LV_CHART_AXIS_PRIMARY_Y], chart->ymax[LV_CHART_AXIS_PRIMARY_Y], 0, h);
+        int32_t temp_y = value_to_y(obj, ser, ser->y_points[id], h);
         p_out->y = h - temp_y;
     }
     else {
@@ -1149,7 +1157,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
 
             p_act = (start_point + i) % chart->point_cnt;
             if(ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                line_dsc.p2.y = lv_map(ser->y_points[p_act], chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+                line_dsc.p2.y =  lv_map(ser->y_points[p_act], chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
                 line_dsc.p2.y = h - line_dsc.p2.y;
                 line_dsc.p2.y += y_ofs;
 
@@ -1309,10 +1317,6 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
     col_dsc.bg_grad.dir = LV_GRAD_DIR_NONE;
     col_dsc.bg_opa = LV_OPA_COVER;
 
-    /*Can't mix axis, always map all series to the priomary Y*/
-    int32_t y_min = chart->ymin[LV_CHART_AXIS_PRIMARY_Y];
-    int32_t y_max = chart->ymax[LV_CHART_AXIS_PRIMARY_Y];
-
     lv_area_t clip_area_ori = layer->_clip_area;
 
     /*Go through all points*/
@@ -1329,11 +1333,17 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
             int32_t p_act = (start_point + i) % chart->point_cnt;
             int32_t v_act = ser->y_points[p_act];
             if(ser->y_points[p_act] == LV_CHART_POINT_NONE) continue;
-            if(v_act <= 0) continue;
+
+            /* Skip negative values in stacked charts. Negative values are not supported
+             * in stacked charts as they cannot be visually represented in the stacking logic. */
+            if(v_act <= 0) {
+                LV_LOG_WARN("Stacked chart doesn't support negative values.");
+                continue;
+            }
             v_sum_all += v_act;
         }
 
-        int32_t total_bar_height = lv_map(v_sum_all, y_min, y_max, 0, h);
+        int32_t total_bar_height = value_to_y(obj, lv_ll_get_head(&chart->series_ll), v_sum_all, h);
         if(total_bar_height <= 0) continue;
 
         if(chart->point_cnt <= 1) {
@@ -1369,9 +1379,11 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
             int32_t p_act = (start_point + i) % chart->point_cnt;
             int32_t v_act = ser->y_points[p_act];
             if(ser->y_points[p_act] == LV_CHART_POINT_NONE) continue;
+            if(v_act <= 0) continue; /*Can't show negative values on a stacked chart*/
+
             v_sum_act += v_act; /*Use the summed value to get its `y` to avoid rounding errors*/
 
-            int32_t segment_y = lv_map(v_sum_act, y_min, y_max, 0, h);
+            int32_t segment_y = value_to_y(obj, ser, v_sum_act, h);
             bar_clip_area.y2 = y_prev;
             bar_clip_area.y1 = obj->coords.y2 - y_ofs - segment_y + 1;
             y_prev = bar_clip_area.y1;
@@ -1623,6 +1635,21 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
             }
         }
     }
+}
+
+/**
+ * Map a value to a height
+ * @param obj   pointer to a chart
+ * @param ser   pointer to the series
+ * @param v     the value to map
+ * @param h     the height to which the value needs to be mapped
+ * @return
+ */
+static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, int32_t h)
+{
+    lv_chart_t * chart = (lv_chart_t *) obj;
+
+    return lv_map(v, chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
 }
 
 #endif
