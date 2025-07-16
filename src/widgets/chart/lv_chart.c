@@ -372,7 +372,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
             if(s == ser) break;
         }
 
-        int32_t temp_y = value_to_y(obj, ser, ser->y_points[id], h);
+        int32_t temp_y = value_to_y(obj, ser, v_sum, h);
         p_out->y = h - temp_y;
     }
     else {
@@ -1391,10 +1391,6 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
             lv_draw_rect(layer, &col_dsc, &bar_full_area);
             col_dsc.base.id1++;
         }
-        bar_clip_area.x1 += block_w + block_gap;
-        bar_clip_area.x2 += block_w + block_gap;
-        bar_full_area.x1 += block_w + block_gap;
-        bar_full_area.x2 += block_w + block_gap;
 
     }
     layer->_clip_area = clip_area_ori;
@@ -1643,7 +1639,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
  * @param ser   pointer to the series
  * @param v     the value to map
  * @param h     the height to which the value needs to be mapped
- * @return
+ * @return      the mapped y-coordinate value corresponding to the input value
  */
 static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, int32_t h)
 {
