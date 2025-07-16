@@ -1,8 +1,8 @@
 name: Hardware Build Test
 
+# No point on running this on pushes to master
+# as we already dispatch a run job for that event
 on:
-  push:
-    branches: 'master'
   pull_request:
     branches: 'master'
 
