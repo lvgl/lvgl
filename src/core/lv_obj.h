@@ -38,50 +38,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-/**
- * Possible states of a widget.
- * OR-ed values are possible
- */
-enum _lv_state_t {
-    LV_STATE_DEFAULT     =  0x0000,
-    LV_STATE_CHECKED     =  0x0001,
-    LV_STATE_FOCUSED     =  0x0002,
-    LV_STATE_FOCUS_KEY   =  0x0004,
-    LV_STATE_EDITED      =  0x0008,
-    LV_STATE_HOVERED     =  0x0010,
-    LV_STATE_PRESSED     =  0x0020,
-    LV_STATE_SCROLLED    =  0x0040,
-    LV_STATE_DISABLED    =  0x0080,
-    LV_STATE_USER_1      =  0x1000,
-    LV_STATE_USER_2      =  0x2000,
-    LV_STATE_USER_3      =  0x4000,
-    LV_STATE_USER_4      =  0x8000,
-
-    LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
-};
-
-/**
- * The possible parts of widgets.
- * The parts can be considered as the internal building block of the widgets.
- * E.g. slider = background + indicator + knob
- * Not all parts are used by every widget
- */
-
-enum _lv_part_t {
-    LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
-    LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
-    LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
-    LV_PART_KNOB         = 0x030000,   /**< Like handle to grab to adjust the value*/
-    LV_PART_SELECTED     = 0x040000,   /**< Indicate the currently selected option or section*/
-    LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. table cells)*/
-    LV_PART_CURSOR       = 0x060000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
-
-    LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
-
-    LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
-};
-
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible

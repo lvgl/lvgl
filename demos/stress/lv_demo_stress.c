@@ -388,7 +388,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_add_state(obj, LV_STATE_CHECKED);
 
             obj = lv_checkbox_create(main_page);
-            lv_obj_add_state(obj, LV_STATE_CHECKED | LV_STATE_DISABLED);
+            lv_obj_add_state(obj, LV_STATE_CHECKED);
+            lv_obj_add_state(obj, LV_STATE_DISABLED);
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 1 + 60);
 
             lv_obj_scroll_by(main_page, 0, 20, LV_ANIM_ON);
