@@ -11,10 +11,10 @@ Example
 	        <enum name="reverse" help="reverse"/>
 	    </enumdef>
 
-	    <prop name="start_angle" help="Start angles of the indicator"/>
-	    <prop name="end_angle" help="End angles of the indicator"/>
-	    <prop name="bg_start_angle" help="Start angles of the background"/>
-	    <prop name="bg_end_angle" help="End angles of the background"/>
+	    <prop name="start_angle" type="int" help="Start angles of the indicator"/>
+	    <prop name="end_angle" type="int" help="End angles of the indicator"/>
+	    <prop name="bg_start_angle" type="int" help="Start angles of the background"/>
+	    <prop name="bg_end_angle" type="int" help="End angles of the background"/>
 	    <prop name="min_value" type="int"/>
 	    <prop name="max_value" type="int"/>
 	    <prop name="value" type="int" help="The current value"/>
