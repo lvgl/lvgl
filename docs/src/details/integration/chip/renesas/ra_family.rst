@@ -22,16 +22,27 @@ Run the Project
   certain minimum versions of the Flexible Software Package (FSP). See the individual
   README.md files in the applicable repositories for info. FSPs can be downloaded
   `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
+  Please notice from FSP version 6.0 and above, LVGL is now part of the middleware section
+  of components.  Therefore when cloning the the latest versions of the supported LVGL board
+  repositories, recursive updating of the the git submodules is no longer needed.
+
 - JLink is used for debugging, it can be downloaded `here
   <https://www.segger.com/downloads/jlink/>`__.
-- Clone the ready-to-use repository for your selected board:
+
+- Clone the ready-to-use repository for your selected board, for FSP version prior to 6.0:
 
     .. code-block:: shell
 
         git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
 
-
   Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
+
+- Clone the ready-to-use repository for your selected board, for FSP version from 6.0 and above:
+
+    .. code-block:: shell
+
+        git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git
+
 - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select
   ``General`` / ``Existing projects into workspace``.
 - Select the cloned folder and press ``Finish``.
@@ -65,7 +76,10 @@ Run the Project
 
    On EK-RA8D1 boards, the ``SW1`` DIP switch 7 (in the middle of the board) should be
    ON, all others are OFF.
-
+   
+   Also note opening a project previously built on top of the FSP prior to v6.0 will trigger
+   a dialog asking whether the user wants to migrate to the new FSP v6.0. The migration will 
+   not break the project,.
 
 
 Modify the project
