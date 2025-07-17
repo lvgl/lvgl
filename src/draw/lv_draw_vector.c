@@ -12,6 +12,10 @@
 
 #if LV_USE_VECTOR_GRAPHIC
 
+#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE)
+    #error "LV_USE_VECTOR_GRAPHIC requires either (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE"
+#endif
+
 #include "../misc/lv_ll.h"
 #include "../misc/lv_types.h"
 #include "../stdlib/lv_string.h"

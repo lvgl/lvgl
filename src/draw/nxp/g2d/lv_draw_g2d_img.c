@@ -16,7 +16,6 @@
 #include "lv_draw_g2d.h"
 
 #if LV_USE_DRAW_G2D
-#include <stdlib.h>
 #include <math.h>
 #include "g2d.h"
 #include "../../../misc/lv_area_private.h"
@@ -92,7 +91,16 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     src_area.x2 = src_area.x1 + lv_area_get_width(&blend_area);
     src_area.y2 = src_area.y1 + lv_area_get_height(&blend_area);
     lv_color_format_t src_cf = img_dsc->header.cf;
-    int32_t src_stride = lv_draw_buf_width_to_stride(img_dsc->header.w, src_cf) / (lv_color_format_get_bpp(src_cf) / 8);
+
+    /* G2D takes stride in pixels. */
+    const uint8_t pixel_size = lv_color_format_get_size(src_cf);
+
+    uint32_t src_stride = img_dsc->header.stride == 0 ?
+                          lv_color_format_get_size(img_dsc->header.cf) * img_dsc->header.w :
+                          img_dsc->header.stride;
+    LV_ASSERT(pixel_size != 0);
+    src_stride /= pixel_size;
+
 
     /* Source image */
     struct g2d_buf * src_buf = _g2d_handle_src_buf(img_dsc);

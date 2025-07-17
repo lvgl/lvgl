@@ -58,13 +58,13 @@ Example
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="event_cb" access="add">
+        <element name="event_cb" access="add" type="void">
             <arg name="callback" type="event_cb"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="user_data" type="string" default="NULL"/>
         </element>
 
-        <element name="screen_load_event" access="add">
+        <element name="screen_load_event" access="add" type="void">
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen"/>
             <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
@@ -72,7 +72,7 @@ Example
             <arg name="delay" type="int" default="0"/>
         </element>
 
-        <element name="screen_create_event" access="add">
+        <element name="screen_create_event" access="add" type="void">
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="screen" type="screen_create_cb"/>
             <arg name="anim_type" type="enum:lv_screen_load_anim" default="none"/>
@@ -81,16 +81,20 @@ Example
         </element>
 
         <element name="subject_set_int_event" access="add">
-            <arg name="name" type="string"/>
-            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="value" type="int"/>
         </element>
 
-        <element name="subject_set_string_event" access="add">
-            <arg name="name" type="string"/>
-            <arg name="trigger" type="lv_event" default="clicked"/>
+        <element name="subject_set_float_event" access="add">
             <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="value" type="float"/>
+        </element>
+
+        <element name="subject_set_string_event" access="add">
+            <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="value" type="int"/>
         </element>
 
@@ -343,6 +347,8 @@ Example
 	    <prop name="snappable" 			type="flag:flag lv_obj_flag"/>
 	    <prop name="press_lock" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="event_bubble" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="event_trickle" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="state_trickle" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="gesture_bubble" 	type="flag:flag lv_obj_flag"/>
 	    <prop name="adv_hittest" 		type="flag:flag lv_obj_flag"/>
 	    <prop name="ignore_layout" 		type="flag:flag lv_obj_flag"/>

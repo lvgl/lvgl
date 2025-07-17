@@ -60,6 +60,8 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
+static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state);
+static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
 static void null_on_delete_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
@@ -322,6 +324,9 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+            lv_obj_children_add_state(obj, state);
+        }
     }
 }
 
@@ -332,6 +337,9 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+            lv_obj_children_remove_state(obj, state);
+        }
     }
 }
 
@@ -1028,6 +1036,40 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
         lv_obj_invalidate(obj);
         lv_obj_refresh_ext_draw_size(obj);
+    }
+}
+
+/**
+ * Apply the state to the children of the object
+ * @param obj pointer to an object
+ * @param state the state to apply
+ */
+static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state)
+{
+    uint32_t child_count = lv_obj_get_child_count(obj);
+
+    for(uint32_t i = 0; i < child_count; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(child) {
+            lv_obj_add_state(child, state);
+        }
+    }
+}
+
+/**
+ * Remove the state from the children of the object
+ * @param obj pointer to an object
+ * @param state the state to remove
+ */
+static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state)
+{
+    uint32_t child_count = lv_obj_get_child_count(obj);
+
+    for(uint32_t i = 0; i < child_count; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(child) {
+            lv_obj_remove_state(child, state);
+        }
     }
 }
 

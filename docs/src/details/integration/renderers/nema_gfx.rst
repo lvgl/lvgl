@@ -77,7 +77,7 @@ provided implementations by setting :c:macro:`LV_USE_NEMA_HAL` to a value other 
 TSC Images
 **********
 
-TSC (ThinkSillicon Compression) images can be drawn by this renderer. The
+TSC (ThinkSilicon Compression) images can be drawn by this renderer. The
 TSC 4/6/6A/12/12A color formats are part of :cpp:type:`lv_color_format_t`.
 All other renderers will ignore images with these color formats.
 Define an image descriptor variable with the corresponding

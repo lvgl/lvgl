@@ -67,7 +67,7 @@ const char * vglite_error_to_string(vg_lite_error_t error)
             break;
     }
 
-    return "VG_LITE_UKNOWN_ERROR";
+    return "VG_LITE_UNKNOWN_ERROR";
 }
 
 #if LV_USE_VGLITE_DRAW_ASYNC

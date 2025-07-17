@@ -192,11 +192,13 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = LV_KEY_ENTER;
     }
 
-    data->timestamp = lv_tick_get();
 
     if(indev->read_cb) {
         LV_TRACE_INDEV("calling indev_read_cb");
         indev->read_cb(indev, data);
+
+        /*Set the time stamp to the current time is it was not set in the read_cb*/
+        if(data->timestamp == 0) data->timestamp = lv_tick_get();
     }
     else {
         LV_LOG_WARN("indev_read_cb is not registered");

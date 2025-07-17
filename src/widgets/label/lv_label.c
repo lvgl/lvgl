@@ -884,7 +884,13 @@ static void draw_main(lv_event_t * e)
         layer->_clip_area = clip_area_ori;
     }
     else {
+        /*Labels have some extra draw area by default to not clip characters with
+         *italic, handwritten and other less standard fonts.
+         *However, with most of the fonts typically it's safe to clip at least to bottom side*/
+        const lv_area_t clip_area_ori = layer->_clip_area;
+        layer->_clip_area.y2 = txt_clip.y2;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
+        layer->_clip_area = clip_area_ori;
     }
 
     lv_area_t clip_area_ori = layer->_clip_area;
