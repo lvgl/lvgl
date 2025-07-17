@@ -243,7 +243,7 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     _g2d_execute_drawing(t);
 
-    draw_g2d_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_g2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_g2d_unit->task_act = NULL;
 
     /* The draw unit is free now. Request a new dispatching as it can get a new task. */
@@ -318,7 +318,7 @@ static void _g2d_render_thread_cb(void * ptr)
         _g2d_execute_drawing(thread_dsc->task_act);
 
         /* Signal the ready state to dispatcher. */
-        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_READY;
+        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
 
         /* Cleanup. */
         thread_dsc->task_act = NULL;
