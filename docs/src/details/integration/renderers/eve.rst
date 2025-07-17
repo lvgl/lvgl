@@ -17,6 +17,7 @@ See also the :ref:`ft81x` framebuffer driver. It drives the same EVE chips
 but is a simpler, more standalone implementation which uses software rendering
 and sends all the pixels over SPI so it is much slower.
 
+
 Limitations
 ***********
 
@@ -24,6 +25,7 @@ Limitations
 - Font format, size, and count limit.
 - The total number of tasks rendered per refresh has an upper limit.
 - Layers are not supported.
+
 
 Usage
 *****
@@ -63,6 +65,7 @@ Check there for your board parameters.
         .backlight_freq = 4000,
         .backlight_pwm = 128,
     };
+
 
 EVE Chip IO Implementation
 --------------------------
@@ -113,6 +116,7 @@ and the ESP32-S3. You may not have success with this speed so it is
 recommended to validate with an ``SPI_SPEED`` value of ``10`` (10 MHz)
 and increase experimentally in your testing.
 
+
 LVGL EVE Display Creation
 -------------------------
 
@@ -125,3 +129,58 @@ the first time ``op_cb`` is called.
 No buffers are required for the LVGL EVE renderer because no pixels
 are written to any buffers in the device running LVGL. When something
 needs to be drawn, a series of commands are sent to EVE.
+
+
+Touch Indev Creation
+--------------------
+
+:cpp:expr:`lv_draw_eve_touch_create(disp)` creates a touch :ref:`indev` for the display.
+
+You may need to configure the i2c address of the touch controller connected to EVE.
+See the section :ref:`eve register access` for more info about register access.
+
+Here is an example of setting the ``REG_TOUCH_CONFIG`` register on a BT817q EVE chip
+for a capacitive touch screen with a controller that has the i2c address ``0x15``.
+
+.. code-block:: c
+
+    /*
+    15:   0: capacitive, 1: resistive         CAPACITIVE
+    14:   host mode                           NO
+    13:   reserved
+    12:   ignore short circuit protection     NO
+    11:   low-power mode                      NO
+    10-4: 7-bit i2c address                   0x15
+     3:   reserved
+     2:   suppress 300ms startup              NO
+     1-0: 2-bit sampling clocks val           use 1 (the reset default)
+    */
+    lv_draw_eve_memwrite16(disp, LV_EVE_REG_TOUCH_CONFIG, 0x0151);
+
+
+Display Rotation
+----------------
+
+Efficient display rotation is fully supported through :cpp:func:`lv_display_set_rotation`.
+Touch input rotation is handled accordingly.
+
+
+.. _eve register access:
+
+EVE Register Access
+-------------------
+
+The functions :cpp:func:`lv_draw_eve_memread8`, :cpp:func:`lv_draw_eve_memread16`, :cpp:func:`lv_draw_eve_memread32`,
+:cpp:func:`lv_draw_eve_memwrite8`, :cpp:func:`lv_draw_eve_memwrite16`, are :cpp:func:`lv_draw_eve_memwrite32`
+available if needed. They are wrappers around ``EVE_memRead8``, etc.
+
+Register definitions and other EVE enumerations are available when you include
+``lvgl.h`` under the prefix namespace ``LV_EVE_``. I.e., ``REG_ID`` is available
+as ``LV_EVE_REG_ID`` and ``EVE_ROM_CHIPID`` is available as ``LV_EVE_EVE_ROM_CHIPID``, etc.
+
+
+Further Reading
+---------------
+
+- https://brtchip.com/wp-content/uploads/Support/Documentation/Programming_Guides/ICs/EVE/FT81X_Series_Programmer_Guide.pdf
+- https://brtchip.com/wp-content/uploads/2024/06/BRT_AN_033_BT81X-Series-Programming-Guide.pdf

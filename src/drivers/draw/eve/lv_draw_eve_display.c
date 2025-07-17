@@ -83,10 +83,11 @@ void * lv_draw_eve_display_get_user_data(lv_display_t * disp)
     return lv_display_get_driver_data(disp);
 }
 
-lv_indev_t * lv_draw_eve_touch_create(void)
+lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp)
 {
     lv_indev_t * indev = lv_indev_create();
 
+    lv_indev_set_display(indev, disp);
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, touch_read_cb);
 
