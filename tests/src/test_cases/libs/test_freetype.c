@@ -531,7 +531,6 @@ void test_freetype_render_outline(void)
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
 
     lv_font_glyph_dsc_t g;
-
     lv_font_get_glyph_dsc(font_italic, &g, 0x9F98, '\0');
 
     const lv_ll_t * outline_data;

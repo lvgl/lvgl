@@ -437,6 +437,9 @@ static void arclabel_draw_main(lv_event_t * e)
     lv_value_precise_t prev_letter_w = 0;
     lv_value_precise_t total_arc_length = deg_to_rad(arclabel->angle_size, arc_r);
     lv_value_precise_t curr_total_arc_length = deg_to_rad(angle_start, arc_r);
+    uint32_t letter;
+    uint32_t letter_next;
+
 
     while(text) {
         uint32_t word_i = 0;
@@ -446,8 +449,6 @@ static void arclabel_draw_main(lv_event_t * e)
         else text = NULL;
 
         while(word_i < text_len && curr_total_arc_length <= total_arc_length) {
-            uint32_t letter;
-            uint32_t letter_next;
             lv_text_encoded_letter_next_2(text_start, &letter, &letter_next, &word_i);
             const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -524,6 +525,8 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     lv_value_precise_t prev_letter_w = 0;
     const lv_value_precise_t angle_size_in_arc_length = deg_to_rad(angle_size, radius);
     lv_value_precise_t total_arc_length = 0;
+    uint32_t letter;
+    uint32_t letter_next;
 
     while(text) {
         uint32_t word_i = 0;
@@ -536,8 +539,6 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
                 break;
             }
 
-            uint32_t letter;
-            uint32_t letter_next;
             lv_text_encoded_letter_next_2(text_start, &letter, &letter_next, &word_i);
             const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
