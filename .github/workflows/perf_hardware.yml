@@ -15,11 +15,6 @@ jobs:
 
     name: Hardware Performance Benchmark
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
