@@ -43,6 +43,7 @@
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 #include "../../core/lv_global.h"
+#include "../../misc/lv_anim_timeline_private.h"
 
 /*********************
  *      DEFINES
@@ -204,14 +205,28 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
 
     /*Create the timelines as well*/
     lv_xml_timeline_t * at_xml;
+    lv_anim_timeline_t ** timeline_array;
+    timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t));
+    uint32_t i = 0;
     LV_LL_READ(&scope->timeline_ll, at_xml) {
         lv_anim_timeline_t * at = lv_anim_timeline_create();
+        at->user_data = lv_strdup(at_xml->name);
 
         lv_anim_t * a_stored;
         LV_LL_READ(&at_xml->anims, a_stored) {
-            lv_anim_timeline_add(at, 0, &a_stored);
+            lv_anim_timeline_add(at, 0, a_stored);
         }
+
+        at->base_obj = state.view;
+        timeline_array[i] = at;
+        i++;
     }
+
+    timeline_array[i] = NULL; /*Closing to avoid storing the length*/
+
+    /*TODO: Don't use the user_data as it might be needed for the user
+     * Store in a special event's user_data*/
+    lv_obj_set_user_data(state.view, timeline_array);
 
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
@@ -416,7 +431,7 @@ lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const cha
     return LV_RESULT_OK;
 }
 
-lv_xml_timeline_t * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name)
+void * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name)
 {
     lv_xml_timeline_t * at;
     if(scope) {

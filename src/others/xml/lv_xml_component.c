@@ -36,8 +36,6 @@ typedef enum {
     STYLE_PROP_TYPE_UNKNOWN
 } style_prop_anim_type_t;
 
-
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -50,6 +48,7 @@ static void process_prop_element(lv_xml_parser_state_t * state, const char ** at
 static char * extract_view_content(const char * xml_definition);
 style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop);
 static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_str);
+static void int_anim_exec_cb(lv_anim_t * a, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -486,7 +485,7 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     lv_xml_register_subject(&state->scope, name, subject);
 }
 
-static void process_timeline_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+static void process_timeline_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
     const char * name = lv_xml_get_value_of(attrs, "name");
 
@@ -505,7 +504,7 @@ static void process_timeline_element(lv_xml_parser_state_t * state, const char *
     state->context = lv_xml_get_timeline(&state->scope, name);
 }
 
-static void process_animation_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+static void process_animation_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
 
     if(state->context) {
@@ -585,7 +584,7 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     lv_anim_init(a);
     lv_anim_set_var(a, lv_strdup(target_str));
     lv_anim_set_values(a, start, end);
-    lv_anim_set_exec_xcb(a, int_anim_exec_cb);
+    lv_anim_set_custom_exec_cb(a, int_anim_exec_cb);
     lv_anim_set_duration(a, lv_xml_atoi(duration_str));
     lv_anim_set_delay(a, lv_xml_atoi(delay_str));
     lv_anim_set_early_apply(a, lv_xml_to_bool(early_apply_str));
@@ -825,11 +824,11 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             break;
         case LV_XML_PARSER_SECTION_TIMELINE:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
-            process_timeline_element(state, name, attrs);
+            process_timeline_element(state, attrs);
             break;
         case LV_XML_PARSER_SECTION_ANIMATION:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
-            process_animations_element(state, name, attrs);
+            process_animation_element(state, attrs);
             break;
         default:
             break;
@@ -948,7 +947,6 @@ style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
         case LV_STYLE_ARC_COLOR:
         case LV_STYLE_IMAGE_RECOLOR:
         case LV_STYLE_RECOLOR:
-        case STYLE_PROP_TYPE_UNKNOWN: /*Don't support color anims yet*/
         default:
             return STYLE_PROP_TYPE_UNKNOWN;
 
@@ -969,9 +967,17 @@ static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_s
     return 0;
 }
 
-static void int_anim_exec_cb(lv_anim_t * a)
+static void int_anim_exec_cb(lv_anim_t * a, int32_t v)
 {
+    uint32_t data = (lv_uintptr_t)lv_anim_get_user_data(a);
+    lv_style_prop_t prop = data >> 24;
+    lv_style_selector_t selector = data & 0x00ffffff;
+
+    lv_style_value_t style_value;
+    style_value.num = v;
+    lv_obj_set_local_style_prop(a->var, prop, style_value, selector);
 
 }
+
 
 #endif /* LV_USE_XML */

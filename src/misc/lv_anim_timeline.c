@@ -11,6 +11,9 @@
 #include "lv_anim_timeline.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
+#if LV_USE_NAME
+    #include "../core/lv_obj_tree.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -19,38 +22,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of anim_timeline_dsc*/
-typedef struct {
-    lv_anim_t anim;
-    uint32_t start_time;
-    uint8_t is_started : 1;
-    uint8_t is_completed : 1;
-} lv_anim_timeline_dsc_t;
-
-/*Data of anim_timeline*/
-struct _lv_anim_timeline_t {
-    /** Dynamically allocated anim dsc array*/
-    lv_anim_timeline_dsc_t * anim_dsc;
-
-    /** The length of anim dsc array*/
-    uint32_t anim_dsc_cnt;
-
-    /** Current time of the animation*/
-    uint32_t act_time;
-
-    /** Reverse playback*/
-    bool reverse;
-
-    /** Repeat count*/
-    uint32_t repeat_count;
-
-    /** Wait before repeat*/
-    uint32_t repeat_delay;
-
-    /** If set, it's assumed that the  `var` of animations is a widget name (path).
-     * The widget pointer will be retrieved by finding them by name on this widget.*/
-    lv_obj_t * base_obj;
-};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -167,6 +138,13 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
     anim_timeline_set_act_time(at, act_time);
 }
 
+void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
+{
+    LV_ASSERT_NULL(at);
+    at->user_data = user_data;
+}
+
+
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
@@ -208,6 +186,12 @@ uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
     return  at->repeat_delay;
+}
+
+void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return at->user_data;
 }
 
 /**********************
@@ -257,7 +241,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
 
             a->act_time = act_time - start_time;
             value = a->path_cb(a);
-            exec_anim(at, a);
+            exec_anim(at, a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -321,21 +305,33 @@ static void anim_timeline_exec_cb(void * var, int32_t v)
 
 static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
 {
-    if(a->exec_cb) {
-        if(at->base_obj) {
-            lv_obj_t * obj = lv_obj_get_child_by_name(at->base_obj, a->var);
-            if(obj) {
-                a->exec_cb(obj, v);
-            }
-            else {
-                LV_LOG_WARN("Widget was not found with name `` as child of %p", a->var, at->base_obj);
-            }
-        }
-        else {
-            a->exec_cb(a->var, v);
+
+    /*a->var stores children names if at->base_obj is set. */
+#if LV_USE_NAME
+    lv_obj_t * obj_resolved;
+    if(at->base_obj) {
+        obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);
+        if(obj_resolved == NULL) {
+            LV_LOG_WARN("Widget was not found with name `` as child of %p", a->var, at->base_obj);
+            return;
         }
     }
+    else {
+        obj_resolved = a->var;
+    }
+#else
+    lv_obj_t * obj_resolved = a->var;
+#endif
 
-    /*name is not resolved to pointer in custom_exec_cb to no alter the animation*/
-    if(a->custom_exec_cb) a->custom_exec_cb(a, v);
+
+    if(a->exec_cb) {
+        a->exec_cb(obj_resolved, v);
+    }
+    if(a->custom_exec_cb) {
+        /*Temporarily replace the var with the resolved object*/
+        void * var_ori = a->var;
+        a->var = obj_resolved;
+        a->custom_exec_cb(a, v);
+        a->var = var_ori;
+    }
 }

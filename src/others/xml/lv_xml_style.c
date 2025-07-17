@@ -30,7 +30,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_style_prop_t style_prop_text_to_enum(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -120,7 +119,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
         }
 
         if(lv_streq(value, "remove")) {
-            lv_style_prop_t prop = style_prop_text_to_enum(name);
+            lv_style_prop_t prop = lv_xml_style_prop_to_enum(name);
             if(prop != LV_STYLE_PROP_INV) lv_style_remove_prop(style, prop);
             else if(lv_streq(name, "pad_all")) {
                 lv_style_remove_prop(style, LV_STYLE_PAD_TOP);

@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_anim.h"
+#include "lv_anim_timeline_private.h"
 
 /*********************
  *      DEFINES
@@ -25,7 +26,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
+/*Data of anim_timeline_dsc*/
+typedef struct _lv_anim_timeline_dsc_t {
+    lv_anim_t anim;
+    uint32_t start_time;
+    uint8_t is_started : 1;
+    uint8_t is_completed : 1;
+} lv_anim_timeline_dsc_t;
+
 
 /**********************
 * GLOBAL PROTOTYPES
@@ -92,6 +100,14 @@ void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay);
  */
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
 
+
+/**
+ * Set the user_data of a an animation timeline
+ * @param at        pointer to the animation timeline.
+ * @param user_data pointer to any data. Only the pointer will be saved.
+ */
+void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data);
+
 /**
  * Get the time used to play the animation timeline.
  * @param at    pointer to the animation timeline.
@@ -124,6 +140,12 @@ uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at);
  * @param at    pointer to the animation timeline.
  */
 uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
+
+/**
+ * Get the user_data of a an animation timeline
+ * @param at    pointer to the animation timeline.
+ */
+void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
 
 /**********************
  *      MACROS
