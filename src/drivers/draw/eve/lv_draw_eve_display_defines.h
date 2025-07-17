@@ -585,8 +585,8 @@ static inline uint32_t LV_EVE_BITMAP_SIZE(uint8_t filter, uint8_t wrapx, uint8_t
  */
 static inline uint32_t LV_EVE_BITMAP_LAYOUT_H(uint16_t linestride, uint16_t height)
 {
-    uint32_t const linestridev = (uint32_t) ((((linestride & 0xC00U) >> 10U) &3UL) << 2U);
-    uint32_t const heightv = (uint32_t) (((height & 0x600U) >> 9U) & 3UL);
+    uint32_t const linestridev = (uint32_t)((((linestride & 0xC00U) >> 10U) & 3UL) << 2U);
+    uint32_t const heightv = (uint32_t)(((height & 0x600U) >> 9U) & 3UL);
     return (LV_EVE_DL_BITMAP_LAYOUT_H | linestridev | heightv);
 }
 
@@ -600,8 +600,8 @@ static inline uint32_t LV_EVE_BITMAP_LAYOUT_H(uint16_t linestride, uint16_t heig
  */
 static inline uint32_t LV_EVE_BITMAP_SIZE_H(uint16_t width, uint16_t height)
 {
-    uint32_t const widthv = (uint32_t) ((((width & 0x600U) >> 9U) & 3UL) << 2U);
-    uint32_t const heightv = (uint32_t) (((height & 0x600U) >> 9U) & 3UL);
+    uint32_t const widthv = (uint32_t)((((width & 0x600U) >> 9U) & 3UL) << 2U);
+    uint32_t const heightv = (uint32_t)(((height & 0x600U) >> 9U) & 3UL);
     return ((LV_EVE_DL_BITMAP_SIZE_H) | widthv | heightv);
 }
 
@@ -685,8 +685,8 @@ static inline uint32_t LV_EVE_BITMAP_TRANSFORM_F(uint32_t val)
  */
 static inline uint32_t LV_EVE_BLEND_FUNC(uint8_t src, uint8_t dst)
 {
-    uint32_t const srcv = (uint32_t) ((src & 7UL) << 3U);
-    uint32_t const dstv = (uint32_t) (dst & 7UL);
+    uint32_t const srcv = (uint32_t)((src & 7UL) << 3U);
+    uint32_t const dstv = (uint32_t)(dst & 7UL);
     return (LV_EVE_DL_BLEND_FUNC | srcv | dstv);
 }
 
@@ -864,8 +864,8 @@ static inline uint32_t LV_EVE_POINT_SIZE(uint16_t size)
  */
 static inline uint32_t LV_EVE_SCISSOR_SIZE(uint16_t width, uint16_t height)
 {
-    uint32_t const widthv = (uint32_t) ((width & 0xFFFUL) << 12U);
-    uint32_t const heightv = (uint32_t) (height & 0xFFFUL);
+    uint32_t const widthv = (uint32_t)((width & 0xFFFUL) << 12U);
+    uint32_t const heightv = (uint32_t)(height & 0xFFFUL);
     return (LV_EVE_DL_SCISSOR_SIZE | widthv | heightv);
 }
 
@@ -877,8 +877,8 @@ static inline uint32_t LV_EVE_SCISSOR_SIZE(uint16_t width, uint16_t height)
  */
 static inline uint32_t LV_EVE_SCISSOR_XY(uint16_t xc0, uint16_t yc0)
 {
-    uint32_t const xc0v = (uint32_t) ((xc0 & 0x7FFUL) << 11U);
-    uint32_t const yc0v = (uint32_t) (yc0 & 0x7FFUL);
+    uint32_t const xc0v = (uint32_t)((xc0 & 0x7FFUL) << 11U);
+    uint32_t const yc0v = (uint32_t)(yc0 & 0x7FFUL);
     return (LV_EVE_DL_SCISSOR_XY | xc0v | yc0v);
 }
 
@@ -889,9 +889,9 @@ static inline uint32_t LV_EVE_SCISSOR_XY(uint16_t xc0, uint16_t yc0)
  */
 static inline uint32_t LV_EVE_STENCIL_FUNC(uint8_t func, uint8_t ref, uint8_t mask)
 {
-    uint32_t const funcv = (uint32_t) ((func & 7UL) << 16U);
-    uint32_t const refv = (uint32_t) ((ref & 0xFFUL) << 8U);
-    uint32_t const maskv = (uint32_t) (mask & 0xFFUL);
+    uint32_t const funcv = (uint32_t)((func & 7UL) << 16U);
+    uint32_t const refv = (uint32_t)((ref & 0xFFUL) << 8U);
+    uint32_t const maskv = (uint32_t)(mask & 0xFFUL);
     return (LV_EVE_DL_STENCIL_FUNC | funcv | refv | maskv);
 }
 
@@ -912,8 +912,8 @@ static inline uint32_t LV_EVE_STENCIL_MASK(uint8_t mask)
  */
 static inline uint32_t LV_EVE_STENCIL_OP(uint8_t sfail, uint8_t spass)
 {
-    uint32_t const sfailv = (uint32_t) ((sfail & 0x07UL) << 3U);
-    uint32_t const spassv = (uint32_t) (spass & 0x07UL);
+    uint32_t const sfailv = (uint32_t)((sfail & 0x07UL) << 3U);
+    uint32_t const spassv = (uint32_t)(spass & 0x07UL);
     return (LV_EVE_DL_STENCIL_OP | sfailv | spassv);
 }
 
@@ -944,8 +944,8 @@ static inline uint32_t LV_EVE_TAG_MASK(uint8_t mask)
  */
 static inline uint32_t LV_EVE_VERTEX2F(int16_t xc0, int16_t yc0)
 {
-    uint32_t const xc0v = ((((uint32_t) ((uint16_t) xc0)) & 0x7FFFUL) << 15U);
-    uint32_t const yc0v = (((uint32_t) ((uint16_t) yc0)) & 0x7FFFUL);
+    uint32_t const xc0v = ((((uint32_t)((uint16_t) xc0)) & 0x7FFFUL) << 15U);
+    uint32_t const yc0v = (((uint32_t)((uint16_t) yc0)) & 0x7FFFUL);
     return (LV_EVE_DL_VERTEX2F | xc0v | yc0v);
 }
 

@@ -195,7 +195,7 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     int32_t disp_w = lv_display_get_original_horizontal_resolution(disp);
     int32_t disp_h = lv_display_get_original_vertical_resolution(disp);
 
-    if (x < disp_w && y < disp_h) {
+    if(x < disp_w && y < disp_h) {
         data->state = LV_INDEV_STATE_PRESSED;
         data->point.x = x;
         data->point.y = y;

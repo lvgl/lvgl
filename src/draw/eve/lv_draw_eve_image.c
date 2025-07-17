@@ -31,7 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void convert_row_rgb565a8_to_argb4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst, uint32_t width);
+static void convert_row_rgb565a8_to_argb4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst,
+                                             uint32_t width);
 static void convert_row_argb8888_to_argb4444(const uint8_t * src, uint8_t * dst, uint32_t width);
 
 /**********************
@@ -119,27 +120,27 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                 EVE_memWrite_flash_buffer(img_addr, src_buf, eve_size);
                 break;
             case LV_COLOR_FORMAT_RGB565A8 : {
-                uint8_t * tmp_buf = lv_malloc(eve_stride);
-                LV_ASSERT_MALLOC(tmp_buf);
-                const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
-                int32_t src_alpha_stride = src_stride / 2;
-                for(uint32_t y = 0; y < src_h; y++) {
-                    convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
-                    EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    LV_ASSERT_MALLOC(tmp_buf);
+                    const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
+                    int32_t src_alpha_stride = src_stride / 2;
+                    for(uint32_t y = 0; y < src_h; y++) {
+                        convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
+                        EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
                 }
-                lv_free(tmp_buf);
-                break;
-            }
             case LV_COLOR_FORMAT_ARGB8888 : {
-                uint8_t * tmp_buf = lv_malloc(eve_stride);
-                LV_ASSERT_MALLOC(tmp_buf);
-                for(uint32_t y = 0; y < src_h; y++) {
-                    convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
-                    EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    LV_ASSERT_MALLOC(tmp_buf);
+                    for(uint32_t y = 0; y < src_h; y++) {
+                        convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
+                        EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
                 }
-                lv_free(tmp_buf);
-                break;
-            }
             default :
                 return;
         }
@@ -195,7 +196,8 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
  *   STATIC FUNCTIONS
  **********************/
 
-static void convert_row_rgb565a8_to_argb4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst, uint32_t width)
+static void convert_row_rgb565a8_to_argb4444(const uint8_t * src, const uint8_t * src_alpha, uint8_t * dst,
+                                             uint32_t width)
 {
     for(uint32_t x = 0; x < width; x++) {
         uint16_t rgb565 = ((const uint16_t *) src)[x];

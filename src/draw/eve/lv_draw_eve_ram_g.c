@@ -37,7 +37,7 @@ static uint32_t fnv_1a_hash(const void * src, size_t len);
 static void grow_hash_table(lv_draw_eve_ramg_t * ramg);
 
 #if RAMG_DEBUG
-static void ramg_debug(lv_draw_eve_ramg_t * ramg, uint32_t key_hash, uint32_t table_index);
+    static void ramg_debug(lv_draw_eve_ramg_t * ramg, uint32_t key_hash, uint32_t table_index);
 #endif
 
 /**********************
