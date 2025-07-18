@@ -173,6 +173,19 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
                              const lv_fpoint_t * p3);
 
 /**
+ * Add ellipse arc to the path from last point to the point
+ * @param path              pointer to a path
+ * @param radius_x          the x radius for ellipse arc
+ * @param radius_y          the y radius for ellipse arc
+ * @param rotate_angle      the rotate angle for arc
+ * @param large_arc         true for large arc, otherwise small
+ * @param clockwise         true for clockwise, otherwise anticlockwise
+ * @param p                 pointer to a `lv_fpoint_t` variable for end point
+ */
+void lv_vector_path_arc_to(lv_vector_path_t * path, float radius_x, float radius_y, float rotate_angle, bool large_arc,
+                           bool clockwise, const lv_fpoint_t * p);
+
+/**
  * Close the sub path
  * @param path              pointer to a path
  */

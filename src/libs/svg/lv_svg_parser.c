@@ -893,6 +893,9 @@ static int _get_path_point_count(char cmd)
         case 'T':
         case 't':
             return 2;
+        case 'A':
+        case 'a':
+            return 4;
         default:
             return 0;
     }
@@ -901,6 +904,7 @@ static int _get_path_point_count(char cmd)
 static bool _is_relative_cmd(char cmd)
 {
     switch(cmd) {
+        case 'a':
         case 'm':
         case 'l':
         case 'h':
@@ -911,6 +915,7 @@ static bool _is_relative_cmd(char cmd)
         case 't':
         case 'z':
             return true;
+        case 'A':
         case 'M':
         case 'L':
         case 'H':
@@ -927,7 +932,7 @@ static bool _is_relative_cmd(char cmd)
 
 static bool _is_path_cmd(char ch)
 {
-    return ch != 0 && strchr("MLHVCSQTZmlhvcsqtz", ch) != NULL;
+    return ch != 0 && strchr("AMLHVCSQTZamlhvcsqtz", ch) != NULL;
 }
 
 static void _process_path_value(lv_svg_node_t * node, lv_svg_attr_type_t type, const char * val_start,
@@ -1176,6 +1181,43 @@ static void _process_path_value(lv_svg_node_t * node, lv_svg_attr_type_t type, c
                     cur_ctrlPoint.y = point[0].y;
                     cur_point.x = point[1].x;
                     cur_point.y = point[1].y;
+                }
+                break;
+            case 'A':
+            case 'a': {
+                    lv_svg_point_t * point = (lv_svg_point_t *)(&path_seg->data);
+                    float rx = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &rx);
+                    float ry = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &ry);
+                    float rotate = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &rotate);
+                    float large_arc = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &large_arc);
+                    float sweep = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &sweep);
+
+                    float xval = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &xval);
+                    float yval = 0.0f;
+                    ptr = _parse_number(ptr, val_end, &yval);
+                    if(relative) {
+                        xval += cur_point.x;
+                        yval += cur_point.y;
+                    }
+
+                    path_seg->cmd = LV_SVG_PATH_CMD_ARC_TO;
+                    point[0].x = rx;
+                    point[0].y = ry;
+                    point[1].x = rotate;
+                    point[1].y = 0.0f;
+                    point[2].x = large_arc;
+                    point[2].y = sweep;
+                    point[3].x = xval;
+                    point[3].y = yval;
+
+                    cur_point.x = xval;
+                    cur_point.y = yval;
                 }
                 break;
             case 'Z':

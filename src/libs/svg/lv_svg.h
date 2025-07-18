@@ -255,6 +255,7 @@ enum _lv_svg_path_cmd_t {
     LV_SVG_PATH_CMD_LINE_TO = 76,
     LV_SVG_PATH_CMD_CURVE_TO = 67,
     LV_SVG_PATH_CMD_QUAD_TO = 81,
+    LV_SVG_PATH_CMD_ARC_TO = 65, /*svg2 extension*/
     LV_SVG_PATH_CMD_CLOSE = 90,
 };
 
