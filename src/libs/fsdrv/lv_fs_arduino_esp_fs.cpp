@@ -3,6 +3,9 @@
 
 #if LV_USE_FS_ARDUINO_ESP_FS
 
+#define CHECK_FILE_P() \
+    if (!file_p) return LV_FS_RES_NOT_EX;
+
 struct FileWrapper final {
     FileWrapper(const File& file) : file(file) {}
     ~FileWrapper() { file.close(); }
@@ -44,6 +47,7 @@ static lv_fs_res_t check_pos(const R pos) {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
@@ -135,6 +139,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     lock_t lock(drv); 
+    CHECK_FILE_P();
     *br = FileWrapper::get(file_p).read((uint8_t *)buf, btr);
     return check_pos(*br);
 }
@@ -151,6 +156,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     lock_t lock(drv);
+    CHECK_FILE_P();
     *bw = FileWrapper::get(file_p).write((uint8_t *)buf, btw);
     return check_pos(*bw);
 }
@@ -166,6 +172,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     lock_t lock(drv);
+    CHECK_FILE_P();
 
     SeekMode mode;
     if(whence == LV_FS_SEEK_SET)
@@ -188,8 +195,11 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     lock_t lock(drv);
+    CHECK_FILE_P();
     *pos_p = FileWrapper::get(file_p).position();
     return check_pos(*pos_p);
 }
+
+#undef CHECK_FILE_P
 
 #endif // LV_USE_FS_ARDUINO_ESP_FS
