@@ -1110,3 +1110,40 @@ div .lvgl-figure-caption p {
 body[data-theme="dark"] .highlight .p {
   color: #a883f3;
 }
+
+/*-------------------------------------------------------------------------
+ * Glossary
+ *-------------------------------------------------------------------------*/
+
+.glossary {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4rem;
+}
+
+.glossary > .dt {
+  font-weight: 800 !important;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin-top: 0;
+}
+
+.glossary > .dt:first-child {
+  margin-top: 2rem;
+}
+
+.glossary > dd {
+  margin-top: 0.25rem;
+}
+
+.glossary > dd > :last-child {
+  margin-bottom: 0;
+}
+
+.glossary dl {
+  margin-top: 1.5em;
+}
+
+.glossary dl dd > :first-child {
+  margin-top: 0 !important;
+}
