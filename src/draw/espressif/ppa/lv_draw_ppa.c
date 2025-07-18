@@ -33,6 +33,8 @@ static bool ppa_isr(ppa_client_handle_t ppa_client, ppa_event_data_t * event_dat
     static void ppa_thread(void * arg);
 #endif
 
+static bool g_ppa_complete = true;
+
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
@@ -56,7 +58,7 @@ void lv_draw_ppa_init(void)
 
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;
-    cfg.max_pending_trans_num = 4;
+    cfg.max_pending_trans_num = 8192;
     res = ppa_register_client(&cfg, &draw_ppa_unit->srm_client);
     LV_ASSERT(res == ESP_OK);
 
@@ -93,6 +95,7 @@ void lv_draw_ppa_deinit(void)
 
 static bool ppa_isr(ppa_client_handle_t ppa_client, ppa_event_data_t * event_data, void * user_data)
 {
+    g_ppa_complete = true;
 
 #if LV_PPA_NONBLOCKING_OPS
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)user_data;
@@ -163,7 +166,14 @@ static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
-    if(u->task_act) return 0;
+    if(u->task_act) {
+        if(!g_ppa_complete) {
+            return LV_DRAW_UNIT_IDLE;
+        } else {
+            u->task_act->state = LV_DRAW_TASK_STATE_READY;
+            u->task_act = NULL;
+        }
+    }
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PPA);
     if(!t || t->preferred_draw_unit_id != DRAW_UNIT_ID_PPA) return LV_DRAW_UNIT_IDLE;
@@ -176,8 +186,6 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     ppa_execute_drawing(u);
 
 #if !LV_PPA_NONBLOCKING_OPS
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
-    u->task_act = NULL;
     lv_draw_dispatch_request();
 #endif
 
@@ -208,9 +216,11 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
+            g_ppa_complete = false;
             lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
+            g_ppa_complete = false;
             lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &t->area);
             break;
         default:
