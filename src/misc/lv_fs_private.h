@@ -33,9 +33,7 @@ struct _lv_fs_file_cache_t {
 
 /** Extended path object to specify buffer for memory-mapped files */
 struct _lv_fs_path_ex_t {
-    char path[4];   /**<  This is needed to make it compatible with a normal path */
-    const void * buffer;
-    uint32_t size;
+    char path[32];   /**<  Store the driver letter address and size*/
 };
 
 /**********************
