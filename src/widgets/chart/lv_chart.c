@@ -1387,8 +1387,9 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
             bar_clip_area.y2 = y_prev;
             bar_clip_area.y1 = obj->coords.y2 - y_ofs - segment_y + 1;
             y_prev = bar_clip_area.y1;
-            layer->_clip_area = bar_clip_area;
-            lv_draw_rect(layer, &col_dsc, &bar_full_area);
+            if(lv_area_intersect(&layer->_clip_area, &clip_area_ori, &bar_clip_area)) {
+                lv_draw_rect(layer, &col_dsc, &bar_full_area);
+            }
             col_dsc.base.id1++;
         }
 
