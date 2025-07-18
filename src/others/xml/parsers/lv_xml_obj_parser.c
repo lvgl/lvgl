@@ -655,6 +655,13 @@ void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const c
     lv_obj_add_event_cb(item, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
 }
 
+void * lv_obj_xml_play_animation_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
 void lv_obj_xml_play_animation_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
 {
 
@@ -948,7 +955,6 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
         return;
     }
 
-
     lv_anim_timeline_t * timeline = NULL;
     lv_anim_timeline_t ** timeline_array = lv_obj_get_user_data(target);
     uint32_t i;
@@ -961,10 +967,11 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
     }
 
     if(timeline == NULL) {
-        LV_LOG_WARN("No timeline is found for `%s` with `%s` name", dsc->target_name, dsc->target_name);
+        LV_LOG_WARN("No timeline is found for `%s` with `%s` name", dsc->target_name, dsc->timeline_name);
         return;
     }
 
+    lv_anim_timeline_set_progress(timeline, 0);
     lv_anim_timeline_start(timeline);
 }
 

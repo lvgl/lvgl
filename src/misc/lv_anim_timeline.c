@@ -11,7 +11,7 @@
 #include "lv_anim_timeline.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
-#if LV_USE_NAME
+#if LV_USE_OBJ_NAME
     #include "../core/lv_obj_tree.h"
 #endif
 
@@ -307,7 +307,7 @@ static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
 {
 
     /*a->var stores children names if at->base_obj is set. */
-#if LV_USE_NAME
+#if LV_USE_OBJ_NAME
     lv_obj_t * obj_resolved;
     if(at->base_obj) {
         obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);

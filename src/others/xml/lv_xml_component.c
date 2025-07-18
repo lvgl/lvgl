@@ -85,6 +85,7 @@ void lv_xml_component_scope_init(lv_xml_component_scope_t * scope)
     lv_ll_init(&scope->event_ll, sizeof(lv_xml_event_cb_t));
     lv_ll_init(&scope->image_ll, sizeof(lv_xml_image_t));
     lv_ll_init(&scope->font_ll, sizeof(lv_xml_font_t));
+    lv_ll_init(&scope->timeline_ll, sizeof(lv_xml_timeline_t));
 }
 
 
@@ -496,7 +497,13 @@ static void process_timeline_element(lv_xml_parser_state_t * state, const char *
 
     /*If already registered skip all. Don't set state->context
      *so animations won't be added later either*/
-    if(lv_xml_get_timeline(&state->scope, name)) return;
+    lv_xml_timeline_t * at;
+    LV_LL_READ(&state->scope.timeline_ll, at) {
+        if(lv_streq(at->name, name)) {
+            LV_LOG_INFO("Timeline %s is already registered. Don't register it again.", name);
+            return;
+        }
+    }
 
     lv_xml_register_timeline(&state->scope, name);
 
@@ -506,8 +513,7 @@ static void process_timeline_element(lv_xml_parser_state_t * state, const char *
 
 static void process_animation_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
-
-    if(state->context) {
+    if(state->context == NULL) {
         LV_LOG_INFO("No parent timeline is set, skipping");
         return;
     }
@@ -521,7 +527,6 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     const char * reverse_delay_str = lv_xml_get_value_of(attrs, "reverse_delay");
     const char * reverse_duration_str = lv_xml_get_value_of(attrs, "reverse_duration");
     const char * repeat_count_str = lv_xml_get_value_of(attrs, "repeat_count");
-    const char * easing_str = lv_xml_get_value_of(attrs, "easing");
     const char * early_apply_str = lv_xml_get_value_of(attrs, "early_apply");
     const char * selector_str = lv_xml_get_value_of(attrs, "selector");
 
@@ -559,23 +564,33 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
 
     if(duration_str == NULL) duration_str = "1000";
     if(delay_str == NULL) delay_str = "0";
-    if(easing_str == NULL) easing_str = "linear";
     if(early_apply_str == NULL) early_apply_str = "false";
     if(selector_str == NULL) selector_str = "";
-    if(reverse_delay_str == NULL) reverse_delay_str = "0";
-    if(reverse_duration_str == NULL) reverse_duration_str = "0";
-    if(repeat_count_str == NULL) repeat_count_str = "1";
 
     lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
 
-    int32_t start = anim_value_to_int(prop, start_str);
-    int32_t end = anim_value_to_int(prop, end_str);
+    int32_t start = anim_value_to_int(prop_type, start_str);
+    int32_t end = anim_value_to_int(prop_type, end_str);
 
     lv_xml_timeline_t * at = state->context;
     if(at == NULL) {
         LV_LOG_WARN("There was no parent timeline for the animation");
         return;
     }
+
+    if(target_str[0] == '#') target_str = lv_xml_get_const(&state->scope, &target_str[1]);
+    if(prop_str[0] == '#') prop_str = lv_xml_get_const(&state->scope, &prop_str[1]);
+    if(start_str[0] == '#') start_str = lv_xml_get_const(&state->scope, &start_str[1]);
+    if(end_str[0] == '#') end_str = lv_xml_get_const(&state->scope, &end_str[1]);
+    if(duration_str[0] == '#') duration_str = lv_xml_get_const(&state->scope, &duration_str[1]);
+    if(delay_str[0] == '#') delay_str = lv_xml_get_const(&state->scope, &delay_str[1]);
+    if(early_apply_str[0] == '#') early_apply_str = lv_xml_get_const(&state->scope, &early_apply_str[1]);
+
+    if(!target_str || !prop_str || !start_str || !end_str || !duration_str || !delay_str || !early_apply_str) {
+        LV_LOG_WARN("Couldn't resolve one or more constants. Skipping the animation.");
+        return;
+    }
+
 
     uint32_t selector_and_prop = ((prop & 0xff) << 24) | selector;
 
@@ -588,9 +603,6 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     lv_anim_set_duration(a, lv_xml_atoi(duration_str));
     lv_anim_set_delay(a, lv_xml_atoi(delay_str));
     lv_anim_set_early_apply(a, lv_xml_to_bool(early_apply_str));
-    lv_anim_set_reverse_delay(a, lv_xml_atoi(reverse_delay_str));
-    lv_anim_set_reverse_duration(a, lv_xml_atoi(reverse_duration_str));
-    lv_anim_set_repeat_count(a, lv_xml_atoi(repeat_count_str));
     lv_anim_set_user_data(a, (void *)((uintptr_t)selector_and_prop));
 }
 
@@ -823,11 +835,9 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             process_subject_element(state, name, attrs);
             break;
         case LV_XML_PARSER_SECTION_TIMELINE:
-            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
             process_timeline_element(state, attrs);
             break;
         case LV_XML_PARSER_SECTION_ANIMATION:
-            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <subjects>*/
             process_animation_element(state, attrs);
             break;
         default:

@@ -2,6 +2,9 @@
 	<consts>
 		<color name="light_blue" value="0xbbbbff"/>
 		<color name="dark_blue" value="0x000080"/>
+        <int name="delay1" value="200"/>
+        <int name="delay2" value="400"/>
+        <int name="duration" value="300"/>
 	</consts>
 
 	<styles>
@@ -10,20 +13,42 @@
 	</styles>
 
     <animations>
-        <timeline>
-            <anim prop="x" target="obj1" start="10" end="20" duration="2000" delay="1000" easing="ease_out"/>
-            <anim prop="x" start="10" end="20" duration="2000" delay="1000" easing="ease_out" early_apply="true"/>
+        <timeline name="load">
+            <animation prop="translate_x" target="lv_label_0" start="-30" end="0" duration="500" delay="0"/>
+            <animation prop="opa" target="lv_label_0" start="0" end="255" duration="500" delay="0"/>
+
+            <animation prop="translate_y" target="card1" start="-20" end="0" duration="#duration" delay="#delay1" early_apply="true"/>
+            <animation prop="opa" target="card1" start="0" end="255" duration="#duration" delay="#delay1" early_apply="true"/>
+
+            <animation prop="translate_y" target="card2" start="-20" end="0" duration="#duration" delay="#delay2" early_apply="true"/>
+            <animation prop="opa" target="card2" start="0" end="255" duration="#duration" delay="#delay2" early_apply="true"/>
         </timeline>
     </animations>
 
-	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label text-translated="tiger"/>
-		<my_card title="Card 1" name="card1"
-				 y="30"
+	<view extends="lv_obj" name="main" width="380" height="400" style_bg_color="#light_blue">
+		<lv_label x="30" text-translated="tiger"/>
+
+        <lv_button x="0" y="20">
+            <play_animation_event target="self" timeline="load" />
+            <lv_label text="Load"/>
+        </lv_button>
+
+        <lv_button x="100" y="20">
+            <play_animation_event target="card1" timeline="shake" />
+            <lv_label text="Shake 1"/>
+        </lv_button>
+
+        <lv_button x="200" y="20">
+            <play_animation_event target="card2" timeline="shake" />
+            <lv_label text="Shake 2"/>
+        </lv_button>
+
+        <my_card title="Card 1" name="card1"
+				 y="80"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 
-		<my_card y="125"
+		<my_card y="200" name="card2"
 				 bg_color="0xffaaaa"
 				 action="Apply"
 				 btn_rel_style="btn_style"

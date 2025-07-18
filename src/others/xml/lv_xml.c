@@ -130,6 +130,8 @@ void lv_xml_init(void)
                            lv_obj_xml_screen_load_event_apply);
     lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
                            lv_obj_xml_screen_create_event_apply);
+    lv_xml_widget_register("lv_obj-play_animation_event", lv_obj_xml_play_animation_event_create,
+                           lv_obj_xml_play_animation_event_apply);
 
     lv_xml_widget_register("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
@@ -214,13 +216,16 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
 
         lv_anim_t * a_stored;
         LV_LL_READ(&at_xml->anims, a_stored) {
-            lv_anim_timeline_add(at, 0, a_stored);
+            int32_t delay = -a_stored->act_time;
+            lv_anim_timeline_add(at, delay, a_stored);
         }
 
         at->base_obj = state.view;
         timeline_array[i] = at;
         i++;
+        lv_anim_timeline_get_playtime(at);
     }
+
 
     timeline_array[i] = NULL; /*Closing to avoid storing the length*/
 
@@ -426,7 +431,7 @@ lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const cha
 
     at = lv_ll_ins_head(&scope->timeline_ll);
     at->name = lv_strdup(name);
-    lv_ll_init(&at->anims, sizeof(lv_xml_timeline_t));
+    lv_ll_init(&at->anims, sizeof(lv_anim_t));
 
     return LV_RESULT_OK;
 }
