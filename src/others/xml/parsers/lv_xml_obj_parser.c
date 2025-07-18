@@ -239,7 +239,7 @@ void * lv_obj_xml_event_cb_create(lv_xml_parser_state_t * state, const char ** a
 
 void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attrs)
 {
-    const char * trigger_str = lv_xml_get_value_of(attrs, "trigger_str");
+    const char * trigger_str = lv_xml_get_value_of(attrs, "trigger");
     lv_event_code_t code = LV_EVENT_CLICKED;
     if(trigger_str) code = lv_xml_trigger_text_to_enum_value(trigger_str);
     if(code == LV_EVENT_LAST)  {
