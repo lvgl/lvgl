@@ -934,12 +934,20 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
     play_anim_dsc_t * dsc = lv_event_get_user_data(e);
     LV_ASSERT_NULL(dsc);
 
+    lv_obj_t * target;
 
-    lv_obj_t * target = lv_obj_get_child_by_name(dsc->base_obj, dsc->target_name);
+    if(lv_streq(dsc->target_name, "self")) {
+        target = dsc->base_obj;
+    }
+    else {
+        target = lv_obj_get_child_by_name(dsc->base_obj, dsc->target_name);
+    }
+
     if(target == NULL) {
         LV_LOG_WARN("No target widget is found with `%s` name", dsc->target_name);
         return;
     }
+
 
     lv_anim_timeline_t * timeline = NULL;
     lv_anim_timeline_t ** timeline_array = lv_obj_get_user_data(target);
