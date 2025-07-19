@@ -7,11 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_blend_neon64_to_rgb565.h"
-#include <src/misc/lv_color.h>
-#include <src/misc/lv_types.h>
-#include <stdint.h>
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON64
 
+#include "../../../../misc/lv_color.h"
+#include "../../../../misc/lv_types.h"
 #include "../lv_draw_sw_blend_private.h"
 #include <arm_neon.h>
 
