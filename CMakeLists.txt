@@ -3,7 +3,12 @@ cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(NOT ESP_PLATFORM)
-  project(lvgl LANGUAGES C HOMEPAGE_URL https://github.com/lvgl/lvgl)
+  if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
+    project(
+      lvgl
+      LANGUAGES C
+      HOMEPAGE_URL https://github.com/lvgl/lvgl)
+  endif()
   if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     enable_language(CXX ASM)
   else()
