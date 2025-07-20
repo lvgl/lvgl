@@ -505,7 +505,7 @@ static lv_result_t cache_iter_next_cb(void * instance, void * context, void * el
         *da_entry += entry_size;
     }
 
-    if(da_entry == NULL) {
+    if(*da_entry == NULL) {
         return LV_RESULT_INVALID;
     }
 
