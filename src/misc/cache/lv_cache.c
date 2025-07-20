@@ -11,6 +11,7 @@
 #include "../lv_assert.h"
 #include "lv_cache_entry_private.h"
 #include "lv_cache_private.h"
+#include "../lv_profiler.h"
 
 /*********************
  *      DEFINES
