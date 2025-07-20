@@ -1,13 +1,13 @@
 /**
- * @file lv_draw_sw_blend_neon64_to_rgb565.c
+ * @file lv_draw_sw_blend_neon_to_rgb565.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw_blend_neon64_to_rgb565.h"
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON64
+#include "lv_draw_sw_blend_neon_to_rgb565.h"
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS
 
 #include "../../../../misc/lv_color.h"
 #include "../../../../misc/lv_types.h"
@@ -156,7 +156,7 @@ static inline uint32_t lv_color_16_16_mix_2_with_opa_mask(const uint16_t * c1, c
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
 
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
@@ -200,7 +200,7 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565(lv_draw_sw_blend_fill_dsc_t 
 
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_opa(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
 
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
@@ -249,7 +249,7 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa(lv_draw_sw_blend_fi
 
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -302,7 +302,7 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_mask(lv_draw_sw_blend_f
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_color_to_rgb565_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -359,7 +359,7 @@ lv_result_t lv_draw_sw_blend_neon64_color_to_rgb565_with_opa_mask(lv_draw_sw_ble
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_l8_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_l8_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -393,7 +393,7 @@ lv_result_t lv_draw_sw_blend_neon64_l8_to_rgb565(lv_draw_sw_blend_image_dsc_t * 
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -427,7 +427,7 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565(lv_draw_sw_blend_image_dsc_t 
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_al88_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -463,7 +463,7 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa(lv_draw_sw_blend_ima
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_al88_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -504,7 +504,7 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_mask(lv_draw_sw_blend_im
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_al88_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -548,7 +548,7 @@ lv_result_t lv_draw_sw_blend_neon64_al88_to_rgb565_with_opa_mask(lv_draw_sw_blen
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_rgb565_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
 
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
@@ -582,7 +582,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565(lv_draw_sw_blend_image_dsc_
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_rgb565_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
 {
 
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
@@ -617,7 +617,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_opa(lv_draw_sw_blend_i
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_rgb565_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -654,7 +654,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_mask(lv_draw_sw_blend_
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_rgb565_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -693,7 +693,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb565_to_rgb565_with_opa_mask(lv_draw_sw_bl
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
+lv_result_t lv_draw_sw_blend_neon_rgb888_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
 {
 
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
@@ -729,7 +729,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565(lv_draw_sw_blend_image_dsc_
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
+lv_result_t lv_draw_sw_blend_neon_rgb888_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -765,7 +765,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_opa(lv_draw_sw_blend_i
 
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
+lv_result_t lv_draw_sw_blend_neon_rgb888_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc, uint8_t src_px_size)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -807,8 +807,8 @@ lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_mask(lv_draw_sw_blend_
 
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                   uint8_t src_px_size)
+lv_result_t lv_draw_sw_blend_neon_rgb888_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc,
+                                                                 uint8_t src_px_size)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -851,7 +851,7 @@ lv_result_t lv_draw_sw_blend_neon64_rgb888_to_rgb565_with_opa_mask(lv_draw_sw_bl
 
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_argb888_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -886,7 +886,7 @@ lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565(lv_draw_sw_blend_image_dsc
     return LV_RESULT_OK;
 }
 
-lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_argb888_to_rgb565_with_opa(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -921,7 +921,7 @@ lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa(lv_draw_sw_blend_
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_argb888_to_rgb565_with_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -959,7 +959,7 @@ lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_mask(lv_draw_sw_blend
     }
     return LV_RESULT_OK;
 }
-lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_argb888_to_rgb565_with_opa_mask(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa < LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf != NULL);
@@ -1004,7 +1004,7 @@ lv_result_t lv_draw_sw_blend_neon64_argb888_to_rgb565_with_opa_mask(lv_draw_sw_b
 }
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
-lv_result_t lv_draw_sw_blend_neon64_argb888_premultiplied_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
+lv_result_t lv_draw_sw_blend_neon_argb888_premultiplied_to_rgb565(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     LV_ASSERT(dsc->opa >= LV_OPA_MAX);
     LV_ASSERT(dsc->mask_buf == NULL);
@@ -2090,4 +2090,4 @@ static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, ui
 {
     return (void *)((uint8_t *)buf + stride);
 }
-#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON64 */
+#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS */
