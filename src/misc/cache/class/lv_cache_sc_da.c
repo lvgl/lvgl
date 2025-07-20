@@ -216,7 +216,8 @@ static void * alloc_new_entry(lv_cache_sc_da_t * da, const void * key,
     lv_cache_entry_init(last_cache_entry, &da->cache, da->cache.node_size);
     lv_cache_entry_disable_deleting(last_cache_entry);
 
-    set_second_chance(last_cache_entry, true);
+    /*New entries start with their second chance set*/
+    set_second_chance(last_cache_entry, true); 
     return last_cache_entry;
 }
 
@@ -275,6 +276,7 @@ static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key,
 
         if(da->cache.ops.compare_cb(curr_da_entry, key) == 0) {
             cache_entry = curr_cache_entry;
+            /*When an entry is used, we set it's second chance to true again*/
             set_second_chance(cache_entry, true);
             break;
         }
@@ -418,6 +420,7 @@ static lv_cache_entry_t * get_possible_victim(lv_cache_sc_da_t * da, size_t inde
         return NULL;
     }
 
+    /*Remove its second chance*/
     set_second_chance(cache_entry, false);
     return NULL;
 }
