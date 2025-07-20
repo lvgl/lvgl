@@ -18,6 +18,11 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
+
       - name: Install EJ dispatcher tool
         run: |
           cargo install ejlv

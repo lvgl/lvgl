@@ -36,6 +36,11 @@ jobs:
           mv artifacts/pr_number/pr_number .
           mv artifacts/comment/comment.md .
 
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
+
       - name: Install EJ dispatcher tool
         run: |
           cargo install ejlv
