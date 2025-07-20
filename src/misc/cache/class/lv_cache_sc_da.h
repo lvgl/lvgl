@@ -32,6 +32,7 @@ extern "C" {
  *    GLOBAL VARIABLES
  *************************/
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_cache_class_t lv_cache_class_sc_da;
+
 /**********************
  *      MACROS
  **********************/
