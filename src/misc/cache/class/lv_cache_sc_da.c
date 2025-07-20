@@ -411,7 +411,7 @@ static lv_cache_entry_t * get_possible_victim(lv_cache_sc_da_t * da, size_t inde
         return cache_entry;
     }
     if(sec_chance == 0 && refs > 0) {
-        LV_LOG_WARN(
+        LV_LOG_INFO(
             "Entry %zu should be evicted but it's still referenced %" LV_PRId32
             " times\n",
             index, refs);
