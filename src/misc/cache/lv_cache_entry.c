@@ -26,7 +26,7 @@ struct _lv_cache_entry_t {
     uint32_t node_size;
 #define LV_CACHE_ENTRY_FLAG_INVALID (1 << 0)
 #define LV_CACHE_ENTRY_FLAG_DISABLE_DELETE (1 << 1)
-#define LV_CACHE_CLASS_FLAG (1 << 7)
+#define LV_CACHE_CLASS_FLAG_CUSTOM (1 << 7)
     uint8_t flags;
 };
 
@@ -197,10 +197,10 @@ void lv_cache_entry_set_class_flag(lv_cache_entry_t * entry, bool value)
 
     LV_ASSERT_NULL(entry);
     if(value) {
-        entry->flags |= LV_CACHE_CLASS_FLAG;
+        entry->flags |= LV_CACHE_CLASS_FLAG_CUSTOM;
     }
     else {
-        entry->flags &= ~LV_CACHE_CLASS_FLAG;
+        entry->flags &= ~LV_CACHE_CLASS_FLAG_CUSTOM;
     }
 }
 
@@ -208,7 +208,7 @@ bool lv_cache_entry_get_class_flag(lv_cache_entry_t * entry)
 {
 
     LV_ASSERT_NULL(entry);
-    return entry->flags & LV_CACHE_CLASS_FLAG;
+    return entry->flags & LV_CACHE_CLASS_FLAG_CUSTOM;
 }
 
 void lv_cache_entry_disable_deleting(lv_cache_entry_t * entry)
