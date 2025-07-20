@@ -66,15 +66,6 @@ static lv_cache_t * create_cache(const lv_cache_class_t * cache_class,
     return lv_cache_create(cache_class, sizeof(test_data_t), max_size, ops);
 }
 
-bool create_cb(void * node, void * user_data)
-{
-    test_data_t * data = (test_data_t *)node;
-    LV_UNUSED(user_data);
-    data->data = lv_malloc(data->slot.size);
-    data->magic = 0xCAFECAFE;
-    return (lv_cache_entry_t *)node;
-}
-
 void test_cache_lru_rb_1(void)
 {
     cache = create_cache(&lv_cache_class_lru_rb_size, CACHE_SIZE_BYTES);
