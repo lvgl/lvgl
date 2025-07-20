@@ -47,7 +47,6 @@ void   lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data);
 void   lv_cache_entry_set_flag(lv_cache_entry_t * entry, uint8_t flags);
 void   lv_cache_entry_remove_flag(lv_cache_entry_t * entry, uint8_t flags);
 bool   lv_cache_entry_has_flag(lv_cache_entry_t * entry, uint8_t flags);
-void lv_cache_entry_disable_deleting(lv_cache_entry_t * entry);
 /*************************
  *    GLOBAL VARIABLES
  *************************/
