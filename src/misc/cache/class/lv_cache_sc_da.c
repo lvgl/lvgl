@@ -42,7 +42,7 @@
 *  ┗ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┛           *
 *                                            *
 * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ *
-* ┃       Buffer Entry Structure     ┃ *
+* ┃       Buffer Entry Structure           ┃ *
 * ┃  ┌────────────┬──────────────────────┐ ┃ *
 * ┃  │   DATA     │     ENTRY_DATA       │ ┃ *
 * ┃  │ (user type)│ (lv_cache_entry_t)   │ ┃ *
