@@ -9,9 +9,7 @@
 #include "lv_cache_entry.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
-#include "lv_cache.h"
 #include "lv_cache_entry_private.h"
-#include "lv_cache_private.h"
 
 /*********************
  *      DEFINES
@@ -20,15 +18,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_cache_entry_t {
-    const lv_cache_t * cache;
-    int32_t ref_cnt;
-    uint32_t node_size;
-#define LV_CACHE_ENTRY_FLAG_INVALID (1 << 0)
-#define LV_CACHE_ENTRY_FLAG_DISABLE_DELETE (1 << 1)
-#define LV_CACHE_CLASS_FLAG_CUSTOM (1 << 7)
-    uint8_t flags;
-};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -87,17 +76,6 @@ void lv_cache_entry_set_node_size(lv_cache_entry_t * entry, uint32_t node_size)
 {
     LV_ASSERT_NULL(entry);
     entry->node_size = node_size;
-}
-
-void lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid)
-{
-    LV_ASSERT_NULL(entry);
-    if(is_invalid) {
-        entry->flags |= LV_CACHE_ENTRY_FLAG_INVALID;
-    }
-    else {
-        entry->flags &= ~LV_CACHE_ENTRY_FLAG_INVALID;
-    }
 }
 
 bool lv_cache_entry_is_invalid(lv_cache_entry_t * entry)
@@ -192,31 +170,23 @@ void lv_cache_entry_delete(lv_cache_entry_t * entry)
     lv_free(data);
 }
 
-void lv_cache_entry_set_class_flag(lv_cache_entry_t * entry, bool value)
+void lv_cache_entry_set_flag(lv_cache_entry_t * entry, uint8_t flags)
 {
-
     LV_ASSERT_NULL(entry);
-    if(value) {
-        entry->flags |= LV_CACHE_CLASS_FLAG_CUSTOM;
-    }
-    else {
-        entry->flags &= ~LV_CACHE_CLASS_FLAG_CUSTOM;
-    }
+    entry->flags |= flags;
 }
 
-bool lv_cache_entry_get_class_flag(lv_cache_entry_t * entry)
+void lv_cache_entry_remove_flag(lv_cache_entry_t * entry, uint8_t flags)
 {
-
     LV_ASSERT_NULL(entry);
-    return entry->flags & LV_CACHE_CLASS_FLAG_CUSTOM;
+    entry->flags &= (~flags);
 }
 
-void lv_cache_entry_disable_deleting(lv_cache_entry_t * entry)
+bool lv_cache_entry_has_flag(lv_cache_entry_t * entry, uint8_t flags)
 {
-
-    entry->flags |= LV_CACHE_ENTRY_FLAG_DISABLE_DELETE;
+    LV_ASSERT_NULL(entry);
+    return (entry->flags & flags) == flags;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

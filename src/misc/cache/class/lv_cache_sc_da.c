@@ -114,7 +114,7 @@ static lv_cache_entry_t * get_possible_victim(lv_cache_sc_da_t * da,
                                               size_t index);
 
 static inline void set_second_chance(lv_cache_entry_t * entry, bool value);
-static inline bool get_second_chance(lv_cache_entry_t * entry);
+static inline bool has_second_chance(lv_cache_entry_t * entry);
 static inline void get_entry(lv_cache_sc_da_t * da, size_t index,
                              void ** cache_data, lv_cache_entry_t ** cache_entry);
 
@@ -164,12 +164,17 @@ static inline void get_entry(lv_cache_sc_da_t * da, size_t index,
 }
 static inline void set_second_chance(lv_cache_entry_t * entry, bool value)
 {
-    lv_cache_entry_set_class_flag(entry, value);
+    if(value) {
+        lv_cache_entry_set_flag(entry, LV_CACHE_ENTRY_FLAG_CLASS_CUSTOM);
+    }
+    else {
+        lv_cache_entry_remove_flag(entry, LV_CACHE_ENTRY_FLAG_CLASS_CUSTOM);
+    }
 }
 
-static inline bool get_second_chance(lv_cache_entry_t * entry)
+static inline bool has_second_chance(lv_cache_entry_t * entry)
 {
-    return lv_cache_entry_get_class_flag(entry);
+    return lv_cache_entry_has_flag(entry, LV_CACHE_ENTRY_FLAG_CLASS_CUSTOM);
 }
 
 static void * alloc_new_entry(lv_cache_sc_da_t * da, const void * key,
@@ -214,10 +219,10 @@ static void * alloc_new_entry(lv_cache_sc_da_t * da, const void * key,
 
     lv_memcpy(last_da_entry, key, da->cache.node_size);
     lv_cache_entry_init(last_cache_entry, &da->cache, da->cache.node_size);
-    lv_cache_entry_disable_deleting(last_cache_entry);
+    lv_cache_entry_set_flag(last_cache_entry, LV_CACHE_ENTRY_FLAG_DISABLE_DELETE);
 
     /*New entries start with their second chance set*/
-    set_second_chance(last_cache_entry, true); 
+    set_second_chance(last_cache_entry, true);
     return last_cache_entry;
 }
 
@@ -406,7 +411,7 @@ static lv_cache_entry_t * get_possible_victim(lv_cache_sc_da_t * da, size_t inde
     lv_cache_entry_t * cache_entry;
     get_entry(da, index, &da_entry, &cache_entry);
 
-    const uint8_t sec_chance = get_second_chance(cache_entry);
+    const uint8_t sec_chance = has_second_chance(cache_entry);
     const int32_t refs = lv_cache_entry_get_ref(cache_entry);
 
     if(sec_chance == 0 && refs == 0) {
