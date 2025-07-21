@@ -1,0 +1,74 @@
+name: Comment PR with Hardware performance tests results
+
+on:
+  workflow_run:
+    workflows: [Hardware Performance Test]
+    types:
+      - completed
+  
+concurrency:
+  group: ${{ github.event.workflow_run.event }}-${{ github.event.workflow_run.head_branch }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment_pr:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+
+    runs-on: ubuntu-24.04
+    name: Comment PR with HW Performance tests results
+    steps:
+      - name: Download Results from PR
+        uses: dawidd6/action-download-artifact@v9
+        with:
+          workflow: perf_hardware.yml
+          path: artifacts
+          # The artifact needs to be downloaded from a PR run that comes from a forked repository
+          allow_forks: true 
+
+      - name: Move artifacts to  current folder
+        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+        run: |
+          mv artifacts/pr_number/pr_number .
+          mv artifacts/comment/comment.md .
+
+      - name: Install EJ dispatcher tool
+        run: |
+          cargo install ejlv
+
+      - name: Comment PR
+        run: |
+          ejlv comment-pr \
+            --comment-path comment.md \
+            --pr-number $(cat pr_number) \
+            --gh-token $GITHUB_TOKEN \
+            --signature "hw_performance_tests"
+
+      - name: Remove trigger label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prPath = 'pr_number';
+
+            if (!fs.existsSync(prPath)) {
+              throw new Error('Error: pr_number not found! Exiting.');
+            }
+
+            const prNumber = Number(fs.readFileSync(prPath, 'utf8').trim());
+
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                name: 'Run benchmarks on HW'
+              });
+              console.log('Label removed successfully');
+            } catch (error) {
+              console.log('Label may have already been removed:', error.message);
+            }

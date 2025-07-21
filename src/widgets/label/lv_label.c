@@ -174,6 +174,14 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
+    va_list args;
+    va_start(args, fmt);
+    lv_label_set_text_vfmt(obj, fmt, args);
+    va_end(args);
+}
+
+void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
+{
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(fmt);
 
@@ -191,10 +199,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
         label->text = NULL;
     }
 
-    va_list args;
-    va_start(args, fmt);
     label->text = lv_text_set_text_vfmt(fmt, args);
-    va_end(args);
     label->static_txt = 0; /*Now the text is dynamically allocated*/
 
     lv_label_refr_text(obj);
