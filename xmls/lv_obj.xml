@@ -95,7 +95,7 @@ Example
         <element name="subject_set_string_event" access="add" type="void">
             <arg name="subject" type="subject"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
-            <arg name="value" type="int"/>
+            <arg name="value" type="string"/>
         </element>
 
         <element name="subject_increment_event" access="add" type="void">
