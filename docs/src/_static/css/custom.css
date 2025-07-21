@@ -559,6 +559,8 @@ code.literal + sub {
 
 #furo-main-content .toctree-wrapper.toctree-landing-page {
   margin-top: 0;
+  padding-left: 1rem;
+  border-left: 1px solid var(--color-border-primary);
 }
 
 #furo-main-content section:has(.toctree-landing-page) {
