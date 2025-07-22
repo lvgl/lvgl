@@ -314,6 +314,17 @@ lv_result_t lv_xml_component_unregister(const char * name)
     }
     lv_ll_clear(&scope->subjects_ll);
 
+    lv_xml_timeline_t * timeline;
+    LV_LL_READ(&scope->timeline_ll, timeline) {
+        lv_anim_t * a;
+        LV_LL_READ(&timeline->anims_ll, a) {
+            lv_free(a->var); /*It was the name of the target object*/
+        }
+        lv_ll_clear(&timeline->anims_ll);
+        lv_free((char *)timeline->name);
+    }
+    lv_ll_clear(&scope->timeline_ll);
+
     lv_free(scope);
 
     return LV_RESULT_OK;
@@ -593,7 +604,7 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
 
     uint32_t selector_and_prop = ((prop & 0xff) << 24) | selector;
 
-    lv_anim_t * a = lv_ll_ins_tail(&at->anims);
+    lv_anim_t * a = lv_ll_ins_tail(&at->anims_ll);
 
     lv_anim_init(a);
     lv_anim_set_var(a, lv_strdup(target_str));

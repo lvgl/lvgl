@@ -57,8 +57,7 @@ typedef struct {
 
 typedef struct {
     const char * name;
-    lv_ll_t anims;
-    uint32_t auto_free_at: 1;
+    lv_ll_t anims_ll;
 } lv_xml_timeline_t;
 
 typedef struct {

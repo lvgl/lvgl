@@ -59,6 +59,7 @@
  **********************/
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs);
 static void view_end_element_handler(void * user_data, const char * name);
+static void free_timelines_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -206,32 +207,34 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
 #endif
 
     /*Create the timelines as well*/
-    lv_xml_timeline_t * at_xml;
-    lv_anim_timeline_t ** timeline_array;
-    timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t));
-    uint32_t i = 0;
-    LV_LL_READ(&scope->timeline_ll, at_xml) {
-        lv_anim_timeline_t * at = lv_anim_timeline_create();
-        at->user_data = lv_strdup(at_xml->name);
+    if(!lv_ll_is_empty(&scope->timeline_ll)) {
+        lv_xml_timeline_t * at_xml;
+        lv_anim_timeline_t ** timeline_array;
+        timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t));
+        uint32_t i = 0;
+        LV_LL_READ(&scope->timeline_ll, at_xml) {
+            lv_anim_timeline_t * at = lv_anim_timeline_create();
+            at->user_data = lv_strdup(at_xml->name);
 
-        lv_anim_t * a_stored;
-        LV_LL_READ(&at_xml->anims, a_stored) {
-            int32_t delay = -a_stored->act_time;
-            lv_anim_timeline_add(at, delay, a_stored);
+            lv_anim_t * a_stored;
+            LV_LL_READ(&at_xml->anims_ll, a_stored) {
+                int32_t delay = -a_stored->act_time;
+                lv_anim_timeline_add(at, delay, a_stored);
+            }
+
+            at->base_obj = state.view;
+            timeline_array[i] = at;
+            i++;
         }
 
-        at->base_obj = state.view;
-        timeline_array[i] = at;
-        i++;
-        lv_anim_timeline_get_playtime(at);
+
+        timeline_array[i] = NULL; /*Closing to avoid storing the length*/
+
+        /*TODO: Don't use the user_data as it might be needed for the user
+         * Store in a special event's user_data*/
+        lv_obj_set_user_data(state.view, timeline_array);
+        lv_obj_add_event_cb(state.view, free_timelines_event_cb, LV_EVENT_DELETE, timeline_array);
     }
-
-
-    timeline_array[i] = NULL; /*Closing to avoid storing the length*/
-
-    /*TODO: Don't use the user_data as it might be needed for the user
-     * Store in a special event's user_data*/
-    lv_obj_set_user_data(state.view, timeline_array);
 
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
@@ -431,7 +434,7 @@ lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const cha
 
     at = lv_ll_ins_head(&scope->timeline_ll);
     at->name = lv_strdup(name);
-    lv_ll_init(&at->anims, sizeof(lv_anim_t));
+    lv_ll_init(&at->anims_ll, sizeof(lv_anim_t));
 
     return LV_RESULT_OK;
 }
@@ -687,20 +690,6 @@ static void resolve_params(lv_xml_component_scope_t * item_scope, lv_xml_compone
     }
 }
 
-//0. new anim_timeline feature
-//1. Save the blueprint of anim timelines on register. anim->var = "path/to/obj"
-//2. When an instance is created
-//    2.1. and an event is added, only the blueprints exist. Add a play_anim_event by providing target name, timeline name, and self. self (the view) is also known as it's created first.
-//    2.2. all objects are created, create instances for all timeline blueprints as well.
-//         set at->start_obj to the view obj, so that the a->var = "path" can be resolved
-//         save the timeline instances in special events (name+pointer)
-//3. play_anim_event is triggered, from the event user data
-//    get self obj
-//    get the target by name from self
-//    get the timeline of target
-//    start the animation
-
-
 static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * scope)
 {
     uint32_t i;
@@ -813,5 +802,16 @@ static void view_end_element_handler(void * user_data, const char * name)
     }
 }
 
+static void free_timelines_event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    lv_anim_timeline_t ** at_array = lv_obj_get_user_data(obj);
+    uint32_t i;
+    for(i = 0; at_array[i]; i++) {
+        lv_free(lv_anim_timeline_get_user_data(at_array[i]));
+        lv_anim_timeline_delete(at_array[i]);
+    }
+    lv_free(at_array);
+}
 
 #endif /* LV_USE_XML */
