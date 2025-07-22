@@ -41,6 +41,14 @@ const lv_font_t * font_normal;
  *      MACROS
  **********************/
 
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_14_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_18_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_20_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_24_aligned)
+LV_FONT_DECLARE(lv_font_benchmark_montserrat_26_aligned)
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/

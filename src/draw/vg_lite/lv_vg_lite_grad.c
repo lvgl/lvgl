@@ -628,7 +628,8 @@ static bool radial_grad_create(grad_item_t * item, vg_lite_color_ramp_t * color_
 static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style)
 {
     if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
-        return vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT) ? GRAD_TYPE_LINEAR_EXT : GRAD_TYPE_LINEAR;
+        // return vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT) ? GRAD_TYPE_LINEAR_EXT : GRAD_TYPE_LINEAR;
+        return GRAD_TYPE_LINEAR;
     }
 
     if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
