@@ -22,6 +22,7 @@
 #include <math.h>
 #include <float.h>
 
+#define EPSILON 1e-6f
 #define MATH_PI  3.14159265358979323846f
 #define MATH_HALF_PI 1.57079632679489661923f
 
@@ -74,11 +75,6 @@ static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_
     dst->stroke_dsc.join = src->stroke_dsc.join;
     dst->stroke_dsc.miter_limit = src->stroke_dsc.miter_limit;
     lv_array_copy(&(dst->stroke_dsc.dash_pattern), &(src->stroke_dsc.dash_pattern));
-    dst->stroke_dsc.gradient.style = src->stroke_dsc.gradient.style;
-    dst->stroke_dsc.gradient.cx = src->stroke_dsc.gradient.cx;
-    dst->stroke_dsc.gradient.cy = src->stroke_dsc.gradient.cy;
-    dst->stroke_dsc.gradient.cr = src->stroke_dsc.gradient.cr;
-    dst->stroke_dsc.gradient.spread = src->fill_dsc.gradient.spread;
     lv_memcpy(&(dst->stroke_dsc.gradient), &(src->stroke_dsc.gradient), sizeof(lv_vector_gradient_t));
     lv_memcpy(&(dst->stroke_dsc.matrix), &(src->stroke_dsc.matrix), sizeof(lv_matrix_t));
 
@@ -193,6 +189,162 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
     lv_array_push_back(&path->points, p1);
     lv_array_push_back(&path->points, p2);
     lv_array_push_back(&path->points, p3);
+}
+
+static lv_fpoint_t _point_on_ellipse(float rx, float ry, float cos_r, float sin_r,
+                                     float cx, float cy, float theta, float alpha)
+{
+    float cos_theta = cosf(theta);
+    float sin_theta = sinf(theta);
+
+    float x = rx * cos_theta;
+    float y = ry * sin_theta;
+
+    float x_rot = cos_r * x - sin_r * y;
+    float y_rot = sin_r * x + cos_r * y;
+
+    if(fabsf(alpha) > EPSILON) {
+        float dx = -rx * sin_theta;
+        float dy = ry * cos_theta;
+        float dx_rot = cos_r * dx - sin_r * dy;
+        float dy_rot = sin_r * dx + cos_r * dy;
+
+        x_rot += alpha * dx_rot;
+        y_rot += alpha * dy_rot;
+    }
+
+    return (lv_fpoint_t) {
+        x_rot + cx, y_rot + cy
+    };
+}
+
+void lv_vector_path_arc_to(lv_vector_path_t * path, float rx, float ry, float rotate_angle, bool large_arc,
+                           bool clockwise, const lv_fpoint_t * p)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(p);
+
+    if(lv_array_is_empty(&path->ops)) {
+        /*first op must be move_to*/
+        return;
+    }
+
+    if(rx <= 0 || ry <= 0) {
+        /*no needed to draw*/
+        return;
+    }
+
+    /*https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes*/
+
+    lv_fpoint_t * cpt = lv_array_back(&path->points);
+
+    float x0 = cpt->x;
+    float y0 = cpt->y;
+
+    /*1. dealing with degradation*/
+    if(fabsf(x0 - p->x) < EPSILON && fabsf(y0 - p->y) < EPSILON) {
+        /*same point*/
+        return;
+    }
+
+    float rotate = MATH_RADIANS(rotate_angle);
+    float sin_r = sinf(rotate);
+    float cos_r = cosf(rotate);
+
+    /*2. transform point*/
+    float dx = (x0 - p->x) * 0.5f;
+    float dy = (y0 - p->y) * 0.5f;
+
+    float x1 = cos_r * dx + sin_r * dy;
+    float y1 = -sin_r * dx + cos_r * dy;
+
+    /*3. adjust radius*/
+    float lambda_val = (x1 * x1) / (rx * rx) + (y1 * y1) / (ry * ry);
+    if(lambda_val > 1.0f) {
+        rx *= sqrtf(lambda_val);
+        ry *= sqrtf(lambda_val);
+    }
+
+    /*4. calc center point*/
+    float rx_sq = rx * rx;
+    float ry_sq = ry * ry;
+    float x1_sq = x1 * x1;
+    float y1_sq = y1 * y1;
+
+    float num = rx_sq * ry_sq - rx_sq * y1_sq - ry_sq * x1_sq;
+    float denom = rx_sq * y1_sq + ry_sq * x1_sq;
+
+    float radicand = (denom > EPSILON) ? num / denom : 0.0f;
+    if(radicand < 0.0f) radicand = 0.0f;
+
+    float sign = (large_arc == clockwise) ? -1.0f : 1.0f;
+    float coef = sign * sqrtf(radicand);
+
+    float cx_prime = (coef * rx * y1) / ry;
+    float cy_prime = -(coef * ry * x1) / rx;
+
+    float cx = cos_r * cx_prime - sin_r * cy_prime + (x0 + p->x) * 0.5f;
+    float cy = sin_r * cx_prime + cos_r * cy_prime + (y0 + p->y) * 0.5f;
+
+    float ux = (x1 - cx_prime) / rx;
+    float uy = (y1 - cy_prime) / ry;
+
+    /*5. calculate the starting angle and ending angle*/
+    float n_sq = ux * ux + uy * uy;
+    float theta1 = 0.0f;
+    if(n_sq > EPSILON) {
+        theta1 = atan2f(uy, ux);
+    }
+
+    float vx = (-x1 - cx_prime) / rx;
+    float vy = (-y1 - cy_prime) / ry;
+
+    float n = sqrtf(n_sq * (vx * vx + vy * vy));
+    float delta = 0.0f;
+    if(n > EPSILON) {
+        float cos_delta = (ux * vx + uy * vy) / n;
+        if(cos_delta > 1.0f) cos_delta = 1.0f;
+        else if(cos_delta < -1.0f) cos_delta = -1.0f;
+
+        delta = acosf(cos_delta);
+        if(ux * vy - uy * vx < 0.0f) delta = -delta;
+    }
+
+    if(!clockwise && delta > 0.0f) {
+        delta -= 2.0f * MATH_PI;
+    }
+    else if(clockwise && delta < 0.0f) {
+        delta += 2.0f * MATH_PI;
+    }
+
+    /*6. split arc into segments within 90 degrees*/
+    float angle_left = fabsf(delta);
+    int seg_count = (int)ceilf(angle_left / MATH_HALF_PI);
+    if(seg_count == 0) seg_count = 1;
+
+    float segment_angle = delta / (float)seg_count;
+
+    float current_angle = theta1;
+    for(int i = 0; i < seg_count; i++) {
+        float next_angle = current_angle + segment_angle;
+
+        float alpha_val;
+        if(fabsf(segment_angle) < 0.1f) {
+            alpha_val = segment_angle / 6.0f;
+        }
+        else {
+            float tan_half = tanf(segment_angle * 0.5f);
+            alpha_val = sinf(segment_angle) * (sqrtf(4.0f + 3.0f * tan_half * tan_half) - 1.0f) / 3.0f;
+        }
+
+        lv_fpoint_t p1 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, current_angle, alpha_val);
+        lv_fpoint_t p2 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, next_angle, -alpha_val);
+        lv_fpoint_t p3 = _point_on_ellipse(rx, ry, cos_r, sin_r, cx, cy, next_angle, 0.0f);
+
+        lv_vector_path_cubic_to(path, &p1, &p2, &p3);
+
+        current_angle = next_angle;
+    }
 }
 
 void lv_vector_path_close(lv_vector_path_t * path)

@@ -503,6 +503,8 @@ static size_t _get_path_seg_size(uint32_t cmd)
             return sizeof(lv_svg_point_t) * 2 + sizeof(uint32_t);
         case LV_SVG_PATH_CMD_CURVE_TO:
             return sizeof(lv_svg_point_t) * 3 + sizeof(uint32_t);
+        case LV_SVG_PATH_CMD_ARC_TO:
+            return sizeof(lv_svg_point_t) * 4 + sizeof(uint32_t);
         default:
             return 0;
     }
@@ -555,6 +557,17 @@ static void _set_path_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc
                         CALC_BOUNDS(pt[0], poly->bounds);
                         CALC_BOUNDS(pt[1], poly->bounds);
                         CALC_BOUNDS(pt[2], poly->bounds);
+                    }
+                    break;
+                case LV_SVG_PATH_CMD_ARC_TO: {
+                        lv_fpoint_t pt[4] = {
+                            {points[0].x, points[0].y},
+                            {points[1].x, points[1].y},
+                            {points[2].x, points[2].y},
+                            {points[3].x, points[3].y}
+                        };
+                        lv_vector_path_arc_to(poly->path, pt[0].x, pt[0].y, pt[1].x, pt[2].x > 0, pt[2].y > 0, &pt[3]);
+                        lv_vector_path_get_bounding(poly->path, &poly->bounds);
                     }
                     break;
                 case LV_SVG_PATH_CMD_CLOSE: {
