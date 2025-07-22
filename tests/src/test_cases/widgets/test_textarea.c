@@ -66,6 +66,23 @@ void test_textarea_cursor_click_pos_field_update(void)
     TEST_ASSERT_FALSE(lv_textarea_get_cursor_click_pos(textarea));
 }
 
+void test_textarea_should_scroll_to_the_end(void)
+{
+    lv_textarea_set_one_line(textarea, true);
+    lv_textarea_add_text(textarea, "Hi this is a long text to test if the textarea scrolls to the end");
+    lv_obj_set_width(textarea, LV_DPI_DEF * 3);
+
+    int32_t cur_pos = (int32_t)lv_textarea_get_cursor_pos(textarea);
+    const lv_font_t * font = lv_obj_get_style_text_font(textarea, LV_PART_MAIN);
+    int32_t font_h = lv_font_get_line_height(font);
+    int32_t w = lv_obj_get_content_width(textarea);
+    if(cur_pos + font_h - lv_obj_get_scroll_left(textarea) > w) {
+        TEST_ASSERT_EQUAL_INT32(lv_obj_get_scroll_x(textarea) + 10, cur_pos - w + font_h);
+    }
+
+    TEST_ASSERT(lv_textarea_get_one_line(textarea));
+}
+
 void test_textarea_should_update_placeholder_text(void)
 {
     const char * new_placeholder = "LVGL Rocks!!!!!";
