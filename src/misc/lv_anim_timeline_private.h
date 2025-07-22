@@ -34,10 +34,13 @@ struct _lv_anim_timeline_t {
     uint32_t anim_dsc_cnt;
 
     /** Current time of the animation*/
-    uint32_t act_time;
+    int32_t act_time;
 
     /** Reverse playback*/
     bool reverse;
+
+    /** Delay before starting the animation from any ends*/
+    uint32_t delay;
 
     /** Repeat count*/
     uint32_t repeat_count;

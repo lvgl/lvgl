@@ -25,8 +25,9 @@
         </timeline>
     </animations>
 
-	<view extends="lv_obj" name="main" width="380" height="400" style_bg_color="#light_blue">
+	<view extends="lv_obj" name="main" style_bg_color="#light_blue">
 		<lv_label x="30" text-translated="tiger"/>
+        <play_animation_event target="self" timeline="load" trigger="screen_loaded"/>
 
         <lv_button x="0" y="20">
             <play_animation_event target="self" timeline="load" />

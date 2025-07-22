@@ -8,7 +8,7 @@
  *********************/
 #include "lv_anim_private.h"
 #include "lv_assert.h"
-#include "lv_anim_timeline.h"
+#include "lv_anim_timeline_private.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
 #if LV_USE_OBJ_NAME
@@ -79,7 +79,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t repeat = at->repeat_count;
-    uint32_t delay = at->repeat_delay;
+    uint32_t repeat_delay = at->repeat_delay;
     uint32_t start = at->act_time;
     uint32_t end = at->reverse ? 0 : playtime;
     uint32_t duration = end > start ? end - start : start - end;
@@ -91,15 +91,21 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
         }
     }
 
+    /*Apply the delay only if playing from any ends*/
+    uint32_t delay = 0;
+    if(!at->reverse && at->act_time == 0) delay = at->delay;
+    else if(at->reverse && at->act_time == playtime) delay = at->delay;
+
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, at);
     lv_anim_set_exec_cb(&a, anim_timeline_exec_cb);
     lv_anim_set_values(&a, start, end);
     lv_anim_set_duration(&a, duration);
+    lv_anim_set_delay(&a, delay);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
     lv_anim_set_repeat_count(&a, repeat);
-    lv_anim_set_repeat_delay(&a, delay);
+    lv_anim_set_repeat_delay(&a, repeat_delay);
     lv_anim_start(&a);
     return playtime;
 }
@@ -115,6 +121,12 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
     LV_ASSERT_NULL(at);
     at->reverse = reverse;
+}
+
+void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay)
+{
+    LV_ASSERT_NULL(at);
+    at->delay = delay;
 }
 
 void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
@@ -144,7 +156,6 @@ void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
     at->user_data = user_data;
 }
 
-
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
@@ -167,6 +178,13 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
     return at->reverse;
+}
+
+
+uint32_t lv_anim_timeline_get_delay(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return at->delay;
 }
 
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
@@ -310,7 +328,9 @@ static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
 #if LV_USE_OBJ_NAME
     lv_obj_t * obj_resolved;
     if(at->base_obj) {
-        obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);
+        if(lv_streq(a->var, "self")) obj_resolved = at->base_obj;
+        else if(lv_streq(a->var, "")) obj_resolved = at->base_obj;
+        else obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);
         if(obj_resolved == NULL) {
             LV_LOG_WARN("Widget was not found with name `` as child of %p", a->var, at->base_obj);
             return;

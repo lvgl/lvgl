@@ -591,7 +591,6 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
         return;
     }
 
-
     uint32_t selector_and_prop = ((prop & 0xff) << 24) | selector;
 
     lv_anim_t * a = lv_ll_ins_tail(&at->anims);
@@ -986,7 +985,6 @@ static void int_anim_exec_cb(lv_anim_t * a, int32_t v)
     lv_style_value_t style_value;
     style_value.num = v;
     lv_obj_set_local_style_prop(a->var, prop, style_value, selector);
-
 }
 
 

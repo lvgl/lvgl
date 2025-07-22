@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_anim.h"
-#include "lv_anim_timeline_private.h"
 
 /*********************
  *      DEFINES
@@ -80,6 +79,14 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 
 /**
+ * Set the time to wait before starting the the animation.
+ * Applies only when playing from the very start, or reverse from the very end.
+ * @param at    pointer to an animation timeline
+ * @return      the delay time in milliseconds
+ */
+void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay);
+
+/**
  * Make the animation timeline repeat itself.
  * @param at        pointer to the animation timeline.
  * @param cnt       repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: to disable repetition.
@@ -99,7 +106,6 @@ void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay);
  * @param progress  set value 0~65535 to map 0~100% animation progress.
  */
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
-
 
 /**
  * Set the user_data of a an animation timeline
@@ -121,6 +127,13 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at);
  * @return return true if it is reverse playback.
  */
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
+
+/**
+ * Get the wait time when  playing from the very start, or reverse from the very end.
+ * @param at    pointer to an animation timeline
+ * @return      the remaining time in milliseconds
+ */
+uint32_t lv_anim_timeline_get_delay(lv_anim_timeline_t * at);
 
 /**
  * Get the progress of the animation timeline.

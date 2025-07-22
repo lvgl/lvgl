@@ -33,6 +33,7 @@ typedef struct {
     const char * timeline_name;
     const char * target_name;
     uint32_t delay;
+    bool reverse;
     lv_obj_t * base_obj; /**< Get the objs by name from here (the view) */
 } play_anim_dsc_t;
 
@@ -655,14 +656,14 @@ void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const c
     lv_obj_add_event_cb(item, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
 }
 
-void * lv_obj_xml_play_animation_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+void * lv_obj_xml_play_timeline_event_create(lv_xml_parser_state_t * state, const char ** attrs)
 {
     LV_UNUSED(attrs);
     void * item = lv_xml_state_get_parent(state);
     return item;
 }
 
-void lv_obj_xml_play_animation_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
+void lv_obj_xml_play_timeline_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
 {
 
     if(state->view == NULL) {
@@ -675,6 +676,7 @@ void lv_obj_xml_play_animation_event_apply(lv_xml_parser_state_t * state, const 
     const char * delay_str = lv_xml_get_value_of(attrs, "delay");
     const char * trigger_str = lv_xml_get_value_of(attrs, "trigger");
     const char * timeline_str = lv_xml_get_value_of(attrs, "timeline");
+    const char * reverse_str = lv_xml_get_value_of(attrs, "reverse");
 
     if(target_str == NULL) {
         LV_LOG_WARN("`target` is missing in <lv_obj-play_animation_event>");
@@ -688,6 +690,7 @@ void lv_obj_xml_play_animation_event_apply(lv_xml_parser_state_t * state, const 
 
     if(delay_str == NULL) delay_str = "0";
     if(trigger_str == NULL) trigger_str = "clicked";
+    if(reverse_str == NULL) reverse_str = "false";
 
     lv_event_code_t trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
     if(trigger == LV_EVENT_LAST)  {
@@ -701,6 +704,7 @@ void lv_obj_xml_play_animation_event_apply(lv_xml_parser_state_t * state, const 
     dsc->target_name = lv_strdup(target_str);
     dsc->timeline_name = lv_strdup(timeline_str);
     dsc->delay = lv_xml_atoi(delay_str);
+    dsc->reverse = lv_xml_to_bool(reverse_str);
     dsc->base_obj = state->view;
 
     void * item = lv_xml_state_get_item(state);
@@ -971,8 +975,18 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
         return;
     }
 
-    lv_anim_timeline_set_progress(timeline, 0);
+    if(dsc->reverse) {
+        lv_anim_timeline_set_reverse(timeline, true);
+        lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
+    }
+    else {
+        lv_anim_timeline_set_reverse(timeline, false);
+        lv_anim_timeline_set_progress(timeline, 0);
+    }
+
+    lv_anim_timeline_set_delay(timeline, dsc->delay);
     lv_anim_timeline_start(timeline);
+
 }
 
 static void free_play_anim_user_data_on_delete_event_cb(lv_event_t * e)
