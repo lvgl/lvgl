@@ -583,8 +583,8 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_ARGB8888:
             return VG_LITE_BGRA8888;
-        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            return VG_sBGRA_8888_PRE;
+        // case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        //     return VG_sBGRA_8888_PRE;
 
         case LV_COLOR_FORMAT_XRGB8888:
             return VG_LITE_BGRX8888;
@@ -647,7 +647,7 @@ void lv_vg_lite_buffer_format_bytes(
         case VG_LITE_BGRX8888:
         case VG_LITE_XBGR8888:
         case VG_LITE_XRGB8888:
-        case VG_sBGRA_8888_PRE:
+        // case VG_sBGRA_8888_PRE:
             *mul = 4;
             break;
         case VG_LITE_NV12:
@@ -977,9 +977,9 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_m
 
     switch(blend_mode) {
         case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
-            if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
-                return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
-            }
+            // if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+            //     return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
+            // }
             return VG_LITE_BLEND_SRC_OVER;
 
         case LV_BLEND_MODE_ADDITIVE: /**< Add the respective color channels*/
@@ -1165,13 +1165,13 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix)
 
 bool lv_vg_lite_support_blend_normal(void)
 {
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
-        return true;
-    }
+    // if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+    //     return true;
+    // }
 
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
-        return true;
-    }
+    // if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+    //     return true;
+    // }
 
     return false;
 }
