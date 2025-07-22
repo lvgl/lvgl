@@ -535,9 +535,6 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     const char * end_str = lv_xml_get_value_of(attrs, "end");
     const char * duration_str = lv_xml_get_value_of(attrs, "duration");
     const char * delay_str = lv_xml_get_value_of(attrs, "delay");
-    const char * reverse_delay_str = lv_xml_get_value_of(attrs, "reverse_delay");
-    const char * reverse_duration_str = lv_xml_get_value_of(attrs, "reverse_duration");
-    const char * repeat_count_str = lv_xml_get_value_of(attrs, "repeat_count");
     const char * early_apply_str = lv_xml_get_value_of(attrs, "early_apply");
     const char * selector_str = lv_xml_get_value_of(attrs, "selector");
 

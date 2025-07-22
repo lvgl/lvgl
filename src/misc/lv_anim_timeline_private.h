@@ -34,7 +34,7 @@ struct _lv_anim_timeline_t {
     uint32_t anim_dsc_cnt;
 
     /** Current time of the animation*/
-    int32_t act_time;
+    uint32_t act_time;
 
     /** Reverse playback*/
     bool reverse;
