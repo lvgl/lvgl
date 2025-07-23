@@ -94,29 +94,3 @@ Appendix
     CHANGELOG
     API/index
 
-
-.. The below toctree directive is merely to eliminate 2 Sphinx warnings that these 2
-   files are "not included in any toctree".  Their sole purpose is so that any reader
-   noticing the URL structure and (as an experiment) browsing to
-
-   https://docs.lvgl.io/master/intro/
-
-   or
-
-   https://docs.lvgl.io/master/details/
-
-   will not be met by a 404 (File not found) error from the docs server.
-
-   Note:  this must be accompanied by "'includehidden': False" in `conf.py` in the
-   `html_theme_options` dictionary so that these 2 files do not appear as redundant
-   entries in the top-level navigation tree.  (This is the only toctree directive
-   with the :hidden: attribute.)
-
-.. Commenting out the below for Furo theme.
-    .. toctree::
-        :hidden:
-
-        intro/index
-        details/index
-
-
