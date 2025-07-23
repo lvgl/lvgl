@@ -162,8 +162,9 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @param font pointer to a font
  * @param letter_space letter space
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
- * @param flags settings for the text from 'txt_flag_type' enum
- * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
+ * @param flag settings for the text from 'txt_flag_type' enum
+ * @param word_w_ptr width (in pixels) of the parsed word. May be NULL.
+ * @param cmd_state pointer to a txt_cmd_state_t variable which stores the current state of command processing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
