@@ -25,6 +25,7 @@ extern "C" {
 #include "lv_draw_eve_target.h"
 #include "../lv_draw_private.h"
 #include "../../misc/lv_types.h"
+#include "../../core/lv_global.h"
 #include "../lv_draw_triangle.h"
 #include "../lv_draw_line.h"
 #include "../lv_draw_label.h"
@@ -50,16 +51,14 @@ typedef struct {
     lv_draw_eve_ramg_hash_table_cell_t * hash_table;
 } lv_draw_eve_ramg_t;
 
-typedef struct {
+struct _lv_draw_eve_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
     lv_display_t * disp;
     lv_draw_eve_ramg_t ramg;
     lv_draw_eve_parameters_t params;
     lv_draw_eve_operation_cb_t op_cb;
-} lv_draw_eve_unit_t;
-
-extern lv_draw_eve_unit_t * lv_draw_eve_unit_g;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,6 +87,8 @@ void lv_draw_eve_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc
 
 #define DEGREES(n) ((65536UL * (n)) / 3600)
 #define F16(x)     ((int32_t)((x) * 65536L))
+
+#define lv_draw_eve_unit_g (LV_GLOBAL_DEFAULT()->draw_eve_unit)
 
 #endif /*LV_USE_DRAW_EVE*/
 

@@ -33,8 +33,6 @@
  *      TYPEDEFS
  **********************/
 
-lv_draw_eve_unit_t * lv_draw_eve_unit_g;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -83,7 +81,7 @@ void lv_draw_eve_set_display_data(lv_display_t * disp, const lv_draw_eve_paramet
     lv_draw_eve_unit_g->params = *params; /* make a copy */
     lv_draw_eve_unit_g->op_cb = op_cb;
 
-    lv_display_add_event_cb(disp, disp_delete_cb, LV_EVENT_DELETE, lv_draw_eve_unit_g);
+    lv_display_add_event_cb(disp, disp_delete_cb, LV_EVENT_DELETE, NULL);
 }
 
 /**********************
@@ -167,8 +165,8 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 
 static void disp_delete_cb(lv_event_t * e)
 {
-    lv_draw_eve_unit_t * draw_eve_unit = lv_event_get_user_data(e);
-    draw_eve_unit->disp = NULL;
+    lv_draw_eve_unit_g->disp = NULL;
+    lv_draw_eve_unit_g = NULL;
 }
 
 
