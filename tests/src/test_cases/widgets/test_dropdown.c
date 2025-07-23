@@ -452,6 +452,40 @@ void test_dropdown_get_options_should_check_lengths(void)
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
 }
 
+void test_dropdown_text_align(void)
+{
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN_WRAP);
+    lv_obj_t * dd;
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
+    lv_obj_set_style_base_dir(dd, LV_BASE_DIR_RTL, 0);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+    lv_obj_set_style_base_dir(dd, LV_BASE_DIR_RTL, 0);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_base_dir(dd, LV_BASE_DIR_RTL, 0);
+
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
+    lv_dropdown_set_symbol(dd, NULL);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
+    lv_dropdown_set_symbol(dd, NULL);
+    dd = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_style_text_align(dd, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_dropdown_set_symbol(dd, NULL);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_3.png");
+}
+
 void test_dropdown_properties(void)
 {
 #if LV_USE_OBJ_PROPERTY
