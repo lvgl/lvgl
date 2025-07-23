@@ -173,15 +173,15 @@ lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, u
 
     uint32_t i;
     lv_uintptr_t adr = 0;
-    for(i = 2; path->path[i] != '-' && path->path[i] != '\0'; i++) {
+    for(i = 2; path->path[i] != '-' && path->path[i] != '\0' && i < sizeof(path->path); i++) {
         adr = adr * 10;
         adr += path->path[i] - '0';
     }
 
-    if(path->path[i] == '\0') return LV_RESULT_INVALID;
+    if(path->path[i] == '\0' || i == sizeof(path->path)) return LV_RESULT_INVALID;
     i++; /*Skip '-'*/
 
-    for(; path->path[i] != '.' && path->path[i] != '\0'; i++) {
+    for(; path->path[i] != '.' && path->path[i] != '\0' && i < sizeof(path->path); i++) {
         *size = (*size) * 10;
         *size += path->path[i] - '0';
     }
