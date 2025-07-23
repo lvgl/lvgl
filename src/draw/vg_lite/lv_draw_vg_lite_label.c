@@ -135,6 +135,33 @@ void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
  *   STATIC FUNCTIONS
  **********************/
 
+static inline lv_result_t init_draw_buf_from_dsc(lv_draw_buf_t * draw_buf, lv_font_glyph_dsc_t * g_dsc)
+{
+    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
+    if(!glyph_bitmap) {
+        return LV_RESULT_INVALID;
+    }
+
+    if(!LV_VG_LITE_IS_ALIGNED(glyph_bitmap, 16)) {
+        LV_LOG_WARN("Glyph data %p is not aligned to 16 bytes", glyph_bitmap);
+        return LV_RESULT_INVALID;
+    }
+
+    if(!LV_VG_LITE_IS_ALIGNED(g_dsc->stride, 16)) {
+        LV_LOG_WARN("Glyph stride %" LV_PRIu32 " is not aligned to 16 bytes", g_dsc->stride);
+        return LV_RESULT_INVALID;
+    }
+
+    return lv_draw_buf_init(
+               draw_buf,
+               g_dsc->box_w,
+               g_dsc->box_h,
+               LV_COLOR_FORMAT_A8,
+               g_dsc->stride,
+               (void *)glyph_bitmap,
+               g_dsc->stride * g_dsc->box_h);
+}
+
 static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                            lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
@@ -146,12 +173,25 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A3:
             case LV_FONT_GLYPH_FORMAT_A4:
             case LV_FONT_GLYPH_FORMAT_A8: {
-                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
-                    if(!glyph_draw_dsc->glyph_data) {
-                        return;
-                    }
+                    if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font)) {
+                        lv_draw_buf_t glyph_draw_buf;
+                        if(init_draw_buf_from_dsc(&glyph_draw_buf, glyph_draw_dsc->g) != LV_RESULT_OK) {
+                            LV_LOG_WARN("Failed to initialize glyph_draw_buf");
+                            return;
+                        }
 
-                    draw_letter_bitmap(t, glyph_draw_dsc);
+                        glyph_draw_dsc->glyph_data = &glyph_draw_buf;
+                        draw_letter_bitmap(t, glyph_draw_dsc);
+                        glyph_draw_dsc->glyph_data = NULL;
+                    }
+                    else {
+                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        if(!glyph_draw_dsc->glyph_data) {
+                            return;
+                        }
+
+                        draw_letter_bitmap(t, glyph_draw_dsc);
+                    }
                 }
                 break;
 
@@ -298,8 +338,8 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_cache_entry_acquire_data(dsc->g->entry);
         lv_vg_lite_pending_add(u->bitmap_font_pending, dsc->g);
     }
-    else {
-        /* No caching, wait for GPU finish before releasing the data */
+    else if(!lv_font_has_static_bitmap(dsc->g->resolved_font)) {
+        /* If there is no caching or no static bitmap is used, wait for the GPU to finish before releasing the data. */
         lv_vg_lite_finish(u);
     }
 
