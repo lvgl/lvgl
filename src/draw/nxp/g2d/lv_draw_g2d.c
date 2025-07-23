@@ -158,9 +158,8 @@ static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
     if(has_recolor)
         return false;
 
-    bool has_rotation = (draw_dsc->rotation != 0);
-    /* Rotation is not supported for PXP hardware. */
-    if(has_rotation && is_hw_pxp)
+    /* G2D can only rotate at 90x angles. */
+    if(draw_dsc->rotation % 900)
         return false;
 
     return true;
