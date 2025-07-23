@@ -38,10 +38,9 @@
 static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * data);
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_format_t cf, lv_opa_t opa);
-
-static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
                               int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
+
+static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area, lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
 static void _g2d_blit(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
@@ -65,7 +64,6 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_draw_g2d_unit_t * u = (lv_draw_g2d_unit_t *)t->draw_unit;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_image_dsc_t * img_dsc = dsc->src;
@@ -109,17 +107,14 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     /* Destination buffer */
     struct g2d_buf * dst_buf = g2d_search_buf_map(draw_buf->data);
 
-    /* G2D takes stride in pixels. */
-    int32_t dest_stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
-    lv_color_format_t dest_cf = draw_buf->header.cf;
 
     void * handle = g2d_get_handle();
 
     struct g2d_surface src_surf;
     struct g2d_surface dst_surf;
 
-    _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
-    _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
+    _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc);
+    _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, draw_buf, dsc);
 
     _g2d_blit(handle, &dst_surf, &src_surf);
 }
@@ -144,9 +139,31 @@ static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * img_dsc)
 }
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_format_t cf, lv_opa_t opa)
+                              int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc)
 {
     src_surf->format = g2d_get_buf_format(cf);
+
+    bool has_rotation = (dsc->rotation != 0);
+    enum g2d_rotation g2d_angle = G2D_ROTATION_0;
+
+    if(has_rotation) {
+        switch(dsc->rotation) {
+            case 0:
+                g2d_angle = G2D_ROTATION_0;
+                break;
+            case 900:
+                g2d_angle = G2D_ROTATION_270;
+                break;
+            case 1800:
+                g2d_angle = G2D_ROTATION_180;
+                break;
+            case 2700:
+                g2d_angle = G2D_ROTATION_90;
+                break;
+            default:
+                g2d_angle = G2D_ROTATION_0;
+        }
+    }
 
     src_surf->left   = area->x1;
     src_surf->top    = area->y1;
@@ -157,18 +174,22 @@ static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * bu
     src_surf->height = area->y2 - area->y1;
 
     src_surf->planes[0] = buf->buf_paddr;
-    src_surf->rot = G2D_ROTATION_0;
+    src_surf->rot = g2d_angle;
 
     src_surf->clrcolor = g2d_rgba_to_u32(lv_color_black());
-    src_surf->global_alpha = opa;
+    src_surf->global_alpha = dsc->opa;
     src_surf->blendfunc = G2D_ONE | G2D_PRE_MULTIPLIED_ALPHA;
 }
 
-static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc)
+static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area, lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc)
 {
-    int32_t width  = lv_area_get_width(area);
-    int32_t height = lv_area_get_height(area);
+    int32_t stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
+    lv_color_format_t cf = draw_buf->header.cf;
+    uint32_t width = draw_buf->header.w;
+    uint32_t height = draw_buf->header.h;
+
+    int32_t blend_w  = lv_area_get_width(area);
+    int32_t blend_h = lv_area_get_height(area);
 
     lv_point_t pivot = dsc->pivot;
     /*The offsets are now relative to the transformation result with pivot ULC*/
@@ -180,32 +201,26 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     int32_t dest_h;
 
     bool has_rotation = (dsc->rotation != 0);
-    enum g2d_rotation g2d_angle = G2D_ROTATION_0;
 
     if(has_rotation) {
         switch(dsc->rotation) {
             case 0:
-                g2d_angle = G2D_ROTATION_0;
                 piv_offset_x = 0;
                 piv_offset_y = 0;
                 break;
             case 900:
-                g2d_angle = G2D_ROTATION_90;
-                piv_offset_x = pivot.x + pivot.y - height;
+                piv_offset_x = pivot.x + pivot.y - blend_h;
                 piv_offset_y = pivot.y - pivot.x;
                 break;
             case 1800:
-                g2d_angle = G2D_ROTATION_180;
-                piv_offset_x = 2 * pivot.x - width;
-                piv_offset_y = 2 * pivot.y - height;
+                piv_offset_x = 2 * pivot.x - blend_w;
+                piv_offset_y = 2 * pivot.y - blend_h;
                 break;
             case 2700:
-                g2d_angle = G2D_ROTATION_270;
                 piv_offset_x = pivot.x - pivot.y;
-                piv_offset_y = pivot.x + pivot.y - width;
+                piv_offset_y = pivot.x + pivot.y - blend_w;
                 break;
             default:
-                g2d_angle = G2D_ROTATION_0;
                 piv_offset_x = 0;
                 piv_offset_y = 0;
         }
@@ -220,8 +235,8 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     trim_x = (fp_scale_x == int_scale_x) ? int_scale_x - 1 : int_scale_x;
     trim_y = (fp_scale_y == int_scale_y) ? int_scale_y - 1 : int_scale_y;
 
-    dest_w = width * fp_scale_x + trim_x;
-    dest_h = height * fp_scale_y + trim_y;
+    dest_w = blend_w * fp_scale_x + trim_x;
+    dest_h = blend_h * fp_scale_y + trim_y;
 
     /*Final pivot offset = scale_factor * rotation_pivot_offset + scaling_pivot_offset*/
     piv_offset_x = floor(fp_scale_x * piv_offset_x) - floor((fp_scale_x - 1) * pivot.x);
@@ -234,11 +249,11 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     dst_surf->right  = area->x1 + piv_offset_x + dest_w - trim_x;
     dst_surf->bottom = area->y1 + piv_offset_y + dest_h - trim_y;
     dst_surf->stride = stride;
-    dst_surf->width  = dest_w - trim_x;
-    dst_surf->height = dest_h - trim_y;
+    dst_surf->width  = width;
+    dst_surf->height = height;
 
     dst_surf->planes[0] = buf->buf_paddr;
-    dst_surf->rot = g2d_angle;
+    dst_surf->rot = G2D_ROTATION_0;
 
     dst_surf->clrcolor = g2d_rgba_to_u32(lv_color_black());
     dst_surf->global_alpha = 0xff;
