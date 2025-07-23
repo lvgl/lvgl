@@ -175,7 +175,7 @@ available it can take a Draw Task.
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a
 useful helper function which is used by the ``dispatch_cb`` to get the next Draw Task
 it should act on.  If it handled the task, it sets the Draw Task's ``state`` field to
-:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED` (meaning "completed").  "Available" in
+:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED`.  "Available" in
 this context means that has been queued and assigned to a given Draw Unit and is
 ready to be carried out.  The ramifications of having multiple drawing threads are
 taken into account for this.
