@@ -40,10 +40,14 @@ extern "C" {
  * Options for text rendering.
  */
 enum {
-    LV_TEXT_FLAG_NONE    = 0x00,
-    LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
-    LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_NONE      = 0x00,
+    LV_TEXT_FLAG_RECOLOR   = 0x01, /**< Enable parsing of recolor command*/
+    LV_TEXT_FLAG_EXPAND    = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
+    LV_TEXT_FLAG_FIT       = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_BREAK_ALL = 0x08, /**< To prevent overflow, insert breaks between any two characters.
+                                        Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
+                                        or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
+                                        and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
 };
 typedef uint8_t lv_text_flag_t;
 
