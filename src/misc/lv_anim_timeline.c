@@ -360,6 +360,7 @@ static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
         obj_resolved = a->var;
     }
 #else
+    LV_UNUSED(at);
     lv_obj_t * obj_resolved = a->var;
 #endif
 
