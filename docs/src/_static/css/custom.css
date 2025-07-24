@@ -553,7 +553,7 @@ code.literal {
   font-weight: 700;
 }
 
-#furo-main-content dd {
+#furo-main-content dl[class]:not(.option-list):not(.field-list):not(.glossary):not(.simple) dd {
   margin-left: 2rem;
 }
 
