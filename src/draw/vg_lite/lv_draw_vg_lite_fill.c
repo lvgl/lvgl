@@ -58,6 +58,14 @@ void lv_draw_vg_lite_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, co
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
+    /* Improve GPU rendering efficiency using simpler fill modes */
+    if(dsc->radius == 0 && dsc->opa >= LV_OPA_MAX && dsc->grad.dir == LV_GRAD_DIR_NONE &&
+       lv_matrix_is_identity((lv_matrix_t *)&matrix)) {
+        lv_vg_lite_clear(&u->target_buffer, &clip_area, lv_vg_lite_color(dsc->color, LV_OPA_COVER, false));
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_quality(path, dsc->radius == 0 ? VG_LITE_LOW : VG_LITE_HIGH);
     lv_vg_lite_path_set_bounding_box_area(path, &clip_area);

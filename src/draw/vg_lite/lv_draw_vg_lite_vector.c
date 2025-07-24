@@ -276,15 +276,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     /* clear area */
     if(!path) {
         vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, u->task_act->opa));
-        vg_lite_rectangle_t rect;
-        lv_vg_lite_rect(&rect, &scissor_area);
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c), {
-            lv_vg_lite_buffer_dump_info(&u->target_buffer);
-            LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
-            lv_vg_lite_color_dump_info(c);
-        });
-        LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
+        lv_vg_lite_clear(&u->target_buffer, &scissor_area, c);
         LV_PROFILER_DRAW_END;
         return;
     }
