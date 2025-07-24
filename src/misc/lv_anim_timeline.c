@@ -156,11 +156,15 @@ void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
     at->user_data = user_data;
 }
 
+#if LV_USE_OBJ_NAME
+
 void lv_anim_timeline_set_base_obj(lv_anim_timeline_t * at, lv_obj_t * base_obj)
 {
     LV_ASSERT_NULL(at);
     at->base_obj = base_obj;
 }
+
+#endif
 
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
@@ -218,6 +222,16 @@ void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
     return at->user_data;
 }
 
+
+#if LV_USE_OBJ_NAME
+
+lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return at->base_obj;
+}
+
+#endif
 /**********************
  *   STATIC FUNCTIONS
  **********************/
