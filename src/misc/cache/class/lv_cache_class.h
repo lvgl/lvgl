@@ -13,5 +13,6 @@
 
 #include "lv_cache_lru_rb.h"
 #include "lv_cache_lru_ll.h"
+#include "lv_cache_sc_da.h"
 
 #endif //LV_CACHE_CLAZZ_H
