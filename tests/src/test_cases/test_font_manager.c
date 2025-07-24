@@ -198,12 +198,20 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     bool delete_result = lv_font_manager_delete(g_font_manager);
     TEST_ASSERT_FALSE(delete_result);
 
+    /* Source should not be removed successfully, because it is used by the fonts */
+    delete_result = lv_font_manager_remove_src(g_font_manager, "Montserrat");
+    TEST_ASSERT_FALSE(delete_result);
+
     lv_obj_delete(label);
     lv_font_manager_delete_font(g_font_manager, font_14);
     lv_font_manager_delete_font(g_font_manager, font_32);
     lv_font_manager_delete_font(g_font_manager, font_40);
     lv_font_manager_delete_font(g_font_manager, font_file_20);
     lv_font_manager_delete_font(g_font_manager, font_buffer_20);
+
+    /* Source should be removed successfully, now that it's not used by any fonts */
+    delete_result = lv_font_manager_remove_src(g_font_manager, "Montserrat");
+    TEST_ASSERT_TRUE(delete_result);
 
     /* Trying to delete a font that was not created by the font manager, it needs to handle this situation */
     lv_font_manager_delete_font(g_font_manager, (lv_font_t *)LV_FONT_DEFAULT);
