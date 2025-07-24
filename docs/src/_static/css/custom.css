@@ -554,7 +554,7 @@ code.literal {
 }
 
 #furo-main-content dd {
-  margin-inline-start: 0;
+  margin-left: 2rem;
 }
 
 #furo-main-content blockquote {
