@@ -156,6 +156,12 @@ void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data)
     at->user_data = user_data;
 }
 
+void lv_anim_timeline_set_base_obj(lv_anim_timeline_t * at, lv_obj_t * base_obj)
+{
+    LV_ASSERT_NULL(at);
+    at->base_obj = base_obj;
+}
+
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);

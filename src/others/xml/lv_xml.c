@@ -49,6 +49,7 @@
  *      DEFINES
  *********************/
 #define xml_path_prefix LV_GLOBAL_DEFAULT()->xml_path_prefix
+#define lv_event_xml_store_timeline LV_GLOBAL_DEFAULT()->lv_event_xml_store_timeline
 
 /**********************
  *      TYPEDEFS
@@ -59,6 +60,7 @@
  **********************/
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs);
 static void view_end_element_handler(void * user_data, const char * name);
+static void get_timeline_from_event_cb(lv_event_t * e);
 static void free_timelines_event_cb(lv_event_t * e);
 
 /**********************
@@ -76,6 +78,9 @@ static void free_timelines_event_cb(lv_event_t * e);
 void lv_xml_init(void)
 {
     xml_path_prefix = lv_strdup("");
+
+    /*It will be sued to store animation time lines in user_data*/
+    lv_event_xml_store_timeline = lv_event_register_id();
 
     lv_xml_component_init();
 
@@ -230,9 +235,8 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
 
         timeline_array[i] = NULL; /*Closing to avoid storing the length*/
 
-        /*TODO: Don't use the user_data as it might be needed for the user
-         * Store in a special event's user_data*/
-        lv_obj_set_user_data(state.view, timeline_array);
+
+        lv_obj_add_event_cb(state.view, get_timeline_from_event_cb, lv_event_xml_store_timeline, timeline_array);
         lv_obj_add_event_cb(state.view, free_timelines_event_cb, LV_EVENT_DELETE, timeline_array);
     }
 
@@ -802,10 +806,15 @@ static void view_end_element_handler(void * user_data, const char * name)
     }
 }
 
+static void get_timeline_from_event_cb(lv_event_t * e)
+{
+    void ** out = lv_event_get_param(e);
+    *out = lv_event_get_user_data(e);
+}
+
 static void free_timelines_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
-    lv_anim_timeline_t ** at_array = lv_obj_get_user_data(obj);
+    lv_anim_timeline_t ** at_array = lv_event_get_user_data(e);
     uint32_t i;
     for(i = 0; at_array[i]; i++) {
         lv_free(lv_anim_timeline_get_user_data(at_array[i]));

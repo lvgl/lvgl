@@ -15,6 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define lv_event_xml_store_timeline LV_GLOBAL_DEFAULT()->lv_event_xml_store_timeline
 
 /**********************
  *      TYPEDEFS
@@ -960,7 +961,13 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
     }
 
     lv_anim_timeline_t * timeline = NULL;
-    lv_anim_timeline_t ** timeline_array = lv_obj_get_user_data(target);
+    lv_anim_timeline_t ** timeline_array = NULL;
+    lv_obj_send_event(target, lv_event_xml_store_timeline, &timeline_array);
+    if(timeline_array == NULL) {
+        LV_LOG_WARN("No time lines are stored in `%s`", dsc->target_name);
+        return;
+    }
+
     uint32_t i;
     for(i = 0; timeline_array[i]; i++) {
         const char * name = lv_anim_timeline_get_user_data(timeline_array[i]);
