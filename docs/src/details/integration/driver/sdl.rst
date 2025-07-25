@@ -14,9 +14,10 @@ Prerequisites
 -------------
 
 Install SDL according to your platform.
-    Linux ``sudo apt install libsdl2-dev``
-    MacOS ``brew install sdl2``
-    Windows https://github.com/libsdl-org/SDL/releases
+
+- Linux ``sudo apt install libsdl2-dev``
+- MacOS ``brew install sdl2``
+- Windows https://github.com/libsdl-org/SDL/releases
 
 
 Configure SDL Driver
@@ -24,6 +25,7 @@ Configure SDL Driver
 
 1. Required linked libraries: -lSDL2
 2. Enable SDL driver support in lv_conf.h, CMake compiler definitions or KConfig.
+
     .. code-block:: c
 
         #define LV_USE_SDL  1

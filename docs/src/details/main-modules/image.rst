@@ -74,17 +74,22 @@ Various built-in color formats are supported:
 The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the following order.
 
 - 32-bit color depth:
-    - **Byte 0**: Blue
-    - **Byte 1**: Green
-    - **Byte 2**: Red
-    - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+  - **Byte 0**: Blue
+  - **Byte 1**: Green
+  - **Byte 2**: Red
+  - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
 - 16-bit color depth:
-    - **Byte 0**: Green 3 lower bit, Blue 5 bit
-    - **Byte 1**: Red 5 bit, Green 3 higher bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+  - **Byte 0**: Green 3 lower bit, Blue 5 bit
+  - **Byte 1**: Red 5 bit, Green 3 higher bit
+  - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
 - 8-bit color depth:
-    - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+  - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
+  - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
 with one of the built-in color formats and an external :ref:`Image decoder <overview_image_decoder>`

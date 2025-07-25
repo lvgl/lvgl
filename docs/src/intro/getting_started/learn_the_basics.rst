@@ -37,11 +37,12 @@ Basic Data Flow
 3. **Create display and input devices**: Create display(s) (:cpp:type:`lv_display_t`) and input device(s)  (:cpp:type:`lv_indev_t`) and set up their callbacks
 4. **Create the UI**: Call LVGL functions to create screens, widgets, styles, animations, events, etc.
 5. **Call lv_timer_handler() in a loop**: It handles all the LVGL-related tasks:
-    - refresh display(s),
-    - read input devices,
-    - fire events based on user input (and other things),
-    - run any animations, and
-    - run user-created timers.
+
+   - refresh display(s),
+   - read input devices,
+   - fire events based on user input (and other things),
+   - run any animations, and
+   - run user-created timers.
 
 Integration example
 -------------------

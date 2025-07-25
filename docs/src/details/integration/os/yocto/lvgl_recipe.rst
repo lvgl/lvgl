@@ -132,14 +132,16 @@ all the layers::
     bitbake-layers show-layers
 
 The following layers should be listed:
-    -  core
-    -  yocto
-    -  yoctobsp
-    -  raspberrypi
-    -  openembedded-layer
-    -  multimedia-layer
-    -  networking-layer
-    -  meta-python
+
+-  core
+-  yocto
+-  yoctobsp
+-  raspberrypi
+-  openembedded-layer
+-  multimedia-layer
+-  networking-layer
+-  meta-python
+
 
 Build for RaspberryPi3 64
 =========================
@@ -197,20 +199,21 @@ bootloader files, and other components that are generated during the Yocto
 build process.
 
 There are some key folders:
-    -  **images**: it contains the images that can be flashed or deployed to
-       the target device. Files like the Linux kernel, root filesystem (e.g., .
-       ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
-       bootable images for the device are found here. t's organized by the
-       machine (or target board) for which the image was built.
-    -  **rmp/deb/ipk**: These folders contain the individual software packages
-       generated during the build, in the specified package format (RPM, DEB,
-       or IPK). These packages are typically created when you're building your
-       Yocto project with package management support enabled. These can later
-       be installed on the target device using package management tools
-    -  **sdk**: This subdirectory contains Software Development Kits (SDKs)
-       that you can use to cross-compile applications for your target system.
-       The SDKs are generated when you use the ``bitbake -c populate_sdk``
-       command.
+
+-  **images**: it contains the images that can be flashed or deployed to
+   the target device. Files like the Linux kernel, root filesystem (e.g., .
+   ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
+   bootable images for the device are found here. t's organized by the
+   machine (or target board) for which the image was built.
+-  **rmp/deb/ipk**: These folders contain the individual software packages
+   generated during the build, in the specified package format (RPM, DEB,
+   or IPK). These packages are typically created when you're building your
+   Yocto project with package management support enabled. These can later
+   be installed on the target device using package management tools
+-  **sdk**: This subdirectory contains Software Development Kits (SDKs)
+   that you can use to cross-compile applications for your target system.
+   The SDKs are generated when you use the ``bitbake -c populate_sdk``
+   command.
 
 
 tmp/sysroots-components
@@ -229,14 +232,15 @@ one package changes, Yocto only needs to update the corresponding component
 rather than rebuilding or copying the entire sysroot.
 
 If you followed the previous steps, here are the folders you will find:
-    - ``all``: Architecture-independent files.
-    - ``cortexa53``: Files for the Cortex-A53 (ARMv8-A) architecture.
-    - ``manifests``: Track files installed in the sysroot by package.
-    - ``raspberrypi3_64``: Files specific to the Raspberry Pi 3 (64-bit).
-    - ``x86_64``: Files for the x86_64 (PC) architecture, typically for
-      cross-compilation tools.
-    - ``x86_64-nativesdk``: Files related to the SDK for cross-compilation on
-      an x86_64 host.
+
+- ``all``: Architecture-independent files.
+- ``cortexa53``: Files for the Cortex-A53 (ARMv8-A) architecture.
+- ``manifests``: Track files installed in the sysroot by package.
+- ``raspberrypi3_64``: Files specific to the Raspberry Pi 3 (64-bit).
+- ``x86_64``: Files for the x86_64 (PC) architecture, typically for
+  cross-compilation tools.
+- ``x86_64-nativesdk``: Files related to the SDK for cross-compilation on
+  an x86_64 host.
 
 Each folder corresponds to components relevant to the specific architecture,
 and they collectively form the complete environment needed to compile and run
@@ -386,9 +390,10 @@ there is a LICENSE.txt. To get the value of the hash of the file, you can do
 this command: ``md5sum LICENSE.txt``
 
 SRC_URI: Specifies the locations of the source code and patches for the recipe:
-    - The main source repository for LVGL specifying the master branch.
-    - The following arguments are the local patch files that will be applied to
-      the source code during the build process.
+
+- The main source repository for LVGL specifying the master branch.
+- The following arguments are the local patch files that will be applied to
+  the source code during the build process.
 
 **SRCREV**: Defines the specific commit (in this case, a Git SHA hash) from
 which the source code will be fetched. This ensures that the build uses a
@@ -421,6 +426,7 @@ manually to understand what is generated each step, or you can run ``bitbake
 lvgl`` to run all the tasks.
 
 Fetch (do_fetch)
+
    .. code-block:: bash
 
       bitbake lvgl -c fetch
@@ -444,6 +450,7 @@ Fetch (do_fetch)
 
 
 Unpack (do_unpack)
+
    .. code-block:: bash
 
       bitbake lvgl -c unpack
@@ -459,6 +466,7 @@ Unpack (do_unpack)
 
 
 Patch (do_patch)
+
    .. code-block:: bash
 
       bitbake lvgl -c patch
@@ -471,6 +479,7 @@ Patch (do_patch)
    current source directory **${S}**.
 
 Configure (do_configure)
+
    .. code-block:: bash
 
       bitbake lvgl -c configure
@@ -491,8 +500,8 @@ Configure (do_configure)
    generated running the CMake command, but nothing is built yet. Also, the
    sysroots have everything required to build lvgl library.
 
-
 Compile (do_compile)
+
    .. code-block:: bash
 
       bitbake lvgl -c compile
@@ -513,6 +522,7 @@ Compile (do_compile)
    After this task has been completed, everything is ready to be installed.
 
 Install (do_install)
+
    .. code-block:: bash
 
       bitbake lvgl -c install

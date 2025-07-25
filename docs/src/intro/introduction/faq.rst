@@ -55,8 +55,9 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 * Enable :ref:`logging`.
 * Enable assertions in ``lv_conf.h`` (``LV_USE_ASSERT_...``).
 * If you use an RTOS:
-   * Increase the stack size of the task that calls :cpp:func:`lv_timer_handler`.
-   * Be sure you are using one of the methods for thread management as described in :ref:`threading`.
+
+  * Increase the stack size of the task that calls :cpp:func:`lv_timer_handler`.
+  * Be sure you are using one of the methods for thread management as described in :ref:`threading`.
 
 
 My display driver is not called. What have I missed?

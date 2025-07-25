@@ -28,12 +28,12 @@ S
 -
 
 The location in the Build Directory where unpacked recipe source code resides.
- By default, this directory is ${WORKDIR}/${BPN}-${PV}, where ${BPN} is the
- base recipe name and ${PV} is the recipe version. If the source tarball
- extracts the code to a directory named anything other than ${BPN}-${PV}, or if
- the source code is fetched from an SCM such as Git or Subversion, then you
- must set S in the recipe so that the OpenEmbedded build system knows where to
- find the unpacked source.
+By default, this directory is ${WORKDIR}/${BPN}-${PV}, where ${BPN} is the
+base recipe name and ${PV} is the recipe version. If the source tarball
+extracts the code to a directory named anything other than ${BPN}-${PV}, or if
+the source code is fetched from an SCM such as Git or Subversion, then you
+must set S in the recipe so that the OpenEmbedded build system knows where to
+find the unpacked source.
 
 As an example, assume a Source Directory top-level folder named poky and a
 default Build Directory at poky/build. In this case, the work directory the

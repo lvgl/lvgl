@@ -14,6 +14,7 @@ Products Portfolio:
 *******************
 
 - Embedded Smart Displays
+
     - `IOT_AIOT Smart Display <https://viewedisplay.com/iot_aiot-smart-display/>`_
     - `Uart Smart Display <https://viewedisplay.com/uart-smart-display/>`_
     - `HDMI Display_Raspberry Pi Display <https://viewedisplay.com/hdmi-display-raspberry-pi-display/>`_
