@@ -340,6 +340,9 @@
 
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
+
+    /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
+    #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
