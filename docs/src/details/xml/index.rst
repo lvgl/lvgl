@@ -27,9 +27,10 @@ Key Concepts
 
 :Framework's Role:
 
-    The LVGL XML Module then takes on the responsibility of rendering and updating the
-    UI based on your declarations, efficiently handling the low-level details of
-    drawing and state management.
+    The LVGL XML Module then takes on the responsibility of creating, managing, rendering,
+    and updating the UI based on your declarations. Once the XML files are loaded, from
+    LVGL's point of view the UI identical to a source-code created UI. It means the the created
+    UI elements can be modified at runtime, and performance is also identical. 
 
 :State-Driven:
 
