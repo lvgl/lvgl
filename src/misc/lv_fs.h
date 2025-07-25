@@ -151,6 +151,15 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size);
 
 /**
+ * Get the buffer address and size from a path object
+ * @param path      pointer to an initialized `lv_fs_path_ex` data
+ * @param buffer    pointer to a `void *` variable to store the address
+ * @param size      pointer to an `uint32_t` data to store the size
+ * @return          LV_RESULT_OK: buffer and size are set; LV_RESULT_INVALID: an error happened.
+ */
+lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size);
+
+/**
  * Close an already opened file
  * @param file_p    pointer to a lv_fs_file_t variable
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
