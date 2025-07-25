@@ -560,8 +560,8 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_scale_set_text_src(scale_hor, hor_text);
     lv_obj_set_width(scale_hor, lv_pct(200));
     lv_obj_set_height(scale_hor, 40);
-    lv_obj_set_style_pad_hor(scale_hor, lv_obj_get_style_pad_left(chart, 0), 0);
-    lv_obj_set_style_pad_ver(scale_ver, lv_obj_get_style_pad_top(chart, 0), 0);
+    lv_obj_set_style_pad_hor(scale_hor, lv_obj_get_style_pad_left(chart, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_ver(scale_ver, lv_obj_get_style_pad_top(chart, LV_PART_MAIN), 0);
     return chart;
 }
 
