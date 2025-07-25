@@ -12,6 +12,7 @@
 #if LV_USE_CHECKBOX != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"
@@ -182,11 +183,16 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         int32_t font_h = lv_font_get_line_height(font);
-        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        lv_text_attributes_t attributes = {0};
+
+        attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        attributes.max_width = LV_COORD_MAX;
+        attributes.text_flags = LV_TEXT_FLAG_NONE;
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+        lv_text_get_size(&txt_size, cb->txt, font, &attributes);
 
         int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -257,11 +263,14 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_draw_rect(layer, &indic_dsc, &marker_area_transf);
 
-    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    lv_text_attributes_t attributes = {0};
+    attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
+    attributes.max_width = LV_COORD_MAX;
 
     lv_point_t txt_size;
-    lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&txt_size, cb->txt, font, &attributes);
 
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);
