@@ -113,18 +113,18 @@ For an example of how draw-unit creation and initialization is done, see
 :cpp:func:`lv_draw_sw_init` in lv_draw_sw.c_ or the other draw units whose ``init``
 functions are optionally called in :cpp:func:`lv_init`.
 
-Thread Priority 
---------------- 
+Thread Priority
+---------------
 
-All draw units operate with a configurable thread priority which can be set using the 
-:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you 
-to fine-tune the priority level across all drawing units, which is especially useful for 
-systems with limited priority levels. 
+All draw units operate with a configurable thread priority which can be set using the
+:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you
+to fine-tune the priority level across all drawing units, which is especially useful for
+systems with limited priority levels.
 
-By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority. 
-This consistent approach ensures that all drawing units (software rendering, hardware 
-accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless 
-explicitly configured otherwise. 
+By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority.
+This consistent approach ensures that all drawing units (software rendering, hardware
+accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless
+explicitly configured otherwise.
 
 .. _lv_draw_sw.c:  https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c
 
@@ -175,7 +175,7 @@ available it can take a Draw Task.
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a
 useful helper function which is used by the ``dispatch_cb`` to get the next Draw Task
 it should act on.  If it handled the task, it sets the Draw Task's ``state`` field to
-:cpp:enumerator:`LV_DRAW_TASK_STATE_READY` (meaning "completed").  "Available" in
+:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED`.  "Available" in
 this context means that has been queued and assigned to a given Draw Unit and is
 ready to be carried out.  The ramifications of having multiple drawing threads are
 taken into account for this.

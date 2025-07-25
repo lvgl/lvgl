@@ -360,7 +360,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     lv_draw_task_t * t = NULL;
     t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     while(t && t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D) {
-        t->state = LV_DRAW_TASK_STATE_READY;
+        t->state = LV_DRAW_TASK_STATE_FINISHED;
         t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     }
 
@@ -406,7 +406,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 #else
     execute_drawing(draw_dave2d_unit);
 #if  (D2_RENDER_EACH_OPERATION)
-    draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
 #endif
     draw_dave2d_unit->task_act = NULL;
 
@@ -433,7 +433,7 @@ static void _dave2d_render_thread_cb(void * ptr)
 
         /*Cleanup*/
 #if  (D2_RENDER_EACH_OPERATION)
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
 #endif
         u->task_act = NULL;
 
@@ -602,7 +602,7 @@ void dave2d_execute_dlist_and_flush(void)
     while(false == lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
         p_list_entry = lv_ll_get_tail(&_ll_Dave2D_Tasks);
         p_list_entry1 = *p_list_entry;
-        p_list_entry1->state = LV_DRAW_TASK_STATE_READY;
+        p_list_entry1->state = LV_DRAW_TASK_STATE_FINISHED;
         lv_ll_remove(&_ll_Dave2D_Tasks, p_list_entry);
         lv_free(p_list_entry);
     }
