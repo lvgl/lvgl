@@ -1,4 +1,4 @@
-.. _xml_animations:
+    .. _xml_animations:
 
 ==========
 Animations
@@ -18,8 +18,8 @@ component itself or by any parent components.
 Defining Timelines
 ------------------
 
-Timelines can be defined inside ``<screen>``s and ``<component>``s.
-For ``<widget>``s, timelines are supported only in LVGL's UI Editor,
+Timelines can be defined inside ``<screen>`` s and ``<component>`` s.
+For ``<widget>`` s, timelines are supported only in LVGL's UI Editor,
 where C code can also be exported from them.
 
 Example:
@@ -50,10 +50,10 @@ Example:
        </lv_button>
    </view>
 
-In summary: inside ``<animations>``, you can define ``<timeline>``s, each with a unique name
+In summary: inside ``<animations>``, you can define ``<timeline>`` s, each with a unique name
 that you can reference later.
 
-Inside a ``<timeline>``, you add ``<animation>``s to describe each step.
+Inside a ``<timeline>``, you add ``<animation>`` s to describe each step.
 Supported properties of ``<animation>`` are:
 
 - ``prop``: Style property to animate. All integer style properties are supported (colors are not).
@@ -97,7 +97,7 @@ Understanding how timelines work internally helps use them effectively.
 When an XML file is registered, the contents of the ``<animations>`` section are parsed,
 and the animation data is stored as a blueprint.
 
-When an instance of a component or screen is created, ``lv_anim_timeline``s are
+When an instance of a component or screen is created, ``lv_anim_timeline`` s are
 created and initialized from the saved blueprint. Each instance gets its own copy.
 
 When a ``<play_timeline_event>`` is added to a UI element, the target and timeline
