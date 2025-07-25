@@ -14,6 +14,7 @@ void lv_example_label_5(void)
     lv_anim_set_delay(&animation_template, 1000);           /*Wait 1 second to start the first scroll*/
     lv_anim_set_repeat_delay(&animation_template,
                              3000);    /*Repeat the scroll 3 seconds after the label scrolls back to the initial position*/
+    lv_anim_set_repeat_count(&animation_template, LV_ANIM_REPEAT_INFINITE);
 
     /*Initialize the label style with the animation template*/
     lv_style_init(&label_style);
