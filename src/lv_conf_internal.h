@@ -968,6 +968,15 @@
             #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
         #endif
     #endif
+
+    /** Disable linear gradient extension for some older versions of drivers. */
+    #ifndef LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+        #ifdef CONFIG_LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+            #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT CONFIG_LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+        #else
+            #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
+        #endif
+    #endif
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
