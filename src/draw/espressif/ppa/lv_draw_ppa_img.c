@@ -24,14 +24,20 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     ppa_blend_oper_config_t cfg = {
         .in_bg = {
             .buffer          = (void *)draw_buf->data,
-            .pic_w           = width,
-            .pic_h           = height,
+            .pic_w           = draw_buf->header.w,
+            .pic_h           = draw_buf->header.h,
             .block_w         = width,
             .block_h         = height,
             .block_offset_x  = 0,
             .block_offset_y  = 0,
-            .blend_cm        = lv_color_format_to_ppa_blend(draw_buf->header.cf)
+            .blend_cm        = lv_color_format_to_ppa_blend(draw_buf->header.cf),
         },
+        .bg_rgb_swap           = false,
+        .bg_byte_swap          = false,
+        .bg_alpha_update_mode  = PPA_ALPHA_NO_CHANGE,
+        .bg_alpha_fix_val      = 0,
+        .bg_ck_en              = false,
+
         .in_fg = {
             .buffer          = (void *)img_dsc->data,
             .pic_w           = width,
@@ -40,34 +46,26 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             .block_h         = height,
             .block_offset_x  = 0,
             .block_offset_y  = 0,
-            .blend_cm        = lv_color_format_to_ppa_blend(dsc->header.cf)
+            .blend_cm        = lv_color_format_to_ppa_blend(dsc->header.cf),
         },
-        .out = {
-            .buffer          = draw_buf->data,
-            .buffer_size     = draw_buf->data_size,
-            .pic_w           = width,
-            .pic_h           = height,
-            .block_offset_x  = 0,
-            .block_offset_y  = 0,
-            .blend_cm        = lv_color_format_to_ppa_blend(draw_buf->header.cf)
-        },
-        .bg_rgb_swap           = false,
-        .bg_byte_swap          = false,
         .fg_rgb_swap           = false,
         .fg_byte_swap          = false,
-        .bg_alpha_update_mode = PPA_ALPHA_FIX_VALUE,
-        .bg_alpha_fix_val = 0xff,
-
-        .fg_alpha_update_mode = PPA_ALPHA_FIX_VALUE,
-        .fg_alpha_fix_val = dsc->opa,
-        .bg_ck_en              = false,
+        .fg_alpha_update_mode = PPA_ALPHA_NO_CHANGE,
+        .fg_alpha_fix_val      = 0xFF,
         .fg_ck_en              = false,
-#if LV_PPA_NONBLOCKING_OPS
+
+        .out = {
+            .buffer          = draw_buf->data,
+            .buffer_size     = PPA_ALIGN_UP(draw_buf->data_size, CONFIG_CACHE_L1_CACHE_LINE_SIZE),
+            .pic_w           = draw_buf->header.w,
+            .pic_h           = draw_buf->header.h,
+            .block_offset_x  = 0,
+            .block_offset_y  = 0,
+            .blend_cm        = lv_color_format_to_ppa_blend(draw_buf->header.cf),
+        },
+
         .mode            = PPA_TRANS_MODE_NON_BLOCKING,
         .user_data       = u,
-#else
-        .mode            = PPA_TRANS_MODE_BLOCKING,
-#endif
     };
 
     esp_err_t ret = ppa_do_blend(u->blend_client, &cfg);

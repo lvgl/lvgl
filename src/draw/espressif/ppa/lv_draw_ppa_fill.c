@@ -35,12 +35,8 @@ void lv_draw_ppa_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
             .fill_cm        = lv_color_format_to_ppa_fill(draw_buf->header.cf),
         },
 
-#if LV_PPA_NONBLOCKING_OPS
         .mode            = PPA_TRANS_MODE_NON_BLOCKING,
         .user_data       = u,
-#else
-        .mode            = PPA_TRANS_MODE_BLOCKING,
-#endif
     };
 
     esp_err_t ret = ppa_do_fill(u->fill_client, &cfg);
