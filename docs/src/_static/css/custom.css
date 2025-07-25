@@ -553,8 +553,8 @@ code.literal {
   font-weight: 700;
 }
 
-#furo-main-content dd {
-  margin-inline-start: 0;
+#furo-main-content dl[class]:not(.option-list):not(.field-list):not(.glossary):not(.simple) dd {
+  margin-left: 2rem;
 }
 
 #furo-main-content blockquote {
@@ -1003,13 +1003,13 @@ dl.field-list {
   display: grid;
   grid-template-columns: auto minmax(70%, 95%);
   margin-bottom: 1.5rem; /* Up from 16 */
-  gap: 1.5rem;
 }
 
 dl.field-list > dt {
   font-weight: 600;
   word-break: break-word;
-  margin-bottom: 0;
+  margin-right: 1em;
+  margin-bottom: 0.15em;
   display: inline-grid;
   grid-template-columns: max-content auto;
 }
