@@ -422,7 +422,7 @@ static bool _is_number_begin(char ch)
 
 static const char * _skip_space(const char * str, const char * str_end)
 {
-    while((str < str_end) && isspace(*str)) {
+    while((str < str_end) && isspace((unsigned char) * str)) {
         ++str;
     }
     return str;
@@ -435,7 +435,7 @@ static bool _is_separators(char c)
 
 static const char * _skip_space_and_separators(const char * str, const char * str_end)
 {
-    while((str < str_end) && (isspace(*str) || _is_separators(*str))) {
+    while((str < str_end) && (isspace((unsigned char) * str) || _is_separators(*str))) {
         ++str;
     }
     return str;
@@ -515,7 +515,7 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
 
     if(*str == '#') {
         if(len == 4) { // three digit hex format '#rgb'
-            if(isxdigit(str[1]) && isxdigit(str[2]) && isxdigit(str[3])) {
+            if(isxdigit((unsigned char)str[1]) && isxdigit((unsigned char)str[2]) && isxdigit((unsigned char)str[3])) {
                 char st[3] = {0};
                 st[0] = st[1] = str[1];
                 r = (uint8_t)strtol(st, NULL, 16);
@@ -526,8 +526,8 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
             }
         }
         else if(len == 7) {    // six digit hex format '#rrggbb'
-            if(isxdigit(str[1]) && isxdigit(str[2]) && isxdigit(str[3])
-               && isxdigit(str[4]) && isxdigit(str[5]) && isxdigit(str[6])) {
+            if(isxdigit((unsigned char)str[1]) && isxdigit((unsigned char)str[2]) && isxdigit((unsigned char)str[3])
+               && isxdigit((unsigned char)str[4]) && isxdigit((unsigned char)str[5]) && isxdigit((unsigned char)str[6])) {
                 char st[3] = {0};
                 st[0] = str[1];
                 st[1] = str[2];
@@ -1462,7 +1462,7 @@ static void _process_paint(lv_svg_node_t * node, lv_svg_attr_type_t type, const 
             url_start = ptr + 1;
         }
 
-        while((ptr < val_end) && !isspace(*ptr) && *ptr != ')') {
+        while((ptr < val_end) && !isspace((unsigned char) * ptr) && *ptr != ')') {
             ++ptr;
         }
 
