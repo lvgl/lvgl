@@ -163,8 +163,6 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix);
 
 bool lv_vg_lite_support_blend_normal(void);
 
-bool lv_vg_lite_16px_align(void);
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);

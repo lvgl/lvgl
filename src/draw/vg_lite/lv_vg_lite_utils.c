@@ -700,20 +700,13 @@ void lv_vg_lite_buffer_format_bytes(
 
 uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format)
 {
-    w = lv_vg_lite_width_align(w);
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
+        w = LV_VG_LITE_ALIGN(w, 16);
+    }
 
     uint32_t mul, div, align;
     lv_vg_lite_buffer_format_bytes(color_format, &mul, &div, &align);
     return LV_VG_LITE_ALIGN(((w * mul + div - 1) / div), align);
-}
-
-uint32_t lv_vg_lite_width_align(uint32_t w)
-{
-    if(lv_vg_lite_16px_align()) {
-        w = LV_VG_LITE_ALIGN(w, 16);
-    }
-
-    return w;
 }
 
 void lv_vg_lite_buffer_init(
@@ -740,13 +733,19 @@ void lv_vg_lite_buffer_init(
     else {
         buffer->tiled = VG_LITE_LINEAR;
     }
+
+    if(buffer->tiled) {
+        LV_ASSERT_FORMAT_MSG(LV_VG_LITE_IS_ALIGNED(width, 4) &&
+                             LV_VG_LITE_IS_ALIGNED(height, 4),
+                             "width : %" LV_PRId32 ", height : %" LV_PRId32, width, height);
+    }
+
     buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
     if(stride == LV_STRIDE_AUTO) {
-        lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-        buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+        buffer->stride = lv_vg_lite_width_to_stride(width, buffer->format);
     }
     else {
         buffer->stride = stride;
@@ -786,8 +785,6 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
         /* Skip palette */
         ptr += LV_VG_LITE_ALIGN(palette_size_bytes, LV_DRAW_BUF_ALIGN);
     }
-
-    width = lv_vg_lite_width_align(width);
 
     lv_vg_lite_buffer_init(buffer, ptr,
                            width, height, stride, format,
@@ -999,11 +996,6 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_m
 
 bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 {
-    uint32_t mul;
-    uint32_t div;
-    uint32_t align;
-    int32_t stride;
-
     if(!buffer) {
         LV_LOG_ERROR("buffer is NULL");
         return false;
@@ -1029,9 +1021,11 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(is_src && buffer->width != (vg_lite_int32_t)lv_vg_lite_width_align(buffer->width)) {
-        LV_LOG_ERROR("buffer width(%d) is not aligned", (int)buffer->width);
-        return false;
+    if(buffer->tiled == VG_LITE_TILED) {
+        if(!LV_VG_LITE_IS_ALIGNED(buffer->width, 4) || !LV_VG_LITE_IS_ALIGNED(buffer->height, 4)) {
+            LV_LOG_ERROR("tiled buffer width(%d) or height(%d) is not aligned to 4", (int)buffer->width, (int)buffer->height);
+            return false;
+        }
     }
 
     if(is_src) {
@@ -1075,11 +1069,9 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-    stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
-
+    const uint32_t stride = lv_vg_lite_width_to_stride(buffer->width, buffer->format);
     if(buffer->stride != stride) {
-        LV_LOG_ERROR("buffer stride(%d) != %d", (int)buffer->stride, (int)stride);
+        LV_LOG_ERROR("buffer stride(%d) != expected(%d)", (int)buffer->stride, (int)stride);
         return false;
     }
 
@@ -1203,11 +1195,6 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix)
 bool lv_vg_lite_support_blend_normal(void)
 {
     return vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT);
-}
-
-bool lv_vg_lite_16px_align(void)
-{
-    return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)

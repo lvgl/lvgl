@@ -155,9 +155,8 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     vg_lite_matrix_t path_matrix = u->global_matrix;
 
-    /* When alignment requirements are not met, use repeated drawing to simulate tile drawing effects. */
     /* vg_lite_tvg does not support VG_LITE_PATTERN_REPEAT */
-    if(dsc->tile && (LV_USE_VG_LITE_THORVG || (img_w % 16 != 0 && lv_vg_lite_16px_align()))) {
+    if(dsc->tile && LV_USE_VG_LITE_THORVG) {
         lv_area_t tile_area;
         if(lv_area_get_width(&dsc->image_area) >= 0) {
             tile_area = dsc->image_area;
