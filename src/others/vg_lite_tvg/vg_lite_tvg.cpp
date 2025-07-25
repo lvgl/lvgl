@@ -2598,10 +2598,6 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
     vg_lite_uint32_t * image_buffer;
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
 
-#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->width, 16));
-#endif
-
     if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
