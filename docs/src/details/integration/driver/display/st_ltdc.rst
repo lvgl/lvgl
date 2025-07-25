@@ -110,7 +110,7 @@ the display width is 800, the display height is 480, and ``1K`` means 1024 bytes
     MEMORY
     {
         FB_RAM (xrw)   : ORIGIN = 0x20000000, LENGTH = 1125K /* single 24bit 800x480 buffer */
-        RAM    (xrw)   : ORIGIN = 0x20232800, LENGTH = 1883K
+        RAM    (xrw)   : ORIGIN = 0x20119400, LENGTH = 1883K
         FLASH  (rx)    : ORIGIN = 0x08000000, LENGTH = 4096K
     }
 
