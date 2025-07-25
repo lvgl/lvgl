@@ -18,12 +18,12 @@ Key Concepts
 ************
 
 
-:Describing the UI:
+Describing the UI
+-----------------
 
-    Instead of providing step-by-step instructions on how to create and modify UI
-    elements as source code, you declare the desired appearance of the UI and optionally 
-    data bindings as well. 
-
+Instead of providing step-by-step instructions on how to create and modify UI
+elements as source code, you declare the desired appearance of the UI and optionally
+data bindings as well.
 
 :Framework's Role:
 
@@ -31,12 +31,6 @@ Key Concepts
     and updating the UI based on your declarations. Once the XML files are loaded, from
     LVGL's point of view the UI identical to a source-code created UI. It means the the created
     UI elements can be modified at runtime, and performance is also identical. 
-
-:State-Driven:
-
-    In declarative UI, the UI is often described as a function of the application's
-    state.  When the state changes, the UI automatically updates to reflect the new
-    state.
 
 :Component-Based:
 
@@ -52,27 +46,21 @@ you might write code to:
 
     Create the button.
     Add an event listener for clicks.
-    When clicked, find the button element and change its color.
+    When clicked, change the button's color by changing its style.
 
 In a declarative approach, you might:
 
-    Define a button component with a property for its color.
+    Define a button component with a style for its color.
 
-    Bind the button's color to a variable that changes when clicked.
+    Bind that style a variable that changes when the button is clicked.
 
-The framework handles the rest, automatically updating the button's appearance when
+The LVGL handles the rest, automatically updating the button's appearance when
 the variable changes.
 
 
 
 Benefits of Using a Declarative UI
 **********************************
-
-:Reduced Code:
-
-    Less code is needed to achieve the same result, as the framework
-    handles the complexities of UI updates.
-
 
 :Improved Readability and Maintainability:
 
@@ -83,11 +71,6 @@ Benefits of Using a Declarative UI
 
     Developers can iterate faster and focus on building the user experience, rather
     than getting bogged down in low-level UI details.
-
-:Enhanced Performance:
-
-    Declarative frameworks can often optimize UI updates, leading to better
-    performance.
 
 
 
