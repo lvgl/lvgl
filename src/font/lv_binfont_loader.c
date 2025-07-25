@@ -407,6 +407,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     }
 
     uint8_t * glyph_bmp = (uint8_t *)lv_malloc(sizeof(uint8_t) * cur_bmp_size);
+    LV_ASSERT_MALLOC(glyph_bmp);
 
     font_dsc->glyph_bitmap = glyph_bmp;
 
