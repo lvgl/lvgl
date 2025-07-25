@@ -21,8 +21,8 @@ Key Concepts
 :Describing the UI:
 
     Instead of providing step-by-step instructions on how to create and modify UI
-    elements, you declare the desired state of your UI based on the application's
-    data, specifically XML files accessible by the application.
+    elements as source code, you declare the desired appearance of the UI and optionally 
+    data bindings as well. 
 
 
 :Framework's Role:
