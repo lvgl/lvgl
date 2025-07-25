@@ -343,6 +343,9 @@
 
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
+
+    /** Disable linear gradient extension for some older versions of drivers. */
+    #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
