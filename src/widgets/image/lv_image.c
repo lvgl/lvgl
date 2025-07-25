@@ -187,11 +187,15 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     lv_image_header_t header;
     lv_result_t res = lv_image_decoder_get_info(src, &header);
     if(res != LV_RESULT_OK) {
-#if LV_USE_LOG
-        char buf[24];
-        LV_LOG_WARN("failed to get image info: %s",
-                    src_type == LV_IMAGE_SRC_FILE ? (const char *)src : (lv_snprintf(buf, sizeof(buf), "%p", src), buf));
-#endif /*LV_USE_LOG*/
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
+        const char * message =  "failed to get image info: ";
+        if(src_type == LV_IMAGE_SRC_FILE) {
+            LV_LOG_WARN("%s%s", message, (const char *)src);
+        }
+        else {
+            LV_LOG_WARN("%s%p", message, src);
+        }
+#endif /*LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN*/
         return;
     }
 
