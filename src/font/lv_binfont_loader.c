@@ -253,7 +253,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         switch(cmap_table[i].format_type) {
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
-                    uint8_t ids_size = (uint8_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
+                    uint32_t ids_size = (uint32_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
                     uint8_t * glyph_id_ofs_list = lv_malloc(ids_size);
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
@@ -407,6 +407,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     }
 
     uint8_t * glyph_bmp = (uint8_t *)lv_malloc(sizeof(uint8_t) * cur_bmp_size);
+    LV_ASSERT_MALLOC(glyph_bmp);
 
     font_dsc->glyph_bitmap = glyph_bmp;
 
