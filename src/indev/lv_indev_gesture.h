@@ -200,13 +200,6 @@ lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, 
 lv_indev_gesture_type_t lv_event_get_gesture_type(lv_event_t * gesture_event);
 
 /**
- * Obtains the coordinates of the current primary point
- * @param recognizer        pointer to a gesture recognizer
- * @param point             pointer to a point
- */
-void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point);
-
-/**
  * Allows to determine if there is an are ongoing gesture
  * @param recognizer        pointer to a gesture recognizer
  * @return                  false if there are no contact points, or the gesture has ended - true otherwise

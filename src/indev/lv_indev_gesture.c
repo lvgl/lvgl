@@ -115,19 +115,6 @@ void lv_indev_set_rotation_rad_threshold(lv_indev_t * indev, float threshold)
     recognizer->config->rotation_angle_rad_threshold = threshold;
 }
 
-void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point)
-{
-    if(recognizer->info->motions[0].finger != -1) {
-        point->x = recognizer->info->motions[0].point.x;
-        point->y = recognizer->info->motions[0].point.y;
-        return;
-    }
-
-    /* There are currently no active contact points */
-    point->x = 0;
-    point->y = 0;
-}
-
 bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer)
 {
     if(recognizer->state == LV_INDEV_GESTURE_STATE_ENDED ||
@@ -221,19 +208,8 @@ void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recogniz
                                lv_indev_gesture_type_t type)
 {
     bool is_active;
-    lv_point_t cur_pnt;
 
     if(recognizer == NULL) return;
-
-    /* If there is a single contact point use its coords,
-     * when there are no contact points it's set to 0,0
-     *
-     * Note: If a gesture was detected, the primary point is overwritten below
-     */
-
-    lv_indev_get_gesture_primary_point(recognizer, &cur_pnt);
-    data->point.x = cur_pnt.x;
-    data->point.y = cur_pnt.y;
 
     data->gesture_type[type] = LV_INDEV_GESTURE_NONE;
     data->gesture_data[type] = NULL;
@@ -251,9 +227,6 @@ void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recogniz
 
     switch(recognizer->state) {
         case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-            lv_indev_get_gesture_center_point(recognizer, &cur_pnt);
-            data->point.x = cur_pnt.x;
-            data->point.y = cur_pnt.y;
             data->gesture_type[type] = type;
             data->gesture_data[type] = (void *) recognizer;
             break;
