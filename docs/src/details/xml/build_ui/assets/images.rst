@@ -71,6 +71,6 @@ After calling this function, when ``"image_name"`` is used as an image source in
 Notes for the UI Editor
 -----------------------
 
-For simplicity, in the UI |nbsp| Editor's preview, images are always loaded as files.
+For simplicity, in the UI editor's preview, images are always loaded as files.
 It makes the preview dynamic so no code export and compilation is needed when an image changes.
 
