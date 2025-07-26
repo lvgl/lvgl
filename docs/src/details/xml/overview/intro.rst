@@ -4,9 +4,6 @@
 Introduction
 ============
 
-.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
-
 The LVGL XML Module implements LVGL's Declarative UI by loading UI elements written in
 XML.  The XML file can be written by hand, but it's highly recommended to use `LVGL's
 UI editor:  <https://lvgl.io/editor>`__ to write the XML files.  This UI editor
@@ -24,12 +21,19 @@ provides features like:
 
 Describing the UI in XML in a declarative manner offers several advantages:
 
-- XML files can be loaded at runtime (e.g. from an SD card) to change the application build.
+- XML files can be loaded at runtime (e.g. from an SD card) allowing you to change
+  the application's UI without changing the firmware.
+- XML files can be loaded dynamically as well, which allows for things like creating
+  UIs from plugins or apps that are downloaded by the firmware.
 - XML is simpler to write than C, enabling people with different skill sets to create LVGL UIs.
 - XML is textual data, making it easy to parse and manipulate with a large number of
   programming and scripting languages.
 - XML can be used to generate LVGL code in any language.
 - XML helps to separate the view from the internal logic.
+- The XML syntax uses the same properties as the C API, so it's easy to learn. E.g.
+  style properties like bg_color, line_width, or widget properties like width,
+  height, label text, etc.
+- A powerful data binding engine allow you to easily bind the widgets to global data.
 
 
 
@@ -53,7 +57,7 @@ push it back to the git repository so that other projects can be updated from it
 The built-in Widgets of LVGL are considered ``the core Component Library`` which is
 always available.
 
-A UI |nbsp| editor project can have any number of Component Libraries but will always
+A UI editor project can have any number of Component Libraries but will always
 have at least 2:
 
 - LVGL's built-in Widgets, and
@@ -169,10 +173,12 @@ Note that only the basic features are shown here.
         </view>
     </component>
 
+
+
 Usage Teaser
 ************
 
-LVGL's UI |nbsp| Editor can be used in two different ways.
+LVGL's UI editor can be used in two different ways.
 
 Export C and H Files
 --------------------
