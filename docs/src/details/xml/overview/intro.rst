@@ -4,6 +4,9 @@
 Introduction
 ============
 
+.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
+
 The LVGL XML Module implements LVGL's Declarative UI by loading UI elements written in
 XML.  The XML file can be written by hand, but it's highly recommended to use `LVGL's
 UI editor:  <https://lvgl.io/editor>`__ to write the XML files.  This UI editor
