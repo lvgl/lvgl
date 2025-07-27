@@ -278,6 +278,10 @@ typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
+typedef struct _lv_gltf_view_t lv_gltf_view_t;
+
+typedef struct _lv_gltf_data_t lv_gltf_data_t;
+
 typedef struct _lv_observer_t lv_observer_t;
 
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
