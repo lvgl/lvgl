@@ -33,8 +33,30 @@ jobs:
             COMMIT_REF="${{ github.sha }}"
           fi
 
+          set +e
           ejlv dispatch-build \
             --socket /ejd/ejd.sock \
             --commit-hash $COMMIT_REF \
             --remote-url $REPO_URL \
             --seconds 1800
+
+          EXIT_CODE=$?
+
+          if [ $EXIT_CODE -eq 0 ]; then
+            exit 0
+          fi
+          
+          echo "ejlv returned exit code " $EXIT_CODE ", cancelling workflow"
+          echo "SHOULD_CANCEL=true" >> $GITHUB_ENV
+          exit 0
+
+      - name: Cancel workflow if needed
+        if: env.SHOULD_CANCEL == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
