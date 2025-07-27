@@ -3137,6 +3137,15 @@
     #endif
 #endif
 
+/** Requires `LV_USE_3DTEXTURE = 1` */
+#ifndef LV_USE_GLTF
+    #ifdef CONFIG_LV_USE_GLTF
+        #define LV_USE_GLTF CONFIG_LV_USE_GLTF
+    #else
+        #define LV_USE_GLTF  0
+    #endif
+#endif
+
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
 #ifndef LV_USE_VECTOR_GRAPHIC
