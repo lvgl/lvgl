@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_blend_neon_to_rgb565.h"
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
 #include "../../../../misc/lv_color.h"
 #include "../../../../misc/lv_types.h"
@@ -2090,4 +2090,4 @@ static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, ui
 {
     return (void *)((uint8_t *)buf + stride);
 }
-#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS */
+#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON*/

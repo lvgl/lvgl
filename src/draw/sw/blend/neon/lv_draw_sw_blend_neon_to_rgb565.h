@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../../../lv_conf_internal.h"
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
 #include "../../../../misc/lv_types.h"
 
@@ -181,7 +181,7 @@ lv_result_t lv_draw_sw_blend_neon_argb888_to_rgb565_with_opa_mask(lv_draw_sw_ble
  *      MACROS
  **********************/
 
-#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON_INTRINSICS */
+#endif /* LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON */
 
 #ifdef __cplusplus
 } /*extern "C"*/

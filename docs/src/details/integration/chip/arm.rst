@@ -58,30 +58,7 @@ LVGL has built-in support to improve the performance of software rendering by ut
 Architecture Support
 --------------------
 
-ARM Neon acceleration support varies depending on the target architecture:
-
-**ARMv7 (32-bit ARM)**
-    For 32-bit ARM architectures (ARMv7), enable Neon acceleration by setting ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf.h``. This uses the internal assembly-optimized Neon implementation. Note that while ARMv6 introduced basic SIMD instructions, full Advanced SIMD (Neon) support began with ARMv7.
-
-**ARMv8 and later (64-bit ARM)**
-    For 64-bit ARM architectures (ARMv8, ARMv9, and future architectures), use ``LV_DRAW_SW_ASM_NEON_INTRINSICS`` instead. The direct assembly version (``LV_DRAW_SW_ASM_NEON``) is only compatible with 32-bit ARM, so the intrinsics-based implementation provides Neon acceleration for 64-bit systems.
+Both 32-bit and 64-bit ARM architectures are supported. Simply set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf.
 
 .. note::
    All ARM64 processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.
-
-Configuration Options
----------------------
-
-To configure Neon acceleration in your project, simply enable it in your LVGL config:
-
-* **For ARMv7 (32-bit):**
-
-.. code-block:: c
-
-    #define LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_NEON
-
-* **For ARMv8 and later (64-bit):** 
-
-.. code-block:: c
-
-    #define LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_NEON_INTRINSICS
