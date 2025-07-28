@@ -1,8 +1,8 @@
 name: Hardware Build Test
 
+# No point on running this on pushes to master
+# as we already dispatch a run job for that event
 on:
-  push:
-    branches: 'master'
   pull_request:
     branches: 'master'
 
@@ -11,13 +11,13 @@ jobs:
     runs-on: self-hosted
     name: Hardware Build Test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
 
       - name: Install EJ dispatcher tool
         run: |
@@ -37,4 +37,4 @@ jobs:
             --socket /ejd/ejd.sock \
             --commit-hash $COMMIT_REF \
             --remote-url $REPO_URL \
-            --seconds 600
+            --seconds 1800

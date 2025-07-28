@@ -15,13 +15,13 @@ jobs:
 
     name: Hardware Performance Benchmark
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
 
       - name: Install EJ dispatcher tool
         run: |
@@ -42,7 +42,7 @@ jobs:
             --comment-path comment.md \
             --commit-hash $COMMIT_REF \
             --remote-url $REPO_URL \
-            --seconds 900
+            --seconds 1800
 
       - name: Upload Comment
         uses: actions/upload-artifact@v4
