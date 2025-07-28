@@ -149,13 +149,8 @@ void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void
 {
     /*Make a path the contains both the address and the size.
      *Also append .bin to make look like a real file path*/
-#ifdef LV_ARCH_64
-    lv_snprintf(path->path, sizeof(path->path), "%c:%" LV_PRIu64 "-%" LV_PRIu32 ".bin", letter,
-                (uint64_t)((lv_uintptr_t) buf), size);
-#else
-    lv_snprintf(path->path, sizeof(path->path), "%c:%" LV_PRIu32 "-%" LV_PRIu32 ".bin", letter,
-                (uint32_t)((lv_uintptr_t) buf), size);
-#endif
+    lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32 ".bin", letter,
+                (size_t) buf, size);
 
 }
 
