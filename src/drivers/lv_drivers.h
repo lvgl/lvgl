@@ -24,6 +24,7 @@ extern "C" {
 #include "display/fb/lv_linux_fbdev.h"
 
 #include "display/tft_espi/lv_tft_espi.h"
+#include "display/lovyan_gfx/lv_lovyan_gfx.h"
 
 #include "display/lcd/lv_lcd_generic_mipi.h"
 #include "display/ili9341/lv_ili9341.h"
