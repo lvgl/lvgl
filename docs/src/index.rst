@@ -20,17 +20,17 @@ Create beautiful UIs for any MCU, MPU and display type.
 
     <div class="home-cards-container">
         <div class="home-cards">
-            <a href="intro/introduction.html" class="home-card">
+            <a href="intro/introduction/index.html" class="home-card">
                 <svg><use href="#svg-home-intro"></use></svg>
                 <h3>Introduction</h3>
                 <p>Get familiar with LVGL.</p>
             </a>
-            <a href="intro/getting_started.html" class="home-card">
+            <a href="intro/getting_started/index.html" class="home-card">
                 <svg><use href="#svg-home-getting-started"></use></svg>
                 <h3>Getting Started</h3>
                 <p>Learn how LVGL works.</p>
             </a>
-            <a href="intro/getting_started.html#what-s-next" class="home-card">
+            <a href="intro/getting_started/whats_next.html" class="home-card">
                 <svg><use href="#svg-home-play"></use></svg>
                 <h3>Going deeper</h3>
                 <p>Get your feet wet with LVGL.</p>
@@ -61,8 +61,8 @@ Introduction
     :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
-    intro/introduction
-    intro/getting_started
+    intro/introduction/index
+    intro/getting_started/index
 
 
 Details
@@ -93,30 +93,4 @@ Appendix
     contributing/index
     CHANGELOG
     API/index
-
-
-.. The below toctree directive is merely to eliminate 2 Sphinx warnings that these 2
-   files are "not included in any toctree".  Their sole purpose is so that any reader
-   noticing the URL structure and (as an experiment) browsing to
-
-   https://docs.lvgl.io/master/intro/
-
-   or
-
-   https://docs.lvgl.io/master/details/
-
-   will not be met by a 404 (File not found) error from the docs server.
-
-   Note:  this must be accompanied by "'includehidden': False" in `conf.py` in the
-   `html_theme_options` dictionary so that these 2 files do not appear as redundant
-   entries in the top-level navigation tree.  (This is the only toctree directive
-   with the :hidden: attribute.)
-
-.. Commenting out the below for Furo theme.
-    .. toctree::
-        :hidden:
-
-        intro/index
-        details/index
-
 
