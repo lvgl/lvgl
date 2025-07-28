@@ -4188,6 +4188,15 @@
     #endif
 #endif
 
+/** Interface for Lovyan_GFX */
+#ifndef LV_USE_LOVYAN_GFX
+    #ifdef CONFIG_LV_USE_LOVYAN_GFX
+        #define LV_USE_LOVYAN_GFX CONFIG_LV_USE_LOVYAN_GFX
+    #else
+        #define LV_USE_LOVYAN_GFX         0
+    #endif
+#endif
+
 /** Driver for evdev input devices */
 #ifndef LV_USE_EVDEV
     #ifdef CONFIG_LV_USE_EVDEV
