@@ -1,5 +1,5 @@
 /**
- * @file lv_loyvan_gfx.h
+ * @file lv_lovyan_gfx.h
  *
  */
 
