@@ -190,7 +190,7 @@ assigned, that MUTEX performs such protection by programmers:
 2.  releasing the MUTEX (a.k.a. unlocking it) after that access or modification
     is complete.
 
-Good design practices for using a MUTEX dictate that the time period that the MUTEX is
+Good design practices for using a MUTEX stress that the time period that the MUTEX is
 locked is kept as short as possible.
 
 If a thread attempts to acquire (lock) the MUTEX while another thread "owns" it,
