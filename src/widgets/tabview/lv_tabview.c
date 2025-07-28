@@ -314,7 +314,7 @@ static void button_clicked_event_cb(lv_event_t * e)
     /* Index of the button that was clicked */
     uint32_t idx = lv_obj_get_index_by_type(button, &lv_button_class);
 
-    /* Switch to the requested tab (no animation, like original code) */
+    /* Switch to the requested tab */
     lv_tabview_set_active(tv, idx, LV_ANIM_OFF);
 
     /* If the tab really changed, notify listeners just like the
