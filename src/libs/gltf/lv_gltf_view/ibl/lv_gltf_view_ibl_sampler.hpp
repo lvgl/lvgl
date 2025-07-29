@@ -66,7 +66,7 @@ class iblSampler
         uint32_t mipmapLevels;
         iblSampler(void);
         void doinit(const char * env_filename);
-        void filterAll(void (*callback)(const char *, float, float));
+        void filterAll();
         void destroy_iblSampler(void);
 };
 
