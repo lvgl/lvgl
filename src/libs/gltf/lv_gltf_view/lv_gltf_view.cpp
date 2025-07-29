@@ -93,6 +93,23 @@ extern "C" {
             return NULL;
         }
         const size_t animation_count = lv_gltf_data_get_animation_count(model);
+        LV_LOG_USER("%zu", model->textures.size());
+        for(size_t i = 0; i < model->textures.size(); ++i){
+            LV_LOG_USER("%zu: %d",i, model->textures[i]);
+        }
+
+        LV_LOG_USER("Meshes %zu", model->meshes.size());
+        for(size_t i = 0; i < model->meshes.size(); ++i){
+            lv_gltf_mesh_data_t* mesh = &model->meshes[i];
+            LV_LOG_USER("Mesh %zu: Primitives %zu", i, mesh->primitives.size());
+            for(size_t j = 0; j < mesh->primitives.size(); ++j){
+                LV_LOG_USER("Mesh %zu: Primitives %zu Albedo %d Normal %d Occlusion %d MetalRough %d", i, j, 
+                            mesh->primitives[j].albedoTexture,
+                            mesh->primitives[j].normalTexture,
+                            mesh->primitives[j].occlusionTexture,
+                            mesh->primitives[j].metalRoughTexture);
+            }
+        }
 
         if(animation_count > 0) {
             lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
@@ -131,12 +148,7 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_gltf_view_shader_get_src(&shaders);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
     char * frag_shader = lv_gltf_view_shader_get_fragment();
-    /*LV_LOG_USER("Vertex shader: %s", vertex_shader);*/
-    //LV_LOG_USER("Frag shader: %s", frag_shader);
-    //
     view->shader_manager = lv_gl_shader_manager_create(shaders.shader_list, shaders.count, vertex_shader, frag_shader);
-    /*view->shader_manager = lv_gl_shader_manager_create(src_includes, sizeof(src_includes) / sizeof(src_includes[0]),*/
-    /*                                                   PREPROCESS(src_vertexShader), PREPROCESS(src_fragmentShader));*/
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
@@ -198,7 +210,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     lv_memset(desc, 0, sizeof(*desc));
     desc->pitch = 0.f;
     desc->yaw = 0.f;
-    desc->distance = 1.f;
+    desc->distance = 5.f;
     desc->focal_x = 0.f;
     desc->focal_y = 0.f;
     desc->focal_z = 0.f;
