@@ -1,5 +1,4 @@
 #include "lv_gltf_view_ibl_sampler.hpp"
-#include <src/libs/gltf/lv_gltf_view/assets/test.h>
 
 #if LV_USE_GLTF
 #include <cstdint>
@@ -61,9 +60,9 @@ iblSampler::iblSampler(void)
     inputTextureID = GL_NONE;
     cubemapTextureID = GL_NONE;
     framebuffer = GL_NONE;
-    /*lv_gltf_view_shader shader;*/
-    /*lv_gltf_view_shader_get_env(&shader);*/
-    shader_manager = lv_gl_shader_manager_create(env_src_includes, sizeof(env_src_includes) / sizeof(*env_src_includes),
+    lv_gltf_view_shader shader;
+    lv_gltf_view_shader_get_env(&shader);
+    shader_manager = lv_gl_shader_manager_create(shader.shader_list, shader.count,
                                                  NULL, NULL);
 
 }

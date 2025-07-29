@@ -30,7 +30,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-	lv_gl_shader_t* shader_list;
+	const lv_gl_shader_t* shader_list;
 	size_t count;
 }lv_gltf_view_shader;
 
