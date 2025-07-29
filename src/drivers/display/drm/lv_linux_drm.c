@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <string.h>
+#include <assert.h>
 
 #include <xf86drm.h>
 #include <xf86drmMode.h>
@@ -36,6 +37,50 @@
     #include "../../opengles/lv_opengles_window.h"
 
 #endif
+
+#ifndef GL_ES_VERSION_2_0
+#include <GLES2/gl2.h>
+#endif
+#include <GLES2/gl2ext.h>
+#include <EGL/egl.h>
+
+#undef EGLAPI
+#define EGLAPI static
+#define EGL_EGLEXT_PROTOTYPES
+#include <EGL/eglext.h>
+#undef EGLAPI
+#undef EGL_EGLEXT_PROTOTYPES
+
+static EGLint (*eglWaitSyncKHR_p) (EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
+static EGLint   eglWaitSyncKHR    (EGLDisplay dpy, EGLSyncKHR sync, EGLint flags)
+{
+    return eglWaitSyncKHR_p(dpy, sync, flags);
+}
+
+static EGLint (*eglDupNativeFenceFDANDROID_p) (EGLDisplay dpy, EGLSyncKHR sync);
+static EGLint   eglDupNativeFenceFDANDROID    (EGLDisplay dpy, EGLSyncKHR sync)
+{
+    return eglDupNativeFenceFDANDROID_p(dpy, sync);
+}
+
+static EGLSyncKHR (*eglCreateSyncKHR_p) (EGLDisplay dpy, EGLenum type, const EGLint *attrib_list);
+static EGLSyncKHR   eglCreateSyncKHR    (EGLDisplay dpy, EGLenum type, const EGLint *attrib_list)
+{
+    return eglCreateSyncKHR_p(dpy, type, attrib_list);
+}
+
+static EGLBoolean (*eglDestroySyncKHR_p) (EGLDisplay dpy, EGLSyncKHR sync);
+static EGLBoolean   eglDestroySyncKHR    (EGLDisplay dpy, EGLSyncKHR sync)
+{
+    return eglDestroySyncKHR_p(dpy, sync);
+}
+
+static EGLint (*eglClientWaitSyncKHR_p) (EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+static EGLint   eglClientWaitSyncKHR    (EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout)
+{
+    return eglClientWaitSyncKHR_p(dpy, sync, flags, timeout);
+}
+
 
 /*********************
  *      DEFINES
@@ -87,6 +132,10 @@ typedef struct {
     drm_buffer_t drm_bufs[2];
     drm_buffer_t * act_buf;
     struct gbm_surface *surface;
+    int kms_in_fence_fd;
+    int kms_out_fence_fd;
+    EGLSyncKHR kms_fence;
+    EGLSyncKHR gpu_fence;
 
 } drm_dev_t;
 
@@ -128,9 +177,12 @@ static uint32_t tick_get_cb(void);
 #if LV_LINUX_DRM_USE_EGL
     drm_buffer_t * drm_fb_get_from_bo(struct gbm_bo *bo);
     static void drm_fb_destroy_callback(struct gbm_bo *bo, void *data);
+    static void drm_gbm_egl_pre(lv_opengles_window_t * window);
+    static void drm_gbm_egl_post1(lv_opengles_window_t * window);
     static void drm_gbm_egl_post2(lv_opengles_window_t * window);
 
     static int drm_atomic_commit(uint32_t fb_id, uint32_t flags);
+    static EGLSyncKHR create_fence(EGLDisplay display, int fd);
 #endif
 
 /**********************
@@ -152,6 +204,8 @@ static uint32_t tick_get_cb(void);
     #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 #endif
 
+#define VOID2U64(x) ((uint64_t)(unsigned long)(x))
+
 drm_dev_t *drm_dev_temp;
 
 /**********************
@@ -169,6 +223,7 @@ lv_display_t * lv_linux_drm_create(void)
     drm_dev_temp = drm_dev;
 
     drm_dev->fd = -1;
+    drm_dev->kms_out_fence_fd = -1;
 
 #if !LV_LINUX_DRM_USE_EGL
     lv_display_t * disp = lv_display_create(800, 480);
@@ -267,8 +322,18 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     lv_display_set_resolution(disp, hor_res, ver_res);
 
 #if LV_LINUX_DRM_USE_EGL
-    lv_opengles_window_t * window = lv_opengles_egl_window_create(hor_res, ver_res, drm_dev->surface, gbm_device, NULL, NULL, drm_gbm_egl_post2);
+    lv_opengles_window_t * window = lv_opengles_egl_window_create(hor_res, ver_res, drm_dev->surface, gbm_device, drm_gbm_egl_pre, drm_gbm_egl_post1, drm_gbm_egl_post2);
     lv_opengles_window_display_create(window, hor_res, ver_res);
+
+    // EGLDisplay display = lv_opengles_egl_window_get_display(window);
+    // const char * egl_exts_dpy = eglQueryString(display, EGL_EXTENSIONS);
+    // LV_LOG_USER("%s", egl_exts_dpy);
+
+    eglWaitSyncKHR_p = (void *) eglGetProcAddress("eglWaitSyncKHR");
+    eglDupNativeFenceFDANDROID_p = (void *) eglGetProcAddress("eglDupNativeFenceFDANDROID");
+    eglCreateSyncKHR_p = (void *) eglGetProcAddress("eglCreateSyncKHR");
+    eglDestroySyncKHR_p = (void *) eglGetProcAddress("eglDestroySyncKHR");
+    eglClientWaitSyncKHR_p = (void *) eglGetProcAddress("eglClientWaitSyncKHR");
 #endif
 
 #if !LV_LINUX_DRM_USE_EGL
@@ -574,6 +639,12 @@ static int drm_atomic_commit(uint32_t fb_id, uint32_t flags)
     drm_add_plane_property(drm_dev_temp, "CRTC_W", drm_dev_temp->width);
     drm_add_plane_property(drm_dev_temp, "CRTC_H", drm_dev_temp->height);
 
+    if (drm_dev_temp->kms_in_fence_fd != -1) {
+        drm_add_crtc_property(drm_dev_temp, "OUT_FENCE_PTR",
+                VOID2U64(&drm_dev_temp->kms_out_fence_fd));
+        drm_add_plane_property(drm_dev_temp, "IN_FENCE_FD", drm_dev_temp->kms_in_fence_fd);
+    }
+
     ret = drmModeAtomicCommit(drm_dev_temp->fd, drm_dev_temp->req, flags, NULL);
     if(ret) {
         LV_LOG_ERROR("drmModeAtomicCommit failed: %s (%d)", strerror(errno), errno);
@@ -582,6 +653,18 @@ static int drm_atomic_commit(uint32_t fb_id, uint32_t flags)
     }
 
     return 0;
+}
+
+static EGLSyncKHR create_fence(EGLDisplay display, int fd)
+{
+	EGLint attrib_list[] = {
+		EGL_SYNC_NATIVE_FENCE_FD_ANDROID, fd,
+		EGL_NONE,
+	};
+	EGLSyncKHR fence = eglCreateSyncKHR(display,
+			EGL_SYNC_NATIVE_FENCE_ANDROID, attrib_list);
+	assert(fence);
+	return fence;
 }
 
 static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
@@ -1190,11 +1273,51 @@ if(!lv_display_flush_is_last(disp)) return;
     drm_dev->act_buf = NULL;
 }
 
+static void drm_gbm_egl_pre(lv_opengles_window_t * window)
+{
+    if (drm_dev_temp->kms_out_fence_fd != -1) {
+        EGLDisplay display = lv_opengles_egl_window_get_display(window);
+        drm_dev_temp->kms_fence = create_fence(display, drm_dev_temp->kms_out_fence_fd);
+        assert(drm_dev_temp->kms_fence);
+
+        /* driver now has ownership of the fence fd: */
+        drm_dev_temp->kms_out_fence_fd = -1;
+
+        /* wait "on the gpu" (ie. this won't necessarily block, but
+            * will block the rendering until fence is signaled), until
+            * the previous pageflip completes so we don't render into
+            * the buffer that is still on screen.
+            */
+        int result = eglWaitSyncKHR(display, drm_dev_temp->kms_fence, 0);
+        assert(result == 1);
+    }
+}
+
+static void drm_gbm_egl_post1(lv_opengles_window_t * window)
+{
+    /* insert fence to be singled in cmdstream.. this fence will be
+        * signaled when gpu rendering done
+        */
+    EGLDisplay display = lv_opengles_egl_window_get_display(window);
+    drm_dev_temp->gpu_fence = create_fence(display, EGL_NO_NATIVE_FENCE_FD_ANDROID);
+    assert(drm_dev_temp->gpu_fence);
+}
+
 static void drm_gbm_egl_post2(lv_opengles_window_t * window)
 {
+    EGLDisplay display = lv_opengles_egl_window_get_display(window);
+
+    /* after swapbuffers, gpu_fence should be flushed, so safe
+        * to get fd:
+        */
+    drm_dev_temp->kms_in_fence_fd = eglDupNativeFenceFDANDROID(display, drm_dev_temp->gpu_fence);
+    assert(eglDestroySyncKHR(display, drm_dev_temp->gpu_fence));
+    drm_dev_temp->gpu_fence = NULL;
+    assert(drm_dev_temp->kms_in_fence_fd != -1);
+
     drm_buffer_t *fb;
 	uint32_t i = 0;
-	uint32_t flags = 0;
+	uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
 	int64_t start_time, report_time, cur_time;
 	int ret;
 
@@ -1207,6 +1330,25 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
     fb = drm_fb_get_from_bo(next_bo);
     if (!fb) {
         LV_LOG_ERROR("Failed to get a new framebuffer BO");
+    }
+
+    if (drm_dev_temp->kms_fence) {
+        EGLint status;
+
+        /* Wait on the CPU side for the _previous_ commit to
+            * complete before we post the flip through KMS, as
+            * atomic will reject the commit if we post a new one
+            * whilst the previous one is still pending.
+            */
+        do {
+            status = eglClientWaitSyncKHR(display,
+                                drm_dev_temp->kms_fence,
+                                0,
+                                EGL_FOREVER_KHR);
+        } while (status != EGL_CONDITION_SATISFIED_KHR);
+
+        assert(eglDestroySyncKHR(display, drm_dev_temp->kms_fence));
+        drm_dev_temp->kms_fence = NULL;
     }
 
     ret = drm_atomic_commit(fb->fb_id, flags);

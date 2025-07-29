@@ -14,6 +14,7 @@
 #include "lv_opengles_driver.h"
 #include "lv_opengles_texture.h"
 #include "lv_opengles_private.h"
+#include "lv_opengles_debug.h"
 
 #include "../../core/lv_refr_private.h"
 #include "../../stdlib/lv_string.h"
@@ -142,7 +143,19 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
 #endif
 
     lv_egl_timer_init();
-    eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
+
+    EGLBoolean res = eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
+    if(res == EGL_FALSE) {
+        LV_LOG_ERROR("eglMakeCurrent failed.");
+        return NULL;
+    }
+
+    res = eglSwapInterval(egl_display, 0);
+    if(res == EGL_FALSE) {
+        LV_LOG_ERROR("eglSwapInterval failed.");
+        return NULL;
+    }
+
     lv_opengles_init();
 
     return window;
@@ -161,7 +174,11 @@ void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window)
 
 void lv_opengles_window_delete(lv_opengles_window_t * window)
 {
-    eglDestroySurface(egl_display, window->surface);
+    EGLBoolean res = eglDestroySurface(egl_display, window->surface);
+    if(res == EGL_FALSE) {
+        LV_LOG_ERROR("eglDestroySurface failed.");
+        return;
+    }
 
     lv_opengles_window_texture_t * texture;
     while((texture = lv_ll_get_head(&window->textures))) {
@@ -375,7 +392,12 @@ static void window_update_handler(lv_timer_t * t)
     LV_LL_READ(&egl_window_ll, window) {
         if(window->pre) window->pre(window);
 
-        eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
+        EGLBoolean res = eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
+        if(res == EGL_FALSE) {
+            LV_LOG_ERROR("eglMakeCurrent failed.");
+            return;
+        }
+
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
 
 #if LV_USE_DRAW_OPENGLES
@@ -470,11 +492,20 @@ static void window_update_handler(lv_timer_t * t)
 
         if(window->post1) window->post1(window);
 
+        GL_CALL(glFinish());
+
         /* Swap front and back buffers */
-        eglSwapBuffers(egl_display, window->surface);
+        res = eglSwapBuffers(egl_display, window->surface);
+        if(res == EGL_FALSE) {
+            LV_LOG_ERROR("eglSwapBuffers failed.");
+            return;
+        }
+
+        GL_CALL(glFinish());
 
         if(window->post2) window->post2(window);
 
+        GL_CALL(glFinish());
     }
 }
 
