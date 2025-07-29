@@ -1,4 +1,5 @@
 #include "lv_gltf_view_ibl_sampler.hpp"
+#include <src/libs/gltf/lv_gltf_view/assets/test.h>
 
 #if LV_USE_GLTF
 #include <cstdint>
@@ -24,7 +25,6 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "../../stb_image/stb_image_resize.h"
 
-void (*callback)(const char *, float, float);
 
 uint8_t min(uint8_t a, uint8_t b)
 {
@@ -61,11 +61,11 @@ iblSampler::iblSampler(void)
     inputTextureID = GL_NONE;
     cubemapTextureID = GL_NONE;
     framebuffer = GL_NONE;
-    lv_gltf_view_shader shader;
-    lv_gltf_view_shader_get_env(&shader);
-    shader_manager = lv_gl_shader_manager_create(shader.shader_list, shader.count, NULL, NULL);
+    /*lv_gltf_view_shader shader;*/
+    /*lv_gltf_view_shader_get_env(&shader);*/
+    shader_manager = lv_gl_shader_manager_create(env_src_includes, sizeof(env_src_includes) / sizeof(*env_src_includes),
+                                                 NULL, NULL);
 
-    callback = NULL;
 }
 
 uint32_t iblSampler::internalFormat(void)
@@ -235,25 +235,14 @@ void iblSampler::doinit(const char * env_filename)
 
     float * data;
     if(env_filename != NULL) {
-#ifdef IBL_SAMPLER_VERBOSITY
-        if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MIN) std::cout << "Loading Environment Panorama/Equirectangular HDR: " <<
-                                                                 env_filename << "\n";
-#endif
         data = stbi_loadf(env_filename, &src_width, &src_height, &src_nrChannels, 3);
     }
     else {
-#ifdef IBL_SAMPLER_VERBOSITY
-        if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MIN) std::cout << "Loading Fallback Environment HDR: " << env_filename << "\n";
-#endif
         extern uint8_t chromatic_jpg[];
         extern int chromatic_jpg_len;
         data = stbi_loadf_from_memory(chromatic_jpg, chromatic_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
     }
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MED) std::cout << "  +--> Width = " << src_width << " / Height = " << src_height
-                                                             << " / Channels = " << src_nrChannels << "\n";
-#endif
     t_image panoramaImage = t_image();
     panoramaImage.width = src_width;
     panoramaImage.height = src_height;
@@ -265,7 +254,6 @@ void iblSampler::doinit(const char * env_filename)
     stbi_image_free(data);
     inputTextureID = loadTextureHDR(&panoramaImage);
     free(panoramaImage.dataFloat);
-
 
     GL_CALL(glGenFramebuffers(1, &framebuffer));
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
@@ -284,10 +272,6 @@ void iblSampler::doinit(const char * env_filename)
 void iblSampler::panoramaToCubeMap(void)
 {
     for(int32_t i = 0; i < 6; ++i) {
-        //std::cout << "panoramaToCubeMap pass #" << i << "\n";
-        if(callback != NULL) {
-            callback("Processing CubeMap filter...", i, 36);
-        }
 
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
         GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -314,6 +298,7 @@ void iblSampler::panoramaToCubeMap(void)
             // Handle shader compilation error
             std::cout << "ENV RENDER ERROR: Some error compiling the cubemap shader, IBL will be corrupted.\n";
         }
+        LV_LOG_USER("Program used %d", program_id);
         GL_CALL(glUseProgram(program_id));
         //  TEXTURE0 = active.
         GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
@@ -348,7 +333,6 @@ void iblSampler::applyFilter(
 
     uint32_t currentTextureSize = textureSize >> targetMipLevel;
     for(uint32_t i = 0; i < 6; ++i) {
-        //if (callback != NULL && (_baseProgress > 0.f)) { callback(_strProgress, i + _baseProgress, 36); }
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
         GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, targetTexture,
                                        targetMipLevel));
@@ -361,6 +345,8 @@ void iblSampler::applyFilter(
         uint32_t vert_shader = lv_gl_shader_manager_select_shader(shader_manager, "fullscreen.vert", nullptr, 0);
         lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_gl_shader_program_get_id(program);
+
+        LV_LOG_USER("Program used %d", program_id);
         GL_CALL(glUseProgram(program_id));
         //  TEXTURE0 = active.
         GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -451,6 +437,7 @@ void iblSampler::sampleLut(uint32_t distribution, uint32_t targetTexture, uint32
     lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(shader_manager, frag_shader, vert_shader);
     GLuint program_id = lv_gl_shader_program_get_id(program);
 
+    LV_LOG_USER("Program used %d", program_id);
     GL_CALL(glUseProgram(program_id));
     //  TEXTURE0 = active.
     GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
@@ -484,64 +471,27 @@ void iblSampler::sampleCharlieLut(void)
     sampleLut(2, charlieLutTextureID, lutResolution);
 }
 
-void iblSampler::filterAll(void (*_callback)(const char *, float, float))
+void iblSampler::filterAll()
 {
-    callback = _callback;
     GLint previousFramebuffer;
     GL_CALL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer));
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MIN) std::cout << "Processing Environment...\n";
-#endif
-
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> panorama->CubeMap filter\n";
-#endif
     panoramaToCubeMap();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
 
-    //if (callback != NULL) { callback("Panorama To Cubemap...", 6, 36); }
-
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> cubeMap->Lambertian filter\n";
-#endif
     cubeMapToLambertian();
 
-    //GL_CALL(glClearDepth(1.0));
-    //GL_CALL(glClearColor(0.8, 0.8, 0.8, 0.0));
-    //GL_CALL(glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT));
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
-    if(callback != NULL) {
-        callback("Lambertian filter...", 12, 36);
-    }
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> cubeMap->GGX filter\n";
-#endif
     cubeMapToGGX();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> cubeMap->Sheen filter\n";
-#endif
     cubeMapToSheen();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
-    if(callback != NULL) {
-        callback("Sampling GGX LUT...", 27, 36);
-    }
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> Sampling GGX Lut\n";
-#endif
     sampleGGXLut();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
-    if(callback != NULL) {
-        callback("Sampling Charlie LUT...", 33, 36);
-    }
 
-#ifdef IBL_SAMPLER_VERBOSITY
-    if(IBL_SAMPLER_VERBOSITY >= VERBOSITY_MAX) std::cout << "  +--> Sampling Charlie Lut\n";
-#endif
     sampleCharlieLut();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
 }
@@ -553,24 +503,9 @@ void iblSampler::destroy_iblSampler(void)
 
 // ------------------------------------------------------------
 
-void (*ibl_load_progress_callback)(const char *, const char *, float, float, float, float) = NULL;
-
-void lv_gltf_view_ibl_set_loadphase_callback(void (*_ibl_load_progress_callback)(const char *, const char *, float,
-                                                                                 float, float, float))
-{
-    ibl_load_progress_callback = _ibl_load_progress_callback;
-}
-
-void ibl_sampler_env_filter_callback(const char * phase_title, float phase_current, float phase_max)
-{
-    if(ibl_load_progress_callback != NULL) {
-        ibl_load_progress_callback(phase_title, "SUBTEST1234", 0.f + ((phase_current / phase_max) * 2.0f), 5.f, 0.f, 0.f);
-    }
-}
-
 lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(lv_gltf_view_env_textures_t * last_env,
-                                                                   const char * env_file_path,
-                                                                   int32_t env_rotation_x10)
+                                                           const char * env_file_path,
+                                                           int32_t env_rotation_x10)
 {
     lv_gltf_view_env_textures_t _ret;
     if((last_env != NULL) && (last_env->loaded == true)) {
@@ -587,7 +522,7 @@ lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(lv_gltf_view_env_text
     }
     auto environmentFiltering = iblSampler();
     environmentFiltering.doinit(env_file_path);
-    environmentFiltering.filterAll(ibl_sampler_env_filter_callback);
+    environmentFiltering.filterAll();
 
     _ret.loaded             = true;
     _ret.angle = (float)env_rotation_x10 / 10.0f;
