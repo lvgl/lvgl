@@ -46,7 +46,7 @@ static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_view_state_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void destroy_environment(lv_gltf_view_env_textures_t * env);
-
+static void set_time_cb(lv_timer_t * timer);
 const lv_obj_class_t lv_gltf_view_class = {
     .base_class = &lv_3dtexture_class,
     .constructor_cb = lv_gltf_view_constructor,
@@ -92,6 +92,12 @@ extern "C" {
             lv_gltf_data_destroy(model);
             return NULL;
         }
+        const size_t animation_count = lv_gltf_data_get_animation_count(model);
+
+        if(animation_count > 0) {
+            lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
+            viewer->desc.timestep = LV_DEF_REFR_PERIOD / 1000.;
+        }
         return model;
     }
 }
@@ -99,6 +105,12 @@ extern "C" {
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void set_time_cb(lv_timer_t * timer)
+{
+    lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
+    lv_obj_invalidate(obj);
+}
 
 static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -117,8 +129,8 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_gltf_view_shader shaders;
     lv_gltf_view_shader_get_src(&shaders);
-    char *vertex_shader = lv_gltf_view_shader_get_vertex();
-    char *frag_shader = lv_gltf_view_shader_get_fragment();
+    char * vertex_shader = lv_gltf_view_shader_get_vertex();
+    char * frag_shader = lv_gltf_view_shader_get_fragment();
     /*LV_LOG_USER("Vertex shader: %s", vertex_shader);*/
     //LV_LOG_USER("Frag shader: %s", frag_shader);
     //
@@ -145,7 +157,7 @@ static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
         lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
         GLuint texture_id = lv_gltf_view_render(viewer);
-        lv_3dtexture_set_src((lv_obj_t*)&viewer->texture, (lv_3dtexture_id_t)texture_id);
+        lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
     }
 
     lv_result_t res;
