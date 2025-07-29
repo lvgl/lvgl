@@ -156,7 +156,7 @@ GLuint lv_gl_shader_manager_get_texture(lv_gl_shader_manager_t * manager,
     lv_gl_shader_texture_t key = { .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_find(&manager->textures_map, &key);
     if(!node) {
-        LV_LOG_WARN("Couldn't find texture with hash %d in cache",
+        LV_LOG_INFO("Couldn't find texture with hash %d in cache",
                     texture_hash);
         return GL_NONE;
     }
@@ -171,7 +171,7 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     /* First check that the shader identifier exists */
     lv_gl_shader_t key = { shader_identifier, NULL };
     lv_rb_node_t * source_node = lv_rb_find(&shader->sources_map, &key);
-    LV_LOG_USER("Select shader '%s'", shader_identifier);
+    LV_LOG_TRACE("Select shader '%s'", shader_identifier);
 
     if(!source_node) {
         LV_LOG_WARN("Couldn't find shader %s", shader_identifier);
@@ -201,7 +201,7 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     bool is_vertex = string_ends_with(shader_identifier, ".vert");
     shader_map_key.id = compile_shader(shader_source, is_vertex);
 
-    LV_LOG_USER("Compiled %s shader %s to %d Hash %u", is_vertex ? "V" : "F", shader_identifier, shader_map_key.id, hash);
+    LV_LOG_TRACE("Compiled %s shader %s to %d Hash %u", is_vertex ? "V" : "F", shader_identifier, shader_map_key.id, hash);
     lv_rb_node_t * node = lv_rb_insert(&shader->compiled_shaders_map, &shader_map_key);
     LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
     lv_memcpy(node->data, &shader_map_key, sizeof(shader_map_key));
@@ -248,7 +248,7 @@ lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
         ((lv_gl_compiled_shader_t *)fragment_node->data)->id;
 
     GLuint program_id = link_program(vertex_shader_id, fragment_shader_id);
-    LV_LOG_USER("Linking program with shaders V: %d F:%d P: %d", vertex_shader_id, fragment_shader_id, program_id);
+    LV_LOG_TRACE("Linking program with shaders V: %d F:%d P: %d", vertex_shader_id, fragment_shader_id, program_id);
 
     lv_gl_shader_program_t * program =
         lv_gl_shader_program_create(program_id);
@@ -277,7 +277,6 @@ void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
     while((node = manager->sources_map.root)) {
         lv_gl_shader_source_t * shader = node->data;
         if(shader->src_allocated) {
-            LV_LOG_USER("Free %s %p", shader->data.name, shader->data.source);
             lv_free((void *)shader->data.source);
         }
         lv_rb_remove_node(&manager->sources_map, node);
