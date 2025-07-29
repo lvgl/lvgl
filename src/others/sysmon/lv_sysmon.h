@@ -64,7 +64,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp);
  * Dump the FPS data recorded between the last and current dump call.
  * @param disp      target display, NULL: use the default
  */
-void lv_sysmon_dump_performance(lv_display_t * disp);
+void lv_sysmon_performance_dump(lv_display_t * disp);
 
 /**
  * Resume the system performance monitor.

@@ -139,7 +139,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
     lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
 }
 
-void lv_sysmon_dump_performance(lv_display_t * disp)
+void lv_sysmon_performance_dump(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) {
