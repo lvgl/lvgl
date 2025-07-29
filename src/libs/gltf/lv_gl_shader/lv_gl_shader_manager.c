@@ -77,7 +77,7 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gl_shader_manager_t * lv_gl_shader_manager_create(lv_gl_shader_t * sources,
+lv_gl_shader_manager_t * lv_gl_shader_manager_create(const lv_gl_shader_t * sources,
                                                      size_t len, const char * vert_src,
                                                      const char * frag_src)
 {

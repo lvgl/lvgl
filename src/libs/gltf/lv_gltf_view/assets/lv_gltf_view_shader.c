@@ -2708,8 +2708,7 @@ static lv_gl_shader_t env_src_includes[] = {
             float y = float((gl_VertexID & 2) << 1);
             texCoord.x = x * 0.5;
             texCoord.y = y * 0.5;
-            /*gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);*/
-            gl_Position = vec4(x - 0.5, y - 0.5, 0, 1);
+            gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
         }
     )" },
 	{ "panorama_to_cubemap.frag", R"(

@@ -639,7 +639,6 @@ void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf
 {
     GL_CALL(glBindVertexArray(manager->bg_vao));
 
-    LV_LOG_USER("Program used %d", manager->bg_program);
     GL_CALL(glUseProgram(manager->bg_program));
     GL_CALL(glEnable(GL_CULL_FACE));
     GL_CALL(glDisable(GL_BLEND));
@@ -694,7 +693,6 @@ void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBu
                       -1.0f, -1.0f, 1.0f,  1.0f, -1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 1.0f
                     };
 
-    LV_LOG_USER("Program used %d", program);
     GL_CALL(glUseProgram(program));
     GL_CALL(glGenVertexArrays(1, vao));
     GL_CALL(glBindVertexArray(*vao));
