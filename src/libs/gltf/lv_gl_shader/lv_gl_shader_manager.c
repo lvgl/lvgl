@@ -165,28 +165,27 @@ GLuint lv_gl_shader_manager_get_texture(lv_gl_shader_manager_t * manager,
 
 uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
                                             const char * shader_identifier,
-                                            lv_gl_shader_t * permutations,
+                                            const lv_gl_shader_t * permutations,
                                             size_t permutations_len)
 {
     /* First check that the shader identifier exists */
     lv_gl_shader_t key = { shader_identifier, NULL };
     lv_rb_node_t * source_node = lv_rb_find(&shader->sources_map, &key);
+    LV_LOG_USER("Select shader '%s'", shader_identifier);
 
     if(!source_node) {
         LV_LOG_WARN("Couldn't find shader %s", shader_identifier);
         return 0;
     }
 
-    const char * original_shader_source =
-        ((lv_gl_shader_source_t *)source_node->data)->data.source;
+    const char * original_shader_source = ((lv_gl_shader_source_t *)source_node->data)->data.source;
     uint32_t hash = lv_gl_shader_hash(shader_identifier);
-
     char * shader_source = construct_shader(original_shader_source,
                                             permutations, permutations_len);
 
-    for(size_t i = 0; i < permutations_len; ++i){
+    for(size_t i = 0; i < permutations_len; ++i) {
         hash ^= lv_gl_shader_hash(permutations[i].name);
-        if(permutations[i].source){
+        if(permutations[i].source) {
             hash ^= lv_gl_shader_hash(permutations[i].source);
         }
     }
@@ -199,11 +198,11 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
         lv_free(shader_source);
         return hash;
     }
+    bool is_vertex = string_ends_with(shader_identifier, ".vert");
+    shader_map_key.id = compile_shader(shader_source, is_vertex);
 
-    shader_map_key.id = compile_shader(
-                            shader_source, string_ends_with(shader_identifier, ".vert"));
-    lv_rb_node_t * node =
-        lv_rb_insert(&shader->compiled_shaders_map, &shader_map_key);
+    LV_LOG_USER("Compiled %s shader %s to %d Hash %u", is_vertex ? "V" : "F", shader_identifier, shader_map_key.id, hash);
+    lv_rb_node_t * node = lv_rb_insert(&shader->compiled_shaders_map, &shader_map_key);
     LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
     lv_memcpy(node->data, &shader_map_key, sizeof(shader_map_key));
 
@@ -247,7 +246,9 @@ lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
         ((lv_gl_compiled_shader_t *)vertex_node->data)->id;
     const GLuint fragment_shader_id =
         ((lv_gl_compiled_shader_t *)fragment_node->data)->id;
+
     GLuint program_id = link_program(vertex_shader_id, fragment_shader_id);
+    LV_LOG_USER("Linking program with shaders V: %d F:%d P: %d", vertex_shader_id, fragment_shader_id, program_id);
 
     lv_gl_shader_program_t * program =
         lv_gl_shader_program_create(program_id);
@@ -272,11 +273,24 @@ void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
     lv_rb_destroy(&manager->textures_map);
 
     lv_rb_node_t * node;
+
+    while((node = manager->sources_map.root)) {
+        lv_gl_shader_source_t * shader = node->data;
+        if(shader->src_allocated) {
+            LV_LOG_USER("Free %s %p", shader->data.name, shader->data.source);
+            lv_free((void *)shader->data.source);
+        }
+        lv_rb_remove_node(&manager->sources_map, node);
+    }
+    lv_rb_destroy(&manager->sources_map);
+
     while((node = manager->compiled_shaders_map.root)) {
         lv_gl_compiled_shader_t * shader = node->data;
         GL_CALL(glDeleteShader(shader->id));
         lv_rb_remove_node(&manager->compiled_shaders_map, node);
     }
+
+    lv_rb_destroy(&manager->compiled_shaders_map);
     while((node = manager->programs_map.root)) {
         lv_gl_program_map_key_t * program_key = node->data;
         lv_gl_shader_program_destroy(program_key->program);
@@ -345,8 +359,8 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id)
 {
     GLuint program_id;
     GL_CALL(program_id = glCreateProgram());
-    GL_CALL(glAttachShader(program_id, vertex_shader_id));
     GL_CALL(glAttachShader(program_id, fragment_shader_id));
+    GL_CALL(glAttachShader(program_id, vertex_shader_id));
     GL_CALL(glLinkProgram(program_id));
 
     int link_status;
@@ -465,11 +479,12 @@ static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len)
                         shaders[i].name, i);
             continue;
         }
-        lv_gl_shader_source_t value = { {
+        lv_gl_shader_source_t value = {
+            .data = {
                 .name = shaders[i].name,
                 .source = shaders[i].source
             },
-            false
+            .src_allocated = false
         };
 
         for(size_t j = 0; j < len; j++) {
@@ -495,6 +510,9 @@ static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len)
                 new_source,
                 "Failed to allocate memory to replace shader include with source code");
 
+            if(value.src_allocated) {
+                lv_free((void *)value.data.source);
+            }
             value.data.source = new_source;
             value.src_allocated = true;
         }

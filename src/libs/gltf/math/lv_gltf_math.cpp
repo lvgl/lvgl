@@ -36,7 +36,8 @@
  **********************/
 
 /** Creates a right-handed view matrix */
-fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center, const fastgltf::math::fvec3 & up)
+fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center,
+                                                const fastgltf::math::fvec3 & up)
 {
     auto dir = normalize(center - eye);
     auto lft = normalize(cross(dir, up));
@@ -54,7 +55,8 @@ fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & ey
  * Creates a right-handed perspective matrix, with the near and far clips at -1 and +1, respectively.
  * @param fov The FOV in radians
  */
-[[nodiscard]] fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear, float zFar) noexcept
+[[nodiscard]] fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear,
+                                                                  float zFar) noexcept
 {
     fastgltf::math::fmat4x4 ret(0.f);
     auto tanHalfFov = std::tan(fov / 2.f);

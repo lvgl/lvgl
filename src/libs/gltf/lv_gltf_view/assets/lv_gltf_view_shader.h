@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_TEMPL_H
-#define LV_TEMPL_H
+#ifndef LV_VIEW_SHADER_H
+#define LV_VIEW_SHADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,4 +54,4 @@ void lv_gltf_view_shader_get_env(lv_gltf_view_shader* shaders);
 #endif
 
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_VIEW_SHADER_H*/

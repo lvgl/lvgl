@@ -2708,7 +2708,8 @@ static lv_gl_shader_t env_src_includes[] = {
             float y = float((gl_VertexID & 2) << 1);
             texCoord.x = x * 0.5;
             texCoord.y = y * 0.5;
-            gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
+            /*gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);*/
+            gl_Position = vec4(x - 0.5, y - 0.5, 0, 1);
         }
     )" },
 	{ "panorama_to_cubemap.frag", R"(
@@ -3321,12 +3322,12 @@ static const char * src_vertex_shader = R"(
     uniform mat4 u_ModelMatrix;
     uniform mat4 u_NormalMatrix;
 
-
     in vec3 a_position;
     out vec3 v_Position;
 #include <animation1.glsl>
 #include <animation2.glsl>
 #include <vert_v1_chunk_00.glsl>
+// CHUNK 00 -> 01
 #include <vert_v1_chunk_01.glsl>
 )";
 
