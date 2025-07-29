@@ -42,6 +42,7 @@
     static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void perf_monitor_disp_event_cb(lv_event_t * e);
     static void perf_dump_info(lv_display_t * disp);
+    static void perf_control(lv_display_t * disp, bool start);
 #endif
 
 #if LV_USE_MEM_MONITOR
@@ -146,6 +147,16 @@ void lv_sysmon_dump_performance(lv_display_t * disp)
         return;
     }
     perf_dump_info(disp);
+}
+
+void lv_sysmon_performance_resume(lv_display_t * disp)
+{
+    perf_control(disp, true);
+}
+
+void lv_sysmon_performance_pause(lv_display_t * disp)
+{
+    perf_control(disp, false);
 }
 
 void lv_sysmon_performance_control(lv_display_t * disp, bool start)
@@ -355,6 +366,24 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     );
 #endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
+}
+
+static void perf_control(lv_display_t * disp, bool start)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
+    if(disp->perf_sysmon_backend.timer == NULL) return;
+
+    if(start) {
+        lv_timer_resume(disp->perf_sysmon_backend.timer);
+    }
+    else {
+        lv_timer_pause(disp->perf_sysmon_backend.timer);
+    }
 }
 
 #endif

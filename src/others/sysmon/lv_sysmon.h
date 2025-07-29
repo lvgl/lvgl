@@ -67,14 +67,20 @@ void lv_sysmon_hide_performance(lv_display_t * disp);
 void lv_sysmon_dump_performance(lv_display_t * disp);
 
 /**
- * Start or stop the system performance monitor.
+ * Resume the system performance monitor.
  * @param disp      target display, NULL: use the default
- * @param start     true for starting the monitor, false for stopping.
- * @note start/stop sysmon automatic updates. When the sysmon is stopped you can use
- * `lv_sysmon_dump_performance` to get performance information. See `lv_sysmon_dump_performance`
- * for more information.
  */
-void lv_sysmon_performance_control(lv_display_t * disp, bool start);
+void lv_sysmon_performance_resume(lv_display_t * disp);
+
+/**
+ * Pause the system performance monitor.
+ *
+ * @param disp      target display, NULL: use the default
+ * @note When the sysmon is stopped you can use `lv_sysmon_dump_performance` to
+ * get performance information. See `lv_sysmon_dump_performance` for more information.
+ */
+void lv_sysmon_performance_pause(lv_display_t * disp);
+
 
 #endif /*LV_USE_PERF_MONITOR*/
 

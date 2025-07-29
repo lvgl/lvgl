@@ -40,15 +40,6 @@ Enable in ``lv_conf.h``:
     /* Optional: log to console instead of screen */
     #define LV_USE_PERF_MONITOR_LOG_MODE 0
 
-Initialization
---------------
-Call in application setup:
-
-.. code-block:: c
-
-    /* Initialize sysmon infrastructure */
-    lv_sysmon_builtin_init();
-
 Creating Monitors
 -----------------
 .. code-block:: c
@@ -74,12 +65,19 @@ Tracks:
 Display format:
 .. code-block::
 
-    32 FPS, 45% CPU, 38% Self
-    8 ms (5 | 3)
+    32 FPS, 45% CPU
+    8 ms
 
 Where:
-- Line 1: FPS, Total CPU%, Self CPU%
+- Line 1: FPS, Total CPU%
 - Line 2: Total time (Render | Flush)
+
+Pause and Resume
+****************
+
+:cpp:expr:`lv_sysmon_performance_pause(disp)` pauses the perf monitor.
+
+:cpp:expr:`lv_sysmon_performance_resume(disp)` resumes the perf monitor.
 
 Memory Monitor
 --------------
