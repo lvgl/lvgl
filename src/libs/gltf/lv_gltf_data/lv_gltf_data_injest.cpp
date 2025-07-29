@@ -282,6 +282,7 @@ static void load_mesh_texture_impl(lv_gltf_data_t * data, const fastgltf::Textur
     else {
         *primitive_tex_uv_id = material_prop.texCoordIndex;
     }
+    LV_LOG_USER("Prim tex prop: %d Prim tex uv id %d", *primitive_tex_prop, *primitive_tex_uv_id);
 }
 
 static void load_mesh_texture(lv_gltf_data_t * data,
@@ -492,8 +493,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else {
-        LV_LOG_ERROR("Failed to load image");
-
+        LV_LOG_ERROR("Failed to load image %s", image.name.c_str());
     }
     LV_LOG_USER("Storing texture with hash: %u %u", hash, texture_id);
     lv_gl_shader_manager_store_texture(shader_manager, hash, texture_id);
@@ -626,6 +626,7 @@ static bool injest_mesh(lv_gltf_data_t * data, fastgltf::Mesh & mesh)
             auto & material = data->asset.materials[it->materialIndex.value()];
             load_mesh_texture(data, material.pbrData.baseColorTexture, &primitive.albedoTexture,
                               &primitive.baseColorTexcoordIndex);
+
             load_mesh_texture(data, material.pbrData.metallicRoughnessTexture, &primitive.metalRoughTexture,
                               &primitive.metallicRoughnessTexcoordIndex);
             load_mesh_texture(data, material.normalTexture, &primitive.normalTexture, &primitive.normalTexcoordIndex);
