@@ -28,11 +28,13 @@
 
 #include "fastgltf/math.hpp"
 #include "lv_gltf_data_internal.hpp"
-static fastgltf::math::fvec3 animation_get_vec3_at_timestamp(lv_gltf_data_t * data, fastgltf::AnimationSampler * sampler,
-                                                      float seconds);
+static fastgltf::math::fvec3 animation_get_vec3_at_timestamp(lv_gltf_data_t * data,
+                                                             fastgltf::AnimationSampler * sampler,
+                                                             float seconds);
 
-static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_data_t * data, fastgltf::AnimationSampler * sampler,
-                                                      float _seconds);
+static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_data_t * data,
+                                                             fastgltf::AnimationSampler * sampler,
+                                                             float _seconds);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,7 +60,8 @@ float lv_gltf_data_get_animation_total_time(lv_gltf_data_t * data, uint32_t inde
     return max_time;
 }
 
-std::vector<uint32_t>* lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_data_t * data,  fastgltf::Node & node)
+std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_data_t * data,
+                                                               fastgltf::Node & node)
 {
     const auto & asset = lv_gltf_data_get_asset(data);
     size_t animation_count = lv_gltf_data_get_animation_count(data);
@@ -79,8 +82,9 @@ std::vector<uint32_t>* lv_gltf_data_animation_get_channel_set(std::size_t anim_n
     return &data->channel_set_cache[&node];
 }
 
-void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_data_t * gltf_data,  fastgltf::Node & node,
-                            fastgltf::math::fmat4x4 & matrix)
+void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_data_t * gltf_data,
+                                         fastgltf::Node & node,
+                                         fastgltf::math::fmat4x4 & matrix)
 {
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
 
@@ -124,7 +128,7 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
                     }
                     break;
                 case fastgltf::AnimationPath::Weights:
-					LV_LOG_WARN("Unhandled weights animation");
+                    LV_LOG_WARN("Unhandled weights animation");
                     break;
             }
         }
@@ -135,8 +139,9 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
  *   STATIC FUNCTIONS
  **********************/
 
-static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_data_t * data, fastgltf::AnimationSampler * sampler,
-                                                      float _seconds)
+static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_data_t * data,
+                                                             fastgltf::AnimationSampler * sampler,
+                                                             float _seconds)
 {
     const auto & asset = lv_gltf_data_get_asset(data);
     auto & _inAcc = asset->accessors[sampler->inputAccessor];

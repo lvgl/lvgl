@@ -394,13 +394,13 @@ static void mouse_button_callback(GLFWwindow * window, int button, int action, i
     LV_UNUSED(mods);
     lv_glfw_window_t * lv_window = lv_glfw_get_lv_window_from_window(window);
     lv_window->mouse_last_state = LV_INDEV_STATE_EX_UNSUPPORTED;
-    if (button == GLFW_MOUSE_BUTTON_LEFT) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_LEFT;
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_RIGHT;
-    else if (button == GLFW_MOUSE_BUTTON_MIDDLE) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_MIDDLE;
-    else if (button == GLFW_MOUSE_BUTTON_4) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_4;
-    else if (button == GLFW_MOUSE_BUTTON_5) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_5;
-    else if (button == GLFW_MOUSE_BUTTON_6) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_6;
-    if (lv_window->mouse_last_state != LV_INDEV_STATE_EX_UNSUPPORTED) {
+    if(button == GLFW_MOUSE_BUTTON_LEFT) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_LEFT;
+    else if(button == GLFW_MOUSE_BUTTON_RIGHT) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_RIGHT;
+    else if(button == GLFW_MOUSE_BUTTON_MIDDLE) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_MIDDLE;
+    else if(button == GLFW_MOUSE_BUTTON_4) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_4;
+    else if(button == GLFW_MOUSE_BUTTON_5) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_5;
+    else if(button == GLFW_MOUSE_BUTTON_6) lv_window->mouse_last_state = LV_INDEV_STATE_EX_MOUSE_6;
+    if(lv_window->mouse_last_state != LV_INDEV_STATE_EX_UNSUPPORTED) {
         lv_window->mouse_last_state |= (action == GLFW_PRESS ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED);
         proc_mouse(lv_window);
     }
