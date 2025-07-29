@@ -308,7 +308,7 @@ static lv_rb_compare_res_t
 shader_program_compare_cb(const lv_gl_program_map_key_t * lhs,
                           const lv_gl_program_map_key_t * rhs)
 {
-    const uint32_t cmp = lhs->vertex_shader_hash == rhs->vertex_shader_hash;
+    const lv_rb_compare_res_t cmp = lhs->vertex_shader_hash - rhs->vertex_shader_hash;
     if(cmp == 0) {
         return lhs->fragment_shader_hash - rhs->fragment_shader_hash;
     }
