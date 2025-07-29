@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_gltf_view_internal.hpp"
-#include <src/libs/gltf/lv_gltf_view/assets/test.h>
 #if LV_USE_GLTF
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include <GL/glew.h>
@@ -231,13 +230,11 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
                                                                                                                                    (prim_gltf_data.materialIndex.value() + 1) : 0);
                 const auto & shaderset = lv_gltf_data_get_shader_set(model, material_index);
                 if(material_index > -1 && !shaderset->ready) {
-                    /*lv_array_t defines;*/
-                    /*lv_array_init(&defines, 64, sizeof(lv_gl_shader_t));*/
-                    /*lv_result_t result = lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &prim_gltf_data);*/
-                    /*LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");*/
-                    /*lv_gltf_renwin_shaderset_t shaderset = lv_gltf_view_shader_compile_program(viewer, &defines);*/
-                    injest_discover_defines(model, &node, &prim_gltf_data);
-                    lv_gltf_renwin_shaderset_t shaderset = lv_gltf_view_shader_compile_program(viewer, all_defines(), all_defines_count());
+                    lv_array_t defines;
+                    lv_array_init(&defines, 64, sizeof(lv_gl_shader_t));
+                    lv_result_t result = lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &prim_gltf_data);
+                    LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
+                    lv_gltf_renwin_shaderset_t shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_t*)defines.data, lv_array_size(&defines));
                     lv_gltf_uniform_locations_t uniform_locations = lv_gltf_uniform_locations_create(shaderset.program);
                     lv_gltf_data_set_shader(model, material_index, uniform_locations, shaderset);
                 }
