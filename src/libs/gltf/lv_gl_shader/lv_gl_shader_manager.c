@@ -319,8 +319,7 @@ static lv_rb_compare_res_t
 shader_source_compare_cb(const lv_gl_shader_source_t * lhs,
                          const lv_gl_shader_source_t * rhs)
 {
-    return lv_gl_shader_hash(lhs->data.name) -
-           lv_gl_shader_hash(rhs->data.name);
+    return lv_strcmp(lhs->data.name, rhs->data.name);
 }
 
 static lv_rb_compare_res_t
