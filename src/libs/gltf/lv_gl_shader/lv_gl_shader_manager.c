@@ -448,6 +448,7 @@ static char * replace_include(const char * source, const char * pattern,
     while((pos = strstr(result, pattern))) {
         lv_memset((void *)pos, ' ', pattern_len);
     }
+    result[new_len] = '\0';
 
     return result;
 }
