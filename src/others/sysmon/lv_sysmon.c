@@ -159,24 +159,6 @@ void lv_sysmon_performance_pause(lv_display_t * disp)
     perf_control(disp, false);
 }
 
-void lv_sysmon_performance_control(lv_display_t * disp, bool start)
-{
-    if(disp == NULL) disp = lv_display_get_default();
-    if(disp == NULL) {
-        LV_LOG_WARN("There is no default display");
-        return;
-    }
-
-    if(disp->perf_sysmon_backend.timer == NULL) return;
-
-    if(start) {
-        lv_timer_resume(disp->perf_sysmon_backend.timer);
-    }
-    else {
-        lv_timer_pause(disp->perf_sysmon_backend.timer);
-    }
-}
-
 #endif
 
 #if LV_USE_MEM_MONITOR
