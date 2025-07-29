@@ -78,7 +78,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void set_bounds_info(lv_gltf_data_t *data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max, fastgltf::math::fvec3 v_cen, float radius);
+static void set_bounds_info(lv_gltf_data_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
+                            fastgltf::math::fvec3 v_cen, float radius);
 static lv_gltf_data_t * create_data_from_bytes(const uint8_t * bytes,
                                                size_t data_size);
 
@@ -208,11 +209,11 @@ lv_gltf_data_t * lv_gltf_data_load_internal(const void * data_source,
         [&](fastgltf::Node & node, const std::string & node_path,
             const std::string & node_ip, size_t node_index,
     std::size_t child_index) {
-            LV_UNUSED(node_index);
-            LV_UNUSED(child_index);
-            lv_gltf_data_node_t data_node;
-            lv_gltf_data_node_init(&data_node, &node, node_ip.c_str(), node_path.c_str());
-            lv_gltf_data_node_add(data, &data_node);
+        LV_UNUSED(node_index);
+        LV_UNUSED(child_index);
+        lv_gltf_data_node_t data_node;
+        lv_gltf_data_node_init(&data_node, &node, node_ip.c_str(), node_path.c_str());
+        lv_gltf_data_node_add(data, &data_node);
     });
 
     {
