@@ -499,7 +499,7 @@ static void draw_primitive(int32_t prim_num,
         GL_CALL(glUniformMatrix4fv(uniforms->model_matrix, 1, GL_FALSE, &matrix[0][0]));
         GL_CALL(glUniformMatrix4fv(uniforms->view_matrix, 1, false, viewer->view_matrix.data()));
         GL_CALL(glUniformMatrix4fv(uniforms->projection_matrix, 1, false, viewer->projection_matrix.data()));
-        GL_CALL(glUniformMatrix4fv(uniforms->view_projection_matrix, 1, false, viewer->projection_matrix.data()));
+        GL_CALL(glUniformMatrix4fv(uniforms->view_projection_matrix, 1, false, viewer->view_projection_matrix.data()));
         const auto & _campos = viewer->camera_pos;
         GL_CALL(glUniform3f(uniforms->camera,  _campos[0], _campos[1], _campos[2]));
 
