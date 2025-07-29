@@ -8,9 +8,6 @@
  *********************/
 
 #include "lv_gltf_view_internal.hpp"
-#include <src/libs/gltf/lv_gltf_view/assets/test.h>
-#include <src/stdlib/lv_string.h>
-#include "assets/test.h"
 
 #if LV_USE_GLTF
 
@@ -113,25 +110,27 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     view->view_matrix = fastgltf::math::fmat4x4(1.0f);
     view->projection_matrix = fastgltf::math::fmat4x4(1.0f);
     view->view_projection_matrix = fastgltf::math::fmat4x4(1.0f);
-    view->camera_pos = fastgltf::math::fvec3(0.f);
+    view->camera_pos = fastgltf::math::fvec3(0.0f);
     view->env_rotation_angle = 0.0f;
     view->texture.h_flip = false;
     view->texture.v_flip = false;
 
     lv_gltf_view_shader shaders;
     lv_gltf_view_shader_get_src(&shaders);
-    /*char *vertex_shader = lv_gltf_view_shader_get_vertex();*/
-    /*char *frag_shader = lv_gltf_view_shader_get_fragment();*/
+    char *vertex_shader = lv_gltf_view_shader_get_vertex();
+    char *frag_shader = lv_gltf_view_shader_get_fragment();
     /*LV_LOG_USER("Vertex shader: %s", vertex_shader);*/
     //LV_LOG_USER("Frag shader: %s", frag_shader);
-    view->shader_manager = lv_gl_shader_manager_create(src_includes, sizeof(src_includes) / sizeof(src_includes[0]),
-                                                       PREPROCESS(src_vertexShader), PREPROCESS(src_fragmentShader));
-    /*lv_free(vertex_shader);*/
-    /*lv_free(frag_shader);*/
+    //
+    view->shader_manager = lv_gl_shader_manager_create(shaders.shader_list, shaders.count, vertex_shader, frag_shader);
+    /*view->shader_manager = lv_gl_shader_manager_create(src_includes, sizeof(src_includes) / sizeof(src_includes[0]),*/
+    /*                                                   PREPROCESS(src_vertexShader), PREPROCESS(src_fragmentShader));*/
+    lv_free(vertex_shader);
+    lv_free(frag_shader);
 
     view->env_textures = lv_gltf_view_ibl_sampler_setup(NULL, NULL, 0);
 
-    lv_array_init(&view->models, 1, sizeof(void *));
+    lv_array_init(&view->models, 1, sizeof(lv_gltf_data_t *));
     new(&view->ibm_by_skin_the_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
 
     LV_TRACE_OBJ_CREATE("end");
@@ -145,30 +144,18 @@ static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_DRAW_MAIN) {
         lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
         lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
-        lv_layer_t * layer = lv_event_get_layer(e);
         GLuint texture_id = lv_gltf_view_render(viewer);
-        /*lv_3dtexture_set_src((lv_obj_t*)&viewer->texture, (lv_3dtexture_id_t)texture_id);*/
-
-        lv_draw_3d_dsc_t dsc;
-        lv_draw_3d_dsc_init(&dsc);
-        dsc.tex_id = texture_id;
-        dsc.h_flip = viewer->texture.h_flip;
-        dsc.v_flip = viewer->texture.v_flip;
-        dsc.opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
-        lv_area_t coords;
-        lv_obj_get_coords(obj, &coords);
-        lv_draw_3d(layer, &dsc, &coords);
+        lv_3dtexture_set_src((lv_obj_t*)&viewer->texture, (lv_3dtexture_id_t)texture_id);
     }
-    else {
-        lv_result_t res;
 
-        /*Call the ancestor's event handler*/
-        res = lv_obj_event_base(MY_CLASS, e);
-        if(res != LV_RESULT_OK) {
-            return;
-        }
+    lv_result_t res;
 
+    /*Call the ancestor's event handler*/
+    res = lv_obj_event_base(MY_CLASS, e);
+    if(res != LV_RESULT_OK) {
+        return;
     }
+
 }
 static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {

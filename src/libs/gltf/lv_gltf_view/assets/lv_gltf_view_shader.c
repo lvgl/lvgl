@@ -1,9 +1,9 @@
 #include "lv_gltf_view_shader.h"
-#include <src/misc/lv_assert.h>
-#include <src/stdlib/lv_string.h>
-#include <string.h>
 
 #if LV_USE_GLTF
+
+#include "../../../../stdlib/lv_sprintf.h"
+#include <string.h>
 
 static lv_gl_shader_t src_includes[] = {
 	{ "tonemapping.glsl", R"(
@@ -3516,19 +3516,16 @@ static char* process_includes(const char* c_src, const char* defines)
     char* rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
     
     size_t num_items = sizeof(src_includes) / sizeof(lv_gl_shader_t);
-    char* search_str = lv_malloc(255);
+    char search_str[255];
     
     for (size_t i = 0; i < num_items; i++) {
-        strcpy(search_str, "\n#include <");
-        strcat(search_str, src_includes[i].name);
-        strcat(search_str, ">");
+        lv_snprintf(search_str, sizeof(search_str),"\n#include <%s>",src_includes[i].name);
         
         char* new_rep = replace_word(rep, search_str, src_includes[i].source);
         lv_free(rep);
         rep = new_rep;
     }
     
-    lv_free(search_str);
     return rep;
 }
 
