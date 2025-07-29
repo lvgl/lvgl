@@ -205,7 +205,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->exposure = 0.8f;
     desc->env_pow = 1.8f;
     desc->blur_bg = 0.2f;
-    desc->bg_mode = 0;
+    desc->bg_mode = 2;
     desc->aa_mode = 2;
     desc->camera = 0;
     desc->fov = 45.f;
