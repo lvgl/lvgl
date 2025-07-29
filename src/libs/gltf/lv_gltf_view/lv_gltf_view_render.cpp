@@ -68,7 +68,6 @@ GLuint lv_gltf_view_render(lv_gltf_view_t * viewer)
     if(n == 0) {
         return GL_NONE;
     }
-    LV_LOG_USER("Rendering %zu models", n);
     lv_gltf_data_t * model = *(lv_gltf_data_t **)lv_array_at(&viewer->models, 0);
     GLuint texture_id = lv_gltf_view_render_model(viewer, model, true, 0, 0, 0, 0);
     for(size_t i = 1; i < n ; ++i) {
@@ -266,7 +265,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     _output = vstate->render_state;
     int32_t anim_num = view_desc->anim;
     if((anim_num >= 0) && ((int64_t)lv_gltf_data_get_animation_count(model) > anim_num)) {
-        if(std::abs(view_desc->timestep) > 0.0001f) {
+        if(LV_ABS(view_desc->timestep) > 0.0001f) {
             //std::cout << "ACTIVE ANIMATION TRIGGER WINDOW MOTION\n";
             model->local_timestamp += view_desc->timestep;
             motion_dirty = true;
@@ -298,7 +297,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     if((model->_last_frame_no_motion == true) && (model->__last_frame_no_motion == true) &&
        (___lastFrameNoMotion == true)) {
         // Nothing changed at all, return the previous output frame
-        LV_LOG_USER("Nothing changed");
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
         return _output.texture;
@@ -493,7 +491,6 @@ static void draw_primitive(int32_t prim_num,
         auto program = lv_gltf_data_get_shader_program(gltf_data, materialIndex);
         const auto & uniforms = get_uniform_ids(gltf_data, materialIndex);
 
-        LV_LOG_USER("Program used %d", program);
         GL_CALL(glUseProgram(program));
 
         GL_CALL(glUniformMatrix4fv(uniforms->model_matrix, 1, GL_FALSE, &matrix[0][0]));
@@ -550,7 +547,6 @@ static void draw_primitive(int32_t prim_num,
             if(gltf_data->node_by_light_index.size() > 0) {
                 size_t max_light_nodes = gltf_data->node_by_light_index.size();
                 size_t max_scene_lights = asset->lights.size();
-                LV_LOG_USER("Lights %zu %zu", max_light_nodes, max_scene_lights);
                 if(max_scene_lights != max_light_nodes) {
                     LV_LOG_ERROR("Scene light count (%zu) != scene light node count (%zu)\n", max_scene_lights, max_light_nodes);
                 }
