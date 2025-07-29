@@ -298,7 +298,6 @@ void iblSampler::panoramaToCubeMap(void)
             // Handle shader compilation error
             std::cout << "ENV RENDER ERROR: Some error compiling the cubemap shader, IBL will be corrupted.\n";
         }
-        LV_LOG_USER("Program used %d", program_id);
         GL_CALL(glUseProgram(program_id));
         //  TEXTURE0 = active.
         GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
@@ -346,7 +345,6 @@ void iblSampler::applyFilter(
         lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_gl_shader_program_get_id(program);
 
-        LV_LOG_USER("Program used %d", program_id);
         GL_CALL(glUseProgram(program_id));
         //  TEXTURE0 = active.
         GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -437,7 +435,6 @@ void iblSampler::sampleLut(uint32_t distribution, uint32_t targetTexture, uint32
     lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(shader_manager, frag_shader, vert_shader);
     GLuint program_id = lv_gl_shader_program_get_id(program);
 
-    LV_LOG_USER("Program used %d", program_id);
     GL_CALL(glUseProgram(program_id));
     //  TEXTURE0 = active.
     GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
