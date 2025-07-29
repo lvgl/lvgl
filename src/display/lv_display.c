@@ -46,6 +46,7 @@ static void set_y_anim(void * obj, int32_t v);
 static void scr_anim_completed(lv_anim_t * a);
 static bool is_out_anim(lv_screen_load_anim_t a);
 static void disp_event_cb(lv_event_t * e);
+static void wait_for_swapping(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -1377,4 +1378,17 @@ static void disp_event_cb(lv_event_t * e)
         default:
             break;
     }
+    if(disp->inv_p == 0) return;
+    wait_for_swapping(disp);
+}
+
+static void wait_for_swapping(lv_display_t * disp)
+{
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
+
+    if(disp->swap_buf_wait_cb) {
+        disp->swap_buf_wait_cb(disp);
+    }
+
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
 }

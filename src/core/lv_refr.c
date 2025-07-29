@@ -56,7 +56,6 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area);
     static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj);
     static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj);
 #endif
-static void wait_for_swapping(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -1382,10 +1381,6 @@ static void draw_buf_flush(lv_display_t * disp)
         call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
 
-    if(lv_display_is_double_buffered(disp)) {
-        wait_for_swapping(disp);
-    }
-
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
         if(disp->buf_act == disp->buf_1) {
@@ -1448,16 +1443,4 @@ static void wait_for_flushing(lv_display_t * disp)
 
     LV_LOG_TRACE("end");
     LV_PROFILER_REFR_END;
-}
-
-static void wait_for_swapping(lv_display_t * disp)
-{
-
-    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
-
-    if(disp->swap_buf_wait_cb) {
-        disp->swap_buf_wait_cb(disp);
-    }
-
-    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
 }
