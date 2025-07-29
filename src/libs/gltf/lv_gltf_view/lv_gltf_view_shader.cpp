@@ -314,7 +314,6 @@ lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * 
 
     GLuint program_id = lv_gl_shader_program_get_id(program);
 
-    LV_LOG_USER("Program used %d", program_id);
     GL_CALL(glUseProgram(program_id));
     lv_gltf_renwin_shaderset_t shader_prog;
     shader_prog.program = program_id;
