@@ -508,8 +508,8 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_gltf_view_state_init(lv_gltf_t * view)
 {
     lv_memset(&view->state, 0, sizeof(view->state));
-    view->state.opaque_frame_buffer_width = lv_obj_get_width((lv_obj_t *)view);
-    view->state.opaque_frame_buffer_height = lv_obj_get_height((lv_obj_t *)view);;
+    view->state.opaque_frame_buffer_width = 256;
+    view->state.opaque_frame_buffer_height = 256;
     view->state.material_variant = 0;
     view->state.render_state_ready = false;
     view->state.render_opaque_buffer = false;
