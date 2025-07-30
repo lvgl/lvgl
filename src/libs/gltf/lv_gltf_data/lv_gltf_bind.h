@@ -1,7 +1,7 @@
 #ifndef LV_GLTF_BIND_H
 #define LV_GLTF_BIND_H
 
-#include "lv_gltf_data.h"
+#include "lv_gltf_model.h"
 
 #if LV_USE_GLTF
 
@@ -58,7 +58,7 @@ void lv_gltf_bind_bind_clean(lv_gltf_bind_t * bind);
  * @param data_mask A mask indicating which data fields to bind.
  * @return Pointer to the newly created lv_gltf_bind_t object, or NULL if the operation failed.
  */
-lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_data_t * data, size_t index, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_model_t * data, size_t index, lv_gltf_bind_prop_t which_prop,
                                            uint32_t data_mask,
                                            lv_gltf_bind_dir_t dir);
 
@@ -71,7 +71,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_data_t * data, size_t index, 
  * @param data_mask A mask indicating which data fields to bind.
  * @return Pointer to the newly created lv_gltf_bind_t object, or NULL if the operation failed.
  */
-lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_data_t * data, const char * node_ip, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_model_t * data, const char * node_ip, lv_gltf_bind_prop_t which_prop,
                                         uint32_t data_mask, lv_gltf_bind_dir_t dir);
 
 /**
@@ -83,7 +83,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_data_t * data, const char * node
  * @param data_mask A mask indicating which data fields to bind.
  * @return Pointer to the newly created lv_gltf_bind_t object, or NULL if the operation failed.
  */
-lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_data_t * data, const char * path, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_model_t * data, const char * path, lv_gltf_bind_prop_t which_prop,
                                           uint32_t data_mask, lv_gltf_bind_dir_t dir);
 
 /**
@@ -95,7 +95,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_data_t * data, const char * pa
  * @param data_mask A mask indicating which data fields to bind.
  * @return True on success, False on failure.
  */
-bool lv_gltf_bind_remove(lv_gltf_data_t * _data, lv_gltf_bind_t * bind);
+bool lv_gltf_bind_remove(lv_gltf_model_t * _data, lv_gltf_bind_t * bind);
 
 #ifdef __cplusplus
 } /*extern "C"*/

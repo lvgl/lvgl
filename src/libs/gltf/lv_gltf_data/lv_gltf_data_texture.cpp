@@ -37,13 +37,13 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gltf_data_destroy_textures(lv_gltf_data_t * data)
+void lv_gltf_data_destroy_textures(lv_gltf_model_t * data)
 {
     glDeleteTextures(data->skin_tex.size(), data->skin_tex.data());
     data->skin_tex.clear();
 }
 
-GLuint lv_gltf_data_create_texture(lv_gltf_data_t * data)
+GLuint lv_gltf_data_create_texture(lv_gltf_model_t * data)
 {
     GLuint texture;
     GL_CALL(glGenTextures(1, &texture));
@@ -51,7 +51,7 @@ GLuint lv_gltf_data_create_texture(lv_gltf_data_t * data)
     return texture;
 }
 
-bool lv_gltf_data_get_texture_pixels(uint8_t * pixels, lv_gltf_data_t * data_obj, uint32_t model_texture_index,
+bool lv_gltf_data_get_texture_pixels(uint8_t * pixels, lv_gltf_model_t * data_obj, uint32_t model_texture_index,
                                      uint32_t mipmapnum,
                                      uint32_t width, uint32_t height, bool has_alpha)
 {
@@ -70,7 +70,7 @@ bool lv_gltf_data_get_texture_pixels(uint8_t * pixels, lv_gltf_data_t * data_obj
     return true;
 }
 
-void lv_gltf_data_texture_to_image_dsc(lv_image_dsc_t * new_image_dsc, lv_gltf_data_t * data_obj,
+void lv_gltf_data_texture_to_image_dsc(lv_image_dsc_t * new_image_dsc, lv_gltf_model_t * data_obj,
                                        uint32_t model_texture_index)
 {
     size_t byte_total_count = 0;
@@ -105,7 +105,7 @@ void lv_gltf_data_texture_to_image_dsc(lv_image_dsc_t * new_image_dsc, lv_gltf_d
     }
 }
 
-bool lv_gltf_data_get_texture_info(lv_gltf_data_t * data_obj, uint32_t model_texture_index, uint32_t mipmapnum,
+bool lv_gltf_data_get_texture_info(lv_gltf_model_t * data_obj, uint32_t model_texture_index, uint32_t mipmapnum,
                                    size_t * byte_count,
                                    uint32_t * width, uint32_t * height, bool * has_alpha)
 {

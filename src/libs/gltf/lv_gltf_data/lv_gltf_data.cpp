@@ -38,12 +38,12 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_gltf_data_t * lv_gltf_data_create_internal(const char * gltf_path,
-                                              fastgltf::Asset asset)
+lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
+                                               fastgltf::Asset asset)
 {
-    lv_gltf_data_t * data = (lv_gltf_data_t *)lv_zalloc(sizeof(*data));
+    lv_gltf_model_t * data = (lv_gltf_model_t *)lv_zalloc(sizeof(*data));
     LV_ASSERT_MALLOC(data);
-    new(data) lv_gltf_data_t;
+    new(data) lv_gltf_model_t;
     new(&data->asset) fastgltf::Asset(std::move(asset));
     data->filename = gltf_path;
     data->has_any_cameras = false;
@@ -54,8 +54,8 @@ lv_gltf_data_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->local_timestamp = 0.0f;
     data->last_material_index = 99999;
     data->last_frame_was_antialiased = false;
+    data->last_frame_no_motion = false;
     data->_last_frame_no_motion = false;
-    data->__last_frame_no_motion = false;
     new(&data->node_binds) NodeOverrideMap();
     new(&data->all_binds) OverrideVector();
     new(&data->node_transform_cache) NodeTransformMap();
@@ -72,103 +72,103 @@ lv_gltf_data_t * lv_gltf_data_create_internal(const char * gltf_path,
     return data;
 }
 
-void lv_gltf_data_destroy(lv_gltf_data_t * data)
+void lv_gltf_data_destroy(lv_gltf_model_t * data)
 {
     lv_gltf_data_destroy_textures(data);
     lv_free(data);
 }
 
-const char * lv_gltf_get_filename(const lv_gltf_data_t * data)
+const char * lv_gltf_get_filename(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->filename;
 }
 
-size_t lv_gltf_data_get_image_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_image_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.images.size();
 }
 
-size_t lv_gltf_data_get_texture_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_texture_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.textures.size();
 }
 
-GLuint lv_gltf_data_get_texture(lv_gltf_data_t * data, size_t index)
+GLuint lv_gltf_data_get_texture(lv_gltf_model_t * data, size_t index)
 {
     LV_ASSERT_NULL(data);
     LV_ASSERT(index < data->textures.size());
     return data->textures[index];
 }
 
-size_t lv_gltf_data_get_material_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_material_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.materials.size();
 }
-size_t lv_gltf_data_get_camera_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_camera_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.cameras.size();
 }
-size_t lv_gltf_data_get_node_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_node_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.nodes.size();
 }
-size_t lv_gltf_data_get_mesh_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_mesh_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.meshes.size();
 }
-size_t lv_gltf_data_get_scene_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_scene_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.scenes.size();
 }
-size_t lv_gltf_data_get_animation_count(const lv_gltf_data_t * data)
+size_t lv_gltf_model_get_animation_count(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->asset.animations.size();
 }
 
-lv_gltf_data_t *
+lv_gltf_model_t *
 lv_gltf_data_load_from_file(const char * file_path,
                             lv_gl_shader_manager_t * shader_manager)
 {
     return lv_gltf_data_load_internal(file_path, 0, shader_manager);
 }
 
-lv_gltf_data_t *
+lv_gltf_model_t *
 lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
                              lv_gl_shader_manager_t * shader_manager)
 {
     return lv_gltf_data_load_internal(data, data_size, shader_manager);
 }
 
-fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_data_t * data)
+fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return &data->asset;
 }
-double lv_gltf_data_get_radius(lv_gltf_data_t * data)
+double lv_gltf_data_get_radius(lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->bound_radius;
 }
-fastgltf::math::fvec3 lv_gltf_data_get_center(const lv_gltf_data_t * data)
+fastgltf::math::fvec3 lv_gltf_data_get_center(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->vertex_cen;
 }
-fastgltf::math::fvec3 lv_gltf_data_get_bounds_min(const lv_gltf_data_t * data)
+fastgltf::math::fvec3 lv_gltf_data_get_bounds_min(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->vertex_min;
 }
-fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_data_t * data)
+fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->vertex_max;
@@ -177,7 +177,7 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_data_t * data)
 
 
 
-void lv_gltf_data_copy_bounds_info(lv_gltf_data_t * to, lv_gltf_data_t * from)
+void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 {
     {
         to->vertex_min[0] = from->vertex_min[0];

@@ -36,28 +36,28 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-GLuint lv_gltf_data_get_skin_texture_at(lv_gltf_data_t * data, size_t index)
+GLuint lv_gltf_data_get_skin_texture_at(lv_gltf_model_t * data, size_t index)
 {
     return data->skin_tex[index];
 }
 
-bool lv_gltf_data_validated_skins_contains(lv_gltf_data_t * data, size_t index)
+bool lv_gltf_data_validated_skins_contains(lv_gltf_model_t * data, size_t index)
 {
     return ((std::find(data->validated_skins.begin(),
                        data->validated_skins.end(),
                        index) != data->validated_skins.end()));
 }
 
-void lv_gltf_data_validate_skin(lv_gltf_data_t * data, size_t index)
+void lv_gltf_data_validate_skin(lv_gltf_model_t * data, size_t index)
 {
     data->validated_skins.push_back(index);
 }
 
-size_t lv_gltf_data_get_skins_size(lv_gltf_data_t * data)
+size_t lv_gltf_data_get_skins_size(lv_gltf_model_t * data)
 {
     return data->validated_skins.size();
 }
-size_t lv_gltf_data_get_skin(lv_gltf_data_t * data, size_t index)
+size_t lv_gltf_data_get_skin(lv_gltf_model_t * data, size_t index)
 {
     return data->validated_skins[index];
 }

@@ -16,7 +16,7 @@
 
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_color.h"
-#include "../lv_gltf_data/lv_gltf_data.h"
+#include "../lv_gltf_data/lv_gltf_model.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +47,7 @@ typedef enum {
  **********************/
 
 lv_obj_t * lv_gltf_create(lv_obj_t * parent);
-lv_gltf_data_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
+lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
 
 /**
  * Set the yaw (horizontal rotation) of the camera
@@ -160,7 +160,7 @@ float lv_gltf_get_focal_z(const lv_obj_t * obj);
  * @param obj pointer to a GLTF viewer object
  * @param model a model attached to this viewer or NULL for the first model
  */
-void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_data_t * model);
+void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model);
 
 /**********************
  * Scene Control Functions
