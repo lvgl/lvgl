@@ -8,10 +8,13 @@
  *********************/
 
 #include "lv_gltf_view_internal.h"
+#include <src/core/lv_obj_pos.h>
+#include <src/misc/lv_array.h>
+#include <src/misc/lv_assert.h>
+#include <src/misc/lv_color.h>
 
 #if LV_USE_GLTF
 
-#include <optional>
 #include "../lv_gltf_data/lv_gltf_data.h"
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include "../math/lv_gltf_math.hpp"
@@ -42,11 +45,14 @@
 static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void lv_gltf_view_state_init(lv_gltf_view_state_t * state);
+static void lv_gltf_view_state_init(lv_gltf_view_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model);
 static void destroy_environment(lv_gltf_view_env_textures_t * env);
 static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager);
+static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
+static lv_gltf_data_t * find_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model);
+
 static void set_time_cb(lv_timer_t * timer);
 const lv_obj_class_t lv_gltf_view_class = {
     .base_class = &lv_3dtexture_class,
@@ -93,13 +99,305 @@ extern "C" {
             lv_gltf_data_destroy(model);
             return NULL;
         }
+
         lv_gltf_parse_model(viewer, model);
+
+        if(lv_array_size(&viewer->models) == 1) {
+            lv_gltf_recenter(obj, model);
+        }
+
         const size_t animation_count = lv_gltf_data_get_animation_count(model);
         if(animation_count > 0) {
             lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
             viewer->desc.timestep = LV_DEF_REFR_PERIOD / 1000.;
         }
         return model;
+    }
+    void lv_gltf_set_yaw(lv_obj_t * obj, float yaw)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.yaw = yaw;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_yaw(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.yaw;
+    }
+
+    void lv_gltf_set_pitch(lv_obj_t * obj, float pitch)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.pitch = pitch;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_pitch(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.pitch;
+    }
+
+    void lv_gltf_set_fov(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.fov = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_fov(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.fov;
+    }
+
+    void lv_gltf_set_distance(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.distance = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_distance(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.distance;
+    }
+
+    void lv_gltf_set_animation(lv_obj_t * obj, int32_t value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.anim = value;
+        lv_obj_invalidate(obj);
+    }
+
+    int32_t lv_gltf_get_animation(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.anim;
+    }
+
+    void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.focal_x = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_focal_x(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.focal_x;
+    }
+
+    void lv_gltf_set_focal_y(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.focal_y = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_focal_y(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.focal_y;
+    }
+
+    void lv_gltf_set_focal_z(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.focal_z = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_focal_z(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.focal_z;
+    }
+
+    void lv_gltf_set_background_color(lv_obj_t * obj, lv_color32_t value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.bg_color = value;
+        lv_obj_invalidate(obj);
+    }
+
+    lv_color32_t lv_gltf_get_background_color(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.bg_color;
+    }
+
+    void lv_gltf_set_camera(lv_obj_t * obj, int32_t value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.camera = value;
+        lv_obj_invalidate(obj);
+    }
+
+    int32_t lv_gltf_get_camera(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.camera;
+    }
+
+    void lv_gltf_set_timestep(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.timestep = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_timestep(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.timestep;
+    }
+
+    void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.aa_mode = value;
+        lv_obj_invalidate(obj);
+    }
+
+    lv_gltf_antialiasing_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.aa_mode;
+    }
+
+    void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_background_mode_t value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.bg_mode = value;
+        lv_obj_invalidate(obj);
+    }
+
+    lv_gltf_background_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.bg_mode;
+    }
+
+    void lv_gltf_set_blur_bg(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.blur_bg = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_blur_bg(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.blur_bg;
+    }
+
+    void lv_gltf_set_env_brightness(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.env_pow = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_env_brightness(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.env_pow;
+    }
+
+    void lv_gltf_set_image_exposure(lv_obj_t * obj, float value)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        viewer->desc.exposure = value;
+        lv_obj_invalidate(obj);
+    }
+
+    float lv_gltf_get_image_exposure(const lv_obj_t * obj)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        return viewer->desc.exposure;
+    }
+    void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_data_t * model)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        if(model == NULL) {
+            LV_ASSERT(lv_array_size(&viewer->models) > 0);
+            model = (lv_gltf_data_t *)lv_array_at(&viewer->models, 0);
+        }
+
+        const auto & center_position = lv_gltf_data_get_center(model);
+        viewer->desc.focal_x = center_position[0];
+        viewer->desc.focal_y = center_position[1];
+        viewer->desc.focal_z = center_position[2];
     }
 }
 
@@ -118,7 +416,7 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
     lv_gltf_view_t * view = (lv_gltf_view_t *)obj;
-    lv_gltf_view_state_init(&view->state);
+    lv_gltf_view_state_init(view);
     lv_gltf_view_desc_init(&view->desc);
     view->view_matrix = fastgltf::math::fmat4x4(1.0f);
     view->projection_matrix = fastgltf::math::fmat4x4(1.0f);
@@ -176,14 +474,15 @@ static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     destroy_environment(&view->env_textures);
 }
 
-static void lv_gltf_view_state_init(lv_gltf_view_state_t * state)
+static void lv_gltf_view_state_init(lv_gltf_view_t * view)
 {
-    lv_memset(state, 0, sizeof(*state));
-    state->opaque_frame_buffer_width = 256;
-    state->opaque_frame_buffer_height = 256;
-    state->material_variant = 0;
-    state->render_state_ready = false;
-    state->render_opaque_buffer = false;
+    lv_memset(&view->state, 0, sizeof(view->state));
+    view->state.opaque_frame_buffer_width = 256;
+    view->state.opaque_frame_buffer_height = 256;
+    view->state.material_variant = 0;
+    view->state.render_state_ready = false;
+    view->state.render_opaque_buffer = false;
+
     /* TODO: Do this during the intialization phase
         state->opaque_render_state = setup_opaque_output(state->opaque_frame_buffer_width, state->opaque_frame_buffer_height);
     */
@@ -200,21 +499,14 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->exposure = 0.8f;
     desc->env_pow = 1.8f;
     desc->blur_bg = 0.2f;
-    desc->bg_mode = 2;
-    desc->aa_mode = 2;
+    desc->bg_mode = LV_GLTF_BG_SOLID;
+    desc->aa_mode = LV_GLTF_AA_CONSTANT;
     desc->camera = 0;
     desc->fov = 45.f;
     desc->anim = 0;
-    desc->spin_degree_offset = 0.f;
     desc->timestep = 0.f;
-    desc->dirty = true;
-    desc->recenter_flag = true;
-    desc->frame_was_cached = false;
     desc->frame_was_antialiased = false;
-    desc->bg_r = 230;
-    desc->bg_g = 230;
-    desc->bg_b = 230;
-    desc->bg_a = 255;
+    desc->bg_color = lv_color32_make(230, 230, 230, 255);
 }
 static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
 {
@@ -272,8 +564,8 @@ static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
 
             LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
             lv_gltf_compiled_shader_t compiled_shader;
-            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(
-                                            viewer, (lv_gl_shader_t *)defines.data, lv_array_size(&defines));
+            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_t *)defines.data,
+                                                                            lv_array_size(&defines));
             compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
         }
@@ -294,178 +586,6 @@ static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
 
     manager->bg_program = lv_gl_shader_program_get_id(program);
     setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);
-}
-
-gl_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height)
-{
-    gl_renwin_state_t result;
-
-    GLuint rtex;
-    GL_CALL(glGenTextures(1, &rtex));
-    result.texture = rtex;
-
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-    GLuint rdepth;
-    GL_CALL(glGenTextures(1, &rdepth));
-    result.renderbuffer = rdepth;
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-#ifdef __EMSCRIPTEN__
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                         GL_UNSIGNED_INT, NULL));
-#else
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                         GL_UNSIGNED_SHORT, NULL));
-#endif
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-
-    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
-
-    return result;
-}
-
-void setup_cleanup_opengl_output(gl_renwin_state_t * state)
-{
-    if(state) {
-        // Delete the framebuffer
-        if(state->framebuffer) {
-            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER,
-                                      0)); // Unbind the framebuffer
-            GL_CALL(glDeleteFramebuffers(1, &state->framebuffer));
-            state->framebuffer = 0; // Reset to avoid dangling pointer
-        }
-
-        // Delete the color texture
-        if(state->texture) {
-            GL_CALL(glDeleteTextures(1, &state->texture));
-            state->texture = 0; // Reset to avoid dangling pointer
-        }
-
-        // Delete the depth texture
-        if(state->renderbuffer) {
-            GL_CALL(glDeleteTextures(1, &state->renderbuffer));
-            state->renderbuffer = 0; // Reset to avoid dangling pointer
-        }
-    }
-}
-
-gl_renwin_state_t setup_primary_output(uint32_t texture_width, uint32_t texture_height, bool mipmaps_enabled)
-{
-    gl_renwin_state_t result;
-
-    GLuint rtex;
-    GL_CALL(glGenTextures(1, &rtex));
-    result.texture = rtex;
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
-    //GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps_enabled ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                            mipmaps_enabled ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-    GLuint rdepth;
-    GL_CALL(glGenTextures(1, &rdepth));
-    result.renderbuffer = rdepth;
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
-#ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
-    // For WebGL2
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                         GL_UNSIGNED_INT, NULL));
-#else
-    // For Desktop OpenGL
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                         GL_UNSIGNED_SHORT, NULL));
-#endif
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-
-    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
-
-    return result;
-}
-
-void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num, lv_gltf_view_desc_t * view_desc,
-                                        const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
-                                        lv_gltf_data_t * gltf_data, bool transmission_pass)
-{
-    // The following matrix math is for the projection matrices as defined by the glTF spec:
-    // https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#projection-matrices
-
-    fastgltf::math::fmat4x4 projection;
-    const auto & asset = lv_gltf_data_get_asset(gltf_data);
-
-    auto width = view_desc->render_width;
-    auto height = view_desc->render_height;
-    // It's possible the transmission pass should simply use the regular passes aspect despite having different metrics itself.  Testing both ways to see which has less distortion
-    float aspect = (float)width / (float)height;
-    if(transmission_pass) {
-        width = 256;
-        height = 256;
-    }
-
-    std::visit(fastgltf::visitor{
-        [&](fastgltf::Camera::Perspective & perspective)
-        {
-            projection = fastgltf::math::fmat4x4(0.0f);
-            projection[0][0] = 1.f / (aspect * tan(0.5f * perspective.yfov));
-            projection[1][1] = 1.f / (tan(0.5f * perspective.yfov));
-            projection[2][3] = -1;
-
-            if(perspective.zfar.has_value()) {
-                // Finite projection matrix
-                projection[2][2] = (*perspective.zfar + perspective.znear) /
-                (perspective.znear - *perspective.zfar);
-                projection[3][2] = (2 * *perspective.zfar * perspective.znear) /
-                (perspective.znear - *perspective.zfar);
-            }
-            else {
-                // Infinite projection matrix
-                projection[2][2] = -1;
-                projection[3][2] = -2 * perspective.znear;
-            }
-        },
-        [&](fastgltf::Camera::Orthographic & orthographic)
-        {
-            projection = fastgltf::math::fmat4x4(1.0f);
-            projection[0][0] = (1.f / orthographic.xmag) * aspect;
-            projection[1][1] = 1.f / orthographic.ymag;
-            projection[2][2] = 2.f / (orthographic.znear - orthographic.zfar);
-            projection[3][2] =
-                (orthographic.zfar + orthographic.znear) / (orthographic.znear - orthographic.zfar);
-        },
-    },
-    asset->cameras[_cur_cam_num].camera);
-
-    viewer->view_matrix = view_mat;
-    viewer->projection_matrix = projection;
-    viewer->view_projection_matrix = projection * view_mat;
-    viewer->camera_pos = view_pos;
 }
 
 void lv_gltf_view_recache_all_transforms(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data)
@@ -605,157 +725,8 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_view_t * viewer, lv_gltf_data_t
     else
         gltf_data->current_camera_index = -1;
 }
-void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
-                            bool transmission_pass)
-{
-    // Create Look-At Matrix
 
-    if(view_desc->recenter_flag) {
-        view_desc->recenter_flag = false;
-        const auto & _autocenpos = lv_gltf_data_get_center(gltf_data);
-        view_desc->focal_x = _autocenpos[0];
-        view_desc->focal_y = _autocenpos[1];
-        view_desc->focal_z = _autocenpos[2];
-    }
-
-    auto _bradius = lv_gltf_data_get_radius(gltf_data);
-    float radius = _bradius * 2.5;
-    radius *= view_desc->distance;
-
-    fastgltf::math::fvec3 rcam_dir = fastgltf::math::fvec3(0.0f, 0.0f, 1.0f);
-
-    // Note because we switched over to fastgltf math and it's right-hand focused, z axis is actually pitch (instead of x-axis), and x axis is yaw, instead of y-axis
-    fastgltf::math::fmat3x3 rotation1 =
-        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(0.f, 0.f, fastgltf::math::radians(view_desc->pitch)));
-    fastgltf::math::fmat3x3 rotation2 = fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(
-                                                                     fastgltf::math::radians(view_desc->yaw + view_desc->spin_degree_offset), 0.f, 0.f));
-
-    rcam_dir = rotation1 * rcam_dir;
-    rcam_dir = rotation2 * rcam_dir;
-
-    fastgltf::math::fvec3 ncam_dir = fastgltf::math::normalize(rcam_dir);
-    fastgltf::math::fvec3 cam_target = fastgltf::math::fvec3(view_desc->focal_x, view_desc->focal_y, view_desc->focal_z);
-    fastgltf::math::fvec3 cam_position = fastgltf::math::fvec3(cam_target[0] + (ncam_dir[0] * radius),
-                                                               cam_target[1] + (ncam_dir[1] * radius),
-                                                               cam_target[2] + (ncam_dir[2] * radius));
-
-    fastgltf::math::fmat4x4 view_mat =
-        lv_gltf_math_look_at_rh(cam_position, cam_target, fastgltf::math::fvec3(0.0f, 1.0f, 0.0f));
-
-    // Create Projection Matrix
-    fastgltf::math::fmat4x4 projection;
-    float fov = view_desc->fov;
-
-    float znear = _bradius * 0.05f;
-    float zfar = _bradius * std::max(4.0, 8.0 * view_desc->distance);
-    auto width = view_desc->render_width;
-    auto height = view_desc->render_height;
-    // It's possible the transmission pass should simply use the regular passes aspect despite having different metrics itself.  Testing both ways to see which has less distortion
-    float aspect = (float)width / (float)height;
-    if(transmission_pass) {
-        width = 256;
-        height = 256;
-    }
-
-    if(fov <= 0.0f) {
-        // Isometric view: create an orthographic projection
-        float orthoSize = view_desc->distance * _bradius; // Adjust as needed
-
-        projection = fastgltf::math::fmat4x4(1.0f);
-        projection[0][0] = -(orthoSize * aspect);
-        projection[1][1] = (orthoSize);
-        projection[2][2] = 2.f / (znear - zfar);
-        projection[3][2] = (zfar + znear) / (znear - zfar);
-
-    }
-    else {
-        // Perspective view
-        projection = fastgltf::math::fmat4x4(0.0f);
-        assert(width != 0 && height != 0);
-        projection[0][0] = 1.f / (aspect * tan(0.5f * fastgltf::math::radians(fov)));
-        projection[1][1] = 1.f / (tan(0.5f * fastgltf::math::radians(fov)));
-        projection[2][3] = -1;
-
-        // Finite projection matrix
-        projection[2][2] = (zfar + znear) / (znear - zfar);
-        projection[3][2] = (2.f * zfar * znear) / (znear - zfar);
-    }
-
-    viewer->view_matrix = view_mat;
-    viewer->projection_matrix = projection;
-    viewer->view_projection_matrix = projection * view_mat;
-    viewer->camera_pos = cam_position;
-}
-
-lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t _ret, uint32_t texture_w,
-                                        uint32_t texture_h, bool prepare_bg)
-{
-    LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", _ret.texture, _ret.renderbuffer);
-
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, _ret.framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _ret.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _ret.renderbuffer, 0));
-    GL_CALL(glViewport(0, 0, texture_w, texture_h));
-    if(prepare_bg) {
-        GL_CALL(glClearColor(view_desc->bg_r / 255.0f, view_desc->bg_g / 255.0f, view_desc->bg_b / 255.0f,
-                             view_desc->bg_a / 255.0f));
-        //GL_CALL(glClearColor(208.0/255.0, 220.0/255.0, 230.0/255.0, 0.0f));
-        GL_CALL(glClearDepth(1.0f));
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-    return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
-}
-
-void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur)
-{
-    GL_CALL(glBindVertexArray(manager->bg_vao));
-
-    GL_CALL(glUseProgram(manager->bg_program));
-    GL_CALL(glEnable(GL_CULL_FACE));
-    GL_CALL(glDisable(GL_BLEND));
-    GL_CALL(glDisable(GL_DEPTH_TEST));
-    GL_CALL(glUniformMatrix4fv(glGetUniformLocation(manager->bg_program, "u_ViewProjectionMatrix"), 1, false,
-                               viewer->view_projection_matrix.data()));
-    //GL_CALL(glBindTextureUnit(0, shaders->lastEnv->specular));
-
-    // Bind the texture to the specified texture unit
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + 0)); // Activate the texture unit
-    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP,
-                          viewer->env_textures.specular)); // Bind the texture (assuming 2D texture)
-
-    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_GGXEnvSampler"), 0));
-
-    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->env_textures.mip_count));
-    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvBlurNormalized"), blur));
-    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvIntensity"), 1.0f));
-    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_Exposure"), 1.0f));
-
-    setup_environment_rotation_matrix(viewer->env_textures.angle, manager->bg_program);
-
-    // Bind the index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager->bg_index_buf);
-
-    // Bind the vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, manager->bg_vertex_buf);
-
-    // Draw the elements
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void *)0);
-
-    GL_CALL(glBindVertexArray(0));
-    return;
-}
-void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program)
-{
-    fastgltf::math::fmat3x3 rotmat =
-        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(env_rotation_angle, 0.f, 3.14159f));
-
-    // Get the uniform location and set the uniform
-    int32_t u_loc;
-    GL_CALL(u_loc = glGetUniformLocation(shader_program, "u_EnvRotation"));
-    GL_CALL(glUniformMatrix3fv(u_loc, 1, GL_FALSE, (const GLfloat *)rotmat.data()));
-}
-
-void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer)
+static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer)
 {
     int32_t indices[] = { 1, 2, 0, 2, 3, 0, 6, 2, 1, 1, 5, 6, 6, 5, 4, 4, 7, 6,
                           6, 3, 2, 7, 3, 6, 3, 7, 0, 7, 4, 0, 5, 1, 0, 4, 5, 0
@@ -785,15 +756,9 @@ void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBu
     GL_CALL(glUseProgram(0));
 }
 
-void setup_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color)
-{
-    GL_CALL(glUniform4f(uniform_loc, static_cast<float>(color[0]), static_cast<float>(color[1]),
-                        static_cast<float>(color[2]), static_cast<float>(color[3])));
-}
-
-lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t state, uint32_t texture_w,
-                                         uint32_t texture_h, uint32_t texture_offset_w, uint32_t texture_offset_h,
-                                         bool prepare_bg)
+lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state,
+                                         uint32_t texture_w,
+                                         uint32_t texture_h, bool prepare_bg)
 {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state.framebuffer));
 
@@ -802,65 +767,15 @@ lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, gl_ren
     }
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state.texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.renderbuffer, 0));
-    GL_CALL(glViewport(texture_offset_w, texture_offset_h, texture_w, texture_h));
+    GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
-        GL_CALL(glClearColor(view_desc->bg_r / 255.0f, view_desc->bg_g / 255.0f, view_desc->bg_b / 255.0f,
-                             view_desc->bg_a / 255.0f));
+        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
+                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
         GL_CALL(glClearDepth(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
-}
-void setup_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color)
-{
-    GL_CALL(glUniform3f(uniform_loc, static_cast<float>(color[0]), static_cast<float>(color[1]),
-                        static_cast<float>(color[2])));
-}
-
-uint32_t setup_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
-                       std::unique_ptr<fastgltf::TextureTransform> & tex_transform, GLint sampler, GLint uv_set,
-                       GLint uv_transform)
-{
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + tex_unit)); // Activate the texture unit
-    GL_CALL(glBindTexture(GL_TEXTURE_2D,
-                          tex_name)); // Bind the texture (assuming 2D texture)
-    GL_CALL(glUniform1i(sampler, tex_unit)); // Set the sampler to use the texture unit
-    GL_CALL(glUniform1i(uv_set, tex_coord_index)); // Set the UV set index
-    if(tex_transform != NULL)
-        GL_CALL(glUniformMatrix3fv(uv_transform, 1, GL_FALSE, &(setup_texture_transform_matrix(*tex_transform)[0][0])));
-    tex_unit++;
-    return tex_unit;
-}
-
-fastgltf::math::fmat3x3 setup_texture_transform_matrix(fastgltf::TextureTransform transform)
-{
-    fastgltf::math::fmat3x3 rotation = fastgltf::math::fmat3x3(0.f);
-    fastgltf::math::fmat3x3 scale = fastgltf::math::fmat3x3(0.f);
-    fastgltf::math::fmat3x3 translation = fastgltf::math::fmat3x3(0.f);
-    fastgltf::math::fmat3x3 result = fastgltf::math::fmat3x3(0.f);
-
-    float s = std::sin(transform.rotation);
-    float c = std::cos(transform.rotation);
-    rotation[0][0] = c;
-    rotation[1][1] = c;
-    rotation[0][1] = s;
-    rotation[1][0] = -s;
-    rotation[2][2] = 1.0f;
-
-    scale[0][0] = transform.uvScale[0];
-    scale[1][1] = transform.uvScale[1];
-    scale[2][2] = 1.0f;
-
-    translation[0][0] = 1.0f;
-    translation[1][1] = 1.0f;
-    translation[0][2] = transform.uvOffset[0];
-    translation[1][2] = transform.uvOffset[1];
-    translation[2][2] = 1.0f;
-
-    result = translation * rotation;
-    result = result * scale;
-    return result;
 }
 
 static void destroy_environment(lv_gltf_view_env_textures_t * env)
