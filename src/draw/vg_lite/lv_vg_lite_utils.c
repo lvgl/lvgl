@@ -1020,39 +1020,45 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
     }
 
     if(is_src) {
+        int memory_align = LV_DRAW_BUF_ALIGN;
         switch(buffer->format) {
             case VG_LITE_INDEX_1:
             case VG_LITE_INDEX_2:
             case VG_LITE_INDEX_4:
             case VG_LITE_A4:
-                if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, 8)) {
-                    return false;
-                }
+                memory_align = 8;
                 break;
 
             case VG_LITE_INDEX_8:
             case VG_LITE_A8:
             case VG_LITE_L8:
-            case LV_COLOR_FORMAT_ARGB2222:
-                if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, 16)) {
-                    return false;
-                }
+            case VG_LITE_RGBA2222:
+            case VG_LITE_BGRA2222:
+            case VG_LITE_ABGR2222:
+            case VG_LITE_ARGB2222:
+                memory_align = 16;
                 break;
 
-            case LV_COLOR_FORMAT_RGB565:
-            case LV_COLOR_FORMAT_ARGB1555:
-            case LV_COLOR_FORMAT_ARGB4444:
-                if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, 32)) {
-                    return false;
-                }
+            case VG_LITE_ABGR1555:
+            case VG_LITE_ARGB1555:
+            case VG_LITE_BGRA5551:
+            case VG_LITE_RGBA5551:
+            case VG_LITE_RGBA4444:
+            case VG_LITE_BGRA4444:
+            case VG_LITE_ABGR4444:
+            case VG_LITE_ARGB4444:
+            case VG_LITE_RGB565:
+            case VG_LITE_BGR565:
+                memory_align = 32;
                 break;
 
             default:
-                if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, LV_DRAW_BUF_ALIGN)) {
-                    LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, LV_DRAW_BUF_ALIGN);
-                    return false;
-                }
                 break;
+        }
+
+        if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, memory_align)) {
+            LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, memory_align);
+            return false;
         }
     }
     else if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, LV_DRAW_BUF_ALIGN)) {
