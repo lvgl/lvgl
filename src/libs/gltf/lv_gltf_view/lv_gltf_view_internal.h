@@ -100,7 +100,7 @@ typedef struct {
     GLint blend_equation;
     GLfloat clear_depth;
     GLfloat clear_color[4];
-}lv_gl_state_t;
+} lv_gl_state_t;
 
 typedef struct {
     uint32_t diffuse;
@@ -130,13 +130,13 @@ struct _lv_gltf_view_t {
     fastgltf::math::fmat4x4 view_projection_matrix;
     fastgltf::math::fvec3 camera_pos;
 
-    std::map<int32_t, std::map<fastgltf::Node*, fastgltf::math::fmat4x4>> ibm_by_skin_the_node;
+    std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_the_node;
     float env_rotation_angle;
     float bound_radius;
 
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
-    lv_gl_shader_manager_t* shader_manager;
+    lv_gl_shader_manager_t * shader_manager;
     lv_gltf_view_env_textures_t env_textures;
 };
 
@@ -145,41 +145,45 @@ struct _lv_gltf_view_t {
  **********************/
 
 GLuint lv_gltf_view_render(lv_gltf_view_t * viewer);
-lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t *result, lv_gltf_data_t *data, fastgltf::Node *node,
-						 fastgltf::Primitive *prim);
+lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_data_t * data,
+                                                        fastgltf::Node * node,
+                                                        fastgltf::Primitive * prim);
 
-lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t *view, const lv_gl_shader_t *defines, size_t n);
+lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
+                                                               size_t n);
 
 /* TODO: These are currently used during the rendering phase but could probably be used during the initialization phase
  * Once we start using them in the initialization function they can be defined as static inside `lv_gltf_view.cpp`
  */
 gl_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height);
-void setup_cleanup_opengl_output(gl_renwin_state_t *state);
+void setup_cleanup_opengl_output(gl_renwin_state_t * state);
 gl_renwin_state_t setup_primary_output(uint32_t texture_width, uint32_t texture_height, bool mipmaps_enabled);
-void setup_view_proj_matrix_from_camera(lv_gltf_view_t *viewer, int32_t _cur_cam_num, lv_gltf_view_desc_t *view_desc,
-					const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
-					lv_gltf_data_t *gltf_data, bool transmission_pass);
+void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num, lv_gltf_view_desc_t * view_desc,
+                                        const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
+                                        lv_gltf_data_t * gltf_data, bool transmission_pass);
 
-void setup_view_proj_matrix(lv_gltf_view_t *viewer, lv_gltf_view_desc_t *view_desc, lv_gltf_data_t *gltf_data,
-			    bool transmission_pass);
-lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t *view_desc, gl_renwin_state_t _ret, uint32_t texture_w, uint32_t texture_h,
-				 bool prepare_bg);
-void setup_draw_environment_background(lv_gl_shader_manager_t *manager, lv_gltf_view_t *viewer, float blur);
+void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
+                            bool transmission_pass);
+lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t _ret, uint32_t texture_w,
+                                        uint32_t texture_h,
+                                        bool prepare_bg);
+void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur);
 void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
-void setup_background_environment(GLuint program, GLuint *vao, GLuint *indexBuffer, GLuint *vertexBuffer);
+void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 void setup_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color);
-lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t *view_desc, gl_renwin_state_t _ret, uint32_t texture_w, uint32_t texture_h,
-				  uint32_t texture_offset_w, uint32_t texture_offset_h, bool prepare_bg);
+lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t _ret, uint32_t texture_w,
+                                         uint32_t texture_h,
+                                         uint32_t texture_offset_w, uint32_t texture_offset_h, bool prepare_bg);
 void setup_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color);
 uint32_t setup_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
-		       std::unique_ptr<fastgltf::TextureTransform> &tex_transform, GLint sampler, GLint uv_set,
-		       GLint uv_transform);
+                       std::unique_ptr<fastgltf::TextureTransform> & tex_transform, GLint sampler, GLint uv_set,
+                       GLint uv_transform);
 fastgltf::math::fmat3x3 setup_texture_transform_matrix(fastgltf::TextureTransform transform);
-void lv_gltf_view_recache_all_transforms(lv_gltf_view_t *viewer, lv_gltf_data_t *gltf_data);
+void lv_gltf_view_recache_all_transforms(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data);
 
 
-lv_obj_t *lv_gltf_view_create_internal(lv_obj_t *parent);
-lv_gltf_data_t *lv_gltf_load_model_from_file_internal(lv_obj_t *obj, const char *path);
+lv_obj_t * lv_gltf_view_create_internal(lv_obj_t * parent);
+lv_gltf_data_t * lv_gltf_load_model_from_file_internal(lv_obj_t * obj, const char * path);
 
 /**********************
  *      MACROS

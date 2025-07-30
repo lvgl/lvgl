@@ -234,7 +234,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
                     lv_array_init(&defines, 64, sizeof(lv_gl_shader_t));
                     lv_result_t result = lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &prim_gltf_data);
                     LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
-                    lv_gltf_renwin_shaderset_t shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_t*)defines.data, lv_array_size(&defines));
+                    lv_gltf_renwin_shaderset_t shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_t *)defines.data,
+                                                                                               lv_array_size(&defines));
                     lv_gltf_uniform_locations_t uniform_locations = lv_gltf_uniform_locations_create(shaderset.program);
                     lv_gltf_data_set_shader(model, material_index, uniform_locations, shaderset);
                 }
