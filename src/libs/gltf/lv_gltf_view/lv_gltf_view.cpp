@@ -93,16 +93,16 @@ extern "C" {
         }
         const size_t animation_count = lv_gltf_data_get_animation_count(model);
         LV_LOG_USER("%zu", model->textures.size());
-        for(size_t i = 0; i < model->textures.size(); ++i){
-            LV_LOG_USER("%zu: %d",i, model->textures[i]);
+        for(size_t i = 0; i < model->textures.size(); ++i) {
+            LV_LOG_USER("%zu: %d", i, model->textures[i]);
         }
 
         LV_LOG_USER("Meshes %zu", model->meshes.size());
-        for(size_t i = 0; i < model->meshes.size(); ++i){
-            lv_gltf_mesh_data_t* mesh = &model->meshes[i];
+        for(size_t i = 0; i < model->meshes.size(); ++i) {
+            lv_gltf_mesh_data_t * mesh = &model->meshes[i];
             LV_LOG_USER("Mesh %zu: Primitives %zu", i, mesh->primitives.size());
-            for(size_t j = 0; j < mesh->primitives.size(); ++j){
-                LV_LOG_USER("Mesh %zu: Primitives %zu Albedo %d Normal %d Occlusion %d MetalRough %d", i, j, 
+            for(size_t j = 0; j < mesh->primitives.size(); ++j) {
+                LV_LOG_USER("Mesh %zu: Primitives %zu Albedo %d Normal %d Occlusion %d MetalRough %d", i, j,
                             mesh->primitives[j].albedoTexture,
                             mesh->primitives[j].normalTexture,
                             mesh->primitives[j].occlusionTexture,
