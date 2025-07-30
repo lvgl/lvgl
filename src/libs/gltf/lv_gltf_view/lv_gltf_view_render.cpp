@@ -18,6 +18,7 @@
 #include "../../../misc/lv_types.h"
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../drivers/glfw/lv_opengles_debug.h"
+#include "../math/lv_gltf_math.hpp"
 
 #include <algorithm>
 #include <fastgltf/tools.hpp>
@@ -34,15 +35,22 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg,
-                                        uint32_t crop_left,
-                                        uint32_t crop_right, uint32_t crop_top, uint32_t crop_bottom);
+static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg);
 static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
 static void setup_finish_frame(void);
 static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, const MaterialIndexMap & map);
 static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data);
+static lv_result_t render_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state,
+                                         uint32_t texture_w,
+                                         uint32_t texture_h, bool prepare_bg);
 
+static fastgltf::math::fmat3x3 create_texture_transform_matrix(std::unique_ptr<fastgltf::TextureTransform> & transform);
+static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color);
+static void render_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color);
+static uint32_t render_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
+                               std::unique_ptr<fastgltf::TextureTransform> & tex_transform, GLint sampler, GLint uv_set,
+                               GLint uv_transform);
 static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                            const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass);
@@ -57,6 +65,23 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
                           uint32_t * tex_num);
 
 static void draw_lights(lv_gltf_data_t * model, GLuint program);
+
+static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height);
+static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state);
+static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_t texture_height, bool mipmaps_enabled);
+
+static void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num,
+                                               lv_gltf_view_desc_t * view_desc,
+                                               const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
+                                               lv_gltf_data_t * gltf_data, bool transmission_pass);
+
+static void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
+                                   bool transmission_pass);
+static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t _ret,
+                                               uint32_t texture_w,
+                                               uint32_t texture_h, bool prepare_bg);
+static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur);
+static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
 /**********************
  *  STATIC VARIABLES
@@ -78,10 +103,10 @@ GLuint lv_gltf_view_render(lv_gltf_view_t * viewer)
         return GL_NONE;
     }
     lv_gltf_data_t * model = *(lv_gltf_data_t **)lv_array_at(&viewer->models, 0);
-    GLuint texture_id = lv_gltf_view_render_model(viewer, model, true, 0, 0, 0, 0);
+    GLuint texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_data_t * model = *(lv_gltf_data_t **)lv_array_at(&viewer->models, i);
-        lv_gltf_view_render_model(viewer, model, false, 0, 0, 0, 0);
+        lv_gltf_view_render_model(viewer, model, false);
     }
     return texture_id;
 }
@@ -116,15 +141,13 @@ static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state)
     GL_CALL(glClearDepth(state->clear_depth));
 }
 
-static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg,
-                                        uint32_t crop_left,
-                                        uint32_t crop_right, uint32_t crop_top, uint32_t crop_bottom)
+static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg)
 {
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
-    bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == BG_ENVIRONMENT);
-    bool opt_aa_this_frame = (view_desc->aa_mode == ANTIALIAS_CONSTANT) ||
-                             (view_desc->aa_mode == ANTIALIAS_NOT_MOVING && model->_last_frame_no_motion == true);
+    bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == LV_GLTF_BG_ENVIRONMENT);
+    bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_CONSTANT) ||
+                             (view_desc->aa_mode == LV_GLTF_AA_NOT_MOVING && model->_last_frame_no_motion == true);
     if(prepare_bg == false) {
         // If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn
         opt_aa_this_frame = view_desc->frame_was_antialiased;
@@ -132,12 +155,13 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
 
     lv_gl_state_t opengl_state;
     lv_gltf_view_push_opengl_state(&opengl_state);
-    gl_renwin_state_t _output;
-    gl_renwin_state_t _opaque;
 
-    view_desc->frame_was_cached = true;
+    int32_t last_render_w = view_desc->render_width;
+    int32_t last_render_h = view_desc->render_height;
     view_desc->render_width = lv_obj_get_width((lv_obj_t *)viewer) * (opt_aa_this_frame ? 2 : 1);
     view_desc->render_height = lv_obj_get_height((lv_obj_t *)viewer) * (opt_aa_this_frame ? 2 : 1);
+
+    bool new_size = last_render_h != view_desc->render_height || last_render_w != view_desc->render_width;
 
     if(opt_aa_this_frame != model->last_frame_was_antialiased) {
         // Antialiasing state has changed since the last render
@@ -152,42 +176,28 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
         model->last_frame_was_antialiased = opt_aa_this_frame;
     }
 
-    if(opt_aa_this_frame) {
-        crop_left *= 2;
-        crop_right *= 2;
-        crop_top *= 2;
-        crop_bottom *= 2;
-    }
     view_desc->frame_was_antialiased = opt_aa_this_frame;
-    if(prepare_bg == true) {
-        if(!vstate->render_state_ready) {
-            _output = setup_primary_output((uint32_t)view_desc->render_width, (uint32_t)view_desc->render_height,
-                                           opt_aa_this_frame);
-            setup_finish_frame();
-            vstate->render_state = _output;
-        }
+
+    if(new_size || !vstate->render_state_ready) {
+        vstate->render_state_ready = true;
+        vstate->render_state =
+            setup_primary_output(view_desc->render_width, view_desc->render_height, opt_aa_this_frame);
+        setup_finish_frame();
+    }
+    if(vstate->render_opaque_buffer) {
+        vstate->opaque_render_state =
+            setup_opaque_output(vstate->opaque_frame_buffer_width, vstate->opaque_frame_buffer_height);
+        setup_finish_frame();
     }
 
-    if(!vstate->render_state_ready) {
-        if(prepare_bg == true) {
-            vstate->render_state_ready = true;
-            if(vstate->render_opaque_buffer) {
-                _opaque = setup_opaque_output(vstate->opaque_frame_buffer_width,
-                                              vstate->opaque_frame_buffer_height);
-                vstate->opaque_render_state = _opaque;
-                setup_finish_frame();
-            }
-        }
-    }
     bool motion_dirty = false;
     if(view_desc->dirty) {
         motion_dirty = true;
     }
     view_desc->dirty = false;
 
-    _output = vstate->render_state;
     int32_t anim_num = view_desc->anim;
-    if((anim_num >= 0) && ((int64_t)lv_gltf_data_get_animation_count(model) > anim_num)) {
+    if(anim_num >= 0 && ((int64_t)lv_gltf_data_get_animation_count(model) > anim_num)) {
         if(LV_ABS(view_desc->timestep) > 0.0001f) {
             //std::cout << "ACTIVE ANIMATION TRIGGER WINDOW MOTION\n";
             model->local_timestamp += view_desc->timestep;
@@ -219,11 +229,11 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     }
 
     if((model->_last_frame_no_motion == true) && (model->__last_frame_no_motion == true) &&
-        (___lastFrameNoMotion == true)) {
+       (___lastFrameNoMotion == true)) {
         // Nothing changed at all, return the previous output frame
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
-        return _output.texture;
+        return vstate->render_state.texture;
     }
 
     render_skins(viewer, model);
@@ -249,19 +259,20 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
 
     model->last_material_index = 99999; // Reset the last material index to an unused value once per frame at the start
     if(vstate->render_opaque_buffer) {
-        if(model->has_any_cameras)
+        if(model->has_any_cameras) {
             setup_view_proj_matrix_from_camera(viewer, model->current_camera_index, view_desc, model->view_mat,
                                                model->view_pos, model, true);
-        else
+        }
+        else {
             setup_view_proj_matrix(viewer, view_desc, model, true);
-        _opaque = vstate->opaque_render_state;
-
-        lv_result_t result = setup_restore_opaque_output(view_desc, _opaque, vstate->opaque_frame_buffer_width,
+        }
+        lv_result_t result = setup_restore_opaque_output(view_desc, vstate->opaque_render_state,
+                                                         vstate->opaque_frame_buffer_width,
                                                          vstate->opaque_frame_buffer_height, prepare_bg);
         LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to setup opaque output which should never happen");
         if(result != LV_RESULT_OK) {
             lv_gltf_view_pop_opengl_state(&opengl_state);
-            return _output.texture;
+            return vstate->render_state.texture;
         }
 
         if(opt_draw_bg) {
@@ -277,30 +288,29 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
                            lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, true);
         }
 
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, _opaque.texture));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->opaque_render_state.texture));
         GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
         GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         setup_finish_frame();
     }
 
     if(model->has_any_cameras) {
-        setup_view_proj_matrix_from_camera(viewer, model->current_camera_index, view_desc, model->view_mat, model->view_pos, model, false);
+        setup_view_proj_matrix_from_camera(viewer, model->current_camera_index, view_desc, model->view_mat,
+                                           model->view_pos, model, false);
     }
-    else{
+    else {
         setup_view_proj_matrix(viewer, view_desc, model, false);
     }
     viewer->env_rotation_angle = viewer->env_textures.angle;
 
     {
-        lv_result_t result = setup_restore_primary_output(view_desc, _output,
-                                                          (uint32_t)view_desc->render_width - (crop_left + crop_right),
-                                                          (uint32_t)view_desc->render_height - (crop_top + crop_bottom),
-                                                          crop_left, crop_bottom, prepare_bg);
+        lv_result_t result = render_primary_output(view_desc, vstate->render_state, (uint32_t)view_desc->render_width,
+                                                   (uint32_t)view_desc->render_height, prepare_bg);
 
         LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to restore primary output which should never happen");
         if(result != LV_RESULT_OK) {
             lv_gltf_view_pop_opengl_state(&opengl_state);
-            return _output.texture;
+            return vstate->render_state.texture;
         }
         if(opt_draw_bg)
             setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
@@ -313,16 +323,14 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
                            lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, false);
         }
         if(opt_aa_this_frame) {
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, _output.texture));
+            GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->render_state.texture));
             GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
             GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         }
         setup_finish_frame();
     }
     lv_gltf_view_pop_opengl_state(&opengl_state);
-    view_desc->frame_was_cached = false;
-
-    return _output.texture;
+    return vstate->render_state.texture;
 }
 
 static void setup_finish_frame(void)
@@ -344,17 +352,17 @@ static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data
     }
 }
 
-static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model){
-
+static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
+{
     uint32_t skin_count = lv_gltf_data_get_skins_size(model);
     if(skin_count == 0) {
         return;
     }
     lv_gltf_data_destroy_textures(model);
     for(size_t i = 0; i < skin_count; ++i) {
-        const auto &skin_index = lv_gltf_data_get_skin(model, i);
-        const auto &skin = model->asset.skins[skin_index];
-        auto &ibm = viewer->ibm_by_skin_the_node[skin_index];
+        const auto & skin_index = lv_gltf_data_get_skin(model, i);
+        const auto & skin = model->asset.skins[skin_index];
+        auto & ibm = viewer->ibm_by_skin_the_node[skin_index];
 
         size_t num_joints = skin.joints.size();
         size_t tex_width = std::ceil(std::sqrt((float)num_joints * 8.0f));
@@ -365,18 +373,19 @@ static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model){
         GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
         GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        float * texture_data = (float*)lv_malloc(tex_width * tex_width * 4 * sizeof(*texture_data));
+        float * texture_data = (float *)lv_malloc(tex_width * tex_width * 4 * sizeof(*texture_data));
         LV_ASSERT_MALLOC(texture_data);
         size_t texture_data_index = 0;
 
         for(uint64_t j = 0; j < num_joints; j++) {
             auto & joint_node = model->asset.nodes[skin.joints[j]];
-            fastgltf::math::fmat4x4 final_joint_matrix = lv_gltf_data_get_cached_transform(model, &joint_node) * ibm[&joint_node]; 
+            fastgltf::math::fmat4x4 final_joint_matrix =
+                lv_gltf_data_get_cached_transform(model, &joint_node) * ibm[&joint_node];
 
-            lv_memcpy(&texture_data[texture_data_index], final_joint_matrix.data(), sizeof(float) * 16); 
+            lv_memcpy(&texture_data[texture_data_index], final_joint_matrix.data(), sizeof(float) * 16);
             lv_memcpy(&texture_data[texture_data_index + 16],
                       fastgltf::math::transpose(fastgltf::math::invert(final_joint_matrix)).data(),
-                      sizeof(float) * 16); 
+                      sizeof(float) * 16);
 
             texture_data_index += 32;
         }
@@ -385,7 +394,6 @@ static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model){
         GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         lv_free(texture_data);
     }
-
 }
 static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
@@ -510,7 +518,7 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
     bool has_material = asset->materials.size() > (materialIndex - 1);
 
     if(!has_material) {
-        setup_uniform_color_alpha(uniforms->base_color_factor, fastgltf::math::fvec4(1.0f));
+        render_uniform_color_alpha(uniforms->base_color_factor, fastgltf::math::fvec4(1.0f));
         GL_CALL(glUniform1f(uniforms->roughness_factor, 0.5f));
         GL_CALL(glUniform1f(uniforms->metallic_factor, 0.5f));
         GL_CALL(glUniform1f(uniforms->ior, 1.5f));
@@ -542,8 +550,8 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
     }
 
     draw_lights(model, program);
-    setup_uniform_color_alpha(uniforms->base_color_factor, gltfMaterial.pbrData.baseColorFactor);
-    setup_uniform_color(uniforms->emissive_factor, gltfMaterial.emissiveFactor);
+    render_uniform_color_alpha(uniforms->base_color_factor, gltfMaterial.pbrData.baseColorFactor);
+    render_uniform_color(uniforms->emissive_factor, gltfMaterial.emissiveFactor);
 
     GL_CALL(glUniform1f(uniforms->emissive_strength, gltfMaterial.emissiveStrength));
     GL_CALL(glUniform1f(uniforms->roughness_factor, gltfMaterial.pbrData.roughnessFactor));
@@ -552,30 +560,30 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
     GL_CALL(glUniform1f(uniforms->dispersion, gltfMaterial.dispersion));
 
     if(gltfMaterial.pbrData.baseColorTexture.has_value())
-        *tex_num = setup_texture(*tex_num, _prim_data->albedoTexture, _prim_data->baseColorTexcoordIndex,
-                                 gltfMaterial.pbrData.baseColorTexture->transform, uniforms->base_color_sampler,
-                                 uniforms->base_color_uv_set, uniforms->base_color_uv_transform);
+        *tex_num = render_texture(*tex_num, _prim_data->albedoTexture, _prim_data->baseColorTexcoordIndex,
+                                  gltfMaterial.pbrData.baseColorTexture->transform, uniforms->base_color_sampler,
+                                  uniforms->base_color_uv_set, uniforms->base_color_uv_transform);
     if(gltfMaterial.emissiveTexture.has_value())
-        *tex_num = setup_texture(*tex_num, _prim_data->emissiveTexture, _prim_data->emissiveTexcoordIndex,
-                                 gltfMaterial.emissiveTexture->transform, uniforms->emissive_sampler,
-                                 uniforms->emissive_uv_set, uniforms->emissive_uv_transform);
+        *tex_num = render_texture(*tex_num, _prim_data->emissiveTexture, _prim_data->emissiveTexcoordIndex,
+                                  gltfMaterial.emissiveTexture->transform, uniforms->emissive_sampler,
+                                  uniforms->emissive_uv_set, uniforms->emissive_uv_transform);
     if(gltfMaterial.pbrData.metallicRoughnessTexture.has_value())
-        *tex_num = setup_texture(*tex_num, _prim_data->metalRoughTexture, _prim_data->metallicRoughnessTexcoordIndex,
-                                 gltfMaterial.pbrData.metallicRoughnessTexture->transform,
-                                 uniforms->metallic_roughness_sampler, uniforms->metallic_roughness_uv_set,
-                                 uniforms->metallic_roughness_uv_transform);
+        *tex_num = render_texture(*tex_num, _prim_data->metalRoughTexture, _prim_data->metallicRoughnessTexcoordIndex,
+                                  gltfMaterial.pbrData.metallicRoughnessTexture->transform,
+                                  uniforms->metallic_roughness_sampler, uniforms->metallic_roughness_uv_set,
+                                  uniforms->metallic_roughness_uv_transform);
     if(gltfMaterial.occlusionTexture.has_value()) {
         GL_CALL(glUniform1f(uniforms->occlusion_strength, static_cast<float>(gltfMaterial.occlusionTexture->strength)));
-        *tex_num = setup_texture(*tex_num, _prim_data->occlusionTexture, _prim_data->occlusionTexcoordIndex,
-                                 gltfMaterial.occlusionTexture->transform, uniforms->occlusion_sampler,
-                                 uniforms->occlusion_uv_set, uniforms->occlusion_uv_transform);
+        *tex_num = render_texture(*tex_num, _prim_data->occlusionTexture, _prim_data->occlusionTexcoordIndex,
+                                  gltfMaterial.occlusionTexture->transform, uniforms->occlusion_sampler,
+                                  uniforms->occlusion_uv_set, uniforms->occlusion_uv_transform);
     }
 
     if(gltfMaterial.normalTexture.has_value()) {
         GL_CALL(glUniform1f(uniforms->normal_scale, static_cast<float>(gltfMaterial.normalTexture->scale)));
-        *tex_num = setup_texture(*tex_num, _prim_data->normalTexture, _prim_data->normalTexcoordIndex,
-                                 gltfMaterial.normalTexture->transform, uniforms->normal_sampler,
-                                 uniforms->normal_uv_set, uniforms->normal_uv_transform);
+        *tex_num = render_texture(*tex_num, _prim_data->normalTexture, _prim_data->normalTexcoordIndex,
+                                  gltfMaterial.normalTexture->transform, uniforms->normal_sampler,
+                                  uniforms->normal_uv_set, uniforms->normal_uv_transform);
     }
 
     if(gltfMaterial.clearcoat) {
@@ -584,35 +592,35 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
                             static_cast<float>(gltfMaterial.clearcoat->clearcoatRoughnessFactor)));
 
         if(gltfMaterial.clearcoat->clearcoatTexture.has_value())
-            *tex_num = setup_texture(*tex_num, _prim_data->clearcoatTexture, _prim_data->clearcoatTexcoordIndex,
-                                     gltfMaterial.clearcoat->clearcoatTexture->transform,
-                                     uniforms->clearcoat_sampler, uniforms->clearcoat_uv_set,
-                                     uniforms->clearcoat_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->clearcoatTexture, _prim_data->clearcoatTexcoordIndex,
+                                      gltfMaterial.clearcoat->clearcoatTexture->transform,
+                                      uniforms->clearcoat_sampler, uniforms->clearcoat_uv_set,
+                                      uniforms->clearcoat_uv_transform);
         if(gltfMaterial.clearcoat->clearcoatRoughnessTexture.has_value())
-            *tex_num = setup_texture(*tex_num, _prim_data->clearcoatRoughnessTexture,
-                                     _prim_data->clearcoatRoughnessTexcoordIndex,
-                                     gltfMaterial.clearcoat->clearcoatRoughnessTexture->transform,
-                                     uniforms->clearcoat_roughness_sampler, uniforms->clearcoat_roughness_uv_set,
-                                     uniforms->clearcoat_roughness_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->clearcoatRoughnessTexture,
+                                      _prim_data->clearcoatRoughnessTexcoordIndex,
+                                      gltfMaterial.clearcoat->clearcoatRoughnessTexture->transform,
+                                      uniforms->clearcoat_roughness_sampler, uniforms->clearcoat_roughness_uv_set,
+                                      uniforms->clearcoat_roughness_uv_transform);
         if(gltfMaterial.clearcoat->clearcoatNormalTexture.has_value()) {
             GL_CALL(glUniform1f(uniforms->clearcoat_normal_scale,
                                 static_cast<float>(gltfMaterial.clearcoat->clearcoatNormalTexture->scale)));
-            *tex_num = setup_texture(*tex_num, _prim_data->clearcoatNormalTexture,
-                                     _prim_data->clearcoatNormalTexcoordIndex,
-                                     gltfMaterial.clearcoat->clearcoatNormalTexture->transform,
-                                     uniforms->clearcoat_normal_sampler, uniforms->clearcoat_normal_uv_set,
-                                     uniforms->clearcoat_normal_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->clearcoatNormalTexture,
+                                      _prim_data->clearcoatNormalTexcoordIndex,
+                                      gltfMaterial.clearcoat->clearcoatNormalTexture->transform,
+                                      uniforms->clearcoat_normal_sampler, uniforms->clearcoat_normal_uv_set,
+                                      uniforms->clearcoat_normal_uv_transform);
         }
     }
 
     if(gltfMaterial.volume) {
         GL_CALL(glUniform1f(uniforms->attenuation_distance, gltfMaterial.volume->attenuationDistance));
-        setup_uniform_color(uniforms->attenuation_color, gltfMaterial.volume->attenuationColor);
+        render_uniform_color(uniforms->attenuation_color, gltfMaterial.volume->attenuationColor);
         GL_CALL(glUniform1f(uniforms->thickness, gltfMaterial.volume->thicknessFactor));
         if(gltfMaterial.volume->thicknessTexture.has_value()) {
-            *tex_num = setup_texture(*tex_num, _prim_data->thicknessTexture, _prim_data->thicknessTexcoordIndex,
-                                     gltfMaterial.volume->thicknessTexture->transform, uniforms->thickness_sampler,
-                                     uniforms->thickness_uv_set, uniforms->thickness_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->thicknessTexture, _prim_data->thicknessTexcoordIndex,
+                                      gltfMaterial.volume->thicknessTexture->transform, uniforms->thickness_sampler,
+                                      uniforms->thickness_uv_set, uniforms->thickness_uv_transform);
         }
     }
 
@@ -620,15 +628,15 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
         GL_CALL(glUniform1f(uniforms->transmission_factor, gltfMaterial.transmission->transmissionFactor));
         GL_CALL(glUniform2i(uniforms->screen_size, viewer->desc.render_width, viewer->desc.render_height));
         if(gltfMaterial.transmission->transmissionTexture.has_value())
-            *tex_num = setup_texture(*tex_num, _prim_data->transmissionTexture,
-                                     _prim_data->transmissionTexcoordIndex,
-                                     gltfMaterial.transmission->transmissionTexture->transform,
-                                     uniforms->transmission_sampler, uniforms->transmission_uv_set,
-                                     uniforms->transmission_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->transmissionTexture,
+                                      _prim_data->transmissionTexcoordIndex,
+                                      gltfMaterial.transmission->transmissionTexture->transform,
+                                      uniforms->transmission_sampler, uniforms->transmission_uv_set,
+                                      uniforms->transmission_uv_transform);
     }
 
     if(gltfMaterial.sheen) {
-        setup_uniform_color(uniforms->sheen_color_factor, gltfMaterial.sheen->sheenColorFactor);
+        render_uniform_color(uniforms->sheen_color_factor, gltfMaterial.sheen->sheenColorFactor);
         GL_CALL(glUniform1f(uniforms->sheen_roughness_factor,
                             static_cast<float>(gltfMaterial.sheen->sheenRoughnessFactor)));
         if(gltfMaterial.sheen->sheenColorTexture.has_value()) {
@@ -636,7 +644,7 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
         }
     }
     if(gltfMaterial.specular) {
-        setup_uniform_color(uniforms->specular_color_factor, gltfMaterial.specular->specularColorFactor);
+        render_uniform_color(uniforms->specular_color_factor, gltfMaterial.specular->specularColorFactor);
         GL_CALL(glUniform1f(uniforms->specular_factor, static_cast<float>(gltfMaterial.specular->specularFactor)));
         if(gltfMaterial.specular->specularTexture.has_value()) {
             LV_LOG_WARN("Material has unhandled specular texture");
@@ -649,44 +657,44 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
     if(gltfMaterial.specularGlossiness) {
         LV_LOG_WARN(
             "Model uses outdated legacy mode pbr_speculargloss. Please update this model to a new shading model ");
-        setup_uniform_color_alpha(uniforms->diffuse_factor, gltfMaterial.specularGlossiness->diffuseFactor);
-        setup_uniform_color(uniforms->specular_factor, gltfMaterial.specularGlossiness->specularFactor);
+        render_uniform_color_alpha(uniforms->diffuse_factor, gltfMaterial.specularGlossiness->diffuseFactor);
+        render_uniform_color(uniforms->specular_factor, gltfMaterial.specularGlossiness->specularFactor);
         GL_CALL(glUniform1f(uniforms->glossiness_factor,
                             static_cast<float>(gltfMaterial.specularGlossiness->glossinessFactor)));
         if(gltfMaterial.specularGlossiness->diffuseTexture.has_value()) {
-            *tex_num = setup_texture(*tex_num, _prim_data->diffuseTexture, _prim_data->diffuseTexcoordIndex,
-                                     gltfMaterial.specularGlossiness->diffuseTexture->transform,
-                                     uniforms->diffuse_sampler, uniforms->diffuse_uv_set,
-                                     uniforms->diffuse_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->diffuseTexture, _prim_data->diffuseTexcoordIndex,
+                                      gltfMaterial.specularGlossiness->diffuseTexture->transform,
+                                      uniforms->diffuse_sampler, uniforms->diffuse_uv_set,
+                                      uniforms->diffuse_uv_transform);
         }
         if(gltfMaterial.specularGlossiness->specularGlossinessTexture.has_value()) {
-            *tex_num = setup_texture(*tex_num, _prim_data->specularGlossinessTexture,
-                                     _prim_data->specularGlossinessTexcoordIndex,
-                                     gltfMaterial.specularGlossiness->specularGlossinessTexture->transform,
-                                     uniforms->specular_glossiness_sampler, uniforms->specular_glossiness_uv_set,
-                                     uniforms->specular_glossiness_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->specularGlossinessTexture,
+                                      _prim_data->specularGlossinessTexcoordIndex,
+                                      gltfMaterial.specularGlossiness->specularGlossinessTexture->transform,
+                                      uniforms->specular_glossiness_sampler, uniforms->specular_glossiness_uv_set,
+                                      uniforms->specular_glossiness_uv_transform);
         }
     }
 
     if(gltfMaterial.diffuseTransmission) {
-        setup_uniform_color(uniforms->diffuse_transmission_color_factor,
-                            gltfMaterial.diffuseTransmission->diffuseTransmissionColorFactor);
+        render_uniform_color(uniforms->diffuse_transmission_color_factor,
+                             gltfMaterial.diffuseTransmission->diffuseTransmissionColorFactor);
         GL_CALL(glUniform1f(uniforms->diffuse_transmission_factor,
                             static_cast<float>(gltfMaterial.diffuseTransmission->diffuseTransmissionFactor)));
         if(gltfMaterial.diffuseTransmission->diffuseTransmissionTexture.has_value()) {
-            *tex_num = setup_texture(*tex_num, _prim_data->diffuseTransmissionTexture,
-                                     _prim_data->diffuseTransmissionTexcoordIndex,
-                                     gltfMaterial.diffuseTransmission->diffuseTransmissionTexture->transform,
-                                     uniforms->diffuse_transmission_sampler, uniforms->diffuse_transmission_uv_set,
-                                     uniforms->diffuse_transmission_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->diffuseTransmissionTexture,
+                                      _prim_data->diffuseTransmissionTexcoordIndex,
+                                      gltfMaterial.diffuseTransmission->diffuseTransmissionTexture->transform,
+                                      uniforms->diffuse_transmission_sampler, uniforms->diffuse_transmission_uv_set,
+                                      uniforms->diffuse_transmission_uv_transform);
         }
         if(gltfMaterial.diffuseTransmission->diffuseTransmissionColorTexture.has_value()) {
-            *tex_num = setup_texture(*tex_num, _prim_data->diffuseTransmissionColorTexture,
-                                     _prim_data->diffuseTransmissionColorTexcoordIndex,
-                                     gltfMaterial.diffuseTransmission->diffuseTransmissionColorTexture->transform,
-                                     uniforms->diffuse_transmission_color_sampler,
-                                     uniforms->diffuse_transmission_color_uv_set,
-                                     uniforms->diffuse_transmission_color_uv_transform);
+            *tex_num = render_texture(*tex_num, _prim_data->diffuseTransmissionColorTexture,
+                                      _prim_data->diffuseTransmissionColorTexcoordIndex,
+                                      gltfMaterial.diffuseTransmission->diffuseTransmissionColorTexture->transform,
+                                      uniforms->diffuse_transmission_color_sampler,
+                                      uniforms->diffuse_transmission_color_uv_set,
+                                      uniforms->diffuse_transmission_color_uv_transform);
         }
     }
 }
@@ -759,4 +767,396 @@ static void draw_lights(lv_gltf_data_t * model, GLuint program)
         glUniform1i(glGetUniformLocation(program, tag), (GLint)model->asset.lights[i].type);
     }
 }
+
+lv_result_t render_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state, uint32_t texture_w,
+                                  uint32_t texture_h, bool prepare_bg)
+{
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state.framebuffer));
+
+    if(glGetError() != GL_NO_ERROR) {
+        return LV_RESULT_INVALID;
+    }
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.renderbuffer, 0));
+    GL_CALL(glViewport(0, 0, texture_w, texture_h));
+    if(prepare_bg) {
+        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
+                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
+        GL_CALL(glClearDepth(1.0f));
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
+
+    return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
+static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color)
+{
+    GL_CALL(glUniform4f(uniform_loc, static_cast<float>(color[0]), static_cast<float>(color[1]),
+                        static_cast<float>(color[2]), static_cast<float>(color[3])));
+}
+static void render_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color)
+{
+    GL_CALL(glUniform3f(uniform_loc, static_cast<float>(color[0]), static_cast<float>(color[1]),
+                        static_cast<float>(color[2])));
+}
+
+static uint32_t render_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
+                               std::unique_ptr<fastgltf::TextureTransform> & tex_transform, GLint sampler, GLint uv_set,
+                               GLint uv_transform)
+{
+    /* Activate the texture unit*/
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + tex_unit));
+    /* Bind the texture (assuming 2D texture) */
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, tex_name));
+    /* Set the sampler to use the texture unit */
+    GL_CALL(glUniform1i(sampler, tex_unit));
+    /* Set the UV set index */
+    GL_CALL(glUniform1i(uv_set, tex_coord_index));
+    if(tex_transform != NULL) {
+        GL_CALL(glUniformMatrix3fv(uv_transform, 1, GL_FALSE, &(create_texture_transform_matrix(tex_transform)[0][0])));
+    }
+
+    tex_unit++;
+    return tex_unit;
+}
+
+static fastgltf::math::fmat3x3 create_texture_transform_matrix(std::unique_ptr<fastgltf::TextureTransform> & transform)
+{
+    fastgltf::math::fmat3x3 rotation = fastgltf::math::fmat3x3(0.f);
+    fastgltf::math::fmat3x3 scale = fastgltf::math::fmat3x3(0.f);
+    fastgltf::math::fmat3x3 translation = fastgltf::math::fmat3x3(0.f);
+    fastgltf::math::fmat3x3 result = fastgltf::math::fmat3x3(0.f);
+
+    float s = std::sin(transform->rotation);
+    float c = std::cos(transform->rotation);
+    rotation[0][0] = c;
+    rotation[1][1] = c;
+    rotation[0][1] = s;
+    rotation[1][0] = -s;
+    rotation[2][2] = 1.0f;
+
+    scale[0][0] = transform->uvScale[0];
+    scale[1][1] = transform->uvScale[1];
+    scale[2][2] = 1.0f;
+
+    translation[0][0] = 1.0f;
+    translation[1][1] = 1.0f;
+    translation[0][2] = transform->uvOffset[0];
+    translation[1][2] = transform->uvOffset[1];
+    translation[2][2] = 1.0f;
+
+    result = translation * rotation;
+    result = result * scale;
+    return result;
+}
+
+static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height)
+{
+    lv_gltf_renwin_state_t result;
+
+    GLuint rtex;
+    GL_CALL(glGenTextures(1, &rtex));
+    result.texture = rtex;
+
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+
+    GLuint rdepth;
+    GL_CALL(glGenTextures(1, &rdepth));
+    result.renderbuffer = rdepth;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+#ifdef __EMSCRIPTEN__
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_INT, NULL));
+#else
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_SHORT, NULL));
+#endif
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+
+    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
+
+    return result;
+}
+
+static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_t texture_height, bool mipmaps_enabled)
+{
+    lv_gltf_renwin_state_t result;
+
+    GLuint rtex;
+    GL_CALL(glGenTextures(1, &rtex));
+    result.texture = rtex;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
+    //GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps_enabled ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            mipmaps_enabled ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+
+    GLuint rdepth;
+    GL_CALL(glGenTextures(1, &rdepth));
+    result.renderbuffer = rdepth;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
+#ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
+    // For WebGL2
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_INT, NULL));
+#else
+    // For Desktop OpenGL
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_SHORT, NULL));
+#endif
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+
+    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
+
+    return result;
+}
+
+static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state)
+{
+    if(!state) {
+        return;
+    }
+    if(state->framebuffer) {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        GL_CALL(glDeleteFramebuffers(1, &state->framebuffer));
+        state->framebuffer = 0;
+    }
+    if(state->texture) {
+        GL_CALL(glDeleteTextures(1, &state->texture));
+        state->texture = 0;
+    }
+    if(state->renderbuffer) {
+        GL_CALL(glDeleteTextures(1, &state->renderbuffer));
+        state->renderbuffer = 0;
+    }
+}
+static void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num,
+                                               lv_gltf_view_desc_t * view_desc,
+                                               const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
+                                               lv_gltf_data_t * gltf_data, bool transmission_pass)
+{
+    /* The following matrix math is for the projection matrices as defined by the glTF spec:*/
+    /* https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#projection-matrices*/
+
+    fastgltf::math::fmat4x4 projection;
+    const auto & asset = lv_gltf_data_get_asset(gltf_data);
+
+    auto width = view_desc->render_width;
+    auto height = view_desc->render_height;
+    /* It's possible the transmission pass should simply use the regular passes aspect despite having different metrics itself. */
+    /* TODO: test both ways to see which has less distortion*/
+
+    float aspect = (float)width / (float)height;
+    if(transmission_pass) {
+        width = 256;
+        height = 256;
+    }
+
+    std::visit(fastgltf::visitor{
+        [&](fastgltf::Camera::Perspective & perspective)
+        {
+            projection = fastgltf::math::fmat4x4(0.0f);
+            projection[0][0] = 1.f / (aspect * tan(0.5f * perspective.yfov));
+            projection[1][1] = 1.f / (tan(0.5f * perspective.yfov));
+            projection[2][3] = -1;
+
+            if(perspective.zfar.has_value()) {
+                // Finite projection matrix
+                projection[2][2] = (*perspective.zfar + perspective.znear) /
+                (perspective.znear - *perspective.zfar);
+                projection[3][2] = (2 * *perspective.zfar * perspective.znear) /
+                (perspective.znear - *perspective.zfar);
+            }
+            else {
+                // Infinite projection matrix
+                projection[2][2] = -1;
+                projection[3][2] = -2 * perspective.znear;
+            }
+        },
+        [&](fastgltf::Camera::Orthographic & orthographic)
+        {
+            projection = fastgltf::math::fmat4x4(1.0f);
+            projection[0][0] = (1.f / orthographic.xmag) * aspect;
+            projection[1][1] = 1.f / orthographic.ymag;
+            projection[2][2] = 2.f / (orthographic.znear - orthographic.zfar);
+            projection[3][2] =
+                (orthographic.zfar + orthographic.znear) / (orthographic.znear - orthographic.zfar);
+        },
+    },
+    asset->cameras[_cur_cam_num].camera);
+
+    viewer->view_matrix = view_mat;
+    viewer->projection_matrix = projection;
+    viewer->view_projection_matrix = projection * view_mat;
+    viewer->camera_pos = view_pos;
+}
+
+static void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
+                                   bool transmission_pass)
+{
+    auto b_radius = lv_gltf_data_get_radius(gltf_data);
+    float radius = b_radius * 2.5;
+    radius *= view_desc->distance;
+
+    fastgltf::math::fvec3 rcam_dir = fastgltf::math::fvec3(0.0f, 0.0f, 1.0f);
+
+    // Note because we switched over to fastgltf math and it's right-hand focused, z axis is actually pitch (instead of x-axis), and x axis is yaw, instead of y-axis
+    fastgltf::math::fmat3x3 rotation1 =
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(0.f, 0.f, fastgltf::math::radians(view_desc->pitch)));
+    fastgltf::math::fmat3x3 rotation2 =
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(fastgltf::math::radians(view_desc->yaw), 0.f, 0.f));
+
+    rcam_dir = rotation1 * rcam_dir;
+    rcam_dir = rotation2 * rcam_dir;
+
+    fastgltf::math::fvec3 ncam_dir = fastgltf::math::normalize(rcam_dir);
+    fastgltf::math::fvec3 cam_target = fastgltf::math::fvec3(view_desc->focal_x, view_desc->focal_y, view_desc->focal_z);
+    fastgltf::math::fvec3 cam_position = fastgltf::math::fvec3(cam_target[0] + (ncam_dir[0] * radius),
+                                                               cam_target[1] + (ncam_dir[1] * radius),
+                                                               cam_target[2] + (ncam_dir[2] * radius));
+
+    fastgltf::math::fmat4x4 view_mat =
+        lv_gltf_math_look_at_rh(cam_position, cam_target, fastgltf::math::fvec3(0.0f, 1.0f, 0.0f));
+
+    // Create Projection Matrix
+    fastgltf::math::fmat4x4 projection;
+    float fov = view_desc->fov;
+
+    float znear = b_radius * 0.05f;
+    float zfar = b_radius * std::max(4.0, 8.0 * view_desc->distance);
+    auto width = view_desc->render_width;
+    auto height = view_desc->render_height;
+    // It's possible the transmission pass should simply use the regular passes aspect despite having different metrics itself.  Testing both ways to see which has less distortion
+    float aspect = (float)width / (float)height;
+    if(transmission_pass) {
+        width = 256;
+        height = 256;
+    }
+
+    if(fov <= 0.0f) {
+        // Isometric view: create an orthographic projection
+        float orthoSize = view_desc->distance * b_radius; // Adjust as needed
+
+        projection = fastgltf::math::fmat4x4(1.0f);
+        projection[0][0] = -(orthoSize * aspect);
+        projection[1][1] = (orthoSize);
+        projection[2][2] = 2.f / (znear - zfar);
+        projection[3][2] = (zfar + znear) / (znear - zfar);
+
+    }
+    else {
+        // Perspective view
+        projection = fastgltf::math::fmat4x4(0.0f);
+        assert(width != 0 && height != 0);
+        projection[0][0] = 1.f / (aspect * tan(0.5f * fastgltf::math::radians(fov)));
+        projection[1][1] = 1.f / (tan(0.5f * fastgltf::math::radians(fov)));
+        projection[2][3] = -1;
+
+        // Finite projection matrix
+        projection[2][2] = (zfar + znear) / (znear - zfar);
+        projection[3][2] = (2.f * zfar * znear) / (znear - zfar);
+    }
+
+    viewer->view_matrix = view_mat;
+    viewer->projection_matrix = projection;
+    viewer->view_projection_matrix = projection * view_mat;
+    viewer->camera_pos = cam_position;
+}
+
+static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t _ret,
+                                               uint32_t texture_w,
+                                               uint32_t texture_h, bool prepare_bg)
+{
+    LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", _ret.texture, _ret.renderbuffer);
+
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, _ret.framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _ret.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _ret.renderbuffer, 0));
+    GL_CALL(glViewport(0, 0, texture_w, texture_h));
+    if(prepare_bg) {
+        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
+                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
+        GL_CALL(glClearDepth(1.0f));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+    return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
+static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur)
+{
+    GL_CALL(glBindVertexArray(manager->bg_vao));
+
+    GL_CALL(glUseProgram(manager->bg_program));
+    GL_CALL(glEnable(GL_CULL_FACE));
+    GL_CALL(glDisable(GL_BLEND));
+    GL_CALL(glDisable(GL_DEPTH_TEST));
+    GL_CALL(glUniformMatrix4fv(glGetUniformLocation(manager->bg_program, "u_ViewProjectionMatrix"), 1, false,
+                               viewer->view_projection_matrix.data()));
+    //GL_CALL(glBindTextureUnit(0, shaders->lastEnv->specular));
+
+    // Bind the texture to the specified texture unit
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + 0)); // Activate the texture unit
+    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP,
+                          viewer->env_textures.specular)); // Bind the texture (assuming 2D texture)
+
+    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_GGXEnvSampler"), 0));
+
+    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->env_textures.mip_count));
+    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvBlurNormalized"), blur));
+    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvIntensity"), 1.0f));
+    GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_Exposure"), 1.0f));
+
+    setup_environment_rotation_matrix(viewer->env_textures.angle, manager->bg_program);
+
+    // Bind the index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager->bg_index_buf);
+
+    // Bind the vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, manager->bg_vertex_buf);
+
+    // Draw the elements
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void *)0);
+
+    GL_CALL(glBindVertexArray(0));
+    return;
+}
+void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program)
+{
+    fastgltf::math::fmat3x3 rotmat =
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(env_rotation_angle, 0.f, 3.14159f));
+
+    // Get the uniform location and set the uniform
+    int32_t u_loc;
+    GL_CALL(u_loc = glGetUniformLocation(shader_program, "u_EnvRotation"));
+    GL_CALL(glUniformMatrix3fv(u_loc, 1, GL_FALSE, (const GLfloat *)rotmat.data()));
+}
+
 #endif /*LV_USE_GLTF*/
