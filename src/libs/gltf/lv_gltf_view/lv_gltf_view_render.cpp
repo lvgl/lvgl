@@ -83,28 +83,28 @@ GLuint lv_gltf_view_render(lv_gltf_view_t * viewer)
 
 static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state)
 {
-    GL_CALL(glGetBooleanv(GL_BLEND, &state->blendEnabled));
-    GL_CALL(glGetIntegerv(GL_BLEND_SRC_ALPHA, &state->blendSrc));
-    GL_CALL(glGetIntegerv(GL_BLEND_DST_ALPHA, &state->blendDst));
-    GL_CALL(glGetIntegerv(GL_BLEND_EQUATION, &state->blendEquation));
-    GL_CALL(glGetFloatv(GL_COLOR_CLEAR_VALUE, state->clearColor));
-    GL_CALL(glGetFloatv(GL_DEPTH_CLEAR_VALUE, &state->clearDepth));
+    GL_CALL(glGetBooleanv(GL_BLEND, &state->blend_enabled));
+    GL_CALL(glGetIntegerv(GL_BLEND_SRC_ALPHA, &state->blend_src));
+    GL_CALL(glGetIntegerv(GL_BLEND_DST_ALPHA, &state->blend_dst));
+    GL_CALL(glGetIntegerv(GL_BLEND_EQUATION, &state->blend_equation));
+    GL_CALL(glGetFloatv(GL_COLOR_CLEAR_VALUE, state->clear_color));
+    GL_CALL(glGetFloatv(GL_DEPTH_CLEAR_VALUE, &state->clear_depth));
 }
 
 static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state)
 {
     GL_CALL(glDisable(GL_CULL_FACE));
-    if(state->blendEnabled) {
+    if(state->blend_enabled) {
         GL_CALL(glEnable(GL_BLEND));
     }
     else {
         GL_CALL(glDisable(GL_BLEND));
     }
-    GL_CALL(glBlendFunc(state->blendSrc, state->blendDst));
-    GL_CALL(glBlendEquation(state->blendEquation));
+    GL_CALL(glBlendFunc(state->blend_src, state->blend_dst));
+    GL_CALL(glBlendEquation(state->blend_equation));
     GL_CALL(glDepthMask(GL_TRUE));
-    GL_CALL(glClearColor(state->clearColor[0], state->clearColor[1], state->clearColor[2], state-> clearColor[3]));
-    GL_CALL(glClearDepth(state->clearDepth));
+    GL_CALL(glClearColor(state->clear_color[0], state->clear_color[1], state->clear_color[2], state-> clear_color[3]));
+    GL_CALL(glClearDepth(state->clear_depth));
 }
 
 static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg,
@@ -499,7 +499,7 @@ static void draw_primitive(int32_t prim_num,
 
         GL_CALL(glUniform1f(uniforms->exposure, view_desc->exposure));
         GL_CALL(glUniform1f(uniforms->env_intensity, view_desc->env_pow));
-        GL_CALL(glUniform1i(uniforms->env_mip_count, (int32_t)env_tex->mipCount));
+        GL_CALL(glUniform1i(uniforms->env_mip_count, (int32_t)env_tex->mip_count));
         setup_environment_rotation_matrix(viewer->env_rotation_angle, program);
         GL_CALL(glEnable(GL_CULL_FACE));
         GL_CALL(glDisable(GL_BLEND));
@@ -768,9 +768,9 @@ static void draw_primitive(int32_t prim_num,
             GL_CALL(glBindTexture(GL_TEXTURE_2D, env_tex->ggxLut));
             GL_CALL(glUniform1i(uniforms->env_ggx_lut_sampler, _texnum++));
         }
-        if(env_tex->charlieLut != GL_NONE) {
+        if(env_tex->charlie_lut != GL_NONE) {
             GL_CALL(glActiveTexture(GL_TEXTURE0 + _texnum));
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, env_tex->charlieLut));
+            GL_CALL(glBindTexture(GL_TEXTURE_2D, env_tex->charlie_lut));
             GL_CALL(glUniform1i(uniforms->env_charlie_lut_sampler, _texnum++));
         }
 
