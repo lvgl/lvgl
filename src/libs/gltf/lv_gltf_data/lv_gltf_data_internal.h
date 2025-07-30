@@ -173,12 +173,19 @@ typedef struct {
 lv_gltf_uniform_locations_t lv_gltf_uniform_locations_create(GLuint program);
 
 typedef struct {
-    bool ready;
     GLuint program;
     uint32_t bg_program;
     uint32_t vert;
     uint32_t frag;
-} lv_gltf_renwin_shaderset_t;
+} lv_gltf_shaderset_t;
+
+typedef struct {
+    lv_gltf_uniform_locations_t uniforms;
+    lv_gltf_shaderset_t shaderset;
+} lv_gltf_compiled_shader_t;
+
+void lv_gltf_store_compiled_shader(lv_gltf_data_t * data, size_t identifier, lv_gltf_compiled_shader_t * shader);
+lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_data_t * data, size_t identifier);
 
 #endif /*LV_USE_GLTF*/
 #endif /* LV_GLTFDATA_PRIVATE_H */

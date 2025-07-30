@@ -149,8 +149,8 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);
 
-lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
-                                                               size_t n);
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
+                                                        size_t n);
 
 /* TODO: These are currently used during the rendering phase but could probably be used during the initialization phase
  * Once we start using them in the initialization function they can be defined as static inside `lv_gltf_view.cpp`

@@ -299,8 +299,8 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
  * @return A gl_renwin_shaderset_t structure representing the compiled and loaded shaders.
  */
 
-lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
-                                                               size_t n)
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
+                                                        size_t n)
 {
     uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",
                                                                    defines, n);
@@ -315,9 +315,8 @@ lv_gltf_renwin_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * 
     GLuint program_id = lv_gl_shader_program_get_id(program);
 
     GL_CALL(glUseProgram(program_id));
-    lv_gltf_renwin_shaderset_t shader_prog;
+    lv_gltf_shaderset_t shader_prog;
     shader_prog.program = program_id;
-    shader_prog.ready = true;
 
     return shader_prog;
 }
