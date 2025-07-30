@@ -33,7 +33,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_gltf_view_create(lv_obj_t * parent);
+lv_obj_t * lv_gltf_create(lv_obj_t * parent);
 lv_gltf_data_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
 
 /**********************

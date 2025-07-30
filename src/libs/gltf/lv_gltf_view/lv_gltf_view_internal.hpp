@@ -17,7 +17,6 @@
 #include "../../../misc/lv_types.h"
 #include "../lv_gl_shader/lv_gl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
-#include "../lv_gltf_data/lv_gltf_data.h"
 #include "../lv_gltf_data/lv_gltf_data_internal.h"
 
 #include <fastgltf/math.hpp>
@@ -93,12 +92,12 @@ typedef struct {
 } lv_gltf_view_desc_t;
 
 typedef struct {
-    GLboolean blendEnabled;
-    GLint blendSrc;
-    GLint blendDst;
-    GLint blendEquation;
-    GLfloat clearDepth;
-    GLfloat clearColor[4];
+    GLboolean blend_enabled;
+    GLint blend_src;
+    GLint blend_dst;
+    GLint blend_equation;
+    GLfloat clear_depth;
+    GLfloat clear_color[4];
 }lv_gl_state_t;
 
 typedef struct {
@@ -106,11 +105,10 @@ typedef struct {
     uint32_t specular;
     uint32_t sheen;
     uint32_t ggxLut;
-    uint32_t charlieLut;
-    uint32_t mipCount;
-    float iblIntensityScale;
+    uint32_t charlie_lut;
+    uint32_t mip_count;
+    float ibl_intensity_scale;
     float angle;
-    bool loaded;
 } lv_gltf_view_env_textures_t;
 
 
