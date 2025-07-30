@@ -282,7 +282,7 @@ static void load_mesh_texture_impl(lv_gltf_data_t * data, const fastgltf::Textur
     else {
         *primitive_tex_uv_id = material_prop.texCoordIndex;
     }
-    LV_LOG_USER("Prim tex prop: %d Prim tex uv id %d", *primitive_tex_prop, *primitive_tex_uv_id);
+    LV_LOG_TRACE("Prim tex prop: %d Prim tex uv id %d", *primitive_tex_prop, *primitive_tex_uv_id);
 }
 
 static void load_mesh_texture(lv_gltf_data_t * data,
@@ -439,12 +439,12 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
     GLuint texture_id = lv_gl_shader_manager_get_texture(shader_manager, hash);
 
     if(texture_id != GL_NONE) {
-        LV_LOG_USER("Emplacing back already cached texture from previous injest iteration %u", texture_id);
+        LV_LOG_TRACE("Emplacing back already cached texture from previous injest iteration %u", texture_id);
         data->textures.emplace_back(texture_id);
         return true;
     }
 
-    LV_LOG_USER("Image (%s) [%d] [%u]", image.name.c_str(), texture_id, hash);
+    LV_LOG_TRACE("Image (%s) [%d] [%u]", image.name.c_str(), texture_id, hash);
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
@@ -459,12 +459,11 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
         [&](fastgltf::sources::URI & file_path)
         {
             LV_ASSERT_MSG(file_path.fileByteOffset == 0, "Offsets aren't supported with stbi");
+            LV_ASSERT_MSG(file_path.uri.isLocalPath(), "We're only capable of loading local files.");
 
-            LV_ASSERT_MSG(file_path.uri.isLocalPath(), " We're only capable of loading local files.");
             int32_t width, height, nrChannels;
-            LV_LOG_USER("Loading image: %s", image.name.c_str());
-            const std::string path(file_path.uri.path().begin(),
-                                   file_path.uri.path().end()); // Thanks C++.
+            LV_LOG_TRACE("Loading image: %s", image.name.c_str());
+            const std::string path(file_path.uri.path().begin(), file_path.uri.path().end()); 
             unsigned char * data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
             glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -473,7 +472,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
         [&](fastgltf::sources::Array & vector)
         {
             int32_t width, height, nrChannels;
-            LV_LOG_USER("Unpacking image data: %s", image.name.c_str());
+            LV_LOG_TRACE("Unpacking image data: %s", image.name.c_str());
 
             unsigned char * data = stbi_load_from_memory(
                 reinterpret_cast<const stbi_uc *>(vector.bytes.data()),
@@ -484,7 +483,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
         },
         [&](fastgltf::sources::BufferView & view)
         {
-            LV_LOG_USER("Injesting image from bufferview: %s", image.name.c_str());
+            LV_LOG_TRACE("Injesting image from bufferview: %s", image.name.c_str());
             image_invalidated |= injest_image_from_buffer_view(data, view, texture_id);
         },
     }, image.data);
@@ -495,7 +494,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
     else {
         LV_LOG_ERROR("Failed to load image %s", image.name.c_str());
     }
-    LV_LOG_USER("Storing texture with hash: %u %u", hash, texture_id);
+    LV_LOG_TRACE("Storing texture with hash: %u %u", hash, texture_id);
     lv_gl_shader_manager_store_texture(shader_manager, hash, texture_id);
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
     data->textures.emplace_back(texture_id);
@@ -522,6 +521,7 @@ static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sourc
         },
         [&](fastgltf::sources::Array & vector)
         {
+            LV_LOG_TRACE("[WEBP] width: %d height: %d", width, height);
             int32_t width, height, nrChannels;
             int32_t webpRes = WebPGetInfo(
                 reinterpret_cast<const uint8_t *>(vector.bytes.data() + buffer_view.byteOffset),
@@ -536,7 +536,7 @@ static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sourc
                     make_small_magenta_texture(texture_id);
                     return true;
                 }
-                LV_LOG_USER("[WEBP] width: %d height: %d", width, height);
+                LV_LOG_TRACE("[WEBP] width: %d height: %d", width, height);
                 glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 stbi_image_free(data);
@@ -569,7 +569,6 @@ static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sourc
                                 unpacked);
                 WebPFree(unpacked);
             }
-            LV_LOG_USER("[WEBP] width: %d height: %d", width, height);
             return false;
         } },
     buffer.data);
