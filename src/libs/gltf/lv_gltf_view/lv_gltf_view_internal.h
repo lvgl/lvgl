@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_GLTF_VIEW_INTERNAL_HPP
-#define LV_GLTF_VIEW_INTERNAL_HPP
+#ifndef LV_GLTF_VIEW_INTERNAL_H
+#define LV_GLTF_VIEW_INTERNAL_H
 
 /*********************
  *      INCLUDES
@@ -19,9 +19,6 @@
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
 #include "../lv_gltf_data/lv_gltf_data_internal.h"
 
-#include <fastgltf/math.hpp>
-#include <fastgltf/types.hpp>
-#include <map>
 
 /*********************
  *      DEFINES
@@ -30,6 +27,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif/* __cplusplus*/
+
 
 typedef enum {
     ANTIALIAS_OFF = 0,
@@ -111,6 +113,13 @@ typedef struct {
     float angle;
 } lv_gltf_view_env_textures_t;
 
+#ifdef __cplusplus
+}
+
+
+#include <fastgltf/math.hpp>
+#include <fastgltf/types.hpp>
+#include <map>
 
 struct _lv_gltf_view_t {
     lv_3dtexture_t texture;
@@ -130,7 +139,6 @@ struct _lv_gltf_view_t {
     lv_gl_shader_manager_t* shader_manager;
     lv_gltf_view_env_textures_t env_textures;
 };
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -177,7 +185,7 @@ lv_gltf_data_t *lv_gltf_load_model_from_file_internal(lv_obj_t *obj, const char 
  *      MACROS
  **********************/
 
-
+#endif/* __cplusplus*/
 #endif /*LV_USE_GLTF*/
 
-#endif /*LV_GLTF_VIEW_INTERNAL_HPP*/
+#endif /*LV_GLTF_VIEW_INTERNAL_H*/

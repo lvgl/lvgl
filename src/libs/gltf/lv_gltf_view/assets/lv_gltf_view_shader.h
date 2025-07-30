@@ -18,7 +18,6 @@ extern "C" {
 
 #if LV_USE_GLTF
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -30,18 +29,18 @@ extern "C" {
  **********************/
 
 typedef struct {
-	const lv_gl_shader_t* shader_list;
+	const lv_gl_shader_t *shader_list;
 	size_t count;
-}lv_gltf_view_shader;
+} lv_gltf_view_shader_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-char* lv_gltf_view_shader_get_vertex(void);
-char* lv_gltf_view_shader_get_fragment(void);
-void lv_gltf_view_shader_get_src(lv_gltf_view_shader* shaders);
-void lv_gltf_view_shader_get_env(lv_gltf_view_shader* shaders);
+char *lv_gltf_view_shader_get_vertex(void);
+char *lv_gltf_view_shader_get_fragment(void);
+void lv_gltf_view_shader_get_src(lv_gltf_view_shader_t *shaders);
+void lv_gltf_view_shader_get_env(lv_gltf_view_shader_t *shaders);
 
 /**********************
  *      MACROS
@@ -52,6 +51,5 @@ void lv_gltf_view_shader_get_env(lv_gltf_view_shader* shaders);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
 
 #endif /*LV_VIEW_SHADER_H*/

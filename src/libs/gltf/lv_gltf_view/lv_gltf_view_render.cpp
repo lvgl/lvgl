@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_gltf_view_internal.hpp"
+#include "lv_gltf_view_internal.h"
 #if LV_USE_GLTF
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include <GL/glew.h>

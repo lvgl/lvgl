@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_gltf_view_internal.hpp"
+#include "lv_gltf_view_internal.h"
 
 #if LV_USE_GLTF
 
@@ -16,12 +16,11 @@
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include "../math/lv_gltf_math.hpp"
 #include "../../../draw/lv_draw_3d.h"
-#include "lv_gltf_view_internal.hpp"
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../core/lv_obj_class_private.h"
 #include "../../../misc/lv_types.h"
 #include "../../../widgets/3dtexture/lv_3dtexture.h"
-#include "ibl/lv_gltf_view_ibl_sampler.hpp"
+#include "ibl/lv_gltf_ibl_sampler.h"
 #include "assets/lv_gltf_view_shader.h"
 #include <fastgltf/math.hpp>
 #include <fastgltf/tools.hpp>
@@ -144,7 +143,7 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     view->texture.h_flip = false;
     view->texture.v_flip = false;
 
-    lv_gltf_view_shader shaders;
+    lv_gltf_view_shader_t shaders;
     lv_gltf_view_shader_get_src(&shaders);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
     char * frag_shader = lv_gltf_view_shader_get_fragment();
@@ -152,7 +151,7 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
-    view->env_textures = lv_gltf_view_ibl_sampler_setup(NULL, 0);
+    lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
     lv_array_init(&view->models, 1, sizeof(lv_gltf_data_t *));
     new(&view->ibm_by_skin_the_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;

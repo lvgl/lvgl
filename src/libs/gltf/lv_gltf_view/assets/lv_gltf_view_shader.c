@@ -3449,12 +3449,12 @@ char* lv_gltf_view_shader_get_fragment(void) {
     return process_includes(src_fragment_shader, GLSL_VERSION_PREFIX);
 }
 
-void lv_gltf_view_shader_get_src(lv_gltf_view_shader *shaders)
+void lv_gltf_view_shader_get_src(lv_gltf_view_shader_t *shaders)
 {
 	shaders->shader_list = src_includes;
 	shaders->count = sizeof(src_includes) / sizeof(src_includes[0]);
 }
-void lv_gltf_view_shader_get_env(lv_gltf_view_shader *shaders)
+void lv_gltf_view_shader_get_env(lv_gltf_view_shader_t *shaders)
 {
 	shaders->shader_list = env_src_includes;
 	shaders->count = sizeof(env_src_includes) / sizeof(env_src_includes[0]);
