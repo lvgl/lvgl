@@ -41,6 +41,7 @@ static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
 static void setup_finish_frame(void);
 static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, const MaterialIndexMap & map);
+static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data);
 
 static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
@@ -119,7 +120,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
                                         uint32_t crop_left,
                                         uint32_t crop_right, uint32_t crop_top, uint32_t crop_bottom)
 {
-    const auto & asset = lv_gltf_data_get_asset(model);
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == BG_ENVIRONMENT);
@@ -181,7 +181,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     }
     bool motion_dirty = false;
     if(view_desc->dirty) {
-        //std::cout << "DIRTY VIEW TRIGGER WINDOW MOTION\n";
         motion_dirty = true;
     }
     view_desc->dirty = false;
@@ -220,55 +219,14 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     }
 
     if((model->_last_frame_no_motion == true) && (model->__last_frame_no_motion == true) &&
-       (___lastFrameNoMotion == true)) {
+        (___lastFrameNoMotion == true)) {
         // Nothing changed at all, return the previous output frame
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
         return _output.texture;
     }
 
-    uint32_t _ss = lv_gltf_data_get_skins_size(model);
-    if(_ss > 0) {
-        lv_gltf_data_destroy_textures(model);
-        uint64_t i = 0u;
-        uint32_t SIZEOF_16FLOATS = sizeof(float) * 16;
-        while(i < _ss) {
-            auto skinIndex = lv_gltf_data_get_skin(model, i);
-            auto skin = asset->skins[skinIndex];
-            auto _ibm = viewer->ibm_by_skin_the_node[skinIndex];
-
-            std::size_t num_joints = skin.joints.size();
-            std::size_t _tex_width = std::ceil(std::sqrt((float)num_joints * 8.0f));
-
-            GLuint rtex = lv_gltf_data_create_texture(model);
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, rtex));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-            /* TODO: perf: Avoid doing memory allocations inside loops */
-            float * _data = new float[_tex_width * _tex_width * 4];
-            std::size_t _dpos = 0;
-            for(uint64_t j = 0; j < num_joints; j++) {
-                auto & _jointNode = asset->nodes[skin.joints[j]];
-                fastgltf::math::fmat4x4 _finalJointMat =
-                    lv_gltf_data_get_cached_transform(model,
-                                                      &_jointNode) *
-                    _ibm[&_jointNode]; // _ibmBySkinThenNode[skinIndex][&_jointNode];
-                std::memcpy(&_data[_dpos], _finalJointMat.data(), SIZEOF_16FLOATS); // Copy final joint matrix
-                std::memcpy(&_data[_dpos + 16],
-                            fastgltf::math::transpose(fastgltf::math::invert(_finalJointMat)).data(),
-                            SIZEOF_16FLOATS); // Copy normal matrix
-                _dpos += 32;
-            }
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _tex_width, _tex_width, 0, GL_RGBA, GL_FLOAT,
-                                 _data));
-            GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-            delete[] _data;
-            ++i;
-        }
-    }
+    render_skins(viewer, model);
 
     NodeDistanceVector distance_sort_nodes;
 
@@ -284,8 +242,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
             distance_sort_nodes.push_back(new_node);
         }
     }
-    // Sort __distance_sort_nodes by the first member (distance)
-    /*std::sort(gltf_data->distance_sort_nodes.begin(), gltf_data->distance_sort_nodes.end(),*/
     std::sort(distance_sort_nodes.begin(), distance_sort_nodes.end(),
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
         return a.first < b.first;
@@ -327,11 +283,12 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
         setup_finish_frame();
     }
 
-    if(model->has_any_cameras)
-        setup_view_proj_matrix_from_camera(viewer, model->current_camera_index, view_desc, model->view_mat,
-                                           model->view_pos, model, false);
-    else
+    if(model->has_any_cameras) {
+        setup_view_proj_matrix_from_camera(viewer, model->current_camera_index, view_desc, model->view_mat, model->view_pos, model, false);
+    }
+    else{
         setup_view_proj_matrix(viewer, view_desc, model, false);
+    }
     viewer->env_rotation_angle = viewer->env_textures.angle;
 
     {
@@ -385,6 +342,50 @@ static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data
                            lv_gltf_data_get_cached_transform(gltf_data, node), &viewer->env_textures, true);
         }
     }
+}
+
+static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model){
+
+    uint32_t skin_count = lv_gltf_data_get_skins_size(model);
+    if(skin_count == 0) {
+        return;
+    }
+    lv_gltf_data_destroy_textures(model);
+    for(size_t i = 0; i < skin_count; ++i) {
+        const auto &skin_index = lv_gltf_data_get_skin(model, i);
+        const auto &skin = model->asset.skins[skin_index];
+        auto &ibm = viewer->ibm_by_skin_the_node[skin_index];
+
+        size_t num_joints = skin.joints.size();
+        size_t tex_width = std::ceil(std::sqrt((float)num_joints * 8.0f));
+
+        GLuint rtex = lv_gltf_data_create_texture(model);
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, rtex));
+        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+        float * texture_data = (float*)lv_malloc(tex_width * tex_width * 4 * sizeof(*texture_data));
+        LV_ASSERT_MALLOC(texture_data);
+        size_t texture_data_index = 0;
+
+        for(uint64_t j = 0; j < num_joints; j++) {
+            auto & joint_node = model->asset.nodes[skin.joints[j]];
+            fastgltf::math::fmat4x4 final_joint_matrix = lv_gltf_data_get_cached_transform(model, &joint_node) * ibm[&joint_node]; 
+
+            lv_memcpy(&texture_data[texture_data_index], final_joint_matrix.data(), sizeof(float) * 16); 
+            lv_memcpy(&texture_data[texture_data_index + 16],
+                      fastgltf::math::transpose(fastgltf::math::invert(final_joint_matrix)).data(),
+                      sizeof(float) * 16); 
+
+            texture_data_index += 32;
+        }
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, tex_width, tex_width, 0, GL_RGBA, GL_FLOAT, texture_data));
+        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+        lv_free(texture_data);
+    }
+
 }
 static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
