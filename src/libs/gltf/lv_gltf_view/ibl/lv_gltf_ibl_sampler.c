@@ -163,7 +163,6 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, sampler->sheen_texture_id));
     GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
     sampler->mipmap_levels = ibl_count_bits(sampler->texture_size) + 1 - sampler->lowest_mip_level;
-    LV_LOG_USER("%d", sampler->mipmap_levels);
 }
 
 static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
