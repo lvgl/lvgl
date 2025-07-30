@@ -501,6 +501,12 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra2222_t> conv_bgra2222_to_bgr
     }
 });
 
+static vg_lite_converter<vg_color32_t, vg_color32_t> conv_brga8888_to_bgra8888(
+    [](vg_color32_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    memcpy(dest, src, sizeof(vg_color32_t) * px_size);
+});
+
 /**********************
  *      MACROS
  **********************/
@@ -2505,11 +2511,13 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
         return Result::Success;
     }
 
+
     ctx->tvg_target_buffer = canvas_target_buffer;
 
+    LV_ASSERT(VG_LITE_IS_ALIGNED(target->stride, sizeof(uint32_t)));
     TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
                                 (uint32_t *)ctx->tvg_target_buffer,
-                                target->width,
+                                target->stride / sizeof(uint32_t),
                                 target->width,
                                 target->height,
                                 SwCanvas::ARGB8888));
@@ -2524,29 +2532,16 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     return Result::Success;
 }
 
-static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
-{
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
-        w = VG_LITE_ALIGN(w, 16);
-    }
-
-    vg_lite_uint32_t mul, div, align;
-    get_format_bytes(color_format, &mul, &div, &align);
-    return VG_LITE_ALIGN((w * mul / div), align);
-}
-
 static bool decode_indexed_line(
     vg_lite_buffer_format_t color_format,
     const vg_lite_uint32_t * palette,
     int32_t x, int32_t y,
-    int32_t w_px, const uint8_t * in, vg_lite_uint32_t * out)
+    int32_t w_px, uint32_t stride, const uint8_t * in, vg_lite_uint32_t * out)
 {
     uint8_t px_size;
     uint16_t mask;
 
-    vg_lite_uint32_t w_byte = width_to_stride(w_px, color_format);
-
-    in += w_byte * y; /*First pixel*/
+    in += stride * y; /*First pixel*/
     out += w_px * y;
 
     int8_t shift = 0;
@@ -2598,13 +2593,14 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
     vg_lite_uint32_t * image_buffer;
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
 
-    if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
+    if(source->format == VG_LITE_BGRA8888
+       && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE
+       && source->stride == source->width * sizeof(vg_lite_uint32_t)) {
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
         vg_lite_uint32_t width = source->width;
         vg_lite_uint32_t height = source->height;
-        vg_lite_uint32_t px_size = width * height;
         image_buffer = ctx->get_image_buffer(width, height);
 
         vg_lite_buffer_t target;
@@ -2613,7 +2609,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         target.format = VG_LITE_BGRA8888;
         target.width = width;
         target.height = height;
-        target.stride = width_to_stride(width, target.format);
+        target.stride = width * sizeof(vg_lite_uint32_t);
 
         switch(source->format) {
             case VG_LITE_INDEX_1:
@@ -2622,7 +2618,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
             case VG_LITE_INDEX_8: {
                     const vg_lite_uint32_t * clut_colors = ctx->get_CLUT(source->format);
                     for(vg_lite_uint32_t y = 0; y < height; y++) {
-                        decode_indexed_line(source->format, clut_colors, 0, y, width, (uint8_t *)source->memory, image_buffer);
+                        decode_indexed_line(source->format, clut_colors, 0, y, width, source->stride, (uint8_t *)source->memory, image_buffer);
                     }
                 }
                 break;
@@ -2687,7 +2683,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
             case VG_LITE_BGRA8888: {
-                    memcpy(image_buffer, source->memory, px_size * sizeof(vg_color32_t));
+                    conv_brga8888_to_bgra8888.convert(&target, source);
                 }
                 break;
 
@@ -2700,6 +2696,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         /* multiply color */
         if(source->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE && !VG_LITE_IS_ALPHA_FORMAT(source->format)) {
             vg_color32_t * dest = (vg_color32_t *)image_buffer;
+            vg_lite_uint32_t px_size = width * height;
             while(px_size--) {
                 dest->alpha = UDIV255(dest->alpha * A(color));
                 dest->red = UDIV255(dest->red * B(color));
