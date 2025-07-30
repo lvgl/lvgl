@@ -178,35 +178,41 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
         return 0;
     }
 
-    const char * original_shader_source = ((lv_gl_shader_source_t *)source_node->data)->data.source;
+    /* Then hash the name with the permutations and see if we already compiled it */
     uint32_t hash = lv_gl_shader_hash(shader_identifier);
-    char * shader_source = construct_shader(original_shader_source,
-                                            permutations, permutations_len);
-
+    char define[512];
     for(size_t i = 0; i < permutations_len; ++i) {
-        hash ^= lv_gl_shader_hash(permutations[i].name);
-        if(permutations[i].source) {
-            hash ^= lv_gl_shader_hash(permutations[i].source);
+        if(permutations[i].source){
+            lv_snprintf(define,sizeof(define),"%%s%s", permutations[i].name, permutations[i].source);
+        } else {
+            lv_snprintf(define,sizeof(define),"%s", permutations[i].name);
         }
+        hash ^= lv_gl_shader_hash(define);
     }
 
     lv_gl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
         lv_rb_find(&shader->compiled_shaders_map, &shader_map_key);
 
+    /* Fast path. Shader already compiled */
     if(shader_map_node != NULL) {
-        lv_free(shader_source);
+        LV_LOG_INFO("Shader '%s' with hash %u found. Id: %d", shader_identifier,hash, ((lv_gl_compiled_shader_t*)shader_map_node->data)->id);
         return hash;
     }
+
+    /* New shader requested, construct and compile it */
     bool is_vertex = string_ends_with(shader_identifier, ".vert");
+    const char * original_shader_source = ((lv_gl_shader_source_t *)source_node->data)->data.source;
+    char * shader_source = construct_shader(original_shader_source,
+                                            permutations, permutations_len);
     shader_map_key.id = compile_shader(shader_source, is_vertex);
+    lv_free(shader_source);
 
     LV_LOG_TRACE("Compiled %s shader %s to %d Hash %u", is_vertex ? "V" : "F", shader_identifier, shader_map_key.id, hash);
     lv_rb_node_t * node = lv_rb_insert(&shader->compiled_shaders_map, &shader_map_key);
     LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
     lv_memcpy(node->data, &shader_map_key, sizeof(shader_map_key));
 
-    lv_free(shader_source);
 
     return hash;
 }
