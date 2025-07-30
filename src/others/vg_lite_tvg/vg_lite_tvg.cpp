@@ -2533,10 +2533,8 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
         return Result::Success;
     }
 
-
     ctx->tvg_target_buffer = canvas_target_buffer;
 
-    LV_ASSERT(VG_LITE_IS_ALIGNED(target->stride, sizeof(uint32_t)));
     TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
                                 (uint32_t *)ctx->tvg_target_buffer,
                                 stride,
