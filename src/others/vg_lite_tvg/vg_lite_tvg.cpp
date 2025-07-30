@@ -2497,13 +2497,21 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     ctx->target_px_size = target->width * target->height;
 
     void * canvas_target_buffer;
+    uint32_t stride = 0;
+
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
         canvas_target_buffer = target->memory;
+
+        /* support target stride */
+        LV_ASSERT(target->stride >= target->width);
+        LV_ASSERT(VG_LITE_IS_ALIGNED(target->stride, sizeof(uint32_t)));
+        stride = target->stride / sizeof(uint32_t);
     }
     else {
         /* if target format is not supported by VG, use internal buffer */
         canvas_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
+        stride = target->width;
     }
 
     /* Prevent repeated target setting */
@@ -2511,13 +2519,11 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
         return Result::Success;
     }
 
-
     ctx->tvg_target_buffer = canvas_target_buffer;
 
-    LV_ASSERT(VG_LITE_IS_ALIGNED(target->stride, sizeof(uint32_t)));
     TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
                                 (uint32_t *)ctx->tvg_target_buffer,
-                                target->stride / sizeof(uint32_t),
+                                stride,
                                 target->width,
                                 target->height,
                                 SwCanvas::ARGB8888));
