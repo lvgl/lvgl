@@ -1027,6 +1027,7 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
     int memory_align = LV_DRAW_BUF_ALIGN;
     if(is_src) {
+        int memory_align = LV_DRAW_BUF_ALIGN;
         switch(buffer->format) {
             case VG_LITE_INDEX_1:
             case VG_LITE_INDEX_2:
@@ -1060,6 +1061,11 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
             default:
                 break;
+        }
+
+        if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, memory_align)) {
+            LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, memory_align);
+            return false;
         }
     }
 
