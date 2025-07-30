@@ -37,9 +37,14 @@
 
 void lv_gltf_store_compiled_shader(lv_gltf_data_t * data, size_t identifier, lv_gltf_compiled_shader_t * shader)
 {
-    /* Asserting this condition is true allows us to skip storing the identifier alongside the compiled shader*/
-    LV_ASSERT(identifier == lv_array_size(&data->compiled_shaders) + 1);
-    lv_array_push_back(&data->compiled_shaders, shader);
+    const size_t index = identifier - 1;
+    if(index >= lv_array_size(&data->compiled_shaders)){
+        lv_array_resize(&data->compiled_shaders, index);
+        lv_array_push_back(&data->compiled_shaders, shader);
+    } else {
+        void* dest = lv_array_at(&data->compiled_shaders, index);
+        lv_memcpy(dest, shader, sizeof(*shader));
+    }
 }
 
 lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_data_t * data, size_t identifier)
