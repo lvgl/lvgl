@@ -174,7 +174,7 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             return LV_DRAW_UNIT_IDLE;
         }
         else {
-            u->task_act->state = LV_DRAW_TASK_STATE_READY;
+            u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
             u->task_act = NULL;
         }
     }
