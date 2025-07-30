@@ -463,7 +463,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
 
             int32_t width, height, nrChannels;
             LV_LOG_TRACE("Loading image: %s", image.name.c_str());
-            const std::string path(file_path.uri.path().begin(), file_path.uri.path().end()); 
+            const std::string path(file_path.uri.path().begin(), file_path.uri.path().end());
             unsigned char * data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
             glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
