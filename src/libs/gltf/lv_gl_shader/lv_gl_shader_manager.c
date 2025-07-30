@@ -182,10 +182,11 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     uint32_t hash = lv_gl_shader_hash(shader_identifier);
     char define[512];
     for(size_t i = 0; i < permutations_len; ++i) {
-        if(permutations[i].source){
-            lv_snprintf(define,sizeof(define),"%%s%s", permutations[i].name, permutations[i].source);
-        } else {
-            lv_snprintf(define,sizeof(define),"%s", permutations[i].name);
+        if(permutations[i].source) {
+            lv_snprintf(define, sizeof(define), "%%s%s", permutations[i].name, permutations[i].source);
+        }
+        else {
+            lv_snprintf(define, sizeof(define), "%s", permutations[i].name);
         }
         hash ^= lv_gl_shader_hash(define);
     }
@@ -196,7 +197,8 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
 
     /* Fast path. Shader already compiled */
     if(shader_map_node != NULL) {
-        LV_LOG_INFO("Shader '%s' with hash %u found. Id: %d", shader_identifier,hash, ((lv_gl_compiled_shader_t*)shader_map_node->data)->id);
+        LV_LOG_INFO("Shader '%s' with hash %u found. Id: %d", shader_identifier, hash,
+                    ((lv_gl_compiled_shader_t *)shader_map_node->data)->id);
         return hash;
     }
 
