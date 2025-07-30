@@ -39,7 +39,7 @@ void lv_gltf_bind_bind_clean(lv_gltf_bind_t * bind)
     bind->dirty = false;
 }
 
-lv_gltf_bind_t * add_by_node(lv_gltf_data_t * gltf_data, fastgltf::Node * node, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node, lv_gltf_bind_prop_t which_prop,
                              uint32_t data_mask,
                              lv_gltf_bind_dir_t dir)
 {
@@ -78,7 +78,7 @@ lv_gltf_bind_t * add_by_node(lv_gltf_data_t * gltf_data, fastgltf::Node * node, 
     return nullptr;
 }
 
-lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_data_t * data, size_t index, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_model_t * data, size_t index, lv_gltf_bind_prop_t which_prop,
                                            uint32_t data_mask,
                                            lv_gltf_bind_dir_t dir)
 {
@@ -90,7 +90,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_data_t * data, size_t index, 
     return add_by_node(data, node->node, which_prop, data_mask, dir);
 }
 
-lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_data_t * data, const char * ip, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_model_t * data, const char * ip, lv_gltf_bind_prop_t which_prop,
                                         uint32_t data_mask,
                                         lv_gltf_bind_dir_t dir)
 {
@@ -101,7 +101,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_ip(lv_gltf_data_t * data, const char * ip, 
     return add_by_node(data, node->node, which_prop, data_mask, dir);
 }
 
-lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_data_t * data, const char * path, lv_gltf_bind_prop_t which_prop,
+lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_model_t * data, const char * path, lv_gltf_bind_prop_t which_prop,
                                           uint32_t data_mask, lv_gltf_bind_dir_t dir)
 {
     lv_gltf_data_node_t * node = lv_gltf_data_node_get_by_path(data, path);
@@ -120,7 +120,7 @@ bool compare_binds(const lv_gltf_bind_t & a, const lv_gltf_bind_t & b)
            (a.data[2] == b.data[2]) && (a.next_bind == b.next_bind);
 }
 
-bool lv_gltf_bind_remove(lv_gltf_data_t * gltf_data, lv_gltf_bind_t * bindToRemove)
+bool lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bindToRemove)
 {
     for(auto pair : gltf_data->node_binds) {
         lv_gltf_bind_t * currentbind = pair.second;

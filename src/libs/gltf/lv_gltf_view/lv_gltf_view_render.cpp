@@ -35,12 +35,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg);
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg);
 static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
 static void setup_finish_frame(void);
-static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, const MaterialIndexMap & map);
-static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data);
+static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map);
+static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
 static lv_result_t render_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state,
                                          uint32_t texture_w,
                                          uint32_t texture_h, bool prepare_bg);
@@ -51,36 +51,36 @@ static void render_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color)
 static uint32_t render_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
                                std::unique_ptr<fastgltf::TextureTransform> & tex_transform, GLint sampler, GLint uv_set,
                                GLint uv_transform);
-static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
+static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                            const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass);
 
-static void setup_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data,
+static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data,
                             fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                             const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass);
 
-static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_data_t * model,
+static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
                           lv_gltf_primitive_t * _prim_data, size_t materialIndex, bool is_transmission_pass, GLuint program,
                           uint32_t * tex_num);
 
-static void draw_lights(lv_gltf_data_t * model, GLuint program);
+static void draw_lights(lv_gltf_model_t * model, GLuint program);
 
 static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height);
 static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state);
 static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_t texture_height, bool mipmaps_enabled);
 
-static void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num,
+static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, int32_t _cur_cam_num,
                                                lv_gltf_view_desc_t * view_desc,
                                                const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
-                                               lv_gltf_data_t * gltf_data, bool transmission_pass);
+                                               lv_gltf_model_t * gltf_data, bool transmission_pass);
 
-static void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
+static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
                                    bool transmission_pass);
 static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t _ret,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg);
-static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur);
+static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
 static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
 /**********************
@@ -95,17 +95,17 @@ static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t
  *   GLOBAL FUNCTIONS
  **********************/
 
-GLuint lv_gltf_view_render(lv_gltf_view_t * viewer)
+GLuint lv_gltf_view_render(lv_gltf_t * viewer)
 {
     const size_t n = lv_array_size(&viewer->models);
 
     if(n == 0) {
         return GL_NONE;
     }
-    lv_gltf_data_t * model = *(lv_gltf_data_t **)lv_array_at(&viewer->models, 0);
+    lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     GLuint texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
-        lv_gltf_data_t * model = *(lv_gltf_data_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
         lv_gltf_view_render_model(viewer, model, false);
     }
     return texture_id;
@@ -141,13 +141,13 @@ static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state)
     GL_CALL(glClearDepth(state->clear_depth));
 }
 
-static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model, bool prepare_bg)
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg)
 {
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == LV_GLTF_BG_ENVIRONMENT);
     bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_CONSTANT) ||
-                             (view_desc->aa_mode == LV_GLTF_AA_NOT_MOVING && model->_last_frame_no_motion == true);
+                             (view_desc->aa_mode == LV_GLTF_AA_NOT_MOVING && model->last_frame_no_motion == true);
     if(prepare_bg == false) {
         // If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn
         opt_aa_this_frame = view_desc->frame_was_antialiased;
@@ -197,9 +197,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
     view_desc->dirty = false;
 
     int32_t anim_num = view_desc->anim;
-    if(anim_num >= 0 && ((int64_t)lv_gltf_data_get_animation_count(model) > anim_num)) {
+    if(anim_num >= 0 && ((int64_t)lv_gltf_model_get_animation_count(model) > anim_num)) {
         if(LV_ABS(view_desc->timestep) > 0.0001f) {
-            //std::cout << "ACTIVE ANIMATION TRIGGER WINDOW MOTION\n";
             model->local_timestamp += view_desc->timestep;
             motion_dirty = true;
         }
@@ -211,25 +210,25 @@ static GLuint lv_gltf_view_render_model(lv_gltf_view_t * viewer, lv_gltf_data_t 
             model->local_timestamp = 0.05f;
         else if(model->local_timestamp < 0.0f)
             model->local_timestamp = model->cur_anim_maxtime - 0.05f;
-        //std::cout << "Animation #" << std::to_string(anim_num) << " | Time = " << std::to_string(local_timestamp) << "\n";
     }
 
     // TODO: check if the override actually affects the transform and that the affected object is visible in the scene
 
     lv_memcpy(&(viewer->last_desc), view_desc, sizeof(*view_desc));
 
-    bool ___lastFrameNoMotion = model->__last_frame_no_motion;
-    model->__last_frame_no_motion = model->_last_frame_no_motion;
-    model->_last_frame_no_motion = true;
-    int32_t pref_cam_num = LV_MIN(view_desc->camera, (int32_t)lv_gltf_data_get_camera_count(model) - 1);
+    bool last_frame_no_motion = model->_last_frame_no_motion;
+    model->_last_frame_no_motion = model->last_frame_no_motion;
+    model->last_frame_no_motion = true;
+
+    int32_t pref_cam_num = LV_MIN(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(model) - 1);
     if(motion_dirty || (pref_cam_num != model->last_camera_index) || lv_gltf_data_transform_cache_is_empty(model)) {
-        model->_last_frame_no_motion = false;
+        model->last_frame_no_motion = false;
         motion_dirty = false;
         lv_gltf_view_recache_all_transforms(viewer, model);
     }
 
-    if((model->_last_frame_no_motion == true) && (model->__last_frame_no_motion == true) &&
-       (___lastFrameNoMotion == true)) {
+    if((model->last_frame_no_motion == true) && (model->_last_frame_no_motion == true) &&
+       (last_frame_no_motion == true)) {
         // Nothing changed at all, return the previous output frame
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
@@ -341,7 +340,7 @@ static void setup_finish_frame(void)
     GL_CALL(glUseProgram(0));
 }
 
-static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, const MaterialIndexMap & map)
+static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map)
 {
     for(const auto & kv : map) {
         for(const auto & pair : kv.second) {
@@ -352,7 +351,7 @@ static void render_materials(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data
     }
 }
 
-static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
+static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {
     uint32_t skin_count = lv_gltf_data_get_skins_size(model);
     if(skin_count == 0) {
@@ -395,7 +394,7 @@ static void render_skins(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
         lv_free(texture_data);
     }
 }
-static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data, fastgltf::Node & node,
+static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                            const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass)
 {
@@ -414,7 +413,7 @@ static void draw_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_da
         GL_CALL(glDrawElements(_prim_data->primitiveType, index_count, _prim_data->indexType, 0));
     }
 }
-static void setup_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_data_t * model, fastgltf::Node & node,
+static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * model, fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                             const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass)
 {
@@ -509,7 +508,7 @@ static void setup_primitive(int32_t prim_num, lv_gltf_view_t * viewer, lv_gltf_d
     }
 }
 
-static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_data_t * model,
+static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
                           lv_gltf_primitive_t * _prim_data, size_t materialIndex, bool is_transmission_pass, GLuint program,
                           uint32_t * tex_num)
 {
@@ -698,7 +697,7 @@ static void draw_material(lv_gltf_view_t * viewer, const lv_gltf_uniform_locatio
         }
     }
 }
-static void draw_lights(lv_gltf_data_t * model, GLuint program)
+static void draw_lights(lv_gltf_model_t * model, GLuint program)
 {
     if(model->node_by_light_index.empty()) {
         return;
@@ -958,10 +957,10 @@ static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state)
         state->renderbuffer = 0;
     }
 }
-static void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t _cur_cam_num,
+static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, int32_t _cur_cam_num,
                                                lv_gltf_view_desc_t * view_desc,
                                                const fastgltf::math::fmat4x4 view_mat, const fastgltf::math::fvec3 view_pos,
-                                               lv_gltf_data_t * gltf_data, bool transmission_pass)
+                                               lv_gltf_model_t * gltf_data, bool transmission_pass)
 {
     /* The following matrix math is for the projection matrices as defined by the glTF spec:*/
     /* https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#projection-matrices*/
@@ -1019,7 +1018,7 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_view_t * viewer, int32_t 
     viewer->camera_pos = view_pos;
 }
 
-static void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_data_t * gltf_data,
+static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
                                    bool transmission_pass)
 {
     auto b_radius = lv_gltf_data_get_radius(gltf_data);
@@ -1110,7 +1109,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_view_t * viewer, float blur)
+static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur)
 {
     GL_CALL(glBindVertexArray(manager->bg_vao));
 

@@ -64,7 +64,7 @@ static lv_result_t add_texture_defines(lv_array_t * array,
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_data_t * data,
+lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_model_t * data,
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim)
 {
@@ -299,7 +299,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
  * @return A gl_renwin_shaderset_t structure representing the compiled and loaded shaders.
  */
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_t * defines,
                                                         size_t n)
 {
     uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",

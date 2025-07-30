@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_gltf_view_internal.h"
+#include <cstdint>
 #include <src/core/lv_obj_pos.h>
 #include <src/misc/lv_array.h>
 #include <src/misc/lv_assert.h>
@@ -15,7 +16,7 @@
 
 #if LV_USE_GLTF
 
-#include "../lv_gltf_data/lv_gltf_data.h"
+#include "../lv_gltf_data/lv_gltf_model.h"
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include "../math/lv_gltf_math.hpp"
 #include "../../../draw/lv_draw_3d.h"
@@ -32,7 +33,8 @@
  *      DEFINES
  *********************/
 
-#define MY_CLASS (&lv_gltf_view_class)
+
+#define MY_CLASS (&lv_gltf_class)
 
 /**********************
  *      TYPEDEFS
@@ -42,27 +44,41 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void lv_gltf_view_state_init(lv_gltf_view_t * state);
+static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
+
+static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
-static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model);
+static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
 static void destroy_environment(lv_gltf_view_env_textures_t * env);
 static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
-static lv_gltf_data_t * find_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model);
 
 static void set_time_cb(lv_timer_t * timer);
-const lv_obj_class_t lv_gltf_view_class = {
-    .base_class = &lv_3dtexture_class,
-    .constructor_cb = lv_gltf_view_constructor,
-    .destructor_cb = lv_gltf_view_destructor,
-    .event_cb = lv_gltf_view_event,
-    .name = "lv_gltf_viewer",
-    .width_def = LV_DPI_DEF * 2,
-    .height_def = LV_DPI_DEF / 10,
-    .instance_size = sizeof(lv_gltf_view_t),
+
+const lv_obj_class_t lv_gltf_class = {
+    &lv_3dtexture_class,
+    lv_gltf_constructor,
+    lv_gltf_destructor,
+    lv_gltf_event,
+#if LV_USE_OBJ_PROPERTY
+    0,
+    0,
+    NULL,
+    0,
+    NULL,
+    0,
+#endif
+    NULL,
+    "lv_gltf",
+    LV_DPI_DEF * 2,
+    LV_DPI_DEF / 10,
+    LV_OBJ_CLASS_EDITABLE_INHERIT,
+    LV_OBJ_CLASS_GROUP_DEF_INHERIT,
+    sizeof(lv_gltf_t),
+    LV_OBJ_CLASS_THEME_INHERITABLE_FALSE
 };
 
 /**********************
@@ -86,38 +102,28 @@ extern "C" {
         return obj;
     }
 
-    lv_gltf_data_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path)
+    lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path)
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
-        lv_gltf_data_t * model = lv_gltf_data_load_from_file(path, viewer->shader_manager);
-        if(!model) {
-            return NULL;
-        }
-        if(lv_array_push_back(&viewer->models, &model) == LV_RESULT_INVALID) {
-            lv_gltf_data_destroy(model);
-            return NULL;
-        }
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
+        lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, viewer->shader_manager);
+        return lv_gltf_add_model(viewer, model);
+    }
 
-        lv_gltf_parse_model(viewer, model);
-
-        if(lv_array_size(&viewer->models) == 1) {
-            lv_gltf_recenter(obj, model);
-        }
-
-        const size_t animation_count = lv_gltf_data_get_animation_count(model);
-        if(animation_count > 0) {
-            lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
-            viewer->desc.timestep = LV_DEF_REFR_PERIOD / 1000.;
-        }
-        return model;
+    lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len)
+    {
+        LV_ASSERT_NULL(obj);
+        LV_ASSERT_OBJ(obj, MY_CLASS);
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
+        lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, viewer->shader_manager);
+        return lv_gltf_add_model(viewer, model);
     }
     void lv_gltf_set_yaw(lv_obj_t * obj, float yaw)
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.yaw = yaw;
         lv_obj_invalidate(obj);
     }
@@ -126,7 +132,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.yaw;
     }
 
@@ -134,7 +140,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.pitch = pitch;
         lv_obj_invalidate(obj);
     }
@@ -143,7 +149,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.pitch;
     }
 
@@ -151,7 +157,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.fov = value;
         lv_obj_invalidate(obj);
     }
@@ -160,7 +166,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.fov;
     }
 
@@ -168,7 +174,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.distance = value;
         lv_obj_invalidate(obj);
     }
@@ -177,7 +183,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.distance;
     }
 
@@ -185,7 +191,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.anim = value;
         lv_obj_invalidate(obj);
     }
@@ -194,7 +200,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.anim;
     }
 
@@ -202,7 +208,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.focal_x = value;
         lv_obj_invalidate(obj);
     }
@@ -211,7 +217,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.focal_x;
     }
 
@@ -219,7 +225,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.focal_y = value;
         lv_obj_invalidate(obj);
     }
@@ -228,7 +234,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.focal_y;
     }
 
@@ -236,7 +242,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.focal_z = value;
         lv_obj_invalidate(obj);
     }
@@ -245,7 +251,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.focal_z;
     }
 
@@ -253,7 +259,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.bg_color = value;
         lv_obj_invalidate(obj);
     }
@@ -262,7 +268,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.bg_color;
     }
 
@@ -270,7 +276,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.camera = value;
         lv_obj_invalidate(obj);
     }
@@ -279,7 +285,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.camera;
     }
 
@@ -287,7 +293,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.timestep = value;
         lv_obj_invalidate(obj);
     }
@@ -296,7 +302,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.timestep;
     }
 
@@ -304,7 +310,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.aa_mode = value;
         lv_obj_invalidate(obj);
     }
@@ -313,7 +319,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.aa_mode;
     }
 
@@ -321,7 +327,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.bg_mode = value;
         lv_obj_invalidate(obj);
     }
@@ -330,7 +336,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.bg_mode;
     }
 
@@ -338,7 +344,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.blur_bg = value;
         lv_obj_invalidate(obj);
     }
@@ -347,7 +353,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.blur_bg;
     }
 
@@ -355,7 +361,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.env_pow = value;
         lv_obj_invalidate(obj);
     }
@@ -364,7 +370,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.env_pow;
     }
 
@@ -372,7 +378,7 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         viewer->desc.exposure = value;
         lv_obj_invalidate(obj);
     }
@@ -381,17 +387,17 @@ extern "C" {
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.exposure;
     }
-    void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_data_t * model)
+    void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         if(model == NULL) {
             LV_ASSERT(lv_array_size(&viewer->models) > 0);
-            model = (lv_gltf_data_t *)lv_array_at(&viewer->models, 0);
+            model = (lv_gltf_model_t *)lv_array_at(&viewer->models, 0);
         }
 
         const auto & center_position = lv_gltf_data_get_center(model);
@@ -405,17 +411,42 @@ extern "C" {
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
+{
+
+    if(!model) {
+        return NULL;
+    }
+    if(lv_array_push_back(&viewer->models, &model) == LV_RESULT_INVALID) {
+        lv_gltf_data_destroy(model);
+        return NULL;
+    }
+
+    lv_gltf_parse_model(viewer, model);
+
+    if(lv_array_size(&viewer->models) == 1) {
+        lv_gltf_recenter((lv_obj_t *)viewer, model);
+    }
+
+    const size_t animation_count = lv_gltf_model_get_animation_count(model);
+    if(animation_count > 0) {
+        lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
+        viewer->desc.timestep = LV_DEF_REFR_PERIOD / 1000.;
+    }
+    return model;
+}
+
 static void set_time_cb(lv_timer_t * timer)
 {
     lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_obj_invalidate(obj);
 }
 
-static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
-    lv_gltf_view_t * view = (lv_gltf_view_t *)obj;
+    lv_gltf_t * view = (lv_gltf_t *)obj;
     lv_gltf_view_state_init(view);
     lv_gltf_view_desc_init(&view->desc);
     view->view_matrix = fastgltf::math::fmat4x4(1.0f);
@@ -436,20 +467,20 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
-    lv_array_init(&view->models, 1, sizeof(lv_gltf_data_t *));
+    lv_array_init(&view->models, 1, sizeof(lv_gltf_model_t *));
     new(&view->ibm_by_skin_the_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
 
     LV_TRACE_OBJ_CREATE("end");
 }
 
-static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e)
+static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
     lv_event_code_t code = lv_event_get_code(e);
 
     if(code == LV_EVENT_DRAW_MAIN) {
         lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
-        lv_gltf_view_t * viewer = (lv_gltf_view_t *)obj;
+        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         GLuint texture_id = lv_gltf_view_render(viewer);
         lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
     }
@@ -462,30 +493,26 @@ static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e)
         return;
     }
 }
-static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_gltf_view_t * view = (lv_gltf_view_t *)obj;
+    lv_gltf_t * view = (lv_gltf_t *)obj;
     lv_gl_shader_manager_destroy(view->shader_manager);
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
-        lv_gltf_data_destroy(*(lv_gltf_data_t **)lv_array_at(&view->models, i));
+        lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
     destroy_environment(&view->env_textures);
 }
 
-static void lv_gltf_view_state_init(lv_gltf_view_t * view)
+static void lv_gltf_view_state_init(lv_gltf_t * view)
 {
     lv_memset(&view->state, 0, sizeof(view->state));
-    view->state.opaque_frame_buffer_width = 256;
-    view->state.opaque_frame_buffer_height = 256;
+    view->state.opaque_frame_buffer_width = lv_obj_get_width((lv_obj_t *)view);
+    view->state.opaque_frame_buffer_height = lv_obj_get_height((lv_obj_t *)view);;
     view->state.material_variant = 0;
     view->state.render_state_ready = false;
     view->state.render_opaque_buffer = false;
-
-    /* TODO: Do this during the intialization phase
-        state->opaque_render_state = setup_opaque_output(state->opaque_frame_buffer_width, state->opaque_frame_buffer_height);
-    */
 }
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
 {
@@ -508,7 +535,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->frame_was_antialiased = false;
     desc->bg_color = lv_color32_make(230, 230, 230, 255);
 }
-static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
+static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {
     const auto & iterate_callback = [&](fastgltf::Node & node, const fastgltf::math::fmat4x4 & matrix) {
         LV_UNUSED(matrix);
@@ -588,11 +615,11 @@ static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
     setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);
 }
 
-void lv_gltf_view_recache_all_transforms(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data)
+void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data)
 {
     const lv_gltf_view_desc_t * view_desc = &viewer->desc;
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
-    int32_t PREF_CAM_NUM = std::min(view_desc->camera, (int32_t)lv_gltf_data_get_camera_count(gltf_data) - 1);
+    int32_t PREF_CAM_NUM = std::min(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
     int32_t anim_num = view_desc->anim;
     uint32_t sceneIndex = 0;
 

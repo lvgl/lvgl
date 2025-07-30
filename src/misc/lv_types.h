@@ -278,9 +278,9 @@ typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
-typedef struct _lv_gltf_view_t lv_gltf_view_t;
+typedef struct _lv_gltf_t lv_gltf_t;
 
-typedef struct _lv_gltf_data_t lv_gltf_data_t;
+typedef struct _lv_gltf_model_t lv_gltf_model_t;
 
 typedef struct _lv_observer_t lv_observer_t;
 

@@ -14,7 +14,7 @@
 
 #if LV_USE_GLTF
 
-#include "lv_gltf_view.h"
+#include "lv_gltf.h"
 #include "../../../misc/lv_types.h"
 #include "../lv_gl_shader/lv_gl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
@@ -25,14 +25,16 @@
  *      DEFINES
  *********************/
 
+
 /**********************
  *      TYPEDEFS
  **********************/
 
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_3dtexture_class;
+
 #ifdef __cplusplus
 extern "C" {
 #endif/* __cplusplus*/
-
 
 
 typedef struct {
@@ -67,8 +69,7 @@ typedef struct {
     bool frame_was_antialiased;
     bool dirty;
     int32_t camera;
-    int32_t anim;               // -1 for no animations, 0+ = Animation index.
-    // Any value higher than the scene's animation count will be limited to the scene's animation count.
+    int32_t anim;
     float timestep;             // How far to step the current animation in seconds
     lv_gltf_antialiasing_mode_t aa_mode;
     lv_gltf_background_mode_t bg_mode;
@@ -105,7 +106,7 @@ typedef struct {
 #include <fastgltf/types.hpp>
 #include <map>
 
-struct _lv_gltf_view_t {
+struct _lv_gltf_t {
     lv_3dtexture_t texture;
     lv_array_t models;
     lv_gltf_view_state_t state;
@@ -128,16 +129,16 @@ struct _lv_gltf_view_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-GLuint lv_gltf_view_render(lv_gltf_view_t * viewer);
-lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_data_t * data,
+GLuint lv_gltf_view_render(lv_gltf_t * viewer);
+lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_model_t * data,
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_view_t * view, const lv_gl_shader_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_t * defines,
                                                         size_t n);
 
 
-void lv_gltf_view_recache_all_transforms(lv_gltf_view_t * viewer, lv_gltf_data_t * gltf_data);
+void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
 
 
 /**********************
