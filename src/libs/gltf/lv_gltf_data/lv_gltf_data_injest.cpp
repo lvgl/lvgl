@@ -70,30 +70,30 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void set_bounds_info(lv_gltf_data_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
+static void set_bounds_info(lv_gltf_model_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
                             fastgltf::math::fvec3 v_cen, float radius);
-static lv_gltf_data_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size);
+static lv_gltf_model_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size);
 
-static lv_gltf_data_t * create_data_from_file(const char * path);
+static lv_gltf_model_t * create_data_from_file(const char * path);
 
-static void injest_grow_bounds_to_include(lv_gltf_data_t * data, const fastgltf::math::fmat4x4 & matrix,
+static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                           const fastgltf::Mesh & mesh);
 
-static void injest_set_initial_bounds(lv_gltf_data_t * data, const fastgltf::math::fmat4x4 & matrix,
+static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                       const fastgltf::Mesh & mesh);
 
-static bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data, fastgltf::Image & image,
+static bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
                          uint32_t index);
 
-static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sources::BufferView & view,
+static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sources::BufferView & view,
                                           GLuint texture_id);
-static void injest_light(lv_gltf_data_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index);
-static bool injest_mesh(lv_gltf_data_t * data, fastgltf::Mesh & mesh);
+static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index);
+static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh);
 
 static void make_small_magenta_texture(uint32_t new_magenta_tex);
 
 template <typename T, typename Func>
-static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_data_t * data,
+static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_model_t * data,
                                    const fastgltf::Primitive * prim, const char * attrib_id, GLuint primitive_vertex_buffer,
                                    size_t offset, Func &&functor);
 
@@ -105,17 +105,17 @@ static inline GLsizei get_level_count(int32_t width, int32_t height)
     return static_cast<GLsizei>(1 + floor(log2(width > height ? width : height)));
 }
 
-static void load_mesh_texture_impl(lv_gltf_data_t * data, const fastgltf::TextureInfo & material_prop,
+static void load_mesh_texture_impl(lv_gltf_model_t * data, const fastgltf::TextureInfo & material_prop,
                                    GLuint * primitive_tex_prop,
                                    GLint * primitive_tex_uv_id);
-static void load_mesh_texture(lv_gltf_data_t * data, const fastgltf::Optional<fastgltf::TextureInfo> & material_prop,
+static void load_mesh_texture(lv_gltf_model_t * data, const fastgltf::Optional<fastgltf::TextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id);
 
-static void load_mesh_texture(lv_gltf_data_t * data,
+static void load_mesh_texture(lv_gltf_model_t * data,
                               const fastgltf::Optional<fastgltf::NormalTextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id);
 
-static void load_mesh_texture(lv_gltf_data_t * data,
+static void load_mesh_texture(lv_gltf_model_t * data,
                               const fastgltf::Optional<fastgltf::OcclusionTextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id);
 
@@ -131,10 +131,10 @@ static void load_mesh_texture(lv_gltf_data_t * data,
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gltf_data_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
-                                            lv_gl_shader_manager_t * shaders)
+lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
+                                             lv_gl_shader_manager_t * shaders)
 {
-    lv_gltf_data_t * data = NULL;
+    lv_gltf_model_t * data = NULL;
     if(data_size > 0) {
         data = create_data_from_bytes((const uint8_t *)data_source, data_size);
     }
@@ -206,7 +206,7 @@ lv_gltf_data_t * lv_gltf_data_load_internal(const void * data_source, size_t dat
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_gltf_data_t * create_data_from_file(const char * path)
+static lv_gltf_model_t * create_data_from_file(const char * path)
 {
 #if FASTGLTF_HAS_MEMORY_MAPPED_FILE
     fastgltf::Parser parser(SUPPORTED_EXTENSIONS);
@@ -235,7 +235,7 @@ static lv_gltf_data_t * create_data_from_file(const char * path)
     return NULL;
 }
 
-static lv_gltf_data_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size)
+static lv_gltf_model_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size)
 {
     fastgltf::Parser parser(SUPPORTED_EXTENSIONS);
     auto gltf_buffer = fastgltf::GltfDataBuffer::FromBytes(reinterpret_cast<const std::byte *>(bytes), data_size);
@@ -267,7 +267,7 @@ static void make_small_magenta_texture(uint32_t new_magenta_tex)
     return;
 }
 
-static void load_mesh_texture_impl(lv_gltf_data_t * data, const fastgltf::TextureInfo & material_prop,
+static void load_mesh_texture_impl(lv_gltf_model_t * data, const fastgltf::TextureInfo & material_prop,
                                    GLuint * primitive_tex_prop,
                                    GLint * primitive_tex_uv_id)
 {
@@ -285,7 +285,7 @@ static void load_mesh_texture_impl(lv_gltf_data_t * data, const fastgltf::Textur
     LV_LOG_TRACE("Prim tex prop: %d Prim tex uv id %d", *primitive_tex_prop, *primitive_tex_uv_id);
 }
 
-static void load_mesh_texture(lv_gltf_data_t * data,
+static void load_mesh_texture(lv_gltf_model_t * data,
                               const fastgltf::Optional<fastgltf::NormalTextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id)
 {
@@ -295,7 +295,7 @@ static void load_mesh_texture(lv_gltf_data_t * data,
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
-static void load_mesh_texture(lv_gltf_data_t * data, const fastgltf::Optional<fastgltf::TextureInfo> & material_prop,
+static void load_mesh_texture(lv_gltf_model_t * data, const fastgltf::Optional<fastgltf::TextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id)
 {
     if(!material_prop) {
@@ -304,7 +304,7 @@ static void load_mesh_texture(lv_gltf_data_t * data, const fastgltf::Optional<fa
     load_mesh_texture_impl(data, material_prop.value(), primitive_tex_prop, primitive_tex_uv_id);
 }
 
-static void load_mesh_texture(lv_gltf_data_t * data,
+static void load_mesh_texture(lv_gltf_model_t * data,
                               const fastgltf::Optional<fastgltf::OcclusionTextureInfo> & material_prop,
                               GLuint * primitive_tex_prop, GLint * primitive_tex_uv_id)
 {
@@ -334,7 +334,7 @@ static bool injest_check_any_image_index_valid(fastgltf::Optional<fastgltf::Text
     return false;
 }
 
-static void injest_grow_bounds_to_include(lv_gltf_data_t * data, const fastgltf::math::fmat4x4 & matrix,
+static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                           const fastgltf::Mesh & mesh)
 {
     /* Grow the bounds to include the specified mesh. */
@@ -384,7 +384,7 @@ static void injest_grow_bounds_to_include(lv_gltf_data_t * data, const fastgltf:
 
     set_bounds_info(data, v_min, v_max, v_cen, new_bound_radius);
 }
-static void injest_set_initial_bounds(lv_gltf_data_t * data, const fastgltf::math::fmat4x4 & matrix,
+static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                       const fastgltf::Mesh & mesh)
 {
     fastgltf::math::fvec3 v_min, v_max, v_cen;
@@ -428,7 +428,7 @@ static void injest_set_initial_bounds(lv_gltf_data_t * data, const fastgltf::mat
     set_bounds_info(data, v_min, v_max, v_cen, radius);
 }
 
-bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data, fastgltf::Image & image,
+bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
                   uint32_t index)
 {
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
@@ -501,7 +501,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_data_t * data
     return true;
 }
 
-static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sources::BufferView & view,
+static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sources::BufferView & view,
                                           GLuint texture_id)
 {
     /* Yes, we've already loaded every buffer into some GL buffer. However, with GL it's simpler
@@ -573,7 +573,7 @@ static bool injest_image_from_buffer_view(lv_gltf_data_t * data, fastgltf::sourc
         } },
     buffer.data);
 }
-static void injest_light(lv_gltf_data_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index)
+static void injest_light(lv_gltf_model_t * data, size_t light_index, fastgltf::Light & light, size_t scene_index)
 {
     fastgltf::math::fmat4x4 tmat;
     // It would seem like we'd need this info but not really, just the index will do at the loading phase, the rest is pulled during frame updates.
@@ -593,7 +593,7 @@ static void injest_light(lv_gltf_data_t * data, size_t light_index, fastgltf::Li
     });
 }
 
-static bool injest_mesh(lv_gltf_data_t * data, fastgltf::Mesh & mesh)
+static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
 {
     /*const auto &asset = GET_ASSET(data);*/
     const auto & outMesh = lv_gltf_get_new_meshdata(data);
@@ -767,7 +767,7 @@ static bool injest_mesh(lv_gltf_data_t * data, fastgltf::Mesh & mesh)
     return true;
 }
 template <typename T, typename Func>
-static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_data_t * data,
+static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_model_t * data,
                                    const fastgltf::Primitive * prim, const char * attrib_id, GLuint primitive_vertex_buffer,
                                    size_t offset, Func &&functor
 
@@ -796,7 +796,7 @@ static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_inde
     return current_attrib_index;
 }
 
-static void set_bounds_info(lv_gltf_data_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
+static void set_bounds_info(lv_gltf_model_t * data, fastgltf::math::fvec3 v_min, fastgltf::math::fvec3 v_max,
                             fastgltf::math::fvec3 v_cen, float radius)
 {
     {

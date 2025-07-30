@@ -34,39 +34,39 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_data_t * data,
+fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_model_t * data,
                                                           fastgltf::Node * node)
 {
     return data->node_transform_cache[node];
 }
 
-bool lv_gltf_data_has_cached_transform(lv_gltf_data_t * data, fastgltf::Node * node)
+bool lv_gltf_data_has_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node)
 {
     return (data->node_transform_cache.find(node) !=
             data->node_transform_cache.end());
 }
-void lv_gltf_data_set_cached_transform(lv_gltf_data_t * data, fastgltf::Node * node,
+void lv_gltf_data_set_cached_transform(lv_gltf_model_t * data, fastgltf::Node * node,
                                        fastgltf::math::fmat4x4 M)
 {
     data->node_transform_cache[node] = M;
 }
-void lv_gltf_data_clear_transform_cache(lv_gltf_data_t * data)
+void lv_gltf_data_clear_transform_cache(lv_gltf_model_t * data)
 {
     data->node_transform_cache.clear();
 }
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_data_t * data)
+bool lv_gltf_data_transform_cache_is_empty(lv_gltf_model_t * data)
 {
     return data->node_transform_cache.size() == 0;
 }
 
-void recache_centerpoint(lv_gltf_data_t * data, size_t index_mesh, int32_t primitive)
+void recache_centerpoint(lv_gltf_model_t * data, size_t index_mesh, int32_t primitive)
 {
     data->local_mesh_to_center_points_by_primitive[index_mesh][primitive] =
         lv_gltf_get_primitive_centerpoint(data, data->asset.meshes[index_mesh],
                                           primitive);
 }
 
-fastgltf::math::fvec3 lv_gltf_data_get_centerpoint(lv_gltf_data_t * gltf_data,
+fastgltf::math::fvec3 lv_gltf_data_get_centerpoint(lv_gltf_model_t * gltf_data,
                                                    fastgltf::math::fmat4x4 matrix,
                                                    size_t mesh_index, int32_t elem)
 {
@@ -75,7 +75,7 @@ fastgltf::math::fvec3 lv_gltf_data_get_centerpoint(lv_gltf_data_t * gltf_data,
     }
     return get_cached_centerpoint(gltf_data, mesh_index, elem, matrix);
 }
-bool lv_gltf_data_centerpoint_cache_contains(lv_gltf_data_t * data, size_t index, int32_t element)
+bool lv_gltf_data_centerpoint_cache_contains(lv_gltf_model_t * data, size_t index, int32_t element)
 {
     return data->local_mesh_to_center_points_by_primitive.find(index) !=
            data->local_mesh_to_center_points_by_primitive.end() &&
@@ -83,7 +83,7 @@ bool lv_gltf_data_centerpoint_cache_contains(lv_gltf_data_t * data, size_t index
            data->local_mesh_to_center_points_by_primitive[index].end();
 }
 
-fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_data_t * data, size_t index,
+fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_model_t * data, size_t index,
                                              int32_t element,
                                              fastgltf::math::fmat4x4 matrix)
 {
