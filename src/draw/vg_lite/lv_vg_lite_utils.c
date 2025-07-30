@@ -718,9 +718,6 @@ void lv_vg_lite_buffer_init(
     vg_lite_buffer_format_t format,
     bool tiled)
 {
-    uint32_t mul;
-    uint32_t div;
-    uint32_t align;
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(ptr);
 
