@@ -44,7 +44,9 @@ static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_view_state_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
+static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model);
 static void destroy_environment(lv_gltf_view_env_textures_t * env);
+static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager);
 static void set_time_cb(lv_timer_t * timer);
 const lv_obj_class_t lv_gltf_view_class = {
     .base_class = &lv_3dtexture_class,
@@ -91,6 +93,7 @@ extern "C" {
             lv_gltf_data_destroy(model);
             return NULL;
         }
+        lv_gltf_parse_model(viewer, model);
         const size_t animation_count = lv_gltf_data_get_animation_count(model);
         if(animation_count > 0) {
             lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
@@ -160,7 +163,6 @@ static void lv_gltf_view_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) {
         return;
     }
-
 }
 static void lv_gltf_view_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -213,6 +215,85 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->bg_g = 230;
     desc->bg_b = 230;
     desc->bg_a = 255;
+}
+static void lv_gltf_parse_model(lv_gltf_view_t * viewer, lv_gltf_data_t * model)
+{
+    const auto & iterate_callback = [&](fastgltf::Node & node, const fastgltf::math::fmat4x4 & matrix) {
+        LV_UNUSED(matrix);
+        if(!node.meshIndex) {
+            return;
+        }
+        auto & mesh_index = node.meshIndex.value();
+        if(node.skinIndex) {
+            auto skin_index = node.skinIndex.value();
+            if(!lv_gltf_data_validated_skins_contains(model, skin_index)) {
+                lv_gltf_data_validate_skin(model, skin_index);
+                auto skin = model->asset.skins[skin_index];
+                if(skin.inverseBindMatrices) {
+                    auto & _ibmVal = skin.inverseBindMatrices.value();
+                    auto & _ibmAccessor = model->asset.accessors[_ibmVal];
+                    if(_ibmAccessor.bufferViewIndex) {
+                        fastgltf::iterateAccessorWithIndex<fastgltf::math::fmat4x4>(
+                            model->asset, _ibmAccessor,
+                        [&](fastgltf::math::fmat4x4 _matrix, std::size_t idx) {
+                            auto & joint_node = model->asset.nodes[skin.joints[idx]];
+                            viewer->ibm_by_skin_the_node[skin_index][&joint_node] = _matrix;
+                        });
+                    }
+                }
+            }
+        }
+        for(size_t mp = 0; mp < model->asset.meshes[mesh_index].primitives.size(); mp++) {
+            auto & model_primitive = model->asset.meshes[mesh_index].primitives[mp];
+            const auto & mappings = model_primitive.mappings;
+            ssize_t material_index =
+                (!mappings.empty() && mappings[viewer->state.material_variant]) ?
+                mappings[viewer->state.material_variant].value() + 1 :
+                ((model_primitive.materialIndex) ? (model_primitive.materialIndex.value() + 1) : 0);
+            if(material_index < 0) {
+                lv_gltf_data_add_opaque_node_primitive(model, 0, &node, mp);
+                continue;
+            }
+            const fastgltf::Material & material = model->asset.materials[material_index - 1];
+
+            viewer->state.render_opaque_buffer |= material.transmission != NULL;
+
+            if(material.alphaMode == fastgltf::AlphaMode::Blend || material.transmission != NULL) {
+                lv_gltf_data_add_blended_node_primitive(model, material_index + 1, &node, mp);
+            }
+            else {
+                lv_gltf_data_add_opaque_node_primitive(model, material_index + 1, &node, mp);
+            }
+
+            lv_array_t defines;
+            lv_array_init(&defines, 64, sizeof(lv_gl_shader_t));
+            lv_result_t result =
+                lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &model_primitive);
+
+            LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
+            lv_gltf_compiled_shader_t compiled_shader;
+            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(
+                                            viewer, (lv_gl_shader_t *)defines.data, lv_array_size(&defines));
+            compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
+            lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
+        }
+    };
+
+    setup_compile_and_load_bg_shader(viewer->shader_manager);
+    fastgltf::iterateSceneNodes(model->asset, 0, fastgltf::math::fmat4x4(), iterate_callback);
+}
+
+static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
+{
+    lv_gl_shader_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL } };
+
+    uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
+    uint32_t vert_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
+
+    lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
+
+    manager->bg_program = lv_gl_shader_program_get_id(program);
+    setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);
 }
 
 gl_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height)
@@ -607,8 +688,7 @@ void setup_view_proj_matrix(lv_gltf_view_t * viewer, lv_gltf_view_desc_t * view_
 }
 
 lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t _ret, uint32_t texture_w,
-                                        uint32_t texture_h,
-                                        bool prepare_bg)
+                                        uint32_t texture_h, bool prepare_bg)
 {
     LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", _ret.texture, _ret.renderbuffer);
 
@@ -708,13 +788,12 @@ void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBu
 void setup_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color)
 {
     GL_CALL(glUniform4f(uniform_loc, static_cast<float>(color[0]), static_cast<float>(color[1]),
-                        static_cast<float>(color[2]),
-                        static_cast<float>(color[3])));
+                        static_cast<float>(color[2]), static_cast<float>(color[3])));
 }
 
 lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, gl_renwin_state_t state, uint32_t texture_w,
-                                         uint32_t texture_h,
-                                         uint32_t texture_offset_w, uint32_t texture_offset_h, bool prepare_bg)
+                                         uint32_t texture_h, uint32_t texture_offset_w, uint32_t texture_offset_h,
+                                         bool prepare_bg)
 {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state.framebuffer));
 
@@ -786,11 +865,8 @@ fastgltf::math::fmat3x3 setup_texture_transform_matrix(fastgltf::TextureTransfor
 
 static void destroy_environment(lv_gltf_view_env_textures_t * env)
 {
-    const unsigned int d[3] = { env->diffuse, env->specular,
-                                env->sheen
-                              };
+    const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
     GL_CALL(glDeleteTextures(3, d));
 }
-
 
 #endif /*LV_USE_GLTF*/

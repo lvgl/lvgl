@@ -56,7 +56,6 @@ lv_gltf_data_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->last_frame_was_antialiased = false;
     data->_last_frame_no_motion = false;
     data->__last_frame_no_motion = false;
-    data->nodes_parsed = false;
     new(&data->node_binds) NodeOverrideMap();
     new(&data->all_binds) OverrideVector();
     new(&data->node_transform_cache) NodeTransformMap();
@@ -69,8 +68,7 @@ lv_gltf_data_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->node_by_light_index) NodeVector();
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
-    new(&data->shader_uniforms) std::vector<lv_gltf_uniform_locations_t>();
-    new(&data->shader_sets) std::vector<lv_gltf_renwin_shaderset_t>();
+    lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
 
