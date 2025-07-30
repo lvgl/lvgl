@@ -75,7 +75,7 @@ struct _lv_gltf_data_t {
 	MaterialIndexMap blended_nodes_by_material_index;
 	NodeOverrideMap node_binds;
 	OverrideVector all_binds;
-	LongVector validated_skins;
+	std::vector<size_t> validated_skins;
 	std::vector<GLuint> skin_tex;
 	NodePrimCenterMap local_mesh_to_center_points_by_primitive;
 
@@ -239,14 +239,14 @@ void lv_gltf_data_add_blended_node_primitive(lv_gltf_data_t *data, size_t mesh_i
  * @param N Pointer to the NodePtr representing the node for which to set the transformation.
  * @param M The transformation matrix to cache.
  */
-void lv_gltf_data_set_cached_transform(lv_gltf_data_t *D, NodePtr N, fastgltf::math::fmat4x4 M);
+void lv_gltf_data_set_cached_transform(lv_gltf_data_t* data, fastgltf::Node* node, fastgltf::math::fmat4x4 M);
 
 /**
  * @brief Clear the transformation cache for the GLTF model data.
  *
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  */
-void lv_gltf_data_clear_transform_cache(lv_gltf_data_t *D);
+void lv_gltf_data_clear_transform_cache(lv_gltf_data_t* data);
 
 /**
  * @brief Retrieve the cached transformation matrix for a specific node in the GLTF model data.
@@ -255,7 +255,7 @@ void lv_gltf_data_clear_transform_cache(lv_gltf_data_t *D);
  * @param N Pointer to the NodePtr representing the node for which to retrieve the transformation.
  * @return The cached transformation matrix.
  */
-fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_data_t *D, NodePtr N);
+fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_data_t* data, fastgltf::Node* node);
 
 /**
  * @brief Check if a cached transformation matrix exists for a given node.
@@ -263,8 +263,8 @@ fastgltf::math::fmat4x4 lv_gltf_data_get_cached_transform(lv_gltf_data_t *D, Nod
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  * @param N Pointer to the NodePtr representing the node for which to retrieve the transformation.
  * @return true if a cache item exists, false otherwise
- */
-bool lv_gltf_data_has_cached_transform(lv_gltf_data_t *D, NodePtr N);
+ int32_t*/
+bool lv_gltf_data_has_cached_transform(lv_gltf_data_t* data, fastgltf::Node* node);
 
 /**
  * @brief Check if the transformation cache is empty.
@@ -272,7 +272,7 @@ bool lv_gltf_data_has_cached_transform(lv_gltf_data_t *D, NodePtr N);
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  * @return True if the transformation cache is empty, false otherwise.
  */
-bool lv_gltf_data_transform_cache_is_empty(lv_gltf_data_t *D);
+bool lv_gltf_data_transform_cache_is_empty(lv_gltf_data_t* data);
 
 /**
  * @brief Retrieve the size of the skins in the GLTF model data.
@@ -280,7 +280,7 @@ bool lv_gltf_data_transform_cache_is_empty(lv_gltf_data_t *D);
  * @param D Pointer to the lv_gltf_data_t object containing the model data.
  * @return The size of the skins.
  */
-size_t lv_gltf_data_get_skins_size(lv_gltf_data_t *D);
+size_t lv_gltf_data_get_skins_size(lv_gltf_data_t *data);
 
 /**
  * @brief Retrieve a specific skin from the GLTF model data.
@@ -289,7 +289,7 @@ size_t lv_gltf_data_get_skins_size(lv_gltf_data_t *D);
  * @param I The index of the skin to retrieve.
  * @return The skin index.
  */
-int32_t lv_gltf_data_get_skin(lv_gltf_data_t *D, size_t I);
+size_t lv_gltf_data_get_skin(lv_gltf_data_t *data, size_t index);
 
 /**
  * @brief Ingest and discover defines for a specific node and primitive in the GLTF model data.

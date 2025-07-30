@@ -57,9 +57,9 @@ size_t lv_gltf_data_get_skins_size(lv_gltf_data_t * data)
 {
     return data->validated_skins.size();
 }
-int32_t lv_gltf_data_get_skin(lv_gltf_data_t * data, uint64_t I)
+size_t lv_gltf_data_get_skin(lv_gltf_data_t * data, size_t index)
 {
-    return data->validated_skins[I];
+    return data->validated_skins[index];
 }
 
 /**********************
