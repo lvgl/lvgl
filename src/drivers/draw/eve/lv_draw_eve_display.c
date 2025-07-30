@@ -13,7 +13,6 @@
 #include "../../../draw/eve/lv_eve.h"
 #include "../../../draw/eve/lv_draw_eve.h"
 #include "../../../display/lv_display_private.h"
-#include "../../../draw/lv_draw_buf.h"
 
 #include "../../../libs/FT800-FT813/EVE_commands.h"
 
@@ -49,17 +48,13 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params, lv_draw_eve_operation_cb_t op_cb,
                                           void * user_data)
 {
-    /* The buffer is not used, so just set something. */
-    static lv_draw_buf_t draw_buf;
     static uint8_t dummy_buf; /* It won't be used as it will send commands instead of draw pixels. */
-    lv_draw_buf_init(&draw_buf, params->hor_res, params->ver_res, LV_COLOR_FORMAT_NATIVE,
-                     params->hor_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_NATIVE),
-                     &dummy_buf, params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_NATIVE));
 
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
     lv_display_set_flush_cb(disp, flush_cb);
-    lv_display_set_draw_buffers(disp, &draw_buf, NULL);
-    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
+    lv_display_set_buffers(disp, &dummy_buf, NULL,
+                           params->hor_res * params->ver_res * LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_NATIVE),
+                           LV_DISPLAY_RENDER_MODE_FULL); /* recreate the full display list each refresh */
     lv_display_add_event_cb(disp, resolution_changed_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_set_driver_data(disp, user_data);
 
