@@ -46,8 +46,7 @@ class iblSampler
         uint32_t createCubemapTexture(bool withMipmaps);
         uint32_t createLutTexture(void);
         void panoramaToCubeMap(void);
-        void applyFilter(uint32_t distribution, float roughness, uint32_t targetMipLevel, uint32_t targetTexture,
-                         uint32_t sampleCount, float lodBias, const char * _strProgress, float _baseProgress);
+        void applyFilter(uint32_t distribution, float roughness, uint32_t targetMipLevel, uint32_t targetTexture, uint32_t sampleCount, float lodBias);
         void cubeMapToLambertian(void);
         void cubeMapToGGX(void);
         void cubeMapToSheen(void);
@@ -65,17 +64,15 @@ class iblSampler
         float scaleValue;
         uint32_t mipmapLevels;
         iblSampler(void);
-        void doinit(const char * env_filename);
+        void init(const char * env_filename);
         void filterAll();
-        void destroy_iblSampler(void);
+        void destroy(void);
 };
 
 void lv_gltf_view_ibl_set_loadphase_callback(void (*_load_progress_callback)(const char *, const char *, float, float,
                                                                              float, float));
 
-lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(lv_gltf_view_env_textures_t * last_env,
-                                                                   const char * env_file_path,
-                                                                   int32_t env_rotation_x10);
+lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(const char * env_file_path, float env_rotation);
 
 #endif /*LV_USE_GLTF*/
 #endif /*IBL_SAMPLER_H*/

@@ -72,7 +72,7 @@ const lv_obj_class_t lv_gltf_view_class = {
 
 extern "C" {
 
-    lv_obj_t * lv_gltf_view_create(lv_obj_t * parent)
+    lv_obj_t * lv_gltf_create(lv_obj_t * parent)
     {
         lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
         lv_obj_class_init_obj(obj);
@@ -152,7 +152,7 @@ static void lv_gltf_view_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
-    view->env_textures = lv_gltf_view_ibl_sampler_setup(NULL, NULL, 0);
+    view->env_textures = lv_gltf_view_ibl_sampler_setup(NULL, 0);
 
     lv_array_init(&view->models, 1, sizeof(lv_gltf_data_t *));
     new(&view->ibm_by_skin_the_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
@@ -236,13 +236,13 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
 
 gl_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_height)
 {
-    gl_renwin_state_t _ret;
+    gl_renwin_state_t result;
 
     GLuint rtex;
     GL_CALL(glGenTextures(1, &rtex));
-    _ret.texture = rtex;
+    result.texture = rtex;
 
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, _ret.texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -253,29 +253,27 @@ gl_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32_t texture_h
 
     GLuint rdepth;
     GL_CALL(glGenTextures(1, &rdepth));
-    _ret.renderbuffer = rdepth;
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, _ret.renderbuffer));
+    result.renderbuffer = rdepth;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-#ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
-    // For WebGL2
+#ifdef __EMSCRIPTEN__
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
-    // For Desktop OpenGL
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
 
-    GL_CALL(glGenFramebuffers(1, &_ret.framebuffer));
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, _ret.framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _ret.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _ret.renderbuffer, 0));
+    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
 
-    return _ret;
+    return result;
 }
 
 void setup_cleanup_opengl_output(gl_renwin_state_t * state)
@@ -666,7 +664,7 @@ void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf
 
     GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_GGXEnvSampler"), 0));
 
-    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->env_textures.mipCount));
+    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->env_textures.mip_count));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvBlurNormalized"), blur));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvIntensity"), 1.0f));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_Exposure"), 1.0f));

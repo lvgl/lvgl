@@ -218,16 +218,15 @@ float * resizeImage(float * input, int inputWidth, int inputHeight, int newWidth
     return output;
 }
 
-void iblSampler::doinit(const char * env_filename)
+void iblSampler::init(const char * env_filename)
 {
     // vv -- WebGL Naming
-    if(getExtension("GL_NV_float") &&
-       getExtension("GL_ARB_color_buffer_float")) {  //&& getExtension("OES_texture_float_linear")) {
-        std::cout << "THIS DEVICE SUPPORTS FLOAT FORMAT TEXTURES\n";
+    if(getExtension("GL_NV_float") && getExtension("GL_ARB_color_buffer_float")) {  
+        LV_LOG_INFO("Device supports float format textures");
     }
     // Native naming #2
     if(getExtension("GL_ARB_color_buffer_float") || getExtension("GL_NV_half_float")) {
-        std::cout << "THIS DEVICE SUPPORTS HALF_FLOAT FORMAT TEXTURES\n";
+        LV_LOG_INFO("Device supports half_float format textures");
     }
 
     int32_t src_width, src_height, src_nrChannels;
@@ -322,12 +321,8 @@ void iblSampler::applyFilter(
     uint32_t targetMipLevel,
     uint32_t targetTexture,
     uint32_t sampleCount,
-    float _lodBias,
-    const char * _strProgress,
-    float _baseProgress)
+    float _lodBias)
 {
-    LV_UNUSED(_strProgress);
-    LV_UNUSED(_baseProgress);
 
     uint32_t currentTextureSize = textureSize >> targetMipLevel;
     for(uint32_t i = 0; i < 6; ++i) {
@@ -374,32 +369,14 @@ void iblSampler::applyFilter(
 
 void iblSampler::cubeMapToLambertian(void)
 {
-    applyFilter(
-        0,
-        0.0,
-        0,
-        lambertianTextureID,
-        lambertianSampleCount,
-        0.0,
-        "Processing Lambertian filter...",
-        6.f
-    );
+    applyFilter(0, 0.0, 0, lambertianTextureID, lambertianSampleCount, 0.0);
 }
 
 void iblSampler::cubeMapToGGX(void)
 {
     for(uint32_t currentMipLevel = 0; currentMipLevel <= mipmapLevels; ++currentMipLevel) {
         float roughness = (float)(currentMipLevel) / (float)(mipmapLevels - 1);
-        applyFilter(
-            1,
-            roughness,
-            currentMipLevel,
-            ggxTextureID,
-            ggxSampleCount,
-            0.0,
-            "Processing GGX filter...",
-            (currentMipLevel == 0) ? 12.f : -1.f
-        );
+        applyFilter(1, roughness, currentMipLevel, ggxTextureID, ggxSampleCount, 0.0);
     }
 }
 
@@ -407,16 +384,7 @@ void iblSampler::cubeMapToSheen(void)
 {
     for(uint32_t currentMipLevel = 0; currentMipLevel <= mipmapLevels; ++currentMipLevel) {
         float roughness = (float)(currentMipLevel) / (float)(mipmapLevels - 1);
-        applyFilter(
-            2,
-            roughness,
-            currentMipLevel,
-            sheenTextureID,
-            sheenSamplCount,
-            0.0,
-            "Processing Sheen filter...",
-            (currentMipLevel == 0) ? 18.f : -1.f
-        );
+        applyFilter( 2, roughness, currentMipLevel, sheenTextureID, sheenSamplCount, 0.0);
     }
 }
 
@@ -492,46 +460,31 @@ void iblSampler::filterAll()
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, previousFramebuffer));
 }
 
-void iblSampler::destroy_iblSampler(void)
+void iblSampler::destroy(void)
 {
     lv_gl_shader_manager_destroy(shader_manager);
 }
 
 // ------------------------------------------------------------
 
-lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(lv_gltf_view_env_textures_t * last_env,
-                                                           const char * env_file_path,
-                                                           int32_t env_rotation_x10)
+lv_gltf_view_env_textures_t lv_gltf_view_ibl_sampler_setup(const char * env_file_path, float env_rotation)
 {
-    lv_gltf_view_env_textures_t _ret;
-    if((last_env != NULL) && (last_env->loaded == true)) {
-        _ret.loaded = true;
-        _ret.angle = last_env->angle;
-        _ret.diffuse = last_env->diffuse;
-        _ret.specular = last_env->specular;
-        _ret.sheen = last_env->sheen;
-        _ret.ggxLut = last_env->ggxLut;
-        _ret.charlieLut = last_env->charlieLut;
-        _ret.mipCount = last_env->mipCount;
-        _ret.iblIntensityScale = last_env->iblIntensityScale;
-        return _ret;
-    }
+    lv_gltf_view_env_textures_t result;
     auto environmentFiltering = iblSampler();
-    environmentFiltering.doinit(env_file_path);
+    environmentFiltering.init(env_file_path);
     environmentFiltering.filterAll();
 
-    _ret.loaded             = true;
-    _ret.angle = (float)env_rotation_x10 / 10.0f;
-    _ret.diffuse            = environmentFiltering.lambertianTextureID;
-    _ret.specular           = environmentFiltering.ggxTextureID;
-    _ret.sheen              = environmentFiltering.sheenTextureID;
-    _ret.ggxLut             = environmentFiltering.ggxLutTextureID;
-    _ret.charlieLut         = environmentFiltering.charlieLutTextureID;
-    _ret.mipCount           = environmentFiltering.mipmapLevels;
-    _ret.iblIntensityScale  = environmentFiltering.scaleValue;
+    result.angle = env_rotation;
+    result.diffuse = environmentFiltering.lambertianTextureID;
+    result.specular = environmentFiltering.ggxTextureID;
+    result.sheen = environmentFiltering.sheenTextureID;
+    result.ggxLut = environmentFiltering.ggxLutTextureID;
+    result.charlie_lut = environmentFiltering.charlieLutTextureID;
+    result.mip_count = environmentFiltering.mipmapLevels;
+    result.ibl_intensity_scale = environmentFiltering.scaleValue;
 
-    environmentFiltering.destroy_iblSampler();
-    return _ret;
+    environmentFiltering.destroy();
+    return result;
 }
 
 #endif /*LV_USE_GLTF*/
