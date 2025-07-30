@@ -1067,7 +1067,7 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
     }
 
     const uint32_t stride = lv_vg_lite_width_to_stride(buffer->width, buffer->format);
-    if(buffer->stride != stride) {
+    if((uint32_t)buffer->stride != stride) {
         LV_LOG_ERROR("buffer stride(%d) != expected(%d)", (int)buffer->stride, (int)stride);
         return false;
     }
