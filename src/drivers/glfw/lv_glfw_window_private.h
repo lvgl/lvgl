@@ -36,6 +36,8 @@ struct _lv_glfw_window_t {
     GLFWwindow * window;
     int32_t hor_res;
     int32_t ver_res;
+    bool h_flip;
+    bool v_flip;
     lv_ll_t textures;
     lv_point_t mouse_last_point;
     lv_indev_state_t mouse_last_state;
