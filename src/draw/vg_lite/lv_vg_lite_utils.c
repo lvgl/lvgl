@@ -480,6 +480,7 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
@@ -505,6 +506,7 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
@@ -581,6 +583,10 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB888:
             return VG_LITE_BGR888;
 
+        /**
+         * The lv_vg_lite_blend_mode function will automatically select the appropriate blend mode,
+         * which is uniformly mapped to VG_LITE_BGRA8888 here.
+         */
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
             return VG_LITE_BGRA8888;
