@@ -501,6 +501,7 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra2222_t> conv_bgra2222_to_bgr
     }
 });
 
+/* Used to copy images with inconsistent strides but the same color format */
 static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgra8888_to_bgra8888(
     [](vg_color32_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
@@ -2693,6 +2694,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
             case VG_LITE_BGRA8888: {
+                    /* For stride conversion */
                     conv_bgra8888_to_bgra8888.convert(&target, source);
                 }
                 break;
