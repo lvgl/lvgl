@@ -1008,6 +1008,7 @@ dl.field-list {
 dl.field-list > dt {
   font-weight: 600;
   word-break: break-word;
+  margin-top: 0.5em;
   margin-right: 1em;
   margin-bottom: 0.15em;
   display: inline-grid;
@@ -1015,7 +1016,7 @@ dl.field-list > dt {
 }
 
 dl.field-list > dd {
-  margin: 0;
+  margin: 0.5em 0 0 0;
 }
 
 /*-------------------------------------------------------------------------
