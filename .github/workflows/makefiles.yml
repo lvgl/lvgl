@@ -1,10 +1,10 @@
-name: Check Makefile for UEFI
+name: Check Makefile
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, release/v8.* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, release/v8.* ]
 
 # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
 # Ensure that only one commit will be running tests at a time on each push
@@ -16,7 +16,7 @@ jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-24.04
-    name: Build using Makefile for UEFI
+    name: Build using Makefile
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
@@ -26,8 +26,6 @@ jobs:
         python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
-    - name: Install clang
-      run: sudo apt-get install clang lld
     - name: Build
-      working-directory: tests/makefile_uefi
-      run: make -j
+      working-directory: tests/makefiles
+      run: make test_file
