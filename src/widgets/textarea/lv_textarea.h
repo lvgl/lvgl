@@ -26,8 +26,10 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_TEXTAREA_CURSOR_LAST (0x7FFF) /*Put the cursor after the last character*/
-
 LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
+
+#define LV_PART_TEXTAREA_PLACEHOLDER LV_PART_CUSTOM_FIRST
+LV_EXPORT_CONST_INT(LV_PART_TEXTAREA_PLACEHOLDER);
 
 /**********************
  *      TYPEDEFS
@@ -55,10 +57,6 @@ enum _lv_property_textarea_id_t {
 #endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
-
-enum _lv_part_textarea_id_t {
-    LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,
-};
 
 /**********************
  * GLOBAL PROTOTYPES

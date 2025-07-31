@@ -118,7 +118,7 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
         lv_obj_remove_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
     }
 
-    lv_obj_add_state(to_focus, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    lv_obj_add_state(to_focus, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY));
     lv_obj_scroll_to_view(to_focus, anim_en);
     dsc->focused_obj = to_focus;
 
@@ -231,7 +231,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(guess && guess != dsc->focused_obj) {
             lv_obj_remove_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
             lv_obj_send_event(dsc->focused_obj, LV_EVENT_DEFOCUSED, lv_indev_active());
-            lv_obj_add_state(guess, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_add_state(guess, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY));
             lv_obj_send_event(guess, LV_EVENT_FOCUSED, lv_indev_active());
             lv_obj_scroll_to_view(guess, LV_ANIM_ON);
             dsc->focused_obj = guess;
@@ -240,7 +240,7 @@ static void gridnav_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_FOCUSED) {
         if(dsc->focused_obj == NULL)  dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj) {
-            lv_obj_add_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_add_state(dsc->focused_obj, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY));
             lv_obj_remove_state(dsc->focused_obj, LV_STATE_PRESSED); /*Be sure the focuses obj is not stuck in pressed state*/
             lv_obj_scroll_to_view(dsc->focused_obj, LV_ANIM_OFF);
         }
@@ -256,7 +256,7 @@ static void gridnav_event_cb(lv_event_t * e)
             if(dsc->focused_obj == NULL) {
                 dsc->focused_obj = child;
                 if(lv_obj_has_state(obj, LV_STATE_FOCUSED)) {
-                    lv_obj_add_state(child, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+                    lv_obj_add_state(child, (lv_state_t)(LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY));
                     lv_obj_scroll_to_view(child, LV_ANIM_OFF);
                 }
             }

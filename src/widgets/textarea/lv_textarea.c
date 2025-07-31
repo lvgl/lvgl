@@ -1431,7 +1431,7 @@ static void draw_cursor(lv_event_t * e)
     /*Draw the letter over the cursor only if
      *the cursor has background or the letter has different color than the original.
      *Else the original letter is drawn twice which makes it look bolder*/
-    lv_color_t label_color = lv_obj_get_style_text_color(ta->label, 0);
+    lv_color_t label_color = lv_obj_get_style_text_color(ta->label, LV_PART_MAIN);
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
     cur_label_dsc.base.layer = layer;

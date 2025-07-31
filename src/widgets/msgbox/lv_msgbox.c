@@ -287,7 +287,7 @@ static void msgbox_size_changed_event_cb(lv_event_t * e)
 {
     lv_obj_t * mbox = lv_event_get_target(e);
     lv_obj_t * content = lv_msgbox_get_content(mbox);
-    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, 0) == LV_SIZE_CONTENT);
+    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
     lv_obj_set_flex_grow(content, !is_msgbox_height_size_content);
 }
 

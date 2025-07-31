@@ -135,7 +135,7 @@ static void draw_3dtexture(lv_event_t * e)
     lv_draw_3d_dsc_t dsc;
     lv_draw_3d_dsc_init(&dsc);
     dsc.tex_id = tex->id;
-    dsc.opa = lv_obj_get_style_opa(obj, 0);
+    dsc.opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
     lv_area_t coords;
     lv_obj_get_coords(obj, &coords);
     lv_draw_3d(layer, &dsc, &coords);
