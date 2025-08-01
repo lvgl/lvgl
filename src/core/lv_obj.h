@@ -368,6 +368,18 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
 void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
                                     lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay);
 
+
+/**
+ * Play a timeline animation on a trigger
+ * @param obj               pointer to widget which should trigger playing the animation
+ * @param trigger           an event code, e.g. `LV_EVENT_CLICKED`
+ * @param at                pointer to an animation timeline
+ * @param delay             wait time before starting the animation
+ * @param reverse           true: play in reverse
+ */
+void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_anim_timeline_t * at, uint32_t delay,
+                                    bool reverse);
+
 #if LV_USE_OBJ_ID
 /**
  * Set an id for an object.

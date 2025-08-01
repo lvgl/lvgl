@@ -130,6 +130,8 @@ typedef struct _lv_theme_t lv_theme_t;
 
 typedef struct _lv_anim_t lv_anim_t;
 
+typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
+
 typedef struct _lv_font_t lv_font_t;
 typedef struct _lv_font_class_t lv_font_class_t;
 typedef struct _lv_font_info_t lv_font_info_t;
