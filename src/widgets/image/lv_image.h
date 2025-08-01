@@ -154,7 +154,7 @@ void lv_image_set_pivot_y(lv_obj_t * obj, int32_t y);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size
@@ -167,7 +167,7 @@ void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size
@@ -180,7 +180,7 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size

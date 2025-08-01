@@ -14,6 +14,7 @@ import subprocess
 import os
 import argparse
 import re
+import shutil
 import importlib.util
 
 
@@ -22,7 +23,7 @@ def get_args():
     parser.add_argument("--input", help="Path to the input C header file", required=True)
     parser.add_argument("--tmp_file", help="Path to save the preprocessed output", required=True)
     parser.add_argument("--output", help="Path to save the cleaned output with removed indentation", required=True)
-    parser.add_argument("--workfolder", help="Path used to create a python environnement", required=True)
+    parser.add_argument("--workfolder", help="Path used to create a python environment", required=True)
 
     parser.add_argument(
         "--defs",
@@ -158,9 +159,10 @@ def main():
     # Check if PCPP is already present on the system
     # if it's not - create a python venv inside the workfolder directory
     # and install it there
-    res = subprocess.run(["which", "pcpp"], capture_output=True)
-    if res.returncode == 0:
-        pcpp_exe = res.stdout.decode().replace("\n", "")
+    pcpp_path = shutil.which("pcpp")
+
+    if pcpp_path:
+        pcpp_exe = pcpp_path
         print(f"Found PCPP: {pcpp_exe}")
     else:
         print("Failed to locate pcpp - installing it")

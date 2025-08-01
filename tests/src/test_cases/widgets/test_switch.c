@@ -145,7 +145,7 @@ void test_screeshots(void)
     sw = lv_switch_create(lv_screen_active());
 
     sw = lv_switch_create(lv_screen_active());
-    lv_obj_add_state(sw, LV_STATE_CHECKED | LV_STATE_DISABLED);
+    lv_obj_add_state(sw, (lv_state_t)(LV_STATE_CHECKED | LV_STATE_DISABLED));
 
     sw = lv_switch_create(lv_screen_active());
     lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_VERTICAL);

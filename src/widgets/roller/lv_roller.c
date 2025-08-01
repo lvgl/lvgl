@@ -151,8 +151,9 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     else {
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, 0);
-        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height(font) + lv_obj_get_style_text_letter_space(obj, 0));
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+        int32_t normal_h = roller->option_cnt * (lv_font_get_line_height(font) + lv_obj_get_style_text_letter_space(obj,
+                                                                                                                    LV_PART_MAIN));
         roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
         if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
         LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
@@ -883,9 +884,9 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     int32_t scale_y = 256;
     lv_obj_t * parent = roller;
     while(parent) {
-        angle += lv_obj_get_style_transform_rotation(parent, 0);
-        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
-        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
+        angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
         scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);

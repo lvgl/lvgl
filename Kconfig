@@ -527,7 +527,7 @@ menu "LVGL configuration"
 			bool "Draw using cached OpenGLES textures"
 			default n
 			depends on LV_USE_OPENGLES
-		
+
 		config LV_USE_PPA
 		bool "Use Espressif's PPA accelerator for ESP SoCs"
 		default n
@@ -886,10 +886,6 @@ menu "LVGL configuration"
 				bool "Enable Montserrat 28 compressed"
 			config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
-			config LV_FONT_SIMSUN_14_CJK
-				bool "Enable Simsun 14 CJK"
-			config LV_FONT_SIMSUN_16_CJK
-				bool "Enable Simsun 16 CJK"
 			config LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
 				bool "Enable SourceHanSansSC 14 CJK"
 			config LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
@@ -978,12 +974,6 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Dejavu 16 Persian, Hebrew, Arabic letters"
 				select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
-			config LV_FONT_DEFAULT_SIMSUN_14_CJK
-				bool "Simsun 14 CJK"
-				select LV_FONT_SIMSUN_14_CJK
-			config LV_FONT_DEFAULT_SIMSUN_16_CJK
-				bool "Simsun 16 CJK"
-				select LV_FONT_SIMSUN_16_CJK
 			config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
 				bool "SourceHanSansSC 14 CJK"
 				select LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
@@ -1740,7 +1730,7 @@ menu "LVGL configuration"
 			default 9 # LVGL_VERSION_MAJOR
 		config LVGL_VERSION_MINOR
 			int
-			default 3 # LVGL_VERSION_MINOR
+			default 4 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
 			default 0 # LVGL_VERSION_PATCH
@@ -2032,6 +2022,19 @@ menu "LVGL configuration"
 			default 0
 			help
 				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
+
+		config LV_USE_NUTTX_MOUSE
+			bool "Use NuttX mouse driver"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_USE_NUTTX_MOUSE_MOVE_STEP
+			int "Mouse movement step (pixels)"
+			depends on LV_USE_NUTTX_MOUSE
+			range 1 10
+			default 1
+			help
+				Set the step size of the mouse movement in pixels.
 
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"

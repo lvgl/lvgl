@@ -686,6 +686,7 @@ static void anim_completed_handler(lv_anim_t * a)
     else {
         /*Restart the animation. If the time is over a little compensate it.*/
         int32_t over_time = 0;
+        a->start_cb_called = 0;
         if(a->act_time > a->duration) over_time = a->act_time - a->duration;
         a->act_time = over_time - (int32_t)(a->repeat_delay);
         /*Swap start and end values in reverse-play mode*/

@@ -127,8 +127,11 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
     if(auto_parent) lv_obj_add_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT);
 
     mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
-    LV_ASSERT_MALLOC(obj);
-    if(mbox->content == NULL) return NULL;
+    LV_ASSERT_MALLOC(mbox->content);
+    if(mbox->content == NULL) {
+        lv_obj_delete(obj);
+        return NULL;
+    }
     lv_obj_class_init_obj(mbox->content);
     lv_obj_set_flex_flow(mbox->content, LV_FLEX_FLOW_COLUMN);
     lv_obj_add_event_cb(obj, msgbox_size_changed_event_cb, LV_EVENT_SIZE_CHANGED, 0);
@@ -142,7 +145,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->header == NULL) {
         mbox->header = lv_obj_class_create_obj(&lv_msgbox_header_class, obj);
-        LV_ASSERT_MALLOC(obj);
+        LV_ASSERT_MALLOC(mbox->header);
         if(mbox->header == NULL) return NULL;
         lv_obj_class_init_obj(mbox->header);
 
@@ -171,7 +174,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
     }
 
     lv_obj_t * btn = lv_obj_class_create_obj(&lv_msgbox_header_button_class, mbox->header);
-    LV_ASSERT_MALLOC(obj);
+    LV_ASSERT_MALLOC(btn);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
     lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
@@ -201,7 +204,7 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
     if(mbox->footer == NULL) {
         mbox->footer = lv_obj_class_create_obj(&lv_msgbox_footer_class, obj);
-        LV_ASSERT_MALLOC(obj);
+        LV_ASSERT_MALLOC(mbox->footer);
         if(mbox->footer == NULL) return NULL;
         lv_obj_class_init_obj(mbox->footer);
 
@@ -211,7 +214,7 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
     }
 
     lv_obj_t * btn = lv_obj_class_create_obj(&lv_msgbox_footer_button_class, mbox->footer);
-    LV_ASSERT_MALLOC(obj);
+    LV_ASSERT_MALLOC(btn);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
     lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
@@ -287,7 +290,7 @@ static void msgbox_size_changed_event_cb(lv_event_t * e)
 {
     lv_obj_t * mbox = lv_event_get_target(e);
     lv_obj_t * content = lv_msgbox_get_content(mbox);
-    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, 0) == LV_SIZE_CONTENT);
+    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, LV_PART_MAIN) == LV_SIZE_CONTENT);
     lv_obj_set_flex_grow(content, !is_msgbox_height_size_content);
 }
 

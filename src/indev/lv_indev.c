@@ -192,11 +192,13 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = LV_KEY_ENTER;
     }
 
-    data->timestamp = lv_tick_get();
 
     if(indev->read_cb) {
         LV_TRACE_INDEV("calling indev_read_cb");
         indev->read_cb(indev, data);
+
+        /*Set the time stamp to the current time is it was not set in the read_cb*/
+        if(data->timestamp == 0) data->timestamp = lv_tick_get();
     }
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
@@ -1500,9 +1502,9 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
-                angle += lv_obj_get_style_transform_rotation(parent, 0);
-                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
-                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
+                angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
+                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
+                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
                 scale_x = (scale_x * zoom_act_x) >> 8;
                 scale_y = (scale_x * zoom_act_y) >> 8;
                 parent = lv_obj_get_parent(parent);
@@ -1581,7 +1583,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
 
     if(editable) {
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, 0);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
     }
@@ -1593,7 +1595,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
         lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
         if(scroll_obj == NULL) return;
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, 0);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
 
         indev->pointer.scroll_throw_vect.y = diff;

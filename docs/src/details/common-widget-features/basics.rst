@@ -38,7 +38,7 @@ All Widget types share some basic attributes:
 - Parent
 - Styles
 - Events it emits
-- Flags like *Clickable*, *Scollable*, etc.
+- Flags like *Clickable*, *Scrollable*, etc.
 - Etc.
 
 You can set/get these attributes with ``lv_obj_set_...`` and
@@ -435,7 +435,7 @@ leave the other states untouched) use
 :cpp:expr:`lv_obj_add_state(widget, LV_STATE_...)` and
 :cpp:expr:`lv_obj_remove_state(widget, LV_STATE_...)`.  In both cases OR-ed state
 values can be used as well. E.g.
-:cpp:expr:`lv_obj_add_state(widget, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
+:cpp:expr:`lv_obj_add_state(widget, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states, read the related section of
 :ref:`styles_overview`.
@@ -467,6 +467,8 @@ There are some Widget attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_SNAPPABLE` If scroll snap is enabled on the parent it can snap to this Widget
 -  :cpp:enumerator:`LV_OBJ_FLAG_PRESS_LOCK` Keep the Widget pressed even if the press slid from the Widget
 -  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_BUBBLE` Propagate the events to the parent as well
+-  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_TRICKLE` Propagate the events to the children as well
+-  :cpp:enumerator:`LV_OBJ_FLAG_STATE_TRICKLE` Propagate the state changes to the children as well
 -  :cpp:enumerator:`LV_OBJ_FLAG_GESTURE_BUBBLE` Propagate the gestures to the parent
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 -  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the Widget not positioned by the layouts

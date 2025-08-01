@@ -552,7 +552,7 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
                 /* Update all recognizers to let them process input */
                 indev->recognizers[i].recog_fn(&indev->recognizers[i], &touches[0], touch_cnt);
 
-                /* Then reset the recognizers which did not repport RECONIZED or ENDED */
+                /* Then reset the recognizers which did not report RECOGNIZED or ENDED */
                 if(((lv_indev_gesture_type_t)i) != type) {
                     reset_recognizer(&indev->recognizers[i]);
                 }
@@ -610,7 +610,7 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
  ********************/
 
 /**
- * Caluclate the direction from the starting center of a two fingers swipe gesture
+ * Calculate the direction from the starting center of a two fingers swipe gesture
  * @param recognizer        pointer to the recognizer handling the two fingers
  *                          swipe gesture
  * @return                  the direction of the swipe, from the starting center

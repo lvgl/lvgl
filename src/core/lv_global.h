@@ -245,6 +245,10 @@ typedef struct _lv_global_t {
     lv_mutex_t lv_general_mutex;
 #if defined(__linux__)
     lv_proc_stat_t linux_last_proc_stat;
+#if defined LV_SYSMON_PROC_IDLE_AVAILABLE
+    uint64_t linux_last_self_proc_time_ticks;
+    lv_proc_stat_t linux_last_system_total_ticks_stat;
+#endif
 #endif
 #endif
 
@@ -257,6 +261,10 @@ typedef struct _lv_global_t {
 
 #if LV_USE_EVDEV
     lv_evdev_discovery_t * evdev_discovery;
+#endif
+
+#if LV_USE_XML
+    const char * xml_path_prefix;
 #endif
 
     void * user_data;

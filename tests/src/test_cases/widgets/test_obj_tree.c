@@ -223,7 +223,7 @@ void test_obj_get_by_name(void)
 
     lv_obj_t * hello_label = lv_label_create(btn);
     lv_label_set_text(hello_label, "Hello");
-    lv_obj_set_name(hello_label, "my_label"); /*Same name as ofr the other label*/
+    lv_obj_set_name(hello_label, "my_label"); /*Same name as for the other label*/
 
     /*Test auto indexing*/
 

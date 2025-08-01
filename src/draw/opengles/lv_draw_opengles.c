@@ -210,7 +210,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     execute_drawing(draw_opengles_unit);
 
-    draw_opengles_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_opengles_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_opengles_unit->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/

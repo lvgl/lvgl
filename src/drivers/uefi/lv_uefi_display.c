@@ -43,7 +43,7 @@ static void _display_ctx_free(lv_uefi_display_context_t * display_ctx);
 static bool _display_interface_is_valid(const EFI_GRAPHICS_OUTPUT_PROTOCOL * interface);
 
 /**********************
- *  GOLBAL VARIABLES
+ *  GLOBAL VARIABLES
  **********************/
 
 /**********************

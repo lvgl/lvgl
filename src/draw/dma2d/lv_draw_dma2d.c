@@ -75,7 +75,7 @@ void lv_draw_dma2d_init(void)
 #endif
 
     /* enable the DMA2D clock */
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
@@ -397,7 +397,7 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_invalidate_cache(&u->writing_area);
 #endif
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 }
 
