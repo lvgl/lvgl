@@ -24,7 +24,7 @@ properties of Widgets.  It's intended use is to:
     - any external input source (e.g. serial)
 
 While using it consumes more program space and more CPU overhead while setting and
-getting Widget properties, it is designed so minimize that additional CPU overhead.
+getting Widget properties, it is designed so as to minimize that additional CPU overhead.
 
 
 
