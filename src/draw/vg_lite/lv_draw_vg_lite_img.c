@@ -72,7 +72,8 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vg_lite_color_t color = lv_vg_lite_image_recolor(&src_buf, dsc);
 
     /* convert the blend mode to vg-lite blend mode, considering the premultiplied alpha */
-    bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
+                       || (decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
 
     /* original image matrix */
@@ -154,9 +155,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
     vg_lite_matrix_t path_matrix = u->global_matrix;
 
-    /* When alignment requirements are not met, use repeated drawing to simulate tile drawing effects. */
-    /* vg_lite_tvg does not support VG_LITE_PATTERN_REPEAT */
-    if(dsc->tile && (LV_USE_VG_LITE_THORVG || (img_w % 16 != 0 && lv_vg_lite_16px_align()))) {
+    if(dsc->tile) {
         lv_area_t tile_area;
         if(lv_area_get_width(&dsc->image_area) >= 0) {
             tile_area = dsc->image_area;
@@ -167,9 +166,15 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         lv_area_set_width(&tile_area, img_w);
         lv_area_set_height(&tile_area, img_h);
 
+        /**
+         * vg_lite_tvg does not support VG_LITE_PATTERN_REPEAT,
+         * use looping texture for simulation.
+         */
+#if LV_USE_VG_LITE_THORVG
         const int32_t tile_x_start = tile_area.x1;
         while(tile_area.y1 <= coords->y2) {
             while(tile_area.x1 <= coords->x2) {
+#endif
                 vg_lite_matrix_t tile_matrix;
                 vg_lite_identity(&tile_matrix);
                 vg_lite_translate(tile_area.x1 - coords->x1, tile_area.y1 - coords->y1, &tile_matrix);
@@ -178,7 +183,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                 lv_vg_lite_matrix_multiply(&pattern_matrix, &tile_matrix);
 
                 lv_area_t clipped_img_area;
-                if(lv_area_intersect(&clipped_img_area, &tile_area, coords)) {
+                if(!LV_USE_VG_LITE_THORVG || lv_area_intersect(&clipped_img_area, &tile_area, coords)) {
                     lv_vg_lite_draw_pattern(
                         &u->target_buffer,
                         lv_vg_lite_path_get_path(path),
@@ -187,12 +192,13 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                         &src_buf,
                         &pattern_matrix,
                         blend,
-                        VG_LITE_PATTERN_COLOR,
+                        VG_LITE_PATTERN_REPEAT,
                         0,
                         color,
                         filter);
                 }
 
+#if LV_USE_VG_LITE_THORVG
                 tile_area.x1 += img_w;
                 tile_area.x2 += img_w;
             }
@@ -202,6 +208,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             tile_area.x1 = tile_x_start;
             tile_area.x2 = tile_x_start + img_w - 1;
         }
+#endif
     }
     else {
         lv_vg_lite_draw_pattern(
@@ -212,7 +219,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             &src_buf,
             &matrix,
             blend,
-            dsc->tile ? VG_LITE_PATTERN_REPEAT : VG_LITE_PATTERN_COLOR,
+            VG_LITE_PATTERN_COLOR,
             0,
             color,
             filter);

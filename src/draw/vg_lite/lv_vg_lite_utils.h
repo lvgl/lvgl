@@ -163,8 +163,6 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix);
 
 bool lv_vg_lite_support_blend_normal(void);
 
-bool lv_vg_lite_16px_align(void);
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
@@ -291,6 +289,19 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
         LV_LOG_ERROR("filter: 0x%X", (int)filter);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
+}
+
+static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t * area, vg_lite_color_t color)
+{
+    vg_lite_rectangle_t rect;
+    lv_vg_lite_rect(&rect, area);
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_clear(target, &rect, color), {
+        lv_vg_lite_buffer_dump_info(target);
+        LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
+        lv_vg_lite_color_dump_info(color);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
 }
 
 /**********************
