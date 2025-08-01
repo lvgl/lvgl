@@ -1,5 +1,5 @@
 /**
- * @file lv_st_ltdc.c
+ * @file lv_st_ltdc_chibios.c
  *
  */
 

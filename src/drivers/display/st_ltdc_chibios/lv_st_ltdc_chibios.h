@@ -66,4 +66,4 @@ void reload_event_callback_handler(
 } /*extern "C"*/
 #endif
 
-#endif /*LV_ST_LTDC_H*/
+#endif /*LV_ST_LTDC_CHIBIOS_H*/
