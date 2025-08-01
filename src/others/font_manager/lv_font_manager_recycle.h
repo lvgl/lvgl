@@ -65,6 +65,13 @@ lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manage
 void lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t * manager, lv_font_t * font,
                                        const lv_font_info_t * ft_info);
 
+/**
+ * Remove fonts with name from recycle manager.
+ * @param manager pointer to font recycle manager.
+ * @param name font name.
+ */
+void lv_font_recycle_remove_fonts(lv_font_manager_recycle_t * manager, const char * name);
+
 /**********************
  *      MACROS
  **********************/
