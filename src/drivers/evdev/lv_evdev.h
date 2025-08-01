@@ -40,12 +40,20 @@ typedef void (*lv_evdev_discovery_cb_t)(lv_indev_t * indev, lv_evdev_type_t type
  **********************/
 
 /**
- * Create evdev input device.
+ * Create evdev input device from a given path.
  * @param type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
  * @param dev_path device path, e.g., /dev/input/event0
  * @return pointer to input device or NULL if opening failed
  */
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path);
+
+/**
+ * Create evdev input device, taking ownership of the given file descriptor.
+ * @param type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
+ * @param fd file descriptor of the evdev device
+ * @return pointer to input device or NULL if opening failed
+ */
+lv_indev_t * lv_evdev_create_fd(lv_indev_type_t indev_type, int fd);
 
 /**
  * Begin automatically creating evdev indevs for all new and existing
