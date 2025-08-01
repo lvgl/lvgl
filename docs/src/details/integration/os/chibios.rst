@@ -87,7 +87,7 @@ When using partial mode, you will need atleast one fullsize framebuffer and one 
 .. code-block:: c
 
     #include "hal_stm32_ltdc.h"
-    #include "../drivers/display/st_ltdc/lv_st_ltdc.h" // Required for the reload_event_callback_handler
+    #include "../drivers/display/st_ltdc_chibios/lv_st_ltdc_chibios.h" // Required for the reload_event_callback_handler
 
     uint8_t frame_buffer[600 * 1024 *
                         2] __attribute__((section(".sdram"), aligned(1))); /**< Frame buffer for LTDC. Height * Width * Bytes_per_pixel, additional settings can be applied like section(.sdram) */
@@ -157,7 +157,7 @@ The principal of initialization is the same as for LTDC.
 .. code-block:: c
 
     #include "hal_stm32_dma2d.h"
-    #include "../drivers/display/st_ltdc/lv_st_ltdc.h" // Required for the transfer_complete_callback_handler
+    #include "../drivers/display/st_ltdc_chibios/lv_st_ltdc_chibios.h" // Required for the transfer_complete_callback_handler
 
     static const DMA2DConfig dma2d_cfg = {
         /* ISR callbacks.*/

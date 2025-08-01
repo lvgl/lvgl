@@ -1,10 +1,10 @@
 /**
- * @file lv_st_ltdc.h
+ * @file lv_st_ltdc_chibios.h
  *
  */
 
-#ifndef LV_ST_LTDC_H
-#define LV_ST_LTDC_H
+#ifndef LV_ST_LTDC_CHIBIOS_H
+#define LV_ST_LTDC_CHIBIOS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../../lv_conf_internal.h"
-#if LV_USE_ST_LTDC && LV_USE_OS != LV_OS_CHIBIOS
+#if LV_USE_ST_LTDC && LV_USE_OS == LV_OS_CHIBIOS
 
 #include "../../../display/lv_display.h"
 
@@ -52,6 +52,10 @@ lv_display_t * lv_st_ltdc_create_direct(void * fb_adr_1, void * fb_adr_2, uint32
 lv_display_t * lv_st_ltdc_create_partial(void * render_buf_1, void * render_buf_2, uint32_t buf_size,
                                          uint32_t layer_idx);
 
+void transfer_complete_callback_handler(
+    void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
+void reload_event_callback_handler(
+    void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
 /**********************
  *      MACROS
  **********************/
