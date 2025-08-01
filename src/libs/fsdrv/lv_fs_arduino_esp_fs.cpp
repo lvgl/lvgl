@@ -7,7 +7,7 @@
     if (!file_p) return LV_FS_RES_NOT_EX;
 
 struct FileWrapper final {
-        FileWrapper(const File& file) : file(file) {}
+        FileWrapper(const File & file) : file(file) {}
         ~FileWrapper()
         {
             file.close();
@@ -21,7 +21,7 @@ struct FileWrapper final {
 };
 
 struct lv_fs_drv_data_t {
-        lv_fs_drv_data_t(FS* fs) :
+        lv_fs_drv_data_t(FS * fs) :
             m_fs(fs), m_sem(xSemaphoreCreateBinary())
         {
             xSemaphoreGive(m_sem);

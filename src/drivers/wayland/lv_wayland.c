@@ -97,8 +97,9 @@ static uint32_t tick_get_cb(void);
  **********************/
 
 static bool is_wayland_initialized                         = false;
-static const struct wl_registry_listener registry_listener = {.global        = handle_global,
-                                                                  .global_remove = handle_global_remove
+static const struct wl_registry_listener registry_listener = {
+    .global        = handle_global,
+    .global_remove = handle_global_remove
 };
 
 /**********************

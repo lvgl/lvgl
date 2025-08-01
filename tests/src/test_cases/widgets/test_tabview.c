@@ -126,20 +126,20 @@ void test_tabview_add_one_tab_with_scroll(void)
 
     lv_obj_t * label = lv_label_create(tab1);
     lv_label_set_text(label, "Content of the first tab\n"
-                             "If the content\n"
-                             "of a tab\n"
-                             "becomes too\n"
-                             "longer\n"
-                             "than the\n"
-                             "container\n"
-                             "then it\n"
-                             "automatically\n"
-                             "becomes\n"
-                             "scrollable.\n"
-                             "\n"
-                             "\n"
-                             "\n"
-                             "Can you see it?");
+                      "If the content\n"
+                      "of a tab\n"
+                      "becomes too\n"
+                      "longer\n"
+                      "than the\n"
+                      "container\n"
+                      "then it\n"
+                      "automatically\n"
+                      "becomes\n"
+                      "scrollable.\n"
+                      "\n"
+                      "\n"
+                      "\n"
+                      "Can you see it?");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_06.png");
 }
