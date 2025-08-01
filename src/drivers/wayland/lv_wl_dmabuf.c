@@ -213,8 +213,9 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
     LV_LOG_ERROR("Failed to create dmabuf buffer\n");
 }
 
-static const struct zwp_linux_buffer_params_v1_listener params_listener = {.created = create_succeeded,
-                                                                               .failed  = create_failed
+static const struct zwp_linux_buffer_params_v1_listener params_listener = {
+    .created = create_succeeded,
+    .failed  = create_failed
 };
 
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window)
