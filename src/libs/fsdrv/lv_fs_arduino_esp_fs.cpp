@@ -56,14 +56,14 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 
 /**
- * Register a driver for the LittleFS File System interface
+ * Register a driver for the Arduino File System interface
  */
-void lv_fs_arduino_esp_fs_init(const init_fs_cb_t init_cb)
+void lv_fs_arduino_esp_fs_init(esp_fs_init_t* esp_fs_init)
 {
-    auto fs_drv = &(LV_GLOBAL_DEFAULT()->arduino_esp_fs_drv);
+    auto fs_drv = esp_fs_init->drv;
     lv_fs_drv_init(fs_drv);
 
-    fs_drv->letter = LV_FS_ARDUINO_ESP_FFAT_LETTER;
+    fs_drv->letter = esp_fs_init->letter;
     fs_drv->open_cb = fs_open;
     fs_drv->close_cb = fs_close;
     fs_drv->read_cb = fs_read;
@@ -71,7 +71,7 @@ void lv_fs_arduino_esp_fs_init(const init_fs_cb_t init_cb)
     fs_drv->seek_cb = fs_seek;
     fs_drv->tell_cb = fs_tell;
 
-    fs_drv->user_data = new lv_fs_drv_data_t(init_cb());
+    fs_drv->user_data = new lv_fs_drv_data_t(esp_fs_init->init());
 
     fs_drv->dir_close_cb = NULL;
     fs_drv->dir_open_cb = NULL;

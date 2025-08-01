@@ -81,8 +81,6 @@ struct _lv_profiler_builtin_ctx_t;
 struct _lv_nuttx_ctx_t;
 #endif
 
-#define LV_USE_FS_ARDUINO_ESP_FS ((LV_USE_FS_ARDUINO_ESP_FFAT != 0) ^ (LV_USE_FS_ARDUINO_ESP_LITTLEFS != 0) ^ (LV_USE_FS_ARDUINO_SD != 0))
-
 typedef struct _lv_global_t {
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
@@ -185,8 +183,16 @@ typedef struct _lv_global_t {
     lv_fs_drv_t littlefs_fs_drv;
 #endif
 
-#if LV_USE_FS_ARDUINO_ESP_FS
-    lv_fs_drv_t arduino_esp_fs_drv;
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_drv_t arduino_esp_littlefs_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_FFAT
+    lv_fs_drv_t arduino_esp_ffat_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_drv_t arduino_esp_sd_drv;
 #endif
 
 #if LV_USE_FREETYPE
