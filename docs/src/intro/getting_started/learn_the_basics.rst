@@ -28,21 +28,23 @@ This chapter will show the basics to give an idea about how LVGL works and how i
 For more details about each feature visit that feature's dedicated documentation page.
 
 
-.. _basic_integration_steps:
+.. _lvgl_integration_overview:
 
-Basic LVGL Integration Steps
-----------------------------
+LVGL Integration Overview
+-------------------------
 
 The following is an overview of how to integrate LVGL into your project.  Complete
 details are available at :ref:`adding_lvgl_to_your_project`.
 
-1. **Driver Initialization**: It's the user's responsibility to set up the clock, timers, peripherals, etc.
-2. **Call lv_init()**: It initializes LVGL itself
-3. **Create display and input devices**: Create display(s)
-   (:cpp:type:`lv_display_t`) and input device(s)  (:cpp:type:`lv_indev_t`) and set up
-   their callbacks
-4. **Create the UI**: Call LVGL functions to create screens, widgets, styles, animations, events, etc.
-5. **Call lv_timer_handler() in a loop**: It handles all the LVGL-related tasks:
+:Driver Initialization:              It's the user's responsibility to set up the
+                                     clock, timers, peripherals, etc.
+:Call lv_init():                     Initialize LVGL itself.
+:Create display and input devices:   Create display(s) (:cpp:type:`lv_display_t`)
+                                     and input device(s)  (:cpp:type:`lv_indev_t`)
+                                     and set up their callbacks.
+:Create the UI:                      Call LVGL functions to create screens, widgets,
+                                     styles, animations, events, etc.
+:Call lv_timer_handler() in a loop:  It handles all the LVGL-related tasks:
 
    - refresh display(s),
    - read input devices,

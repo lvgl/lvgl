@@ -1103,7 +1103,7 @@ dl.field-list > dd {
 div .lvgl-figure-caption p {
   font-size: 0.8rem;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
 figure figcaption .caption-text {
@@ -1111,7 +1111,7 @@ figure figcaption .caption-text {
 }
 
 article figure {
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
 /*-------------------------------------------------------------------------
