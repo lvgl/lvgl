@@ -4,7 +4,7 @@
 #include "../../core/lv_global.h"
 
 /**
- * The implementation of the file system drivers in Arduino has a single FS and File interface, 
+ * The implementation of the file system drivers in Arduino has a single FS and File interface,
  * so it was decided to wrap this into a single thread-safe model.
  */
 
@@ -15,15 +15,15 @@
 
 #include <FS.h>
 
-typedef FS *(*init_fs_cb_t)(void);
+typedef FS * (*init_fs_cb_t)(void);
 
 typedef struct {
     char letter;
-    lv_fs_drv_t* drv;
+    lv_fs_drv_t * drv;
     init_fs_cb_t init;
 } esp_fs_init_t;
 
-void lv_fs_arduino_esp_fs_init(esp_fs_init_t* esp_fs_init);
+void lv_fs_arduino_esp_fs_init(esp_fs_init_t * esp_fs_init);
 
 #endif // LV_USE_FS_ARDUINO_ESP_FS
 

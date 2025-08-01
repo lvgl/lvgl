@@ -14,14 +14,16 @@
  */
 extern "C" void lv_fs_arduino_esp_littlefs_init(void)
 {
-    lv_fs_arduino_esp_fs_init((esp_fs_init_t[]){{
-        .letter = LV_FS_ARDUINO_ESP_LITTLEFS_LETTER,
-        .drv = &(LV_GLOBAL_DEFAULT()->arduino_esp_littlefs_drv),
-        .init = []() -> FS* {
-            LittleFS.begin();
-            return &LittleFS;
+    lv_fs_arduino_esp_fs_init((esp_fs_init_t[]) {
+        {
+            .letter = LV_FS_ARDUINO_ESP_LITTLEFS_LETTER,
+            .drv = &(LV_GLOBAL_DEFAULT()->arduino_esp_littlefs_drv),
+            .init = []() -> FS* {
+                LittleFS.begin();
+                return &LittleFS;
+            }
         }
-    }});
+    });
 }
 
 #else /*LV_USE_FS_ARDUINO_ESP_LITTLEFS == 0*/

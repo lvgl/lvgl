@@ -190,7 +190,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
         case 9:
             lv_textarea_set_text(ta, "A very very long text which will should make the text area scrollable"
-                                 "Here area some dummy sentences to be sure the text area will be really scrollable.");
+                                     "Here area some dummy sentences to be sure the text area will be really scrollable.");
             break;
         case 10:
             obj = lv_keyboard_create(lv_screen_active());

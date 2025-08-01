@@ -100,7 +100,7 @@ void lv_example_table_2(void)
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(label, "%" LV_PRIu32" items were created in %" LV_PRIu32" ms\n"
-                          "using %zu bytes of memory",
+                                 "using %zu bytes of memory",
                           (uint32_t)ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);

@@ -34,8 +34,8 @@ void test_tiny_ttf_rendering_test(void)
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_add_style(label, &style, 0);
     lv_label_set_text(label, "Hello world\n"
-                      "I'm a font created with Tiny TTF\n"
-                      "Accents: ÁÉÍÓÖŐÜŰ áéíóöőüű");
+                             "I'm a font created with Tiny TTF\n"
+                             "Accents: ÁÉÍÓÖŐÜŰ áéíóöőüű");
     lv_obj_center(label);
 
 #ifndef NON_AMD64_BUILD

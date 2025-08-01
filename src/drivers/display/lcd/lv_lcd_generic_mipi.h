@@ -185,12 +185,12 @@ typedef struct {
  * @return              pointer to the created display
  */
 lv_display_t * lv_lcd_generic_mipi_create_ex(
-    uint32_t hor_res, 
-    uint32_t ver_res, 
+    uint32_t hor_res,
+    uint32_t ver_res,
     lv_lcd_flag_t flags,
-    lv_lcd_send_cmd_cb_t send_cmd_cb, 
+    lv_lcd_send_cmd_cb_t send_cmd_cb,
     lv_lcd_send_color_cb_t send_color_cb,
-    void *user_data);
+    void * user_data);
 
 /**
  * Create a MIPI DCS compatible LCD display
@@ -203,10 +203,10 @@ lv_display_t * lv_lcd_generic_mipi_create_ex(
  * @return              pointer to the created display
  */
 lv_display_t * lv_lcd_generic_mipi_create(
-    uint32_t hor_res, 
-    uint32_t ver_res, 
+    uint32_t hor_res,
+    uint32_t ver_res,
     lv_lcd_flag_t flags,
-    lv_lcd_send_cmd_cb_t send_cmd_cb, 
+    lv_lcd_send_cmd_cb_t send_cmd_cb,
     lv_lcd_send_color_cb_t send_color_cb);
 
 /**

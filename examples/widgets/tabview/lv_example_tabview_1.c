@@ -15,20 +15,20 @@ void lv_example_tabview_1(void)
     /*Add content to the tabs*/
     lv_obj_t * label = lv_label_create(tab1);
     lv_label_set_text(label, "This the first tab\n\n"
-                      "If the content\n"
-                      "of a tab\n"
-                      "becomes too\n"
-                      "longer\n"
-                      "than the\n"
-                      "container\n"
-                      "then it\n"
-                      "automatically\n"
-                      "becomes\n"
-                      "scrollable.\n"
-                      "\n"
-                      "\n"
-                      "\n"
-                      "Can you see it?");
+                             "If the content\n"
+                             "of a tab\n"
+                             "becomes too\n"
+                             "longer\n"
+                             "than the\n"
+                             "container\n"
+                             "then it\n"
+                             "automatically\n"
+                             "becomes\n"
+                             "scrollable.\n"
+                             "\n"
+                             "\n"
+                             "\n"
+                             "Can you see it?");
 
     label = lv_label_create(tab2);
     lv_label_set_text(label, "Second tab");

@@ -150,7 +150,7 @@ typedef struct {
 class vg_lite_ctx
 {
     public:
-        std::unique_ptr<SwCanvas> canvas;
+        std::unique_ptr < SwCanvas > canvas;
         void * target_buffer;
         void * tvg_target_buffer;
         vg_lite_uint32_t target_px_size;
@@ -246,8 +246,8 @@ class vg_lite_ctx
 
     private:
         /*  */
-        std::vector<vg_lite_uint32_t> src_buffer;
-        std::vector<vg_lite_uint32_t> dest_buffer;
+        std::vector < vg_lite_uint32_t > src_buffer;
+        std::vector < vg_lite_uint32_t > dest_buffer;
 
         vg_lite_uint32_t clut_2colors[2];
         vg_lite_uint32_t clut_4colors[4];
@@ -255,7 +255,7 @@ class vg_lite_ctx
         vg_lite_uint32_t clut_256colors[256];
 };
 
-template <typename DEST_TYPE, typename SRC_TYPE>
+template < typename DEST_TYPE, typename SRC_TYPE >
 class vg_lite_converter
 {
     public:
@@ -299,11 +299,11 @@ static BlendMethod blend_method_conv(vg_lite_blend_t blend);
 static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap);
 static StrokeJoin stroke_join_conv(vg_lite_join_style_t join);
 static FillSpread fill_spread_conv(vg_lite_gradient_spreadmode_t spread);
-static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix);
-static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
+static Result shape_append_path(std::unique_ptr < Shape > & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix);
+static Result shape_append_rect(std::unique_ptr < Shape > & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target);
-static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
+static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr < Picture > & picture, const vg_lite_buffer_t * source,
                            vg_lite_color_t color = 0);
 
 static inline bool math_zero(float a)
@@ -333,7 +333,7 @@ static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_mat
 
 /* color converters */
 
-static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
+static vg_lite_converter < vg_color16_t, vg_color32_t > conv_bgra8888_to_bgr565(
     [](vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -345,7 +345,7 @@ static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
     }
 });
 
-static vg_lite_converter<vg_color16_alpha_t, vg_color32_t> conv_bgra8888_to_bgra5658(
+static vg_lite_converter < vg_color16_alpha_t, vg_color32_t > conv_bgra8888_to_bgra5658(
     [](vg_color16_alpha_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -358,7 +358,7 @@ static vg_lite_converter<vg_color16_alpha_t, vg_color32_t> conv_bgra8888_to_bgra
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color16_t> conv_bgr565_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color16_t > conv_bgr565_to_bgra8888(
     [](vg_color32_t * dest, const vg_color16_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -371,7 +371,7 @@ static vg_lite_converter<vg_color32_t, vg_color16_t> conv_bgr565_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color16_alpha_t> conv_bgra5658_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color16_alpha_t > conv_bgra5658_to_bgra8888(
     [](vg_color32_t * dest, const vg_color16_alpha_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -384,7 +384,7 @@ static vg_lite_converter<vg_color32_t, vg_color16_alpha_t> conv_bgra5658_to_bgra
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgrx8888_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color32_t > conv_bgrx8888_to_bgra8888(
     [](vg_color32_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -395,7 +395,7 @@ static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgrx8888_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color24_t> conv_bgr888_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color24_t > conv_bgr888_to_bgra8888(
     [](vg_color32_t * dest, const vg_color24_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -408,7 +408,7 @@ static vg_lite_converter<vg_color32_t, vg_color24_t> conv_bgr888_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha8_to_bgra8888(
+static vg_lite_converter < vg_color32_t, uint8_t > conv_alpha8_to_bgra8888(
     [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t color)
 {
     while(px_size--) {
@@ -422,7 +422,7 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha8_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha4_to_bgra8888(
+static vg_lite_converter < vg_color32_t, uint8_t > conv_alpha4_to_bgra8888(
     [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t color)
 {
     /* 1 byte -> 2 px */
@@ -449,7 +449,7 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha4_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, uint8_t> conv_l8_to_bgra8888(
+static vg_lite_converter < vg_color32_t, uint8_t > conv_l8_to_bgra8888(
     [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -462,7 +462,7 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_l8_to_bgra8888(
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color_bgra5551_t> conv_bgra5551_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color_bgra5551_t > conv_bgra5551_to_bgra8888(
     [](vg_color32_t * dest, const vg_color_bgra5551_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -475,7 +475,7 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra5551_t> conv_bgra5551_to_bgr
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color_bgra4444_t> conv_bgra4444_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color_bgra4444_t > conv_bgra4444_to_bgra8888(
     [](vg_color32_t * dest, const vg_color_bgra4444_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -488,7 +488,7 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra4444_t> conv_bgra4444_to_bgr
     }
 });
 
-static vg_lite_converter<vg_color32_t, vg_color_bgra2222_t> conv_bgra2222_to_bgra8888(
+static vg_lite_converter < vg_color32_t, vg_color_bgra2222_t > conv_bgra2222_to_bgra8888(
     [](vg_color32_t * dest, const vg_color_bgra2222_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
@@ -2340,7 +2340,7 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
     return 0;
 }
 
-static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_path_t * path)
+static Result shape_set_stroke(std::unique_ptr < Shape > & shape, const vg_lite_path_t * path)
 {
     switch(path->path_type) {
         case VG_LITE_DRAW_ZERO:
@@ -2372,7 +2372,7 @@ static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_pat
     return Result::Success;
 }
 
-static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix)
+static Result shape_append_path(std::unique_ptr < Shape > & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix)
 {
     uint8_t fmt_len = vlc_format_len(path->format);
     uint8_t * cur = (uint8_t *)path->path;
@@ -2463,7 +2463,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
     return Result::Success;
 }
 
-static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
+static Result shape_append_rect(std::unique_ptr < Shape > & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect)
 {
     if(rect) {
@@ -2592,7 +2592,7 @@ static bool decode_indexed_line(
     return true;
 }
 
-static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
+static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr < Picture > & picture, const vg_lite_buffer_t * source,
                            vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;

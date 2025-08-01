@@ -62,7 +62,7 @@ static void buffer_free(struct buffer * buf);
  **********************/
 
 static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener_v3 = {.format   = dmabuf_format,
-           .modifier = dmabuf_modifiers
+                                                                           .modifier = dmabuf_modifiers
 };
 static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener    = {.format = dmabuf_format};
 
@@ -210,7 +210,7 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
 }
 
 static const struct zwp_linux_buffer_params_v1_listener params_listener = {.created = create_succeeded,
-           .failed  = create_failed
+                                                                               .failed  = create_failed
 };
 
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window)
@@ -271,17 +271,17 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
         params                   = zwp_linux_dmabuf_v1_create_params(window->wl_ctx->dmabuf_ctx.handler);
 
         switch(lv_display_get_color_format(window->lv_disp)) {
-            case LV_COLOR_FORMAT_XRGB8888:
-                drmcf = DRM_FORMAT_XRGB8888;
+        case LV_COLOR_FORMAT_XRGB8888:
+                    drmcf = DRM_FORMAT_XRGB8888;
                 break;
-            case LV_COLOR_FORMAT_ARGB8888:
-                drmcf = DRM_FORMAT_ARGB8888;
+        case LV_COLOR_FORMAT_ARGB8888:
+                    drmcf = DRM_FORMAT_ARGB8888;
                 break;
-            case LV_COLOR_FORMAT_RGB565:
-                drmcf = DRM_FORMAT_RGB565;
+        case LV_COLOR_FORMAT_RGB565:
+                    drmcf = DRM_FORMAT_RGB565;
                 break;
-            default:
-                drmcf = DRM_FORMAT_ARGB8888;
+        default:
+                    drmcf = DRM_FORMAT_ARGB8888;
         }
 
         zwp_linux_buffer_params_v1_add(params, buffers[i].dmabuf_fds[0], 0, buffers[i].offsets[0], buffers[i].strides[0], 0,

@@ -79,6 +79,14 @@
 #include "my_include.h"
 #endif
 
+#ifndef LV_USE_CUSTOM_MIPI
+    #ifdef CONFIG_LV_USE_CUSTOM_MIPI
+        #define LV_USE_CUSTOM_MIPI CONFIG_LV_USE_CUSTOM_MIPI
+    #else
+        #define LV_USE_CUSTOM_MIPI 0
+    #endif
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -2894,6 +2902,32 @@
         #endif
     #endif
 #endif
+
+/** API for Arduino FFat. */
+#ifndef LV_USE_FS_ARDUINO_ESP_FFAT
+    #ifdef CONFIG_LV_USE_FS_ARDUINO_ESP_FFAT
+        #define LV_USE_FS_ARDUINO_ESP_FFAT CONFIG_LV_USE_FS_ARDUINO_ESP_FFAT
+    #else
+        #define LV_USE_FS_ARDUINO_ESP_FFAT 0
+    #endif
+#endif
+#if LV_USE_FS_ARDUINO_ESP_FFAT
+    #ifndef LV_FS_ARDUINO_ESP_FFAT_LETTER
+        #ifdef CONFIG_LV_FS_ARDUINO_ESP_FFAT_LETTER
+            #define LV_FS_ARDUINO_ESP_FFAT_LETTER CONFIG_LV_FS_ARDUINO_ESP_FFAT_LETTER
+        #else
+            #define LV_FS_ARDUINO_ESP_FFAT_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_ESP_FFAT_PATH
+        #ifdef CONFIG_LV_FS_ARDUINO_ESP_FFAT_PATH
+            #define LV_FS_ARDUINO_ESP_FFAT_PATH CONFIG_LV_FS_ARDUINO_ESP_FFAT_PATH
+        #else
+            #define LV_FS_ARDUINO_ESP_FFAT_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
+#endif
+
 
 /** API for Arduino Sd. */
 #ifndef LV_USE_FS_ARDUINO_SD

@@ -7,40 +7,54 @@
     if (!file_p) return LV_FS_RES_NOT_EX;
 
 struct FileWrapper final {
-    FileWrapper(const File& file) : file(file) {}
-    ~FileWrapper() { file.close(); }
-    static File &get(void* file_p) {
-        return static_cast<FileWrapper*>(file_p)->file;
-    }
-private:
-    File file;
+        FileWrapper(const File& file) : file(file) {}
+        ~FileWrapper()
+        {
+            file.close();
+        }
+        static File & get(void * file_p)
+        {
+            return static_cast<FileWrapper *>(file_p)->file;
+        }
+    private:
+        File file;
 };
 
 struct lv_fs_drv_data_t {
-    lv_fs_drv_data_t(FS* fs) : 
-        m_fs(fs), m_sem(xSemaphoreCreateBinary()) { xSemaphoreGive(m_sem); }
-    File open(const char* path, const char* mode) {
-        return m_fs->open(path, mode);
-    }
-    QueueHandle_t sem() const { return m_sem; }
-private:
-    FS* m_fs;
-    QueueHandle_t m_sem;
+        lv_fs_drv_data_t(FS* fs) :
+            m_fs(fs), m_sem(xSemaphoreCreateBinary())
+        {
+            xSemaphoreGive(m_sem);
+        }
+        File open(const char * path, const char * mode)
+        {
+            return m_fs->open(path, mode);
+        }
+        QueueHandle_t sem() const
+        {
+            return m_sem;
+        }
+    private:
+        FS * m_fs;
+        QueueHandle_t m_sem;
 };
 
 struct lock_t final {
-    lock_t(const lv_fs_drv_t* drv) : m_sem(static_cast<lv_fs_drv_data_t*>(drv->user_data)->sem()) {
-        while (xSemaphoreTake(m_sem, portMAX_DELAY) == pdFALSE) ;
-    }
-    ~lock_t() {
-        xSemaphoreGive(m_sem);
-    }
-private:
-    QueueHandle_t m_sem;
+        lock_t(const lv_fs_drv_t * drv) : m_sem(static_cast<lv_fs_drv_data_t *>(drv->user_data)->sem())
+        {
+            while(xSemaphoreTake(m_sem, portMAX_DELAY) == pdFALSE) ;
+        }
+        ~lock_t()
+        {
+            xSemaphoreGive(m_sem);
+        }
+    private:
+        QueueHandle_t m_sem;
 };
 
 template<typename R>
-static lv_fs_res_t check_pos(const R pos) {
+static lv_fs_res_t check_pos(const R pos)
+{
     return static_cast<int32_t>(pos) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
@@ -58,7 +72,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 /**
  * Register a driver for the Arduino File System interface
  */
-void lv_fs_arduino_esp_fs_init(esp_fs_init_t* esp_fs_init)
+void lv_fs_arduino_esp_fs_init(esp_fs_init_t * esp_fs_init)
 {
     auto fs_drv = esp_fs_init->drv;
     lv_fs_drv_init(fs_drv);
@@ -106,7 +120,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_ARDUINO_ESP_FFAT_PATH "%s", path);
 
-    File file = static_cast<lv_fs_drv_data_t*>(drv->user_data)->open(buf, flags);
+    File file = static_cast<lv_fs_drv_data_t *>(drv->user_data)->open(buf, flags);
     if(!file) {
         return nullptr;
     }
@@ -123,7 +137,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     lock_t lock(drv);
-    delete static_cast<FileWrapper*>(file_p);
+    delete static_cast<FileWrapper *>(file_p);
     return LV_FS_RES_OK;
 }
 
@@ -138,7 +152,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    lock_t lock(drv); 
+    lock_t lock(drv);
     CHECK_FILE_P();
     *br = FileWrapper::get(file_p).read((uint8_t *)buf, btr);
     return check_pos(*br);
