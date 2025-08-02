@@ -530,6 +530,14 @@ void lv_obj_set_style_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style
     lv_obj_set_local_style_prop(obj, LV_STYLE_IMAGE_RECOLOR_OPA, v, selector);
 }
 
+void lv_obj_set_style_image_colorkey(lv_obj_t * obj, const lv_image_colorkey_t * value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_IMAGE_COLORKEY, v, selector);
+}
+
 void lv_obj_set_style_line_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
