@@ -2109,6 +2109,7 @@ menu "LVGL configuration"
 		config LV_USE_ST_LTDC_CHIBIOS
 			bool "ChibiOS specific LTDC driver"
 			default n
+			depends on LV_USE_OS && !LV_USE_ST_LTDC
 		
 		config LV_ST_LTDC_INCLUDE
 			string "Default LTDC header"
