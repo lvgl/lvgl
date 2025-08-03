@@ -1315,6 +1315,8 @@
     #if LV_USE_OS != LV_OS_CHIBIOS
         #define LV_ST_LTDC_INCLUDE "ltdc.h"
     #else
+        #undef LV_USE_ST_LTDC
+        #define LV_USE_ST_LTDC_CHIBIOS 1
         #define LV_ST_LTDC_INCLUDE "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
     #endif
     /* Only used for partial. */

@@ -4261,6 +4261,24 @@
             #endif
         #endif
     #else
+        #ifndef LV_USE_ST_LTDC
+            #ifdef CONFIG_LV_USE_ST_LTDC
+                #define LV_USE_ST_LTDC CONFIG_LV_USE_ST_LTDC
+            #else
+                #undef LV_USE_ST_LTDC
+            #endif
+        #endif
+        #ifndef LV_USE_ST_LTDC_CHIBIOS
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                    #define LV_USE_ST_LTDC_CHIBIOS CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                #else
+                    #define LV_USE_ST_LTDC_CHIBIOS 0
+                #endif
+            #else
+                #define LV_USE_ST_LTDC_CHIBIOS 1
+            #endif
+        #endif
         #ifndef LV_ST_LTDC_INCLUDE
             #ifdef CONFIG_LV_ST_LTDC_INCLUDE
                 #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE

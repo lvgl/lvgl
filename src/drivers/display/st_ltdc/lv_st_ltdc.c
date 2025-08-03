@@ -8,7 +8,7 @@
  *********************/
 
 #include "../../../lv_conf_internal.h"
-#if LV_USE_ST_LTDC && LV_USE_OS != LV_OS_CHIBIOS
+#if LV_USE_ST_LTDC
 
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
