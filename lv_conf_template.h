@@ -1313,6 +1313,7 @@
 #define LV_USE_ST_LTDC    0
 #if LV_USE_ST_LTDC
     #if LV_USE_OS != LV_OS_CHIBIOS
+        #define LV_USE_ST_LTDC_CHIBIOS 0
         #define LV_ST_LTDC_INCLUDE "ltdc.h"
     #else
         #undef LV_USE_ST_LTDC

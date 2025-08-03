@@ -4253,6 +4253,13 @@
 #endif
 #if LV_USE_ST_LTDC
     #if LV_USE_OS != LV_OS_CHIBIOS
+        #ifndef LV_USE_ST_LTDC_CHIBIOS
+            #ifdef CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                #define LV_USE_ST_LTDC_CHIBIOS CONFIG_LV_USE_ST_LTDC_CHIBIOS
+            #else
+                #define LV_USE_ST_LTDC_CHIBIOS 0
+            #endif
+        #endif
         #ifndef LV_ST_LTDC_INCLUDE
             #ifdef CONFIG_LV_ST_LTDC_INCLUDE
                 #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE
