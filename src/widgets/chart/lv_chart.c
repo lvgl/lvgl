@@ -1303,7 +1303,7 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
         return;
     }
 
-    int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the column on ~adjacent X*/
+    int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the columns on adjacent X ticks*/
     int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
 
     int32_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
