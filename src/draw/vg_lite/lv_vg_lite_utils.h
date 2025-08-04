@@ -293,6 +293,19 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
     LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
 }
 
+static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t * area, vg_lite_color_t color)
+{
+    vg_lite_rectangle_t rect;
+    lv_vg_lite_rect(&rect, area);
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_clear(target, &rect, color), {
+        lv_vg_lite_buffer_dump_info(target);
+        LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
+        lv_vg_lite_color_dump_info(color);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
+}
+
 /**********************
  *      MACROS
  **********************/
