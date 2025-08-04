@@ -229,7 +229,11 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     lv_color_format_t cf = decoded->header.cf;
 
     if(cf == LV_COLOR_FORMAT_ARGB8888 && lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
         cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+#else
+        LV_LOG_WARN("LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED is not enabled. Falling back to ARGB8888");
+#endif
     }
 
     lv_draw_sw_blend_dsc_t blend_dsc;

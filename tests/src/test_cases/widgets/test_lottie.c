@@ -28,29 +28,11 @@ void tearDown(void)
 
 void test_lottie_simple(void)
 {
-    lv_draw_buf_t draw_buf;
-    lv_draw_buf_init(
-        &draw_buf, 100, 100,
-        LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED,
-        LV_STRIDE_AUTO,
-        buf, sizeof(buf));
-
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
-    lv_lottie_set_draw_buf(lottie, &draw_buf);
+    lv_lottie_set_buffer(lottie, 100, 100, lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED));
     lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
     lv_obj_center(lottie);
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_1.png");
 
-    /**
-     * lv_lottie will add the LV_IMAGE_FLAGS_PREMULTIPLIED flag to the drawing buffer,
-     * which should have the same effect as LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED.
-     */
-    lv_draw_buf_init(
-        &draw_buf, 100, 100,
-        LV_COLOR_FORMAT_ARGB8888,
-        LV_STRIDE_AUTO,
-        buf, sizeof(buf));
-    lv_lottie_set_draw_buf(lottie, &draw_buf);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_1.png");
 
     /*Wait a little*/
@@ -187,6 +169,25 @@ void test_lottie_no_jump_when_visible_again(void)
     lv_test_fast_forward(750);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_3.png");
 
+}
+
+void test_lottie_set_draw_buf(void)
+{
+    /**
+     * lv_lottie will add the LV_IMAGE_FLAGS_PREMULTIPLIED flag to the drawing buffer,
+     * which should have the same effect as LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED.
+     */
+    lv_draw_buf_t draw_buf;
+    lv_draw_buf_init(
+        &draw_buf, 100, 100,
+        LV_COLOR_FORMAT_ARGB8888,
+        LV_STRIDE_AUTO,
+        lv_draw_buf_align(buf, LV_COLOR_FORMAT_ARGB8888), sizeof(buf));
+    lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
+    lv_lottie_set_draw_buf(lottie, &draw_buf);
+    lv_lottie_set_src_data(lottie, test_lottie_approve, test_lottie_approve_size);
+    lv_obj_center(lottie);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_1.png");
 }
 
 #endif
