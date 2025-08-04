@@ -32,7 +32,6 @@
  **********************/
 typedef enum {
     STYLE_PROP_TYPE_INT,
-    STYLE_PROP_TYPE_COLOR,
     STYLE_PROP_TYPE_UNKNOWN
 } style_prop_anim_type_t;
 
@@ -46,7 +45,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
 static void process_image_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs);
 static char * extract_view_content(const char * xml_definition);
-style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop);
+static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop);
 static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_str);
 static void int_anim_exec_cb(lv_anim_t * a, int32_t v);
 
@@ -891,7 +890,7 @@ static char * extract_view_content(const char * xml_definition)
 }
 
 
-style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
+static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
 {
     switch(prop) {
         case LV_STYLE_WIDTH:
@@ -954,16 +953,6 @@ style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
         case LV_STYLE_RECOLOR_OPA:
             return STYLE_PROP_TYPE_INT;
 
-        case LV_STYLE_BG_COLOR:
-        case LV_STYLE_BG_GRAD_COLOR:
-        case LV_STYLE_BORDER_COLOR:
-        case LV_STYLE_OUTLINE_COLOR:
-        case LV_STYLE_SHADOW_COLOR:
-        case LV_STYLE_TEXT_COLOR:
-        case LV_STYLE_LINE_COLOR:
-        case LV_STYLE_ARC_COLOR:
-        case LV_STYLE_IMAGE_RECOLOR:
-        case LV_STYLE_RECOLOR:
         default:
             return STYLE_PROP_TYPE_UNKNOWN;
 
@@ -974,11 +963,6 @@ static int32_t anim_value_to_int(lv_style_prop_t prop_type, const char * value_s
 {
     if(prop_type == STYLE_PROP_TYPE_INT) {
         return lv_xml_atoi(value_str);
-    }
-
-    if(prop_type == STYLE_PROP_TYPE_COLOR) {
-        lv_color_t c = lv_xml_to_color(value_str);
-        return (int32_t) lv_color_to_u32(c);
     }
 
     return 0;

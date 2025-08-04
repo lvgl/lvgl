@@ -81,8 +81,8 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 /**
  * Set the time to wait before starting the the animation.
  * Applies only when playing from the very start, or reverse from the very end.
- * @param at    pointer to an animation timeline
- * @return      the delay time in milliseconds
+ * @param at        pointer to an animation timeline
+ * @param delay     the delay time in milliseconds
  */
 void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay);
 
@@ -178,7 +178,7 @@ void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
  * If set, it's assumed that the  `var` of animations is a widget name (path).
  * The widget pointer will be retrieved by finding them by name on this widget.
  * @param at        pointer to the animation timeline.
- * @param base_obj  pointer to a widget
+ * @return          pointer to the base widget
  */
 lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at);
 #endif

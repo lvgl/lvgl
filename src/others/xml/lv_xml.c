@@ -215,7 +215,7 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
     if(!lv_ll_is_empty(&scope->timeline_ll)) {
         lv_xml_timeline_t * at_xml;
         lv_anim_timeline_t ** timeline_array;
-        timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t));
+        timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t *));
         uint32_t i = 0;
         LV_LL_READ(&scope->timeline_ll, at_xml) {
             lv_anim_timeline_t * at = lv_anim_timeline_create();
