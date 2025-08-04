@@ -72,7 +72,8 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     vg_lite_color_t color = lv_vg_lite_image_recolor(&src_buf, dsc);
 
     /* convert the blend mode to vg-lite blend mode, considering the premultiplied alpha */
-    bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
+                       || (decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
 
     /* original image matrix */
