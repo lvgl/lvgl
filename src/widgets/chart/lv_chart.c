@@ -375,8 +375,10 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         int32_t temp_y = value_to_y(obj, ser, v_sum, h);
         p_out->y = h - temp_y;
     }
+    /*LV_CHART_TYPE_NONE*/
     else {
         p_out->x = 0;
+        p_out->y = 0;
     }
 
     int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -1353,11 +1355,11 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
             bar_full_area.x1 = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
         }
         bar_full_area.x2 = bar_full_area.x1 + block_w - 1;
-        if(bar_full_area.x2 < clip_area_ori.x1) {
-            col_dsc.base.id1++;
-            continue;
-        }
 
+        /*No in the clip area yet*/
+        if(bar_full_area.x2 < clip_area_ori.x1) continue;
+
+        /*Out of the clip area already*/
         if(bar_full_area.x1 > clip_area_ori.x2) break;
 
         /*Draw the full_bar_area and set the clip area to clip the segments*/
@@ -1365,26 +1367,29 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
         bar_full_area.y1 = bar_full_area.y2 - y_ofs - total_bar_height + 1;
 
         lv_area_t bar_clip_area = bar_full_area;
-        int32_t y_prev = obj->coords.y2;
+        int32_t y_prev = obj->coords.y2 + 1;
 
         /*Draw the current point of all data line*/
         int32_t v_sum_act = 0;
         LV_LL_READ(&chart->series_ll, ser) {
-            if(ser->hidden) continue;
-
             int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_dsc.bg_color = ser->color;
 
             int32_t p_act = (start_point + i) % chart->point_cnt;
             int32_t v_act = ser->y_points[p_act];
-            if(ser->y_points[p_act] == LV_CHART_POINT_NONE) continue;
-            if(v_act <= 0) continue; /*Can't show negative values on a stacked chart*/
+            /*Can't show negative values on a stacked chart*/
+            if(ser->y_points[p_act] == LV_CHART_POINT_NONE ||
+               v_act <= 0 ||
+               ser->hidden) {
+                col_dsc.base.id1++;
+                continue;
+            }
 
             v_sum_act += v_act; /*Use the summed value to get its `y` to avoid rounding errors*/
 
             int32_t segment_y = value_to_y(obj, ser, v_sum_act, h);
-            bar_clip_area.y2 = y_prev;
+            bar_clip_area.y2 = y_prev - 1;
             bar_clip_area.y1 = obj->coords.y2 - y_ofs - segment_y + 1;
             y_prev = bar_clip_area.y1;
             if(lv_area_intersect(&layer->_clip_area, &clip_area_ori, &bar_clip_area)) {
