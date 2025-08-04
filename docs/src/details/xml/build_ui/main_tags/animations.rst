@@ -107,5 +107,5 @@ that will be created only later in the ``<view>``.)
 Finally, when the trigger event happens, LVGL finds the target widget by the saved name,
 retrieves the specified timeline, and starts it.
 
-Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``s)
+Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\ s)
 and play their ``load`` timelines independently with different delays.
