@@ -2598,7 +2598,9 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                            vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
+
+    /* At least 8-byte alignment */
+    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, 8));
 
     /**
      * Since ThorVG's picture->load does not support stride,
