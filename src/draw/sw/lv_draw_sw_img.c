@@ -228,6 +228,10 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     uint32_t img_stride = decoded->header.stride;
     lv_color_format_t cf = decoded->header.cf;
 
+    if(cf == LV_COLOR_FORMAT_ARGB8888 && lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
+        cf = LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED;
+    }
+
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
