@@ -737,7 +737,14 @@ void lv_vg_lite_buffer_init(
                              "width : %" LV_PRId32 ", height : %" LV_PRId32, width, height);
     }
 
-    buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+    /* Alpha image need to be multiplied by color */
+    if(format == VG_LITE_A8 || format == VG_LITE_A4) {
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    }
+    else {
+        buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+    }
+
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
@@ -786,11 +793,6 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     lv_vg_lite_buffer_init(buffer, ptr,
                            width, height, stride, format,
                            lv_draw_buf_has_flag(draw_buf, LV_VG_LITE_IMAGE_FLAGS_TILED));
-
-    /* Alpha image need to be multiplied by color */
-    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
-        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    }
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
@@ -1027,7 +1029,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
     int memory_align = LV_DRAW_BUF_ALIGN;
     if(is_src) {
-        int memory_align = LV_DRAW_BUF_ALIGN;
         switch(buffer->format) {
             case VG_LITE_INDEX_1:
             case VG_LITE_INDEX_2:
@@ -1061,11 +1062,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
             default:
                 break;
-        }
-
-        if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, memory_align)) {
-            LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, memory_align);
-            return false;
         }
     }
 
