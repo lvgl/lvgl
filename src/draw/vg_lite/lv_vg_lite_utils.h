@@ -114,8 +114,6 @@ void lv_vg_lite_buffer_format_bytes(
 
 uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format);
 
-uint32_t lv_vg_lite_width_align(uint32_t w);
-
 void lv_vg_lite_buffer_init(
     vg_lite_buffer_t * buffer,
     const void * ptr,
