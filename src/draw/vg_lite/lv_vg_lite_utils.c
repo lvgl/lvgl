@@ -725,9 +725,6 @@ void lv_vg_lite_buffer_init(
     vg_lite_buffer_format_t format,
     bool tiled)
 {
-    uint32_t mul;
-    uint32_t div;
-    uint32_t align;
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(ptr);
 
@@ -740,13 +737,19 @@ void lv_vg_lite_buffer_init(
     else {
         buffer->tiled = VG_LITE_LINEAR;
     }
+
+    if(buffer->tiled) {
+        LV_ASSERT_FORMAT_MSG(LV_VG_LITE_IS_ALIGNED(width, 4) &&
+                             LV_VG_LITE_IS_ALIGNED(height, 4),
+                             "width : %" LV_PRId32 ", height : %" LV_PRId32, width, height);
+    }
+
     buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
     if(stride == LV_STRIDE_AUTO) {
-        lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-        buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+        buffer->stride = lv_vg_lite_width_to_stride(width, buffer->format);
     }
     else {
         buffer->stride = stride;
