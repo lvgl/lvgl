@@ -7,10 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "fastgltf/types.hpp"
 #include "lv_gltf_view_internal.h"
-#include <src/libs/gltf/lv_gltf_data/lv_gltf_data_internal.h>
+
 #if LV_USE_GLTF
+
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -21,6 +21,8 @@
 #include "../math/lv_gltf_math.hpp"
 
 #include <algorithm>
+
+#include <fastgltf/types.hpp>
 #include <fastgltf/tools.hpp>
 
 /*********************

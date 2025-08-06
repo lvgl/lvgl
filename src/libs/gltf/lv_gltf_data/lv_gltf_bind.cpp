@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <cstdint>
 #include <lvgl.h>
-#include "../../../drivers/glfw/lv_opengles_debug.h"
 
 #include <fastgltf/core.hpp>
 #include <fastgltf/types.hpp>
