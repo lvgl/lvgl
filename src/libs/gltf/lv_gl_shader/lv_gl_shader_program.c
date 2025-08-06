@@ -1,5 +1,5 @@
 /**
- * @file lv_opengl_shader_program.c
+ * @file lv_gl_shader_program.c
  *
  */
 
