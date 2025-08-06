@@ -1,5 +1,5 @@
 /**
-  @file lv_opengl_shader_internal.h
+  @file lv_gl_shader_internal.h
  *
  */
 
@@ -99,4 +99,4 @@ lv_gl_shader_program_t * lv_gl_shader_manager_get_program(lv_gl_shader_manager_t
 #endif
 
 #endif /*LV_USE_GLTF*/
-#endif /*LV_OPENGL_SHADER_INTERNAL_H*/
+#endif /*LV_GL_SHADER_INTERNAL_H*/

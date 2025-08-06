@@ -1,10 +1,10 @@
 /**
- * @file lv_gltf_view.h
+ * @file lv_gltf.h
  *
  */
 
-#ifndef LV_GLTF_VIEW_H
-#define LV_GLTF_VIEW_H
+#ifndef LV_GLTF_H
+#define LV_GLTF_H
 
 /*********************
  *      INCLUDES
@@ -312,4 +312,4 @@ lv_gltf_antialiasing_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
 
 #endif /*LV_USE_GLTF*/
 
-#endif /*LV_GLTF_VIEW_H*/
+#endif /*LV_GLTF_H*/
