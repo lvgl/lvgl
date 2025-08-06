@@ -30,7 +30,7 @@ fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & ey
 fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear, float zFar);
 
 template <typename T>
-[[nodiscard]] fastgltf::math::quat<T> lv_gltf_math_euler_to_quartenion(T P, T Y, T R)
+[[nodiscard]] fastgltf::math::quat<T> lv_gltf_math_euler_to_quaternion(T P, T Y, T R)
 {
     // Convert degrees to radians if necessary
     // roll = roll * (M_PI / 180.0);
