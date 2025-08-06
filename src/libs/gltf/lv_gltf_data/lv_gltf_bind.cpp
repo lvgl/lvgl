@@ -128,9 +128,9 @@ lv_result_t lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bi
                     gltf_data->node_binds[pair.first] = currentbind->next_bind;
                 }
 
-                for(uint32_t i = 0; i < lv_array_size(&gltf_data->binds); ++i){
-                    const lv_gltf_bind_t* current_entry = (const lv_gltf_bind_t*)lv_array_at(&gltf_data->binds, i);
-                    if(current_entry->id == bind_to_remove->id){
+                for(uint32_t i = 0; i < lv_array_size(&gltf_data->binds); ++i) {
+                    const lv_gltf_bind_t * current_entry = (const lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, i);
+                    if(current_entry->id == bind_to_remove->id) {
                         lv_array_remove(&gltf_data->binds, i);
                     }
                 }
