@@ -5,7 +5,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <algorithm>
 #include <cstdint>
 #include <lvgl.h>
 
@@ -64,14 +63,14 @@ lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node,
         while(existingbind->next_bind != nullptr)
             existingbind = existingbind->next_bind;
 
-        gltf_data->all_binds.push_back(new_bind);
-        existingbind->next_bind = &gltf_data->all_binds[gltf_data->all_binds.size() - 1];
+        lv_array_push_back(&gltf_data->binds, &new_bind);
+        existingbind->next_bind  = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
         return existingbind->next_bind;
     }
     else {
         // No existing bind, insert the new one
-        gltf_data->all_binds.push_back(new_bind);
-        gltf_data->node_binds[node] = &gltf_data->all_binds[gltf_data->all_binds.size() - 1];
+        lv_array_push_back(&gltf_data->binds, &new_bind);
+        gltf_data->node_binds[node] = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
         return gltf_data->node_binds[node];
     }
     return nullptr;
@@ -112,21 +111,14 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_model_t * data, const char * p
     return add_by_node(data, node->node, which_prop, data_mask, dir);
 }
 
-// Custom comparison function to compare structs
-bool compare_binds(const lv_gltf_bind_t & a, const lv_gltf_bind_t & b)
-{
-    return (a.prop == b.prop) && (a.data_mask == b.data_mask) && (a.data[0] == b.data[0]) && (a.data[1] == b.data[1]) &&
-           (a.data[2] == b.data[2]) && (a.next_bind == b.next_bind);
-}
-
-bool lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bindToRemove)
+lv_result_t lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bind_to_remove)
 {
     for(auto pair : gltf_data->node_binds) {
         lv_gltf_bind_t * currentbind = pair.second;
         lv_gltf_bind_t * previousbind = nullptr;
 
         while(currentbind != nullptr) {
-            if(currentbind == bindToRemove) {
+            if(currentbind->id == bind_to_remove->id) {
                 // Found the bind to remove
                 if(previousbind != nullptr) {
                     // Link the previous bind to the next one
@@ -135,13 +127,14 @@ bool lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bindToRem
                 else {
                     gltf_data->node_binds[pair.first] = currentbind->next_bind;
                 }
-                gltf_data->all_binds.erase(std::remove_if(gltf_data->all_binds.begin(),
-                                                          gltf_data->all_binds.end(),
-                [&bindToRemove](const lv_gltf_bind_t & item) {
-                    return compare_binds(item, *bindToRemove);
-                }),
-                gltf_data->all_binds.end());
-                return true; // Successfully removed
+
+                for(uint32_t i = 0; i < lv_array_size(&gltf_data->binds); ++i){
+                    const lv_gltf_bind_t* current_entry = (const lv_gltf_bind_t*)lv_array_at(&gltf_data->binds, i);
+                    if(current_entry->id == bind_to_remove->id){
+                        lv_array_remove(&gltf_data->binds, i);
+                    }
+                }
+                return LV_RESULT_OK;
             }
             previousbind = currentbind;
             if(currentbind != nullptr) {
@@ -154,7 +147,7 @@ bool lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bindToRem
             }
         }
     }
-    return false;
+    return LV_RESULT_INVALID;
 }
 
 #endif /*LV_USE_GLTF*/

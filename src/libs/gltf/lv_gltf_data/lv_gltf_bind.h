@@ -32,6 +32,7 @@ struct _lv_gltf_bind {
     struct _lv_gltf_bind * next_bind;
     lv_gltf_bind_prop_t prop;
     lv_gltf_bind_dir_t dir;
+    uint32_t id;
     uint32_t data_mask;
     float data[LV_GLTF_BIND_MAX_CHANNELS];
     bool dirty;
@@ -95,7 +96,7 @@ lv_gltf_bind_t * lv_gltf_bind_add_by_path(lv_gltf_model_t * data, const char * p
  * @param data_mask A mask indicating which data fields to bind.
  * @return True on success, False on failure.
  */
-bool lv_gltf_bind_remove(lv_gltf_model_t * _data, lv_gltf_bind_t * bind);
+lv_result_t lv_gltf_bind_remove(lv_gltf_model_t * _data, lv_gltf_bind_t * bind);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -57,7 +57,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->last_frame_no_motion = false;
     data->_last_frame_no_motion = false;
     new(&data->node_binds) NodeOverrideMap();
-    new(&data->all_binds) OverrideVector();
     new(&data->node_transform_cache) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
@@ -68,6 +67,8 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->node_by_light_index) NodeVector();
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
+
+    lv_array_init(&data->binds, 0, sizeof(lv_gltf_bind_t));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
