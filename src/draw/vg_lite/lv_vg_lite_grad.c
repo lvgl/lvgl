@@ -191,8 +191,7 @@ bool lv_vg_lite_draw_grad(
                 vg_lite_linear_gradient_t * linear_grad = &grad_item->vg.linear;
                 vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(linear_grad);
                 LV_ASSERT_NULL(grad_mat_p);
-                vg_lite_identity(grad_mat_p);
-                lv_vg_lite_matrix_multiply(grad_mat_p, grad_matrix);
+                *grad_mat_p = *grad_matrix;
                 grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
 
                 LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_grad");

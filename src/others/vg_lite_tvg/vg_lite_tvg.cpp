@@ -1464,10 +1464,18 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        /* Offset the gradient matrix transformation to align with hardware behavior */
+        vg_lite_matrix_t grad_matrix;
+        vg_lite_identity(&grad_matrix);
+        if(!vg_lite_matrix_inverse(&grad_matrix, path_matrix)) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
+
         auto linearGrad = LinearGradient::gen();
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->linear(grad->linear_grad.X0, grad->linear_grad.Y0, grad->linear_grad.X1,
                                                      grad->linear_grad.Y1));
-        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->spread(fill_spread_conv(grad->spread_mode)));
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_COLOR_RAMP_STOPS];
@@ -1982,8 +1990,16 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        /* Offset the gradient matrix transformation to align with hardware behavior */
+        vg_lite_matrix_t grad_matrix;
+        vg_lite_identity(&grad_matrix);
+        if(!vg_lite_matrix_inverse(&grad_matrix, path_matrix)) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
+
         auto radialGrad = RadialGradient::gen();
-        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->radial(grad->radial_grad.cx, grad->radial_grad.cy, grad->radial_grad.r));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->spread(fill_spread_conv(grad->spread_mode)));
 
