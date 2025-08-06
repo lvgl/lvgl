@@ -30,8 +30,6 @@
  *      TYPEDEFS
  **********************/
 
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_3dtexture_class;
-
 #ifdef __cplusplus
 extern "C" {
 #endif/* __cplusplus*/
