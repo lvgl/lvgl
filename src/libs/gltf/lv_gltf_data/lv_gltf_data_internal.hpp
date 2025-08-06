@@ -333,7 +333,7 @@ fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_model_t *data, size_t index
 void lv_gltf_data_destroy_textures(lv_gltf_model_t *data);
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t *data);
 void lv_gltf_data_nodes_init(lv_gltf_model_t *data, size_t size);
-void lv_gltf_data_node_init(lv_gltf_data_node_t *node, fastgltf::Node *fastgltf_node, const char *ip, const char *path);
+void lv_gltf_data_node_init(lv_gltf_data_node_t * node, fastgltf::Node * fastgltf_node, const char * path, const char * ip);
 void lv_gltf_data_node_add(lv_gltf_model_t *data, const lv_gltf_data_node_t *data_node);
 void lv_gltf_data_node_delete(lv_gltf_data_node_t *node);
 
