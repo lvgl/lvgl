@@ -1031,9 +1031,9 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
 
     // Note because we switched over to fastgltf math and it's right-hand focused, z axis is actually pitch (instead of x-axis), and x axis is yaw, instead of y-axis
     fastgltf::math::fmat3x3 rotation1 =
-        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(0.f, 0.f, fastgltf::math::radians(view_desc->pitch)));
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quaternion(0.f, 0.f, fastgltf::math::radians(view_desc->pitch)));
     fastgltf::math::fmat3x3 rotation2 =
-        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(fastgltf::math::radians(view_desc->yaw), 0.f, 0.f));
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quaternion(fastgltf::math::radians(view_desc->yaw), 0.f, 0.f));
 
     rcam_dir = rotation1 * rcam_dir;
     rcam_dir = rotation2 * rcam_dir;
@@ -1152,7 +1152,7 @@ static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, 
 void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program)
 {
     fastgltf::math::fmat3x3 rotmat =
-        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quartenion(env_rotation_angle, 0.f, 3.14159f));
+        fastgltf::math::asMatrix(lv_gltf_math_euler_to_quaternion(env_rotation_angle, 0.f, 3.14159f));
 
     // Get the uniform location and set the uniform
     int32_t u_loc;

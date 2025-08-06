@@ -726,7 +726,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
             localmatrix = fastgltf::math::scale(
                               fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
                                                      made_rotation_changes ?
-                                                     lv_gltf_math_euler_to_quartenion(
+                                                     lv_gltf_math_euler_to_quaternion(
                                                          local_rot[0], local_rot[1], local_rot[2]) :
                                                      local_quat),
                               local_scale);
