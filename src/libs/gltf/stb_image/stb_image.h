@@ -935,11 +935,11 @@ typedef struct {
 #endif
 
 #ifndef STBI_NO_PSD
-    static int      stbi__psd_test(stbi__context * s);
-    static void  *  stbi__psd_load(stbi__context * s, int * x, int * y, int * comp, int req_comp, stbi__result_info * ri,
-    int bpc);
-    static int      stbi__psd_info(stbi__context * s, int * x, int * y, int * comp);
-    static int      stbi__psd_is16(stbi__context * s);
+static int      stbi__psd_test(stbi__context * s);
+static void  *  stbi__psd_load(stbi__context * s, int * x, int * y, int * comp, int req_comp, stbi__result_info * ri,
+                               int bpc);
+static int      stbi__psd_info(stbi__context * s, int * x, int * y, int * comp);
+static int      stbi__psd_is16(stbi__context * s);
 #endif
 
 #ifndef STBI_NO_HDR
@@ -955,11 +955,11 @@ typedef struct {
 #endif
 
 #ifndef STBI_NO_GIF
-    static int      stbi__gif_test(stbi__context * s);
-    static void  *  stbi__gif_load(stbi__context * s, int * x, int * y, int * comp, int req_comp, stbi__result_info * ri);
-    static void  *  stbi__load_gif_main(stbi__context * s, int ** delays, int * x, int * y, int * z, int * comp,
-    int req_comp);
-    static int      stbi__gif_info(stbi__context * s, int * x, int * y, int * comp);
+static int      stbi__gif_test(stbi__context * s);
+static void  *  stbi__gif_load(stbi__context * s, int * x, int * y, int * comp, int req_comp, stbi__result_info * ri);
+static void  *  stbi__load_gif_main(stbi__context * s, int ** delays, int * x, int * y, int * z, int * comp,
+                                    int req_comp);
+static int      stbi__gif_info(stbi__context * s, int * x, int * y, int * comp);
 #endif
 
 #ifndef STBI_NO_PNM
@@ -1330,10 +1330,10 @@ static void stbi__float_postprocess(float * result, int * x, int * y, int * comp
 #ifndef STBI_NO_STDIO
 
 #if defined(_WIN32) && defined(STBI_WINDOWS_UTF8)
-    STBI_EXTERN __declspec(dllimport) int __stdcall MultiByteToWideChar(unsigned int cp, unsigned long flags,
-    const char * str, int cbmb, wchar_t * widestr, int cchwide);
-    STBI_EXTERN __declspec(dllimport) int __stdcall WideCharToMultiByte(unsigned int cp, unsigned long flags,
-    const wchar_t * widestr, int cchwide, char * str, int cbmb, const char * defchar, int * used_default);
+STBI_EXTERN __declspec(dllimport) int __stdcall MultiByteToWideChar(unsigned int cp, unsigned long flags,
+                                                                    const char * str, int cbmb, wchar_t * widestr, int cchwide);
+STBI_EXTERN __declspec(dllimport) int __stdcall WideCharToMultiByte(unsigned int cp, unsigned long flags,
+                                                                    const wchar_t * widestr, int cchwide, char * str, int cbmb, const char * defchar, int * used_default);
 #endif
 
 #if defined(_WIN32) && defined(STBI_WINDOWS_UTF8)
@@ -4574,7 +4574,8 @@ static int stbi__parse_huffman_block(stbi__zbuf * a)
             if(stbi__zlength_extra[z]) len += stbi__zreceive(a, stbi__zlength_extra[z]);
             z = stbi__zhuffman_decode(a, &a->z_distance);
             if(z < 0 ||
-               z >= 30) return stbi__err("bad huffman code", "Corrupt PNG"); // per DEFLATE, distance codes 30 and 31 must not appear in compressed data
+               z >= 30) return stbi__err("bad huffman code",
+                                             "Corrupt PNG"); // per DEFLATE, distance codes 30 and 31 must not appear in compressed data
             dist = stbi__zdist_base[z];
             if(stbi__zdist_extra[z]) dist += stbi__zreceive(a, stbi__zdist_extra[z]);
             if(zout - a->zout_start < dist) return stbi__err("bad dist", "Corrupt PNG");
