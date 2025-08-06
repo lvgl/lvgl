@@ -2,6 +2,7 @@
 #define LV_GLTFDATA_HPP
 
 #include "../../../lv_conf_internal.h"
+#include <src/misc/lv_types.h>
 #if LV_USE_GLTF
 #include <fastgltf/math.hpp>
 #include "lv_gltf_model.h"
@@ -74,7 +75,7 @@ struct _lv_gltf_model_t {
 	MaterialIndexMap opaque_nodes_by_material_index;
 	MaterialIndexMap blended_nodes_by_material_index;
 	NodeOverrideMap node_binds;
-	OverrideVector all_binds;
+	lv_array_t binds;
 	std::vector<size_t> validated_skins;
 	std::vector<GLuint> skin_tex;
 	NodePrimCenterMap local_mesh_to_center_points_by_primitive;
