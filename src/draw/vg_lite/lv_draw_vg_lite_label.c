@@ -271,53 +271,26 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    /* If clipping is not required, blit directly */
-    if(lv_area_is_in(&image_area, &t->clip_area, false)) {
-        /* rect is used to crop the pixel-aligned padding area */
-        vg_lite_rectangle_t rect = {
-            .x = 0,
-            .y = 0,
-            .width = lv_area_get_width(&image_area),
-            .height = lv_area_get_height(&image_area)
-        };
+    vg_lite_rectangle_t rect = {
+        .x = clip_area.x1 - image_area.x1,
+        .y = clip_area.y1 - image_area.y1,
+        .width = lv_area_get_width(&clip_area),
+        .height = lv_area_get_height(&clip_area)
+    };
 
-        lv_vg_lite_blit_rect(
-            &u->target_buffer,
-            src_buf,
-            &rect,
-            &matrix,
-            VG_LITE_BLEND_SRC_OVER,
-            color,
-            VG_LITE_FILTER_LINEAR);
+    /* add offset for clipped area */
+    if(rect.x || rect.y) {
+        vg_lite_translate(rect.x, rect.y, &matrix);
     }
-    else {
-        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
-        lv_vg_lite_path_append_rect(
-            path,
-            clip_area.x1, clip_area.y1,
-            lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
-            0);
-        lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
-        lv_vg_lite_path_end(path);
 
-        vg_lite_matrix_t path_matrix = u->global_matrix;
-        if(is_rotated) vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
-
-        lv_vg_lite_draw_pattern(
-            &u->target_buffer,
-            lv_vg_lite_path_get_path(path),
-            VG_LITE_FILL_EVEN_ODD,
-            &path_matrix,
-            src_buf,
-            &matrix,
-            VG_LITE_BLEND_SRC_OVER,
-            VG_LITE_PATTERN_COLOR,
-            0,
-            color,
-            VG_LITE_FILTER_LINEAR);
-
-        lv_vg_lite_path_drop(u, path);
-    }
+    lv_vg_lite_blit_rect(
+        &u->target_buffer,
+        src_buf,
+        &rect,
+        &matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        color,
+        VG_LITE_FILTER_LINEAR);
 
     /* Check if the data has cache and add it to the pending list */
     if(dsc->g->entry) {
