@@ -704,11 +704,12 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
     if(ta->pwd_bullet) return ta->pwd_bullet;
 
     lv_font_glyph_dsc_t g;
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
-    if(lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0))
+    const lv_font_t * bullet_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    if(lv_font_get_glyph_dsc(bullet_font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, '\0'))
         return LV_SYMBOL_BULLET;
+
     return "*";
 }
 
@@ -1184,6 +1185,7 @@ static void refr_cursor_area(lv_obj_t * obj)
 
         uint32_t tmp = letter;
         if(is_valid_but_non_printable_char(letter)) {
+            /*If non printable get the letter_w of the space char*/
             tmp = ' ';
         }
         letter_w = lv_font_get_glyph_width(font, tmp, IGNORE_KERNING);

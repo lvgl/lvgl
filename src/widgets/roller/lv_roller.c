@@ -538,6 +538,12 @@ static void draw_main(lv_event_t * e)
         label_dsc.base.layer = layer;
         lv_obj_init_draw_label_dsc(obj, LV_PART_SELECTED, &label_dsc);
 
+        lv_text_attributes_t attributes = {0};
+        attributes.letter_space = label_dsc.letter_space;
+        attributes.line_space = label_dsc.line_space;
+        attributes.max_width = lv_obj_get_width(obj);
+        attributes.text_flags = LV_TEXT_FLAG_EXPAND;
+
         /*Redraw the text on the selected area*/
         lv_area_t sel_area;
         get_sel_area(obj, &sel_area);
@@ -550,8 +556,7 @@ static void draw_main(lv_event_t * e)
 
             /*Get the size of the "selected text"*/
             lv_point_t label_sel_size;
-            lv_text_get_size(&label_sel_size, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space,
-                             label_dsc.line_space, lv_obj_get_width(obj), LV_TEXT_FLAG_EXPAND);
+            lv_text_get_size(&label_sel_size, lv_label_get_text(label), label_dsc.font, &attributes);
 
             /*Move the selected label proportionally with the background label*/
             int32_t roller_h = lv_obj_get_height(obj);
@@ -858,11 +863,15 @@ static int32_t get_selected_label_width(const lv_obj_t * obj)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return 0;
 
+    lv_text_attributes_t attributes = {0};
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_SELECTED);
-    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
+    attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
+    attributes.max_width = LV_COORD_MAX;
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
+
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    lv_text_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&size, txt, font, &attributes);
     return size.x;
 }
 

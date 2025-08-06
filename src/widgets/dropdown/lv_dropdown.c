@@ -868,6 +868,7 @@ static void draw_main(lv_event_t * e)
     int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
 
+    lv_text_attributes_t attributes = {0};
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
     symbol_dsc.base.layer = layer;
@@ -892,8 +893,13 @@ static void draw_main(lv_event_t * e)
         int32_t symbol_h;
         if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
             lv_point_t size;
-            lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
-                             symbol_dsc.flag);
+
+            attributes.letter_space = symbol_dsc.letter_space;
+            attributes.line_space = symbol_dsc.line_space;
+            attributes.max_width = LV_COORD_MAX;
+            attributes.text_flags = symbol_dsc.flag;
+
+            lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, &attributes);
             symbol_w = size.x;
             symbol_h = size.y;
         }
@@ -944,9 +950,13 @@ static void draw_main(lv_event_t * e)
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
     label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
+    attributes.letter_space = label_dsc.letter_space;
+    attributes.max_width = LV_COORD_MAX;
+    attributes.line_space = label_dsc.line_space;
+    attributes.text_flags = label_dsc.flag;
+
     lv_point_t size;
-    lv_text_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                     label_dsc.flag);
+    lv_text_get_size(&size, opt_txt, label_dsc.font, &attributes);
 
     lv_area_t txt_area;
     txt_area.x1 = obj->coords.x1 + left;
