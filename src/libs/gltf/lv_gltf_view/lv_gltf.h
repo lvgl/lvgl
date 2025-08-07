@@ -42,6 +42,12 @@ typedef enum {
     LV_GLTF_BG_ENVIRONMENT = 2,
 } lv_gltf_background_mode_t;
 
+#define LV_GLTF_ANIM_SPEED_HALF 500
+#define LV_GLTF_ANIM_SPEED_NORMAL 1000
+#define LV_GLTF_ANIM_SPEED_2X 2000
+#define LV_GLTF_ANIM_SPEED_3X 3000
+#define LV_GLTF_ANIM_SPEED_4X 4000
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -184,20 +190,22 @@ int32_t lv_gltf_get_camera(const lv_obj_t * obj);
 /**
  * Set the animation speed ratio
  *
- * Values greater than 1.0 will speed-up the animation
- * Values less than 1.0 will slow down the animation
+ * Values greater than 1000 will speed-up the animation
+ * Values less than 1000 will slow down the animation
  *
  * @param obj pointer to a GLTF viewer object
  * @param value speed-up ratio of the animation
  */
-void lv_gltf_set_animation_speed(lv_obj_t * obj, float value);
+void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value);
 
 /**
  * Get the animation speed ratio
  *
+ * The actual ratio is 
+ *
  * @param obj pointer to a GLTF viewer object
  */
-float lv_gltf_get_animation_speed(const lv_obj_t * obj);
+uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj);
 
 /**********************
  * Visual Settings Functions
