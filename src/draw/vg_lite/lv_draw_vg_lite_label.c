@@ -353,7 +353,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
 
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         /* set scissor area */
-        lv_vg_lite_set_scissor_area(&t->clip_area);
+        lv_vg_lite_set_scissor_area(u, &t->clip_area);
 
         /* no bounding box */
         lv_vg_lite_path_set_bounding_box(outline,
