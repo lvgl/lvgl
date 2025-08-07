@@ -42,6 +42,8 @@ typedef enum {
     LV_GLTF_BG_ENVIRONMENT = 2,
 } lv_gltf_background_mode_t;
 
+#define LV_GLTF_ANIM_SPEED_TENTH 100
+#define LV_GLTF_ANIM_SPEED_QUARTER 250
 #define LV_GLTF_ANIM_SPEED_HALF 500
 #define LV_GLTF_ANIM_SPEED_NORMAL 1000
 #define LV_GLTF_ANIM_SPEED_2X 2000
@@ -175,17 +177,17 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model);
 /**
  * Set the active camera index
  * @param obj pointer to a GLTF viewer object
- * @param value camera index (-1 for default, 0 = platter, 1+ = scene camera index)
+ * @param value camera index (0 for default, 1+ = scene camera index)
  * @note Values higher than the scene's camera count will be limited to the scene's camera count
  */
-void lv_gltf_set_camera(lv_obj_t * obj, int32_t value);
+void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value);
 
 /**
  * Get the active camera index
  * @param obj pointer to a GLTF viewer object
  * @return camera index
  */
-int32_t lv_gltf_get_camera(const lv_obj_t * obj);
+uint32_t lv_gltf_get_camera(const lv_obj_t * obj);
 
 /**
  * Set the animation speed ratio

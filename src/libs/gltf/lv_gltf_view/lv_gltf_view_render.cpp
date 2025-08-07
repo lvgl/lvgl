@@ -209,8 +209,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     model->_last_frame_no_motion = model->last_frame_no_motion;
     model->last_frame_no_motion = true;
 
-    int32_t pref_cam_num = LV_MIN(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(model) - 1);
     if(motion_dirty || (pref_cam_num != model->last_camera_index) || lv_gltf_data_transform_cache_is_empty(model)) {
+    int32_t pref_cam_num = LV_MIN((int32_t)view_desc->camera - 1, (int32_t)lv_gltf_model_get_camera_count(model) - 1);
         model->last_frame_no_motion = false;
         motion_dirty = false;
         lv_gltf_view_recache_all_transforms(viewer, model);

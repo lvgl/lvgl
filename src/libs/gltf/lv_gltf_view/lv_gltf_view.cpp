@@ -264,7 +264,7 @@ lv_color32_t lv_gltf_get_background_color(const lv_obj_t * obj)
     return viewer->desc.bg_color;
 }
 
-void lv_gltf_set_camera(lv_obj_t * obj, int32_t value)
+void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -273,7 +273,7 @@ void lv_gltf_set_camera(lv_obj_t * obj, int32_t value)
     lv_obj_invalidate(obj);
 }
 
-int32_t lv_gltf_get_camera(const lv_obj_t * obj)
+uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -586,7 +586,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
 {
     const lv_gltf_view_desc_t * view_desc = &viewer->desc;
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
-    int32_t PREF_CAM_NUM = std::min(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
+    int32_t PREF_CAM_NUM = std::min((int32_t)view_desc->camera - 1, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
     int32_t anim_num = gltf_data->current_animation;
     uint32_t scene_index = 0;
 
