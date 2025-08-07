@@ -90,6 +90,18 @@ lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag
     return disp;
 }
 
+lv_display_t * lv_ili9341_create_with_user_data(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
+                                                lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_color_cb_t send_color_cb,
+                                                void * user_data)
+{
+    lv_display_t * disp = lv_lcd_generic_mipi_create_display_no_init(hor_res, ver_res);
+    lv_display_set_user_data(disp, user_data);
+    lv_lcd_generic_mipi_controller_init(disp, flags, send_cmd_cb, send_color_cb);
+
+    lv_lcd_generic_mipi_send_cmd_list(disp, init_cmd_list);
+    return disp;
+}
+
 void lv_ili9341_set_gap(lv_display_t * disp, uint16_t x, uint16_t y)
 {
     lv_lcd_generic_mipi_set_gap(disp, x, y);

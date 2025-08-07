@@ -73,3 +73,27 @@ For additional details and a working example see the `generic MIPI driver docume
 
 	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
 	
+Advanced topics
+---------------
+
+Pass user data to the display driver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :cpp:func:`lv_st7796_create_with_user_data()` is similar to the :cpp:func:`lv_st7796_create()` function, but it allows passing a user data pointer to the display driver. 
+This pointer can be used to store any user-specific data that is needed by the display driver callbacks.
+
+.. code-block:: c
+
+	/**
+	* Create an LCD display with ST7796 driver with user data
+	* @param hor_res       horizontal resolution
+	* @param ver_res       vertical resolution
+	* @param flags         default configuration settings (mirror, RGB ordering, etc.)
+	* @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+	* @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
+	* @param user_data     user data to be set for the display. It can be accessed in send_cmd and send_color functions with `lv_display_get_user_data`
+	* @return              pointer to the created display
+	*/
+	lv_display_t * lv_st7796_create_with_user_data(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
+												lv_st7796_send_cmd_cb_t send_cmd_cb, lv_st7796_send_color_cb_t send_color_cb,
+												void * user_data);
