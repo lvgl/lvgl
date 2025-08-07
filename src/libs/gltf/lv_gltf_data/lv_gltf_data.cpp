@@ -154,6 +154,7 @@ lv_result_t lv_gltf_model_play_animation(lv_gltf_model_t * model, size_t index)
     }
 
     if(lv_timer_get_paused(model->animation_update_timer)) {
+        model->last_tick = lv_tick_get();
         lv_timer_resume(model->animation_update_timer);
     }
 
