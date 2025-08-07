@@ -113,6 +113,20 @@ lv_result_t lv_gltf_model_play_animation(lv_gltf_model_t * model, size_t index);
  */
 void lv_gltf_model_pause_animation(lv_gltf_model_t * model);
 
+/**
+ * @brief Check if an animation is currently being played
+ *
+ * @param model Pointer to the glTF model structure
+ */
+bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
+
+/**
+ * @brief Get the current selected animation. To see if it's playing see `lv_gltf_model_is_animation_paused`
+ *
+ * @param model Pointer to the glTF model structure
+ */
+size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
