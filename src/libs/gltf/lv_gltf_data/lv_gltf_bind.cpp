@@ -14,6 +14,8 @@
 
 #include "lv_gltf_bind.h"
 
+static uint32_t bind_count = 0;
+
 void lv_gltf_bind_set(lv_gltf_bind_t * bind, uint8_t channel, float data)
 {
     LV_ASSERT_NULL(bind);
@@ -47,6 +49,7 @@ lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node,
 
     // Create a new bind
     lv_gltf_bind_t new_bind;
+    new_bind.id = bind_count++;
     new_bind.prop = which_prop;
     new_bind.data_mask = data_mask;
     new_bind.data[0] = new_bind.data[1] = new_bind.data[2] = which_prop == LV_GLTF_BIND_PROP_SCALE ? 1.f : 0.f;
