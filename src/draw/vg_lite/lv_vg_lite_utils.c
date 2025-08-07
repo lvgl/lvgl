@@ -17,6 +17,7 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
+#include "../../misc/lv_area_private.h"
 #include <string.h>
 #include <math.h>
 
@@ -1283,9 +1284,16 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
     return p;
 }
 
-void lv_vg_lite_set_scissor_area(const lv_area_t * area)
+void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    /* Avoid setting the same scissor frequently */
+    if(lv_area_is_equal(area, &u->current_scissor_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
 #if VGLITE_RELEASE_VERSION <= VGLITE_MAKE_VERSION(4,0,57)
     /**
      * In the new version of VG-Lite, vg_lite_set_scissor no longer needs to call vg_lite_enable_scissor and
@@ -1308,6 +1316,8 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
         LV_LOG_ERROR("area: %d, %d, %d, %d",
                      (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
     });
+
+    u->current_scissor_area = *area;
     LV_PROFILER_DRAW_END;
 }
 
@@ -1383,6 +1393,9 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     /* Clear bitmap font dsc reference */
     lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
+
+    /* Reset scissor area */
+    lv_memzero(&u->current_scissor_area, sizeof(u->current_scissor_area));
 
     u->flush_count = 0;
     u->letter_count = 0;

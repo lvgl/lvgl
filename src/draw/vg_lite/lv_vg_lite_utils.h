@@ -167,7 +167,7 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
 
-void lv_vg_lite_set_scissor_area(const lv_area_t * area);
+void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area);
 
 void lv_vg_lite_disable_scissor(void);
 
