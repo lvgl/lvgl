@@ -2,10 +2,10 @@
 #define LV_GLTFDATA_HPP
 
 #include "../../../lv_conf_internal.h"
-#include <src/misc/lv_types.h>
+
 #if LV_USE_GLTF
+
 #include <fastgltf/math.hpp>
-#include "lv_gltf_model.h"
 #include "lv_gltf_data_internal.h"
 #include "lv_gltf_bind.h"
 
@@ -79,28 +79,35 @@ struct _lv_gltf_model_t {
 	std::vector<size_t> validated_skins;
 	std::vector<GLuint> skin_tex;
 	NodePrimCenterMap local_mesh_to_center_points_by_primitive;
+	lv_gltf_t* viewer;
 
 	std::vector<lv_gltf_mesh_data_t> meshes;
 	std::vector<GLuint> textures;
 	lv_array_t compiled_shaders;
 	std::map<fastgltf::Node *, std::vector<uint32_t> > channel_set_cache;
-
+	fastgltf::math::fmat4x4 view_mat;
+	fastgltf::math::fvec3 view_pos;
 	fastgltf::math::fvec3 vertex_max;
 	fastgltf::math::fvec3 vertex_min;
 	fastgltf::math::fvec3 vertex_cen;
-	float bound_radius;
 
-	bool has_any_cameras;
+	lv_timer_t* animation_update_timer;
+
+	size_t current_animation;
+	size_t last_material_index;
+
 	int32_t current_camera_index;
 	int32_t last_camera_index;
-	fastgltf::math::fmat4x4 view_mat;
-	fastgltf::math::fvec3 view_pos;
-
 	int32_t last_anim_num;
-	float cur_anim_maxtime;
-	float local_timestamp;
 
-	size_t last_material_index;
+	float bound_radius;
+
+	uint32_t current_animation_max_time;
+	uint32_t local_timestamp;
+	uint32_t last_tick;
+
+	bool has_any_cameras;
+	bool is_animation_enabled;
 	bool last_pass_was_transmission;
 	bool last_frame_was_antialiased;
 	bool last_frame_no_motion;
@@ -356,7 +363,7 @@ bool lv_gltf_data_get_texture_pixels(void *pixels, lv_gltf_model_t *data_obj, ui
 lv_gltf_data_node_t *lv_gltf_data_node_get_by_index(lv_gltf_model_t *data, size_t index);
 lv_gltf_data_node_t *lv_gltf_data_node_get_by_ip(lv_gltf_model_t *data, const char *ip);
 lv_gltf_data_node_t *lv_gltf_data_node_get_by_path(lv_gltf_model_t *data, const char *path);
-float lv_gltf_data_get_animation_total_time(lv_gltf_model_t *data, uint32_t index);
+uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t *data, uint32_t index);
 std::vector<uint32_t> *lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t *data, fastgltf::Node &node);
 void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_model_t *gltf_data, fastgltf::Node &node,
 					 fastgltf::math::fmat4x4 &matrix);

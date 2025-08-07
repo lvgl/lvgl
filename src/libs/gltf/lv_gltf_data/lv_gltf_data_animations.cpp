@@ -48,7 +48,7 @@ static fastgltf::math::fquat animation_get_quat_at_timestamp(lv_gltf_model_t * d
  *   GLOBAL FUNCTIONS
  **********************/
 
-float lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t index)
+uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t index)
 {
     LV_ASSERT(data->asset.animations.size() > index);
     auto & animation = data->asset.animations[index];
@@ -57,7 +57,7 @@ float lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t ind
         auto & accessor = data->asset.accessors[animation.samplers[i].inputAccessor];
         max_time = std::max(max_time, fastgltf::getAccessorElement<float>(data->asset, accessor, accessor.count - 1));
     }
-    return max_time;
+    return (uint32_t)(max_time * 1000);
 }
 
 std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t * data,

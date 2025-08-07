@@ -8,11 +8,6 @@
  *********************/
 
 #include "lv_gltf_view_internal.h"
-#include <cstdint>
-#include <src/core/lv_obj_pos.h>
-#include <src/misc/lv_array.h>
-#include <src/misc/lv_assert.h>
-#include <src/misc/lv_color.h>
 
 #if LV_USE_GLTF
 
@@ -56,7 +51,6 @@ static void destroy_environment(lv_gltf_view_env_textures_t * env);
 static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 
-static void set_time_cb(lv_timer_t * timer);
 
 const lv_obj_class_t lv_gltf_class = {
     &lv_3dtexture_class,
@@ -187,21 +181,21 @@ extern "C" {
         return viewer->desc.distance;
     }
 
-    void lv_gltf_set_animation(lv_obj_t * obj, int32_t value)
+    void lv_gltf_set_animation_speed(lv_obj_t * obj, float value)
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
         lv_gltf_t * viewer = (lv_gltf_t *)obj;
-        viewer->desc.anim = value;
+        viewer->desc.animation_speed_ratio = value;
         lv_obj_invalidate(obj);
     }
 
-    int32_t lv_gltf_get_animation(const lv_obj_t * obj)
+    float lv_gltf_get_animation_speed(const lv_obj_t * obj)
     {
         LV_ASSERT_NULL(obj);
         LV_ASSERT_OBJ(obj, MY_CLASS);
         lv_gltf_t * viewer = (lv_gltf_t *)obj;
-        return viewer->desc.anim;
+        return viewer->desc.animation_speed_ratio;
     }
 
     void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
@@ -287,23 +281,6 @@ extern "C" {
         LV_ASSERT_OBJ(obj, MY_CLASS);
         lv_gltf_t * viewer = (lv_gltf_t *)obj;
         return viewer->desc.camera;
-    }
-
-    void lv_gltf_set_timestep(lv_obj_t * obj, float value)
-    {
-        LV_ASSERT_NULL(obj);
-        LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_t * viewer = (lv_gltf_t *)obj;
-        viewer->desc.timestep = value;
-        lv_obj_invalidate(obj);
-    }
-
-    float lv_gltf_get_timestep(const lv_obj_t * obj)
-    {
-        LV_ASSERT_NULL(obj);
-        LV_ASSERT_OBJ(obj, MY_CLASS);
-        lv_gltf_t * viewer = (lv_gltf_t *)obj;
-        return viewer->desc.timestep;
     }
 
     void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t value)
@@ -421,26 +398,17 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
         lv_gltf_data_destroy(model);
         return NULL;
     }
-
+    model->viewer = viewer;
     lv_gltf_parse_model(viewer, model);
+
 
     if(lv_array_size(&viewer->models) == 1) {
         lv_gltf_recenter((lv_obj_t *)viewer, model);
     }
 
-    const size_t animation_count = lv_gltf_model_get_animation_count(model);
-    if(animation_count > 0) {
-        lv_timer_create(set_time_cb, LV_DEF_REFR_PERIOD, viewer);
-        viewer->desc.timestep = LV_DEF_REFR_PERIOD / 1000.;
-    }
     return model;
 }
 
-static void set_time_cb(lv_timer_t * timer)
-{
-    lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
-    lv_obj_invalidate(obj);
-}
 
 static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -530,8 +498,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->aa_mode = LV_GLTF_AA_CONSTANT;
     desc->camera = 0;
     desc->fov = 45.f;
-    desc->anim = 0;
-    desc->timestep = 0.f;
+    desc->animation_speed_ratio = 1;
     desc->frame_was_antialiased = false;
     desc->bg_color = lv_color32_make(230, 230, 230, 255);
 }
@@ -612,7 +579,7 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 
 static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
 {
-    lv_gl_shader_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL } };
+    lv_gl_shader_define_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL , false} };
 
     uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
     uint32_t vert_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
@@ -628,7 +595,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
     const lv_gltf_view_desc_t * view_desc = &viewer->desc;
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
     int32_t PREF_CAM_NUM = std::min(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
-    int32_t anim_num = view_desc->anim;
+    int32_t anim_num = gltf_data->current_animation;
     uint32_t sceneIndex = 0;
 
     gltf_data->last_camera_index = PREF_CAM_NUM;
@@ -643,7 +610,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
         bool made_changes = false;
         bool made_rotation_changes = false;
         if(lv_gltf_data_animation_get_channel_set(anim_num, gltf_data, node)->size() > 0) {
-            lv_gltf_data_animation_matrix_apply(gltf_data->local_timestamp, anim_num, gltf_data, node,
+            lv_gltf_data_animation_matrix_apply(gltf_data->local_timestamp / 1000., anim_num, gltf_data, node,
                                                 localmatrix);
             made_changes = true;
         }

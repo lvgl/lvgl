@@ -198,21 +198,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
     view_desc->dirty = false;
 
-    int32_t anim_num = view_desc->anim;
-    if(anim_num >= 0 && ((int64_t)lv_gltf_model_get_animation_count(model) > anim_num)) {
-        if(LV_ABS(view_desc->timestep) > 0.0001f) {
-            model->local_timestamp += view_desc->timestep;
-            motion_dirty = true;
-        }
-        if(model->last_anim_num != anim_num) {
-            model->cur_anim_maxtime = lv_gltf_data_get_animation_total_time(model, anim_num);
-            model->last_anim_num = anim_num;
-        }
-        if(model->local_timestamp >= model->cur_anim_maxtime)
-            model->local_timestamp = 0.05f;
-        else if(model->local_timestamp < 0.0f)
-            model->local_timestamp = model->cur_anim_maxtime - 0.05f;
-    }
+
+    motion_dirty |= model->is_animation_enabled;
 
     // TODO: check if the override actually affects the transform and that the affected object is visible in the scene
 
@@ -1029,7 +1016,6 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
 
     fastgltf::math::fvec3 rcam_dir = fastgltf::math::fvec3(0.0f, 0.0f, 1.0f);
 
-    // Note because we switched over to fastgltf math and it's right-hand focused, z axis is actually pitch (instead of x-axis), and x axis is yaw, instead of y-axis
     fastgltf::math::fmat3x3 rotation1 =
         fastgltf::math::asMatrix(lv_gltf_math_euler_to_quaternion(0.f, 0.f, fastgltf::math::radians(view_desc->pitch)));
     fastgltf::math::fmat3x3 rotation2 =
