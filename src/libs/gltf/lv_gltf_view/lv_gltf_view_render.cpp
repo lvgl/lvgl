@@ -192,16 +192,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         setup_finish_frame();
     }
 
-    bool motion_dirty = false;
-    if(view_desc->dirty) {
-        motion_dirty = true;
-    }
-    view_desc->dirty = false;
-
-
-    motion_dirty |= model->is_animation_enabled;
-
-    // TODO: check if the override actually affects the transform and that the affected object is visible in the scene
+    bool dirty = lv_memcmp(&viewer->last_desc, view_desc, sizeof(*view_desc)) != 0 || model->is_animation_enabled;
 
     lv_memcpy(&(viewer->last_desc), view_desc, sizeof(*view_desc));
 
@@ -209,16 +200,14 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     model->_last_frame_no_motion = model->last_frame_no_motion;
     model->last_frame_no_motion = true;
 
-    if(motion_dirty || (pref_cam_num != model->last_camera_index) || lv_gltf_data_transform_cache_is_empty(model)) {
     int32_t pref_cam_num = LV_MIN((int32_t)view_desc->camera - 1, (int32_t)lv_gltf_model_get_camera_count(model) - 1);
+
+    if(dirty || (pref_cam_num != model->last_camera_index) || lv_gltf_data_transform_cache_is_empty(model)) {
         model->last_frame_no_motion = false;
-        motion_dirty = false;
         lv_gltf_view_recache_all_transforms(viewer, model);
     }
-
-    if((model->last_frame_no_motion == true) && (model->_last_frame_no_motion == true) &&
-       (last_frame_no_motion == true)) {
-        // Nothing changed at all, return the previous output frame
+    else if(model->last_frame_no_motion && model->_last_frame_no_motion && last_frame_no_motion) {
+        /* Nothing changed at all, return the previous output frame */
         setup_finish_frame();
         lv_gltf_view_pop_opengl_state(&opengl_state);
         return vstate->render_state.texture;

@@ -65,7 +65,6 @@ typedef struct {
     lv_color32_t bg_color;
 
     bool frame_was_antialiased;
-    bool dirty;
     uint32_t camera;
     int32_t animation_speed_ratio;
     lv_gltf_antialiasing_mode_t aa_mode;
