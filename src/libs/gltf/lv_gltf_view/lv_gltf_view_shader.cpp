@@ -122,7 +122,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             if(add_define(result, "USE_PUNCTUAL", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            char* count = (char*) lv_zalloc(5);
+            char * count = (char *) lv_zalloc(5);
             lv_snprintf(count, sizeof(count), "%zu", light_count);
             if(add_define(result, "LIGHT_COUNT", count, true) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;

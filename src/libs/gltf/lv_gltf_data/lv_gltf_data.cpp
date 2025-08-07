@@ -149,13 +149,13 @@ size_t lv_gltf_model_get_animation_count(const lv_gltf_model_t * data)
 lv_result_t lv_gltf_model_play_animation(lv_gltf_model_t * model, size_t index)
 {
     LV_ASSERT_NULL(model);
-    if(index >= model->asset.animations.size()){
+    if(index >= model->asset.animations.size()) {
         return LV_RESULT_INVALID;
     }
 
-    if(lv_timer_get_paused(model->animation_update_timer)){
+    if(lv_timer_get_paused(model->animation_update_timer)) {
         lv_timer_resume(model->animation_update_timer);
-    } 
+    }
 
     model->current_animation_max_time = lv_gltf_data_get_animation_total_time(model, index);
     model->current_animation = index;
@@ -251,7 +251,7 @@ static void update_animation_cb(lv_timer_t * timer)
     if(model->local_timestamp >= model->current_animation_max_time) {
         model->local_timestamp = 50;
     }
-    lv_obj_invalidate((lv_obj_t*)model->viewer);
+    lv_obj_invalidate((lv_obj_t *)model->viewer);
 }
 
 #endif /*LV_USE_GLTF*/
