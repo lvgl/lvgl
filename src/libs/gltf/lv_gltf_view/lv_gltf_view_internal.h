@@ -132,7 +132,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_define_t * defines,
                                                         size_t n);
 
 

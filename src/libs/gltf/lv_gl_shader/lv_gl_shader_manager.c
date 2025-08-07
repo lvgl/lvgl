@@ -60,7 +60,7 @@ static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len);
 static bool string_ends_with(const char * value, const char * suffix);
 
 static char * construct_shader(const char * source,
-                               const lv_gl_shader_t * permutations,
+                               const lv_gl_shader_define_t * permutations,
                                size_t permutations_len);
 
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader);
@@ -165,7 +165,7 @@ GLuint lv_gl_shader_manager_get_texture(lv_gl_shader_manager_t * manager,
 
 uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
                                             const char * shader_identifier,
-                                            const lv_gl_shader_t * permutations,
+                                            const lv_gl_shader_define_t * permutations,
                                             size_t permutations_len)
 {
     /* First check that the shader identifier exists */
@@ -182,8 +182,8 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     uint32_t hash = lv_gl_shader_hash(shader_identifier);
     char define[512];
     for(size_t i = 0; i < permutations_len; ++i) {
-        if(permutations[i].source) {
-            lv_snprintf(define, sizeof(define), "%%s%s", permutations[i].name, permutations[i].source);
+        if(permutations[i].value) {
+            lv_snprintf(define, sizeof(define), "%%s%s", permutations[i].name, permutations[i].value);
         }
         else {
             lv_snprintf(define, sizeof(define), "%s", permutations[i].name);
@@ -389,7 +389,7 @@ static char * append_to_shader(char * dst, const char * src, size_t * curr_index
 }
 
 static char * construct_shader(const char * source,
-                               const lv_gl_shader_t * permutations,
+                               const lv_gl_shader_define_t * permutations,
                                size_t permutations_len)
 {
     const char * defines = "#version 300 es\n";
@@ -406,9 +406,9 @@ static char * construct_shader(const char * source,
         }
         shader_source_size +=
             lv_strlen(permutations[i].name) + 1; /* ' ' */
-        if(permutations[i].source) {
+        if(permutations[i].value) {
             shader_source_size +=
-                lv_strlen(permutations[i].source) + 1; /* '\n' */
+                lv_strlen(permutations[i].value) + 1; /* '\n' */
         }
     }
 
@@ -429,9 +429,9 @@ static char * construct_shader(const char * source,
         }
         append_to_shader(result, prefix, &curr_index);
         append_to_shader(result, permutations[i].name, &curr_index);
-        if(permutations[i].source) {
+        if(permutations[i].value) {
             result[curr_index++] = ' ';
-            append_to_shader(result, permutations[i].source,
+            append_to_shader(result, permutations[i].value,
                              &curr_index);
         }
         result[curr_index++] = '\n';
