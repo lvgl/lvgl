@@ -246,7 +246,7 @@ static void update_animation_cb(lv_timer_t * timer)
     const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
 
     model->last_tick = current_tick;
-    model->local_timestamp += delta * model->viewer->desc.animation_speed_ratio;
+    model->local_timestamp += (delta * model->viewer->desc.animation_speed_ratio) / 1000;
 
     if(model->local_timestamp >= model->current_animation_max_time) {
         model->local_timestamp = 50;

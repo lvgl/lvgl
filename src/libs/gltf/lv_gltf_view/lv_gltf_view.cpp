@@ -179,7 +179,7 @@ float lv_gltf_get_distance(const lv_obj_t * obj)
     return viewer->desc.distance;
 }
 
-void lv_gltf_set_animation_speed(lv_obj_t * obj, float value)
+void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -188,7 +188,7 @@ void lv_gltf_set_animation_speed(lv_obj_t * obj, float value)
     lv_obj_invalidate(obj);
 }
 
-float lv_gltf_get_animation_speed(const lv_obj_t * obj)
+uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -482,20 +482,15 @@ static void lv_gltf_view_state_init(lv_gltf_t * view)
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
 {
     lv_memset(desc, 0, sizeof(*desc));
-    desc->pitch = 0.f;
-    desc->yaw = 0.f;
-    desc->distance = 5.f;
-    desc->focal_x = 0.f;
-    desc->focal_y = 0.f;
-    desc->focal_z = 0.f;
-    desc->exposure = 0.8f;
-    desc->env_pow = 1.8f;
+    desc->distance = 2.f;
+    desc->exposure = 1.0f;
+    desc->env_pow = 1.0f;
     desc->blur_bg = 0.2f;
     desc->bg_mode = LV_GLTF_BG_SOLID;
     desc->aa_mode = LV_GLTF_AA_CONSTANT;
     desc->camera = 0;
     desc->fov = 45.f;
-    desc->animation_speed_ratio = 1;
+    desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
     desc->bg_color = lv_color32_make(230, 230, 230, 255);
 }
@@ -593,7 +588,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
     int32_t PREF_CAM_NUM = std::min(view_desc->camera, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
     int32_t anim_num = gltf_data->current_animation;
-    uint32_t sceneIndex = 0;
+    uint32_t scene_index = 0;
 
     gltf_data->last_camera_index = PREF_CAM_NUM;
     lv_gltf_data_clear_transform_cache(gltf_data);
@@ -602,7 +597,7 @@ void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * g
     auto tmat = fastgltf::math::fmat4x4{};
     auto cammat = fastgltf::math::fmat4x4{};
     fastgltf::custom_iterate_scene_nodes(
-        *asset, sceneIndex, &tmat,
+        *asset, scene_index, &tmat,
     [&](fastgltf::Node & node, fastgltf::math::fmat4x4 & parentworldmatrix, fastgltf::math::fmat4x4 & localmatrix) {
         bool made_changes = false;
         bool made_rotation_changes = false;
