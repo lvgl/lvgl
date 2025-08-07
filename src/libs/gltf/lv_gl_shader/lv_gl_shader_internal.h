@@ -35,6 +35,12 @@ typedef struct {
 } lv_gl_shader_t;
 
 typedef struct {
+    const char * name;
+    const char * value;
+    bool value_allocated;
+} lv_gl_shader_define_t;
+
+typedef struct {
     lv_gl_shader_t data;
     bool src_allocated;
 } lv_gl_shader_source_t;
@@ -84,7 +90,7 @@ GLuint lv_gl_shader_manager_get_texture(lv_gl_shader_manager_t * manager, uint32
 void lv_gl_shader_manager_store_texture(lv_gl_shader_manager_t * manager, uint32_t hash, GLuint id);
 uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
                                             const char * shader_identifier,
-                                            const lv_gl_shader_t * permutations,
+                                            const lv_gl_shader_define_t * permutations,
                                             size_t permutations_len);
 lv_gl_shader_program_t * lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
                                                           uint32_t fragment_shader_hash,

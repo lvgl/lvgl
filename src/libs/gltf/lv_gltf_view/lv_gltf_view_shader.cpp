@@ -31,7 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t add_define(lv_array_t * array, const char * defsymbol, const char * defvalue_or_null);
+static lv_result_t add_define(lv_array_t * array, const char * defsymbol, const char * value, bool value_allocated);
 static lv_result_t add_define_if_primitive_attribute_exists(lv_array_t * array, const fastgltf::Asset & asset,
                                                             const fastgltf::Primitive * primitive, const char * attribute,
                                                             const char * define);
@@ -70,13 +70,13 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
 {
     const auto & asset = data->asset;
 
-    if(add_define(result, "_OPAQUE", "0") == LV_RESULT_INVALID) {
+    if(add_define(result, "_OPAQUE", "0", false) == LV_RESULT_INVALID) {
         return LV_RESULT_INVALID;
     }
-    if(add_define(result, "_MASK", "1") == LV_RESULT_INVALID) {
+    if(add_define(result, "_MASK", "1", false) == LV_RESULT_INVALID) {
         return LV_RESULT_INVALID;
     }
-    if(add_define(result, "_BLEND", "2") == LV_RESULT_INVALID) {
+    if(add_define(result, "_BLEND", "2", false) == LV_RESULT_INVALID) {
         return LV_RESULT_INVALID;
     }
 
@@ -86,67 +86,67 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                   "We specify fastgltf::Options::GenerateMeshIndices, so we should always have indices");
 
     if(!prim->materialIndex.has_value()) {
-        if(add_define(result, "ALPHAMODE", "_OPAQUE") == LV_RESULT_INVALID) {
+        if(add_define(result, "ALPHAMODE", "_OPAQUE", false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
     }
     else {
         const auto & material = asset.materials[prim->materialIndex.value()];
-        if(add_define(result, "TONEMAP_KHR_PBR_NEUTRAL", NULL) == LV_RESULT_INVALID) {
+        if(add_define(result, "TONEMAP_KHR_PBR_NEUTRAL", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
         if(material.unlit) {
-            if(add_define(result, "MATERIAL_UNLIT", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            if(add_define(result, "LINEAR_OUTPUT", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
         else {
-            if(add_define(result, "MATERIAL_METALLICROUGHNESS", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_METALLICROUGHNESS", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            if(add_define(result, "LINEAR_OUTPUT", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
         const size_t light_count = data->node_by_light_index.size();
-        if(add_define(result, "USE_IBL", NULL) == LV_RESULT_INVALID) {
+        if(add_define(result, "USE_IBL", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
         if(light_count > 10) {
             LV_LOG_ERROR("Too many scene lights, max is 10");
         }
         else if(light_count > 0) {
-            if(add_define(result, "USE_PUNCTUAL", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "USE_PUNCTUAL", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            char tmp[5];
-            lv_snprintf(tmp, sizeof(tmp), "%zu", light_count);
-            if(add_define(result, "LIGHT_COUNT", tmp) == LV_RESULT_INVALID) {
+            char* count = (char*) lv_zalloc(5);
+            lv_snprintf(count, sizeof(count), "%zu", light_count);
+            if(add_define(result, "LIGHT_COUNT", count, true) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
         else {
-            if(add_define(result, "LIGHT_COUNT", "0") == LV_RESULT_INVALID) {
+            if(add_define(result, "LIGHT_COUNT", "0", false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
 
         // only set cutoff value for mask material
         if(material.alphaMode == fastgltf::AlphaMode::Mask) {
-            if(add_define(result, "ALPHAMODE", "_MASK") == LV_RESULT_INVALID) {
+            if(add_define(result, "ALPHAMODE", "_MASK", false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
         else if(material.alphaMode == fastgltf::AlphaMode::Opaque) {
-            if(add_define(result, "ALPHAMODE", "_OPAQUE") == LV_RESULT_INVALID) {
+            if(add_define(result, "ALPHAMODE", "_OPAQUE", false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
         else {
-            if(add_define(result, "ALPHAMODE", "_BLEND") == LV_RESULT_INVALID) {
+            if(add_define(result, "ALPHAMODE", "_BLEND", false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
@@ -171,19 +171,19 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             return LV_RESULT_INVALID;
         }
 
-        if(add_define(result, "MATERIAL_EMISSIVE_STRENGTH", NULL) == LV_RESULT_INVALID) {
+        if(add_define(result, "MATERIAL_EMISSIVE_STRENGTH", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
         if(material.sheen)
-            if(add_define(result, "MATERIAL_SHEEN", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_SHEEN", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         if(material.specular)
-            if(add_define(result, "MATERIAL_SPECULAR", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_SPECULAR", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         if(material.specularGlossiness) {
-            if(add_define(result, "MATERIAL_SPECULARGLOSSINESS", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_SPECULARGLOSSINESS", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.specularGlossiness->diffuseTexture, "HAS_DIFFUSE_MAP",
@@ -196,17 +196,17 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             }
         }
         if(material.transmission) {
-            if(add_define(result, "MATERIAL_TRANSMISSION", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            if(add_define(result, "MATERIAL_DISPERSION", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_DISPERSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            if(add_define(result, "MATERIAL_VOLUME", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_VOLUME", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(material.transmission->transmissionTexture.has_value())
-                if(add_define(result, "HAS_TRANSMISSION_MAP", NULL) == LV_RESULT_INVALID) {
+                if(add_define(result, "HAS_TRANSMISSION_MAP", NULL, false) == LV_RESULT_INVALID) {
                     return LV_RESULT_INVALID;
                 }
             if(material.volume) {
@@ -215,7 +215,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             }
         }
         if(material.clearcoat) {
-            if(add_define(result, "MATERIAL_CLEARCOAT", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_CLEARCOAT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.clearcoat->clearcoatTexture, "HAS_CLEARCOAT_MAP",
@@ -233,16 +233,16 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             }
         }
         if(material.diffuseTransmission) {
-            if(add_define(result, "MATERIAL_DIFFUSE_TRANSMISSION", NULL) == LV_RESULT_INVALID) {
+            if(add_define(result, "MATERIAL_DIFFUSE_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(material.diffuseTransmission->diffuseTransmissionTexture.has_value()) {
-                if(add_define(result, "HAS_DIFFUSE_TRANSMISSION_MAP", NULL) == LV_RESULT_INVALID) {
+                if(add_define(result, "HAS_DIFFUSE_TRANSMISSION_MAP", NULL, false) == LV_RESULT_INVALID) {
                     return LV_RESULT_INVALID;
                 }
             }
             if(material.diffuseTransmission->diffuseTransmissionColorTexture.has_value()) {
-                if(add_define(result, "HAS_DIFFUSE_TRANSMISSION_COLOR_MAP", NULL) == LV_RESULT_INVALID) {
+                if(add_define(result, "HAS_DIFFUSE_TRANSMISSION_COLOR_MAP", NULL, false) == LV_RESULT_INVALID) {
                     return LV_RESULT_INVALID;
                 }
             }
@@ -282,7 +282,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
     const auto * joints0it = prim->findAttribute("JOINTS_0");
     const auto * weights0it = prim->findAttribute("WEIGHTS_0");
     if((node->skinIndex.has_value()) && (joints0it != prim->attributes.end()) && (weights0it != prim->attributes.end())) {
-        if(add_define(result, "USE_SKINNING", NULL) == LV_RESULT_INVALID) {
+        if(add_define(result, "USE_SKINNING", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
     }
@@ -299,7 +299,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
  * @return A gl_renwin_shaderset_t structure representing the compiled and loaded shaders.
  */
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_define_t * defines,
                                                         size_t n)
 {
     uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",
@@ -325,17 +325,17 @@ lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const 
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t add_define(lv_array_t * array, const char * name, const char * value)
+static lv_result_t add_define(lv_array_t * array, const char * name, const char * value, bool value_allocated)
 {
     const size_t n = lv_array_size(array);
     for(size_t i = 0; i < n; ++i) {
-        lv_gl_shader_t * shader = (lv_gl_shader_t *)lv_array_at(array, i);
-        if(lv_streq(shader->name, name)) {
+        lv_gl_shader_define_t * define = (lv_gl_shader_define_t *)lv_array_at(array, i);
+        if(lv_streq(define->name, name)) {
             return LV_RESULT_OK;
         }
     }
 
-    lv_gl_shader_t entry = { name, value };
+    lv_gl_shader_define_t entry = { name, value, value_allocated };
     return lv_array_push_back(array, &entry);
 }
 
@@ -347,20 +347,20 @@ static lv_result_t add_define_if_primitive_attribute_exists(lv_array_t * array, 
     if(it == primitive->attributes.end() || !asset.accessors[it->accessorIndex].bufferViewIndex.has_value()) {
         return LV_RESULT_OK;
     }
-    return add_define(array, define, NULL);
+    return add_define(array, define, NULL, false);
 }
 
 static lv_result_t add_texture_defines_impl(lv_array_t * array, const fastgltf::TextureInfo & material_prop,
                                             const char * define,
                                             const char * uv_define)
 {
-    if(add_define(array, define, NULL) == LV_RESULT_INVALID) {
+    if(add_define(array, define, NULL, false) == LV_RESULT_INVALID) {
         return LV_RESULT_INVALID;
     }
     if(!material_prop.transform) {
         return LV_RESULT_OK;
     }
-    return add_define(array, uv_define, NULL);
+    return add_define(array, uv_define, NULL, false);
 }
 
 static lv_result_t add_texture_defines(lv_array_t * array,

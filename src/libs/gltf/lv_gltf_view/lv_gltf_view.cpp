@@ -585,16 +585,24 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
             }
 
             lv_array_t defines;
-            lv_array_init(&defines, 64, sizeof(lv_gl_shader_t));
+            lv_array_init(&defines, 64, sizeof(lv_gl_shader_define_t));
             lv_result_t result =
                 lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &model_primitive);
 
             LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
             lv_gltf_compiled_shader_t compiled_shader;
-            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_t *)defines.data,
+            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_define_t*)defines.data,
                                                                             lv_array_size(&defines));
             compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
+            const size_t n = lv_array_size(&defines);
+            for(size_t i = 0; i < n; ++i){
+                lv_gl_shader_define_t* define = (lv_gl_shader_define_t*) lv_array_at(&defines, i);
+                if(define->value_allocated){
+                    lv_free((void*)define->value);
+                }
+            }
+            lv_array_deinit(&defines);
         }
     };
 
