@@ -98,7 +98,7 @@ size_t lv_gltf_model_get_scene_count(const lv_gltf_model_t * model);
 size_t lv_gltf_model_get_animation_count(const lv_gltf_model_t * model);
 
 /**
- * @brief Select and start playing an animation 
+ * @brief Select and start playing an animation
  *
  * @param model Pointer to the glTF model structure
  * @param index Animation number to start playing
