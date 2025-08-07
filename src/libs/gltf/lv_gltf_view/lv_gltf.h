@@ -182,33 +182,22 @@ void lv_gltf_set_camera(lv_obj_t * obj, int32_t value);
 int32_t lv_gltf_get_camera(const lv_obj_t * obj);
 
 /**
- * Set the active animation index
+ * Set the animation speed ratio
+ *
+ * Values greater than 1.0 will speed-up the animation
+ * Values less than 1.0 will slow down the animation
+ *
  * @param obj pointer to a GLTF viewer object
- * @param value animation index (-1 for no animations, 0+ = animation index)
- * @note Values higher than the scene's animation count will be limited to the scene's animation count
+ * @param value speed-up ratio of the animation
  */
-void lv_gltf_set_animation(lv_obj_t * obj, int32_t value);
+void lv_gltf_set_animation_speed(lv_obj_t * obj, float value);
 
 /**
- * Get the active animation index
+ * Get the animation speed ratio
+ *
  * @param obj pointer to a GLTF viewer object
- * @return animation index
  */
-int32_t lv_gltf_get_animation(const lv_obj_t * obj);
-
-/**
- * Set the animation timestep
- * @param obj pointer to a GLTF viewer object
- * @param value timestep in seconds to advance the current animation
- */
-void lv_gltf_set_timestep(lv_obj_t * obj, float value);
-
-/**
- * Get the animation timestep
- * @param obj pointer to a GLTF viewer object
- * @return timestep in seconds
- */
-float lv_gltf_get_timestep(const lv_obj_t * obj);
+float lv_gltf_get_animation_speed(const lv_obj_t * obj);
 
 /**********************
  * Visual Settings Functions

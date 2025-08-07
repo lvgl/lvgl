@@ -8,9 +8,14 @@
  *********************/
 
 #include "lv_gltf_data_internal.hpp"
+
 #if LV_USE_GLTF
+
 #include <fastgltf/tools.hpp>
 #include "../../../misc/lv_assert.h"
+#include "../../../core/lv_obj_pos.h"
+#include "../../../misc/lv_timer.h"
+#include "../lv_gltf_view/lv_gltf_view_internal.h"
 
 
 /*********************
@@ -26,6 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void update_animation_cb(lv_timer_t * timer);
 
 /**********************
  *  STATIC VARIABLES
@@ -50,12 +56,17 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->current_camera_index = -1;
     data->last_camera_index = -5;
     data->last_anim_num = -5;
-    data->cur_anim_maxtime = -1.f;
+    data->current_animation_max_time = 0;
     data->local_timestamp = 0.0f;
     data->last_material_index = 99999;
     data->last_frame_was_antialiased = false;
     data->last_frame_no_motion = false;
     data->_last_frame_no_motion = false;
+
+    data->animation_update_timer = lv_timer_create(update_animation_cb, LV_DEF_REFR_PERIOD, data);
+    lv_timer_pause(data->animation_update_timer);
+    LV_ASSERT_NULL(data->animation_update_timer);
+
     new(&data->node_binds) NodeOverrideMap();
     new(&data->node_transform_cache) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
@@ -135,6 +146,30 @@ size_t lv_gltf_model_get_animation_count(const lv_gltf_model_t * data)
     return data->asset.animations.size();
 }
 
+lv_result_t lv_gltf_model_play_animation(lv_gltf_model_t * model, size_t index)
+{
+    LV_ASSERT_NULL(model);
+    if(index >= model->asset.animations.size()){
+        return LV_RESULT_INVALID;
+    }
+
+    if(lv_timer_get_paused(model->animation_update_timer)){
+        lv_timer_resume(model->animation_update_timer);
+    } 
+
+    model->current_animation_max_time = lv_gltf_data_get_animation_total_time(model, index);
+    model->current_animation = index;
+    model->is_animation_enabled = true;
+    return LV_RESULT_OK;
+}
+
+void lv_gltf_model_pause_animation(lv_gltf_model_t * model)
+{
+    LV_ASSERT_NULL(model);
+    model->is_animation_enabled = false;
+    lv_timer_pause(model->animation_update_timer);
+}
+
 lv_gltf_model_t *
 lv_gltf_data_load_from_file(const char * file_path,
                             lv_gl_shader_manager_t * shader_manager)
@@ -202,6 +237,22 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void update_animation_cb(lv_timer_t * timer)
+{
+    lv_gltf_model_t * model = (lv_gltf_model_t *)lv_timer_get_user_data(timer);
+
+    const uint32_t current_tick = lv_tick_get();
+    const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
+
+    model->last_tick = current_tick;
+    model->local_timestamp += delta * model->viewer->desc.animation_speed_ratio;
+
+    if(model->local_timestamp >= model->current_animation_max_time) {
+        model->local_timestamp = 50;
+    }
+    lv_obj_invalidate((lv_obj_t*)model->viewer);
+}
 
 #endif /*LV_USE_GLTF*/
 

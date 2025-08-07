@@ -67,8 +67,7 @@ typedef struct {
     bool frame_was_antialiased;
     bool dirty;
     int32_t camera;
-    int32_t anim;
-    float timestep;             // How far to step the current animation in seconds
+    float animation_speed_ratio;
     lv_gltf_antialiasing_mode_t aa_mode;
     lv_gltf_background_mode_t bg_mode;
     float blur_bg;              /** How much to blur the environment background, between 0.0 and 1.0 */
