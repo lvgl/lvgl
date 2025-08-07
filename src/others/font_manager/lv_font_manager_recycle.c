@@ -145,6 +145,22 @@ void lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t * manager, lv_f
     LV_LOG_INFO("insert font: %s(%d) to reuse list", ft_info->name, ft_info->size);
 }
 
+void lv_font_recycle_remove_fonts(lv_font_manager_recycle_t * manager, const char * name)
+{
+    LV_ASSERT_NULL(manager);
+    LV_ASSERT_NULL(name);
+
+    lv_font_recycle_t * next;
+    lv_font_recycle_t * recycle = lv_ll_get_head(&manager->recycle_ll);
+    while(recycle != NULL) {
+        next = lv_ll_get_next(&manager->recycle_ll, recycle);
+        if(lv_strcmp(recycle->name, name) == 0) {
+            lv_font_recycle_close(manager, recycle);
+        }
+        recycle = next;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
