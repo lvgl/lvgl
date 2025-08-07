@@ -454,7 +454,7 @@ static void window_update_handler(lv_timer_t * t)
                                      GL_BGR, GL_UNSIGNED_BYTE, texture->fb));
 #elif LV_COLOR_DEPTH == 32
                 GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGBA, GL_UNSIGNED_BYTE, texture->fb));
+                                     0, GL_BGRA, GL_UNSIGNED_BYTE, texture->fb));
 #else
 #error("Unsupported color format")
 #endif
