@@ -324,8 +324,8 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * bytes_align);
 
 static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
-static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
-static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
+static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_matrix_t * grad_matrix,
+                                       const vg_lite_matrix_t * path_matrix);
 
 /**********************
  *  STATIC VARIABLES
@@ -1464,10 +1464,13 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        vg_lite_matrix_t grad_matrix;
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, path_matrix));
+
         auto linearGrad = LinearGradient::gen();
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->linear(grad->linear_grad.X0, grad->linear_grad.Y0, grad->linear_grad.X1,
                                                      grad->linear_grad.Y1));
-        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->spread(fill_spread_conv(grad->spread_mode)));
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_COLOR_RAMP_STOPS];
@@ -1919,9 +1922,7 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
         vg_lite_matrix_t grad_matrix;
-        vg_lite_identity(&grad_matrix);
-        vg_lite_matrix_inverse(&grad_matrix, matrix);
-        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, matrix));
 
         vg_lite_fpoint_t p1 = {0.0f, 0.0f};
         vg_lite_fpoint_t p2 = {1.0f, 0};
@@ -1982,8 +1983,11 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        vg_lite_matrix_t grad_matrix;
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, path_matrix));
+
         auto radialGrad = RadialGradient::gen();
-        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->radial(grad->radial_grad.cx, grad->radial_grad.cy, grad->radial_grad.r));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->spread(fill_spread_conv(grad->spread_mode)));
 
@@ -2188,6 +2192,15 @@ static vg_lite_error_t vg_lite_error_conv(Result result)
 
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix)
 {
+    static const Matrix identity = {
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    };
+    if(!matrix) {
+        return identity;
+    }
+
     return *(Matrix *)matrix;
 }
 
@@ -2988,6 +3001,27 @@ static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_mat
 
     /* Copy temporary matrix into result. */
     lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
+}
+
+static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_matrix_t * grad_matrix,
+                                       const vg_lite_matrix_t * path_matrix)
+{
+    /**
+     * Since Thorvg internally multiplies the path (shape) matrix with the gradient matrix to produce
+     * the rendering result, and VG-Lite's gradient matrix and path matrix are completely independent,
+     * requiring a previous multiplication to achieve the same rendering result,
+     * for the VG-Lite emulator, it is necessary to offset the gradient matrix to obtain the user's original gradient matrix
+     * to simulate hardware behavior:
+     * matrix_out = path_matrix * gradient_matrix
+     * =>
+     * gradient_matrix = inv(path_matrix) * matrix_out
+     */
+    if(!vg_lite_matrix_inverse(result, path_matrix)) {
+        return Result::InvalidArguments;
+    }
+
+    vg_lite_matrix_multiply(result, grad_matrix);
+    return Result::Success;
 }
 
 #endif
