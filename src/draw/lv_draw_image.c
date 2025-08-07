@@ -180,6 +180,8 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
             }
 
         }
+
+        lv_image_decoder_close(&decoder_dsc);
     }
 
     LV_PROFILER_DRAW_END;
