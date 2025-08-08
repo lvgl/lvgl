@@ -171,13 +171,15 @@ void lv_gltf_model_pause_animation(lv_gltf_model_t * model)
     lv_timer_pause(model->animation_update_timer);
 }
 
-bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model){
+bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model)
+{
 
     LV_ASSERT_NULL(model);
     return !model->is_animation_enabled;
 }
 
-size_t lv_gltf_model_get_animation(lv_gltf_model_t * model){
+size_t lv_gltf_model_get_animation(lv_gltf_model_t * model)
+{
 
     LV_ASSERT_NULL(model);
     return model->current_animation;

@@ -43,7 +43,7 @@ static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
 static void setup_finish_frame(void);
 static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map);
 static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
-static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t* state,
+static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state,
                                          int32_t texture_w,
                                          int32_t texture_h, bool prepare_bg);
 
@@ -79,7 +79,7 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, int32_t _cur_
 
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
                                    bool transmission_pass);
-static lv_result_t setup_restore_opaque_output(lv_gltf_t* viewer, const lv_gltf_renwin_state_t* _ret,
+static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * _ret,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg);
 static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
@@ -252,7 +252,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             return vstate->render_state.texture;
         }
 
-        if(opt_draw_bg) { 
+        if(opt_draw_bg) {
             setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
@@ -279,7 +279,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         setup_view_proj_matrix(viewer, view_desc, model, false);
     }
 
-    lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width, 
+    lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width,
                                                view_desc->render_height, prepare_bg);
 
     LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to restore primary output which should never happen");
@@ -742,7 +742,7 @@ static void draw_lights(lv_gltf_model_t * model, GLuint program)
     }
 }
 
-lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t* state, int32_t texture_w,
+lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state, int32_t texture_w,
                                   int32_t texture_h, bool prepare_bg)
 {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state->framebuffer));
@@ -755,8 +755,8 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t*)viewer, LV_PART_MAIN);
-        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t*)viewer, LV_PART_MAIN);
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
 
         GL_CALL(glClearDepth(1.0f));
@@ -1068,7 +1068,7 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
 }
 
 
-static lv_result_t setup_restore_opaque_output(lv_gltf_t* viewer, const lv_gltf_renwin_state_t* renwin_state,
+static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * renwin_state,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg)
 {
@@ -1080,8 +1080,8 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t* viewer, const lv_gltf_
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t*)viewer, LV_PART_MAIN);
-        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t*)viewer, LV_PART_MAIN);
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
         GL_CALL(glClearDepth(1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
