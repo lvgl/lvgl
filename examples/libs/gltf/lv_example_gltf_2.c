@@ -1,6 +1,8 @@
 #include "lv_example_gltf.h"
 
-#if LV_USE_GLTF && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+
+#if LV_USE_GLTF
 
 static size_t camera_count;
 static size_t current_camera;
@@ -42,4 +44,17 @@ void lv_example_gltf_2(void)
     lv_timer_create(timer_cb, 5000, gltf);
 }
 
+#else 
+
+void lv_example_gltf_2(void)
+{
+    /*TODO
+     *fallback for online examples*/
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "glTF web support is coming soon");
+    lv_obj_center(label);
+}
+
+#endif
 #endif
