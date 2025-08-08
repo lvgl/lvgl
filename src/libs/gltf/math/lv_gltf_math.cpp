@@ -57,16 +57,16 @@ fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & ey
  * Creates a right-handed perspective matrix, with the near and far clips at -1 and +1, respectively.
  * @param fov The FOV in radians
  */
-[[nodiscard]] fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear,
-                                                                  float zFar) noexcept
+[[nodiscard]] fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float z_near,
+                                                                  float z_far) noexcept
 {
     fastgltf::math::fmat4x4 ret(0.f);
     auto tanHalfFov = std::tan(fov / 2.f);
     ret.col(0).x() = 1.f / (ratio * tanHalfFov);
     ret.col(1).y() = 1.f / tanHalfFov;
-    ret.col(2).z() = -(zFar + zNear) / (zFar - zNear);
+    ret.col(2).z() = -(z_far + z_near) / (z_far - z_near);
     ret.col(2).w() = -1.f;
-    ret.col(3).z() = -(2.f * zFar * zNear) / (zFar - zNear);
+    ret.col(3).z() = -(2.f * z_far * z_near) / (z_far - z_near);
     return ret;
 }
 
