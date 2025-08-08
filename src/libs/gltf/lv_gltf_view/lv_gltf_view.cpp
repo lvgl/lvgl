@@ -355,38 +355,41 @@ lv_gltf_background_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj)
     return viewer->desc.bg_mode;
 }
 
-void lv_gltf_set_blur_bg(lv_obj_t * obj, float value)
+void lv_gltf_set_background_blur(lv_obj_t * obj, uint32_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    viewer->desc.blur_bg = value;
+    if(value > 100) {
+        value = 100;
+    }
+    viewer->desc.blur_bg = value / 100.f;
     lv_obj_invalidate(obj);
 }
 
-float lv_gltf_get_blur_bg(const lv_obj_t * obj)
+uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    return viewer->desc.blur_bg;
+    return viewer->desc.blur_bg * 100;
 }
 
-void lv_gltf_set_env_brightness(lv_obj_t * obj, float value)
+void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    viewer->desc.env_pow = value;
+    viewer->desc.env_pow = value / 100.;
     lv_obj_invalidate(obj);
 }
 
-float lv_gltf_get_env_brightness(const lv_obj_t * obj)
+uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    return viewer->desc.env_pow;
+    return viewer->desc.env_pow * 100;
 }
 
 void lv_gltf_set_image_exposure(lv_obj_t * obj, float value)
@@ -523,8 +526,8 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     lv_memset(desc, 0, sizeof(*desc));
     desc->distance = 2.f;
     desc->exposure = 1.0f;
-    desc->env_pow = 1.0f;
-    desc->blur_bg = 0.2f;
+    desc->env_pow = 1.8f;
+    desc->blur_bg = 0.5f;
     desc->bg_mode = LV_GLTF_BG_SOLID;
     desc->aa_mode = LV_GLTF_AA_ON;
     desc->fov = 45.f;
