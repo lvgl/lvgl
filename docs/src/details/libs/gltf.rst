@@ -152,7 +152,7 @@ The glTF extension relies on **OpenGL ES 3.0** for 3D rendering. LVGL includes b
 The renderer uses OpenGL ES 3.0 shaders (GLSL version 300 es) to provide modern PBR (Physically Based Rendering) capabilities.
 
 Dependencies
-============
+------------
 
 The glTF extension requires the following external libraries:
 
@@ -240,7 +240,7 @@ Usage
 *****
 
 Demo Application
-================
+----------------
 
 LVGL provides a complete glTF demo that showcases the capabilities of the 3D viewer:
 
@@ -257,7 +257,7 @@ This demo creates an interactive 3D viewer with:
 - Visual settings adjustment
 
 Basic glTF Viewer Creation
-==========================
+--------------------------
 
 Here's how to create a basic glTF viewer and load a model:
 
@@ -276,7 +276,7 @@ Here's how to create a basic glTF viewer and load a model:
     }
 
 Camera Controls
-===============
+---------------
 
 The glTF viewer provides comprehensive camera controls:
 
@@ -301,7 +301,7 @@ The glTF viewer provides comprehensive camera controls:
     lv_gltf_recenter(gltf, model);
 
 Animation Control
-=================
+-----------------
 
 Control model animations with these functions:
 
@@ -321,7 +321,7 @@ Control model animations with these functions:
     bool is_paused = lv_gltf_model_is_animation_paused(model);
 
 Visual Settings
-===============
+---------------
 
 Customize the visual appearance of your 3D scene:
 
@@ -339,7 +339,7 @@ Customize the visual appearance of your 3D scene:
     lv_gltf_set_antialiasing_mode(gltf, LV_GLTF_AA_DYNAMIC);
 
 Multi-Model Support
-===================
+-------------------
 
 Load and manage multiple glTF models in a single viewer:
 
@@ -355,7 +355,7 @@ Load and manage multiple glTF models in a single viewer:
     lv_gltf_model_t * specific = lv_gltf_get_model_by_index(gltf, 1);
 
 Model Inspection
-================
+----------------
 
 Query model properties to understand its structure:
 
@@ -371,7 +371,7 @@ Query model properties to understand its structure:
     size_t camera_count = lv_gltf_model_get_camera_count(model);
 
 Widget Architecture
-******************
+*******************
 
 The glTF widget extends the ``lv_3dtexture`` widget, which means:
 
@@ -379,7 +379,7 @@ The glTF widget extends the ``lv_3dtexture`` widget, which means:
 - All ``lv_3dtexture`` functions are also available for advanced 3D texture management
 
 Animation Speed System
-======================
+----------------------
 
 Animation speeds use integer values to avoid floating-point arithmetic:
 
