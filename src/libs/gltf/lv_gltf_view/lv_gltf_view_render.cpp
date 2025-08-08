@@ -878,7 +878,6 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glGenTextures(1, &rtex));
     result.texture = rtex;
     GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
-    //GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmaps_enabled ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                             mipmaps_enabled ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
