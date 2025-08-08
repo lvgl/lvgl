@@ -148,8 +148,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == LV_GLTF_BG_ENVIRONMENT);
-    bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_CONSTANT) ||
-                             (view_desc->aa_mode == LV_GLTF_AA_NOT_MOVING && model->last_frame_no_motion == true);
+    bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_ON) ||
+                             (view_desc->aa_mode == LV_GLTF_AA_DYNAMIC && model->last_frame_no_motion == true);
     if(prepare_bg == false) {
         // If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn
         opt_aa_this_frame = view_desc->frame_was_antialiased;

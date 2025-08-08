@@ -487,7 +487,7 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->env_pow = 1.0f;
     desc->blur_bg = 0.2f;
     desc->bg_mode = LV_GLTF_BG_SOLID;
-    desc->aa_mode = LV_GLTF_AA_CONSTANT;
+    desc->aa_mode = LV_GLTF_AA_ON;
     desc->camera = 0;
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
