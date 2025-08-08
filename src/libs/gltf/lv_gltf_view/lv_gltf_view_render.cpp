@@ -235,7 +235,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         return a.first < b.first;
     });
     /* Reset the last material index to an unused value once per frame at the start*/
-    model->last_material_index = 99999; 
+    model->last_material_index = 99999;
     if(vstate->render_opaque_buffer) {
         if(model->camera > 0) {
             setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model->view_mat,
