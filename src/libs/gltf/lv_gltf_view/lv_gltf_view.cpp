@@ -255,9 +255,9 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
         return;
     }
 
-    lv_gltf_model_t* model = *(lv_gltf_model_t**) lv_array_at(&viewer->models, 0);
+    lv_gltf_model_t * model = *(lv_gltf_model_t **) lv_array_at(&viewer->models, 0);
 
-    if(value > model->asset.cameras.size()){
+    if(value > model->asset.cameras.size()) {
         return;
     }
 
@@ -275,7 +275,7 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
     if(lv_array_is_empty(&viewer->models)) {
         return 0;
     }
-    const lv_gltf_model_t* model = *(const lv_gltf_model_t**)lv_array_at(&viewer->models, 0);
+    const lv_gltf_model_t * model = *(const lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     return model->camera;
 }
 
@@ -289,7 +289,7 @@ uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj)
     if(lv_array_is_empty(&viewer->models)) {
         return 0;
     }
-    const lv_gltf_model_t* model = *(const lv_gltf_model_t**) lv_array_at(&viewer->models, 0);
+    const lv_gltf_model_t * model = *(const lv_gltf_model_t **) lv_array_at(&viewer->models, 0);
     return lv_gltf_model_get_camera_count(model);
 }
 
