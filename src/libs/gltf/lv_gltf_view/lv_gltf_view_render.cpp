@@ -1051,7 +1051,7 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
     else {
         // Perspective view
         projection = fastgltf::math::fmat4x4(0.0f);
-        assert(width != 0 && height != 0);
+        LV_ASSERT(width != 0 && height != 0);
         projection[0][0] = 1.f / (aspect * tan(0.5f * fastgltf::math::radians(fov)));
         projection[1][1] = 1.f / (tan(0.5f * fastgltf::math::radians(fov)));
         projection[2][3] = -1;
