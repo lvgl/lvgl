@@ -31,15 +31,14 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_GLTF_AA_OFF = 0,
-    LV_GLTF_AA_CONSTANT = 1,
-    LV_GLTF_AA_NOT_MOVING = 2,
+    LV_GLTF_AA_OFF = 0, /** Anti aliasing off*/
+    LV_GLTF_AA_ON = 1,  /** Anti aliasing on*/
+    LV_GLTF_AA_DYNAMIC = 2, /** Anti aliasing on only when frame has no movement*/
 } lv_gltf_antialiasing_mode_t;
 
 typedef enum {
-    LV_GLTF_BG_CLEAR = 0,
-    LV_GLTF_BG_SOLID = 1,
-    LV_GLTF_BG_ENVIRONMENT = 2,
+    LV_GLTF_BG_SOLID = 0, /** Solid background. Use `lv_obj_set_style_bg_color` to set the background color*/
+    LV_GLTF_BG_ENVIRONMENT = 1, /** Environnement background*/
 } lv_gltf_background_mode_t;
 
 #define LV_GLTF_ANIM_SPEED_TENTH 100
