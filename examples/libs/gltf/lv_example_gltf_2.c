@@ -4,7 +4,7 @@
 
 static size_t camera_count;
 static size_t current_camera;
-static size_t current_speed = LV_GLTF_ANIM_SPEED_HALF;
+static uint32_t current_speed = LV_GLTF_ANIM_SPEED_HALF;
 
 /**
  * Timer callback that updates the current camera and the current animation speed
@@ -19,6 +19,7 @@ static void timer_cb(lv_timer_t * timer)
         current_speed = LV_GLTF_ANIM_SPEED_HALF;
     }
 
+    LV_LOG_USER("Setting camera %zu and animation speed %" PRIu32, current_camera, current_speed);
     lv_gltf_set_camera(gltf, current_camera);
     lv_gltf_set_animation_speed(gltf, current_speed);
 }
