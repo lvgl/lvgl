@@ -117,7 +117,7 @@ lv_obj_t * lv_demo_gltf(const char * path)
     lv_obj_set_size(viewer, LV_PCT(100), LV_PCT(100));
     lv_obj_remove_flag(viewer, LV_OBJ_FLAG_SCROLLABLE);
     lv_gltf_set_background_mode(viewer, LV_GLTF_BG_ENVIRONMENT);
-    lv_gltf_model_t* model = lv_gltf_load_model_from_file(viewer, path);
+    lv_gltf_model_t * model = lv_gltf_load_model_from_file(viewer, path);
     LV_ASSERT_NULL(model);
 
     init_subjects(viewer);
