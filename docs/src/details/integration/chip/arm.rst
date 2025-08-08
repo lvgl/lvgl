@@ -52,7 +52,7 @@ To add Arm2D to your project, follow these steps:
 Neon Acceleration
 -----------------
 
-Some ARM processors with the ARMv7 architecture and every ARM processor from the ARMv8 architecture support the `Neon SIMD <https://www.arm.com/technologies/neon>`__ instruction set.
+Some ARM Cortex-A and Cortex-R processors with the ARMv7 architecture and every ARM Cortex-A and Cortex-R processor from the ARMv8 architecture support the `Neon SIMD <https://www.arm.com/technologies/neon>` instruction set.
 LVGL has built-in support to improve the performance of software rendering by utilizing Neon instructions.
 
 Architecture Support
@@ -61,4 +61,4 @@ Architecture Support
 Both 32-bit and 64-bit ARM architectures are supported. Simply set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf``.
 
 .. note::
-   All ARM64 processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.
+   All ARM Cortex-A and Cortex-R 64-bit processors include Neon support as a mandatory feature starting with the ARMv8 architecture specification. This makes Neon acceleration universally available on all 64-bit ARM platforms, including current and future ARM architectures.
