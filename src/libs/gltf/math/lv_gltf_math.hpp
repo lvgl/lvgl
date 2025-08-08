@@ -10,9 +10,10 @@
  *      INCLUDES
  *********************/
 
-#include "fastgltf/math.hpp"
+#include "../../../lv_conf_internal.h"
 
-
+#if LV_USE_GLTF
+#include <fastgltf/math.hpp>
 
 /*********************
  *      DEFINES
@@ -26,8 +27,8 @@
  * GLOBAL PROTOTYPES
  **********************/
 
-fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center, const fastgltf::math::fvec3 & up);
-fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear, float zFar);
+fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center, const fastgltf::math::fvec3 & up) noexcept;
+fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear, float zFar) noexcept;
 
 template <typename T>
 [[nodiscard]] fastgltf::math::quat<T> lv_gltf_math_euler_to_quaternion(T P, T Y, T R)
@@ -74,4 +75,5 @@ template <typename T>
  *      MACROS
  **********************/
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_USE_GLTF*/
+#endif /*LV_GLTF_MATH_HPP*/
