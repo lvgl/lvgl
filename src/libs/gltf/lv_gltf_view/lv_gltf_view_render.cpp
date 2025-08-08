@@ -1073,7 +1073,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg)
 {
-    LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", renwin_state->texture, renwin_state->renderbuffer);
+    LV_LOG_TRACE("Color texture ID: %u, Depth texture ID: %u", renwin_state->texture, renwin_state->renderbuffer);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, renwin_state->framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renwin_state->texture, 0));
@@ -1100,12 +1100,10 @@ static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, 
     GL_CALL(glDisable(GL_DEPTH_TEST));
     GL_CALL(glUniformMatrix4fv(glGetUniformLocation(manager->bg_program, "u_ViewProjectionMatrix"), 1, false,
                                viewer->view_projection_matrix.data()));
-    //GL_CALL(glBindTextureUnit(0, shaders->lastEnv->specular));
 
-    // Bind the texture to the specified texture unit
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + 0)); // Activate the texture unit
-    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP,
-                          viewer->env_textures.specular)); // Bind the texture (assuming 2D texture)
+    /* Bind the texture to the specified texture unit*/
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
+    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, viewer->env_textures.specular));
 
     GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_GGXEnvSampler"), 0));
 
@@ -1116,14 +1114,9 @@ static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, 
 
     setup_environment_rotation_matrix(viewer->env_textures.angle, manager->bg_program);
 
-    // Bind the index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager->bg_index_buf);
-
-    // Bind the vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, manager->bg_vertex_buf);
-
-    // Draw the elements
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void *)0);
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager->bg_index_buf));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, manager->bg_vertex_buf));
+    GL_CALL(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL));
 
     GL_CALL(glBindVertexArray(0));
     return;
