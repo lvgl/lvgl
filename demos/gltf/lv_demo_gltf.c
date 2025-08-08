@@ -89,6 +89,9 @@ static lv_gltf_set_int_fn_union_t animation_speed_fn = { .fn = lv_gltf_set_anima
 static lv_gltf_set_int_fn_union_t background_mode_fn = { .fn = lv_gltf_set_background_mode };
 static lv_gltf_set_int_fn_union_t antialiasing_mode_fn = { .fn = lv_gltf_set_antialiasing_mode };
 
+static lv_gltf_set_int_fn_union_t env_brightness_fn = { .fn = lv_gltf_set_env_brightness };
+static lv_gltf_set_int_fn_union_t bg_blur_fn = { .fn = lv_gltf_set_background_blur };
+
 static lv_subject_t yaw_subject;
 static lv_subject_t pitch_subject;
 static lv_subject_t distance_subject;
@@ -96,6 +99,8 @@ static lv_subject_t camera_subject;
 static lv_subject_t animation_subject;
 static lv_subject_t antialiasing_subject;
 static lv_subject_t background_subject;
+static lv_subject_t env_brightness_subject;
+static lv_subject_t background_blur_subject;
 static lv_subject_t animation_speed_subject;
 
 /**********************
@@ -144,6 +149,8 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_init_int(&animation_subject, lv_gltf_model_get_animation(lv_gltf_get_primary_model(viewer)));
     lv_subject_init_int(&antialiasing_subject, lv_gltf_get_antialiasing_mode(viewer));
     lv_subject_init_int(&background_subject, lv_gltf_get_background_mode(viewer));
+    lv_subject_init_int(&env_brightness_subject, lv_gltf_get_env_brightness(viewer));
+    lv_subject_init_int(&background_blur_subject, lv_gltf_get_background_blur(viewer));
 
     lv_subject_add_observer_obj(&camera_subject, viewer_observer_int_cb, viewer, camera_fn.ptr);
     lv_subject_add_observer_obj(&pitch_subject, viewer_observer_float_cb, viewer, pitch_fn.ptr);
@@ -154,6 +161,8 @@ static void init_subjects(lv_obj_t * viewer)
     lv_subject_add_observer_obj(&animation_speed_subject, viewer_observer_int_cb, viewer, animation_speed_fn.ptr);
 
     lv_subject_add_observer_obj(&background_subject, viewer_observer_int_cb, viewer, background_mode_fn.ptr);
+    lv_subject_add_observer_obj(&env_brightness_subject, viewer_observer_int_cb, viewer, env_brightness_fn.ptr);
+    lv_subject_add_observer_obj(&background_blur_subject, viewer_observer_int_cb, viewer, bg_blur_fn.ptr);
 
     lv_subject_add_observer_obj(&antialiasing_subject, viewer_observer_int_cb, viewer, antialiasing_mode_fn.ptr);
 }
@@ -273,7 +282,7 @@ static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
 
     lv_obj_t * animation_ratio_slider = lv_slider_create(animation_row);
     lv_obj_set_width(animation_ratio_slider, LV_PCT(100));
-    lv_slider_set_min_value(animation_ratio_slider, 100);
+    lv_slider_set_min_value(animation_ratio_slider, 0);
     lv_slider_set_max_value(animation_ratio_slider, LV_GLTF_ANIM_SPEED_4X);
     lv_slider_bind_value(animation_ratio_slider, &animation_speed_subject);
 
@@ -302,6 +311,29 @@ static void create_background_panel(lv_obj_t * panel)
 
     lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironnement");
     lv_dropdown_bind_value(background_dropdown, &background_subject);
+
+    lv_obj_t * env_brightness_title = add_title_to_row(bg_row, "");
+    lv_label_bind_text(env_brightness_title, &env_brightness_subject, "Env Brightness %d");
+
+    lv_obj_t * env_brightness_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(env_brightness_slider, &env_brightness_subject);
+    lv_obj_set_width(env_brightness_slider, LV_PCT(100));
+
+    lv_slider_set_min_value(env_brightness_slider, 0);
+    lv_slider_set_max_value(env_brightness_slider, 1000);
+    style_slider(env_brightness_slider, SLIDER_COLOR);
+
+    lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
+    lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
+
+    lv_obj_t * backgorund_blur_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(backgorund_blur_slider, &background_blur_subject);
+    lv_obj_set_width(backgorund_blur_slider, LV_PCT(100));
+    lv_slider_set_min_value(backgorund_blur_slider, 0);
+    lv_slider_set_max_value(backgorund_blur_slider, 100);
+
+    style_slider(backgorund_blur_slider, SLIDER_COLOR);
+
 }
 
 static void on_mouse_event(lv_event_t * e)
