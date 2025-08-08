@@ -23,6 +23,7 @@
 #ifndef M_PI
     #define M_PI 3.14159265358979323846264338327950288
 #endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,7 +33,7 @@
  **********************/
 
 fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center, const fastgltf::math::fvec3 & up) noexcept;
-fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float zNear, float zFar) noexcept;
+fastgltf::math::fmat4x4 lv_gltf_math_perspective_rh(float fov, float ratio, float z_near, float z_far) noexcept;
 
 template <typename T>
 [[nodiscard]] fastgltf::math::quat<T> lv_gltf_math_euler_to_quaternion(T P, T Y, T R)
