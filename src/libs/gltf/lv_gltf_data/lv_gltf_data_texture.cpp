@@ -65,7 +65,7 @@ bool lv_gltf_data_get_texture_pixels(uint8_t * pixels, lv_gltf_model_t * data_ob
     GLuint texid = data_obj->textures[model_texture_index];
     // Bind the texture
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texid));
-    glGetTexImage(GL_TEXTURE_2D, mipmapnum, (has_alpha) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    GL_CALL(glGetTexImage(GL_TEXTURE_2D, mipmapnum, (has_alpha) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, pixels));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
     return true;
 }
