@@ -53,8 +53,44 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create a GLTF viewer object
+ * @param parent pointer to the parent object
+ * @return pointer to the created GLTF viewer object
+ */
 lv_obj_t * lv_gltf_create(lv_obj_t * parent);
+
+/**
+ * Load a GLTF model from a file into the viewer
+ * @param obj pointer to a GLTF viewer object
+ * @param path file path to the GLTF model to load
+ * @return pointer to the loaded GLTF model, or NULL on failure
+ */
 lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
+
+/**
+ * Get the number of models loaded in the GLTF viewer
+ * @param obj pointer to a GLTF viewer object
+ * @return the total number of models in the viewer
+ */
+size_t lv_gltf_get_model_count(lv_obj_t * obj);
+
+/**
+ * Get a specific model by its index
+ * @param obj pointer to a GLTF viewer object
+ * @param id index of the model to retrieve (0-based)
+ * @return pointer to the model at the specified index, or NULL if index is invalid
+ */
+lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id);
+
+/**
+ * Get the primary model from the GLTF viewer
+ * The primary model is the first model added to the viewer and can be used
+ * for camera selection and other primary operations
+ * @param obj pointer to a GLTF viewer object
+ * @return pointer to the primary model, or NULL if no models are loaded
+ */
+lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj);
 
 /**
  * Set the yaw (horizontal rotation) of the camera
