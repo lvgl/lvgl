@@ -130,5 +130,5 @@ After calling this function, when ``"font_name"`` is used as a font in XML, ``&m
 Notes for the UI Editor
 -----------------------
 
-For simplicity, in the UI |nbsp| Editor's preview, fonts are always loaded as tinyttf fonts.
+For simplicity, in the UI editor's preview, fonts are always loaded as tinyttf fonts.
 It makes the preview dynamic as no code export and compilation is needed when a font changes.
