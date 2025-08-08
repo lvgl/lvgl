@@ -281,30 +281,30 @@ lv_gltf_background_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj);
 /**
  * Set the background blur amount
  * @param obj pointer to a GLTF viewer object
- * @param value blur amount between 0.0 and 1.0
+ * @param value blur amount between 0 and 100
  */
-void lv_gltf_set_blur_bg(lv_obj_t * obj, float value);
+void lv_gltf_set_background_blur(lv_obj_t * obj, uint32_t value);
 
 /**
  * Get the background blur amount
  * @param obj pointer to a GLTF viewer object
- * @return blur amount between 0.0 and 1.0
+ * @return blur amount between 0 and 100
  */
-float lv_gltf_get_blur_bg(const lv_obj_t * obj);
+uint32_t lv_gltf_get_background_blur(const lv_obj_t * obj);
 
 /**
  * Set the environmental brightness/power
  * @param obj pointer to a GLTF viewer object
- * @param value brightness multiplier (1.0 is default)
+ * @param value brightness multiplier
  */
-void lv_gltf_set_env_brightness(lv_obj_t * obj, float value);
+void lv_gltf_set_env_brightness(lv_obj_t * obj, uint32_t value);
 
 /**
  * Get the environmental brightness/power
  * @param obj pointer to a GLTF viewer object
  * @return brightness multiplier
  */
-float lv_gltf_get_env_brightness(const lv_obj_t * obj);
+uint32_t lv_gltf_get_env_brightness(const lv_obj_t * obj);
 
 /**
  * Set the image exposure level
