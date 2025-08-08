@@ -1085,7 +1085,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
         GL_CALL(glClearDepth(1.0f));
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
