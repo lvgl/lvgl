@@ -130,9 +130,9 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
         data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
     }
     else {
-        extern uint8_t chromatic_jpg[];
-        extern int chromatic_jpg_len;
-        data = stbi_loadf_from_memory(chromatic_jpg, chromatic_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
+        extern unsigned char pisa_jpg[];
+        extern unsigned int pisa_jpg_len;
+        data = stbi_loadf_from_memory(pisa_jpg, pisa_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
     }
 
     {
@@ -238,10 +238,6 @@ static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_
         // Apply global scale factor to compensate for intensity lost when clamping
         scale_factor = (clamped_sum + diff_sum) / clamped_sum;
         LV_LOG_INFO("HDR Intensity Scale %f\n", scale_factor);
-    }
-
-    if(max_value > 1.0) {
-        LV_LOG_WARN("Environment light intensity cannot be displayed correctly on this device \n");
     }
 
     sampler->scale_value = scale_factor;
