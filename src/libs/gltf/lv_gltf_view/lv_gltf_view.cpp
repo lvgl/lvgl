@@ -289,7 +289,6 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
         return;
     }
 
-    LV_LOG_USER("Set camera to %d", value);
     model->camera = value;
     lv_obj_invalidate(obj);
 }
@@ -528,8 +527,8 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->exposure = 1.0f;
     desc->env_pow = 1.8f;
     desc->blur_bg = 0.5f;
-    desc->bg_mode = LV_GLTF_BG_SOLID;
-    desc->aa_mode = LV_GLTF_AA_ON;
+    desc->bg_mode = LV_GLTF_BG_ENVIRONMENT;
+    desc->aa_mode = LV_GLTF_AA_OFF;
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
