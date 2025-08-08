@@ -13,7 +13,6 @@
 
 #include "../lv_gltf_data/lv_gltf_model.h"
 #include "../lv_gltf_data/lv_gltf_data_internal.hpp"
-#include "../math/lv_gltf_math.hpp"
 #include "../../../draw/lv_draw_3d.h"
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../core/lv_obj_class_private.h"
@@ -40,7 +39,6 @@
  **********************/
 
 static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
-
 static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
@@ -252,7 +250,19 @@ void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    viewer->desc.camera = value;
+
+    if(lv_array_is_empty(&viewer->models)) {
+        return;
+    }
+
+    lv_gltf_model_t* model = *(lv_gltf_model_t**) lv_array_at(&viewer->models, 0);
+
+    if(value > model->asset.cameras.size()){
+        return;
+    }
+
+    LV_LOG_USER("Set camera to %d", value);
+    model->camera = value;
     lv_obj_invalidate(obj);
 }
 
@@ -261,7 +271,26 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj)
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    return viewer->desc.camera;
+
+    if(lv_array_is_empty(&viewer->models)) {
+        return 0;
+    }
+    const lv_gltf_model_t* model = *(const lv_gltf_model_t**)lv_array_at(&viewer->models, 0);
+    return model->camera;
+}
+
+uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj)
+{
+
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(lv_array_is_empty(&viewer->models)) {
+        return 0;
+    }
+    const lv_gltf_model_t* model = *(const lv_gltf_model_t**) lv_array_at(&viewer->models, 0);
+    return lv_gltf_model_get_camera_count(model);
 }
 
 void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t value)
@@ -355,7 +384,7 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     if(model == NULL) {
         LV_ASSERT(lv_array_size(&viewer->models) > 0);
-        model = (lv_gltf_model_t *)lv_array_at(&viewer->models, 0);
+        model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     }
 
     const auto & center_position = lv_gltf_data_get_center(model);
@@ -401,7 +430,6 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->projection_matrix = fastgltf::math::fmat4x4(1.0f);
     view->view_projection_matrix = fastgltf::math::fmat4x4(1.0f);
     view->camera_pos = fastgltf::math::fvec3(0.0f);
-    view->env_rotation_angle = 0.0f;
     view->texture.h_flip = false;
     view->texture.v_flip = false;
 
@@ -416,7 +444,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
     lv_array_init(&view->models, 1, sizeof(lv_gltf_model_t *));
-    new(&view->ibm_by_skin_the_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
+    new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
 
     LV_TRACE_OBJ_CREATE("end");
 }
@@ -471,7 +499,6 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->blur_bg = 0.2f;
     desc->bg_mode = LV_GLTF_BG_SOLID;
     desc->aa_mode = LV_GLTF_AA_ON;
-    desc->camera = 0;
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
@@ -490,14 +517,14 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                 lv_gltf_data_validate_skin(model, skin_index);
                 auto skin = model->asset.skins[skin_index];
                 if(skin.inverseBindMatrices) {
-                    auto & _ibmVal = skin.inverseBindMatrices.value();
-                    auto & _ibmAccessor = model->asset.accessors[_ibmVal];
-                    if(_ibmAccessor.bufferViewIndex) {
+                    auto & ibm_value = skin.inverseBindMatrices.value();
+                    auto & ibm_accessor = model->asset.accessors[ibm_value];
+                    if(ibm_accessor.bufferViewIndex) {
                         fastgltf::iterateAccessorWithIndex<fastgltf::math::fmat4x4>(
-                            model->asset, _ibmAccessor,
+                            model->asset, ibm_accessor,
                         [&](fastgltf::math::fmat4x4 _matrix, std::size_t idx) {
                             auto & joint_node = model->asset.nodes[skin.joints[idx]];
-                            viewer->ibm_by_skin_the_node[skin_index][&joint_node] = _matrix;
+                            viewer->ibm_by_skin_then_node[skin_index][&joint_node] = _matrix;
                         });
                     }
                 }
@@ -564,143 +591,6 @@ static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
     setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);
 }
 
-void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data)
-{
-    const lv_gltf_view_desc_t * view_desc = &viewer->desc;
-    const auto & asset = lv_gltf_data_get_asset(gltf_data);
-    int32_t PREF_CAM_NUM = std::min((int32_t)view_desc->camera - 1, (int32_t)lv_gltf_model_get_camera_count(gltf_data) - 1);
-    int32_t anim_num = gltf_data->current_animation;
-    uint32_t scene_index = 0;
-
-    gltf_data->last_camera_index = PREF_CAM_NUM;
-    lv_gltf_data_clear_transform_cache(gltf_data);
-    gltf_data->current_camera_index = -1;
-    gltf_data->has_any_cameras = false;
-    auto tmat = fastgltf::math::fmat4x4{};
-    auto cammat = fastgltf::math::fmat4x4{};
-    fastgltf::custom_iterate_scene_nodes(
-        *asset, scene_index, &tmat,
-    [&](fastgltf::Node & node, fastgltf::math::fmat4x4 & parentworldmatrix, fastgltf::math::fmat4x4 & localmatrix) {
-        bool made_changes = false;
-        bool made_rotation_changes = false;
-        if(lv_gltf_data_animation_get_channel_set(anim_num, gltf_data, node)->size() > 0) {
-            lv_gltf_data_animation_matrix_apply(gltf_data->local_timestamp / 1000., anim_num, gltf_data, node,
-                                                localmatrix);
-            made_changes = true;
-        }
-        if(gltf_data->node_binds.find(&node) != gltf_data->node_binds.end()) {
-            lv_gltf_bind_t * current_override = gltf_data->node_binds[&node];
-            fastgltf::math::fvec3 local_pos;
-            fastgltf::math::fquat local_quat;
-            fastgltf::math::fvec3 local_scale;
-            fastgltf::math::decomposeTransformMatrix(localmatrix, local_scale, local_quat, local_pos);
-            fastgltf::math::fvec3 local_rot = lv_gltf_math_quaternion_to_euler(local_quat);
-
-            // Traverse through all linked overrides
-            while(current_override != nullptr) {
-                if(current_override->prop == LV_GLTF_BIND_PROP_ROTATION) {
-                    if(current_override->dir) {
-                        current_override->data[0] = local_rot[0];
-                        current_override->data[1] = local_rot[1];
-                        current_override->data[2] = local_rot[2];
-                    }
-                    else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_rot[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_rot[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
-                            local_rot[2] = current_override->data[2];
-                        made_changes = true;
-                        made_rotation_changes = true;
-                    }
-                }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_POSITION) {
-                    if(current_override->dir) {
-                        current_override->data[0] = local_pos[0];
-                        current_override->data[1] = local_pos[1];
-                        current_override->data[2] = local_pos[2];
-                    }
-                    else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_pos[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_pos[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
-                            local_pos[2] = current_override->data[2];
-                        made_changes = true;
-                    }
-                }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_WORLD_POSITION) {
-                    fastgltf::math::fvec3 world_pos;
-                    fastgltf::math::fquat world_quat;
-                    fastgltf::math::fvec3 world_scale;
-                    fastgltf::math::decomposeTransformMatrix(parentworldmatrix * localmatrix,
-                                                             world_scale, world_quat, world_pos);
-                    //fastgltf::math::fvec3 world_rot = quaternionToEuler(world_quat);
-
-                    if(current_override->dir) {
-                        current_override->data[0] = world_pos[0];
-                        current_override->data[1] = world_pos[1];
-                        current_override->data[2] = world_pos[2];
-                    } /*else {
-                        if(current_override->data_mask & LV_GLTF_OVERRIDE_MASK_CHANNEL_1) world_pos[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_OVERRIDE_MASK_CHANNEL_2) world_pos[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_OVERRIDE_MASK_CHANNEL_3) world_pos[2] = current_override->data[2];
-                        made_changes = true;
-                    }*/
-                }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_SCALE) {
-                    if(current_override->dir) {
-                        current_override->data[0] = local_scale[0];
-                        current_override->data[1] = local_scale[1];
-                        current_override->data[2] = local_scale[2];
-                    }
-                    else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_scale[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_scale[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
-                            local_scale[2] = current_override->data[2];
-                        made_changes = true;
-                    }
-                }
-
-                // Move to the next override in the linked list
-                current_override = current_override->next_bind;
-            }
-
-            // Rebuild the local matrix after applying all overrides
-            localmatrix = fastgltf::math::scale(
-                              fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
-                                                     made_rotation_changes ?
-                                                     lv_gltf_math_euler_to_quaternion(
-                                                         local_rot[0], local_rot[1], local_rot[2]) :
-                                                     local_quat),
-                              local_scale);
-        }
-
-        if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
-            lv_gltf_data_set_cached_transform(gltf_data, &node, parentworldmatrix * localmatrix);
-        }
-        if(node.cameraIndex.has_value() && (gltf_data->current_camera_index < PREF_CAM_NUM)) {
-            gltf_data->has_any_cameras = true;
-            gltf_data->current_camera_index += 1;
-            if(gltf_data->current_camera_index == PREF_CAM_NUM) {
-                cammat = (parentworldmatrix * localmatrix);
-            }
-        }
-    });
-    if(gltf_data->has_any_cameras) {
-        gltf_data->view_pos[0] = cammat[3][0];
-        gltf_data->view_pos[1] = cammat[3][1];
-        gltf_data->view_pos[2] = cammat[3][2];
-        gltf_data->view_mat = fastgltf::math::invert(cammat);
-    }
-    else
-        gltf_data->current_camera_index = -1;
-}
 
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer)
 {
