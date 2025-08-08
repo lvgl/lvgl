@@ -1,7 +1,8 @@
 #include "lv_example_gltf.h"
 
-#if LV_USE_GLTF && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
 
+#if LV_USE_GLTF
 /**
  * Timer callback to continuously rotate the model
  */
@@ -32,4 +33,17 @@ void lv_example_gltf_1(void)
     lv_timer_create(spin_timer_cb, LV_DEF_REFR_PERIOD, gltf);
 }
 
+#else
+
+void lv_example_gltf_1(void)
+{
+    /*TODO
+     *fallback for online examples*/
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "glTF web support is coming soon");
+    lv_obj_center(label);
+}
+
+#endif
 #endif
