@@ -1412,6 +1412,9 @@
     /** Vector graphic demo */
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
 
+    /** GLTF demo */
+    #define LV_USE_DEMO_GLTF            0
+
     /*---------------------------
      * Demos from lvgl/lv_demos
       ---------------------------*/

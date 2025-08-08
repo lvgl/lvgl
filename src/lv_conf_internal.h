@@ -4547,6 +4547,15 @@
         #endif
     #endif
 
+    /** GLTF demo */
+    #ifndef LV_USE_DEMO_GLTF
+        #ifdef CONFIG_LV_USE_DEMO_GLTF
+            #define LV_USE_DEMO_GLTF CONFIG_LV_USE_DEMO_GLTF
+        #else
+            #define LV_USE_DEMO_GLTF            0
+        #endif
+    #endif
+
     /*---------------------------
      * Demos from lvgl/lv_demos
       ---------------------------*/
