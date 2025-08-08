@@ -388,12 +388,16 @@ Animation speeds use integer values to avoid floating-point arithmetic:
 - Values greater than 1000 speed up animations (e.g., 2000 = 2.0x speed)
 - Values less than 1000 slow down animations (e.g., 500 = 0.5x speed)
 
+.. _gltf_example:
+
 Examples
 ********
 
 .. include:: ../../examples/libs/gltf/index.rst
 
-API Reference
-*************
+.. _gltf_api:
+
+API
+***
 
 .. API startswith:  lv_gltf_
