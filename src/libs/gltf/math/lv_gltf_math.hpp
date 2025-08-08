@@ -1,6 +1,6 @@
 /**
  * @file lv_gltf_math.hpp
- *
+ * @brief GLTF math utilities and helper functions
  */
 
 #ifndef LV_GLTF_MATH_HPP
@@ -13,6 +13,7 @@
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_GLTF
+
 #include <fastgltf/math.hpp>
 
 /*********************
