@@ -7,9 +7,11 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "lv_gltf_math.hpp"
+
 #if LV_USE_GLTF
-#include "fastgltf/math.hpp"
+
+#include <fastgltf/math.hpp>
 
 /*********************
  *      DEFINES
@@ -37,7 +39,7 @@
 
 /** Creates a right-handed view matrix */
 fastgltf::math::fmat4x4 lv_gltf_math_look_at_rh(const fastgltf::math::fvec3 & eye, const fastgltf::math::fvec3 & center,
-                                                const fastgltf::math::fvec3 & up)
+                                                const fastgltf::math::fvec3 & up) noexcept
 {
     auto dir = normalize(center - eye);
     auto lft = normalize(cross(dir, up));
