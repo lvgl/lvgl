@@ -214,20 +214,6 @@ uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj);
  **********************/
 
 /**
- * Set the background color
- * @param obj pointer to a GLTF viewer object
- * @param value background color
- */
-void lv_gltf_set_background_color(lv_obj_t * obj, lv_color32_t value);
-
-/**
- * Get the background color
- * @param obj pointer to a GLTF viewer object
- * @return background color
- */
-lv_color32_t lv_gltf_get_background_color(const lv_obj_t * obj);
-
-/**
  * Set the background mode
  * @param obj pointer to a GLTF viewer object
  * @param value background mode

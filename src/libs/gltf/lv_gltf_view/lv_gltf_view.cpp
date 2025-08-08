@@ -247,23 +247,6 @@ float lv_gltf_get_focal_z(const lv_obj_t * obj)
     return viewer->desc.focal_z;
 }
 
-void lv_gltf_set_background_color(lv_obj_t * obj, lv_color32_t value)
-{
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    viewer->desc.bg_color = value;
-    lv_obj_invalidate(obj);
-}
-
-lv_color32_t lv_gltf_get_background_color(const lv_obj_t * obj)
-{
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    return viewer->desc.bg_color;
-}
-
 void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value)
 {
     LV_ASSERT_NULL(obj);
@@ -492,7 +475,6 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
-    desc->bg_color = lv_color32_make(230, 230, 230, 255);
 }
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {

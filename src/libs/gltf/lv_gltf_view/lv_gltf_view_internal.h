@@ -62,8 +62,6 @@ typedef struct {
     float focal_x;
     float focal_y;
     float focal_z;
-    lv_color32_t bg_color;
-
     bool frame_was_antialiased;
     uint32_t camera;
     int32_t animation_speed_ratio;
