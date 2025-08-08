@@ -19,8 +19,7 @@
 #include "../../../misc/lv_log.h"
 #include "../../../misc/lv_math.h"
 #include "../../../stdlib/lv_sprintf.h"
-#include <cstdint>
-#include <cstdio>
+#include "../../../misc/lv_fs.h"
 
 #include "../stb_image/stb_image.h"
 #include <webp/decode.h>
@@ -207,31 +206,53 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
 static lv_gltf_model_t * create_data_from_file(const char * path)
 {
-#if FASTGLTF_HAS_MEMORY_MAPPED_FILE
-    fastgltf::Parser parser(SUPPORTED_EXTENSIONS);
-    std::filesystem::path gltfFilePath{ path };
-    auto gltfFile = fastgltf::MappedGltfFile::FromPath(gltfFilePath);
-    if(!gltfFile) {
-        LV_LOG_ERROR("Failed to open glTF file: %s", std::string(fastgltf::getErrorMessage(gltfFile.error())).c_str());
-        return NULL;
-    }
-    auto asset = parser.loadGltf(gltfFile.get(), gltfFilePath.parent_path(), GLTF_OPTIONS);
-    if(!asset) {
-        LV_LOG_ERROR("Failed to decode glTF file: %s", std::string(fastgltf::getErrorMessage(asset.error())).c_str());
-        return NULL;
-    }
-
-    return lv_gltf_data_create_internal(path, std::move(asset.get()));
+#if !FASTGLTF_HAS_MEMORY_MAPPED_FILE
+#error This version of fastgltf can not open GLTF files from filesystem. Either encode your GLB into a source file and create or build fastgltf with FASTGLTF_HAS_MEMORY_MAPPED_FILE set to '1'
 #endif
 
-    /* TODO: This should be checked at compile time.
-     * 1. Add LV_USE_GLTF_FILE as a config
-     * 2. Generate a compilation error if  LV_USE_GLTF_FILE == 1 and FASTGLTF_HAS_MEMORY_MAPPED_FILE != 1
-     */
-    LV_LOG_ERROR("This version of fastgltf can not open GLTF files from filesystem.");
-    LV_LOG_ERROR(
-        "Either encode your GLB into a source file and create or build fastgltf with FASTGLTF_HAS_MEMORY_MAPPED_FILE set to '1'");
-    return NULL;
+    lv_fs_file_t file;
+    lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(res != LV_FS_RES_OK) {
+        LV_LOG_ERROR("Failed to open file '%s': %d", path, res);
+        return NULL;
+    }
+    res = lv_fs_seek(&file, 0, LV_FS_SEEK_END);
+    if(res != LV_FS_RES_OK) {
+        LV_LOG_ERROR("Failed to seek end of file '%s': %d", path, res);
+        return NULL;
+    }
+    uint32_t file_size;
+    res = lv_fs_tell(&file, &file_size);
+    if(res != LV_FS_RES_OK) {
+        LV_LOG_ERROR("Failed to get file count size '%s': %d", path, res);
+        return NULL;
+    }
+
+    res = lv_fs_seek(&file, 0, LV_FS_SEEK_SET);
+    if(res != LV_FS_RES_OK) {
+        LV_LOG_ERROR("Failed to seek start of file '%s': %d", path, res);
+        return NULL;
+    }
+
+    uint8_t * bytes = (uint8_t *) lv_malloc(file_size);
+
+    uint32_t bytes_read;
+    res = lv_fs_read(&file, bytes, file_size, &bytes_read);
+    if(res != LV_FS_RES_OK) {
+        LV_LOG_ERROR("Failed to seek start of file '%s': %d", path, res);
+        return NULL;
+    }
+    if(bytes_read != file_size) {
+        LV_LOG_ERROR("Failed to read the entire gltf file '%s': %d", path, res);
+        return NULL;
+    }
+    lv_fs_close(&file);
+
+    lv_gltf_model_t * model = create_data_from_bytes(bytes, file_size);
+    lv_free(bytes);
+
+    model->filename = path;
+    return model;
 }
 
 static lv_gltf_model_t * create_data_from_bytes(const uint8_t * bytes, size_t data_size)
