@@ -30,6 +30,10 @@
 
 #define MY_CLASS (&lv_gltf_class)
 
+#ifndef LV_GLTF_INITIAL_MODEL_CAPACITY
+    #define LV_GLTF_INITIAL_MODEL_CAPACITY 1
+#endif /*LV_GLTF_INITIAL_MODEL_CAPACITY*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -473,7 +477,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
-    lv_array_init(&view->models, 1, sizeof(lv_gltf_model_t *));
+    lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_t *));
     new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4> >;
 
     LV_TRACE_OBJ_CREATE("end");
