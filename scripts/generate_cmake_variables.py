@@ -58,11 +58,11 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool, d
     # If we use Kconfig, we must check the CONFIG_LV_USE_* and 
     # CONFIG_LV_BUILD_* defines
     if kconfig:
-        CONFIG_PATTERN="^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD)"
+        CONFIG_PATTERN="^#define +(CONFIG_LV_USE|CONFIG_LV_BUILD|CONFIG_LV_[0-9A-Z_]+_USE)"
         CONFIG_PREFIX=""
     # Otherwise check the LV_USE_* and LV_BUILD_* defines
     else:
-        CONFIG_PATTERN="^#define +(LV_USE|LV_BUILD)"
+        CONFIG_PATTERN="^#define +(LV_USE|LV_BUILD|LV_[0-9A-Z_]+_USE)"
         CONFIG_PREFIX="CONFIG_"
 
 
