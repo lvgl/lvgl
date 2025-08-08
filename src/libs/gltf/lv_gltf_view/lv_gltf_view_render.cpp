@@ -153,7 +153,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_ON) ||
                              (view_desc->aa_mode == LV_GLTF_AA_DYNAMIC && model->last_frame_no_motion == true);
     if(prepare_bg == false) {
-        // If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn
+        /* If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn*/
         opt_aa_this_frame = view_desc->frame_was_antialiased;
     }
 
@@ -168,7 +168,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     bool new_size = last_render_h != view_desc->render_height || last_render_w != view_desc->render_width;
 
     if(opt_aa_this_frame != model->last_frame_was_antialiased) {
-        // Antialiasing state has changed since the last render
+        /* Antialiasing state has changed since the last render */
         if(prepare_bg == true) {
             if(vstate->render_state_ready) {
                 setup_cleanup_opengl_output(&vstate->render_state);
@@ -234,8 +234,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
         return a.first < b.first;
     });
-
-    model->last_material_index = 99999; // Reset the last material index to an unused value once per frame at the start
+    /* Reset the last material index to an unused value once per frame at the start*/
+    model->last_material_index = 99999; 
     if(vstate->render_opaque_buffer) {
         if(model->camera > 0) {
             setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model->view_mat,
