@@ -112,7 +112,6 @@ struct _lv_gltf_t {
     fastgltf::math::fvec3 camera_pos;
 
     std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_the_node;
-    float env_rotation_angle;
     float bound_radius;
 
     lv_gltf_view_desc_t desc;
