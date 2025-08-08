@@ -109,6 +109,34 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
     lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
 }
+
+size_t lv_gltf_get_model_count(lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return lv_array_size(&((lv_gltf_t *)obj)->models);
+}
+
+lv_gltf_model_t * lv_gltf_get_model_by_index(lv_obj_t * obj, size_t id)
+{
+
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *) obj;
+
+    if(id >= lv_array_size(&viewer->models)) {
+        return NULL;
+    }
+    return *(lv_gltf_model_t **)lv_array_at(&((lv_gltf_t *)obj)->models, id);
+
+}
+lv_gltf_model_t * lv_gltf_get_primary_model(lv_obj_t * obj)
+{
+
+    return lv_gltf_get_model_by_index(obj, 0);
+}
+
 void lv_gltf_set_yaw(lv_obj_t * obj, float yaw)
 {
     LV_ASSERT_NULL(obj);

@@ -43,7 +43,7 @@ extern "C" {
 #include "render/lv_demo_render.h"
 #endif
 
-#if LV_USE_DEMO_GTLF
+#if LV_USE_DEMO_GLTF
 #include "gltf/lv_demo_gltf.h"
 #endif
 

@@ -30,7 +30,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_demo_gltf(const char * path);
+lv_obj_t * lv_demo_gltf(const char * path);
 
 /**********************
  *      MACROS
