@@ -20,6 +20,9 @@
  *      DEFINES
  *********************/
 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846264338327950288
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -66,7 +69,7 @@ template <typename T>
     T cosy_cosp = T(1.0) - T(2.0) * (Q11 + q[2] * q[2]);
 
     return fastgltf::math::vec<T, 3>(
-               (std::abs(sinp) >= T(1)) ? std::copysign(T(3.1415926) / T(2), sinp) : std::asin(sinp),
+               (std::abs(sinp) >= T(1)) ? std::copysign(T(M_PI) / T(2), sinp) : std::asin(sinp),
                std::atan2(siny_cosp, cosy_cosp),
                std::atan2(sinr_cosp, cosr_cosp)
            );
