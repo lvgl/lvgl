@@ -43,9 +43,9 @@ static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
 static void setup_finish_frame(void);
 static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map);
 static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
-static lv_result_t render_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state,
-                                         uint32_t texture_w,
-                                         uint32_t texture_h, bool prepare_bg);
+static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t* state,
+                                         int32_t texture_w,
+                                         int32_t texture_h, bool prepare_bg);
 
 static fastgltf::math::fmat3x3 create_texture_transform_matrix(std::unique_ptr<fastgltf::TextureTransform> & transform);
 static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color);
@@ -79,7 +79,7 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, int32_t _cur_
 
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
                                    bool transmission_pass);
-static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t _ret,
+static lv_result_t setup_restore_opaque_output(lv_gltf_t* viewer, const lv_gltf_renwin_state_t* _ret,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg);
 static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
@@ -243,7 +243,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         else {
             setup_view_proj_matrix(viewer, view_desc, model, true);
         }
-        lv_result_t result = setup_restore_opaque_output(view_desc, vstate->opaque_render_state,
+        lv_result_t result = setup_restore_opaque_output(viewer, &vstate->opaque_render_state,
                                                          vstate->opaque_frame_buffer_width,
                                                          vstate->opaque_frame_buffer_height, prepare_bg);
         LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to setup opaque output which should never happen");
@@ -252,8 +252,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             return vstate->render_state.texture;
         }
 
-        if(opt_draw_bg) {
-            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg * 0.4f);
+        if(opt_draw_bg) { 
+            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
         render_materials(viewer, model, model->opaque_nodes_by_material_index);
@@ -279,32 +279,30 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         setup_view_proj_matrix(viewer, view_desc, model, false);
     }
 
-    {
-        lv_result_t result = render_primary_output(view_desc, vstate->render_state, (uint32_t)view_desc->render_width,
-                                                   (uint32_t)view_desc->render_height, prepare_bg);
+    lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width, 
+                                               view_desc->render_height, prepare_bg);
 
-        LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to restore primary output which should never happen");
-        if(result != LV_RESULT_OK) {
-            lv_gltf_view_pop_opengl_state(&opengl_state);
-            return vstate->render_state.texture;
-        }
-        if(opt_draw_bg)
-            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
-        render_materials(viewer, model, model->opaque_nodes_by_material_index);
-
-        for(const auto & node_distance_pair : distance_sort_nodes) {
-            const auto & node_element = node_distance_pair.second; // Access the second member (NodeIndexPair)
-            const auto & node = node_element.first;
-            draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
-                           lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, false);
-        }
-        if(opt_aa_this_frame) {
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->render_state.texture));
-            GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-        }
-        setup_finish_frame();
+    LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to restore primary output which should never happen");
+    if(result != LV_RESULT_OK) {
+        lv_gltf_view_pop_opengl_state(&opengl_state);
+        return vstate->render_state.texture;
     }
+    if(opt_draw_bg)
+        setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+    render_materials(viewer, model, model->opaque_nodes_by_material_index);
+
+    for(const auto & node_distance_pair : distance_sort_nodes) {
+        const auto & node_element = node_distance_pair.second;
+        const auto & node = node_element.first;
+        draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
+                       lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, false);
+    }
+    if(opt_aa_this_frame) {
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->render_state.texture));
+        GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+    }
+    setup_finish_frame();
     lv_gltf_view_pop_opengl_state(&opengl_state);
     return vstate->render_state.texture;
 }
@@ -744,20 +742,23 @@ static void draw_lights(lv_gltf_model_t * model, GLuint program)
     }
 }
 
-lv_result_t render_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state, uint32_t texture_w,
-                                  uint32_t texture_h, bool prepare_bg)
+lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t* state, int32_t texture_w,
+                                  int32_t texture_h, bool prepare_bg)
 {
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state.framebuffer));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state->framebuffer));
 
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.renderbuffer, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
-        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
-                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
+        /* cast is safe because viewer is a lv_obj_t*/
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t*)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t*)viewer, LV_PART_MAIN);
+        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
+
         GL_CALL(glClearDepth(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
@@ -1066,19 +1067,22 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
     viewer->camera_pos = cam_position;
 }
 
-static lv_result_t setup_restore_opaque_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t _ret,
+
+static lv_result_t setup_restore_opaque_output(lv_gltf_t* viewer, const lv_gltf_renwin_state_t* renwin_state,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg)
 {
-    LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", _ret.texture, _ret.renderbuffer);
+    LV_LOG_USER("Color texture ID: %u, Depth texture ID: %u", renwin_state->texture, renwin_state->renderbuffer);
 
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, _ret.framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _ret.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _ret.renderbuffer, 0));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, renwin_state->framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renwin_state->texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renwin_state->renderbuffer, 0));
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
-        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
-                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
+        /* cast is safe because viewer is a lv_obj_t*/
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t*)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t*)viewer, LV_PART_MAIN);
+        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
         GL_CALL(glClearDepth(1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
