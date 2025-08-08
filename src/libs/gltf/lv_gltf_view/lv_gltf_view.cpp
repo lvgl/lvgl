@@ -750,28 +750,6 @@ static void setup_background_environment(GLuint program, GLuint * vao, GLuint * 
     GL_CALL(glUseProgram(0));
 }
 
-lv_result_t setup_restore_primary_output(lv_gltf_view_desc_t * view_desc, lv_gltf_renwin_state_t state,
-                                         uint32_t texture_w,
-                                         uint32_t texture_h, bool prepare_bg)
-{
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state.framebuffer));
-
-    if(glGetError() != GL_NO_ERROR) {
-        return LV_RESULT_INVALID;
-    }
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state.texture, 0));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state.renderbuffer, 0));
-    GL_CALL(glViewport(0, 0, texture_w, texture_h));
-    if(prepare_bg) {
-        GL_CALL(glClearColor(view_desc->bg_color.red / 255.0f, view_desc->bg_color.green / 255.0f,
-                             view_desc->bg_color.blue / 255.0f, view_desc->bg_color.alpha / 255.0f));
-        GL_CALL(glClearDepth(1.0f));
-        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    }
-
-    return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
-}
-
 static void destroy_environment(lv_gltf_view_env_textures_t * env)
 {
     const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
