@@ -203,7 +203,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     model->last_frame_no_motion = true;
 
 
-    if(dirty ||  lv_gltf_data_transform_cache_is_empty(model) || (model->camera != model->last_camera_index)) {
+    if(dirty || lv_gltf_data_transform_cache_is_empty(model) || (model->camera != model->last_camera_index)) {
         model->last_frame_no_motion = false;
         lv_gltf_view_recache_all_transforms(model);
     }
