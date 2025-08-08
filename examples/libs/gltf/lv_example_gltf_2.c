@@ -44,7 +44,7 @@ void lv_example_gltf_2(void)
     lv_timer_create(timer_cb, 5000, gltf);
 }
 
-#else 
+#else
 
 void lv_example_gltf_2(void)
 {
