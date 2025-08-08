@@ -197,7 +197,7 @@ uint32_t lv_gltf_get_camera(const lv_obj_t * obj);
  *
  * To get the camera count of other models, call
  * lv_gltf_model_get_camera_count(model) directly with the specific model
- * 
+ *
  * @param obj pointer to a GLTF viewer object
  * @return number of available cameras
  */
