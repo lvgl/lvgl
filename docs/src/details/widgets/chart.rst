@@ -38,7 +38,7 @@ Each chart has the following attributes (over and above attributes found in
 
 Type (governs how a chart's data series are drawn)
 
-- Can be LINE (default), BAR, SCATTER, or none.
+- Can be LINE (default), BAR, STACKED, SCATTER, or NONE.
 - You can change the chart's type at any point during its life.
 
 Horizontal and Vertical division lines
@@ -60,8 +60,8 @@ Point count (number of data points in all data series added to the chart)
 - default 10
 - If you provide your own data-value arrays, each array so provided must contain
   at least this number of values.
-- For LINE- and BAR-charts, this is the number of points on the X axis.
-- LINE- and BAR-charts require only one data-value array to supply Y-values for each data point.
+- For LINE-, BAR-, STACKED-charts, this is the number of points on the X axis.
+- LINE-, BAR-, STACKED-charts require only one data-value array to supply Y-values for each data point.
 - For SCATTER charts, this is the number of scatter-points in the data series.
 - SCATTER charts have separate data-value arrays for both X-values and Y-values.
 
@@ -121,7 +121,7 @@ Parts and Styles
 
 -  :cpp:enumerator:`LV_PART_MAIN` The background of the chart. Uses the :ref:`typical
    background <typical bg props>` and line style properties (for division lines).
-   *Padding* makes the series area smaller. For BAR charts ``pad_column`` sets the
+   *Padding* makes the series area smaller. For BAR and STACKED charts ``pad_column`` sets the
    space between bars in the same data series.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` A scrollbar used if the chart is zoomed. See
    :ref:`base_widget`'s documentation for details.
@@ -157,7 +157,9 @@ A chart can be one of the following types:
   can also be illustrated if their ``width``, ``height``, ``bg_color`` and ``radius``
   styles (for :cpp:enumerator:`LV_PART_ITEMS`) are set and both ``width`` and
   ``height`` have non-zero values.
-- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
+- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw individual vertical bars for each point in each series.
+- :cpp:enumerator:`LV_CHART_TYPE_STACKED`: Draw vertical stacked bars where multiple data series
+  are displayed as segments within a single bar for each data point. Supports only positive values.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and optionally
   lines between the points if line-width style values for
   :cpp:enumerator:`LV_PART_ITEMS` is a non-zero value, and the point's Y-value is

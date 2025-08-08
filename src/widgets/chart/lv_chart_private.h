@@ -63,7 +63,7 @@ struct _lv_chart_t {
     uint32_t hdiv_cnt;          /**< Number of horizontal division lines */
     uint32_t vdiv_cnt;          /**< Number of vertical division lines */
     uint32_t point_cnt;         /**< Number of points in all series */
-    lv_chart_type_t type  : 3;  /**< Chart type */
+    lv_chart_type_t type  : 4;  /**< Chart type */
     lv_chart_update_mode_t update_mode : 2;
 };
 
