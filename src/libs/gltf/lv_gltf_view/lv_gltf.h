@@ -175,18 +175,33 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model);
 
 /**
  * Set the active camera index
+ * The camera is selected from the first GLTF model added to the viewer
+ *
  * @param obj pointer to a GLTF viewer object
- * @param value camera index (0 for default, 1+ = scene camera index)
- * @note Values higher than the scene's camera count will be limited to the scene's camera count
+ * @param value camera index (0 for default camera, 1+ for scene camera index)
+ * @note Values higher than the scene's camera count will be clamped to the maximum available camera index
  */
 void lv_gltf_set_camera(lv_obj_t * obj, uint32_t value);
 
 /**
  * Get the active camera index
  * @param obj pointer to a GLTF viewer object
- * @return camera index
+ * @return active camera index
  */
 uint32_t lv_gltf_get_camera(const lv_obj_t * obj);
+
+/**
+ * Get the number of cameras in the first GLTF model added to the viewer
+ * This count represents the valid range for the camera index parameter
+ * used with lv_gltf_set_camera()
+ *
+ * To get the camera count of other models, call
+ * lv_gltf_model_get_camera_count(model) directly with the specific model
+ * 
+ * @param obj pointer to a GLTF viewer object
+ * @return number of available cameras
+ */
+uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj);
 
 /**
  * Set the animation speed ratio

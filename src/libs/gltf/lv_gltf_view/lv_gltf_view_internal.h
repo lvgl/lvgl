@@ -63,7 +63,6 @@ typedef struct {
     float focal_y;
     float focal_z;
     bool frame_was_antialiased;
-    uint32_t camera;
     int32_t animation_speed_ratio;
     lv_gltf_antialiasing_mode_t aa_mode;
     lv_gltf_background_mode_t bg_mode;
@@ -104,18 +103,17 @@ struct _lv_gltf_t {
     lv_3dtexture_t texture;
     lv_array_t models;
     lv_gltf_view_state_t state;
+    lv_gltf_view_desc_t desc;
+    lv_gltf_view_desc_t last_desc;
+    lv_gl_shader_manager_t * shader_manager;
+    lv_gltf_view_env_textures_t env_textures;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;
     fastgltf::math::fmat4x4 view_projection_matrix;
     fastgltf::math::fvec3 camera_pos;
 
-    std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_the_node;
-    float bound_radius;
+    std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_then_node;
 
-    lv_gltf_view_desc_t desc;
-    lv_gltf_view_desc_t last_desc;
-    lv_gl_shader_manager_t * shader_manager;
-    lv_gltf_view_env_textures_t env_textures;
 };
 
 /**********************
@@ -129,10 +127,6 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
 
 lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_define_t * defines,
                                                         size_t n);
-
-
-void lv_gltf_view_recache_all_transforms(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
-
 
 /**********************
  *      MACROS

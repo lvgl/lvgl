@@ -96,8 +96,7 @@ struct _lv_gltf_model_t {
 	size_t current_animation;
 	size_t last_material_index;
 
-	int32_t current_camera_index;
-	int32_t last_camera_index;
+	uint32_t last_camera_index;
 	int32_t last_anim_num;
 
 	float bound_radius;
@@ -105,8 +104,8 @@ struct _lv_gltf_model_t {
 	uint32_t current_animation_max_time;
 	uint32_t local_timestamp;
 	uint32_t last_tick;
+	uint32_t camera;
 
-	bool has_any_cameras;
 	bool is_animation_enabled;
 	bool last_pass_was_transmission;
 	bool last_frame_was_antialiased;

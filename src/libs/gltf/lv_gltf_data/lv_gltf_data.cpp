@@ -52,8 +52,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(data) lv_gltf_model_t;
     new(&data->asset) fastgltf::Asset(std::move(asset));
     data->filename = gltf_path;
-    data->has_any_cameras = false;
-    data->current_camera_index = -1;
     data->last_camera_index = -5;
     data->last_anim_num = -5;
     data->current_animation_max_time = 0;
