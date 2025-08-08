@@ -278,7 +278,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     else {
         setup_view_proj_matrix(viewer, view_desc, model, false);
     }
-    viewer->env_rotation_angle = viewer->env_textures.angle;
 
     {
         lv_result_t result = render_primary_output(view_desc, vstate->render_state, (uint32_t)view_desc->render_width,
@@ -433,7 +432,7 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     GL_CALL(glUniform1f(uniforms->exposure, view_desc->exposure));
     GL_CALL(glUniform1f(uniforms->env_intensity, view_desc->env_pow));
     GL_CALL(glUniform1i(uniforms->env_mip_count, (int32_t)env_tex->mip_count));
-    setup_environment_rotation_matrix(viewer->env_rotation_angle, program);
+    setup_environment_rotation_matrix(viewer->env_textures.angle, program);
     GL_CALL(glEnable(GL_CULL_FACE));
     GL_CALL(glDisable(GL_BLEND));
     GL_CALL(glEnable(GL_DEPTH_TEST));
