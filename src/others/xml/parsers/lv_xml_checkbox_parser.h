@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_CHECKBOX_XML_PARSER_H
-#define LV_CHECKBOX_XML_PARSER_H
+#ifndef LV_XML_CHECKBOX_PARSER_H
+#define LV_XML_CHECKBOX_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ void lv_xml_checkbox_apply(lv_xml_parser_state_t * state, const char ** attrs);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_CHECKBOX_XML_PARSE_H*/
+#endif /*LV_XML_CHECKBOX_PARSER_H*/

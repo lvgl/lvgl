@@ -84,7 +84,7 @@ Moving the cursor
 -----------------
 
 The cursor position can be modified programmatically using
-:cpp:expr:`lv_textarea_set_cursor_pos(textarea, corsor_pos)` where ``cursor_pos`` is
+:cpp:expr:`lv_textarea_set_cursor_pos(textarea, cursor_pos)` where ``cursor_pos`` is
 the zero-based index of the character the cursor should be placed in front of.
 :cpp:enumerator:`LV_TEXTAREA_CURSOR_LAST` can be passed to mean "after the
 last character"
@@ -102,8 +102,8 @@ cursor will jump to the position where the Text Area was clicked.
 Hiding the cursor
 -----------------
 
-The cursor is normally always visible.  It it can be a good idea to style it
-to be visible only in :cpp:enumerator:`LV_STATE_FOCUSED` state.  See :ref:`styles`
+The cursor is normally always visible. It can be a good idea to style it
+to be visible only in :cpp:enumerator:`LV_STATE_FOCUSED` state. See :ref:`styles`
 for more information about how to do this.
 
 One-line mode

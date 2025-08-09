@@ -46,8 +46,8 @@ the size is set explicitly, parts on the Line may not be visible.
 Invert y
 --------
 
-By default, the *y == 0* point is in the top of the Widget. It might be
-counter-intuitive in some cases so the y coordinates can be inverted
+By default, the *y == 0* point is at the top of the Widget. It might be
+counterintuitive in some cases, so the y coordinates can be inverted
 with :cpp:expr:`lv_line_set_y_invert(line, true)`. In this case, *y == 0* will
 be at the bottom of the Widget. *y invert* is disabled by default.
 

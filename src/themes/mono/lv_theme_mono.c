@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_theme_private.h"
-#include "../../../lvgl.h"
+#include "../../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_MONO
 
@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+
 struct _my_theme_t;
 typedef struct _my_theme_t my_theme_t;
 
@@ -88,7 +89,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     style_init_reset(&theme->styles.scrollbar);
     lv_style_set_bg_opa(&theme->styles.scrollbar, LV_OPA_COVER);
     lv_style_set_bg_color(&theme->styles.scrollbar, COLOR_FG);
-    lv_style_set_width(&theme->styles.scrollbar,  PAD_DEF);
+    lv_style_set_width(&theme->styles.scrollbar, PAD_DEF);
 
     style_init_reset(&theme->styles.scr);
     lv_style_set_bg_opa(&theme->styles.scr, LV_OPA_COVER);
@@ -180,11 +181,48 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
  *   GLOBAL FUNCTIONS
  **********************/
 
+lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font)
+{
+    /*This trick is required only to avoid the garbage collection of
+     *styles' data if LVGL is used in a binding (e.g. MicroPython)
+     *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
+    if(!lv_theme_mono_is_inited()) {
+        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
+    }
+
+    my_theme_t * theme = theme_def;
+
+    theme->base.disp = disp;
+    theme->base.font_small = LV_FONT_DEFAULT;
+    theme->base.font_normal = LV_FONT_DEFAULT;
+    theme->base.font_large = LV_FONT_DEFAULT;
+    theme->base.apply_cb = theme_apply;
+
+    style_init(theme, dark_bg, font);
+
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
+        lv_obj_report_style_change(NULL);
+    }
+
+    theme->inited = true;
+
+    return (lv_theme_t *)theme_def;
+}
+
 bool lv_theme_mono_is_inited(void)
 {
     my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
+}
+
+lv_theme_t * lv_theme_mono_get(void)
+{
+    if(!lv_theme_mono_is_inited()) {
+        return NULL;
+    }
+
+    return (lv_theme_t *)theme_def;
 }
 
 void lv_theme_mono_deinit(void)
@@ -203,31 +241,9 @@ void lv_theme_mono_deinit(void)
     }
 }
 
-lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font)
-{
-    /*This trick is required only to avoid the garbage collection of
-     *styles' data if LVGL is used in a binding (e.g. MicroPython)
-     *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
-    if(!lv_theme_mono_is_inited()) {
-        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
-    }
-
-    my_theme_t * theme = theme_def;
-
-    theme->base.disp = disp;
-    theme->base.font_small = LV_FONT_DEFAULT;
-    theme->base.font_normal = LV_FONT_DEFAULT;
-    theme->base.font_large = LV_FONT_DEFAULT;
-    theme->base.apply_cb = theme_apply;
-
-    style_init(theme, dark_bg, font);
-
-    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
-
-    theme->inited = true;
-
-    return (lv_theme_t *)theme_def;
-}
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
@@ -467,6 +483,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.large_border, LV_PART_ITEMS | LV_STATE_EDITED);
     }
 #endif
+
 #if LV_USE_LIST
     else if(lv_obj_check_type(obj, &lv_list_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
@@ -481,7 +498,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.pr, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.large_border, LV_STATE_EDITED);
-
     }
 #endif
 #if LV_USE_MSGBOX
@@ -490,6 +506,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         return;
     }
 #endif
+
 #if LV_USE_SPINBOX
     else if(lv_obj_check_type(obj, &lv_spinbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
@@ -514,10 +531,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 static void style_init_reset(lv_style_t * style)
 {

@@ -60,6 +60,10 @@ lv_state_t lv_xml_style_state_to_enum(const char * txt)
     else if(lv_streq("edited", txt)) return LV_STATE_EDITED;
     else if(lv_streq("hovered", txt)) return LV_STATE_HOVERED;
     else if(lv_streq("disabled", txt)) return LV_STATE_DISABLED;
+    else if(lv_streq("user_1", txt)) return LV_STATE_USER_1;
+    else if(lv_streq("user_2", txt)) return LV_STATE_USER_2;
+    else if(lv_streq("user_3", txt)) return LV_STATE_USER_3;
+    else if(lv_streq("user_4", txt)) return LV_STATE_USER_4;
 
     return 0; /*Return 0 in lack of a better option. */
 }
@@ -120,12 +124,30 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
 
         if(value[0] == '#') {
             const char * value_clean = &value[1];
+            bool const_found = false;
             lv_xml_const_t * c;
             LV_LL_READ(&scope->const_ll, c) {
                 if(lv_streq(c->name, value_clean)) {
                     value = c->value;
+                    const_found = true;
                     break;
                 }
+            }
+            if(!const_found) {
+                lv_xml_component_scope_t * global_scope = lv_xml_component_get_scope("globals");
+                if(global_scope) {
+                    LV_LL_READ(&global_scope->const_ll, c) {
+                        if(lv_streq(c->name, value_clean)) {
+                            value = c->value;
+                            const_found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if(!const_found) {
+                LV_LOG_WARN("Constant `%s` is not found", value_clean);
+                continue;
             }
         }
 
@@ -316,43 +338,6 @@ const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selec
     }
 
     return style_name;
-}
-
-void lv_xml_style_add_to_obj(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * text)
-{
-    char * str = lv_strdup(text);
-    char * str_ori = str;
-
-    /* Split the string based on space and colons */
-    char * onestyle_str = lv_xml_split_str(&str, ' ');
-    while(onestyle_str != NULL) {
-        /* Parse the parts and states after the space */
-        lv_style_selector_t selector = 0;
-        const char * style_name = lv_xml_style_string_process(onestyle_str, &selector);
-        if(style_name != NULL) {
-            lv_xml_style_t * xml_style = NULL;
-            /*Resolve parameters or just find the style*/
-            if(style_name[0] == '$') {
-                /*E.g. `$pr_style` style name means use the value
-                 *coming from the parent's `pr_style` named attribute*/
-                const char * name_clean = &style_name[1];
-                const char * parent_style_name = lv_xml_get_value_of(state->parent_attrs, name_clean);
-                if(parent_style_name) {
-                    xml_style = lv_xml_get_style_by_name(state->parent_scope, parent_style_name);
-                }
-            }
-            else {
-                xml_style = lv_xml_get_style_by_name(&state->scope, style_name);
-            }
-            if(xml_style) {
-                /* Apply with the selector */
-                lv_obj_add_style(obj, &xml_style->style, selector);
-            }
-        }
-        onestyle_str = lv_xml_split_str(&str, ' ');
-    }
-
-    lv_free(str_ori);
 }
 
 lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_scope_t * scope, const char * style_name_raw)

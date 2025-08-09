@@ -75,7 +75,7 @@ void lv_draw_dma2d_init(void)
 #endif
 
     /* enable the DMA2D clock */
-#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5) || defined(STM32L4)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
@@ -211,72 +211,16 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
 #if LV_DRAW_DMA2D_CACHE
 void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
-    if((SCB->CCR & SCB_CCR_DC_Msk) == 0) return; /* data cache is disabled */
-
-    uint32_t rows_remaining = mem_area->height;
-    uint32_t row_addr = (uint32_t)(uintptr_t) mem_area->first_byte;
-    uint32_t row_end_addr = 0;
-
-    __DSB();
-
-    while(rows_remaining) {
-        uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
-                                __SCB_DCACHE_LINE_SIZE) + 1;
-
-        if(addr == row_end_addr) {
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        while(cache_lines) {
-            SCB->DCIMVAC = addr;
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        row_end_addr = addr - __SCB_DCACHE_LINE_SIZE;
-        row_addr += mem_area->stride;
-        rows_remaining--;
-    };
-
-    __DSB();
-    __ISB();
+    if(SCB->CCR & SCB_CCR_DC_Msk) {
+        SCB_InvalidateDCache();
+    }
 }
 
 void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
-    if((SCB->CCR & SCB_CCR_DC_Msk) == 0) return;  /* data cache is disabled */
-
-    uint32_t rows_remaining = mem_area->height;
-    uint32_t row_addr = (uint32_t)(uintptr_t) mem_area->first_byte;
-    uint32_t row_end_addr = 0;
-
-    __DSB();
-
-    while(rows_remaining) {
-        uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
-                                __SCB_DCACHE_LINE_SIZE) + 1;
-
-        if(addr == row_end_addr) {
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        while(cache_lines) {
-            SCB->DCCMVAC = addr;
-            addr += __SCB_DCACHE_LINE_SIZE;
-            cache_lines--;
-        }
-
-        row_end_addr = addr - __SCB_DCACHE_LINE_SIZE;
-        row_addr += mem_area->stride;
-        rows_remaining--;
-    };
-
-    __DSB();
-    __ISB();
+    if(SCB->CCR & SCB_CCR_DC_Msk) {
+        SCB_CleanDCache();
+    }
 }
 #endif
 
@@ -402,23 +346,11 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             return LV_DRAW_UNIT_IDLE;
         }
 
-        void * dest = lv_draw_layer_go_to_xy(layer,
-                                             clipped_coords.x1 - layer->buf_area.x1,
-                                             clipped_coords.y1 - layer->buf_area.y1);
-
         if(dsc->opa >= LV_OPA_MAX) {
-            lv_draw_dma2d_opaque_image(
-                t,
-                dest,
-                &clipped_coords,
-                lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
+            lv_draw_dma2d_opaque_image(t, dsc, &t->area);
         }
         else {
-            lv_draw_dma2d_image(
-                t,
-                dest,
-                &clipped_coords,
-                lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
+            lv_draw_dma2d_image(t, dsc, &t->area);
         }
     }
 
@@ -465,7 +397,7 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_invalidate_cache(&u->writing_area);
 #endif
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 }
 

@@ -162,6 +162,26 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_min_value(lv_obj_t * obj, int32_t min)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    if(scale->range_min == min) return;
+    scale->range_min = min;
+
+    lv_obj_invalidate(obj);
+}
+
+void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    if(scale->range_max == max) return;
+    scale->range_max = max;
+
+    lv_obj_invalidate(obj);
+}
+
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -358,9 +378,27 @@ void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, 
     LV_ASSERT_OBJ(scale, MY_CLASS);
     LV_ASSERT_NULL(section);
 
-    section->range_min = min;
-    section->range_max = max;
+    lv_scale_set_section_min_value(scale, section, min);
+    lv_scale_set_section_max_value(scale, section, max);
+}
 
+void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t min)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    if(section->range_min == min) return;
+    section->range_min = min;
+    lv_obj_invalidate(scale);
+}
+
+void lv_scale_set_section_max_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t max)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    if(section->range_max == max) return;
+    section->range_max = max;
     lv_obj_invalidate(scale);
 }
 

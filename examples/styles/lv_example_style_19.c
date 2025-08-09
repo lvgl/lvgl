@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_SLIDER
+#if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_LOG
 
 /**
  * Test between a full background modal and a recolor modal
@@ -35,7 +35,7 @@ void lv_example_style_19(void)
 
     uint32_t t = lv_tick_get();
     lv_refr_now(NULL); /*Render only*/
-    LV_LOG_USER("%u ms\n", lv_tick_elaps(t));
+    LV_LOG_USER("%" LV_PRIu32 " ms\n", lv_tick_elaps(t));
 }
 
 #endif

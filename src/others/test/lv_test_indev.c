@@ -55,6 +55,24 @@ void lv_test_indev_create_all(void)
     lv_indev_set_read_cb(_state.encoder_indev,  lv_test_encoder_read_cb);
 }
 
+void lv_test_indev_delete_all(void)
+{
+    if(_state.mouse_indev) {
+        lv_indev_delete(_state.mouse_indev);
+        _state.mouse_indev = NULL;
+    }
+
+    if(_state.keypad_indev) {
+        lv_indev_delete(_state.keypad_indev);
+        _state.keypad_indev = NULL;
+    }
+
+    if(_state.encoder_indev) {
+        lv_indev_delete(_state.encoder_indev);
+        _state.encoder_indev = NULL;
+    }
+}
+
 lv_indev_t * lv_test_indev_get_indev(lv_indev_type_t type)
 {
     switch(type) {

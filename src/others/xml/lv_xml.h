@@ -14,14 +14,19 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../misc/lv_types.h"
-#include "../../misc/lv_event.h"
-#include "../../others/observer/lv_observer.h"
 
 #if LV_USE_XML
+#include "../../misc/lv_event.h"
+#include "../../others/observer/lv_observer.h"
+#include "lv_xml_test.h"
+#include "lv_xml_translation.h"
+#include "lv_xml_component.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#define LV_XML_MAX_PATH_LENGTH 256
 
 /**********************
  *      TYPEDEFS
@@ -33,11 +38,24 @@ extern "C" {
 
 void lv_xml_init(void);
 
+void lv_xml_deinit(void);
+
 void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
 
 void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * parent_ctx,
                               lv_xml_component_scope_t * scope,
                               const char ** attrs);
+
+/**
+ * Set a path to prefix the image and font file source paths.
+ *
+ * In globals.xml usually the source path is like "images/logo.png".
+ * But on the actual device it can be located at e.g. "A:ui/assets/images/logo.png".
+ * By setting "A:ui/assets/" the path set in the XML files will be prefixed accordingly.
+ *
+ * @param path_prefix   the path to be used as prefix
+ */
+void lv_xml_set_default_asset_path(const char * path_prefix);
 
 lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * name, const lv_font_t * font);
 

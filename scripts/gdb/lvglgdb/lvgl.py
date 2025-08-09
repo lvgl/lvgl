@@ -1,5 +1,8 @@
 import argparse
 from typing import Iterator, Union, Optional
+from PIL import Image
+import numpy as np
+from pathlib import Path
 
 import gdb
 
@@ -94,7 +97,7 @@ class LVObject(Value):
         return self.spec_attr.child_cnt if self.spec_attr else 0
 
     @property
-    def childs(self):
+    def children(self):
         if not self.spec_attr:
             return
 
@@ -114,7 +117,9 @@ class LVObject(Value):
         for i in range(count):
             style = styles[i].style
             prop_cnt = style.prop_cnt
-            values_and_props = style.values_and_props.cast("lv_style_const_prop_t", ptr=True)
+            values_and_props = style.values_and_props.cast(
+                "lv_style_const_prop_t", ptr=True
+            )
             for j in range(prop_cnt):
                 prop = values_and_props[j].prop
                 if prop == LV_STYLE_PROP_INV or prop == LV_STYLE_PROP_ANY:
@@ -122,9 +127,7 @@ class LVObject(Value):
                 yield values_and_props[j]
 
     def get_child(self, index: int):
-        return (
-            self.spec_attr.children[index] if self.spec_attr else None
-        )
+        return self.spec_attr.children[index] if self.spec_attr else None
 
 
 class LVDisplay(Value):
@@ -134,10 +137,220 @@ class LVDisplay(Value):
         super().__init__(disp)
 
     @property
+    def hor_res(self) -> int:
+        """Get horizontal resolution in pixels"""
+        return int(self.super_value("hor_res"))
+
+    @property
+    def ver_res(self) -> int:
+        """Get vertical resolution in pixels"""
+        return int(self.super_value("ver_res"))
+
+    @property
     def screens(self):
         screens = self.super_value("screens")
         for i in range(self.screen_cnt):
             yield LVObject(screens[i])
+
+    # Buffer-related properties
+    @property
+    def buf_1(self):
+        """Get first draw buffer (may be None)"""
+        buf_ptr = self.super_value("buf_1")
+        return LVDrawBuf(buf_ptr) if buf_ptr else None
+
+    @property
+    def buf_2(self):
+        """Get second draw buffer (may be None)"""
+        buf_ptr = self.super_value("buf_2")
+        return LVDrawBuf(buf_ptr) if buf_ptr else None
+
+    @property
+    def buf_act(self):
+        """Get currently active draw buffer (may be None)"""
+        buf_ptr = self.super_value("buf_act")
+        return LVDrawBuf(buf_ptr) if buf_ptr else None
+
+
+class LVDrawBuf(Value):
+    """LVGL draw buffer"""
+
+    _color_formats = {
+        "RGB565": None,
+        "RGB888": None,
+        "ARGB8888": None,
+        "XRGB8888": None,
+    }
+
+    _bpp = {
+        "RGB565": 16,
+        "RGB888": 24,
+        "ARGB8888": 32,
+        "XRGB8888": 32,
+    }
+
+    def __init__(self, draw_buf: Value):
+        super().__init__(draw_buf)
+        self._init_color_formats()
+
+    def _init_color_formats(self):
+        """init color formats from enum"""
+        for fmt in self._color_formats.keys():
+            if self._color_formats[fmt] is None:
+                try:
+                    self._color_formats[fmt] = int(
+                        gdb.parse_and_eval(f"LV_COLOR_FORMAT_{fmt}")
+                    )
+                except:
+                    print(f"Warning: Failed to get LV_COLOR_FORMAT_{fmt}")
+                    self._color_formats[fmt] = -1
+
+    def color_format_info(self) -> dict:
+        """get color format info"""
+        header = self.super_value("header")
+        cf = int(header["cf"])
+
+        fmt_name = "UNKNOWN"
+        for name, val in self._color_formats.items():
+            if val == cf:
+                fmt_name = name
+                break
+
+        return {"value": cf, "name": fmt_name, "bpp": self._bpp.get(fmt_name, 0)}
+
+    @property
+    def header(self) -> dict:
+        """Get the image header information as a dictionary"""
+        header = self.super_value("header")
+        return {
+            "w": header["w"],
+            "h": header["h"],
+            "stride": header["stride"],
+            "cf": header["cf"],  # Color format
+        }
+
+    @property
+    def data_size(self) -> int:
+        """Get the total buffer size in bytes"""
+        return self.super_value("data_size")
+
+    @property
+    def data(self) -> bytes:
+        """Get the buffer data ptr"""
+        return self.super_value("data")
+
+    def data_dump(self, filename: str, format: str = None) -> bool:
+        """
+        Dump the buffer data to an image file.
+
+        Args:
+            filename: Output file path
+            format: Image format (None for auto-detection from filename)
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # Validate input parameters
+            if not filename:
+                raise ValueError("Output filename cannot be empty")
+
+            # Get buffer metadata
+            header = self.super_value("header")
+            width = int(header["w"])
+            height = int(header["h"])
+            cf_info = self.color_format_info()
+            data_ptr = self.super_value("data")
+            data_size = int(self.super_value("data_size"))
+
+            # Validate buffer data
+            if not data_ptr:
+                raise ValueError("Data pointer is NULL")
+            if width <= 0 or height <= 0:
+                raise ValueError(f"Invalid dimensions: {width}x{height}")
+            if data_size <= 0:
+                raise ValueError(f"Invalid data size: {data_size}")
+
+            # Read pixel data
+            pixel_data = (
+                gdb.selected_inferior().read_memory(int(data_ptr), data_size).tobytes()
+            )
+            if not pixel_data:
+                raise ValueError("Failed to read pixel data")
+
+            # Process based on color format
+            img = self._convert_to_image(pixel_data, width, height, cf_info["value"])
+            if img is None:
+                return False
+
+            # Determine output format
+            output_format = (
+                format.upper() if format else Path(filename).suffix[1:].upper() or "BMP"
+            )
+
+            # Save image
+            img.save(filename, format=output_format)
+            print(
+                f"Successfully saved {cf_info['name']} buffer as {output_format} to {filename}"
+            )
+            return True
+
+        except gdb.MemoryError:
+            print("Error: Failed to access memory")
+            return False
+        except ValueError as e:
+            print(f"Validation error: {str(e)}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            return False
+
+    def _convert_to_image(
+        self, pixel_data: bytes, width: int, height: int, color_format: int
+    ) -> Optional[Image.Image]:
+        """
+        Convert raw pixel data to PIL Image based on color format.
+
+        Args:
+            pixel_data: Raw pixel bytes
+            width: Image width
+            height: Image height
+            color_format: LVGL color format value
+
+        Returns:
+            PIL.Image or None if conversion fails
+        """
+        try:
+            if color_format == self._color_formats["RGB565"]:
+                # Convert RGB565 to RGB888
+                arr = np.frombuffer(pixel_data, dtype=np.uint8)
+                arr = arr.reshape((height, width, 2))
+                rgb565 = np.frombuffer(pixel_data, dtype=np.uint16).reshape((height, width))
+                r = (((rgb565 & 0xF800) >> 11) << 3).astype(np.uint8)
+                g = ((rgb565 & 0x07E0) >> 3).astype(np.uint8)
+                b = ((rgb565 & 0x001F) << 3).astype(np.uint8)
+                return Image.fromarray(np.dstack((r, g, b)), "RGB")
+
+            elif color_format == self._color_formats["RGB888"]:
+                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(height, width, 3)
+                rgb_arr = arr[:, :, [2, 1, 0]]  # BGR -> RGB
+                return Image.fromarray(rgb_arr, "RGB")
+
+            elif color_format == self._color_formats["ARGB8888"]:
+                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(-1, 4)
+                rgba = np.column_stack((arr[:, 1:4], arr[:, 0]))  # ARGB -> RGBA
+                return Image.frombytes("RGBA", (width, height), rgba.tobytes())
+
+            elif color_format == self._color_formats["XRGB8888"]:
+                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(-1, 4)
+                rgb = arr[:, [2, 1, 0]]  # BGR -> RGB
+                return Image.fromarray(rgb.reshape(height, width, 3), "RGB")
+
+            raise ValueError(f"Unsupported color format: 0x{color_format:x}")
+
+        except Exception as e:
+            print(f"Conversion error: {str(e)}")
+            return None
 
 
 class LVGL:
@@ -153,6 +366,10 @@ class LVGL:
 
         for disp in LVList(ll, "lv_display_t"):
             yield LVDisplay(disp)
+
+    def disp_default(self):
+        disp_default = self.lv_global.disp_default
+        return LVDisplay(disp_default) if disp_default else None
 
     def screen_active(self):
         disp = self.lv_global.disp_default
@@ -182,7 +399,9 @@ def set_lvgl_instance(lv_global: Union[gdb.Value, Value, None]):
 
     inited = lv_global.inited
     if not inited:
-        print("\x1b[31mlvgl is not initialized yet. Please call `set_lvgl_instance(None)` later.\x1b[0m")
+        print(
+            "\x1b[31mlvgl is not initialized yet. Please call `set_lvgl_instance(None)` later.\x1b[0m"
+        )
         return
 
     g_lvgl_instance = LVGL(lv_global)
@@ -221,7 +440,7 @@ class DumpObj(gdb.Command):
             return
 
         # dump children
-        for child in obj.childs:
+        for child in obj.children:
             self.dump_obj(child, depth + 1, limit=limit)
 
     def invoke(self, args, from_tty):
@@ -257,6 +476,55 @@ class DumpObj(gdb.Command):
                 for screen in disp.screens:
                     print(f'{"  " * (depth + 1)}Screen@{hex(screen)}')
                     self.dump_obj(screen, depth=depth + 1, limit=args.level)
+
+
+class DumpDisplayBuf(gdb.Command):
+    """dump display buf to image"""
+
+    def __init__(self):
+        super(DumpDisplayBuf, self).__init__(
+            "dump display", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
+        )
+
+    def invoke(self, args, from_tty):
+        parser = argparse.ArgumentParser(description="Dump display draw buffer.")
+        parser.add_argument(
+            "-p",
+            "--prefix",
+            type=str,
+            default="",
+            help="prefix of dump file path",
+        )
+        parser.add_argument(
+            "-f",
+            "--format",
+            type=str,
+            choices=["bmp", "png"],
+            default=None,
+            help="dump file format (bmp or png)",
+        )
+
+        try:
+            args = parser.parse_args(gdb.string_to_argv(args))
+        except SystemExit:
+            return
+
+        display = g_lvgl_instance.disp_default()
+        if not display:
+            print("Error: Invalid display pointer")
+            return
+        buffers = {
+            "buf_1": display.buf_1,
+            "buf_2": display.buf_2,
+        }
+
+        for buf_name, buf_ptr in buffers.items():
+            if buf_ptr is not None:
+                draw_buf = LVDrawBuf(buf_ptr)
+                filename = f"{args.prefix}{buf_name}.{args.format.lower() if args.format else 'bmp'}"
+                draw_buf.data_dump(filename, args.format)
+            else:
+                print(f"Warning: {buf_name} buffer is None, skipping.")
 
 
 class InfoStyle(gdb.Command):
@@ -328,7 +596,11 @@ class InfoDrawUnit(gdb.Command):
         }
 
         type = types.get(name, lookup_type("lv_draw_unit_t"))
-        print(draw_unit.cast(type, ptr=True).dereference().format_string(pretty_structs=True, symbols=True))
+        print(
+            draw_unit.cast(type, ptr=True)
+            .dereference()
+            .format_string(pretty_structs=True, symbols=True)
+        )
 
     def invoke(self, args, from_tty):
         for unit in g_lvgl_instance.draw_units():

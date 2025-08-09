@@ -5,6 +5,7 @@ All Widgets
 ===========
 
 .. toctree::
+    :class:    toctree-1-deep
     :maxdepth: 1
 
     base_widget
@@ -12,11 +13,13 @@ All Widgets
 |hr_left_250|
 
 .. toctree::
+    :class:    toctree-1-deep
     :maxdepth: 1
 
     3dtexture
     animimg
     arc
+    arclabel
     bar
     button
     buttonmatrix
@@ -51,6 +54,4 @@ All Widgets
 
 .. |hr_left_250|  raw:: html
 
-    <hr style="width: 250px; height: 1px; text-align: left; margin-left: 0;
-    margin-right: auto; border:none; background-color:#808080; color: #808080;
-    clear:none;" />
+    <hr />

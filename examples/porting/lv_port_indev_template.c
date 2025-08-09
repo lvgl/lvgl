@@ -1,5 +1,5 @@
 /**
- * @file lv_port_indev_templ.c
+ * @file lv_port_indev_template.c
  *
  */
 

@@ -3,7 +3,8 @@
     Copyright (c) 2007-21 Mike Karlesky, Mark VanderVoord, Greg Williams
     [Released under MIT License. Please refer to license.txt for details]
 ============================================================================ */
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || LV_BUILD_TEST_PERF
+
 #include "unity.h"
 
 #ifndef UNITY_PROGMEM
@@ -1115,7 +1116,7 @@ void UnityAssertFloatSpecial(const UNITY_FLOAT actual,
             is_trait = !UNITY_IS_INF(actual) && !UNITY_IS_NAN(actual);
             break;
 
-        case UNITY_FLOAT_INVALID_TRAIT:  /* Supress warning */
+        case UNITY_FLOAT_INVALID_TRAIT:  /* Suppress warning */
         default: /* including UNITY_FLOAT_INVALID_TRAIT */
             trait_index = 0;
             trait_names[0] = UnityStrInvalidFloatTrait;
@@ -1342,7 +1343,7 @@ void UnityAssertDoubleSpecial(const UNITY_DOUBLE actual,
             is_trait = !UNITY_IS_INF(actual) && !UNITY_IS_NAN(actual);
             break;
 
-        case UNITY_FLOAT_INVALID_TRAIT:  /* Supress warning */
+        case UNITY_FLOAT_INVALID_TRAIT:  /* Suppress warning */
         default: /* including UNITY_FLOAT_INVALID_TRAIT */
             trait_index = 0;
             trait_names[0] = UnityStrInvalidFloatTrait;
@@ -2486,4 +2487,3 @@ int UnityTestMatches(void)
 #endif /* UNITY_USE_COMMAND_LINE_ARGS */
 /*-----------------------------------------------*/
 #endif /*LV_BUILD_TEST*/
-

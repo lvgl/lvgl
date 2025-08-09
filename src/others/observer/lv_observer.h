@@ -32,10 +32,11 @@ typedef enum {
     LV_SUBJECT_TYPE_INVALID =   0,   /**< indicates Subject not initialized yet */
     LV_SUBJECT_TYPE_NONE =      1,   /**< a null value like None or NILt */
     LV_SUBJECT_TYPE_INT =       2,   /**< an int32_t */
-    LV_SUBJECT_TYPE_POINTER =   3,   /**< a void pointer */
-    LV_SUBJECT_TYPE_COLOR   =   4,   /**< an lv_color_t */
-    LV_SUBJECT_TYPE_GROUP  =    5,   /**< an array of Subjects */
-    LV_SUBJECT_TYPE_STRING  =   6,   /**< a char pointer */
+    LV_SUBJECT_TYPE_FLOAT =     3,   /**< a float, requires `LV_USE_FLOAT 1` */
+    LV_SUBJECT_TYPE_POINTER =   4,   /**< a void pointer */
+    LV_SUBJECT_TYPE_COLOR   =   5,   /**< an lv_color_t */
+    LV_SUBJECT_TYPE_GROUP  =    6,   /**< an array of Subjects */
+    LV_SUBJECT_TYPE_STRING  =   7,   /**< a char pointer */
 } lv_subject_type_t;
 
 /**
@@ -45,6 +46,9 @@ typedef union {
     int32_t num;           /**< Integer number (opacity, enums, booleans or "normal" numbers) */
     const void * pointer;  /**< Constant pointer  (string buffer, format string, font, cone text, etc.) */
     lv_color_t color;      /**< Color */
+#if LV_USE_FLOAT
+    float float_v;         /**< Floating point value*/
+#endif
 } lv_subject_value_t;
 
 /**
@@ -57,7 +61,7 @@ typedef struct {
     void * user_data;                    /**< Additional parameter, can be used freely by user */
     uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
     uint32_t size                 : 24;  /**< String buffer size or group length */
-    uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notifcation,
+    uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
                                           * start notifying from the beginning. */
 } lv_subject_t;
 
@@ -99,6 +103,38 @@ int32_t lv_subject_get_int(lv_subject_t * subject);
  * @return          current value
  */
 int32_t lv_subject_get_previous_int(lv_subject_t * subject);
+
+#if LV_USE_FLOAT
+
+/**
+ * Initialize an float-type Subject.
+ * @param subject   pointer to Subject
+ * @param value     initial value
+ */
+void lv_subject_init_float(lv_subject_t * subject, float value);
+
+/**
+ * Set value of an float Subject and notify Observers.
+ * @param subject   pointer to Subject
+ * @param value     new value
+ */
+void lv_subject_set_float(lv_subject_t * subject, float value);
+
+/**
+ * Get current value of an float Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+float lv_subject_get_float(lv_subject_t * subject);
+
+/**
+ * Get previous value of an float Subject.
+ * @param subject   pointer to Subject
+ * @return          current value
+ */
+float lv_subject_get_previous_float(lv_subject_t * subject);
+
+#endif /*LV_USE_FLOAT*/
 
 /**
  * Initialize a string-type Subject.
@@ -239,7 +275,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  * When the Widget is deleted, Observer will be unsubscribed from Subject automatically.
  * @param subject       pointer to Subject
  * @param observer_cb   notification callback
- * @param obj           pinter to Widget
+ * @param obj           pointer to Widget
  * @param user_data     optional user data
  * @return              pointer to newly-created Observer
  * @note                Do not call `lv_observer_remove()` on Observers created this way.
@@ -305,6 +341,61 @@ void * lv_observer_get_user_data(const lv_observer_t * observer);
  * @param subject       pointer to Subject
  */
 void lv_subject_notify(lv_subject_t * subject);
+
+/**
+ * Add an event handler to increment (or decrement) the value of a subject on a trigger.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param step      value to add on trigger
+ * @param min       the minimum value
+ * @param max       the maximum value
+ */
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        int32_t min, int32_t max);
+
+/**
+ * Set the value of an integer subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value);
+
+
+#if LV_USE_FLOAT
+/**
+ * Set the value of a float subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value);
+#endif
+
+/**
+ * Set the value of a string subject.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to change
+ * @param trigger   the trigger on which the subject should be changed
+ * @param value     the value to set
+ */
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value);
+
+/**
+ * Disable a style if a subject's value is not equal to a reference value
+ * @param obj           pointer to Widget
+ * @param style         pointer to a style
+ * @param selector      pointer to a selector
+ * @param subject       pointer to Subject
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
+                                  lv_subject_t * subject, int32_t ref_value);
 
 /**
  * Set Widget's flag(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.

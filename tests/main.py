@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import errno
 import shutil
 import subprocess
 import sys
@@ -17,6 +16,7 @@ sys.path.append(lvgl_script_path)
 wayland_dir = os.path.join(lvgl_test_dir, "wayland_protocols")
 wayland_protocols_dir = os.path.realpath("/usr/share/wayland-protocols")
 
+from perf import perf_test_options
 from LVGLImage import LVGLImage, ColorFormat, CompressMethod
 
 # Key values must match variable names in CMakeLists.txt.
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Build and/or run LVGL tests.', epilog=epilog)
     parser.add_argument('--build-options', nargs=1,
-                        choices=list(chain(build_only_options, test_options)),
+                        choices=list(chain(build_only_options, test_options, perf_test_options)),
                         help='''the build option name to build or run. When
                         omitted all build configurations are used.
                         ''')
@@ -258,6 +258,15 @@ if __name__ == "__main__":
 
     for options_name in options_to_build:
         is_test = options_name in test_options
+        is_perf_test = options_name in perf_test_options
+        if is_perf_test:
+            perf_test_script = os.path.join(lvgl_test_dir, "perf.py")
+            try:
+                subprocess.check_call([perf_test_script, *(sys.argv[1:])])
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
+            continue
+
         build_type = 'Debug'
         build_tests(options_name, build_type, args.clean)
         if is_test:
@@ -268,7 +277,7 @@ if __name__ == "__main__":
         if args.auto_clean:
             build_dir = get_build_dir(options_name)
             print("Removing " + build_dir)
-            shutil. rmtree(build_dir)
+            shutil.rmtree(build_dir)
 
     if args.report:
         generate_code_coverage_report()

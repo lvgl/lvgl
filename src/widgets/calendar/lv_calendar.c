@@ -97,11 +97,36 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
+    if(calendar->today.year == year && calendar->today.month == month
+       && calendar->today.day == day) return;
+
     calendar->today.year         = year;
     calendar->today.month        = month;
     calendar->today.day          = day;
 
     highlight_update(obj);
+}
+
+void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, year, calendar->today.month, calendar->today.day);
+
+}
+
+void lv_calendar_set_today_month(lv_obj_t * obj, uint32_t month)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, calendar->today.year, month, calendar->today.day);
+}
+
+void lv_calendar_set_today_day(lv_obj_t * obj, uint32_t day)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, day);
 }
 
 void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
@@ -121,6 +146,9 @@ void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
+
+    /*Don't return if the new value is the same, as this function is also
+     *used the update the calendar e.g. when switching to Chinese mode*/
 
     calendar->showed_date.year   = year;
     calendar->showed_date.month  = month;
@@ -212,6 +240,21 @@ void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
     }
 }
 
+void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_month_shown(obj, year, calendar->showed_date.month);
+
+}
+
+void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    lv_calendar_set_month_shown(obj, calendar->showed_date.year, month);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -288,19 +331,6 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_UNUSED(class_p);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
-    /*Initialize the allocated 'ext'*/
-
-    calendar->today.year  = 2024;
-    calendar->today.month = 1;
-    calendar->today.day   = 1;
-
-    calendar->showed_date.year  = 2024;
-    calendar->showed_date.month = 1;
-    calendar->showed_date.day   = 1;
-
-    calendar->highlighted_dates      = NULL;
-    calendar->highlighted_dates_num  = 0;
-
     lv_memzero(calendar->nums, sizeof(calendar->nums));
     uint8_t i;
     uint8_t j = 0;
@@ -330,10 +360,10 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
 
-    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_text_align(calendar->btnm, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
-    lv_calendar_set_month_shown(obj, calendar->showed_date.year, calendar->showed_date.month);
-    lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
+    lv_calendar_set_month_shown(obj, 2024, 1);
+    lv_calendar_set_today_date(obj, 2024, 1, 1);
 }
 
 static void draw_task_added_event_cb(lv_event_t * e)

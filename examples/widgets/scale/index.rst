@@ -64,6 +64,12 @@ A round scale style simulating a sunset/sunrise widget
 .. lv_example:: widgets/scale/lv_example_scale_11
   :language: c
 
+A round scale style simulating a compass
+----------------------------------------
+
+.. lv_example:: widgets/scale/lv_example_scale_12
+  :language: c
+
 Axis ticks and labels with scrolling on a chart
 -----------------------------------------------
 .. lv_example:: widgets/chart/lv_example_chart_2

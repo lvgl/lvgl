@@ -96,11 +96,11 @@ commit. It's usually one word and can be chosen freely. For example
 ``<body>`` optional and can be used to describe the details of this
 change.
 
-``<footer>`` shall contain
+``<footer>`` shall contain:
 
-- the words "BREAKING CHANGE" if the changes break the API
+- begin it with "BREAKING CHANGE" if the changes break the API;
 - reference to the GitHub issue or Pull Request if applicable.
-  (See `Linking a pull rquest to an issue <https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/using-keywords-in-issues-and-pull-requests#linking-a-pull-request-to-an-issue>`__
+  (See `Linking a pull request to an issue <https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/using-keywords-in-issues-and-pull-requests#linking-a-pull-request-to-an-issue>`__
   for details.)
 
 Some examples:

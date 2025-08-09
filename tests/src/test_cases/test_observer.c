@@ -192,6 +192,52 @@ void test_observer_int(void)
     lv_observer_remove(basic_observer);
 }
 
+void test_observer_float(void)
+{
+    static lv_subject_t subject;
+    lv_subject_init_float(&subject, 5.25);
+    lv_observer_t * basic_observer =
+        lv_subject_add_observer(&subject, observer_basic, NULL);
+
+    TEST_ASSERT_EQUAL_FLOAT(5.25, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(5.25, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(1, observer_called);
+
+    lv_subject_set_float(&subject, 10.5);
+    TEST_ASSERT_EQUAL_FLOAT(10.5, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(5.25, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(2, observer_called);
+
+    lv_subject_set_float(&subject, 15.75);
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(10.5, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /* Observer shouldn't be called if value is the same */
+    lv_subject_set_float(&subject, 15.75);
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /*Ignore incorrect types*/
+    lv_subject_set_pointer(&subject, NULL);
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    lv_subject_set_color(&subject, lv_color_black());
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    lv_subject_copy_string(&subject, "hello");
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_float(&subject));
+    TEST_ASSERT_EQUAL_FLOAT(15.75, lv_subject_get_previous_float(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    lv_observer_remove(basic_observer);
+}
+
 void test_observer_string(void)
 {
     char buf_current[32];
@@ -755,6 +801,17 @@ void test_observer_label_text_normal(void)
     lv_subject_init_int(&subject_int, 10);
     observer = lv_label_bind_text(obj, &subject_int, NULL);
     TEST_ASSERT_EQUAL_STRING("10", lv_label_get_text(obj));
+
+    /*Bind it with "%0.1f" if NULL is passed*/
+    static lv_subject_t subject_float;
+    lv_subject_init_float(&subject_float, 10.5);
+    observer = lv_label_bind_text(obj, &subject_float, NULL);
+    TEST_ASSERT_EQUAL_STRING("10.5", lv_label_get_text(obj));
+
+    /*Bind it with "%0.1f" if NULL is passed*/
+    lv_subject_set_float(&subject_float, 81.5);
+    observer = lv_label_bind_text(obj, &subject_float, "Value: %0.2f");
+    TEST_ASSERT_EQUAL_STRING("Value: 81.50", lv_label_get_text(obj));
 
     /*Bind to string*/
     static char buf[32];

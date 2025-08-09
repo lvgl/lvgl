@@ -19,10 +19,8 @@
 	    <prop name="total_tick_count" type="int" help=""/>
 	    <prop name="major_tick_every" type="int" help=""/>
 	    <prop name="label_show" type="bool" help=""/>
-	    <prop name="range" help="">
-	    	<param name="range_min" type="int" help=""/>
-	    	<param name="range_max" type="int" help=""/>
-	    </prop>
+	    <prop name="min_value" type="int" help=""/>
+	    <prop name="max_value" type="int" help=""/>
 	    <prop name="angle_range" type="deg" help=""/>
 	    <prop name="rotation" type="deg" help=""/>
 	    <prop name="text_src" type="string[NULL]" help=""/>
@@ -30,10 +28,8 @@
 	    <prop name="draw_ticks_on_top" type="bool" help=""/>
 
 	    <element name="section" type="lv_scale_section" access="add">
-	    	<prop name="range" help="">
-	    		<param name="int" type="minor_range" help=""/>
-	    		<param name="int" type="major_range" help=""/>
-	    	</prop>
+	    	<prop name="min_value" type="int" help=""/>
+	    	<prop name="max_value" type="int" help=""/>
 	    	<prop name="style_main" type="style" help=""/>
 	    	<prop name="style_indicator" type="style" help=""/>
 	    	<prop name="style_items" type="style" help=""/>

@@ -45,15 +45,20 @@ Create a Menu
 
 This creates a Menu Widget with this object hierarchy:
 
-    - Menu: :cpp:type:`lv_menu_t`
-        - Hidden Sub-Page Storage: :cpp:type:`lv_obj_t`
-        - Main container: :cpp:var:`lv_menu_main_cont_class`
-            - Main header: :cpp:var:`lv_menu_main_header_cont_class`
-                - Back button: :ref:`lv_button`
-                    - Back button icon: :ref:`lv_image`
-                - Main header title: :ref:`lv_label` (default hidden)
+- Menu: :cpp:type:`lv_menu_t`
 
-Note that no sidebar is created.  You can create one later if you wish.
+  - Hidden Sub-Page Storage: :cpp:type:`lv_obj_t`
+  - Main container: :cpp:var:`lv_menu_main_cont_class`
+
+    - Main header: :cpp:var:`lv_menu_main_header_cont_class`
+
+      - Back button: :ref:`lv_button`
+
+        - Back button icon: :ref:`lv_image`
+
+      - Main header title: :ref:`lv_label` (default hidden)
+
+Note that no sidebar is created. You can create one later if you wish.
 
 
 Header mode

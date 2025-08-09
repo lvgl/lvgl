@@ -7,19 +7,16 @@
 	<styles>
 		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
 		<style name="btn_pr_style" bg_opa="255"/>
-        <style name="red_border" border_color="0xff0000"></style>
-
 	</styles>
 
 	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label text="Hello"/>
+		<lv_label text-translated="tiger"/>
 		<my_card title="Card 1" name="card1"
-				 y="0"
-                 styles="red_border"
+				 y="30"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
 
-		<my_card y="85"
+		<my_card y="125"
 				 bg_color="0xffaaaa"
 				 action="Apply"
 				 btn_rel_style="btn_style"

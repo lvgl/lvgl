@@ -53,6 +53,9 @@ struct _lv_sysmon_perf_info_t {
     struct {
         uint32_t fps;
         uint32_t cpu;
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+        uint32_t cpu_proc;              /** The applications idle time percentage */
+#endif
         uint32_t refr_avg_time;
         uint32_t render_avg_time;       /**< Pure rendering time without flush time*/
         uint32_t flush_avg_time;        /**< Pure flushing time without rendering time*/

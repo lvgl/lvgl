@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_SLIDER_XML_PARSER_H
-#define LV_SLIDER_XML_PARSER_H
+#ifndef LV_XML_SLIDER_PARSER_H
+#define LV_XML_SLIDER_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_SLIDER_XML_PARSE_H*/
+#endif /*LV_XML_SLIDER_PARSER_H*/

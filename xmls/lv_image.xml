@@ -27,9 +27,7 @@ Example
 	    <prop name="rotation" type="int" help=""/>
 	    <prop name="scale_x" type="int" help=""/>
 	    <prop name="scale_y" type="int" help=""/>
-	    <prop name="pivot" help="">
-	    	<param name="pivot_x" type="int" help=""/>
-	    	<param name="pivot_y" type="int" help=""/>
-	    </prop>
+    	<prop name="pivot_x" type="int" help=""/>
+    	<prop name="pivot_y" type="int" help=""/>
 	</api>
 </widget>

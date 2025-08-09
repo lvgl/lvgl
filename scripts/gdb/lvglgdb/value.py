@@ -19,7 +19,7 @@ class Value(gdb.Value):
             return Value(super().__getattribute__(key))
         return Value(super().__getitem__(key))
 
-    def cast(self, type_name: str | gdb.Type, ptr: bool = False) -> Optional['Value']:
+    def cast(self, type_name: Union[str, gdb.Type], ptr: bool = False) -> Optional['Value']:
         try:
             gdb_type = gdb.lookup_type(type_name) if isinstance(type_name, str) else type_name
             if ptr:

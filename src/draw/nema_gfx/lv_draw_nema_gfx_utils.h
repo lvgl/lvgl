@@ -25,7 +25,7 @@
  */
 
 /**
- * @file lv_draw_nema_gfx.h
+ * @file lv_draw_nema_gfx_utils.h
  *
  */
 

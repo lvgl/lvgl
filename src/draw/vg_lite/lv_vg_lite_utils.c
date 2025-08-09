@@ -1,5 +1,5 @@
 /**
- * @file vg_lite_utils.c
+ * @file lv_vg_lite_utils.c
  *
  */
 
@@ -39,6 +39,8 @@
 #define FEATURE_ENUM_TO_STRING(e) \
     case (gcFEATURE_BIT_VG_##e):  \
     return #e
+
+#define LV_VG_LITE_IMAGE_FLAGS_TILED LV_IMAGE_FLAGS_USER1
 
 /**********************
  *      TYPEDEFS
@@ -158,7 +160,7 @@ const char * lv_vg_lite_error_string(vg_lite_error_t error)
         default:
             break;
     }
-    return "UNKNOW_ERROR";
+    return "UNKNOWN_ERROR";
 }
 
 const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
@@ -213,7 +215,7 @@ const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
         default:
             break;
     }
-    return "UNKNOW_FEATURE";
+    return "UNKNOWN_FEATURE";
 }
 
 const char * lv_vg_lite_buffer_format_string(vg_lite_buffer_format_t format)
@@ -271,7 +273,7 @@ const char * lv_vg_lite_buffer_format_string(vg_lite_buffer_format_t format)
         default:
             break;
     }
-    return "UNKNOW_BUFFER_FORMAT";
+    return "UNKNOWN_BUFFER_FORMAT";
 }
 
 const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
@@ -299,7 +301,7 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
         default:
             break;
     }
-    return "UNKNOW_VLC_OP";
+    return "UNKNOWN_VLC_OP";
 }
 
 static void path_data_print_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
@@ -478,6 +480,7 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
@@ -503,6 +506,7 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB4444:
@@ -579,10 +583,13 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB888:
             return VG_LITE_BGR888;
 
+        /**
+         * The lv_vg_lite_blend_mode function will automatically select the appropriate blend mode,
+         * which is uniformly mapped to VG_LITE_BGRA8888 here.
+         */
         case LV_COLOR_FORMAT_ARGB8888:
-            return VG_LITE_BGRA8888;
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            return VG_sBGRA_8888_PRE;
+            return VG_LITE_BGRA8888;
 
         case LV_COLOR_FORMAT_XRGB8888:
             return VG_LITE_BGRX8888;
@@ -645,7 +652,6 @@ void lv_vg_lite_buffer_format_bytes(
         case VG_LITE_BGRX8888:
         case VG_LITE_XBGR8888:
         case VG_LITE_XRGB8888:
-        case VG_sBGRA_8888_PRE:
             *mul = 4;
             break;
         case VG_LITE_NV12:
@@ -783,7 +789,9 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
     width = lv_vg_lite_width_align(width);
 
-    lv_vg_lite_buffer_init(buffer, ptr, width, height, stride, format, false);
+    lv_vg_lite_buffer_init(buffer, ptr,
+                           width, height, stride, format,
+                           lv_draw_buf_has_flag(draw_buf, LV_VG_LITE_IMAGE_FLAGS_TILED));
 
     /* Alpha image need to be multiplied by color */
     if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
@@ -952,7 +960,7 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)
 {
-    if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+    if(!has_pre_mul && lv_vg_lite_support_blend_normal()) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
                 return VG_LITE_BLEND_NORMAL_LVGL;
@@ -973,9 +981,6 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_m
 
     switch(blend_mode) {
         case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
-            if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
-                return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
-            }
             return VG_LITE_BLEND_SRC_OVER;
 
         case LV_BLEND_MODE_ADDITIVE: /**< Add the respective color channels*/
@@ -1161,15 +1166,7 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix)
 
 bool lv_vg_lite_support_blend_normal(void)
 {
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
-        return true;
-    }
-
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
-        return true;
-    }
-
-    return false;
+    return vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT);
 }
 
 bool lv_vg_lite_16px_align(void)

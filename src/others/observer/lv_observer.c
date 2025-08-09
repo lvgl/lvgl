@@ -34,13 +34,54 @@ typedef struct {
     flag_cond_t cond : 3;
 } flag_and_cond_t;
 
+typedef struct {
+    const lv_style_t * style;
+    lv_style_selector_t selector;
+    int32_t value;
+} bind_style_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t value;
+} subject_set_int_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    float value;
+} subject_set_float_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    const char * value;
+} subject_set_string_user_data_t;
+
+
+typedef struct {
+    lv_subject_t * subject;
+    int32_t step;
+    int32_t min;
+    int32_t max;
+} subject_increment_user_data_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void subject_set_int_cb(lv_event_t * e);
+
+#if LV_USE_FLOAT
+    static void subject_set_float_cb(lv_event_t * e);
+#endif
+
+static void subject_set_string_cb(lv_event_t * e);
+static void subject_increment_cb(lv_event_t * e);
+
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv, flag_cond_t cond);
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
@@ -70,6 +111,9 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void dropdown_value_changed_event_cb(lv_event_t * e);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
+
+static void free_user_data_event_cb(lv_event_t * e);
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -123,6 +167,51 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject)
 
     return subject->prev_value.num;
 }
+
+#if LV_USE_FLOAT
+
+void lv_subject_init_float(lv_subject_t * subject, float value)
+{
+    lv_memzero(subject, sizeof(lv_subject_t));
+    subject->type = LV_SUBJECT_TYPE_FLOAT;
+    subject->value.float_v = value;
+    subject->prev_value.float_v = value;
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+}
+
+void lv_subject_set_float(lv_subject_t * subject, float value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
+
+    subject->prev_value.float_v = subject->value.float_v;
+    subject->value.float_v = value;
+    lv_subject_notify_if_changed(subject);
+}
+
+float lv_subject_get_float(lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
+
+    return subject->value.float_v;
+}
+
+float lv_subject_get_previous_float(lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return 0;
+    }
+
+    return subject->prev_value.float_v;
+}
+
+#endif /*LV_USE_FLOAT*/
 
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
@@ -461,6 +550,105 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        int32_t min, int32_t max)
+{
+    subject_increment_user_data_t * user_data = lv_malloc(sizeof(subject_increment_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data in in <lv_obj-subject_increment>");
+        return;
+    }
+
+    user_data->step = step;
+    user_data->min = min;
+    user_data->max = max;
+    user_data->subject = subject;
+    lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
+{
+    subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = value;
+
+    lv_obj_add_event_cb(obj, subject_set_int_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+#if LV_USE_FLOAT
+void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value)
+{
+    subject_set_float_user_data_t * user_data = lv_malloc(sizeof(subject_set_float_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = value;
+
+    lv_obj_add_event_cb(obj, subject_set_float_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+#endif /*LV_USE_FLOAT*/
+
+void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
+                                         const char * value)
+{
+    subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = lv_strdup(value);
+    LV_ASSERT_MALLOC(user_data->value);
+
+    lv_obj_add_event_cb(obj, subject_set_string_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, subject_set_string_free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+
+lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
+                                  lv_subject_t * subject, int32_t ref_value)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_style(obj, style, selector);
+
+    bind_style_t * p = lv_malloc(sizeof(bind_style_t));
+    LV_ASSERT_MALLOC(p);
+    if(p == NULL) {
+        LV_LOG_WARN("Out of memory");
+        return NULL;
+    }
+
+    p->style = style;
+    p->selector = selector;
+    p->value = ref_value;
+
+    lv_observer_t * observable = lv_subject_add_observer_obj(subject, bind_style_observer_cb, obj, p);
+    observable->auto_free_user_data = 1;
+    return observable;
+}
+
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
@@ -568,6 +756,11 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
         if(subject->type == LV_SUBJECT_TYPE_INT) {
             fmt = "%d";
         }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
         else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
             return NULL;
@@ -575,7 +768,7 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
     }
     else {
         if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
-           subject->type != LV_SUBJECT_TYPE_INT) {
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
             return NULL;
         }
@@ -592,7 +785,7 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
 
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
     }
@@ -610,7 +803,7 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
 
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
     }
@@ -674,6 +867,49 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
  *   STATIC FUNCTIONS
  **********************/
 
+
+static void subject_set_int_cb(lv_event_t * e)
+{
+    subject_set_int_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_set_int(user_data->subject, user_data->value);
+}
+
+#if LV_USE_FLOAT
+static void subject_set_float_cb(lv_event_t * e)
+{
+    subject_set_float_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_set_float(user_data->subject, user_data->value);
+}
+#endif
+
+static void subject_set_string_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_copy_string(user_data->subject, user_data->value);
+}
+
+static void subject_increment_cb(lv_event_t * e)
+{
+    subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
+
+
+    if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
+        int32_t value = lv_subject_get_int(user_data->subject);
+        value += user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_int(user_data->subject, value);
+    }
+#if LV_USE_FLOAT
+    else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
+        float value = lv_subject_get_float(user_data->subject);
+        value += (float)user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_float(user_data->subject, (float)value);
+    }
+#endif
+}
+
+
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
@@ -712,6 +948,15 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
     return observable;
+}
+
+static void bind_style_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_style_t * p = observer->user_data;
+
+    int32_t current_v = lv_subject_get_int(subject);
+    bool dis = current_v != p->value;
+    lv_obj_style_set_disabled(observer->target, p->style, p->selector, dis);
 }
 
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -788,6 +1033,13 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject)
                 lv_subject_notify(subject);
             }
             break;
+#if LV_USE_FLOAT
+        case LV_SUBJECT_TYPE_FLOAT :
+            if(subject->value.float_v != subject->prev_value.float_v) {
+                lv_subject_notify(subject);
+            }
+            break;
+#endif
         case LV_SUBJECT_TYPE_GROUP :
         case LV_SUBJECT_TYPE_POINTER :
             /* Always notify as we don't know how to compare this */
@@ -821,6 +1073,11 @@ static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subj
             case LV_SUBJECT_TYPE_INT:
                 lv_label_set_text_fmt(observer->target, fmt, subject->value.num);
                 break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.float_v);
+                break;
+#endif
             case LV_SUBJECT_TYPE_STRING:
             case LV_SUBJECT_TYPE_POINTER:
                 lv_label_set_text_fmt(observer->target, fmt, subject->value.pointer);
@@ -840,12 +1097,26 @@ static void arc_value_changed_event_cb(lv_event_t * e)
     lv_obj_t * arc = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
 
-    lv_subject_set_int(subject, lv_arc_get_value(arc));
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_arc_get_value(arc));
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_arc_get_value(arc));
+    }
+#endif
 }
 
 static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_arc_set_value(observer->target, subject->value.num);
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_arc_set_value(observer->target, subject->value.num);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_arc_set_value(observer->target, (int32_t)subject->value.float_v);
+    }
+#endif
 }
 
 #endif /*LV_USE_ARC*/
@@ -857,12 +1128,26 @@ static void slider_value_changed_event_cb(lv_event_t * e)
     lv_obj_t * slider = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
 
-    lv_subject_set_int(subject, lv_slider_get_value(slider));
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_slider_get_value(slider));
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_slider_get_value(slider));
+    }
+#endif
 }
 
 static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_slider_set_value(observer->target, (int32_t)subject->value.float_v, LV_ANIM_OFF);
+    }
+#endif
 }
 
 #endif /*LV_USE_SLIDER*/
@@ -902,5 +1187,18 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 }
 
 #endif /*LV_USE_DROPDOWN*/
+
+static void free_user_data_event_cb(lv_event_t * e)
+{
+    lv_free(lv_event_get_user_data(e));
+}
+
+static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
+{
+    subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_free((void *)user_data->value);
+    lv_free(user_data);
+}
+
 
 #endif /*LV_USE_OBSERVER*/

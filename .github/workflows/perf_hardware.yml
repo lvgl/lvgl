@@ -1,0 +1,72 @@
+name: Hardware Performance Test
+
+on:
+  push:
+    branches: 'master'
+  pull_request:
+    types: [labeled]
+
+jobs:
+  run_benchmark:
+    runs-on: self-hosted
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && contains(github.event.label.name, 'Run benchmarks on HW'))
+
+    name: Hardware Performance Benchmark
+    steps:
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
+
+      - name: Install EJ dispatcher tool
+        run: |
+          cargo install ejlv
+
+      - name: Dispatch job
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
+            COMMIT_REF="${{ github.event.pull_request.head.sha }}"
+          else
+            REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+            COMMIT_REF="${{ github.sha }}"
+          fi
+
+          ejlv dispatch-run \
+            --socket /ejd/ejd.sock \
+            --comment-path comment.md \
+            --commit-hash $COMMIT_REF \
+            --remote-url $REPO_URL \
+            --seconds 1800
+
+      - name: Upload Comment
+        uses: actions/upload-artifact@v4
+        with:
+          name: comment
+          path: comment.md
+          if-no-files-found: error
+
+      - name: Delete Comment
+        run: |
+          rm -f comment.md
+
+  save_pr_number:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'pull_request' }}
+    name: HW Benchmark - Save PR Number
+    steps:
+      - name: Save PR number 
+        run: |
+          echo ${{ github.event.number }} > pr_number
+
+      - name: Upload PR number as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
+

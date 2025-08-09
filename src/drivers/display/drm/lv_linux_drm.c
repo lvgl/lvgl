@@ -26,7 +26,9 @@
 #include <drm_fourcc.h>
 
 #include "../../../stdlib/lv_sprintf.h"
-#if LV_LINUX_DRM_GBM_BUFFERS
+#include "../../../draw/lv_draw_buf.h"
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     #include <gbm.h>
     #include <linux/dma-buf.h>
@@ -169,7 +171,8 @@ static int link_program(unsigned program);
 
 static uint32_t tick_get_cb(void);
 
-#if LV_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+
     static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf);
     static int handle_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf);
 #endif
@@ -189,7 +192,7 @@ static uint32_t tick_get_cb(void);
  *  STATIC VARIABLES
  **********************/
 
-#if LV_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     static struct gbm_device * gbm_device;
 
@@ -271,7 +274,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
 
     LV_LOG_ERROR("HERE");
 
-#if LV_LINUX_DRM_GBM_BUFFERS 
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
         struct dma_buf_sync sync_req;
         int res;
@@ -567,10 +570,9 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     int ret;
     static int first = 1;
-    // uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_NONBLOCK;
-    uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
- 
-#if LV_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
+    uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_NONBLOCK;
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
 
     struct dma_buf_sync sync_req;
 
@@ -993,7 +995,7 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
                 (fourcc >> 0) & 0xff, (fourcc >> 8) & 0xff, (fourcc >> 16) & 0xff, (fourcc >> 24) & 0xff);
 
 
-#if LV_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     /* Create GBM device and buffer */
     gbm_device = gbm_create_device(drm_dev->fd);
@@ -1085,7 +1087,7 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
     return 0;
 }
 
-#if LV_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
 static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
@@ -1199,14 +1201,14 @@ static int handle_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
 }
 
-#endif /* END LV_LINUX_DRM_GBM_BUFFERS */
+#endif /* END LV_USE_LINUX_DRM_GBM_BUFFERS */
 
 
 static int drm_setup_buffers(drm_dev_t * drm_dev)
 {
     int ret;
 
-#if LV_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     ret = create_gbm_buffer(drm_dev, &drm_dev->drm_bufs[0]);
     if(ret < 0) {

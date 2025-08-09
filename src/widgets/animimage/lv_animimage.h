@@ -36,7 +36,7 @@ extern "C" {
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_animimage_id_t {
     LV_PROPERTY_ID2(ANIMIMAGE, SRC,         LV_PROPERTY_TYPE_POINTER,  LV_PROPERTY_TYPE_INT,  0),
     LV_PROPERTY_ID(ANIMIMAGE, DURATION,     LV_PROPERTY_TYPE_INT,   1),
     LV_PROPERTY_ID(ANIMIMAGE, REPEAT_COUNT, LV_PROPERTY_TYPE_INT,   2),

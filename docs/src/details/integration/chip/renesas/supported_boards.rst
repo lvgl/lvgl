@@ -28,6 +28,23 @@ Supported Boards
            <iframe width="320" height="180" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
+   * - **EK-RA8P1**
+     -
+         | 1 GHz
+         | Arm Cortex-M85
+     -
+         | 1872KB internal
+         | 128MB external
+         | 1MB internal flash
+     -
+         | 7”
+         | 1024x600
+         | Parallel RGB888
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/PoxDoQp51G8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek_ra8p1>`__
    * - **EK-RA6M3G**
      -
          | 120 MHz

@@ -9,7 +9,7 @@
 		<style name="blue" text_color="#dark_blue" text_font="lv_montserrat_30"/>
 		<style name="scale_main" bg_opa="50%" pad_all="32" radius="8"/>
 		<style name="scale_indic" length="20" />
-		<style name="scale_sectoion_indic" text_color="#00ff00" line_width="6"/>
+		<style name="scale_sectoion_indic" text_color="0x00ff00" line_width="6"/>
 	</styles>
 
 	<view  width="700" height="470" style_bg_color="#light_blue" flex_flow="column_wrap">
@@ -20,9 +20,10 @@
         </lv_spangroup>
 
         <lv_scale total_tick_count="31" show_label="true" major_tick_every="6"
-        		  range="10 110" width="300"
-        		  styles="scale_main scale_indic:indicator">
-	        <lv_scale-section range="30 60" style_indicator="scale_sectoion_indic"/>
+        		  min_value="10" max_value="110" width="300">
+            <style name="scale_main"/>
+            <style name="scale_indic" selector="indicator"/>
+	        <lv_scale-section min_value="30" max_value="60" style_indicator="scale_sectoion_indic"/>
         </lv_scale>
 
         <lv_table column_count="4" style_border_side:items="full">

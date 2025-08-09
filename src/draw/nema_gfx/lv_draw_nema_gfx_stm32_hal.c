@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_nema_gfx_hal.c
+ * @file lv_draw_nema_gfx_stm32_hal.c
  *
  * Global functions that implement some HAL functionality
  * which Nema will call directly.
@@ -25,8 +25,6 @@
 #include <string.h>
 
 #include LV_NEMA_STM32_HAL_INCLUDE
-
-#include <cmsis_os2.h>
 
 #include "tsi_malloc.h"
 
@@ -69,8 +67,6 @@ static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE]; /* NemaGFX memory pool *
 static nema_ringbuffer_t ring_buffer_str;
 static volatile int last_cl_id = -1;
 
-//static osSemaphoreId_t nema_irq_sem = NULL; // Declare CL IRQ semaphore
-
 /**********************
  *      MACROS
  **********************/
@@ -88,9 +84,6 @@ static volatile int last_cl_id = -1;
     LV_UNUSED(hgpu2d);
 
     last_cl_id = CmdListID;
-
-    /* Return a token back to a semaphore */
-    //    osSemaphoreRelease(nema_irq_sem);
 }
 
 int32_t nema_sys_init(void)
@@ -102,10 +95,6 @@ int32_t nema_sys_init(void)
     /* Register Command List Complete Callback */
     HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, GPU2D_CommandListCpltCallback);
 #endif
-
-    /* Create IRQ semaphore */
-    //    nema_irq_sem = osSemaphoreNew(1, 1, NULL);
-    //    assert(nema_irq_sem != NULL);
 
     /* Initialise Mem Space */
     error_code = tsi_malloc_init_pool_aligned(0, (void *)nemagfx_pool_mem, (uintptr_t)nemagfx_pool_mem,

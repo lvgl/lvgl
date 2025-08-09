@@ -34,7 +34,8 @@ void test_xml_chart_with_attrs(void)
 
     const char * primary_y_axis_attrs[] = {
         "axis", "primary_y",
-        "range", "0 40",
+        "min_value", "0",
+        "max_value", "40",
         NULL, NULL,
     };
     lv_xml_create(chart, "lv_chart-axis", primary_y_axis_attrs);
@@ -59,7 +60,8 @@ void test_xml_chart_with_attrs(void)
 
     const char * secondary_y_axis_attrs[] = {
         "axis", "secondary_y",
-        "range", "70 90",
+        "min_value", "70",
+        "max_value", "90",
         NULL, NULL,
     };
     lv_xml_create(chart, "lv_chart-axis", secondary_y_axis_attrs);

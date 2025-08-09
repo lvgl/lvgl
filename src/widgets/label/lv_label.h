@@ -54,7 +54,7 @@ typedef enum {
 } lv_label_long_mode_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_label_id_t {
     LV_PROPERTY_ID(LABEL, TEXT,                   LV_PROPERTY_TYPE_TEXT,      0),
     LV_PROPERTY_ID(LABEL, LONG_MODE,              LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       2),
@@ -98,6 +98,22 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * @endcode
  */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
+
+/**
+ * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
+ * @param obj           pointer to a label object
+ * @param fmt           `printf`-like format
+ * @param args          variadic argments list
+ *
+ * Example:
+ * @code
+ * va_list args;
+ * va_start(args, fmt);
+ * lv_label_set_text_vfmt(label1, fmt, args);
+ * va_end(args);
+ * @endcode
+ */
+void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
 
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable

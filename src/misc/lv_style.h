@@ -132,7 +132,7 @@ typedef union {
  *
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
-enum {
+enum _lv_style_id_t {
     LV_STYLE_PROP_INV               = 0,
 
     /*Group 0*/

@@ -44,7 +44,7 @@ typedef enum {
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_slider_class;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_property_slider_id_t {
     LV_PROPERTY_ID2(SLIDER, VALUE,          LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_BOOL,  0),
     LV_PROPERTY_ID2(SLIDER, LEFT_VALUE,     LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_BOOL,  1),
     LV_PROPERTY_ID2(SLIDER, RANGE,          LV_PROPERTY_TYPE_INT,   LV_PROPERTY_TYPE_INT,   2),
@@ -88,12 +88,26 @@ void lv_slider_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 void lv_slider_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
- * Set minimum and the maximum values of a bar
+ * Set the minimum and the maximum values of a bar
  * @param obj       pointer to the slider object
  * @param min       minimum value
  * @param max       maximum value
  */
 void lv_slider_set_range(lv_obj_t * obj, int32_t min, int32_t max);
+
+/**
+ * Set the minimum values of a bar
+ * @param obj       pointer to the slider object
+ * @param min       minimum value
+ */
+void lv_slider_set_min_value(lv_obj_t * obj, int32_t min);
+
+/**
+ * Set the maximum values of a bar
+ * @param obj       pointer to the slider object
+ * @param max       maximum value
+ */
+void lv_slider_set_max_value(lv_obj_t * obj, int32_t max);
 
 /**
  * Set the mode of slider.

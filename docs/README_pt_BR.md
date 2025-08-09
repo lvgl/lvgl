@@ -201,7 +201,8 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+lv_obj_add_state(cb, LV_STATE_CHECKED);
+lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melão\ne uma nova linha");
 lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 ```
@@ -403,8 +404,8 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
 **Familiarize-se com o LVGL**
 
   1. Confira as [demos on-line](https://lvgl.io/demos) para ver o LVGL em ação (~3 minutos)
-  2. Leia a página de [introdução](https://docs.lvgl.io/master/intro/index.html) da documentação (~5 minutos)
-  3. Familiarize-se com o básico na página de [visão geral rápida](https://docs.lvgl.io/master/intro/getting_started.html) (~15 minutos)
+  2. Leia a página de [introdução](https://docs.lvgl.io/master/intro/introduction/index.html) da documentação (~5 minutos)
+  3. Familiarize-se com o básico na página de [visão geral rápida](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html) (~15 minutos)
 
 **Começando a usar o LVGL**
 

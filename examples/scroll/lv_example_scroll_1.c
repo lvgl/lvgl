@@ -78,7 +78,7 @@ void lv_example_scroll_1(void)
     lv_label_set_text(label, "Bottom");
     lv_obj_center(label);
 
-    /* When LV_OBJ_FLAG_SCROLL_ELASTIC is cleared, scrolling does not go past edge bounaries. */
+    /* When LV_OBJ_FLAG_SCROLL_ELASTIC is cleared, scrolling does not go past edge boundaries. */
     /* lv_obj_clear_flag(panel, LV_OBJ_FLAG_SCROLL_ELASTIC); */
 
     /* Call `scroll_update_cb` while panel is being scrolled. */

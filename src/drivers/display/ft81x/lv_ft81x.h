@@ -28,24 +28,24 @@ extern "C" {
  **********************/
 
 typedef struct {
-    uint16_t hor_res;
-    uint16_t ver_res;
+    uint16_t hor_res;   /**< active display width */
+    uint16_t ver_res;   /**< active display height */
 
-    uint16_t hcycle;
-    uint16_t hoffset;
-    uint16_t hsync0;
-    uint16_t hsync1;
-    uint16_t vcycle;
-    uint16_t voffset;
-    uint16_t vsync0;
-    uint16_t vsync1;
-    uint8_t swizzle;
-    uint8_t pclkpol;
-    uint8_t cspread;
-    uint8_t pclk;
+    uint16_t hcycle;    /**< total number of clocks per line, incl front/back porch */
+    uint16_t hoffset;   /**< start of active line */
+    uint16_t hsync0;    /**< start of horizontal sync pulse */
+    uint16_t hsync1;    /**< end of horizontal sync pulse */
+    uint16_t vcycle;    /**< total number of lines per screen, including pre/post */
+    uint16_t voffset;   /**< start of active screen */
+    uint16_t vsync0;    /**< start of vertical sync pulse */
+    uint16_t vsync1;    /**< end of vertical sync pulse */
+    uint8_t swizzle;    /**< FT8xx output to LCD - pin order */
+    uint8_t pclkpol;    /**< LCD data is clocked in on this PCLK edge */
+    uint8_t cspread;    /**< helps with noise, when set to 1 fewer signals are changed simultaneously, reset-default: 1 */
+    uint8_t pclk;       /**< 60MHz / pclk = pclk frequency */
 
-    bool has_crystal;
-    bool is_bt81x;
+    bool has_crystal;   /**< has an external clock crystal */
+    bool is_bt81x;      /**< is a BT series model, not FT */
 } lv_ft81x_parameters_t;
 
 typedef enum {
@@ -53,9 +53,10 @@ typedef enum {
     LV_FT81X_SPI_OPERATION_CS_DEASSERT,
     LV_FT81X_SPI_OPERATION_SEND,
     LV_FT81X_SPI_OPERATION_RECEIVE
-} lv_ft81x_spi_operation;
+} lv_ft81x_spi_operation_t;
 
-typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation operation, void * data, uint32_t length);
+typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation_t operation, void * data,
+                                  uint32_t length);
 
 /**********************
  * GLOBAL PROTOTYPES

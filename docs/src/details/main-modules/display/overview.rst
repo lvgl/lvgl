@@ -20,7 +20,7 @@ How Many Displays Can LVGL Use?
 
 LVGL can use any number of displays.  It is only limited by available RAM and MCU time.
 
-Why would you want multi-display support?  Here are some examples:
+Why would you want multi-display support? Here are some examples:
 
 - Have a "normal" TFT display with local UI and create "virtual" screens on VNC
   on demand. (You need to add your VNC driver.)

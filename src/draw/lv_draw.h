@@ -66,22 +66,52 @@ typedef enum {
 } lv_draw_task_type_t;
 
 typedef enum {
-    LV_DRAW_TASK_STATE_WAITING,     /*Waiting for something to be finished. E.g. rendering a layer*/
+    /** Waiting for an other task to be finished.
+     * For example in case of `LV_DRAW_TASK_TYPE_LAYER` (used to blend a layer)
+     * is blocked until all the draw tasks of the layer is rendered. */
+    LV_DRAW_TASK_STATE_BLOCKED,
+
+    /** The draw task is added to the layers list and waits to be rendered. */
+    LV_DRAW_TASK_STATE_WAITING,
+
+    /** The draw task is added to the command queue of the draw unit.
+     * As the queued task are executed in order it's possible to queue multiple draw task
+     * (for the same draw unit) even if they are depending on each other.
+     * Therefore `lv_draw_get_available_task` and `lv_draw_get_next_available_task` can return
+     * draw task for the same draw unit even if a dependent draw task is not finished ready yet.*/
     LV_DRAW_TASK_STATE_QUEUED,
+
+    /** The draw task is being rendered. This draw task needs to be finished before
+     * `lv_draw_get_available_task` and `lv_draw_get_next_available_task` would
+     * return any depending draw tasks.*/
     LV_DRAW_TASK_STATE_IN_PROGRESS,
-    LV_DRAW_TASK_STATE_READY,
+
+    /** The draw task is rendered. It will be removed from the draw task list of the layer
+     * and freed automatically. */
+    LV_DRAW_TASK_STATE_FINISHED,
 } lv_draw_task_state_t;
 
 struct _lv_layer_t  {
-
-    /** Target draw buffer of the layer*/
+    /** Target draw buffer of the layer */
     lv_draw_buf_t * draw_buf;
+
+    /** Linked list of draw tasks */
+    lv_draw_task_t * draw_task_head;
+
+    /** Parent layer */
+    lv_layer_t * parent;
+
+    /** Next layer */
+    lv_layer_t * next;
+
+    /** User data */
+    void * user_data;
 
     /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
 
-    /** The color format of the layer. LV_COLOR_FORMAT_...  */
-    lv_color_format_t color_format;
+    /** The physical clipping area relative to the display */
+    lv_area_t phy_clip_area;
 
     /**
      * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
@@ -93,32 +123,25 @@ struct _lv_layer_t  {
      */
     lv_area_t _clip_area;
 
-    /**
-     * The physical clipping area relative to the display.
-     */
-    lv_area_t phy_clip_area;
-
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /** Transform matrix to be applied when rendering the layer */
     lv_matrix_t matrix;
 #endif
 
-    /** Opacity of the layer */
-    lv_opa_t opa;
-
-    /*Recolor of the layer*/
-    lv_color32_t recolor;
-
     /** Partial y offset */
     int32_t partial_y_offset;
 
-    /** Linked list of draw tasks */
-    lv_draw_task_t * draw_task_head;
+    /** Recolor of the layer */
+    lv_color32_t recolor;
 
-    lv_layer_t * parent;
-    lv_layer_t * next;
+    /** The color format of the layer. LV_COLOR_FORMAT_... */
+    lv_color_format_t color_format;
+
+    /** Flag indicating all tasks are added */
     bool all_tasks_added;
-    void * user_data;
+
+    /** Opacity of the layer */
+    lv_opa_t opa;
 };
 
 typedef struct {
@@ -126,7 +149,7 @@ typedef struct {
     lv_obj_t * obj;
 
     /**The widget part for which draw descriptor was created */
-    lv_part_t part;
+    uint32_t part;
 
     /**A widget type specific ID (e.g. table row index). See the docs of the given widget.*/
     uint32_t id1;

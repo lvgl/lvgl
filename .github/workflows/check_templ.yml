@@ -1,0 +1,28 @@
+name: Compare file templates with file names
+on:
+  push:
+  pull_request:
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  template-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Compare file templates with file names
+        run: python scripts/lv_templ_check.py --fix
+      - name: Check that repository is clean
+        run: git diff --exit-code >/dev/null 2>&1 || (echo "Please fix template issues using scripts/lv_templ_check.py"; false)

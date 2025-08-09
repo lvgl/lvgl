@@ -1,0 +1,103 @@
+name: Emulated Performance Test
+
+on:
+  push:
+    branches: 'master'
+  pull_request:
+    branches: 'master'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  check_scripts:
+    runs-on: ubuntu-24.04
+    name: ARM Emulated Benchmark - Script Check
+    strategy:
+      fail-fast: false
+      matrix: 
+        test_script:
+          - scripts/perf/tests/filter_docker_logs/test.sh
+          # These scripts aren't executed in this workflow directly. Instead, they're run
+          # by the `Emulated Performance Test Results Handler` workflow.
+          # That workflow runs in the context of the `master` branch, so this workflow ensures
+          # the scripts are tested in the PR context before merging. Helping to prevent CI failures in `master`
+          - scripts/perf/tests/benchmark_results_comment/test.sh
+          - scripts/perf/tests/serialize_results/test.sh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check Script
+        run: |
+          pip3 install msgpack==1.1.0
+          ./${{ matrix.test_script }}
+
+  run_benchmark:
+    runs-on: ubuntu-24.04
+    name: ARM Emulated Benchmark ${{ matrix.image_type }} - ${{matrix.config }}
+    needs: check_scripts
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - image_type: 32b
+          image_version : |
+            main@sha256:61e287d63b19a503cc4505c13bd93f5e05e19513a947feb048d75662c398c862
+          config : lv_conf_perf32b
+        - image_type: 64b
+          image_version: |
+            main@sha256:e8663d9c138e98b78d12cc8ad056b7d4b0cc4ad233c6f54202e40ce7606c2670
+          config : lv_conf_perf64b
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate lv_conf.h
+        run: |
+          cp lv_conf_template.h configs/ci/perf/lv_conf_perf.h
+          python scripts/generate_lv_conf.py \
+            --template lv_conf_template.h \
+            --config configs/ci/perf/lv_conf_perf.h \
+            --defaults configs/ci/perf/${{matrix.config}}.defaults
+      - name: Run Benchmark Demo
+        run: |
+          # Mounts the current lvgl source code into the container and runs the demo benchmark
+          # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
+          docker run -t --privileged \
+            --name so3-lvperf \
+            -v /dev:/dev \
+            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
+            -v $(pwd):/so3/usr/lib/lvgl \
+            -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
+            ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
+
+      - name: Collect Logs
+        run: |
+          sudo cat $(docker inspect --format='{{.LogPath}}' so3-lvperf) | python scripts/perf/filter_docker_benchmark_logs.py results-${{matrix.image_type}}-${{matrix.config}}.json
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{matrix.image_type}}-${{matrix.config}}
+          path: results-${{matrix.image_type}}-${{matrix.config}}.json
+          if-no-files-found: error
+
+  save_pr_number:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'pull_request' }}
+    name: ARM Emulated Benchmark - Save PR Number
+    needs: run_benchmark
+    steps:
+      - name: Save PR number 
+        run: |
+          echo ${{ github.event.number }} > pr_number
+
+      - name: Upload PR number as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number

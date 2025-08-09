@@ -35,6 +35,9 @@ extern "C" {
 #include "display/st_ltdc/lv_st_ltdc.h"
 #include "display/ft81x/lv_ft81x.h"
 
+#include "draw/eve/lv_draw_eve_display.h"
+#include "draw/eve/lv_draw_eve_display_defines.h"
+
 #include "nuttx/lv_nuttx_entry.h"
 #include "nuttx/lv_nuttx_fbdev.h"
 #include "nuttx/lv_nuttx_touchscreen.h"

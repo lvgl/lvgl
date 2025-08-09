@@ -23,10 +23,10 @@ Draw-Pipeline Overview
 **********************
 
 On modern computing hardware meant to be used with larger display panels, there are
-sometimes options for different ways drawing can be accomplished.  For example, some
+sometimes options for different ways drawing can be accomplished. For example, some
 MCUs come with hardware that is very good (and fast) at certain types of drawing
-tasks.  Alternatively, you might have access to a drawing library that performs
-certain types of drawing tasks with great efficiency.  To make it possible to utilize
+tasks. Alternatively, you might have access to a drawing library that performs
+certain types of drawing tasks with great efficiency. To make it possible to utilize
 such facilities in the most efficient fashion, LVGL v9 and onwards implements a
 :dfn:`Drawing Pipeline`, like an assembly line, where decisions are made as to which
 drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
@@ -109,22 +109,22 @@ create and initialize it (after :cpp:func:`lv_init`) as above.  This will includ
 several things, but setting its ``evaluate_cb`` and ``dispatch_cb`` callbacks
 (mentioned later) are two of them.
 
-For an example of how draw-unit cration and initialization is done, see
+For an example of how draw-unit creation and initialization is done, see
 :cpp:func:`lv_draw_sw_init` in lv_draw_sw.c_ or the other draw units whose ``init``
 functions are optionally called in :cpp:func:`lv_init`.
 
-Thread Priority 
---------------- 
+Thread Priority
+---------------
 
-All draw units operate with a configurable thread priority which can be set using the 
-:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you 
-to fine-tune the priority level across all drawing units, which is especially useful for 
-systems with limited priority levels. 
+All draw units operate with a configurable thread priority which can be set using the
+:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you
+to fine-tune the priority level across all drawing units, which is especially useful for
+systems with limited priority levels.
 
-By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority. 
-This consistent approach ensures that all drawing units (software rendering, hardware 
-accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless 
-explicitly configured otherwise. 
+By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority.
+This consistent approach ensures that all drawing units (software rendering, hardware
+accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless
+explicitly configured otherwise.
 
 .. _lv_draw_sw.c:  https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c
 
@@ -175,7 +175,7 @@ available it can take a Draw Task.
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a
 useful helper function which is used by the ``dispatch_cb`` to get the next Draw Task
 it should act on.  If it handled the task, it sets the Draw Task's ``state`` field to
-:cpp:enumerator:`LV_DRAW_TASK_STATE_READY` (meaning "completed").  "Available" in
+:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED`.  "Available" in
 this context means that has been queued and assigned to a given Draw Unit and is
 ready to be carried out.  The ramifications of having multiple drawing threads are
 taken into account for this.

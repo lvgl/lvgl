@@ -20,7 +20,7 @@ Dave2D is capable of accelerating most of the drawing operations of LVGL:
 
 
 As Dave2D works in the background, the CPU is free for other tasks. In practice, during rendering, Dave2D can reduce the CPU usage by
-half or to one-third, depending on the application.
+half to one-third, depending on the application.
 
 
 GLCDC
@@ -35,14 +35,14 @@ More info can be found at the :ref:`driver's page<renesas_glcdc>`.
 MPU Drivers
 ***********
 
-Renesas MPUs (i.e., the RZ/G family) can use LVGL MPU drivers.
+Renesas MPUs (i.e., the RZ/G family) can use these LVGL MPU drivers.
 
 Wayland
 -------
 
-Supported on boards with a Wayland desktop AKA a Wayland compositor.
+Use of the Wayland driver is supported on boards with a Wayland desktop AKA a Wayland compositor.
 
 fbdev
 -----
 
-Almost always available.
+The LVGL ``fbdev`` (frame buffer) display driver can almost always be used.

@@ -21,7 +21,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_svg_tag_t {
     LV_SVG_TAG_INVALID = -1,
     LV_SVG_TAG_CONTENT,
     LV_SVG_TAG_SVG,
@@ -54,7 +54,7 @@ enum {
 };
 typedef int8_t lv_svg_tag_t;
 
-enum {
+enum _lv_svg_attr_type_t {
     LV_SVG_ATTR_INVALID = 0,
     LV_SVG_ATTR_ID,
     LV_SVG_ATTR_XML_ID,
@@ -136,7 +136,7 @@ enum {
 };
 typedef uint8_t lv_svg_attr_type_t;
 
-enum {
+enum _lv_svg_transform_type_t {
     LV_SVG_TRANSFORM_TYPE_MATRIX = 1,
     LV_SVG_TRANSFORM_TYPE_TRANSLATE,
     LV_SVG_TRANSFORM_TYPE_ROTATE,
@@ -147,36 +147,36 @@ enum {
 typedef uint8_t lv_svg_transform_type_t;
 
 #if LV_USE_SVG_ANIMATION
-enum {
+enum lv_svg_anim_action_t {
     LV_SVG_ANIM_REMOVE = 0,
     LV_SVG_ANIM_FREEZE,
 };
 
-enum {
+enum _lv_svg_anim_restart_type_t {
     LV_SVG_ANIM_RESTART_ALWAYS = 0,
     LV_SVG_ANIM_RESTART_WHEN_NOT_ACTIVE,
     LV_SVG_ANIM_RESTART_NEVER,
 };
 
-enum {
+enum _lv_svg_anim_calc_mode_t {
     LV_SVG_ANIM_CALC_MODE_LINEAR = 0,
     LV_SVG_ANIM_CALC_MODE_PACED,
     LV_SVG_ANIM_CALC_MODE_SPLINE,
     LV_SVG_ANIM_CALC_MODE_DISCRETE,
 };
 
-enum {
+enum _lv_svg_anim_additive_type_t {
     LV_SVG_ANIM_ADDITIVE_REPLACE = 0,
     LV_SVG_ANIM_ADDITIVE_SUM,
 };
 
-enum {
+enum _lv_svg_anim_accumulate_type_t {
     LV_SVG_ANIM_ACCUMULATE_NONE = 0,
     LV_SVG_ANIM_ACCUMULATE_SUM,
 };
 #endif
 
-enum {
+enum _lv_svg_aspect_ratio_t {
     LV_SVG_ASPECT_RATIO_NONE = 0,
     LV_SVG_ASPECT_RATIO_XMIN_YMIN = (1 << 1),
     LV_SVG_ASPECT_RATIO_XMID_YMIN = (2 << 1),
@@ -188,12 +188,12 @@ enum {
     LV_SVG_ASPECT_RATIO_XMID_YMAX = (8 << 1),
     LV_SVG_ASPECT_RATIO_XMAX_YMAX = (9 << 1),
 };
+typedef uint32_t lv_svg_aspect_ratio_t;
 
-enum {
+enum _lv_svg_aspect_ratio_opt_t {
     LV_SVG_ASPECT_RATIO_OPT_MEET = 0,
     LV_SVG_ASPECT_RATIO_OPT_SLICE,
 };
-typedef uint32_t lv_svg_aspect_ratio_t;
 
 typedef struct {
     float x;
@@ -206,27 +206,27 @@ typedef struct {
 
 typedef uint32_t lv_svg_color_t;
 
-enum {
+enum _lv_svg_fill_rule_t {
     LV_SVG_FILL_NONZERO = 0,
     LV_SVG_FILL_EVENODD,
 };
 typedef uint8_t lv_svg_fill_rule_t;
 
-enum {
+enum _lv_svg_line_cap_t {
     LV_SVG_LINE_CAP_BUTT = 0,
     LV_SVG_LINE_CAP_SQUARE,
     LV_SVG_LINE_CAP_ROUND,
 };
 typedef uint8_t lv_svg_line_cap_t;
 
-enum {
+enum _lv_svg_line_join_t {
     LV_SVG_LINE_JOIN_MITER = 0,
     LV_SVG_LINE_JOIN_BEVEL,
     LV_SVG_LINE_JOIN_ROUND,
 };
 typedef uint8_t lv_svg_line_join_t;
 
-enum {
+enum _lv_svg_gradient_units_t {
     LV_SVG_GRADIENT_UNITS_OBJECT = 0,
     LV_SVG_GRADIENT_UNITS_USER_SPACE,
 };
@@ -250,11 +250,12 @@ typedef struct {
 } lv_svg_attr_values_list_t;
 
 /* https://www.w3.org/TR/SVGTiny12/svgudomidl.html */
-enum {
+enum _lv_svg_path_cmd_t {
     LV_SVG_PATH_CMD_MOVE_TO = 77,
     LV_SVG_PATH_CMD_LINE_TO = 76,
     LV_SVG_PATH_CMD_CURVE_TO = 67,
     LV_SVG_PATH_CMD_QUAD_TO = 81,
+    LV_SVG_PATH_CMD_ARC_TO = 65, /*svg2 extension*/
     LV_SVG_PATH_CMD_CLOSE = 90,
 };
 
@@ -267,13 +268,13 @@ typedef struct {
     uint8_t data[1];
 } lv_svg_attr_path_value_t;
 
-enum {
+enum _lv_svg_attr_value_type_t {
     LV_SVG_ATTR_VALUE_DATA = 0,
     LV_SVG_ATTR_VALUE_PTR,
 };
 typedef uint8_t lv_svg_attr_value_type_t;
 
-enum {
+enum _lv_svg_attr_value_class_t {
     LV_SVG_ATTR_VALUE_NONE = 0,
     LV_SVG_ATTR_VALUE_INITIAL,
     LV_SVG_ATTR_VALUE_INHERIT,

@@ -83,7 +83,11 @@ void lv_draw_sw_init(void)
     draw_sw_unit->base_unit.dispatch_cb = dispatch;
     draw_sw_unit->base_unit.evaluate_cb = evaluate;
     draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
+#if LV_USE_DRAW_ARM2D_SYNC
+    draw_sw_unit->base_unit.name = "SW_ARM2D";
+#else
     draw_sw_unit->base_unit.name = "SW";
+#endif
 
 #if LV_USE_OS
     uint32_t i;
@@ -325,7 +329,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     draw_sw_unit->task_act = t;
 
     execute_drawing(t);
-    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_sw_unit->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
@@ -362,7 +366,7 @@ static void render_thread_cb(void * ptr)
 #if LV_USE_PARALLEL_DRAW_DEBUG
         parallel_debug_draw(thread_dsc->task_act, thread_dsc->idx);
 #endif
-        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_READY;
+        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         thread_dsc->task_act = NULL;
 
         /*The draw unit is free now. Request a new dispatching as it can get a new task*/

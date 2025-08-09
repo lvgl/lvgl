@@ -26,7 +26,7 @@ By default, LVGL itself uses Timers to:
   monitor system performance statistics and LVGL's memory usage.
 
 Timers are non-preemptive, which means a Timer cannot interrupt another
-Timer. Therefore, you can call any LVGL related function in a Timer.
+Timer. Therefore, you can call any LVGL-related function in a Timer.
 
 
 

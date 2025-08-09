@@ -61,6 +61,13 @@ if enough memory is available. Single-buffered mode is what you should use
 if memory is very scarce. If there is almost enough memory for double-buffered
 direct mode, but not quite, then use partial render mode.
 
+To clarify what ``my_ltdc_framebuffer_address`` exactly is, it's the value of
+``pLayerCfg.FBStartAdress`` when the LTDC layer is configured using the STM32 HAL,
+which is written to the ``CFBAR`` register of the LTDC layer peripheral.
+
+.. image:: /_static/images/stm32cubemx-ltdc-fbaddr.png
+
+
 Partial Render Mode
 *******************
 
@@ -82,6 +89,31 @@ layer's framebuffer and flush to it.
 Providing a second partial buffer can improve CPU utilization and increase
 performance compared to
 a single buffer if :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` is enabled.
+
+
+Linker Script
+*************
+
+.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
+.. |divide| unicode:: U+000F7 .. DIVISION SIGN
+
+You should ensure the LTDC framebuffer memory is actually reserved in the linker script.
+This is a file that normally has the extension ``.ld``.
+In the below example, ``1125K`` is specified because the color depth is 24 (3 bytes per pixel),
+the display width is 800, the display height is 480, and ``1K`` means 1024 bytes.
+3 |times| 800 |times| 480 |divide| 1024 = 1125. You should ensure the sum of the RAM entries
+(``FB_RAM`` + ``RAM``) equals the total RAM of the device.
+
+.. code-block::
+
+    /* Memories definition */
+    MEMORY
+    {
+        FB_RAM (xrw)   : ORIGIN = 0x20000000, LENGTH = 1125K /* single 24bit 800x480 buffer */
+        RAM    (xrw)   : ORIGIN = 0x20119400, LENGTH = 1883K
+        FLASH  (rx)    : ORIGIN = 0x08000000, LENGTH = 4096K
+    }
+
 
 Display Rotation
 ****************

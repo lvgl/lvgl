@@ -177,7 +177,7 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
             }
         case LV_DRAW_TASK_TYPE_TRIANGLE: {
                 lv_draw_triangle_dsc_t * draw_triangle_dsc = (lv_draw_triangle_dsc_t *) task->draw_dsc;
-                if((draw_triangle_dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
+                if((draw_triangle_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
                     if(task->preference_score > 80) {
                         task->preference_score = 80;
                         task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
@@ -285,7 +285,7 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     nema_gfx_execute_drawing(draw_nema_gfx_unit);
 
-    draw_nema_gfx_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_nema_gfx_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_nema_gfx_unit->task_act = NULL;
 
     /* The draw unit is free now. Request a new dispatching as it can get a new task. */
@@ -388,7 +388,7 @@ static void nema_gfx_render_thread_cb(void * ptr)
             nema_gfx_execute_drawing(u);
         }
         /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         /* Cleanup. */
         u->task_act = NULL;
 

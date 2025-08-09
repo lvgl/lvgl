@@ -8,7 +8,7 @@ Roller (lv_roller)
 Overview
 ********
 
-Roller allows the end user to select an item from a list by scrolling it.
+Roller allows the end user to select an item from a list by scrolling through it.
 The item in the middle is the selected item and normally stands out from
 the other items due to different styles applied to it.
 

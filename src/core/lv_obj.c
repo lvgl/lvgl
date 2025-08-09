@@ -39,6 +39,16 @@
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_screen_load_anim_t anim_type;
+    uint32_t duration;
+    uint32_t delay;
+    union {
+        lv_obj_t * screen;
+        lv_screen_create_cb_t create_cb;
+    } target;
+} screen_load_anim_dsc_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -50,7 +60,13 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
+static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state);
+static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
 static void null_on_delete_cb(lv_event_t * e);
+static void screen_load_on_trigger_event_cb(lv_event_t * e);
+static void screen_create_on_trigger_event_cb(lv_event_t * e);
+static void free_user_data_on_delete_event_cb(lv_event_t * e);
+static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
@@ -308,6 +324,9 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+            lv_obj_children_add_state(obj, state);
+        }
     }
 }
 
@@ -318,6 +337,9 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
         update_obj_state(obj, new_state);
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_STATE_TRICKLE)) {
+            lv_obj_children_remove_state(obj, state);
+        }
     }
 }
 
@@ -461,6 +483,41 @@ lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 }
 #endif
 
+void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_obj_t * screen,
+                                  lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
+{
+    if(screen == NULL) {
+        LV_LOG_WARN("`screen` is NULL, can't load a non existing screens");
+        return;
+    }
+
+    screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(screen_load_anim_dsc_t));
+    dsc->anim_type = anim_type;
+    dsc->duration = duration;
+    dsc->delay = delay;
+    dsc->target.screen = screen;
+
+    lv_obj_add_event_cb(obj, screen_load_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
+
+void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
+                                    lv_screen_load_anim_t anim_type, uint32_t duration, uint32_t delay)
+{
+    screen_load_anim_dsc_t * dsc = lv_malloc(sizeof(screen_load_anim_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(screen_load_anim_dsc_t));
+    dsc->anim_type = anim_type;
+    dsc->duration = duration;
+    dsc->delay = delay;
+    dsc->target.create_cb = screen_create_cb;
+
+    lv_obj_add_event_cb(obj, screen_create_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
+
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
 {
     obj->user_data = user_data;
@@ -592,14 +649,14 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
-        if(lv_obj_get_style_bg_grad_dir(obj, 0) != LV_GRAD_DIR_NONE) {
-            if(lv_obj_get_style_bg_grad_opa(obj, 0) < LV_OPA_MAX ||
-               lv_obj_get_style_bg_main_opa(obj, 0) < LV_OPA_MAX) {
+        if(lv_obj_get_style_bg_grad_dir(obj, LV_PART_MAIN) != LV_GRAD_DIR_NONE) {
+            if(lv_obj_get_style_bg_grad_opa(obj, LV_PART_MAIN) < LV_OPA_MAX ||
+               lv_obj_get_style_bg_main_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
         }
-        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
+        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, LV_PART_MAIN);
         if(grad_dsc) {
             uint32_t i;
             for(i = 0; i < grad_dsc->stops_count; i++) {
@@ -982,6 +1039,40 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     }
 }
 
+/**
+ * Apply the state to the children of the object
+ * @param obj pointer to an object
+ * @param state the state to apply
+ */
+static void lv_obj_children_add_state(lv_obj_t * obj, lv_state_t state)
+{
+    uint32_t child_count = lv_obj_get_child_count(obj);
+
+    for(uint32_t i = 0; i < child_count; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(child) {
+            lv_obj_add_state(child, state);
+        }
+    }
+}
+
+/**
+ * Remove the state from the children of the object
+ * @param obj pointer to an object
+ * @param state the state to remove
+ */
+static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state)
+{
+    uint32_t child_count = lv_obj_get_child_count(obj);
+
+    for(uint32_t i = 0; i < child_count; i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        if(child) {
+            lv_obj_remove_state(child, state);
+        }
+    }
+}
+
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
     /*Check all children of `parent`*/
@@ -1007,6 +1098,33 @@ static void null_on_delete_cb(lv_event_t * e)
 {
     lv_obj_t ** obj_ptr = lv_event_get_user_data(e);
     *obj_ptr = NULL;
+}
+
+static void screen_load_on_trigger_event_cb(lv_event_t * e)
+{
+    screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+    lv_screen_load_anim(dsc->target.screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+}
+
+static void screen_create_on_trigger_event_cb(lv_event_t * e)
+{
+    screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+
+    lv_obj_t * screen = dsc->target.create_cb();
+    lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+    lv_obj_add_event_cb(screen, delete_on_screen_unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+}
+
+static void free_user_data_on_delete_event_cb(lv_event_t * e)
+{
+    lv_free(lv_event_get_user_data(e));
+}
+
+static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
+{
+    lv_obj_delete(lv_event_get_target_obj(e));
 }
 
 #if LV_USE_OBJ_PROPERTY

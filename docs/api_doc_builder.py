@@ -25,10 +25,10 @@ rst_section_line_char = '='
 _re_api_section_sep = re.compile(r'(?mi)^API *\r?\n^\*\*\*\s*')
 
 # Regex to identify '.. API equals: lv_obj_t, lv_array_t' directives.
-_re_api_equals = re.compile(r'(?mi)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)\r\n\s*')
+_re_api_equals = re.compile(r'(?mi)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)')
 
 # Regex to identify '.. API startswith: lv_obj, lv_array' directives.
-_re_api_startswith = re.compile(r'(?mi)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)\r\n\s*')
+_re_api_startswith = re.compile(r'(?mi)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)')
 
 # Regex to match comma and whitespace list-item separators on multiple lines.
 _re_multi_line_comma_sep = re.compile(r'(?m)[,\s]+')
@@ -240,7 +240,7 @@ def _process_end_of_eligible_doc(b: str, rst_file: str) -> (str, str, int):
     # 4.  Remove `_auto_gen_sep` and everything after it:
     new_b = b.split(_auto_gen_sep, 1)[0]
 
-    # 5.  With `new_B, add any editor-added hyperlinks to set:
+    # 5.  With `new_b`, add any editor-added hyperlinks to set:
     #     `editor_link_set`.
     for line in new_b.splitlines():
         match = _re_editor_added_hyperlink.match(line)
@@ -587,7 +587,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
         f.write(subdir_stem + '\n')
         f.write(section_line)
         f.write('\n')
-        f.write('.. toctree::\n    :maxdepth: 1\n\n')
+        f.write('.. toctree::\n    :maxdepth: 1\n    :class:    toctree-1-deep\n\n')
 
         # One entry per `.rst` file
         for h_file in elig_h_files:
@@ -627,20 +627,27 @@ def _recursively_create_api_rst_files(depth: int,
                                       src_dir_bep: str,
                                       out_root_dir: str) -> int:
     """
-    Create `.rst` files for the eligible `.h` found in `src_dir_bep` and
+    Create `.rst` files for the eligible C source files found in `src_dir_bep` and
     recursively for subdirectories below it.  ("bep" = being processed.)
 
     Eligible
-        An `.h` file is eligible if Doxygen generated documentation for it.
-        The `EXCLUDE_PATTERNS` Doxygen configuration value can cause
-        Doxygen to skip certain files and directories, in which case,
-        the `.h` files skipped ARE NOT eligible.
+        An input file (e.g. `.h` or `.c`) file is eligible if Doxygen generated
+        documentation for it.  The combination of these configuration items in
+        the Doxyfile:
+
+        - INPUT
+        - FILE_PATTERNS
+        - EXCLUDE
+        - EXCLUDE_PATTERNS
+
+        controls the files Doxygen processes.  Files not processed are not eligible.
 
     Whether a subdirectory is eligible to be included in an `index.rst`
-    file depends upon whether any eligible `.h` files were recursively
+    file depends upon whether any eligible files were recursively
     found within it.  And that isn't known until this function finishes
     (recursively) processing a directory and returns the number of
-    eligible `.h` files found.  Thus, the steps taken within are:
+    eligible `.h` files found in its subdirectory tree.  Thus, the steps
+    taken within are:
 
     - Discover all eligible `.h` files directly contained in `src_dir_bep`.
     - Recursively do the same for each subdirectory, adding the returned
@@ -682,7 +689,7 @@ def _recursively_create_api_rst_files(depth: int,
             if dir_item.lower().endswith('.h'):
                 eligible = (dir_item in doxygen_xml.files)
                 if eligible:
-                    elig_h_files.append(path_bep)  # Add to .H file list.
+                    elig_h_files.append(path_bep)  # Add file to list.
                     elig_h_file_count += 1
 
     # For each subdir...
@@ -698,7 +705,13 @@ def _recursively_create_api_rst_files(depth: int,
             elig_h_file_count += subdir_eligible_h_file_count
 
     if elig_h_file_count > 0:
-        # Create index.rst plus .RST files for any direct .H files in dir.
+        # Sort both lists.
+        # Evidently the Linux-Python's implementation of `listdir()` does not
+        # automatically produce a sorted list.
+        elig_sub_dirs.sort()
+        elig_h_files.sort()
+
+        # Create index.rst plus .RST files for any .H file directly in in dir.
         _create_rst_files_for_dir(src_root_len,
                                   src_dir_bep,
                                   elig_h_files,
