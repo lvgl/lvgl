@@ -559,8 +559,8 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
 
     :param src_root_dir_len:  Length of source-root path string, used with `out_root_dir` to build paths
     :param src_dir_bep:       Directory currently *being processed*
-    :param elig_h_files:      Eligible `.h` files directly contained in `src_dir_bep`
-    :param elig_sub_dirs:     List of sub-dirs that contained eligible `.h` files
+    :param elig_h_files:      Eligible `.h*` files directly contained in `src_dir_bep`
+    :param elig_sub_dirs:     List of sub-dirs that contained eligible `.h*` files
     :param out_root_dir:      Root of output directory, used with to build paths.
     :return:                  n/a
     """
@@ -603,14 +603,15 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
     # One .rst file per h_file
     for h_file in elig_h_files:
         filename = os.path.basename(h_file)
-        stem = os.path.splitext(filename)[0]
+        stem, ext = os.path.splitext(filename)
+        ext = ext[1:]      # Remove leading '.'.
         rst_file = os.path.join(out_dir, stem + '.rst')
         html_file = os.path.join(sub_path, stem + '.html')
         old_html_files[stem] = html_file
 
         with open(rst_file, 'w') as f:
             # Sphinx link target.
-            f.write(f'.. _{stem}_h:\n\n')
+            f.write(f'.. _{stem}_{ext}:\n\n')
             # Doc title.
             section_line = (rst_section_line_char * len(filename)) + '\n'
             f.write(section_line)
@@ -631,7 +632,7 @@ def _recursively_create_api_rst_files(depth: int,
     recursively for subdirectories below it.  ("bep" = being processed.)
 
     Eligible
-        An input file (e.g. `.h` or `.c`) file is eligible if Doxygen generated
+        An input file (e.g. `.h*` or `.c`) file is eligible if Doxygen generated
         documentation for it.  The combination of these configuration items in
         the Doxyfile:
 
@@ -646,12 +647,12 @@ def _recursively_create_api_rst_files(depth: int,
     file depends upon whether any eligible files were recursively
     found within it.  And that isn't known until this function finishes
     (recursively) processing a directory and returns the number of
-    eligible `.h` files found in its subdirectory tree.  Thus, the steps
+    eligible `.h*` files found in its subdirectory tree.  Thus, the steps
     taken within are:
 
-    - Discover all eligible `.h` files directly contained in `src_dir_bep`.
+    - Discover all eligible `.h*` files directly contained in `src_dir_bep`.
     - Recursively do the same for each subdirectory, adding the returned
-      count of eligible `.h` files to the sum (`elig_h_file_count`).
+      count of eligible `.h*` files to the sum (`elig_h_file_count`).
     - If `elig_h_file_count > 0`:
         - call _create_rst_files_for_dir() to generate appropriate
           `.rst` files for this directory.
@@ -665,9 +666,9 @@ def _recursively_create_api_rst_files(depth: int,
     :param src_root_len:  Length of source-root path
     :param src_dir_bep:   Source directory *being processed*
     :param out_root_dir:  Output root directory (used to build output paths)
-    :return:              Number of `.h` files encountered (so caller knows
+    :return:              Number of `.h*` files encountered (so caller knows
                             whether that directory recursively held any
-                            eligible `.h` files, to know whether to include
+                            eligible `.h*` files, to know whether to include
                             "subdir/index" in caller's local `index.rst` file).
     """
     elig_h_files = []
@@ -686,7 +687,8 @@ def _recursively_create_api_rst_files(depth: int,
         if os.path.isdir(path_bep):
             sub_dirs.append(path_bep)         # Add to sub-dir list.
         else:
-            if dir_item.lower().endswith('.h'):
+            fn = dir_item.lower()
+            if fn.endswith('.h') or fn.endswith('.hpp'):
                 eligible = (dir_item in doxygen_xml.files)
                 if eligible:
                     elig_h_files.append(path_bep)  # Add file to list.
@@ -711,7 +713,7 @@ def _recursively_create_api_rst_files(depth: int,
         elig_sub_dirs.sort()
         elig_h_files.sort()
 
-        # Create index.rst plus .RST files for any .H file directly in in dir.
+        # Create index.rst plus .RST files for any .H* file directly in in dir.
         _create_rst_files_for_dir(src_root_len,
                                   src_dir_bep,
                                   elig_h_files,
@@ -723,9 +725,9 @@ def _recursively_create_api_rst_files(depth: int,
 
 def create_api_rst_files(src_root_dir: str, out_root_dir: str):
     """
-    Create `.rst` files for API pages based on the `.h` files found
+    Create `.rst` files for API pages based on the `.h*` files found
     in a tree-walk of `a_src_root` and the current contents of the
-    `doxygen_xml.files` dictionary (used to filter out `.h` files that
+    `doxygen_xml.files` dictionary (used to filter out `.h*` files that
     Doxygen generated no documentation for).  Output the `.rst` files
     into `out_root_dir` mirroring the `a_src_root` directory structure.
 
