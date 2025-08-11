@@ -12,6 +12,10 @@ Overview
 
 The main purpose for this driver is for testing/debugging the LVGL application in an **OpenGL** simulation window.
 
+LVGL can also be used with the OpenGLES EGL API. EGL is a lower-level API that is more closely tied to the underlying
+drivers of the platform. The OpenGL support in LVGL is intended to be portable between different APIs. Currently
+there is support for GLFW and EGL. Using EGL requires some additional platform integration. See :ref:`EGL <opengl_es_driver_egl>` below.
+
 Prerequisites
 -------------
 
@@ -46,7 +50,7 @@ Basic Usage
         lv_init();
 
         /* create a window and initialize OpenGL */
-        lv_glfw_window_t * window = lv_glfw_window_create(WIDTH, HEIGHT, true);
+        lv_opengles_window_t * window = lv_opengles_glfw_window_create(WIDTH, HEIGHT, true);
 
         /* create a display that flushes to a texture */
         lv_display_t * texture = lv_opengles_texture_create(WIDTH, HEIGHT);
@@ -54,10 +58,10 @@ Basic Usage
 
         /* add the texture to the window */
         unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
-        lv_glfw_texture_t * window_texture = lv_glfw_window_add_texture(window, texture_id, WIDTH, HEIGHT);
+        lv_opengles_window_texture_t * window_texture = lv_opengles_window_add_texture(window, texture_id, WIDTH, HEIGHT);
 
         /* get the mouse indev of the window texture */
-        lv_indev_t * mouse = lv_glfw_texture_get_mouse_indev(window_texture);
+        lv_indev_t * mouse = lv_opengles_window_texture_get_mouse_indev(window_texture);
 
         /* add a cursor to the mouse indev */
         LV_IMAGE_DECLARE(mouse_cursor_icon);
@@ -101,7 +105,7 @@ used to add content to a texture and the driver will draw the texture in the win
 
         /* create a window and initialize OpenGL */
         /* multiple windows can be created */
-        lv_glfw_window_t * window = lv_glfw_window_create(WIDTH, HEIGHT, true);
+        lv_opengles_window_t * window = lv_opengles_glfw_window_create(WIDTH, HEIGHT, true);
 
         /****************************
         *   OPTIONAL MAIN TEXTURE
@@ -113,10 +117,10 @@ used to add content to a texture and the driver will draw the texture in the win
 
         /* add the main texture to the window */
         unsigned int main_texture_id = lv_opengles_texture_get_texture_id(main_texture);
-        lv_glfw_texture_t * window_main_texture = lv_glfw_window_add_texture(window, main_texture_id, WIDTH, HEIGHT);
+        lv_opengles_window_texture_t * window_main_texture = lv_opengles_window_add_texture(window, main_texture_id, WIDTH, HEIGHT);
 
         /* get the mouse indev of this main texture */
-        lv_indev_t * main_texture_mouse = lv_glfw_texture_get_mouse_indev(window_main_texture);
+        lv_indev_t * main_texture_mouse = lv_opengles_window_texture_get_mouse_indev(window_main_texture);
 
         /* add a cursor to the mouse indev */
         LV_IMAGE_DECLARE(mouse_cursor_icon);
@@ -138,7 +142,7 @@ used to add content to a texture and the driver will draw the texture in the win
 
         /* add the sub texture to the window */
         unsigned int sub_texture_id = lv_opengles_texture_get_texture_id(sub_texture);
-        lv_glfw_texture_t * window_sub_texture = lv_glfw_window_add_texture(window, sub_texture_id, sub_texture_w, sub_texture_h);
+        lv_opengles_window_texture_t * window_sub_texture = lv_opengles_window_add_texture(window, sub_texture_id, sub_texture_w, sub_texture_h);
 
         /* create Widgets on the screen of the sub texture */
         lv_display_set_default(sub_texture);
@@ -146,11 +150,11 @@ used to add content to a texture and the driver will draw the texture in the win
         lv_display_set_default(main_texture);
 
         /* position the sub texture within the window */
-        lv_glfw_texture_set_x(window_sub_texture, 250);
-        lv_glfw_texture_set_y(window_sub_texture, 150);
+        lv_opengles_window_texture_set_x(window_sub_texture, 250);
+        lv_opengles_window_texture_set_y(window_sub_texture, 150);
 
         /* optionally change the opacity of the sub texture */
-        lv_glfw_texture_set_opa(window_sub_texture, LV_OPA_80);
+        lv_opengles_window_texture_set_opa(window_sub_texture, LV_OPA_80);
 
         /*********************************************
         *   USE AN EXTERNAL OPENGL TEXTURE IN LVGL
@@ -181,12 +185,12 @@ used to add content to a texture and the driver will draw the texture in the win
         glBindTexture(GL_TEXTURE_2D, 0);
 
         /* add the external texture to the window */
-        lv_glfw_texture_t * window_external_texture = lv_glfw_window_add_texture(window, external_texture_id, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
+        lv_opengles_window_texture_t * window_external_texture = lv_opengles_window_add_texture(window, external_texture_id, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
 
         /* set the position and opacity of the external texture within the window */
-        lv_glfw_texture_set_x(window_external_texture, 20);
-        lv_glfw_texture_set_y(window_external_texture, 20);
-        lv_glfw_texture_set_opa(window_external_texture, LV_OPA_70);
+        lv_opengles_window_texture_set_x(window_external_texture, 20);
+        lv_opengles_window_texture_set_y(window_external_texture, 20);
+        lv_opengles_window_texture_set_opa(window_external_texture, LV_OPA_70);
 
         /*********************************************
         *   USE AN LVGL TEXTURE IN ANOTHER LIBRARY
@@ -223,3 +227,39 @@ Known Limitations
 
 .. Comment:  The above blank line is necessary for Sphinx to not complain,
     since it looks for the blank line after a bullet list.
+
+
+.. _opengl_es_driver_egl:
+
+EGL
+---
+
+:cpp:func:`lv_opengles_egl_window_create` can be used to create a :cpp:type:`lv_opengles_window_t`
+which can be used with the same generic LVGL OpenGL APIs as a GLFW window shown above.
+
+To get started with EGL on Linux with DRM and no window manager,
+enable the following in your ``lv_conf.h`` (or Kconfig or CMake).
+
+.. code-block:: c
+
+    #define LV_USE_OPENGLES              1
+    #define LV_USE_OPENGLES_API          LV_OPENGLES_API_EGL
+    #define LV_USE_LINUX_DRM             1
+    #define LV_USE_LINUX_DRM_GBM_BUFFERS 1
+    #define LV_LINUX_DRM_USE_EGL         1
+    #define LV_USE_DRAW_OPENGLES         1   /* optional */
+
+
+Render Direct to Window
+-----------------------
+
+.. warning::
+
+    This feature is incomplete and has bugs.
+
+So far all the UIs demonstrated render to a LVGL display-sized intermediate texture before that texture is "rendered"
+to the window. At the least, it will cost a screen-sized read and a write inside the GPU. Performance can be
+improved if the the LVGL OpenGL driver renders its cached textures directly to the window (and :c:macro:`LV_USE_DRAW_OPENGLES` is enabled).
+This can be done by creating the display with :cpp:func:`lv_opengles_window_display_create` instead of
+:cpp:func:`lv_opengles_texture_create` + :cpp:func:`lv_opengles_texture_get_texture_id` + :cpp:func:`lv_opengles_window_add_texture`.
+Performance should be better with GLFW and EGL. EGL currently has issues when used this way.
