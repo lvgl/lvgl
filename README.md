@@ -51,7 +51,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Widgets, Styles, Layouts and more**
   - 30+ built-in [Widgets](https://docs.lvgl.io/master/details/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
-  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html) with  ~100 style properties to customize any part of the widgets in any state.
+  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) with  ~100 style properties to customize any part of the widgets in any state.
   - [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems.
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
@@ -218,7 +218,8 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+lv_obj_add_state(cb, LV_STATE_CHECKED);
+lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 ```
@@ -420,8 +421,8 @@ This list will guide you to get started with LVGL step-by-step.
 **Get Familiar with LVGL**
 
   1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes).
-  2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes).
-  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/intro/getting_started.html#lvgl-basics) page (15 minutes).
+  2. Read the [Introduction](https://docs.lvgl.io/master/intro/introduction/index.html) page of the documentation (5 minutes).
+  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html) page (15 minutes).
 
 **Start to Use LVGL**
 

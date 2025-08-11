@@ -87,6 +87,9 @@
 #if LV_USE_EVDEV
     #include "drivers/evdev/lv_evdev_private.h"
 #endif
+#if LV_USE_DRAW_EVE
+    #include "draw/eve/lv_draw_eve.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -274,6 +277,10 @@ void lv_init(void)
 
 #if LV_USE_UEFI
     lv_uefi_platform_init();
+#endif
+
+#if LV_USE_DRAW_EVE
+    lv_draw_eve_init();
 #endif
 
     lv_obj_style_init();
@@ -511,8 +518,8 @@ void lv_deinit(void)
     lv_objid_builtin_destroy();
 #endif
 
-#if LV_USE_XML && LV_USE_TEST
-    lv_xml_test_unregister();
+#if LV_USE_XML
+    lv_xml_deinit();
 #endif
 
 #if LV_USE_TRANSLATION

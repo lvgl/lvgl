@@ -106,9 +106,6 @@ typedef struct _lv_obj_t lv_obj_t;
 
 typedef lv_obj_t * (*lv_screen_create_cb_t)(void);
 
-typedef uint16_t lv_state_t;
-typedef uint32_t lv_part_t;
-
 typedef uint8_t lv_opa_t;
 
 typedef uint8_t lv_style_prop_t;
@@ -387,6 +384,10 @@ typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 typedef struct _lv_translation_tag_dsc_t lv_translation_tag_dsc_t;
 
 typedef struct _lv_translation_pack_t lv_translation_pack_t;
+#endif
+
+#if LV_USE_DRAW_EVE
+typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif
 
 #endif /*__ASSEMBLY__*/

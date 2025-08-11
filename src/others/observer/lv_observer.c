@@ -47,6 +47,11 @@ typedef struct {
 
 typedef struct {
     lv_subject_t * subject;
+    float value;
+} subject_set_float_user_data_t;
+
+typedef struct {
+    lv_subject_t * subject;
     const char * value;
 } subject_set_string_user_data_t;
 
@@ -63,6 +68,11 @@ typedef struct {
  **********************/
 
 static void subject_set_int_cb(lv_event_t * e);
+
+#if LV_USE_FLOAT
+    static void subject_set_float_cb(lv_event_t * e);
+#endif
+
 static void subject_set_string_cb(lv_event_t * e);
 static void subject_increment_cb(lv_event_t * e);
 
@@ -574,6 +584,24 @@ void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv
     lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 }
 
+#if LV_USE_FLOAT
+void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value)
+{
+    subject_set_float_user_data_t * user_data = lv_malloc(sizeof(subject_set_float_user_data_t));
+    if(user_data == NULL) {
+        LV_ASSERT_MALLOC(user_data);
+        LV_LOG_WARN("Couldn't allocate user_data");
+        return;
+    }
+
+    user_data->subject = subject;
+    user_data->value = value;
+
+    lv_obj_add_event_cb(obj, subject_set_float_cb, trigger, user_data);
+    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+}
+#endif /*LV_USE_FLOAT*/
+
 void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
                                          const char * value)
 {
@@ -846,6 +874,14 @@ static void subject_set_int_cb(lv_event_t * e)
     lv_subject_set_int(user_data->subject, user_data->value);
 }
 
+#if LV_USE_FLOAT
+static void subject_set_float_cb(lv_event_t * e)
+{
+    subject_set_float_user_data_t * user_data = lv_event_get_user_data(e);
+    lv_subject_set_float(user_data->subject, user_data->value);
+}
+#endif
+
 static void subject_set_string_cb(lv_event_t * e)
 {
     subject_set_string_user_data_t * user_data = lv_event_get_user_data(e);
@@ -855,12 +891,22 @@ static void subject_set_string_cb(lv_event_t * e)
 static void subject_increment_cb(lv_event_t * e)
 {
     subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
-    int32_t value = lv_subject_get_int(user_data->subject);
 
-    value += user_data->step;
-    value = LV_CLAMP(user_data->min, value, user_data->max);
 
-    lv_subject_set_int(user_data->subject, value);
+    if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
+        int32_t value = lv_subject_get_int(user_data->subject);
+        value += user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_int(user_data->subject, value);
+    }
+#if LV_USE_FLOAT
+    else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
+        float value = lv_subject_get_float(user_data->subject);
+        value += (float)user_data->step;
+        value = LV_CLAMP(user_data->min, value, user_data->max);
+        lv_subject_set_float(user_data->subject, (float)value);
+    }
+#endif
 }
 
 

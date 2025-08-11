@@ -48,6 +48,8 @@ extern "C" {
 #define LV_SCR_LOAD_ANIM_OUT_TOP       LV_SCREEN_LOAD_ANIM_OUT_TOP
 #define LV_SCR_LOAD_ANIM_OUT_BOTTOM    LV_SCREEN_LOAD_ANIM_OUT_BOTTOM
 
+#define lv_ft81x_spi_operation lv_ft81x_spi_operation_t
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

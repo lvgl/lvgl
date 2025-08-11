@@ -58,3 +58,6 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
     - src/others/xml
     - xmls
 
+**FT800-FT813 (EVE GPU driver)**
+- Path src/libs/FT800-FT813
+- Source: https://github.com/RudolphRiedel/FT800-FT813

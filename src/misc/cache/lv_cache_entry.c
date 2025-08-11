@@ -9,9 +9,7 @@
 #include "lv_cache_entry.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
-#include "lv_cache.h"
 #include "lv_cache_entry_private.h"
-#include "lv_cache_private.h"
 
 /*********************
  *      DEFINES
@@ -20,13 +18,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_cache_entry_t {
-    const lv_cache_t * cache;
-    int32_t ref_cnt;
-    uint32_t node_size;
 
-    bool is_invalid;
-};
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -86,16 +78,10 @@ void lv_cache_entry_set_node_size(lv_cache_entry_t * entry, uint32_t node_size)
     entry->node_size = node_size;
 }
 
-void lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid)
-{
-    LV_ASSERT_NULL(entry);
-    entry->is_invalid = is_invalid;
-}
-
 bool lv_cache_entry_is_invalid(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
-    return entry->is_invalid;
+    return entry->flags & LV_CACHE_ENTRY_FLAG_INVALID;
 }
 
 void * lv_cache_entry_get_data(lv_cache_entry_t * entry)
@@ -169,15 +155,37 @@ void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, con
     entry->cache = cache;
     entry->node_size = node_size;
     entry->ref_cnt = 0;
-    entry->is_invalid = false;
+    entry->flags = 0;
 }
 
 void lv_cache_entry_delete(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
 
+    if(entry->flags & LV_CACHE_ENTRY_FLAG_DISABLE_DELETE) {
+        return;
+    }
+
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);
+}
+
+void lv_cache_entry_set_flag(lv_cache_entry_t * entry, uint8_t flags)
+{
+    LV_ASSERT_NULL(entry);
+    entry->flags |= flags;
+}
+
+void lv_cache_entry_remove_flag(lv_cache_entry_t * entry, uint8_t flags)
+{
+    LV_ASSERT_NULL(entry);
+    entry->flags &= (~flags);
+}
+
+bool lv_cache_entry_has_flag(lv_cache_entry_t * entry, uint8_t flags)
+{
+    LV_ASSERT_NULL(entry);
+    return (entry->flags & flags) == flags;
 }
 
 /**********************

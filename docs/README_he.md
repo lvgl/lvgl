@@ -50,7 +50,7 @@ LVGL היא ספריית הגרפיקה החינמית והפתוחה הפופו
 
 **ווידג'טים, עיצובים, פריסות ועוד**
 -מעל 30 [ווידג'טים](https://docs.lvgl.io/master/details/widgets/index.html) מובנים: כפתור, תווית, סליידר, טבלה, מקלדת, מד, קשת, לוח ועוד.
--מערכת [עיצובים גמישה](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html) עם ~100 מאפייני עיצוב להתאמה אישית.
+-מערכת [עיצובים גמישה](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) עם ~100 מאפייני עיצוב להתאמה אישית.
 -מנועים לפריסה בסגנון [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) ו-[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html) להתאמה רספונסיבית.
 -תומכת בטקסטים ב־UTF-8 כולל עברית, סינית, תאית, הינדית, ערבית, פרסית ועוד.
 -תמיכה ב־word wrapping, kerning, גלילה, תצוגת תווים בעברית, סמיילים ועוד.
@@ -215,7 +215,8 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+lv_obj_add_state(cb, LV_STATE_CHECKED);
+lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "מלון\nושורה חדשה");
 lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 ```
@@ -405,8 +406,8 @@ cz_label.align(lv.ALIGN.BOTTOM_LEFT, 5, -5)
 **הכרת LVGL**
 
 1.בדוק את [הדמו המקוון](https://lvgl.io/demos) כדי לראות את LVGL בפעולה (3 דקות).
-2.קרא את עמוד [המבוא](https://docs.lvgl.io/master/intro/index.html) בתיעוד (5 דקות).
-3.הכר את הבסיס בעמוד [סקירה מהירה](https://docs.lvgl.io/master/intro/getting_started.html#lvgl-basics) (15 דקות).
+2.קרא את עמוד [המבוא](https://docs.lvgl.io/master/intro/introduction/index.html) בתיעוד (5 דקות).
+3.הכר את הבסיס בעמוד [סקירה מהירה](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html) (15 דקות).
 
 **התחל להשתמש ב-LVGL**
 

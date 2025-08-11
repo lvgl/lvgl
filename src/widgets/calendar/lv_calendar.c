@@ -360,7 +360,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
 
-    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_set_style_text_align(calendar->btnm, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
     lv_calendar_set_month_shown(obj, 2024, 1);
     lv_calendar_set_today_date(obj, 2024, 1, 1);

@@ -1,0 +1,40 @@
+name: Hardware Build Test
+
+# No point on running this on pushes to master
+# as we already dispatch a run job for that event
+on:
+  pull_request:
+    branches: 'master'
+
+jobs:
+  run_benchmark:
+    runs-on: self-hosted
+    name: Hardware Build Test
+    steps:
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y libfontconfig-dev
+
+      - name: Install EJ dispatcher tool
+        run: |
+          cargo install ejlv
+
+      - name: Dispatch job
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
+            COMMIT_REF="${{ github.event.pull_request.head.sha }}"
+          else
+            REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+            COMMIT_REF="${{ github.sha }}"
+          fi
+
+          ejlv dispatch-build \
+            --socket /ejd/ejd.sock \
+            --commit-hash $COMMIT_REF \
+            --remote-url $REPO_URL \
+            --seconds 1800
