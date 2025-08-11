@@ -54,7 +54,7 @@ static void lv_label_set_dots(lv_obj_t * label, uint32_t dot_begin);
 static void set_ofs_x_anim(void * obj, int32_t v);
 static void set_ofs_y_anim(void * obj, int32_t v);
 static size_t get_text_length(const char * text);
-static void copy_text_to_label(lv_label_t * label, const char * text);
+static void copy_text_to_label(lv_label_t* label, const char* text, size_t len);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
 static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, const char * txt,
                                    uint32_t length, const lv_font_t * font, int32_t letter_space, lv_area_t * txt_coords, lv_text_flag_t flags);
@@ -130,46 +130,77 @@ lv_obj_t * lv_label_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_label_set_text(lv_obj_t * obj, const char * text)
+static void lv_label_set_text_inner(lv_obj_t* obj, const char* text, size_t len)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_label_t * label = (lv_label_t *)obj;
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	lv_label_t* label = (lv_label_t*)obj;
 
-    /*If text is NULL then just refresh with the current text*/
-    if(text == NULL) text = label->text;
+	/*If set its own text then reallocate it (maybe its size changed)*/
+	if (label->text == text && label->static_txt == 0)
+	{
+		label->text = lv_realloc(label->text, len);
+		LV_ASSERT_MALLOC(label->text);
+		if (label->text == NULL)
+			return;
 
-    lv_label_revert_dots(obj); /*In case text == label->text*/
-    const size_t text_len = get_text_length(text);
+#  if LV_USE_ARABIC_PERSIAN_CHARS
+		lv_text_ap_proc(label->text, label->text);
+#  endif
+	}
+	else
+	{
+		/*Free the old text*/
+		if (label->text != NULL && label->static_txt == 0)
+		{
+			lv_free(label->text);
+			label->text = NULL;
+		}
 
-    /*If set its own text then reallocate it (maybe its size changed)*/
-    if(label->text == text && label->static_txt == 0) {
-        label->text = lv_realloc(label->text, text_len);
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
+		label->text = lv_malloc(len);
+		LV_ASSERT_MALLOC(label->text);
+		if (label->text == NULL)
+			return;
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
-        lv_text_ap_proc(label->text, label->text);
-#endif
+		copy_text_to_label(label, text, len);
 
-    }
-    else {
-        /*Free the old text*/
-        if(label->text != NULL && label->static_txt == 0) {
-            lv_free(label->text);
-            label->text = NULL;
-        }
+		/*Now the text is dynamically allocated*/
+		label->static_txt = 0;
+	}
 
-        label->text = lv_malloc(text_len);
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
+	lv_label_refr_text(obj);
+}
 
-        copy_text_to_label(label, text);
+void lv_label_set_text(lv_obj_t* obj, const char* text)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	lv_label_t* label = (lv_label_t*)obj;
 
-        /*Now the text is dynamically allocated*/
-        label->static_txt = 0;
-    }
+	/*If text is NULL then just refresh with the current text*/
+	if (text == NULL)
+		text = label->text;
 
-    lv_label_refr_text(obj);
+	lv_label_revert_dots(obj); /*In case text == label->text*/
+	const size_t text_len = get_text_length(text);
+
+	lv_label_set_text_inner(obj, text, text_len);
+}
+
+void lv_label_set_text_with_length(lv_obj_t* obj, const char* text, size_t len)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	lv_label_t* label = (lv_label_t*)obj;
+
+	/*If text is NULL then just refresh with the current text*/
+	if (text == NULL)
+		text = label->text;
+
+	lv_label_revert_dots(obj); /*In case text == label->text*/
+	size_t text_len = get_text_length(text);
+	text_len =
+		LV_MIN(text_len, len + 1); // prevent checking length twice by using LV_MIN directly with get_text_length()
+
+	lv_label_set_text_inner(obj, text, text_len);
+	label->text[text_len - 1] = '\0'; // ensure null-termination
 }
 
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
@@ -1264,12 +1295,12 @@ static size_t get_text_length(const char * text)
     return len;
 }
 
-static void copy_text_to_label(lv_label_t * label, const char * text)
+static void copy_text_to_label(lv_label_t* label, const char* text, size_t len)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
     lv_text_ap_proc(text, label->text);
 #else
-    lv_strcpy(label->text, text);
+	lv_strncpy(label->text, text, len);
 #endif
 }
 
