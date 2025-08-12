@@ -165,15 +165,6 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 vg_lite_matrix_t grad_matrix = *matrix;
-
-#if LV_USE_VG_LITE_THORVG
-                /* Workaround inconsistent radial gradient matrix behavior between device and ThorVG */
-                if(dsc->fill_dsc.gradient.style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-                    /* Restore matrix to identity */
-                    vg_lite_identity(&grad_matrix);
-                }
-#endif
-
                 vg_lite_matrix_t fill_matrix;
                 lv_vg_lite_matrix(&fill_matrix, &dsc->fill_dsc.matrix);
                 lv_vg_lite_matrix_multiply(&grad_matrix, &fill_matrix);
