@@ -862,7 +862,7 @@ table.docutils th p {
 }
 
 /* Selects [View on GitHub] "button". */
-.lv-example-link-button {
+#furo-main-content .lv-example-link-button {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 4px;
