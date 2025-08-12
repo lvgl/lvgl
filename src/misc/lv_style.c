@@ -210,10 +210,23 @@ void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 
     lv_style_reset(dst);
 
-    /*Source is empty*/
-    if(src->values_and_props == NULL) return;
-    if(src->prop_cnt == 0) return;
+    lv_style_merge(dst, src);
+}
 
+void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
+{
+    if(lv_style_is_const(dst)) {
+        LV_LOG_WARN("The destination can not be a constant style");
+        return;
+    }
+
+    /*Source is empty*/
+    if(src->values_and_props == NULL)
+        return;
+    if(src->prop_cnt == 0)
+        return;
+
+    // Merge the styles
     int32_t i;
     if(lv_style_is_const(src)) {
         lv_style_const_prop_t * props_and_values = (lv_style_const_prop_t *)src->values_and_props;
