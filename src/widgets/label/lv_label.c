@@ -1306,6 +1306,7 @@ static size_t get_text_length(const char * text)
 static void copy_text_to_label(lv_label_t * label, const char * text, size_t len)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
+    LV_UNUSED(len);
     lv_text_ap_proc(text, label->text);
 #else
     lv_strncpy(label->text, text, len);
