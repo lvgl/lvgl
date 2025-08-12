@@ -112,6 +112,15 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 
     /* Set the gesture information, before returning to LVGL */
     lv_indev_gesture_recognizers_set_data(drv, data);
+
+    if(window->body->input.touch_event_cnt > 0) {
+        data->point.x = window->body->input.touches[0].point.x;
+        data->point.y = window->body->input.touches[0].point.y;
+    }
+    else {
+        data->point.x = 0;
+        data->point.y = 0;
+    }
 }
 
 static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t serial, uint32_t time,

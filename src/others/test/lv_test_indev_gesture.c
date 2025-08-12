@@ -112,6 +112,15 @@ static void lv_test_gesture_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
                                         _state.touch_data,
                                         _state.max_touch_cnt);
     lv_indev_gesture_recognizers_set_data(indev, data);
+    if(_state.touch_data != NULL && _state.max_touch_cnt > 0) {
+        data->point.x = _state.touch_data[0].point.x;
+        data->point.y = _state.touch_data[0].point.y;
+    }
+    else {
+        LV_LOG_ERROR("Invalid touch data or max touch count");
+        data->point.x = 0;
+        data->point.y = 0;
+    }
 }
 
 #endif /*LV_USE_TEST*/
