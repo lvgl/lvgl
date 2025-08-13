@@ -40,10 +40,17 @@ static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * data);
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
                               int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
 
-static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area, lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc);
+static void _g2d_set_tmp_surf(struct g2d_surface * tmp_surf, struct g2d_buf * buf, const lv_area_t * area,
+                              lv_color_format_t cf);
+
+static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
+                              lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
 static void _g2d_blit(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
+
+static void _g2d_blit_two_steps(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf,
+                                struct g2d_surface * tmp_surf);
 
 /**********************
  *  STATIC VARIABLES
@@ -116,7 +123,25 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc);
     _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, draw_buf, dsc);
 
-    _g2d_blit(handle, &dst_surf, &src_surf);
+    bool has_rotation = (dsc->rotation != 0);
+
+    if(has_rotation) {
+        /** If the image has rotation, then blit in two steps:
+         *   1. Source with rotation to temporary surface.
+         *   2. Temporary with other transformations (if any) to destination (frame buffer).
+         */
+        struct g2d_buf * tmp_buf = g2d_alloc(lv_area_get_width(&src_area) * lv_area_get_height(&src_area) * sizeof(
+                                                 lv_color32_t), 1);
+        G2D_ASSERT_MSG(tmp_buf, "Failed to alloc temporary buffer.");
+        struct g2d_surface tmp_surf;
+        _g2d_set_tmp_surf(&tmp_surf, tmp_buf, &src_area, src_cf);
+        _g2d_blit_two_steps(handle, &dst_surf, &src_surf, &tmp_surf);
+        g2d_free(tmp_buf);
+    }
+    else {
+        // If rotation is not involved, blit in one step.
+        _g2d_blit(handle, &dst_surf, &src_surf);
+    }
 }
 
 /**********************
@@ -181,7 +206,31 @@ static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * bu
     src_surf->blendfunc = G2D_ONE | G2D_PRE_MULTIPLIED_ALPHA;
 }
 
-static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area, lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc)
+static void _g2d_set_tmp_surf(struct g2d_surface * tmp_surf, struct g2d_buf * buf, const lv_area_t * area,
+                              lv_color_format_t cf)
+{
+    tmp_surf->format = g2d_get_buf_format(cf);
+
+    int32_t dest_w = area->x2 - area->x1;
+    int32_t dest_h = area->y2 - area->y1;
+
+    tmp_surf->left   = area->x1;
+    tmp_surf->top    = area->y1;
+    tmp_surf->right  = area->x1 + dest_w;
+    tmp_surf->bottom = area->y1 + dest_h;
+    tmp_surf->stride = dest_w;
+    tmp_surf->width  = dest_w;
+    tmp_surf->height = dest_h;
+
+    tmp_surf->planes[0] = buf->buf_paddr;
+    tmp_surf->rot = G2D_ROTATION_0;
+
+    tmp_surf->global_alpha = 0x00;
+    tmp_surf->blendfunc = G2D_ONE_MINUS_SRC_ALPHA | G2D_PRE_MULTIPLIED_ALPHA;
+}
+
+static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
+                              lv_draw_buf_t * draw_buf, const lv_draw_image_dsc_t * dsc)
 {
     int32_t stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
     lv_color_format_t cf = draw_buf->header.cf;
@@ -265,6 +314,32 @@ static void _g2d_blit(void * handle, struct g2d_surface * dst_surf, struct g2d_s
     g2d_enable(handle, G2D_BLEND);
     g2d_enable(handle, G2D_GLOBAL_ALPHA);
     g2d_blit(handle, src_surf, dst_surf);
+    g2d_finish(handle);
+    g2d_disable(handle, G2D_GLOBAL_ALPHA);
+    g2d_disable(handle, G2D_BLEND);
+}
+
+static void _g2d_blit_two_steps(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf,
+                                struct g2d_surface * tmp_surf)
+{
+    g2d_clear(handle, tmp_surf);
+
+    g2d_enable(handle, G2D_BLEND);
+    g2d_enable(handle, G2D_GLOBAL_ALPHA);
+    g2d_blit(handle, src_surf, tmp_surf);
+    g2d_finish(handle);
+    g2d_disable(handle, G2D_GLOBAL_ALPHA);
+    g2d_disable(handle, G2D_BLEND);
+
+    /**After first blit, change blending and global alpha for temporary surface
+     * since the surface now acts as source.
+     */
+    tmp_surf->blendfunc = G2D_ONE | G2D_PRE_MULTIPLIED_ALPHA;
+    tmp_surf->global_alpha = 0xFF;
+
+    g2d_enable(handle, G2D_BLEND);
+    g2d_enable(handle, G2D_GLOBAL_ALPHA);
+    g2d_blit(handle, tmp_surf, dst_surf);
     g2d_finish(handle);
     g2d_disable(handle, G2D_GLOBAL_ALPHA);
     g2d_disable(handle, G2D_BLEND);
