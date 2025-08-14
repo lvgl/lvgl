@@ -63,12 +63,6 @@ typedef struct {
 
 typedef struct {
     lv_subject_t * subject;
-    void * element; /**< E.g. min_value of a scale section*/
-    int32_t * num;
-} bind_element_num_t;
-
-typedef struct {
-    lv_subject_t * subject;
     int32_t step;
     int32_t min;
     int32_t max;
@@ -127,7 +121,11 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
-static void free_user_data_event_cb(lv_event_t * e);
+#if LV_USE_SCALE
+    static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
 static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 
 /**********************
@@ -580,7 +578,7 @@ void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, 
     user_data->max = max;
     user_data->subject = subject;
     lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
@@ -596,7 +594,7 @@ void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv
     user_data->value = value;
 
     lv_obj_add_event_cb(obj, subject_set_int_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 #if LV_USE_FLOAT
@@ -613,7 +611,7 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
     user_data->value = value;
 
     lv_obj_add_event_cb(obj, subject_set_float_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 #endif /*LV_USE_FLOAT*/
 
@@ -913,6 +911,40 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     return observer;
 }
 #endif /*LV_USE_DROPDOWN*/
+
+#if LV_USE_SCALE
+
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_min_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+#endif /*LV_USE_SCALE*/
 
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 {
@@ -1284,10 +1316,21 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 
 #endif /*LV_USE_DROPDOWN*/
 
-static void free_user_data_event_cb(lv_event_t * e)
+#if LV_USE_SCALE
+
+static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_free(lv_event_get_user_data(e));
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_min_value(observer->target, section, subject->value.num);
 }
+
+static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_max_value(observer->target, section, subject->value.num);
+}
+
+#endif /*LV_USE_SCALE*/
 
 static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
 {

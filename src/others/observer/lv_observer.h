@@ -603,6 +603,28 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 #endif
 
+#if LV_USE_SCALE
+
+/**
+ * Bind an integer subject to a scales section minimum value
+ * @param obj       pointer to an Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scales section maximum value
+ * @param obj       pointer to an Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+#endif
+
 /**********************
  *      MACROS
  **********************/

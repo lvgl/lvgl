@@ -25,6 +25,7 @@
  **********************/
 
 static lv_span_overflow_t spangroup_overflow_to_enum(const char * txt);
+static void free_fmt_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -87,6 +88,19 @@ void lv_xml_spangroup_span_apply(lv_xml_parser_state_t * state, const char ** at
             lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_spangroup_set_span_style(spangroup, span, &style_dsc->style);
         }
+        else if(lv_streq("bind_text", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject == NULL) {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in spangroup span bind_text", value);
+                continue;
+            }
+            const char * fmt = lv_xml_get_value_of(attrs, "bind_text-fmt");
+            if(fmt) {
+                fmt = lv_strdup(fmt);
+                lv_obj_add_event_cb(spangroup, free_fmt_event_cb, LV_EVENT_DELETE, (void *) fmt);
+            }
+            lv_spangroup_bind_span_text(spangroup, span, subject, fmt);
+        }
     }
 }
 
@@ -101,6 +115,12 @@ static lv_span_overflow_t spangroup_overflow_to_enum(const char * txt)
 
     LV_LOG_WARN("%s is an unknown value for span's overflow", txt);
     return 0; /*Return 0 in lack of a better option. */
+}
+
+static void free_fmt_event_cb(lv_event_t * e)
+{
+    void * fmt = lv_event_get_user_data(e);
+    lv_free(fmt);
 }
 
 #endif /* LV_USE_XML */

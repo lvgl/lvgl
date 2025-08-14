@@ -43,7 +43,6 @@ typedef struct {
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
-static void free_user_data_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
@@ -275,7 +274,7 @@ void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attr
     if(user_data_str) user_data = lv_strdup(user_data_str);
 
     lv_obj_add_event_cb(obj, cb, code, user_data);
-    if(user_data) lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    if(user_data) lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 void * lv_obj_xml_subject_set_create(lv_xml_parser_state_t * state, const char ** attrs)
@@ -894,11 +893,6 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
 }
 
-
-static void free_user_data_event_cb(lv_event_t * e)
-{
-    lv_free(lv_event_get_user_data(e));
-}
 
 static void screen_create_on_trigger_event_cb(lv_event_t * e)
 {
