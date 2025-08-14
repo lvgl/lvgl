@@ -36,7 +36,7 @@ Describing the UI in XML in a declarative manner offers several advantages:
 - The XML syntax uses the same properties as the C API, so it's easy to learn. E.g.
   style properties like bg_color, line_width, or widget properties like width,
   height, label text, etc.
-- A powerful data binding engine allow you to easily bind the widgets to global data.
+- A powerful data binding engine allows you to easily bind the widgets to global data.
 
 
 
