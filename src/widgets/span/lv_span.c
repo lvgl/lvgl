@@ -199,6 +199,29 @@ void lv_span_set_text(lv_span_t * span, const char * text)
 #endif
 }
 
+void lv_span_set_text_fmt(lv_span_t * span, const char * fmt, ...)
+{
+    if(span == NULL || fmt == NULL) {
+        return;
+    }
+
+    va_list args;
+    va_start(args, fmt);
+    char * text = lv_text_set_text_vfmt(fmt, args);
+    LV_ASSERT_MALLOC(text);
+    if(text == NULL) return;
+
+    va_end(args);
+
+    if(span->txt == NULL && span->static_flag) {
+        lv_free(span->txt);
+    }
+
+    span->static_flag = 0;
+    span->txt = text;
+}
+
+
 void lv_spangroup_set_span_text(lv_obj_t * obj, lv_span_t * span, const char * text)
 {
     lv_span_set_text(span, text);
@@ -231,6 +254,30 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
 void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const char * text)
 {
     lv_span_set_text_static(span, text);
+    lv_spangroup_refresh(obj);
+}
+
+void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...)
+{
+    if(span == NULL || fmt == NULL) {
+        return;
+    }
+
+    va_list args;
+    va_start(args, fmt);
+    char * text = lv_text_set_text_vfmt(fmt, args);
+    LV_ASSERT_MALLOC(text);
+    if(text == NULL) return;
+
+    va_end(args);
+
+    if(span->txt == NULL && span->static_flag) {
+        lv_free(span->txt);
+    }
+
+    span->static_flag = 0;
+    span->txt = text;
+
     lv_spangroup_refresh(obj);
 }
 

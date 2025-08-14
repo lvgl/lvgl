@@ -55,6 +55,17 @@ typedef struct {
     const char * value;
 } subject_set_string_user_data_t;
 
+typedef struct {
+    lv_subject_t * subject;
+    void * element; /**< E.g. span of a span group*/
+    const char * fmt;
+} bind_element_string_t;
+
+typedef struct {
+    lv_subject_t * subject;
+    void * element; /**< E.g. min_value of a scale section*/
+    int32_t * num;
+} bind_element_num_t;
 
 typedef struct {
     lv_subject_t * subject;
@@ -90,6 +101,10 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
 
 #if LV_USE_LABEL
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
+#if LV_USE_SPAN
+    static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
 #if LV_USE_ARC
@@ -779,6 +794,54 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
 }
 #endif /*LV_USE_LABEL*/
 
+#if LV_USE_SPAN
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(span);
+
+    if(fmt == NULL) {
+        if(subject->type == LV_SUBJECT_TYPE_INT) {
+            fmt = "%d";
+        }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
+        else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+    else {
+        if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+
+    bind_element_string_t * user_data = lv_zalloc(sizeof(bind_element_string_t));
+    if(user_data == NULL) {
+        LV_LOG_WARN("Couldn't allocate user_data");
+        LV_ASSERT_MALLOC(user_data);
+        return NULL;
+    }
+
+    user_data->subject = subject;
+    user_data->element = span;
+    user_data->fmt = fmt;
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, span_text_observer_cb, obj, user_data);
+    observer->auto_free_user_data = 1;
+
+    return observer;
+}
+#endif /*LV_USE_SPAN*/
+
+
 #if LV_USE_ARC
 lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -1089,6 +1152,39 @@ static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subj
 }
 
 #endif /*LV_USE_LABEL*/
+
+#if LV_USE_SPAN
+
+static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_element_string_t * user_data = observer->user_data;
+
+    if(user_data->fmt == NULL) {
+        lv_spangroup_set_span_text(observer->target, user_data->element, subject->value.pointer);
+    }
+    else {
+        switch(subject->type) {
+
+            case LV_SUBJECT_TYPE_INT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.num);
+                break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.float_v);
+                break;
+#endif
+            case LV_SUBJECT_TYPE_STRING:
+            case LV_SUBJECT_TYPE_POINTER:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.pointer);
+                break;
+            default:
+                return;
+        }
+    }
+}
+
+#endif /*LV_USE_SPAN*/
+
 
 #if LV_USE_ARC
 

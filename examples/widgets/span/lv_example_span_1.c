@@ -24,6 +24,10 @@ void lv_example_span_1(void)
     lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_ORANGE));
     lv_style_set_pad_all(&style, 2);
 
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 23);
+
+
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     /* Setting a fixed width and height to LV_SIZE_CONTENT will make the text wrap */
     lv_obj_set_width(spans, 300);
@@ -36,14 +40,15 @@ void lv_example_span_1(void)
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_indent(spans, 20);
 
+
     lv_span_t * span = lv_spangroup_add_span(spans);
-    lv_span_set_text(span, "China is a beautiful country.");
+    lv_span_set_text(span, "good good study, day day up.");
     lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED));
     lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
     lv_style_set_text_opa(lv_span_get_style(span), LV_OPA_50);
 
     span = lv_spangroup_add_span(spans);
-    lv_span_set_text_static(span, "good good study, day day up.");
+    lv_spangroup_bind_span_text(spans, span, &subject, "%d users");
 #if LV_FONT_MONTSERRAT_24
     lv_style_set_text_font(lv_span_get_style(span),  &lv_font_montserrat_24);
 #endif
