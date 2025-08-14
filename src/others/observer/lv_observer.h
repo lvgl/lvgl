@@ -545,6 +545,24 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
 #endif
 
+#if LV_USE_LABEL
+
+/**
+ * Bind an integer, string, or pointer Subject to a Label.
+ * @param obj       pointer to Spangroup
+ * @param span      pointer to Span
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            `fmt == NULL` can be used only with string and pointer Subjects.
+ * @note            If Subject is a pointer and `fmt == NULL`, pointer must point
+ *                  to a `\0` terminated string.
+ */
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt);
+
+#endif
+
 #if LV_USE_ARC
 /**
  * Bind an integer subject to an Arc's value.
