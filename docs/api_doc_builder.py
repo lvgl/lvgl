@@ -198,7 +198,7 @@ def _conditionally_add_hyperlink(obj, genned_link_set: set, exclude_set: set):
         # Note:  we can't use 'lvgl/src' because there is no guarantee
         # that the user's LVGL repo directory will be called that.
         src_root = '/src/'
-        i = obj.file_name.find(src_root) + len(src_root)
+        i = obj.file_name.index(src_root) + len(src_root)
         link_name = obj.file_name[i:]
         if link_name not in genned_link_set:
             if link_name not in exclude_set:
@@ -735,7 +735,7 @@ def _recursively_create_api_rst_files(depth: int,
     recursively for subdirectories below it.  ("bep" = being processed.)
 
     Eligible
-        An input file (e.g. `.h*` or `.c`) file is eligible if Doxygen generated
+        An input file (e.g. `.h*`) file is eligible if Doxygen generated
         documentation for it.  The combination of these configuration items in
         the Doxyfile:
 
