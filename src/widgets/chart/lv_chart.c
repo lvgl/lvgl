@@ -1364,7 +1364,7 @@ static void draw_series_stacked(lv_obj_t * obj, lv_layer_t * layer)
 
         /*Draw the full_bar_area and set the clip area to clip the segments*/
         bar_full_area.y2 = obj->coords.y2 + col_dsc.radius;
-        bar_full_area.y1 = bar_full_area.y2 - y_ofs - total_bar_height + 1;
+        bar_full_area.y1 = obj->coords.y2 - y_ofs - total_bar_height + 1;
 
         lv_area_t bar_clip_area = bar_full_area;
         int32_t y_prev = obj->coords.y2 + 1;
