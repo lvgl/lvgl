@@ -42,12 +42,12 @@ typedef struct {
     bool initialized;
     bool independent_image_heap;
 
-    lv_draw_buf_malloc_cb malloc_cb;
-    lv_draw_buf_free_cb free_cb;
+    lv_draw_buf_malloc_cb_t malloc_cb;
+    lv_draw_buf_free_cb_t free_cb;
 
 #if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
-    lv_draw_buf_malloc_cb malloc_cb_default;
-    lv_draw_buf_free_cb free_cb_default;
+    lv_draw_buf_malloc_cb_t malloc_cb_default;
+    lv_draw_buf_free_cb_t free_cb_default;
 #endif
 } lv_nuttx_ctx_image_cache_t;
 /**********************
