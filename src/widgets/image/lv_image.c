@@ -8,6 +8,7 @@
  *********************/
 #include "lv_image_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_image_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
@@ -234,10 +235,15 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMAGE_SRC_SYMBOL) {
         /*`lv_image_dsc_get_info` couldn't set the width and height of a font so set it here*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        lv_text_attributes_t attributes = {0};
+
+        attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        attributes.max_width = LV_COORD_MAX;
+        attributes.text_flags = LV_TEXT_FLAG_NONE;
+
         lv_point_t size;
-        lv_text_get_size(&size, src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&size, src, font, &attributes);
         header.w = size.x;
         header.h = size.y;
     }
@@ -915,8 +921,14 @@ static void draw_image(lv_event_t * e)
             const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
             if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
                 lv_point_t text_size;
-                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
-                                 label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+                lv_text_attributes_t attributes;
+                attributes.letter_space = label_dsc.letter_space;
+                attributes.line_space = label_dsc.line_space;
+                attributes.max_width = LV_COORD_MAX;
+                attributes.text_flags = LV_TEXT_FLAG_NONE;
+
+                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, &attributes);
                 lv_area_set(&aligned_coords, 0, 0, text_size.x, text_size.y);
                 lv_area_align(&obj->coords, &aligned_coords, img->align, img->offset.x, img->offset.y);
                 coords = &aligned_coords;

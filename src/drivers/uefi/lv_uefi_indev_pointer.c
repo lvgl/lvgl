@@ -10,7 +10,7 @@
 #include "../../lvgl.h"
 #include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_types.h"
-#include "../../misc/lv_text.h"
+#include "../../misc/lv_text_private.h"
 
 #if LV_USE_UEFI
 

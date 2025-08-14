@@ -42,13 +42,22 @@ extern "C" {
 
 typedef enum {
     LV_TEXT_FLAG_NONE      = 0x00,
-    LV_TEXT_FLAG_EXPAND    = 0x01, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TEXT_FLAG_FIT       = 0x02, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
-    LV_TEXT_FLAG_BREAK_ALL = 0x04, /**< To prevent overflow, insert breaks between any two characters.
-                                        Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
-                                        or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
-                                        and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
-    LV_TEXT_FLAG_RECOLOR   = 0x08, /**< Enable parsing of recolor command*/
+
+    /*Ignore max-width to avoid automatic word wrapping*/
+    LV_TEXT_FLAG_EXPAND    = 0x01,
+
+    /**Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_FIT       = 0x02,
+
+    /**To prevent overflow, insert breaks between any two characters.
+    Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
+    or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
+    and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
+    LV_TEXT_FLAG_BREAK_ALL = 0x04,
+
+    /**Enable parsing of recolor command*/
+    LV_TEXT_FLAG_RECOLOR   = 0x08,
+
 } lv_text_flag_t;
 
 /** Label align policy*/
@@ -66,56 +75,33 @@ typedef enum {
     LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
 } lv_text_cmd_state_t;
 
+typedef struct {
+    int32_t letter_space;   /**< Letter space between letters*/
+    int32_t line_space;     /**< Space between lines of text*/
+    int32_t max_width;      /**< Max width of the text (break the lines to fit this size). Set COORD_MAX to avoid*/
+    lv_text_flag_t text_flags;
+} lv_text_attributes_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the text attributes descriptor
+ * @param attributes the text attributes descriptor to initialize
+ */
+void lv_text_attributes_init(lv_text_attributes_t * attributes);
 
 /**
  * Get size of a text
  * @param size_res pointer to a 'point_t' variable to store the result
  * @param text pointer to a text
  * @param font pointer to font of the text
- * @param letter_space letter space of the text
- * @param line_space line space of the text
- * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
- * @param flag settings for the text from ::lv_text_flag_t
-
- * line breaks
+ * @param attributes the text attributes, flags for line break behaviour, spacing etc
  */
-void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
-                      int32_t line_space, int32_t max_width, lv_text_flag_t flag);
+void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                      lv_text_attributes_t * attributes);
 
-/**
- * Give the length of a text with a given font
- * @param txt a '\0' terminate string
- * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
- * UTF-8)
- * @param font pointer to a font
- * @param letter_space letter space
- * @return length of a char_num long text
- */
-int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space);
-
-/**
- * Give the length of a text with a given font with text flags
- * @param txt a '\0' terminate string
- * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
- * UTF-8)
- * @param font pointer to a font
- * @param letter_space letter space
- * @param flags settings for the text from ::lv_text_flag_t
- * @return length of a char_num long text
- */
-int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space,
-                                     lv_text_flag_t flags);
-
-/**
- * Check if c is command state
- * @param state
- * @param c
- * @return True if c is state
- */
-bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
 /**********************
  *      MACROS
  **********************/
