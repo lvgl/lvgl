@@ -40,7 +40,7 @@ typedef lv_obj_tree_walk_res_t (*lv_obj_tree_walk_cb_t)(lv_obj_t *, void *);
 /**
  * Delete an object and all of its children.
  * Also remove the objects from their group and remove all animations (if any).
- * Send `LV_EVENT_DELETED` to deleted objects.
+ * Send `LV_EVENT_DELETE` to deleted objects.
  * @param obj       pointer to an object
  */
 void lv_obj_delete(lv_obj_t * obj);
@@ -48,7 +48,7 @@ void lv_obj_delete(lv_obj_t * obj);
 /**
  * Delete all children of an object.
  * Also remove the objects from their group and remove all animations (if any).
- * Send `LV_EVENT_DELETED` to deleted objects.
+ * Send `LV_EVENT_DELETE` to deleted objects.
  * @param obj       pointer to an object
  */
 void lv_obj_clean(lv_obj_t * obj);

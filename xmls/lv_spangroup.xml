@@ -26,6 +26,10 @@ Example
 		<element name="span" type="lv_span" access="add">
 			<prop name="text" type="string" help=""/>
 			<prop name="style" type="style" help=""/>
+    	    <prop name="bind_text" help="">
+                <param name="bind_text" type="subject"/>
+                <param name="fmt" type="string" default="NULL"/>
+            </prop>
 		</element>
 	</api>
 </widget>
