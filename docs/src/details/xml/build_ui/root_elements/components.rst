@@ -238,7 +238,7 @@ The following example demonstrates parameter passing and the use of the
 Live Example
 *************
 
-.. include:: ../../../../../examples/others/xml/index.rst
+.. include:: ../../../../../../examples/others/xml/index.rst
 
 API
 ***
