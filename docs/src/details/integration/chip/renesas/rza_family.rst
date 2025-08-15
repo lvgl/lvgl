@@ -2,6 +2,8 @@
 RZ/A Family
 ===========
 
+.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
+
 Supported boards in the RZ/A Family:
 
 - **RZ/A3M**
@@ -11,7 +13,7 @@ Supported boards in the RZ/A Family:
 Run the Project
 ***************
 
-- The RZ/A boards are MPUs with a focus on baremetal and RTOS applications. Projects are built for them using e2 Studio IDE, available for Windows, Mac, and Linux.
+- The RZ/A boards are MPUs with a focus on bare metal and RTOS applications. Projects are built for them using e\ |sup2| Studio IDE, available for Windows, Mac, and Linux.
 - Clone the ready-to-use repository for your board:
 
     .. code-block:: shell
