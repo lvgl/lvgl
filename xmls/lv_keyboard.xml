@@ -10,6 +10,7 @@ Example
 	        <enum name="text_lower"/>
 	        <enum name="text_arabic"/>
 	        <enum name="special"/>
+	        <enum name="number"/>
 	        <enum name="user_1"/>
 	        <enum name="user_2"/>
 	        <enum name="user_3"/>
