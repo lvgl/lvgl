@@ -36,13 +36,12 @@ Configuration
 
    - Set :c:macro:`LV_VG_LITE_FLUSH_MAX_COUNT` to zero (recommended). The rendering backend will obtain the GPU's working status every time it writes rendering instructions to the command buffer.
 
-   When the GPU is idle, it will immediately call ``vg_lite_flush`` to notify the GPU to start rendering and swap the command buffer. When the GPU is busy, it will continue to fill the command buffer cache with rendering instructions.
-   The underlying driver will automatically determine if the command buffer has been filled. When it is about to be filled, it will forcibly wait for the unfinished drawing tasks to end and swap the command buffer.
-   This method can effectively improve GPU utilization, especially in scenarios where rendering text, as the GPU's drawing time and the CPU's data preparation time are very close, allowing the CPU and GPU to run in parallel.
+     When the GPU is idle, it will immediately call ``vg_lite_flush`` to notify the GPU to start rendering and swap the command buffer. When the GPU is busy, it will continue to fill the command buffer cache with rendering instructions.
+     The underlying driver will automatically determine if the command buffer has been filled. When it is about to be filled, it will forcibly wait for the unfinished drawing tasks to end and swap the command buffer.
+     This method can effectively improve GPU utilization, especially in scenarios where rendering text, as the GPU's drawing time and the CPU's data preparation time are very close, allowing the CPU and GPU to run in parallel.
 
    - Set :c:macro:`LV_VG_LITE_FLUSH_MAX_COUNT` to a value greater than zero, such as 8. After writing 8 rendering instructions to the command buffer, the rendering backend
-
-   will call ``vg_lite_flush`` to notify the GPU to start rendering and swap the command buffer.
+     will call ``vg_lite_flush`` to notify the GPU to start rendering and swap the command buffer.
 
 5. Set the :c:macro:`LV_VG_LITE_USE_BOX_SHADOW` configuration to use GPU rendering for shadows.
    In fact, GPU hardware does not actually support shadow rendering. However, through experimentation, it has been found that a similar shadow effect

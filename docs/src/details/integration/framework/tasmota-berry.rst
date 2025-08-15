@@ -6,7 +6,7 @@ What is Tasmota?
 ----------------
 
 `Tasmota <https://github.com/arendst/Tasmota>`__ is a widely used
-open-source firmware for ESP8266 and EPS32 based devices. It supports a
+open-source firmware for ESP8266 and ESP32 based devices. It supports a
 wide variety of devices, sensors and integrations to Home Automation and
 Cloud services. Tasmota firmware is downloaded more than 200,000 times
 each month, and has an active and growing community.

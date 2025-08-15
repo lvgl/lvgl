@@ -2,6 +2,8 @@
 NXP
 ===
 
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
+
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of our
 microcontrollers as an optional software component, allowing easy evaluation and
 migration into your product design. LVGL is a free and open-source embedded
@@ -40,6 +42,7 @@ individually as well simultaneously with the CPU (in LVGL multithreading mode).
 
 PXP accelerator
 ~~~~~~~~~~~~~~~
+
 Basic configuration:
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -48,7 +51,7 @@ Basic configuration:
 - In order to use PXP to rotate the screen, select in "lv_conf.h": Set :c:macro:`LV_USE_ROTATE_PXP` to `1`.
 - Enable PXP asserts in "lv_conf.h": Set :c:macro: `LV_USE_PXP_ASSERT` to `1`.
   There are few PXP assertions that can stop the program execution in case the
-  c:macro:`LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
+  :c:macro:`LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
 - If :c:macro:`SDK_OS_FREE_RTOS` symbol is defined, FreeRTOS implementation
   will be used, otherwise bare metal code will be included.
@@ -220,7 +223,7 @@ Basic configuration:
 - Enable VGLite asserts in "lv_conf.h": Set :c:macro: `LV_USE_VGLITE_ASSERT` to
   `1`.
   VGLite assertions will verify the driver API status code and in any error, it
-  can stop the program execution in case the c:macro: `LV_ASSERT_HANDLER` is set
+  can stop the program execution in case the :c:macro: `LV_ASSERT_HANDLER` is set
   to `while(1);` (Halt by default). Else, there will be logged just an error
   message via `LV_LOG_ERROR`.
 
@@ -425,7 +428,7 @@ Basic configuration:
 - In order to use G2D as a draw unit, select in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_G2D` to `1`.
 - Enable G2D asserts in "lv_conf.h": Set :c:macro: `LV_USE_G2D_ASSERT` to `1`.
   There are few G2D assertions that can stop the program execution in case the
-  c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
+  :c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
 
 Basic initialization:
@@ -505,7 +508,7 @@ Supported draw tasks are available in "src/draw/nx/g2d/lv_draw_g2d.c":
 Known limitations:
 ^^^^^^^^^^^^^^^^^^
 
-- G2D/PXP can only rotate at 90x angles.
+- G2D/PXP can only rotate at 90\ |deg| angles.
 - Rotation is not supported for images unaligned to blocks of 16x16 pixels. G2D/PXP
   is set to process 16x16 blocks to optimize the system for memory bandwidth and
   image processing time. The output engine essentially truncates any output
