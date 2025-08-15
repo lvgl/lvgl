@@ -36,7 +36,8 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 typedef enum {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
-    LV_CHART_TYPE_BAR,      /**< Draw columns*/
+    LV_CHART_TYPE_BAR,      /**< Draw bars for each series*/
+    LV_CHART_TYPE_STACKED,  /**< Draw a single stacked bar for each data point. Supports only positive values*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
 } lv_chart_type_t;
 
