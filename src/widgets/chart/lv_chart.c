@@ -623,10 +623,10 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
+
     ser->y_points[ser->start_point] = value;
     invalidate_point(obj, ser->start_point);
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
-    invalidate_point(obj, ser->start_point);
 }
 
 void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x_value, int32_t y_value)
@@ -1536,19 +1536,19 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(i >= chart->point_cnt) return;
 
-    int32_t w  = lv_obj_get_content_width(obj);
-    int32_t scroll_left = lv_obj_get_scroll_left(obj);
 
     /*In shift mode the whole chart changes so the whole object*/
     if(chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT) {
         lv_obj_invalidate(obj);
         return;
     }
+    int32_t w  = lv_obj_get_content_width(obj);
+    int32_t scroll_left = lv_obj_get_scroll_left(obj);
+    int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t x_ofs = obj->coords.x1 + pleft + bwidth - scroll_left;
 
     if(chart->type == LV_CHART_TYPE_LINE) {
-        int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        int32_t x_ofs = obj->coords.x1 + pleft + bwidth - scroll_left;
         int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
         int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR);
 
@@ -1557,6 +1557,7 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
         coords.y1 -= line_width + point_w;
         coords.y2 += line_width + point_w;
 
+        /*Invalidate the area between the previous and the next points*/
         if(i < chart->point_cnt - 1) {
             coords.x1 = ((w * i) / (chart->point_cnt - 1)) + x_ofs - line_width - point_w;
             coords.x2 = ((w * (i + 1)) / (chart->point_cnt - 1)) + x_ofs + line_width + point_w;
@@ -1573,17 +1574,19 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
         lv_area_t col_a;
         /*Gap between the column on ~adjacent X*/
         int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+        int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
 
-        int32_t block_w = (w + block_gap) / chart->point_cnt;
-
-        int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         int32_t x_act;
-        x_act = (int32_t)((int32_t)(block_w) * i) ;
-        x_act += obj->coords.x1 + bwidth + lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        if(chart->point_cnt > 1) {
+            x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1);
+        }
+        else {
+            x_act = 0;
+        }
 
         lv_obj_get_coords(obj, &col_a);
-        col_a.x1 = x_act - scroll_left;
-        col_a.x2 = col_a.x1 + block_w;
+        col_a.x1 = x_act + x_ofs;
+        col_a.x2 = col_a.x1 + block_w + block_gap;
         col_a.x1 -= block_gap;
 
         lv_obj_invalidate_area(obj, &col_a);
