@@ -1267,7 +1267,7 @@ static inline uint32_t lv_color_8_16_mix_2_with_mask(const uint8_t * src, const 
 {
 
     return ((uint32_t)lv_color_8_16_mix_1_internal(src[2], dst[1], LV_OPA_MIX2(src[3], mask[1])) << 16) |
-           lv_color_8_16_mix_1_internal(src[0], dst[0], LV_OPA_MIX2(src[3], mask[0]));
+           lv_color_8_16_mix_1_internal(src[0], dst[0], LV_OPA_MIX2(src[1], mask[0]));
 }
 static inline uint32_t lv_color_8_16_mix_2_with_opa_mask(const uint8_t * src, const uint16_t * dst, uint8_t opa,
                                                          const uint8_t * mask)
