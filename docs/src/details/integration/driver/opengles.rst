@@ -8,9 +8,9 @@ Overview
 --------
 
 The **OpenGL ES** display/input
-`driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for
-simulating the LVGL display and keyboard/mouse inputs in an desktop window created
-via GLFW.
+`driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/glfw/lv_opengles_driver.c>`__
+offers support for simulating the LVGL display and keyboard/mouse inputs in an desktop
+window created via GLFW.
 
 It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
 
