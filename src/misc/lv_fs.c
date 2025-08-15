@@ -489,7 +489,7 @@ const char * lv_fs_get_last(const char * path)
 
     size_t i;
     for(i = len; i > 0; i--) {
-        if(path[i] == '/' || path[i] == '\\') break;
+        if(path[i] == '/' || path[i] == '\\' || path[i] == ':') break;
     }
 
     /*No '/' or '\' in the path so return with path itself*/

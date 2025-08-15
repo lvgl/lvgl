@@ -15,6 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define lv_event_xml_store_timeline LV_GLOBAL_DEFAULT()->lv_event_xml_store_timeline
 
 /**********************
  *      TYPEDEFS
@@ -29,17 +30,26 @@ typedef struct {
     const char * screen_name;
 } screen_load_anim_dsc_t;
 
+typedef struct {
+    const char * timeline_name;
+    const char * target_name;
+    uint32_t delay;
+    bool reverse;
+    lv_obj_t * base_obj; /**< Get the objs by name from here (the view) */
+} play_anim_dsc_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
-static lv_style_selector_t get_selector(const char * str);
 static void free_user_data_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 static void free_screen_create_user_data_on_delete_event_cb(lv_event_t * e);
+static void play_anim_on_trigger_event_cb(lv_event_t * e);
+static void free_play_anim_user_data_on_delete_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -181,7 +191,7 @@ void lv_obj_xml_style_apply(lv_xml_parser_state_t * state, const char ** attrs)
     }
 
     const char * selector_str = lv_xml_get_value_of(attrs, "selector");
-    lv_style_selector_t selector = get_selector(selector_str);
+    lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
 
     void * item = lv_xml_state_get_parent(state);
     lv_obj_add_style(item, &xml_style->style, selector);
@@ -210,7 +220,7 @@ void lv_obj_xml_remove_style_apply(lv_xml_parser_state_t * state, const char ** 
         style = &xml_style->style;
     }
 
-    lv_style_selector_t selector = get_selector(selector_str);
+    lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
 
     void * item = lv_xml_state_get_item(state);
     lv_obj_remove_style(item, style, selector);
@@ -437,7 +447,7 @@ void lv_obj_xml_bind_style_apply(lv_xml_parser_state_t * state, const char ** at
     int32_t ref_value = lv_xml_atoi(ref_value_str);
 
     const char * selector_str = lv_xml_get_value_of(attrs, "selector");
-    lv_style_selector_t selector = get_selector(selector_str);
+    lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
 
     void * item = lv_xml_state_get_parent(state);
     lv_obj_bind_style(item, &xml_style->style, selector, subject, ref_value);
@@ -647,6 +657,62 @@ void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const c
     lv_obj_add_event_cb(item, free_screen_create_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
 }
 
+void * lv_obj_xml_play_timeline_event_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_play_timeline_event_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+
+    if(state->view == NULL) {
+        /*Shouldn't happen*/
+        LV_LOG_WARN("view is not set, can't add the event");
+        return;
+    }
+
+    const char * target_str = lv_xml_get_value_of(attrs, "target");
+    const char * delay_str = lv_xml_get_value_of(attrs, "delay");
+    const char * trigger_str = lv_xml_get_value_of(attrs, "trigger");
+    const char * timeline_str = lv_xml_get_value_of(attrs, "timeline");
+    const char * reverse_str = lv_xml_get_value_of(attrs, "reverse");
+
+    if(target_str == NULL) {
+        LV_LOG_WARN("`target` is missing in <lv_obj-play_animation_event>");
+        return;
+    }
+
+    if(timeline_str == NULL) {
+        LV_LOG_WARN("`timeline` is missing in <lv_obj-play_animation_event>");
+        return;
+    }
+
+    if(delay_str == NULL) delay_str = "0";
+    if(trigger_str == NULL) trigger_str = "clicked";
+    if(reverse_str == NULL) reverse_str = "false";
+
+    lv_event_code_t trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
+    if(trigger == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't apply <screen_load_event> because `%s` trigger is invalid.", trigger_str);
+        return;
+    }
+
+    play_anim_dsc_t * dsc = lv_malloc(sizeof(play_anim_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(play_anim_dsc_t));
+    dsc->target_name = lv_strdup(target_str);
+    dsc->timeline_name = lv_strdup(timeline_str);
+    dsc->delay = lv_xml_atoi(delay_str);
+    dsc->reverse = lv_xml_to_bool(reverse_str);
+    dsc->base_obj = state->view;
+
+    void * item = lv_xml_state_get_item(state);
+    lv_obj_add_event_cb(item, play_anim_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(item, free_play_anim_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -804,6 +870,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
     else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
+    else SET_STYLE_IF(transform_skew_y, lv_xml_atoi(value));
     else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(&state->scope, value));
     else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
     else SET_STYLE_IF(recolor, lv_xml_to_color(value));
@@ -827,27 +894,6 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
 }
 
-static lv_style_selector_t get_selector(const char * str)
-{
-    if(str == NULL) return 0;
-    lv_style_selector_t selector = 0;
-    char buf[256];
-    lv_strncpy(buf, str, sizeof(buf));
-
-    char * bufp = buf;
-    const char * next = lv_xml_split_str(&bufp, '|');
-
-    while(next) {
-        /* Handle different states and parts */
-        selector |= lv_xml_style_state_to_enum(next);
-        selector |= lv_xml_style_part_to_enum(next);
-
-        /* Move to the next token */
-        next = lv_xml_split_str(&bufp, '|');
-    }
-
-    return selector;
-}
 
 static void free_user_data_event_cb(lv_event_t * e)
 {
@@ -892,6 +938,69 @@ static void free_screen_create_user_data_on_delete_event_cb(lv_event_t * e)
 {
     screen_load_anim_dsc_t * dsc = lv_event_get_user_data(e);
     lv_free((void *)dsc->screen_name);
+    lv_free(dsc);
+}
+
+static void play_anim_on_trigger_event_cb(lv_event_t * e)
+{
+    play_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+
+    lv_obj_t * target;
+
+    if(lv_streq(dsc->target_name, "self")) {
+        target = dsc->base_obj;
+    }
+    else {
+        target = lv_obj_get_child_by_name(dsc->base_obj, dsc->target_name);
+    }
+
+    if(target == NULL) {
+        LV_LOG_WARN("No target widget is found with `%s` name", dsc->target_name);
+        return;
+    }
+
+    lv_anim_timeline_t * timeline = NULL;
+    lv_anim_timeline_t ** timeline_array = NULL;
+    lv_obj_send_event(target, lv_event_xml_store_timeline, &timeline_array);
+    if(timeline_array == NULL) {
+        LV_LOG_WARN("No time lines are stored in `%s`", dsc->target_name);
+        return;
+    }
+
+    uint32_t i;
+    for(i = 0; timeline_array[i]; i++) {
+        const char * name = lv_anim_timeline_get_user_data(timeline_array[i]);
+        if(lv_streq(name, dsc->timeline_name)) {
+            timeline = timeline_array[i];
+            break;
+        }
+    }
+
+    if(timeline == NULL) {
+        LV_LOG_WARN("No timeline is found for `%s` with `%s` name", dsc->target_name, dsc->timeline_name);
+        return;
+    }
+
+    if(dsc->reverse) {
+        lv_anim_timeline_set_reverse(timeline, true);
+        lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
+    }
+    else {
+        lv_anim_timeline_set_reverse(timeline, false);
+        lv_anim_timeline_set_progress(timeline, 0);
+    }
+
+    lv_anim_timeline_set_delay(timeline, dsc->delay);
+    lv_anim_timeline_start(timeline);
+
+}
+
+static void free_play_anim_user_data_on_delete_event_cb(lv_event_t * e)
+{
+    play_anim_dsc_t * dsc = lv_event_get_user_data(e);
+    lv_free((void *)dsc->target_name);
+    lv_free((void *)dsc->timeline_name);
     lv_free(dsc);
 }
 

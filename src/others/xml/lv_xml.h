@@ -91,6 +91,10 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const cha
 
 lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_scope_t * scope, const char * name);
 
+lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const char * name);
+
+void * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name);
+
 /**********************
  *      MACROS
  **********************/

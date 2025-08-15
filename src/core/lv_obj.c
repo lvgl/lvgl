@@ -23,6 +23,7 @@
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_types.h"
+#include "../misc/lv_anim_timeline.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
 #include "lv_obj_draw_private.h"
@@ -49,6 +50,12 @@ typedef struct {
     } target;
 } screen_load_anim_dsc_t;
 
+typedef struct {
+    lv_anim_timeline_t * at;
+    uint32_t delay;
+    bool reverse;
+} timeline_play_dsc_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -65,6 +72,7 @@ static void lv_obj_children_remove_state(lv_obj_t * obj, lv_state_t state);
 static void null_on_delete_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
+static void play_timeline_on_trigger_event_cb(lv_event_t * e);
 static void free_user_data_on_delete_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 
@@ -515,6 +523,20 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
     dsc->target.create_cb = screen_create_cb;
 
     lv_obj_add_event_cb(obj, screen_create_on_trigger_event_cb, trigger, dsc);
+    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+}
+
+void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_anim_timeline_t * at, uint32_t delay,
+                                    bool reverse)
+{
+    timeline_play_dsc_t * dsc = lv_malloc(sizeof(timeline_play_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
+    lv_memzero(dsc, sizeof(timeline_play_dsc_t));
+    dsc->at = at;
+    dsc->delay = delay;
+    dsc->reverse = reverse;
+
+    lv_obj_add_event_cb(obj, play_timeline_on_trigger_event_cb, trigger, dsc);
     lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
 }
 
@@ -1115,6 +1137,23 @@ static void screen_create_on_trigger_event_cb(lv_event_t * e)
     lv_obj_t * screen = dsc->target.create_cb();
     lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
     lv_obj_add_event_cb(screen, delete_on_screen_unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+}
+
+static void play_timeline_on_trigger_event_cb(lv_event_t * e)
+{
+    timeline_play_dsc_t * dsc = lv_event_get_user_data(e);
+    LV_ASSERT_NULL(dsc);
+
+    if(dsc->reverse) {
+        lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        lv_anim_timeline_set_reverse(dsc->at, true);
+    }
+    else {
+        lv_anim_timeline_set_progress(dsc->at, 0);
+        lv_anim_timeline_set_reverse(dsc->at, false);
+    }
+    lv_anim_timeline_set_delay(dsc->at, dsc->delay);
+    lv_anim_timeline_start(dsc->at);
 }
 
 static void free_user_data_on_delete_event_cb(lv_event_t * e)
