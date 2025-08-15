@@ -1371,6 +1371,8 @@ static void indev_proc_press(lv_indev_t * indev)
         indev_gesture(indev);
         if(indev_reset_check(indev)) return;
 
+        /*In event driven mode resume the timer so that it can trigger long pressed and other time related events.
+         *As a side effect it will also call read_cb periodically in event driven mode. */
         if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && lv_timer_get_paused(indev->read_timer)) {
             lv_timer_resume(indev->read_timer);
         }
