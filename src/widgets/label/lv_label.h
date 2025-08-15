@@ -88,6 +88,15 @@ lv_obj_t * lv_label_create(lv_obj_t * parent);
 void lv_label_set_text(lv_obj_t * obj, const char * text);
 
 /**
+ * Set a new text for a label. Memory will be allocated to store the text by the label.
+ * If no '\0' is found within the specified length, the text will be truncated.
+ * @param obj           pointer to a label object
+ * @param text          (optionally '\0' terminated) character string. NULL to refresh with the current text.
+ * @param len           length of the text to set
+ */
+void lv_label_set_text_with_length(lv_obj_t * obj, const char * text, size_t len);
+
+/**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
  * @param fmt           `printf`-like format
