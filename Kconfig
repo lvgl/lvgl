@@ -2056,6 +2056,17 @@ menu "LVGL configuration"
 			help
 				Set the step size of the mouse movement in pixels.
 
+		config LV_USE_NUTTX_TRACE_FILE
+			bool "Use NuttX trace file"
+			depends on LV_USE_NUTTX
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
+
+		config LV_NUTTX_TRACE_FILE_PATH
+			depends on LV_USE_NUTTX_TRACE_FILE
+			string "NuttX trace file path"
+			default "/data/lvgl-trace.log"
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n
