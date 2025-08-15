@@ -743,7 +743,7 @@ def run(args):
         if debugging_breathe:
             from sphinx.cmd.build import main as sphinx_build
             # Don't allow parallel processing while debugging (the '-j' arg is removed).
-            sphinx_args = ['-M', 'html', f'{src}', f'{dst}', '-D', f'version={ver}']
+            sphinx_args = ['-M', 'html', f'{src}', f'{dst}']
 
             if len(env_opt) > 0:
                 sphinx_args.append(f'{env_opt}')

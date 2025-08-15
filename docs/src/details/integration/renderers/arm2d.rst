@@ -65,6 +65,6 @@ Examples
 API
 ***
 
-:ref:`lv_draw_sw_arm2d_h`
+:ref:`draw/sw/arm2d/lv_draw_sw_arm2d.h`
 
-:ref:`lv_blend_arm2d_h`
+:ref:`draw/sw/blend/arm2d/lv_blend_arm2d.h`

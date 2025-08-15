@@ -159,4 +159,5 @@ See :ref:`indev_creation` to see how to do this.
 
 API
 ***
-:ref:`lv_tick_h`
+
+.. API startswith:  lv_tick_

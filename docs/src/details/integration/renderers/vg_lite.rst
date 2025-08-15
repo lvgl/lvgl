@@ -73,14 +73,13 @@ For detailed instructions, see :ref:`vg_lite_tvg`.
 API
 ***
 
-:ref:`lv_draw_vglite_h`
+.. API startswith:  lv_draw_vglite_
 
-:ref:`lv_vglite_buf_h`
+.. API equals:      vglite_set_buf
 
-:ref:`lv_vglite_matrix_h`
+.. API equals:      vglite_set_translation_matrix
 
-:ref:`lv_vglite_path_h`
+.. API equals:      vglite_create_rect_path_data
 
-:ref:`lv_vglite_utils_h`
-
+.. API equals:      vglite_get_color
 

@@ -26,4 +26,4 @@ Display (lv_display)
 API
 ***
 
-:ref:`lv_display_h`
+:ref:`display/lv_display.h`
