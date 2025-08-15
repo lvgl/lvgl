@@ -18,3 +18,4 @@ https://github.com/lvgl/lv_port_texas_sk-am62b-p1
 https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
 https://github.com/lvgl/lv_port_renesas_ek-ra6m3g
 https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit
+https://github.com/lvgl/lv_port_f-and-s_picocoremx93
