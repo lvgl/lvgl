@@ -37,6 +37,7 @@
 #include "parsers/lv_xml_textarea_parser.h"
 #include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_arc_parser.h"
+#include "parsers/lv_xml_switch_parser.h"
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
@@ -113,6 +114,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
     lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
     lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
+    lv_xml_widget_register("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
     lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
     lv_xml_widget_register("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
     lv_xml_widget_register("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);
