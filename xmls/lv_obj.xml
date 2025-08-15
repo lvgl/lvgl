@@ -256,7 +256,7 @@ Example
         <prop name="style_outline_opa" type="opa"/>
         <prop name="style_outline_pad" type="int"/>
 
-        <prop name="style_style_shadow_width" type="int"/>
+        <prop name="style_shadow_width" type="int"/>
         <prop name="style_shadow_color" type="color"/>
         <prop name="style_shadow_opa" type="opa"/>
         <prop name="style_shadow_offset_x" type="int"/>
