@@ -139,7 +139,7 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
         /* Crop out extra pixels drawn due to scaling accuracy issues */
         lv_area_t scissor_area = layer->phy_clip_area;
         lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
-        lv_vg_lite_set_scissor_area(&scissor_area);
+        lv_vg_lite_set_scissor_area(u, &scissor_area);
     }
 
     switch(t->type) {

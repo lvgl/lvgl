@@ -292,7 +292,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         /* set scissor area */
-        lv_vg_lite_set_scissor_area(&scissor_area);
+        lv_vg_lite_set_scissor_area(u, &scissor_area);
         LV_LOG_TRACE("Set scissor area: X1:%" LV_PRId32 ", Y1:%" LV_PRId32 ", X2:%" LV_PRId32 ", Y2:%" LV_PRId32,
                      scissor_area.x1, scissor_area.y1, scissor_area.x2, scissor_area.y2);
     }
