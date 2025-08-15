@@ -367,6 +367,7 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
 {
     LV_ASSERT_NULL(dest);
     LV_ASSERT_NULL(dest->handlers);
+    LV_ASSERT_NULL(dest->handlers->buf_copy_cb);
     LV_ASSERT_NULL(src);
 
     dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);

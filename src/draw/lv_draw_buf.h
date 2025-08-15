@@ -286,7 +286,8 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
  * @param src       pointer to the source draw buffer
  * @param src_area  the area to copy from the destination buffer, if NULL, use the whole buffer
  * @note `dest_area` and `src_area` should have the same width and height
- * @note  `dest` and `src` should have same color format. Color converting is not supported now.
+ * @note  The default copy function required `dest` and `src` to have the same color format.
+ * Overwriting dest->handlers->buf_copy_cb can resolve this limitation.
  */
 void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
                       const lv_draw_buf_t * src, const lv_area_t * src_area);
