@@ -201,8 +201,8 @@ build process.
 There are some key folders:
 
 -  **images**: it contains the images that can be flashed or deployed to
-   the target device. Files like the Linux kernel, root filesystem (e.g., .
-   ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
+   the target device. Files like the Linux kernel, root filesystem (e.g.,
+   .ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
    bootable images for the device are found here. t's organized by the
    machine (or target board) for which the image was built.
 -  **rmp/deb/ipk**: These folders contain the individual software packages
@@ -593,10 +593,10 @@ To generate an SDK of the environment, run the following command:
 
     bitbake core-image-base -c populate_sdk
 
-This will create a script ``build/tmp/deploy/sdk/
-poky-glibc-x86_64-core-image-base-cortexa53-raspberrypi3-64-toolchain-5.0.4.
-sh``. This script allows you to install the SDK where you prefer. Here is the
-execution output of the script
+This will create a script
+``build/tmp/deploy/sdk/poky-glibc-x86_64-core-image-base-cortexa53-raspberrypi3-64-toolchain-5.0.4.sh``.
+This script allows you to install the SDK where you prefer. Here is the execution
+output of the script
 
 .. code-block:: bash
 
@@ -674,8 +674,7 @@ or multiple applications using lvgl
 We will focus on 1 application that will clone an lvgl git repository and patch
 it for our needs.
 
-The content of ``recipes-lvglapp/lvgl-fbdev-benchmark/lvglbenchmarkfbdev_2.4.
-bb``
+The content of ``recipes-lvglapp/lvgl-fbdev-benchmark/lvglbenchmarkfbdev_2.4.bb``
 
 .. code-block:: none
 

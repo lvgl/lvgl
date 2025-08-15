@@ -59,7 +59,7 @@ A style can be added to any state or state combination. For example,
 setting a different background color for the default and pressed states.
 If a property is not defined in a state the best matching state's
 property will be used. Typically this means the property with
-:cpp:enumerator:`LV_STATE_DEFAULT` is used.˛ If the property is not set even for the
+:cpp:enumerator:`LV_STATE_DEFAULT` is used.  If the property is not set even for the
 default state the default value will be used. (See later)
 
 Since :cpp:enumerator:`LV_PART_MAIN` and :cpp:enumerator:`LV_STATE_DEFAULT` both

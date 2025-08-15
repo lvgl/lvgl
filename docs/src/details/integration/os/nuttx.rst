@@ -133,7 +133,7 @@ Running the NuttX Simulator
 
    $ ./nuttx
 
-Using the 'NSH>' terminal start the LVGL demo:
+Using the ``NSH>`` terminal start the LVGL demo:
 
 .. code-block:: shell
 
