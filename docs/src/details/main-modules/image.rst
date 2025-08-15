@@ -7,8 +7,10 @@ Images (lv_image)
 An image can be a file or a variable that stores the bitmap itself and
 some metadata.
 
-Store images
-************
+
+
+Stored Images
+*************
 
 You can store images in two places
 
@@ -16,6 +18,7 @@ You can store images in two places
 - as a file
 
 .. _overview_image_variables:
+
 
 Variables
 ---------
@@ -38,6 +41,7 @@ into the resulting executable like any other constant data.
 
 .. _overview_image_files:
 
+
 Files
 -----
 
@@ -56,7 +60,9 @@ easier to replace without needing to rebuild the main program.
 
 .. _overview_image_color_formats:
 
-Color formats
+
+
+Color Formats
 *************
 
 Various built-in color formats are supported:
@@ -87,13 +93,13 @@ The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the f
 
 - 16-bit color depth:
 
-  - **Byte 0**: Green 3 lower bit, Blue 5 bit
-  - **Byte 1**: Red 5 bit, Green 3 higher bit
+  - **Byte 0**: Green 3 lower bits, Blue 5 bit
+  - **Byte 1**: Red 5 bit, Green 3 higher bits
   - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 - 8-bit color depth:
 
-  - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
+  - **Byte 0**: Red 3 bits, Green 3 bits, Blue 2 bits
   - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
@@ -101,15 +107,19 @@ with one of the built-in color formats and an external :ref:`Image decoder <over
 needs to be used to decode the image.
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
-- :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
+- :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has an alpha
+  channel and an alpha byte is added for every pixel.
 
-Add and use images
-******************
+
+
+Adding and Using Images
+***********************
 
 You can add images to LVGL in two ways:
 
 - using the online converter
 - manually create images
+
 
 Online converter
 ----------------
@@ -141,8 +151,9 @@ want:
 - RGB565 Swap for 16-bit color depth (two bytes are swapped)
 - RGB888 for 32-bit color depth
 
-Manually create an image
-------------------------
+
+Manually creating an image
+--------------------------
 
 If you are generating an image at run-time, you can craft an image
 variable to display it using LVGL. For example:
@@ -163,8 +174,9 @@ variable to display it using LVGL. For example:
 Another (possibly simpler) option to create and display an image at
 run-time is to use the :ref:`Canvas <lv_canvas>` Widget.
 
-Use images
-----------
+
+Using images
+------------
 
 The simplest way to use an image in LVGL is to display it with an
 :ref:`lv_image` Widget:
@@ -183,9 +195,11 @@ If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
 
+
+
 .. _overview_image_decoder:
 
-Image decoder
+Image Decoder
 *************
 
 As you can see in the :ref:`overview_image_color_formats` section, LVGL
@@ -236,9 +250,9 @@ the real, renderable bitmap.
 accordingly. You should choose the correct format according to your needs:
 a fully opaque image, using an alpha channel.
 
-After decoding, the *raw* formats are considered *True color* by the
-library. In other words, the image decoder must decode the *Raw* images
-to *True color* according to the format described in the :ref:`overview_image_color_formats` section.
+The decoded format of a RAW image depends on the decoder.  Example:  JPG images are
+decoded to RGB888 and PNG images are decoded to ARGB8888.  See
+:ref:`overview_image_color_formats` for more details.
 
 
 Registering an image decoder
@@ -298,7 +312,7 @@ open/close the PNG files. It should look like this:
      /* Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format */
      dsc->decoded.header.cf = LV_COLOR_FORMAT_...
 
-     /* Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format. */
+     /* Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in ARGB8888 format. */
      lv_result_t res = lv_bin_decoder_open(decoder, dsc);
 
      return res;
@@ -381,7 +395,7 @@ open/close the PNG files. It should look like this:
 
    }
 
-So in summary:
+In summary:
 
 - In ``decoder_info``, you should collect some basic information about the image and store it in ``header``.
 - In ``decoder_open``, you should try to open the image source pointed by
@@ -397,8 +411,8 @@ So in summary:
   Decoding the whole image requires extra memory and some computational overhead.
 
 
-Manually use an image decoder
------------------------------
+Manually using an image decoder
+-------------------------------
 
 LVGL will use registered image decoders automatically if you try and
 draw a raw image (i.e. using the ``lv_image`` Widget) but you can use them
@@ -507,6 +521,8 @@ See the detailed code below:
     ...
   }
 
+
+
 .. _overview_image_caching:
 
 Image caching
@@ -527,6 +543,7 @@ be beneficial for your platform or not. Image caching may not be worth
 it if you have a deeply embedded target which decodes small images from
 a relatively fast storage medium.
 
+
 Cache size
 ----------
 
@@ -537,6 +554,7 @@ no image is cached.
 The size of cache can be changed at run-time with
 :cpp:expr:`lv_cache_set_max_size(size_t size)`,
 and get with :cpp:expr:`lv_cache_get_max_size()`.
+
 
 Value of images
 ---------------
@@ -564,6 +582,7 @@ to make it more alive.
 If there is no more space in the cache, the entry with *usage_count == 0*
 and lowest life value will be dropped.
 
+
 Memory usage
 ------------
 
@@ -573,6 +592,7 @@ open.
 
 Therefore, it's the user's responsibility to be sure there is enough RAM
 to cache even the largest images at the same time.
+
 
 Clean the cache
 ---------------
@@ -585,6 +605,7 @@ detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
 To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
+
 
 Custom cache algorithm
 ----------------------
@@ -646,6 +667,8 @@ following code to replace the LVGL built-in cache manager:
     lv_cache_set_manager(&my_manager);
     lv_cache_unlock();
    }
+
+
 
 .. _overview_image_api:
 
