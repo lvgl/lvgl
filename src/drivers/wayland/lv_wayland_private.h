@@ -77,6 +77,10 @@ enum object_type {
 #define LAST_DECORATION (OBJECT_BORDER_RIGHT)
 #define NUM_DECORATIONS (LAST_DECORATION - FIRST_DECORATION + 1)
 
+#if LV_WAYLAND_USE_DMABUF
+#define MAX_BUFFER_PLANES 4
+#endif
+
 struct window;
 struct input {
     struct {
@@ -127,6 +131,7 @@ typedef struct {
     struct buffer * buffers;
     struct zwp_linux_dmabuf_v1 * handler;
     uint32_t format;
+    uint8_t last_used;
 } dmabuf_ctx_t;
 
 typedef struct {
@@ -223,6 +228,25 @@ struct window {
     bool fullscreen;
     uint32_t frame_counter;
 };
+
+#if LV_WAYLAND_USE_DMABUF
+struct buffer {
+    int busy;
+
+#if LV_WAYLAND_USE_DMABUF
+    struct window * window;
+    int plane_count;
+
+    int dmabuf_fds[MAX_BUFFER_PLANES];
+    uint32_t strides[MAX_BUFFER_PLANES];
+    uint32_t offsets[MAX_BUFFER_PLANES];
+    struct wl_buffer * buffer;
+#endif
+
+    void * buf_base[MAX_BUFFER_PLANES];
+    lv_draw_buf_t * lv_draw_buf;
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -334,6 +358,7 @@ lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
+void lv_wayland_wait_swap_buf_cb(lv_display_t * disp);
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p);
 
 /**********************
