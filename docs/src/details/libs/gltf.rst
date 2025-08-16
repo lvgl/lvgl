@@ -168,6 +168,7 @@ Setup
 
 .. code-block:: cmake
 
+    include(FetchContent)
     # Set policy to allow to run the target_link_libraries cmd on targets that are
     # build in another directory. Currently, the linking is not handled by
     cmake_policy(SET CMP0079 NEW)
