@@ -189,12 +189,9 @@ static void grid_update(lv_obj_t * cont, void * user_data)
     LV_LOG_INFO("update %p container", (void *)cont);
     LV_UNUSED(user_data);
 
-    //    const int32_t * col_templ = get_col_dsc(cont);
-    //    const int32_t * row_templ = get_row_dsc(cont);
-    //    if(col_templ == NULL || row_templ == NULL) return;
-
     lv_grid_calc_t c;
-    calc(cont, &c);
+    lv_result_t res = calc(cont, &c);
+    if(res != LV_RESULT_OK) return;
 
     item_repos_hint_t hint;
     lv_memzero(&hint, sizeof(hint));

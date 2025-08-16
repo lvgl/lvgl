@@ -11,7 +11,7 @@ Example
 			<enum name="range" help="range"/>
 		</enumdef>
 
-		<enumdef name="bar_orientation" help="">
+		<enumdef name="lv_bar_orientation" help="">
 			<enum name="auto" help=""/>
 			<enum name="horizontal" help=""/>
 			<enum name="vertical" help=""/>

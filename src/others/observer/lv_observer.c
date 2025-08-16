@@ -55,6 +55,11 @@ typedef struct {
     const char * value;
 } subject_set_string_user_data_t;
 
+typedef struct {
+    lv_subject_t * subject;
+    void * element; /**< E.g. span of a span group*/
+    const char * fmt;
+} bind_element_string_t;
 
 typedef struct {
     lv_subject_t * subject;
@@ -92,6 +97,10 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
+#if LV_USE_SPAN
+    static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
 #if LV_USE_ARC
     static void arc_value_changed_event_cb(lv_event_t * e);
     static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -112,7 +121,11 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
-static void free_user_data_event_cb(lv_event_t * e);
+#if LV_USE_SCALE
+    static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
 static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
 
 /**********************
@@ -565,7 +578,7 @@ void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, 
     user_data->max = max;
     user_data->subject = subject;
     lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
@@ -581,7 +594,7 @@ void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv
     user_data->value = value;
 
     lv_obj_add_event_cb(obj, subject_set_int_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 #if LV_USE_FLOAT
@@ -598,7 +611,7 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
     user_data->value = value;
 
     lv_obj_add_event_cb(obj, subject_set_float_cb, trigger, user_data);
-    lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 #endif /*LV_USE_FLOAT*/
 
@@ -779,6 +792,54 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
 }
 #endif /*LV_USE_LABEL*/
 
+#if LV_USE_SPAN
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(span);
+
+    if(fmt == NULL) {
+        if(subject->type == LV_SUBJECT_TYPE_INT) {
+            fmt = "%d";
+        }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
+        else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+    else {
+        if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+
+    bind_element_string_t * user_data = lv_zalloc(sizeof(bind_element_string_t));
+    if(user_data == NULL) {
+        LV_LOG_WARN("Couldn't allocate user_data");
+        LV_ASSERT_MALLOC(user_data);
+        return NULL;
+    }
+
+    user_data->subject = subject;
+    user_data->element = span;
+    user_data->fmt = fmt;
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, span_text_observer_cb, obj, user_data);
+    observer->auto_free_user_data = 1;
+
+    return observer;
+}
+#endif /*LV_USE_SPAN*/
+
+
 #if LV_USE_ARC
 lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -850,6 +911,40 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     return observer;
 }
 #endif /*LV_USE_DROPDOWN*/
+
+#if LV_USE_SCALE
+
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_min_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+#endif /*LV_USE_SCALE*/
 
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 {
@@ -1090,6 +1185,39 @@ static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subj
 
 #endif /*LV_USE_LABEL*/
 
+#if LV_USE_SPAN
+
+static void span_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    bind_element_string_t * user_data = observer->user_data;
+
+    if(user_data->fmt == NULL) {
+        lv_spangroup_set_span_text(observer->target, user_data->element, subject->value.pointer);
+    }
+    else {
+        switch(subject->type) {
+
+            case LV_SUBJECT_TYPE_INT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.num);
+                break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.float_v);
+                break;
+#endif
+            case LV_SUBJECT_TYPE_STRING:
+            case LV_SUBJECT_TYPE_POINTER:
+                lv_spangroup_set_span_text_fmt(observer->target, user_data->element, user_data->fmt, subject->value.pointer);
+                break;
+            default:
+                return;
+        }
+    }
+}
+
+#endif /*LV_USE_SPAN*/
+
+
 #if LV_USE_ARC
 
 static void arc_value_changed_event_cb(lv_event_t * e)
@@ -1188,10 +1316,21 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 
 #endif /*LV_USE_DROPDOWN*/
 
-static void free_user_data_event_cb(lv_event_t * e)
+#if LV_USE_SCALE
+
+static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_free(lv_event_get_user_data(e));
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_min_value(observer->target, section, subject->value.num);
 }
+
+static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_max_value(observer->target, section, subject->value.num);
+}
+
+#endif /*LV_USE_SCALE*/
 
 static void subject_set_string_free_user_data_event_cb(lv_event_t * e)
 {

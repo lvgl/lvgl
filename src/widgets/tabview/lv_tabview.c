@@ -242,6 +242,13 @@ uint32_t lv_tabview_get_tab_active(lv_obj_t * obj)
     return tabview->tab_cur;
 }
 
+lv_obj_t * lv_tabview_get_tab_button(lv_obj_t * obj, int32_t idx)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return lv_obj_get_child_by_type(lv_tabview_get_tab_bar(obj), idx, &lv_button_class);
+}
+
 uint32_t lv_tabview_get_tab_count(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

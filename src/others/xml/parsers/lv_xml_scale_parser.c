@@ -68,7 +68,7 @@ void lv_xml_scale_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("min_value", name)) lv_scale_set_min_value(item, lv_xml_atoi(value));
         else if(lv_streq("max_value", name)) lv_scale_set_max_value(item, lv_xml_atoi(value));
         else if(lv_streq("angle_range", name)) lv_scale_set_angle_range(item, lv_xml_atoi(value));
-        else if(lv_streq("rotation", name)) lv_scale_set_rotation(item, lv_xml_to_bool(value));
+        else if(lv_streq("rotation", name)) lv_scale_set_rotation(item, lv_xml_atoi(value));
     }
 }
 
@@ -104,6 +104,24 @@ void lv_xml_scale_section_apply(lv_xml_parser_state_t * state, const char ** att
         else if(lv_streq("style_items", name)) {
             lv_xml_style_t * style_dsc = lv_xml_get_style_by_name(&state->scope, value);
             lv_scale_set_section_style_items(scale, section, &style_dsc->style);
+        }
+        else if(lv_streq("bind_min_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_scale_bind_section_min_value(scale, section, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in scale section's bind_min_value", value);
+            }
+        }
+        else if(lv_streq("bind_max_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_scale_bind_section_max_value(scale, section, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in scale section's bind_max_value", value);
+            }
         }
     }
 }

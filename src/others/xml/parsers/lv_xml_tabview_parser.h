@@ -30,6 +30,8 @@ void * lv_xml_tabview_tab_bar_create(lv_xml_parser_state_t * state, const char *
 void lv_xml_tabview_tab_bar_apply(lv_xml_parser_state_t * state, const char ** attrs);
 void * lv_xml_tabview_tab_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_xml_tabview_tab_apply(lv_xml_parser_state_t * state, const char ** attrs);
+void * lv_xml_tabview_tab_button_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_xml_tabview_tab_button_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
 /**********************
  *      MACROS

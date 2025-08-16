@@ -210,6 +210,14 @@ void lv_event_stop_trickling(lv_event_t * e);
 void lv_event_stop_processing(lv_event_t * e);
 
 /**
+ * Helper function typically used in LV_EVENT_DELETE
+ * to free the event's user_data
+ * @param e     pointer to an event descriptor
+ */
+void lv_event_free_user_data_cb(lv_event_t * e);
+
+
+/**
  * Register a new, custom event ID.
  * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
  * @return      the new event id

@@ -21,6 +21,7 @@ extern "C" {
 #include "lv_xml_test.h"
 #include "lv_xml_translation.h"
 #include "lv_xml_component.h"
+#include "lv_xml_widget.h"
 
 /*********************
  *      DEFINES

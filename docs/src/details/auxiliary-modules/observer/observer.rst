@@ -361,13 +361,18 @@ integer value:
 
 - flag (or OR-ed combination of flags) from from the ``LV_OBJ_FLAG_...`` enumeration values;
 - state (or OR-ed combination of states) from the ``LV_STATE_...`` enumeration values;
-- text value for Label Widgets;
+- text value for
+
+    - Label
+    - Span;
+
 - integer value for these Widget types:
 
     - Arc
     - Drop-Down
     - Roller
     - Slider
+    - Scale Section Min/Max value
 
 Any number of Observers can be created for a single Widget, each bound to ONE of
 the above properties.
@@ -507,6 +512,15 @@ If ``NULL`` is passed for the ``format_string`` argument:
 **Example:**  "%d |deg|\C"
 
 
+Spangroup's Span
+~~~~~~~~~~~~~~~~
+
+Very similarly to Label Text binding a Span's text can be bound to a subject as well.
+
+The only difference is that in the bind function both the spangroup and the span needs to be specified:
+
+ :cpp:expr:`lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)`
+
 Arc Widgets
 ~~~~~~~~~~~
 
@@ -561,6 +575,23 @@ It support only integer subjects.
 
 
 .. _change_subject_on_event:
+
+Scale's Section
+~~~~~~~~~~~~~~~
+
+This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
+minimum or maximum values directly.  Note that this is a one way binding (Subject ==> Widget)
+as the Scale Section's are not interactive.
+(Requires :c:macro:`LV_USE_SCALE` to be configured to ``1``.)
+
+It support only integer subjects.
+
+- :cpp:expr:`lv_scale_bind_section_min_value(scale, section1, &subject)`
+- :cpp:expr:`lv_scale_bind_section_max_value(scale, section1, &subject)`
+
+
+.. _change_subject_on_event:
+
 
 Change Subject on Event
 -----------------------
