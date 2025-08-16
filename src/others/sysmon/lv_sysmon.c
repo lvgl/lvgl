@@ -331,7 +331,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     lv_label_set_text_fmt(
         label,
-        "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU, %" LV_PRIu32 "%% Self\n"
+        "%" LV_PRIu32" FPS | CPU (%" LV_PRIu32 "%% | %" LV_PRIu32 "%%)\n"
         "%" LV_PRIu32" ms (%" LV_PRIu32" | %" LV_PRIu32")",
         perf->calculated.fps, perf->calculated.cpu, perf->calculated.cpu_proc,
         perf->calculated.render_avg_time + perf->calculated.flush_avg_time,
