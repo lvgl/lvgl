@@ -265,6 +265,8 @@ static void create_animation_panel(lv_obj_t * panel, lv_obj_t * viewer)
 
     play_pause_event_data_t * event_data = lv_malloc(sizeof(*event_data));
     LV_ASSERT_MALLOC(event_data);
+    event_data->label = animation_pp_btn_label;
+    event_data->viewer = viewer;
     lv_obj_add_event_cb(animation_pp_btn, on_animation_play_pause_event, LV_EVENT_CLICKED, event_data);
     lv_obj_add_event_cb(animation_pp_btn, on_animation_play_pause_event, LV_EVENT_DELETE, event_data);
 
