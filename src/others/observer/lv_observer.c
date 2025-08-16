@@ -485,6 +485,10 @@ void lv_observer_remove(lv_observer_t * observer)
 
     observer->subject->notify_restart_query = 1;
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    if(observer->destructor && observer->ext_data) observer->destructor(observer->ext_data);
+#endif
+
     lv_ll_remove(&(observer->subject->subs_ll), observer);
 
     if(observer->auto_free_user_data) {
@@ -862,6 +866,21 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
 
     return observer->user_data;
 }
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_observer_set_external_data(lv_observer_t * observer, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(observer);
+
+    /* Clean up existing external data if present */
+    if(observer->destructor && observer->ext_data) {
+        observer->destructor(observer->ext_data);
+    }
+
+    observer->ext_data = ext_data;
+    observer->destructor = destructor;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

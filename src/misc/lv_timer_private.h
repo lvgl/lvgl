@@ -35,6 +35,10 @@ struct _lv_timer_t {
     int32_t repeat_count;      /**< 1: One time;  -1 : infinity;  n>0: residual times */
     uint32_t paused : 1;
     uint32_t auto_delete : 1;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 typedef struct {
