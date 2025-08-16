@@ -96,6 +96,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
     lv_xml_widget_register("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
     lv_xml_widget_register("lv_tabview-tab", lv_xml_tabview_tab_create, lv_xml_tabview_tab_apply);
+    lv_xml_widget_register("lv_tabview-tab_button", lv_xml_tabview_tab_button_create, lv_xml_tabview_tab_button_apply);
     lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
     lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);

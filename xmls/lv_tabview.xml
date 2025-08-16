@@ -16,5 +16,9 @@ Example
         <element name="tab" type="lv_obj" access="add">
             <arg name="text" type="string"/>
         </element>
+        <element name="tab_button" type="lv_obj" access="get">
+            <arg name="index" type="int"/>
+        </element>
+
     </api>
 </widget>
