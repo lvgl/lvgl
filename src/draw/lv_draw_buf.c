@@ -29,6 +29,8 @@
  **********************/
 static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
+static void buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                     const lv_draw_buf_t * src, const lv_area_t * src_area);
 static void * buf_align(void * buf, lv_color_format_t color_format);
 static void * draw_buf_malloc(const lv_draw_buf_handlers_t * handler, size_t size_bytes,
                               lv_color_format_t color_format);
@@ -58,20 +60,22 @@ void lv_draw_buf_init_handlers(void)
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
 {
-    lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride);
+    lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_copy, buf_align, NULL, NULL, width_to_stride);
 }
 
 void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
-                               lv_draw_buf_malloc_cb buf_malloc_cb,
-                               lv_draw_buf_free_cb buf_free_cb,
-                               lv_draw_buf_align_cb align_pointer_cb,
-                               lv_draw_buf_cache_operation_cb invalidate_cache_cb,
-                               lv_draw_buf_cache_operation_cb flush_cache_cb,
-                               lv_draw_buf_width_to_stride_cb width_to_stride_cb)
+                               lv_draw_buf_malloc_cb_t buf_malloc_cb,
+                               lv_draw_buf_free_cb_t buf_free_cb,
+                               lv_draw_buf_copy_cb_t buf_copy_cb,
+                               lv_draw_buf_align_cb_t align_pointer_cb,
+                               lv_draw_buf_cache_operation_cb_t invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb_t flush_cache_cb,
+                               lv_draw_buf_width_to_stride_cb_t width_to_stride_cb)
 {
     lv_memzero(handlers, sizeof(lv_draw_buf_handlers_t));
     handlers->buf_malloc_cb = buf_malloc_cb;
     handlers->buf_free_cb = buf_free_cb;
+    handlers->buf_copy_cb = buf_copy_cb;
     handlers->align_pointer_cb = align_pointer_cb;
     handlers->invalidate_cache_cb = invalidate_cache_cb;
     handlers->flush_cache_cb = flush_cache_cb;
@@ -207,64 +211,6 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
         buf += stride;
     }
     lv_draw_buf_flush_cache(draw_buf, a);
-    LV_PROFILER_DRAW_END;
-}
-
-void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
-                      const lv_draw_buf_t * src, const lv_area_t * src_area)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    uint8_t * dest_bufc;
-    uint8_t * src_bufc;
-    int32_t line_width;
-
-    /*Source and dest color format must be same. Color conversion is not supported yet.*/
-    LV_ASSERT_FORMAT_MSG(dest->header.cf == src->header.cf, "Color format mismatch: %d != %d",
-                         dest->header.cf, src->header.cf);
-
-    if(dest_area == NULL) line_width = dest->header.w;
-    else line_width = lv_area_get_width(dest_area);
-
-    /* For indexed image, copy the palette if we are copying full image area*/
-    if(dest_area == NULL || src_area == NULL) {
-        if(LV_COLOR_FORMAT_IS_INDEXED(dest->header.cf)) {
-            lv_memcpy(dest->data, src->data, LV_COLOR_INDEXED_PALETTE_SIZE(dest->header.cf) * sizeof(lv_color32_t));
-        }
-    }
-
-    /*Check source and dest area have same width*/
-    if((src_area == NULL && line_width != src->header.w) || \
-       (src_area != NULL && line_width != lv_area_get_width(src_area))) {
-        LV_ASSERT_MSG(0, "Source and destination areas have different width");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    if(src_area) src_bufc = lv_draw_buf_goto_xy(src, src_area->x1, src_area->y1);
-    else src_bufc = lv_draw_buf_goto_xy(src, 0, 0);
-
-    if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
-    else dest_bufc = lv_draw_buf_goto_xy(dest, 0, 0);
-
-    int32_t start_y, end_y;
-    if(dest_area) {
-        start_y = dest_area->y1;
-        end_y = dest_area->y2;
-    }
-    else {
-        start_y = 0;
-        end_y = dest->header.h - 1;
-    }
-
-    uint32_t dest_stride = dest->header.stride;
-    uint32_t src_stride = src->header.stride;
-    uint32_t line_bytes = (line_width * lv_color_format_get_bpp(dest->header.cf) + 7) >> 3;
-
-    for(; start_y <= end_y; start_y++) {
-        lv_memcpy(dest_bufc, src_bufc, line_bytes);
-        dest_bufc += dest_stride;
-        src_bufc += src_stride;
-    }
     LV_PROFILER_DRAW_END;
 }
 
@@ -414,6 +360,17 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
         LV_LOG_ERROR("draw buffer is not allocated, ignored");
     }
     LV_PROFILER_DRAW_END;
+}
+
+void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                      const lv_draw_buf_t * src, const lv_area_t * src_area)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(dest->handlers);
+    LV_ASSERT_NULL(dest->handlers->buf_copy_cb);
+    LV_ASSERT_NULL(src);
+
+    dest->handlers->buf_copy_cb(dest, dest_area, src, src_area);
 }
 
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
@@ -662,6 +619,64 @@ static void * buf_malloc(size_t size_bytes, lv_color_format_t color_format)
 static void buf_free(void * buf)
 {
     lv_free(buf);
+}
+
+static void buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                     const lv_draw_buf_t * src, const lv_area_t * src_area)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    uint8_t * dest_bufc;
+    uint8_t * src_bufc;
+    int32_t line_width;
+
+    /*Source and dest color format must be same. Color conversion is not supported yet.*/
+    LV_ASSERT_FORMAT_MSG(dest->header.cf == src->header.cf, "Color format mismatch: %d != %d",
+                         dest->header.cf, src->header.cf);
+
+    if(dest_area == NULL) line_width = dest->header.w;
+    else line_width = lv_area_get_width(dest_area);
+
+    /* For indexed image, copy the palette if we are copying full image area*/
+    if(dest_area == NULL || src_area == NULL) {
+        if(LV_COLOR_FORMAT_IS_INDEXED(dest->header.cf)) {
+            lv_memcpy(dest->data, src->data, LV_COLOR_INDEXED_PALETTE_SIZE(dest->header.cf) * sizeof(lv_color32_t));
+        }
+    }
+
+    /*Check source and dest area have same width*/
+    if((src_area == NULL && line_width != src->header.w) || \
+       (src_area != NULL && line_width != lv_area_get_width(src_area))) {
+        LV_ASSERT_MSG(0, "Source and destination areas have different width");
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    if(src_area) src_bufc = lv_draw_buf_goto_xy(src, src_area->x1, src_area->y1);
+    else src_bufc = lv_draw_buf_goto_xy(src, 0, 0);
+
+    if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
+    else dest_bufc = lv_draw_buf_goto_xy(dest, 0, 0);
+
+    int32_t start_y, end_y;
+    if(dest_area) {
+        start_y = dest_area->y1;
+        end_y = dest_area->y2;
+    }
+    else {
+        start_y = 0;
+        end_y = dest->header.h - 1;
+    }
+
+    uint32_t dest_stride = dest->header.stride;
+    uint32_t src_stride = src->header.stride;
+    uint32_t line_bytes = (line_width * lv_color_format_get_bpp(dest->header.cf) + 7) >> 3;
+
+    for(; start_y <= end_y; start_y++) {
+        lv_memcpy(dest_bufc, src_bufc, line_bytes);
+        dest_bufc += dest_stride;
+        src_bufc += src_stride;
+    }
+    LV_PROFILER_DRAW_END;
 }
 
 static void * buf_align(void * buf, lv_color_format_t color_format)

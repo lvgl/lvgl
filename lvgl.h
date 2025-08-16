@@ -133,6 +133,7 @@ extern "C" {
 #include "src/lv_api_map_v9_0.h"
 #include "src/lv_api_map_v9_1.h"
 #include "src/lv_api_map_v9_2.h"
+#include "src/lv_api_map_v9_3.h"
 
 #if LV_USE_PRIVATE_API
 #include "src/lvgl_private.h"

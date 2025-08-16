@@ -25,12 +25,13 @@ extern "C" {
  **********************/
 
 struct _lv_draw_buf_handlers_t {
-    lv_draw_buf_malloc_cb buf_malloc_cb;
-    lv_draw_buf_free_cb buf_free_cb;
-    lv_draw_buf_align_cb align_pointer_cb;
-    lv_draw_buf_cache_operation_cb invalidate_cache_cb;
-    lv_draw_buf_cache_operation_cb flush_cache_cb;
-    lv_draw_buf_width_to_stride_cb width_to_stride_cb;
+    lv_draw_buf_malloc_cb_t buf_malloc_cb;
+    lv_draw_buf_free_cb_t buf_free_cb;
+    lv_draw_buf_copy_cb_t buf_copy_cb;
+    lv_draw_buf_align_cb_t align_pointer_cb;
+    lv_draw_buf_cache_operation_cb_t invalidate_cache_cb;
+    lv_draw_buf_cache_operation_cb_t flush_cache_cb;
+    lv_draw_buf_width_to_stride_cb_t width_to_stride_cb;
 };
 
 /**********************
