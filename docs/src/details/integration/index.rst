@@ -1,4 +1,4 @@
-.. _integration:
+.. _integration_index:
 
 ===========
 Integration
