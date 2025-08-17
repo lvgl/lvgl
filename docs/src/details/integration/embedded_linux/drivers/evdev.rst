@@ -37,7 +37,7 @@ Ensure that an ``lv_display_t`` object is already created for ``disp``. An examp
 
 .. code-block:: c
 
-    lv_display_t * disp = lv_linux_fbdev
+    lv_display_t * disp = lv_linux_fbdev_create();
     lv_linux_fbdev_set_file(disp, "/dev/fb0");_create();
 
 
