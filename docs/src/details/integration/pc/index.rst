@@ -14,6 +14,7 @@ Running on PC
     linux
     windows
     macos
+    browser
     sdl
     uefi
 

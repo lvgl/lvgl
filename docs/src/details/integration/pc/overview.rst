@@ -1,8 +1,8 @@
 .. _simulator:
 
-=============
-Running on PC
-=============
+========
+Overview
+========
 
 You can try out LVGL **using only your PC** (i.e. without any
 development boards). LVGL will run on a simulator environment on the PC
@@ -40,7 +40,8 @@ External project not maintained by the LVGL organization:
 Built-in drivers
 ----------------
 
-LVGL comes with several :ref:`built-in drivers <drivers>`.
+LVGL comes with several built-in drivers, operating system and GPU support.
+See :ref:`integration_index`.
 
 Even if a simulator project comes with e.g. SDL, you can easily replace it by enabling
 another driver in ``lv_conf.h`` and calling its ``create`` function.
