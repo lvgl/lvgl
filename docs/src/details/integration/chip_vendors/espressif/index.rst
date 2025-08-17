@@ -2,7 +2,7 @@
 
 =========
 Espressif
-========
+=========
 
 .. toctree::
     :maxdepth: 2
