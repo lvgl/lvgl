@@ -144,6 +144,8 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     uint32_t removed_count = 0;
     int32_t i;
     
+    if(event_cnt == 0) return 0;
+    
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
         if(dsc && dsc->cb == event_cb) {
