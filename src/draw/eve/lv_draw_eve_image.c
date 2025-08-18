@@ -149,9 +149,10 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     lv_eve_save_context();
 
+    lv_eve_color_opa(draw_dsc->opa);
+
     if(draw_dsc->recolor_opa > LV_OPA_MIN) {
-        lv_eve_color_opa(draw_dsc->recolor_opa);
-        lv_eve_color(draw_dsc->recolor);
+        lv_eve_color(lv_color_mix(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa));
     }
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
