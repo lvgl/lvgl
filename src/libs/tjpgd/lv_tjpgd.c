@@ -169,6 +169,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
 #else
         LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
+        lv_free(f);
         return LV_RESULT_INVALID;
 #endif
     }
@@ -186,20 +187,20 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
     JDEC * jd = lv_malloc(sizeof(JDEC));
-    dsc->user_data = jd;
     JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
-    if(rc) return LV_RESULT_INVALID;
-
-    dsc->header.cf = LV_COLOR_FORMAT_RGB888;
-    dsc->header.w = jd->width;
-    dsc->header.h = jd->height;
-    dsc->header.stride = jd->width * 3;
-
     if(rc != JDR_OK) {
+        lv_fs_close(f);
+        lv_free(f);
         lv_free(workb_temp);
         lv_free(jd);
         return LV_RESULT_INVALID;
     }
+
+    dsc->user_data = jd;
+    dsc->header.cf = LV_COLOR_FORMAT_RGB888;
+    dsc->header.w = jd->width;
+    dsc->header.h = jd->height;
+    dsc->header.stride = jd->width * 3;
 
     return LV_RESULT_OK;
 }
