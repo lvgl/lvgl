@@ -311,6 +311,9 @@
 	    <prop name="flex_track_place" type="enum:lv_flex_align"/>
 	    <prop name="flex_grow" type="int"/>
 
+
+        <prop name="grid_column_dsc_array" type="grid_dsc[LV_GRID_TEMPLATE_LAST]"/>
+        <prop name="grid_row_dsc_array" type="grid_dsc[LV_GRID_TEMPLATE_LAST]"/>
 	    <prop name="grid_column_align" type="enum:lv_grid_align"/>
 	    <prop name="grid_row_align" type="enum:lv_grid_align"/>
 	    <prop name="grid_cell_column_pos" type="int"/>
