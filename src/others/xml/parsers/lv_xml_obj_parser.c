@@ -900,7 +900,7 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
             if(value[i] == ' ') item_cnt++;
         }
 
-        int32_t * dsc_array = lv_malloc((item_cnt + 1) * sizeof(int32_t)); /*+1 for LV_GRID_TEMPLATE_LAST*/
+        int32_t * dsc_array = lv_malloc((item_cnt + 2) * sizeof(int32_t)); /*+2 for LV_GRID_TEMPLATE_LAST*/
 
         char * value_buf = (char *)value;
         item_cnt = 0;

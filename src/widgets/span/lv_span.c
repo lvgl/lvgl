@@ -209,11 +209,14 @@ void lv_span_set_text_fmt(lv_span_t * span, const char * fmt, ...)
     va_start(args, fmt);
     char * text = lv_text_set_text_vfmt(fmt, args);
     LV_ASSERT_MALLOC(text);
-    if(text == NULL) return;
+    if(text == NULL) {
+        va_end(args);
+        return;
+    }
 
     va_end(args);
 
-    if(span->txt == NULL && span->static_flag) {
+    if(span->txt && !span->static_flag) {
         lv_free(span->txt);
     }
 
@@ -267,11 +270,14 @@ void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char
     va_start(args, fmt);
     char * text = lv_text_set_text_vfmt(fmt, args);
     LV_ASSERT_MALLOC(text);
-    if(text == NULL) return;
+    if(text == NULL) {
+        va_end(args);
+        return;
+    }
 
     va_end(args);
 
-    if(span->txt == NULL && span->static_flag) {
+    if(span->txt && !span->static_flag) {
         lv_free(span->txt);
     }
 

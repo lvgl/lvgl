@@ -97,7 +97,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * @code
  * lv_label_set_text_fmt(label1, "%d user", user_num);
  * @endcode
- * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
+ * @note If `LV_USE_ARABIC_PERSIAN_CHARS` is enabled the text will be modified to have the correct Arabic characters in it.
  */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 

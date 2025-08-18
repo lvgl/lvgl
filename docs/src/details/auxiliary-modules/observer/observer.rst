@@ -372,7 +372,7 @@ integer value:
     - Drop-Down
     - Roller
     - Slider
-    - Scale Section Min/Max value
++    - Scale Section Min/Max values
 
 Any number of Observers can be created for a single Widget, each bound to ONE of
 the above properties.
@@ -521,6 +521,9 @@ The only difference is that in the bind function both the spangroup and the span
 
  :cpp:expr:`lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)`
 
+Note that before calling :cpp:expr:`lv_spangroup_delete_span` :cpp:expr:`lv_observer_remove`
+needs to be called manually as LVGL can't remove the binding automatically.
+
 Arc Widgets
 ~~~~~~~~~~~
 
@@ -578,10 +581,10 @@ Scale's Section
 
 This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
 minimum or maximum values directly.  Note that this is a one way binding (Subject ==> Widget)
-as the Scale Section's are not interactive.
+as the Scale Section's boundaries are not interactive.
 (Requires :c:macro:`LV_USE_SCALE` to be configured to ``1``.)
 
-It support only integer subjects.
+It supports only integer subjects.
 
 - :cpp:expr:`lv_scale_bind_section_min_value(scale, section1, &subject)`
 - :cpp:expr:`lv_scale_bind_section_max_value(scale, section1, &subject)`
