@@ -128,7 +128,14 @@ static void chart_event_cb(lv_event_t * e)
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, ser->y_points[base_dsc->id2]);
 
         lv_point_t text_size;
-        lv_text_get_size(&text_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_text_attributes_t attributes = {0};
+
+        attributes.letter_space = 0;
+        attributes.line_space = 0;
+        attributes.max_width = LV_COORD_MAX;
+        attributes.text_flags = LV_TEXT_FLAG_NONE;
+
+        lv_text_get_size(&text_size, buf, LV_FONT_DEFAULT, &attributes);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;

@@ -265,8 +265,6 @@ static void color_event_cb(lv_event_t * e)
     }
 }
 
-
-
 static void scroll_anim_y_cb(void * var, int32_t v)
 {
     lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);

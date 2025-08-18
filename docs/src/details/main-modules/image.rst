@@ -65,6 +65,11 @@ Various built-in color formats are supported:
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but it also adds an alpha (transparency) byte for every pixel.
 - :cpp:enumerator:`LV_COLOR_FORMAT_I1`, :cpp:enumerator:`LV_COLOR_FORMAT_I2`, :cpp:enumerator:`LV_COLOR_FORMAT_I4`, :cpp:enumerator:`LV_COLOR_FORMAT_I8`:
   Uses a palette with 2, 4, 16 or 256 colors and stores each pixel in 1, 2, 4 or 8 bits.
+
+  Since the colors in the palette can be anything, the pixel data for these formats is stored as ``ARGB8888``.
+
+  When using LVGL's SW render, make sure ``LV_DRAW_SW_SUPPORT_ARGB8888`` is set to ``1``
+  in your LVGL config.
 - :cpp:enumerator:`LV_COLOR_FORMAT_A1`, :cpp:enumerator:`LV_COLOR_FORMAT_A2`, :cpp:enumerator:`LV_COLOR_FORMAT_A4`, :cpp:enumerator:`LV_COLOR_FORMAT_A8`:
   **Only stores the Alpha value with 1, 2, 4 or 8 bits.** The pixels take the color of ``style.img_recolor`` and
   the set opacity. The source image has to be an alpha channel. This is

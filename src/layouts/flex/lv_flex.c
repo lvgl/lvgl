@@ -236,13 +236,23 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     int32_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     int32_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
 
+    lv_obj_t * parent = lv_obj_get_parent(cont);
+    bool ignore_size_content = false;
+    if(parent != NULL) {
+        bool parent_is_flex = lv_obj_get_style_layout(parent, LV_PART_MAIN) == LV_LAYOUT_FLEX;
+        uint8_t parent_row = lv_obj_get_style_flex_flow(parent, LV_PART_MAIN) & LV_FLEX_COLUMN ? 0 : 1;
+        uint8_t grow_value = lv_obj_get_style_flex_grow(cont, LV_PART_MAIN);
+        ignore_size_content = parent_is_flex && (parent_row == f->row) && (grow_value > 0);
+    }
+
     /*Can't wrap if the size is auto (i.e. the size depends on the children)*/
-    if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT))) {
+    if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT)) &&
+       !ignore_size_content) {
         f->wrap = false;
     }
-    int32_t(*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
-    int32_t(*get_cross_size)(const lv_obj_t *) = (!f->row ? lv_obj_get_width_with_margin :
-                                                  lv_obj_get_height_with_margin);
+    int32_t (*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
+    int32_t (*get_cross_size)(const lv_obj_t *) =
+        (!f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
 
     t->track_main_size = 0;
     t->track_fix_main_size = 0;

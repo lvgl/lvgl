@@ -68,7 +68,7 @@ typedef struct {
       * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
     uint8_t req_raw_bitmap: 1;
 
-    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
+    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
 
     union {
         uint32_t index;       /**< Unicode code point*/
@@ -113,7 +113,7 @@ struct _lv_font_t {
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
-    const lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
+    const lv_font_t * fallback;     /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
 };
 
@@ -172,7 +172,6 @@ const void * lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc);
  */
 bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next);
-
 /**
  * Release the bitmap of a font.
  * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t) before you can call this function.
