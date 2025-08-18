@@ -573,9 +573,6 @@ It support only integer subjects.
 
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
-
-.. _change_subject_on_event:
-
 Scale's Section
 ~~~~~~~~~~~~~~~
 
