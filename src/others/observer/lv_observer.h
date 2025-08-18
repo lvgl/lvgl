@@ -548,7 +548,7 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
 #if LV_USE_LABEL
 
 /**
- * Bind an integer, string, or pointer Subject to a Label.
+ * Bind an integer, string, or pointer Subject to a Spangroup's Span.
  * @param obj       pointer to Spangroup
  * @param span      pointer to Span
  * @param subject   pointer to Subject
@@ -607,7 +607,7 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 
 /**
  * Bind an integer subject to a scales section minimum value
- * @param obj       pointer to an Scale
+ * @param obj       pointer to a Scale
  * @param section   pointer to a Scale section
  * @param subject   pointer to a Subject
  * @return          pointer to newly-created Observer

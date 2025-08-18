@@ -75,6 +75,9 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj);
  * Remove the span from the spangroup and free memory.
  * @param obj   pointer to a spangroup object.
  * @param span  pointer to a span.
+ * @note        Note that before calling `lv_spangroup_delete_span`
+ *              `lv_observer_remove` needs to be called manually as LVGL can't remove the
+ *              binding automatically.
  */
 void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
 
@@ -100,7 +103,7 @@ void lv_span_set_text(lv_span_t * span, const char * text);
  * @param span  pointer to a span.
  * @param fmt   `printf`-like format string
  */
-void lv_span_set_text_fmt(lv_span_t * span, const char * fmt, ...);
+void lv_span_set_text_fmt(lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
 /**
  * Set a static text. It will not be saved by the span so the 'text' variable
@@ -136,7 +139,7 @@ void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const c
  * @param span  pointer to a span.
  * @param fmt   `printf`-like format string
  */
-void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...);
+void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(3, 4);
 
 /**
  * Set a static text. It will not be saved by the span so the 'text' variable

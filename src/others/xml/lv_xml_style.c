@@ -290,7 +290,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
                 if(value[c] == ' ') item_cnt++;
             }
 
-            int32_t * dsc_array = lv_malloc((item_cnt + 1) * sizeof(int32_t)); /*+1 for LV_GRID_TEMPLATE_LAST*/
+            int32_t * dsc_array = lv_malloc((item_cnt + 2) * sizeof(int32_t)); /*+2 for LV_GRID_TEMPLATE_LAST*/
 
             char * value_buf = (char *)value;
             item_cnt = 0;
