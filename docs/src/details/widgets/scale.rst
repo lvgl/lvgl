@@ -4,6 +4,7 @@
 Scale (lv_scale)
 ================
 
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Overview
 ********
@@ -120,7 +121,7 @@ Or both of the above can be done at the same time:
 
 Some labels of the Scale might be drawn upside down (to match the tick) if the Scale includes a certain angle range.
 If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used.
-Labels that would be upside down are then rotated 180
+Labels that would be upside down are then rotated 180\ |deg|
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR)`.
 Labels can also be moved a fixed distance in X and Y pixels using
 :cpp:expr:`lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR)`.
