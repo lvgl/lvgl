@@ -13,15 +13,17 @@
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
-#include "ltdc.h"
+#include "main.h"
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     #if LV_USE_DRAW_DMA2D
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
     #endif /*LV_USE_DRAW_DMA2D*/
 
-    #include "dma2d.h"
+    extern DMA2D_HandleTypeDef hdma2d;
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
+
+extern LTDC_HandleTypeDef hltdc;
 
 /*********************
  *      DEFINES
