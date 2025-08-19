@@ -84,8 +84,7 @@ handling methods:
 Palette and Alpha index
 -----------------------
 
-Besides the *True color* (RGB) color format, the following formats are
-supported:
+Besides RGB888 and ARGB8888 color formats, the following formats are supported:
 
 - **Indexed**: Image has a color palette, and each pixel is an index into that palette.
 - **Alpha indexed**: The values stored at pixel positions are alpha (opacity) values.
