@@ -1286,6 +1286,10 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
     if(label_dsc->text != NULL) {
         lv_text_get_size(&label_size, label_dsc->text, label_dsc->font, &attributes);
     }
+    else {
+        label_size.x = 0;
+        label_size.y = 0;
+    }
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
