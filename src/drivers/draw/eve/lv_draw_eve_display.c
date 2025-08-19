@@ -117,7 +117,7 @@ void lv_draw_eve_pre_upload_font_range(lv_display_t * disp, const lv_font_t * fo
         lv_font_glyph_dsc_t glyph_dsc;
         bool found = lv_font_get_glyph_dsc_fmt_txt(font, &glyph_dsc, i, '\0');
         if(!found) {
-            LV_LOG_WARN("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
+            LV_LOG_INFO("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
                         "because it is not part of the font", i);
             continue;
         }
@@ -144,7 +144,7 @@ void lv_draw_eve_pre_upload_font_text(lv_display_t * disp, const lv_font_t * fon
         lv_font_glyph_dsc_t glyph_dsc;
         bool found = lv_font_get_glyph_dsc_fmt_txt(font, &glyph_dsc, unicode_letter, unicode_letter_next);
         if(!found) {
-            LV_LOG_WARN("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
+            LV_LOG_INFO("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
                         "because it is not part of the font", i);
             continue;
         }
