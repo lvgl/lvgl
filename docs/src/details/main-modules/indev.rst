@@ -194,7 +194,7 @@ This must be done in the user defined indev ``read_cb``. This will iterate over 
 recognized or ended gesture. For now only one multi-touch gesture can be recognized/ended at a time.
 
 Once the recognizers are updated, calling ``lv_indev_gesture_recognizers_set_data`` will update the ``lv_indev_data_t`` structure.
-It is meant to be done in the indev ``read_cb``. This allows the future ``lv_event_t`` to eb filled with multi-touch gesture info.
+It is meant to be done in the indev ``read_cb``. This allows the future ``lv_event_t`` to be filled with multi-touch gesture info.
 
 Here is an example of the ``read_cb``:
 
@@ -549,7 +549,7 @@ Using Buttons with Encoder Logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to standard encoder behavior, you can also utilize its logic
-to navigate(focus) and edit widgets using buttons. This is especially
+to navigate (focus) and edit widgets using buttons. This is especially
 handy if you have only few buttons available, or you want to use other
 buttons in addition to an encoder wheel.
 
@@ -558,7 +558,7 @@ You need to have 3 buttons available:
 - :cpp:enumerator:`LV_KEY_ENTER`: will simulate press or pushing of the encoder button.
 - :cpp:enumerator:`LV_KEY_LEFT`: will simulate turning encoder left.
 - :cpp:enumerator:`LV_KEY_RIGHT`: will simulate turning encoder right.
-- other keys will be passed to the focused widget.
+- Other keys will be passed to the focused widget.
 
 If you hold the keys it will simulate an encoder advance with period
 specified in ``indev_drv.long_press_repeat_time``.
