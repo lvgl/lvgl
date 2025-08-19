@@ -153,7 +153,7 @@ bool lv_draw_eve_image_src_check(const void * src)
         case LV_COLOR_FORMAT_ARGB8888:
             break;
         default :
-            LV_LOG_WARN("v_draw_eve can only render L8, RGB565, RGB565A8, and ARGB8888 images for now.");
+            LV_LOG_WARN("lv_draw_eve can only render L8, RGB565, RGB565A8, and ARGB8888 images for now.");
             return false;
     }
 
