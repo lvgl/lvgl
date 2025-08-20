@@ -98,12 +98,13 @@ void * lv_xml_tabview_tab_button_create(lv_xml_parser_state_t * state, const cha
 
     const char * index_str = lv_xml_get_value_of(attrs, "index");
     int32_t index_int = index_str ? lv_xml_atoi(index_str) : 0;
-    if(LV_ABS(index_int) >= btn_cnt) {
-        LV_LOG_WARN("tabindex is out of range, using the first tab instead");
-        index_int = 0;
-    }
 
     void * item = lv_tabview_get_tab_button(tv, index_int);
+
+    if(item == NULL) {
+        LV_LOG_WARN("tabindex is out of range, using the first tab instead");
+        item = lv_tabview_get_tab_button(tv, 0);
+    }
 
     return item;
 }

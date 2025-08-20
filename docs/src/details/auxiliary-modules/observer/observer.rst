@@ -372,7 +372,7 @@ integer value:
     - Drop-Down
     - Roller
     - Slider
-+    - Scale Section Min/Max values
+    - Scale Section Min/Max values
 
 Any number of Observers can be created for a single Widget, each bound to ONE of
 the above properties.
