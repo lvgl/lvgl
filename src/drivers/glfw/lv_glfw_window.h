@@ -62,8 +62,8 @@ void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window);
  * @param h             height in pixels of the texture
  * @return              the new texture handle
  */
-lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id, int32_t w,
-                                               int32_t h);
+lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id,
+                                                              int32_t w, int32_t h);
 
 /**
  * Remove a texture from its GLFW window and delete it

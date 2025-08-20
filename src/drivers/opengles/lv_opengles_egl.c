@@ -42,6 +42,7 @@ struct _lv_opengles_window_t {
     lv_opengles_egl_window_cb_t pre;
     lv_opengles_egl_window_cb_t post1;
     lv_opengles_egl_window_cb_t post2;
+    void * user_data;
 #if LV_USE_DRAW_OPENGLES
     uint8_t direct_render_invalidated: 1;
 #endif
@@ -109,7 +110,8 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
                                                      void * device,
                                                      lv_opengles_egl_window_cb_t pre,
                                                      lv_opengles_egl_window_cb_t post1,
-                                                     lv_opengles_egl_window_cb_t post2){
+                                                     lv_opengles_egl_window_cb_t post2)
+{
     backend_device = device;
     if(lv_egl_init() == LV_RESULT_INVALID) {
         return NULL;
@@ -170,6 +172,16 @@ void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window)
 {
     LV_UNUSED(window);
     return (void *)(uintptr_t)egl_display;
+}
+
+void lv_opengles_egl_window_set_user_data(lv_opengles_window_t * window, void * user_data)
+{
+    window->user_data = user_data;
+}
+
+void * lv_opengles_egl_window_get_user_data(lv_opengles_window_t * window)
+{
+    return window->user_data;
 }
 
 void lv_opengles_window_delete(lv_opengles_window_t * window)
@@ -334,9 +346,10 @@ static lv_result_t lv_egl_init(void)
     }
 
     /* get an EGL display connection */
-    if (backend_device) {
+    if(backend_device) {
         egl_display = eglGetDisplay(backend_device);
-    } else {
+    }
+    else {
         egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     }
 

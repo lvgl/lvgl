@@ -7,24 +7,28 @@ OpenGL ES Display/Inputs Driver
 Overview
 --------
 
-| The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an desktop window created via GLFW.
-| It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
+The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for creating
+LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
+It can be used like **Wayland**, **XCB**, **SDL** or **Qt** or it can be used for more embedded applications.
 
-The main purpose for this driver is for testing/debugging the LVGL application in an **OpenGL** simulation window.
+The GLFW driver is a quick way to get started on PC-like platforms.
 
 LVGL can also be used with the OpenGLES EGL API. EGL is a lower-level API that is more closely tied to the underlying
 drivers of the platform. The OpenGL support in LVGL is intended to be portable between different APIs. Currently
 there is support for GLFW and EGL. Using EGL requires some additional platform integration. See :ref:`EGL <opengl_es_driver_egl>` below.
 
+Getting Started with GLFW
+-------------------------
+
 Prerequisites
--------------
+~~~~~~~~~~~~~
 
 The OpenGL driver uses GLEW GLFW to access the OpenGL window manager.
 
 1. Install GLEW and GLFW: ``sudo apt-get install libglew-dev libglfw3-dev``
 
 Configure OpenGL Driver
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Required linked libraries: -lGL -lGLEW -lglfw
 2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
@@ -33,7 +37,7 @@ Configure OpenGL Driver
         #define LV_USE_OPENGLES  1
 
 Basic Usage
------------
+~~~~~~~~~~~
 
 .. code-block:: c
 
@@ -83,7 +87,7 @@ Basic Usage
     }
 
 Advanced Usage
---------------
+~~~~~~~~~~~~~~
 
 The OpenGL driver can draw textures from the user. A third-party library could be
 used to add content to a texture and the driver will draw the texture in the window.

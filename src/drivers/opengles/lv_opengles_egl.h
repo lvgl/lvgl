@@ -48,6 +48,8 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
 
 void * lv_opengles_egl_window_get_surface(lv_opengles_window_t * window);
 void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window);
+void lv_opengles_egl_window_set_user_data(lv_opengles_window_t * window, void * user_data);
+void * lv_opengles_egl_window_get_user_data(lv_opengles_window_t * window);
 
 /**********************
  *      MACROS
