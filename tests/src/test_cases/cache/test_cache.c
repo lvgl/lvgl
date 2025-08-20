@@ -9,23 +9,17 @@ static uint32_t MEM_SIZE = 0;
 
 // Cache size in bytes
 #define CACHE_SIZE_BYTES 1000
-
-static lv_cache_t * cache = NULL;
+#define CACHE_EXPECTED_DATA_CNT 10
 
 void setUp(void)
 {
     /* Function run before every test */
     MEM_SIZE = lv_test_get_free_mem();
-    cache = NULL;
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
-    if(cache) {
-        lv_cache_destroy(cache, NULL);
-        cache = NULL;
-    }
     TEST_ASSERT_MEM_LEAK_LESS_THAN(MEM_SIZE, 64);
 }
 
@@ -68,7 +62,7 @@ static lv_cache_t * create_cache(const lv_cache_class_t * cache_class,
 
 void test_cache_lru_rb_1(void)
 {
-    cache = create_cache(&lv_cache_class_lru_rb_size, CACHE_SIZE_BYTES);
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_rb_size, CACHE_SIZE_BYTES);
     TEST_ASSERT_NOT_NULL(cache);
     void * record_data_ptr = NULL;
 
@@ -154,14 +148,16 @@ void test_cache_lru_rb_1(void)
 
     // Now the freed cache size should be 8 + 32 = 40
     TEST_ASSERT_EQUAL(40, lv_cache_get_free_size(cache, NULL));
+
+    lv_cache_destroy(cache, NULL);
 }
 
-void cache_add_acquire_test(void)
+static void cache_add_acquire_test(lv_cache_t * cache, test_data_t * expected_data, size_t expected_data_cnt)
 {
     TEST_ASSERT_NOT_NULL(cache);
-    test_data_t expected_data[10];
+    lv_memzero(expected_data, sizeof(test_data_t) * expected_data_cnt);
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < expected_data_cnt; ++i) {
         expected_data[i].key1 = i;
         expected_data[i].key2 = i + 1;
         lv_cache_entry_t * entry =
@@ -170,7 +166,7 @@ void cache_add_acquire_test(void)
         lv_cache_release(cache, entry, NULL);
     }
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < expected_data_cnt; ++i) {
         lv_cache_entry_t * entry =
             lv_cache_acquire(cache, &expected_data[i], NULL);
         TEST_ASSERT_NOT_NULL(entry);
@@ -181,12 +177,12 @@ void cache_add_acquire_test(void)
     }
 }
 
-void cache_eviction_test(void)
+static void cache_eviction_test(lv_cache_t * cache, test_data_t * expected_data, size_t expected_data_cnt)
 {
     TEST_ASSERT_NOT_NULL(cache);
-    test_data_t expected_data[10];
+    lv_memzero(expected_data, sizeof(test_data_t) * expected_data_cnt);
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < expected_data_cnt; ++i) {
         expected_data[i].key1 = i;
         expected_data[i].key2 = i + 1;
         lv_cache_entry_t * entry =
@@ -195,7 +191,7 @@ void cache_eviction_test(void)
         lv_cache_release(cache, entry, NULL);
     }
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < expected_data_cnt; ++i) {
         lv_cache_entry_t * entry =
             lv_cache_acquire(cache, &expected_data[i], NULL);
         TEST_ASSERT_NOT_NULL(entry);
@@ -217,7 +213,7 @@ void cache_eviction_test(void)
 
     /* Check that we removed a previous entry */
     size_t original_entries_found_cnt = 0;
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < expected_data_cnt; ++i) {
         lv_cache_entry_t * entry =
             lv_cache_acquire(cache, &expected_data[i], NULL);
         if(entry != NULL) {
@@ -230,53 +226,65 @@ void cache_eviction_test(void)
 
 void test_cache_lru_rb_count_add_acquire(void)
 {
-    cache = create_cache(&lv_cache_class_lru_rb_count, 10);
-    cache_add_acquire_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_rb_count, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_add_acquire_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_lru_ll_count_add_acquire(void)
 {
-    cache = create_cache(&lv_cache_class_lru_ll_count, 10);
-    cache_add_acquire_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_ll_count, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_add_acquire_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_sc_da_add_acquire(void)
 {
-    cache = create_cache(&lv_cache_class_sc_da, 10);
-    cache_add_acquire_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_sc_da, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_add_acquire_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_sc_da_eviction(void)
 {
-    cache = create_cache(&lv_cache_class_sc_da, 10);
-    cache_eviction_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_sc_da, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_eviction_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_lru_rb_count_eviction(void)
 {
-    cache = create_cache(&lv_cache_class_lru_rb_count, 10);
-    cache_eviction_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_rb_count, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_eviction_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_lru_ll_count_eviction(void)
 {
-    cache = create_cache(&lv_cache_class_lru_ll_count, 10);
-    cache_eviction_test();
+    lv_cache_t * cache = create_cache(&lv_cache_class_lru_ll_count, CACHE_EXPECTED_DATA_CNT);
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
+    cache_eviction_test(cache, expected_data, CACHE_EXPECTED_DATA_CNT);
+    lv_cache_destroy(cache, NULL);
 }
 
 void test_cache_sc_da_eviction_second_chance_spares_referenced_entries(void)
 {
-    cache = create_cache(&lv_cache_class_sc_da, 10);
+    lv_cache_t * cache = create_cache(&lv_cache_class_sc_da, CACHE_EXPECTED_DATA_CNT);
     TEST_ASSERT_NOT_NULL(cache);
-    test_data_t expected_data[10];
+    test_data_t expected_data[CACHE_EXPECTED_DATA_CNT];
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < CACHE_EXPECTED_DATA_CNT; ++i) {
         expected_data[i].key1 = i;
         expected_data[i].key2 = i + 1;
         lv_cache_add(cache, &expected_data[i], NULL);
     }
 
-    for(size_t i = 0; i < 10; ++i) {
+    for(size_t i = 0; i < CACHE_EXPECTED_DATA_CNT; ++i) {
         lv_cache_entry_t * entry =
             lv_cache_acquire(cache, &expected_data[i], NULL);
         TEST_ASSERT_NOT_NULL(entry);
@@ -293,6 +301,7 @@ void test_cache_sc_da_eviction_second_chance_spares_referenced_entries(void)
     lv_cache_entry_t * new_entry =
         lv_cache_add(cache, &new_expected_entry, NULL);
     TEST_ASSERT_NULL(new_entry);
+    lv_cache_destroy(cache, NULL);
 }
 
 #endif
