@@ -36,7 +36,6 @@ extern "C" {
 #define lv_draw_buf_copy_cb                 lv_draw_buf_copy_cb_t
 #define lv_draw_buf_align_cb                lv_draw_buf_align_cb_t
 #define lv_draw_buf_cache_operation_cb      lv_draw_buf_cache_operation_cb_t
-#define lv_draw_buf_cache_operation_cb      lv_draw_buf_cache_operation_cb_t
 #define lv_draw_buf_width_to_stride_cb      lv_draw_buf_width_to_stride_cb_t
 
 
