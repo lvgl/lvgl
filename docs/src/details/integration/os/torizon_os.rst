@@ -143,7 +143,7 @@ Now edit the Dockerfile. Copy-paste the block below into the file:
    ENTRYPOINT [ "./lvglsim" ]
 
 
-The ``Dockerfile`` acts like a recipe to build two images and  ``build`` and ``deploy``.
+The ``Dockerfile`` acts like a recipe to build two images:  ``build`` and ``deploy``.
 
 First it downloads the necessary packages to build the simulator using Debian's package manager ``apt-get``.
 

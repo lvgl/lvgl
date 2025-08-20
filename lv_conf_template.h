@@ -340,6 +340,12 @@
 
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
+
+    /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
+    #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
+
+    /** Disable linear gradient extension for some older versions of drivers. */
+    #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
@@ -1265,6 +1271,13 @@
 
     /** Mouse movement step (pixels) */
     #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
+
+    /*NuttX trace file and its path*/
+    #define LV_USE_NUTTX_TRACE_FILE 0
+    #if LV_USE_NUTTX_TRACE_FILE
+        #define LV_NUTTX_TRACE_FILE_PATH "/data/lvgl-trace.log"
+    #endif
+
 #endif
 
 /** Driver for /dev/dri/card */

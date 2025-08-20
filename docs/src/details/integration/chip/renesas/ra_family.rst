@@ -108,7 +108,7 @@ Configuration
 Hardware and software components can be modified in a visual way using the
 ``Configuration Window``.
 
-As of e2studio 2025-04.1 and FSP 6.0.0, LVGL is a managed component.
+As of e\ |sup2| Studio 2025-04.1 and FSP 6.0.0, LVGL is a managed component.
 
 
 

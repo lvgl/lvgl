@@ -191,8 +191,7 @@ bool lv_vg_lite_draw_grad(
                 vg_lite_linear_gradient_t * linear_grad = &grad_item->vg.linear;
                 vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(linear_grad);
                 LV_ASSERT_NULL(grad_mat_p);
-                vg_lite_identity(grad_mat_p);
-                lv_vg_lite_matrix_multiply(grad_mat_p, grad_matrix);
+                *grad_mat_p = *grad_matrix;
                 grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
 
                 LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_grad");
@@ -629,7 +628,11 @@ static bool radial_grad_create(grad_item_t * item, vg_lite_color_ramp_t * color_
 static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style)
 {
     if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
+#if LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+        return GRAD_TYPE_LINEAR;
+#else
         return vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT) ? GRAD_TYPE_LINEAR_EXT : GRAD_TYPE_LINEAR;
+#endif
     }
 
     if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {

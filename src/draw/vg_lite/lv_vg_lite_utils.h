@@ -114,8 +114,6 @@ void lv_vg_lite_buffer_format_bytes(
 
 uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format);
 
-uint32_t lv_vg_lite_width_align(uint32_t w);
-
 void lv_vg_lite_buffer_init(
     vg_lite_buffer_t * buffer,
     const void * ptr,
@@ -163,15 +161,13 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix);
 
 bool lv_vg_lite_support_blend_normal(void);
 
-bool lv_vg_lite_16px_align(void);
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
 
-void lv_vg_lite_set_scissor_area(const lv_area_t * area);
+void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area);
 
 void lv_vg_lite_disable_scissor(void);
 

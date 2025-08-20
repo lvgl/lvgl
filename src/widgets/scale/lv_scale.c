@@ -14,6 +14,7 @@
 #include "../../core/lv_group.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
+#include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_arc.h"
 
 /*********************
@@ -630,6 +631,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     label_dsc.base.layer = layer;
     /* Formatting the labels with the configured style for LV_PART_INDICATOR */
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -1272,10 +1274,22 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
+    lv_text_attributes_t attributes = {0};
+    attributes.letter_space = label_dsc->letter_space;
+    attributes.line_space = label_dsc->line_space;
+    attributes.max_width = LV_COORD_MAX;
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
+
     /* Reserve appropriate size for the tick label */
     lv_point_t label_size;
-    lv_text_get_size(&label_size, label_dsc->text,
-                     label_dsc->font, label_dsc->letter_space, label_dsc->line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+    if(label_dsc->text != NULL) {
+        lv_text_get_size(&label_size, label_dsc->text, label_dsc->font, &attributes);
+    }
+    else {
+        label_size.x = 0;
+        label_size.y = 0;
+    }
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {

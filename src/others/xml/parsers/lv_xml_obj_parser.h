@@ -60,6 +60,9 @@ void lv_obj_xml_screen_load_event_apply(lv_xml_parser_state_t * state, const cha
 void * lv_obj_xml_screen_create_event_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_screen_create_event_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
+void * lv_obj_xml_play_timeline_event_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_play_timeline_event_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
 /**********************
  *      MACROS
  **********************/

@@ -25,7 +25,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
+/*Data of anim_timeline_dsc*/
+typedef struct _lv_anim_timeline_dsc_t {
+    lv_anim_t anim;
+    uint32_t start_time;
+    uint8_t is_started : 1;
+    uint8_t is_completed : 1;
+} lv_anim_timeline_dsc_t;
+
 
 /**********************
 * GLOBAL PROTOTYPES
@@ -54,7 +61,7 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv
 /**
  * Start the animation timeline.
  * @param at    pointer to the animation timeline.
- * @return total time spent in animation timeline.
+ * @return      total time spent in animation timeline.
  */
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at);
 
@@ -70,6 +77,14 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
  * @param reverse   whether to play in reverse.
  */
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
+
+/**
+ * Set the time to wait before starting the the animation.
+ * Applies only when playing from the very start, or reverse from the very end.
+ * @param at        pointer to an animation timeline
+ * @param delay     the delay time in milliseconds
+ */
+void lv_anim_timeline_set_delay(lv_anim_timeline_t * at, uint32_t delay);
 
 /**
  * Make the animation timeline repeat itself.
@@ -93,23 +108,48 @@ void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay);
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
 
 /**
+ * Set the user_data of a an animation timeline
+ * @param at        pointer to the animation timeline.
+ * @param user_data pointer to any data. Only the pointer will be saved.
+ */
+void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data);
+
+#if LV_USE_OBJ_NAME
+/**
+ * Set base object.
+ * If set, it's assumed that the  `var` of animations is a widget name (path).
+ * The widget pointer will be retrieved by finding them by name on this widget.
+ * @param at        pointer to the animation timeline.
+ * @param base_obj  pointer to a widget
+ */
+void lv_anim_timeline_set_base_obj(lv_anim_timeline_t * at, lv_obj_t * base_obj);
+#endif
+
+/**
  * Get the time used to play the animation timeline.
- * @param at    pointer to the animation timeline.
- * @return total time spent in animation timeline.
+ * @param at        pointer to the animation timeline.
+ * @return total    time spent in animation timeline.
  */
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at);
 
 /**
  * Get whether the animation timeline is played in reverse.
- * @param at    pointer to the animation timeline.
- * @return return true if it is reverse playback.
+ * @param at        pointer to the animation timeline.
+ * @return return   true if it is reverse playback.
  */
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
 
 /**
+ * Get the wait time when  playing from the very start, or reverse from the very end.
+ * @param at    pointer to an animation timeline
+ * @return      the remaining time in milliseconds
+ */
+uint32_t lv_anim_timeline_get_delay(lv_anim_timeline_t * at);
+
+/**
  * Get the progress of the animation timeline.
  * @param at    pointer to the animation timeline.
- * @return return value 0~65535 to map 0~100% animation progress.
+ * @return      return value 0~65535 to map 0~100% animation progress.
  */
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at);
 
@@ -124,6 +164,25 @@ uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at);
  * @param at    pointer to the animation timeline.
  */
 uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
+
+/**
+ * Get the user_data of a an animation timeline
+ * @param at    pointer to the animation timeline.
+ */
+void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
+
+
+#if LV_USE_OBJ_NAME
+/**
+ * Get base object.
+ * If set, it's assumed that the  `var` of animations is a widget name (path).
+ * The widget pointer will be retrieved by finding them by name on this widget.
+ * @param at        pointer to the animation timeline.
+ * @return          pointer to the base widget
+ */
+lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at);
+#endif
+
 
 /**********************
  *      MACROS

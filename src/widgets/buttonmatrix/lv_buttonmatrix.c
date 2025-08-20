@@ -17,7 +17,7 @@
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_refr.h"
-#include "../../misc/lv_text.h"
+#include "../../misc/lv_text_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../stdlib/lv_string.h"
 
@@ -727,9 +727,14 @@ static void draw_main(lv_event_t * e)
             txt = txt_ap;
         }
 #endif
+        lv_text_attributes_t attributes = {0};
+        attributes.letter_space = letter_space;
+        attributes.line_space = line_space;
+        attributes.text_flags = draw_label_dsc_act.flag;
+        attributes.max_width = lv_area_get_width(&area_obj);
+
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, txt, font, letter_space,
-                         line_space, lv_area_get_width(&area_obj), draw_label_dsc_act.flag);
+        lv_text_get_size(&txt_size, txt, font, &attributes);
 
         btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
         btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;

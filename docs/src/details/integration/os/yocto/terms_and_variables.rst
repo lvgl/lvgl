@@ -18,7 +18,7 @@ Yocto Variables Glossary
 This chapter lists basic variables used in the LVGL Yocto guide and gives an
 overview of their function and contents.
 
-A More complete variable glossary can be found in `Yocto Variable Glossary
+A more complete variable glossary can be found in `Yocto Variable Glossary
 <https://docs.yoctoproject.org/ref-manual/variables.html>`_. This section
 covers a lot of variables used in the OpenEmbedded build system.
 

@@ -496,6 +496,16 @@ menu "LVGL configuration"
 			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+			bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+			bool "Disable linear gradient extension for some older versions of drivers."
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
@@ -2045,6 +2055,17 @@ menu "LVGL configuration"
 			default 1
 			help
 				Set the step size of the mouse movement in pixels.
+
+		config LV_USE_NUTTX_TRACE_FILE
+			bool "Use NuttX trace file"
+			depends on LV_USE_NUTTX
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
+
+		config LV_NUTTX_TRACE_FILE_PATH
+			depends on LV_USE_NUTTX_TRACE_FILE
+			string "NuttX trace file path"
+			default "/data/lvgl-trace.log"
 
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"

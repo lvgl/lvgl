@@ -1606,6 +1606,7 @@ class DoxygenXml(object):
             'LV_ATTRIBUTE_FAST_MEM=',
             'LV_ATTRIBUTE_EXTERN_DATA=',
             'LV_FORMAT_ATTRIBUTE(fmt,va)=',
+            'FASTGLTF_EXPORT=',
         ]
 
         cfg.set('PREDEFINED', predefined_symbols)
@@ -1631,7 +1632,12 @@ class DoxygenXml(object):
             full_path = os.path.join(lvgl_src_dir, osal_dir, osal_h)
             exclude_paths.append(full_path)
 
+        # Exclude as a workaround for Breathe parsing problems.
         full_path = os.path.join(lvgl_src_dir, 'core', 'lv_obj_property.h')
+        exclude_paths.append(full_path)
+
+        # Exclude GLTF templates that Breathe appears to not know how to parse.
+        full_path = os.path.join(lvgl_src_dir, 'libs', 'gltf', 'fastgltf', 'lv_fastgltf.hpp')
         exclude_paths.append(full_path)
 
         cfg.set('EXCLUDE', exclude_paths)

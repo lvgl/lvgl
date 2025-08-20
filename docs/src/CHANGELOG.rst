@@ -11,7 +11,7 @@ Summary
 
 This is a significant release packed with exciting updates from both our community and internal team.
 
-One of the most notable additions is **XML support**, enabling you to describe your UI in a declarative manner. This way LVGL UI can be loaded at runtime without recompiling and deploying the application. This feature is also a key requirement for the upcoming `UI Editor <https://docs.lvgl.io/master/details/auxiliary-modules/xml/intro.html>`_ we're developing.
+One of the most notable additions is **XML support**, enabling you to describe your UI in a declarative manner. This way LVGL UI can be loaded at runtime without recompiling and deploying the application. This feature is also a key requirement for the upcoming `UI editor <https://docs.lvgl.io/master/details/auxiliary-modules/xml/intro.html>`_ we're developing.
 
 The `documentation <https://docs.lvgl.io/master/>`_ has been thoroughly reorganized and proofread.
 

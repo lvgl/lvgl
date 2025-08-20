@@ -7,3 +7,15 @@ https://github.com/lvgl/lv_nuttx
 https://github.com/lvgl/lv_zephyr
 https://github.com/lvgl/lv_esp_idf
 https://github.com/lvgl/lv_port_actions_technology
+https://github.com/lvgl/lv_port_stm32u5g9j-dk2
+https://github.com/lvgl/lv_port_renesas-ek-rz_a3m
+https://github.com/lvgl/lv_port_renesas_ek_ra8p1
+https://github.com/lvgl/lv_port_toradex_verdin_am62
+https://github.com/lvgl/lv_port_texas_sk-am62l
+https://github.com/lvgl/lv_port_nxp_imx93
+https://github.com/lvgl/lv_port_icop_qec_ppc_m_090t
+https://github.com/lvgl/lv_port_texas_sk-am62b-p1
+https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
+https://github.com/lvgl/lv_port_renesas_ek-ra6m3g
+https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit
+https://github.com/lvgl/lv_port_f-and-s_picocoremx93

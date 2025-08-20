@@ -117,7 +117,8 @@ by getting the Y coordinate of a child.
     int32_t y_end = lv_obj_get_y(child);
     if(y_start + 100 != y_end) fail();
 
-Please refer to :ref:`lv_test_indev_h` for the list of supported input device emulation functions.
+Please refer to :ref:`others/test/lv_test_indev.h` for the list of supported input
+device emulation functions.
 
 Screenshot Comparison
 ---------------------

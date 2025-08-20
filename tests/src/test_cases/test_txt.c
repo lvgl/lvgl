@@ -130,11 +130,12 @@ void test_txt_get_encoded_next_detect_invalid_4_byte_input(void)
 void test_txt_next_line_should_handle_empty_string(void)
 {
     const lv_font_t * font_ptr = NULL;
-    int32_t letter_space = 0;
-    int32_t max_width = 0;
-    lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+    lv_text_attributes_t attributes = {0};
+    attributes.letter_space = 0;
+    attributes.max_width = 0;
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
 
-    uint32_t next_line = lv_text_get_next_line("", 0, font_ptr, letter_space, max_width, NULL, flag);
+    uint32_t next_line = lv_text_get_next_line("", 0, font_ptr, NULL, &attributes);
 
     TEST_ASSERT_EQUAL_UINT32(0, next_line);
 }

@@ -35,6 +35,7 @@ body {
   --icon-search: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="4.25" stroke="%230E0E0E" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="%230E0E0E" stroke-width="1.5" stroke-linecap="round"/></svg>');
   --sidebar-search-icon-size: 1.25rem;
   --sidebar-item-spacing-horizontal: 0.5rem;
+  --toc-item-spacing-vertical: 0;
   --header-padding: 1rem;
 
   --color-link: var(--color-text-base);
@@ -52,6 +53,8 @@ body {
   --color-sidebar-background: var(--color-background-primary);
   --color-sidebar-background-border: var(--color-border-primary);
   --color-content-foreground: var(--color-text-secondary);
+  --color-sidebar-item-background--current: transparent;
+  --color-sidebar-item-background--hover: rgba(var(--color-accent-rgb), 0.16);
 }
 
 body,
@@ -168,8 +171,7 @@ a {
 hr {
   border: none;
   border-top: 1px solid var(--color-border-primary);
-  margin: 2rem 0;
-  max-width: 30rem;
+  margin: 3rem 0;
 }
 
 .lv-example-container + hr {
@@ -222,6 +224,7 @@ span.pre:first-child {
   border-radius: 0.25rem;
   box-shadow: 0 0 0 1px var(--color-border-secondary), 0px 2px 4px rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.15s ease-in-out;
+  z-index: 1;
 }
 
 .sidebar-search-container:has(.sidebar-search:focus-within) {
@@ -255,6 +258,11 @@ span.pre:first-child {
   }
 }
 
+.sidebar-tree .has-children > ul {
+  border-left: 1px solid var(--color-border-primary);
+  padding-left: 0.5rem;
+}
+
 .sidebar-tree .reference {
   border-radius: 0.5rem;
   font-weight: 450;
@@ -264,11 +272,17 @@ span.pre:first-child {
 .sidebar-tree .current-page > .reference {
   color: var(--color-text-base);
   font-weight: 550;
+  background-color: rgba(var(--color-accent-rgb), 0.24);
 }
 
 .sidebar-tree .reference:hover {
   color: var(--color-text-base);
-  background-color: var(--color-background-primary);
+  background-color: rgba(var(--color-accent-rgb), 0.12);
+}
+
+.sidebar-tree .current.has-children > a {
+  color: var(--color-text-base);
+  font-weight: 550;
 }
 
 .sidebar-tree label {
@@ -344,21 +358,24 @@ span.pre:first-child {
   transition: color 0.15s ease-in-out;
 }
 
-.content a {
-  color: var(--color-accent);
-  font-weight: 500;
-  transition: color 0.15s ease-in-out;
-}
-
 .content strong {
   font-weight: 600;
   color: var(--color-text-base);
 }
 
+.toc-drawer.no-toc {
+  display: block;
+  visibility: hidden;
+}
+
 .sig-inline,
 code.literal {
-  font-weight: 500;
+  font-weight: inherit;
   font-size: 80%;
+}
+
+code.literal + sub {
+  bottom: 0;
 }
 
 .highlight {
@@ -383,8 +400,18 @@ code.literal {
   background-color: var(--color-background-secondary) !important;
 }
 
+.toctree-wrapper {
+  margin-top: 3rem;
+}
+
 .toc-tree {
   line-height: 1.4;
+  border-left: 0;
+  padding-left: 0;
+}
+
+.toc-title {
+  padding-left: 0;
 }
 
 .toc-tree li.scroll-current > .reference {
@@ -397,6 +424,25 @@ code.literal {
 
 .toc-tree-container {
   padding-right: 1.5rem;
+}
+
+.toc-tree ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toc-tree ul {
+  margin: 0.25rem 0 -0.25rem;
+  border-left: 1px solid var(--color-border-primary);
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+
+.toc-tree > ul,
+.toc-tree > ul > li:first-child > ul {
+  border-left: none !important;
+  padding-left: 0 !important;
 }
 
 .headerlink {
@@ -440,6 +486,7 @@ code.literal {
     right: -17.5rem;
     border-left: 1px solid var(--color-border-primary);
     background-clip: padding-box;
+    padding-left: 1.5rem;
   }
 
   .toc-drawer .toc-tree {
@@ -451,14 +498,20 @@ code.literal {
   padding-top: 4rem;
 }
 
+#furo-main-content a {
+  color: var(--color-accent);
+  font-weight: 500;
+  transition: color 0.15s ease-in-out;
+}
+
 /*-------------------------------------------------------------------------
  * TOC Level 1
  *-------------------------------------------------------------------------*/
 
-#furo-main-content ul:has(.toctree-l1) {
-  max-width: 50%;
+#furo-main-content ul:has(> .toctree-l1) {
   list-style-type: none;
-  padding: 0;
+  margin: 0.5rem 0;
+  padding-left: 0;
 }
 
 #furo-main-content .toctree-l1 > a {
@@ -500,14 +553,29 @@ code.literal {
   margin-top: 0.125rem;
 }
 
+.content:has(.home-cards-container) + .toc-drawer.no-toc {
+  display: none;
+}
+
+#furo-main-content .toctree-wrapper.toctree-landing-page {
+  margin-top: 0;
+  padding-left: 1rem;
+  border-left: 1px solid var(--color-border-primary);
+}
+
+#furo-main-content section:has(.toctree-landing-page) {
+  margin-top: 3rem;
+}
+
 /*-------------------------------------------------------------------------
  * TOC Level 2
  *-------------------------------------------------------------------------*/
 
-#furo-main-content ul:has(.toctree-l2) {
+#furo-main-content ul:has(> .toctree-l2) {
   list-style-type: none;
-  padding: 0;
+  padding: 0 0 0 1rem;
   margin-top: 0.5rem;
+  border-left: 1px solid var(--color-border-primary);
 }
 
 #furo-main-content .toctree-l2 + .toctree-l2 {
@@ -530,14 +598,15 @@ code.literal {
   color: var(--color-text-base);
 }
 
-#furo-main-content .toctree-l2 ul:has(.toctree-l3) {
+#furo-main-content ul:has(> .toctree-l3) {
   margin: 0.25rem 0;
-  padding-left: 1rem;
   list-style-type: none;
   font-size: 0.875rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  padding: 0 0 0 1rem;
+  border-left: 1px solid var(--color-border-primary);
 }
 
 #furo-main-content .toctree-l3 > a {
@@ -560,6 +629,15 @@ code.literal {
 #furo-main-content blockquote {
   border-radius: 0.25rem;
   font-size: 0.8125rem;
+}
+
+#furo-main-content .toctree-wrapper a {
+  color: var(--color-text-base);
+  text-decoration: none;
+}
+
+#furo-main-content .toctree-wrapper a:hover {
+  color: var(--color-accent);
 }
 
 .nav-overlay-icon .icon,
@@ -862,7 +940,7 @@ table.docutils th p {
 }
 
 /* Selects [View on GitHub] "button". */
-.lv-example-link-button {
+#furo-main-content .lv-example-link-button {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 4px;
@@ -1034,4 +1112,41 @@ div .lvgl-figure-caption p {
 /* Pygments .p = Punctuation */
 body[data-theme="dark"] .highlight .p {
   color: #a883f3;
+}
+
+/*-------------------------------------------------------------------------
+ * Glossary
+ *-------------------------------------------------------------------------*/
+
+.glossary {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4rem;
+}
+
+.glossary > .dt {
+  font-weight: 800 !important;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin-top: 0;
+}
+
+.glossary > .dt:first-child {
+  margin-top: 2rem;
+}
+
+.glossary > dd {
+  margin-top: 0.25rem;
+}
+
+.glossary > dd > :last-child {
+  margin-bottom: 0;
+}
+
+.glossary dl {
+  margin-top: 1.5em;
+}
+
+.glossary dl dd > :first-child {
+  margin-top: 0 !important;
 }
