@@ -93,8 +93,8 @@ only need to call this function to set up and use your dictionary:
 
 .. code-block:: c
 
-       lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_screen_active());
-       lv_100ask_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);
+       lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_screen_active());  
+       lv_ime_pinyin_set_dict(pinyin_ime, your_pinyin_dict);  
 
 
 
@@ -105,14 +105,16 @@ Modes
 
 lv_ime_pinyin has the following modes:
 
--  :cpp:enumerator:`LV_IME_PINYIN_MODE_K26`: Pinyin 26-key input mode
--  :cpp:enumerator:`LV_IME_PINYIN_MODE_K9`: Pinyin 9-key input mode
--  :cpp:enumerator:`LV_IME_PINYIN_MODE_K9_NUMBER`: Numeric keypad mode
+-  :cpp:enumerator:`LV_IME_PINYIN_MODE_K26_CH`: 26-key Chinese input mode of Pinyin input method
+-  :cpp:enumerator:`LV_IME_PINYIN_MODE_K26_EN`: 26-key English input mode of Pinyin input method
+-  :cpp:enumerator:`LV_IME_PINYIN_MODE_K26_SPECIAL`: 26-key special symbol input mode for Pinyin input method
+-  :cpp:enumerator:`LV_IME_PINYIN_MODE_K9_NUMBER`: 9-key numeric input mode of Pinyin input method
+-  :cpp:enumerator:`LV_IME_PINYIN_MODE_K9_CH`: 9-key Pinyin input mode of Pinyin input method
 
 The Keyboard's ``TEXT``-mode layout contains buttons to change mode.
 
 To set the mode manually, use :cpp:expr:`lv_ime_pinyin_set_mode(pinyin_ime, mode)`.
-The default mode is :cpp:enumerator:`LV_IME_PINYIN_MODE_K26`.
+The default mode is :cpp:enumerator:`LV_IME_PINYIN_MODE_K26_CH`.
 
 
 
