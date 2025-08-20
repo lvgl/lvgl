@@ -290,6 +290,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
                 if(value[c] == ' ') item_cnt++;
             }
 
+            /*This not freed automatically as the styles doesn't have any mechanisms to detect
+             * removal of properties. It's assumed that the styles are created once and never freed. */
             int32_t * dsc_array = lv_malloc((item_cnt + 2) * sizeof(int32_t)); /*+2 for LV_GRID_TEMPLATE_LAST*/
 
             char * value_buf = (char *)value;
