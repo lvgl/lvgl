@@ -148,11 +148,6 @@ static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_for
 
 static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 {
-    bool is_tiled = draw_dsc->tile;
-    /* Tiled image (repeat image) is currently not supported. */
-    if(is_tiled)
-        return false;
-
     bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
     /* Recolor is not supported. */
     if(has_recolor)
