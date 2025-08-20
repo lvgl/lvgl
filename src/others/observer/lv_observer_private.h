@@ -37,6 +37,10 @@ struct _lv_observer_t {
     uint32_t auto_free_user_data : 1;   /**< Automatically free user data when observer is removed */
     uint32_t notified : 1;              /**< Was observer already notified? */
     uint32_t for_obj : 1;               /**< Is `target` a pointer to a Widget (`lv_obj_t *`)? */
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 
