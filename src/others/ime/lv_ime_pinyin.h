@@ -20,16 +20,21 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_IME_PINYIN_USE_K9_MODE
 #define LV_IME_PINYIN_K9_MAX_INPUT  7
-
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef enum {
-    LV_IME_PINYIN_MODE_K26,
-    LV_IME_PINYIN_MODE_K9,
+    LV_IME_PINYIN_MODE_K26_CH,
+    LV_IME_PINYIN_MODE_K26_EN,
+    LV_IME_PINYIN_NODE_K26_SPECIAL,
+#if LV_IME_PINYIN_USE_K9_MODE
     LV_IME_PINYIN_MODE_K9_NUMBER,
+    LV_IME_PINYIN_MODE_K9_CH,
+#endif
 } lv_ime_pinyin_mode_t;
 
 /*Data of pinyin_dict*/
