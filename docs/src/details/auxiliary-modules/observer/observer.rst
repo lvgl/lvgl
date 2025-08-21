@@ -515,9 +515,9 @@ If ``NULL`` is passed for the ``format_string`` argument:
 Spangroup's Span
 ~~~~~~~~~~~~~~~~
 
-Very similarly to Label Text binding a Span's text can be bound to a subject as well.
+Very similar to Label-text binding, a Span's text can be bound to a subject as well.
 
-The only difference is that in the bind function both the spangroup and the span needs to be specified:
+The only difference is that in the bind function both the Spangroup and the Span need to be specified:
 
  :cpp:expr:`lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)`
 
@@ -580,7 +580,7 @@ Scale's Section
 ~~~~~~~~~~~~~~~
 
 This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
-minimum or maximum values directly.  Note that this is a one way binding (Subject ==> Widget)
+minimum or maximum values directly.  Note that this is a one-way binding (Subject ==> Widget)
 as the Scale Section's boundaries are not interactive.
 (Requires :c:macro:`LV_USE_SCALE` to be configured to ``1``.)
 
