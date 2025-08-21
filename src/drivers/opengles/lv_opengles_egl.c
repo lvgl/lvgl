@@ -240,12 +240,12 @@ void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
         return;
     }
 
-    lv_ll_remove(&texture->window->textures, texture);
-    lv_free(texture);
-
 #if LV_USE_DRAW_OPENGLES
     texture->window->direct_render_invalidated = 1;
 #endif
+
+    lv_ll_remove(&texture->window->textures, texture);
+    lv_free(texture);
 }
 
 lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, int32_t w, int32_t h)

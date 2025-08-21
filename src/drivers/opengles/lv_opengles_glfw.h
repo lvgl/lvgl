@@ -41,7 +41,7 @@ extern "C" {
 lv_opengles_window_t * lv_opengles_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev);
 
 /**
- * Get the GLFW window handle for an lv_glfw_window
+ * Get the GLFW window handle for a GLFW lv_opengles_window_t
  * @param window        GLFW window to return the handle of
  * @return              the GLFW window handle
  */

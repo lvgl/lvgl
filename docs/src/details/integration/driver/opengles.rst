@@ -7,7 +7,7 @@ OpenGL ES Display/Inputs Driver
 Overview
 --------
 
-The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for creating
+The **OpenGL ES** display/input driver offers support for creating
 LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
 It can be used like **Wayland**, **XCB**, **SDL** or **Qt** or it can be used for more embedded applications.
 
