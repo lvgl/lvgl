@@ -37,7 +37,6 @@ static int DecodeLZWTurbo(GIFIMAGE *pImage, int iOptions);
 static int32_t readMem(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen);
 static int32_t seekMem(GIFFILE *pFile, int32_t iPosition);
 int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo);
-#if defined( PICO_BUILD ) || defined( __LINUX__ ) || defined( __MCUXPRESSO )
 static int32_t readFile(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen);
 static int32_t seekFile(GIFFILE *pFile, int32_t iPosition);
 static void closeFile(void *handle);
@@ -164,7 +163,6 @@ int GIF_getLastError(GIFIMAGE *pGIF)
     return pGIF->iError;
 } /* GIF_getLastError() */
 
-#endif // !__cplusplus
 //
 // Helper functions for memory based images
 //

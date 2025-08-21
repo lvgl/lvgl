@@ -12,16 +12,22 @@
 
 #ifndef __ANIMATEDGIF__
 #define __ANIMATEDGIF__
-#if defined( PICO_BUILD ) || defined( __MACH__ ) || defined( __LINUX__ ) || defined( __MCUXPRESSO )
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
+
+#include "../../../../misc/lv_fs.h"
+#include "../../../../lv_conf_internal.h"
+#include LV_STDINT_INCLUDE
+#include "../../../../stdlib/lv_string.h"
+// #include <stdlib.h>
+
+#define memcpy lv_memcpy
+#define memmove lv_memmove
+#define memcmp lv_memcmp
+#define memset lv_memset
 #define memcpy_P memcpy
-#define PROGMEM
-#else
-#include <Arduino.h>
-#endif
+
+#include "../../../../tick/lv_tick.h"
+#define millis lv_tick_get
+#define delay lv_delay_ms
 
 // Cortex-M4/M7 allow unaligned access to SRAM
 #if defined(HAL_ESP32_HAL_H_) || defined(TEENSYDUINO) || defined(ARM_MATH_CM4) || defined(ARM_MATH_CM7)

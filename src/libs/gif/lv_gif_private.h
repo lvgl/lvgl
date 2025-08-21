@@ -19,6 +19,8 @@ extern "C" {
 
 #if LV_USE_GIF
 
+#include "AnimatedGIF/src/AnimatedGIF.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -33,10 +35,11 @@ extern "C" {
 
 struct _lv_gif_t {
     lv_image_t img;
-    gd_GIF * gif;
+    GIFIMAGE gif;
     lv_timer_t * timer;
     lv_image_dsc_t imgdsc;
     uint32_t last_call;
+    uint32_t is_open : 1;
 };
 
 
