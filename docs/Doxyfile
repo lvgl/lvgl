@@ -815,11 +815,11 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf and *.qsf.
 
-FILE_PATTERNS          = lv*.h  \
-                         *.hh   \
-                         *.hxx  \
-                         *.hpp  \
-                         *.h++
+FILE_PATTERNS          = lv*.h    \
+                         lv*.hh   \
+                         lv*.hxx  \
+                         lv*.hpp  \
+                         lv*.h++
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.

@@ -32,8 +32,8 @@
 
 	    <prop name="point_count" type="int" help=""/>
 	    <prop name="update_mode" type="enum:lv_chart_update_mode" help=""/>
-	    <prop name="nor_div_line_count" help=""/>
-	    <prop name="ver_div_line_count" help=""/>
+	    <prop name="hor_div_line_count" type="int" help="number of horizontal division lines"/>
+	    <prop name="ver_div_line_count" type="int" help="number of vertical division lines"/>
 
 	    <element name="series" type="lv_chart_series" access="add">
 	        <arg name="color" type="color" help=""/>

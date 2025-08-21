@@ -80,6 +80,14 @@ Example
             <arg name="delay" type="int" default="0"/>
         </element>
 
+        <element name="play_timeline_event" access="add" type="void">
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="target" type="lv_obj"/>
+            <arg name="timeline" type="timeline"/>
+            <arg name="delay" type="int" default="0"/>
+            <arg name="reverse" type="bool" default="false"/>
+        </element>
+
         <element name="subject_set_int_event" access="add" type="void">
             <arg name="subject" type="subject"/>
             <arg name="trigger" type="lv_event" default="clicked"/>

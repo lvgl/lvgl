@@ -664,13 +664,19 @@ extern "C" {
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
+        vg_lite_matrix_t new_matrix = *matrix;
+        if(rect->x || rect->y) {
+            /* simulate hardware device clipping behavior */
+            vg_lite_translate(-rect->x, -rect->y, &new_matrix);
+        }
+
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_rect(shape, target, rect));
-        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(&new_matrix)));
 
         auto picture = tvg::Picture::gen();
         TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
-        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(&new_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
@@ -2611,7 +2617,9 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                            vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
+
+    /* At least 8-byte alignment */
+    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, 8));
 
     /**
      * Since ThorVG's picture->load does not support stride,

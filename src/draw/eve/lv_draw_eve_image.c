@@ -61,9 +61,6 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
-    int32_t clip_w = lv_area_get_width(&t->clip_area);
-    int32_t clip_h = lv_area_get_height(&t->clip_area);
-
     const uint8_t * src_buf = img_dsc->data;
     int32_t src_w = img_dsc->header.w;
     int32_t src_h = img_dsc->header.h;
@@ -160,7 +157,7 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
     EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
     /*real height and width is mandatory for rotation and scale (Clip Area)*/
-    EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, clip_w, clip_h));
+    EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, src_w, src_h));
 
     EVE_cmd_dl_burst(BITMAP_LAYOUT(eve_format, eve_stride, src_h));
 

@@ -606,6 +606,7 @@ Triangles are defined by :cpp:type:`lv_draw_triangle_dsc_t`, which includes:
          ``color`` field is ignored. The ``opa`` field adjusts overall opacity.
 
 Functions for triangle drawing:
+
 - :cpp:expr:`lv_draw_triangle_dsc_init(&dsc)` initializes a triangle descriptor.
 - :cpp:expr:`lv_draw_triangle(layer, &dsc)` creates a task to draw a triangle.
 - :cpp:expr:`lv_draw_task_get_triangle_dsc(draw_task)` retrieves triangle descriptor.

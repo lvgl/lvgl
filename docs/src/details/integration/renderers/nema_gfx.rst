@@ -109,6 +109,6 @@ See the LVGL :ref:`DMA2D support <dma2d>`.
 API
 ***
 
-:ref:`lv_draw_nema_gfx_h`
+.. API startswith:  lv_draw_nema_
 
-:ref:`lv_draw_nema_gfx_utils_h`
+.. API startswith:  lv_nemagfx_

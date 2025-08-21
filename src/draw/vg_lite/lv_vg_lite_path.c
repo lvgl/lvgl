@@ -398,8 +398,12 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
 void lv_vg_lite_path_close(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
+#if LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+    LV_UNUSED(path);
+#else
     lv_vg_lite_path_reserve_space(path, 1 * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_CLOSE);
+#endif
 }
 
 void lv_vg_lite_path_end(lv_vg_lite_path_t * path)

@@ -17,6 +17,7 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
+#include "../../misc/lv_area_private.h"
 #include <string.h>
 #include <math.h>
 
@@ -718,9 +719,6 @@ void lv_vg_lite_buffer_init(
     vg_lite_buffer_format_t format,
     bool tiled)
 {
-    uint32_t mul;
-    uint32_t div;
-    uint32_t align;
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(ptr);
 
@@ -733,13 +731,26 @@ void lv_vg_lite_buffer_init(
     else {
         buffer->tiled = VG_LITE_LINEAR;
     }
-    buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+
+    if(buffer->tiled) {
+        LV_ASSERT_FORMAT_MSG(LV_VG_LITE_IS_ALIGNED(width, 4) &&
+                             LV_VG_LITE_IS_ALIGNED(height, 4),
+                             "width : %" LV_PRId32 ", height : %" LV_PRId32, width, height);
+    }
+
+    /* Alpha image need to be multiplied by color */
+    if(format == VG_LITE_A8 || format == VG_LITE_A4) {
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    }
+    else {
+        buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+    }
+
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
     if(stride == LV_STRIDE_AUTO) {
-        lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-        buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+        buffer->stride = lv_vg_lite_width_to_stride(width, buffer->format);
     }
     else {
         buffer->stride = stride;
@@ -783,11 +794,6 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     lv_vg_lite_buffer_init(buffer, ptr,
                            width, height, stride, format,
                            lv_draw_buf_has_flag(draw_buf, LV_VG_LITE_IMAGE_FLAGS_TILED));
-
-    /* Alpha image need to be multiplied by color */
-    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
-        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    }
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
@@ -1278,9 +1284,16 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
     return p;
 }
 
-void lv_vg_lite_set_scissor_area(const lv_area_t * area)
+void lv_vg_lite_set_scissor_area(struct _lv_draw_vg_lite_unit_t * u, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    /* Avoid setting the same scissor frequently */
+    if(lv_area_is_equal(area, &u->current_scissor_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
 #if VGLITE_RELEASE_VERSION <= VGLITE_MAKE_VERSION(4,0,57)
     /**
      * In the new version of VG-Lite, vg_lite_set_scissor no longer needs to call vg_lite_enable_scissor and
@@ -1303,6 +1316,8 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
         LV_LOG_ERROR("area: %d, %d, %d, %d",
                      (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
     });
+
+    u->current_scissor_area = *area;
     LV_PROFILER_DRAW_END;
 }
 
@@ -1378,6 +1393,9 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     /* Clear bitmap font dsc reference */
     lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
+
+    /* Reset scissor area */
+    lv_memzero(&u->current_scissor_area, sizeof(u->current_scissor_area));
 
     u->flush_count = 0;
     u->letter_count = 0;

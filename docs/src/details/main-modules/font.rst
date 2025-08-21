@@ -312,7 +312,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
    Add `FontAwesome.woff <https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff>`__.
 3. Set the parameters such as Name, Size, BPP. You'll use this name to
    declare and use the font in your code.
-4. Add the Unicode ID of the symbol to the range field. E.g.\ ``0xf287``
+4. Add the Unicode ID of the symbol to the range field. E.g. ``0xf287``
    for the USB symbol. More symbols can be enumerated with ``,``.
 5. Convert the font and copy the generated source code to your project.
    Make sure to compile the ``.c`` file of your font.

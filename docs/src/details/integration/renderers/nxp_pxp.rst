@@ -5,6 +5,6 @@ NXP PXP GPU
 API
 ***
 
-:ref:`lv_draw_pxp_h`
+.. API startswith:  lv_draw_pxp_
 
-:ref:`lv_pxp_cfg_h`
+.. API startswith:  lv_pxp_

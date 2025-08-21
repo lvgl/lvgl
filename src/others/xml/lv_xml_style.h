@@ -41,20 +41,6 @@ typedef struct _lv_xml_style_t {
 lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char ** attrs);
 
 /**
- * Convert a style state to enum
- * @param txt       e.g. "pressed"
- * @return          the enum `LV_STATE_PRESSED`
- */
-lv_state_t lv_xml_style_state_to_enum(const char * txt);
-
-/**
- * Convert a style part to enum
- * @param txt       e.g. "knob"
- * @return          the enum `LV_PART_KNOB`
- */
-lv_part_t lv_xml_style_part_to_enum(const char * txt);
-
-/**
  * Decompose a string like `"style1:pressed:checked:knob"` to style name and selector
  * @param txt           the input string
  * @param selector      store the selectors here

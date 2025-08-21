@@ -7,7 +7,9 @@ SDL Driver
 Overview
 --------
 
-| SDL (Simple DirectMedia Layer) provides a cross-platform way to handle graphics, input, and multimedia, making it an excellent choice for running LVGL applications on a PC.
+SDL (Simple DirectMedia Layer) provides a cross-platform way to handle graphics,
+input, and multimedia, making it an excellent choice for running LVGL applications on
+a PC.
 
 
 Prerequisites

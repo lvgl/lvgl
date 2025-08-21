@@ -7,10 +7,15 @@ OpenGL ES Display/Inputs Driver
 Overview
 --------
 
-| The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an desktop window created via GLFW.
-| It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
+The **OpenGL ES** display/input
+`driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/glfw/lv_opengles_driver.c>`__
+offers support for simulating the LVGL display and keyboard/mouse inputs in an desktop
+window created via GLFW.
 
-The main purpose for this driver is for testing/debugging the LVGL application in an **OpenGL** simulation window.
+It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
+
+The main purpose for this driver is for testing/debugging the LVGL application in
+an **OpenGL** simulation window.
 
 Prerequisites
 -------------

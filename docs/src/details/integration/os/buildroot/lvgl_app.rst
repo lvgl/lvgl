@@ -137,7 +137,7 @@ to extend or modify the content of the root filesystem without altering the
 base packages or recompiling everything.
 
 Create the rootfs overlay structure and include the executable of the built 
-$application.
+application.
 
 .. code-block:: bash 
 

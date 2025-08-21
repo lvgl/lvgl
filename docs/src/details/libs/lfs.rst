@@ -62,7 +62,7 @@ Example
 API
 ***
 
-:ref:`lv_fsdrv_h`
+:ref:`libs/fsdrv/lv_fsdrv.h`
 
 See also:  `lvgl/src/libs/fsdrv/lv_fs_littlefs.c <https://github.com/lvgl/lvgl/blob/master/src/libs/fsdrv/lv_fs_littlefs.c>`__
 
