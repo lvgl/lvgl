@@ -66,7 +66,7 @@ void * lv_xml_table_column_create(lv_xml_parser_state_t * state, const char ** a
     LV_UNUSED(attrs);
 
     /*Nothing to create*/
-    return lv_xml_state_get_parent(state);;
+    return lv_xml_state_get_parent(state);
 }
 
 void lv_xml_table_column_apply(lv_xml_parser_state_t * state, const char ** attrs)
@@ -90,7 +90,7 @@ void * lv_xml_table_cell_create(lv_xml_parser_state_t * state, const char ** att
     LV_UNUSED(attrs);
 
     /*Nothing to create*/
-    return lv_xml_state_get_parent(state);;
+    return lv_xml_state_get_parent(state);
 }
 
 void lv_xml_table_cell_apply(lv_xml_parser_state_t * state, const char ** attrs)

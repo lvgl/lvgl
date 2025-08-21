@@ -1137,7 +1137,7 @@ static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radiu
 
             cir_x[cir_size] = x_int[0] - 1;
             cir_y[cir_size] = y_8th_cnt;
-            c->cir_opa[cir_size] = 1 * 4 + x_fract[1] + x_fract[2] + x_fract[3];;
+            c->cir_opa[cir_size] = 1 * 4 + x_fract[1] + x_fract[2] + x_fract[3];
             c->cir_opa[cir_size] *= 16;
             cir_size++;
         }
@@ -1151,7 +1151,7 @@ static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radiu
 
             cir_x[cir_size] = x_int[0] - 1;
             cir_y[cir_size] = y_8th_cnt;
-            c->cir_opa[cir_size] = 2 * 4 + x_fract[2] + x_fract[3];;
+            c->cir_opa[cir_size] = 2 * 4 + x_fract[2] + x_fract[3];
             c->cir_opa[cir_size] *= 16;
             cir_size++;
         }
@@ -1165,7 +1165,7 @@ static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radiu
 
             cir_x[cir_size] = x_int[0] - 1;
             cir_y[cir_size] = y_8th_cnt;
-            c->cir_opa[cir_size] = 3 * 4 + x_fract[3];;
+            c->cir_opa[cir_size] = 3 * 4 + x_fract[3];
             c->cir_opa[cir_size] *= 16;
             cir_size++;
         }

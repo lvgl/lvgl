@@ -384,7 +384,7 @@ static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
 
-    size_t used_size = mon->total_size - mon->free_size;;
+    size_t used_size = mon->total_size - mon->free_size;
     size_t used_kb = used_size / 1024;
     size_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
     size_t max_used_kb = mon->max_used / 1024;
