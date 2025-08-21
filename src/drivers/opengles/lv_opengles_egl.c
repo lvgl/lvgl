@@ -505,8 +505,6 @@ static void window_update_handler(lv_timer_t * t)
 
         if(window->post1) window->post1(window);
 
-        GL_CALL(glFinish());
-
         /* Swap front and back buffers */
         res = eglSwapBuffers(egl_display, window->surface);
         if(res == EGL_FALSE) {
@@ -514,11 +512,7 @@ static void window_update_handler(lv_timer_t * t)
             return;
         }
 
-        GL_CALL(glFinish());
-
         if(window->post2) window->post2(window);
-
-        GL_CALL(glFinish());
     }
 }
 
