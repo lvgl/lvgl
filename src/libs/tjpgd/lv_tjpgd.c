@@ -167,6 +167,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 return LV_RESULT_INVALID;
             }
         }
+        else {
+            lv_free(f);
+            return LV_RESULT_INVALID;
+        }
 #else
         LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
         lv_free(f);
@@ -183,6 +187,14 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 return LV_RESULT_INVALID;
             }
         }
+        else {
+            lv_free(f);
+            return LV_RESULT_INVALID;
+        }
+    }
+    else {
+        lv_free(f);
+        return LV_RESULT_INVALID;
     }
 
     uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
