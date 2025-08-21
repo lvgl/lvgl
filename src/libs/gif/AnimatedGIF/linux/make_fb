@@ -1,0 +1,13 @@
+CFLAGS=-D__LINUX__ -c -Wall -O2 
+LIBS = 
+
+all: fb_demo 
+
+fb_demo: fb_demo.o
+	$(CC) fb_demo.o $(LIBS) -o fb_demo
+
+fb_demo.o: fb_demo.c
+	$(CC) $(CFLAGS) fb_demo.c
+
+clean:
+	rm -rf *.o fb_demo
