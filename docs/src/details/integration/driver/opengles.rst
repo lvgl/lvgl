@@ -263,7 +263,7 @@ Render Direct to Window
 
 So far all the UIs demonstrated render to a LVGL display-sized intermediate texture before that texture is "rendered"
 to the window. At the least, it will cost a screen-sized read and a write inside the GPU. Performance can be
-improved if the the LVGL OpenGL driver renders its cached textures directly to the window (and :c:macro:`LV_USE_DRAW_OPENGLES` is enabled).
+improved if the LVGL OpenGL driver renders its cached textures directly to the window (and :c:macro:`LV_USE_DRAW_OPENGLES` is enabled).
 This can be done by creating the display with :cpp:func:`lv_opengles_window_display_create` instead of
 :cpp:func:`lv_opengles_texture_create` + :cpp:func:`lv_opengles_texture_get_texture_id` + :cpp:func:`lv_opengles_window_add_texture`.
 Performance should be better with GLFW and EGL. EGL currently has issues when used this way.
