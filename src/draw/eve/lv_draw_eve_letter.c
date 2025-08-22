@@ -123,10 +123,10 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     lv_eve_color_opa(glyph_draw_dsc->opa);
     lv_eve_color(glyph_draw_dsc->color);
 
-    EVE_cmd_dl_burst(BITMAP_SOURCE(ramg_addr));
+    lv_eve_bitmap_source(ramg_addr);
 
-    EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, g_box_w, g_box_h));
-    EVE_cmd_dl_burst(BITMAP_LAYOUT(bpp_eve, g_aligned_stride, g_box_h));
+    lv_eve_bitmap_size(EVE_NEAREST, EVE_BORDER, EVE_BORDER, g_box_w, g_box_h);
+    lv_eve_bitmap_layout(bpp_eve, g_aligned_stride, g_box_h);
 
     lv_eve_vertex_2f(glyph_draw_dsc->letter_coords->x1, glyph_draw_dsc->letter_coords->y1);
 }
