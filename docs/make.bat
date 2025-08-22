@@ -24,11 +24,13 @@ setlocal ENABLEDELAYEDEXPANSION
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
+
 if "%LVGL_DOC_BUILD_INTERMEDIATE_DIR%" == "" (
 	set SOURCEDIR=intermediate
 ) else (
 	set SOURCEDIR=%LVGL_DOC_BUILD_INTERMEDIATE_DIR%
 )
+
 if "%LVGL_DOC_BUILD_OUTPUT_DIR%" == "" (
 	set BUILDDIR=build
 ) else (
