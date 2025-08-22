@@ -104,7 +104,7 @@ Usage
     #define V_RES (480)
 
     /* Create a display */
-    lv_disp_t * disp = lv_wayland_create_window(H_RES, V_RES, "Window Title", close_cb);
+    lv_disp_t * disp = lv_wayland_window_create(H_RES, V_RES, "Window Title", close_cb);
 
 
 As part of the above call, the Wayland driver will register four input devices
