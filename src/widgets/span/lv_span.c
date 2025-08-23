@@ -1246,6 +1246,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             label_draw_dsc.text = bidi_txt;
             label_draw_dsc.text_length = txt_bytes;
             label_draw_dsc.letter_space = pinfo->letter_space;
+            label_draw_dsc.line_space = line_space;
             label_draw_dsc.decor = lv_span_get_style_text_decor(obj, pinfo->span);
             lv_area_t a;
             a.x1 = pos.x;
