@@ -733,7 +733,7 @@ static unique_ptr<Scene> _useBuildHelper(SvgLoaderData& loaderData, const SvgNod
 
         auto width = (symbol.hasWidth ? symbol.w : vBox.w);
         if (node->node.use.isWidthSet) width = node->node.use.w;
-        auto height = (symbol.hasHeight ? symbol.h : vBox.h);;
+        auto height = (symbol.hasHeight ? symbol.h : vBox.h);
         if (node->node.use.isHeightSet) height = node->node.use.h;
         auto vw = (symbol.hasViewBox ? symbol.vw : width);
         auto vh = (symbol.hasViewBox ? symbol.vh : height);

@@ -93,7 +93,7 @@ static bool _clockwise(const Point* pts, uint32_t n)
     for (uint32_t i = 0; i < n - 1; i++) {
         area += cross(pts[i], pts[i + 1]);
     }
-    area += cross(pts[n - 1], pts[0]);;
+    area += cross(pts[n - 1], pts[0]);
 
     return area < 0.0f;
 }

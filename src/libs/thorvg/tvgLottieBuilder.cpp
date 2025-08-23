@@ -48,8 +48,8 @@ static void _rotationXYZ(Matrix* m, float degreeX, float degreeY, float degreeZ)
     auto radianZ = deg2rad(degreeZ);
 
     auto cx = cosf(radianX), sx = sinf(radianX);
-    auto cy = cosf(radianY), sy = sinf(radianY);;
-    auto cz = cosf(radianZ), sz = sinf(radianZ);;
+    auto cy = cosf(radianY), sy = sinf(radianY);
+    auto cz = cosf(radianZ), sz = sinf(radianZ);
     m->e11 = cy * cz;
     m->e12 = -cy * sz;
     m->e21 = sx * sy * cz + cx * sz;
