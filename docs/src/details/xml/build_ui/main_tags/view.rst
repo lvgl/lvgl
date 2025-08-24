@@ -7,7 +7,7 @@ View
 Overview
 ********
 
-The ``<view>`` tag can be used as children of the following tags:
+The ``<view>`` tag can be used as a child of the following tags:
 
 - ``<component>``
 - ``<widget>``
