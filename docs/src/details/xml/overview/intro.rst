@@ -221,7 +221,7 @@ Load the UI from XML
 
 Although Widgets' XML always needs to be exported in C and compiled into the
 application (just like the built-in LVGL Widgets' C code is compiled into the
-application), the XML for Components' can be loaded (learned) at runtime, and
+application), the XML for Components can be loaded (learned) at runtime, and
 thereafter any number of instances of them can be created.
 
 In the simplest case, a Component can be registered with
