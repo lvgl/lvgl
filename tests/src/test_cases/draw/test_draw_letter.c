@@ -8,7 +8,7 @@
     #define TEST_ASSERT_EQUAL_LETTER_SCREENSHOT(path) TEST_ASSERT_EQUAL_SCREENSHOT(path)
 #else
     #define TEST_ASSERT_EQUAL_LETTER_SCREENSHOT(path) LV_UNUSED(path)
-#endif
+ #endif
 
 void setUp(void)
 {
@@ -138,11 +138,21 @@ static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
     lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
-    lv_area_set(&layer._clip_area, 40, 40, 200 - 1, 200 - 1);
+
+    /* drawing letter with clipping */
+    lv_area_t clip_area;
+    lv_area_set(&clip_area, 40, 40, 200 - 1, 200 - 1);
+    layer._clip_area = clip_area;
 
     for(int i = 0; i < 9; i++) {
-        draw_letter_with_rotation(canvas, &layer, rotation, (i % 3) * 80 + 40, (i / 3) * 80 + 40);
+        draw_letter_with_rotation(canvas, &layer, rotation, (i % 3) * 80 + 40, (i / 3) * 80 + 70);
     }
+
+    lv_draw_border_dsc_t draw_border_dsc;
+    lv_draw_border_dsc_init(&draw_border_dsc);
+    draw_border_dsc.width = 1;
+    draw_border_dsc.color = lv_color_black();
+    lv_draw_border(&layer, &draw_border_dsc, &clip_area);
 
     lv_canvas_finish_layer(canvas, &layer);
 
