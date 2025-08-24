@@ -14,7 +14,7 @@ A single ``project.xml`` file should be created for each project where the follo
 content is specified:
 
 :<folders>: Specifies the list of paths to Component Libraries. LVGL's base Widgets are
-            always loaded automatically, and therefore does not need to be specified
+            always loaded automatically, and therefore do not need to be specified
             in this list.
 :<targets>: Describes various hardware configurations, allowing the UI |nbsp| Editor
             to check if the UI is out of resources and to select different previews
