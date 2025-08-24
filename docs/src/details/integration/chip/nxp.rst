@@ -49,7 +49,7 @@ Basic configuration:
 - Select NXP PXP engine in "lv_conf.h": Set :c:macro:`LV_USE_PXP` to `1`.
 - In order to use PXP as a draw unit, select in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_PXP` to `1`.
 - In order to use PXP to rotate the screen, select in "lv_conf.h": Set :c:macro:`LV_USE_ROTATE_PXP` to `1`.
-- Enable PXP asserts in "lv_conf.h": Set :c:macro: `LV_USE_PXP_ASSERT` to `1`.
+- Enable PXP asserts in "lv_conf.h": Set :c:macro:`LV_USE_PXP_ASSERT` to `1`.
   There are few PXP assertions that can stop the program execution in case the
   :c:macro:`LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
@@ -220,10 +220,10 @@ Basic configuration:
 - Select NXP VGLite engine in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_VGLITE` to
   `1`. :c:macro:`SDK_OS_FREE_RTOS` symbol needs to be defined so that FreeRTOS
   driver osal implementation will be enabled.
-- Enable VGLite asserts in "lv_conf.h": Set :c:macro: `LV_USE_VGLITE_ASSERT` to
+- Enable VGLite asserts in "lv_conf.h": Set :c:macro:`LV_USE_VGLITE_ASSERT` to
   `1`.
   VGLite assertions will verify the driver API status code and in any error, it
-  can stop the program execution in case the :c:macro: `LV_ASSERT_HANDLER` is set
+  can stop the program execution in case the :c:macro:`LV_ASSERT_HANDLER` is set
   to `while(1);` (Halt by default). Else, there will be logged just an error
   message via `LV_LOG_ERROR`.
 
@@ -307,7 +307,7 @@ Advanced configuration:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - Enable VGLite blit split in "lv_conf.h":
-  Set :c:macro: `LV_USE_VGLITE_BLIT_SPLIT` to `1`.
+  Set :c:macro:`LV_USE_VGLITE_BLIT_SPLIT` to `1`.
   Enabling the blit split workaround will mitigate any quality degradation issue
   on screen's dimension > 352 pixels.
 
@@ -322,7 +322,7 @@ Advanced configuration:
   the blit split.
 
 - Enable VGLite draw task synchronously in "lv_conf.h":
-  Set :c:macro: `LV_USE_VGLITE_DRAW_ASYNC` to `1`.
+  Set :c:macro:`LV_USE_VGLITE_DRAW_ASYNC` to `1`.
   Multiple draw tasks can be queued and flushed them once to the GPU based on
   the GPU idle status. If GPU is busy, the task will be queued, and the VGLite
   dispatcher will ask for a new available task. If GPU is idle, the queue with
@@ -426,9 +426,9 @@ Basic configuration:
 
 - Select NXP G2D engine in "lv_conf.h": Set :c:macro:`LV_USE_G2D` to `1`.
 - In order to use G2D as a draw unit, select in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_G2D` to `1`.
-- Enable G2D asserts in "lv_conf.h": Set :c:macro: `LV_USE_G2D_ASSERT` to `1`.
+- Enable G2D asserts in "lv_conf.h": Set :c:macro:`LV_USE_G2D_ASSERT` to `1`.
   There are few G2D assertions that can stop the program execution in case the
-  :c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
+  :c:macro:`LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
 
 Basic initialization:
