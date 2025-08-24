@@ -24,7 +24,7 @@ the content of the UI.
 - :ref:`<styles> <xml_styles>`, and
 - :ref:`<view> <xml_view>`
 
-That is, Screens **cannot** have an :ref:`<api> <xml_api>` or :ref:`<preview> <xml_preview>`
+That is, Screens **cannot** have :ref:`<api> <xml_api>` or :ref:`<preview> <xml_preview>`
 elements.
 
 
