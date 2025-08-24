@@ -27,7 +27,6 @@
 static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void next_frame_task_cb(lv_timer_t * t);
-static void gif_draw_cb(GIFDRAW * pdraw);
 
 /**********************
  *  STATIC VARIABLES
@@ -72,14 +71,14 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
         gifobj->imgdsc.data = NULL;
     }
 
-    GIF_begin(gif, GIF_PALETTE_RGB8888);
+    GIF_begin(gif, GIF_PALETTE_RGB565_LE);
 
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         gifobj->is_open = GIF_openRAM(gif, img_dsc->data, img_dsc->data_size, NULL);
     }
     else if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
-        // gifobj->is_open = GIF_openFile(gif, src, gif_draw_cb);
+        gifobj->is_open = GIF_openFile(gif, src, NULL);
     }
     if(gifobj->is_open == 0) {
         LV_LOG_WARN("Couldn't load the source");
@@ -88,7 +87,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     uint32_t width = GIF_getCanvasWidth(gif);
     uint32_t height = GIF_getCanvasHeight(gif);
-    gif->pFrameBuffer = lv_malloc(width * height * 5);
+    gif->pFrameBuffer = lv_malloc(width * height * 3);
     gif->ucDrawType = GIF_DRAW_COOKED;
     LV_ASSERT_MALLOC(gif->pFrameBuffer);
     if(gif->pFrameBuffer == NULL) {
@@ -101,11 +100,11 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     gifobj->imgdsc.data = gif->pFrameBuffer + width * height;
     gifobj->imgdsc.header.magic = LV_IMAGE_HEADER_MAGIC;
     gifobj->imgdsc.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
-    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
+    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_RGB565;
     gifobj->imgdsc.header.h = height;
     gifobj->imgdsc.header.w = width;
-    gifobj->imgdsc.header.stride = width * 4;
-    gifobj->imgdsc.data_size = width * height * 4;
+    gifobj->imgdsc.header.stride = width * 2;
+    gifobj->imgdsc.data_size = width * height * 2;
 
     lv_image_set_src(obj, &gifobj->imgdsc);
 
@@ -226,16 +225,9 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_obj_invalidate(obj);
 }
 
-// static void gif_draw_cb(GIFDRAW * pdraw)
-// {
-//     lv_gif_t * gifobj = pdraw->pUser;
-
-//     // uint8_t * dst = &gifobj->canvas[((pdraw->iY + pdraw->y)
-//     //                                  * pdraw->iWidth + pdraw->iX) * 4];
-//     // lv_memcpy(dst, pdraw->pPixels, pdraw->iWidth * 4);
-
-//     gifobj->imgdsc.data = pdraw->pPixels
-// }
+/**********************
+ *   ININE INCLUDES
+ **********************/
 
 #include "AnimatedGIF/src/gif.inl"
 

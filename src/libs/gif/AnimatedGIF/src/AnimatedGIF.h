@@ -17,22 +17,12 @@
 #include "../../../../lv_conf_internal.h"
 #include LV_STDINT_INCLUDE
 #include "../../../../stdlib/lv_string.h"
-// #include <stdlib.h>
 
 #define memcpy lv_memcpy
 #define memmove lv_memmove
 #define memcmp lv_memcmp
 #define memset lv_memset
-#define memcpy_P memcpy
-
-#include "../../../../tick/lv_tick.h"
-#define millis lv_tick_get
-#define delay lv_delay_ms
-
-// Cortex-M4/M7 allow unaligned access to SRAM
-#if defined(HAL_ESP32_HAL_H_) || defined(TEENSYDUINO) || defined(ARM_MATH_CM4) || defined(ARM_MATH_CM7)
-#define ALLOWS_UNALIGNED
-#endif
+#define memcpy_P lv_memcpy
 
 //
 // GIF Animator
@@ -70,11 +60,7 @@
 #define MAX_CODE_SIZE 12
 
 #define MAX_COLORS 256
-#ifdef __LINUX__
-#define MAX_WIDTH 2048
-#else
 #define MAX_WIDTH 480
-#endif // __LINUX__
 #define LZW_BUF_SIZE (6*MAX_CHUNK_SIZE)
 #define LZW_HIGHWATER (4*MAX_CHUNK_SIZE)
 // This buffer is used to store the pixel sequence in reverse order
@@ -140,7 +126,7 @@ typedef struct gif_file_tag
   int32_t iPos; // current file position
   int32_t iSize; // file size
   uint8_t *pData; // memory file pointer
-  void * fHandle; // class pointer to File/SdFat or whatever you want
+  lv_fs_file_t fHandle; // class pointer to File/SdFat or whatever you want
 } GIFFILE;
 
 typedef struct gif_info_tag
@@ -174,7 +160,7 @@ typedef int32_t (GIF_READ_CALLBACK)(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
 typedef int32_t (GIF_SEEK_CALLBACK)(GIFFILE *pFile, int32_t iPosition);
 typedef void (GIF_DRAW_CALLBACK)(GIFDRAW *pDraw);
 typedef void * (GIF_OPEN_CALLBACK)(const char *szFilename, int32_t *pFileSize);
-typedef void (GIF_CLOSE_CALLBACK)(void *pHandle);
+typedef void (GIF_CLOSE_CALLBACK)(lv_fs_file_t *pHandle);
 typedef void * (GIF_ALLOC_CALLBACK)(uint32_t iSize);
 typedef void (GIF_FREE_CALLBACK)(void *buffer);
 //
@@ -217,47 +203,6 @@ typedef struct gif_image_tag
     unsigned char ucLineBuf[MAX_WIDTH]; // current line
 } GIFIMAGE;
 
-#ifdef __cplusplus
-//
-// The GIF class wraps portable C code which does the actual work
-//
-class AnimatedGIF
-{
-  public:
-    int open(uint8_t *pData, int iDataSize, GIF_DRAW_CALLBACK *pfnDraw);
-#ifdef ARDUINO
-    int openFLASH(uint8_t *pData, int iDataSize, GIF_DRAW_CALLBACK *pfnDraw);
-#endif
-    int open(const char *szFilename, GIF_OPEN_CALLBACK *pfnOpen, GIF_CLOSE_CALLBACK *pfnClose, GIF_READ_CALLBACK *pfnRead, GIF_SEEK_CALLBACK *pfnSeek, GIF_DRAW_CALLBACK *pfnDraw);
-    void close();
-    void reset();
-    void begin(uint8_t ucPaletteType = GIF_PALETTE_RGB565_LE);
-    void begin(int iEndian, uint8_t ucPaletteType) { begin(ucPaletteType); };
-    int playFrame(bool bSync, int *delayMilliseconds, void *pUser = NULL);
-    int getCanvasWidth();
-    int getFrameWidth();
-    int getFrameHeight();
-    int getFrameXOff();
-    int getFrameYOff();
-    int allocTurboBuf(GIF_ALLOC_CALLBACK *pfnAlloc);
-    int allocFrameBuf(GIF_ALLOC_CALLBACK *pfnAlloc);
-    void setTurboBuf(void *pTurboBuffer);
-    void setFrameBuf(void *pFrameBuffer);
-    int setDrawType(int iType);
-    int freeFrameBuf(GIF_FREE_CALLBACK *pfnFree);
-    int freeTurboBuf(GIF_FREE_CALLBACK *pfnFree);
-    uint8_t *getFrameBuf();
-    uint8_t *getTurboBuf();
-    int getCanvasHeight();
-    int getLoopCount();
-    int getInfo(GIFINFO *pInfo);
-    int getLastError();
-    int getComment(char *destBuffer);
-
-  private:
-    GIFIMAGE _gif;
-};
-#else
 // C interface
     int GIF_openRAM(GIFIMAGE *pGIF, uint8_t *pData, int iDataSize, GIF_DRAW_CALLBACK *pfnDraw);
     int GIF_openFile(GIFIMAGE *pGIF, const char *szFilename, GIF_DRAW_CALLBACK *pfnDraw);
@@ -271,27 +216,31 @@ class AnimatedGIF
     int GIF_getInfo(GIFIMAGE *pGIF, GIFINFO *pInfo);
     int GIF_getLastError(GIFIMAGE *pGIF);
     int GIF_getLoopCount(GIFIMAGE *pGIF);
-#endif // __cplusplus
 
 #if (INTPTR_MAX == INT64_MAX)
-#define ALLOWS_UNALIGNED
-#define INTELSHORT(p) (*(uint16_t *)p)
-#define INTELLONG(p) (*(uint64_t *)p)
-#define REGISTER_WIDTH 64
-#define BIGINT int64_t
-#define BIGUINT uint64_t
+    #define REGISTER_WIDTH 64
+    #ifdef ALLOWS_UNALIGNED
+        #define INTELSHORT(p) (*(uint16_t *)p)
+        #define INTELLONG(p) (*(uint64_t *)p)
+    #else
+        // Due to unaligned memory causing an exception, we have to do these macros the slow way
+        #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
+        #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24) + (*(p+4)<<32) + (*(p+5)<<40) + (*(p+6)<<48) + (*(p+7)<<56))
+    #endif // ALLOWS_UNALIGNED
+    #define BIGINT int64_t
+    #define BIGUINT uint64_t
 #else
-#define REGISTER_WIDTH 32
-#ifdef ALLOWS_UNALIGNED
-#define INTELSHORT(p) (*(uint16_t *)p)
-#define INTELLONG(p) (*(uint32_t *)p)
-#else
-// Due to unaligned memory causing an exception, we have to do these macros the slow way
-#define INTELSHORT(p) ((*p) + (*(p+1)<<8))
-#define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24))
-#endif // ALLOWS_UNALIGNED
-#define BIGINT int32_t
-#define BIGUINT uint32_t
+    #define REGISTER_WIDTH 32
+    #ifdef ALLOWS_UNALIGNED
+        #define INTELSHORT(p) (*(uint16_t *)p)
+        #define INTELLONG(p) (*(uint32_t *)p)
+    #else
+        // Due to unaligned memory causing an exception, we have to do these macros the slow way
+        #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
+        #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24))
+    #endif // ALLOWS_UNALIGNED
+    #define BIGINT int32_t
+    #define BIGUINT uint32_t
 #endif // 64 vs 32-bit native register size
 
 #endif // __ANIMATEDGIF__

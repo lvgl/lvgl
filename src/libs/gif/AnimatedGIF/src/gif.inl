@@ -20,11 +20,6 @@
 //===========================================================================
 #include "AnimatedGIF.h"
 
-#if defined( HAL_ESP32_HAL_H_ )
-#define memcpy_P memcpy
-#pragma GCC optimize("O2")
-#endif
-
 static const unsigned char cGIFBits[9] = {1,4,4,4,8,8,8,8,8}; // convert odd bpp values to ones we can handle
 
 // forward references
@@ -39,7 +34,7 @@ static int32_t seekMem(GIFFILE *pFile, int32_t iPosition);
 int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo);
 static int32_t readFile(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen);
 static int32_t seekFile(GIFFILE *pFile, int32_t iPosition);
-static void closeFile(void *handle);
+static void closeFile(lv_fs_file_t *handle);
 
 // C API
 int GIF_openRAM(GIFIMAGE *pGIF, uint8_t *pData, int iDataSize, GIF_DRAW_CALLBACK *pfnDraw)
@@ -55,7 +50,6 @@ int GIF_openRAM(GIFIMAGE *pGIF, uint8_t *pData, int iDataSize, GIF_DRAW_CALLBACK
     return GIFInit(pGIF);
 } /* GIF_openRAM() */
 
-#ifdef __LINUX__
 int GIF_openFile(GIFIMAGE *pGIF, const char *szFilename, GIF_DRAW_CALLBACK *pfnDraw)
 {
     pGIF->iError = GIF_SUCCESS;
@@ -64,20 +58,20 @@ int GIF_openFile(GIFIMAGE *pGIF, const char *szFilename, GIF_DRAW_CALLBACK *pfnD
     pGIF->pfnDraw = pfnDraw;
     pGIF->pfnOpen = NULL;
     pGIF->pfnClose = closeFile;
-    pGIF->GIFFile.fHandle = fopen(szFilename, "r+b");
-    if (pGIF->GIFFile.fHandle == NULL)
+    if (LV_FS_RES_OK != lv_fs_open(&pGIF->GIFFile.fHandle, szFilename, LV_FS_MODE_RD))
        return 0;
-    fseek((FILE *)pGIF->GIFFile.fHandle, 0, SEEK_END);
-    pGIF->GIFFile.iSize = (int)ftell((FILE *)pGIF->GIFFile.fHandle);
-    fseek((FILE *)pGIF->GIFFile.fHandle, 0, SEEK_SET);
+    lv_fs_seek(&pGIF->GIFFile.fHandle, 0, LV_FS_SEEK_END);
+    uint32_t pos;
+    lv_fs_tell(&pGIF->GIFFile.fHandle, &pos);
+    pGIF->GIFFile.iSize = pos;
+    lv_fs_seek(&pGIF->GIFFile.fHandle, 0, LV_FS_SEEK_SET);
     return GIFInit(pGIF);
 } /* GIF_openFile() */
-#endif
 
 void GIF_close(GIFIMAGE *pGIF)
 {
     if (pGIF->pfnClose)
-        (*pGIF->pfnClose)(pGIF->GIFFile.fHandle);
+        (*pGIF->pfnClose)(&pGIF->GIFFile.fHandle);
 } /* GIF_close() */
 
 void GIF_begin(GIFIMAGE *pGIF, unsigned char ucPaletteType)
@@ -180,7 +174,6 @@ static int32_t readMem(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
     return iBytesRead;
 } /* readMem() */
 
-#ifndef __LINUX__
 static int32_t readFLASH(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
 {
     int32_t iBytesRead;
@@ -194,7 +187,6 @@ static int32_t readFLASH(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
     pFile->iPos += iBytesRead;
     return iBytesRead;
 } /* readFLASH() */
-#endif // __LINUX__
 
 static int32_t seekMem(GIFFILE *pFile, int32_t iPosition)
 {
@@ -204,10 +196,9 @@ static int32_t seekMem(GIFFILE *pFile, int32_t iPosition)
     return iPosition;
 } /* seekMem() */
 
-#if defined ( __LINUX__ ) || defined( __MCUXPRESSO )
-static void closeFile(void *handle)
+static void closeFile(lv_fs_file_t *handle)
 {
-    fclose((FILE *)handle);
+    lv_fs_close(handle);
 } /* closeFile() */
 
 static int32_t seekFile(GIFFILE *pFile, int32_t iPosition)
@@ -215,7 +206,7 @@ static int32_t seekFile(GIFFILE *pFile, int32_t iPosition)
     if (iPosition < 0) iPosition = 0;
     else if (iPosition >= pFile->iSize) iPosition = pFile->iSize-1;
     pFile->iPos = iPosition;
-    fseek((FILE *)pFile->fHandle, iPosition, SEEK_SET);
+    lv_fs_seek(&pFile->fHandle, iPosition, LV_FS_SEEK_SET);
     return iPosition;
 } /* seekMem() */
 
@@ -228,12 +219,13 @@ static int32_t readFile(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
        iBytesRead = pFile->iSize - pFile->iPos;
     if (iBytesRead <= 0)
        return 0;
-    iBytesRead = (int)fread(pBuf, 1, iBytesRead, (FILE *)pFile->fHandle);
+    uint32_t br;
+    lv_fs_read(&pFile->fHandle, pBuf, iBytesRead, &br);
+    iBytesRead = br;
     pFile->iPos += iBytesRead;
     return iBytesRead;
 } /* readFile() */
 
-#endif // __LINUX__
 //
 // The following functions are written in plain C and have no
 // 3rd party dependencies, not even the C runtime library
