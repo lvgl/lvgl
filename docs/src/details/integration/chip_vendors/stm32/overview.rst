@@ -2,12 +2,63 @@
 Overview
 ========
 
-LVGL Can be added to `STM32CubeIDE <https://www.st.com/en/development-tools/stm32cubeide.html>`__
-in a similar fashion to any other Eclipse-based IDE.
+
+About
+*****
+
+ST Microelectronics is a chip vendor and board manufacturer of 32-bit ARM
+MCUs and MPUs.
+
+
+Application Development
+-----------------------
+
+STM32CubeIDE is an Eclipse-based IDE which is typically used to develop for STM32.
+It can configure your project, build,
+flash, and debug. It integrates LVGL similarly to any other Eclipse-based IDE.
+The projects it generates are STM32 HAL based. The STM32 HAL is maintained by ST
+and is a good fit for many applications. STM32CubeIDE can optionally generate projects that
+use FreeRTOS.
+
+STM32 projects can be created with STM32CubeIDE or with other frameworks that don't use the STM32 HAL.
+There are many ways to develop for STM32
+including manual bare metal, Zephry RTOS, NuttX RTOS, ChibiOS, and many more. Frameworks
+like Zephyr and NuttX often cause a project to be treated like "a Zephry project on STM32"
+rather than an "STM32 project running Zephry", so their documentation is where to start.
+Also worth mentioning is STM32CubeMX; a graphical tool for generating the boilerplate code for an
+STM32 HAL project to build it outside of STM32CubeIDE.
+Furthermore, STM32CubeCLT is a toolset for integrating ST proprietary tools into
+other IDEs such as Visual Studio Code.
+
+
+Ready-to-Use Projects
+---------------------
+
+LVGL maintains a few projects for STM32 boards. See `the boards page <https://lvgl.io/boards#st>`__
+for ST boards that have been certified by LVGL and have up-to-date LVGL integration, and check
+`all the repos <https://github.com/orgs/lvgl/repositories?q=lv_port_stm>`__
+for other ST board repos that exist. Follow the README.md files in those repos
+for specific instructions to get started with them.
+
+
+LVGL Support for STM32 Graphical Peripherals
+--------------------------------------------
+
+LVGL has good support for the graphical hardware acceleration peripherals that some STM32
+models feature. Sometimes these features can be utilized together at the same time.
+See the individual pages about them.
+
+- :ref:`LTDC: display controller. <stm32 ltdc driver>`
+- :ref:`DMA2D: asynchronous pixel data memory operations. <dma2d>``
+- :ref:`NemaGFX: GPU for rendering 2D graphics primitives. <nema_gfx>``
+
+Each page mentions if/how they can be used with each other.
 
 
 Including LVGL in a Project
 ---------------------------
+
+It's easy to add LVGL to your STM32 project.
 
 - Create or open a project in STM32CubeIDE.
 - Copy the entire LVGL folder to *[project_folder]/Drivers/lvgl*.
@@ -24,14 +75,14 @@ Now that the source files are included in your project, follow the instructions 
 ``lv_conf.h`` file, and initialise the display.
 
 
-Bare Metal Example
-------------------
+STM32 HAL Example
+-----------------
 
 A minimal example using STM32CubeIDE, and HAL. \* When setting up
 **Pinout and Configuration** using the **Device Configuration Tool**,
 select **System Core** -> **SYS** and ensure that **Timebase Source** is
 set to **SysTick**. \* Configure any other peripherals (including the
-LCD panel), and initialise them in *main.c*. \* ``#include "lvgl.h"`` in
+LCD panel), and initialize them in *main.c*. \* ``#include "lvgl.h"`` in
 the *main.c* file. \* Create some frame buffer(s) as global variables:
 
 .. code-block:: c
@@ -269,31 +320,3 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
       * Inform the graphics library that you are ready with the flushing */
      lv_display_flush_ready(display);
    }
-
-.. _dma2d:
-
-DMA2D Support
--------------
-
-LVGL supports DMA2D - a feature of some STM32 MCUs which can improve performance
-when blending fills and images. Some STM32 product lines such as STM32F4 STM32F7, STM32L4,
-STM32U5, and STM32H7 include models with DMA2D support.
-
-LVGL's integration with DMA2D can be enabled by setting ``LV_USE_DRAW_DMA2D``
-to ``1`` in ``lv_conf.h``
-
-With ``LV_USE_DRAW_DMA2D_INTERRUPT`` set to ``0`` and ``LV_USE_OS`` set to ``LV_OS_NONE``,
-DMA2D will draw some fills and images concurrently with the software render where
-possible. If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is set to ``1`` and ``LV_USE_OS`` set to
-``LV_OS_FREERTOS`` (or another OS) the main difference will be that the core will idle
-instead of "busywait" while waiting for a DMA2D transfer to complete.
-
-If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is enabled then you are required to call
-:cpp:expr:`lv_draw_dma2d_transfer_complete_interrupt_handler` whenever the DMA2D
-"transfer complete" global interrupt is received.
-
-DMA2D also makes possible to mix layers that have color format on
-:c:macro:`LV_COLOR_FORMAT_ARGB1555` on top of :c:macro:`LV_COLOR_FORMAT_RGB565`
-layers.
-
-If your STM device has a NeoChrom GPU, you can use the :ref:`Nema GFX renderer <nema_gfx>` instead.

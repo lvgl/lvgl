@@ -8,8 +8,18 @@ NemaGFX is a high-level graphics API supported
 by many embedded 2.5D GPUs. LVGL can use it to
 natively render LVGL graphics.
 
-Get Started with the Riverdi STM32U5 5-inch Display
-***************************************************
+Since NemaGFX is simply an API standard, it is not specific
+to only STM32 devices.
+This page discusses the role that NemaGFX has in
+STM32 devices.
+
+ST's integration of NemaGFX is called NeoChrom.
+
+LVGL integrates NemaGFX as a :ref:`draw unit <draw units>`.
+
+
+Ready-to-use Projects that have NemaGFX enabled
+***********************************************
 
 `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
 is a ready-to-use port for the Riverdi STM32 5.0" Embedded Display
@@ -20,6 +30,7 @@ Follow the instructions in the readme to get started.
 is a ready-to-use port for the STM32U5G9J-DK2 devkit with a 5.0" display
 and a NeoChrom VG GPU.
 Follow the instructions in the readme to get started.
+
 
 Usage and Configuration
 ***********************
@@ -74,6 +85,7 @@ lock resources. You may use a custom HAL implementation for your platform or use
 provided implementations by setting :c:macro:`LV_USE_NEMA_HAL` to a value other than
 :c:macro:`LV_NEMA_HAL_CUSTOM`.
 
+
 TSC Images
 **********
 
@@ -95,16 +107,16 @@ renderer.
         .data_size = sizeof(img_demo_widgets_avatar_tsc6a_map),
     };
 
-DMA2D
-*****
 
-The Nema renderer uses DMA2D to flush in parallel with rendering in
-`lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__.
+Interop with the LTDC driver and the DMA2D Draw Unit
+****************************************************
 
-If your STM does not have the Nema GPU, it may still support
-DMA2D. DMA2D is a simple peripheral which can draw fills
-and images independently of the CPU.
-See the LVGL :ref:`DMA2D support <dma2d>`.
+NemaGFX can be enabled at the same time as LTDC. They will not interfere
+with each other at all.
+
+NemaGFX and DMA2D may be enabled at the same time. They are both draw units
+and they will both independently accept draw tasks.
+
 
 API
 ***
