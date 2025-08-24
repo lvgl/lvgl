@@ -232,6 +232,6 @@ Note that loading UI components from XML has virtually no impact on performance.
 Once the XML files are registered and the UI is created, the performance, appearance
 and behavior are exactly the same as if it were created from C code.
 
-Registering XML Components and creating instances is neither memory hungry nor slow.
+Registering XML Components and creating instances are neither memory hungry nor slow.
 The biggest memory overhead is that the ``<view>`` of the Components is saved in RAM
 (typically 1–2 kB/component).
