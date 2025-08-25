@@ -71,7 +71,7 @@ typedef struct {
     int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter border */
 
     union {
-        uint32_t index;       /**< Unicode code point*/
+        uint32_t index;       /**< Glyph descriptor index*/
         const void * src;     /**< Pointer to the source data used by image fonts*/
     } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
