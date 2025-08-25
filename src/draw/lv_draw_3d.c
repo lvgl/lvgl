@@ -42,7 +42,7 @@ void lv_draw_3d_dsc_init(lv_draw_3d_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_3d_dsc_t);
     dsc->tex_id = LV_3DTEXTURE_ID_NULL;
     dsc->h_flip = false;
-    dsc->v_flip = true;
+    dsc->v_flip = false;
     dsc->opa = LV_OPA_COVER;
 }
 

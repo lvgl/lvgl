@@ -113,7 +113,7 @@ static void lv_3dtexture_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_3dtexture_t * tex = (lv_3dtexture_t *)obj;
     tex->id = LV_3DTEXTURE_ID_NULL;
     tex->h_flip = false;
-    tex->v_flip = true;
+    tex->v_flip = false;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
