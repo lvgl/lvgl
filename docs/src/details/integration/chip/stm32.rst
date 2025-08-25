@@ -148,18 +148,21 @@ FreeRTOS Example
 
 A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 *Note that we have not used Mutexes in this example, however LVGL is* **NOT**
-*thread safe and so Mutexes should be used*. See: :ref:`threading`
-\* ``#include "lvgl.h"`` \* Create your frame buffer(s) as global variables:
+*thread safe and so Mutexes should be used*. See: :ref:`threading` for details.
 
-.. code-block:: c
+Each of these requires ``#include "lvgl.h"``.
 
-    /* Frame buffers
-     * Static or global buffer(s). The second buffer is optional */
-    #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
-    /* TODO: Declare your own BUFF_SIZE appropriate to your system. */
-    #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
-    static uint8_t buf_1[BUFF_SIZE];
-    static uint8_t buf_2[BUFF_SIZE];
+- Create your frame buffer(s) as global variables.
+
+  .. code-block:: c
+
+      /* Frame buffers
+       * Static or global buffer(s). The second buffer is optional */
+      #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
+      /* TODO: Declare your own BUFF_SIZE appropriate to your system. */
+      #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
+      static uint8_t buf_1[BUFF_SIZE];
+      static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main`` function, after your peripherals (SPI, GPIOs, LCD
   etc) have been initialised, initialise LVGL using :cpp:func:`lv_init`,
