@@ -310,8 +310,8 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    /* If clipping or rotation is not required, blit directly */
-    if(!dsc->rotation || lv_area_is_in(&image_area, &t->clip_area, false)) {
+    /* If rotation is not required, blit directly */
+    if(!dsc->rotation) {
         vg_lite_rectangle_t rect = {
             .x = clip_area.x1 - image_area.x1,
             .y = clip_area.y1 - image_area.y1,
@@ -340,8 +340,8 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             image_area.x1, image_area.y1,
             lv_area_get_width(&image_area), lv_area_get_height(&image_area),
             0);
-        lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
+        lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
 
         vg_lite_matrix_t path_matrix = u->global_matrix;
 
@@ -402,14 +402,28 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     path_clip_area.y2++;
 
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
-    const lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
+    const lv_point_t glyph_pos = {
+        dsc->letter_coords->x1 - dsc->g->ofs_x,
+        dsc->letter_coords->y1 + dsc->g->box_h + dsc->g->ofs_y
+    };
     /* scale size */
     const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
+
+    const bool has_rotation_with_cliped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
-    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
+
+    if(!has_rotation_with_cliped && dsc->rotation) {
+        vg_lite_translate(glyph_pos.x + dsc->pivot.x, glyph_pos.y, &matrix);
+        vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
+        vg_lite_translate(-dsc->pivot.x, 0, &matrix);
+    }
+    else {
+        vg_lite_translate(glyph_pos.x, glyph_pos.y, &matrix);
+    }
+
     vg_lite_scale(scale, scale, &matrix);
 
     /* matrix for drawing, different from matrix for calculating the bounding box */
@@ -430,7 +444,11 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
     const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
-    if(dsc->rotation) {
+    if(has_rotation_with_cliped) {
+        /**
+         * When intersecting the clipping region,
+         * rotate the path contents without rotating the bounding box for cropping
+         */
         vg_lite_matrix_t internal_matrix;
         vg_lite_identity(&internal_matrix);
         const float pivot_x = dsc->pivot.x / scale;
@@ -458,7 +476,25 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         return;
     }
 
-    lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+    if(dsc->rotation) {
+        /* The bounding rectangle before scaling relative to the original coordinates of the path */
+        lv_area_t box_area;
+        box_area.x1 = dsc->g->ofs_x;
+        box_area.y1 = -dsc->g->box_h - dsc->g->ofs_y;
+        lv_area_set_width(&box_area, dsc->g->box_w);
+        lv_area_set_height(&box_area, dsc->g->box_h);
+
+        /* Scale the path area to fit the original path data */
+        lv_vg_lite_path_set_bounding_box(outline,
+                                         box_area.x1 / scale,
+                                         box_area.y1 / scale,
+                                         box_area.x2 / scale,
+                                         box_area.y2 / scale);
+    }
+    else {
+        lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+    }
+
     lv_vg_lite_draw(
         &u->target_buffer,
         lv_vg_lite_path_get_path(outline),

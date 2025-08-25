@@ -111,20 +111,22 @@ void test_draw_sin_wave(void)
     lv_obj_delete(canvas);
 }
 
-static void draw_letter_with_rotation(lv_obj_t * canvas, lv_layer_t * layer, int32_t rotation, int32_t x, int32_t y)
+static void draw_letter_with_rotation(lv_obj_t * canvas, lv_layer_t * layer, uint32_t unicode, int32_t rotation,
+                                      int32_t x, int32_t y)
 {
     lv_draw_letter_dsc_t letter_dsc;
     lv_draw_letter_dsc_init(&letter_dsc);
     letter_dsc.color = lv_color_hex(0xff0000);
     letter_dsc.font = lv_obj_get_style_text_font(canvas, 0);
-    letter_dsc.unicode = 'A';
+    letter_dsc.unicode = unicode;
     letter_dsc.rotation = rotation;
     lv_draw_letter(layer, &letter_dsc, &(lv_point_t) {
         .x = x, .y = y
     });
 }
 
-static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t rotation, const char * ref_img_path)
+static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, uint32_t unicode, int32_t rotation,
+                             const char * ref_img_path)
 {
     lv_obj_t * canvas = canvas_create(240, 240);
 
@@ -148,7 +150,7 @@ static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t
     const int32_t offset_y = 70;
 
     for(int i = 0; i < 9; i++) {
-        draw_letter_with_rotation(canvas, &layer, rotation, (i % 3) * 80 + offset_x, (i / 3) * 80 + offset_y);
+        draw_letter_with_rotation(canvas, &layer, unicode, rotation, (i % 3) * 80 + offset_x, (i / 3) * 80 + offset_y);
     }
 
     lv_draw_border_dsc_t draw_border_dsc;
@@ -167,14 +169,26 @@ static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t
 
 void test_draw_letter_bitmap(void)
 {
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 0, "draw/letter_bitmap_rotated_0.png");
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 450, "draw/letter_bitmap_roated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'A', 0, "draw/letter_bitmap_A_rotated_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'A', 450, "draw/letter_bitmap_A_roated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'A', 900, "draw/letter_bitmap_A_roated_90.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'A', 1800, "draw/letter_bitmap_A_roated_180.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'g', 0, "draw/letter_bitmap_g_rotated_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'g', 450, "draw/letter_bitmap_g_roated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'g', 900, "draw/letter_bitmap_g_roated_90.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 'g', 1800, "draw/letter_bitmap_g_roated_180.png");
 }
 
 void test_draw_letter_outline(void)
 {
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 0, "draw/letter_outline_rotated_0.png");
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 450, "draw/letter_outline_rotated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'A', 0, "draw/letter_outline_A_rotated_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'A', 450, "draw/letter_outline_A_roated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'A', 900, "draw/letter_outline_A_roated_90.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'A', 1800, "draw/letter_outline_A_roated_180.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'g', 0, "draw/letter_outline_g_rotated_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'g', 450, "draw/letter_outline_g_roated_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'g', 900, "draw/letter_outline_g_roated_90.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 'g', 1800, "draw/letter_outline_g_roated_180.png");
 }
 
 #endif
