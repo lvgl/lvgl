@@ -636,6 +636,17 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp)
     return disp->act_scr;
 }
 
+lv_obj_t * lv_display_get_screen_loading(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered to get the current screen being loaded");
+        return NULL;
+    }
+
+    return disp->scr_to_load;
+}
+
 lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
