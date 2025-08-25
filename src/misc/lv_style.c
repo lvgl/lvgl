@@ -222,11 +222,11 @@ void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
 
     /*Source is empty*/
     if(src->values_and_props == NULL) {
-        LV_LOG_WARN("Source style is empty");
+        LV_LOG_TRACE("Source style is empty");
         return;
     }
     if(src->prop_cnt == 0) {
-        LV_LOG_WARN("Source style has no properties");
+        LV_LOG_TRACE("Source style has no properties");
         return;
     }
 
