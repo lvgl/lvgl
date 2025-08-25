@@ -176,13 +176,13 @@ def generate_code_coverage_report():
     os.chdir(lvgl_test_dir)
     delete_dir_ignore_missing('report')
     os.mkdir('report')
-    root_dir = os.pardir
+    root_dir = os.path.dirname(lvgl_test_dir)  # Get parent directory of tests (lvgl directory)
     html_report_file = 'report/index.html'
-    cmd = ['gcovr', '--gcov-ignore-parse-errors', 'negative_hits.warn', 
+    cmd = ['gcovr', '--gcov-ignore-parse-errors', 
            '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
            '-j', str(os.cpu_count()), '--print-summary',
-           '--html-title', 'LVGL Test Coverage', '--filter', r'../src/.*/lv_.*\.c']
+           '--html-title', 'LVGL Test Coverage', '--filter', os.path.join(root_dir, 'src/.*/lv_.*\.c')]
 
     subprocess.check_call(cmd)
     print("Done: See %s" % html_report_file, flush=True)

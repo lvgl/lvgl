@@ -37,6 +37,7 @@
 #include "parsers/lv_xml_textarea_parser.h"
 #include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_arc_parser.h"
+#include "parsers/lv_xml_switch_parser.h"
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
@@ -95,6 +96,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
     lv_xml_widget_register("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
     lv_xml_widget_register("lv_tabview-tab", lv_xml_tabview_tab_create, lv_xml_tabview_tab_apply);
+    lv_xml_widget_register("lv_tabview-tab_button", lv_xml_tabview_tab_button_create, lv_xml_tabview_tab_button_apply);
     lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
     lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
@@ -113,6 +115,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
     lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
     lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
+    lv_xml_widget_register("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
     lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
     lv_xml_widget_register("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
     lv_xml_widget_register("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);

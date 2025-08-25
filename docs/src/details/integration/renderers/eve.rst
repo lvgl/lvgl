@@ -165,6 +165,36 @@ Efficient display rotation is fully supported through :cpp:func:`lv_display_set_
 Touch input rotation is handled accordingly.
 
 
+Asset Pre-Upload
+----------------
+
+Images and fonts are uploaded to the EVE chip's RAM_G as-needed during rendering.
+An image or glyph will not be uploaded until it needs to be rendered. Once it is
+uploaded, it will stay in RAM_G until reset. The first time a screen is shown,
+there may be a noticeable delay while an image or set of glyphs is uploaded
+for use for the first time. To mitigate this delay, there is a set of functions
+provided to upload the assets early.
+
+:cpp:func:`lv_draw_eve_pre_upload_image` is used to upload images.
+:cpp:func:`lv_draw_eve_pre_upload_font_range` is used to upload a range of characters.
+The range is provided as the first and last unicode code points in the range. Both
+the start and the end values are included in the range. It can be called multiple
+times with different ranges.
+:cpp:func:`lv_draw_eve_pre_upload_font_text` is used to upload all the glyphs that
+are needed to render a specific string (ASCII or UTF-8).
+It can be called multiple times with different strings.
+
+.. code-block:: c
+
+    LV_IMAGE_DECLARE(asset_digital_lock);
+    lv_draw_eve_pre_upload_image(disp, &asset_digital_lock);
+
+    LV_FONT_DECLARE(lv_font_montserrat_48);
+    lv_draw_eve_pre_upload_font_text(disp, &lv_font_montserrat_48, "The current time is");
+    lv_draw_eve_pre_upload_font_range(disp, &lv_font_montserrat_48, '0', '9');
+    lv_draw_eve_pre_upload_font_range(disp, &lv_font_montserrat_48, ':', ':');
+
+
 .. _eve register access:
 
 EVE Register Access

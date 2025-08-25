@@ -82,7 +82,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
 
     lv_style_t * style = &xml_style->style;
 
-    for(int i = 0; attrs[i]; i += 2) {
+    int32_t i;
+    for(i = 0; attrs[i]; i += 2) {
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
         if(lv_streq(name, "name")) continue;
@@ -280,7 +281,42 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
         else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
+        else if(lv_streq(name, "style_grid_column_dsc_array") ||
+                lv_streq(name, "style_grid_row_dsc_array")) {
 
+            uint32_t item_cnt = 0;
+            uint32_t c;
+            for(c = 0; value[c] != '\0'; c++) {
+                if(value[c] == ' ') item_cnt++;
+            }
+
+            /*This not freed automatically as the styles doesn't have any mechanisms to detect
+             * removal of properties. It's assumed that the styles are created once and never freed. */
+            int32_t * dsc_array = lv_malloc((item_cnt + 2) * sizeof(int32_t)); /*+2 for LV_GRID_TEMPLATE_LAST*/
+
+            char * value_buf = (char *)value;
+            item_cnt = 0;
+            const char * sub_value = lv_xml_split_str(&value_buf, ' ');
+            while(sub_value) {
+                if(sub_value[0] == 'f' && sub_value[1] == 'r') {
+                    dsc_array[item_cnt] = LV_GRID_FR(lv_xml_atoi(sub_value + 3)); /*+3 to skip "fr("*/
+                }
+                else {
+                    dsc_array[item_cnt] = lv_xml_atoi(sub_value);
+                }
+
+                item_cnt++;
+                sub_value = lv_xml_split_str(&value_buf, ' ');
+            }
+            dsc_array[item_cnt] = LV_GRID_TEMPLATE_LAST;
+
+            if(lv_streq(name, "style_grid_column_dsc_array")) {
+                lv_style_set_grid_column_dsc_array(style, dsc_array);
+            }
+            else {
+                lv_style_set_grid_row_dsc_array(style, dsc_array);
+            }
+        }
 
         else {
             LV_LOG_WARN("%s style property is not supported", name);

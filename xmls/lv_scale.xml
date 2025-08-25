@@ -33,6 +33,8 @@
 	    	<prop name="style_main" type="style" help=""/>
 	    	<prop name="style_indicator" type="style" help=""/>
 	    	<prop name="style_items" type="style" help=""/>
+            <prop name="bind_min_value" type="subject" help="Connect a subject to the section's min value"/>
+            <prop name="bind_max_value" type="subject" help="Connect a subject to the section's max value"/>
 	    </element>
 	</api>
 </widget>

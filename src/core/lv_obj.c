@@ -73,7 +73,6 @@ static void null_on_delete_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void play_timeline_on_trigger_event_cb(lv_event_t * e);
-static void free_user_data_on_delete_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 
 #if LV_USE_OBJ_PROPERTY
@@ -508,7 +507,7 @@ void lv_obj_add_screen_load_event(lv_obj_t * obj, lv_event_code_t trigger, lv_ob
     dsc->target.screen = screen;
 
     lv_obj_add_event_cb(obj, screen_load_on_trigger_event_cb, trigger, dsc);
-    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, dsc);
 }
 
 void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_screen_create_cb_t screen_create_cb,
@@ -523,7 +522,7 @@ void lv_obj_add_screen_create_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
     dsc->target.create_cb = screen_create_cb;
 
     lv_obj_add_event_cb(obj, screen_create_on_trigger_event_cb, trigger, dsc);
-    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, dsc);
 }
 
 void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_anim_timeline_t * at, uint32_t delay,
@@ -537,7 +536,7 @@ void lv_obj_add_play_timeline_event(lv_obj_t * obj, lv_event_code_t trigger, lv_
     dsc->reverse = reverse;
 
     lv_obj_add_event_cb(obj, play_timeline_on_trigger_event_cb, trigger, dsc);
-    lv_obj_add_event_cb(obj, free_user_data_on_delete_event_cb, LV_EVENT_DELETE, dsc);
+    lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, dsc);
 }
 
 void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
@@ -1156,10 +1155,6 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
     lv_anim_timeline_start(dsc->at);
 }
 
-static void free_user_data_on_delete_event_cb(lv_event_t * e)
-{
-    lv_free(lv_event_get_user_data(e));
-}
 
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
 {

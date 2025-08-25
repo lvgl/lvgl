@@ -239,6 +239,12 @@ void lv_event_stop_processing(lv_event_t * e)
     e->stop_processing = 1;
 }
 
+void lv_event_free_user_data_cb(lv_event_t * e)
+{
+    void * p = lv_event_get_user_data(e);
+    lv_free(p);
+}
+
 uint32_t lv_event_register_id(void)
 {
     event_last_id ++;
