@@ -137,6 +137,13 @@
  * - Rendering engine needs to support 3x3 matrix transformations. */
 #define LV_DRAW_TRANSFORM_USE_MATRIX            0
 
+/*Use asm to accelerate the draw buffer conversion*/
+#define  LV_USE_DRAW_BUF_CONVERT_ASM     LV_DRAW_BUF_CONVERT_ASM_NONE
+
+#if LV_USE_DRAW_BUF_CONVERT_ASM == LV_DRAW_BUF_CONVERT_ASM_CUSTOM
+    #define  LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE ""
+#endif
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers

@@ -33,6 +33,11 @@
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
+#define LV_DRAW_BUF_CONVERT_ASM_NONE         0
+#define LV_DRAW_BUF_CONVERT_ASM_NEON         1
+#define LV_DRAW_BUF_CONVERT_ASM_HELIUM       2
+#define LV_DRAW_BUF_CONVERT_ASM_CUSTOM       255
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -337,6 +342,25 @@
         #define LV_DRAW_TRANSFORM_USE_MATRIX CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
     #else
         #define LV_DRAW_TRANSFORM_USE_MATRIX            0
+    #endif
+#endif
+
+/*Use asm to accelerate the draw buffer conversion*/
+#ifndef LV_USE_DRAW_BUF_CONVERT_ASM
+    #ifdef CONFIG_LV_USE_DRAW_BUF_CONVERT_ASM
+        #define LV_USE_DRAW_BUF_CONVERT_ASM CONFIG_LV_USE_DRAW_BUF_CONVERT_ASM
+    #else
+        #define  LV_USE_DRAW_BUF_CONVERT_ASM     LV_DRAW_BUF_CONVERT_ASM_NONE
+    #endif
+#endif
+
+#if LV_USE_DRAW_BUF_CONVERT_ASM == LV_DRAW_BUF_CONVERT_ASM_CUSTOM
+    #ifndef LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE
+            #define LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE CONFIG_LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE
+        #else
+            #define  LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE ""
+        #endif
     #endif
 #endif
 
