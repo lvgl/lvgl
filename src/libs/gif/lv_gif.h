@@ -16,14 +16,9 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 #include "../../misc/lv_types.h"
-#include "../../draw/lv_draw_buf.h"
-#include "../../widgets/image/lv_image.h"
-#include "../../core/lv_obj_class.h"
 #include LV_STDBOOL_INCLUDE
 #include LV_STDINT_INCLUDE
 #if LV_USE_GIF
-
-#include "gifdec.h"
 
 /*********************
  *      DEFINES
