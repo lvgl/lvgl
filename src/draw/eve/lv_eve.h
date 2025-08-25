@@ -63,6 +63,17 @@ typedef struct {
     uint16_t scy;
 } lv_eve_drawing_context_t;
 
+/* drawing context that is not saved and restored
+ * by SAVE_CONTEXT and RESTORE_CONTEXT
+ */
+typedef struct {
+    uint32_t bitmap_source;
+    uint32_t bitmap_size;
+    uint32_t bitmap_size_h;
+    uint32_t bitmap_layout;
+    uint32_t bitmap_layout_h;
+} lv_eve_drawing_state_t;
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -85,6 +96,9 @@ void lv_eve_draw_circle_simple(int16_t coord_x1, int16_t coord_y1, uint16_t radi
 void lv_eve_draw_rect_simple(int16_t coord_x1, int16_t coord_y1, int16_t coord_x2, int16_t coord_y2,
                              uint16_t radius);
 void lv_eve_mask_round(int16_t coord_x1, int16_t coord_y1, int16_t coord_x2, int16_t coord_y2, int16_t radius);
+void lv_eve_bitmap_source(uint32_t addr);
+void lv_eve_bitmap_size(uint8_t filter, uint8_t wrapx, uint8_t wrapy, uint16_t width, uint16_t height);
+void lv_eve_bitmap_layout(uint8_t format, uint16_t linestride, uint16_t height);
 
 /**********************
  *  EXTERN VARIABLES
