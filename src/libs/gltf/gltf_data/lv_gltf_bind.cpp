@@ -47,7 +47,6 @@ lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node,
         return nullptr;
     }
 
-    // Create a new bind
     lv_gltf_bind_t new_bind;
     new_bind.id = bind_count++;
     new_bind.prop = which_prop;
