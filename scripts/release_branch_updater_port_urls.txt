@@ -13,6 +13,7 @@ https://github.com/lvgl/lv_port_renesas_ek_ra8p1
 https://github.com/lvgl/lv_port_toradex_verdin_am62
 https://github.com/lvgl/lv_port_texas_sk-am62l
 https://github.com/lvgl/lv_port_nxp_imx93
+https://github.com/lvgl/lv_port_nxp_frdm_mcxn947 
 https://github.com/lvgl/lv_port_icop_qec_ppc_m_090t
 https://github.com/lvgl/lv_port_texas_sk-am62b-p1
 https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
