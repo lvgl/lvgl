@@ -8,7 +8,7 @@
     #define TEST_ASSERT_EQUAL_LETTER_SCREENSHOT(path) TEST_ASSERT_EQUAL_SCREENSHOT(path)
 #else
     #define TEST_ASSERT_EQUAL_LETTER_SCREENSHOT(path) LV_UNUSED(path)
- #endif
+#endif
 
 void setUp(void)
 {
@@ -144,8 +144,11 @@ static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t
     lv_area_set(&clip_area, 40, 40, 200 - 1, 200 - 1);
     layer._clip_area = clip_area;
 
+    const int32_t offset_x = 40;
+    const int32_t offset_y = 70;
+
     for(int i = 0; i < 9; i++) {
-        draw_letter_with_rotation(canvas, &layer, rotation, (i % 3) * 80 + 40, (i / 3) * 80 + 70);
+        draw_letter_with_rotation(canvas, &layer, rotation, (i % 3) * 80 + offset_x, (i / 3) * 80 + offset_y);
     }
 
     lv_draw_border_dsc_t draw_border_dsc;
@@ -164,14 +167,14 @@ static void test_draw_letter(lv_freetype_font_render_mode_t render_mode, int32_t
 
 void test_draw_letter_bitmap(void)
 {
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 0, "draw/letter_bitmap_rotate_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 0, "draw/letter_bitmap_rotated_0.png");
     test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 450, "draw/letter_bitmap_roated_45.png");
 }
 
 void test_draw_letter_outline(void)
 {
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 0, "draw/letter_outline_rotate_0.png");
-    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 450, "draw/letter_outline_rotate_45.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 0, "draw/letter_outline_rotated_0.png");
+    test_draw_letter(LV_FREETYPE_FONT_RENDER_MODE_OUTLINE, 450, "draw/letter_outline_rotated_45.png");
 }
 
 #endif
