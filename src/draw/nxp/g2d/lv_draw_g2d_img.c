@@ -21,6 +21,7 @@
 #include "g2d.h"
 #include "../../../misc/lv_area_private.h"
 #include "../../lv_draw_image_private.h"
+#include "../../lv_image_decoder_private.h"
 #include "lv_g2d_utils.h"
 #include "lv_g2d_buf_map.h"
 
@@ -40,7 +41,7 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
                               const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup, const lv_area_t * img_coords,
                               const lv_area_t * clipped_img_area);
 
-static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * data);
+static struct g2d_buf * _g2d_handle_src_buf(const lv_draw_buf_t * data);
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
                               int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
@@ -80,12 +81,10 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
 
     bool is_tiled = (dsc->tile != 0);
 
-    if(is_tiled) {
+    if(is_tiled)
         lv_draw_image_tiled_helper(t, dsc, coords, _g2d_draw_core_cb);
-    }
-    else {
+    else
         lv_draw_image_normal_helper(t, dsc, coords, _g2d_draw_core_cb);
-    }
 }
 
 /**********************
@@ -98,6 +97,8 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
 {
     LV_UNUSED(sup);
     lv_draw_buf_t * draw_buf = t->target_layer->draw_buf;
+
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, clipped_img_area);
@@ -124,7 +125,7 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
 
 
     /* Source image */
-    struct g2d_buf * src_buf = _g2d_handle_src_buf(img_dsc);
+    struct g2d_buf * src_buf = _g2d_handle_src_buf(decoded);
 
     /* Destination buffer */
     struct g2d_buf * dst_buf = g2d_search_buf_map(draw_buf->data);
@@ -159,7 +160,7 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     }
 }
 
-static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * img_dsc)
+static struct g2d_buf * _g2d_handle_src_buf(const lv_draw_buf_t * img_dsc)
 {
     struct g2d_buf * src_buf = g2d_search_buf_map((void *)img_dsc->data);
 
