@@ -9,7 +9,7 @@
 #include "lv_gif_private.h"
 #if LV_USE_GIF
 #include "../../misc/lv_timer_private.h"
-// #include "../../misc/cache/lv_cache.h"
+#include "../../misc/cache/lv_cache.h"
 #include "../../core/lv_obj_class_private.h"
 
 /*********************
@@ -64,7 +64,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     /*Close previous gif if any*/
     if(gifobj->is_open) {
-        // lv_image_cache_drop(lv_image_get_src(obj));
+        lv_image_cache_drop(lv_image_get_src(obj));
 
         GIF_close(gif);
         gifobj->is_open = 0;
@@ -75,7 +75,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
-        gifobj->is_open = GIF_openRAM(gif, img_dsc->data, img_dsc->data_size, NULL);
+        gifobj->is_open = GIF_openRAM(gif, (uint8_t *) img_dsc->data, img_dsc->data_size, NULL);
     }
     else if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         gifobj->is_open = GIF_openFile(gif, src, NULL);
@@ -108,6 +108,8 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     lv_image_set_src(obj, &gifobj->imgdsc);
 
+    gifobj->loop_count = GIF_getLoopCount(&gifobj->gif);
+
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
 
@@ -115,67 +117,68 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
 }
 
-// void lv_gif_restart(lv_obj_t * obj)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
+void lv_gif_restart(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-//     if(gifobj->gif == NULL) {
-//         LV_LOG_WARN("Gif resource not loaded correctly");
-//         return;
-//     }
+    if(!gifobj->is_open) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
 
-//     gd_rewind(gifobj->gif);
-//     lv_timer_resume(gifobj->timer);
-//     lv_timer_reset(gifobj->timer);
-// }
+    GIF_reset(&gifobj->gif);
+    gifobj->loop_count = -1; /* match the behavior of the old library */
+    lv_timer_resume(gifobj->timer);
+    lv_timer_reset(gifobj->timer);
+}
 
-// void lv_gif_pause(lv_obj_t * obj)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
-//     lv_timer_pause(gifobj->timer);
-// }
+void lv_gif_pause(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    lv_timer_pause(gifobj->timer);
+}
 
-// void lv_gif_resume(lv_obj_t * obj)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
+void lv_gif_resume(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-//     if(gifobj->gif == NULL) {
-//         LV_LOG_WARN("Gif resource not loaded correctly");
-//         return;
-//     }
+    if(!gifobj->is_open) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
 
-//     lv_timer_resume(gifobj->timer);
-// }
+    lv_timer_resume(gifobj->timer);
+}
 
-// bool lv_gif_is_loaded(lv_obj_t * obj)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
+bool lv_gif_is_loaded(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-//     return (gifobj->gif != NULL);
-// }
+    return gifobj->is_open;
+}
 
-// int32_t lv_gif_get_loop_count(lv_obj_t * obj)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
+int32_t lv_gif_get_loop_count(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-//     if(gifobj->gif == NULL) {
-//         return -1;
-//     }
+    if(!gifobj->is_open) {
+        return -1;
+    }
 
-//     return gifobj->gif->loop_count;
-// }
+    return gifobj->loop_count;
+}
 
-// void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
-// {
-//     lv_gif_t * gifobj = (lv_gif_t *) obj;
+void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-//     if(gifobj->gif == NULL) {
-//         LV_LOG_WARN("Gif resource not loaded correctly");
-//         return;
-//     }
+    if(!gifobj->is_open) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
 
-//     gifobj->gif->loop_count = count;
-// }
+    gifobj->loop_count = count;
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -197,10 +200,13 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
-    // lv_image_cache_drop(lv_image_get_src(obj));
+    lv_image_cache_drop(lv_image_get_src(obj));
 
-    if(gifobj->is_open)
+    if(gifobj->is_open) {
+        void * framebuffer = gifobj->gif.pFrameBuffer;
         GIF_close(&gifobj->gif);
+        lv_free(framebuffer);
+    }
     lv_timer_delete(gifobj->timer);
 }
 
@@ -214,19 +220,26 @@ static void next_frame_task_cb(lv_timer_t * t)
     if(has_next <= 0) {
         /*It was the last repeat*/
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
-        // lv_timer_pause(t);
+        if(gifobj->loop_count > 0) {
+            if(gifobj->loop_count == 1) {
+                lv_timer_pause(t);
+            }
+            else {
+                gifobj->loop_count--;
+            }
+        }
         if(res != LV_RESULT_OK) return;
     }
     else {
         lv_timer_set_period(gifobj->timer, ms_delay_next);
     }
 
-    // lv_image_cache_drop(lv_image_get_src(obj));
+    lv_image_cache_drop(lv_image_get_src(obj));
     lv_obj_invalidate(obj);
 }
 
 /**********************
- *   ININE INCLUDES
+ *   INLINE INCLUDES
  **********************/
 
 #include "AnimatedGIF/src/gif.inl"

@@ -16,6 +16,7 @@
 #include "../../../../misc/lv_fs.h"
 #include "../../../../lv_conf_internal.h"
 #include LV_STDINT_INCLUDE
+#include LV_LIMITS_INCLUDE
 #include "../../../../stdlib/lv_string.h"
 
 #define memcpy lv_memcpy
@@ -29,7 +30,7 @@
 // Written by Larry Bank
 // Copyright (c) 2020 BitBank Software, Inc.
 // bitbank@pobox.com
-// 
+//
 // Designed to decode images up to 480x320 on MCUs
 // using less than 22K of RAM
 // ...and decode any sized image when more RAM is available
@@ -50,12 +51,12 @@
 #define TURBO_BUFFER_SIZE 0x6100
 
 // If you intend to decode generic GIFs, you want this value to be 12. If you are using GIFs solely for animations in
-// your own project, and you control the GIFs you intend to play, then you can save additional RAM here: 
+// your own project, and you control the GIFs you intend to play, then you can save additional RAM here:
 // the decoder must reserve a minimum of 4 byte * (1<<MAX_CODE_SIZE) for the dictionary, but based on implementation
 // actually reserves 5 byte * (1<<MAX_CODE_SIZE). Small or low colour GIFs may inherently not require a large
 // dictionary. For larger GIFs, the en(!)coder can "voluntarily" choose not to utilize the entire dictionary. I.e.,
 // by preparing (specially encoding) the GIFs, you can save >10kB RAM, but you will not be able to decode arbitrary
-// images anymore. One application to craft such GIFs can be found here (use option -d) 
+// images anymore. One application to craft such GIFs can be found here (use option -d)
 // https://create.stephan-brumme.com/flexigif-lossless-gif-lzw-optimization/
 #define MAX_CODE_SIZE 12
 
@@ -217,30 +218,16 @@ typedef struct gif_image_tag
     int GIF_getLastError(GIFIMAGE *pGIF);
     int GIF_getLoopCount(GIFIMAGE *pGIF);
 
-#if (INTPTR_MAX == INT64_MAX)
-    #define REGISTER_WIDTH 64
-    #ifdef ALLOWS_UNALIGNED
-        #define INTELSHORT(p) (*(uint16_t *)p)
-        #define INTELLONG(p) (*(uint64_t *)p)
-    #else
-        // Due to unaligned memory causing an exception, we have to do these macros the slow way
-        #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
-        #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24) + (*(p+4)<<32) + (*(p+5)<<40) + (*(p+6)<<48) + (*(p+7)<<56))
-    #endif // ALLOWS_UNALIGNED
-    #define BIGINT int64_t
-    #define BIGUINT uint64_t
+#define REGISTER_WIDTH 32
+#ifdef ALLOWS_UNALIGNED
+    #define INTELSHORT(p) (*(uint16_t *)p)
+    #define INTELLONG(p) (*(uint32_t *)p)
 #else
-    #define REGISTER_WIDTH 32
-    #ifdef ALLOWS_UNALIGNED
-        #define INTELSHORT(p) (*(uint16_t *)p)
-        #define INTELLONG(p) (*(uint32_t *)p)
-    #else
-        // Due to unaligned memory causing an exception, we have to do these macros the slow way
-        #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
-        #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24))
-    #endif // ALLOWS_UNALIGNED
-    #define BIGINT int32_t
-    #define BIGUINT uint32_t
-#endif // 64 vs 32-bit native register size
+    // Due to unaligned memory causing an exception, we have to do these macros the slow way
+    #define INTELSHORT(p) ((*p) + (*(p+1)<<8))
+    #define INTELLONG(p) ((*p) + (*(p+1)<<8) + (*(p+2)<<16) + (*(p+3)<<24))
+#endif // ALLOWS_UNALIGNED
+#define BIGINT int32_t
+#define BIGUINT uint32_t
 
 #endif // __ANIMATEDGIF__

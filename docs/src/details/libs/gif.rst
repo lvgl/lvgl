@@ -6,8 +6,8 @@ GIF Decoder
 
 **GIF Decoder** is an LVGL extension that enables you to use GIF images in your LVGL UI.
 
-For a detailed introduction, see:  https://github.com/lecram/gifdec .
-
+The implementation uses the `AnimatedGIF <https://github.com/bitbank2/AnimatedGIF/tree/master>`__
+library.
 
 
 Usage
@@ -43,14 +43,10 @@ from files.  To do so, follow the instructions in :ref:`file_system`.
 Memory Requirements
 *******************
 
-To decode and display a GIF animation the following amount of RAM (in bytes) is
-required for each of the following color depths:
-
 .. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
 
-- :c:macro:`LV_COLOR_DEPTH` ``8``: 3 |times| image width |times| image height
-- :c:macro:`LV_COLOR_DEPTH` ``16``: 4 |times| image width |times| image height
-- :c:macro:`LV_COLOR_DEPTH` ``32``: 5 |times| image width |times| image height
+To decode and display a GIF animation ~25 kB of RAM is needed plus
+3 |times| image width |times| image height.
 
 
 

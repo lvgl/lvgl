@@ -98,7 +98,7 @@ int rc;
     if (delayMilliseconds)
        *delayMilliseconds = 0; // clear any old valid
     if (pGIF->GIFFile.iPos >= pGIF->GIFFile.iSize-1) // no more data exists
-    {   
+    {
         (*pGIF->pfnSeek)(&pGIF->GIFFile, 0); // seek to start
     }
     if (GIFParseInfo(pGIF, 0))
@@ -174,20 +174,6 @@ static int32_t readMem(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
     return iBytesRead;
 } /* readMem() */
 
-static int32_t readFLASH(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
-{
-    int32_t iBytesRead;
-
-    iBytesRead = iLen;
-    if ((pFile->iSize - pFile->iPos) < iLen)
-       iBytesRead = pFile->iSize - pFile->iPos;
-    if (iBytesRead <= 0)
-       return 0;
-    memcpy_P(pBuf, &pFile->pData[pFile->iPos], iBytesRead);
-    pFile->iPos += iBytesRead;
-    return iBytesRead;
-} /* readFLASH() */
-
 static int32_t seekMem(GIFFILE *pFile, int32_t iPosition)
 {
     if (iPosition < 0) iPosition = 0;
@@ -262,7 +248,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
     int32_t iOffset = 0;
     int32_t iStartPos = pPage->GIFFile.iPos; // starting file position
     int iReadSize;
-    
+
     pPage->bUseLocalPalette = 0; // assume no local palette
     pPage->bEndOfFrame = 0; // we're just getting started
     pPage->iFrameDelay = 0; // may not have a gfx extension block
@@ -313,7 +299,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                 uint8_t *pPal1 = (uint8_t*)pPage->pPalette;
                 for (i=0; i<(1<<iColorTableBits); i++) {
                     uint16_t usGray;
-                    usGray = p[iOffset]; // R 
+                    usGray = p[iOffset]; // R
                     usGray += p[iOffset+1]*2; // G is twice as important
                     usGray += p[iOffset+2]; // B
                     pPal1[i] = (usGray >= 512); // bright enough = 1
@@ -444,7 +430,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
         return 0;
     }
     iOffset += 8;
-    
+
     /* Image descriptor
      7 6 5 4 3 2 1 0    M=0 - use global color map, ignore pixel
      M I 0 0 0 pixel    M=1 - local color map follows, use pixel
@@ -457,7 +443,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
     {// by default, convert to byte-reversed RGB565 for immediate use
         j = (1<<((pPage->ucMap & 7)+1));
         // Read enough additional data for the color table
-        iBytesRead += (*pPage->pfnRead)(&pPage->GIFFile, &pPage->ucFileBuf[iBytesRead], j*3);            
+        iBytesRead += (*pPage->pfnRead)(&pPage->GIFFile, &pPage->ucFileBuf[iBytesRead], j*3);
         if (pPage->ucPaletteType == GIF_PALETTE_RGB565_LE || pPage->ucPaletteType == GIF_PALETTE_RGB565_BE)
         {
             for (i=0; i<j; i++)
@@ -728,7 +714,7 @@ static int GIFGetMoreData(GIFIMAGE *pPage)
     int iDelta = (pPage->iLZWSize - pPage->iLZWOff);
     int iLZWBufSize;
     unsigned char c = 1;
-    
+
     // Turbo mode uses combined buffers to read more compressed data
     iLZWBufSize = (pPage->pTurboBuffer) ? LZW_BUF_SIZE_TURBO : LZW_BUF_SIZE;
     // move any existing data down
@@ -761,13 +747,13 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
 {
     uint8_t c, *s, *d8, *pEnd;
     uint8_t *pActivePalette;
-    
+
     pActivePalette = (pPage->bUseLocalPalette) ? (uint8_t *)pPage->pLocalPalette : (uint8_t *)pPage->pPalette;
     // d8 points to the line in the full sized canvas where the new opaque pixels will be merged
     d8 = &pPage->pFrameBuffer[pDraw->iX + (pDraw->iY + pDraw->y) * pPage->iCanvasWidth];
     s = pDraw->pPixels; // s points to the newly decoded pixels of this line of the current frame
     pEnd = s + pDraw->iWidth; // faster way to loop over the source pixels - eliminates a counter variable
-    
+
     if (pPage->ucPaletteType == GIF_PALETTE_1BPP || pPage->ucPaletteType == GIF_PALETTE_1BPP_OLED) { // 1-bit mono
         uint8_t *d = NULL;
         uint8_t *pPal = pActivePalette;
@@ -1024,7 +1010,7 @@ static void DrawNewPixels(GIFIMAGE *pPage, GIFDRAW *pDraw)
 
     s = pDraw->pPixels;
     d = &pPage->pFrameBuffer[pDraw->iX + (pDraw->y + pDraw->iY)  * iPitch]; // dest pointer in our complete canvas buffer
-    
+
     // Apply the new pixels to the main image
     if (pDraw->ucHasTransparency) { // if transparency used
         uint8_t c, ucTransparent = pDraw->ucTransparent;
@@ -1147,7 +1133,7 @@ uint16_t *pLengths;
     GIFGetMoreData(pImage); // Read some data to start
     codestart = pImage->ucCodeStart;
     iColors = 1 << codestart;
-    sMask = -1 << (codestart+1);
+    sMask = UINT32_MAX << (codestart+1);
     sMask = 0xffffffff - sMask;
     cc = (sMask >> 1) + 1; /* Clear code */
     eoi = cc + 1;
@@ -1166,7 +1152,7 @@ uint16_t *pLengths;
    }
 init_codetable:
    codesize = codestart + 1;
-   sMask = -1 << (codestart+1);
+   sMask = UINT32_MAX << (codestart+1);
    sMask = 0xffffffff - sMask;
    nextcode = cc + 2;
    nextlim = (1 << codesize);
@@ -1450,7 +1436,7 @@ init_codetable:
     nextcode = cc + 2;
     nextlim = (unsigned short) ((1 << codesize));
     // This part of the table needs to be reset multiple times
-    memset(&giftabs[cc], LINK_UNUSED, sizeof(pImage->usGIFTable) - sizeof(giftabs[0])*cc);
+    memset(&giftabs[cc], (uint8_t) LINK_UNUSED, sizeof(pImage->usGIFTable) - sizeof(giftabs[0])*cc);
     ulBits = INTELLONG(&p[pImage->iLZWOff]); // start by reading 4 bytes of LZW data
     GET_CODE
     if (code == cc) // we just reset the dictionary, so get another code

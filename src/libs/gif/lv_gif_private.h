@@ -38,7 +38,7 @@ struct _lv_gif_t {
     GIFIMAGE gif;
     lv_timer_t * timer;
     lv_image_dsc_t imgdsc;
-    uint32_t last_call;
+    int32_t loop_count;
     uint32_t is_open : 1;
 };
 
