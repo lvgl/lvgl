@@ -161,9 +161,9 @@ void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void
 
 lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size)
 {
-    LV_ASSERT(path);
-    LV_ASSERT(buffer);
-    LV_ASSERT(size);
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(size);
 
     *size = 0;
     *buffer = NULL;
