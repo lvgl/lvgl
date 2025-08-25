@@ -119,7 +119,7 @@ static lv_obj_t * create_col_wrap(size_t count)
         lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_BLUE), 0);
 
         lv_obj_t * label = lv_label_create(obj);
-        lv_label_set_text_fmt(label, "%lu", i);
+        lv_label_set_text_fmt(label, "%lu", (unsigned long)i);
         lv_obj_center(label);
     }
 
@@ -170,7 +170,7 @@ static lv_obj_t * create_row_wrap(size_t count)
         lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_BLUE), 0);
 
         lv_obj_t * label = lv_label_create(obj);
-        lv_label_set_text_fmt(label, "%lu", i);
+        lv_label_set_text_fmt(label, "%lu", (unsigned long)i);
         lv_obj_center(label);
     }
 
