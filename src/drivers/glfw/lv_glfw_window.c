@@ -71,13 +71,18 @@ static lv_ll_t glfw_window_ll;
 lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
                                             bool v_flip,  const char * title)
 {
+    LV_ASSERT_NULL(title);
     if(lv_glfw_init() != 0) {
+        LV_LOG_ERROR("Failed to init glfw");
         return NULL;
     }
 
     lv_glfw_window_t * window = lv_ll_ins_tail(&glfw_window_ll);
     LV_ASSERT_MALLOC(window);
-    if(window == NULL) return NULL;
+    if(window == NULL) {
+        LV_LOG_ERROR("Failed to create glfw window");
+        return NULL;
+    }
     lv_memzero(window, sizeof(*window));
 
     /* Create window with graphics context */
