@@ -17,6 +17,7 @@
     freetype
     fs
     gif
+    gltf
     lfs
     libjpeg_turbo
     libpng

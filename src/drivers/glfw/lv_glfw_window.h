@@ -42,10 +42,38 @@ extern "C" {
 lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev);
 
 /**
+ * Create a GLFW window with no textures and initialize OpenGL
+ * @param hor_res            width in pixels of the window
+ * @param ver_res            height in pixels of the window
+ * @param use_mouse_indev    send pointer indev input to LVGL display textures
+ * @param h_flip             Should the window contents be horizontally mirrored?
+ * @param v_flip             Should the window contents be vertically mirrored?
+ * @param title              The window title
+ * @return                   the new GLFW window handle
+ */
+lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
+                                            bool v_flip,  const char * title);
+
+/**
+ * Set the window's title text
+ * @param window     GLFW window to configure
+ * @param new_title  The new title text
+ */
+void lv_glfw_window_set_title(lv_glfw_window_t * window, const char * new_title);
+
+/**
  * Delete a GLFW window. If it is the last one, the process will exit
  * @param window    GLFW window to delete
  */
 void lv_glfw_window_delete(lv_glfw_window_t * window);
+
+/**
+ * Set the horizontal / vertical flipping of a GLFW window
+ * @param window    GLFW window to configure
+ * @param h_flip    Should the window contents be horizontally mirrored?
+ * @param v_flip    Should the window contents be vertically mirrored?
+ */
+void lv_glfw_window_set_flip(lv_glfw_window_t * window, bool h_flip, bool v_flip);
 
 /**
  * Get the GLFW window handle for an lv_glfw_window
