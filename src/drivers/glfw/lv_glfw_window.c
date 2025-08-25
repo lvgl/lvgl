@@ -113,7 +113,7 @@ lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bo
 
 lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev)
 {
-    return lv_glfw_window_create_ex(hor_res, ver_res, use_mouse_indev, false, false, NULL);
+    return lv_glfw_window_create_ex(hor_res, ver_res, use_mouse_indev, false, false, "LVGL Simulator");
 }
 
 void lv_glfw_window_set_title(lv_glfw_window_t * window, const char * new_title)
