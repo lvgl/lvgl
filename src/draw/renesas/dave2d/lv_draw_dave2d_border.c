@@ -78,13 +78,6 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
     lv_area_move(&local_outer_area, x, y);
     lv_area_move(&local_inner_area, x, y);
 
-#if D2_RENDER_EACH_OPERATION
-    d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
-#endif
-    //
-    // Generate render operations
-    //
-
     d2_framebuffer_from_layer(u->d2_handle, t->target_layer);
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
@@ -143,14 +136,6 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
                      (d2_point)D2_FIX4(lv_area_get_height(&a)));
     }
 
-    //
-    // Execute render operations
-    //
-#if D2_RENDER_EACH_OPERATION
-    d2_executerenderbuffer(u->d2_handle, u->renderbuffer, 0);
-    d2_flushframe(u->d2_handle);
-#endif
-
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
@@ -190,9 +175,6 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
     lv_area_move(&outer_area, x, y);
     lv_area_move(&inner_area, x, y);
 
-#if D2_RENDER_EACH_OPERATION
-    d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
-#endif
     //
     // Generate render operations
     //
@@ -401,14 +383,6 @@ static void dave2d_draw_border_complex(lv_draw_task_t * t, const lv_area_t * ori
         }
         d2_setantialiasing(u->d2_handle, aa); //restore original setting
     }
-
-    //
-    // Execute render operations
-    //
-#if D2_RENDER_EACH_OPERATION
-    d2_executerenderbuffer(u->d2_handle, u->renderbuffer, 0);
-    d2_flushframe(u->d2_handle);
-#endif
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);

@@ -17,7 +17,8 @@ extern "C" {
 #if LV_USE_DRAW_DAVE2D
 #include "../../lv_draw.h"
 #include "../../lv_draw_private.h"
-#include "hal_data.h"
+#include "bsp_api.h"
+#include "dave_driver.h"
 #include "lv_draw_dave2d_utils.h"
 #include "../../lv_draw_rect.h"
 #include "../../lv_draw_line.h"
@@ -33,8 +34,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define D2_RENDER_EACH_OPERATION      (1)
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -49,6 +48,8 @@ typedef struct {
     uint32_t idx;
     d2_device * d2_handle;
     d2_renderbuffer * renderbuffer;
+    d2_renderbuffer * label_renderbuffer;
+
 #if LV_USE_OS
     lv_mutex_t * pd2Mutex;
 #endif
