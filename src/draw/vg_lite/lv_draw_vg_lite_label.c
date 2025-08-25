@@ -484,6 +484,9 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
         lv_area_set_width(&box_area, dsc->g->box_w);
         lv_area_set_height(&box_area, dsc->g->box_h);
 
+        /* Workaround for loss of rotation precision */
+        lv_area_increase(&box_area, 5, 5);
+
         /* Scale the path area to fit the original path data */
         lv_vg_lite_path_set_bounding_box(outline,
                                          box_area.x1 / scale,
