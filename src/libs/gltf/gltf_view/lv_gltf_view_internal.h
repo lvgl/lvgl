@@ -64,8 +64,8 @@ typedef struct {
     float focal_z;
     bool frame_was_antialiased;
     int32_t animation_speed_ratio;
-    lv_gltf_antialiasing_mode_t aa_mode;
-    lv_gltf_background_mode_t bg_mode;
+    lv_gltf_aa_mode_t aa_mode;
+    lv_gltf_bg_mode_t bg_mode;
     float blur_bg;              /** How much to blur the environment background, between 0.0 and 1.0 */
     float env_pow;              /** Environmental brightness, 1.8 by default */
     float exposure;             /** Image exposure level, 1.0 default */

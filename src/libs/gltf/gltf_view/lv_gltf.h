@@ -31,15 +31,15 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_GLTF_AA_OFF = 0, /** Anti aliasing off*/
-    LV_GLTF_AA_ON = 1,  /** Anti aliasing on*/
-    LV_GLTF_AA_DYNAMIC = 2, /** Anti aliasing on only when frame has no movement*/
-} lv_gltf_antialiasing_mode_t;
+    LV_GLTF_AA_MODE_OFF = 0, /** Anti aliasing off*/
+    LV_GLTF_AA_MODE_ON = 1,  /** Anti aliasing on*/
+    LV_GLTF_AA_MODE_DYNAMIC = 2, /** Anti aliasing on only when frame has no movement*/
+} lv_gltf_aa_mode_t;
 
 typedef enum {
-    LV_GLTF_BG_SOLID = 0, /** Solid background. Use `lv_obj_set_style_bg_color` to set the background color*/
-    LV_GLTF_BG_ENVIRONMENT = 1, /** Environnement background*/
-} lv_gltf_background_mode_t;
+    LV_GLTF_BG_MODE_SOLID = 0, /** Solid background. Use `lv_obj_set_style_bg_color` to set the background color*/
+    LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environnement background*/
+} lv_gltf_bg_mode_t;
 
 #define LV_GLTF_ANIM_SPEED_TENTH 100
 #define LV_GLTF_ANIM_SPEED_QUARTER 250
@@ -269,14 +269,14 @@ uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj);
  * @param obj pointer to a GLTF viewer object
  * @param value background mode
  */
-void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_background_mode_t value);
+void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_bg_mode_t value);
 
 /**
  * Get the background mode
  * @param obj pointer to a GLTF viewer object
  * @return background mode
  */
-lv_gltf_background_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj);
+lv_gltf_bg_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj);
 
 /**
  * Set the background blur amount
@@ -329,14 +329,14 @@ float lv_gltf_get_image_exposure(const lv_obj_t * obj);
  * @param obj pointer to a GLTF viewer object
  * @param value anti-aliasing mode
  */
-void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t value);
+void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_aa_mode_t value);
 
 /**
  * Get the anti-aliasing mode
  * @param obj pointer to a GLTF viewer object
  * @return anti-aliasing mode
  */
-lv_gltf_antialiasing_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
+lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

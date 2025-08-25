@@ -324,7 +324,7 @@ uint32_t lv_gltf_get_camera_count(const lv_obj_t * obj)
     return lv_gltf_model_get_camera_count(model);
 }
 
-void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t value)
+void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_aa_mode_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -333,7 +333,7 @@ void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_antialiasing_mode_t v
     lv_obj_invalidate(obj);
 }
 
-lv_gltf_antialiasing_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj)
+lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -341,7 +341,7 @@ lv_gltf_antialiasing_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj)
     return viewer->desc.aa_mode;
 }
 
-void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_background_mode_t value)
+void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_bg_mode_t value)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -350,7 +350,7 @@ void lv_gltf_set_background_mode(lv_obj_t * obj, lv_gltf_background_mode_t value
     lv_obj_invalidate(obj);
 }
 
-lv_gltf_background_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj)
+lv_gltf_bg_mode_t lv_gltf_get_background_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -530,8 +530,8 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->exposure = 1.0f;
     desc->env_pow = 1.8f;
     desc->blur_bg = 0.5f;
-    desc->bg_mode = LV_GLTF_BG_ENVIRONMENT;
-    desc->aa_mode = LV_GLTF_AA_OFF;
+    desc->bg_mode = LV_GLTF_BG_MODE_ENVIRONMENT;
+    desc->aa_mode = LV_GLTF_AA_MODE_OFF;
     desc->fov = 45.f;
     desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
