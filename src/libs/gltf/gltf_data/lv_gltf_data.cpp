@@ -185,14 +185,14 @@ size_t lv_gltf_model_get_animation(lv_gltf_model_t * model)
 
 lv_gltf_model_t *
 lv_gltf_data_load_from_file(const char * file_path,
-                            lv_gl_shader_manager_t * shader_manager)
+                            lv_opengl_shader_manager_t * shader_manager)
 {
     return lv_gltf_data_load_internal(file_path, 0, shader_manager);
 }
 
 lv_gltf_model_t *
 lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
-                             lv_gl_shader_manager_t * shader_manager)
+                             lv_opengl_shader_manager_t * shader_manager)
 {
     return lv_gltf_data_load_internal(data, data_size, shader_manager);
 }

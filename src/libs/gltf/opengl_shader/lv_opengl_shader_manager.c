@@ -1,5 +1,5 @@
 /**
- * @file lv_gl_shader_manager.c
+ * @file lv_opengl_shader_manager.c
  *
  */
 
@@ -10,7 +10,7 @@
 
 #include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
-#include "lv_gl_shader_internal.h"
+#include "lv_opengl_shader_internal.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_log.h"
 #include "../../../misc/lv_rb.h"
@@ -32,35 +32,35 @@
  *      TYPEDEFS
  **********************/
 
-typedef lv_gl_compiled_shader_t lv_gl_shader_texture_t;
+typedef lv_opengl_compiled_shader_t lv_opengl_shader_texture_t;
 
 typedef struct {
-    lv_gl_shader_program_t * program;
+    lv_opengl_shader_program_t * program;
     uint32_t vertex_shader_hash;
     uint32_t fragment_shader_hash;
-} lv_gl_program_map_key_t;
+} lv_opengl_program_map_key_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
 static lv_rb_compare_res_t
-shader_source_compare_cb(const lv_gl_shader_source_t * lhs,
-                         const lv_gl_shader_source_t * rhs);
+shader_source_compare_cb(const lv_opengl_shader_source_t * lhs,
+                         const lv_opengl_shader_source_t * rhs);
 
 static lv_rb_compare_res_t
-compiled_shader_compare_cb(const lv_gl_compiled_shader_t * lhs,
-                           const lv_gl_compiled_shader_t * rhs);
+compiled_shader_compare_cb(const lv_opengl_compiled_shader_t * lhs,
+                           const lv_opengl_compiled_shader_t * rhs);
 
 static lv_rb_compare_res_t
-shader_program_compare_cb(const lv_gl_program_map_key_t * lhs,
-                          const lv_gl_program_map_key_t * rhs);
+shader_program_compare_cb(const lv_opengl_program_map_key_t * lhs,
+                          const lv_opengl_program_map_key_t * rhs);
 
-static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len);
+static lv_rb_t create_shader_map(const lv_opengl_shader_t * shaders, size_t len);
 static bool string_ends_with(const char * value, const char * suffix);
 
 static char * construct_shader(const char * source,
-                               const lv_gl_shader_define_t * permutations,
+                               const lv_opengl_shader_define_t * permutations,
                                size_t permutations_len);
 
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader);
@@ -77,12 +77,12 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gl_shader_manager_t * lv_gl_shader_manager_create(const lv_gl_shader_t * sources,
+lv_opengl_shader_manager_t * lv_opengl_shader_manager_create(const lv_opengl_shader_t * sources,
                                                      size_t len, const char * vert_src,
                                                      const char * frag_src)
 {
-    lv_gl_shader_manager_t * shader =
-        (lv_gl_shader_manager_t *)lv_malloc_zeroed(sizeof(*shader));
+    lv_opengl_shader_manager_t * shader =
+        (lv_opengl_shader_manager_t *)lv_malloc_zeroed(sizeof(*shader));
     LV_ASSERT_MALLOC(shader);
     if(!shader) {
         return NULL;
@@ -90,14 +90,14 @@ lv_gl_shader_manager_t * lv_gl_shader_manager_create(const lv_gl_shader_t * sour
 
     shader->sources_map = create_shader_map(sources, len);
     if(vert_src != NULL) {
-        lv_gl_shader_t entry = { "__MAIN__.vert", lv_strdup(vert_src) };
+        lv_opengl_shader_t entry = { "__MAIN__.vert", lv_strdup(vert_src) };
         lv_rb_node_t * node = lv_rb_insert(&shader->sources_map, &entry);
         LV_ASSERT_MSG(node,
                       "Failed to insert shader source to source map");
         lv_memcpy(node->data, &entry, sizeof(entry));
     }
     if(frag_src != NULL) {
-        lv_gl_shader_t entry = { "__MAIN__.frag", lv_strdup(frag_src) };
+        lv_opengl_shader_t entry = { "__MAIN__.frag", lv_strdup(frag_src) };
         lv_rb_node_t * node = lv_rb_insert(&shader->sources_map, &entry);
         LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
         lv_memcpy(node->data, &entry, sizeof(entry));
@@ -105,16 +105,16 @@ lv_gl_shader_manager_t * lv_gl_shader_manager_create(const lv_gl_shader_t * sour
 
     lv_rb_init(&shader->compiled_shaders_map,
                (lv_rb_compare_t)compiled_shader_compare_cb,
-               sizeof(lv_gl_compiled_shader_t));
+               sizeof(lv_opengl_compiled_shader_t));
 
     /* Textures and compiled shaders share the same compare function */
     lv_rb_init(&shader->textures_map,
                (lv_rb_compare_t)compiled_shader_compare_cb,
-               sizeof(lv_gl_shader_texture_t));
+               sizeof(lv_opengl_shader_texture_t));
 
     lv_rb_init(&shader->programs_map,
                (lv_rb_compare_t)shader_program_compare_cb,
-               sizeof(lv_gl_program_map_key_t));
+               sizeof(lv_opengl_program_map_key_t));
 
     shader->bg_index_buf = 0;
     shader->bg_vertex_buf = 0;
@@ -122,7 +122,7 @@ lv_gl_shader_manager_t * lv_gl_shader_manager_create(const lv_gl_shader_t * sour
     return shader;
 }
 
-uint32_t lv_gl_shader_hash(const char * value)
+uint32_t lv_opengl_shader_hash(const char * value)
 {
     uint32_t hash = 0;
     const size_t len = lv_strlen(value);
@@ -135,11 +135,11 @@ uint32_t lv_gl_shader_hash(const char * value)
     return hash;
 }
 
-void lv_gl_shader_manager_store_texture(lv_gl_shader_manager_t * manager,
+void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager,
                                         uint32_t texture_hash,
                                         GLuint texture_id)
 {
-    lv_gl_shader_texture_t key = { .id = texture_id, .hash = texture_hash };
+    lv_opengl_shader_texture_t key = { .id = texture_id, .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_insert(&manager->textures_map, &key);
     if(!node) {
         LV_LOG_WARN("Failed to cache texture hash: %d id: %d",
@@ -150,26 +150,26 @@ void lv_gl_shader_manager_store_texture(lv_gl_shader_manager_t * manager,
     lv_memcpy(node->data, &key, sizeof(key));
 }
 
-GLuint lv_gl_shader_manager_get_texture(lv_gl_shader_manager_t * manager,
+GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager,
                                         uint32_t texture_hash)
 {
-    lv_gl_shader_texture_t key = { .hash = texture_hash };
+    lv_opengl_shader_texture_t key = { .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_find(&manager->textures_map, &key);
     if(!node) {
         LV_LOG_INFO("Couldn't find texture with hash %d in cache",
                     texture_hash);
         return GL_NONE;
     }
-    return ((lv_gl_shader_texture_t *)node->data)->id;
+    return ((lv_opengl_shader_texture_t *)node->data)->id;
 }
 
-uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
+uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader,
                                             const char * shader_identifier,
-                                            const lv_gl_shader_define_t * permutations,
+                                            const lv_opengl_shader_define_t * permutations,
                                             size_t permutations_len)
 {
     /* First check that the shader identifier exists */
-    lv_gl_shader_t key = { shader_identifier, NULL };
+    lv_opengl_shader_t key = { shader_identifier, NULL };
     lv_rb_node_t * source_node = lv_rb_find(&shader->sources_map, &key);
     LV_LOG_TRACE("Select shader '%s'", shader_identifier);
 
@@ -179,7 +179,7 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     }
 
     /* Then hash the name with the permutations and see if we already compiled it */
-    uint32_t hash = lv_gl_shader_hash(shader_identifier);
+    uint32_t hash = lv_opengl_shader_hash(shader_identifier);
     char define[512];
     for(size_t i = 0; i < permutations_len; ++i) {
         if(permutations[i].value) {
@@ -188,23 +188,23 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
         else {
             lv_snprintf(define, sizeof(define), "%s", permutations[i].name);
         }
-        hash ^= lv_gl_shader_hash(define);
+        hash ^= lv_opengl_shader_hash(define);
     }
 
-    lv_gl_compiled_shader_t shader_map_key = { hash, 0 };
+    lv_opengl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
         lv_rb_find(&shader->compiled_shaders_map, &shader_map_key);
 
     /* Fast path. Shader already compiled */
     if(shader_map_node != NULL) {
         LV_LOG_INFO("Shader '%s' with hash %u found. Id: %d", shader_identifier, hash,
-                    ((lv_gl_compiled_shader_t *)shader_map_node->data)->id);
+                    ((lv_opengl_compiled_shader_t *)shader_map_node->data)->id);
         return hash;
     }
 
     /* New shader requested, construct and compile it */
     bool is_vertex = string_ends_with(shader_identifier, ".vert");
-    const char * original_shader_source = ((lv_gl_shader_source_t *)source_node->data)->data.source;
+    const char * original_shader_source = ((lv_opengl_shader_source_t *)source_node->data)->data.source;
     char * shader_source = construct_shader(original_shader_source,
                                             permutations, permutations_len);
     shader_map_key.id = compile_shader(shader_source, is_vertex);
@@ -219,22 +219,22 @@ uint32_t lv_gl_shader_manager_select_shader(lv_gl_shader_manager_t * shader,
     return hash;
 }
 
-lv_gl_shader_program_t *
-lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
+lv_opengl_shader_program_t *
+lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
                                  uint32_t fragment_shader_hash,
                                  uint32_t vertex_shader_hash)
 {
-    lv_gl_program_map_key_t key = {
+    lv_opengl_program_map_key_t key = {
         .vertex_shader_hash = vertex_shader_hash,
         .fragment_shader_hash = fragment_shader_hash
     };
 
     lv_rb_node_t * node = lv_rb_find(&manager->programs_map, &key);
     if(node) {
-        return ((lv_gl_program_map_key_t *)node->data)->program;
+        return ((lv_opengl_program_map_key_t *)node->data)->program;
     }
 
-    lv_gl_compiled_shader_t shader_key = { .hash = vertex_shader_hash };
+    lv_opengl_compiled_shader_t shader_key = { .hash = vertex_shader_hash };
     lv_rb_node_t * vertex_node =
         lv_rb_find(&manager->compiled_shaders_map, &shader_key);
     shader_key.hash = fragment_shader_hash;
@@ -251,19 +251,19 @@ lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
         fragment_shader_hash);
 
     const GLuint vertex_shader_id =
-        ((lv_gl_compiled_shader_t *)vertex_node->data)->id;
+        ((lv_opengl_compiled_shader_t *)vertex_node->data)->id;
     const GLuint fragment_shader_id =
-        ((lv_gl_compiled_shader_t *)fragment_node->data)->id;
+        ((lv_opengl_compiled_shader_t *)fragment_node->data)->id;
 
     GLuint program_id = link_program(vertex_shader_id, fragment_shader_id);
     LV_LOG_TRACE("Linking program with shaders V: %d F:%d P: %d", vertex_shader_id, fragment_shader_id, program_id);
 
-    lv_gl_shader_program_t * program =
-        lv_gl_shader_program_create(program_id);
+    lv_opengl_shader_program_t * program =
+        lv_opengl_shader_program_create(program_id);
 
     LV_ASSERT_MSG(program, "Failed to create program");
 
-    lv_gl_program_map_key_t prog_key = {
+    lv_opengl_program_map_key_t prog_key = {
         .program = program,
         .fragment_shader_hash = fragment_shader_hash,
         .vertex_shader_hash = vertex_shader_hash
@@ -274,7 +274,7 @@ lv_gl_shader_manager_get_program(lv_gl_shader_manager_t * manager,
     return program;
 }
 
-void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
+void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager)
 {
     LV_LOG_INFO("Destroying shader cache");
 
@@ -283,7 +283,7 @@ void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
     lv_rb_node_t * node;
 
     while((node = manager->sources_map.root)) {
-        lv_gl_shader_source_t * shader = node->data;
+        lv_opengl_shader_source_t * shader = node->data;
         if(shader->src_allocated) {
             lv_free((void *)shader->data.source);
         }
@@ -292,15 +292,15 @@ void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
     lv_rb_destroy(&manager->sources_map);
 
     while((node = manager->compiled_shaders_map.root)) {
-        lv_gl_compiled_shader_t * shader = node->data;
+        lv_opengl_compiled_shader_t * shader = node->data;
         GL_CALL(glDeleteShader(shader->id));
         lv_rb_remove_node(&manager->compiled_shaders_map, node);
     }
 
     lv_rb_destroy(&manager->compiled_shaders_map);
     while((node = manager->programs_map.root)) {
-        lv_gl_program_map_key_t * program_key = node->data;
-        lv_gl_shader_program_destroy(program_key->program);
+        lv_opengl_program_map_key_t * program_key = node->data;
+        lv_opengl_shader_program_destroy(program_key->program);
         lv_rb_remove_node(&manager->programs_map, node);
     }
     lv_rb_destroy(&manager->programs_map);
@@ -312,8 +312,8 @@ void lv_gl_shader_manager_destroy(lv_gl_shader_manager_t * manager)
  **********************/
 
 static lv_rb_compare_res_t
-shader_program_compare_cb(const lv_gl_program_map_key_t * lhs,
-                          const lv_gl_program_map_key_t * rhs)
+shader_program_compare_cb(const lv_opengl_program_map_key_t * lhs,
+                          const lv_opengl_program_map_key_t * rhs)
 {
     const lv_rb_compare_res_t cmp = lhs->vertex_shader_hash - rhs->vertex_shader_hash;
     if(cmp == 0) {
@@ -323,15 +323,15 @@ shader_program_compare_cb(const lv_gl_program_map_key_t * lhs,
 }
 
 static lv_rb_compare_res_t
-shader_source_compare_cb(const lv_gl_shader_source_t * lhs,
-                         const lv_gl_shader_source_t * rhs)
+shader_source_compare_cb(const lv_opengl_shader_source_t * lhs,
+                         const lv_opengl_shader_source_t * rhs)
 {
     return lv_strcmp(lhs->data.name, rhs->data.name);
 }
 
 static lv_rb_compare_res_t
-compiled_shader_compare_cb(const lv_gl_compiled_shader_t * lhs,
-                           const lv_gl_compiled_shader_t * rhs)
+compiled_shader_compare_cb(const lv_opengl_compiled_shader_t * lhs,
+                           const lv_opengl_compiled_shader_t * rhs)
 {
     return lhs->hash - rhs->hash;
 }
@@ -389,7 +389,7 @@ static char * append_to_shader(char * dst, const char * src, size_t * curr_index
 }
 
 static char * construct_shader(const char * source,
-                               const lv_gl_shader_define_t * permutations,
+                               const lv_opengl_shader_define_t * permutations,
                                size_t permutations_len)
 {
     const char * defines = "#version 300 es\n";
@@ -472,11 +472,11 @@ static char * replace_include(const char * source, const char * pattern,
 
     return result;
 }
-static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len)
+static lv_rb_t create_shader_map(const lv_opengl_shader_t * shaders, size_t len)
 {
     lv_rb_t map;
     lv_rb_init(&map, (lv_rb_compare_t)shader_source_compare_cb,
-               sizeof(lv_gl_shader_source_t));
+               sizeof(lv_opengl_shader_source_t));
 
     char pattern[256];
     for(size_t i = 0; i < len; i++) {
@@ -485,7 +485,7 @@ static lv_rb_t create_shader_map(const lv_gl_shader_t * shaders, size_t len)
                         shaders[i].name, i);
             continue;
         }
-        lv_gl_shader_source_t value = {
+        lv_opengl_shader_source_t value = {
             .data = {
                 .name = shaders[i].name,
                 .source = shaders[i].source

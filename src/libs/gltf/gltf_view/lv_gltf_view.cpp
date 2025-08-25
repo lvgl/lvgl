@@ -50,7 +50,7 @@ static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
 static void destroy_environment(lv_gltf_view_env_textures_t * env);
-static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager);
+static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 
 
@@ -471,7 +471,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_gltf_view_shader_get_src(&shaders);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
     char * frag_shader = lv_gltf_view_shader_get_fragment();
-    view->shader_manager = lv_gl_shader_manager_create(shaders.shader_list, shaders.count, vertex_shader, frag_shader);
+    view->shader_manager = lv_opengl_shader_manager_create(shaders.shader_list, shaders.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
@@ -506,7 +506,7 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_gltf_t * view = (lv_gltf_t *)obj;
-    lv_gl_shader_manager_destroy(view->shader_manager);
+    lv_opengl_shader_manager_destroy(view->shader_manager);
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
@@ -586,19 +586,19 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
             }
 
             lv_array_t defines;
-            lv_array_init(&defines, 64, sizeof(lv_gl_shader_define_t));
+            lv_array_init(&defines, 64, sizeof(lv_opengl_shader_define_t));
             lv_result_t result =
                 lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &model_primitive);
 
             LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
             lv_gltf_compiled_shader_t compiled_shader;
-            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_gl_shader_define_t *)defines.data,
+            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_opengl_shader_define_t *)defines.data,
                                                                             lv_array_size(&defines));
             compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
             const size_t n = lv_array_size(&defines);
             for(size_t i = 0; i < n; ++i) {
-                lv_gl_shader_define_t * define = (lv_gl_shader_define_t *) lv_array_at(&defines, i);
+                lv_opengl_shader_define_t * define = (lv_opengl_shader_define_t *) lv_array_at(&defines, i);
                 if(define->value_allocated) {
                     lv_free((void *)define->value);
                 }
@@ -611,16 +611,16 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
     fastgltf::iterateSceneNodes(model->asset, 0, fastgltf::math::fmat4x4(), iterate_callback);
 }
 
-static void setup_compile_and_load_bg_shader(lv_gl_shader_manager_t * manager)
+static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager)
 {
-    lv_gl_shader_define_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL, false} };
+    lv_opengl_shader_define_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL, false} };
 
-    uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
-    uint32_t vert_shader_hash = lv_gl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
+    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
+    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
 
-    lv_gl_shader_program_t * program = lv_gl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
 
-    manager->bg_program = lv_gl_shader_program_get_id(program);
+    manager->bg_program = lv_opengl_shader_program_get_id(program);
     setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);
 }
 

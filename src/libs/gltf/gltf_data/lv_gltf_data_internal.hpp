@@ -324,7 +324,7 @@ lv_gltf_mesh_data_t *lv_gltf_get_new_meshdata(lv_gltf_model_t *_data);
 
 lv_gltf_model_t *lv_gltf_data_create_internal(const char *gltf_path, fastgltf::Asset);
 
-lv_gltf_model_t *lv_gltf_data_load_internal(const void *data_source, size_t data_size, lv_gl_shader_manager_t *shaders);
+lv_gltf_model_t *lv_gltf_data_load_internal(const void *data_source, size_t data_size, lv_opengl_shader_manager_t *shaders);
 
 /*void set_node_at_path(lv_gltf_data_t *data, const std::string &path,*/
 /*		      fastgltf::Node *node);*/

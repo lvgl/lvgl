@@ -5,7 +5,7 @@
 #if LV_USE_GLTF
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include "../gl_shader/lv_gl_shader_internal.h"
+#include "../opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
 
@@ -198,7 +198,7 @@ lv_gltf_compiled_shader_t * lv_gltf_get_compiled_shader(lv_gltf_model_t * data, 
  */
 lv_gltf_model_t *
 lv_gltf_data_load_from_file(const char * file_path,
-                            lv_gl_shader_manager_t * shader_manager);
+                            lv_opengl_shader_manager_t * shader_manager);
 
 /**
  * @brief Load the gltf file encoded within the supplied byte array
@@ -211,7 +211,7 @@ lv_gltf_data_load_from_file(const char * file_path,
 
 lv_gltf_model_t *
 lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
-                             lv_gl_shader_manager_t * shader_manager);
+                             lv_opengl_shader_manager_t * shader_manager);
 
 
 /**

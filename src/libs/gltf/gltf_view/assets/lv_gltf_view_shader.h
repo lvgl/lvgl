@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../gl_shader/lv_gl_shader_internal.h"
+#include "../../opengl_shader/lv_opengl_shader_internal.h"
 
 #if LV_USE_GLTF
 
@@ -29,7 +29,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-	const lv_gl_shader_t *shader_list;
+	const lv_opengl_shader_t *shader_list;
 	size_t count;
 } lv_gltf_view_shader_t;
 

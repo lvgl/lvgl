@@ -1,5 +1,5 @@
 /**
- * @file lv_gl_shader_program.c
+ * @file lv_opengl_shader_program.c
  *
  */
 
@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_gl_shader_internal.h"
+#include "lv_opengl_shader_internal.h"
 
 #if LV_USE_GLTF
 
@@ -26,10 +26,10 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void update_uniform_1i(lv_gl_shader_program_t * program, const char * prop,
+static void update_uniform_1i(lv_opengl_shader_program_t * program, const char * prop,
                               int value);
 
-static void update_uniform_1f(lv_gl_shader_program_t * program, const char * prop,
+static void update_uniform_1f(lv_opengl_shader_program_t * program, const char * prop,
                               float value);
 
 /**********************
@@ -44,9 +44,9 @@ static void update_uniform_1f(lv_gl_shader_program_t * program, const char * pro
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gl_shader_program_t * lv_gl_shader_program_create(unsigned int _program)
+lv_opengl_shader_program_t * lv_opengl_shader_program_create(unsigned int _program)
 {
-    lv_gl_shader_program_t * program = lv_malloc(sizeof(*program));
+    lv_opengl_shader_program_t * program = lv_malloc(sizeof(*program));
     LV_ASSERT_MALLOC(program);
     if(!program) {
         return NULL;
@@ -58,7 +58,7 @@ lv_gl_shader_program_t * lv_gl_shader_program_create(unsigned int _program)
     return program;
 }
 
-void lv_gl_shader_program_destroy(lv_gl_shader_program_t * program)
+void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
 {
 #ifndef __EMSCRIPTEN__
     GLuint shader_names[10];
@@ -76,7 +76,7 @@ void lv_gl_shader_program_destroy(lv_gl_shader_program_t * program)
     GL_CALL(glDeleteProgram(program->id));
 }
 
-GLuint lv_gl_shader_program_get_id(lv_gl_shader_program_t * program)
+GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)
 {
     LV_ASSERT_NULL(program);
     return program->id;
@@ -86,7 +86,7 @@ GLuint lv_gl_shader_program_get_id(lv_gl_shader_program_t * program)
  *   STATIC FUNCTIONS
  **********************/
 
-static void update_uniform_1i(lv_gl_shader_program_t * program, const char * prop,
+static void update_uniform_1i(lv_opengl_shader_program_t * program, const char * prop,
                               int value)
 {
     GLuint location = glGetUniformLocation(program->id, prop);
@@ -101,7 +101,7 @@ static void update_uniform_1i(lv_gl_shader_program_t * program, const char * pro
     GL_CALL(glUniform1i(location, value));
 }
 
-static void update_uniform_1f(lv_gl_shader_program_t * program, const char * prop,
+static void update_uniform_1f(lv_opengl_shader_program_t * program, const char * prop,
                               float value)
 {
     GLuint location = glGetUniformLocation(program->id, prop);

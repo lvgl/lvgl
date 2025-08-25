@@ -12,7 +12,7 @@
 #include "fastgltf/types.hpp"
 #include "../gltf_data/lv_gltf_data_internal.hpp"
 #include "../gltf_data/lv_gltf_data_internal.h"
-#include "../gl_shader/lv_gl_shader_internal.h"
+#include "../opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../misc/lv_array.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_types.h"
@@ -299,20 +299,20 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
  * @return A gl_renwin_shaderset_t structure representing the compiled and loaded shaders.
  */
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_define_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
                                                         size_t n)
 {
-    uint32_t frag_shader_hash = lv_gl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",
+    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",
                                                                    defines, n);
 
-    uint32_t vert_shader_hash = lv_gl_shader_manager_select_shader(view->shader_manager, "__MAIN__.vert",
+    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(view->shader_manager, "__MAIN__.vert",
                                                                    defines, n);
-    lv_gl_shader_program_t * program =
-        lv_gl_shader_manager_get_program(view->shader_manager, frag_shader_hash, vert_shader_hash);
+    lv_opengl_shader_program_t * program =
+        lv_opengl_shader_manager_get_program(view->shader_manager, frag_shader_hash, vert_shader_hash);
 
     LV_ASSERT_NULL(program);
 
-    GLuint program_id = lv_gl_shader_program_get_id(program);
+    GLuint program_id = lv_opengl_shader_program_get_id(program);
 
     GL_CALL(glUseProgram(program_id));
     lv_gltf_shaderset_t shader_prog;
@@ -329,13 +329,13 @@ static lv_result_t add_define(lv_array_t * array, const char * name, const char 
 {
     const size_t n = lv_array_size(array);
     for(size_t i = 0; i < n; ++i) {
-        lv_gl_shader_define_t * define = (lv_gl_shader_define_t *)lv_array_at(array, i);
+        lv_opengl_shader_define_t * define = (lv_opengl_shader_define_t *)lv_array_at(array, i);
         if(lv_streq(define->name, name)) {
             return LV_RESULT_OK;
         }
     }
 
-    lv_gl_shader_define_t entry = { name, value, value_allocated };
+    lv_opengl_shader_define_t entry = { name, value, value_allocated };
     return lv_array_push_back(array, &entry);
 }
 

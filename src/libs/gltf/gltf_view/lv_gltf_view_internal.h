@@ -16,7 +16,7 @@
 
 #include "lv_gltf.h"
 #include "../../../misc/lv_types.h"
-#include "../gl_shader/lv_gl_shader_internal.h"
+#include "../opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
 #include "../gltf_data/lv_gltf_data_internal.h"
 
@@ -78,7 +78,7 @@ typedef struct {
     GLint blend_equation;
     GLfloat clear_depth;
     GLfloat clear_color[4];
-} lv_gl_state_t;
+} lv_opengl_state_t;
 
 typedef struct {
     uint32_t diffuse;
@@ -105,7 +105,7 @@ struct _lv_gltf_t {
     lv_gltf_view_state_t state;
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
-    lv_gl_shader_manager_t * shader_manager;
+    lv_opengl_shader_manager_t * shader_manager;
     lv_gltf_view_env_textures_t env_textures;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;
@@ -125,7 +125,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);
 
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_gl_shader_define_t * defines,
+lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
                                                         size_t n);
 
 /**********************

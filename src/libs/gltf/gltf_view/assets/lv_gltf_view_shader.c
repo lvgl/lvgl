@@ -5,7 +5,7 @@
 #include "../../../../stdlib/lv_sprintf.h"
 #include <string.h>
 
-static lv_gl_shader_t src_includes[] = {
+static lv_opengl_shader_t src_includes[] = {
 	{ "tonemapping.glsl", R"(
 
         uniform float u_Exposure;
@@ -2696,7 +2696,7 @@ static lv_gl_shader_t src_includes[] = {
     )" },
 };
 
-static lv_gl_shader_t env_src_includes[] = {
+static lv_opengl_shader_t env_src_includes[] = {
 	{ "fullscreen.vert", R"(
         precision highp float;
 
@@ -3514,7 +3514,7 @@ static char* process_includes(const char* c_src, const char* defines)
     
     char* rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
     
-    size_t num_items = sizeof(src_includes) / sizeof(lv_gl_shader_t);
+    size_t num_items = sizeof(src_includes) / sizeof(lv_opengl_shader_t);
     char search_str[255];
     
     for (size_t i = 0; i < num_items; i++) {

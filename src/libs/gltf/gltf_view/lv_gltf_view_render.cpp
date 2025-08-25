@@ -39,8 +39,8 @@
  **********************/
 
 static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg);
-static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state);
-static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state);
+static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state);
+static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state);
 static void setup_finish_frame(void);
 static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map);
 static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
@@ -84,7 +84,7 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
 static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * _ret,
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg);
-static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
+static void setup_draw_environment_background(lv_opengl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
 static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
 /**********************
@@ -119,7 +119,7 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state)
+static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state)
 {
     GL_CALL(glGetBooleanv(GL_BLEND, &state->blend_enabled));
     GL_CALL(glGetIntegerv(GL_BLEND_SRC_ALPHA, &state->blend_src));
@@ -129,7 +129,7 @@ static void lv_gltf_view_push_opengl_state(lv_gl_state_t * state)
     GL_CALL(glGetFloatv(GL_DEPTH_CLEAR_VALUE, &state->clear_depth));
 }
 
-static void lv_gltf_view_pop_opengl_state(const lv_gl_state_t * state)
+static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
 {
     GL_CALL(glDisable(GL_CULL_FACE));
     if(state->blend_enabled) {
@@ -157,7 +157,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         opt_aa_this_frame = view_desc->frame_was_antialiased;
     }
 
-    lv_gl_state_t opengl_state;
+    lv_opengl_state_t opengl_state;
     lv_gltf_view_push_opengl_state(&opengl_state);
 
     int32_t last_render_w = view_desc->render_width;
@@ -1089,7 +1089,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-static void setup_draw_environment_background(lv_gl_shader_manager_t * manager, lv_gltf_t * viewer, float blur)
+static void setup_draw_environment_background(lv_opengl_shader_manager_t * manager, lv_gltf_t * viewer, float blur)
 {
     GL_CALL(glBindVertexArray(manager->bg_vao));
 

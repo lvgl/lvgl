@@ -81,7 +81,7 @@ static void injest_grow_bounds_to_include(lv_gltf_model_t * data, const fastgltf
 static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::math::fmat4x4 & matrix,
                                       const fastgltf::Mesh & mesh);
 
-static bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
+static bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
                          uint32_t index);
 
 static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sources::BufferView & view,
@@ -131,7 +131,7 @@ static void load_mesh_texture(lv_gltf_model_t * data,
  **********************/
 
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
-                                             lv_gl_shader_manager_t * shaders)
+                                             lv_opengl_shader_manager_t * shaders)
 {
     lv_gltf_model_t * data = NULL;
     if(data_size > 0) {
@@ -448,15 +448,15 @@ static void injest_set_initial_bounds(lv_gltf_model_t * data, const fastgltf::ma
     set_bounds_info(data, v_min, v_max, v_cen, radius);
 }
 
-bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
+bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t * data, fastgltf::Image & image,
                   uint32_t index)
 {
     std::string _tex_id = std::string(lv_gltf_get_filename(data)) + "_IMG" + std::to_string(index);
 
     char tmp[512];
     lv_snprintf(tmp, sizeof(tmp), "%s_img_%u", data->filename, index);
-    const uint32_t hash = lv_gl_shader_hash(tmp);
-    GLuint texture_id = lv_gl_shader_manager_get_texture(shader_manager, hash);
+    const uint32_t hash = lv_opengl_shader_hash(tmp);
+    GLuint texture_id = lv_opengl_shader_manager_get_texture(shader_manager, hash);
 
     if(texture_id != GL_NONE) {
         LV_LOG_TRACE("Emplacing back already cached texture from previous injest iteration %u", texture_id);
@@ -515,7 +515,7 @@ bool injest_image(lv_gl_shader_manager_t * shader_manager, lv_gltf_model_t * dat
         LV_LOG_ERROR("Failed to load image %s", image.name.c_str());
     }
     LV_LOG_TRACE("Storing texture with hash: %u %u", hash, texture_id);
-    lv_gl_shader_manager_store_texture(shader_manager, hash, texture_id);
+    lv_opengl_shader_manager_store_texture(shader_manager, hash, texture_id);
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
     data->textures.emplace_back(texture_id);
     return true;
