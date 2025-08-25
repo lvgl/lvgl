@@ -275,27 +275,20 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
             if(grow_value) {
-#  if 1
-				int32_t min_size = f->row ? calc_dynamic_width(item, LV_STYLE_MIN_WIDTH, NULL)
-										  : calc_dynamic_height(item, LV_STYLE_MIN_HEIGHT, NULL);
-				int32_t max_size = f->row ? calc_dynamic_width(item, LV_STYLE_MAX_WIDTH, NULL)
-										  : calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT, NULL);
-#  else
-				int32_t min_size = f->row ? lv_obj_get_style_min_width(item, LV_PART_MAIN)
-										  : lv_obj_get_style_min_height(item, LV_PART_MAIN);
-				int32_t max_size = f->row ? lv_obj_get_style_max_width(item, LV_PART_MAIN)
-										  : lv_obj_get_style_max_height(item, LV_PART_MAIN);
-#  endif
-				int32_t req_size = min_size;
-				if (item_id != item_start_id)
-					req_size += item_gap; /*No gap before the first item*/
+                int32_t min_size = f->row ? calc_dynamic_width(item, LV_STYLE_MIN_WIDTH, NULL)
+                                   : calc_dynamic_height(item, LV_STYLE_MIN_HEIGHT, NULL);
+                int32_t max_size = f->row ? calc_dynamic_width(item, LV_STYLE_MAX_WIDTH, NULL)
+                                   : calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT, NULL);
+                int32_t req_size = min_size;
+                if(item_id != item_start_id)
+                    req_size += item_gap; /*No gap before the first item*/
 
-				/*Wrap if can't fit*/
-				if (f->wrap && t->track_fix_main_size + grow_min_size_sum + req_size > max_main_size)
-					break;
+                /*Wrap if can't fit*/
+                if(f->wrap && t->track_fix_main_size + grow_min_size_sum + req_size > max_main_size)
+                    break;
 
-				grow_min_size_sum += req_size;
-				if(item_id != item_start_id) {
+                grow_min_size_sum += req_size;
+                if(item_id != item_start_id) {
                     t->track_fix_main_size += item_gap; /*The gap is always taken from the space*/
                 }
 
@@ -308,12 +301,12 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
 
 
                     new_dsc[t->grow_item_cnt - 1].item = item;
-					new_dsc[t->grow_item_cnt - 1].min_size = min_size;
-					new_dsc[t->grow_item_cnt - 1].max_size = max_size;
-					new_dsc[t->grow_item_cnt - 1].grow_value = grow_value;
-					new_dsc[t->grow_item_cnt - 1].clamped = 0;
+                    new_dsc[t->grow_item_cnt - 1].min_size = min_size;
+                    new_dsc[t->grow_item_cnt - 1].max_size = max_size;
+                    new_dsc[t->grow_item_cnt - 1].grow_value = grow_value;
+                    new_dsc[t->grow_item_cnt - 1].clamped = 0;
 
-					t->grow_dsc = new_dsc;
+                    t->grow_dsc = new_dsc;
                 }
             }
             else {

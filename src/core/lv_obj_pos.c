@@ -84,86 +84,72 @@ void lv_obj_set_y(lv_obj_t * obj, int32_t y)
     }
 }
 
-int32_t calc_dynamic_width(lv_obj_t* obj, lv_style_prop_t prop, int32_t* const content_width)
+int32_t calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_width)
 {
-	LV_ASSERT(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH);
+    LV_ASSERT(prop == LV_STYLE_WIDTH || prop == LV_STYLE_MIN_WIDTH || prop == LV_STYLE_MAX_WIDTH);
 
-	int32_t width = lv_obj_get_style_prop(obj, 0, prop).num;
+    int32_t width = lv_obj_get_style_prop(obj, 0, prop).num;
 
-	if (width == LV_SIZE_CONTENT)
-	{
-		if (content_width == NULL)
-		{
-			width = calc_content_width(obj);
-		}
-		else
-		{
-			if (*content_width < 0)
-			{
-				*content_width = calc_content_width(obj);
-			}
-			width = *content_width;
-		}
-	}
-	else if (LV_COORD_IS_PCT(width))
-	{
-		lv_obj_t* parent = lv_obj_get_parent(obj);
-		if (parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT)
-		{
-			/*If parent has content size and the child has pct size
-			 *a circular dependency will occur. To solve it keep child size at zero */
-			width = lv_obj_get_style_space_left(obj, 0) + lv_obj_get_style_space_right(obj, 0);
-		}
-		else
-		{
-			int32_t parent_w = lv_obj_get_content_width(parent);
-			width = (LV_COORD_GET_PCT(width) * parent_w) / 100;
+    if(width == LV_SIZE_CONTENT) {
+        if(content_width == NULL) {
+            width = calc_content_width(obj);
+        }
+        else {
+            if(*content_width < 0) {
+                *content_width = calc_content_width(obj);
+            }
+            width = *content_width;
+        }
+    }
+    else if(LV_COORD_IS_PCT(width)) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        if(parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT) {
+            /*If parent has content size and the child has pct size
+             *a circular dependency will occur. To solve it keep child size at zero */
+            width = lv_obj_get_style_space_left(obj, 0) + lv_obj_get_style_space_right(obj, 0);
+        }
+        else {
+            int32_t parent_w = lv_obj_get_content_width(parent);
+            width = (LV_COORD_GET_PCT(width) * parent_w) / 100;
             width -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN) + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
-		}
-	}
-	return width;
+        }
+    }
+    return width;
 }
 
-int32_t calc_dynamic_height(lv_obj_t* obj, lv_style_prop_t prop, int32_t* const content_height)
+int32_t calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_height)
 {
-	LV_ASSERT(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT);
+    LV_ASSERT(prop == LV_STYLE_HEIGHT || prop == LV_STYLE_MIN_HEIGHT || prop == LV_STYLE_MAX_HEIGHT);
 
-	int32_t height = lv_obj_get_style_prop(obj, 0, prop).num;
+    int32_t height = lv_obj_get_style_prop(obj, 0, prop).num;
 
-	if (height == LV_SIZE_CONTENT)
-	{
-		if (content_height == NULL)
-		{
-			height = calc_content_height(obj);
-		}
-		else
-		{
-			if (*content_height < 0)
-			{
-				*content_height = calc_content_height(obj);
-			}
-			height = *content_height;
-		}
-	}
-	else if (LV_COORD_IS_PCT(height))
-	{
-		lv_obj_t* parent = lv_obj_get_parent(obj);
-		if (parent->h_layout == 0 && lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT)
-		{
-			/*If parent has content size and the child has pct size
-			 *a circular dependency will occur. To solve it keep child size at zero */
-			height = lv_obj_get_style_space_top(obj, 0) + lv_obj_get_style_space_bottom(obj, 0);
-		}
+    if(height == LV_SIZE_CONTENT) {
+        if(content_height == NULL) {
+            height = calc_content_height(obj);
+        }
+        else {
+            if(*content_height < 0) {
+                *content_height = calc_content_height(obj);
+            }
+            height = *content_height;
+        }
+    }
+    else if(LV_COORD_IS_PCT(height)) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        if(parent->h_layout == 0 && lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT) {
+            /*If parent has content size and the child has pct size
+             *a circular dependency will occur. To solve it keep child size at zero */
+            height = lv_obj_get_style_space_top(obj, 0) + lv_obj_get_style_space_bottom(obj, 0);
+        }
 
-		else
-		{
-			int32_t parent_h = lv_obj_get_content_height(parent);
+        else {
+            int32_t parent_h = lv_obj_get_content_height(parent);
             height = (LV_COORD_GET_PCT(height) * parent_h) / 100;
             height -=
                 lv_obj_get_style_margin_top(obj, LV_PART_MAIN) + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
-		}
-	}
-	return height;
+        }
+    }
+    return height;
 }
 
 bool lv_obj_refr_size(lv_obj_t * obj)
@@ -182,32 +168,30 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         int32_t content_width = -1;
-		w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
-		int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
-		int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
-		w = LV_CLAMP(minw, w, maxw);
-	}
+        w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
+        int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
+        int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
+        w = LV_CLAMP(minw, w, maxw);
+    }
 
-	int32_t h;
-	if (obj->h_layout)
-	{
-		h = lv_obj_get_height(obj);
-	}
-	else
-	{
-		int32_t content_height = -1;
-		h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
-		int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
-		int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
-		h = LV_CLAMP(minh, h, maxh);
-	}
+    int32_t h;
+    if(obj->h_layout) {
+        h = lv_obj_get_height(obj);
+    }
+    else {
+        int32_t content_height = -1;
+        h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
+        int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
+        int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
+        h = LV_CLAMP(minh, h, maxh);
+    }
 
-	/*Do nothing if the size is not changed*/
-	/*It is very important else recursive resizing can occur without size change*/
-	if (lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h)
-		return false;
+    /*Do nothing if the size is not changed*/
+    /*It is very important else recursive resizing can occur without size change*/
+    if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h)
+        return false;
 
-	/*Invalidate the original area*/
+    /*Invalidate the original area*/
     lv_obj_invalidate(obj);
 
     /*Save the original coordinates*/
