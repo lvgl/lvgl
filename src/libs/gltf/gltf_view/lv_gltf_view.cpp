@@ -11,8 +11,8 @@
 
 #if LV_USE_GLTF
 
-#include "../lv_gltf_data/lv_gltf_model.h"
-#include "../lv_gltf_data/lv_gltf_data_internal.hpp"
+#include "../gltf_data/lv_gltf_model.h"
+#include "../gltf_data/lv_gltf_data_internal.hpp"
 #include "../../../draw/lv_draw_3d.h"
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../core/lv_obj_class_private.h"

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_gl_shader/lv_gl_shader_internal.h"
+#include "../../gl_shader/lv_gl_shader_internal.h"
 
 #if LV_USE_GLTF
 

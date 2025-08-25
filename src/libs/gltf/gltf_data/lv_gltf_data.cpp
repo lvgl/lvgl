@@ -15,7 +15,7 @@
 #include "../../../misc/lv_assert.h"
 #include "../../../core/lv_obj_pos.h"
 #include "../../../misc/lv_timer.h"
-#include "../lv_gltf_view/lv_gltf_view_internal.h"
+#include "../gltf_view/lv_gltf_view_internal.h"
 
 
 /*********************

@@ -10,9 +10,9 @@
 #if LV_USE_GLTF
 
 #include "fastgltf/types.hpp"
-#include "../lv_gltf_data/lv_gltf_data_internal.hpp"
-#include "../lv_gltf_data/lv_gltf_data_internal.h"
-#include "../lv_gl_shader/lv_gl_shader_internal.h"
+#include "../gltf_data/lv_gltf_data_internal.hpp"
+#include "../gltf_data/lv_gltf_data_internal.h"
+#include "../gl_shader/lv_gl_shader_internal.h"
 #include "../../../misc/lv_array.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_types.h"

@@ -16,9 +16,9 @@
 
 #include "lv_gltf.h"
 #include "../../../misc/lv_types.h"
-#include "../lv_gl_shader/lv_gl_shader_internal.h"
+#include "../gl_shader/lv_gl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
-#include "../lv_gltf_data/lv_gltf_data_internal.h"
+#include "../gltf_data/lv_gltf_data_internal.h"
 
 
 /*********************

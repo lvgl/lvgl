@@ -16,7 +16,7 @@
 #include "../../../../stdlib/lv_string.h"
 #include "../../../../drivers/glfw/lv_opengles_debug.h"
 
-#include "../../lv_gl_shader/lv_gl_shader_internal.h"
+#include "../../gl_shader/lv_gl_shader_internal.h"
 #include "../lv_gltf_view_internal.h"
 #include "../assets/lv_gltf_view_shader.h"
 

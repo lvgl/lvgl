@@ -5,7 +5,7 @@
 #if LV_USE_GLTF
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include "../lv_gl_shader/lv_gl_shader_internal.h"
+#include "../gl_shader/lv_gl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
 

@@ -16,7 +16,7 @@
 
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_color.h"
-#include "../lv_gltf_data/lv_gltf_model.h"
+#include "../gltf_data/lv_gltf_model.h"
 
 #ifdef __cplusplus
 extern "C" {
