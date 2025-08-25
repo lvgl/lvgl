@@ -56,7 +56,8 @@ details are available at :ref:`adding_lvgl_to_your_project`.
 Example
 ~~~~~~~
 
-This is a brief example showing how simple it is to add LVGL to a new project.
+This is just a brief example of how to add LVGL to a new project. For more details
+check out :ref:`Integration Overview <adding_lvgl_to_your_project>`.
 
 .. code-block:: c
 
