@@ -1,6 +1,6 @@
-===================
-Display Controllers
-===================
+==========================
+Display Controller Support
+==========================
 
 .. toctree::
     :maxdepth: 2

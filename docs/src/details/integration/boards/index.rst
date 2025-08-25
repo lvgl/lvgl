@@ -1,8 +1,8 @@
 .. _boards:
 
-================
-Supported Boards
-================
+=============
+Board Support
+=============
 
 
 .. toctree::

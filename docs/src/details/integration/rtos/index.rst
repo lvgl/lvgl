@@ -1,6 +1,6 @@
-====
-RTOS
-====
+============
+RTOS Support
+============
 
 .. toctree:: :maxdepth: 2
 

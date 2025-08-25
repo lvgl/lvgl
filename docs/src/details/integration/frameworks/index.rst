@@ -1,6 +1,6 @@
-==========
-Frameworks
-==========
+=================
+Framework Support
+=================
 
 .. toctree::
     :maxdepth: 2

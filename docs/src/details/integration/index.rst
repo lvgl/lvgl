@@ -1,8 +1,8 @@
 .. _integration_index:
 
-===========
-Integration
-===========
+================
+Integrating LVGL
+================
 
 .. toctree::
     :maxdepth: 2

@@ -1,8 +1,8 @@
 .. _chip_vendors:
 
-============
-Chip Vendors
-============
+===================
+Chip Vendor Support
+===================
 
 .. toctree::
     :maxdepth: 2

@@ -1,8 +1,8 @@
 .. _embedded_linux:
 
-==============
-Embedded Linux
-==============
+============================
+Running under Embedded Linux
+============================
 
 .. toctree::
     :maxdepth: 2
