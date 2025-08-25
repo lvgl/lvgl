@@ -9,6 +9,7 @@ Renderers and GPUs
     arm2d
     espressif_ppa
     eve
+    m2d
     nema_gfx
     nxp_pxp
     nxp_vglite_gpu
