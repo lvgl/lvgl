@@ -751,7 +751,7 @@ void test_image_raw_data_as_file(void)
     };
 
     lv_fs_path_ex_t mempath;
-    lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, img_bin, sizeof(img_bin));
+    lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, img_bin, sizeof(img_bin), "bin");
 
     lv_obj_t * img_1 = lv_image_create(lv_screen_active());
     lv_image_set_src(img_1, (const char *)&mempath);

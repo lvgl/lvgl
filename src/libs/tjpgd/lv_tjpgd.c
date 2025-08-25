@@ -161,7 +161,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             f = lv_malloc(sizeof(lv_fs_file_t));
             if(f == NULL) return LV_RESULT_INVALID;
             lv_fs_path_ex_t path;
-            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size);
+            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size, "bin");
             lv_fs_res_t res;
             res = lv_fs_open(f, (const char *)&path, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
