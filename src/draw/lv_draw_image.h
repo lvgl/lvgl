@@ -81,6 +81,8 @@ struct _lv_draw_image_dsc_t {
      * `image_area` area*/
     uint16_t tile               : 1;
 
+    const lv_image_colorkey_t * colorkey;
+
     /**Used internally to store some information about the palette or the color of A8 images*/
     lv_draw_image_sup_t * sup;
 

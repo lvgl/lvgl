@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[120] = {
+const lv_property_name_t lv_style_property_names[121] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -64,6 +64,7 @@ const lv_property_name_t lv_style_property_names[120] = {
     {"grid_row_align",         LV_PROPERTY_STYLE_GRID_ROW_ALIGN,},
     {"grid_row_dsc_array",     LV_PROPERTY_STYLE_GRID_ROW_DSC_ARRAY,},
     {"height",                 LV_PROPERTY_STYLE_HEIGHT,},
+    {"image_colorkey",         LV_PROPERTY_STYLE_IMAGE_COLORKEY,},
     {"image_opa",              LV_PROPERTY_STYLE_IMAGE_OPA,},
     {"image_recolor",          LV_PROPERTY_STYLE_IMAGE_RECOLOR,},
     {"image_recolor_opa",      LV_PROPERTY_STYLE_IMAGE_RECOLOR_OPA,},
