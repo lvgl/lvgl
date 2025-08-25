@@ -121,9 +121,16 @@ void * lv_circle_buf_head(const lv_circle_buf_t * circle_buf);
 /**
  * Get the tail of the buffer
  * @param circle_buf pointer to buffer
- * @return pointer to the tail of the buffer
+ * @return pointer to the tail of the buffer (the value to be written next)
  */
 void * lv_circle_buf_tail(const lv_circle_buf_t * circle_buf);
+
+/**
+ * Get the latest value of the buffer
+ * @param circle_buf pointer to buffer
+ * @return pointer to the latest written value of the buffer, NULL if the buffer is empty
+ */
+void * lv_circle_buf_latest(const lv_circle_buf_t * circle_buf);
 
 /**
  * Read a value
@@ -136,7 +143,7 @@ lv_result_t lv_circle_buf_read(lv_circle_buf_t * circle_buf, void * data);
 /**
  * Write a value
  * @param circle_buf pointer to buffer
- * @param data pointer to the value to write
+ * @param data pointer to the value to write, NULL to write an uninitialized value
  * @return LV_RESULT_OK: the value is written; LV_RESULT_INVALID: the value is not written
  */
 lv_result_t lv_circle_buf_write(lv_circle_buf_t * circle_buf, const void * data);
