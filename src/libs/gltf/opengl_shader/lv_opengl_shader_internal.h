@@ -82,19 +82,19 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program);
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program);
 
 lv_opengl_shader_manager_t * lv_opengl_shader_manager_create(const lv_opengl_shader_t * sources,
-                                                     size_t len, const char * vert_src,
-                                                     const char * frag_src);
+                                                             size_t len, const char * vert_src,
+                                                             const char * frag_src);
 void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager);
 uint32_t lv_opengl_shader_hash(const char * value);
 GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager, uint32_t hash);
 void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager, uint32_t hash, GLuint id);
 uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader,
-                                            const char * shader_identifier,
-                                            const lv_opengl_shader_define_t * permutations,
-                                            size_t permutations_len);
+                                                const char * shader_identifier,
+                                                const lv_opengl_shader_define_t * permutations,
+                                                size_t permutations_len);
 lv_opengl_shader_program_t * lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
-                                                          uint32_t fragment_shader_hash,
-                                                          uint32_t vertex_shader_hash);
+                                                                  uint32_t fragment_shader_hash,
+                                                                  uint32_t vertex_shader_hash);
 
 /**********************
  *      MACROS

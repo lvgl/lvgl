@@ -415,7 +415,8 @@ static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distr
 
     uint32_t frag_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
     uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader, vert_shader);
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader,
+                                                                                vert_shader);
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 
     GL_CALL(glUseProgram(program_id));

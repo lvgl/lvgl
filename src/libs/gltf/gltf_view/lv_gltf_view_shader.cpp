@@ -303,10 +303,10 @@ lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const 
                                                         size_t n)
 {
     uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(view->shader_manager, "__MAIN__.frag",
-                                                                   defines, n);
+                                                                       defines, n);
 
     uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(view->shader_manager, "__MAIN__.vert",
-                                                                   defines, n);
+                                                                       defines, n);
     lv_opengl_shader_program_t * program =
         lv_opengl_shader_manager_get_program(view->shader_manager, frag_shader_hash, vert_shader_hash);
 

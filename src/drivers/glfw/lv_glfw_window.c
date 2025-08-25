@@ -336,7 +336,7 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
 #if LV_USE_DRAW_OPENGLES
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                                &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip);
+                                       &clip_area, window->h_flip, texture_disp == NULL ? !window->v_flip : window->v_flip);
 #else
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
                                        &clip_area, window->h_flip, window->v_flip);
@@ -399,15 +399,17 @@ static void proc_mouse(lv_glfw_window_t * window)
     LV_LL_READ_BACK(&window->textures, texture) {
         if(lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
             /* adjust the mouse pointer coordinates so that they are relative to the texture */
-            if (window->h_flip) {
+            if(window->h_flip) {
                 texture->indev_last_point.x = texture->area.x2 - window->mouse_last_point.x;
-            } else {
+            }
+            else {
                 texture->indev_last_point.x  = window->mouse_last_point.x - texture->area.x1;
             }
-            if (window->v_flip) {
+            if(window->v_flip) {
                 texture->indev_last_point.y = (texture->area.y2 - window->mouse_last_point.y);
-            } else {
-                texture->indev_last_point.y =  (window->mouse_last_point.y - texture->area.y1);
+            }
+            else {
+                texture->indev_last_point.y = (window->mouse_last_point.y - texture->area.y1);
             }
             texture->indev_last_state = window->mouse_last_state;
             lv_indev_read(texture->indev);

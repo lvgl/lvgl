@@ -618,7 +618,8 @@ static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manage
     uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
     uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
 
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(manager, frag_shader_hash,
+                                                                                vert_shader_hash);
 
     manager->bg_program = lv_opengl_shader_program_get_id(program);
     setup_background_environment(manager->bg_program, &manager->bg_vao, &manager->bg_index_buf, &manager->bg_vertex_buf);

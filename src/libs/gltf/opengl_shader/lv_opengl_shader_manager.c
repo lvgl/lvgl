@@ -78,8 +78,8 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
  **********************/
 
 lv_opengl_shader_manager_t * lv_opengl_shader_manager_create(const lv_opengl_shader_t * sources,
-                                                     size_t len, const char * vert_src,
-                                                     const char * frag_src)
+                                                             size_t len, const char * vert_src,
+                                                             const char * frag_src)
 {
     lv_opengl_shader_manager_t * shader =
         (lv_opengl_shader_manager_t *)lv_malloc_zeroed(sizeof(*shader));
@@ -136,8 +136,8 @@ uint32_t lv_opengl_shader_hash(const char * value)
 }
 
 void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager,
-                                        uint32_t texture_hash,
-                                        GLuint texture_id)
+                                            uint32_t texture_hash,
+                                            GLuint texture_id)
 {
     lv_opengl_shader_texture_t key = { .id = texture_id, .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_insert(&manager->textures_map, &key);
@@ -151,7 +151,7 @@ void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager
 }
 
 GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager,
-                                        uint32_t texture_hash)
+                                            uint32_t texture_hash)
 {
     lv_opengl_shader_texture_t key = { .hash = texture_hash };
     lv_rb_node_t * node = lv_rb_find(&manager->textures_map, &key);
@@ -164,9 +164,9 @@ GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager
 }
 
 uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader,
-                                            const char * shader_identifier,
-                                            const lv_opengl_shader_define_t * permutations,
-                                            size_t permutations_len)
+                                                const char * shader_identifier,
+                                                const lv_opengl_shader_define_t * permutations,
+                                                size_t permutations_len)
 {
     /* First check that the shader identifier exists */
     lv_opengl_shader_t key = { shader_identifier, NULL };
@@ -221,8 +221,8 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
 
 lv_opengl_shader_program_t *
 lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
-                                 uint32_t fragment_shader_hash,
-                                 uint32_t vertex_shader_hash)
+                                     uint32_t fragment_shader_hash,
+                                     uint32_t vertex_shader_hash)
 {
     lv_opengl_program_map_key_t key = {
         .vertex_shader_hash = vertex_shader_hash,
