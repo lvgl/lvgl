@@ -8,10 +8,10 @@
  *********************/
 #include "../../display/lv_display.h"
 #include "../../misc/lv_area_private.h"
-#include <src/misc/lv_types.h>
 
 #if LV_USE_OPENGLES
 
+#include "../../misc/lv_types.h"
 #include "lv_opengles_debug.h"
 #include "lv_opengles_driver.h"
 
