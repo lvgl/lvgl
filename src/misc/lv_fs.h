@@ -142,13 +142,25 @@ bool lv_fs_is_ready(char letter);
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
 
 /**
- * Make a path object for the memory-mapped file compatible with the file system interface
+ * Create a special object from buffer/ memory address which looks like a file and can be passed
+ * as path to `lv_fs_open` and other functions accepting a path.
+ *
+ * For example
+ * @code
+ *      //Create a PNG file from t a buffer and use it
+ *      lv_fs_path_ex_t p;
+ *      lv_fs_make_path_from_buffer(&p, 'A', my_buf, my_buf_size, "png");
+ *      lv_image_set_src(image1, &p);
+ *
+ * @endcode
  * @param path      path to a lv_fs_path_ex object
  * @param letter    the identifier letter of the driver. E.g. `LV_FS_MEMFS_LETTER`
  * @param buf       address of the memory buffer
  * @param size      size of the memory buffer in bytes
+ * @param ext       the extension, e.g. "png", if NULL no extension will be added.
  */
-void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size);
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size,
+                                 const char * ext);
 
 /**
  * Get the buffer address and size from a path object

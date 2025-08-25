@@ -145,13 +145,18 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     return LV_FS_RES_OK;
 }
 
-void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size)
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size, const char * ext)
 {
-    /*Make a path the contains both the address and the size.
-     *Also append .bin to make look like a real file path*/
-    lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32 ".bin", letter,
-                (size_t) buf, size);
+    /*Make a path the contains both the address and the size. */
 
+    /*Don't add the '.' and the extension if the extension is NULL*/
+    if(ext == NULL) {
+        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32, letter, (size_t) buf, size);
+    }
+    else {
+        lv_snprintf(path->path, sizeof(path->path), "%c:%zu-%" LV_PRIu32 ".%s", letter,
+                    (size_t) buf, size, ext);
+    }
 }
 
 lv_result_t lv_fs_get_buffer_from_path(lv_fs_path_ex_t * path, void ** buffer, uint32_t * size)
