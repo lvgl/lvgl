@@ -177,7 +177,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: report/
+        path: tests/report/
 
     - name: Comment coverage results on PR
       if: github.event_name == 'pull_request'
@@ -186,17 +186,33 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
-          const coverageSummary = fs.readFileSync('report/index.html', 'utf8');
-          const coverageLines = coverageSummary.match(/Lines: \d+\.\d+% \(\d+\/\d+\)/g);
-          const coverageBranches = coverageSummary.match(/Branches: \d+\.\d+% \(\d+\/\d+\)/g);
-          
-          const comment = `### Code Coverage Report
-          **Lines:** ${coverageLines[0]}
-          **Branches:** ${coverageBranches[0]}
-          
-          [Detailed Coverage Report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+          let comment;
+          try {
+            if (fs.existsSync('tests/report/index.html')) {
+              const coverageSummary = fs.readFileSync('tests/report/index.html', 'utf8');
 
-          github.rest.issues.createComment({
+              const coverageLines = coverageSummary.match(/Lines: \d+(?:\.\d+)?% \(\d+\/\d+\)/g) || ['N/A'];
+              const coverageBranches = coverageSummary.match(/Branches: \d+(?:\.\d+)?% \(\d+\/\d+\)/g) || ['N/A'];
+
+              const comment = `### Code Coverage Report
+              **Lines:** ${coverageLines[0]}
+              **Branches:** ${coverageBranches[0]}
+
+              [Detailed Coverage Report](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+            } else {
+              comment = `### Code Coverage Report
+              Coverage report not found. The coverage report could not be generated or is missing.
+
+              [Workflow Run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+            }
+          } catch (error) {
+            comment = `### Code Coverage Report
+            Error reading coverage report: ${error.message}
+
+            [Workflow Run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+          }
+
+          await github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
