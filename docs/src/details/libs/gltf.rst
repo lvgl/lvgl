@@ -293,7 +293,7 @@ The glTF viewer provides comprehensive camera controls:
     /* Set field of view (0 for orthographic) */
     lv_gltf_set_fov(gltf, 60.0f);
     
-    /* Set focal point */
+    /* Set the focal point - The position the camera is pointing at */
     lv_gltf_set_focal_x(gltf, 0.0f);
     lv_gltf_set_focal_y(gltf, 0.0f);
     lv_gltf_set_focal_z(gltf, 0.0f);
