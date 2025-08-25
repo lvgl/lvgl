@@ -11,11 +11,10 @@
 #if LV_USE_DRAW_OPENGLES
 #include "../lv_draw_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
-#include "../../drivers/glfw/lv_opengles_debug.h"
-#include "../../drivers/glfw/lv_opengles_texture.h"
-#include "../../drivers/glfw/lv_opengles_driver.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "../../drivers/opengles/lv_opengles_debug.h"
+#include "../../drivers/opengles/lv_opengles_texture.h"
+#include "../../drivers/opengles/lv_opengles_driver.h"
+#include "../../drivers/opengles/lv_opengles_private.h"
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_rect.h"
 #include "../../draw/lv_draw_arc.h"
@@ -190,9 +189,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(texture == 0) {
         lv_display_t * disp = lv_refr_get_disp_refreshing();
         if(layer != disp->layer_head) {
-            void * buf = lv_draw_layer_alloc_buf(layer);
-            if(buf == NULL) return -1;
-
             int32_t w = lv_area_get_width(&layer->buf_area);
             int32_t h = lv_area_get_height(&layer->buf_area);
 
@@ -404,24 +400,23 @@ static void blend_texture_layer(lv_draw_task_t * t)
 
     lv_layer_t * dest_layer = t->target_layer;
     unsigned int target_texture = layer_get_texture(dest_layer);
-    LV_ASSERT(target_texture != 0);
     int32_t targ_tex_w = lv_area_get_width(&dest_layer->buf_area);
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
-
-    unsigned int framebuffer = get_framebuffer(u);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    if(target_texture) {
+        unsigned int framebuffer = get_framebuffer(u);
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     // TODO rotation
     lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, false);
 
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    if(target_texture) {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    }
 
-
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
     GL_CALL(glDeleteTextures(1, &src_texture));
 }
 
@@ -489,15 +484,14 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_layer_t * dest_layer = t->target_layer;
 
     unsigned int target_texture = layer_get_texture(dest_layer);
-    LV_ASSERT(target_texture != 0);
     int32_t targ_tex_w = lv_area_get_width(&dest_layer->buf_area);
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
-
-    unsigned int framebuffer = get_framebuffer(u);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    if(target_texture) {
+        unsigned int framebuffer = get_framebuffer(u);
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     lv_area_move(&t->clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
@@ -505,7 +499,9 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
     lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, true);
 
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    if(target_texture) {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    }
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
@@ -533,18 +529,21 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             lv_area_move(&fill_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
             unsigned int target_texture = layer_get_texture(layer);
-            LV_ASSERT(target_texture != 0);
             int32_t targ_tex_w = lv_area_get_width(&layer->buf_area);
             int32_t targ_tex_h = lv_area_get_height(&layer->buf_area);
 
-            unsigned int framebuffer = get_framebuffer(u);
-            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-            GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+            if(target_texture) {
+                unsigned int framebuffer = get_framebuffer(u);
+                GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+                GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+            }
 
             lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
             lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
 
-            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            if(target_texture) {
+                GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            }
 
             return;
         }
@@ -595,10 +594,11 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
      */
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, data));
 
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
+
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
     return texture;
 }
@@ -610,15 +610,14 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
 
     lv_layer_t * dest_layer = t->target_layer;
     unsigned int target_texture = layer_get_texture(dest_layer);
-    LV_ASSERT(target_texture != 0);
     int32_t targ_tex_w = lv_area_get_width(&dest_layer->buf_area);
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
-
-    unsigned int framebuffer = get_framebuffer(u);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    if(target_texture) {
+        unsigned int framebuffer = get_framebuffer(u);
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+    }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     lv_area_t clip_area = t->clip_area;
@@ -626,8 +625,9 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
 
     lv_opengles_render_texture(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, true);
 
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+    if(target_texture) {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    }
 }
 #endif /*LV_USE_3DTEXTURE*/
 

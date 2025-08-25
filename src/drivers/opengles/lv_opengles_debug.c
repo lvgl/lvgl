@@ -10,6 +10,8 @@
 #include "lv_opengles_debug.h"
 #if LV_USE_OPENGLES
 
+#include "lv_opengles_private.h"
+
 #include "../../misc/lv_log.h"
 
 /*********************
@@ -36,6 +38,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_OPENGLES_DEBUG
 void GLClearError()
 {
     while(glGetError() != GL_NO_ERROR);
@@ -48,6 +51,7 @@ void GLLogCall(const char * function, const char * file, int line)
         LV_LOG_ERROR("[OpenGL Error] (%d) %s %s:%d", error, function, file, line);
     }
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
