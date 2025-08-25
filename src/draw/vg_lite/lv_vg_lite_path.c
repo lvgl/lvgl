@@ -647,6 +647,7 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 {
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(cb);
+    LV_PROFILER_DRAW_BEGIN;
 
     uint8_t fmt_len = lv_vg_lite_path_format_len(path->format);
     uint8_t * cur = path->path;
@@ -688,6 +689,8 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 
         cb(user_data, op_code, tmp_data, arg_len);
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src)
