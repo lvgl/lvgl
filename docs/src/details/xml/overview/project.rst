@@ -13,8 +13,9 @@ Overview
 A single ``project.xml`` file should be created for each project where the following
 content is specified:
 
-:<folders>: Specifies the path to Component Libraries. LVGL's base Widgets are
-            always loaded automatically.
+:<folders>: Specifies the list of paths to Component Libraries. LVGL's base Widgets are
+            always loaded automatically, and therefore do not need to be specified
+            in this list.
 :<targets>: Describes various hardware configurations, allowing the UI |nbsp| Editor
             to check if the UI is out of resources and to select different previews
             for each Screen according to the specified displays.

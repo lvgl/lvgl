@@ -1,8 +1,8 @@
 .. _xml_translation:
 
-============
-Translations
-============
+=====================
+Language Translations
+=====================
 
 Overview
 ********
@@ -10,7 +10,10 @@ Overview
 The XML translation module allows defining and using translated strings directly within XML files.
 
 It's built on top of :ref:`LVGL's translation module <translation>`.
-Check it out to learn more about selecting the active language, retrieving translations, and fallback behavior.
+
+Check it out to learn more about selecting the active language, retrieving
+translations, and fallback behavior.
+
 
 
 Usage

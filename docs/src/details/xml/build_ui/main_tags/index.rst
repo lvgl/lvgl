@@ -1,11 +1,10 @@
 .. _xml_main_tags:
 
-=========
-Main tags
-=========
+=============
+Main XML Tags
+=============
 
 .. toctree::
-    :class:    toctree-1-deep
     :maxdepth: 2
 
     api
