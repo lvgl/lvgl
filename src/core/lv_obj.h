@@ -170,6 +170,9 @@ typedef struct {
     uint8_t layer_type : 2;    /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
 } _lv_obj_spec_attr_t;
 
+#define STYLE_COUNT_BITS 6
+#define LV_OBJ_MAX_STYLE_COUNT ((1 << STYLE_COUNT_BITS) - 1)
+
 typedef struct _lv_obj_t {
     const lv_obj_class_t * class_p;
     struct _lv_obj_t * parent;
@@ -185,7 +188,7 @@ typedef struct _lv_obj_t {
     uint16_t readjust_scroll_after_layout : 1;
     uint16_t scr_layout_inv : 1;
     uint16_t skip_trans : 1;
-    uint16_t style_cnt  : 6;
+    uint16_t style_cnt  : STYLE_COUNT_BITS;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t being_deleted   : 1;

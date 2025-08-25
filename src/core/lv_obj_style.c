@@ -75,6 +75,10 @@ void _lv_obj_style_init(void)
 
 void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
 {
+    if(obj->style_cnt == LV_OBJ_MAX_STYLE_COUNT) {
+        LV_LOG_WARN("Object style count has reached it's maximum value of %d styles", LV_OBJ_MAX_STYLE_COUNT);
+        return;
+    }
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     uint32_t i;
