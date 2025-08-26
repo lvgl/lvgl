@@ -7,15 +7,33 @@ Introduction
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
-The LVGL XML Module implements LVGL's Declarative UI by loading UI elements written in
-XML.  The XML file can be written by hand, but it's highly recommended to use `LVGL's
-UI editor  <https://lvgl.io/editor>`__ to write the XML files.  This UI editor
-provides features like:
+.. glossary::
 
-- Instant preview of the XML files
-- Autocomplete and Syntax highlighting
-- Online preview for collaboration and testing
-- `Figma <https://www.figma.com/>`__ integration to easily reimplement Figma designs
+    Declarative UI
+
+        Declarative UI (user interface) is an approach to UI creation in which the
+        creator describes *what* elements are needed in the UI, what data they are
+        bound to, and to some degree, what they should look like, but can leave out
+        details such as their exact position or in what sequence they should be
+        created at run time.
+
+    Imperative UI
+
+        Imperative UI is an approach to UI creation in which the creator describes
+        every detail of how the UI is created at run time.  Imperative UI is the
+        UI-building approach you use when you build your LVGL UI in C code.
+
+The LVGL XML Module implements LVGL's :term:`Declarative UI` by loading UI elements
+written in XML.  The XML file can be written by hand, but it is considerably more
+efficient to write the XML files using `LVGL's UI Editor  <https://lvgl.io/editor>`__
+and thus highly recommended.  This UI Editor provides features like:
+
+- instant preview of the XML files,
+- auto-complete,
+- syntax highlighting,
+- online preview for collaboration and testing,
+- `Figma <https://www.figma.com/>`__ integration to efficiently implement Figma
+  designs in LVGL.
 
 .. warning::
 
@@ -60,7 +78,7 @@ push it back to the git repository so that other projects can be updated from it
 The built-in Widgets of LVGL are considered ``the core Component Library`` which is
 always available.
 
-A UI editor project can have any number of Component Libraries but will always
+A UI Editor project can have any number of Component Libraries but will always
 have at least 2:
 
 - LVGL's built-in Widgets, and
@@ -88,11 +106,11 @@ but rather compiled into the application as C code.  The main characteristics of
 - They can have a large API with ``set/get/add`` functions.
 - They can themselves contain Widgets as children (e.g. ``Tabview``'s tabs, ``Dropdown``'s lists).
 
-Any handwritten Widget can be accessed from XML by:
+Any custom Widgets you create can be accessed from XML by:
 
 1. Defining its API in an XML file.
 2. Writing and registering an XML parser for it.
-   `See some examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
+   `See examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
 
 
 Components
@@ -109,10 +127,11 @@ The main characteristics of Components are:
 - They can contain (as children) Widgets and/or other Components.
 - They can have a simple API to pass properties to their children (e.g. ``btn_text`` to a Label's text).
 
-Regardless of whether the XML was written manually or by the UI |nbsp| editor, the XML files
-defining Components can be registered in LVGL, and after that, instances can be created.
-In other words, LVGL can just read the XML files, "learn" the Components from them, and
-thereafter create children as part of Screens and other Components.
+Regardless of whether the XML was written manually or by the UI |nbsp| Editor, the XML
+files defining Components can be registered in LVGL, and after that, instances can be
+created.  In other words, LVGL can just read the XML files, "learn" the Components
+from them, and thereafter create those components as children of Screens and/or other
+Components.
 
 
 Screens
@@ -124,7 +143,7 @@ Screens
 - They are built from Widgets and/or other Components to describe the :ref:`Screen <screens>`.
 - They can be loaded from XML at runtime as they describe only visual aspects of the UI.
 - They do not have an API.
-- They can be referenced in Screen load events.
+- They can be referenced in Screen-load events.
 
 
 
@@ -148,7 +167,7 @@ will be children of these root elements:
             children and their properties.
 
 This is a simple example illustrating what an LVGL XML Component looks like.
-Note that only the basic features are shown here.
+Only basic features are shown.
 
 .. code-block:: xml
 
@@ -183,34 +202,36 @@ Usage Teaser
 
 LVGL's UI editor can be used in two different ways.
 
+
 Export C and H Files
 --------------------
 
 The Widgets, Components, Screens, images, fonts, etc., can be converted to .C/.H files having
-plain LVGL code. The exported code works the same way as if it was written by the
-user.
+code that accesses the LVGL API in the same way user-written code does.
 
-In this case, the XML files are not required anymore to run the C code (unless modifications may
-be made later and code is exported again).
+In this case, the XML files are not required anymore to run the C code (unless modifications
+are made later and code is exported again).
 
-The XML files were used only during editing/implementing the Widgets and Components to save
-recompilation time and optionally leverage other useful UI |nbsp| Editor features.
+The XML files were used only during Widget and Component creation to save
+recompilation time and optionally to take advantage of other useful UI editor features.
+
 
 Load the UI from XML
 --------------------
 
-Although the Widgets' code always needs to be exported in C and compiled into the
-application (just like the built-in LVGL Widgets are also part of the application), the Components'
-XML can be loaded and any number of instances can be created at runtime.
+Although Widgets' XML always needs to be exported in C and compiled into the
+application (just like the built-in LVGL Widgets' C code is compiled into the
+application), the XML for Components can be loaded (learned) at runtime, and
+thereafter any number of instances of them can be created.
 
 In the simplest case, a Component can be registered with
 :cpp:expr:`lv_xml_component_register_from_file(path)` and an instance can be created with
 :cpp:expr:`lv_obj_t * obj = lv_xml_create(parent, "my_button", NULL)`.
 
-Note that loading the UI from XML practically has no impact on performance.
-Once the XML files are registered and the UI is created, it behaves the same way
-as if it were created from C code.
+Note that loading UI components from XML has virtually no impact on performance.
+Once the XML files are registered and the UI is created, the performance, appearance
+and behavior are exactly the same as if it were created from C code.
 
-Registering XMLs and creating instances is not memory hungry nor slow. The biggest
-memory overhead is that the ``<view>`` of the Components is saved in RAM (typically
-1–2 kB/component).
+Registering XML Components and creating instances are neither memory hungry nor slow.
+The biggest memory overhead is that the ``<view>`` of the Components is saved in RAM
+(typically 1–2 kB/component).

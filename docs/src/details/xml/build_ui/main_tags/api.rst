@@ -13,6 +13,8 @@ The only common point is that both Widgets and Components support having
 However, as Widgets and Components work very differently (Widgets have C code,
 but Components are pure XML), even properties are interpreted differently.
 
+
+
 Components
 **********
 
@@ -41,6 +43,7 @@ These properties are set once (at creation time), and there are no specific
 ``set`` functions to modify the property later. LVGL's general API can still be
 used to modify any widget in the component, but no dedicated API functions are generated.
 
+
 Referencing properties
 ----------------------
 
@@ -49,6 +52,7 @@ For example, if a component has ``<prop name="button_label" type="string"/>``,
 it can be used in a label as ``<lv_label text="$button_label"/>``.
 
 In the generated code, these are passed as arguments in create/set functions.
+
 
 Default values
 --------------
@@ -59,11 +63,13 @@ This can be ensured by:
 - Simply setting them in the XML instance
 - Providing a default value in the ``<api>``, e.g., ``<prop name="foo" type="string" default="bar"/>``
 
+
 Limitations
 -----------
 
 Note that none of the Widget API features such as ``<param>``, ``<enumdef>``, or ``<element>``
 can be used for Components. Only simple properties that are forwarded are supported.
+
 
 Example
 -------
@@ -92,8 +98,11 @@ Example
         </view>
     </component>
 
+
+
 Widgets
 *******
+
 
 Properties
 ----------
@@ -105,6 +114,7 @@ Properties are the core part of describing a Widget's API.
     <api>
         <prop name="text" type="string" help="Text of the label."/>
     </api>
+
 
 Parameters
 ----------
@@ -137,6 +147,7 @@ Unset parameters fall back to:
 - Their default value (if defined)
 - Type-specific defaults (e.g., 0, false, NULL)
 
+
 Mapping
 -------
 
@@ -147,6 +158,7 @@ See `the LVGL XML parsers <https://github.com/lvgl/lvgl/tree/master/src/others/x
 If ``<param>``s are used, they are passed to the same ``set`` function.
 If a property is not set on a Widget instance, it is skipped and the Widget's
 built-in default is used.
+
 
 <enumdef>
 ---------
@@ -167,6 +179,7 @@ Only used with Widgets, this tag defines enums for parameter values.
 
 Enum values are ignored in export; the names are used and resolved by the compiler.
 XML parsers must handle mapping enum names to C enums.
+
 
 .. _xml_widget_element:
 
