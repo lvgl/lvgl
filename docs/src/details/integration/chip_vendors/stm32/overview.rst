@@ -55,24 +55,54 @@ See the individual pages about them.
 Each page mentions if/how they can be used with each other.
 
 
+
+
+
+
+
+
+
+
+
+
 Including LVGL in a Project
 ---------------------------
 
-It's easy to add LVGL to your STM32 project.
-
 - Create or open a project in STM32CubeIDE.
-- Copy the entire LVGL folder to *[project_folder]/Drivers/lvgl*.
+- ``git clone`` or copy LVGL into your project directory.
 - In the STM32CubeIDE **Project Explorer** pane: right click on the
-  LVGL folder that you copied (you may need to refresh the view first
-  before it will appear), and select **Add/remove include path…**. If
-  this doesn't appear, or doesn't work, you can review your project
+  LVGL folder and select **Add/remove include path…**. If
+  this doesn't appear or doesn't work, you can review your project
   include paths under the **Project** -> **Properties** menu, and then
   navigating to **C/C++ Build** -> **Settings** -> **Include paths**, and
   ensuring that the LVGL directory is listed.
 
 Now that the source files are included in your project, follow the instructions to
 :ref:`add LVGL to your project <adding_lvgl_to_your_project>` and to create the
-``lv_conf.h`` file, and initialise the display.
+``lv_conf.h`` file and initialize the display.
+Before manually initializing your display though, check to see
+if your project uses the LTDC (LCD-TFT Display Controller) peripheral. If it
+does, you can simply :ref:`use LVGL's LTDC driver <stm32 ltdc driver>`.
+For info about driving a display specifically on an STM32, read the
+:ref:`STM32 LCD guide <lcd_stm32_guide>`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 STM32 HAL Example
