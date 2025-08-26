@@ -110,6 +110,7 @@ extern "C" {
 #include "src/libs/gltf/gltf_data/lv_gltf_model.h"
 #include "src/libs/gltf/gltf_view/lv_gltf.h"
 #include "src/libs/gif/lv_gif.h"
+#include "src/libs/gstreamer/lv_gstreamer.h"
 #include "src/libs/qrcode/lv_qrcode.h"
 #include "src/libs/tjpgd/lv_tjpgd.h"
 #include "src/libs/libjpeg_turbo/lv_libjpeg_turbo.h"

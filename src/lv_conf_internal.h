@@ -3038,6 +3038,14 @@
     #endif
 #endif
 
+/** GStreamer library */
+#ifndef LV_USE_GSTREAMER
+    #ifdef CONFIG_LV_USE_GSTREAMER
+        #define LV_USE_GSTREAMER CONFIG_LV_USE_GSTREAMER
+    #else
+        #define LV_USE_GSTREAMER 0
+    #endif
+#endif
 
 /** Decode bin images to RAM */
 #ifndef LV_BIN_DECODER_RAM_LOAD
