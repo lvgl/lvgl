@@ -117,9 +117,9 @@ static void _g2d_draw_core_cb(lv_draw_task_t * t, const lv_draw_image_dsc_t * dr
     /* G2D takes stride in pixels. */
     const uint8_t pixel_size = lv_color_format_get_size(src_cf);
 
-    uint32_t src_stride = img_dsc->header.stride == 0 ?
-                          lv_color_format_get_size(img_dsc->header.cf) * img_dsc->header.w :
-                          img_dsc->header.stride;
+    uint32_t src_stride = draw_dsc->header.stride == 0 ?
+                          lv_color_format_get_size(draw_dsc->header.cf) * draw_dsc->header.w :
+                          draw_dsc->header.stride;
     LV_ASSERT(pixel_size != 0);
     src_stride /= pixel_size;
 
