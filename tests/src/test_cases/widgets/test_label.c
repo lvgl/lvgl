@@ -667,6 +667,7 @@ void test_label_recolor_with_text_wrap(void)
     /* The bug would manifest as improper recolor handling when text wraps */
     /* This test verifies that recolor commands work correctly with text wrapping */
     /* No assertion needed - the test passes if no crashes occur during rendering */
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor_2.png");
 }
 
 static void scroll_next_step(lv_obj_t * label1, lv_obj_t * label2, const char * text1, const char * text2, uint32_t idx)
