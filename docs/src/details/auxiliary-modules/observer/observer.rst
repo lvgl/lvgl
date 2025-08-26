@@ -477,7 +477,7 @@ the Subject's value is used to update the Label's text as follows:
                     text.  See :ref:`observer_format_string` for other options.
 
 :integer Subject:   Subject's integer value is used with the ``format_string`` argument.
-                    See See :ref:`observer_format_string` for details.
+                    See :ref:`observer_format_string` for details.
 
 Note that this is a one-way binding (Subject ===> Widget).
 
@@ -532,7 +532,7 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Arc Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_ARC` to be configured to ``1``.)
 
-It support integer and float subjects.
+It supports integer and float Subjects.
 
 
 - :cpp:expr:`lv_arc_bind_value(arc, &subject)`
@@ -546,7 +546,7 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Slider Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_SLIDER` to be configured to ``1``.)
 
-It support integer and float subjects.
+It supports integer and float Subjects.
 
 - :cpp:expr:`lv_slider_bind_value(slider, &subject)`
 
@@ -556,10 +556,10 @@ Roller Widgets
 
 This method of subscribing to an integer Subject affects a Roller Widget's integer
 value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
-user's direct interaction with the Slider Widget updates the Subject's value and vice
+user's direct interaction with the Roller Widget updates the Subject's value and vice
 versa.  (Requires :c:macro:`LV_USE_ROLLER` to be configured to ``1``.)
 
-It support only integer subjects.
+It supports only integer Subjects.
 
 - :cpp:expr:`lv_roller_bind_value(roller, &subject)`
 
@@ -572,7 +572,7 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Drop-Down Widget updates the Subject's value and
 vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
 
-It support only integer subjects.
+It supports only integer Subjects.
 
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
@@ -584,7 +584,7 @@ minimum or maximum values directly.  Note that this is a one-way binding (Subjec
 as the Scale Section's boundaries are not interactive.
 (Requires :c:macro:`LV_USE_SCALE` to be configured to ``1``.)
 
-It supports only integer subjects.
+It supports only integer Subjects.
 
 - :cpp:expr:`lv_scale_bind_section_min_value(scale, section1, &subject)`
 - :cpp:expr:`lv_scale_bind_section_max_value(scale, section1, &subject)`
