@@ -213,11 +213,13 @@ def generate_test_images():
                     print(f"converting {os.path.basename(png)}, format: {fmt.name}, compress: {compress_name}")
 
 
-def clean_build_dirs_with_filter(build_dir, filter_name):
+def clean_build_dirs_with_filter(build_dir, clean_filters):
     for entry in os.listdir(build_dir):
         entry_path = os.path.join(build_dir, entry)
-        if entry == filter_name:
+
+        if any(entry.endswith(filter) for filter in clean_filters):
             continue
+
         if os.path.isfile(entry_path):
             os.remove(entry_path)
         elif os.path.isdir(entry_path):
@@ -290,12 +292,15 @@ if __name__ == "__main__":
         if args.auto_clean:
             build_dir = get_build_dir(options_name)
 
-            # Clean the build directory without CMakeFiles directory for report
             if args.report:
-                clean_build_dirs_with_filter(build_dir, 'CMakeFiles')
+                # Keep the files that gcovr analysis depends on and delete
+                # the rest to solve the storage capacity limit of GitHub CI
+                clean_filters = ['CMakeFiles', '.c']
+                clean_build_dirs_with_filter(build_dir, clean_filters)
                 print(f"Append {build_dir} to clean list")
                 clean_build_dirs.append(build_dir)
             else:
+                # Remove all build directories directly
                 print(f"Removing {build_dir}")
                 shutil.rmtree(build_dir)
 
