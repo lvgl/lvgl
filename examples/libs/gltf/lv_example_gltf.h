@@ -1,10 +1,10 @@
 /**
- * @file lv_3dtexture_private.h
+ * @file lv_example_gltf.h
  *
  */
 
-#ifndef LV_3DTEXTURE_PRIVATE_H
-#define LV_3DTEXTURE_PRIVATE_H
+#ifndef LV_EXAMPLE_GLTF_H
+#define LV_EXAMPLE_GLTF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,10 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_3dtexture.h"
-#if LV_USE_3DTEXTURE
-
-#include "../../core/lv_obj_private.h"
+#include "../../lv_examples.h"
 
 /*********************
  *      DEFINES
@@ -27,26 +24,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of 3dtexture*/
-struct _lv_3dtexture_t {
-    lv_obj_t obj;
-    lv_3dtexture_id_t id;
-    bool h_flip;
-    bool v_flip;
-};
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_gltf_1(void);
+void lv_example_gltf_2(void);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_3DTEXTURE*/
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_3DTEXTURE_PRIVATE_H*/
+#endif /*LV_EXAMPLE_GLTF_H*/
