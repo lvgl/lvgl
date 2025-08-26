@@ -307,7 +307,7 @@ if __name__ == "__main__":
     if args.report:
         generate_code_coverage_report()
 
-    # Clean the all build directory after report
+    # Clean all build directories after report
     for build_dir in clean_build_dirs:
         print(f"Removing {build_dir}")
         shutil.rmtree(build_dir)
