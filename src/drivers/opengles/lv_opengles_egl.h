@@ -39,9 +39,9 @@ typedef void (*lv_opengles_egl_window_cb_t)(lv_opengles_window_t * window);
  * @param ver_res               height in pixels of the window
  * @param native_window_handle  a handle to a native window for the platform
  * @param device                a `EGLNativeDisplayType`
- # @param pre                   called before rendering
- # @param post1                 called after rendering, before swapping
- # @param post2                 called after swapping
+ * @param pre                   called before rendering
+ * @param post1                 called after rendering, before swapping
+ * @param post2                 called after swapping
  * @return                      the new EGL OpenGL window handle
  */
 lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle,
