@@ -413,11 +413,13 @@ static void blend_texture_layer(lv_draw_task_t * t)
     // TODO rotation
     bool h_flip = false;
     bool v_flip = false;
+#if LV_USE_3DTEXTURE
     if(t->type == LV_DRAW_TASK_TYPE_3D) {
         lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
     }
+#endif
     lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, h_flip,
                                v_flip);
 
@@ -435,11 +437,13 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
     bool h_flip = false;
     bool v_flip = false;
+#if LV_USE_3DTEXTURE
     if(t->type == LV_DRAW_TASK_TYPE_3D) {
         lv_draw_3d_dsc_t * _3d_dsc = (lv_draw_3d_dsc_t *)t->draw_dsc;
         h_flip = _3d_dsc->h_flip;
         v_flip = _3d_dsc->v_flip;
     }
+#endif
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
