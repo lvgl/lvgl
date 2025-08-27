@@ -46,10 +46,6 @@ void lv_draw_dave2d_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
-#if D2_RENDER_EACH_OPERATION
-    d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
-#endif
-
     //
     // Generate render operations
     //
@@ -170,15 +166,6 @@ void lv_draw_dave2d_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
             }
         }
     }
-
-    //
-    // Execute render operations
-    //
-
-#if D2_RENDER_EACH_OPERATION
-    d2_executerenderbuffer(u->d2_handle, u->renderbuffer, 0);
-    d2_flushframe(u->d2_handle);
-#endif
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
