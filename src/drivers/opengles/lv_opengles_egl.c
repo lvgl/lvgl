@@ -477,7 +477,7 @@ static void window_update_handler(lv_timer_t * t)
                 GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
                 lv_opengles_render_texture(window_display_texture, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, true);
+                                           &texture->area, false, false);
 #endif
             }
             else {
@@ -495,10 +495,10 @@ static void window_update_handler(lv_timer_t * t)
 
 #if LV_USE_DRAW_OPENGLES
                 lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, texture->disp == NULL);
+                                           &texture->area, false, texture->disp != NULL);
 #else
                 lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, true);
+                                           &texture->area, false, false);
 #endif
             }
         }

@@ -226,7 +226,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
     float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     hor_scale = h_flip ? -hor_scale : hor_scale;
-    ver_scale = v_flip ? -ver_scale : ver_scale;
+    ver_scale = v_flip ? ver_scale : -ver_scale;
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
@@ -242,10 +242,10 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
                         : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, x_coef, ix_co);
         float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, x_coef, ix_co)
                         : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, x_coef, ix_co);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co);
+        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co)
+                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co);
+        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co)
+                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co);
 
         float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
