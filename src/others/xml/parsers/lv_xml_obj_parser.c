@@ -43,7 +43,6 @@ typedef struct {
  **********************/
 static lv_obj_flag_t flag_to_enum(const char * txt);
 static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const char * name, const char * value);
-static void free_user_data_event_cb(lv_event_t * e);
 static void screen_create_on_trigger_event_cb(lv_event_t * e);
 static void screen_load_on_trigger_event_cb(lv_event_t * e);
 static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
@@ -275,7 +274,7 @@ void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attr
     if(user_data_str) user_data = lv_strdup(user_data_str);
 
     lv_obj_add_event_cb(obj, cb, code, user_data);
-    if(user_data) lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
+    if(user_data) lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
 void * lv_obj_xml_subject_set_create(lv_xml_parser_state_t * state, const char ** attrs)
@@ -892,13 +891,45 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
     else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
     else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
+    else if(lv_streq(prop_name, "style_grid_column_dsc_array") ||
+            lv_streq(prop_name, "style_grid_row_dsc_array")) {
+
+        uint32_t item_cnt = 0;
+        uint32_t i;
+        for(i = 0; value[i] != '\0'; i++) {
+            if(value[i] == ' ') item_cnt++;
+        }
+
+        int32_t * dsc_array = lv_malloc((item_cnt + 2) * sizeof(int32_t)); /*+2 for LV_GRID_TEMPLATE_LAST*/
+
+        char * value_buf = (char *)value;
+        item_cnt = 0;
+        const char * sub_value = lv_xml_split_str(&value_buf, ' ');
+        while(sub_value) {
+            if(sub_value[0] == 'f' && sub_value[1] == 'r') {
+                dsc_array[item_cnt] = LV_GRID_FR(lv_xml_atoi(sub_value + 3)); /*+3 to skip "fr("*/
+            }
+            else {
+                dsc_array[item_cnt] = lv_xml_atoi(sub_value);
+            }
+
+            item_cnt++;
+            sub_value = lv_xml_split_str(&value_buf, ' ');
+        }
+
+        dsc_array[item_cnt] = LV_GRID_TEMPLATE_LAST;
+
+        lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, dsc_array);
+
+        if(lv_streq(prop_name, "style_grid_column_dsc_array")) {
+            lv_obj_set_style_grid_column_dsc_array(obj, dsc_array, selector);
+        }
+        else {
+            lv_obj_set_style_grid_row_dsc_array(obj, dsc_array, selector);
+        }
+    }
 }
 
-
-static void free_user_data_event_cb(lv_event_t * e)
-{
-    lv_free(lv_event_get_user_data(e));
-}
 
 static void screen_create_on_trigger_event_cb(lv_event_t * e)
 {

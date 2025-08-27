@@ -23,12 +23,14 @@ extern "C" {
 #if LV_USE_DRAW_EVE
 
 #include "lv_draw_eve_target.h"
+#include "lv_draw_eve_ram_g.h"
 #include "../lv_draw_private.h"
 #include "../../misc/lv_types.h"
 #include "../../core/lv_global.h"
 #include "../lv_draw_triangle.h"
 #include "../lv_draw_line.h"
 #include "../lv_draw_label.h"
+#include "../../font/lv_font_fmt_txt.h"
 #include "../lv_draw_arc.h"
 
 /*********************
@@ -66,6 +68,8 @@ struct _lv_draw_eve_unit_t {
 
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                        const lv_area_t * coords);
+bool lv_draw_eve_image_src_check(const void * src);
+uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc_t * img_dsc);
 
 void lv_draw_eve_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
@@ -76,6 +80,9 @@ void lv_draw_eve_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
 
 void lv_draw_eve_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
                        const lv_area_t * coords);
+bool lv_draw_eve_label_font_check(const lv_font_t * font);
+uint32_t lv_draw_eve_label_upload_glyph(bool burst_is_active, const lv_font_fmt_txt_dsc_t * font_dsc,
+                                        uint32_t gid_index);
 
 void lv_draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 

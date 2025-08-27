@@ -1042,7 +1042,7 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     }
 
     if(row) {
-        int32_t y = p.y + lv_obj_get_scroll_y(obj);;
+        int32_t y = p.y + lv_obj_get_scroll_y(obj);
         y -= obj->coords.y1;
         y -= lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
 

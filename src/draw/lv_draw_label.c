@@ -281,6 +281,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     /*Go the first visible line*/
     while(pos.y + line_height_font < t->clip_area.y1) {
         /*Go to next line*/
+        remaining_len -= line_end - line_start;
         line_start = line_end;
         line_end += lv_text_get_next_line(&dsc->text[line_start], remaining_len, font, NULL, &attributes);
         pos.y += line_height;

@@ -89,6 +89,15 @@ uint32_t lv_tabview_get_tab_count(lv_obj_t * obj);
 uint32_t lv_tabview_get_tab_active(lv_obj_t * obj);
 
 /**
+ * Get a given tab button by index
+ * @param obj       pointer to a tabview widget
+ * @param idx       zero based index of the tab button to get.
+ *                  < 0 means start counting tab button from the back (-1 is the last tab button)
+ * @return          pointer to the tab button, or NULL if the index was out of range
+ */
+lv_obj_t * lv_tabview_get_tab_button(lv_obj_t * obj, int32_t idx);
+
+/**
  * Get the widget where the container of each tab is created
  * @param obj       pointer to a tabview widget
  * @return          the main container widget

@@ -46,10 +46,21 @@ void test_canvas_functions_invalidate(void)
     TEST_ASSERT(draw_counter == 0);
 
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_NATIVE);
+
+    /* test uninitialized draw buffer, it should fail.*/
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    TEST_ASSERT_NULL(lv_canvas_get_draw_buf(canvas));
+    TEST_ASSERT_NULL(lv_canvas_get_image(canvas));
+    TEST_ASSERT_NULL(lv_canvas_get_buf(canvas));
+
     LV_DRAW_BUF_INIT_STATIC(draw_buf);
     canvas_draw_buf_reshape(&draw_buf);
 
     lv_canvas_set_draw_buf(canvas, &draw_buf);
+    TEST_ASSERT_EQUAL_PTR(lv_canvas_get_draw_buf(canvas), &draw_buf);
+    TEST_ASSERT_EQUAL_PTR(lv_canvas_get_image(canvas), &draw_buf);
+    TEST_ASSERT_EQUAL_PTR(lv_canvas_get_buf(canvas), draw_buf.unaligned_data);
+
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 1);
 

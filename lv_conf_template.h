@@ -986,6 +986,9 @@
 /** Rlottie library */
 #define LV_USE_RLOTTIE 0
 
+/** Requires `LV_USE_3DTEXTURE = 1` */
+#define LV_USE_GLTF  0
+
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
 #define LV_USE_VECTOR_GRAPHIC  0
@@ -1415,6 +1418,9 @@
 
     /** Vector graphic demo */
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
+    /** GLTF demo */
+    #define LV_USE_DEMO_GLTF            0
 
     /*---------------------------
      * Demos from lvgl/lv_demos

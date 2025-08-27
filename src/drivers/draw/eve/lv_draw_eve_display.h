@@ -56,6 +56,38 @@ void * lv_draw_eve_display_get_user_data(lv_display_t * disp);
 lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp);
 
 
+/* RAM_G asset pre-upload functions */
+
+/**
+ * Upload an image src to RAM_G now instead of as-needed during rendering.
+ * @param disp    pointer to the lv_draw_eve display
+ * @param src     image src. The value passed to `lv_image_set_src`
+ */
+void lv_draw_eve_pre_upload_image(lv_display_t * disp, const void * src);
+
+/**
+ * Upload font glyphs to RAM_G now instead of as-needed during rendering.
+ * Upload all the glyphs in the range of unicode code points (inclusive of the start and end values).
+ * It can be called multiple times with different ranges.
+ * @param disp                  pointer to the lv_draw_eve display
+ * @param font                  the font to upload glyphs from
+ * @param unicode_range_start   the first unicode code point in the range of glyphs to upload
+ * @param unicode_range_end     the last unicode code point (inclusive) in the range of glyphs to upload
+ */
+void lv_draw_eve_pre_upload_font_range(lv_display_t * disp, const lv_font_t * font, uint32_t unicode_range_start,
+                                       uint32_t unicode_range_end);
+
+/**
+ * Upload font glyphs to RAM_G now instead of as-needed during rendering.
+ * It will upload all the glyphs needed to render the string `text`.
+ * It can be called multiple times with different strings.
+ * @param disp    pointer to the lv_draw_eve display
+ * @param font    the font to upload glyphs from
+ * @param text    the ASCII or UTF-8 string that will be iterated for glyphs to upload
+ */
+void lv_draw_eve_pre_upload_font_text(lv_display_t * disp, const lv_font_t * font, const char * text);
+
+
 /* Low-level EVE control functions */
 
 /**
