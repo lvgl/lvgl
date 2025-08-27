@@ -541,6 +541,9 @@
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 #endif
 
+/* Enable usage of the LVGL's vg_lite spec driver */
+#define LV_USE_VG_LITE_DRIVER  0
+
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
 #define LV_USE_GESTURE_RECOGNITION 0
