@@ -343,6 +343,7 @@ static void delete_cb(lv_event_t * e)
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
     LV_ASSERT_NULL(drv);
     lv_free(drv);
+    lv_display_set_driver_data(disp, NULL);
 }
 
 static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp)
