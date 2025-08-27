@@ -45,7 +45,6 @@
 #include "../../draw/lv_draw_image.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_anim_timeline_private.h"
-#include "../../font/lv_binfont_loader.h"
 
 /*********************
  *      DEFINES
@@ -57,18 +56,6 @@
  *      TYPEDEFS
  **********************/
 
-typedef enum {
-    LV_XML_TYPE_UNKNOWN,
-    LV_XML_TYPE_COMPONENT,
-    LV_XML_TYPE_TRANSLATIONS,
-    LV_XML_TYPE_TEST,
-} lv_xml_type_t;
-
-typedef struct {
-    XML_Parser parser;
-    lv_xml_type_t type;
-} load_from_file_parser_data_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -76,10 +63,6 @@ static void view_start_element_handler(void * user_data, const char * name, cons
 static void view_end_element_handler(void * user_data, const char * name);
 static void get_timeline_from_event_cb(lv_event_t * e);
 static void free_timelines_event_cb(lv_event_t * e);
-static lv_result_t load_from_pack_recursive(char * path_buf, const char * path);
-static void load_from_file(const char * path);
-static char * path_filename_without_extension(const char * path);
-static void load_from_file_start_element_handler(void * user_data, const char * name, const char ** attrs);
 
 /**********************
  *  STATIC VARIABLES
@@ -341,13 +324,6 @@ void lv_xml_set_default_asset_path(const char * path_prefix)
     lv_free((void *)xml_path_prefix);
     if(path_prefix == NULL) path_prefix = "";
     xml_path_prefix = lv_strdup(path_prefix);
-}
-
-
-lv_result_t lv_xml_load_from_pack(const char * path)
-{
-    char path_buf[LV_FS_MAX_PATH_LENGTH];
-    return load_from_pack_recursive(path_buf, path);
 }
 
 
@@ -848,215 +824,6 @@ static void free_timelines_event_cb(lv_event_t * e)
         lv_anim_timeline_delete(at_array[i]);
     }
     lv_free(at_array);
-}
-
-static lv_result_t load_from_pack_recursive(char * path_buf, const char * path)
-{
-    lv_result_t ret = LV_RESULT_OK;
-    lv_fs_res_t fs_res;
-
-    lv_fs_dir_t dir;
-    fs_res = lv_fs_dir_open(&dir, path);
-    if(fs_res != LV_FS_RES_OK) {
-        LV_LOG_WARN("Couldn't open directory %s", path);
-        return LV_RESULT_INVALID;
-    }
-
-    while(1) {
-        fs_res = lv_fs_dir_read(&dir, path_buf, LV_FS_MAX_PATH_LENGTH);
-        if(fs_res != LV_FS_RES_OK) {
-            LV_LOG_WARN("Couldn't read directory %s", path);
-            ret = LV_RESULT_INVALID;
-            goto dir_close_out;
-        }
-
-        if(path_buf[0] == '\0') {
-            break;
-        }
-
-        int full_path_len = lv_fs_join(NULL, 0, path, path_buf);
-        char * full_path = lv_malloc(full_path_len + 1);
-        LV_ASSERT_MALLOC(full_path);
-        lv_fs_join(full_path, full_path_len + 1, path, path_buf);
-
-        if(path_buf[0] == '/') {
-            ret = load_from_pack_recursive(path_buf, full_path);
-        }
-        else {
-            load_from_file(full_path);
-        }
-
-        lv_free(full_path);
-
-        if(ret != LV_RESULT_OK) {
-            goto dir_close_out;
-        }
-    }
-
-dir_close_out:
-    fs_res = lv_fs_dir_close(&dir);
-    if(fs_res != LV_FS_RES_OK) {
-        LV_LOG_WARN("Error closing directory %s", path);
-        ret = LV_RESULT_INVALID;
-    }
-
-    return ret;
-}
-
-static void load_from_file(const char * path)
-{
-    lv_image_header_t img_header;
-    lv_font_t * font;
-
-    const char * ext = lv_fs_get_ext(path);
-
-    if(lv_streq(ext, "xml")) {
-        lv_fs_res_t fs_res;
-        lv_fs_file_t f;
-        fs_res = lv_fs_open(&f, path, LV_FS_MODE_RD);
-        if(fs_res != LV_FS_RES_OK) {
-            LV_LOG_WARN("Couldn't open %s", path);
-            return;
-        }
-
-        /* Determine file size */
-        lv_fs_seek(&f, 0, LV_FS_SEEK_END);
-        uint32_t file_size = 0;
-        lv_fs_tell(&f, &file_size);
-        lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
-
-        /* Create the buffer */
-        char * xml_buf = lv_malloc(file_size + 1);
-        if(xml_buf == NULL) {
-            LV_LOG_WARN("Memory allocation failed for file %s (%d bytes)", path, file_size + 1);
-            lv_fs_close(&f);
-            return;
-        }
-
-        /* Read the file content  */
-        uint32_t rn;
-        fs_res = lv_fs_read(&f, xml_buf, file_size, &rn);
-        if(fs_res != LV_FS_RES_OK || rn != file_size) {
-            LV_LOG_WARN("Couldn't read %s fully", path);
-            lv_free(xml_buf);
-            lv_fs_close(&f);
-            return;
-        }
-
-        lv_fs_close(&f);
-
-        /* Null-terminate the buffer */
-        xml_buf[rn] = '\0';
-
-        load_from_file_parser_data_t parser_data;
-
-        XML_Memory_Handling_Suite mem_handlers;
-        mem_handlers.malloc_fcn = lv_malloc;
-        mem_handlers.realloc_fcn = lv_realloc;
-        mem_handlers.free_fcn = lv_free;
-        XML_Parser parser = XML_ParserCreate_MM(NULL, &mem_handlers, NULL);
-        parser_data.parser = parser;
-        parser_data.type = LV_XML_TYPE_UNKNOWN;
-        XML_SetUserData(parser, &parser_data);
-        XML_SetStartElementHandler(parser, load_from_file_start_element_handler);
-
-        /* Parse the XML */
-        enum XML_Status parser_res = XML_Parse(parser, xml_buf, file_size, XML_TRUE);
-        enum XML_Error parser_error = XML_GetErrorCode(parser);
-        if(parser_res == XML_STATUS_ERROR && parser_error != XML_ERROR_ABORTED) {
-            LV_LOG_WARN("XML parsing error: %s on line %lu", XML_ErrorString(parser_error),
-                        XML_GetCurrentLineNumber(parser));
-            XML_ParserFree(parser);
-            lv_free(xml_buf);
-            return;
-        }
-        XML_ParserFree(parser);
-
-        switch(parser_data.type) {
-            case LV_XML_TYPE_COMPONENT: {
-                    char * component_name = path_filename_without_extension(path);
-                    lv_xml_component_register_from_data(component_name, xml_buf);
-                    lv_free(component_name);
-                    break;
-                }
-            case LV_XML_TYPE_TRANSLATIONS:
-#if LV_USE_TRANSLATION
-                lv_xml_translation_register_from_data(xml_buf);
-#else
-                LV_LOG_WARN("Translation XML found but translations not enabled");
-#endif
-                break;
-            case LV_XML_TYPE_TEST:
-#if LV_USE_TEST
-                lv_xml_test_register_from_data(xml_buf, "");
-#else
-                LV_LOG_WARN("Test suite XML found but testing not enabled");
-#endif
-                break;
-            default:
-                LV_LOG_WARN("Unknown XML type found in pack");
-                break;
-        }
-
-        lv_free(xml_buf);
-    }
-    else if(LV_RESULT_OK == lv_image_decoder_get_info(path, &img_header)) {
-        char * img_name = path_filename_without_extension(path);
-        lv_xml_register_image(NULL, img_name, path);
-        lv_free(img_name);
-    }
-    else if(NULL != (font = lv_binfont_create(path))) {
-        lv_xml_component_scope_t * scope = lv_xml_component_get_scope("globals");
-        if(scope) {
-            char * font_name = path_filename_without_extension(path);
-            lv_xml_register_font(scope, font_name, font);
-            lv_xml_font_t * new_font;
-            LV_LL_READ(&scope->font_ll, new_font) {
-                if(lv_streq(new_font->name, font_name))  {
-                    new_font->font_destroy_cb = lv_binfont_destroy;
-                    break;
-                }
-            }
-            lv_free(font_name);
-        }
-        else {
-            LV_LOG_WARN("No global scope found to register font '%s' from pack", path);
-            lv_binfont_destroy(font);
-        }
-    }
-    else {
-        LV_LOG_WARN("Did not use '%s' from XML pack.", path);
-    }
-}
-
-static char * path_filename_without_extension(const char * path)
-{
-    const char * last = lv_fs_get_last(path);
-    const char * ext = lv_fs_get_ext(last);
-    char * filename = lv_strdup(last);
-    LV_ASSERT_MALLOC(filename);
-    if(ext[0]) {
-        filename[lv_strlen(last) - lv_strlen(ext) - 1] = '\0'; /*Trim the extension*/
-    }
-    return filename;
-}
-
-static void load_from_file_start_element_handler(void * user_data, const char * name, const char ** attrs)
-{
-    LV_UNUSED(attrs);
-    load_from_file_parser_data_t * data = user_data;
-
-    if(lv_streq(name, "component")) {
-        data->type = LV_XML_TYPE_COMPONENT;
-    }
-    else if(lv_streq(name, "translations")) {
-        data->type = LV_XML_TYPE_TRANSLATIONS;
-    }
-    else if(lv_streq(name, "test")) {
-        data->type = LV_XML_TYPE_TEST;
-    }
-
-    XML_StopParser(data->parser, XML_FALSE);
 }
 
 #endif /* LV_USE_XML */

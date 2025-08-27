@@ -247,7 +247,18 @@ char * lv_fs_up(char * path);
  */
 const char * lv_fs_get_last(const char * path);
 
-int lv_fs_join(char * buf, size_t buf_sz, const char * base, const char * last);
+/**
+ * Concatenate two path components and automatically add/remove a separator as needed.
+ * buf, buf_sz, and the return value are analogous to lv_snprintf
+ * @param buf     the buffer to place the result in
+ * @param buf_sz  the size of buf. At most buf_sz - 1 characters will be written to buf,
+ *                and a null terminator
+ * @param base    the first path component
+ * @param end     the second path component
+ * @return        the number of characters (not including the null terminator)
+ *                that would be written to buf, even if buf_sz-1 was smaller
+ */
+int lv_fs_path_join(char * buf, size_t buf_sz, const char * base, const char * end);
 
 /**********************
  *      MACROS
