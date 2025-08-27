@@ -247,6 +247,8 @@ char * lv_fs_up(char * path);
  */
 const char * lv_fs_get_last(const char * path);
 
+int lv_fs_join(char * buf, size_t buf_sz, const char * base, const char * last);
+
 /**********************
  *      MACROS
  **********************/

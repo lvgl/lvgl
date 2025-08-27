@@ -497,6 +497,28 @@ const char * lv_fs_get_last(const char * path)
 
     return &path[i + 1];
 }
+
+int lv_fs_join(char * buf, size_t buf_sz, const char * base, const char * last)
+{
+    size_t base_len = lv_strlen(base);
+    char base_last_char = base_len ? base[base_len - 1] : '\0';
+
+    bool base_has_sep = base_last_char == '/' || base_last_char == '\\';
+    bool last_has_sep = last[0] == '/' || last[0] == '\\';
+
+    if(base_has_sep && last_has_sep) {
+        last++;
+        last_has_sep = false;
+    }
+
+    const char * sep = "/";
+    if(base_has_sep || last_has_sep) {
+        sep = "";
+    }
+
+    return lv_snprintf(buf, buf_sz, "%s%s%s", base, sep, last);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

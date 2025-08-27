@@ -58,6 +58,8 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
  */
 void lv_xml_set_default_asset_path(const char * path_prefix);
 
+lv_result_t lv_xml_load_from_pack(const char * path);
+
 lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * name, const lv_font_t * font);
 
 const lv_font_t * lv_xml_get_font(lv_xml_component_scope_t * scope, const char * name);
