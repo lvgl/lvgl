@@ -336,6 +336,8 @@ lv_style_prop_t lv_xml_style_prop_to_enum(const char * txt)
     else if(lv_streq(txt, "max_height")) return LV_STYLE_MAX_HEIGHT;
     else if(lv_streq(txt, "length")) return LV_STYLE_LENGTH;
     else if(lv_streq(txt, "radius")) return LV_STYLE_RADIUS;
+    else if(lv_streq(txt, "radial_offset")) return LV_STYLE_RADIAL_OFFSET;
+    else if(lv_streq(txt, "align")) return LV_STYLE_ALIGN;
 
     else if(lv_streq(txt, "pad_left")) return LV_STYLE_PAD_LEFT;
     else if(lv_streq(txt, "pad_right")) return LV_STYLE_PAD_RIGHT;

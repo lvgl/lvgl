@@ -773,6 +773,8 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(max_height, lv_xml_to_size(value));
     else SET_STYLE_IF(length, lv_xml_to_size(value));
     else SET_STYLE_IF(radius, lv_xml_to_size(value));
+    else SET_STYLE_IF(radial_offset, lv_xml_atoi(value));
+    else SET_STYLE_IF(align, lv_xml_align_to_enum(value));
 
     else SET_STYLE_IF(pad_left, lv_xml_atoi(value));
     else SET_STYLE_IF(pad_right, lv_xml_atoi(value));
