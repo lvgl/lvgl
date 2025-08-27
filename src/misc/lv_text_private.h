@@ -80,7 +80,7 @@ void lv_text_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 void lv_text_cut(char * txt, uint32_t pos, uint32_t len);
 
 /**
- * return a new formatted text. Memory will be allocated to store the text.
+ * Return a new formatted text. Memory will be allocated to store the text.
  * @param fmt `printf`-like format
  * @param ap items to print
 

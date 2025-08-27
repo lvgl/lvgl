@@ -13,6 +13,7 @@
 #include "../../../draw/eve/lv_eve.h"
 #include "../../../draw/eve/lv_draw_eve.h"
 #include "../../../display/lv_display_private.h"
+#include "../../../misc/lv_text_private.h"
 
 #include "../../../libs/FT800-FT813/EVE_commands.h"
 
@@ -87,6 +88,72 @@ lv_indev_t * lv_draw_eve_touch_create(lv_display_t * disp)
     lv_indev_set_read_cb(indev, touch_read_cb);
 
     return indev;
+}
+
+void lv_draw_eve_pre_upload_image(lv_display_t * disp, const void * src)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
+
+    if(!lv_draw_eve_image_src_check(src)) {
+        return;
+    }
+
+    uint32_t ramg_addr = lv_draw_eve_image_upload_image(false, src);
+    if(ramg_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+        LV_LOG_WARN("Could not pre-upload image because space could not be allocated in RAM_G.");
+    }
+}
+
+void lv_draw_eve_pre_upload_font_range(lv_display_t * disp, const lv_font_t * font, uint32_t unicode_range_start,
+                                       uint32_t unicode_range_end)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
+
+    if(!lv_draw_eve_label_font_check(font)) {
+        return;
+    }
+
+    for(uint32_t i = unicode_range_start; i <= unicode_range_end; i++) {
+        lv_font_glyph_dsc_t glyph_dsc;
+        bool found = lv_font_get_glyph_dsc_fmt_txt(font, &glyph_dsc, i, '\0');
+        if(!found) {
+            LV_LOG_INFO("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
+                        "because it is not part of the font", i);
+            continue;
+        }
+        uint32_t ramg_addr = lv_draw_eve_label_upload_glyph(false, font->dsc, glyph_dsc.gid.index);
+        if(ramg_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+            LV_LOG_WARN("Could not pre-upload glyph because space could not be allocated in RAM_G.");
+            /* don't return in case there are smaller glyphs that there is space for */
+        }
+    }
+}
+
+void lv_draw_eve_pre_upload_font_text(lv_display_t * disp, const lv_font_t * font, const char * text)
+{
+    LV_ASSERT_MSG(disp->flush_cb == flush_cb, "tried to do an LVGL EVE pre-upload without a draw_eve display");
+
+    if(!lv_draw_eve_label_font_check(font)) {
+        return;
+    }
+
+    for(uint32_t i = 0; text[i];) {
+        uint32_t unicode_letter;
+        uint32_t unicode_letter_next;
+        lv_text_encoded_letter_next_2(text, &unicode_letter, &unicode_letter_next, &i);
+        lv_font_glyph_dsc_t glyph_dsc;
+        bool found = lv_font_get_glyph_dsc_fmt_txt(font, &glyph_dsc, unicode_letter, unicode_letter_next);
+        if(!found) {
+            LV_LOG_INFO("Could not pre-upload glyph with unicode code point '0x%"LV_PRIX32"' "
+                        "because it is not part of the font", unicode_letter);
+            continue;
+        }
+        uint32_t ramg_addr = lv_draw_eve_label_upload_glyph(false, font->dsc, glyph_dsc.gid.index);
+        if(ramg_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+            LV_LOG_WARN("Could not pre-upload glyph because space could not be allocated in RAM_G.");
+            /* don't return in case there are smaller glyphs that there is space for */
+        }
+    }
 }
 
 uint8_t lv_draw_eve_memread8(lv_display_t * disp, uint32_t address)

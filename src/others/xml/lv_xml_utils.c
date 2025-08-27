@@ -83,8 +83,8 @@ int32_t lv_xml_atoi_split(const char ** str, char delimiter)
     int32_t result = 0;
     int sign = 1;
 
-    /* Skip leading whitespace */
-    while(*s == ' ' || *s == '\t')  s++;
+    /* Skip leading whitespace and repeated delimiters */
+    while(*s == delimiter || *s == ' ' || *s == '\t') s++;
 
     /* Handle optional sign */
     if(*s == '-') {
@@ -128,8 +128,8 @@ float lv_xml_atof_split(const char ** str, char delimiter)
     float result = 0.0f;
     int sign = 1;
 
-    /* Skip leading whitespace */
-    while(*s == ' ' || *s == '\t') s++;
+    /* Skip leading whitespace and repeated delimiters */
+    while(*s == delimiter || *s == ' ' || *s == '\t') s++;
 
     /* Handle optional sign */
     if(*s == '-') {
@@ -263,6 +263,11 @@ int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
 
 char * lv_xml_split_str(char ** src, char delimiter)
 {
+    /*Skip multiple delimiters*/
+    while(*src[0] == delimiter) {
+        src++;
+    }
+
     if(*src[0] == '\0') return NULL;
 
     char * src_first = *src;

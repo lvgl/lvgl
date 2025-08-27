@@ -75,15 +75,18 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
  *      TYPEDEFS
  **********************/
 
-typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
+typedef void * (*lv_draw_buf_malloc_cb_t)(size_t size, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
+typedef void (*lv_draw_buf_free_cb_t)(void * draw_buf);
 
-typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_format);
+typedef void (*lv_draw_buf_copy_cb_t)(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                                      const lv_draw_buf_t * src, const lv_area_t * src_area);
 
-typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+typedef void * (*lv_draw_buf_align_cb_t)(void * buf, lv_color_format_t color_format);
 
-typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
+typedef void (*lv_draw_buf_cache_operation_cb_t)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+
+typedef uint32_t (*lv_draw_buf_width_to_stride_cb_t)(uint32_t w, lv_color_format_t color_format);
 
 struct _lv_draw_buf_t {
     lv_image_header_t header;
@@ -110,18 +113,20 @@ void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers);
  * @param handlers             the draw buffer handlers to set
  * @param buf_malloc_cb        the callback to allocate memory for the buffer
  * @param buf_free_cb          the callback to free memory of the buffer
+ * @param buf_copy_cb          the callback to copy a draw buffer to an other
  * @param align_pointer_cb     the callback to align the buffer
  * @param invalidate_cache_cb  the callback to invalidate the cache of the buffer
  * @param flush_cache_cb       the callback to flush buffer
  * @param width_to_stride_cb   the callback to calculate the stride based on the width and color format
  */
 void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
-                               lv_draw_buf_malloc_cb buf_malloc_cb,
-                               lv_draw_buf_free_cb buf_free_cb,
-                               lv_draw_buf_align_cb align_pointer_cb,
-                               lv_draw_buf_cache_operation_cb invalidate_cache_cb,
-                               lv_draw_buf_cache_operation_cb flush_cache_cb,
-                               lv_draw_buf_width_to_stride_cb width_to_stride_cb);
+                               lv_draw_buf_malloc_cb_t buf_malloc_cb,
+                               lv_draw_buf_free_cb_t buf_free_cb,
+                               lv_draw_buf_copy_cb_t buf_copy_cb,
+                               lv_draw_buf_align_cb_t align_pointer_cb,
+                               lv_draw_buf_cache_operation_cb_t invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb_t flush_cache_cb,
+                               lv_draw_buf_width_to_stride_cb_t width_to_stride_cb);
 
 /**
  * Get the struct which holds the callbacks for draw buf management.
@@ -192,17 +197,6 @@ uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers,
  */
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
-/**
- * Copy an area from a buffer to another
- * @param dest      pointer to the destination draw buffer
- * @param dest_area the area to copy from the destination buffer, if NULL, use the whole buffer
- * @param src       pointer to the source draw buffer
- * @param src_area  the area to copy from the destination buffer, if NULL, use the whole buffer
- * @note `dest_area` and `src_area` should have the same width and height
- * @note  `dest` and `src` should have same color format. Color converting is not supported fow now.
- */
-void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
-                      const lv_draw_buf_t * src, const lv_area_t * src_area);
 
 /**
  * Note: Eventually, lv_draw_buf_malloc/free will be kept as private.
@@ -284,6 +278,19 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
  * @param draw_buf  the draw buffer to destroy
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
+
+/**
+ * Copy an area from a buffer to another
+ * @param dest      pointer to the destination draw buffer
+ * @param dest_area the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @param src       pointer to the source draw buffer
+ * @param src_area  the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @note `dest_area` and `src_area` should have the same width and height
+ * @note  The default copy function required `dest` and `src` to have the same color format.
+ * Overwriting dest->handlers->buf_copy_cb can resolve this limitation.
+ */
+void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                      const lv_draw_buf_t * src, const lv_area_t * src_area);
 
 /**
  * Return pointer to the buffer at the given coordinates

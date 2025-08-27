@@ -54,14 +54,12 @@ static void convert_row_argb8888_to_argb4444(const uint8_t * src, uint8_t * dst,
 
 void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-    if(lv_image_src_get_type(draw_dsc->src) != LV_IMAGE_SRC_VARIABLE) {
-        LV_LOG_WARN("v_draw_eve can only render images from variables (not files or symbols) for now.");
+    if(!lv_draw_eve_image_src_check(draw_dsc->src)) {
         return;
     }
 
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
-    const uint8_t * src_buf = img_dsc->data;
     int32_t src_w = img_dsc->header.w;
     int32_t src_h = img_dsc->header.h;
     int32_t src_stride = img_dsc->header.stride;
@@ -73,89 +71,43 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
 
     uint8_t eve_format;
     int32_t eve_stride;
-    uint8_t eve_alignment;
 
     switch(src_cf) {
         case LV_COLOR_FORMAT_L8:
             eve_format = EVE_L8;
             eve_stride = src_stride;
-            eve_alignment = 1;
             break;
         case LV_COLOR_FORMAT_RGB565:
             eve_format = EVE_RGB565;
             eve_stride = src_stride;
-            eve_alignment = 2;
             break;
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_ARGB8888:
             eve_format = EVE_ARGB4;
             eve_stride = src_w * 2;
-            eve_alignment = 2;
             break;
         default :
-            LV_LOG_WARN("v_draw_eve can only render L8, RGB565, RGB565A8, and ARGB8888 images for now.");
-            return;
+            LV_ASSERT(0);
     }
 
-    int32_t eve_size = eve_stride * src_h;
-
-    uint32_t img_addr;
-    bool img_is_loaded = lv_draw_eve_ramg_get_addr(&img_addr, (uintptr_t) src_buf, eve_size, eve_alignment);
-
-    if(!img_is_loaded) { /* New image to load  */
-        if(img_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
-            LV_LOG_WARN("Could not load image because space could not be allocated in RAM_G.");
-            return;
-        }
-
-        /* Load image to RAM_G */
-        EVE_end_cmd_burst();
-
-        switch(src_cf) {
-            case LV_COLOR_FORMAT_L8 :
-            case LV_COLOR_FORMAT_RGB565 :
-                EVE_memWrite_flash_buffer(img_addr, src_buf, eve_size);
-                break;
-            case LV_COLOR_FORMAT_RGB565A8 : {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    LV_ASSERT_MALLOC(tmp_buf);
-                    const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
-                    int32_t src_alpha_stride = src_stride / 2;
-                    for(uint32_t y = 0; y < src_h; y++) {
-                        convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
-                        EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
-                    }
-                    lv_free(tmp_buf);
-                    break;
-                }
-            case LV_COLOR_FORMAT_ARGB8888 : {
-                    uint8_t * tmp_buf = lv_malloc(eve_stride);
-                    LV_ASSERT_MALLOC(tmp_buf);
-                    for(uint32_t y = 0; y < src_h; y++) {
-                        convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
-                        EVE_memWrite_flash_buffer(img_addr + y * eve_stride, tmp_buf, eve_stride);
-                    }
-                    lv_free(tmp_buf);
-                    break;
-                }
-            default :
-                return;
-        }
-
-        EVE_start_cmd_burst();
+    uint32_t ramg_addr = lv_draw_eve_image_upload_image(true, img_dsc);
+    if(ramg_addr == LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+        LV_LOG_WARN("Could not load image because space could not be allocated in RAM_G.");
+        return;
     }
 
     lv_eve_scissor(t->clip_area.x1, t->clip_area.y1, t->clip_area.x2, t->clip_area.y2);
 
     lv_eve_save_context();
 
+    lv_eve_color_opa(draw_dsc->opa);
+
     if(draw_dsc->recolor_opa > LV_OPA_MIN) {
-        lv_eve_color_opa(draw_dsc->recolor_opa);
-        lv_eve_color(draw_dsc->recolor);
+        lv_eve_color(lv_color_mix(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa));
     }
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
-    EVE_cmd_dl_burst(BITMAP_SOURCE(img_addr));
+    EVE_cmd_dl_burst(BITMAP_SOURCE(ramg_addr));
     /*real height and width is mandatory for rotation and scale (Clip Area)*/
     EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, src_w, src_h));
 
@@ -185,6 +137,114 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     lv_eve_restore_context();
 }
 
+bool lv_draw_eve_image_src_check(const void * src)
+{
+    if(lv_image_src_get_type(src) != LV_IMAGE_SRC_VARIABLE) {
+        LV_LOG_WARN("lv_draw_eve can only render images from variables (not files or symbols) for now.");
+        return false;
+    }
+
+    const lv_image_dsc_t * img_dsc = src;
+
+    switch(img_dsc->header.cf) {
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8888:
+            break;
+        default :
+            LV_LOG_WARN("lv_draw_eve can only render L8, RGB565, RGB565A8, and ARGB8888 images for now.");
+            return false;
+    }
+
+    return true;
+}
+
+uint32_t lv_draw_eve_image_upload_image(bool burst_is_active, const lv_image_dsc_t * img_dsc)
+{
+    const uint8_t * src_buf = img_dsc->data;
+    int32_t src_w = img_dsc->header.w;
+    int32_t src_h = img_dsc->header.h;
+    int32_t src_stride = img_dsc->header.stride;
+    lv_color_format_t src_cf = img_dsc->header.cf;
+
+    if(src_stride == 0) {
+        src_stride = src_w * lv_color_format_get_size(src_cf);
+    }
+
+    int32_t eve_stride;
+    uint8_t eve_alignment;
+
+    switch(src_cf) {
+        case LV_COLOR_FORMAT_L8:
+            eve_stride = src_stride;
+            eve_alignment = 1;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            eve_stride = src_stride;
+            eve_alignment = 2;
+            break;
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8888:
+            eve_stride = src_w * 2;
+            eve_alignment = 2;
+            break;
+        default :
+            LV_ASSERT(0);
+    }
+
+    int32_t eve_size = eve_stride * src_h;
+
+    uint32_t ramg_addr;
+    bool img_is_loaded = lv_draw_eve_ramg_get_addr(&ramg_addr, (uintptr_t) src_buf, eve_size, eve_alignment);
+
+    /* New image to load  */
+    if(!img_is_loaded && ramg_addr != LV_DRAW_EVE_RAMG_OUT_OF_RAMG) {
+
+        /* Load image to RAM_G */
+
+        if(burst_is_active) {
+            EVE_end_cmd_burst();
+        }
+
+        switch(src_cf) {
+            case LV_COLOR_FORMAT_L8:
+            case LV_COLOR_FORMAT_RGB565:
+                EVE_memWrite_flash_buffer(ramg_addr, src_buf, eve_size);
+                break;
+            case LV_COLOR_FORMAT_RGB565A8: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    LV_ASSERT_MALLOC(tmp_buf);
+                    const uint8_t * src_alpha_buf = src_buf + src_h * src_stride;
+                    int32_t src_alpha_stride = src_stride / 2;
+                    for(uint32_t y = 0; y < src_h; y++) {
+                        convert_row_rgb565a8_to_argb4444(src_buf + y * src_stride, src_alpha_buf + y * src_alpha_stride, tmp_buf, src_w);
+                        EVE_memWrite_flash_buffer(ramg_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+            case LV_COLOR_FORMAT_ARGB8888: {
+                    uint8_t * tmp_buf = lv_malloc(eve_stride);
+                    LV_ASSERT_MALLOC(tmp_buf);
+                    for(uint32_t y = 0; y < src_h; y++) {
+                        convert_row_argb8888_to_argb4444(src_buf + y * src_stride, tmp_buf, src_w);
+                        EVE_memWrite_flash_buffer(ramg_addr + y * eve_stride, tmp_buf, eve_stride);
+                    }
+                    lv_free(tmp_buf);
+                    break;
+                }
+            default:
+                LV_ASSERT(0);
+        }
+
+        if(burst_is_active) {
+            EVE_start_cmd_burst();
+        }
+    }
+
+    return ramg_addr;
+}
 
 
 

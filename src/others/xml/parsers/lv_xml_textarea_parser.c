@@ -56,7 +56,7 @@ void lv_xml_textarea_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
 
         if(lv_streq("text", name)) lv_textarea_set_text(item, value);
-        else if(lv_streq("placeholder", name)) lv_textarea_set_placeholder_text(item, value);
+        else if(lv_streq("placeholder_text", name)) lv_textarea_set_placeholder_text(item, value);
         else if(lv_streq("one_line", name)) lv_textarea_set_one_line(item, lv_xml_to_bool(value));
         else if(lv_streq("password_mode", name)) lv_textarea_set_password_mode(item, lv_xml_to_bool(value));
         else if(lv_streq("password_show_time", name)) lv_textarea_set_password_show_time(item, lv_xml_atoi(value));

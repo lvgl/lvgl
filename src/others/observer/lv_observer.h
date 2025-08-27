@@ -545,6 +545,24 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
 #endif
 
+#if LV_USE_SPAN
+
+/**
+ * Bind an integer, string, or pointer Subject to a Spangroup's Span.
+ * @param obj       pointer to Spangroup
+ * @param span      pointer to Span
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            `fmt == NULL` can be used only with string and pointer Subjects.
+ * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
+ *                  as text as they are, integers as %d, floats as %0.1f
+ */
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt);
+
+#endif
+
 #if LV_USE_ARC
 /**
  * Bind an integer subject to an Arc's value.
@@ -583,6 +601,28 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
+
+#if LV_USE_SCALE
+
+/**
+ * Bind an integer subject to a scales section minimum value
+ * @param obj       pointer to a Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scales section maximum value
+ * @param obj       pointer to an Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
 #endif
 
 /**********************

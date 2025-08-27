@@ -82,7 +82,7 @@ LVGL manages many complex data structures, and those structures are "system
 resources" that must be protected from being "seen" by other threads in an
 inconsistent state.  A high percentage LVGL functions (functions that start with
 ``lv_``) either read from or change those data structures.  Those that change them
-place the data in an inconsistent state during execution (because such changes are
+place the data in an inconsistent state during call execution (because such changes are
 multi-step sequences), but return them to a consistent state before those functions
 return.  For this reason, execution of each LVGL function must be allowed to complete
 before any other LVGL function is started.
@@ -177,7 +177,7 @@ Method 2:  Use a MUTEX
 ----------------------
 A MUTEX stands for "MUTually EXclusive" and is a synchronization primitive that
 protects the state of a system resource from being modified or accessed by multiple
-threads of execution at once.  In other words, it makes data so protected "appear"
+threads of execution at the same time.  In other words, it makes data thus protected "appear"
 atomic (all threads using this data "see" it in a consistent state).  Most OSes
 provide MUTEXes.
 
@@ -190,9 +190,12 @@ assigned, that MUTEX performs such protection by programmers:
 2.  releasing the MUTEX (a.k.a. unlocking it) after that access or modification
     is complete.
 
+Good design practices for using a MUTEX stress that the time period that the MUTEX is
+locked is kept as short as possible.
+
 If a thread attempts to acquire (lock) the MUTEX while another thread "owns" it,
 that thread waits on the other thread to release (unlock) it before it is allowed
-to continue execution.
+to continue to execute.
 
 To be clear:  this must be done *both* by threads that READ from that resource, and
 threads that MODIFY that resource.
