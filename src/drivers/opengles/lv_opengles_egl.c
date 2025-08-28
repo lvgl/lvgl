@@ -268,7 +268,7 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     dsc->opa = LV_OPA_COVER;
 
 #if LV_USE_DRAW_OPENGLES
-    static uint8_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(disp, &dummy_buf, NULL, h * lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888),
                            LV_DISPLAY_RENDER_MODE_FULL);
 #else
