@@ -31,11 +31,11 @@
 #include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
-    #if defined(GCID_REV_CID)
-        #define VG_LITE_OPTIONS  <Series/GCID_REV_CID/vg_lite_options.h>
+    #if defined(LV_VG_LITE_HAL_GPU_SERIES)
+        #define VG_LITE_OPTIONS  <Series/LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION/vg_lite_options.h>
         #include VG_LITE_OPTIONS
     #else
-        #error "GCID_REV_CID is not defined; eg: -DGCID_REV_CID=gc355/0x0_1216"
+        #error "LV_VG_LITE_HAL_GPU_SERIES and / LV_VG_LITE_HAL_GPU_REVISION or are/is not defined, check your lv_conf.h"
     #endif
 
 #endif /* LV_USE_VG_LITE_DRIVER */
