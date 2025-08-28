@@ -409,6 +409,13 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp);
 lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
 
 /**
+ * Return the screen that is currently being loaded by the display
+ * @param disp      pointer to a display object (NULL to use the default screen)
+ * @return          pointer to the screen being loaded or NULL if no screen is currently being loaded
+ */
+lv_obj_t * lv_display_get_screen_loading(lv_display_t * disp);
+
+/**
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.
  * @param disp      pointer to display which top layer should be get. (NULL to use the default screen)
  * @return          pointer to the top layer object

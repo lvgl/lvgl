@@ -40,7 +40,9 @@ You can get pointers to each of these screens on a specified display by using
 To set a Screen you create to be the :ref:`active_screen`, call
 :cpp:func:`lv_screen_load` or :cpp:func:`lv_screen_load_anim`.
 
-
+Calling :cpp:expr:`lv_display_get_screen_loading(disp)` will return the screen that is
+being loaded. A Screen is considered "being loaded" until the loading animation finishes.
+If no Screen is being loaded, this function will return ``NULL``.
 
 .. _layers_top_and_sys:
 
