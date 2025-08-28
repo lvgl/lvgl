@@ -92,6 +92,10 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
     const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
+    if(dsc->colorkey) {
+        lv_vg_lite_set_color_key(dsc->colorkey);
+    }
+
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&t->_real_area, &t->clip_area, false) && dsc->clip_radius <= 0 && !dsc->tile) {
         /* rect is used to crop the pixel-aligned padding area */
@@ -223,6 +227,10 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             0,
             color,
             filter);
+    }
+
+    if(dsc->colorkey) {
+        lv_vg_lite_set_color_key(NULL);
     }
 
     lv_vg_lite_path_drop(u, path);
