@@ -214,3 +214,36 @@ You can add a delay between the commands by using the pseudo-command ``LV_LCD_CM
 To terminate the command list you must use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
 
 See an actual example of sending a command list `here <https://github.com/lvgl/lvgl/blob/master/src/drivers/display/st7789/lv_st7789.c>`__.
+
+Separate display and controller initialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The :cpp:func:`lv_lcd_generic_mipi_create()` function initializes both the display and the LCD controller. However, in some cases it is useful to separate these two steps.
+
+To achieve this, you need to first call the :cpp:func:`lv_lcd_generic_mipi_create_display_no_init()` function to create the display object without initializing the controller, and then call the
+:cpp:func:`lv_lcd_generic_mipi_controller_init()` function to initialize the controller.
+
+For example, you may want to set up custom user data in the display object before the controller is initialized:
+
+.. code-block:: c
+
+	#include "src/drivers/display/st7789/lv_st7789.h"
+
+	#define LCD_H_RES               240
+	#define LCD_V_RES               320
+
+	lv_display_t *my_disp;
+
+	...
+
+	int main(int argc, char ** argv)
+	{
+		...
+
+		/* Create the LVGL display object and the LCD display driver */
+		my_disp = lv_lcd_generic_mipi_create_display_no_init(LCD_H_RES, LCD_V_RES);
+		lv_display_set_user_data(my_disp, my_user_data);
+		lv_lcd_generic_mipi_controller_init(my_disp, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
+
+		...
+	}
