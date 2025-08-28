@@ -18,6 +18,10 @@
     #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
 #endif
 
+#if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 2
+    #error "Wayland with DMABUF only supports 2 LV_WAYLAND_BUF_COUNT"
+#endif
+
 #if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
     #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
 #endif
