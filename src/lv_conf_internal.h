@@ -33,6 +33,9 @@
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
+#define LV_OPENGLES_API_GLFW        0
+#define LV_OPENGLES_API_EGL         1
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -4177,6 +4180,14 @@
             #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
+
+    #ifndef LV_LINUX_DRM_USE_EGL
+        #ifdef CONFIG_LV_LINUX_DRM_USE_EGL
+            #define LV_LINUX_DRM_USE_EGL CONFIG_LV_LINUX_DRM_USE_EGL
+        #else
+            #define LV_LINUX_DRM_USE_EGL     0
+        #endif
+    #endif
 #endif
 
 /** Interface for TFT_eSPI */
@@ -4383,6 +4394,17 @@
             #endif
         #else
             #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
+        #endif
+    #endif
+
+    /** Select which OpenGL API to use. Possible options:
+     * - LV_OPENGLES_API_GLFW
+     * - LV_OPENGLES_API_EGL */
+    #ifndef LV_USE_OPENGLES_API
+        #ifdef CONFIG_LV_USE_OPENGLES_API
+            #define LV_USE_OPENGLES_API CONFIG_LV_USE_OPENGLES_API
+        #else
+            #define LV_USE_OPENGLES_API LV_OPENGLES_API_GLFW
         #endif
     #endif
 #endif

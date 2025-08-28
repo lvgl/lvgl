@@ -219,10 +219,10 @@ Setup
         lv_init();
         
         /* GLFW setup */
-        lv_glfw_window_t *window = lv_glfw_window_create(WINDOW_WIDTH, WINDOW_HEIGHT, true);
+        lv_opengles_window_t *window = lv_opengles_glfw_window_create(WINDOW_WIDTH, WINDOW_HEIGHT, true);
         lv_display_t *display = lv_opengles_texture_create(WINDOW_WIDTH, WINDOW_HEIGHT);
         unsigned int texture_id = lv_opengles_texture_get_texture_id(display);
-        lv_glfw_window_add_texture(window, texture_id, WINDOW_WIDTH, WINDOW_HEIGHT);
+        lv_opengles_window_add_texture(window, texture_id, WINDOW_WIDTH, WINDOW_HEIGHT);
         
         /* Load and display glTF demo */
         lv_demo_gltf("A:<path/to/gltf>");

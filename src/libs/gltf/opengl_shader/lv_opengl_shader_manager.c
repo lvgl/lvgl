@@ -17,7 +17,8 @@
 #include "../../../misc/lv_types.h"
 #include "../../../stdlib/lv_mem.h"
 #include "../../../stdlib/lv_sprintf.h"
-#include "../../../drivers/glfw/lv_opengles_debug.h"
+#include "../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../drivers/opengles/lv_opengles_debug.h"
 #include "../../../stdlib/lv_string.h"
 
 #include <GL/glew.h>

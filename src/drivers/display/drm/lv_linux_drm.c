@@ -25,11 +25,25 @@
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../draw/lv_draw_buf.h"
 
+#if LV_LINUX_DRM_USE_EGL && !LV_USE_LINUX_DRM_GBM_BUFFERS
+    #error LV_USE_LINUX_DRM_GBM_BUFFERS is required to use LV_LINUX_DRM_USE_EGL
+#endif
+
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     #include <gbm.h>
     #include <linux/dma-buf.h>
     #include <sys/ioctl.h>
+
+#endif
+
+#if LV_LINUX_DRM_USE_EGL
+
+    #include "../../opengles/lv_opengles_egl.h"
+    #include "../../opengles/lv_opengles_texture.h"
+    #include "../../opengles/lv_opengles_window.h"
+    #include "../../opengles/lv_opengles_private.h"
+    #include <EGL/eglext.h>
 
 #endif
 
@@ -46,6 +60,8 @@
 
 #define BUFFER_CNT 2
 
+#define USE_EGL_EXPERIMENTAL_DIRECT_WINDOW_RENDER 0
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -56,6 +72,9 @@ typedef struct {
     unsigned long int size;
     uint8_t * map;
     uint32_t fb_handle;
+#if LV_LINUX_DRM_USE_EGL
+    uint32_t fb_id;
+#endif
 } drm_buffer_t;
 
 typedef struct {
@@ -80,6 +99,22 @@ typedef struct {
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[BUFFER_CNT];
     drm_buffer_t * act_buf;
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    struct gbm_device * gbm_device;
+#endif
+#if LV_LINUX_DRM_USE_EGL
+    struct gbm_surface * surface;
+    int kms_in_fence_fd;
+    int kms_out_fence_fd;
+    EGLSyncKHR kms_fence;
+    EGLSyncKHR gpu_fence;
+    struct gbm_bo * bo;
+    EGLint(*eglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
+    EGLint(*eglDupNativeFenceFDANDROID)(EGLDisplay dpy, EGLSyncKHR sync);
+    EGLSyncKHR(*eglCreateSyncKHR)(EGLDisplay dpy, EGLenum type, const EGLint * attrib_list);
+    EGLBoolean(*eglDestroySyncKHR)(EGLDisplay dpy, EGLSyncKHR sync);
+    EGLint(*eglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+#endif
 } drm_dev_t;
 
 /**********************
@@ -116,15 +151,21 @@ static uint32_t tick_get_cb(void);
 
 #endif
 
+#if LV_LINUX_DRM_USE_EGL
+
+    static drm_buffer_t * drm_fb_get_from_bo(struct gbm_bo * bo);
+    static void drm_fb_destroy_callback(struct gbm_bo * bo, void * data);
+    static void drm_gbm_egl_pre(lv_opengles_window_t * window);
+    static void drm_gbm_egl_post1(lv_opengles_window_t * window);
+    static void drm_gbm_egl_post2(lv_opengles_window_t * window);
+    static int drm_atomic_commit(drm_dev_t * drm_dev, uint32_t fb_id, uint32_t flags);
+    static EGLSyncKHR create_fence(drm_dev_t * drm_dev, EGLDisplay display, int fd);
+
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
-
-    static struct gbm_device * gbm_device;
-
-#endif
 
 /**********************
  *      MACROS
@@ -139,22 +180,32 @@ static uint32_t tick_get_cb(void);
 
 lv_display_t * lv_linux_drm_create(void)
 {
+    lv_display_t * disp;
+
     lv_tick_set_cb(tick_get_cb);
 
     drm_dev_t * drm_dev = lv_malloc_zeroed(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
 
-    lv_display_t * disp = lv_display_create(800, 480);
+    drm_dev->fd = -1;
+#if !LV_LINUX_DRM_USE_EGL
+    disp = lv_display_create(800, 480);
     if(disp == NULL) {
         lv_free(drm_dev);
         return NULL;
     }
-    drm_dev->fd = -1;
     lv_display_set_driver_data(disp, drm_dev);
     lv_display_set_flush_wait_cb(disp, drm_flush_wait);
     lv_display_set_flush_cb(disp, drm_flush);
 
+#else /*LV_LINUX_DRM_USE_EGL*/
+    disp = (lv_display_t *) drm_dev;
+
+    drm_dev->kms_in_fence_fd = -1;
+    drm_dev->kms_out_fence_fd = -1;
+
+#endif
 
     return disp;
 }
@@ -207,16 +258,23 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
 
 void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
-    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
     int ret;
+
+#if !LV_LINUX_DRM_USE_EGL
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+#else
+    drm_dev_t * drm_dev = (drm_dev_t *) disp;
+#endif
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);
     if(ret) {
-        close(drm_dev->fd);
-        drm_dev->fd = -1;
         return;
     }
 
+    int32_t hor_res = drm_dev->width;
+    int32_t ver_res = drm_dev->height;
+
+#if !LV_LINUX_DRM_USE_EGL
     ret = drm_setup_buffers(drm_dev);
     if(ret) {
         LV_LOG_ERROR("DRM buffer allocation failed");
@@ -227,8 +285,6 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("DRM subsystem and buffer mapped successfully");
 
-    int32_t hor_res = drm_dev->width;
-    int32_t ver_res = drm_dev->height;
     int32_t width = drm_dev->mmWidth;
 
     size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
@@ -250,6 +306,31 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+
+#else /*LV_LINUX_DRM_USE_EGL*/
+    lv_opengles_window_t * window = lv_opengles_egl_window_create(hor_res, ver_res, drm_dev->surface, drm_dev->gbm_device,
+                                                                  drm_gbm_egl_pre, drm_gbm_egl_post1, drm_gbm_egl_post2);
+    lv_opengles_egl_window_set_user_data(window, drm_dev);
+
+#if !USE_EGL_EXPERIMENTAL_DIRECT_WINDOW_RENDER
+    /* create a display that flushes to a texture */
+    lv_display_t * texture = lv_opengles_texture_create(hor_res, ver_res);
+    lv_display_set_default(texture);
+
+    /* add the texture to the window */
+    unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
+    lv_opengles_window_texture_t * window_texture = lv_opengles_window_add_texture(window, texture_id, hor_res, ver_res);
+#else
+    /* render directly to the window */
+    lv_opengles_window_display_create(window, hor_res, ver_res);
+#endif
+
+    drm_dev->eglWaitSyncKHR = (void *) eglGetProcAddress("eglWaitSyncKHR");
+    drm_dev->eglDupNativeFenceFDANDROID = (void *) eglGetProcAddress("eglDupNativeFenceFDANDROID");
+    drm_dev->eglCreateSyncKHR = (void *) eglGetProcAddress("eglCreateSyncKHR");
+    drm_dev->eglDestroySyncKHR = (void *) eglGetProcAddress("eglDestroySyncKHR");
+    drm_dev->eglClientWaitSyncKHR = (void *) eglGetProcAddress("eglClientWaitSyncKHR");
+#endif
 }
 
 /**********************
@@ -442,7 +523,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     static int first = 1;
     uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_NONBLOCK;
 
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
 
     struct dma_buf_sync sync_req;
 
@@ -810,14 +891,27 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
 #if LV_USE_LINUX_DRM_GBM_BUFFERS
 
     /* Create GBM device and buffer */
-    gbm_device = gbm_create_device(drm_dev->fd);
+    drm_dev->gbm_device = gbm_create_device(drm_dev->fd);
 
-    if(gbm_device == NULL) {
+    if(drm_dev->gbm_device == NULL) {
         LV_LOG_ERROR("Failed to create GBM device");
         goto err;
     }
 
-    LV_LOG_INFO("GBM device backend: %s", gbm_device_get_backend_name(gbm_device));
+    LV_LOG_INFO("GBM device backend: %s", gbm_device_get_backend_name(drm_dev->gbm_device));
+#endif
+
+#if LV_LINUX_DRM_USE_EGL
+
+    /* Add support to create a surface with modifiers */
+    drm_dev->surface = gbm_surface_create(drm_dev->gbm_device,
+                                          drm_dev->width, drm_dev->height, GBM_BO_FORMAT_ARGB8888,
+                                          GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
+    if(!drm_dev->surface) {
+        LV_LOG_ERROR("failed to create gbm surface");
+        gbm_device_destroy(drm_dev->gbm_device);
+        goto err;
+    }
 
 #endif
 
@@ -906,7 +1000,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     }
 
     /* Create a linear GBM buffer object - best practice when modifiers are not used */
-    if(!(gbm_bo = gbm_bo_create(gbm_device,
+    if(!(gbm_bo = gbm_bo_create(drm_dev->gbm_device,
                                 drm_dev->width, drm_dev->height, GBM_BO_FORMAT_XRGB8888,
                                 GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR))) {
 
@@ -1052,6 +1146,198 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
     drm_dev->act_buf = NULL;
 
 }
+
+#if LV_LINUX_DRM_USE_EGL
+
+static void drm_gbm_egl_pre(lv_opengles_window_t * window)
+{
+    drm_dev_t * drm_dev = lv_opengles_egl_window_get_user_data(window);
+    if(drm_dev->kms_out_fence_fd != -1) {
+        EGLDisplay display = lv_opengles_egl_window_get_display(window);
+        drm_dev->kms_fence = create_fence(drm_dev, display, drm_dev->kms_out_fence_fd);
+        LV_ASSERT_NULL(drm_dev->kms_fence);
+
+        drm_dev->kms_out_fence_fd = -1;
+
+        int result = drm_dev->eglWaitSyncKHR(display, drm_dev->kms_fence, 0);
+        LV_ASSERT(result == 1);
+    }
+}
+
+static void drm_gbm_egl_post1(lv_opengles_window_t * window)
+{
+    drm_dev_t * drm_dev = lv_opengles_egl_window_get_user_data(window);
+    EGLDisplay display = lv_opengles_egl_window_get_display(window);
+    drm_dev->gpu_fence = create_fence(drm_dev, display, EGL_NO_NATIVE_FENCE_FD_ANDROID);
+    LV_ASSERT_NULL(drm_dev->gpu_fence);
+}
+
+static void drm_gbm_egl_post2(lv_opengles_window_t * window)
+{
+    drm_dev_t * drm_dev = lv_opengles_egl_window_get_user_data(window);
+    EGLDisplay display = lv_opengles_egl_window_get_display(window);
+
+    drm_dev->kms_in_fence_fd = drm_dev->eglDupNativeFenceFDANDROID(display, drm_dev->gpu_fence);
+    LV_ASSERT(drm_dev->eglDestroySyncKHR(display, drm_dev->gpu_fence));
+    drm_dev->gpu_fence = NULL;
+    LV_ASSERT(drm_dev->kms_in_fence_fd != -1);
+
+    drm_buffer_t * fb;
+    uint32_t i = 0;
+    uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
+    int64_t start_time, report_time, cur_time;
+    int ret;
+
+    /* Get the next bo to display */
+    struct gbm_bo * next_bo = gbm_surface_lock_front_buffer(drm_dev->surface);
+    if(!next_bo) {
+        LV_LOG_ERROR("Failed to lock frontbuffer");
+    }
+
+    fb = drm_fb_get_from_bo(next_bo);
+    if(!fb) {
+        LV_LOG_ERROR("Failed to get a new framebuffer BO");
+    }
+
+    if(drm_dev->kms_fence) {
+        EGLint status;
+
+        do {
+            status = drm_dev->eglClientWaitSyncKHR(display,
+                                                   drm_dev->kms_fence,
+                                                   0,
+                                                   EGL_FOREVER_KHR);
+        } while(status != EGL_CONDITION_SATISFIED_KHR);
+
+        LV_ASSERT(drm_dev->eglDestroySyncKHR(display, drm_dev->kms_fence));
+        drm_dev->kms_fence = NULL;
+    }
+
+    ret = drm_atomic_commit(drm_dev, fb->fb_id, flags);
+    if(ret) {
+        LV_LOG_ERROR("failed to commit: %s", strerror(errno));
+    }
+
+    /* release last buffer to render on again: */
+    if(drm_dev->bo)
+        gbm_surface_release_buffer(drm_dev->surface, drm_dev->bo);
+    drm_dev->bo = next_bo;
+
+}
+
+
+static drm_buffer_t * drm_fb_get_from_bo(struct gbm_bo * bo)
+{
+    int drm_fd = gbm_device_get_fd(gbm_bo_get_device(bo));
+    drm_buffer_t * fb = gbm_bo_get_user_data(bo);
+    uint32_t width, height, format, strides[4] = {0}, handles[4] = {0}, offsets[4] = {0}, flags = 0;
+    int ret = -1;
+
+    if(fb)
+        return fb;
+
+    fb = lv_malloc_zeroed(sizeof(drm_buffer_t));
+
+    width = gbm_bo_get_width(bo);
+    height = gbm_bo_get_height(bo);
+    format = gbm_bo_get_format(bo);
+    const int num_planes = gbm_bo_get_plane_count(bo);
+    for(int i = 0; i < num_planes; i++) {
+        handles[i] = gbm_bo_get_handle_for_plane(bo, i).u32;
+        strides[i] = gbm_bo_get_stride_for_plane(bo, i);
+        offsets[i] = gbm_bo_get_offset(bo, i);
+    }
+
+    memcpy(handles, (uint32_t [4]) {
+        gbm_bo_get_handle(bo).u32, 0, 0, 0
+    }, 16);
+    memcpy(strides, (uint32_t [4]) {
+        gbm_bo_get_stride(bo), 0, 0, 0
+    }, 16);
+    memset(offsets, 0, 16);
+    ret = drmModeAddFB2(drm_fd, width, height, format,
+                        handles, strides, offsets, &fb->fb_id, 0);
+    fb->fb_handle = fb->fb_id;
+
+    if(ret) {
+        LV_LOG_ERROR("failed to create fb: %s", strerror(errno));
+        lv_free(fb);
+        return NULL;
+    }
+
+    gbm_bo_set_user_data(bo, fb, drm_fb_destroy_callback);
+
+    return fb;
+}
+
+static void drm_fb_destroy_callback(struct gbm_bo * bo, void * data)
+{
+    int drm_fd = gbm_device_get_fd(gbm_bo_get_device(bo));
+    drm_buffer_t * fb = data;
+
+    if(fb->fb_id)
+        drmModeRmFB(drm_fd, fb->fb_id);
+
+    lv_free(fb);
+}
+
+static int drm_atomic_commit(drm_dev_t * drm_dev, uint32_t fb_id, uint32_t flags)
+{
+    int ret;
+    static int first = 1;
+
+    drm_dev->req = drmModeAtomicAlloc();
+
+    /* On first Atomic commit, do a modeset */
+    if(first) {
+        drm_add_conn_property(drm_dev, "CRTC_ID", drm_dev->crtc_id);
+
+        drm_add_crtc_property(drm_dev, "MODE_ID", drm_dev->blob_id);
+        drm_add_crtc_property(drm_dev, "ACTIVE", 1);
+
+        flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;
+
+        first = 0;
+    }
+
+    drm_add_plane_property(drm_dev, "FB_ID", fb_id);
+    drm_add_plane_property(drm_dev, "CRTC_ID", drm_dev->crtc_id);
+    drm_add_plane_property(drm_dev, "SRC_X", 0);
+    drm_add_plane_property(drm_dev, "SRC_Y", 0);
+    drm_add_plane_property(drm_dev, "SRC_W", drm_dev->width << 16);
+    drm_add_plane_property(drm_dev, "SRC_H", drm_dev->height << 16);
+    drm_add_plane_property(drm_dev, "CRTC_X", 0);
+    drm_add_plane_property(drm_dev, "CRTC_Y", 0);
+    drm_add_plane_property(drm_dev, "CRTC_W", drm_dev->width);
+    drm_add_plane_property(drm_dev, "CRTC_H", drm_dev->height);
+
+    if(drm_dev->kms_in_fence_fd != -1) {
+        drm_add_crtc_property(drm_dev, "OUT_FENCE_PTR", (uintptr_t) &drm_dev->kms_out_fence_fd);
+        drm_add_plane_property(drm_dev, "IN_FENCE_FD", drm_dev->kms_in_fence_fd);
+    }
+
+    ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, NULL);
+    if(ret) {
+        LV_LOG_ERROR("drmModeAtomicCommit failed: %s (%d)", strerror(errno), errno);
+        drmModeAtomicFree(drm_dev->req);
+        return ret;
+    }
+
+    return 0;
+}
+
+static EGLSyncKHR create_fence(drm_dev_t * drm_dev, EGLDisplay display, int fd)
+{
+    EGLint attrib_list[] = {
+        EGL_SYNC_NATIVE_FENCE_FD_ANDROID, fd,
+        EGL_NONE,
+    };
+    EGLSyncKHR fence = drm_dev->eglCreateSyncKHR(display, EGL_SYNC_NATIVE_FENCE_ANDROID, attrib_list);
+    LV_ASSERT_NULL(fence);
+    return fence;
+}
+
+#endif /*LV_LINUX_DRM_USE_EGL*/
 
 static uint32_t tick_get_cb(void)
 {

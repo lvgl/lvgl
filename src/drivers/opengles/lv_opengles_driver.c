@@ -6,14 +6,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../display/lv_display.h"
-#include "../../misc/lv_area_private.h"
 
+#include "lv_opengles_driver.h"
 #if LV_USE_OPENGLES
 
 #include "../../misc/lv_types.h"
 #include "lv_opengles_debug.h"
-#include "lv_opengles_driver.h"
+#include "lv_opengles_private.h"
+
+#include "../../display/lv_display.h"
+#include "../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -84,6 +86,8 @@ static int shader_location[] = { 0, 0, 0, 0, 0, 0 };
 static const char * vertex_shader =
     "#version 300 es\n"
     "\n"
+    "precision mediump float;\n"
+    "\n"
     "in vec4 position;\n"
     "in vec2 texCoord;\n"
     "\n"
@@ -95,19 +99,19 @@ static const char * vertex_shader =
     "{\n"
     "    gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);\n"
     "    v_TexCoord = texCoord;\n"
-    "};\n";
+    "}\n";
 
 static const char * fragment_shader =
     "#version 300 es\n"
     "\n"
     "precision lowp float;\n"
     "\n"
-    "layout(location = 0) out vec4 color;\n"
+    "out vec4 color;\n"
     "\n"
     "in vec2 v_TexCoord;\n"
     "\n"
     "uniform sampler2D u_Texture;\n"
-    "uniform int u_ColorDepth;\n"
+    "uniform float u_ColorDepth;\n"
     "uniform float u_Opa;\n"
     "uniform bool u_IsFill;\n"
     "uniform vec3 u_FillColor;\n"
@@ -116,18 +120,18 @@ static const char * fragment_shader =
     "{\n"
     "    vec4 texColor;\n"
     "    if (u_IsFill) {\n"
-    "        texColor = vec4(u_FillColor, 1.0f);\n"
+    "        texColor = vec4(u_FillColor, 1.0);\n"
     "    } else {\n"
     "        texColor = texture(u_Texture, v_TexCoord);\n"
     "    }\n"
-    "    if (u_ColorDepth == 8) {\n"
+    "    if (abs(u_ColorDepth - 8.0) < 0.1) {\n"
     "        float gray = texColor.r;\n"
     "        color = vec4(gray, gray, gray, u_Opa);\n"
     "    } else {\n"
     "        float combinedAlpha = texColor.a * u_Opa;\n"
     "        color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);\n"
     "    }\n"
-    "};\n";
+    "}\n";
 
 /**********************
  *      MACROS
@@ -198,7 +202,7 @@ void lv_opengles_render_clear(void)
 
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 {
-    glViewport(x, y, w, h);
+    GL_CALL(glViewport(x, y, w, h));
 }
 
 /**********************
@@ -222,7 +226,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
     float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     hor_scale = h_flip ? -hor_scale : hor_scale;
-    ver_scale = v_flip ? -ver_scale : ver_scale;
+    ver_scale = v_flip ? ver_scale : -ver_scale;
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
@@ -238,10 +242,10 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
                         : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, x_coef, ix_co);
         float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, x_coef, ix_co)
                         : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, x_coef, ix_co);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co);
+        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co)
+                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co);
+        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co)
+                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co);
 
         float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
@@ -253,7 +257,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     }
 
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
@@ -265,8 +269,8 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
 
 static void lv_opengles_enable_blending(void)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GL_CALL(glEnable(GL_BLEND));
+    GL_CALL(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 }
 
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
