@@ -63,7 +63,7 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     }
 
 #if LV_USE_DRAW_OPENGLES
-    static uint8_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(disp, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
