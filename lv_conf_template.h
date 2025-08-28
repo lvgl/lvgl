@@ -541,6 +541,9 @@
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 #endif
 
+/* Enable usage of the LVGL's vg_lite spec driver */
+#define LV_USE_VG_LITE_DRIVER  0
+
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
 #define LV_USE_GESTURE_RECOGNITION 0
@@ -986,6 +989,9 @@
 /** Rlottie library */
 #define LV_USE_RLOTTIE 0
 
+/** Requires `LV_USE_3DTEXTURE = 1` */
+#define LV_USE_GLTF  0
+
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
 #define LV_USE_VECTOR_GRAPHIC  0
@@ -1408,6 +1414,9 @@
 
     /** Vector graphic demo */
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
+    /** GLTF demo */
+    #define LV_USE_DEMO_GLTF            0
 
     /*---------------------------
      * Demos from lvgl/lv_demos

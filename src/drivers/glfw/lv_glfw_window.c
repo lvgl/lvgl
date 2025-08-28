@@ -10,6 +10,7 @@
 #if LV_USE_OPENGLES
 #include <stdlib.h>
 #include "../../core/lv_refr.h"
+#include "../../stdlib/lv_sprintf.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
@@ -67,30 +68,41 @@ static lv_ll_t glfw_window_ll;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev)
+lv_glfw_window_t * lv_glfw_window_create_ex(int32_t hor_res, int32_t ver_res, bool use_mouse_indev, bool h_flip,
+                                            bool v_flip,  const char * title)
 {
+    LV_ASSERT_NULL(title);
     if(lv_glfw_init() != 0) {
+        LV_LOG_ERROR("Failed to init glfw");
         return NULL;
     }
 
     lv_glfw_window_t * window = lv_ll_ins_tail(&glfw_window_ll);
     LV_ASSERT_MALLOC(window);
-    if(window == NULL) return NULL;
+    if(window == NULL) {
+        LV_LOG_ERROR("Failed to create glfw window");
+        return NULL;
+    }
     lv_memzero(window, sizeof(*window));
 
     /* Create window with graphics context */
     lv_glfw_window_t * existing_window = lv_ll_get_head(&glfw_window_ll);
-    window->window = glfwCreateWindow(hor_res, ver_res, "LVGL Simulator", NULL,
+    window->window = glfwCreateWindow(hor_res, ver_res, title, NULL,
                                       existing_window ? existing_window->window : NULL);
     if(window->window == NULL) {
-        LV_LOG_ERROR("glfwCreateWindow fail.");
+        LV_LOG_ERROR("glfwCreateWindow fail");
         lv_ll_remove(&glfw_window_ll, window);
         lv_free(window);
         return NULL;
     }
 
+    glfwSetWindowTitle(window->window, title);
+
+    window->h_flip = h_flip;
+    window->v_flip = v_flip;
     window->hor_res = hor_res;
     window->ver_res = ver_res;
+
     lv_ll_init(&window->textures, sizeof(lv_glfw_texture_t));
     window->use_indev = use_mouse_indev;
 
@@ -102,6 +114,16 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
     lv_opengles_init();
 
     return window;
+}
+
+lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool use_mouse_indev)
+{
+    return lv_glfw_window_create_ex(hor_res, ver_res, use_mouse_indev, false, false, "LVGL Simulator");
+}
+
+void lv_glfw_window_set_title(lv_glfw_window_t * window, const char * new_title)
+{
+    glfwSetWindowTitle(window->window, new_title);
 }
 
 void lv_glfw_window_delete(lv_glfw_window_t * window)
@@ -125,6 +147,12 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
 void * lv_glfw_window_get_glfw_window(lv_glfw_window_t * window)
 {
     return (void *)(window->window);
+}
+
+void lv_glfw_window_set_flip(lv_glfw_window_t * window, bool h_flip, bool v_flip)
+{
+    window->h_flip = h_flip;
+    window->v_flip = v_flip;
 }
 
 lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsigned int texture_id, int32_t w, int32_t h)
@@ -308,10 +336,10 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
 #if LV_USE_DRAW_OPENGLES
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, texture_disp == NULL);
+                                       &clip_area, window->h_flip, texture_disp == NULL ? window->v_flip : !window->v_flip);
 #else
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, true);
+                                       &clip_area, window->h_flip, window->v_flip);
 #endif
         }
 
@@ -371,8 +399,18 @@ static void proc_mouse(lv_glfw_window_t * window)
     LV_LL_READ_BACK(&window->textures, texture) {
         if(lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
             /* adjust the mouse pointer coordinates so that they are relative to the texture */
-            texture->indev_last_point.x = window->mouse_last_point.x - texture->area.x1;
-            texture->indev_last_point.y = window->mouse_last_point.y - texture->area.y1;
+            if(window->h_flip) {
+                texture->indev_last_point.x = texture->area.x2 - window->mouse_last_point.x;
+            }
+            else {
+                texture->indev_last_point.x  = window->mouse_last_point.x - texture->area.x1;
+            }
+            if(window->v_flip) {
+                texture->indev_last_point.y = (texture->area.y2 - window->mouse_last_point.y);
+            }
+            else {
+                texture->indev_last_point.y = (window->mouse_last_point.y - texture->area.y1);
+            }
             texture->indev_last_state = window->mouse_last_state;
             lv_indev_read(texture->indev);
             break;
