@@ -17,6 +17,7 @@
 #define LV_OS_WINDOWS       5
 #define LV_OS_MQX           6
 #define LV_OS_SDL2          7
+#define LV_OS_CHIBIOS       8
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -265,6 +266,7 @@
  * - LV_OS_WINDOWS
  * - LV_OS_MQX
  * - LV_OS_SDL2
+ * - LV_OS_CHIBIOS
  * - LV_OS_CUSTOM */
 #ifndef LV_USE_OS
     #ifdef CONFIG_LV_USE_OS
@@ -4312,12 +4314,73 @@
     #endif
 #endif
 #if LV_USE_ST_LTDC
+    #if LV_USE_OS != LV_OS_CHIBIOS
+        #ifndef LV_USE_ST_LTDC_CHIBIOS
+            #ifdef CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                #define LV_USE_ST_LTDC_CHIBIOS CONFIG_LV_USE_ST_LTDC_CHIBIOS
+            #else
+                #define LV_USE_ST_LTDC_CHIBIOS 0
+            #endif
+        #endif
+        #ifndef LV_ST_LTDC_INCLUDE
+            #ifdef CONFIG_LV_ST_LTDC_INCLUDE
+                #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE
+            #else
+                #define LV_ST_LTDC_INCLUDE "ltdc.h"
+            #endif
+        #endif
+    #else
+        #ifndef LV_USE_ST_LDC
+            #ifdef CONFIG_LV_USE_ST_LDC
+                #define LV_USE_ST_LDC CONFIG_LV_USE_ST_LDC
+            #else
+                #define LV_USE_ST_LDC 0
+            #endif
+        #endif
+        #ifndef LV_USE_ST_LTDC_CHIBIOS
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                    #define LV_USE_ST_LTDC_CHIBIOS CONFIG_LV_USE_ST_LTDC_CHIBIOS
+                #else
+                    #define LV_USE_ST_LTDC_CHIBIOS 0
+                #endif
+            #else
+                #define LV_USE_ST_LTDC_CHIBIOS 1
+            #endif
+        #endif
+        #ifndef LV_ST_LTDC_INCLUDE
+            #ifdef CONFIG_LV_ST_LTDC_INCLUDE
+                #define LV_ST_LTDC_INCLUDE CONFIG_LV_ST_LTDC_INCLUDE
+            #else
+                #define LV_ST_LTDC_INCLUDE "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
+            #endif
+        #endif
+    #endif
     /* Only used for partial. */
     #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
         #ifdef CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
             #define LV_ST_LTDC_USE_DMA2D_FLUSH CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
         #else
             #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
+        #endif
+    #endif
+    #if LV_ST_LTDC_USE_DMA2D_FLUSH
+        #if LV_USE_OS != LV_OS_CHIBIOS
+            #ifndef LV_ST_LTDC_DMA2D_INCLUDE
+                #ifdef CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                    #define LV_ST_LTDC_DMA2D_INCLUDE CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                #else
+                    #define LV_ST_LTDC_DMA2D_INCLUDE "dma2d.h"
+                #endif
+            #endif
+        #else
+            #ifndef LV_ST_LTDC_DMA2D_INCLUDE
+                #ifdef CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                    #define LV_ST_LTDC_DMA2D_INCLUDE CONFIG_LV_ST_LTDC_DMA2D_INCLUDE
+                #else
+                    #define LV_ST_LTDC_DMA2D_INCLUDE "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
+                #endif
+            #endif
         #endif
     #endif
 #endif
