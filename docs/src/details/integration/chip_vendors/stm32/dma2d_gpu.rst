@@ -58,13 +58,13 @@ other RTOS tasks while a DMA2D transfer is ongoing, you need two things:
    ``LV_USE_DRAW_DMA2D_INTERRUPT`` to ``1`` in ``lv_conf.h``.
 
 
-Interop with LTDC and NemaGFX
-*****************************
+Interop with LTDC and NeoChrom
+******************************
 
 DMA2D usage can be freely mixed with LTDC usage as long as ``LV_ST_LTDC_USE_DMA2D_FLUSH``
 is **not** enabled. LTDC will use the DMA2D peripheral for flushing, if that is enabled.
 
-NemaGFX and DMA2D may be enabled at the same time. They are both draw units
+NeoChrom and DMA2D may be enabled at the same time. They are both draw units
 and they will both independently accept draw tasks.
 
 

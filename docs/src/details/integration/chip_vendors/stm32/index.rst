@@ -9,7 +9,7 @@ STM32
 
     overview
     ltdc
-    nema_gfx_gpu
+    neochrom
     dma2d_gpu
     lcd_stm32_guide
 

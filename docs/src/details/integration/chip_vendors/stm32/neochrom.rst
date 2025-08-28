@@ -1,29 +1,18 @@
-.. _nema_gfx:
+.. _neochrom:
 
-====================
-NemaGFX Acceleration
-====================
+========
+NeoChrom
+========
 
-NemaGFX is a high-level graphics API supported
-by many embedded 2.5D GPUs. LVGL can use it to
-natively render LVGL graphics.
-
-Since NemaGFX is simply an API standard, it is not specific
-to only STM32 devices.
-This page discusses the role that NemaGFX has in
-STM32 devices.
-
-ST's integration of NemaGFX is called NeoChrom.
-
-LVGL integrates NemaGFX as a :ref:`draw unit <draw units>`.
+LVGL integrates NeoChrom as a :ref:`draw unit <draw units>`.
 
 
-Ready-to-use Projects that have NemaGFX enabled
-***********************************************
+Ready-to-use Projects that have NeoChrom enabled
+************************************************
 
 `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
 is a ready-to-use port for the Riverdi STM32 5.0" Embedded Display
-(STM32U599NJH6Q or STM32U5A9NJH6Q) which has Nema enabled.
+(STM32U599NJH6Q or STM32U5A9NJH6Q) which has NeoChrom enabled.
 Follow the instructions in the readme to get started.
 
 `lv_port_stm32u5g9j-dk2 <https://github.com/lvgl/lv_port_stm32u5g9j-dk2>`__
@@ -42,16 +31,16 @@ to the size of the display you will be using so that enough static
 memory will be reserved for VG. Without VG, more task types will be
 performed by the software renderer.
 
-"libs/nema_gfx" contains pre-compiled binaries for the Nema GPU drivers.
+"libs/nema_gfx" contains pre-compiled binaries for the NeoChrom GPU drivers.
 
 `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
 is already configured to link the "cortex_m33_revC" binaries when building
 and `lv_port_stm32u5g9j-dk2 <https://github.com/lvgl/lv_port_stm32u5g9j-dk2>`__
 is configured to link the "cortex_m33_NemaPVG" binaries when building.
 
-"cortex_m33_revC" works on all STM32 m33 devices with a Nema core while "cortex_m33_NemaPVG"
+"cortex_m33_revC" works on all STM32 m33 devices with a NeoChrom core while "cortex_m33_NemaPVG"
 additionally supports the tessellation and matrix multiplication acceleration that
-the STM32 U5F and U5G Nema cores are capable of.
+the STM32 U5F and U5G NeoChrom cores are capable of.
 
 With a different STM32CubeIDE project, you can configure the libraries to be linked
 by right-clicking the project in the "Project Explorer" sidebar, clicking
@@ -80,7 +69,7 @@ At the time of writing, :c:macro:`LV_USE_OS` support is experimental
 and not yet working in
 `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
 
-NemaGFX requires a simple HAL implementation to allocate memory and optionally
+NeoChrom requires a simple HAL implementation to allocate memory and optionally
 lock resources. You may use a custom HAL implementation for your platform or use one of the
 provided implementations by setting :c:macro:`LV_USE_NEMA_HAL` to a value other than
 :c:macro:`LV_NEMA_HAL_CUSTOM`.
@@ -88,6 +77,8 @@ provided implementations by setting :c:macro:`LV_USE_NEMA_HAL` to a value other 
 
 TSC Images
 **********
+
+`The TSC converter can be downloaded from here. <https://drive.google.com/file/d/1wUcurTe1bvwC6e-tMDbXd1-e5kS8YdQK/view?usp=sharing>`_
 
 TSC (ThinkSilicon Compression) images can be drawn by this renderer. The
 TSC 4/6/6A/12/12A color formats are part of :cpp:type:`lv_color_format_t`.
@@ -111,10 +102,10 @@ renderer.
 Interop with the LTDC driver and the DMA2D Draw Unit
 ****************************************************
 
-NemaGFX can be enabled at the same time as LTDC. They will not interfere
+NeoChrom can be enabled at the same time as LTDC. They will not interfere
 with each other at all.
 
-NemaGFX and DMA2D may be enabled at the same time. They are both draw units
+NeoChrom and DMA2D may be enabled at the same time. They are both draw units
 and they will both independently accept draw tasks.
 
 

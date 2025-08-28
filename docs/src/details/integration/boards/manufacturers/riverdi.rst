@@ -37,7 +37,7 @@ Embedded Displays.
 - `RVT50HQSNWN00 <https://riverdi.com/product/5-inch-lcd-display-stm32u5-rvt50hqsnwn00>`_
 
 It natively supports the embedded NeoChrom GPU thanks to LVGL's support
-for :ref:`Nema GFX <nema_gfx>`. NemaVG --- an extension to Nema's
+for :ref:`NeoChrom <neochrom>`. NemaVG --- an extension to NeoChrom's
 base support --- is implemented by this MCU.
 
 The MCU has an LCD driver peripheral which LVGL uses to update the

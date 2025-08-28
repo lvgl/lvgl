@@ -136,8 +136,8 @@ created using :cpp:func:`lv_st_ltdc_create_partial`.
 is used.
 
 
-Interop with the DMA2D and NemaGFX Draw Units
-*********************************************
+Interop with the DMA2D and NeoChrom Draw Units
+**********************************************
 
 :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` can be enabled to use DMA2D to flush
 partial buffers in parallel with other LVGL tasks, whether or not OS is
@@ -147,14 +147,5 @@ option.
 It must not be enabled at the same time as :c:macro:`LV_USE_DRAW_DMA2D`.
 See the :ref:`DMA2D support <dma2d>`.
 
-NemaGFX can be enabled at the same time as LTDC. They will not interfere
+NeoChrom can be enabled at the same time as LTDC. They will not interfere
 with each other at all.
-
-
-.. admonition::  Further Reading
-
-    You may be interested in enabling the :ref:`Nema GFX renderer <nema_gfx>`
-    if your STM32 has a NeoChrom GPU.
-
-    `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
-    is a way to quick way to get started with LTDC on LVGL.

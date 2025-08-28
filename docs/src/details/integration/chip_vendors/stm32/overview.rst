@@ -20,6 +20,8 @@ The projects it generates are STM32 HAL based. The STM32 HAL is maintained by ST
 and is a good fit for many applications. STM32CubeIDE can optionally generate projects that
 use FreeRTOS.
 
+`STM32CubeIDE can be downloaded from here. <https://www.st.com/en/development-tools/stm32cubeide.html>`_
+
 STM32 projects can be created with STM32CubeIDE or with other frameworks that don't use the STM32 HAL.
 There are many ways to develop for STM32
 including manual bare metal, Zephry RTOS, NuttX RTOS, ChibiOS, and many more. Frameworks
@@ -49,8 +51,8 @@ models feature. Sometimes these features can be utilized together at the same ti
 See the individual pages about them.
 
 - :ref:`LTDC: display controller. <stm32 ltdc driver>`
-- :ref:`DMA2D: asynchronous pixel data memory operations. <dma2d>``
-- :ref:`NemaGFX: GPU for rendering 2D graphics primitives. <nema_gfx>``
+- :ref:`DMA2D: asynchronous pixel data memory operations. <dma2d>`
+- :ref:`NeoChrom: GPU for rendering 2D graphics primitives. <neochrom>`
 
 Each page mentions if/how they can be used with each other.
 
@@ -108,12 +110,17 @@ For info about driving a display specifically on an STM32, read the
 STM32 HAL Example
 -----------------
 
-A minimal example using STM32CubeIDE, and HAL. \* When setting up
-**Pinout and Configuration** using the **Device Configuration Tool**,
-select **System Core** -> **SYS** and ensure that **Timebase Source** is
-set to **SysTick**. \* Configure any other peripherals (including the
-LCD panel), and initialize them in *main.c*. \* ``#include "lvgl.h"`` in
-the *main.c* file. \* Create some frame buffer(s) as global variables:
+A minimal example using STM32CubeIDE, and HAL.
+
+- When setting up
+  **Pinout and Configuration** using the **Device Configuration Tool**,
+  select **System Core** -> **SYS** and ensure that **Timebase Source** is
+  set to **SysTick**.
+- Configure any other peripherals (including the
+  LCD panel), and initialize them in *main.c*.
+- ``#include "lvgl.h"`` in
+  the *main.c* file.
+- Create some frame buffer(s) as global variables:
 
 .. code-block:: c
 
