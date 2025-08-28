@@ -530,6 +530,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     uint32_t next_char_offset;
     uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
+
     cmd_state_t recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
     lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
     uint8_t is_first_space_after_cmd = 0;
@@ -553,7 +554,6 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         line_start_x = pos.x;
 
         /*Write all letter of a line*/
-        recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
         next_char_offset = 0;
 #if LV_USE_BIDI
         char * bidi_txt = lv_malloc(line_end - line_start + 1);
