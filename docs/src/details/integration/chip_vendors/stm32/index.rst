@@ -8,6 +8,7 @@ STM32
     :maxdepth: 2
 
     overview
+    add_lvgl_to_your_stm32_project
     ltdc
     neochrom
     dma2d_gpu
