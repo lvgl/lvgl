@@ -62,7 +62,7 @@ if memory is very scarce. If there is almost enough memory for double-buffered
 direct mode, but not quite, then use partial render mode.
 
 To clarify what ``my_ltdc_framebuffer_address`` exactly is, it's the value of
-``pLayerCfg.FBStartAddress`` when the LTDC layer is configured using the STM32 HAL,
+``pLayerCfg.FBStartAdress`` when the LTDC layer is configured using the STM32 HAL,
 which is written to the ``CFBAR`` register of the LTDC layer peripheral.
 
 .. image:: /_static/images/stm32cubemx-ltdc-fbaddr.png
