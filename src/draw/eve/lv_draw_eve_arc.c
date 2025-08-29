@@ -307,7 +307,9 @@ static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, cons
 
     if(dsc->rounded) {
         lv_eve_stencil_func(EVE_EQUAL, 1, 0XFF);
-        lv_eve_stencil_op(EVE_ZERO, EVE_ZERO);
+        if(opa < 255) {
+            lv_eve_stencil_op(EVE_ZERO, EVE_ZERO);
+        }
 
         int32_t half_width = width / 2;
         int32_t adjusted_radius = radius_out - half_width;
