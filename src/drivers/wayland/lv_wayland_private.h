@@ -136,6 +136,7 @@ typedef struct {
     struct buffer * buffers;
     struct zwp_linux_dmabuf_v1 * handler;
     uint32_t format;
+    uint8_t last_used;
 } dmabuf_ctx_t;
 
 typedef struct {
@@ -375,6 +376,7 @@ void destroy_decorators_buf(struct window * window, struct graphic_object * deco
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
+void lv_wayland_wait_swap_buf_cb(lv_display_t * disp);
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p);
 
 /**********************
