@@ -85,10 +85,6 @@ implement a separate set of callbacks for each display. Also note that the user 
 Example
 -------
 
-.. note::
-	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
-
-
 .. code-block:: c
 
 	#include "src/drivers/display/st7789/lv_st7789.h"
