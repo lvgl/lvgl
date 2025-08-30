@@ -45,10 +45,9 @@ typedef struct {
     uint64_t tick;     /**< The tick value of the profiler item */
     char tag;          /**< The tag of the profiler item */
     const char * func; /**< A pointer to the function associated with the profiler item */
-#if LV_USE_OS
+    const char * task; /**< A pointer to the task name associated with the profiler item */
     int tid;           /**< The thread ID of the profiler item */
-    int cpu;         /**< The CPU ID of the profiler item */
-#endif
+    int cpu;           /**< The CPU ID of the profiler item */
 } lv_profiler_builtin_item_t;
 
 /**
@@ -69,6 +68,8 @@ typedef struct _lv_profiler_builtin_ctx_t {
  *  STATIC PROTOTYPES
  **********************/
 
+static void lv_profiler_builtin_write_internal(const char * func, const char * task, char tag, uint64_t tick, int tid,
+                                               int cpu);
 static uint64_t default_tick_get_cb(void);
 static void default_flush_cb(const char * buf);
 static int default_tid_get_cb(void);
@@ -183,6 +184,40 @@ void lv_profiler_builtin_write(const char * func, char tag)
         return;
     }
 
+#if LV_USE_OS
+    lv_profiler_builtin_write_internal(func, "LVGL", tag, profiler_ctx->config.tick_get_cb(),
+                                       profiler_ctx->config.tid_get_cb(), profiler_ctx->config.cpu_get_cb());
+#else
+    lv_profiler_builtin_write_internal(func, "LVGL", tag, profiler_ctx->config.tick_get_cb(), 1, 0);
+#endif
+}
+
+void lv_profiler_builtin_write_custom(const char * func, const char * task, char tag, uint64_t tick, int tid,
+                                      int cpu)
+{
+    LV_ASSERT_NULL(profiler_ctx);
+    LV_ASSERT_NULL(func);
+    LV_ASSERT_NULL(task);
+
+    if(!profiler_ctx->enable) {
+        return;
+    }
+
+    lv_profiler_builtin_write_internal(func, task, tag, tick, tid, cpu);
+}
+
+uint64_t lv_profiler_builtin_tick_get(void)
+{
+    return profiler_ctx->config.tick_get_cb();
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_profiler_builtin_write_internal(const char * func, const char * task, char tag, uint64_t tick, int tid,
+                                               int cpu)
+{
     LV_PROFILER_MULTEX_LOCK;
 
     if(profiler_ctx->cur_index >= profiler_ctx->item_num) {
@@ -192,22 +227,16 @@ void lv_profiler_builtin_write(const char * func, char tag)
 
     lv_profiler_builtin_item_t * item = &profiler_ctx->item_arr[profiler_ctx->cur_index];
     item->func = func;
+    item->task = task;
     item->tag = tag;
-    item->tick = profiler_ctx->config.tick_get_cb();
-
-#if LV_USE_OS
-    item->tid = profiler_ctx->config.tid_get_cb();
-    item->cpu = profiler_ctx->config.cpu_get_cb();
-#endif
+    item->tick = tick;
+    item->tid = tid;
+    item->cpu = cpu;
 
     profiler_ctx->cur_index++;
 
     LV_PROFILER_MULTEX_UNLOCK;
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 static uint64_t default_tick_get_cb(void)
 {
@@ -244,23 +273,15 @@ static void flush_no_lock(void)
         uint64_t sec = item->tick / tick_per_sec;
         uint64_t nsec = (item->tick % tick_per_sec) * (LV_PROFILER_TICK_PER_SEC_MAX / tick_per_sec);
 
-#if LV_USE_OS
         lv_snprintf(buf, sizeof(buf),
-                    "   LVGL-%d [%d] %" LV_PRIu64 ".%09" LV_PRIu64 ": tracing_mark_write: %c|1|%s\n",
+                    "   %s-%d [%d] %" LV_PRIu64 ".%09" LV_PRIu64 ": tracing_mark_write: %c|1|%s\n",
+                    item->task,
                     item->tid,
                     item->cpu,
                     sec,
                     nsec,
                     item->tag,
                     item->func);
-#else
-        lv_snprintf(buf, sizeof(buf),
-                    "   LVGL-1 [0] %" LV_PRIu64 ".%09" LV_PRIu64 ": tracing_mark_write: %c|1|%s\n",
-                    sec,
-                    nsec,
-                    item->tag,
-                    item->func);
-#endif
         profiler_ctx->config.flush_cb(buf);
     }
 }
