@@ -581,6 +581,8 @@ void test_spangroup_set_line_space(void)
     lv_span_set_text(span, test_text);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_14.png");
+
+    lv_obj_set_style_text_font(spangroup, LV_FONT_DEFAULT, 0);
     lv_freetype_font_delete(font);
 }
 
