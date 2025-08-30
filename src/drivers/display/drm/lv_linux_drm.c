@@ -56,6 +56,10 @@ typedef struct {
     unsigned long int size;
     uint8_t * map;
     uint32_t fb_handle;
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    uint32_t prime_fd;
+    struct gbm_bo * bo;
+#endif
 } drm_buffer_t;
 
 typedef struct {
@@ -107,6 +111,7 @@ static int drm_setup_buffers(drm_dev_t * drm_dev);
 static void drm_flush_wait(lv_display_t * drm_dev);
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void drm_dmabuf_set_active_buf(lv_event_t * event);
+static void drm_free(lv_event_t * e);
 
 static uint32_t tick_get_cb(void);
 
@@ -154,7 +159,7 @@ lv_display_t * lv_linux_drm_create(void)
     lv_display_set_driver_data(disp, drm_dev);
     lv_display_set_flush_wait_cb(disp, drm_flush_wait);
     lv_display_set_flush_cb(disp, drm_flush);
-
+    lv_display_add_event_cb(disp, drm_free, LV_EVENT_DELETE, NULL);
 
     return disp;
 }
@@ -692,6 +697,9 @@ static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id)
 
     LV_LOG_TRACE("crtc_idx: %d", drm_dev->crtc_idx);
 
+    drmModeFreeConnector(conn);
+    drmModeFreeResources(res);
+
     return 0;
 
 free_res:
@@ -922,7 +930,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     if(n_planes != 1) {
         LV_LOG_ERROR("The current implementation only supports a single plane per fd");
-        return -1;
+        goto err;
     }
 
     w = gbm_bo_get_width(gbm_bo);
@@ -935,12 +943,13 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
                 buf->size, buf->pitch, buf->offset, drm_format_name);
+    if(drm_format_name) free(drm_format_name);
 
     prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
 
     if(prime_fd < 0) {
         LV_LOG_ERROR("Failed to get prime fd for plane 0");
-        return -1;
+        goto err;
 
     }
 
@@ -948,7 +957,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     if(buf->map == MAP_FAILED) {
         LV_LOG_ERROR("Failed to mmap dma-buf fd.");
-        return -1;
+        goto err;
     }
 
     /* Used to perform DMA_BUF_SYNC ioctl calls during the rendering cycle */
@@ -963,7 +972,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     if(res) {
         LV_LOG_ERROR("drmModeAddFB2 failed");
-        return -1;
+        goto err;
     }
 
     if(drmCloseBufferHandle(drm_dev->fd, handles[0]) != 0) {
@@ -971,8 +980,30 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
         return -1;
     }
 
+    /* Used for cleaning GBM properly in drm_free */
+    buf->prime_fd = prime_fd;
+    buf->bo = gbm_bo;
+
     return 0;
 
+err:
+    if(buf->handle) {
+        /* Nevermind the outcome, just try to close */
+        (void)drmCloseBufferHandle(drm_dev->fd, handles[0]);
+    }
+
+    if(buf->map) {
+        munmap(buf->map, buf->size);
+        buf->map = NULL;
+    }
+
+    if(prime_fd >= 0)
+        close(prime_fd);
+
+    if(gbm_bo)
+        gbm_bo_destroy(gbm_bo);
+
+    return -1;
 }
 
 #endif /* END LV_USE_LINUX_DRM_GBM_BUFFERS */
@@ -1051,6 +1082,144 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
     drm_dev->act_buf = NULL;
 
+}
+
+static void drm_free(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_current_target(e);
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+    if(drm_dev == NULL) return;
+
+    /* Restore original CRTC if it's saved */
+    if(drm_dev->fd >= 0 && drm_dev->saved_crtc) {
+        drmModeCrtc * s_crtc = drm_dev->saved_crtc;
+        drmModeSetCrtc(drm_dev->fd, s_crtc->crtc_id, s_crtc->buffer_id, 0, 0, NULL,
+                       0, &s_crtc->mode);
+        drmModeFreeCrtc(s_crtc);
+        drm_dev->saved_crtc = NULL;
+    }
+
+    /* Prevent new flushes & free any pending atomic request */
+    lv_display_set_flush_cb(disp, NULL);
+    if(drm_dev->req) {
+        drmModeAtomicFree(drm_dev->req);
+        drm_dev->req = NULL;
+    }
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+
+    for(int i = 0; i < BUFFER_CNT; ++i) {
+        drm_buffer_t * b = &drm_dev->drm_bufs[i];
+
+        if(b->fb_handle) {
+            drmModeRmFB(drm_dev->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
+
+        if(b->map) {
+            munmap(b->map, b->size);
+            b->map = NULL;
+        }
+
+        if(b->prime_fd >= 0) {
+            close(b->prime_fd);
+            b->prime_fd = -1;
+        }
+
+        if(b->bo) {
+            gbm_bo_destroy(b->bo);
+            b->bo = NULL;
+        }
+    }
+
+    if(gbm_device) {
+        gbm_device_destroy(gbm_device);
+        gbm_device = NULL;
+    }
+}
+
+#else /* Using dumb buffers */
+
+    for(int i = 0; i < BUFFER_CNT; ++i)
+    {
+        drm_buffer_t * b = &drm_dev->drm_bufs[i];
+
+        if(b->fb_handle) {
+            drmModeRmFB(drm_dev->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
+        if(b->map) {
+            munmap(b->map, b->size);
+            b->map = NULL;
+        }
+        if(b->handle) {
+            drmModeDestroyDumbBuffer(drm_dev->fd, b->handle);
+            b->handle = 0;
+        }
+    }
+
+#endif /* END LV_USE_LINUX_DRM_GBM_BUFFERS */
+
+for(uint32_t i = 0; i < drm_dev->count_plane_props; ++i)
+{
+    if(drm_dev->plane_props[i]) {
+        drmModeFreeProperty(drm_dev->plane_props[i]);
+        drm_dev->plane_props[i] = NULL;
+    }
+}
+drm_dev->count_plane_props = 0;
+
+for(uint32_t i = 0; i < drm_dev->count_crtc_props; ++i)
+{
+    if(drm_dev->crtc_props[i]) {
+        drmModeFreeProperty(drm_dev->crtc_props[i]);
+        drm_dev->crtc_props[i] = NULL;
+    }
+}
+drm_dev->count_crtc_props = 0;
+
+for(uint32_t i = 0; i < drm_dev->count_conn_props; ++i)
+{
+    if(drm_dev->conn_props[i]) {
+        drmModeFreeProperty(drm_dev->conn_props[i]);
+        drm_dev->conn_props[i] = NULL;
+    }
+}
+drm_dev->count_conn_props = 0;
+
+if(drm_dev->blob_id)
+{
+    drmModeDestroyPropertyBlob(drm_dev->fd, drm_dev->blob_id);
+    drm_dev->blob_id = 0;
+}
+
+if(drm_dev->conn)
+{
+    drmModeFreeConnector(drm_dev->conn);
+    drm_dev->conn = NULL;
+}
+
+if(drm_dev->crtc)
+{
+    drmModeFreeCrtc(drm_dev->crtc);
+    drm_dev->crtc = NULL;
+}
+
+if(drm_dev->plane)
+{
+    drmModeFreePlane(drm_dev->plane);
+    drm_dev->plane = NULL;
+}
+
+if(drm_dev->fd >= 0)
+{
+    close(drm_dev->fd);
+    drm_dev->fd = -1;
+}
+
+lv_display_set_driver_data(disp, NULL);
+
+lv_free(drm_dev);
 }
 
 static uint32_t tick_get_cb(void)
