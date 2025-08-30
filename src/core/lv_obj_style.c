@@ -334,7 +334,7 @@ void lv_obj_style_set_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
             return;
         }
     }
-    LV_LOG_WARN("%p style was not found on %p widget with %6x selector", (void *)style, (void *)obj, selector);
+    LV_LOG_WARN("%p style was not found on %p widget with %6" LV_PRIx32 " selector", (void *)style, (void *)obj, selector);
 }
 
 bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
@@ -346,7 +346,7 @@ bool lv_obj_style_get_disabled(lv_obj_t * obj, const lv_style_t * style, lv_styl
         }
     }
 
-    LV_LOG_WARN("%p style was not found on %p widget with %6x selector", (void *)style, (void *)obj, selector);
+    LV_LOG_WARN("%p style was not found on %p widget with %6" LV_PRIx32 " selector", (void *)style, (void *)obj, selector);
     return false;
 }
 
