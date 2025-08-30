@@ -79,8 +79,8 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     }
 
     const uint8_t * buf_u8 = draw_buf->data;
-    /* ARM require a 32 byte aligned address. */
-    uint8_t align_bytes = 32;
+    /*Cache management requires us to know the cache line size for proper alignment */
+    uint8_t align_bytes = __SCB_DCACHE_LINE_SIZE;
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
