@@ -175,6 +175,34 @@ menu "LVGL configuration"
 		help
 			Align the start address of draw_buf addresses to this bytes.
 
+		choice LV_USE_DRAW_BUF_CONVERT_ASM
+			prompt "Asm mode in draw_buf convert"
+			default LV_DRAW_BUF_CONVERT_ASM_NONE
+			help
+				ASM mode to be used
+
+			config LV_DRAW_BUF_CONVERT_ASM_NONE
+				bool "0: NONE"
+			config LV_DRAW_BUF_CONVERT_ASM_NEON
+				bool "1: NEON"
+			config LV_DRAW_BUF_CONVERT_ASM_HELIUM
+				bool "2: HELIUM"
+			config LV_DRAW_BUF_CONVERT_ASM_CUSTOM
+				bool "255: CUSTOM"
+		endchoice
+
+		config LV_USE_DRAW_BUF_CONVERT_ASM
+			int
+			default 0 if LV_DRAW_BUF_CONVERT_ASM_NONE
+			default 1 if LV_DRAW_BUF_CONVERT_ASM_NEON
+			default 2 if LV_DRAW_BUF_CONVERT_ASM_HELIUM
+			default 255 if LV_DRAW_BUF_CONVERT_ASM_CUSTOM
+
+		config LV_DRAW_BUF_CONVERT_ASM_CUSTOM_INCLUDE
+			string "Set the custom asm include file"
+			default ""
+			depends on LV_DRAW_BUF_CONVERT_ASM_CUSTOM
+
 		config LV_DRAW_TRANSFORM_USE_MATRIX
 			bool "Using matrix for transformations"
 			default n
