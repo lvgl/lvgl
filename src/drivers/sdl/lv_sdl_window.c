@@ -448,8 +448,8 @@ static void texture_resize(lv_display_t * disp)
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
-    
-    SDL_PIXELFORMAT_ARGB8888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
+
+    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_ARGB8888;
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, disp->hor_res, disp->ver_res);
