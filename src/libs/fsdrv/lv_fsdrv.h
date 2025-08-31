@@ -67,6 +67,11 @@ void lv_fs_arduino_sd_init(void);
 void lv_fs_uefi_init(void);
 #endif
 
+#if LV_USE_FS_FROGFS
+void lv_fs_frogfs_init(void);
+void lv_fs_frogfs_deinit(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/
