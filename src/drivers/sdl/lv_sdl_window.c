@@ -447,7 +447,7 @@ static void texture_resize(lv_display_t * disp)
 
 #if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 1
     SDL_PixelFormatEnum px_format =
-        SDL_PIXELFORMAT_RGB888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
+        SDL_PIXELFORMAT_ARGB8888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
 #elif LV_COLOR_DEPTH == 24
     SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_BGR24;
 #elif LV_COLOR_DEPTH == 16
