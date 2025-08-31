@@ -372,6 +372,11 @@ static void window_create(lv_display_t * disp)
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
 
     int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
     int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
@@ -379,14 +384,13 @@ static void window_create(lv_display_t * disp)
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
-    dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
-                                       LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
+    dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_ACCELERATED);
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
-    lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
-    if(dsc->fb2) lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
+    lv_memset(dsc->fb1, 0x00, hor_res * ver_res * px_size);
+    if(dsc->fb2) lv_memset(dsc->fb2, 0x00, hor_res * ver_res * px_size);
 
 #endif /*LV_USE_DRAW_SDL == 0*/
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
@@ -444,21 +448,12 @@ static void texture_resize(lv_display_t * disp)
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
-
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 1
-    SDL_PixelFormatEnum px_format =
-        SDL_PIXELFORMAT_ARGB8888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
-#elif LV_COLOR_DEPTH == 24
-    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_BGR24;
-#elif LV_COLOR_DEPTH == 16
-    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
-#else
-#error("Unsupported color format")
-#endif
+    
+    SDL_PIXELFORMAT_ARGB8888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, disp->hor_res, disp->ver_res);
-    SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_NONE);
 }
 
 static void * sdl_draw_buf_realloc_aligned(void * ptr, size_t new_size)
