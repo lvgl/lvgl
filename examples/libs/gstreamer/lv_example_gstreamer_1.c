@@ -17,6 +17,15 @@ void play_pause_pressed(lv_event_t * e)
         lv_label_set_text(button_label, LV_SYMBOL_PLAY);
         lv_gstreamer_pause(streamer);
     }
+
+}
+static void streamer_ready(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * play_pause_button = (lv_obj_t *)lv_event_get_user_data(e);
+    if(code == LV_EVENT_READY) {
+        lv_obj_align(play_pause_button, LV_ALIGN_BOTTOM_MID, -20, 0);
+    }
 }
 
 /**
@@ -46,6 +55,7 @@ void lv_example_gstreamer_1(void)
     lv_obj_t * pp_btn_label = lv_label_create(play_pause_button);
     lv_label_set_text_static(pp_btn_label, LV_SYMBOL_PLAY);
     lv_obj_add_event_cb(play_pause_button, play_pause_pressed, LV_EVENT_CLICKED, pp_btn_label);
+    lv_obj_add_event_cb(streamer, streamer_ready, LV_EVENT_READY, play_pause_button);
 }
 
 #endif
