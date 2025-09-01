@@ -284,6 +284,34 @@ lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
     }
 }
 
+void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
+{
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
+
+    if(streamer->pipeline == NULL) {
+        return;
+    }
+
+    g_object_set(streamer->audio_volume, "volume", volume / 100.f, NULL);
+}
+
+uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
+
+    if(streamer->pipeline == NULL) {
+        return 0;
+    }
+
+    float volume_f;
+    g_object_get(streamer->audio_volume, "volume",  &volume_f, NULL);
+
+    return (uint8_t)(volume_f * 100.f);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -425,6 +453,12 @@ static lv_result_t gstreamer_create_pipeline(lv_gstreamer_t * streamer, GstEleme
         return LV_RESULT_INVALID;
     }
 
+    streamer->audio_volume = gst_element_factory_make("volume", "lv_gstreamer_audio_volume");
+    if(!streamer->audio_volume) {
+        LV_LOG_ERROR("Failed to create volume element");
+        return LV_RESULT_INVALID;
+    }
+
     GstElement * video_rate = gst_element_factory_make("videorate", "lv_gstreamer_video_rate");
     if(!video_rate) {
         LV_LOG_ERROR("Failed to create videorate element");
@@ -457,7 +491,7 @@ static lv_result_t gstreamer_create_pipeline(lv_gstreamer_t * streamer, GstEleme
 
     /* The caller has already added head and whatever comes before it to the pipeline */
     gst_bin_add_many(GST_BIN(pipeline), streamer->video_convert, video_rate, video_queue, video_app_sink,
-                     streamer->audio_convert, audio_resample, audio_sink, NULL);
+                     streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL);
 
     /* Here we set the fps we want the pipeline to produce and the color format*
      * This is achieved by the video_convert and video_rate elements that will automaticall throttle and
@@ -475,7 +509,7 @@ static lv_result_t gstreamer_create_pipeline(lv_gstreamer_t * streamer, GstEleme
         LV_LOG_ERROR("Failed to link video convert to sink");
     }
 
-    if(!gst_element_link_many(streamer->audio_convert, audio_resample, audio_sink, NULL)) {
+    if(!gst_element_link_many(streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL)) {
         LV_LOG_ERROR("Failed to link audio convert to sink");
     }
 

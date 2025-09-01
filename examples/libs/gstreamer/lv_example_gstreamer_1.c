@@ -6,6 +6,13 @@ typedef struct {
     lv_obj_t * button_label;
 } btn_user_data_t;
 
+static void volume_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * streamer = lv_observer_get_target_obj(observer);
+    int32_t volume = lv_subject_get_int(subject);
+    LV_LOG_USER("Setting volume %" PRIu32, volume);
+    lv_gstreamer_set_volume(streamer, (uint8_t)volume);
+}
 
 static void play_pause_pressed(lv_event_t * e)
 {
@@ -59,6 +66,7 @@ void lv_example_gstreamer_1(void)
     lv_slider_set_range(volume_slider, 0, 100);
     lv_subject_init_int(&volume_subject, 0);
     lv_slider_bind_value(volume_slider, &volume_subject);
+    lv_subject_add_observer_obj(&volume_subject, volume_observer_cb, streamer, NULL);
 
     lv_obj_t * play_pause_button = lv_button_create(streamer);
     lv_obj_center(play_pause_button);

@@ -129,6 +129,20 @@ uint32_t lv_gstreamer_get_position(lv_obj_t * gstreamer);
  */
 lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * gstreamer);
 
+/**
+ * Set the volume of this gstreamer
+ * @param gstreamer     pointer to a gstreamer object
+ * @param voume         the value to set in the range [0..100]. Higher values are clamped
+ */
+void lv_gstreamer_set_volume(lv_obj_t * gstreamer, uint8_t volume);
+
+/**
+ * Get the volume of this gstreamer
+ * @param gstreamer     pointer to a gstreamer object
+ * @return      the volume for this gstreamer
+ */
+uint8_t lv_gstreamer_get_volume(lv_obj_t * gstreamer);
+
 /**********************
  *      MACROS
  **********************/
