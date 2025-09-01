@@ -220,7 +220,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     float hor_scale = tex_w / (float)disp_w;
     float ver_scale = tex_h / (float)disp_h;
     float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
-    float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
+    float ver_translate = (float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale);
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? -ver_scale : ver_scale;
     float matrix[9] = {
