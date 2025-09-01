@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_GSTREAMER && LV_BUILD_EXAMPLES
 
-static lv_subject_t position_subject;
 typedef struct {
     lv_obj_t * streamer;
     lv_obj_t * button_label;
@@ -40,27 +39,29 @@ static void streamer_ready(lv_event_t * e)
  */
 void lv_example_gstreamer_1(void)
 {
-    streamer = lv_gstreamer_create(lv_screen_active());
+    static lv_subject_t volume_subject;
     static btn_user_data_t btn_user_data;
     lv_obj_t * streamer = lv_gstreamer_create(lv_screen_active());
     lv_obj_center(streamer);
 
     /* the gstreamer widget inherits the `lv_image` widget,
-     * meaning you can also call specific image functions with it */
+         * meaning you can also call specific image functions with it */
     lv_image_set_scale(streamer, 200);
 
     lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_URI_DECODE, LV_GSTREAMER_PROPERTY_URI_DECODE,
                          "https://gstreamer.freedesktop.org/data/media/sintel_trailer-480p.webm");
 
-    lv_obj_t * position_slider = lv_slider_create(lv_screen_active());
-    lv_obj_align(position_slider, LV_ALIGN_BOTTOM_MID, 0, 50);
-    lv_subject_init_int(&position_subject, 0);
-    lv_slider_bind_value(position_slider, &position_subject);
-    lv_slider_set_min_value(position_slider, 0);
-    lv_slider_set_max_value(position_slider, 100);
+    lv_obj_t * volume_slider = lv_slider_create(lv_screen_active());
+    lv_slider_set_orientation(volume_slider, LV_SLIDER_ORIENTATION_VERTICAL);
+    lv_obj_set_size(volume_slider, LV_PCT(1), LV_PCT(50));
+    lv_obj_align(volume_slider, LV_ALIGN_RIGHT_MID, -20, 0);
 
-    lv_obj_t * play_pause_button = lv_button_create(lv_screen_active());
-    lv_obj_align(position_slider, LV_ALIGN_BOTTOM_RIGHT, 0, 50);
+    lv_slider_set_range(volume_slider, 0, 100);
+    lv_subject_init_int(&volume_subject, 0);
+    lv_slider_bind_value(volume_slider, &volume_subject);
+
+    lv_obj_t * play_pause_button = lv_button_create(streamer);
+    lv_obj_center(play_pause_button);
     lv_obj_t * pp_btn_label = lv_label_create(play_pause_button);
     lv_label_set_text_static(pp_btn_label, LV_SYMBOL_PLAY);
 
