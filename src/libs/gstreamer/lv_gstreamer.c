@@ -376,10 +376,8 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
         return;
     }
 
-    /* The first frame, the video information is invalid, we get it here
-     * This is also the place to do stuff we only want to do once like send an event
-     * informing the user that the stream is ready*/
-    if(!streamer->is_video_info_valid) {
+    const bool first_frame = !streamer->is_video_info_valid;
+    if(first_frame) {
         GstCaps * caps = gst_sample_get_caps(sample);
         if(!caps || !gst_video_info_from_caps(&streamer->video_info, caps)) {
             LV_LOG_ERROR("Failed to get video info from caps");
@@ -387,7 +385,6 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
             return;
         }
         streamer->is_video_info_valid = true;
-        lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
 
     GstBuffer * buffer = gst_sample_get_buffer(sample);
@@ -410,6 +407,11 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
             }
         };
         lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+    }
+    /* We send the event AFTER setting the image source so that users can query the
+     * resolution on this specific event callback */
+    if(first_frame) {
+        lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
     gst_sample_unref(sample);
 }
