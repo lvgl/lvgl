@@ -381,6 +381,7 @@ static lv_result_t event_send_core(lv_event_t * e)
         e->current_target = parent;
         res = event_send_core(e);
     }
+    if(res != LV_RESULT_OK) return res;
 
     /*Trickle down to children if enabled*/
     if(event_is_trickled(e)) {
