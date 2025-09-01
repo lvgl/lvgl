@@ -107,7 +107,7 @@ void lv_gstreamer_stop(lv_obj_t * gstreamer);
  * @param gstreamer     pointer to a gstreamer object
  * @param position      position to seek to
  */
-void lv_gstreamer_seek(lv_obj_t * gstreamer, uint32_t position);
+void lv_gstreamer_set_position(lv_obj_t * gstreamer, uint32_t position);
 
 /**
  * Get the duration of this gstreamer

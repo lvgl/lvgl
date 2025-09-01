@@ -201,7 +201,7 @@ void lv_gstreamer_stop(lv_obj_t * obj)
         LV_LOG_ERROR("Unable to stop pipeline");
     }
 }
-void lv_gstreamer_seek(lv_obj_t * obj, uint32_t position)
+void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
