@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_GSTREAMER_PRIVATE_H
-#define LV_GSTREAMER_PRIVATE_H
+#ifndef LV_GSTREAMER_INTERNAL_H
+#define LV_GSTREAMER_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,4 +73,4 @@ typedef struct {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GSTREAMER_PRIVATE_H*/
+#endif /*LV_GSTREAMER_INTERNAL_H*/
