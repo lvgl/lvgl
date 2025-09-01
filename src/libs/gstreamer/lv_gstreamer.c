@@ -7,10 +7,13 @@
  *      INCLUDES
  *********************/
 
-#include "glib.h"
 #include "lv_gstreamer_internal.h"
 
 #if LV_USE_GSTREAMER
+
+#include <glib.h>
+#include <gst/gstelementfactory.h>
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
@@ -18,8 +21,6 @@
 
 #define MY_CLASS (&lv_gstreamer_class)
 
-#include <gst/gstelementfactory.h>
-#include "../../core/lv_obj_class_private.h"
 
 /**********************
  *      TYPEDEFS
