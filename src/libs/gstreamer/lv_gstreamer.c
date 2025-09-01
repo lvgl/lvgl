@@ -312,6 +312,35 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
     return (uint8_t)(volume_f * 100.f);
 }
 
+/**
+ * Set the speed rate of this gstreamer
+ * @param gstreamer     pointer to a gstreamer object
+ * @param rate      the rate factor.  Example values:
+ *                      - 256:   1x
+ *                      - <256:  slow down
+ *                      - >256:  speed up
+ *                      - 128:   0.5x
+ *                      - 512:   2x
+ */
+void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
+{
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
+
+    gdouble gst_rate = (gdouble)rate / 256.0;
+
+    gint64 current_pos;
+    gst_element_query_position(streamer->pipeline, GST_FORMAT_TIME, &current_pos);
+
+    /* Perform the seek with new rate from the current position */
+    gst_element_seek(streamer->pipeline, gst_rate,
+                     GST_FORMAT_TIME,
+                     GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
+                     GST_SEEK_TYPE_SET, current_pos,
+                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

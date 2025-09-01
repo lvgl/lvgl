@@ -143,6 +143,19 @@ void lv_gstreamer_set_volume(lv_obj_t * gstreamer, uint8_t volume);
  */
 uint8_t lv_gstreamer_get_volume(lv_obj_t * gstreamer);
 
+/**
+ * Set the speed rate of this gstreamer
+ * @param gstreamer     pointer to a gstreamer object
+ * @param rate      the rate factor.  Example values:
+ *                      - 256:   1x
+ *                      - <256:  slow down
+ *                      - >256:  speed up
+ *                      - 128:   0.5x
+ *                      - 512:   2x
+ */
+void lv_gstreamer_set_rate(lv_obj_t * gstreamer, uint32_t rate);
+
+
 /**********************
  *      MACROS
  **********************/
