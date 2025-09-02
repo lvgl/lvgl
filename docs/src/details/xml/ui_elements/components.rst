@@ -25,15 +25,15 @@ Although they can't contain C code, they are very powerful:
 - Local styles can be defined, and the global styles can be used
 - Local constants can be defined, and the global constants can be used
 - Function calls, subject changes, or screen load/create events can be added. See :ref:`XML Events <xml_events>`
-- Previews can be defined to preview the components in various settings
+- Previews can be defined to preview the components in various settings in the UI Editor
 
 Unlike Widgets (which are always compiled into the application), Components can either:
 
 1. be loaded at runtime from XML, or
-2. be exported to C code and compiled with the application.
+2. be exported to C code ny LVGL UI Editor and compiled with the application.
 
-Usage from XML
-**************
+Using the XML files
+*******************
 
 In XML Files
 ------------
@@ -103,10 +103,12 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
-Usage from Exported Code
-************************
+Using the Exported Code
+***********************
 
-From each Component XML file, a C and H file is exported with a single function inside:
+If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the components.The resulting code is completely self suffucent and the XMLs files are not needed anymore. The resulting code is the same as one could write by hand as well.
+
+The exported code looks like this:
 
 .. code-block:: c
 

@@ -11,4 +11,10 @@ Root elements
     components
     widgets
     screens
-
+    animations
+    api
+    consts
+    events
+    preview
+    styles
+    view

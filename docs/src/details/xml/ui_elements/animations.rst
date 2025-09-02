@@ -26,29 +26,31 @@ Example:
 
 .. code-block:: xml
 
-   <animations>
+    <component>
+       <animations>
 
-       <!-- Show the component and its children -->
-       <timeline name="load">
-           <animation prop="translate_x" target="self" start="-30" end="0" duration="500"/>
-           <animation prop="opa" target="icon" start="0" end="255" duration="500"/>
-           <animation prop="opa" target="text" start="0" end="255" duration="500" delay="200"/>
-       </timeline>
+           <!-- Show the component and its children -->
+           <timeline name="load">
+               <animation prop="translate_x" target="self" start="-30" end="0" duration="500"/>
+               <animation prop="opa" target="icon" start="0" end="255" duration="500"/>
+               <animation prop="opa" target="text" start="0" end="255" duration="500" delay="200"/>
+           </timeline>
 
-       <!-- Shake horizontally -->
-       <timeline name="shake">
-           <animation prop="translate_x" target="self" start="0" end="-30" duration="150"/>
-           <animation prop="translate_x" target="self" start="-30" end="30" duration="300" delay="150"/>
-           <animation prop="translate_x" target="self" start="30" end="0" duration="150" delay="450"/>
-       </timeline>
-   </animations>
+           <!-- Shake horizontally -->
+           <timeline name="shake">
+               <animation prop="translate_x" target="self" start="0" end="-30" duration="150"/>
+               <animation prop="translate_x" target="self" start="-30" end="30" duration="300" delay="150"/>
+               <animation prop="translate_x" target="self" start="30" end="0" duration="150" delay="450"/>
+           </timeline>
+       </animations>
 
-   <view>
-       <lv_button width="200">
-           <my_icon name="icon" src="image1"/>
-           <lv_label name="text" text="Click me"/>
-       </lv_button>
-   </view>
+       <view>
+           <lv_button width="200">
+               <my_icon name="icon" src="image1"/>
+               <lv_label name="text" text="Click me"/>
+           </lv_button>
+       </view>
+    </component>
 
 In summary: inside ``<animations>``, you can define ``<timeline>``\ s, each with a unique name
 that you can reference later.
