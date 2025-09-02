@@ -33,5 +33,7 @@ Example
 	    <prop name="mode" type="enum:lv_bar_mode"/>
 
 	    <prop name="orientation" type="enum:lv_bar_orientation"/>
+
+        <prop name="bind_value" type="subject" />
 	</api>
 </widget>
