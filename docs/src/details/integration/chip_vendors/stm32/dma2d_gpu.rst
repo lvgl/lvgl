@@ -5,7 +5,7 @@ STM32 DMA2D
 ===========
 
 STM32 DMA2D is also called Chrom-ART. It will be referred to as DMA2D
-in this page.
+on this page.
 
 
 What is DMA2D
@@ -33,8 +33,8 @@ Usage
 To use DMA2D in your project now, set ``LV_USE_DRAW_DMA2D``
 to ``1`` in ``lv_conf.h``. You will need to specify the header for LVGL
 to include internally for DMA2D definitions. Set ``LV_DRAW_DMA2D_HAL_INCLUDE``
-to the corresponding header. I.e., if your STM32 model is an STM32U5, the
-header name will likely be `"stm32u5xx_hal.h"`. If you're using a framework,
+to the corresponding header. E.g., if your STM32 model is an STM32U5, the
+header name will likely be ``"stm32u5xx_hal.h"``. If you're using a framework,
 ensure it will not be in contention with LVGL over the DMA2D peripheral.
 LVGL uses direct memory register access to manipulate the DMA2D peripheral.
 It does not use the STM32 HAL.

@@ -6,7 +6,7 @@ Overview
 About
 *****
 
-ST Microelectronics is a chip vendor and board manufacturer of 32-bit ARM
+STMicroelectronics is a chip vendor and board manufacturer of 32-bit ARM
 MCUs and MPUs.
 
 
@@ -24,9 +24,9 @@ use FreeRTOS.
 
 STM32 projects can be created with STM32CubeIDE or with other frameworks that don't use the STM32 HAL.
 There are many ways to develop for STM32
-including manual bare metal, Zephry RTOS, NuttX RTOS, ChibiOS, and many more. Frameworks
-like Zephyr and NuttX often cause a project to be treated like "a Zephry project on STM32"
-rather than an "STM32 project running Zephry", so their documentation is where to start.
+including manual bare metal, Zephyr RTOS, NuttX RTOS, ChibiOS, and many more. Frameworks
+like Zephyr and NuttX often cause a project to be treated like "a Zephyr project on STM32"
+rather than an "STM32 project running Zephyr", so their documentation is where to start.
 Also worth mentioning is STM32CubeMX; a graphical tool for generating the boilerplate code for an
 STM32 HAL project to build it outside of STM32CubeIDE.
 Furthermore, STM32CubeCLT is a toolset for integrating ST proprietary tools into
