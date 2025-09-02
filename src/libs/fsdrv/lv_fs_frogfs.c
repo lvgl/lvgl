@@ -12,16 +12,6 @@
 
 #include "frogfs/frogfs.h"
 
-/* frogfs uses `malloc`. We need to `free` something it returns */
-#include <stdlib.h>
-
-/* frogfs uses the stdio.h definitions of SEEK_SET, SEEK_CUR, and SEEK_END */
-#ifdef __has_include
-    #if __has_include(<stdio.h>)
-        #include <stdio.h>
-    #endif
-#endif
-
 #include "../../core/lv_global.h"
 
 #if !LV_FS_IS_VALID_LETTER(LV_FS_FROGFS_LETTER)
@@ -31,16 +21,6 @@
 /*********************
  *      DEFINES
  *********************/
-
-#ifndef SEEK_SET
-    #define SEEK_SET 0
-#endif
-#ifndef SEEK_CUR
-    #define SEEK_CUR 1
-#endif
-#ifndef SEEK_END
-    #define SEEK_END 2
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -256,7 +236,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         lv_strlcpy(fn, name, fn_len);
     }
 
-    free(name); /* frogfs `malloc`d it */
+    lv_free(name); /* frogfs `malloc`d it */
 
     return LV_FS_RES_OK;
 }

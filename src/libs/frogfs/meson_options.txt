@@ -1,0 +1,4 @@
+option('log-level', type: 'combo', choices: ['none', 'error', 'warn', 'info', 'debug', 'verbose'], value: 'warn')
+option('use-heatshrink', type: 'boolean', value: false)
+option('use-miniz', type: 'boolean', value: false)
+option('use-zlib', type: 'boolean', value: false)

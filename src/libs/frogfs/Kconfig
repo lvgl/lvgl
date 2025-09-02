@@ -1,0 +1,68 @@
+menu "FrogFS"
+
+choice
+	prompt "Log level"
+	default FROGFS_LOG_LEVEL_WARN
+	help
+		This option sets the log level for FrogFS.
+
+config FROGFS_LOG_LEVEL_NONE
+	bool "None"
+
+config FROGFS_LOG_LEVEL_ERROR
+	bool "Error"
+
+config FROGFS_LOG_LEVEL_WARN
+	bool "Warning"
+
+config FROGFS_LOG_LEVEL_INFO
+	bool "Info"
+
+config FROGFS_LOG_LEVEL_DEBUG
+	bool "Debug"
+
+config FROGFS_LOG_LEVEL_VERBOSE
+	bool "Verbose"
+
+endchoice # "Log level"
+
+config FROGFS_USE_MINIZ
+	bool "Use miniz for gzip and zlib compression"
+	default y if !IDF_TARGET_ESP8266
+	help
+		If enabled, this will enable support for decompressing files using
+		miniz for gzip and zlib formats using the deflate algorithm.
+
+config FROGFS_USE_ZLIB
+	bool "Use zlib for gzip and zlib compression"
+	default n
+	help
+		If enabled, this will enable support for decompressing files using
+		zlib for gzip and zlib formats using the deflate algorithm.
+
+		This requires zlib as a project dependency.
+
+config FROGFS_USE_HEATSHRINK
+	bool "Use heatshrink"
+	default n
+	help
+		If enabled, this will enable support for decompressing files using
+		the heatshrink algorithm.
+
+config FROGFS_MAX_PARTITIONS
+	int "Max partitions"
+	default 1
+	help
+		This option specifies the number of partitions that can be mounted
+		using VFS at the same time.
+
+config FROGFS_VFS_SUPPORT_DIR
+	bool "Compile in VFS directory functions"
+	default y
+	depends on VFS_SUPPORT_DIR
+	help
+		This option if enabled includes the following VFS functions:
+
+		stat, opendir, readdir, telldir, seekdir, closedir, and access
+
+endmenu
