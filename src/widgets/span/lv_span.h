@@ -345,7 +345,6 @@ void lv_spangroup_refresh(lv_obj_t * obj);
  * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
  *                  or NULL to bind to the value directly.
  * @return          pointer to newly-created Observer
- * @note            `fmt == NULL` can be used only with string and pointer Subjects.
  * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
  *                  as text as they are, integers as %d, floats as %0.1f
  */

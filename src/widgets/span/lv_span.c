@@ -49,6 +49,7 @@ typedef struct {
     void * element; /**< span of a span group*/
     const char * fmt;
 } bind_element_string_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
