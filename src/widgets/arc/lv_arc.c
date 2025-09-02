@@ -18,6 +18,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw_arc.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -50,6 +51,10 @@ static void value_update(lv_obj_t * arc);
 static int32_t knob_get_extra_size(lv_obj_t * obj);
 static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise_t angle,
                                           const lv_value_precise_t tolerance_deg);
+#if LV_USE_OBSERVER
+    static void arc_value_changed_event_cb(lv_event_t * e);
+    static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -366,6 +371,25 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj)
 /*=====================
  * Other functions
  *====================*/
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, arc_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
 
 void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
 {
@@ -1024,5 +1048,37 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
 
     return false;
 }
+
+#if LV_USE_OBSERVER
+
+static void arc_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * arc = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_subject_set_int(subject, lv_arc_get_value(arc));
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_subject_set_float(subject, (float)lv_arc_get_value(arc));
+    }
+#endif
+}
+
+static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_arc_set_value(observer->target, subject->value.num);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_arc_set_value(observer->target, (int32_t)subject->value.float_v);
+    }
+#endif
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

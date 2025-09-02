@@ -24,6 +24,7 @@
 #include "../../misc/lv_text_private.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../../stdlib/lv_string.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -58,6 +59,10 @@ static void copy_text_to_label(lv_label_t * label, const char * text);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
 static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, const char * txt,
                                    uint32_t length, const lv_font_t * font, lv_area_t * txt_coords, lv_text_attributes_t * attributes);
+
+#if LV_USE_OBSERVER
+    static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -664,6 +669,40 @@ bool lv_label_get_recolor(const lv_obj_t * obj)
  * Other functions
  *====================*/
 
+#if LV_USE_OBSERVER
+lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(fmt == NULL) {
+        if(subject->type == LV_SUBJECT_TYPE_INT) {
+            fmt = "%d";
+        }
+#if LV_USE_FLOAT
+        else if(subject->type == LV_SUBJECT_TYPE_FLOAT) {
+            fmt = "%0.1f";
+        }
+#endif
+        else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+    else {
+        if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER &&
+           subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+            LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+            return NULL;
+        }
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, label_text_observer_cb, obj, (void *)fmt);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -709,6 +748,8 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     /*Refresh the label*/
     lv_label_refr_text(obj);
 }
+
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -1330,5 +1371,37 @@ static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, con
         /* Nothing to do */
     }
 }
+
+#if LV_USE_OBSERVER
+
+static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    const char * fmt = observer->user_data;
+
+    if(fmt == NULL) {
+        lv_label_set_text(observer->target, subject->value.pointer);
+    }
+    else {
+        switch(subject->type) {
+            case LV_SUBJECT_TYPE_INT:
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.num);
+                break;
+#if LV_USE_FLOAT
+            case LV_SUBJECT_TYPE_FLOAT:
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.float_v);
+                break;
+#endif
+            case LV_SUBJECT_TYPE_STRING:
+            case LV_SUBJECT_TYPE_POINTER:
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.pointer);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+#endif /*LV_USE_LABEL*/
+
 
 #endif

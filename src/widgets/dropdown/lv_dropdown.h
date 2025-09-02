@@ -233,6 +233,17 @@ void lv_dropdown_close(lv_obj_t * obj);
  */
 bool lv_dropdown_is_open(lv_obj_t * obj);
 
+
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer Subject to a Dropdown's value.
+ * @param obj       pointer to Dropdown
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
+
 /**********************
  *      MACROS
  **********************/
