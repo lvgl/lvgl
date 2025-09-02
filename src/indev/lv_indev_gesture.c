@@ -20,7 +20,6 @@
 
 #include <math.h>
 #include "lv_indev_gesture.h"
-#include "lv_indev_gesture_private.h"
 
 /********************
  *      DEFINES
@@ -40,7 +39,15 @@
  * STATIC PROTOTYPES
  ********************/
 
-static lv_indev_gesture_t * init_gesture_info(void);
+static void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, lv_indev_touch_data_t * touches,
+                                          uint16_t touch_cnt);
+static void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer,
+                                             lv_indev_touch_data_t * touches,
+                                             uint16_t touch_cnt);
+static void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * recognizer,
+                                                      lv_indev_touch_data_t * touches,
+                                                      uint16_t touch_cnt);
+
 static lv_indev_gesture_motion_t * get_motion(uint8_t id, lv_indev_gesture_t * info);
 static int8_t get_motion_idx(uint8_t id, lv_indev_gesture_t * info);
 static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_t * info);
@@ -66,60 +73,70 @@ static lv_indev_gesture_type_t get_first_recognized_or_ended_gesture(lv_indev_t 
  * GLOBAL FUNCTIONS
  ********************/
 
+void lv_indev_gesture_init(lv_indev_t * indev)
+{
+    LV_ASSERT_NULL(indev);
+    lv_memzero(&indev->recognizers, sizeof(indev->recognizers));
+    indev->cur_gesture = LV_INDEV_GESTURE_NONE;
+    lv_memzero(&indev->gesture_data, sizeof(indev->gesture_data));
+    lv_memzero(&indev->gesture_type, sizeof(indev->gesture_type));
+
+    for(uint8_t r = 0; r < LV_INDEV_GESTURE_CNT; r++) {
+        lv_indev_gesture_t * info = &indev->recognizers[r].info;
+
+        indev->recognizers[r].config.pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
+        indev->recognizers[r].config.pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
+        indev->recognizers[r].config.rotation_angle_rad_threshold = LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
+
+        info->scale = 1;
+
+        for(uint8_t i = 0; i < LV_GESTURE_MAX_POINTS; i++) {
+            info->motions[i].finger = -1;
+        }
+    }
+
+    indev->recognizers[LV_INDEV_GESTURE_PINCH].recog_fn = lv_indev_gesture_detect_pinch;
+    indev->recognizers[LV_INDEV_GESTURE_ROTATE].recog_fn = lv_indev_gesture_detect_rotation;
+    indev->recognizers[LV_INDEV_GESTURE_TWO_FINGERS_SWIPE].recog_fn = lv_indev_gesture_detect_two_fingers_swipe;
+}
+
 void lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)
 {
+    LV_ASSERT_NULL(indev);
     /* A up threshold MUST always be bigger than 1 */
     LV_ASSERT(threshold > 1.0f);
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_PINCH];
-
-    if(recognizer->config == NULL) {
-        recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT_MALLOC(recognizer->config);
-        recognizer->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
-    }
-
-    recognizer->config->pinch_up_threshold = threshold;
+    recognizer->config.pinch_up_threshold = threshold;
 }
 
 void lv_indev_set_pinch_down_threshold(lv_indev_t * indev, float threshold)
 {
+    LV_ASSERT_NULL(indev);
     /* A down threshold MUST always be smaller than 1 */
     LV_ASSERT(threshold < 1.0f);
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_PINCH];
-
-    if(recognizer->config == NULL) {
-        recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT_MALLOC(recognizer->config);
-        recognizer->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
-    }
-
-    recognizer->config->pinch_down_threshold = threshold;
+    recognizer->config.pinch_down_threshold = threshold;
 }
 
 void lv_indev_set_rotation_rad_threshold(lv_indev_t * indev, float threshold)
 {
+    LV_ASSERT_NULL(indev);
     /* A rotation threshold MUST always be a positive number */
     LV_ASSERT(threshold > 0.0f);
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_ROTATE];
-
-    if(recognizer->config == NULL) {
-
-        recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT(recognizer->config != NULL);
-        recognizer->config->rotation_angle_rad_threshold = LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
-    }
-
-    recognizer->config->rotation_angle_rad_threshold = threshold;
+    recognizer->config.rotation_angle_rad_threshold = threshold;
 }
 
 void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point)
 {
-    if(recognizer->info->motions[0].finger != -1) {
-        point->x = recognizer->info->motions[0].point.x;
-        point->y = recognizer->info->motions[0].point.y;
+    LV_ASSERT_NULL(recognizer);
+    LV_ASSERT_NULL(point);
+    if(recognizer->info.motions[0].finger != -1) {
+        point->x = recognizer->info.motions[0].point.x;
+        point->y = recognizer->info.motions[0].point.y;
         return;
     }
 
@@ -130,8 +147,9 @@ void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t * recogniz
 
 bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer)
 {
+    LV_ASSERT_NULL(recognizer);
     if(recognizer->state == LV_INDEV_GESTURE_STATE_ENDED ||
-       recognizer->info->finger_cnt == 0) {
+       recognizer->info.finger_cnt == 0) {
         return false;
     }
 
@@ -140,6 +158,7 @@ bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer)
 
 float lv_event_get_pinch_scale(lv_event_t * gesture_event)
 {
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_gesture_recognizer_t * recognizer;
 
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, LV_INDEV_GESTURE_PINCH)) == NULL) {
@@ -151,6 +170,7 @@ float lv_event_get_pinch_scale(lv_event_t * gesture_event)
 
 float lv_event_get_rotation(lv_event_t * gesture_event)
 {
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_gesture_recognizer_t * recognizer;
 
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, LV_INDEV_GESTURE_ROTATE)) == NULL) {
@@ -162,6 +182,7 @@ float lv_event_get_rotation(lv_event_t * gesture_event)
 
 float lv_event_get_two_fingers_swipe_distance(lv_event_t * gesture_event)
 {
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_gesture_recognizer_t * recognizer;
 
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, LV_INDEV_GESTURE_TWO_FINGERS_SWIPE)) == NULL) {
@@ -173,7 +194,7 @@ float lv_event_get_two_fingers_swipe_distance(lv_event_t * gesture_event)
 
 lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event)
 {
-
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_gesture_recognizer_t * recognizer;
 
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, LV_INDEV_GESTURE_TWO_FINGERS_SWIPE)) == NULL) {
@@ -185,18 +206,21 @@ lv_dir_t lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event)
 
 void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point)
 {
+    LV_ASSERT_NULL(recognizer);
+    LV_ASSERT_NULL(point);
     if(lv_indev_recognizer_is_active(recognizer) == false) {
         point->x = 0;
         point->y = 0;
         return;
     }
 
-    point->x = recognizer->info->center.x;
-    point->y = recognizer->info->center.y;
+    point->x = recognizer->info.center.x;
+    point->y = recognizer->info.center.y;
 }
 
 lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, lv_indev_gesture_type_t type)
 {
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_gesture_recognizer_t * recognizer;
 
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event, type)) == NULL) {
@@ -208,6 +232,7 @@ lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, 
 
 lv_indev_gesture_type_t lv_event_get_gesture_type(lv_event_t * gesture_event)
 {
+    LV_ASSERT_NULL(gesture_event);
     lv_indev_t * indev = (lv_indev_t *) gesture_event->param;
 
     if(indev == NULL) {
@@ -220,6 +245,8 @@ lv_indev_gesture_type_t lv_event_get_gesture_type(lv_event_t * gesture_event)
 void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recognizer_t * recognizer,
                                lv_indev_gesture_type_t type)
 {
+    LV_ASSERT_NULL(data);
+    LV_ASSERT_NULL(recognizer);
     bool is_active;
 
     if(recognizer == NULL) return;
@@ -254,276 +281,10 @@ void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recogniz
     }
 }
 
-
-void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, lv_indev_touch_data_t * touches,
-                                   uint16_t touch_cnt)
-{
-    lv_indev_touch_data_t * touch;
-    lv_indev_gesture_recognizer_t * r = recognizer;
-    uint8_t i;
-
-    if(r->info == NULL) {
-        LV_LOG_TRACE("init gesture info");
-        r->info = init_gesture_info();
-    }
-
-    if(r->config == NULL) {
-        LV_LOG_TRACE("init gesture configuration - set defaults");
-        r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT_MALLOC(r->config);
-
-        r->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
-        r->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
-    }
-
-    /* Process collected touch events */
-    for(i = 0; i < touch_cnt; i++) {
-        touch = touches;
-        process_touch_event(touch, r->info);
-        touches++;
-
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
-                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
-    }
-
-    LV_LOG_TRACE("Current finger count: %d state: %d", r->info->finger_cnt, r->state);
-
-    if(r->info->finger_cnt == 2) {
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_NONE:
-
-                /* 2 fingers down - potential pinch or swipe */
-                reset_recognizer(recognizer);
-                gesture_update_center_point(r->info, 2);
-                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                gesture_calculate_factors(r->info, 2);
-                if(r->info->scale > LV_GESTURE_PINCH_MAX_INITIAL_SCALE) {
-                    r->state = LV_INDEV_GESTURE_STATE_CANCELED;
-                    break;
-                }
-                if(r->info->scale > r->config->pinch_up_threshold ||
-                   r->info->scale < r->config->pinch_down_threshold) {
-                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
-                }
-                break;
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* It's an ongoing pinch gesture - update the factors */
-                gesture_calculate_factors(r->info, 2);
-                LV_ASSERT(r->info != NULL);
-                r->scale = r->info->scale;
-                r->type = LV_INDEV_GESTURE_PINCH;
-                break;
-            case LV_INDEV_GESTURE_STATE_ENDED:
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-                reset_recognizer(r);
-                break;
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-    else {
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* Gesture has ended */
-                r->state = LV_INDEV_GESTURE_STATE_ENDED;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                /* User lifted a finger before reaching threshold */
-                r->state = LV_INDEV_GESTURE_STATE_CANCELED;
-                break;
-            case LV_INDEV_GESTURE_STATE_ENDED:
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-                reset_recognizer(r);
-                break;
-
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-}
-
-void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer, lv_indev_touch_data_t * touches,
-                                      uint16_t touch_cnt)
-{
-    lv_indev_touch_data_t * touch;
-    lv_indev_gesture_recognizer_t * r = recognizer;
-    uint8_t i;
-
-    if(r->info == NULL) {
-        LV_LOG_TRACE("init gesture info");
-        r->info = init_gesture_info();
-    }
-
-    if(r->config == NULL) {
-        LV_LOG_TRACE("init gesture configuration - set defaults");
-        r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-
-        LV_ASSERT(r->config != NULL);
-    }
-
-    /* Process collected touch events */
-    for(i = 0; i < touch_cnt; i++) {
-
-        touch = touches;
-        process_touch_event(touch, r->info);
-        touches++;
-
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
-                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
-    }
-
-    LV_LOG_TRACE("Current finger count: %d state: %d", r->info->finger_cnt, r->state);
-
-    if(r->info->finger_cnt == 2) {
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_NONE:
-                /* 2 fingers down - potential rotation or swipe */
-                reset_recognizer(recognizer);
-                gesture_update_center_point(r->info, 2);
-                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                /* Update the rotation from the inputs */
-                gesture_calculate_factors(r->info, 2);
-                if(fabs(r->info->rotation - r->info->p_rotation) > r->config->rotation_angle_rad_threshold) {
-
-                    gesture_update_center_point(r->info, 2);
-                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
-                }
-                break;
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* It's a recognized rotation gesture - update the factors */
-                gesture_calculate_factors(r->info, 2);
-                r->type = LV_INDEV_GESTURE_ROTATE;
-                r->rotation = r->info->rotation;
-                break;
-            case LV_INDEV_GESTURE_STATE_ENDED:
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-                reset_recognizer(r);
-                r->type = LV_INDEV_GESTURE_NONE;
-                r->state = LV_INDEV_GESTURE_STATE_CANCELED;
-                break;
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-    else {
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* Gesture has ended */
-                r->type = LV_INDEV_GESTURE_ROTATE;
-                r->state = LV_INDEV_GESTURE_STATE_ENDED;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                /* User lifted a finger before reaching threshold */
-                reset_recognizer(r);
-                break;
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-            case LV_INDEV_GESTURE_STATE_ENDED:
-                reset_recognizer(r);
-                break;
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-}
-
-void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * recognizer,
-                                               lv_indev_touch_data_t * touches,
-                                               uint16_t touch_cnt)
-{
-    lv_indev_touch_data_t * touch;
-    lv_indev_gesture_recognizer_t * r = recognizer;
-    uint8_t i;
-    float dist;
-
-    if(r->info == NULL) {
-        LV_LOG_TRACE("init gesture info");
-        r->info = init_gesture_info();
-    }
-
-    if(r->config == NULL) {
-        LV_LOG_TRACE("init gesture configuration - set defaults");
-        r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
-
-        LV_ASSERT(r->config != NULL);
-    }
-
-    /* Process collected touch events */
-    for(i = 0; i < touch_cnt; i++) {
-
-        touch = touches;
-        process_touch_event(touch, r->info);
-        touches++;
-
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
-                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
-    }
-
-    LV_LOG_TRACE("Current finger count: %d state: %d", r->info->finger_cnt, r->state);
-
-    if(r->info->finger_cnt == 2) {
-
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_NONE:
-                /* 2 fingers down - potential rotation or swipe */
-                reset_recognizer(recognizer);
-                gesture_update_center_point(r->info, 2);
-                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                /* The gesture is ongoing, now wait for the distance from the center
-                to be higher than the threshold to pass it as recognized */
-                gesture_calculate_factors(r->info, 2);
-                dist = SQUARE_SUM(r->info->delta_x, r->info->delta_y);
-                if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
-                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
-                }
-                break;
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* The gesture is now recognized, and will stay recognized
-                until a finger is lifted */
-                gesture_calculate_factors(r->info, 2);
-                r->distance = (float) sqrt(SQUARE_SUM(r->info->delta_x, r->info->delta_y));
-                r->two_fingers_swipe_dir = calculate_swipe_dir(r);
-                r->type = LV_INDEV_GESTURE_TWO_FINGERS_SWIPE;
-                break;
-            case LV_INDEV_GESTURE_STATE_ENDED:
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-                reset_recognizer(r);
-                break;
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-    else {
-
-        switch(r->state) {
-            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
-                /* Gesture has ended */
-                r->state = LV_INDEV_GESTURE_STATE_ENDED;
-                r->type = LV_INDEV_GESTURE_TWO_FINGERS_SWIPE;
-                break;
-            case LV_INDEV_GESTURE_STATE_ONGOING:
-                /* User lifted a finger before reaching threshold */
-                reset_recognizer(r);
-                r->state = LV_INDEV_GESTURE_STATE_ENDED;
-                break;
-            case LV_INDEV_GESTURE_STATE_CANCELED:
-            case LV_INDEV_GESTURE_STATE_ENDED:
-                reset_recognizer(r);
-                r->state = LV_INDEV_GESTURE_STATE_NONE;
-                break;
-            default:
-                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
-        }
-    }
-}
-
 void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data_t * touches, uint16_t touch_cnt)
 {
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(touches);
     lv_indev_gesture_type_t type;
 
     /* First check if a recognizer state is RECOGNIZED or ENDED. *
@@ -573,6 +334,8 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
 
 void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(data);
     lv_indev_gesture_type_t type;
     type = get_first_recognized_or_ended_gesture(indev);
 
@@ -590,7 +353,6 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
     }
 }
 
-
 /********************
  * STATIC FUNCTIONS
  ********************/
@@ -603,14 +365,14 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
  */
 static lv_dir_t calculate_swipe_dir(lv_indev_gesture_recognizer_t * recognizer)
 {
-    float abs_x = LV_ABS(recognizer->info->delta_x);
-    float abs_y = LV_ABS(recognizer->info->delta_y);
+    float abs_x = LV_ABS(recognizer->info.delta_x);
+    float abs_y = LV_ABS(recognizer->info.delta_y);
 
     if(abs_x > abs_y) {
-        return recognizer->info->delta_x > 0 ? LV_DIR_RIGHT : LV_DIR_LEFT;
+        return recognizer->info.delta_x > 0 ? LV_DIR_RIGHT : LV_DIR_LEFT;
     }
     else {
-        return recognizer->info->delta_y > 0 ? LV_DIR_BOTTOM : LV_DIR_TOP;
+        return recognizer->info.delta_y > 0 ? LV_DIR_BOTTOM : LV_DIR_TOP;
     }
 }
 
@@ -634,6 +396,245 @@ lv_indev_gesture_recognizer_t * lv_indev_get_gesture_recognizer(lv_event_t * ges
     return (lv_indev_gesture_recognizer_t *) indev->gesture_data[type];
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, lv_indev_touch_data_t * touches,
+                                          uint16_t touch_cnt)
+{
+    LV_ASSERT_NULL(recognizer);
+    LV_ASSERT_NULL(touches);
+    lv_indev_touch_data_t * touch;
+    lv_indev_gesture_recognizer_t * r = recognizer;
+    uint8_t i;
+
+    /* Process collected touch events */
+    for(i = 0; i < touch_cnt; i++) {
+        touch = touches;
+        process_touch_event(touch, &r->info);
+        touches++;
+
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
+                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info.finger_cnt);
+    }
+
+    LV_LOG_TRACE("Current finger count: %d state: %d", r->info.finger_cnt, r->state);
+
+    if(r->info.finger_cnt == 2) {
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+
+                /* 2 fingers down - potential pinch or swipe */
+                reset_recognizer(recognizer);
+                gesture_update_center_point(&r->info, 2);
+                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                gesture_calculate_factors(&r->info, 2);
+                if(r->info.scale > LV_GESTURE_PINCH_MAX_INITIAL_SCALE) {
+                    r->state = LV_INDEV_GESTURE_STATE_CANCELED;
+                    break;
+                }
+                if(r->info.scale > r->config.pinch_up_threshold ||
+                   r->info.scale < r->config.pinch_down_threshold) {
+                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
+                }
+                break;
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* It's an ongoing pinch gesture - update the factors */
+                gesture_calculate_factors(&r->info, 2);
+                r->scale = r->info.scale;
+                r->type = LV_INDEV_GESTURE_PINCH;
+                break;
+            case LV_INDEV_GESTURE_STATE_ENDED:
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+                reset_recognizer(r);
+                break;
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+    else {
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* Gesture has ended */
+                r->state = LV_INDEV_GESTURE_STATE_ENDED;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                /* User lifted a finger before reaching threshold */
+                r->state = LV_INDEV_GESTURE_STATE_CANCELED;
+                break;
+            case LV_INDEV_GESTURE_STATE_ENDED:
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+                reset_recognizer(r);
+                break;
+
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+}
+
+static void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer,
+                                             lv_indev_touch_data_t * touches,
+                                             uint16_t touch_cnt)
+{
+    LV_ASSERT_NULL(recognizer);
+    LV_ASSERT_NULL(touches);
+    lv_indev_touch_data_t * touch;
+    lv_indev_gesture_recognizer_t * r = recognizer;
+    uint8_t i;
+
+    /* Process collected touch events */
+    for(i = 0; i < touch_cnt; i++) {
+
+        touch = touches;
+        process_touch_event(touch, &r->info);
+        touches++;
+
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
+                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info.finger_cnt);
+    }
+
+    LV_LOG_TRACE("Current finger count: %d state: %d", r->info.finger_cnt, r->state);
+
+    if(r->info.finger_cnt == 2) {
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+                /* 2 fingers down - potential rotation or swipe */
+                reset_recognizer(recognizer);
+                gesture_update_center_point(&r->info, 2);
+                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                /* Update the rotation from the inputs */
+                gesture_calculate_factors(&r->info, 2);
+                if(fabs(r->info.rotation - r->info.p_rotation) > r->config.rotation_angle_rad_threshold) {
+
+                    gesture_update_center_point(&r->info, 2);
+                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
+                }
+                break;
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* It's a recognized rotation gesture - update the factors */
+                gesture_calculate_factors(&r->info, 2);
+                r->type = LV_INDEV_GESTURE_ROTATE;
+                r->rotation = r->info.rotation;
+                break;
+            case LV_INDEV_GESTURE_STATE_ENDED:
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+                reset_recognizer(r);
+                r->type = LV_INDEV_GESTURE_NONE;
+                r->state = LV_INDEV_GESTURE_STATE_CANCELED;
+                break;
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+    else {
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* Gesture has ended */
+                r->type = LV_INDEV_GESTURE_ROTATE;
+                r->state = LV_INDEV_GESTURE_STATE_ENDED;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                /* User lifted a finger before reaching threshold */
+                reset_recognizer(r);
+                break;
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+            case LV_INDEV_GESTURE_STATE_ENDED:
+                reset_recognizer(r);
+                break;
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+}
+
+static void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * recognizer,
+                                                      lv_indev_touch_data_t * touches,
+                                                      uint16_t touch_cnt)
+{
+    LV_ASSERT_NULL(recognizer);
+    LV_ASSERT_NULL(touches);
+    lv_indev_touch_data_t * touch;
+    lv_indev_gesture_recognizer_t * r = recognizer;
+    uint8_t i;
+    float dist;
+
+    /* Process collected touch events */
+    for(i = 0; i < touch_cnt; i++) {
+
+        touch = touches;
+        process_touch_event(touch, &r->info);
+        touches++;
+
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
+                     i, touch->id, touch->state, touch->point.x, touch->point.y, r->info.finger_cnt);
+    }
+
+    LV_LOG_TRACE("Current finger count: %d state: %d", r->info.finger_cnt, r->state);
+
+    if(r->info.finger_cnt == 2) {
+
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_NONE:
+                /* 2 fingers down - potential rotation or swipe */
+                reset_recognizer(recognizer);
+                gesture_update_center_point(&r->info, 2);
+                r->state = LV_INDEV_GESTURE_STATE_ONGOING;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                /* The gesture is ongoing, now wait for the distance from the center
+                to be higher than the threshold to pass it as recognized */
+                gesture_calculate_factors(&r->info, 2);
+                dist = SQUARE_SUM(r->info.delta_x, r->info.delta_y);
+                if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
+                    r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
+                }
+                break;
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* The gesture is now recognized, and will stay recognized
+                until a finger is lifted */
+                gesture_calculate_factors(&r->info, 2);
+                r->distance = (float) sqrt(SQUARE_SUM(r->info.delta_x, r->info.delta_y));
+                r->two_fingers_swipe_dir = calculate_swipe_dir(r);
+                r->type = LV_INDEV_GESTURE_TWO_FINGERS_SWIPE;
+                break;
+            case LV_INDEV_GESTURE_STATE_ENDED:
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+                reset_recognizer(r);
+                break;
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+    else {
+
+        switch(r->state) {
+            case LV_INDEV_GESTURE_STATE_RECOGNIZED:
+                /* Gesture has ended */
+                r->state = LV_INDEV_GESTURE_STATE_ENDED;
+                r->type = LV_INDEV_GESTURE_TWO_FINGERS_SWIPE;
+                break;
+            case LV_INDEV_GESTURE_STATE_ONGOING:
+                /* User lifted a finger before reaching threshold */
+                reset_recognizer(r);
+                r->state = LV_INDEV_GESTURE_STATE_ENDED;
+                break;
+            case LV_INDEV_GESTURE_STATE_CANCELED:
+            case LV_INDEV_GESTURE_STATE_ENDED:
+                reset_recognizer(r);
+                r->state = LV_INDEV_GESTURE_STATE_NONE;
+                break;
+            default:
+                LV_ASSERT_MSG(true, "invalid gesture recognizer state");
+        }
+    }
+}
+
 /**
  * Resets a gesture recognizer, motion descriptors are preserved
  * @param recognizer        a pointer to the recognizer to reset
@@ -647,9 +648,9 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
 
     if(recognizer == NULL) return;
 
-    finger_cnt = recognizer->info->finger_cnt;
-    info = recognizer->info;
-    conf = recognizer->config;
+    finger_cnt = recognizer->info.finger_cnt;
+    info = &recognizer->info;
+    conf = &recognizer->config;
     recog_fn = recognizer->recog_fn;
 
     /* Set everything to zero but preserve the motion descriptors,
@@ -657,37 +658,15 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
     lv_memzero((uint8_t *)info + sizeof(info->motions), sizeof(lv_indev_gesture_t) - sizeof(info->motions));
     lv_memzero(recognizer, sizeof(lv_indev_gesture_recognizer_t));
 
-    recognizer->info = info;
-    recognizer->config = conf;
+    recognizer->info = *info;
+    recognizer->config = *conf;
     recognizer->recog_fn = recog_fn;
 
-    recognizer->scale = recognizer->info->scale = 1.0;
-    recognizer->info->finger_cnt = finger_cnt;
+    recognizer->scale = recognizer->info.scale = 1.0;
+    recognizer->info.finger_cnt = finger_cnt;
 
     recognizer->state = LV_INDEV_GESTURE_STATE_NONE;
     recognizer->type = LV_INDEV_GESTURE_NONE;
-}
-
-/**
- * Initializes a motion descriptors used with the recognizer(s)
- * @return a pointer to gesture descriptor
- */
-static lv_indev_gesture_t * init_gesture_info(void)
-{
-    lv_indev_gesture_t * info;
-    uint8_t i;
-
-    info = lv_malloc_zeroed(sizeof(lv_indev_gesture_t));
-    LV_ASSERT_MALLOC(info);
-
-    info->scale = 1;
-    info->rotation = 0.0;
-
-    for(i = 0; i < LV_GESTURE_MAX_POINTS; i++) {
-        info->motions[i].finger = -1;
-    }
-
-    return info;
 }
 
 /**
