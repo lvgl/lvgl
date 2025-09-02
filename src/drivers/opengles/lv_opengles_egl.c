@@ -89,7 +89,7 @@ static EGLint const attribute_list[] = {
     EGL_RED_SIZE, 8,
     EGL_GREEN_SIZE, 8,
     EGL_BLUE_SIZE, 8,
-    EGL_ALPHA_SIZE, 8,        // ← important!
+    EGL_ALPHA_SIZE, 8,
     EGL_NONE
 };
 

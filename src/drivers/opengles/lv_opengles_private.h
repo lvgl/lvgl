@@ -24,6 +24,8 @@ extern "C" {
 #include <GL/gl.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
+#else
+#error LV_USE_OPENGLES_API was not one of the valid values
 #endif
 
 /*********************

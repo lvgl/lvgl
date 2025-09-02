@@ -251,7 +251,7 @@ enable the following in your ``lv_conf.h`` (or Kconfig or CMake).
     #define LV_USE_LINUX_DRM             1
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 1
     #define LV_LINUX_DRM_USE_EGL         1
-    #define LV_USE_DRAW_OPENGLES         1   /* optional */
+    #define LV_USE_DRAW_OPENGLES         1   /* optional: use texture caching. needed for actual performance advantage */
 
 
 Render Direct to Window
