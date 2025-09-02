@@ -61,7 +61,7 @@ void lv_fs_frogfs_init(void)
         .addr = frogfs_bin,
     };
 
-    frogfs_fs_t *fs = frogfs_init(&frogfs_config);
+    frogfs_fs_t * fs = frogfs_init(&frogfs_config);
     if(fs == NULL) {
         LV_LOG_ERROR("Could not initialize frogfs with bin 0x%p", frogfs_bin);
         return;
@@ -106,7 +106,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         return NULL;
     }
 
-    frogfs_fs_t *fs = drv->user_data;
+    frogfs_fs_t * fs = drv->user_data;
 
     const frogfs_entry_t * entry = frogfs_get_entry(fs, path);
     if(entry == NULL) {
@@ -194,7 +194,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
-    frogfs_fs_t *fs = drv->user_data;
+    frogfs_fs_t * fs = drv->user_data;
 
     const frogfs_entry_t * entry = frogfs_get_entry(fs, path);
     if(entry == NULL) {
