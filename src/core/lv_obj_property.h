@@ -44,7 +44,7 @@ extern "C" {
  * produces
  * LV_PROPERTY_OBJ_FLAG_CLICKABLE = (LV_PROPERTY_OBJ_START + (1)) | ((LV_PROPERTY_TYPE_INT) << LV_PROPERTY_TYPE_SHIFT)
  */
-#define LV_PROPERTY_ID(clz, name, type, index)          LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
+#define LV_PROPERTY_ID(clz, name, type, index)          LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + ((int)index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
 
 /* Example:
  * LV_PROPERTY_ID2(SLIDER, VALUE, LV_PROPERTY_TYPE_INT, LV_PROPERTY_TYPE_BOOL, 0)
