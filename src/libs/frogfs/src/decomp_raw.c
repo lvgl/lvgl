@@ -77,4 +77,7 @@ const frogfs_decomp_funcs_t frogfs_decomp_raw = {
     .tell = tell_raw,
 };
 
+#else
+/*This typedef exists purely to keep -Wpedantic happy when the file is empty.*/
+typedef int _keep_pedantic_happy;
 #endif /*LV_BUILD_FROGFS*/

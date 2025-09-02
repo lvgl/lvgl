@@ -391,4 +391,7 @@ cleanup:
     return r;
 }
 
+#else
+/*This typedef exists purely to keep -Wpedantic happy when the file is empty.*/
+typedef int _keep_pedantic_happy;
 #endif /*LV_BUILD_FROGFS*/

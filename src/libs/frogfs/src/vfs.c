@@ -361,4 +361,7 @@ esp_err_t frogfs_vfs_deregister(const char *base_path)
     return ESP_ERR_NOT_FOUND;
 }
 
+#else
+/*This typedef exists purely to keep -Wpedantic happy when the file is empty.*/
+typedef int _keep_pedantic_happy;
 #endif /*LV_BUILD_FROGFS*/
