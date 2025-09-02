@@ -216,6 +216,8 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
     lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
 
+    lv_label_revert_dots(obj);
+
     /*If text is NULL then refresh*/
     if(fmt == NULL) {
         lv_label_refr_text(obj);

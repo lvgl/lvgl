@@ -59,6 +59,7 @@ get_directory_property(HAS_PARENT_SCOPE PARENT_DIRECTORY)
 
 # Set sources used for LVGL components
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c
+                          ${LVGL_ROOT_DIR}/src/*.cpp
                           ${LVGL_ROOT_DIR}/src/*.S)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)

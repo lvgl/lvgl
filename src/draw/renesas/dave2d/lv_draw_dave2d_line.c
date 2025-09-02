@@ -51,9 +51,6 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
         LV_ASSERT(0);
     }
 
-#if D2_RENDER_EACH_OPERATION
-    d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
-#endif
     //
     // Generate render operations
     //
@@ -76,14 +73,6 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     d2_renderline(u->d2_handle, D2_FIX4(p1_x), D2_FIX4(p1_y), D2_FIX4(p2_x),
                   D2_FIX4(p2_y), D2_FIX4(dsc->width), d2_le_exclude_none);
-
-    //
-    // Execute render operations
-    //
-#if D2_RENDER_EACH_OPERATION
-    d2_executerenderbuffer(u->d2_handle, u->renderbuffer, 0);
-    d2_flushframe(u->d2_handle);
-#endif
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);

@@ -213,6 +213,19 @@ def generate_test_images():
                     print(f"converting {os.path.basename(png)}, format: {fmt.name}, compress: {compress_name}")
 
 
+def clean_build_dirs_with_filter(build_dir, clean_filters):
+    for entry in os.listdir(build_dir):
+        entry_path = os.path.join(build_dir, entry)
+
+        if any(entry.endswith(filter) for filter in clean_filters):
+            continue
+
+        if os.path.isfile(entry_path):
+            os.remove(entry_path)
+        elif os.path.isdir(entry_path):
+            shutil.rmtree(entry_path)
+
+
 if __name__ == "__main__":
     epilog = '''This program builds and optionally runs the LVGL test programs.
     There are two types of LVGL tests: "build", and "test". The build-only
@@ -256,6 +269,7 @@ if __name__ == "__main__":
         else:
             options_to_build = test_options
 
+    clean_build_dirs = []
     for options_name in options_to_build:
         is_test = options_name in test_options
         is_perf_test = options_name in perf_test_options
@@ -274,10 +288,26 @@ if __name__ == "__main__":
                 run_tests(options_name, args.test_suite)
             except subprocess.CalledProcessError as e:
                 sys.exit(e.returncode)
+
         if args.auto_clean:
             build_dir = get_build_dir(options_name)
-            print("Removing " + build_dir)
-            shutil.rmtree(build_dir)
+
+            if args.report:
+                # Keep the files that gcovr analysis depends on and delete
+                # the rest to solve the storage capacity limit of GitHub CI
+                clean_filters = ['CMakeFiles', '.c']
+                clean_build_dirs_with_filter(build_dir, clean_filters)
+                print(f"Append {build_dir} to clean list")
+                clean_build_dirs.append(build_dir)
+            else:
+                # Remove all build directories directly
+                print(f"Removing {build_dir}")
+                shutil.rmtree(build_dir)
 
     if args.report:
         generate_code_coverage_report()
+
+    # Clean all build directories after report
+    for build_dir in clean_build_dirs:
+        print(f"Removing {build_dir}")
+        shutil.rmtree(build_dir)

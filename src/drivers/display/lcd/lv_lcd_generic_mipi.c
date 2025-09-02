@@ -30,6 +30,7 @@ static void set_mirror(lv_lcd_generic_mipi_driver_t * drv, bool mirror_x, bool m
 static void set_swap_xy(lv_lcd_generic_mipi_driver_t * drv, bool swap);
 static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation_t rot);
 static void res_chg_event_cb(lv_event_t * e);
+static void delete_cb(lv_event_t * e);
 static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
@@ -70,6 +71,9 @@ lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv
 
     /* register resolution change callback (NOTE: this handles screen rotation as well) */
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+
+    /* register object deletion callback for freeing driver struct */
+    lv_display_add_event_cb(disp, delete_cb, LV_EVENT_DELETE, NULL);
 
     /* register flush callback */
     lv_display_set_flush_cb(disp, flush_cb);
@@ -331,6 +335,15 @@ static void res_chg_event_cb(lv_event_t * e)
 
     /* handle rotation */
     set_rotation(drv, rot);
+}
+
+static void delete_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_current_target(e);
+    lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
+    LV_ASSERT_NULL(drv);
+    lv_free(drv);
+    lv_display_set_driver_data(disp, NULL);
 }
 
 static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp)

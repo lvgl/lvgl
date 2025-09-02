@@ -172,3 +172,9 @@ jobs:
         echo "Failing the build due to newly generated reference images."
         exit 1
 
+    - name: Upload coverage reports as artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports-${{ matrix.build_config }}
+        path: tests/report/
