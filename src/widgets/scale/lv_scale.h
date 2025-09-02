@@ -20,6 +20,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../line/lv_line.h"
 #include "../image/lv_image.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -343,6 +344,32 @@ int32_t lv_scale_get_range_min_value(lv_obj_t * obj);
  * @return      Scale's maximum value
  */
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj);
+
+/*=====================
+ * Other functions
+ *====================*/
+
+#if LV_USE_OBSERVER
+
+/**
+ * Bind an integer subject to a scales section minimum value
+ * @param obj       pointer to a Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+/**
+ * Bind an integer subject to a scales section maximum value
+ * @param obj       pointer to an Scale
+ * @param section   pointer to a Scale section
+ * @param subject   pointer to a Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
+
+#endif
 
 /**********************
  *      MACROS

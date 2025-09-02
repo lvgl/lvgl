@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_ARC != 0
 
 #include "../../core/lv_obj.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -231,6 +232,17 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj);
 /*=====================
  * Other functions
  *====================*/
+
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer subject to an Arc's value.
+ * @param obj       pointer to Arc
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
+
 
 /**
  * Align an object to the current position of the arc (knob)

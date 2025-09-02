@@ -129,6 +129,17 @@ const char * lv_roller_get_options(const lv_obj_t * obj);
  */
 uint32_t lv_roller_get_option_count(const lv_obj_t * obj);
 
+
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer Subject to a Roller's value.
+ * @param obj       pointer to Roller
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
+
 /**********************
  *      MACROS
  **********************/
