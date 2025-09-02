@@ -103,8 +103,10 @@ void lv_indev_gesture_init(lv_indev_t * indev)
 void lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)
 {
     LV_ASSERT_NULL(indev);
-    /* A up threshold MUST always be bigger than 1 */
-    LV_ASSERT(threshold > 1.0f);
+    if(threshold <= 1.0f) {
+        LV_LOG_WARN("Pinch up threshold: %f, must be greater than 1.0", threshold);
+        return;
+    }
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_PINCH];
     recognizer->config.pinch_up_threshold = threshold;
@@ -113,8 +115,10 @@ void lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)
 void lv_indev_set_pinch_down_threshold(lv_indev_t * indev, float threshold)
 {
     LV_ASSERT_NULL(indev);
-    /* A down threshold MUST always be smaller than 1 */
-    LV_ASSERT(threshold < 1.0f);
+    if(threshold >= 1.0f) {
+        LV_LOG_WARN("Pinch down threshold: %f, must be less than 1.0", threshold);
+        return;
+    }
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_PINCH];
     recognizer->config.pinch_down_threshold = threshold;
@@ -123,8 +127,10 @@ void lv_indev_set_pinch_down_threshold(lv_indev_t * indev, float threshold)
 void lv_indev_set_rotation_rad_threshold(lv_indev_t * indev, float threshold)
 {
     LV_ASSERT_NULL(indev);
-    /* A rotation threshold MUST always be a positive number */
-    LV_ASSERT(threshold > 0.0f);
+    if(threshold <= 0.0f) {
+        LV_LOG_WARN("Rotation threshold: %f, must be greater than 0.0", threshold);
+        return;
+    }
 
     lv_indev_gesture_recognizer_t * recognizer = &indev->recognizers[LV_INDEV_GESTURE_ROTATE];
     recognizer->config.rotation_angle_rad_threshold = threshold;
