@@ -48,7 +48,8 @@ static uint8_t * read_file(const char * filename, uint32_t * size);
 static bool get_jpeg_head_info(const char * filename, uint32_t * width, uint32_t * height, uint32_t * orientation);
 static bool get_jpeg_size(uint8_t * data, uint32_t data_size, uint32_t * width, uint32_t * height);
 static bool get_jpeg_direction(uint8_t * data, uint32_t data_size, uint32_t * orientation);
-static void rotate_buffer(lv_draw_buf_t * decoded, uint8_t * buffer, uint32_t line_index, uint32_t angle);
+static void rotate_buffer(lv_draw_buf_t * decoded, uint8_t * buffer, uint32_t line_index, uint32_t angle,
+                          uint32_t row_stride);
 static void error_exit(j_common_ptr cinfo);
 /**********************
  *  STATIC VARIABLES
@@ -277,7 +278,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     /* More stuff */
     JSAMPARRAY buffer;  /* Output row buffer */
 
-    int row_stride;     /* physical row width in output buffer */
+    uint32_t row_stride;     /* physical row width in output buffer */
     uint32_t image_angle = 0;   /* image rotate angle */
 
     lv_draw_buf_t * decoded = NULL;
@@ -386,7 +387,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
             jpeg_read_scanlines(&cinfo, buffer, 1);
 
             /* Assume put_scanline_someplace wants a pointer and sample count. */
-            rotate_buffer(decoded, buffer[0], line_index, image_angle);
+            rotate_buffer(decoded, buffer[0], line_index, image_angle, row_stride);
 
             line_index++;
         }
@@ -563,7 +564,8 @@ static bool get_jpeg_direction(uint8_t * data, uint32_t data_size, uint32_t * or
     return JPEG_HEADER_OK;
 }
 
-static void rotate_buffer(lv_draw_buf_t * decoded, uint8_t * buffer, uint32_t line_index, uint32_t angle)
+static void rotate_buffer(lv_draw_buf_t * decoded, uint8_t * buffer, uint32_t line_index, uint32_t angle,
+                          uint32_t row_stride)
 {
     if(angle == 90) {
         for(uint32_t x = 0; x < decoded->header.h; x++) {
@@ -584,7 +586,7 @@ static void rotate_buffer(lv_draw_buf_t * decoded, uint8_t * buffer, uint32_t li
         }
     }
     else {
-        lv_memcpy(decoded->data + line_index * decoded->header.stride, buffer, decoded->header.stride);
+        lv_memcpy(decoded->data + line_index * decoded->header.stride, buffer, row_stride);
     }
 }
 

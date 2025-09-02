@@ -38,6 +38,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
+static void reset_image_attributes(lv_obj_t * obj);
 #if LV_USE_OBJ_PROPERTY
     static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
     static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
@@ -177,11 +178,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMAGE_SRC_UNKNOWN) {
         if(src) LV_LOG_WARN("unknown image type");
-        if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)img->src);
-        }
-        img->src      = NULL;
-        img->src_type = LV_IMAGE_SRC_UNKNOWN;
+        reset_image_attributes(obj);
         return;
     }
 
@@ -194,6 +191,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
         else {
             LV_LOG_WARN("failed to get image info: %p", src);
         }
+        reset_image_attributes(obj);
         return;
     }
 
@@ -1021,6 +1019,20 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_pivot(obj, 0, 0);
         scale_update(obj, LV_SCALE_NONE, LV_SCALE_NONE);
     }
+}
+
+static void reset_image_attributes(lv_obj_t * obj)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+    if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
+        lv_free((void *)img->src);
+    }
+    img->src = NULL;
+    img->src_type = LV_IMAGE_SRC_UNKNOWN;
+    img->w = 0;
+    img->h = 0;
+    img->cf = LV_COLOR_FORMAT_UNKNOWN;
+    lv_obj_refresh_self_size(obj);
 }
 
 #if LV_USE_OBJ_PROPERTY

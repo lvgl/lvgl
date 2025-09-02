@@ -31,10 +31,6 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
 
     lv_area_move(&clipped_area, x, y);
 
-#if D2_RENDER_EACH_OPERATION
-    d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
-#endif
-
     lv_point_precise_t p[3];
     p[0] = dsc->p[0];
     p[1] = dsc->p[1];
@@ -156,14 +152,6 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
                  (d2_point)      D2_FIX4(p[2].x),
                  (d2_point)      D2_FIX4(p[2].y),
                  flags);
-
-    //
-    // Execute render operations
-    //
-#if D2_RENDER_EACH_OPERATION
-    d2_executerenderbuffer(u->d2_handle, u->renderbuffer, 0);
-    d2_flushframe(u->d2_handle);
-#endif
 
     d2_setalphamode(u->d2_handle, current_alpha_mode);
 

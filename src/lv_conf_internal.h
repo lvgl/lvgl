@@ -1551,6 +1551,15 @@
     #endif
 #endif
 
+/* Enable usage of the LVGL's vg_lite spec driver */
+#ifndef LV_USE_VG_LITE_DRIVER
+    #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
+        #define LV_USE_VG_LITE_DRIVER CONFIG_LV_USE_VG_LITE_DRIVER
+    #else
+        #define LV_USE_VG_LITE_DRIVER  0
+    #endif
+#endif
+
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
 #ifndef LV_USE_GESTURE_RECOGNITION
