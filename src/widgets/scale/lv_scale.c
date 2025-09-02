@@ -528,7 +528,8 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
 lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(section);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
@@ -543,7 +544,8 @@ lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section
 lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(section);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);

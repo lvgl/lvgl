@@ -456,7 +456,7 @@ Subject's value to be set to ``1`` or ``0`` respectively.
 Specific Widget Types
 ~~~~~~~~~~~~~~~~~~~~~
 
-To learn how to bind subjects to Arcs, Labels, Slider, etc. visit the "Data binding"
+To learn how to bind subjects to Arcs, Labels, Sliders, etc. visit the "Data binding"
 section of the given widget's documentation. For example: :ref:`Data binding for lv_label <lv_label_data_binding>`.
 
 Change Subject on Event

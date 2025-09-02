@@ -186,7 +186,7 @@ bool lv_slider_is_symmetrical(lv_obj_t * obj);
 
 #if LV_USE_OBSERVER
 /**
- * Bind an integer Subject to a Slider's value.
+ * Bind an integer or float Subject to a Slider's value.
  * @param obj       pointer to Slider
  * @param subject   pointer to Subject
  * @return          pointer to newly-created Observer

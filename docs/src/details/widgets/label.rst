@@ -197,7 +197,7 @@ To get familiar with observers, subjects, and data bindings in general visit the
 :ref:`Observer <observer_how_to_use>` page.
 
 This method of subscribing to a Subject affects a Label Widget's
-``text``.  The Subject can be an STRING, POINTER or INTEGER type.
+``text``.  The Subject can be a STRING, POINTER, INTEGER, or FLOAT type.
 
 When the subscription occurs, and each time the Subject's value is changed thereafter,
 the Subject's value is used to update the Label's text as follows:
