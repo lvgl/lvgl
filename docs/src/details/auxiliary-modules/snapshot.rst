@@ -21,7 +21,7 @@ the image descriptor which can be used as an Image Widget's image source using
 Note, only following color formats are supported at this time:
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB565`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8565`
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
