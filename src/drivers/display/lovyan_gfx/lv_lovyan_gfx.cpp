@@ -9,13 +9,6 @@
 #include "lv_lovyan_gfx.h"
 #if LV_USE_LOVYAN_GFX
 
-#define LGFX_USE_V1
-#include <LovyanGFX.hpp>
-
-#ifndef LV_LGFX_USER_INCLUDE
-    #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
-#endif
-
 #include LV_LGFX_USER_INCLUDE
 
 /*********************
@@ -34,6 +27,7 @@ typedef struct {
  **********************/
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void resolution_changed_event_cb(lv_event_t * e);
+static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,7 +41,7 @@ static void resolution_changed_event_cb(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes)
+lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes, bool touch)
 {
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_malloc_zeroed(sizeof(lv_lovyan_gfx_t));
     LV_ASSERT_MALLOC(dsc);
@@ -65,13 +59,22 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setRotation(0);
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
-    dsc->tft->fillScreen(TFT_BLACK);
+    dsc->tft->fillScreen(0x00000);
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
     lv_display_add_event_cb(disp, resolution_changed_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_set_buffers(disp, (void *)buf, NULL, buf_size_bytes, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+    if(touch) {
+        /* Register an input device when touch is enabled */
+        lv_indev_t * lv_input = lv_indev_create();
+        lv_indev_set_driver_data(lv_input, (void *)dsc);
+        lv_indev_set_type(lv_input, LV_INDEV_TYPE_POINTER);
+        lv_indev_set_read_cb(lv_input, read_touch);
+    }
+
     return disp;
 }
 
@@ -118,6 +121,23 @@ static void resolution_changed_event_cb(lv_event_t * e)
         case LV_DISPLAY_ROTATION_270:
             dsc->tft->setRotation(3);   /* Landscape orientation, flipped */
             break;
+    }
+}
+
+static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data)
+{
+    lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_indev_get_driver_data(indev_driver);
+    uint16_t x;
+    uint16_t y;
+    bool touched = dsc->tft->getTouch(&x, &y);
+    if(!touched) {
+        data->state = LV_INDEV_STATE_RELEASED;
+    }
+    else {
+        data->state = LV_INDEV_STATE_PRESSED;
+        /*Set the coordinates*/
+        data->point.x = x;
+        data->point.y = y;
     }
 }
 

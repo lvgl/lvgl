@@ -2075,6 +2075,14 @@ menu "LVGL configuration"
 			bool "Use TFT_eSPI driver"
 			default n
 
+		config LV_USE_LOVYAN_GFX
+			bool "Use LovyanGFX driver"
+			default n
+		config LV_LGFX_USER_INCLUDE
+			string "Header for LovyanGFX user configuration"
+			default "lv_lgfx_user.hpp"
+			depends on LV_USE_LOVYAN_GFX
+
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"
 			default n

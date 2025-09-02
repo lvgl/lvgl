@@ -1304,6 +1304,11 @@
 /** Interface for Lovyan_GFX */
 #define LV_USE_LOVYAN_GFX         0
 
+#if LV_USE_LOVYAN_GFX
+    #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
+
+#endif /*LV_USE_LOVYAN_GFX*/
+
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
 

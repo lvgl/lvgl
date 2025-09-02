@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../../display/lv_display.h"
+#include "../../../indev/lv_indev.h"
 
 #if LV_USE_LOVYAN_GFX
 
@@ -28,7 +29,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes);
+lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes,
+                                    bool touch);
 
 /**********************
  *      MACROS
