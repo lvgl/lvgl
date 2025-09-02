@@ -1,4 +1,4 @@
-    .. _xml_animations:
+.. _xml_animations:
 
 ==========
 Animations
@@ -13,7 +13,7 @@ Timelines are composed of simple animations. For example: *"change the ``bg_opa`
 of ``my_button_2`` from 0 to 255 in 500 ms."*
 
 Each component can define its own timeline animations, which can then be played by the
-component itself or by any parent components.
+component itself or by any parent component.
 
 Defining Timelines
 ------------------
@@ -26,31 +26,33 @@ Example:
 
 .. code-block:: xml
 
-   <animations>
+    <component>
+       <animations>
 
-       <!-- Show the component and its children -->
-       <timeline name="load">
-           <animation prop="translate_x" target="self" start="-30" end="0" duration="500"/>
-           <animation prop="opa" target="icon" start="0" end="255" duration="500"/>
-           <animation prop="opa" target="text" start="0" end="255" duration="500" delay="200"/>
-       </timeline>
+           <!-- Show the component and its children -->
+           <timeline name="load">
+               <animation prop="translate_x" target="self" start="-30" end="0" duration="500"/>
+               <animation prop="opa" target="icon" start="0" end="255" duration="500"/>
+               <animation prop="opa" target="text" start="0" end="255" duration="500" delay="200"/>
+           </timeline>
 
-       <!-- Shake horizontally -->
-       <timeline name="shake">
-           <animation prop="translate_x" target="self" start="0" end="-30" duration="150"/>
-           <animation prop="translate_x" target="self" start="-30" end="30" duration="300" delay="150"/>
-           <animation prop="translate_x" target="self" start="30" end="0" duration="150" delay="450"/>
-       </timeline>
-   </animations>
+           <!-- Shake horizontally -->
+           <timeline name="shake">
+               <animation prop="translate_x" target="self" start="0" end="-30" duration="150"/>
+               <animation prop="translate_x" target="self" start="-30" end="30" duration="300" delay="150"/>
+               <animation prop="translate_x" target="self" start="30" end="0" duration="150" delay="450"/>
+           </timeline>
+       </animations>
 
-   <view>
-       <lv_button width="200">
-           <my_icon name="icon" src="image1"/>
-           <lv_label name="text" text="Click me"/>
-       </lv_button>
-   </view>
+       <view>
+           <lv_button width="200">
+               <my_icon name="icon" src="image1"/>
+               <lv_label name="text" text="Click me"/>
+           </lv_button>
+       </view>
+    </component>
 
-In summary: inside ``<animations>``, you can define ``<timeline>``\ s, each with a unique name
+In summary: inside ``<animations>``, you can define ``<timeline>``\s, each with a unique name
 that you can reference later.
 
 Inside a ``<timeline>``, you add ``<animation>``\ s to describe each step.
@@ -83,29 +85,30 @@ Example:
        </custom_button>
    </view>
 
-You set a ``target`` UI element and select one of its ``timeline``s to play.
+You set a ``target`` UI element and select one of its ``timeline``\ s to play.
 If ``target="self"``, the timeline is looked up in the current component/widget/screen
 (i.e. in the current XML file).
 
-You can also set ``delay`` and ``reverse="true"`` when playing a timeline.
+You can also set a ``delay`` and ``reverse="true"`` when playing a timeline.
 
 Under the Hood
 --------------
 
-Understanding how timelines work internally helps use them effectively.
+Understanding how timelines work internally helps in using them effectively.
 
 When an XML file is registered, the contents of the ``<animations>`` section are parsed,
 and the animation data is stored as a blueprint.
 
-When an instance of a component or screen is created, ``lv_anim_timeline``\ s are
-created and initialized from the saved blueprint. Each instance gets its own copy.
+When an instance of a component or screen is created, ``lv_anim_timeline``\s are
+created and initialized from the saved blueprint. Each instance gets its own copy of the timelines.
 
 When a ``<play_timeline_event>`` is added to a UI element, the target and timeline
 names are saved as strings. (It can't use pointers as the event can reference UI elements
 that will be created only later in the ``<view>``.)
 
-Finally, when the trigger event happens, LVGL finds the target widget by the saved name,
+Finally, when the play timeline event is triggered, LVGL finds the target widget by the saved name,
 retrieves the specified timeline, and starts it.
 
-Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\ s)
+Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\s)
 and play their ``load`` timelines independently with different delays.
+

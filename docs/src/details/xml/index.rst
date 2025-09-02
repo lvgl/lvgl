@@ -10,6 +10,7 @@ XML - Declarative UI
     :maxdepth: 2
 
     overview/index
-    build_ui/index
-    test
+    ui_elements/index
+    assets/index
+    features/index
     license

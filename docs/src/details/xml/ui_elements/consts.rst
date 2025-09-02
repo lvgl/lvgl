@@ -17,7 +17,6 @@ The supported types are:
 - ``opa``
 - ``bool``
 
-
 Usage
 *****
 
@@ -33,10 +32,11 @@ Constants can be used in:
 - Style properties
 - Widget and Component properties
 
-And they can be used like this:
+Constant values can be referenced by ``#constant_name``. For example:
 
 .. code-block:: xml
 
     <styles>
         <style name="style1" bg_color="#color1"/>
     </styles>
+
