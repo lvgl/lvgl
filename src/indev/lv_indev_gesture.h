@@ -75,7 +75,7 @@ typedef struct lv_indev_gesture_configuration {
     float rotation_angle_rad_threshold; /* Threshold for the rotation gesture to be recognized - in radians */
 } lv_indev_gesture_configuration_t;
 
-/* Data structures for touch events - used to repsensent a libinput event */
+/* Data structures for touch events - used to represent a libinput event */
 /* Emitted by devices capable of tracking identifiable contacts (type B) */
 typedef struct lv_indev_touch_data {
     lv_point_t point;                   /* Coordinates of the touch */
@@ -116,7 +116,7 @@ typedef struct lv_indev_gesture_recognizer {
  **********************/
 
 /**
- * Initialize the gesture recognizer. It will set the default configuration and
+ * Initialize the gesture recognizer. It will set the default configuration.
  * @param indev             pointer to the indev device containing the gesture recognizer
  */
 void lv_indev_gesture_init(lv_indev_t * indev);

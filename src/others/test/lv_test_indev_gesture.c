@@ -56,13 +56,17 @@ void lv_test_indev_gesture_create(void)
 
 void lv_test_indev_gesture_delete(void)
 {
-    lv_indev_delete(_state.gesture_indev);
-    _state.gesture_indev = NULL;
+    if(_state.gesture_indev) {
+        lv_indev_delete(_state.gesture_indev);
+        _state.gesture_indev = NULL;
+    }
 
     if(_state.touch_data) {
         lv_free(_state.touch_data);
         _state.touch_data = NULL;
     }
+
+    _state.max_touch_cnt = 0;
 }
 
 lv_indev_t * lv_test_indev_get_gesture_indev(lv_indev_type_t type)

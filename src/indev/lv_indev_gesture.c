@@ -641,29 +641,24 @@ static void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognize
  */
 static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
 {
-    uint8_t finger_cnt;
-    lv_indev_gesture_t * info;
-    lv_indev_gesture_configuration_t * conf;
-    lv_recognizer_func_t recog_fn;
-
     if(recognizer == NULL) return;
 
-    finger_cnt = recognizer->info.finger_cnt;
-    info = &recognizer->info;
-    conf = &recognizer->config;
-    recog_fn = recognizer->recog_fn;
+    /* Backup the original descriptors */
+    const uint8_t ori_finger_cnt = recognizer->info.finger_cnt;
+    const lv_indev_gesture_t ori_info = recognizer->info;
+    const lv_indev_gesture_configuration_t ori_conf = recognizer->config;
+    const lv_recognizer_func_t ori_recog_fn = recognizer->recog_fn;
 
-    /* Set everything to zero but preserve the motion descriptors,
-     * which are located at the start of the lv_indev_gesture_t struct */
-    lv_memzero((uint8_t *)info + sizeof(info->motions), sizeof(lv_indev_gesture_t) - sizeof(info->motions));
+    /* Reset the recognizer */
     lv_memzero(recognizer, sizeof(lv_indev_gesture_recognizer_t));
 
-    recognizer->info = *info;
-    recognizer->config = *conf;
-    recognizer->recog_fn = recog_fn;
+    /* Restore the original descriptors */
+    recognizer->info.finger_cnt = ori_finger_cnt;
+    recognizer->info = ori_info;
+    recognizer->config = ori_conf;
+    recognizer->recog_fn = ori_recog_fn;
 
     recognizer->scale = recognizer->info.scale = 1.0;
-    recognizer->info.finger_cnt = finger_cnt;
 
     recognizer->state = LV_INDEV_GESTURE_STATE_NONE;
     recognizer->type = LV_INDEV_GESTURE_NONE;
