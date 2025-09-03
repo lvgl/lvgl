@@ -114,7 +114,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
 
     GstElement * head = gst_element_factory_make(factory_name, "lv_gstreamer_source");
     if(!head) {
-        gst_object_unref(streamer->pipeline);
+        gst_object_unref(pipeline);
         LV_LOG_ERROR("Failed to create source from factory '%s'", factory_name);
         return LV_RESULT_INVALID;
     }
