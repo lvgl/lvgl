@@ -350,7 +350,7 @@ static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
     if(at->base_obj) {
         if(lv_streq(a->var, "self")) obj_resolved = at->base_obj;
         else if(lv_streq(a->var, "")) obj_resolved = at->base_obj;
-        else obj_resolved = lv_obj_get_child_by_name(at->base_obj, a->var);
+        else obj_resolved = lv_obj_find_by_name(at->base_obj, a->var);
         if(obj_resolved == NULL) {
             LV_LOG_WARN("Widget was not found with name `%s` as child of %p", (const char *)a->var, (void *)at->base_obj);
             return;

@@ -985,7 +985,7 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
         target = dsc->base_obj;
     }
     else {
-        target = lv_obj_get_child_by_name(dsc->base_obj, dsc->target_name);
+        target = lv_obj_find_by_name(dsc->base_obj, dsc->target_name);
     }
 
     if(target == NULL) {
