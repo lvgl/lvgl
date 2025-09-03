@@ -939,15 +939,42 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
         if (pDraw->ucHasTransparency) {
             uint8_t ucTransparent = pDraw->ucTransparent;
             if (pDraw->ucDisposalMethod == 2) { // restore to background color
-                uint16_t u16BG = pPal[pDraw->ucBackground];
-                while (s < pEnd) {
-                    c = *s++;
-                    if (c != ucTransparent) {
-                        *d++ = pPal[c];
-                        *d8++ = c;
-                    } else {
-                        *d++ = u16BG; // transparent pixel is restored to background color
-                        *d8++ = pDraw->ucBackground;
+                uint8_t * bg = &pPal[pDraw->ucBackground * 3];
+                if (pPage->ucPaletteType == GIF_PALETTE_RGB888) {
+                    while (s < pEnd) {
+                        c = *s++;
+                        if (c != ucTransparent) {
+                            *d8++ = c;
+                            d[0] = pPal[c * 3 + 0];
+                            d[1] = pPal[c * 3 + 1];
+                            d[2] = pPal[c * 3 + 2];
+                            d += 3;
+                        } else {
+                            *d8++ = pDraw->ucBackground;
+                            d[0] = bg[0];
+                            d[1] = bg[1];
+                            d[2] = bg[2];
+                            d += 3;
+                        }
+                    }
+                } else { /* GIF_PALETTE_RGB8888 */
+                    while (s < pEnd) {
+                        c = *s++;
+                        if (c != ucTransparent) {
+                            *d8++ = c;
+                            d[0] = pPal[c * 3 + 0];
+                            d[1] = pPal[c * 3 + 1];
+                            d[2] = pPal[c * 3 + 2];
+                            d[3] = 0xFF;
+                            d += 4;
+                        } else {
+                            *d8++ = pDraw->ucBackground;
+                            d[0] = bg[0];
+                            d[1] = bg[1];
+                            d[2] = bg[2];
+                            d[3] = 0xFF;
+                            d += 4;
+                        }
                     }
                 }
             } else { // no disposal, just write non-transparent pixels
