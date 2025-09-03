@@ -11,10 +11,11 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
 #include "../../../misc/lv_area_private.h"
 #include "g2d.h"
 #include "lv_g2d_buf_map.h"
+#include "lv_g2d_utils.h"
 
 /*********************
  *      DEFINES
@@ -70,17 +71,12 @@ static int32_t is_hw_pxp = 0;
 void lv_draw_g2d_init(void)
 {
     lv_draw_buf_g2d_init_handlers();
-
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_unit_t * draw_g2d_unit = lv_draw_create_unit(sizeof(lv_draw_g2d_unit_t));
     draw_g2d_unit->base_unit.evaluate_cb = _g2d_evaluate;
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     draw_g2d_unit->base_unit.name = "G2D";
-    g2d_create_buf_map();
-    if(g2d_open(&draw_g2d_unit->g2d_handle)) {
-        LV_LOG_ERROR("g2d_open fail.\n");
-    }
-    g2d_query_hardware(draw_g2d_unit->g2d_handle, G2D_HARDWARE_PXP_V1, &is_hw_pxp);
 
 #if LV_USE_G2D_DRAW_THREAD
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
@@ -89,6 +85,12 @@ void lv_draw_g2d_init(void)
     lv_thread_init(&thread_dsc->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, LV_DRAW_THREAD_STACK_SIZE,
                    thread_dsc);
 #endif
+#endif
+    g2d_create_buf_map();
+    void * handle;
+    LV_ASSERT_MSG(!g2d_open(&handle), "Cannot open G2D handle\r\n");
+    g2d_query_hardware(handle, G2D_HARDWARE_PXP_V1, &is_hw_pxp);
+    g2d_set_handle(handle);
 }
 
 void lv_draw_g2d_deinit(void)
@@ -99,7 +101,7 @@ void lv_draw_g2d_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#if LV_USE_DRAW_G2D
 static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -278,7 +280,7 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 
     res = lv_thread_delete(&thread_dsc->thread);
 #endif
-    g2d_close(draw_g2d_unit->g2d_handle);
+    g2d_close(g2d_get_handle());
 
     return res;
 }
@@ -343,4 +345,5 @@ static void _g2d_render_thread_cb(void * ptr)
 }
 #endif
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/
