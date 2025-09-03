@@ -371,7 +371,6 @@ lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_displa
 lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int width, int height);
 lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
-struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
 void destroy_decorators_buf(struct window * window, struct graphic_object * decoration);
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
@@ -379,6 +378,9 @@ void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
 void lv_wayland_wait_swap_buf_cb(lv_display_t * disp);
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p);
 
+#if LV_WAYLAND_WINDOW_DECORATIONS
+struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
+#endif
 /**********************
  *      SME
  **********************/

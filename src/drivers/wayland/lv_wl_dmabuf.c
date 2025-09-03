@@ -564,6 +564,7 @@ static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned ch
     return NULL;
 }
 
+#if LV_WAYLAND_WINDOW_DECORATIONS
 static void create_decorators_buf(struct window * window, struct graphic_object * decoration)
 {
     struct zwp_linux_buffer_params_v1 * params;
@@ -625,5 +626,6 @@ struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphi
         return window->decorators_buf[id];
     }
 }
+#endif
 
 #endif /* LV_WAYLAND_DMABUF */
