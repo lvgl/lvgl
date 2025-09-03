@@ -88,7 +88,7 @@ void lv_indev_gesture_init(lv_indev_t * indev)
         indev->recognizers[r].config.pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
         indev->recognizers[r].config.rotation_angle_rad_threshold = LV_GESTURE_ROTATION_ANGLE_RAD_THRESHOLD;
 
-        info->scale = 1;
+        info->param.scale = 1;
 
         for(uint8_t i = 0; i < LV_GESTURE_MAX_POINTS; i++) {
             info->motions[i].finger = -1;
@@ -220,8 +220,8 @@ void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognize
         return;
     }
 
-    point->x = recognizer->info.center.x;
-    point->y = recognizer->info.center.y;
+    point->x = recognizer->info.param.center.x;
+    point->y = recognizer->info.param.center.y;
 }
 
 lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, lv_indev_gesture_type_t type)
@@ -371,14 +371,14 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
  */
 static lv_dir_t calculate_swipe_dir(lv_indev_gesture_recognizer_t * recognizer)
 {
-    float abs_x = LV_ABS(recognizer->info.delta_x);
-    float abs_y = LV_ABS(recognizer->info.delta_y);
+    float abs_x = LV_ABS(recognizer->info.param.delta_x);
+    float abs_y = LV_ABS(recognizer->info.param.delta_y);
 
     if(abs_x > abs_y) {
-        return recognizer->info.delta_x > 0 ? LV_DIR_RIGHT : LV_DIR_LEFT;
+        return recognizer->info.param.delta_x > 0 ? LV_DIR_RIGHT : LV_DIR_LEFT;
     }
     else {
-        return recognizer->info.delta_y > 0 ? LV_DIR_BOTTOM : LV_DIR_TOP;
+        return recognizer->info.param.delta_y > 0 ? LV_DIR_BOTTOM : LV_DIR_TOP;
     }
 }
 
@@ -438,19 +438,19 @@ static void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recogn
                 break;
             case LV_INDEV_GESTURE_STATE_ONGOING:
                 gesture_calculate_factors(&r->info, 2);
-                if(r->info.scale > LV_GESTURE_PINCH_MAX_INITIAL_SCALE) {
+                if(r->info.param.scale > LV_GESTURE_PINCH_MAX_INITIAL_SCALE) {
                     r->state = LV_INDEV_GESTURE_STATE_CANCELED;
                     break;
                 }
-                if(r->info.scale > r->config.pinch_up_threshold ||
-                   r->info.scale < r->config.pinch_down_threshold) {
+                if(r->info.param.scale > r->config.pinch_up_threshold ||
+                   r->info.param.scale < r->config.pinch_down_threshold) {
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
                 }
                 break;
             case LV_INDEV_GESTURE_STATE_RECOGNIZED:
                 /* It's an ongoing pinch gesture - update the factors */
                 gesture_calculate_factors(&r->info, 2);
-                r->scale = r->info.scale;
+                r->scale = r->info.param.scale;
                 r->type = LV_INDEV_GESTURE_PINCH;
                 break;
             case LV_INDEV_GESTURE_STATE_ENDED:
@@ -516,7 +516,7 @@ static void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * rec
             case LV_INDEV_GESTURE_STATE_ONGOING:
                 /* Update the rotation from the inputs */
                 gesture_calculate_factors(&r->info, 2);
-                if(fabs(r->info.rotation - r->info.p_rotation) > r->config.rotation_angle_rad_threshold) {
+                if(fabs(r->info.param.rotation - r->info.param.p_rotation) > r->config.rotation_angle_rad_threshold) {
 
                     gesture_update_center_point(&r->info, 2);
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
@@ -526,7 +526,7 @@ static void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * rec
                 /* It's a recognized rotation gesture - update the factors */
                 gesture_calculate_factors(&r->info, 2);
                 r->type = LV_INDEV_GESTURE_ROTATE;
-                r->rotation = r->info.rotation;
+                r->rotation = r->info.param.rotation;
                 break;
             case LV_INDEV_GESTURE_STATE_ENDED:
             case LV_INDEV_GESTURE_STATE_CANCELED:
@@ -596,7 +596,7 @@ static void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognize
                 /* The gesture is ongoing, now wait for the distance from the center
                 to be higher than the threshold to pass it as recognized */
                 gesture_calculate_factors(&r->info, 2);
-                dist = SQUARE_SUM(r->info.delta_x, r->info.delta_y);
+                dist = SQUARE_SUM(r->info.param.delta_x, r->info.param.delta_y);
                 if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
                 }
@@ -605,7 +605,7 @@ static void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognize
                 /* The gesture is now recognized, and will stay recognized
                 until a finger is lifted */
                 gesture_calculate_factors(&r->info, 2);
-                r->distance = (float) sqrt(SQUARE_SUM(r->info.delta_x, r->info.delta_y));
+                r->distance = (float) sqrt(SQUARE_SUM(r->info.param.delta_x, r->info.param.delta_y));
                 r->two_fingers_swipe_dir = calculate_swipe_dir(r);
                 r->type = LV_INDEV_GESTURE_TWO_FINGERS_SWIPE;
                 break;
@@ -649,23 +649,16 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
 {
     if(recognizer == NULL) return;
 
-    /* Backup the original descriptors */
-    const lv_indev_gesture_t ori_info = recognizer->info;
-    const lv_indev_gesture_configuration_t ori_conf = recognizer->config;
-    const lv_recognizer_func_t ori_recog_fn = recognizer->recog_fn;
-
-    /* Reset the recognizer */
-    lv_memzero(recognizer, sizeof(lv_indev_gesture_recognizer_t));
-
-    /* Restore the original descriptors */
-    recognizer->info = ori_info;
-    recognizer->config = ori_conf;
-    recognizer->recog_fn = ori_recog_fn;
-
-    recognizer->scale = recognizer->info.scale = 1.0;
-
-    recognizer->state = LV_INDEV_GESTURE_STATE_NONE;
     recognizer->type = LV_INDEV_GESTURE_NONE;
+    recognizer->state = LV_INDEV_GESTURE_STATE_NONE;
+
+    lv_memzero(&recognizer->info.param, sizeof(recognizer->info.param));
+
+    recognizer->scale = recognizer->info.param.scale = 1.0f;
+    recognizer->rotation = 0.0f;
+    recognizer->distance = 0.0f;
+    recognizer->speed = 0.0f;
+    recognizer->two_fingers_swipe_dir = LV_DIR_NONE;
 }
 
 /**
@@ -812,10 +805,10 @@ static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_
     uint8_t touch_cnt = 0;
     x = y = 0;
 
-    g->p_scale = g->scale;
-    g->p_delta_x = g->delta_x;
-    g->p_delta_y = g->delta_y;
-    g->p_rotation = g->rotation;
+    g->param.p_scale = g->param.scale;
+    g->param.p_delta_x = g->param.delta_x;
+    g->param.p_delta_y = g->param.delta_y;
+    g->param.p_rotation = g->param.rotation;
 
     for(i = 0; i < touch_points_nb; i++) {
         motion = &g->motions[i];
@@ -830,22 +823,22 @@ static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_
         }
     }
 
-    g->center.x = x / touch_cnt;
-    g->center.y = y / touch_cnt;
+    g->param.center.x = x / touch_cnt;
+    g->param.center.y = y / touch_cnt;
 
     for(i = 0; i < touch_points_nb; i++) {
         motion = &g->motions[i];
         if(motion->finger >= 0) {
-            delta_x[i] = motion->point.x - g->center.x;
-            delta_y[i] = motion->point.y - g->center.y;
+            delta_x[i] = motion->point.x - g->param.center.x;
+            delta_y[i] = motion->point.y - g->param.center.y;
             scale_factor += (delta_x[i] * delta_x[i]) + (delta_y[i] * delta_y[i]);
         }
     }
     for(i = 0; i < touch_points_nb; i++) {
         motion = &g->motions[i];
         if(motion->finger >= 0) {
-            g->scale_factors_x[i] = delta_x[i] / scale_factor;
-            g->scale_factors_y[i] = delta_y[i] / scale_factor;
+            g->param.scale_factors_x[i] = delta_x[i] / scale_factor;
+            g->param.scale_factors_y[i] = delta_y[i] / scale_factor;
         }
     }
 }
@@ -886,8 +879,8 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
     center_y = center_y / touch_cnt;
 
     /* translation */
-    g->delta_x = g->p_delta_x + (center_x - g->center.x);
-    g->delta_y = g->p_delta_y + (center_y - g->center.y);
+    g->param.delta_x = g->param.p_delta_x + (center_x - g->param.center.x);
+    g->param.delta_y = g->param.p_delta_y + (center_y - g->param.center.y);
 
     /* rotation & scaling */
     for(i = 0; i < touch_points_nb; i++) {
@@ -896,13 +889,13 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
         if(motion->finger >= 0) {
             d_x = (motion->point.x - center_x);
             d_y = (motion->point.y - center_y);
-            a += g->scale_factors_x[i] * d_x + g->scale_factors_y[i] * d_y;
-            b += g->scale_factors_x[i] * d_y - g->scale_factors_y[i] * d_x;
+            a += g->param.scale_factors_x[i] * d_x + g->param.scale_factors_y[i] * d_y;
+            b += g->param.scale_factors_x[i] * d_y - g->param.scale_factors_y[i] * d_x;
         }
     }
 
-    g->rotation = g->p_rotation + atan2f(b, a);
-    g->scale = g->p_scale * sqrtf((a * a) + (b * b));
+    g->param.rotation = g->param.p_rotation + atan2f(b, a);
+    g->param.scale = g->param.p_scale * sqrtf((a * a) + (b * b));
 }
 
 /**

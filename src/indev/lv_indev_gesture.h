@@ -50,19 +50,21 @@ typedef struct lv_indev_gesture {
 
     /* Motion descriptor, stores the coordinates and velocity of a contact point */
     lv_indev_gesture_motion_t motions[LV_GESTURE_MAX_POINTS];
+    struct {
+        lv_point_t center;                  /* Center point */
+        float scale;                        /* Scale factor & previous scale factor */
+        float p_scale;
+        float scale_factors_x[LV_GESTURE_MAX_POINTS];   /* Scale factor relative to center for each point */
+        float scale_factors_y[LV_GESTURE_MAX_POINTS];
 
-    lv_point_t center;                  /* Center point */
-    float scale;                        /* Scale factor & previous scale factor */
-    float p_scale;
-    float scale_factors_x[LV_GESTURE_MAX_POINTS];   /* Scale factor relative to center for each point */
-    float scale_factors_y[LV_GESTURE_MAX_POINTS];
+        float delta_x;                      /* Translation & previous translation */
+        float delta_y;
+        float p_delta_x;
+        float p_delta_y;
+        float rotation;                     /* Rotation & previous rotation*/
+        float p_rotation;
+    } param;
 
-    float delta_x;                      /* Translation & previous translation */
-    float delta_y;
-    float p_delta_x;
-    float p_delta_y;
-    float rotation;                     /* Rotation & previous rotation*/
-    float p_rotation;
     uint8_t finger_cnt;                 /* Current number of contact points */
 } lv_indev_gesture_t;
 
