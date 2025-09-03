@@ -346,14 +346,20 @@ void lv_gstreamer_set_rate(lv_obj_t * obj, uint32_t rate)
     gdouble gst_rate = (gdouble)rate / 256.0;
 
     gint64 current_pos;
-    gst_element_query_position(streamer->pipeline, GST_FORMAT_TIME, &current_pos);
+
+    if(!gst_element_query_position(streamer->pipeline, GST_FORMAT_TIME, &current_pos)) {
+        LV_LOG_WARN("Failed to query current position which is required to set the stream rate");
+        return;
+    }
 
     /* Perform the seek with new rate from the current position */
-    gst_element_seek(streamer->pipeline, gst_rate,
-                     GST_FORMAT_TIME,
-                     GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
-                     GST_SEEK_TYPE_SET, current_pos,
-                     GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+    if(!gst_element_seek(streamer->pipeline, gst_rate,
+                         GST_FORMAT_TIME,
+                         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
+                         GST_SEEK_TYPE_SET, current_pos,
+                         GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+        LV_LOG_WARN("Failed to change stream rate");
+    }
 }
 
 /**********************
