@@ -95,9 +95,9 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent);
  *                      for common factory names, check `LV_GSTREAMER_FACTORY_XXX` defines
  * @param property      the property name for the gstreamer source object
  *                      for common properties, see `LV_GSTREAMER_PROPERTY_XXX` defines
- *                      Passing NULL will create the source object but not set it's source
+ *                      Passing NULL will create the source object but not set its source
  * @param source        the property value for the gstreamer source object
- *                      Passing NULL will create the source object but not set it's source
+ *                      Passing NULL will create the source object but not set its source
  * @return LV_RESULT_OK if the source was correctly set else LV_RESULT_INVALID
  */
 lv_result_t lv_gstreamer_set_src(lv_obj_t * gstreamer, const char * factory_name, const char * property,
@@ -131,14 +131,14 @@ void lv_gstreamer_set_position(lv_obj_t * gstreamer, uint32_t position);
 /**
  * Get the duration of this gstreamer
  * @param gstreamer     pointer to a gstreamer object
- * @return              the duration of the gstreamer object
+ * @return              the duration (in ms) of the gstreamer object
  */
 uint32_t lv_gstreamer_get_duration(lv_obj_t * gstreamer);
 
 /**
  * Get the position of this gstreamer
  * @param gstreamer     pointer to a gstreamer object
- * @return              the duration of the gstreamer object
+ * @return              the position (in ms) of the gstreamer object
  */
 uint32_t lv_gstreamer_get_position(lv_obj_t * gstreamer);
 
@@ -151,7 +151,7 @@ lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * gstreamer);
 /**
  * Set the volume of this gstreamer
  * @param gstreamer     pointer to a gstreamer object
- * @param voume         the value to set in the range [0..100]. Higher values are clamped
+ * @param volume         the value to set in the range [0..100]. Higher values are clamped
  */
 void lv_gstreamer_set_volume(lv_obj_t * gstreamer, uint8_t volume);
 
