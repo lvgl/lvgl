@@ -56,6 +56,9 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
 static void buffer_free(struct buffer * buf);
 static void dmabuf_wait_swap_buf(lv_display_t * disp);
 
+#if LV_USE_ROTATE_G2D
+    static struct buffer * get_next_buffer(dmabuf_ctx_t * context);
+#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -91,9 +94,16 @@ void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context)
 {
     memset(context, 0, sizeof(*context));
     context->format = DRM_FORMAT_INVALID;
+    context->last_used = 0;
 }
 lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_display_t * display)
 {
+#if LV_USE_G2D
+    if(LV_USE_ROTATE_G2D == 1) {
+        lv_display_set_draw_buffers(display, context->buffers[2].lv_draw_buf, NULL);
+        return LV_RESULT_OK;
+    }
+#endif
     if(LV_WAYLAND_BUF_COUNT == 2) {
         lv_display_set_draw_buffers(display, context->buffers[0].lv_draw_buf, context->buffers[1].lv_draw_buf);
         return LV_RESULT_OK;
@@ -162,7 +172,13 @@ static void dmabuf_wait_swap_buf(lv_display_t * disp)
         return;
     }
 
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+    int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % (LV_WAYLAND_BUF_COUNT - 1);
+#else
     int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % LV_WAYLAND_BUF_COUNT;
+#endif
+#endif
 
     while(window->wl_ctx->dmabuf_ctx.buffers[buf_nr].busy) {
         wl_display_roundtrip(lv_wl_ctx.display);
@@ -173,21 +189,45 @@ static void dmabuf_wait_swap_buf(lv_display_t * disp)
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
     struct window * window = lv_display_get_user_data(disp);
-    struct buffer * buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
+    struct buffer * buf;
+    int32_t src_width, src_height;
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+    buf    = get_next_buffer(&window->wl_ctx->dmabuf_ctx);
+    src_width  = lv_area_get_height(area);
+    src_height = lv_area_get_width(area);
+#else
+    buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
+    src_width  = lv_area_get_width(area);
+    src_height = lv_area_get_height(area);
+#endif
+#else
+    buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
+    src_width  = lv_area_get_width(area);
+    src_height = lv_area_get_height(area);
+#endif
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
         return;
     }
 
-    int32_t src_width  = lv_area_get_width(area);
-    int32_t src_height = lv_area_get_height(area);
-
     lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+    lv_draw_buf_invalidate_cache(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, NULL);
+#endif
+#endif
 
     /* Mark surface damage */
     wl_surface_damage(window->body->surface, area->x1, area->y1, src_width, src_height);
 
     if(lv_display_flush_is_last(disp)) {
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+        g2d_rotate(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, buf->lv_draw_buf,
+                   window->width, window->height, lv_display_get_color_format(window->lv_disp));
+#endif
+#endif
         /* Finally, attach buffer and commit to surface */
         wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
         wl_surface_commit(window->body->surface);
@@ -335,14 +375,24 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
     const uint32_t flags = 0;
     struct zwp_linux_buffer_params_v1 * params;
     uint32_t drmcf = lv_wayland_dmabuf_get_format(window);
-    const int stride        = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(window->lv_disp));
+    int stride        = lv_draw_buf_width_to_stride(window->width, lv_display_get_color_format(window->lv_disp));
     struct buffer * buffers = (struct buffer *)calloc(LV_WAYLAND_BUF_COUNT, sizeof(struct buffer));
     LV_ASSERT_MALLOC(buffers);
 
     for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        uint32_t w = width;
+        uint32_t h = height;
+#if LV_USE_G2D
+        if(LV_USE_ROTATE_G2D && i == 2) {
+            w = height;
+            h = width;
+        }
+#endif
+        stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(window->lv_disp));
+
         buffers[i].window = window;
         buffers[i].lv_draw_buf =
-            lv_draw_buf_create(width, height, lv_display_get_color_format(window->lv_disp), stride);
+            lv_draw_buf_create(w, h, lv_display_get_color_format(window->lv_disp), stride);
         buffers[i].strides[0]    = stride;
         buffers[i].dmabuf_fds[0] = g2d_get_buf_fd(buffers[i].lv_draw_buf);
         buffers[i].buf_base[0]   = buffers[i].lv_draw_buf->data;
@@ -352,7 +402,7 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
                                        0);
 
         zwp_linux_buffer_params_v1_add_listener(params, &params_listener, &buffers[i]);
-        zwp_linux_buffer_params_v1_create(params, width, height, drmcf, flags);
+        zwp_linux_buffer_params_v1_create(params, w, h, drmcf, flags);
     }
 
     wl_display_roundtrip(lv_wl_ctx.display);
@@ -565,6 +615,16 @@ static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned ch
 
     return NULL;
 }
+
+#if LV_USE_ROTATE_G2D
+static struct buffer * get_next_buffer(dmabuf_ctx_t * context)
+{
+    int next_buf = (context->last_used + 1) % (LV_WAYLAND_BUF_COUNT - 1);
+    context->buffers[next_buf].busy = 1;
+    context->last_used = next_buf;
+    return &context->buffers[next_buf];
+}
+#endif
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
 static void create_decorators_buf(struct window * window, struct graphic_object * decoration)

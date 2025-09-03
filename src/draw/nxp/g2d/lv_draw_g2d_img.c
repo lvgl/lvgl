@@ -15,6 +15,7 @@
 
 #include "lv_draw_g2d.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <math.h>
 #include "g2d.h"
@@ -43,7 +44,7 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
                               int32_t stride, lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
-static void _g2d_blit(void * g2d_handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
+static void _g2d_blit(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf);
 
 /**********************
  *  STATIC VARIABLES
@@ -112,13 +113,15 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     int32_t dest_stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
     lv_color_format_t dest_cf = draw_buf->header.cf;
 
+    void * handle = g2d_get_handle();
+
     struct g2d_surface src_surf;
     struct g2d_surface dst_surf;
 
     _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
     _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
 
-    _g2d_blit(u->g2d_handle, &dst_surf, &src_surf);
+    _g2d_blit(handle, &dst_surf, &src_surf);
 }
 
 /**********************
@@ -242,13 +245,14 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
     dst_surf->blendfunc = G2D_ONE_MINUS_SRC_ALPHA | G2D_PRE_MULTIPLIED_ALPHA;
 }
 
-static void _g2d_blit(void * g2d_handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf)
+static void _g2d_blit(void * handle, struct g2d_surface * dst_surf, struct g2d_surface * src_surf)
 {
-    g2d_enable(g2d_handle, G2D_BLEND);
-    g2d_enable(g2d_handle, G2D_GLOBAL_ALPHA);
-    g2d_blit(g2d_handle, src_surf, dst_surf);
-    g2d_finish(g2d_handle);
-    g2d_disable(g2d_handle, G2D_GLOBAL_ALPHA);
-    g2d_disable(g2d_handle, G2D_BLEND);
+    g2d_enable(handle, G2D_BLEND);
+    g2d_enable(handle, G2D_GLOBAL_ALPHA);
+    g2d_blit(handle, src_surf, dst_surf);
+    g2d_finish(handle);
+    g2d_disable(handle, G2D_GLOBAL_ALPHA);
+    g2d_disable(handle, G2D_BLEND);
 }
 #endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_G2D*/
