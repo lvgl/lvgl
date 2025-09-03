@@ -942,12 +942,12 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                 uint8_t * bg = &pPal[pDraw->ucBackground * 3];
                 if (pPage->ucPaletteType == GIF_PALETTE_RGB888) {
                     while (s < pEnd) {
-                        c = *s++;
-                        if (c != ucTransparent) {
-                            *d8++ = c;
-                            d[0] = pPal[c * 3 + 0];
-                            d[1] = pPal[c * 3 + 1];
-                            d[2] = pPal[c * 3 + 2];
+                        pixel = *s++;
+                        if (pixel != ucTransparent) {
+                            *d8++ = pixel;
+                            d[0] = pPal[(pixel * 3) + 0];
+                            d[1] = pPal[(pixel * 3) + 1];
+                            d[2] = pPal[(pixel * 3) + 2];
                             d += 3;
                         } else {
                             *d8++ = pDraw->ucBackground;
@@ -959,12 +959,12 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                     }
                 } else { /* GIF_PALETTE_RGB8888 */
                     while (s < pEnd) {
-                        c = *s++;
-                        if (c != ucTransparent) {
-                            *d8++ = c;
-                            d[0] = pPal[c * 3 + 0];
-                            d[1] = pPal[c * 3 + 1];
-                            d[2] = pPal[c * 3 + 2];
+                        pixel = *s++;
+                        if (pixel != ucTransparent) {
+                            *d8++ = pixel;
+                            d[0] = pPal[(pixel * 3) + 0];
+                            d[1] = pPal[(pixel * 3) + 1];
+                            d[2] = pPal[(pixel * 3) + 2];
                             d[3] = 0xFF;
                             d += 4;
                         } else {
