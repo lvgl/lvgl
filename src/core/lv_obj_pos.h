@@ -345,6 +345,24 @@ int32_t lv_obj_get_self_width(const lv_obj_t * obj);
 int32_t lv_obj_get_self_height(const lv_obj_t * obj);
 
 /**
+ * Get the style width actually used by the object after clamping the width within the min max range.
+ * @param obj       pointer to an objects
+ * @return          the min/max/normal width set by `lv_obj_set_style_<min/max>_width()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj);
+
+/**
+ * Get the style height actually used by the object after clamping the height within the min max range.
+ * @param obj       pointer to an objects
+ * @return          the min/max/normal height set by `lv_obj_set_style_<min/max>_height()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj);
+
+/**
  * Handle if the size of the internal ("virtual") content of an object has changed.
  * @param obj       pointer to an object
  * @return          false: nothing happened; true: refresh happened

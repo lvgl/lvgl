@@ -345,37 +345,49 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
     margin_func_t get_margin_cross_end = (!f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
 
+    typedef int32_t (*get_style_size_func_t)(const lv_obj_t *);
+    get_style_size_func_t get_style_size = (f->row ? lv_obj_get_style_clamped_width : lv_obj_get_style_clamped_height);
+    bool is_size_content = get_style_size(cont) == LV_SIZE_CONTENT;
+
     /*Calculate the size of grow items first*/
     uint32_t i;
-    bool grow_reiterate  = true;
-    while(grow_reiterate && t->grow_item_cnt) {
-        grow_reiterate = false;
-        int32_t grow_value_sum = 0;
-        int32_t grow_max_size = t->track_main_size - t->track_fix_main_size;
+    if(is_size_content) {
+        /* If the parent is `LV_SIZE_CONTENT` then any children with a grow value should be set to the minimum size */
         for(i = 0; i < t->grow_item_cnt; i++) {
-            if(t->grow_dsc[i].clamped == 0) {
-                grow_value_sum += t->grow_dsc[i].grow_value;
-            }
-            else {
-                grow_max_size -= t->grow_dsc[i].final_size;
-            }
+            t->grow_dsc[i].final_size = t->grow_dsc[i].min_size;
         }
-        int32_t grow_unit;
-
-        for(i = 0; i < t->grow_item_cnt; i++) {
-            if(t->grow_dsc[i].clamped == 0) {
-                LV_ASSERT(grow_value_sum != 0);
-                grow_unit = grow_max_size / grow_value_sum;
-                int32_t size = grow_unit * t->grow_dsc[i].grow_value;
-                int32_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
-
-                if(size_clamp != size) {
-                    t->grow_dsc[i].clamped = 1;
-                    grow_reiterate = true;
+    }
+    else {
+        bool grow_reiterate = true;
+        while(grow_reiterate && t->grow_item_cnt) {
+            grow_reiterate = false;
+            int32_t grow_value_sum = 0;
+            int32_t grow_max_size = t->track_main_size - t->track_fix_main_size;
+            for(i = 0; i < t->grow_item_cnt; i++) {
+                if(t->grow_dsc[i].clamped == 0) {
+                    grow_value_sum += t->grow_dsc[i].grow_value;
                 }
-                t->grow_dsc[i].final_size = size_clamp;
-                grow_value_sum -= t->grow_dsc[i].grow_value;
-                grow_max_size  -= t->grow_dsc[i].final_size;
+                else {
+                    grow_max_size -= t->grow_dsc[i].final_size;
+                }
+            }
+            int32_t grow_unit;
+
+            for(i = 0; i < t->grow_item_cnt; i++) {
+                if(t->grow_dsc[i].clamped == 0) {
+                    LV_ASSERT(grow_value_sum != 0);
+                    grow_unit = grow_max_size / grow_value_sum;
+                    int32_t size = grow_unit * t->grow_dsc[i].grow_value;
+                    int32_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
+
+                    if(size_clamp != size) {
+                        t->grow_dsc[i].clamped = 1;
+                        grow_reiterate = true;
+                    }
+                    t->grow_dsc[i].final_size = size_clamp;
+                    grow_value_sum -= t->grow_dsc[i].grow_value;
+                    grow_max_size -= t->grow_dsc[i].final_size;
+                }
             }
         }
     }
@@ -386,7 +398,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
     int32_t place_gap = 0;
     place_content(f->main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
-    if(f->row && rtl) main_pos += lv_obj_get_content_width(cont);
+    if(f->row && rtl)
+        main_pos += lv_obj_get_content_width(cont);
 
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
