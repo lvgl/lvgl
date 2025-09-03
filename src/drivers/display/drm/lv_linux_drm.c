@@ -1323,7 +1323,7 @@ static int drm_atomic_commit(drm_dev_t * drm_dev, uint32_t fb_id, uint32_t flags
         return ret;
     }
 
-    if (drm_dev->kms_in_fence_fd != -1) {
+    if(drm_dev->kms_in_fence_fd != -1) {
         close(drm_dev->kms_in_fence_fd);
         drm_dev->kms_in_fence_fd = -1;
     }
