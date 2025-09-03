@@ -18,8 +18,14 @@
     #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
 #endif
 
-#if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
-    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
+#if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
+    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_G2D"
+#endif
+
+#if LV_USE_G2D
+    #if LV_USE_ROTATE_G2D && !LV_WAYLAND_USE_DMABUF
+        #error "LV_USE_ROTATE_G2D is supported only with DMABUF"
+    #endif
 #endif
 
 #ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
