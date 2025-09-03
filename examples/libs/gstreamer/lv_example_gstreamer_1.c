@@ -1,7 +1,8 @@
 #include "../../lv_examples.h"
 
-#if LV_USE_GSTREAMER && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
 
+#if LV_USE_GSTREAMER
 typedef struct {
     lv_obj_t * streamer;
     lv_obj_t * pp_button;
@@ -151,5 +152,19 @@ void lv_example_gstreamer_1(void)
     event_data.button_label = lv_label_create(event_data.pp_button);
     lv_label_set_text_static(event_data.button_label, LV_SYMBOL_PAUSE);
 }
+
+#else
+
+void lv_example_gstreamer_1(void)
+{
+    /*TODO
+     *fallback for online examples*/
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "GStreamer web support is coming soon");
+    lv_obj_center(label);
+}
+
+#endif
 
 #endif
