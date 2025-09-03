@@ -321,10 +321,10 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
         return 0;
     }
 
-    float volume_f;
-    g_object_get(streamer->audio_volume, "volume",  &volume_f, NULL);
+    gdouble volume;
+    g_object_get(streamer->audio_volume, "volume",  &volume, NULL);
 
-    return (uint8_t)(volume_f * 100.f);
+    return (uint8_t)(volume * 100.f);
 }
 
 /**
