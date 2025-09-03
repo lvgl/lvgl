@@ -66,7 +66,9 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     if(gifobj->is_open) {
         lv_image_cache_drop(lv_image_get_src(obj));
 
+        void * framebuffer = gif->pFrameBuffer;
         GIF_close(gif);
+        lv_free(framebuffer);
         gifobj->is_open = 0;
         gifobj->imgdsc.data = NULL;
     }
