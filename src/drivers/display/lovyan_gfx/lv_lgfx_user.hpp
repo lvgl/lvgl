@@ -21,6 +21,8 @@ public:
 
     void initDMA(void) {}
 
+    void waitDMA(void) {}
+
     void fillScreen(uint16_t color) {}
 
     void setRotation(uint8_t rotation) {}
