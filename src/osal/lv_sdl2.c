@@ -180,6 +180,11 @@ uint32_t lv_os_get_idle_percent(void)
 }
 #endif
 
+void lv_sleep_ms(uint32_t ms)
+{
+    SDL_Delay(ms);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
