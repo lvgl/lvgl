@@ -172,6 +172,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
         int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
         w = LV_CLAMP(minw, w, maxw);
+        obj->w_min = w == minw;
+        obj->w_max = w == maxw;
     }
 
     int32_t h;
@@ -184,6 +186,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
         int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
         h = LV_CLAMP(minh, h, maxh);
+        obj->h_min = h == minh;
+        obj->h_max = h == maxh;
     }
 
     /*Do nothing if the size is not changed*/
@@ -628,6 +632,36 @@ int32_t lv_obj_get_self_height(const lv_obj_t * obj)
     lv_point_t p = {LV_COORD_MIN, 0};
     lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
+}
+
+int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj)
+{
+    int32_t w;
+    if(obj->w_min) {
+        w = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+    }
+    else if(obj->w_max) {
+        w = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+    }
+    else {
+        w = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    }
+    return w;
+}
+
+int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj)
+{
+    int32_t h;
+    if(obj->h_min) {
+        h = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+    }
+    else if(obj->h_max) {
+        h = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+    }
+    else {
+        h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    }
+    return h;
 }
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)

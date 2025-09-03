@@ -1,8 +1,8 @@
 #if LV_BUILD_TEST
-#include "../lvgl.h"
-#include "../../lvgl_private.h"
+#  include "../../lvgl_private.h"
+#  include "../lvgl.h"
 
-#include "unity/unity.h"
+#  include "unity/unity.h"
 
 static lv_obj_t * active_screen = NULL;
 
@@ -83,7 +83,6 @@ void test_wrap_grow_min_width(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
-
 
     for(int i = 0; i < 14; i++) {
         lv_obj_t * obj = lv_obj_create(lv_screen_active());
@@ -305,8 +304,97 @@ void test_row_wrap_grow_size_content_2(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_row_wrap_grow_size_2.png");
 }
+/**
+ * When the container is set to LV_SIZE_CONTENT in flex direction and an item is set to grow,
+ * the size of the grown item should be equal to the min size of the item
+ */
+void test_col_grow_size_content(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont, "cont");
+    lv_obj_set_size(cont, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_bg_color(cont, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_COVER, 0);
 
-static lv_obj_t  * cont_row_5_create(void)
+    lv_obj_t * header = lv_label_create(cont);
+    lv_obj_set_name(header, "header");
+    lv_label_set_text(header, "header");
+
+    lv_obj_t * item = lv_obj_create(cont);
+    lv_obj_set_name(item, "item");
+    lv_obj_set_width(item, LV_PCT(100));
+    lv_obj_set_flex_grow(item, 1);
+    lv_obj_set_style_bg_color(item, lv_color_hex(0x00ff00), 0);
+    lv_obj_set_style_bg_opa(item, LV_OPA_COVER, 0);
+
+    lv_obj_t * footer = lv_label_create(cont);
+    lv_obj_set_name(footer, "footer");
+    lv_label_set_text(footer, "footer");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_col_grow_size_content.png");
+
+    lv_obj_set_style_min_height(item, 200, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_col_grow_size_content_min_size.png");
+
+    /* The min size of the cont should "override" the `LV_SIZE_CONTENT` height so item should be visible and grow to
+     * fill space */
+    lv_obj_set_style_min_height(item, 0, LV_PART_MAIN);
+    lv_obj_set_style_min_height(cont, 500, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_col_grow_size_content_min_size_cont.png");
+
+    /* The min size of the cont should "override" the `LV_SIZE_CONTENT` height so item should be visible and grow to
+     * fill space up to the max size */
+    lv_obj_set_style_max_height(item, 200, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_col_grow_size_content_max_size_cont.png");
+}
+
+/**
+ * When the container is set to LV_SIZE_CONTENT in flex direction and an item is set to grow,
+ * the size of the grown item should be equal to the min size of the item
+ */
+void test_row_grow_size_content(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont, "cont");
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_PCT(100));
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_bg_color(cont, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_COVER, 0);
+
+    lv_obj_t * left = lv_label_create(cont);
+    lv_obj_set_name(left, "left");
+    lv_label_set_text(left, "left");
+
+    lv_obj_t * item = lv_obj_create(cont);
+    lv_obj_set_name(item, "item");
+    lv_obj_set_height(item, LV_PCT(100));
+    lv_obj_set_flex_grow(item, 1);
+    lv_obj_set_style_bg_color(item, lv_color_hex(0x00ff00), 0);
+    lv_obj_set_style_bg_opa(item, LV_OPA_COVER, 0);
+
+    lv_obj_t * right = lv_label_create(cont);
+    lv_obj_set_name(right, "right");
+    lv_label_set_text(right, "right");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_row_grow_size_content.png");
+
+    lv_obj_set_style_min_width(item, 200, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_row_grow_size_content_min_size.png");
+
+    /* The min size of the cont should "override" the `LV_SIZE_CONTENT` width so item should be visible and grow to
+     * fill space */
+    lv_obj_set_style_min_width(item, 0, LV_PART_MAIN);
+    lv_obj_set_style_min_width(cont, 500, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_row_grow_size_content_min_size_cont.png");
+
+    /* The min size of the cont should "override" the `LV_SIZE_CONTENT` width so item should be visible and grow to
+     * fill space up to the max size */
+    lv_obj_set_style_max_width(item, 200, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_row_grow_size_content_max_size_cont.png");
+}
+
+static lv_obj_t * cont_row_5_create(void)
 {
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
@@ -369,6 +457,5 @@ void test_flex_hide_items(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items.png");
 }
-
 
 #endif
