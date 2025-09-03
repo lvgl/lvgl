@@ -106,8 +106,18 @@ static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
         return;
     }
 
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+    data->point.x = window->body->input.pointer.y;
+    data->point.y = window->body->width - window->body->input.pointer.x;
+#else
     data->point.x = window->body->input.pointer.x;
     data->point.y = window->body->input.pointer.y;
+#endif
+#else
+    data->point.x = window->body->input.pointer.x;
+    data->point.y = window->body->input.pointer.y;
+#endif
     data->state   = window->body->input.pointer.left_button;
 }
 

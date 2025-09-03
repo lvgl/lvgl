@@ -15,7 +15,8 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "../../lv_draw_buf_private.h"
 #include "g2d.h"
 #include "lv_g2d_buf_map.h"
@@ -89,4 +90,5 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     g2d_cache_op(buf, G2D_CACHE_FLUSH);
 }
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/

@@ -15,7 +15,8 @@
 
 #include "lv_g2d_utils.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "lv_g2d_buf_map.h"
 #include "lv_draw_g2d.h"
 
@@ -30,7 +31,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static void * g2d_handle;
 /**********************
 *      MACROS
 **********************/
@@ -90,8 +91,57 @@ int32_t g2d_get_buf_fd(const lv_draw_buf_t * draw_buf)
     return g2d_buf_export_fd(buf);
 }
 
+void g2d_set_handle(void * handle)
+{
+    g2d_handle = handle;
+}
+void * g2d_get_handle(void)
+{
+    return g2d_handle;
+}
+
+#if LV_USE_ROTATE_G2D
+void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32_t height, lv_color_format_t cf)
+{
+    struct g2d_surface src_surf, dst_surf;
+    struct g2d_buf * src_buf = g2d_search_buf_map(buf1->data);
+    struct g2d_buf * dst_buf = g2d_search_buf_map(buf2->data);
+
+    src_surf.format = g2d_get_buf_format(cf);
+
+    src_surf.left   = 0;
+    src_surf.top    = 0;
+    src_surf.right  = height;
+    src_surf.bottom = width;
+    src_surf.stride = height;
+    src_surf.width  = height;
+    src_surf.height = width;
+
+    src_surf.planes[0] = src_buf->buf_paddr;
+    src_surf.rot = G2D_ROTATION_0;
+
+    dst_surf.format = g2d_get_buf_format(cf);
+
+    dst_surf.left   = 0;
+    dst_surf.top    = 0;
+    dst_surf.right  = width;
+    dst_surf.bottom = height;
+    dst_surf.stride = width;
+    dst_surf.width  = width;
+    dst_surf.height = height;
+
+    dst_surf.planes[0] = dst_buf->buf_paddr;
+    dst_surf.rot = G2D_ROTATION_90;
+
+    void * handle = g2d_get_handle();
+    g2d_blit(handle, &src_surf, &dst_surf);
+    g2d_finish(handle);
+}
+#endif
+
 /**********************
 *   STATIC FUNCTIONS
 **********************/
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/

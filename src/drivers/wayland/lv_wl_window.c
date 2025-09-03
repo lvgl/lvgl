@@ -83,6 +83,15 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     int32_t window_width;
     int32_t window_height;
 
+    uint32_t width = hor_res;
+    uint32_t height = ver_res;
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+    width = ver_res;
+    height = hor_res;
+#endif
+#endif
+
     lv_wayland_init();
 
     window_width  = hor_res;
@@ -104,7 +113,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     window->close_cb = close_cb;
 
     /* Initialize display driver */
-    window->lv_disp = lv_display_create(hor_res, ver_res);
+    window->lv_disp = lv_display_create(width, height);
     if(window->lv_disp == NULL) {
         LV_LOG_ERROR("failed to create lvgl display");
         return NULL;
@@ -348,7 +357,15 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 #endif
 
     if(window->lv_disp) {
+#if LV_USE_G2D
+#if LV_USE_ROTATE_G2D
+        lv_display_set_resolution(window->lv_disp, height, width);
+#else
         lv_display_set_resolution(window->lv_disp, width, height);
+#endif
+#else
+        lv_display_set_resolution(window->lv_disp, width, height);
+#endif
         window->body->input.pointer.x = LV_MIN((int32_t)window->body->input.pointer.x, (width - 1));
         window->body->input.pointer.y = LV_MIN((int32_t)window->body->input.pointer.y, (height - 1));
     }

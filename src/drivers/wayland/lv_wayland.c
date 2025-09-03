@@ -10,20 +10,34 @@
 
 #if LV_USE_WAYLAND
 
-#if LV_WAYLAND_BUF_COUNT < 1 || LV_WAYLAND_BUF_COUNT > 2
-    #error "Invalid LV_WAYLAND_BUF_COUNT. Expected either 1 or 2"
+#if LV_USE_G2D
+    #if LV_USE_ROTATE_G2D
+        #if !LV_WAYLAND_USE_DMABUF
+            #error "LV_USE_ROTATE_G2D is supported only with DMABUF"
+        #endif
+        #if LV_WAYLAND_BUF_COUNT != 3
+            #error "LV_WAYLAND_BUF_COUNT must be 3 when LV_USE_ROTATE_G2D is enabled"
+        #endif
+        #define LV_WAYLAND_CHECK_BUF_COUNT 0
+    #endif
 #endif
 
-#if !LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 1
-    #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
+#ifndef LV_WAYLAND_CHECK_BUF_COUNT
+    #if LV_WAYLAND_BUF_COUNT < 1 || LV_WAYLAND_BUF_COUNT > 2
+        #error "Invalid LV_WAYLAND_BUF_COUNT. Expected either 1 or 2"
+    #endif
+
+    #if !LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 1
+        #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
+    #endif
+
+    #if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 2
+        #error "Wayland with DMABUF only supports 2 LV_WAYLAND_BUF_COUNT"
+    #endif
 #endif
 
-#if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 2
-    #error "Wayland with DMABUF only supports 2 LV_WAYLAND_BUF_COUNT"
-#endif
-
-#if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
-    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
+#if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
+    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_G2D"
 #endif
 
 #ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
