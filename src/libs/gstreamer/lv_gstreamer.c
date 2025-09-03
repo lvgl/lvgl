@@ -170,6 +170,10 @@ void lv_gstreamer_play(lv_obj_t * obj)
         return;
     }
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
+    if(!streamer->pipeline) {
+        LV_LOG_WARN("Cannot play: GStreamer pipeline not initialized");
+        return;
+    }
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PLAYING);
     if(ret == GST_STATE_CHANGE_FAILURE) {
         LV_LOG_ERROR("Unable to play pipeline");
@@ -179,8 +183,12 @@ void lv_gstreamer_play(lv_obj_t * obj)
 void lv_gstreamer_pause(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!obj) {
+        return;
+    }
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
-    if(!streamer && !streamer->pipeline) {
+    if(!streamer->pipeline) {
+        LV_LOG_WARN("Cannot pause: GStreamer pipeline not initialized");
         return;
     }
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_PAUSED);
@@ -192,9 +200,14 @@ void lv_gstreamer_pause(lv_obj_t * obj)
 
 void lv_gstreamer_stop(lv_obj_t * obj)
 {
+
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!obj) {
+        return;
+    }
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
-    if(!streamer && !streamer->pipeline) {
+    if(!streamer->pipeline) {
+        LV_LOG_WARN("Cannot stop: GStreamer pipeline not initialized");
         return;
     }
     GstStateChangeReturn ret = gst_element_set_state(streamer->pipeline, GST_STATE_READY);
@@ -205,13 +218,14 @@ void lv_gstreamer_stop(lv_obj_t * obj)
 void lv_gstreamer_set_position(lv_obj_t * obj, uint32_t position)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
-
-    if(streamer->pipeline == NULL) {
-        LV_LOG_WARN("Cannot seek: GStreamer pipeline not initialized");
+    if(!obj) {
         return;
     }
-
+    lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
+    if(!streamer->pipeline) {
+        LV_LOG_WARN("Cannot set position: GStreamer pipeline not initialized");
+        return;
+    }
     gint64 seek_position = (gint64)position * GST_MSECOND;
 
     if(!gst_element_seek_simple(streamer->pipeline, GST_FORMAT_TIME,
@@ -226,7 +240,7 @@ uint32_t lv_gstreamer_get_duration(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
-    if(streamer->pipeline == NULL) {
+    if(!streamer->pipeline) {
         return 0;
     }
 
@@ -243,7 +257,7 @@ uint32_t lv_gstreamer_get_position(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
-    if(streamer->pipeline == NULL) {
+    if(!streamer->pipeline) {
         return 0;
     }
 
@@ -260,7 +274,7 @@ lv_gstreamer_state_t lv_gstreamer_get_state(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
-    if(streamer->pipeline == NULL) {
+    if(!streamer->pipeline) {
         return LV_GSTREAMER_STATE_NULL;
     }
 
@@ -291,7 +305,7 @@ void lv_gstreamer_set_volume(lv_obj_t * obj, uint8_t volume)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
-    if(streamer->pipeline == NULL) {
+    if(!streamer->pipeline) {
         return;
     }
 
@@ -303,7 +317,7 @@ uint8_t lv_gstreamer_get_volume(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gstreamer_t * streamer = (lv_gstreamer_t *)obj;
 
-    if(streamer->pipeline == NULL) {
+    if(!streamer->pipeline) {
         return 0;
     }
 
