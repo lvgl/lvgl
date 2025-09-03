@@ -234,18 +234,14 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     };
 
     if(texture != 0) {
-        float x_coef = 1.0f / (float)(2 * lv_area_get_width(texture_area));
-        float y_coef = 1.0f / (float)(2 * lv_area_get_height(texture_area));
-        float ix_co = 1.0f - x_coef;
-        float iy_co = 1.0f - y_coef;
-        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, x_coef, ix_co)
-                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, x_coef, ix_co);
-        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, x_coef, ix_co)
-                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, x_coef, ix_co);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, y_coef, iy_co);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, y_coef, iy_co)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, y_coef, iy_co);
+        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, 0.f, 1.f);
+        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, 0.f, 1.f);
+        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, 0.f, 1.f);
+        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
 
         float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
