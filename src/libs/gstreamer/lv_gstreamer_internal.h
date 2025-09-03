@@ -33,10 +33,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
-
 struct _lv_gstreamer_t {
     lv_image_t image;
     lv_image_dsc_t frame;
