@@ -650,7 +650,6 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
     if(recognizer == NULL) return;
 
     /* Backup the original descriptors */
-    const uint8_t ori_finger_cnt = recognizer->info.finger_cnt;
     const lv_indev_gesture_t ori_info = recognizer->info;
     const lv_indev_gesture_configuration_t ori_conf = recognizer->config;
     const lv_recognizer_func_t ori_recog_fn = recognizer->recog_fn;
@@ -659,7 +658,6 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
     lv_memzero(recognizer, sizeof(lv_indev_gesture_recognizer_t));
 
     /* Restore the original descriptors */
-    recognizer->info.finger_cnt = ori_finger_cnt;
     recognizer->info = ori_info;
     recognizer->config = ori_conf;
     recognizer->recog_fn = ori_recog_fn;
