@@ -559,10 +559,12 @@ static lv_result_t gstreamer_create_pipeline(lv_gstreamer_t * streamer, GstEleme
 
     if(!gst_element_link_many(streamer->video_convert, video_rate, video_queue, video_app_sink, NULL)) {
         LV_LOG_ERROR("Failed to link video convert to sink");
+        return LV_RESULT_INVALID;
     }
 
     if(!gst_element_link_many(streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL)) {
         LV_LOG_ERROR("Failed to link audio convert to sink");
+        return LV_RESULT_INVALID;
     }
 
     g_signal_connect(video_app_sink, "new-sample", G_CALLBACK(on_new_sample), streamer);
