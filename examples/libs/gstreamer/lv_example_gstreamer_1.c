@@ -120,7 +120,7 @@ void lv_example_gstreamer_1(void)
     lv_subject_init_int(&volume_subject, 50);
     lv_subject_add_observer_obj(&volume_subject, volume_observer_cb, event_data.streamer, NULL);
     lv_slider_bind_value(volume_slider, &volume_subject);
-    lv_label_bind_text(volume_label, &volume_subject, "%3" LV_PRIu32 "%%");
+    lv_label_bind_text(volume_label, &volume_subject, "%3" LV_PRId32 "%%");
 
     /* Create a slider to see the position in the stream with 2 text label on each side
      * One for the current position in the stream and the other for the total duration of the stream*/
