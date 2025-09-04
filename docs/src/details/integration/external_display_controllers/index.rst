@@ -1,3 +1,5 @@
+.. _display controllers:
+
 ==========================
 Display Controller Support
 ==========================
