@@ -21,7 +21,8 @@ extern "C" {
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #elif LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL
-#include <GL/gl.h>
+#include <GLES/gl.h>
+#include <GLES/glext.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
 #else
@@ -31,6 +32,16 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+/* In desktop GL (<Gl/gl.h>) these symbols are defined but for EGL
+ * they are defined as extensions with the _EXT suffix */
+#ifndef GL_BGRA
+#define GL_BGRA GL_BGRA_EXT
+#endif /*GL_BGRA*/
+
+#ifndef GL_BGR
+#define GL_BGR GL_BGR_EXT
+#endif /*GL_BGR*/
 
 /**********************
  *      TYPEDEFS
