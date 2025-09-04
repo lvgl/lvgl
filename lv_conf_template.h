@@ -360,7 +360,7 @@
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #define LV_USE_DRAW_OPENGLES 0
 
 #if LV_USE_DRAW_OPENGLES
@@ -1360,13 +1360,13 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
 #endif
 
-/** Use GLFW to open window on PC and handle mouse and keyboard */
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
 #define LV_USE_GLFW   0
 
 

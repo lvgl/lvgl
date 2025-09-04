@@ -1,4 +1,4 @@
-.. _opengl_es_driver:
+.. _glfw_driver:
 
 ====
 GLFW
@@ -7,15 +7,11 @@ GLFW
 Overview
 --------
 
-The **OpenGL ES** display/input driver offers support for creating
+The **GLFW** display/input driver offers support for creating
 LVGL displays and keyboard/mouse inputs that can be used in an OpenGL context.
 It can be used like **Wayland**, **XCB**, **SDL** or **Qt** or it can be used for more embedded applications.
 
 The GLFW driver is a quick way to get started on PC-like platforms.
-
-LVGL can also be used with the OpenGLES EGL API. EGL is a lower-level API that is more closely tied to the underlying
-drivers of the platform. The OpenGL support in LVGL is intended to be portable between different APIs. Currently
-there is support for GLFW and EGL. Using EGL requires some additional platform integration. See :ref:`EGL <opengl_es_driver_egl>` below.
 
 Getting Started with GLFW
 -------------------------
@@ -23,15 +19,16 @@ Getting Started with GLFW
 Prerequisites
 ~~~~~~~~~~~~~
 
-The OpenGL driver uses GLEW GLFW to access the OpenGL window manager.
+The GLFW driver uses GLEW GLFW to access the OpenGL window manager.
 
 1. Install GLEW and GLFW: ``sudo apt-get install libglew-dev libglfw3-dev``
 
-Configure OpenGL Driver
-~~~~~~~~~~~~~~~~~~~~~~~
+Configure GLFW Driver
+~~~~~~~~~~~~~~~~~~~~~
 
 1. Required linked libraries: -lGL -lGLEW -lglfw
 2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
+
     .. code-block:: c
 
         #define LV_USE_OPENGLES  1
@@ -89,7 +86,7 @@ Basic Usage
 Advanced Usage
 ~~~~~~~~~~~~~~
 
-The OpenGL driver can draw textures from the user. A third-party library could be
+The GLFW driver can draw textures from the user. A third-party library could be
 used to add content to a texture and the driver will draw the texture in the window.
 
 .. code-block:: c
@@ -206,64 +203,9 @@ used to add content to a texture and the driver will draw the texture in the win
         third_party_lib_use_texture(sub_texture_id);
     }
 
-OpenGL Texture Caching Renderer
--------------------------------
+
+Improving Performance
+---------------------
 
 There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
-The textures are retrieved from the cache and reused when there is a match.
-The performance will be drastically improved in most cases.
-
-.. code-block:: c
-
-    #define LV_USE_DRAW_OPENGLES 1
-
-Known Limitations
-~~~~~~~~~~~~~~~~~
-
-- Performance will be the same or slightly worse if the drawn areas are never found in the cache
-  due to Widgets with continuously varying colors or shapes. One example is a label whose color
-  is set to a random value every frame, as in the "Multiple labels" scene of the benchmark demo.
-- Layers with transparent pixels and an overall layer transparency will not blend correctly.
-  The effect can be observed in the "Containers with opa_layer" scene of the benchmark demo
-  in the border corners.
-- Layers with rotation are not currently supported. Images with rotation are fine.
-
-
-.. Comment:  The above blank line is necessary for Sphinx to not complain,
-    since it looks for the blank line after a bullet list.
-
-
-.. _opengl_es_driver_egl:
-
-EGL
----
-
-:cpp:func:`lv_opengles_egl_window_create` can be used to create a :cpp:type:`lv_opengles_window_t`
-which can be used with the same generic LVGL OpenGL APIs as a GLFW window shown above.
-
-To get started with EGL on Linux with DRM and no window manager,
-enable the following in your ``lv_conf.h`` (or Kconfig or CMake).
-
-.. code-block:: c
-
-    #define LV_USE_OPENGLES              1
-    #define LV_USE_OPENGLES_API          LV_OPENGLES_API_EGL
-    #define LV_USE_LINUX_DRM             1
-    #define LV_USE_LINUX_DRM_GBM_BUFFERS 1
-    #define LV_LINUX_DRM_USE_EGL         1
-    #define LV_USE_DRAW_OPENGLES         1   /* optional: use texture caching. needed for actual performance advantage */
-
-
-Render Direct to Window
------------------------
-
-.. warning::
-
-    This feature is incomplete and has bugs.
-
-So far all the UIs demonstrated render to a LVGL display-sized intermediate texture before that texture is "rendered"
-to the window. At the least, it will cost a screen-sized read and a write inside the GPU. Performance can be
-improved if the LVGL OpenGL driver renders its cached textures directly to the window (and :c:macro:`LV_USE_DRAW_OPENGLES` is enabled).
-This can be done by creating the display with :cpp:func:`lv_opengles_window_display_create` instead of
-:cpp:func:`lv_opengles_texture_create` + :cpp:func:`lv_opengles_texture_get_texture_id` + :cpp:func:`lv_opengles_window_add_texture`.
-Performance should be better with GLFW and EGL. EGL currently has issues when used this way.
+See :ref:`opengl_texture_caching_renderer` to learn more about it.

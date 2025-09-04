@@ -1009,7 +1009,7 @@
     #endif
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #ifndef LV_USE_DRAW_OPENGLES
     #ifdef CONFIG_LV_USE_DRAW_OPENGLES
         #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
@@ -4383,7 +4383,7 @@
     #endif
 #endif
 
-
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES
         #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
@@ -4405,7 +4405,7 @@
     #endif
 #endif
 
-/** Use GLFW to open window on PC and handle mouse and keyboard */
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
 #ifndef LV_USE_GLFW
     #ifdef CONFIG_LV_USE_GLFW
         #define LV_USE_GLFW CONFIG_LV_USE_GLFW
