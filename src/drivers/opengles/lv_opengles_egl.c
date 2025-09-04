@@ -331,6 +331,7 @@ void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, 
 
 lv_indev_t * lv_opengles_window_texture_get_mouse_indev(lv_opengles_window_texture_t * texture)
 {
+    LV_UNUSED(texture);
     LV_LOG_WARN("EGL does not create indevs. Returning NULL.");
     return NULL;
 }
@@ -398,7 +399,6 @@ static void lv_egl_timer_init(void)
 static void window_update_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    int count = 0;
     lv_opengles_window_t * window;
 
     /* render each window */
