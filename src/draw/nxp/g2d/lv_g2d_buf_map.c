@@ -156,6 +156,7 @@ void g2d_free_item(void * key)
         for(uint32_t i = 0; i < lv_array_size(list); i++) {
             item = (lv_map_item_t *)lv_array_at(list, i);
             if(item->key == key) {
+                g2d_free(item->value);
                 lv_array_remove(list, i);
                 return;
             }
