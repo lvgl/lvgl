@@ -15,7 +15,6 @@
     bmp
     ffmpeg
     freetype
-    frogfs
     fs
     gif
     lfs

@@ -2963,23 +2963,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_FS_FROGFS
-    #ifdef CONFIG_LV_USE_FS_FROGFS
-        #define LV_USE_FS_FROGFS CONFIG_LV_USE_FS_FROGFS
-    #else
-        #define LV_USE_FS_FROGFS 0
-    #endif
-#endif
-#if LV_USE_FS_FROGFS
-    #ifndef LV_FS_FROGFS_LETTER
-        #ifdef CONFIG_LV_FS_FROGFS_LETTER
-            #define LV_FS_FROGFS_LETTER CONFIG_LV_FS_FROGFS_LETTER
-        #else
-            #define LV_FS_FROGFS_LETTER '\0'
-        #endif
-    #endif
-#endif
-
 /** LODEPNG decoder library */
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG

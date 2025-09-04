@@ -29,14 +29,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Recurse into a directory, loading all XML components,
- * screens, and translations, as well as any binfmt fonts,
- * and images for which a decoder is registered.
- * @param path   the path to a directory to load files from
- * @return       `LV_RESULT_OK` if there were no issues or
- *               `LV_RESULT_INVALID` otherwise.
- */
 lv_result_t lv_xml_load_all(const char * path);
 
 /**********************
