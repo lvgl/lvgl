@@ -362,6 +362,14 @@ int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj);
  */
 int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj);
 
+bool lv_obj_is_width_min(const lv_obj_t * obj);
+
+bool lv_obj_is_height_min(const lv_obj_t * obj);
+
+bool lv_obj_is_width_max(const lv_obj_t * obj);
+
+bool lv_obj_is_height_max(const lv_obj_t * obj);
+
 /**
  * Handle if the size of the internal ("virtual") content of an object has changed.
  * @param obj       pointer to an object
