@@ -51,9 +51,11 @@ extern "C" {
 #include "windows/lv_windows_input.h"
 #include "windows/lv_windows_display.h"
 
-#include "glfw/lv_glfw_window.h"
-#include "glfw/lv_opengles_texture.h"
-#include "glfw/lv_opengles_driver.h"
+#include "opengles/lv_opengles_window.h"
+#include "opengles/lv_opengles_texture.h"
+#include "opengles/lv_opengles_driver.h"
+#include "opengles/lv_opengles_glfw.h"
+#include "opengles/lv_opengles_egl.h"
 
 #include "qnx/lv_qnx.h"
 

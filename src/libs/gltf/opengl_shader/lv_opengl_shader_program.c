@@ -11,7 +11,8 @@
 
 #if LV_USE_GLTF
 
-#include "../../../drivers/glfw/lv_opengles_debug.h"
+#include "../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../drivers/opengles/lv_opengles_debug.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../stdlib/lv_mem.h"
 /*********************

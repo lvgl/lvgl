@@ -10,16 +10,36 @@
 extern "C" {
 #endif
 
+/*********************
+ *      INCLUDES
+ *********************/
+
 #include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 
-#include <stdbool.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+#if LV_USE_OPENGLES_DEBUG
 
 void GLClearError(void);
 
 void GLLogCall(const char * function, const char * file, int line);
+
+#endif
+
+/**********************
+ *      MACROS
+ **********************/
 
 #if LV_USE_OPENGLES_DEBUG
 #define GL_CALL(x) do {\
