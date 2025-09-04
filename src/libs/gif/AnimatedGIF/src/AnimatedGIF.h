@@ -19,12 +19,6 @@
 #include LV_LIMITS_INCLUDE
 #include "../../../../stdlib/lv_string.h"
 
-#define memcpy lv_memcpy
-#define memmove lv_memmove
-#define memcmp lv_memcmp
-#define memset lv_memset
-#define memcpy_P lv_memcpy
-
 //
 // GIF Animator
 // Written by Larry Bank

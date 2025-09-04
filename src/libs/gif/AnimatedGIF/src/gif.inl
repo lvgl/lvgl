@@ -76,7 +76,7 @@ void GIF_close(GIFIMAGE *pGIF)
 
 void GIF_begin(GIFIMAGE *pGIF, unsigned char ucPaletteType)
 {
-    memset(pGIF, 0, sizeof(GIFIMAGE));
+    lv_memset(pGIF, 0, sizeof(GIFIMAGE));
     pGIF->ucPaletteType = ucPaletteType;
 } /* GIF_begin() */
 
@@ -169,7 +169,7 @@ static int32_t readMem(GIFFILE *pFile, uint8_t *pBuf, int32_t iLen)
        iBytesRead = pFile->iSize - pFile->iPos;
     if (iBytesRead <= 0)
        return 0;
-    memmove(pBuf, &pFile->pData[pFile->iPos], iBytesRead);
+    lv_memmove(pBuf, &pFile->pData[pFile->iPos], iBytesRead);
     pFile->iPos += iBytesRead;
     return iBytesRead;
 } /* readMem() */
@@ -267,7 +267,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
     }
     if (iStartPos == 0) // start of the file
     { // canvas size
-        if (memcmp(p, "GIF89", 5) != 0 && memcmp(p, "GIF87", 5) != 0) // not a GIF file
+        if (lv_memcmp(p, "GIF89", 5) != 0 && lv_memcmp(p, "GIF87", 5) != 0) // not a GIF file
         {
            pPage->iError = GIF_BAD_FILE;
            return 0;
@@ -306,7 +306,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                     iOffset += 3;
                 }
             } else { // just copy it as-is (RGB888 & RGB8888 output)
-                memcpy(pPage->pPalette, &p[iOffset], (1<<iColorTableBits) * 3);
+                lv_memcpy(pPage->pPalette, &p[iOffset], (1<<iColorTableBits) * 3);
                 iOffset += (1 << iColorTableBits) * 3;
             }
         }
@@ -338,7 +338,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                         c = p[iOffset++]; /* Block length */
                         if ((iBytesRead - iOffset) < (c+32)) // need to read more data first
                         {
-                            memmove(pPage->ucFileBuf, &pPage->ucFileBuf[iOffset], (iBytesRead-iOffset)); // move existing data down
+                            lv_memmove(pPage->ucFileBuf, &pPage->ucFileBuf[iOffset], (iBytesRead-iOffset)); // move existing data down
                             iBytesRead -= iOffset;
                             iStartPos += iOffset;
                             iOffset = 0;
@@ -346,7 +346,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                         }
                         if (c == 11) // fixed block length
                         { // Netscape app block contains the repeat count
-                            if (memcmp(&p[iOffset], "NETSCAPE2.0", 11) == 0)
+                            if (lv_memcmp(&p[iOffset], "NETSCAPE2.0", 11) == 0)
                             {
                                 if (p[iOffset+11] == 3 && p[iOffset+12] == 1) // loop count
                                     pPage->iRepeatCount = INTELSHORT(&p[iOffset+13]);
@@ -380,7 +380,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                         c = p[iOffset++]; /* Block length */
                         if ((iBytesRead - iOffset) < (c+32)) // need to read more data first
                         {
-                            memmove(pPage->ucFileBuf, &pPage->ucFileBuf[iOffset], (iBytesRead-iOffset)); // move existing data down
+                            lv_memmove(pPage->ucFileBuf, &pPage->ucFileBuf[iOffset], (iBytesRead-iOffset)); // move existing data down
                             iBytesRead -= iOffset;
                             iStartPos += iOffset;
                             iOffset = 0;
@@ -469,7 +469,7 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
                 iOffset += 3;
             }
         } else { // just copy it as-is
-            memcpy(pPage->pLocalPalette, &p[iOffset], j * 3);
+            lv_memcpy(pPage->pLocalPalette, &p[iOffset], j * 3);
             iOffset += j*3;
         }
         pPage->bUseLocalPalette = 1;
@@ -488,14 +488,14 @@ static int GIFParseInfo(GIFIMAGE *pPage, int bInfoOnly)
 //     Serial.printf("Chunk size = %d\n", c);
      if (c <= (iBytesRead - iOffset))
      {
-       memcpy(&pPage->ucLZW[pPage->iLZWSize], &p[iOffset], c);
+       lv_memcpy(&pPage->ucLZW[pPage->iLZWSize], &p[iOffset], c);
        pPage->iLZWSize += c;
        iOffset += c;
      }
      else // partial chunk in our buffer
      {
        int iPartialLen = (iBytesRead - iOffset);
-       memcpy(&pPage->ucLZW[pPage->iLZWSize], &p[iOffset], iPartialLen);
+       lv_memcpy(&pPage->ucLZW[pPage->iLZWSize], &p[iOffset], iPartialLen);
        pPage->iLZWSize += iPartialLen;
        iOffset += iPartialLen;
        (*pPage->pfnRead)(&pPage->GIFFile, &pPage->ucLZW[pPage->iLZWSize], c - iPartialLen);
@@ -552,7 +552,7 @@ int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo)
         {
             if ((iDataAvailable - iOff) < 258) // need to read more data first
             {
-                memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
+                lv_memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
                 iDataAvailable -= iOff;
                 iOff = 0;
                 iReadAmount = (*pPage->pfnRead)(&pPage->GIFFile, &cBuf[iDataAvailable], FILE_BUF_SIZE-iDataAvailable);
@@ -595,7 +595,7 @@ int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo)
                        c = cBuf[iOff++];
                        if ((iDataAvailable - iOff) < (c+258)) // need to read more data first
                         {
-                            memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
+                            lv_memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
                             iDataAvailable -= iOff;
                             iOff = 0;
                             iReadAmount = (*pPage->pfnRead)(&pPage->GIFFile, &cBuf[iDataAvailable], FILE_BUF_SIZE-iDataAvailable);
@@ -636,7 +636,7 @@ int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo)
         if ((iDataAvailable - iOff) < (c+258)) // need to read more data first
          {
              if (iOff < iDataAvailable) {
-                 memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
+                 lv_memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
                  iDataAvailable -= iOff;
                  iOff = 0;
              } else { // already points beyond end
@@ -653,7 +653,7 @@ int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo)
         {
             if (iOff > (3*FILE_BUF_SIZE/4) && iDataRemaining > 0) /* Near end of buffer, re-align */
             {
-                memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
+                lv_memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
                 iDataAvailable -= iOff;
                 iOff = 0;
                 iReadAmount = (FILE_BUF_SIZE - iDataAvailable);
@@ -683,7 +683,7 @@ int GIF_getInfo(GIFIMAGE *pPage, GIFINFO *pInfo)
              // read new page data starting at this offset
             if (pPage->GIFFile.iSize > FILE_BUF_SIZE && iDataRemaining > 0) // since we didn't read the whole file in one shot
             {
-                memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
+                lv_memmove(cBuf, &cBuf[iOff], (iDataAvailable-iOff)); // move existing data down
                 iDataAvailable -= iOff;
                 iOff = 0;
                 iReadAmount = (FILE_BUF_SIZE - iDataAvailable);
@@ -1039,7 +1039,7 @@ static void DrawNewPixels(GIFIMAGE *pPage, GIFDRAW *pDraw)
     if (pDraw->ucHasTransparency) { // if transparency used
         uint8_t c, ucTransparent = pDraw->ucTransparent;
         if (pDraw->ucDisposalMethod == 2) {
-            memset(d, pDraw->ucBackground, pDraw->iWidth); // start with background color
+            lv_memset(d, pDraw->ucBackground, pDraw->iWidth); // start with background color
         }
         for (x=0; x<pDraw->iWidth; x++) {
             c = *s++;
@@ -1048,7 +1048,7 @@ static void DrawNewPixels(GIFIMAGE *pPage, GIFDRAW *pDraw)
             d++;
         }
     } else { // disposal method doesn't matter when there aren't any transparent pixels
-        memcpy(d, s, pDraw->iWidth); // just overwrite the old pixels
+        lv_memcpy(d, s, pDraw->iWidth); // just overwrite the old pixels
     }
 } /* DrawNewPixels() */
 //
@@ -1460,7 +1460,7 @@ init_codetable:
     nextcode = cc + 2;
     nextlim = (unsigned short) ((1 << codesize));
     // This part of the table needs to be reset multiple times
-    memset(&giftabs[cc], (uint8_t) LINK_UNUSED, sizeof(pImage->usGIFTable) - sizeof(giftabs[0])*cc);
+    lv_memset(&giftabs[cc], (uint8_t) LINK_UNUSED, sizeof(pImage->usGIFTable) - sizeof(giftabs[0])*cc);
     ulBits = INTELLONG(&p[pImage->iLZWOff]); // start by reading 4 bytes of LZW data
     GET_CODE
     if (code == cc) // we just reset the dictionary, so get another code
