@@ -47,15 +47,15 @@ with other draw units (typically only the software draw unit). By default,
 any time that DMA2D is working on a draw task that LVGL depends on the
 completion of before continuing, LVGL will spin waiting for
 DMA2D to complete. If you would like the CPU to sleep or be scheduled to
-other RTOS tasks while a DMA2D transfer is ongoing, you need two things:
+other RTOS tasks while a DMA2D transfer is ongoing, do the following:
 
-1. An RTOS/OS present. Set ``LV_USE_OS`` to one of the supported values
-   in ``lv_conf_template.h``.
-2. The responsibility of calling
+1. An RTOS/OS must be present. Set ``LV_USE_OS`` to one of the supported values
+   in ``lv_conf_template.h`` corresponding to the RTOS you're using.
+2. Set ``LV_USE_DRAW_DMA2D_INTERRUPT`` to ``1`` in ``lv_conf.h``.
+3. You must call
    :cpp:expr:`lv_draw_dma2d_transfer_complete_interrupt_handler()`
    when you receive the global interrupt that signals
-   a DMA2D transfer has completed. To use it, set
-   ``LV_USE_DRAW_DMA2D_INTERRUPT`` to ``1`` in ``lv_conf.h``.
+   a DMA2D transfer has completed.
 
 
 Interop with LTDC and NeoChrom
