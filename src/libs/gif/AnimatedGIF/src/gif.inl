@@ -1501,36 +1501,4 @@ init_codetable:
 //    return -1;
 } /* DecodeLZW() */
 
-void GIF_setDrawCallback(GIFIMAGE *pGIF, GIF_DRAW_CALLBACK *pfnDraw)
-{
-   pGIF->pfnDraw = pfnDraw;
-} /* GIF_setDrawCallback() */
-//
-// Scale 2 scanlines down by 50% with pixel averaging
-// writes new values over previous line
-// expects RGB565 little endian pixels as input
-//
-void GIF_scaleHalf(uint16_t *pCurrent, uint16_t *pPrev, int iWidth, int bBigEndian)
-{
-int x;
-uint16_t *d = pPrev;
-uint32_t gSum, rbSum, pix0,pix1,pix2,pix3;
-const uint32_t RBMask = 0xf81f, GMask = 0x7e0;
-
-   for (x=0; x<iWidth; x+=2)
-   {
-      pix0 = pCurrent[0]; pix1 = pCurrent[1];
-      pix2 = pPrev[0]; pix3 = pPrev[1];
-      pCurrent += 2; pPrev += 2;
-      gSum = (pix0 & GMask) + (pix1 & GMask) + (pix2 & GMask) + (pix3 & GMask);
-      gSum = ((gSum + 0x40) >> 2) & GMask; // for rounding towards 1
-      rbSum = (pix0 & RBMask) + (pix1 & RBMask) + (pix2 & RBMask) + (pix3 & RBMask);
-      rbSum = ((rbSum + 0x1002) >> 2) & RBMask;
-      if (bBigEndian)
-         *d++ = __builtin_bswap16((uint16_t)(gSum + rbSum));
-      else
-         *d++ = (uint16_t)(gSum + rbSum); // store finished pixel
-   } // for x
-} /* GIF_scaleHalf() */
-
 
