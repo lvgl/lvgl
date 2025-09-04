@@ -945,15 +945,15 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                         pixel = *s++;
                         if (pixel != ucTransparent) {
                             *d8++ = pixel;
-                            d[0] = pPal[(pixel * 3) + 0];
+                            d[0] = pPal[(pixel * 3) + 2];
                             d[1] = pPal[(pixel * 3) + 1];
-                            d[2] = pPal[(pixel * 3) + 2];
+                            d[2] = pPal[(pixel * 3) + 0];
                             d += 3;
                         } else {
                             *d8++ = pDraw->ucBackground;
-                            d[0] = bg[0];
+                            d[0] = bg[2];
                             d[1] = bg[1];
-                            d[2] = bg[2];
+                            d[2] = bg[0];
                             d += 3;
                         }
                     }
@@ -962,9 +962,9 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                         pixel = *s++;
                         if (pixel != ucTransparent) {
                             *d8++ = pixel;
-                            d[0] = pPal[(pixel * 3) + 0];
+                            d[0] = pPal[(pixel * 3) + 2];
                             d[1] = pPal[(pixel * 3) + 1];
-                            d[2] = pPal[(pixel * 3) + 2];
+                            d[2] = pPal[(pixel * 3) + 0];
                             d[3] = 0xFF;
                             d += 4;
                         } else {
@@ -980,9 +980,9 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                         pixel = *s++;
                         if (pixel != ucTransparent) {
                             *d8 = pixel;
-                            d[0] = pPal[(pixel * 3) + 0]; // convert to RGB888 pixels
+                            d[0] = pPal[(pixel * 3) + 2]; // convert to RGB888 pixels
                             d[1] = pPal[(pixel * 3) + 1];
-                            d[2] = pPal[(pixel * 3) + 2];
+                            d[2] = pPal[(pixel * 3) + 0];
                         }
                         d8++;
                         d += 3;
@@ -992,9 +992,9 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                         pixel = *s++;
                         if (pixel != ucTransparent) {
                             *d8 = pixel;
-                            d[0] = pPal[(pixel * 3) + 0]; // convert to RGB8888 pixels
+                            d[0] = pPal[(pixel * 3) + 2]; // convert to RGB8888 pixels
                             d[1] = pPal[(pixel * 3) + 1];
-                            d[2] = pPal[(pixel * 3) + 2];
+                            d[2] = pPal[(pixel * 3) + 0];
                             d[3] = 0xff;
                         }
                         d8++;
@@ -1006,16 +1006,16 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
             if (pPage->ucPaletteType == GIF_PALETTE_RGB888) {
                 for (x=0; x<pPage->iWidth; x++) {
                     pixel = *d8++ = *s++;
-                    *d++ = pPal[(pixel * 3) + 0]; // convert to RGB888 pixels
+                    *d++ = pPal[(pixel * 3) + 2]; // convert to RGB888 pixels
                     *d++ = pPal[(pixel * 3) + 1];
-                    *d++ = pPal[(pixel * 3) + 2];
+                    *d++ = pPal[(pixel * 3) + 0];
                 }
             } else { // must be RGBA32
                 for (x=0; x<pPage->iWidth; x++) {
                     pixel = *d8++ = *s++;
-                    *d++ = pPal[(pixel * 3) + 0]; // convert to RGB8888 pixels
+                    *d++ = pPal[(pixel * 3) + 2]; // convert to RGB8888 pixels
                     *d++ = pPal[(pixel * 3) + 1];
-                    *d++ = pPal[(pixel * 3) + 2];
+                    *d++ = pPal[(pixel * 3) + 0];
                     *d++ = 0xff;
                 }
             }
