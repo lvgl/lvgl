@@ -23,9 +23,29 @@ library folder.
 Set up drivers
 --------------
 
-To get started it's recommended to use `TFT_eSPI <https://github.com/Bodmer/TFT_eSPI>`__ library as a TFT
-driver to simplify testing. To make it work, setup ``TFT_eSPI``
-according to your TFT display type via editing either:
+To get started, the recommended option is to use the LovyanGFX
+library as the TFT driver, since it makes testing much easier. 
+You’ll need to create a display configuration file, such as ``my_display.hpp``
+similar to the example in `LovyanGFX user_setting.ino <https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino>`__
+In the Arduino IDE, you can create a new tab and name it ``my_display.hpp`` and paste the content of your configuration file there.
+If you prefer not to use LovyanGFX, you can integrate other graphics libraries as well by implementing a wrapper class in the same way LovyanGFX is handled; 
+`lv_lgfx_user.hpp <https://github.com/lvgl/lvgl/blob/master/src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp>`__
+provides a good example of this. Once your configuration file 
+is ready, update ``lv_conf.h`` to include it, for example:
+
+.. code-block:: c
+
+   /* Interface for Lovyan_GFX */
+   #define LV_USE_LOVYAN_GFX         1
+
+   #if LV_USE_LOVYAN_GFX
+       #define LV_LGFX_USER_INCLUDE "my_display.hpp"
+   #endif /*LV_USE_LOVYAN_GFX*/
+
+
+Alternatively, you can use `TFT_eSPI <https://github.com/Bodmer/TFT_eSPI>`__ library.
+To make it work, set up ``TFT_eSPI`` according to your 
+TFT display type via editing either:
 
 - ``User_Setup.h``
 - or by selecting a configuration in the ``User_Setup_Select.h``
