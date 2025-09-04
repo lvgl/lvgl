@@ -43,6 +43,7 @@
     #include "../../opengles/lv_opengles_texture.h"
     #include "../../opengles/lv_opengles_window.h"
     #include "../../opengles/lv_opengles_private.h"
+    #include <EGL/egl.h>
     #include <EGL/eglext.h>
 
 #endif
@@ -140,28 +141,21 @@ static int drm_get_conn_props(drm_dev_t * drm_dev);
 static int drm_add_plane_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int drm_add_crtc_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
 static int drm_add_conn_property(drm_dev_t * drm_dev, const char * name, uint64_t value);
-static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
                       uint32_t crtc_idx);
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id);
 static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
-static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
-static int drm_setup_buffers(drm_dev_t * drm_dev);
-static void drm_flush_wait(lv_display_t * drm_dev);
-static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
-static void drm_dmabuf_set_active_buf(lv_event_t * event);
 
 static uint32_t tick_get_cb(void);
 
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
-
+#if !LV_USE_LINUX_DRM_GBM_BUFFERS
+    static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
+#elif LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
     static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf);
-
 #endif
 
 #if LV_LINUX_DRM_USE_EGL
-
     static drm_buffer_t * drm_fb_get_from_bo(struct gbm_bo * bo);
     static void drm_fb_destroy_callback(struct gbm_bo * bo, void * data);
     static void drm_gbm_egl_pre(lv_opengles_window_t * window);
@@ -169,8 +163,14 @@ static uint32_t tick_get_cb(void);
     static void drm_gbm_egl_post2(lv_opengles_window_t * window);
     static int drm_atomic_commit(drm_dev_t * drm_dev, uint32_t fb_id, uint32_t flags);
     static EGLSyncKHR create_fence(drm_dev_t * drm_dev, EGLDisplay display, int fd);
-
+#else
+    static int drm_setup_buffers(drm_dev_t * drm_dev);
+    static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf);
+    static void drm_flush_wait(lv_display_t * drm_dev);
+    static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+    static void drm_dmabuf_set_active_buf(lv_event_t * event);
 #endif
+
 
 /**********************
  *  STATIC VARIABLES
@@ -219,6 +219,7 @@ lv_display_t * lv_linux_drm_create(void)
     return disp;
 }
 
+#if !LV_LINUX_DRM_USE_EGL
 /* Called by LVGL when there is something that needs redrawing
  * it sets the active buffer. if GBM buffers are used, it issues a DMA_BUF_SYNC
  * ioctl call to lock the buffer for CPU access, the buffer is unlocked just
@@ -264,6 +265,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
     }
 
 }
+#endif /*!LV_LINUX_DRM_USE_EGL*/
 
 void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
@@ -328,7 +330,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     /* add the texture to the window */
     unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
-    lv_opengles_window_texture_t * window_texture = lv_opengles_window_add_texture(window, texture_id, hor_res, ver_res);
+    lv_opengles_window_add_texture(window, texture_id, hor_res, ver_res);
 #else
     /* render directly to the window */
     lv_opengles_window_display_create(window, hor_res, ver_res);
@@ -527,6 +529,7 @@ static int drm_add_conn_property(drm_dev_t * drm_dev, const char * name, uint64_
     return 0;
 }
 
+#if !LV_LINUX_DRM_USE_EGL
 static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     int ret;
@@ -578,6 +581,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     return 0;
 }
+#endif /*!LV_LINUX_DRM_USE_EGL*/
 
 static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane_id, uint32_t crtc_id,
                       uint32_t crtc_idx)
@@ -932,6 +936,7 @@ err:
     return -1;
 }
 
+#if !LV_USE_LINUX_DRM_GBM_BUFFERS
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     struct drm_mode_create_dumb creq;
@@ -989,8 +994,9 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     return 0;
 }
+#endif /*!LV_USE_LINUX_DRM_GBM_BUFFERS*/
 
-#if LV_USE_LINUX_DRM_GBM_BUFFERS
+#if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
 
 static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
@@ -998,9 +1004,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     struct gbm_bo * gbm_bo;
     int prime_fd;
     uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
-    uint32_t w, h, format;
     uint32_t n_planes;
-    char * drm_format_name;
     int res;
 
     /* gbm_bo_format does not define anything other than ARGB8888 or XRGB8888 */
@@ -1029,16 +1033,13 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
         return -1;
     }
 
-    w = gbm_bo_get_width(gbm_bo);
-    h = gbm_bo_get_height(gbm_bo);
-    format = gbm_bo_get_format(gbm_bo);
+    uint32_t h = gbm_bo_get_height(gbm_bo);
     pitches[0] = buf->pitch = gbm_bo_get_stride_for_plane(gbm_bo, 0);
     offsets[0] = buf->offset = gbm_bo_get_offset(gbm_bo, 0);
     buf->size = h * buf->pitch;
-    drm_format_name = drmGetFormatName(format);
 
     LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
-                buf->size, buf->pitch, buf->offset, drm_format_name);
+                buf->size, buf->pitch, buf->offset, drmGetFormatName(format));
 
     prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
 
@@ -1079,9 +1080,9 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
 }
 
-#endif /* END LV_USE_LINUX_DRM_GBM_BUFFERS */
+#endif /* LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL*/
 
-
+#if !LV_LINUX_DRM_USE_EGL
 static int drm_setup_buffers(drm_dev_t * drm_dev)
 {
     int ret;
@@ -1156,6 +1157,7 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
     drm_dev->act_buf = NULL;
 
 }
+#endif /*!LV_LINUX_DRM_USE_EGL*/
 
 #if LV_LINUX_DRM_USE_EGL
 
@@ -1193,9 +1195,7 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
     LV_ASSERT(drm_dev->kms_in_fence_fd != -1);
 
     drm_buffer_t * fb;
-    uint32_t i = 0;
     uint32_t flags = DRM_MODE_ATOMIC_NONBLOCK;
-    int64_t start_time, report_time, cur_time;
     int ret;
 
     /* Get the next bo to display */
@@ -1240,7 +1240,7 @@ static drm_buffer_t * drm_fb_get_from_bo(struct gbm_bo * bo)
 {
     int drm_fd = gbm_device_get_fd(gbm_bo_get_device(bo));
     drm_buffer_t * fb = gbm_bo_get_user_data(bo);
-    uint32_t width, height, format, strides[4] = {0}, handles[4] = {0}, offsets[4] = {0}, flags = 0;
+    uint32_t width, height, format, strides[4] = {0}, handles[4] = {0}, offsets[4] = {0};
     int ret = -1;
 
     if(fb)
