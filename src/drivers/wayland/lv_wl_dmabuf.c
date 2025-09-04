@@ -675,18 +675,15 @@ struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphi
 {
     uint8_t id = decoration->type;
 
-    if(window->decorators_buf[id] == NULL || (window->decorators_buf[id]->width == (uint32_t)decoration->width &&
-                                              window->decorators_buf[id]->height == (uint32_t)decoration->height)) {
+    if(window->decorators_buf[id] == NULL) {
         create_decorators_buf(window, decoration);
-
-        return window->decorators_buf[id];
     }
-    else {
+    else if(window->decorators_buf[id]->width != (uint32_t)decoration->width ||
+            window->decorators_buf[id]->height != (uint32_t)decoration->height) {
         destroy_decorators_buf(window, decoration);
         create_decorators_buf(window, decoration);
-
-        return window->decorators_buf[id];
     }
+    return window->decorators_buf[id];
 }
 #endif
 
