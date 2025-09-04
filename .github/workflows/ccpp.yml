@@ -29,7 +29,7 @@ jobs:
                        'OPTIONS_SDL']
     name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -39,6 +39,8 @@ jobs:
       run: scripts/install-prerequisites.sh
     - name: Install pngquant
       run:  scripts/install_pngquant.sh
+    - name: Verify the environment dependency installation
+      run: scripts/run_tests.sh --skip-tests
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
@@ -60,7 +62,7 @@ jobs:
     - name: patch freetype vcpkg URL
       run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
@@ -93,7 +95,7 @@ jobs:
       with:
         python-version: '3.12'
     - name: Clone LVGL as a Component
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         path: components/lvgl
     - name: Copy IDF Project Example
@@ -113,7 +115,7 @@ jobs:
                       '32bit build']
     name: Run tests with ${{ matrix.build_config }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -123,6 +125,8 @@ jobs:
       run: scripts/install-prerequisites.sh
     - name: Install pngquant
       run: scripts/install_pngquant.sh
+    - name: Verify the environment dependency installation
+      run: scripts/run_tests.sh --skip-tests
     - name: Fix kernel mmap rnd bits
       # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are

@@ -1567,6 +1567,37 @@
     #endif
 #endif
 
+#if LV_USE_VG_LITE_DRIVER
+
+    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+    #ifndef LV_VG_LITE_HAL_GPU_SERIES
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+            #define LV_VG_LITE_HAL_GPU_SERIES CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+        #else
+            #define LV_VG_LITE_HAL_GPU_SERIES gc255
+        #endif
+    #endif
+
+    /* Used to pick the correct GPU revision header it depends on the vendor */
+    #ifndef LV_VG_LITE_HAL_GPU_REVISION
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+            #define LV_VG_LITE_HAL_GPU_REVISION CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+        #else
+            #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+        #endif
+    #endif
+
+    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+        #else
+            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+        #endif
+    #endif
+
+#endif
+
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
 #ifndef LV_USE_GESTURE_RECOGNITION

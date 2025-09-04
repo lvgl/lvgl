@@ -11,6 +11,7 @@
 #if LV_USE_OPENGLES
 
 #include "../../misc/lv_types.h"
+#include "../../misc/lv_profiler.h"
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
@@ -186,23 +187,31 @@ void lv_opengles_deinit(void)
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
                                 lv_color_black());
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color);
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_clear(void)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glViewport(x, y, w, h));
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
@@ -212,8 +221,12 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
-    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) return;
+    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -261,6 +274,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
     lv_opengles_render_draw();
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_opengles_enable_blending(void)
@@ -451,31 +465,41 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
 
 static void lv_opengles_shader_set_uniform1i(const char * name, int value)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glUniform1i(lv_opengles_shader_get_uniform_location(name), value));
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, transpose, values));
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_opengles_shader_set_uniform1f(const char * name, float value)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glUniform1f(lv_opengles_shader_get_uniform_location(name), value));
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2)
 {
+    LV_PROFILER_DRAW_BEGIN;
     GL_CALL(glUniform3f(lv_opengles_shader_get_uniform_location(name), value_0, value_1, value_2));
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_opengles_render_draw(void)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_opengles_shader_bind();
     lv_opengles_vertex_array_bind();
     lv_opengles_index_buffer_bind();
     unsigned int count = lv_opengles_index_buffer_get_count();
     GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL));
+    LV_PROFILER_DRAW_END;
 }
 
 /**

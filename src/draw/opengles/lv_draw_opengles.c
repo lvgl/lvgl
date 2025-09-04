@@ -129,17 +129,22 @@ void lv_draw_opengles_deinit(void)
 
 static bool opengles_texture_cache_create_cb(cache_data_t * cached_data, void * user_data)
 {
-    return draw_to_texture((lv_draw_opengles_unit_t *)user_data, cached_data);
+    LV_PROFILER_DRAW_BEGIN;
+    bool ret = draw_to_texture((lv_draw_opengles_unit_t *)user_data, cached_data);
+    LV_PROFILER_DRAW_END;
+    return ret;
 }
 
 static void opengles_texture_cache_free_cb(cache_data_t * cached_data, void * user_data)
 {
     LV_UNUSED(user_data);
+    LV_PROFILER_DRAW_BEGIN;
 
     lv_free(cached_data->draw_dsc);
     GL_CALL(glDeleteTextures(1, &cached_data->texture));
     cached_data->draw_dsc = NULL;
     cached_data->texture = 0;
+    LV_PROFILER_DRAW_END;
 }
 
 static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs)
@@ -236,6 +241,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
 static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * task = u->task_act;
 
     lv_layer_t dest_layer;
@@ -357,6 +363,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         default:
             /*The malloced cache_data->draw_dsc will be freed automatically on failure
             *in opengles_texture_cache_free_cb*/
+            LV_PROFILER_DRAW_END;
             return false;
     }
 
@@ -377,11 +384,13 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
     }
 
+    LV_PROFILER_DRAW_END;
     return true;
 }
 
 static void blend_texture_layer(lv_draw_task_t * t)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)t->draw_unit;
     lv_area_t area;
@@ -428,10 +437,12 @@ static void blend_texture_layer(lv_draw_task_t * t)
     }
 
     GL_CALL(glDeleteTextures(1, &src_texture));
+    LV_PROFILER_DRAW_END;
 }
 
 static void draw_from_cached_texture(lv_draw_task_t * t)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *)t->draw_unit;
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
@@ -491,6 +502,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_area_move(&t->_real_area, a.x1, a.y1);
 
     if(!entry_cached) {
+        LV_PROFILER_DRAW_END;
         return;
     }
 
@@ -531,6 +543,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
             lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
+    LV_PROFILER_DRAW_END;
 }
 
 static void execute_drawing(lv_draw_opengles_unit_t * u)
@@ -600,6 +613,7 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
 
 static unsigned int create_texture(int32_t w, int32_t h, const void * data)
 {
+    LV_PROFILER_DRAW_BEGIN;
     unsigned int texture;
     GL_CALL(glGenTextures(1, &texture));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -617,12 +631,14 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
+    LV_PROFILER_DRAW_END;
     return texture;
 }
 
 #if LV_USE_3DTEXTURE
 static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *) t->draw_unit;
 
     lv_layer_t * dest_layer = t->target_layer;
@@ -646,6 +662,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
+    LV_PROFILER_DRAW_END;
 }
 #endif /*LV_USE_3DTEXTURE*/
 
