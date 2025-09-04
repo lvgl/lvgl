@@ -363,6 +363,10 @@
 /** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
+#if LV_USE_DRAW_OPENGLES
+    #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+#endif
+
 /** Draw using espressif PPA accelerator */
 #define LV_USE_PPA  0
 #if LV_USE_PPA

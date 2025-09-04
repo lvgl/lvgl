@@ -1021,6 +1021,16 @@
     #endif
 #endif
 
+#if LV_USE_DRAW_OPENGLES
+    #ifndef LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+        #ifdef CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+            #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+        #else
+            #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+        #endif
+    #endif
+#endif
+
 /** Draw using espressif PPA accelerator */
 #ifndef LV_USE_PPA
     #ifdef CONFIG_LV_USE_PPA

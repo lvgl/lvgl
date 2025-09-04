@@ -100,7 +100,7 @@ void lv_draw_opengles_init(void)
     draw_opengles_unit->base_unit.evaluate_cb = evaluate;
     draw_opengles_unit->base_unit.name = "OPENGLES";
     draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
-    sizeof(cache_data_t), 128, (lv_cache_ops_t) {
+    sizeof(cache_data_t), LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)opengles_texture_cache_compare_cb,
         .create_cb = (lv_cache_create_cb_t)opengles_texture_cache_create_cb,
         .free_cb = (lv_cache_free_cb_t)opengles_texture_cache_free_cb,
