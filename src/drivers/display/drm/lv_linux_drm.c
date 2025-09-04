@@ -1190,7 +1190,8 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
     EGLDisplay display = lv_opengles_egl_window_get_display(window);
 
     drm_dev->kms_in_fence_fd = drm_dev->egl_dup_native_fence_fd_android(display, drm_dev->gpu_fence);
-    LV_ASSERT(drm_dev->egl_destroy_sync_khr(display, drm_dev->gpu_fence));
+    bool res = drm_dev->egl_destroy_sync_khr(display, drm_dev->gpu_fence);
+    LV_ASSERT(res);
     drm_dev->gpu_fence = NULL;
     LV_ASSERT(drm_dev->kms_in_fence_fd != -1);
 
@@ -1219,7 +1220,8 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
                                                        EGL_FOREVER_KHR);
         } while(status != EGL_CONDITION_SATISFIED_KHR);
 
-        LV_ASSERT(drm_dev->egl_destroy_sync_khr(display, drm_dev->kms_fence));
+        bool res = drm_dev->egl_destroy_sync_khr(display, drm_dev->kms_fence);
+        LV_ASSERT(res);
         drm_dev->kms_fence = NULL;
     }
 
