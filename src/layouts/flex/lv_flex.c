@@ -360,9 +360,15 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
     margin_func_t get_margin_cross_end = (!f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
 
-    typedef int32_t (*get_style_size_func_t)(const lv_obj_t *);
-    get_style_size_func_t get_style_size = (f->row ? lv_obj_get_style_clamped_width : lv_obj_get_style_clamped_height);
-    bool is_size_content = get_style_size(cont) == LV_SIZE_CONTENT;
+    typedef int32_t (*get_style_clamped_size_func_t)(const lv_obj_t *);
+    get_style_clamped_size_func_t get_style_clamped_size =
+        (f->row ? lv_obj_get_style_clamped_width : lv_obj_get_style_clamped_height);
+    margin_func_t get_style_size = (f->row ? lv_obj_get_style_width : lv_obj_get_style_height);
+
+    /* Need to check both the regular and clamped size to prevent an infinite loop where the cont toggles between
+     * clamped & unclamped */
+    bool is_size_content =
+        get_style_size(cont, LV_PART_MAIN) == LV_SIZE_CONTENT && get_style_clamped_size(cont) == LV_SIZE_CONTENT;
 
     /*Calculate the size of grow items first*/
     uint32_t i;

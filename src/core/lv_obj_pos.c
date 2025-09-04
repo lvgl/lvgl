@@ -664,6 +664,26 @@ int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj)
     return h;
 }
 
+bool lv_obj_is_width_min(const lv_obj_t * obj)
+{
+    return obj->w_min;
+}
+
+bool lv_obj_is_height_min(const lv_obj_t * obj)
+{
+    return obj->h_min;
+}
+
+bool lv_obj_is_width_max(const lv_obj_t * obj)
+{
+    return obj->w_max;
+}
+
+bool lv_obj_is_height_max(const lv_obj_t * obj)
+{
+    return obj->h_max;
+}
+
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
     int32_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
