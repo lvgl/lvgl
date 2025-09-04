@@ -207,7 +207,7 @@ Setup
 
 3. **Setup OpenGL ES Driver** 
 
-   Follow the OpenGL ES driver setup documentation (:ref:``opengl_es_driver``) to configure GLFW and OpenGL ES support for your platform.
+   Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure GLFW and OpenGL ES support for your platform.
 
 4. **Basic Setup Example**
 
