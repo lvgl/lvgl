@@ -73,7 +73,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
         gifobj->imgdsc.data = NULL;
     }
 
-    GIF_begin(gif, GIF_PALETTE_RGB565_LE);
+    GIF_begin(gif, GIF_PALETTE_RGB8888);
 
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
@@ -89,7 +89,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     uint32_t width = GIF_getCanvasWidth(gif);
     uint32_t height = GIF_getCanvasHeight(gif);
-    gif->pFrameBuffer = lv_malloc(width * height * 3);
+    gif->pFrameBuffer = lv_malloc(width * height * 5);
     gif->ucDrawType = GIF_DRAW_COOKED;
     LV_ASSERT_MALLOC(gif->pFrameBuffer);
     if(gif->pFrameBuffer == NULL) {
@@ -102,11 +102,11 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     gifobj->imgdsc.data = gif->pFrameBuffer + width * height;
     gifobj->imgdsc.header.magic = LV_IMAGE_HEADER_MAGIC;
     gifobj->imgdsc.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
-    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_RGB565;
+    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     gifobj->imgdsc.header.h = height;
     gifobj->imgdsc.header.w = width;
-    gifobj->imgdsc.header.stride = width * 2;
-    gifobj->imgdsc.data_size = width * height * 2;
+    gifobj->imgdsc.header.stride = width * 4;
+    gifobj->imgdsc.data_size = width * height * 4;
 
     lv_image_set_src(obj, &gifobj->imgdsc);
 

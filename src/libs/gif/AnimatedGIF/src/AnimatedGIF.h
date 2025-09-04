@@ -85,7 +85,7 @@ enum {
    GIF_PALETTE_RGB565_LE = 0, // little endian (default)
    GIF_PALETTE_RGB565_BE,     // big endian
    GIF_PALETTE_RGB888,        // original 24-bpp entries
-   GIF_PALETTE_RGB8888,       // 32-bit (alpha = 0xff)
+   GIF_PALETTE_RGB8888,       // 32-bit (alpha = 0xff or 0x00)
    GIF_PALETTE_1BPP,          // 1-bit per pixel (horizontal, MSB on left)
    GIF_PALETTE_1BPP_OLED      // 1-bit per pixel (vertical, LSB on top)
 };

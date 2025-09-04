@@ -969,10 +969,7 @@ static void DrawCooked(GIFIMAGE *pPage, GIFDRAW *pDraw, void *pDest)
                             d += 4;
                         } else {
                             *d8++ = pDraw->ucBackground;
-                            d[0] = bg[0];
-                            d[1] = bg[1];
-                            d[2] = bg[2];
-                            d[3] = 0xFF;
+                            d[3] = 0x00;
                             d += 4;
                         }
                     }

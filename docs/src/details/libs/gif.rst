@@ -46,7 +46,7 @@ Memory Requirements
 .. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
 
 To decode and display a GIF animation ~25 kB of RAM is needed plus
-3 |times| image width |times| image height.
+5 |times| image width |times| image height.
 
 
 
