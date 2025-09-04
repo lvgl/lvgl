@@ -77,6 +77,14 @@ typedef struct {
 #endif
 } drm_buffer_t;
 
+#if LV_LINUX_DRM_USE_EGL
+    typedef EGLint(*egl_wait_sync_khr_t)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
+    typedef EGLint(*egl_dup_native_fence_fd_android_t)(EGLDisplay dpy, EGLSyncKHR sync);
+    typedef EGLSyncKHR(*egl_create_sync_khr_t)(EGLDisplay dpy, EGLenum type, const EGLint * attrib_list);
+    typedef EGLBoolean(*egl_destroy_sync_khr_t)(EGLDisplay dpy, EGLSyncKHR sync);
+    typedef EGLint(*egl_client_wait_sync_khr_t)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+#endif
+
 typedef struct {
     int fd;
     uint32_t conn_id, enc_id, crtc_id, plane_id, crtc_idx;
@@ -109,11 +117,12 @@ typedef struct {
     EGLSyncKHR kms_fence;
     EGLSyncKHR gpu_fence;
     struct gbm_bo * bo;
-    EGLint(*eglWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
-    EGLint(*eglDupNativeFenceFDANDROID)(EGLDisplay dpy, EGLSyncKHR sync);
-    EGLSyncKHR(*eglCreateSyncKHR)(EGLDisplay dpy, EGLenum type, const EGLint * attrib_list);
-    EGLBoolean(*eglDestroySyncKHR)(EGLDisplay dpy, EGLSyncKHR sync);
-    EGLint(*eglClientWaitSyncKHR)(EGLDisplay dpy, EGLSyncKHR sync, EGLint flags, EGLTimeKHR timeout);
+
+    egl_wait_sync_khr_t egl_wait_sync_khr;
+    egl_dup_native_fence_fd_android_t egl_dup_native_fence_fd_android;
+    egl_create_sync_khr_t egl_create_sync_khr;
+    egl_destroy_sync_khr_t egl_destroy_sync_khr;
+    egl_client_wait_sync_khr_t egl_client_wait_sync_khr;
 #endif
 } drm_dev_t;
 
@@ -325,11 +334,12 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     lv_opengles_window_display_create(window, hor_res, ver_res);
 #endif
 
-    drm_dev->eglWaitSyncKHR = (void *) eglGetProcAddress("eglWaitSyncKHR");
-    drm_dev->eglDupNativeFenceFDANDROID = (void *) eglGetProcAddress("eglDupNativeFenceFDANDROID");
-    drm_dev->eglCreateSyncKHR = (void *) eglGetProcAddress("eglCreateSyncKHR");
-    drm_dev->eglDestroySyncKHR = (void *) eglGetProcAddress("eglDestroySyncKHR");
-    drm_dev->eglClientWaitSyncKHR = (void *) eglGetProcAddress("eglClientWaitSyncKHR");
+    drm_dev->egl_wait_sync_khr = (egl_wait_sync_khr_t) eglGetProcAddress("eglWaitSyncKHR");
+    drm_dev->egl_dup_native_fence_fd_android = (egl_dup_native_fence_fd_android_t)
+                                               eglGetProcAddress("eglDupNativeFenceFDANDROID");
+    drm_dev->egl_create_sync_khr = (egl_create_sync_khr_t) eglGetProcAddress("eglCreateSyncKHR");
+    drm_dev->egl_destroy_sync_khr = (egl_destroy_sync_khr_t) eglGetProcAddress("eglDestroySyncKHR");
+    drm_dev->egl_client_wait_sync_khr = (egl_client_wait_sync_khr_t) eglGetProcAddress("eglClientWaitSyncKHR");
 #endif
 }
 
@@ -1159,7 +1169,7 @@ static void drm_gbm_egl_pre(lv_opengles_window_t * window)
 
         drm_dev->kms_out_fence_fd = -1;
 
-        int result = drm_dev->eglWaitSyncKHR(display, drm_dev->kms_fence, 0);
+        int result = drm_dev->egl_wait_sync_khr(display, drm_dev->kms_fence, 0);
         LV_ASSERT(result == 1);
     }
 }
@@ -1177,8 +1187,8 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
     drm_dev_t * drm_dev = lv_opengles_egl_window_get_user_data(window);
     EGLDisplay display = lv_opengles_egl_window_get_display(window);
 
-    drm_dev->kms_in_fence_fd = drm_dev->eglDupNativeFenceFDANDROID(display, drm_dev->gpu_fence);
-    LV_ASSERT(drm_dev->eglDestroySyncKHR(display, drm_dev->gpu_fence));
+    drm_dev->kms_in_fence_fd = drm_dev->egl_dup_native_fence_fd_android(display, drm_dev->gpu_fence);
+    LV_ASSERT(drm_dev->egl_destroy_sync_khr(display, drm_dev->gpu_fence));
     drm_dev->gpu_fence = NULL;
     LV_ASSERT(drm_dev->kms_in_fence_fd != -1);
 
@@ -1203,13 +1213,13 @@ static void drm_gbm_egl_post2(lv_opengles_window_t * window)
         EGLint status;
 
         do {
-            status = drm_dev->eglClientWaitSyncKHR(display,
-                                                   drm_dev->kms_fence,
-                                                   0,
-                                                   EGL_FOREVER_KHR);
+            status = drm_dev->egl_client_wait_sync_khr(display,
+                                                       drm_dev->kms_fence,
+                                                       0,
+                                                       EGL_FOREVER_KHR);
         } while(status != EGL_CONDITION_SATISFIED_KHR);
 
-        LV_ASSERT(drm_dev->eglDestroySyncKHR(display, drm_dev->kms_fence));
+        LV_ASSERT(drm_dev->egl_destroy_sync_khr(display, drm_dev->kms_fence));
         drm_dev->kms_fence = NULL;
     }
 
@@ -1337,7 +1347,7 @@ static EGLSyncKHR create_fence(drm_dev_t * drm_dev, EGLDisplay display, int fd)
         EGL_SYNC_NATIVE_FENCE_FD_ANDROID, fd,
         EGL_NONE,
     };
-    EGLSyncKHR fence = drm_dev->eglCreateSyncKHR(display, EGL_SYNC_NATIVE_FENCE_ANDROID, attrib_list);
+    EGLSyncKHR fence = drm_dev->egl_create_sync_khr(display, EGL_SYNC_NATIVE_FENCE_ANDROID, attrib_list);
     LV_ASSERT_NULL(fence);
     return fence;
 }
