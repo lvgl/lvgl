@@ -17,16 +17,14 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 
-#if LV_USE_OPENGLES_API == LV_OPENGLES_API_GLFW
+#if LV_USE_GLFW
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#elif LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL
+#elif LV_USE_EGL
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
-#else
-#error LV_USE_OPENGLES_API was not one of the valid values
 #endif
 
 /*********************

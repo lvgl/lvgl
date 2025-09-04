@@ -33,9 +33,6 @@
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
-#define LV_OPENGLES_API_GLFW        0
-#define LV_OPENGLES_API_EGL         1
-
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -4386,7 +4383,7 @@
     #endif
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES
         #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
@@ -4406,18 +4403,17 @@
             #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
         #endif
     #endif
+#endif
 
-    /** Select which OpenGL API to use. Possible options:
-     * - LV_OPENGLES_API_GLFW
-     * - LV_OPENGLES_API_EGL */
-    #ifndef LV_USE_OPENGLES_API
-        #ifdef CONFIG_LV_USE_OPENGLES_API
-            #define LV_USE_OPENGLES_API CONFIG_LV_USE_OPENGLES_API
-        #else
-            #define LV_USE_OPENGLES_API LV_OPENGLES_API_GLFW
-        #endif
+/** Use GLFW to open window on PC and handle mouse and keyboard */
+#ifndef LV_USE_GLFW
+    #ifdef CONFIG_LV_USE_GLFW
+        #define LV_USE_GLFW CONFIG_LV_USE_GLFW
+    #else
+        #define LV_USE_GLFW   0
     #endif
 #endif
+
 
 /** QNX Screen display and input drivers */
 #ifndef LV_USE_QNX
@@ -4751,6 +4747,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_USE_THORVG 0
     #endif
 #endif
+
+#ifndef LV_USE_EGL
+	#define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+#endif /* LV_USE_EGL */
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)

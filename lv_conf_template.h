@@ -1360,16 +1360,15 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
-
-    /** Select which OpenGL API to use. Possible options:
-     * - LV_OPENGLES_API_GLFW
-     * - LV_OPENGLES_API_EGL */
-    #define LV_USE_OPENGLES_API LV_OPENGLES_API_GLFW
 #endif
+
+/** Use GLFW to open window on PC and handle mouse and keyboard */
+#define LV_USE_GLFW   0
+
 
 /** QNX Screen display and input drivers */
 #define LV_USE_QNX              0

@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_opengles_egl.h"
-#if LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL
+#if LV_USE_EGL
 
 #include "lv_opengles_window.h"
 #include "lv_opengles_driver.h"
@@ -554,4 +554,4 @@ static void ensure_init_window_display_texture(void)
 }
 #endif
 
-#endif /*LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL*/
+#endif /*LV_USE_EGL*/

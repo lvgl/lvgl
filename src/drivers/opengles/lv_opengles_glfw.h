@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 #include "../../lv_conf_internal.h"
-#if LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_GLFW
+#if LV_USE_GLFW
 
 #include "../../misc/lv_types.h"
 
@@ -79,7 +79,7 @@ void * lv_opengles_glfw_window_get_glfw_window(lv_opengles_window_t * window);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_GLFW*/
+#endif /*LV_USE_GLFW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

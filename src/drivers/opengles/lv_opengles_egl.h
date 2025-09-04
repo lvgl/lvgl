@@ -11,7 +11,9 @@ extern "C" {
 #endif
 
 #include "../../lv_conf_internal.h"
-#if LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL
+
+
+#if LV_USE_EGL
 
 #include "../../misc/lv_types.h"
 
@@ -59,7 +61,7 @@ void * lv_opengles_egl_window_get_user_data(lv_opengles_window_t * window);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_OPENGLES && LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL*/
+#endif /*LV_USE_EGL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
