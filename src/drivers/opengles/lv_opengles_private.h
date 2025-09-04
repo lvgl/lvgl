@@ -17,15 +17,17 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 
-#if LV_USE_GLFW
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#elif LV_USE_EGL
+#if LV_USE_EGL
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
-#endif
+#else
+/* For now, by default we add glew and glfw.
+   In the future we need to consider adding a config for setting these includes*/
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#endif /*LV_USE_EGL*/
 
 /*********************
  *      DEFINES
