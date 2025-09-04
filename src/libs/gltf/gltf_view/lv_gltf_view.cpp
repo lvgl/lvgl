@@ -466,6 +466,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->camera_pos = fastgltf::math::fvec3(0.0f);
     view->texture.h_flip = false;
     view->texture.v_flip = false;
+    new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
     lv_gltf_view_shader_t shaders;
     lv_gltf_view_shader_get_src(&shaders);
@@ -507,6 +508,9 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_gltf_t * view = (lv_gltf_t *)obj;
     lv_opengl_shader_manager_destroy(view->shader_manager);
+    using IbmBySkinThenNodeMap = std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
+
+    view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
