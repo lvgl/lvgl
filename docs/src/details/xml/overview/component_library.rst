@@ -13,17 +13,18 @@ Overview
 The collection of Components, Widgets, Screens, Images, Fonts, etc., is called a
 Component Library.
 
-A Component Library can be fully self-sufficient, but it can also reference data from
+A Component Library can be fully self-contained, or it can also reference data from
 other Component Libraries.
 
 LVGL itself is a Component Library that supplies the built-in Widgets, data types,
-etc. You can
-find the XML files that describe the LVGL Widgets
+etc.  You can find the XML files that describe the LVGL Widgets
 `here <https://github.com/lvgl/lvgl/tree/master/xmls>`__.
 
-A project always has at least 2 Component Libraries:  that of LVGL as mentioned
-above, and its own where the Screens, Components, and Widgets of the project are
-defined.  A project may include additional Component Libraries.
+An LVGL firmware project that uses external XML files to define part (or all) of its
+user interface (UI) always has at least 2 Component Libraries:  that of LVGL as
+mentioned above, and at least 1 Component Library where a related set of Screens,
+Components, and Widgets of the project are defined.  A project may include additional
+Component Libraries.
 
 
 Structure
@@ -63,33 +64,30 @@ A typical structure for a Component Library looks like this:
       └── image2.png
 
 
-Visibility
-**********
+Name Visibility
+***************
 
-The content of all ``globals.xml`` files is part of a common global scope, and
-any Components, Widgets or Screens defined therein can be used in all .XML files.
+In the context of UI components defined in XML files, there are two namespaces:
 
-Styles, constants, and other data defined in the XML file of Components, Widgets, or Screens
-are local to that XML file.
+:global namespace:
 
-Thus, there are two namespaces:
+    Created from the combined data from the ``globals.xml`` file from each included
+    Component Library, the names of :ref:`Subjects <observer_subject>`, enumerations,
+    constants, styles, fonts and images defined therein can be referenced from all
+    XML files used in a project.
 
-1. **local namespace** within the given XML file of Components, Widgets and Screens.
-2. **global namespace** created from the data in the ``globals.xml`` file from each
-   Component Library included.
+:local namespace:
 
-To find names referenced in XML files, the local namespace is checked first, and if
-a name is not found there, then the global namespace is checked.
-
-The names of defined Components, Widgets and Screens become part of the global
-namespace and must be unique therein.  This ensures that each Component has a unique
-name.
+    Names created within all other XML files can only be referenced from within those
+    XML files.  Exception:  names of defined Components, Widgets and Screens become
+    part of the global namespace, and therefore must be unique within the global
+    namespace.  This ensures each Component has a unique name.
 
 All data belonging to the LVGL core Component Library is prefixed by ``lv_``
 (e.g., ``lv_label``, ``lv_font_default``).
 
 A custom Component can be prefixed with ``watch_``, ``small_``, ``light_``, or
-anything else the developer deems appropriate.
+anything else the development team deems appropriate.
 
 LVGL's UI |nbsp| Editor will show an error if there is a name conflict.
 
@@ -105,7 +103,7 @@ in it are:
 
 :<config>:          Can specify name and help.
 :<api>:             Used with ``<enumdefs>`` to show possible values for Widget or Component attributes.
-:<subjects>:        List of :ref:`Subjects <observer_subject>`. Can be considered the API of a Component Library.
+:<subjects>:        List of :ref:`Subjects <observer_subject>`; can be considered the API of a Component Library.
 :<consts>:          Globally available constants.
 :<styles>:          Globally available styles.
 :<fonts>:           Globally available fonts.
