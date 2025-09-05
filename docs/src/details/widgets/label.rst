@@ -212,6 +212,11 @@ the Subject's value is used to update the Label's text as follows:
 :integer Subject:   Subject's integer value is used with the ``format_string`` argument.
                     See :ref:`observer_format_string` for details.
 
+
+:float Subject:     Subject's float value is used with the ``format_string`` argument.
+                    Requires ``LV_USE_FLOAT``.
+                    See :ref:`observer_format_string` for details.
+
 Note that this is a one-way binding (Subject ===> Widget).
 
 - :cpp:expr:`lv_label_bind_text(label, &subject, format_string)`
@@ -233,8 +238,8 @@ printf-like format specifier and be one of the following:
                              cross-platform equivalent where ``xx`` can be ``8``,
                              ``16``, ``32`` or ``64``, depending on the platform).
 
-:float Subject:              "%f" format specifier, or e.g. "%0.2f" to display two digits after the decimal point.
-
+:float Subject:              "%f" format specifier, e.g. "%0.2f", to display two digits
+                             after the decimal point.
 
 If ``NULL`` is passed for the ``format_string`` argument:
 
@@ -242,9 +247,9 @@ If ``NULL`` is passed for the ``format_string`` argument:
 :integer Subject:            The Label will simply display the number. Equivalent to "%d".
 :float Subject:            The Label will display the value with "%0.1f" format string.
 
-**Example:**  "%d |deg|\C"
+**Example:**  "%d |deg|\ C"
 
-As usual with format strings, ``%%`` shall be used to get ``%``. For example ``%d%%``
+As usual with format strings, ``%%`` is used to get ``%``. For example ``%d%%``
 
 
 
