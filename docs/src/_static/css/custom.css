@@ -28,6 +28,7 @@
 body {
   --font-stack: "Inter", sans-serif;
   --font-stack--monospace: "Geist Mono", monospace;
+  font-variant-ligatures: none;
   --sidebar-item-font-size: 0.875rem;
   --sidebar-item-spacing-horizontal: 0.75rem;
   --sidebar-item-spacing-vertical: 0.5rem;
