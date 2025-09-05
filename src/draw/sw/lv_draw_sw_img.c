@@ -408,6 +408,11 @@ static void recolor_only(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_ds
     buf_h = MAX_BUF_SIZE / buf_stride;
     if(buf_h > blend_h) buf_h = blend_h;
     tmp_buf = lv_malloc(buf_stride * buf_h);
+    LV_ASSERT_MALLOC(tmp_buf);
+    if(!tmp_buf) {
+        LV_LOG_WARN("Failed to perform image recolor operation. Out of memory");
+        return;
+    }
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
