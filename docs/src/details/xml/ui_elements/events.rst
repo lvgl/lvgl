@@ -54,8 +54,6 @@ The ``user_data`` is optional. If omitted, ``NULL`` will be passed.
 
 .. _xml_events_screen:
 
-
-
 Screen Load and Create events
 *****************************
 

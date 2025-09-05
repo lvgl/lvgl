@@ -27,6 +27,12 @@ Although they can't contain C code, they are very powerful:
 - Function calls, subject changes, or screen load/create events can be added. See :ref:`XML Events <xml_events>`
 - Previews can be defined to preview the components in various settings in the UI Editor
 
+
+When a Component is created, it can extend an other Component or Widget like  ``<view extends="lv_slider">``.
+If a Widget was extended, the component can use the Widget's API. For example ``<view extends="lv_slider" min_value="20"``>
+If a Component was extended the `<api>` properties can be used: ``<view extends="my_button" button_text="Apply">``
+
+
 Unlike Widgets (which are always compiled into the application), Components can either:
 
 1. be loaded at runtime from XML, or
@@ -106,7 +112,8 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 Using the Exported Code
 ***********************
 
-If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the components.The resulting code is completely self suffucent and the XMLs files are not needed anymore. The resulting code is the same as one could write by hand as well.
+If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the components.
+The resulting code is completely self sufficient and the XMLs files are not needed anymore. The resulting code is the samesiilar to what one could write by hand as well.
 
 The exported code looks like this:
 
@@ -114,12 +121,12 @@ The exported code looks like this:
 
     lv_obj_t * component_name_create(lv_obj_t * parent, ...api properties...);
 
-where 'component_name' (in the function above) is replaced by the Component's XML
+where ``component_name`` is replaced by the Component's XML
 file name.
 
 When a Component is used in another Component's XML code and the code is exported,
 this ``create`` function will be called. This means that Components do not have a
-detailed set/get API but can be created with a fixed set of parameters.
+detailed set/get API but it is created with a fixed set of parameters.
 
 If the user needs to access or modify values dynamically, it is recommended to use a
 :ref:`Data bindings via Subject  <xml_subjects>`.
@@ -127,13 +134,6 @@ If the user needs to access or modify values dynamically, it is recommended to u
 The user can also call these ``..._create()`` functions at any time from application code
 to create new components on demand.
 
-Extending
-*********
-
-Additionally, when a Component is created, it can use the extended Widget's attributes
-(see ``<view extends="...">`` in the code examples below).
-
-This means that Components inherit the API of the extended Widget as well.
 
 .. _component_custom_api:
 

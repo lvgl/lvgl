@@ -33,7 +33,7 @@ Constants can be used in:
 - Style properties
 - Widget and Component properties
 
-And they can be used like this:
+Constant values can be referenced by ``#constant_name``. For example:
 
 .. code-block:: xml
 

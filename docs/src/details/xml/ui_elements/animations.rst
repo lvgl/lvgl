@@ -89,7 +89,7 @@ You set a ``target`` UI element and select one of its ``timeline``s to play.
 If ``target="self"``, the timeline is looked up in the current component/widget/screen
 (i.e. in the current XML file).
 
-You can also set ``delay`` and ``reverse="true"`` when playing a timeline.
+You can also set a ``delay`` and ``reverse="true"`` when playing a timeline.
 
 Under the Hood
 --------------
@@ -100,13 +100,13 @@ When an XML file is registered, the contents of the ``<animations>`` section are
 and the animation data is stored as a blueprint.
 
 When an instance of a component or screen is created, ``lv_anim_timeline``\ s are
-created and initialized from the saved blueprint. Each instance gets its own copy.
+created and initialized from the saved blueprint. Each instance gets its own copy of the timelines.
 
 When a ``<play_timeline_event>`` is added to a UI element, the target and timeline
 names are saved as strings. (It can't use pointers as the event can reference UI elements
 that will be created only later in the ``<view>``.)
 
-Finally, when the trigger event happens, LVGL finds the target widget by the saved name,
+Finally, when the play timeline event is triggered, LVGL finds the target widget by the saved name,
 retrieves the specified timeline, and starts it.
 
 Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\ s)

@@ -12,13 +12,26 @@ Overview
 
 Besides components and Screens, Widgets are the other main building blocks of UIs.
 
+The XML file of the Widgets is wrapped in a ``<widget>`` XML root element.
+
+``<widget>``\ s support the following child XML tags:
+
+- :ref:`<consts> <xml_consts>`
+- :ref:`<api> <xml_api>`
+- :ref:`<styles> <xml_styles>`, and
+- :ref:`<view> <xml_view>`
+- :ref:`<previews> <xml_preview>`
+
+Just like Components, Widgets also can be the children of other Widgets and Components.
+
 Note that Widgets cannot be loaded from XML directly, but it's possible to write and register
-simple XML parsers wor widgets. When a widget is referenced in a component's or screen's XML
+simple XML parsersfwor widgets. When a widget is referenced in a component's or screen's XML
 the XML parser will be called to map the properties to C function calls.
 
 LVGL already provides all the helper functions and the required libraries. Also there
 are `many XML parser examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
 for the built-in LVGL widigets.
+
 
 Built-in Widgets
 ****************
@@ -125,34 +138,16 @@ And in XML it can be used like
     </view>
 
 
-
-
 Usage in LVGL's UI Editor
 *************************
 
-The XML file of the Widgets is wrapped in a ``<widget>`` XML root element.
+New widget
+----------
 
-``<widget>``\ s support the following child XML tags:
+It's possible to create new widgets by writing C code manually (the same way as the built-in LVGL widgets are created),
+however, using the UI |nbsp| Editor it's much faster and simpler.
 
-- :ref:`<consts> <xml_consts>`
-- :ref:`<api> <xml_api>`
-- :ref:`<styles> <xml_styles>`, and
-- :ref:`<view> <xml_view>`
-- :ref:`<previews> <xml_preview>`
-
-Just like Components, Widgets also can be the children of other Widgets and Components.
-
-The main difference is that Widgets are written in C and compiled into the application.
-It means unlike Components, Widgets can contain custom C code. For example, when a property is set,
-any complex C code can run to set that value.
-
-Creating New Widgets
-********************
-
-It's possible to create new widgets in the same way as the built-in LVGL widgets are handled.
-
-However, using the UI |nbsp| Editor it's much faster and simpler. When an XML file is created and
-the ``<widget>`` root element is used, the following .C/.H files are generated automatically:
+When an XML file is created and the ``<widget>`` root element is used, the following .C/.H files are generated automatically:
 
 :<widget_name>_gen.h:           Contains the generated API implementation of the widget
                                 (overwritten on each code export).
@@ -168,9 +163,6 @@ the ``<widget>`` root element is used, the following .C/.H files are generated a
 :<widget_name>_xml_parser.c:    Processes the XML strings and calls the required
                                 functions according to the set attributes. Only a
                                 skeleton is exported once.
-
-Usage
-*****
 
 
 Adding Custom Code
