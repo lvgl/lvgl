@@ -80,6 +80,7 @@ typedef enum {
 
 typedef void (*lv_display_flush_cb_t)(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 typedef void (*lv_display_flush_wait_cb_t)(lv_display_t * disp);
+typedef void (*lv_display_swap_buf_wait_cb_t)(lv_display_t * disp);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -322,6 +323,16 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
  *                  If NULL `lv_display_flush_ready()` can be used to signal that flushing is ready.
  */
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb);
+
+/**
+ * Set a callback to be used while LVGL is waiting for the swap buffer to be ready.
+ * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+ * If not set no waiting is done.
+ * @param disp      pointer to a display
+ * @param wait_cb   a callback to call while LVGL is waiting for the swap buffer ready.
+ *                  If NULL no waiting is done.
+ */
+void lv_display_set_swap_buf_wait_cb(lv_display_t * disp, lv_display_swap_buf_wait_cb_t wait_cb);
 
 /**
  * Set the color format of the display.
