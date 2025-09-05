@@ -11,11 +11,16 @@ cmake_minimum_required(VERSION 3.16)
 if(WIN32)
     set(VCPKG_TARGET_TRIPLET "x64-windows")
     include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
+else()
+    add_compile_options(-Og)
 endif()
 
 project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
+
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
+add_link_options(--coverage)
 
 set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
@@ -160,6 +165,7 @@ if ($ENV{NON_AMD64_BUILD})
     message("Non AMD64 target is specified")
 
     # Ensure 32-bit build
+    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
@@ -417,6 +423,7 @@ else()
         include_directories(${OPENGL_INCLUDE_DIR})
         include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
+        link_libraries(${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
         message("Enable LV_USE_OPENGLES")
     else()
         message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
@@ -427,6 +434,8 @@ endif()
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")
     add_definitions(-DLV_USE_LIBINPUT=0)
+else()
+    link_libraries(input)
 endif()
 
 find_package(PkgConfig)
@@ -441,6 +450,7 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/FindLibDRM.cmake)
 if(Libdrm_FOUND)
     include_directories(${Libdrm_INCLUDE_DIRS})
+    link_libraries(drm)
 else()
     message("libdrm not found, defaulting to 0")
     add_definitions(-DLV_USE_LINUX_DRM=0)
@@ -502,16 +512,16 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_runner_fname}
     )
     target_link_libraries(${test_name} PRIVATE
-            test_common
-            lvgl_demos
-            lvgl
-            lvgl_thorvg
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             ${FFMPEG_LIBRARIES}
+            test_common
+            lvgl_demos
+            lvgl
+            lvgl_thorvg
             m
             pthread
             ${TEST_LIBS})
