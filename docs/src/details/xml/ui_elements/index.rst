@@ -1,8 +1,8 @@
-.. _xml_root_elements:
+.. _xml_ui_elements:
 
-=============
-Root elements
-=============
+===========
+UI Elements
+===========
 
 .. toctree::
     :class:    toctree-1-deep

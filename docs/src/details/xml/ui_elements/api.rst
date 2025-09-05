@@ -5,7 +5,7 @@ API
 ===
 
 The ``<api>`` tag can be a child of ``<widget>`` and ``<component>`` tags.
-(``<screen>``\ s don't support custom APIs.)
+(``<screen>``\s don't support custom APIs.)
 
 The only common point is that both Widgets and Components support having
 ``<prop>`` (properties) in the ``<api>`` tag to describe their interface.
@@ -21,8 +21,8 @@ Overview
 
 While Widgets can have complex ``set``/``get`` APIs, Components are very simple.
 
-When the components' XML is converted to C files, only a ``create`` function is generated,
-where all the ``<prop>``\ s are arguments. For example:
+When a component's XML is converted to C files, only a ``create`` function is generated,
+where all the ``<prop>``\s are arguments. For example:
 
 .. code-block:: xml
 
@@ -34,7 +34,7 @@ where all the ``<prop>``\ s are arguments. For example:
 Referencing properties
 ----------------------
 
-``<prop>``\ s are simply forwarded to widget or component APIs.
+``<prop>``\s are simply forwarded to Widget or Component APIs.
 For example, if a component has ``<prop name="button_label" type="string"/>``,
 it can be used in a label child as ``<lv_label text="$button_label"/>``.
 
@@ -52,7 +52,7 @@ This can be ensured by:
 Code generation
 ---------------
 
-LVGL's UI Editor can also generate code from the component's XML. Depending on the ``<api>`` a function like
+LVGL's UI Editor can also generate code from the component's XML. Depending on the ``<api>``, a function like
 this is generated:
 
 .. code-block:: c
@@ -148,7 +148,7 @@ Each ``<prop>`` is mapped to a ``set`` function. This mapping is implemented
 in the Widget's XML parser.
 See `the LVGL XML parsers <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`_.
 
-If ``<param>``s are used, they are passed to the same ``set`` function.
+If ``<param>``\s are used, they are passed to the same ``set`` function.
 If a property is not set on a Widget instance, it is skipped and the Widget's
 built-in default is used.
 
@@ -169,7 +169,7 @@ Only used with Widgets, this tag defines enums for parameter values.
         </prop>
     </api>
 
-The actual values of the enum fields are not important durigng code export as only the names are used and resolved by the compiler.
+The actual values of the enum fields are not important during code export as only the names are used and resolved by the compiler.
 XML parsers must handle mapping enum string names (e.g. ``"normal"``) to C enums (e.g. ``MY_WIDGET_MODE_NORMAL``).
 
 .. _xml_widget_element:
@@ -178,51 +178,50 @@ XML parsers must handle mapping enum string names (e.g. ``"normal"``) to C enums
 -------------
 
 Also exclusive to Widgets, elements define sub-widgets or internal structures
-(e.g., chart series, dropdown list, tab views).
+(e.g., chart series, dropdown lists, tab views).
 
 Elements are also very useful to create "slots" (similar to tabview tabs), like a content and header area for a window widget, where
 children can be created directly.
 
+Elements are described inside the ``<api>`` tag, and they can have ``<arg>`` and ``<prop>`` children:
 
-Elements are described inside the ``<api>`` tag and they can have ``<arg>`` and ``<prop>`` children:
+- ``<arg>``\s are required and used when creating/getting the element.
+- ``<prop>``\s are optional and mapped to setters.
 
-- ``<arg>``\ s are required and used when creating/getting the element.
-- ``<prop>``\ s are optional and mapped to setters.
-
-It's example to define an "indicator" that can be added dynamically to a widget. It will create `my_indicator_t *`
-elements, the same way as for example :cpp:expr:`lv_chart_add_series` works.
+Here's an example to define an "indicator" that can be added dynamically to a widget. It will create `my_indicator_t *`
+elements, the same way as, for example, :cpp:expr:`lv_chart_add_series` works.
 
 .. code-block:: xml
 
     <api>
         <element name="indicator" type="my_indicator_t" help="The indicator of my_widget" access="add">
-            <!-- args are passed when the element is created  -->
+            <!-- args are passed when the element is created -->
             <arg name="color" type="color"/>
             <arg name="max_value" type="int"/>
 
-            <!-- props can be set by setters at any time--->
+            <!-- props can be set by setters at any time -->
             <prop name="value" type="int"/>
         </element>
     </api>
 
 Element `access` types can be:
 
-- ``add``: Create multiple elements dynamically. For example tabview tabs.
-- ``get``: Access implicitly created elements. For example dropdown list.
-- ``set``: Access indexed parts. For example table cells.
-- ``custom``: Map custom C function to XML, e.g. ``bind_state_is_eq``
+- ``add``: Create multiple elements dynamically. For example, tabview tabs.
+- ``get``: Access implicitly created elements. For example, dropdown lists.
+- ``set``: Access indexed parts. For example, table cells.
+- ``custom``: Map custom C functions to XML, e.g. ``bind_state_is_eq``
 
-As ``add`` and ``get`` elements return an object they also have a type.
-This type can be any custom type, for example, `type="my_data"`. In the exported code the
+As ``add`` and ``get`` elements return an object, they also have a type.
+This type can be any custom type, for example, `type="my_data"`. In the exported code, the
 return value will be saved in a ``my_data_t *`` variable.
 
-If the type is ``type="lv_obj"`` it allows the element to have children widgets or components.
+If the type is ``type="lv_obj"``, it allows the element to have child widgets or components.
 
 Elements are referenced as ``<widget-element>`` in the ``<view>``.
-The parts of the name are separated by `-`.  As `-` is not allowed inside names it's safe to use
+The parts of the name are separated by `-`. As `-` is not allowed inside names, it's safe to use
 as a separator.
 
-Note that, only the API can be defined in XML for elements; implementations must be in C.
+Note that only the API can be defined in XML for elements; implementations must be in C.
 
 access="add"
 ~~~~~~~~~~~~
@@ -319,7 +318,7 @@ access="custom"
 ~~~~~~~~~~~~~~~
 
 Used to describe any custom API functions with a custom name.
-"custom" elements can have only arguments and no `type` so they are pure setters.
+"custom" elements can have only arguments and no `type`, so they are pure setters.
 
 .. code-block:: xml
 
@@ -342,3 +341,4 @@ LVGL's UI Editor generates this:
 .. code-block:: c
 
     void my_widget_bind_color(lv_obj_t * parent, lv_subject_t * subject, lv_color_t color, int32_t ref_value);
+

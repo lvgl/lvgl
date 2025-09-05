@@ -9,11 +9,11 @@ Overview
 
 Components are one of the main building blocks for creating new UI elements.
 
-``<component>``\ s support the following child XML tags:
+``<component>``\s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`
-- :ref:`<styles> <xml_styles>`, and
+- :ref:`<styles> <xml_styles>`
 - :ref:`<view> <xml_view>`
 - :ref:`<previews> <xml_preview>`
 
@@ -22,21 +22,19 @@ Although they can't contain C code, they are very powerful:
 - They can extend another Component or Widget (the base can be defined)
 - Components can be built from Widgets and other Components
 - A custom API can be defined
-- Local styles can be defined, and the global styles can be used
-- Local constants can be defined, and the global constants can be used
+- Local styles can be defined, and global styles can be used
+- Local constants can be defined, and global constants can be used
 - Function calls, subject changes, or screen load/create events can be added. See :ref:`XML Events <xml_events>`
 - Previews can be defined to preview the components in various settings in the UI Editor
 
-
-When a Component is created, it can extend an other Component or Widget like  ``<view extends="lv_slider">``.
-If a Widget was extended, the component can use the Widget's API. For example ``<view extends="lv_slider" min_value="20"``>
-If a Component was extended the `<api>` properties can be used: ``<view extends="my_button" button_text="Apply">``
-
+When a Component is created, it can extend another Component or Widget like ``<view extends="lv_slider">``.
+If a Widget is extended, the component can use the Widget's API, e.g., ``<view extends="lv_slider" min_value="20">``.
+If a Component is extended, the `<api>` properties can be used: ``<view extends="my_button" button_text="Apply">``.
 
 Unlike Widgets (which are always compiled into the application), Components can either:
 
 1. be loaded at runtime from XML, or
-2. be exported to C code ny LVGL UI Editor and compiled with the application.
+2. be exported to C code by LVGL's UI Editor and compiled with the application.
 
 Using the XML files
 *******************
@@ -44,13 +42,13 @@ Using the XML files
 In XML Files
 ------------
 
-Using Components in XMLs is very intuitive. The name of the components can be used as XML tag
+Using Components in XML is very intuitive. The name of the Component can be used as an XML tag
 in the ``<view>`` of other Components, Screens, and Widgets.
 
 The Component properties are just XML attributes.
 
-To load Components from file, it's assumed that the XML files are saved to the device
-either as data (byte array) or as file. Once the data is saved, each component
+To load Components from files, it's assumed that the XML files are saved to the device
+either as data (byte array) or as files. Once the data is saved, each Component
 can be registered, and instances can be created after that.
 
 .. code-block:: xml
@@ -112,8 +110,8 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 Using the Exported Code
 ***********************
 
-If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the components.
-The resulting code is completely self sufficient and the XMLs files are not needed anymore. The resulting code is the samesiilar to what one could write by hand as well.
+If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the Components.
+The resulting code is completely self-sufficient and the XML files are not needed anymore. The resulting code is similar to what one could write by hand as well.
 
 The exported code looks like this:
 
@@ -126,14 +124,13 @@ file name.
 
 When a Component is used in another Component's XML code and the code is exported,
 this ``create`` function will be called. This means that Components do not have a
-detailed set/get API but it is created with a fixed set of parameters.
+detailed set/get API, but are created with a fixed set of parameters.
 
-If the user needs to access or modify values dynamically, it is recommended to use a
-:ref:`Data bindings via Subject  <xml_subjects>`.
+If the user needs to access or modify values dynamically, it is recommended to use
+:ref:`Data bindings via Subject <xml_subjects>`.
 
 The user can also call these ``..._create()`` functions at any time from application code
-to create new components on demand.
-
+to create new Components on demand.
 
 .. _component_custom_api:
 
@@ -147,8 +144,8 @@ The properties of child elements can be adjusted, such as:
     <my_button x="10" width="200"/>
 
 However, it's also possible to define custom properties in the ``<api>`` tag.
-The properties then can be passed to any properties of the children by
-referencing them by ``$``. For example:
+These properties can then be passed to any properties of the children by
+referencing them using ``$``. For example:
 
 .. code-block:: xml
 
@@ -163,7 +160,7 @@ referencing them by ``$``. For example:
         </view>
     </component>
 
-And it can be used like
+And it can be used like:
 
 .. code-block:: xml
 
@@ -176,7 +173,7 @@ And it can be used like
         </view>
     </component>
 
-In this setup, the ``btn_text`` property is mandatory, however it can be made optional
+In this setup, the ``btn_text`` property is mandatory. However, it can be made optional
 by setting a default value:
 
 .. code-block:: xml
@@ -244,3 +241,4 @@ Live Example
 
 API
 ***
+

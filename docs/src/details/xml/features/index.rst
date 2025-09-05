@@ -1,16 +1,13 @@
-.. _xml_main_tags:
+.. _xml_features:
 
-=========
-Main tags
-=========
+========
+Features
+========
 
 .. toctree::
     :class:    toctree-1-deep
     :maxdepth: 2
 
-    api
-    consts
-    styles
-    view
-    animations
-    preview
+    subjects
+    tests
+    translations

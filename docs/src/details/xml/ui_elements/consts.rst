@@ -17,7 +17,6 @@ The supported types are:
 - ``opa``
 - ``bool``
 
-
 Usage
 *****
 
@@ -40,3 +39,4 @@ Constant values can be referenced by ``#constant_name``. For example:
     <styles>
         <style name="style1" bg_color="#color1"/>
     </styles>
+

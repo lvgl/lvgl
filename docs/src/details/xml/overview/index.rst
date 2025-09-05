@@ -9,7 +9,5 @@ Overview
     :maxdepth: 2
 
     intro
-    component_library
-    project
     syntax
 

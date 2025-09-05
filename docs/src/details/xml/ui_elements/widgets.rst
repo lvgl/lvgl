@@ -10,54 +10,53 @@ Overview
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
-Besides components and Screens, Widgets are the other main building blocks of UIs.
+Besides Components and Screens, Widgets are the other main building blocks of UIs.
 
-The XML file of the Widgets is wrapped in a ``<widget>`` XML root element.
+The XML file of a Widget is wrapped in a ``<widget>`` XML root element.
 
-``<widget>``\ s support the following child XML tags:
+``<widget>``\s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`
-- :ref:`<styles> <xml_styles>`, and
+- :ref:`<styles> <xml_styles>`
 - :ref:`<view> <xml_view>`
 - :ref:`<previews> <xml_preview>`
 
-Just like Components, Widgets also can be the children of other Widgets and Components.
+Just like Components, Widgets can also be children of other Widgets and Components.
 
 Note that Widgets cannot be loaded from XML directly, but it's possible to write and register
-simple XML parsersfwor widgets. When a widget is referenced in a component's or screen's XML
+simple XML parsers for Widgets. When a Widget is referenced in a Component's or Screen's XML,
 the XML parser will be called to map the properties to C function calls.
 
-LVGL already provides all the helper functions and the required libraries. Also there
-are `many XML parser examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
-for the built-in LVGL widigets.
-
+LVGL already provides all the helper functions and required libraries. There are also
+`many XML parser examples here <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
+for the built-in LVGL Widgets.
 
 Built-in Widgets
 ****************
 
-The built-in LVGL widgets (e.g. :ref:`lv_slider`, :ref:`lv_label`, :ref:`lv_chart`, etc.) already
-have XML parsers and therefore are available in XML.
+The built-in LVGL widgets (e.g., :ref:`lv_slider`, :ref:`lv_label`, :ref:`lv_chart`, etc.) already
+have XML parsers and are therefore available in XML.
 
 For example:
 
 .. code-block:: xml
+
     <component>
         <view>
             <lv_label x="10" text="Hello"/>
         </view>
     </component>
 
-The built-in widgets are
+The built-in widgets consist of:
 
-- pure C code
-  (e.g. `lv_slider.c <https://github.com/lvgl/lvgl/tree/master/src/widgets/slider/lv_slider.c>`__)
-- an XML file to define only the API
-  (e.g. `lv_slider.xml <https://github.com/lvgl/lvgl/blob/master/xmls/lv_slider.xml>`__).
-  It is used only in the UI |nbsp| Editor to validate and autocomplete properties.
-- an XML parser C file to map the XML attributes to C functions.
-  (e.g. `lv_xml_slider_parser.c <https://github.com/lvgl/lvgl/blob/master/src/others/xml/parsers/lv_xml_slider_parser.c>`__)
-
+- Pure C code
+  (e.g., `lv_slider.c <https://github.com/lvgl/lvgl/tree/master/src/widgets/slider/lv_slider.c>`__)
+- An XML file to define only the API
+  (e.g., `lv_slider.xml <https://github.com/lvgl/lvgl/blob/master/xmls/lv_slider.xml>`__),
+  used only in the UI |nbsp| Editor to validate and autocomplete properties
+- An XML parser C file to map the XML attributes to C functions
+  (e.g., `lv_xml_slider_parser.c <https://github.com/lvgl/lvgl/blob/master/src/others/xml/parsers/lv_xml_slider_parser.c>`__)
 
 XML Parser
 **********
@@ -65,7 +64,7 @@ XML Parser
 Write a parser
 --------------
 
-To make the Widgets accessible from XML, an XML parser needs to be created and
+To make Widgets accessible from XML, an XML parser needs to be created and
 registered for each Widget. The XML parser for the label Widget looks like this:
 
 .. code-block:: c
@@ -105,13 +104,13 @@ registered for each Widget. The XML parser for the label Widget looks like this:
         return 0; /* Return 0 in the absence of a better option. */
     }
 
-By lines like ``if(lv_streq("text", name)) lv_label_set_text(obj, value);``
-it's possible to map any ``set`` functions to any XML properties.
+By using lines like ``if(lv_streq("text", name)) lv_label_set_text(obj, value);``,
+any ``set`` function can be mapped to XML properties.
 
 Register a widget
 -----------------
 
-A Widget XML processor can be registered as follows. After registration
+A Widget XML processor can be registered as follows:
 
 .. code-block:: c
 
@@ -127,9 +126,9 @@ After registration, a Widget can be created like this from C code:
         NULL, NULL,
     };
 
-    lv_xml_create(lv_screen_active(), "lv_label", attrs);
+    lv_obj_t * label = lv_xml_create(lv_screen_active(), "lv_label", attrs);
 
-And in XML it can be used like
+And in XML, it can be used like this:
 
 .. code-block:: xml
 
@@ -137,43 +136,41 @@ And in XML it can be used like
         <lv_label width="100" text="I'm a label!" wrap="scroll"/>
     </view>
 
-
 Usage in LVGL's UI Editor
 *************************
 
 New widget
 ----------
 
-It's possible to create new widgets by writing C code manually (the same way as the built-in LVGL widgets are created),
-however, using the UI |nbsp| Editor it's much faster and simpler.
+It's possible to create new widgets by writing C code manually (the same way as built-in LVGL widgets are created),
+however, using the UI |nbsp| Editor is much faster and simpler.
 
 When an XML file is created and the ``<widget>`` root element is used, the following .C/.H files are generated automatically:
 
-:<widget_name>_gen.h:           Contains the generated API implementation of the widget
-                                (overwritten on each code export).
-:<widget_name>_private_gen.h:   Contains private API and the data for the widget
-                                (overwritten on each code export).
-:<widget_name>_gen.c:           Contains the internals of the Widget, e.g. constructor with the children,
-                                destructors, event handler, etc. (overwritten on each code export).
+:<widget_name>_gen.h:           Contains the generated API implementation of the Widget
+                                (overwritten on each code export)
+:<widget_name>_private_gen.h:   Contains private API and data for the Widget
+                                (overwritten on each code export)
+:<widget_name>_gen.c:           Contains the internals of the Widget, e.g., constructor with children,
+                                destructor, event handler, etc. (overwritten on each code export)
 :<widget_name>.h:               Includes ``<widget_name>_gen.h`` and allows the user to
-                                define custom APIs. Only a skeleton is exported once.
+                                define custom APIs. Only a skeleton is exported once
 :<widget_name>.c:               Contains hooks from ``<widget_name>_gen.c`` and allows
                                 the user to write custom code. Only a skeleton is
-                                exported once.
+                                exported once
 :<widget_name>_xml_parser.c:    Processes the XML strings and calls the required
                                 functions according to the set attributes. Only a
-                                skeleton is exported once.
-
+                                skeleton is exported once
 
 Adding Custom Code
 ------------------
 
 ``<widget_name>.c`` contains three hooks:
 
-- **Constructor hook**: Called when the Widget and all its children are created. Any
-  modifications can be done on the children here.
-- **Destructor hook**: Called when the Widget is deleted. All manually allocated
-  memory needs to be freed here.
+- **Constructor hook**: Called when the Widget and all its children are created.
+  Any modifications can be done on the children here.
+- **Destructor hook**: Called when the Widget is deleted.
+  All manually allocated memory needs to be freed here.
 - **Event hook**: Called at the beginning of the Widget's event callback to perform
   any custom action.
 
@@ -186,10 +183,11 @@ Besides these, any custom code and functions can be freely implemented in this f
 Elements
 --------
 
-Elements are internal parts of the widget that can be accessed and/or created dynamically.
-For example, tabs of a tabview, list of a dropdown, series of a chart, etc.
+Elements are internal parts of the Widget that can be accessed and/or created dynamically.
+For example: tabs of a tabview, list of a dropdown, series of a chart, etc.
 
-Just like any other Widget API properties, Elements also can be defined in the ``<api>``
+Just like any other Widget API properties, Elements can also be defined in the ``<api>``
 tag of the Widget's XML.
 
-Learn more about the Elements in the documentation page of :ref:`<api> <xml_widget_element>`.
+Learn more about Elements in the documentation page for :ref:`<api> <xml_widget_element>`.
+

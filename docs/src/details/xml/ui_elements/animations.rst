@@ -1,4 +1,4 @@
-    .. _xml_animations:
+.. _xml_animations:
 
 ==========
 Animations
@@ -13,13 +13,13 @@ Timelines are composed of simple animations. For example: *"change the ``bg_opa`
 of ``my_button_2`` from 0 to 255 in 500 ms."*
 
 Each component can define its own timeline animations, which can then be played by the
-component itself or by any parent components.
+component itself or by any parent component.
 
 Defining Timelines
 ------------------
 
-Timelines can be defined inside ``<screen>``\ s and ``<component>``\ s.
-For ``<widget>``\ s, timelines are supported only in LVGL's UI Editor,
+Timelines can be defined inside ``<screen>``\s and ``<component>``\s.
+For ``<widget>``\s, timelines are supported only in LVGL's UI Editor,
 where C code can also be exported from them.
 
 Example:
@@ -52,10 +52,10 @@ Example:
        </view>
     </component>
 
-In summary: inside ``<animations>``, you can define ``<timeline>``\ s, each with a unique name
+In summary: inside ``<animations>``, you can define ``<timeline>``\s, each with a unique name
 that you can reference later.
 
-Inside a ``<timeline>``, you add ``<animation>``\ s to describe each step.
+Inside a ``<timeline>``, you add ``<animation>``\s to describe each step.
 Supported properties of ``<animation>`` are:
 
 - ``prop``: Style property to animate. All integer style properties are supported (colors are not).
@@ -64,7 +64,7 @@ Supported properties of ``<animation>`` are:
 - ``start``: Start value (integer only).
 - ``end``: End value (integer only).
 - ``duration``: Duration of the animation in milliseconds.
-- ``delay``: Delay before starting in milliseconds.
+- ``delay``: Delay before starting, in milliseconds.
 - ``early_apply``: If ``true``, the start value is applied immediately, even during the delay.
 
 Playing Timelines
@@ -85,7 +85,7 @@ Example:
        </custom_button>
    </view>
 
-You set a ``target`` UI element and select one of its ``timeline``s to play.
+You set a ``target`` UI element and select one of its ``timeline``\s to play.
 If ``target="self"``, the timeline is looked up in the current component/widget/screen
 (i.e. in the current XML file).
 
@@ -94,12 +94,12 @@ You can also set a ``delay`` and ``reverse="true"`` when playing a timeline.
 Under the Hood
 --------------
 
-Understanding how timelines work internally helps use them effectively.
+Understanding how timelines work internally helps in using them effectively.
 
 When an XML file is registered, the contents of the ``<animations>`` section are parsed,
 and the animation data is stored as a blueprint.
 
-When an instance of a component or screen is created, ``lv_anim_timeline``\ s are
+When an instance of a component or screen is created, ``lv_anim_timeline``\s are
 created and initialized from the saved blueprint. Each instance gets its own copy of the timelines.
 
 When a ``<play_timeline_event>`` is added to a UI element, the target and timeline
@@ -109,5 +109,6 @@ that will be created only later in the ``<view>``.)
 Finally, when the play timeline event is triggered, LVGL finds the target widget by the saved name,
 retrieves the specified timeline, and starts it.
 
-Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\ s)
+Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\s)
 and play their ``load`` timelines independently with different delays.
+
