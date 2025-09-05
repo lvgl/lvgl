@@ -378,6 +378,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     streamer->frame_queue = g_async_queue_new();
     LV_ASSERT_NULL(streamer->frame_queue);
+    streamer->last_sample = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -437,16 +438,12 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
         streamer->is_video_info_valid = true;
     }
 
+
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
     if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        uint8_t * new_frame_data = lv_realloc((uint8_t *)streamer->frame.data, map.size);
-        LV_ASSERT_MALLOC(new_frame_data);
-        streamer->frame.data = new_frame_data;
-        /* TODO: Avoid copying every frame. */
-        lv_memcpy((uint8_t *)streamer->frame.data, map.data, map.size);
         streamer->frame = (lv_image_dsc_t) {
-            .data = new_frame_data,
+            .data = map.data,
             .data_size = map.size,
             .header = {
                 .magic = LV_IMAGE_HEADER_MAGIC,
@@ -463,7 +460,11 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     if(first_frame) {
         lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
-    gst_sample_unref(sample);
+
+    if(streamer->last_sample) {
+        gst_sample_unref(streamer->last_sample);
+    }
+    streamer->last_sample = sample;
 }
 static void gstreamer_timer_cb(lv_timer_t * timer)
 {
@@ -486,8 +487,10 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
         gst_object_unref(streamer->pipeline);
     }
+    if(streamer->last_sample) {
+        gst_sample_unref(streamer->last_sample);
+    }
 
-    lv_free((void *)streamer->frame.data);
     g_async_queue_unref(streamer->frame_queue);
 }
 
