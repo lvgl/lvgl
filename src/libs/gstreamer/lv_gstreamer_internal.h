@@ -44,7 +44,6 @@ struct _lv_gstreamer_t {
     lv_timer_t * gstreamer_timer;
     GAsyncQueue * frame_queue;
     bool is_video_info_valid;
-    bool frame_waiting;
 };
 
 typedef struct {

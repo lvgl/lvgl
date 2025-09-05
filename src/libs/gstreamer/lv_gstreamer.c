@@ -630,11 +630,6 @@ static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data)
         return GST_FLOW_OK;
     }
 
-    if(streamer->frame_waiting) {
-        gst_sample_unref(sample);
-        return GST_FLOW_OK;
-    }
-
     g_async_queue_push(streamer->frame_queue, sample);
     return GST_FLOW_OK;
 }
