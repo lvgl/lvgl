@@ -30,64 +30,21 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_GESTURE_MAX_POINTS 2
-
 /**********************
  *      TYPEDEFS
  **********************/
 
-/* Represent the motion of a finger */
-typedef struct lv_indev_gesture_motion {
-    int8_t finger;                      /* The ID of the tracked finger */
-    lv_point_t start_point;             /* The coordinates where the DOWN event occurred */
-    lv_point_t point;                   /* The current coordinates */
-    lv_indev_state_t state;             /* DEBUG: The state i.e PRESSED or RELEASED */
-} lv_indev_gesture_motion_t;
+/* Opaque types defined in the private header */
+struct lv_indev_gesture;
+struct lv_indev_gesture_configuration;
 
-/* General descriptor for a gesture, used by recognizer state machines to track
- * the scale, rotation, and translation NOTE: (this will likely become private) */
-typedef struct lv_indev_gesture {
+typedef struct lv_indev_gesture_recognizer lv_indev_gesture_recognizer_t;
+typedef struct lv_indev_touch_data lv_indev_touch_data_t;
 
-    /* Motion descriptor, stores the coordinates and velocity of a contact point */
-    lv_indev_gesture_motion_t motions[LV_GESTURE_MAX_POINTS];
-    struct {
-        lv_point_t center;                  /* Center point */
-        float scale;                        /* Scale factor & previous scale factor */
-        float p_scale;
-        float scale_factors_x[LV_GESTURE_MAX_POINTS];   /* Scale factor relative to center for each point */
-        float scale_factors_y[LV_GESTURE_MAX_POINTS];
+typedef struct lv_indev_gesture lv_indev_gesture_t;
+typedef struct lv_indev_gesture_configuration lv_indev_gesture_configuration_t;
 
-        float delta_x;                      /* Translation & previous translation */
-        float delta_y;
-        float p_delta_x;
-        float p_delta_y;
-        float rotation;                     /* Rotation & previous rotation*/
-        float p_rotation;
-    } param;
-
-    uint8_t finger_cnt;                 /* Current number of contact points */
-} lv_indev_gesture_t;
-
-/* Recognizer configuration. It stores the thresholds needed to detect the gestures and
- * consider them as recognized. Once recognized, indev start sending LV_GESTURE event
- */
-typedef struct lv_indev_gesture_configuration {
-    float pinch_up_threshold;           /* Threshold for the pinch up gesture to be recognized - in pixels */
-    float pinch_down_threshold;         /* Threshold for the pinch down gesture to be recognized - in pixels */
-    float rotation_angle_rad_threshold; /* Threshold for the rotation gesture to be recognized - in radians */
-} lv_indev_gesture_configuration_t;
-
-/* Data structures for touch events - used to represent a libinput event */
-/* Emitted by devices capable of tracking identifiable contacts (type B) */
-typedef struct lv_indev_touch_data {
-    lv_point_t point;                   /* Coordinates of the touch */
-    lv_indev_state_t state;             /* The state i.e PRESSED or RELEASED */
-    uint8_t id;                         /* Identification/slot of the contact point */
-    uint32_t timestamp;                 /* Timestamp in milliseconds */
-} lv_indev_touch_data_t;
-
-struct lv_indev_gesture_recognizer;
-typedef void (*lv_recognizer_func_t)(struct lv_indev_gesture_recognizer *, lv_indev_touch_data_t *, uint16_t);
+typedef void (*lv_recognizer_func_t)(lv_indev_gesture_recognizer_t *, lv_indev_touch_data_t *, uint16_t);
 
 /* The states of a gesture recognizer */
 typedef enum {
@@ -98,20 +55,30 @@ typedef enum {
     LV_INDEV_GESTURE_STATE_CANCELED,    /* Canceled - usually a finger is lifted */
 } lv_indev_gesture_state_t;
 
+/* Data structures for touch events - used to repsensent a libinput event */
+/* Emitted by devices capable of tracking identifiable contacts (type B) */
+struct lv_indev_touch_data {
+    lv_point_t point;                   /* Coordinates of the touch */
+    lv_indev_state_t state;             /* The state i.e PRESSED or RELEASED */
+    uint8_t id;                         /* Identification/slot of the contact point */
+    uint32_t timestamp;                 /* Timestamp in milliseconds */
+};
+
 /* Gesture recognizer */
-typedef struct lv_indev_gesture_recognizer {
+struct lv_indev_gesture_recognizer {
     lv_indev_gesture_type_t type;       /* The detected gesture type */
     lv_indev_gesture_state_t state;     /* The gesture state ongoing, recognized */
-    lv_indev_gesture_t info;            /* Information on the motion of each touch point */
+    lv_indev_gesture_t * info;          /* Information on the motion of each touch point */
     float scale;                        /* Relevant for the pinch gesture */
     float rotation;                     /* Relevant for rotation */
     float distance;                     /* Relevant for swipes */
     float speed;
     lv_dir_t two_fingers_swipe_dir;     /* Relevant for swipes */
 
-    lv_indev_gesture_configuration_t config;  /* The recognizer config, containing the gestures thresholds */
+    lv_indev_gesture_configuration_t * config;  /* The recognizer config, containing the gestures
+                                                   thresholds */
     lv_recognizer_func_t recog_fn;      /* The recognizer function that this recongnizer must execute */
-} lv_indev_gesture_recognizer_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
