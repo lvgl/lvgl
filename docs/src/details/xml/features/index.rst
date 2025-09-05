@@ -1,13 +1,13 @@
-.. _xml_overview:
+.. _xml_features:
 
 ========
-Overview
+Features
 ========
 
 .. toctree::
     :class:    toctree-1-deep
     :maxdepth: 2
 
-    intro
-    syntax
-
+    subjects
+    tests
+    translations

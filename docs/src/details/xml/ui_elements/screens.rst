@@ -21,10 +21,14 @@ the content of the UI.
 Screens can have only the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
-- :ref:`<styles> <xml_styles>`, and
+- :ref:`<styles> <xml_styles>`
 - :ref:`<view> <xml_view>`
 
-That is, Screens **cannot** have an :ref:`<api> <xml_api>` or :ref:`<preview> <xml_preview>`.
+That is, Screens **cannot** have:
+
+- :ref:`<api> <xml_api>`: Screens are always created as they are, with no parameters.
+- :ref:`<preview> <xml_preview>`: In LVGL's UI Editor, ``<preview>`` is used to set the style, size, and other parameters of the previewing "screen". For Screens, the
+  preview options are defined in ``project.xml``. Learn more in :ref:`Screen preview <_xml_screen_preview>`
 
 Usage
 *****
@@ -33,7 +37,7 @@ Each XML file describes a :ref:`Screen <screens>`. The name of the XML file will
 also be the name of the Screen.
 
 This example illustrates a screen in XML. In the example, a ``<my_header>``
-and a ``<my_main_cont>`` component is used to keep the screen simple.
+and a ``<my_main_cont>`` component are used to keep the screen simple.
 
 .. code-block:: xml
 
@@ -62,10 +66,12 @@ and a ``<my_main_cont>`` component is used to keep the screen simple.
 Code export
 ***********
 
-When the C code is exported from the UI |nbsp| Editor, ``screen_name_gen.c/h`` files are exported,
+LVGL's UI Editor can export C code for Screens as well. It generates ``screen_name_gen.c/h`` files,
 containing only a single ``lv_obj_t * screen_name_create(void)`` create function.
 
 By using this function, any number of screen instances can be created and loaded as needed.
+
+.. _xml_screen_preview:
 
 Preview
 *******
@@ -104,4 +110,5 @@ Both are supported by adding special XML tags as children of Components or Widge
        </lv_button>
    </view>
 
-Learn more on :ref:`XML Events <xml_events_screen>` page.
+Learn more on the :ref:`XML Events <xml_events_screen>` page.
+

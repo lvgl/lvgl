@@ -9,7 +9,6 @@ Overview
 
 In XML files, both style sheets (:cpp:expr:`lv_style_t`) and local styles can be used.
 
-
 Style Sheets
 ************
 
@@ -22,7 +21,7 @@ In the ``<styles>`` section, styles and their properties can be defined like thi
         border_width="2px"
         border_color="0xff0000"/>
 
-Styles can be referenced like this in the ``<view>``\ :
+Styles can be referenced like this in the ``<view>``:
 
 .. code-block:: xml
 
@@ -30,22 +29,22 @@ Styles can be referenced like this in the ``<view>``\ :
         <lv_slider value="20">
              <style name="main"/>
              <style name="red" selector="knob"/>
-             <style name="blue" selector="knob focused"/>
+             <style name="blue" selector="knob|focused"/>
         </lv_slider>
     </view>
 
-As shown in the example, parts and states can be set as ``selector``\ .
-
+As shown in the example, parts and states can be set using ``selector``.
 
 Local Styles
 ************
 
-Local styles can be used directly in a Widget, for example:
+Local styles can be used directly, for example:
 
 .. code-block:: xml
 
-    <lv_label style_bg_opa="200" style_bg_opa:disabled="100"/>
+    <lv_label style_bg_opa="200" style_bg_color="0x123456"/>
 
+Selectors are not supported for local style properties yet.
 
 Gradients
 *********
@@ -65,11 +64,12 @@ or
 
     <lv_button style_bg_grad="grad1"/>
 
+Note that gradients are not supported in LVGL's UI Editor yet.
 
 Horizontal or Vertical Gradient
 -------------------------------
 
-To define a simple ``<horizontal>`` or ``<vertical>`` gradients:
+To define a simple ``<horizontal>`` or ``<vertical>`` gradient:
 
 .. code-block:: xml
 
@@ -79,7 +79,6 @@ To define a simple ``<horizontal>`` or ``<vertical>`` gradients:
             <stop color="#00ff00" offset="128" opa="100%"/>
         </horizontal>
     </gradients>
-
 
 Linear Gradient
 ---------------
@@ -95,7 +94,6 @@ To define a skewed gradient from two points:
         </linear>
     </gradients>
 
-
 Radial Gradient
 ---------------
 
@@ -110,7 +108,6 @@ To define a radial gradient:
         </radial>
     </gradients>
 
-
 Conical Gradient
 ----------------
 
@@ -124,3 +121,4 @@ To define a conical gradient:
             <stop color="#00ff00" opa="100%"/>
         </conical>
     </gradients>
+
