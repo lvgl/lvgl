@@ -11,7 +11,8 @@
 
 #include "lv_g2d_buf_map.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include <stdio.h>
 #include "lv_g2d_utils.h"
 #include "g2d.h"
@@ -155,6 +156,7 @@ void g2d_free_item(void * key)
         for(uint32_t i = 0; i < lv_array_size(list); i++) {
             item = (lv_map_item_t *)lv_array_at(list, i);
             if(item->key == key) {
+                g2d_free(item->value);
                 lv_array_remove(list, i);
                 return;
             }
@@ -244,4 +246,5 @@ static void _map_free_item(lv_map_item_t * item)
     item = NULL;
 }
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/
