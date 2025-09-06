@@ -915,7 +915,7 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font,
     uint32_t ofs = lv_text_get_next_line(txt, LV_TEXT_LEN_MAX, font, use_width, &attributes);
     *end_ofs = ofs;
 
-    if(txt[ofs] == '\0' && *use_width < attributes.max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
+    if(txt[ofs] == '\0' && *use_width <= attributes.max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
         return false;
     }
     else {
@@ -1320,16 +1320,17 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 #endif
 
             bool need_draw_ellipsis = false;
-            uint32_t dot_width = 0;
-
+            int32_t dot_width = 0;
             /* deal overflow */
             if(ellipsis_valid) {
-                uint32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
+                int32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
 
                 label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;
+                int32_t text_width = coords.x2 - a.x1;
                 uint32_t next_ofs;
-                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
+                text_width = text_width > dot_width ? text_width - dot_width : text_width;
+                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, text_width,
                                                          label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
                 a.x2 = a.x1 + pinfo->txt_w;
                 label_draw_dsc.text_length = next_ofs;
@@ -1366,6 +1367,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
             if(need_draw_ellipsis) {
                 label_draw_dsc.text = "...";
+                label_draw_dsc.text_length = LV_TEXT_LEN_MAX;
 
 #if LV_USE_BIDI
                 if(label_draw_dsc.bidi_dir == LV_BASE_DIR_RTL) {
