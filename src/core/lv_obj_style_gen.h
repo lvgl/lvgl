@@ -451,6 +451,12 @@ static inline lv_opa_t lv_obj_get_style_image_recolor_opa(const lv_obj_t * obj, 
     return (lv_opa_t)v.num;
 }
 
+static inline const lv_image_colorkey_t * lv_obj_get_style_image_colorkey(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_IMAGE_COLORKEY);
+    return (const lv_image_colorkey_t *)v.ptr;
+}
+
 static inline int32_t lv_obj_get_style_line_width(const lv_obj_t * obj, lv_part_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_WIDTH);
@@ -864,6 +870,7 @@ void lv_obj_set_style_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_select
 void lv_obj_set_style_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
+void lv_obj_set_style_image_colorkey(lv_obj_t * obj, const lv_image_colorkey_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_line_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_dash_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_line_dash_gap(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
