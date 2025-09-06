@@ -106,6 +106,11 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
+#else
+    struct {
+        lv_point_t point;
+        lv_indev_state_t state;
+    } touch;
 #endif
 };
 

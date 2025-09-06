@@ -153,16 +153,12 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("failed to register pointeraxis indev");
     }
 
-#if LV_USE_GESTURE_RECOGNITION
-
     window->lv_indev_touch = lv_wayland_touch_create();
     lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
 
     if(!window->lv_indev_touch) {
         LV_LOG_ERROR("failed to register touch indev");
     }
-
-#endif /* END LV_USE_GESTURE_RECOGNITION */
 
     window->lv_indev_keyboard = lv_wayland_keyboard_create();
     lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
