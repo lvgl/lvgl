@@ -1277,12 +1277,12 @@ static void lv_label_refr_text(lv_obj_t * obj)
 static void lv_label_revert_dots(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
-    if(label->dot_begin != LV_LABEL_DOT_BEGIN_INV) {
+    if(label->dot_begin != LV_LABEL_DOT_BEGIN_INV && !label->static_txt) {
         for(int i = 0; i < LV_LABEL_DOT_NUM + 1 && label->dot[i]; i++) {
             label->text[label->dot_begin + i] = label->dot[i];
         }
-        label->dot_begin = LV_LABEL_DOT_BEGIN_INV;
     }
+    label->dot_begin = LV_LABEL_DOT_BEGIN_INV;
 }
 
 static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
@@ -1290,6 +1290,13 @@ static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
     lv_label_t * label = (lv_label_t *)obj;
     LV_ASSERT_MSG(label->dot_begin == LV_LABEL_DOT_BEGIN_INV, "Label dots already set");
     if(dot_begin != LV_LABEL_DOT_BEGIN_INV) {
+        /* setting dots modifies the string so the string must be modifiable */
+        if(label->static_txt) {
+            label->text = lv_strdup(label->text);
+            LV_ASSERT_MALLOC(label->text);
+            label->static_txt = 0;
+        }
+
         /*Save characters*/
         lv_strncpy(label->dot, &label->text[dot_begin], LV_LABEL_DOT_NUM + 1);
         label->dot_begin = dot_begin;
