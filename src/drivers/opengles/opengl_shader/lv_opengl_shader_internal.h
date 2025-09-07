@@ -6,7 +6,7 @@
 #ifndef LV_OPENGL_SHADER_INTERNAL_H
 #define LV_OPENGL_SHADER_INTERNAL_H
 
-#include "../../../../lv_conf_internal.h"
+#include "../../../lv_conf_internal.h"
 
 #if LV_USE_GLTF
 #include "../lv_opengles_private.h"
