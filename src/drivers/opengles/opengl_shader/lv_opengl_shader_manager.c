@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "../../../../lv_conf_internal.h"
 #if LV_USE_GLTF
 #include "lv_opengl_shader_internal.h"
 #include "../../../misc/lv_assert.h"

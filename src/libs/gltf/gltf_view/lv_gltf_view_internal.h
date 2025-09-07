@@ -16,7 +16,7 @@
 
 #include "lv_gltf.h"
 #include "../../../misc/lv_types.h"
-#include "../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
 #include "../gltf_data/lv_gltf_data_internal.h"
 
