@@ -34,8 +34,8 @@ jobs:
             Feel free to comment if you have remarks or ideas on this topic.
 
             cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
-          days-before-stale: 14
-          days-before-close: 7
+          days-before-stale: 60
+          days-before-close: 14
           exempt-issue-labels: '🔥 Important'
           exempt-pr-labels: '🔥 Important'
           stale-issue-label: '💤 Stale'
