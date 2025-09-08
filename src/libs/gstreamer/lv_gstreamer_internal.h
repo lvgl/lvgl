@@ -55,6 +55,8 @@ typedef struct {
     size_t data_size;
 } frame_data_t;
 
+typedef struct _lv_gstreamer_t lv_gstreamer_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
