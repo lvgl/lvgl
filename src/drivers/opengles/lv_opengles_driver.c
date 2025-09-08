@@ -17,6 +17,8 @@
 
 #include "../../display/lv_display.h"
 #include "../../misc/lv_area_private.h"
+#include "opengl_shader/lv_opengl_shader_internal.h"
+#include "assets/lv_opengles_standard_shader.h"
 
 /*********************
  *      DEFINES
@@ -49,8 +51,8 @@ static void lv_opengles_index_buffer_deinit(void);
 static unsigned int lv_opengles_index_buffer_get_count(void);
 static void lv_opengles_index_buffer_bind(void);
 static void lv_opengles_index_buffer_unbind(void);
-static unsigned int lv_opengles_shader_compile(unsigned int type, const char * source);
-static unsigned int lv_opengles_shader_create(const char * vertexShader, const char * fragmentShader);
+static void lv_opengles_shader_manager_init(void);
+static void lv_opengles_shader_program_init(void);
 static void lv_opengles_shader_init(void);
 static void lv_opengles_shader_deinit(void);
 static void lv_opengles_shader_bind(void);
@@ -72,6 +74,8 @@ static float lv_opengles_map_float(float x, float min_in, float max_in, float mi
  **********************/
 static bool is_init;
 
+static lv_opengl_shader_manager_t * shader_manager;
+
 static unsigned int vertex_buffer_id = 0;
 
 static unsigned int vertex_array_id = 0;
@@ -83,56 +87,6 @@ static unsigned int shader_id;
 
 static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor" };
 static int shader_location[] = { 0, 0, 0, 0, 0, 0 };
-
-static const char * vertex_shader =
-    "#version 300 es\n"
-    "\n"
-    "precision mediump float;\n"
-    "\n"
-    "in vec4 position;\n"
-    "in vec2 texCoord;\n"
-    "\n"
-    "out vec2 v_TexCoord;\n"
-    "\n"
-    "uniform mat3 u_VertexTransform;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "    gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);\n"
-    "    v_TexCoord = texCoord;\n"
-    "}\n";
-
-static const char * fragment_shader =
-    "#version 300 es\n"
-    "\n"
-    "precision lowp float;\n"
-    "\n"
-    "out vec4 color;\n"
-    "\n"
-    "in vec2 v_TexCoord;\n"
-    "\n"
-    "uniform sampler2D u_Texture;\n"
-    "uniform float u_ColorDepth;\n"
-    "uniform float u_Opa;\n"
-    "uniform bool u_IsFill;\n"
-    "uniform vec3 u_FillColor;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "    vec4 texColor;\n"
-    "    if (u_IsFill) {\n"
-    "        texColor = vec4(u_FillColor, 1.0);\n"
-    "    } else {\n"
-    "        texColor = texture(u_Texture, v_TexCoord);\n"
-    "    }\n"
-    "    if (abs(u_ColorDepth - 8.0) < 0.1) {\n"
-    "        float gray = texColor.r;\n"
-    "        color = vec4(gray, gray, gray, u_Opa);\n"
-    "    } else {\n"
-    "        float combinedAlpha = texColor.a * u_Opa;\n"
-    "        color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);\n"
-    "    }\n"
-    "}\n";
 
 /**********************
  *      MACROS
@@ -374,51 +328,36 @@ static void lv_opengles_index_buffer_unbind(void)
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-static unsigned int lv_opengles_shader_compile(unsigned int type, const char * source)
+static void lv_opengles_shader_manager_init(void)
 {
-    unsigned int id;
-    GL_CALL(id = glCreateShader(type));
-    const char * src = source;
-    GL_CALL(glShaderSource(id, 1, &src, NULL));
-    GL_CALL(glCompileShader(id));
-
-    int result;
-    GL_CALL(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
-    if(result == GL_FALSE) {
-        int length;
-        GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
-        char * message = lv_malloc_zeroed(length * sizeof(char));
-        GL_CALL(glGetShaderInfoLog(id, length, &length, message));
-        LV_LOG_ERROR("Failed to compile %s shader!", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
-        LV_LOG_ERROR("%s", message);
-        GL_CALL(glDeleteShader(id));
-        return 0;
-    }
-
-    return id;
+    lv_opengl_shader_portions_t portions;
+    lv_opengles_standard_shader_get_src(&portions);
+    char * vertex_shader = lv_opengles_standard_shader_get_vertex();
+    char * frag_shader = lv_opengles_standard_shader_get_fragment();
+    shader_manager = lv_opengl_shader_manager_create(portions.all, portions.count, vertex_shader, frag_shader);
+    lv_free(vertex_shader);
+    lv_free(frag_shader);
 }
 
-static unsigned int lv_opengles_shader_create(const char * vertexShader, const char * fragmentShader)
+static void lv_opengles_shader_program_init(void)
 {
-    unsigned int program;
-    GL_CALL(program = glCreateProgram());
-    unsigned int vs = lv_opengles_shader_compile(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = lv_opengles_shader_compile(GL_FRAGMENT_SHADER, fragmentShader);
+    /* To add defines:  lv_opengl_shader_define_t frag_defs[1] = { { "PLACEHOLDER", NULL, false} }; */
 
-    GL_CALL(glAttachShader(program, vs));
-    GL_CALL(glAttachShader(program, fs));
-    GL_CALL(glLinkProgram(program));
-    GL_CALL(glValidateProgram(program));
+    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.frag", NULL, 0);
+    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.vert", NULL, 0);
 
-    GL_CALL(glDeleteShader(vs));
-    GL_CALL(glDeleteShader(fs));
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(shader_manager, frag_shader_hash,
+                                                                                vert_shader_hash);
 
-    return program;
+    shader_id = lv_opengl_shader_program_get_id(program);
 }
 
 static void lv_opengles_shader_init(void)
 {
-    if(shader_id == 0) shader_id = lv_opengles_shader_create(vertex_shader, fragment_shader);
+    if(shader_id == 0) {
+        lv_opengles_shader_manager_init();
+        lv_opengles_shader_program_init();
+    }
 }
 
 static void lv_opengles_shader_deinit(void)

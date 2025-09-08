@@ -3404,39 +3404,6 @@ static const char *src_fragment_shader = R"(
 
 const size_t src_includes_count = sizeof src_includes / sizeof src_includes[0];
 
-/**
- * @file lv_templ.c
- *
- */
-
-/*********************
- *      INCLUDES
- *********************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -3449,15 +3416,15 @@ char* lv_gltf_view_shader_get_fragment(void) {
     return lv_opengl_shader_manager_process_includes(src_fragment_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count);
 }
 
-void lv_gltf_view_shader_get_src(lv_gltf_view_shader_t *shaders)
+void lv_gltf_view_shader_get_src(lv_opengl_shader_portions_t *portions)
 {
-	shaders->shader_list = src_includes;
-	shaders->count = sizeof(src_includes) / sizeof(src_includes[0]);
+	portions->all = src_includes;
+	portions->count = sizeof(src_includes) / sizeof(src_includes[0]);
 }
-void lv_gltf_view_shader_get_env(lv_gltf_view_shader_t *shaders)
+void lv_gltf_view_shader_get_env(lv_opengl_shader_portions_t *portions)
 {
-	shaders->shader_list = env_src_includes;
-	shaders->count = sizeof(env_src_includes) / sizeof(env_src_includes[0]);
+	portions->all = env_src_includes;
+	portions->count = sizeof(env_src_includes) / sizeof(env_src_includes[0]);
 }
 
 #endif /*LV_USE_GLTF*/
