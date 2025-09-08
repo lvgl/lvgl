@@ -115,10 +115,6 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
-    if(disp->flush_cb != flush_cb) {
-        return 0;
-    }
-
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
     return dsc->texture_id;
 }
