@@ -77,6 +77,6 @@ The glTF extension provides support for loading and rendering 3D models using th
 This extension requires OpenGL ES 3.0 and provides comprehensive 3D rendering capabilities including PBR materials,
 animations, and interactive camera controls for embedded 3D visualization.
 
-For complete implementation details, see :ref:glTF <gltf>.
+For complete implementation details, see :ref:`glTF <gltf>`.
 
 
