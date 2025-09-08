@@ -120,6 +120,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     }
 
     if(!gst_bin_add(GST_BIN(pipeline), head)) {
+        gst_object_unref(head);
         gst_object_unref(pipeline);
         LV_LOG_ERROR("Failed to add source element to pipeline");
         return LV_RESULT_INVALID;
@@ -139,6 +140,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
             return LV_RESULT_INVALID;
         }
         if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
+            gst_object_unref(decodebin);
             gst_object_unref(pipeline);
             LV_LOG_ERROR("Failed to add decodebin element to pipeline");
             return LV_RESULT_INVALID;
@@ -497,58 +499,46 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static lv_result_t gstreamer_create_pipeline(lv_gstreamer_t * streamer, GstElement * pipeline,
                                              GstElement * decode_element)
 {
-    streamer->video_convert = gst_element_factory_make("videoconvert", "lv_gstreamer_video_convert");
-    if(!streamer->video_convert) {
-        LV_LOG_ERROR("Failed to create videoconvert element");
-        return LV_RESULT_INVALID;
-    }
-    streamer->audio_convert = gst_element_factory_make("audioconvert", "lv_gstreamer_audio_convert");
-    if(!streamer->audio_convert) {
-        LV_LOG_ERROR("Failed to create audioconvert element");
-        return LV_RESULT_INVALID;
-    }
 
-    streamer->audio_volume = gst_element_factory_make("volume", "lv_gstreamer_audio_volume");
-    if(!streamer->audio_volume) {
-        LV_LOG_ERROR("Failed to create volume element");
-        return LV_RESULT_INVALID;
-    }
-
-    GstElement * video_rate = gst_element_factory_make("videorate", "lv_gstreamer_video_rate");
-    if(!video_rate) {
-        LV_LOG_ERROR("Failed to create videorate element");
-        return LV_RESULT_INVALID;
-    }
-
-    GstElement * video_queue = gst_element_factory_make("queue", "lv_gstreamer_video_queue");
-    if(!video_queue) {
-        LV_LOG_ERROR("Failed to create queue element");
-        return LV_RESULT_INVALID;
-    }
-
-    GstElement * video_app_sink = gst_element_factory_make("appsink", "lv_gstreamer_video_sink");
-    if(!video_app_sink) {
-        LV_LOG_ERROR("Failed to create an appsink element for the video data");
-        return LV_RESULT_INVALID;
-    }
-
-    GstElement * audio_resample = gst_element_factory_make("audioresample", "lv_gstreamer_audio_resample");
-    if(!audio_resample) {
-        LV_LOG_ERROR("Failed to create audioresample element");
-        return LV_RESULT_INVALID;
+    /* The caller has already added head and whatever comes before it to the pipeline.
+     * So inside this function, we only need to handle adding the elements that are created here */
+    GstElement * video_app_sink;
+    GstElement * video_rate;
+    GstElement * video_queue;
+    GstElement * audio_resample;
+    GstElement * audio_sink;
+    struct {
+        const char * factory;
+        const char * name;
+        GstElement ** store;
+    } const elements[] = {
+        {"videoconvert",  "lv_gstreamer_video_convert",  &streamer->video_convert},
+        {"audioconvert",  "lv_gstreamer_audio_convert",  &streamer->audio_convert},
+        {"volume",        "lv_gstreamer_audio_volume",   &streamer->audio_volume},
+        {"videorate",     "lv_gstreamer_video_rate",     &video_rate},
+        {"queue",         "lv_gstreamer_video_queue",    &video_queue},
+        {"appsink",       "lv_gstreamer_video_sink",     &video_app_sink},
+        {"audioresample", "lv_gstreamer_audio_resample", &audio_resample},
+        {"autoaudiosink", "lv_gstreamer_audio_sink",     &audio_sink},
+    };
+    const size_t element_count = sizeof(elements) / sizeof(elements[0]);
+    for(size_t i = 0; i < element_count; ++i) {
+        GstElement * el = gst_element_factory_make(elements[i].factory, elements[i].name);
+        if(!el) {
+            /* The previous elements were added to the pipeline so we don't need to unref them explicitly
+             * Unrefing the pipeline is enough and is done by caller*/
+            LV_LOG_ERROR("Failed to create %s element", elements[i].name);
+            return LV_RESULT_INVALID;
+        }
+        *(elements[i].store) = el;
+        if(!gst_bin_add(GST_BIN(pipeline), el)) {
+            gst_object_unref(el);
+            LV_LOG_ERROR("Failed to add %s element to pipeline", elements[i].name);
+            return LV_RESULT_INVALID;
+        }
     }
 
-    GstElement * audio_sink = gst_element_factory_make("autoaudiosink", "lv_gstreamer_audio_sink");
-    if(!audio_sink) {
-        LV_LOG_ERROR("Failed to create audiosink element");
-        return LV_RESULT_INVALID;
-    }
-
-    /* The caller has already added head and whatever comes before it to the pipeline */
-    gst_bin_add_many(GST_BIN(pipeline), streamer->video_convert, video_rate, video_queue, video_app_sink,
-                     streamer->audio_convert, audio_resample, streamer->audio_volume, audio_sink, NULL);
-
-    /* Here we set the fps we want the pipeline to produce and the color format*
+    /* Here we set the fps we want the pipeline to produce and the color format
      * This is achieved by the video_convert and video_rate elements that will automaticall throttle and
      * convert the image to the format we desire*/
     uint32_t target_fps = 1000 / LV_DEF_REFR_PERIOD;
