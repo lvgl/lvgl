@@ -5,7 +5,7 @@
 #include "../../../../stdlib/lv_sprintf.h"
 #include <string.h>
 
-static lv_opengl_shader_t src_includes[] = {
+const lv_opengl_shader_t src_includes[] = {
 	{ "tonemapping.glsl", R"(
 
         uniform float u_Exposure;
@@ -3401,6 +3401,9 @@ static const char *src_fragment_shader = R"(
 #include <frag_v1_chunk_05.glsl>
 
 )";
+
+const size_t src_includes_count = sizeof src_includes / sizeof src_includes[0];
+
 /**
  * @file lv_templ.c
  *
@@ -3426,9 +3429,6 @@ static const char *src_fragment_shader = R"(
  *  STATIC PROTOTYPES
  **********************/
 
-static char* replace_word(const char* s, const char* f, const char* r);
-static char* process_includes(const char* c_src, const char* defines);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -3442,11 +3442,11 @@ static char* process_includes(const char* c_src, const char* defines);
  **********************/
 
 char* lv_gltf_view_shader_get_vertex(void) {
-    return process_includes(src_vertex_shader, GLSL_VERSION_PREFIX);
+    return lv_opengl_shader_manager_process_includes(src_vertex_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count );
 }
 
 char* lv_gltf_view_shader_get_fragment(void) {
-    return process_includes(src_fragment_shader, GLSL_VERSION_PREFIX);
+    return lv_opengl_shader_manager_process_includes(src_fragment_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count);
 }
 
 void lv_gltf_view_shader_get_src(lv_gltf_view_shader_t *shaders)
@@ -3458,74 +3458,6 @@ void lv_gltf_view_shader_get_env(lv_gltf_view_shader_t *shaders)
 {
 	shaders->shader_list = env_src_includes;
 	shaders->count = sizeof(env_src_includes) / sizeof(env_src_includes[0]);
-}
-
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static char* replace_word(const char* source, const char* f, const char* r)
-{
-    if (!source || !f || !r || strlen(f) == 0 || strcmp(f, r) == 0 || !strstr(source, f)) {
-        return lv_strdup(source);
-    }
-    
-    size_t s_len = strlen(source);
-    size_t f_len = strlen(f);
-    size_t r_len = strlen(r);
-    
-    size_t count = 0;
-    const char* temp = source;
-    while ((temp = strstr(temp, f)) != NULL) {
-        count++;
-        temp += f_len;
-    }
-    
-    size_t new_size = s_len + count * (r_len - f_len) + 1;
-    char* result = lv_malloc(new_size);
-    LV_ASSERT_MALLOC(result);
-    
-    char* dest = result;
-    const char* src = source;
-    const char* pos;
-    
-    while ((pos = strstr(src, f)) != NULL) {
-        size_t prefix_len = pos - src;
-        memcpy(dest, src, prefix_len);
-        dest += prefix_len;
-        
-        memcpy(dest, r, r_len);
-        dest += r_len;
-        
-        src = pos + f_len;
-    }
-    
-    strcpy(dest, src);
-    
-    return result;
-}
-
-static char* process_includes(const char* c_src, const char* defines)
-{
-    if (!c_src || !defines) {
-        return NULL;
-    }
-    
-    char* rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
-    
-    size_t num_items = sizeof(src_includes) / sizeof(lv_opengl_shader_t);
-    char search_str[255];
-    
-    for (size_t i = 0; i < num_items; i++) {
-        lv_snprintf(search_str, sizeof(search_str),"\n#include <%s>",src_includes[i].name);
-        
-        char* new_rep = replace_word(rep, search_str, src_includes[i].source);
-        lv_free(rep);
-        rep = new_rep;
-    }
-    
-    return rep;
 }
 
 #endif /*LV_USE_GLTF*/
