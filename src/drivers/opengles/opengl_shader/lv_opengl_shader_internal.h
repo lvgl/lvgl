@@ -38,6 +38,11 @@ typedef struct {
 } lv_opengl_shader_t;
 
 typedef struct {
+    const lv_opengl_shader_t * all;
+    uint32_t count;
+} lv_opengl_shader_portions_t;
+
+typedef struct {
     const char * name;
     const char * value;
     bool value_allocated;
