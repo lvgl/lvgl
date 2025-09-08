@@ -91,9 +91,8 @@ lv_obj_t * lv_gstreamer_create(lv_obj_t * parent)
 
 lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, const char * property, const char * source)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(factory_name);
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(factory_name);
 
     if(!obj || !factory_name) {
         LV_LOG_WARN("Refusing to set source with invalid params. Obj: %p Factory Name: %s", obj, factory_name);
