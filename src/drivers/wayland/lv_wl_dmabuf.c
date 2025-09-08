@@ -54,6 +54,7 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
 static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned char * color_p);
 static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct window * window, int width, int height);
 static void buffer_free(struct buffer * buf);
+static void dmabuf_wait_swap_buf(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -153,7 +154,7 @@ void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, s
     LV_UNUSED(obj);
 }
 
-void lv_wayland_wait_swap_buf_cb(lv_display_t * disp)
+static void dmabuf_wait_swap_buf(lv_display_t * disp)
 {
     struct window * window = lv_display_get_user_data(disp);
 
@@ -195,6 +196,7 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
         wl_callback_add_listener(cb, lv_wayland_window_get_wl_surface_frame_listener(), window->body);
 
         window->flush_pending = true;
+        dmabuf_wait_swap_buf(disp);
     }
     else {
         /* Not the last frame yet, so tell lvgl to keep going

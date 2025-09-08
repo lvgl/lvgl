@@ -132,7 +132,6 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 #if LV_WAYLAND_USE_DMABUF
     lv_wayland_dmabuf_set_draw_buffers(&lv_wl_ctx.dmabuf_ctx, window->lv_disp);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_dmabuf_flush_full_mode);
-    lv_display_set_swap_buf_wait_cb(window->lv_disp, lv_wayland_wait_swap_buf_cb);
 #else
     lv_wayland_shm_set_draw_buffers(&lv_wl_ctx.shm_ctx, window->lv_disp);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_shm_flush_partial_mode);

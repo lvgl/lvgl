@@ -1380,7 +1380,6 @@ static void draw_buf_flush(lv_display_t * disp)
     if(disp->flush_cb) {
         call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
-
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
         if(disp->buf_act == disp->buf_1) {
