@@ -309,32 +309,28 @@ void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager)
 }
 
 char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines,
-                                                 const lv_opengl_shader_t * includes_src, size_t num_items)
+                                                 const lv_opengl_shader_t * src_includes, size_t num_items)
 {
-    if(!c_src || !defines || !includes_src) {
+
+    if(!c_src || !defines || !src_includes) {
         return NULL;
     }
 
     char * rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
-    if(!rep) return NULL;
+    if(!rep) {
+        return NULL;
+    }
 
-    const size_t needed_extra = strlen("\n#include <>") + 1;
+    char search_str[255];
+
     for(size_t i = 0; i < num_items; i++) {
-        char * search_str = (char *)lv_malloc(strlen(includes_src[i].name) + needed_extra);
-        if(!search_str) {
-            lv_free(rep);
-            return NULL;
-        }
+        lv_snprintf(search_str, sizeof(search_str), "\n#include <%s>", src_includes[i].name);
 
-        lv_snprintf(search_str, sizeof(search_str), "\n#include <%s>", includes_src[i].name);
-
-        char * new_rep = replace_word(rep, search_str, includes_src[i].source);
-        lv_free(search_str);
-        if(!new_rep) {
-            lv_free(rep);
-            return NULL;
-        }
+        char * new_rep = replace_word(rep, search_str, src_includes[i].source);
         lv_free(rep);
+        if(!new_rep) {
+            return NULL;
+        }
         rep = new_rep;
     }
 
