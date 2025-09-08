@@ -134,18 +134,18 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     if(!lv_streq(LV_GSTREAMER_FACTORY_URI_DECODE, factory_name)) {
         GstElement * decodebin = gst_element_factory_make("decodebin", "lv_gstreamer_decodebin");
         if(!decodebin) {
-            gst_object_unref(streamer->pipeline);
+            gst_object_unref(pipeline);
             LV_LOG_ERROR("Failed to create decodebin element");
             return LV_RESULT_INVALID;
         }
         if(!gst_bin_add(GST_BIN(pipeline), decodebin)) {
-            gst_object_unref(streamer->pipeline);
+            gst_object_unref(pipeline);
             LV_LOG_ERROR("Failed to add decodebin element to pipeline");
             return LV_RESULT_INVALID;
         }
 
         if(!gst_element_link(head, decodebin)) {
-            gst_object_unref(streamer->pipeline);
+            gst_object_unref(pipeline);
             LV_LOG_ERROR("Failed to link source with parsebin elements");
             return LV_RESULT_INVALID;
         }
@@ -155,7 +155,7 @@ lv_result_t lv_gstreamer_set_src(lv_obj_t * obj, const char * factory_name, cons
     lv_result_t res = gstreamer_create_pipeline(streamer, pipeline, head);
     if(res == LV_RESULT_INVALID) {
         LV_LOG_ERROR("Pipeline creation failed");
-        gst_object_unref(streamer->pipeline);
+        gst_object_unref(pipeline);
         return res;
     }
 
