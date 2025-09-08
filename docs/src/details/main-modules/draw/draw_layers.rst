@@ -176,7 +176,7 @@ To save memory, LVGL can render certain types of layers in smaller chunks:
     chunk is set using :c:macro:`LV_DRAW_LAYER_SIMPLE_BUF_SIZE` in ``lv_conf.h``.
 
 2.  **Transform Layers**:
-    Transform Widgets cannot be rendered in chunks because transformations
+    Transformed Widgets cannot be rendered in chunks because transformations
     often affect pixels outside the given area. For such layers, LVGL allocates
     a buffer large enough to render the entire transformed area without limits.
 

@@ -359,8 +359,12 @@ Call :cpp:expr:`lv_anim_timeline_get_reverse(timeline)` function to get whether 
 Animation Timeline is also played in reverse after its forward play completes.
 
 Call :cpp:expr:`lv_anim_timeline_delete(timeline)` function to delete the Animation Timeline.
-**Note**: If you need to delete a Widget during Animation, be sure to delete the
-Animation Timeline before deleting the Widget. Otherwise, the program may crash or behave abnormally.
+
+.. caution::
+
+    If you need to delete a Widget during Animation, be sure to delete the Animation
+    Timeline before deleting the Widget. Otherwise, the program may crash or behave
+    abnormally.
 
 If a base object is set with :cpp:expr:`lv_anim_timeline_set_base_object(timeline, obj)`,
 ``var`` in the added animations is assumed to be a widget name (or path) string.
