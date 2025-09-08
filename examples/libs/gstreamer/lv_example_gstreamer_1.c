@@ -153,7 +153,7 @@ static void volume_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * streamer = lv_observer_get_target_obj(observer);
     int32_t volume = lv_subject_get_int(subject);
-    LV_LOG_USER("Setting volume %" PRIu32, volume);
+    LV_LOG_USER("Setting volume %" PRId32, volume);
     lv_gstreamer_set_volume(streamer, (uint8_t)volume);
 }
 
