@@ -7,6 +7,7 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 #include "lv_opengl_shader_internal.h"
