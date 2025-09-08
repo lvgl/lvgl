@@ -12,8 +12,6 @@
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../misc/lv_types.h"

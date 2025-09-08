@@ -3,8 +3,6 @@
 
 #include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
-#include <GL/glew.h>
-#include <GL/gl.h>
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"

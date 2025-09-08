@@ -10,7 +10,7 @@
 #include "lv_gltf_bind.h"
 
 #include "../../../misc/lv_array.h"
-#include <GL/gl.h>
+#include "../../../drivers/opengles/lv_opengles_private.h"
 
 #ifdef __cplusplus
 
