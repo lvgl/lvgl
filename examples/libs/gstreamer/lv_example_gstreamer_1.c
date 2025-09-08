@@ -134,7 +134,7 @@ static void control_bar_create(event_data_t * event_data)
     lv_slider_bind_value(position_slider, &event_data->position_subject);
 
     event_data->duration_label = lv_label_create(cont);
-    lv_obj_set_width(event_data->position_label, 80);
+    lv_obj_set_width(event_data->duration_label, 80);
     lv_label_set_text_static(event_data->duration_label, "0:00:000");
     lv_obj_set_style_text_align(event_data->duration_label, LV_TEXT_ALIGN_RIGHT, 0);
 
