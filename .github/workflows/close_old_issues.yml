@@ -15,7 +15,7 @@ jobs:
           stale-issue-message: |
             We need some feedback on this issue.
 
-            Now we mark this as "Abandoned" because there was no activity here for 60 days.
+            Now we mark this as "Stale" because there was no activity here for 60 days.
 
             Remove the "Stale" label or comment else this will be closed in 14 days.
 
@@ -23,9 +23,9 @@ jobs:
           stale-pr-message: |
             We need some feedback on this pull request.
 
-            Now we mark this as "Abandoned" because there was no activity here for 60 days.
+            Now we mark this as "Stale" because there was no activity here for 60 days.
 
-            Remove the "Abandoned" label or comment else this will be closed in 14 days.
+            Remove the "Stale" label or comment else this will be closed in 14 days.
 
             cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           close-issue-message: |
