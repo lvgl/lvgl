@@ -78,7 +78,7 @@ typedef struct _lv_shader_program {
  * GLOBAL PROTOTYPES
  **********************/
 
-char* lv_opengl_shader_manager_process_includes(const char* c_src, const char* defines);
+char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines);
 
 lv_opengl_shader_program_t * lv_opengl_shader_program_create(uint32_t id);
 void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program);

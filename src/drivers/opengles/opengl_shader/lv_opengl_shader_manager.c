@@ -190,9 +190,9 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
     }
 
     uint32_t hash = lv_opengl_shader_hash(shader_identifier);
-    if (needed_buffer_size > 0) {
+    if(needed_buffer_size > 0) {
         needed_buffer_size += 1;
-        char* define = (char *)lv_malloc(needed_buffer_size);
+        char * define = (char *)lv_malloc(needed_buffer_size);
         for(size_t i = 0; i < permutations_len; ++i) {
             if(permutations[i].value) {
                 lv_snprintf(define, needed_buffer_size, "%s%s", permutations[i].name, permutations[i].value);
@@ -320,13 +320,46 @@ void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager)
 
 }
 
+char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines,
+                                                 const lv_opengl_shader_t * includes_src, size_t num_items )
+{
+    if(!c_src || !defines || !includes_src) {
+        return NULL;
+    }
+    
+    char * rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
+    if(!rep) return NULL;
+
+    const size_t needed_extra = strlen("\n#include <>") + 1;    
+    for (size_t i = 0; i < num_items; i++) {
+        char * search_str = (char *)lv_malloc( strlen(includes_src[i].name) + needed_extra);
+        if(!search_str) {
+            free(rep);
+            return NULL;
+        }
+
+        lv_snprintf(search_str, sizeof(search_str), "\n#include <%s>", includes_src[i].name);
+        
+        char * new_rep = replace_word(rep, search_str, includes_src[i].source);
+        lv_free(search_str);
+        if(!new_rep) {
+            free(rep);
+            return NULL;
+        }
+        lv_free(rep);
+        rep = new_rep;
+    }
+    
+    return rep;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static char* replace_word(const char* source, const char* f, const char* r)
+static char * replace_word(const char * source, const char * f, const char * r)
 {
-    if (!source || !f || !r || strlen(f) == 0 || strcmp(f, r) == 0 || !strstr(source, f)) {
+    if(!source || !f || !r || strlen(f) == 0 || strcmp(f, r) == 0 || !strstr(source, f)) {
         return lv_strdup(source);
     }
     
@@ -335,21 +368,21 @@ static char* replace_word(const char* source, const char* f, const char* r)
     size_t r_len = strlen(r);
     
     size_t count = 0;
-    const char* temp = source;
-    while ((temp = strstr(temp, f)) != NULL) {
+    const char * temp = source;
+    while((temp = strstr(temp, f)) != NULL) {
         count++;
         temp += f_len;
     }
     
     size_t new_size = s_len + count * (r_len - f_len) + 1;
-    char* result = lv_malloc(new_size);
+    char * result = lv_malloc(new_size);
     LV_ASSERT_MALLOC(result);
     
-    char* dest = result;
-    const char* src = source;
-    const char* pos;
+    char * dest = result;
+    const char * src = source;
+    const char * pos;
     
-    while ((pos = strstr(src, f)) != NULL) {
+    while((pos = strstr(src, f)) != NULL) {
         size_t prefix_len = pos - src;
         memcpy(dest, src, prefix_len);
         dest += prefix_len;
@@ -363,32 +396,6 @@ static char* replace_word(const char* source, const char* f, const char* r)
     strcpy(dest, src);
     
     return result;
-}
-
-char* lv_opengl_shader_manager_process_includes(const char* c_src, const char* defines, const lv_opengl_shader_t *includes_src, size_t num_items )
-{
-    if (!c_src || !defines || !includes_src) {
-        return NULL;
-    }
-    
-    char* rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
-    if (!rep) return NULL;
-
-    const size_t needed_extra = strlen("\n#include <>") + 1;    
-    for (size_t i = 0; i < num_items; i++) {
-        char *search_str = (char *)lv_malloc( strlen(includes_src[i].name) + needed_extra );
-        if (!search_str) { free(rep); return NULL; }
-
-        lv_snprintf(search_str, sizeof(search_str),"\n#include <%s>",includes_src[i].name);
-        
-        char* new_rep = replace_word(rep, search_str, includes_src[i].source);
-        lv_free(search_str);
-        if (!new_rep) { free(rep); return NULL; }
-        lv_free(rep);
-        rep = new_rep;
-    }
-    
-    return rep;
 }
 
 static lv_rb_compare_res_t
