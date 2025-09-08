@@ -1,8 +1,8 @@
 .. _opengl_driver:
 
-==============
+=============
 OpenGL Driver
-==============
+=============
 
 Overview
 --------
@@ -47,12 +47,19 @@ Basic Usage
     {
         /* initialize lvgl */
         lv_init();
+        /* Don't forget the tick callback */
 
         /* NOTE: OpenGL context must be created before this point */
 
         /* create a display that flushes to a texture */
         lv_display_t * texture = lv_opengles_texture_create(WIDTH, HEIGHT);
-        lv_display_set_default(texture);
+        /*  If you already have an OpenGL texture ready, you can create a LVGL display from it. */
+        //lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id);
+
+        /* Set the display render mode and flush callback 
+         * lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
+         * lv_display_set_flush_cb(display, flush_cb);
+         */
 
         /* get the texture ID for use in your application */
         unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
@@ -65,9 +72,6 @@ Basic Usage
             uint32_t time_until_next = lv_timer_handler();
             if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD;
             lv_delay_ms(time_until_next);
-            
-            /* use texture_id in your OpenGL rendering */
-            your_opengl_render_function(texture_id);
         }
 
         return 0;
