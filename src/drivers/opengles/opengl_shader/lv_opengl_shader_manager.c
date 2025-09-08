@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lv_conf_internal.h"
-#if LV_USE_GLTF
+#if LV_USE_OPENGLES
 #include "lv_opengl_shader_internal.h"
 #include "../../../misc/lv_assert.h"
 #include "../../../misc/lv_log.h"
@@ -16,12 +16,12 @@
 #include "../../../misc/lv_types.h"
 #include "../../../stdlib/lv_mem.h"
 #include "../../../stdlib/lv_sprintf.h"
-#include "../../../drivers/opengles/lv_opengles_private.h"
-#include "../../../drivers/opengles/lv_opengles_debug.h"
+#include "../lv_opengles_private.h"
+#include "../lv_opengles_debug.h"
 #include "../../../stdlib/lv_string.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #include <string.h>
 
 /*********************
@@ -43,6 +43,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static char* replace_word(const char* s, const char* f, const char* r);
 
 static lv_rb_compare_res_t
 shader_source_compare_cb(const lv_opengl_shader_source_t * lhs,
@@ -179,18 +181,28 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
     }
 
     /* Then hash the name with the permutations and see if we already compiled it */
-    uint32_t hash = lv_opengl_shader_hash(shader_identifier);
-    char define[512];
+    size_t needed_buffer_size = 0;
     for(size_t i = 0; i < permutations_len; ++i) {
-        if(permutations[i].value) {
-            lv_snprintf(define, sizeof(define), "%%s%s", permutations[i].name, permutations[i].value);
-        }
-        else {
-            lv_snprintf(define, sizeof(define), "%s", permutations[i].name);
-        }
-        hash ^= lv_opengl_shader_hash(define);
+        LV_ASSERT_NULL(permutations[i].name);
+        needed_buffer_size += strlen(permutations[i].name);
+        if(permutations[i].value) needed_buffer_size += strlen(permutations[i].value);
     }
 
+    uint32_t hash = lv_opengl_shader_hash(shader_identifier);
+    if (needed_buffer_size > 0) {
+        needed_buffer_size += 1;
+        char* define = (char *)lv_malloc(needed_buffer_size);
+        for(size_t i = 0; i < permutations_len; ++i) {
+            if(permutations[i].value) {
+                lv_snprintf(define, needed_buffer_size, "%s%s", permutations[i].name, permutations[i].value);
+            }
+            else {
+                lv_snprintf(define, needed_buffer_size, "%s", permutations[i].name);
+            }
+            hash ^= lv_opengl_shader_hash(define);
+        }
+        lv_free(define);
+    }
     lv_opengl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
         lv_rb_find(&shader->compiled_shaders_map, &shader_map_key);
@@ -310,6 +322,73 @@ void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static char* replace_word(const char* source, const char* f, const char* r)
+{
+    if (!source || !f || !r || strlen(f) == 0 || strcmp(f, r) == 0 || !strstr(source, f)) {
+        return lv_strdup(source);
+    }
+    
+    size_t s_len = strlen(source);
+    size_t f_len = strlen(f);
+    size_t r_len = strlen(r);
+    
+    size_t count = 0;
+    const char* temp = source;
+    while ((temp = strstr(temp, f)) != NULL) {
+        count++;
+        temp += f_len;
+    }
+    
+    size_t new_size = s_len + count * (r_len - f_len) + 1;
+    char* result = lv_malloc(new_size);
+    LV_ASSERT_MALLOC(result);
+    
+    char* dest = result;
+    const char* src = source;
+    const char* pos;
+    
+    while ((pos = strstr(src, f)) != NULL) {
+        size_t prefix_len = pos - src;
+        memcpy(dest, src, prefix_len);
+        dest += prefix_len;
+        
+        memcpy(dest, r, r_len);
+        dest += r_len;
+        
+        src = pos + f_len;
+    }
+    
+    strcpy(dest, src);
+    
+    return result;
+}
+
+char* lv_opengl_shader_manager_process_includes(const char* c_src, const char* defines, const lv_opengl_shader_t *includes_src, size_t num_items )
+{
+    if (!c_src || !defines || !includes_src) {
+        return NULL;
+    }
+    
+    char* rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
+    if (!rep) return NULL;
+
+    const size_t needed_extra = strlen("\n#include <>") + 1;    
+    for (size_t i = 0; i < num_items; i++) {
+        char *search_str = (char *)lv_malloc( strlen(includes_src[i].name) + needed_extra );
+        if (!search_str) { free(rep); return NULL; }
+
+        lv_snprintf(search_str, sizeof(search_str),"\n#include <%s>",includes_src[i].name);
+        
+        char* new_rep = replace_word(rep, search_str, includes_src[i].source);
+        lv_free(search_str);
+        if (!new_rep) { free(rep); return NULL; }
+        lv_free(rep);
+        rep = new_rep;
+    }
+    
+    return rep;
+}
 
 static lv_rb_compare_res_t
 shader_program_compare_cb(const lv_opengl_program_map_key_t * lhs,
@@ -551,4 +630,4 @@ static bool string_ends_with(const char * value, const char * suffix)
     return lv_streq(value + value_len - suffix_len, suffix);
 }
 
-#endif /*LV_USE_GLTF*/
+#endif /*LV_USE_OPENGLES*/

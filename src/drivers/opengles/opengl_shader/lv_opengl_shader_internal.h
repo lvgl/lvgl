@@ -8,7 +8,7 @@
 
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_GLTF
+#if LV_USE_OPENGLES
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
 #include "../../../misc/lv_types.h"
@@ -78,6 +78,8 @@ typedef struct _lv_shader_program {
  * GLOBAL PROTOTYPES
  **********************/
 
+char* lv_opengl_shader_manager_process_includes(const char* c_src, const char* defines);
+
 lv_opengl_shader_program_t * lv_opengl_shader_program_create(uint32_t id);
 void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program);
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program);
@@ -105,5 +107,5 @@ lv_opengl_shader_program_t * lv_opengl_shader_manager_get_program(lv_opengl_shad
 } /*extern "C"*/
 #endif
 
-#endif /*LV_USE_GLTF*/
+#endif /*LV_USE_OPENGLES*/
 #endif /*LV_OPENGL_SHADER_INTERNAL_H*/

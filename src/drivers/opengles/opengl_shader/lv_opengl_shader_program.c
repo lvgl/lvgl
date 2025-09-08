@@ -9,7 +9,7 @@
 
 #include "lv_opengl_shader_internal.h"
 
-#if LV_USE_GLTF
+#if LV_USE_OPENGLES
 
 #include "../lv_opengles_private.h"
 #include "../lv_opengles_debug.h"
@@ -118,4 +118,4 @@ static void update_uniform_1f(lv_opengl_shader_program_t * program, const char *
     GL_CALL(glUniform1f(location, value));
 }
 
-#endif /*LV_USE_GLTF*/
+#endif /*LV_USE_OPENGLES*/
