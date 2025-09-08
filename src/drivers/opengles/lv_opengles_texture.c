@@ -13,6 +13,7 @@
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
+#include "lv_opengles_driver.h"
 #include "../../display/lv_display_private.h"
 
 #include <stdlib.h>
@@ -133,6 +134,7 @@ static lv_display_t * lv_opengles_texture_create_common(int32_t w, int32_t h)
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_driver_data(disp, dsc);
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
+    lv_opengles_init();
     return disp;
 }
 
