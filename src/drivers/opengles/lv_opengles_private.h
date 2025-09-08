@@ -19,9 +19,10 @@ extern "C" {
 
 #if LV_USE_EGL
 #include <GLES/gl.h>
-#include <GLES/glext.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
+#include <GLES/glext.h>
+#include <GLES2/gl2ext.h>
 #else
 /* For now, by default we add glew and glfw.
    In the future we need to consider adding a config for setting these includes*/

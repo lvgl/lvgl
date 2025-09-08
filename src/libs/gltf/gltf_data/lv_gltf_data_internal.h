@@ -3,8 +3,6 @@
 
 #include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
-#include <GL/glew.h>
-#include <GL/gl.h>
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
@@ -239,24 +237,6 @@ void lv_gltf_data_destroy(lv_gltf_model_t * _data);
 void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from);
 
 /**
- * @brief Retrieve information about a specific texture in a GLTF model.
- *
- * @param data_obj Pointer to the lv_gltf_data_t object containing the model data.
- * @param model_texture_index The index of the texture in the model.
- * @param mipmapnum The mipmap level to retrieve information for.
- * @param byte_count Pointer to a size_t variable to store the byte count of the texture.
- * @param width Pointer to a uint32_t variable to store the width of the texture.
- * @param height Pointer to a uint32_t variable to store the height of the texture.
- * @param has_alpha Pointer to a bool variable to indicate if the texture has an alpha channel.
- * @return True if the texture information was successfully retrieved, false otherwise.
- */
-bool lv_gltf_data_get_texture_info(lv_gltf_model_t * data_obj,
-                                   uint32_t model_texture_index,
-                                   uint32_t mipmapnum, size_t * byte_count,
-                                   uint32_t * width, uint32_t * height,
-                                   bool * has_alpha);
-
-/**
  * @brief Swap the red and blue channels in a pixel buffer.
  *
  * @param pixel_buffer Pointer to the pixel buffer containing the image data.
@@ -266,18 +246,6 @@ bool lv_gltf_data_get_texture_info(lv_gltf_model_t * data_obj,
 void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              size_t byte_total_count,
                              bool has_alpha);
-
-/**
- * @brief Convert a texture from a GLTF model to an image descriptor.
- *
- * @param new_image_dsc Pointer to the lv_image_dsc_t structure to be populated with the image data.
- * @param data_obj Pointer to the lv_gltf_data_t object containing the model data.
- * @param model_texture_index The index of the texture in the model to convert.
- */
-void lv_gltf_data_texture_to_image_dsc(lv_image_dsc_t * new_image_dsc,
-                                       lv_gltf_model_t * data_obj,
-                                       uint32_t model_texture_index);
-
 
 
 #endif /*LV_USE_GLTF*/
