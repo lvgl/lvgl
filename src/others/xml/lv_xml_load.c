@@ -12,7 +12,6 @@
 
 #include "lv_xml_private.h"
 #include "../../libs/expat/expat.h"
-#include "../../font/lv_binfont_loader.h"
 
 /*********************
  *      DEFINES
@@ -54,9 +53,21 @@ static void load_from_file_start_element_handler(void * user_data, const char * 
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_xml_load_all(const char * path)
+lv_result_t lv_xml_load_all_from_path(const char * path)
 {
     char path_buf[LV_FS_MAX_PATH_LENGTH];
+
+    /* set the default asset path to the pack path so XML asset paths are relative to it */
+    const char * asset_path = path;
+    /* end the asset path with a '/' */
+    char path_last_char = path[0] ? path[lv_strlen(path) - 1] : '\0';
+    if(path_last_char != '\0' && path_last_char != ':'
+       && path_last_char != '/' && path_last_char != '\\') {
+        lv_snprintf(path_buf, sizeof(path_buf), "%s/", path);
+        asset_path = path_buf;
+    }
+    lv_xml_set_default_asset_path(asset_path);
+
     return load_all_recursive(path_buf, path);
 }
 
@@ -119,9 +130,6 @@ dir_close_out:
 
 static void load_from_file(const char * path)
 {
-    lv_image_header_t img_header;
-    lv_font_t * font;
-
     const char * ext = lv_fs_get_ext(path);
 
     if(lv_streq(ext, "xml")) {
@@ -207,32 +215,8 @@ static void load_from_file(const char * path)
 
         lv_free(xml_buf);
     }
-    else if(LV_RESULT_OK == lv_image_decoder_get_info(path, &img_header)) {
-        char * img_name = path_filename_without_extension(path);
-        lv_xml_register_image(NULL, img_name, path);
-        lv_free(img_name);
-    }
-    else if(NULL != (font = lv_binfont_create(path))) {
-        lv_xml_component_scope_t * scope = lv_xml_component_get_scope("globals");
-        if(scope) {
-            char * font_name = path_filename_without_extension(path);
-            lv_xml_register_font(scope, font_name, font);
-            lv_xml_font_t * new_font;
-            LV_LL_READ(&scope->font_ll, new_font) {
-                if(lv_streq(new_font->name, font_name))  {
-                    new_font->font_destroy_cb = lv_binfont_destroy;
-                    break;
-                }
-            }
-            lv_free(font_name);
-        }
-        else {
-            LV_LOG_WARN("No global scope found to register font '%s' from pack", path);
-            lv_binfont_destroy(font);
-        }
-    }
     else {
-        LV_LOG_WARN("Did not use '%s' from XML pack.", path);
+        LV_LOG_INFO("Did not use '%s' from XML pack.", path);
     }
 }
 
@@ -253,7 +237,7 @@ static void load_from_file_start_element_handler(void * user_data, const char * 
     LV_UNUSED(attrs);
     load_from_file_parser_data_t * data = user_data;
 
-    if(lv_streq(name, "component") || lv_streq(name, "screen")) {
+    if(lv_streq(name, "component") || lv_streq(name, "screen") || lv_streq(name, "globals")) {
         data->type = LV_XML_TYPE_COMPONENT;
     }
     else if(lv_streq(name, "translations")) {
