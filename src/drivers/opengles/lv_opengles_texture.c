@@ -66,6 +66,19 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     return disp;
 }
 
+lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, unsigned int texture_id)
+{
+
+    lv_display_t * disp = lv_opengles_texture_create_common(w, h);
+    if(!disp) {
+        return NULL;
+    }
+    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+    dsc->texture_id = texture_id;
+    return disp;
+
+}
+
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
