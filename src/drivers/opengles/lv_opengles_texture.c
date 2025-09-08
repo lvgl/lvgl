@@ -31,6 +31,7 @@ typedef struct {
 #if !LV_USE_DRAW_OPENGLES
     uint8_t * fb1;
 #endif /*!LV_USE_DRAW_OPENGLES*/
+    bool is_texture_owner;
 } lv_opengles_texture_t;
 
 /**********************
@@ -64,6 +65,7 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
     unsigned int texture_id = create_texture(w, h);
     dsc->texture_id = texture_id;
+    dsc->is_texture_owner = true;
     return disp;
 }
 
@@ -76,6 +78,7 @@ lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, 
     }
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
     dsc->texture_id = texture_id;
+    dsc->is_texture_owner = false;
     return disp;
 
 }
@@ -213,7 +216,9 @@ static void release_disp_cb(lv_event_t * e)
 #if !LV_USE_DRAW_OPENGLES
     free(dsc->fb1);
 #endif /*!LV_USE_DRAW_OPENGLES*/
-    GL_CALL(glDeleteTextures(1, &dsc->texture_id));
+    if(dsc->is_texture_owner) {
+        GL_CALL(glDeleteTextures(1, &dsc->texture_id));
+    }
     lv_free(dsc);
 }
 
