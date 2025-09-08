@@ -180,27 +180,17 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
     }
 
     /* Then hash the name with the permutations and see if we already compiled it */
-    size_t needed_buffer_size = 0;
+    char define[512];
+    uint32_t hash = lv_opengl_shader_hash(shader_identifier);
     for(size_t i = 0; i < permutations_len; ++i) {
         LV_ASSERT_NULL(permutations[i].name);
-        needed_buffer_size += strlen(permutations[i].name);
-        if(permutations[i].value) needed_buffer_size += strlen(permutations[i].value);
-    }
-
-    uint32_t hash = lv_opengl_shader_hash(shader_identifier);
-    if(needed_buffer_size > 0) {
-        needed_buffer_size += 1;
-        char * define = (char *)lv_malloc(needed_buffer_size);
-        for(size_t i = 0; i < permutations_len; ++i) {
-            if(permutations[i].value) {
-                lv_snprintf(define, needed_buffer_size, "%s%s", permutations[i].name, permutations[i].value);
-            }
-            else {
-                lv_snprintf(define, needed_buffer_size, "%s", permutations[i].name);
-            }
-            hash ^= lv_opengl_shader_hash(define);
+        if(permutations[i].value) {
+            lv_snprintf(define, sizeof(define), "%s%s", permutations[i].name, permutations[i].value);
         }
-        lv_free(define);
+        else {
+            lv_snprintf(define, sizeof(define), "%s", permutations[i].name);
+        }
+        hash ^= lv_opengl_shader_hash(define);
     }
     lv_opengl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
