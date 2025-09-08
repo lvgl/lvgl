@@ -13,6 +13,8 @@ extern "C" {
 #include "../../../misc/lv_color.h"
 #include "../../lv_draw_buf.h"
 
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
+
 /*********************
  *      DEFINES
  *********************/
@@ -47,7 +49,7 @@ lv_result_t _lv_draw_buf_convert_premultiply_indexed_neon(lv_draw_buf_t * buf);
  * @param buf     pointer to a draw buf
  */
 lv_result_t _lv_draw_buf_convert_premultiply_argb8888_neon(lv_draw_buf_t * buf);
-
+#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON*/
 
 #ifdef __cplusplus
 } /* extern "C" */
