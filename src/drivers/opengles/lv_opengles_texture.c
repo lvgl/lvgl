@@ -27,7 +27,9 @@
 
 typedef struct {
     unsigned int texture_id;
+#if !LV_USE_DRAW_OPENGLES
     uint8_t * fb1;
+#endif /*!LV_USE_DRAW_OPENGLES*/
 } lv_opengles_texture_t;
 
 /**********************
@@ -174,7 +176,9 @@ static void release_disp_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_user_data(e);
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+#if !LV_USE_DRAW_OPENGLES
     free(dsc->fb1);
+#endif /*!LV_USE_DRAW_OPENGLES*/
     GL_CALL(glDeleteTextures(1, &dsc->texture_id));
     lv_free(dsc);
 }
