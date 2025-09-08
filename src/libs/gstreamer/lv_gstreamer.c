@@ -50,7 +50,7 @@ const lv_obj_class_t lv_gstreamer_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_gstreamer_t),
     .base_class = &lv_image_class,
-    .name = "gstreamer",
+    .name = "lv_gstreamer",
 };
 
 /**********************
