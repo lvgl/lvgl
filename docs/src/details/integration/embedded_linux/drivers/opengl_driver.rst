@@ -57,8 +57,8 @@ Basic Usage
         //lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id);
 
         /* Set the display render mode and flush callback 
-         * lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
-         * lv_display_set_flush_cb(display, flush_cb);
+         * lv_display_set_render_mode(texture, LV_DISPLAY_RENDER_MODE_FULL);
+         * lv_display_set_flush_cb(texture, flush_cb);
          */
 
         /* get the texture ID for use in your application */
