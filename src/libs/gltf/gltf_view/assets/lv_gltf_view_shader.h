@@ -21,8 +21,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define GLSL_VERSION_PREFIX "#version 300 es\n"
-
 /**********************
  *      TYPEDEFS
  **********************/

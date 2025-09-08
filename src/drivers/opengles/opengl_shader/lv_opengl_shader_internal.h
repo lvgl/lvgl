@@ -26,6 +26,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define GLSL_VERSION_PREFIX "#version 300 es\n"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -78,7 +80,8 @@ typedef struct _lv_shader_program {
  * GLOBAL PROTOTYPES
  **********************/
 
-char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines);
+char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines,
+                                                 const lv_opengl_shader_t * includes_src, size_t num_items);
 
 lv_opengl_shader_program_t * lv_opengl_shader_program_create(uint32_t id);
 void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program);

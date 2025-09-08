@@ -21,8 +21,6 @@
 #include "../lv_opengles_debug.h"
 #include "../../../stdlib/lv_string.h"
 
-#include <GL/glew.h>
-//#include <GLFW/glfw3.h>
 #include <string.h>
 
 /*********************
@@ -334,7 +332,7 @@ char * lv_opengl_shader_manager_process_includes(const char * c_src, const char 
     for(size_t i = 0; i < num_items; i++) {
         char * search_str = (char *)lv_malloc(strlen(includes_src[i].name) + needed_extra);
         if(!search_str) {
-            free(rep);
+            lv_free(rep);
             return NULL;
         }
 
@@ -343,7 +341,7 @@ char * lv_opengl_shader_manager_process_includes(const char * c_src, const char 
         char * new_rep = replace_word(rep, search_str, includes_src[i].source);
         lv_free(search_str);
         if(!new_rep) {
-            free(rep);
+            lv_free(rep);
             return NULL;
         }
         lv_free(rep);
