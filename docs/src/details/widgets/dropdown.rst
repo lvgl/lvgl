@@ -143,7 +143,7 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget) so a
 user's direct interaction with the Drop-Down Widget updates the Subject's value and
 vice versa.
 
-It support only integer subjects.
+It support only integer Subjects.
 
 - :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
 
