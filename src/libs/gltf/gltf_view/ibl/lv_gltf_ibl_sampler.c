@@ -108,9 +108,10 @@ static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
     sampler->lut_resolution = 1024;
     sampler->lut_sample_count = 64;
     sampler->scale_value = 1.0;
-    lv_gltf_view_shader_t env_shader;
-    lv_gltf_view_shader_get_env(&env_shader);
-    sampler->shader_manager = lv_opengl_shader_manager_create(env_shader.shader_list, env_shader.count, NULL, NULL);
+    lv_opengl_shader_portions_t env_shader_portions;
+    lv_gltf_view_shader_get_env(&env_shader_portions);
+    sampler->shader_manager = lv_opengl_shader_manager_create(env_shader_portions.all, env_shader_portions.count, NULL,
+                                                              NULL);
 }
 
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)

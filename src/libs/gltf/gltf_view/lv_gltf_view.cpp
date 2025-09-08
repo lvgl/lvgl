@@ -468,11 +468,11 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->texture.v_flip = false;
     new(&view->ibm_by_skin_then_node) std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
-    lv_gltf_view_shader_t shaders;
-    lv_gltf_view_shader_get_src(&shaders);
+    lv_opengl_shader_portions_t portions;
+    lv_gltf_view_shader_get_src(&portions);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
     char * frag_shader = lv_gltf_view_shader_get_fragment();
-    view->shader_manager = lv_opengl_shader_manager_create(shaders.shader_list, shaders.count, vertex_shader, frag_shader);
+    view->shader_manager = lv_opengl_shader_manager_create(portions.all, portions.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
