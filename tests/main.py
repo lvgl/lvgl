@@ -25,7 +25,6 @@ build_only_options = {
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
     'OPTIONS_24BIT': 'Normal config, 24 bit color depth',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
-    'OPTIONS_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
 }
 
 if platform.system() != 'Windows':
