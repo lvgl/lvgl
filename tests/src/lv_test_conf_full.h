@@ -165,12 +165,6 @@
     #define LV_LIBINPUT_XKB     1
 #endif
 
-#ifndef LV_USE_OPENGLES
-    #if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
-        #define LV_USE_OPENGLES 1
-    #endif
-#endif
-
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_USE_LVGL_PORT 0
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 64
