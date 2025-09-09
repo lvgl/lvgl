@@ -201,8 +201,8 @@ EVE Register Access
 -------------------
 
 The functions :cpp:func:`lv_draw_eve_memread8`, :cpp:func:`lv_draw_eve_memread16`, :cpp:func:`lv_draw_eve_memread32`,
-:cpp:func:`lv_draw_eve_memwrite8`, :cpp:func:`lv_draw_eve_memwrite16`, are :cpp:func:`lv_draw_eve_memwrite32`
-available if needed. They are wrappers around ``EVE_memRead8``, etc.
+:cpp:func:`lv_draw_eve_memwrite8`, :cpp:func:`lv_draw_eve_memwrite16`, and :cpp:func:`lv_draw_eve_memwrite32`
+are available if needed. They are wrappers around ``EVE_memRead8()``, etc.
 
 Register definitions and other EVE enumerations are available when you include
 ``lvgl.h`` under the prefix namespace ``LV_EVE_``. I.e., ``REG_ID`` is available

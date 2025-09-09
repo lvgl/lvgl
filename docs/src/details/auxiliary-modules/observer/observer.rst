@@ -459,14 +459,15 @@ Specific Widget Types
 To learn how to bind subjects to Arcs, Labels, Sliders, etc. visit the "Data binding"
 section of the given widget's documentation. For example: :ref:`Data binding for lv_label <lv_label_data_binding>`.
 
+
 Change Subject on Event
 -----------------------
 
-It's a common requirement to update a subject based on a user action (trigger).
+It's a common requirement to update a Subject based on a user action (trigger).
 To simplify this, *subject set* and *increment* actions can be attached directly to any widget.
 
 Internally, these are implemented as special event callbacks.
-Note: these callbacks are **not** automatically removed when a subject is deinited.
+Note: these callbacks are **not** automatically removed when a subject is de-initialized.
 
 Increment
 ~~~~~~~~~
