@@ -1,3 +1,5 @@
+.. _esp_dma2d:
+
 =======================================
 2D Direct Memory Access (DMA2D) Support
 =======================================
@@ -16,7 +18,7 @@ these data into fixed size blocks, called bursts. Also the DMA2D is used to pick
 output chunks from the PPA client and copy over to the destination buffer, or the display
 frame-buffer.
 
-More information about PPA can be found in: :ref:`PPA (Pixel Processing Accelerator) Support <hardware_accelerator_ppa>`.
+More information about PPA can be found in: :ref:`PPA (Pixel Processing Accelerator) Support <esp_ppa>`.
 
 Interacting to the DMA2D
 ------------------------

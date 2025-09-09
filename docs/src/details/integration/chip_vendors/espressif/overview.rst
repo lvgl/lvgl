@@ -62,10 +62,10 @@ Espressif, via its component manager system, provides a ready to use
 LVGL porting component, which is the recommended and preferred way of 
 integrating input and output devices from the ESP32 chip to the LVGL
 Display subsystem, this component is covered in
-:ref:`Add LVGL to an ESP32 IDF project <add_lvgl_to_esp32_idf_project>`
+:ref:`Add LVGL to an ESP32 IDF project <lvgl_esp_idf>`
 
 Besides the display controller, some ESP32 chips offer graphical hardware
 acceleration peripherals like:
 
-- :ref:`Support 2D Direct Memory Access (DMA2D) <hardware_accelerator_dma2d>`
-- :ref:`Support for Pixel Processing Accelerator <hardware_accelerator_ppa>`
+- :ref:`Support 2D Direct Memory Access (DMA2D) <esp_dma2d>`
+- :ref:`Support for Pixel Processing Accelerator <esp_ppa>`
