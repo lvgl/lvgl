@@ -428,6 +428,7 @@ else()
         include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
+        set(TEST_ENABLE_OPENGLES 1)
     else()
         message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
         add_definitions(-DLV_USE_OPENGLES=0)
@@ -530,10 +531,10 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         target_link_libraries(${test_name} PRIVATE ${SDL_LIBRARY})
     endif()
 
-	if (NOT $ENV{NON_AMD64_BUILD})
-	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
-	endif()
+    if (TEST_ENABLE_OPENGLES)
+        target_link_libraries(${test_name} PRIVATE
+            ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+    endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
