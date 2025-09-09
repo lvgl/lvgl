@@ -36,7 +36,8 @@ typedef void (*lv_delay_cb_t)(uint32_t ms);
  **********************/
 
 /**
- * You have to call this function periodically
+ * You have to call this function periodically.
+ * It is typically safe to call from an interrupt handler or a different thread.
  * @param tick_period   the call period of this function in milliseconds
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period);
