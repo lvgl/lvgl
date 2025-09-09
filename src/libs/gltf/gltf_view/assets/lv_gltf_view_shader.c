@@ -5,7 +5,7 @@
 #include "../../../../stdlib/lv_sprintf.h"
 #include <string.h>
 
-const lv_opengl_shader_t src_includes[] = {
+static const lv_opengl_shader_t src_includes[] = {
 	{ "tonemapping.glsl", R"(
 
         uniform float u_Exposure;
@@ -2696,7 +2696,7 @@ const lv_opengl_shader_t src_includes[] = {
     )" },
 };
 
-static lv_opengl_shader_t env_src_includes[] = {
+static const lv_opengl_shader_t env_src_includes[] = {
 	{ "fullscreen.vert", R"(
         precision highp float;
 
