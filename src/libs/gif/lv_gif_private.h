@@ -36,6 +36,8 @@ extern "C" {
 struct _lv_gif_t {
     lv_image_t img;
     GIFIMAGE gif;
+    const void * src;
+    lv_color_format_t color_format;
     lv_timer_t * timer;
     lv_image_dsc_t imgdsc;
     int32_t loop_count;

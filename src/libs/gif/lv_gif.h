@@ -42,6 +42,15 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 lv_obj_t * lv_gif_create(lv_obj_t * parent);
 
 /**
+ * Set the color format of the internally allocated framebuffer that the gif
+ * will be decoded to. The default is LV_COLOR_FORMAT_ARGB8888.
+ * Call this before `lv_gif_set_src` to avoid reallocating the framebuffer.
+ * @param obj            pointer to a gif object
+ * @param color_format   the color format of the gif framebuffer
+ */
+void lv_gif_set_color_format(lv_obj_t * obj, lv_color_format_t color_format);
+
+/**
  * Set the gif data to display on the object
  * @param obj       pointer to a gif object
  * @param src       1) pointer to an ::lv_image_dsc_t descriptor (which contains gif raw data) or
