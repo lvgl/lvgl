@@ -389,7 +389,7 @@ integrity of the license file included in the package. In LVGL repository,
 there is a LICENSE.txt. To get the value of the hash of the file, you can do
 this command: ``md5sum LICENSE.txt``
 
-SRC_URI: Specifies the locations of the source code and patches for the recipe:
+**SRC_URI**: Specifies the locations of the source code and patches for the recipe:
 
 - The main source repository for LVGL specifying the master branch.
 - The following arguments are the local patch files that will be applied to
@@ -409,7 +409,8 @@ configuration step.
 **S**: This variable defines the source directory where the unpacked source
 code will be located after fetching. ``${WORKDIR}`` is a standard
 variable in BitBake that points to the working directory for the recipe.
-require: This line includes another configuration file, ``lv-conf.inc``,
+
+**require**: This line includes another configuration file, ``lv-conf.inc``,
 which likely contains additional configuration options or variables
 specific to the LVGL library.
 

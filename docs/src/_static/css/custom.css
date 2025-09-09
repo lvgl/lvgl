@@ -1111,7 +1111,8 @@ figure figcaption .caption-text {
   font-size: 0.8rem;
 }
 
-article figure {
+article figure,
+article img {
   margin-bottom: 2rem;
 }
 

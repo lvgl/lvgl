@@ -37,7 +37,7 @@ find the unpacked source.
 
 As an example, assume a Source Directory top-level folder named poky and a
 default Build Directory at poky/build. In this case, the work directory the
-build system uses to keep the unpacked recipe for db is the following:
+build system uses to keep the unpacked recipe for db (Berkeley DB) is the following:
 
 .. code-block:: bash
 
