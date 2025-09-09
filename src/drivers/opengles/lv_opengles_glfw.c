@@ -567,6 +567,8 @@ static void window_update_handler(lv_timer_t * t)
 
 static void glfw_error_cb(int error, const char * description)
 {
+    LV_UNUSED(error);
+    LV_UNUSED(description);
     LV_LOG_ERROR("GLFW Error %d: %s", error, description);
 }
 

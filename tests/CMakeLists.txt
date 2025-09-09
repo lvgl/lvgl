@@ -73,6 +73,10 @@ set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
 
+set(LVGL_TEST_OPTIONS_OPENGLES
+    -DLV_TEST_OPTION=8
+)
+
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
 )
@@ -151,6 +155,12 @@ elseif (OPTIONS_TEST_VG_LITE)
         # Set a tolerance value for the VG-Lite tests.
         add_definitions(-DREF_IMG_TOLERANCE=9)
     endif()
+elseif (OPTIONS_TEST_OPENGLES)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_OPENGLES} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_opengles/")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
