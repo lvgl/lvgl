@@ -52,7 +52,7 @@ setting the DMA2D flag to true:
         };
 
         esp_lcd_panel_dev_config_t lcd_dev_config = {
-            .reset_gpio_num = UI_FIRWARE_PIN_NUM_LCD_RST,
+            .reset_gpio_num = UI_FIRMWARE_PIN_NUM_LCD_RST,
             .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
             .bits_per_pixel = 24,
             .vendor_config = &vendor_config,

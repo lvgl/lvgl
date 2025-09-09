@@ -85,7 +85,7 @@ a message on the monitor console that indicates error when esp32 calls the
 This happens because PPA only accepts chunks of data that are aligned to the 
 cache L1 line size, that is it 64-bytes, even though the PPA draw unit handles
 the alignment of the source buffer, the target draw buffer area should be also
-aligned otherwise the transfer from PPA to it will may fail. To prevent this 
+aligned otherwise the transfer from PPA to it may fail. To prevent this 
 behavior is interesting to make `CONFIG_LV_DRAW_BUF_ALIGN` to be a multiple of the
 cache L1 line size, that is it, set its value to `64` instead of the default of `4`.
 
@@ -94,7 +94,7 @@ cache L1 line size, that is it, set its value to `64` instead of the default of 
         CONFIG_LV_DRAW_BUF_ALIGN=64
 
 
-EPS32-P4 monitor log reports buffer underrun and frame-rate decreases
+ESP32-P4 monitor log reports buffer underrun and frame-rate decreases
 ---------------------------------------------------------------------
 
 In cases when the PSRAM is enabled and the PPA is used, it is common to see

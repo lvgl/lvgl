@@ -5,7 +5,7 @@ Add LVGL to an ESP32 IDF project
 ================================
 
 
-LVGL can be used and configured as standard `ESP-IDF <https://github.com/espressif/esp-idf>`__ component.
+LVGL can be used and configured as a standard `ESP-IDF <https://github.com/espressif/esp-idf>`__ component.
 
 If you are new to ESP-IDF, follow the instructions in the `ESP-IDF Programming guide <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html>`__ to install and set up ESP-IDF on your machine.
 
@@ -45,14 +45,14 @@ For LVGL development and testing, it may be useful to use LVGL as a local compon
 
 .. note::
 
-   All components from ``${project_dir}/components`` are automatically added to build.
+   All components from ``${project_dir}/components`` are automatically added to the build.
 
 Display Integration
 -------------------
 
-For successful LVGL project you will need a display driver and optionally a touch driver. Espressif provides these drivers that are built on its `esp_lcd <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/lcd/index.html>`__ component.
+For a successful LVGL project, you will need a display driver and optionally a touch driver. Espressif provides these drivers that are built on its `esp_lcd <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/lcd/index.html>`__ component.
 
--  esp_lcd natively supports for some `basic displays <https://github.com/espressif/esp-idf/tree/master/components/esp_lcd/src>`__
+-  esp_lcd natively supports some `basic displays <https://github.com/espressif/esp-idf/tree/master/components/esp_lcd/src>`__
 -  Other displays are maintained in `esp-bsp repository <https://github.com/espressif/esp-bsp/tree/master/components/lcd>`__ and are uploaded to ESP Registry
 -  Touch drivers are maintained in `esp-bsp repository <https://github.com/espressif/esp-bsp/tree/master/components/lcd_touch>`__ and are uploaded to ESP Registry
 
@@ -81,14 +81,14 @@ IDF project.
 Starting the LVGL component
 ---------------------------
 
-Once the user has been configured the IDF project and the LVGL component, all 
+Once the IDF project and the LVGL component have been configured, all 
 the early initialization process inside of the code will be ready to use, however
 the user should manually start the LVGL subsystem for IDF by calling `bsp_display_start()`, 
 or `lvgl_port_init()` if LVGL was manually configured, for example without using
 the `esp_bsp` component. 
 
-After calling this function the LVGL will be running in background, that is it, 
-different than usual, there is no need to periodic call :cpp:expr:` lv_timer_handler()`,
+After calling this function, LVGL will be running in the background; that is, 
+unlike the usual approach, there is no need to periodically call :cpp:expr:`lv_timer_handler()`,
 this function is called by a background task managed by the IDF.
 
 .. code-block:: c

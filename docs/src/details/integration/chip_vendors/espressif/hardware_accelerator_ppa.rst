@@ -11,7 +11,7 @@ DMA-2D hardware which is responsible to move the input/output buffers into/from 
 Supported devices
 -----------------
 
-The Espressif targets that supports the PPA are:
+The Espressif targets that support the PPA are:
 
 - ESP32-P4 series.
 
@@ -20,8 +20,8 @@ Using the LVGL PPA draw unit on your ESP-IDF project
 ----------------------------------------------------
 
 LVGL supports, in experimental level, the filling and the image blending
-acceleration through the PPA, the user can enable it inside their ``sdkconfig.default`` by
-adding the following option to enable the PPA draw unit in conjunction to the software render:
+acceleration through the PPA, the user can enable it in their ``sdkconfig.defaults`` by
+adding the following option to enable the PPA draw unit in conjunction with the software renderer:
 
    .. code:: c
 
@@ -44,7 +44,7 @@ Limitations
 -----------
 
 Please notice that the PPA is at experimental level where some performance gains are expected on drawing tasks related
-to rectangle copy or filling, while for image blending, even though it is operational, there is no significant gains,
+to rectangle copy or filling, while for image blending, even though it is operational, there are no significant gains,
 the initial cause for that according to the PPA section from reference manual is due to the DMA-2D memory bandwidth.
 
 
@@ -66,7 +66,7 @@ PPA rotation and mirror client.
 When compared to pure software rotation, using the PPA to rotate the objects
 can save up 40% of rendering time in average, while keeping the CPU in idle 
 saving power, or using it to perform other tasks, PPA rotation is asynchronous,
-and once started it will signals the application using its dedicated interrupt.
+and once started it will signal the application using its dedicated interrupt.
 
 To enable such behavior on the display driver, the PPA acceleration should
 be set on the project `sdkconfig.defaults` via the symbol `CONFIG_LVGL_PORT_ENABLE_PPA`,
