@@ -1007,6 +1007,7 @@ static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_
     dst->stroke_dsc.cap = src->stroke_dsc.cap;
     dst->stroke_dsc.join = src->stroke_dsc.join;
     dst->stroke_dsc.miter_limit = src->stroke_dsc.miter_limit;
+    lv_array_clear(&(dst->stroke_dsc.dash_pattern));
     lv_array_copy(&(dst->stroke_dsc.dash_pattern), &(src->stroke_dsc.dash_pattern));
     lv_memcpy(&(dst->stroke_dsc.gradient), &(src->stroke_dsc.gradient), sizeof(lv_vector_gradient_t));
     lv_memcpy(&(dst->stroke_dsc.matrix), &(src->stroke_dsc.matrix), sizeof(lv_matrix_t));
@@ -1286,6 +1287,7 @@ static void _special_render(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * d
         dst->stroke_dsc.miter_limit = src->stroke_dsc.miter_limit;
     }
     if(obj->flags & _RENDER_ATTR_STROKE_DASH_ARRAY) {
+        lv_array_clear(&(dst->stroke_dsc.dash_pattern));
         lv_array_copy(&(dst->stroke_dsc.dash_pattern), &(src->stroke_dsc.dash_pattern));
     }
 }
