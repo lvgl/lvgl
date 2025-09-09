@@ -35,9 +35,9 @@ Create beautiful UIs for any MCU, MPU and display type.
                 <h3>Going deeper</h3>
                 <p>Get your feet wet with LVGL.</p>
             </a>
-            <a href="details/integration/adding-lvgl-to-your-project/index.html" class="home-card">
+            <a href="details/integration/index.html" class="home-card">
                 <svg><use href="#svg-home-integration"></use></svg>
-                <h3>Add LVGL to your project</h3>
+                <h3>Integrating LVGL into Your Project</h3>
                 <p>Learn how to add LVGL to your project for any platform, framework and display type.</p>
             </a>
             <a href="details/widgets/index.html" class="home-card">
@@ -93,30 +93,4 @@ Appendix
     contributing/index
     CHANGELOG
     API/index
-
-
-.. The below toctree directive is merely to eliminate 2 Sphinx warnings that these 2
-   files are "not included in any toctree".  Their sole purpose is so that any reader
-   noticing the URL structure and (as an experiment) browsing to
-
-   https://docs.lvgl.io/master/intro/
-
-   or
-
-   https://docs.lvgl.io/master/details/
-
-   will not be met by a 404 (File not found) error from the docs server.
-
-   Note:  this must be accompanied by "'includehidden': False" in `conf.py` in the
-   `html_theme_options` dictionary so that these 2 files do not appear as redundant
-   entries in the top-level navigation tree.  (This is the only toctree directive
-   with the :hidden: attribute.)
-
-.. Commenting out the below for Furo theme.
-    .. toctree::
-        :hidden:
-
-        intro/index
-        details/index
-
 

@@ -1,0 +1,131 @@
+=========================
+X11 Display/Inputs driver
+=========================
+
+Overview
+--------
+
+The **X11** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/x11>`__
+offers support for simulating the LVGL display and keyboard/mouse inputs in an X11
+desktop window.
+
+It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
+
+The main purpose for this driver is for testing/debugging the LVGL application in a
+**Linux** simulation window.
+
+
+Prerequisites
+-------------
+
+The X11 driver uses XLib to access the linux window manager.
+
+1. Install XLib: ``sudo apt-get install libx11-6`` (should be installed already)
+2. Install XLib development package: ``sudo apt-get install libx11-dev``
+
+
+Configure X11 driver
+--------------------
+
+1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
+    .. code-block:: c
+
+        #define LV_USE_X11  1
+
+2. Optional configuration options:
+    -  Direct Exit
+        .. code-block:: c
+
+            #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
+            // or
+            #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler */
+
+
+    -  Double buffering
+        .. code-block:: c
+
+            #define LV_X11_DOUBLE_BUFFER  1 /* preferred default */
+            // or
+            #define LV_X11_DOUBLE_BUFFER  0 /* not recommended */
+
+    - Render mode
+        .. code-block:: c
+
+            #define LV_X11_RENDER_MODE_PARTIAL 1  /* LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default */
+            // or
+            #define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
+            // or
+            #define LV_X11_RENDER_MODE_DULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
+
+Usage
+-----
+
+| The minimal initialisation opening a window and enabling keyboard/mouse support
+| (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
+
+.. code-block:: c
+
+    int main(int argc, char ** argv)
+    {
+        ...
+
+        /* initialize X11 display driver */
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+
+        /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
+        lv_x11_inputs_create(disp, NULL);
+
+        ...
+
+        while(true)
+        {
+            ...
+
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
+        }
+    }
+
+| Full initialisation with mouse pointer symbol and own application exit handling
+| (dependent on LV_X11_DIRECT_EXIT (can be 1 or 0))
+
+.. code-block:: c
+
+    bool terminated = false;
+
+    #if !LV_X11_DIRECT_EXIT
+    static void on_close_cb(lv_event_t * e)
+    {
+        ...
+
+        terminate = true;
+    }
+    #endif
+
+    int main(int argc, char ** argv)
+    {
+        ...
+
+        /* initialize X11 display driver */
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_add_event_cb(disp, on_close_cb, LV_EVENT_DELETE, disp);
+
+        /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
+        LV_IMAGE_DECLARE(my_mouse_cursor_icon);
+        lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
+
+        #if !LV_X11_DIRECT_EXIT
+        /* set optional window close callback to enable application cleanup and exit */
+        lv_x11_window_set_close_cb(disp, on_close_cb, disp);
+        #endif
+
+        ...
+
+        while(!terminated)
+        {
+            ...
+
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
+        }
+    }

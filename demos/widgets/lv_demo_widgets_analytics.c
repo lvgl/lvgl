@@ -560,8 +560,8 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_scale_set_text_src(scale_hor, hor_text);
     lv_obj_set_width(scale_hor, lv_pct(200));
     lv_obj_set_height(scale_hor, 40);
-    lv_obj_set_style_pad_hor(scale_hor, lv_obj_get_style_pad_left(chart, 0), 0);
-    lv_obj_set_style_pad_ver(scale_ver, lv_obj_get_style_pad_top(chart, 0), 0);
+    lv_obj_set_style_pad_hor(scale_hor, lv_obj_get_style_pad_left(chart, LV_PART_MAIN), 0);
+    lv_obj_set_style_pad_ver(scale_ver, lv_obj_get_style_pad_top(chart, LV_PART_MAIN), 0);
     return chart;
 }
 
@@ -668,8 +668,12 @@ static void chart_event_cb(lv_event_t * e)
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_chart_get_series_y_array(obj, (lv_chart_series_t *)ser)[base_dsc->id2]);
 
+            lv_text_attributes_t attributes;
+            lv_text_attributes_init(&attributes);
+            attributes.max_width = LV_COORD_MAX;
+            attributes.text_flags = LV_TEXT_FLAG_NONE;
             lv_point_t text_size;
-            lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&text_size, buf, font_normal, &attributes);
 
             lv_area_t txt_area;
             lv_area_t draw_task_area;

@@ -41,6 +41,8 @@
     static void perf_update_timer_cb(lv_timer_t * t);
     static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void perf_monitor_disp_event_cb(lv_event_t * e);
+    static void perf_dump_info(lv_display_t * disp);
+    static void perf_control(lv_display_t * disp, bool start);
 #endif
 
 #if LV_USE_MEM_MONITOR
@@ -135,6 +137,26 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
     }
 
     lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
+}
+
+void lv_sysmon_performance_dump(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+    perf_dump_info(disp);
+}
+
+void lv_sysmon_performance_resume(lv_display_t * disp)
+{
+    perf_control(disp, true);
+}
+
+void lv_sysmon_performance_pause(lv_display_t * disp)
+{
+    perf_control(disp, false);
 }
 
 #endif
@@ -233,12 +255,9 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
     }
 }
 
-static void perf_update_timer_cb(lv_timer_t * t)
+static void perf_dump_info(lv_display_t * disp)
 {
-    lv_display_t * disp = lv_timer_get_user_data(t);
-
     uint32_t LV_SYSMON_GET_IDLE(void);
-
 
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
     info->calculated.run_cnt++;
@@ -287,6 +306,13 @@ static void perf_update_timer_cb(lv_timer_t * t)
     info->measured.last_report_timestamp = lv_tick_get();
 }
 
+static void perf_update_timer_cb(lv_timer_t * t)
+{
+    lv_display_t * disp = lv_timer_get_user_data(t);
+
+    perf_dump_info(disp);
+}
+
 static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
@@ -324,6 +350,24 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
 }
 
+static void perf_control(lv_display_t * disp, bool start)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
+    if(disp->perf_sysmon_backend.timer == NULL) return;
+
+    if(start) {
+        lv_timer_resume(disp->perf_sysmon_backend.timer);
+    }
+    else {
+        lv_timer_pause(disp->perf_sysmon_backend.timer);
+    }
+}
+
 #endif
 
 #if LV_USE_MEM_MONITOR
@@ -340,7 +384,7 @@ static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
 
-    size_t used_size = mon->total_size - mon->free_size;;
+    size_t used_size = mon->total_size - mon->free_size;
     size_t used_kb = used_size / 1024;
     size_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
     size_t max_used_kb = mon->max_used / 1024;

@@ -160,8 +160,8 @@ static inline ppa_srm_color_mode_t lv_color_format_to_ppa_srm(lv_color_format_t 
             return PPA_SRM_COLOR_MODE_RGB565;
         case LV_COLOR_FORMAT_RGB888:
             return PPA_SRM_COLOR_MODE_RGB888;
-        case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
             return PPA_SRM_COLOR_MODE_ARGB8888;
         default:
             return PPA_SRM_COLOR_MODE_RGB565;

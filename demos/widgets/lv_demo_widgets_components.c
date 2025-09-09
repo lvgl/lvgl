@@ -47,6 +47,15 @@ const lv_font_t * font_normal;
 
 void lv_demo_widgets_components_init(void)
 {
+#if LV_USE_DEMO_BENCHMARK && LV_DEMO_BENCHMARK_ALIGNED_FONTS
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_aligned)
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_14_aligned)
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_aligned)
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_18_aligned)
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_20_aligned)
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_24_aligned)
+#define USE_ALIGNED_FONTS
+#endif
 
     if(LV_HOR_RES <= 320) disp_size = DISP_SMALL;
     else if(LV_HOR_RES < 720) disp_size = DISP_MEDIUM;
@@ -56,14 +65,14 @@ void lv_demo_widgets_components_init(void)
     font_normal = LV_FONT_DEFAULT;
 
     if(disp_size == DISP_LARGE) {
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_large     = &lv_font_benchmark_montserrat_24_aligned;
 #elif LV_FONT_MONTSERRAT_24
         font_large     = &lv_font_montserrat_24;
 #else
         LV_LOG_WARN("LV_FONT_MONTSERRAT_24 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
 #endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_normal    = &lv_font_benchmark_montserrat_16_aligned;
 #elif LV_FONT_MONTSERRAT_16
         font_normal    = &lv_font_montserrat_16;
@@ -72,14 +81,14 @@ void lv_demo_widgets_components_init(void)
 #endif
     }
     else if(disp_size == DISP_MEDIUM) {
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_large     = &lv_font_benchmark_montserrat_20_aligned;
 #elif LV_FONT_MONTSERRAT_20
         font_large     = &lv_font_montserrat_20;
 #else
         LV_LOG_WARN("LV_FONT_MONTSERRAT_20 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
 #endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_normal    = &lv_font_benchmark_montserrat_14_aligned;
 #elif LV_FONT_MONTSERRAT_14
         font_normal    = &lv_font_montserrat_14;
@@ -88,14 +97,14 @@ void lv_demo_widgets_components_init(void)
 #endif
     }
     else {   /* disp_size == DISP_SMALL */
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_large     = &lv_font_benchmark_montserrat_18_aligned;
 #elif LV_FONT_MONTSERRAT_18
         font_large     = &lv_font_montserrat_18;
 #else
         LV_LOG_WARN("LV_FONT_MONTSERRAT_18 or LV_DEMO_BENCHMARK_ALIGNED_FONTS is not enabled for the widgets demo. Using LV_FONT_DEFAULT instead.");
 #endif
-#if LV_DEMO_BENCHMARK_ALIGNED_FONTS
+#ifdef USE_ALIGNED_FONTS
         font_normal    = &lv_font_benchmark_montserrat_12_aligned;
 #elif LV_FONT_MONTSERRAT_12
         font_normal    = &lv_font_montserrat_12;

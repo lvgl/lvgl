@@ -27,27 +27,37 @@ writing such a callback in an effective way.
 This chapter will show the basics to give an idea about how LVGL works and how it can be used.
 For more details about each feature visit that feature's dedicated documentation page.
 
-.. _basic_data_flow:
 
-Basic Data Flow
----------------
+.. _lvgl_integration_overview:
 
-1. **Driver Initialization**: It's the user's responsibility to set up the clock, timers, peripherals, etc.
-2. **Call lv_init()**: It initializes LVGL itself
-3. **Create display and input devices**: Create display(s) (:cpp:type:`lv_display_t`) and input device(s)  (:cpp:type:`lv_indev_t`) and set up their callbacks
-4. **Create the UI**: Call LVGL functions to create screens, widgets, styles, animations, events, etc.
-5. **Call lv_timer_handler() in a loop**: It handles all the LVGL-related tasks:
-    - refresh display(s),
-    - read input devices,
-    - fire events based on user input (and other things),
-    - run any animations, and
-    - run user-created timers.
+LVGL Integration Overview
+-------------------------
 
-Integration example
--------------------
+The following is an overview of how to integrate LVGL into your project.  Complete
+details are available at :ref:`adding_lvgl_to_your_project`.
+
+:Driver Initialization:              It is the user's responsibility to set up the
+                                     clock, timers, peripherals, etc.
+:Call lv_init():                     Initialize LVGL itself.
+:Create display and input devices:   Create display(s) (:cpp:type:`lv_display_t`)
+                                     and input device(s)  (:cpp:type:`lv_indev_t`)
+                                     and set up their callbacks.
+:Create the UI:                      Call LVGL functions to create screens, widgets,
+                                     styles, animations, events, etc.
+:Call lv_timer_handler() in a loop:  This handles all the LVGL-related tasks:
+
+   - refresh display(s),
+   - read input devices,
+   - fire events based on user input (and other things),
+   - run any animations, and
+   - run user-created timers.
+
+
+Example
+~~~~~~~
 
 This is just a brief example of how to add LVGL to a new project. For more details
-check out :ref:`adding_lvgl_to_your_project`.
+check out :ref:`Integration Overview <adding_lvgl_to_your_project>`.
 
 .. code-block:: c
 
@@ -61,42 +71,44 @@ check out :ref:`adding_lvgl_to_your_project`.
 
         lv_display_t * display = lv_display_create(320, 240);
 
-        /*LVGL will render to this 1/10 screen sized buffer for 2 bytes/pixel*/
+        /* LVGL will render to this 1/10 screen sized buffer for 2 bytes/pixel */
         static uint8_t buf[320 * 240 / 10 * 2];
         lv_display_set_buffers(display, buf, NULL, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-        /*This callback will display the rendered image*/
+        /* This callback will display the rendered image */
         lv_display_set_flush_cb(display, my_flush_cb);
 
-        /*Create widgets*/
+        /* Create widgets */
         lv_obj_t * label = lv_label_create(lv_screen_active());
         lv_label_set_text(label, "Hello LVGL!");
 
-        /*Make LVGL periodically execute its tasks*/
+        /* Make LVGL periodically execute its tasks */
         while(1) {
+            /* Provide updates to currently-displayed Widgets here. */
             lv_timer_handler();
             my_sleep(5);  /*Wait 5 milliseconds before processing LVGL timer again*/
         }
     }
 
-    /*Return the elapsed milliseconds since startup.
-     *It needs to be implemented by the user*/
+    /* Return the elapsed milliseconds since startup.
+     * It needs to be implemented by the user */
     uint32_t my_get_millis(void)
     {
         return my_tick_ms;
     }
 
-    /*Copy the rendered image to the screen.
-     *It needs to be implemented by the user*/
+    /* Copy rendered image to screen.
+     * This needs to be implemented by the user. */
     void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_buf)
     {
-        /*Show the rendered image on the display*/
+        /* Show the rendered image on the display */
         my_display_update(area, px_buf);
 
-        /*Indicate that the buffer is available.
-         *If DMA were used, call in the DMA complete interrupt*/
+        /* Indicate that the buffer is available.
+         * If DMA were used, call in the DMA complete interrupt. */
         lv_display_flush_ready();
     }
+
 
 
 .. _basics_displays:
@@ -107,10 +119,12 @@ Displays
 *Display* refers to the actual hardware. In order to connect LVGL to the hardware an :cpp:expr:`lv_display_t`
 object needs to be created and initialized.
 
-LVGL has built-in support for many :ref:`built-in drivers <drivers>`, but it's easy to initialize a
+LVGL has built-in support for many built-in drivers (see :ref:`integration_index`), but it's easy to initialize a
 display from scratch as well (as shown above).
 
 LVGL also handles multiple displays at once.
+
+
 
 .. _basics_screens:
 
@@ -128,6 +142,8 @@ The most common way to create a screen is by creating a :ref:`Base widget <base_
     lv_obj_t * my_screen = lv_obj_create(NULL);
 
 A screen can be loaded like this: :cpp:expr:`lv_screen_load(my_screen)`
+
+
 
 .. _basics:widgets:
 
@@ -163,18 +179,19 @@ Here is an example that also shows some non-pixel units for sizes:
 .. code-block:: c
 
     lv_obj_t * my_button1 = lv_button_create(lv_screen_active());
-    /*Set parent-sized width, and content-sized height*/
+    /* Set parent-sized width, and content-sized height */
     lv_obj_set_size(my_button1, lv_pct(100), LV_SIZE_CONTENT);
-    /*Align to the right center with 20px offset horizontally*/
+    /* Align to the right center with 20px offset horizontally */
     lv_obj_align(my_button1, LV_ALIGN_RIGHT_MID, -20, 0);
 
     lv_obj_t * my_label1 = lv_label_create(my_button1);
     lv_label_set_text_fmt(my_label1, "Click me!");
     lv_obj_set_style_text_color(my_label1, lv_color_hex(0xff0000), 0);
-    /*Make the text red*/
+    /* Make the text red */
 
 To see the full API for any widget, see its documentation at :ref:`widgets`, or check
 its related header file in the source code.
+
 
 
 .. _basics_events:
@@ -218,6 +235,8 @@ The Widget that triggered the event can be retrieved with:
 
 Learn all about Events in the :ref:`events` section.
 
+
+
 Parts and States
 ****************
 
@@ -235,6 +254,7 @@ By using parts you can apply different :ref:`styles <basics_styles>` to the part
 of a widget.
 
 Read the Widget's documentation to learn which parts it uses.
+
 
 .. _basics_states:
 
@@ -269,6 +289,8 @@ To programmatically add or remove states use:
    lv_obj_add_state(widget, LV_STATE_...);
    lv_obj_remove_state(widget, LV_STATE_...);
 
+
+
 .. _basics_styles:
 
 Styles
@@ -297,6 +319,7 @@ See :ref:`style_properties_overview` for more details.
 
 See :ref:`style_properties` to see the full list.
 
+
 Adding styles to the widgets
 ----------------------------
 
@@ -308,6 +331,7 @@ After that it can be added to widgets:
     lv_obj_add_style(my_checkbox1, &style1, LV_STATE_DISABLED); /*Add to checkbox's disabled state*/
     lv_obj_add_style(my_slider1, &style1, LV_PART_KNOB | LV_STATE_PRESSED); /*Add to the slider's knob pressed state*/
 
+
 Inheritance
 -----------
 
@@ -316,6 +340,7 @@ means if a property is not set in a Widget it will be searched for in
 its parents. For example, you can set the font once in the screen's
 style and all text on that screen will inherit it by default, unless the
 font is specified on the widget or one of its parents.
+
 
 Local styles
 ------------
@@ -328,6 +353,8 @@ style which resides inside the Widget and is used only by that Widget:
     lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 
 See :ref:`styles` for full details.
+
+
 
 .. _basics_subjects:
 

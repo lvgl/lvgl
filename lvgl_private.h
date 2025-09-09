@@ -18,6 +18,7 @@ extern "C" {
 #include "src/display/lv_display_private.h"
 #include "src/indev/lv_indev_private.h"
 #include "src/misc/lv_text_private.h"
+#include "src/misc/cache/lv_cache.h"
 #include "src/misc/cache/lv_cache_entry_private.h"
 #include "src/misc/cache/lv_cache_private.h"
 #include "src/layouts/lv_layout_private.h"

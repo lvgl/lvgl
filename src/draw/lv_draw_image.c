@@ -76,7 +76,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LAYER);
     lv_draw_image_dsc_t * new_image_dsc = t->draw_dsc;
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
-    t->state = LV_DRAW_TASK_STATE_WAITING;
+    t->state = LV_DRAW_TASK_STATE_BLOCKED;
 
     lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
                                       dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
@@ -180,6 +180,8 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
             }
 
         }
+
+        lv_image_decoder_close(&decoder_dsc);
     }
 
     LV_PROFILER_DRAW_END;

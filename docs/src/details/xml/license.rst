@@ -29,7 +29,7 @@ You are permitted to:
 
 - Use this Specification in **any firmware or embedded application** built on top of the official `LVGL library <https://github.com/lvgl/lvgl>`_ (MIT-licensed).
 - Use the LVGL XML loader freely in accordance with its MIT license.
-- Use the Specification with the **LVGL UI Editor** and **official LVGL tools such as the CLI or XML loader**.
+- Use the Specification with the **LVGL UI editor** and **official LVGL tools such as the CLI or XML loader**.
 - Write, load, edit, or generate user interfaces described in the LVGL XML Specification for **internal use** only, including automation or configuration tools used solely inside your organization.
 - Create **internal scripts or plugins** that help your own developers use or manage this Specification, as long as these are **not shared outside your organization or made publicly available**.
 - Share XML-based UI files within customer firmware or projects that target LVGL-based embedded systems.
@@ -55,7 +55,7 @@ You are **explicitly permitted** to:
 
 - Use XML files with this Specification in your own projects.
 - Load XMLs at runtime using LVGL’s XML loader.
-- Generate XMLs using the LVGL UI Editor.
+- Generate XMLs using the LVGL UI editor.
 - Customize XMLs manually or with internal utilities.
 - Share LVGL-based projects with XML files as part of a commercial product or firmware.
 

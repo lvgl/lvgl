@@ -66,10 +66,29 @@ typedef enum {
 } lv_draw_task_type_t;
 
 typedef enum {
-    LV_DRAW_TASK_STATE_WAITING,     /*Waiting for something to be finished. E.g. rendering a layer*/
+    /** Waiting for an other task to be finished.
+     * For example in case of `LV_DRAW_TASK_TYPE_LAYER` (used to blend a layer)
+     * is blocked until all the draw tasks of the layer is rendered. */
+    LV_DRAW_TASK_STATE_BLOCKED,
+
+    /** The draw task is added to the layers list and waits to be rendered. */
+    LV_DRAW_TASK_STATE_WAITING,
+
+    /** The draw task is added to the command queue of the draw unit.
+     * As the queued task are executed in order it's possible to queue multiple draw task
+     * (for the same draw unit) even if they are depending on each other.
+     * Therefore `lv_draw_get_available_task` and `lv_draw_get_next_available_task` can return
+     * draw task for the same draw unit even if a dependent draw task is not finished ready yet.*/
     LV_DRAW_TASK_STATE_QUEUED,
+
+    /** The draw task is being rendered. This draw task needs to be finished before
+     * `lv_draw_get_available_task` and `lv_draw_get_next_available_task` would
+     * return any depending draw tasks.*/
     LV_DRAW_TASK_STATE_IN_PROGRESS,
-    LV_DRAW_TASK_STATE_READY,
+
+    /** The draw task is rendered. It will be removed from the draw task list of the layer
+     * and freed automatically. */
+    LV_DRAW_TASK_STATE_FINISHED,
 } lv_draw_task_state_t;
 
 struct _lv_layer_t  {
@@ -130,7 +149,7 @@ typedef struct {
     lv_obj_t * obj;
 
     /**The widget part for which draw descriptor was created */
-    lv_part_t part;
+    uint32_t part;
 
     /**A widget type specific ID (e.g. table row index). See the docs of the given widget.*/
     uint32_t id1;

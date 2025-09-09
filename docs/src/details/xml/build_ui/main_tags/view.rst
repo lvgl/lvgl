@@ -7,12 +7,12 @@ View
 Overview
 ********
 
-The ``<view>`` tag can be used in:
+The ``<view>`` tag can be used as a child of the following tags:
 
-- ``<component>``\ s
-- ``<widget>``\ s
-- ``<screen>``\ s
-- ``<test>``\ s
+- ``<component>``
+- ``<widget>``
+- ``<screen>``
+- ``<test>``
 
 to describe how these items look. Inside ``<view>``, children can be added in a nested way
 using already defined ``widget``\ s and ``component``\ s. For example:
@@ -25,6 +25,8 @@ using already defined ``widget``\ s and ``component``\ s. For example:
             <lv_label text="Click me"/>
         </lv_button>
     </view>
+
+
 
 Extends
 *******

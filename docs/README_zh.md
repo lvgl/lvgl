@@ -66,7 +66,7 @@
 -  不依赖特定的硬件平台，可以在任何显示屏上运行
 -  配置可裁剪（最低资源占用：64 kB Flash，16 kB RAM）
 -  基于UTF-8的多语种支持，例如中文、日文、韩文、阿拉伯文等
--  可以通过[类CSS](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html)的方式来设计、布局图形界面（例如：[Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)）
+-  可以通过[类CSS](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html)的方式来设计、布局图形界面（例如：[Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)）
 -  支持操作系统、外置内存、以及硬件加速（LVGL已内建支持STM32 DMA2D、SWM341 DMA2D、NXP PXP和VGLite）
 -  即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/details/main-modules/display/index.html)的情况下，也可保证渲染如丝般顺滑
 -  全部由C编写完成，并支持C++调用
@@ -145,8 +145,8 @@ LVGL也支持：
 
 请按照如下顺序来学习LVGL：
 1. 使用[网页在线例程](https://lvgl.io/demos) 来体验LVGL（3分钟）
-2. 阅读文档[简介](https://docs.lvgl.io/master/intro/introduction.html)章节来初步了解LVGL（5分钟）
-3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/intro/getting_started.html)章节来了解LVGL的基本知识（15分钟）
+2. 阅读文档[简介](https://docs.lvgl.io/master/intro/introduction/index.html)章节来初步了解LVGL（5分钟）
+3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html)章节来了解LVGL的基本知识（15分钟）
 4. 学习如何使用[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html)来在电脑上仿真LVGL（10分钟）
 5. 试着动手实践一些[例程](https://github.com/lvgl/lvgl/tree/master/examples)
 6. 参考[移植指南](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html)尝试将LVGL移植到一块开发板上，LVGL也已经提供了一些移植好的[工程](https://github.com/lvgl?q=lv_port_)
@@ -240,7 +240,8 @@ lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+lv_obj_add_state(cb, LV_STATE_CHECKED);
+lv_obj_add_state(cb, LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
 lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 ```

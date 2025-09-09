@@ -36,6 +36,7 @@ typedef struct {
     const char * input_path;
     const char * utouch_path;
     const char * mouse_path;
+    const char * trace_path;
 } lv_nuttx_dsc_t;
 
 typedef struct {
@@ -47,6 +48,7 @@ typedef struct {
 
 typedef struct _lv_nuttx_ctx_t {
     void * image_cache;
+    int trace_fd;
 } lv_nuttx_ctx_t;
 
 /**********************

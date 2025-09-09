@@ -25,6 +25,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_fs.h"
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -154,7 +155,7 @@ void lv_image_set_pivot_y(lv_obj_t * obj, int32_t y);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size
@@ -167,7 +168,7 @@ void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size
@@ -180,7 +181,7 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
  * Note that indexed and alpha only images can't be transformed.
  * @param obj       pointer to an image object
  * @param zoom      the zoom factor.  Example values:
- *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - 256 or LV_SCALE_NONE:  no zoom
  *                      - <256:  scale down
  *                      - >256:  scale up
  *                      - 128:  half size
@@ -337,6 +338,17 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
  * @return          an lv_image_dsc_t bitmap mask source.
  */
 const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
+
+
+#if LV_USE_OBSERVER
+/**
+ * Bind a pointer Subject to an Image's source.
+ * @param obj       pointer to Image
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
 /**********************
  *      MACROS

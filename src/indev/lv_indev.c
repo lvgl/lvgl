@@ -81,7 +81,6 @@ static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
-static void indev_init_gesture_recognizers(lv_indev_t * indev);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
@@ -143,7 +142,9 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
 
-    indev_init_gesture_recognizers(indev);
+#if LV_USE_GESTURE_RECOGNITION
+    lv_indev_gesture_init(indev);
+#endif
 
     return indev;
 }
@@ -1371,6 +1372,8 @@ static void indev_proc_press(lv_indev_t * indev)
         indev_gesture(indev);
         if(indev_reset_check(indev)) return;
 
+        /*In event driven mode resume the timer so that it can trigger long pressed and other time related events.
+         *As a side effect it will also call read_cb periodically in event driven mode. */
         if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && lv_timer_get_paused(indev->read_timer)) {
             lv_timer_resume(indev->read_timer);
         }
@@ -1502,9 +1505,9 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
-                angle += lv_obj_get_style_transform_rotation(parent, 0);
-                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
-                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
+                angle += lv_obj_get_style_transform_rotation(parent, LV_PART_MAIN);
+                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, LV_PART_MAIN);
+                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, LV_PART_MAIN);
                 scale_x = (scale_x * zoom_act_x) >> 8;
                 scale_y = (scale_x * zoom_act_y) >> 8;
                 parent = lv_obj_get_parent(parent);
@@ -1583,7 +1586,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
 
     if(editable) {
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, 0);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
     }
@@ -1595,7 +1598,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
         lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
         if(scroll_obj == NULL) return;
         uint32_t indev_sensitivity = indev->rotary_sensitivity;
-        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, 0);
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, LV_PART_MAIN);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
 
         indev->pointer.scroll_throw_vect.y = diff;
@@ -1909,22 +1912,4 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
-}
-
-/**
- * Initialize this indev's recognizers. It specify their recognizer function
- * @param indev             pointer to the indev containing the recognizers to initialize
- */
-static void indev_init_gesture_recognizers(lv_indev_t * indev)
-{
-#if LV_USE_GESTURE_RECOGNITION
-    indev->recognizers[LV_INDEV_GESTURE_NONE].recog_fn = NULL;
-    indev->recognizers[LV_INDEV_GESTURE_PINCH].recog_fn = lv_indev_gesture_detect_pinch;
-    indev->recognizers[LV_INDEV_GESTURE_ROTATE].recog_fn = lv_indev_gesture_detect_rotation;
-    indev->recognizers[LV_INDEV_GESTURE_TWO_FINGERS_SWIPE].recog_fn = lv_indev_gesture_detect_two_fingers_swipe;
-    indev->recognizers[LV_INDEV_GESTURE_SCROLL].recog_fn = NULL;
-    indev->recognizers[LV_INDEV_GESTURE_SWIPE].recog_fn = NULL;
-#else
-    LV_UNUSED(indev);
-#endif
 }

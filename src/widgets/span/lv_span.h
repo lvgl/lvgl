@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 #include "../../core/lv_obj.h"
+#include "../../others/observer/lv_observer.h"
 
 #if LV_USE_SPAN != 0
 
@@ -75,6 +76,9 @@ lv_span_t * lv_spangroup_add_span(lv_obj_t * obj);
  * Remove the span from the spangroup and free memory.
  * @param obj   pointer to a spangroup object.
  * @param span  pointer to a span.
+ * @note        Note that before calling `lv_spangroup_delete_span`
+ *              `lv_observer_remove` needs to be called manually as LVGL can't remove the
+ *              binding automatically.
  */
 void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
 
@@ -90,6 +94,17 @@ void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
  * @param text  pointer to a text.
  */
 void lv_span_set_text(lv_span_t * span, const char * text);
+
+
+/**
+ * Set a new text for a span using a printf-like formatting string.
+ * Memory will be allocated to store the text by the span.
+ * As the spangroup is not passed a redraw (invalidation) can't be triggered automatically.
+ * Therefore `lv_spangroup_refresh(spangroup)` needs to be called manually,
+ * @param span  pointer to a span.
+ * @param fmt   `printf`-like format string
+ */
+void lv_span_set_text_fmt(lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
 /**
  * Set a static text. It will not be saved by the span so the 'text' variable
@@ -117,6 +132,15 @@ void lv_spangroup_set_span_text(lv_obj_t * obj, lv_span_t * span, const char * t
  * @param text  pointer to a text.
  */
 void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const char * text);
+
+/**
+ * Set a new text for a span using a printf-like formatting string.
+ * Memory will be allocated to store the text by the span.
+ * @param obj   pointer to a spangroup widget.
+ * @param span  pointer to a span.
+ * @param fmt   `printf`-like format string
+ */
+void lv_spangroup_set_span_text_fmt(lv_obj_t * obj, lv_span_t * span, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(3, 4);
 
 /**
  * Set a static text. It will not be saved by the span so the 'text' variable
@@ -310,6 +334,23 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * po
  * @param obj   pointer to a spangroup object.
  */
 void lv_spangroup_refresh(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+
+/**
+ * Bind an integer, string, or pointer Subject to a Spangroup's Span.
+ * @param obj       pointer to Spangroup
+ * @param span      pointer to Span
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
+ *                  as text as they are, integers as %d, floats as %0.1f
+ */
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt);
+
+#endif
 
 /**********************
  *      MACROS

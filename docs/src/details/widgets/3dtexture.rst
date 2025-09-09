@@ -34,7 +34,7 @@ OpenGL is the first supported 3D graphics back-end. The following must be enable
 - :c:macro:`LV_USE_OPENGLES`
 - :c:macro:`LV_USE_DRAW_OPENGLES`
 
-See :ref:`LVGL's OpenGLES driver docs <opengl_es_driver>` to create a window and a
+See :ref:`LVGL's OpenGLES driver docs <opengl_driver>` to create a window and a
 display texture.
 
 The `lv_example_3dtexture <https://github.com/lvgl/lv_example_3dtexture>` repository is a

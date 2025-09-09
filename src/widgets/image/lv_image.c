@@ -8,12 +8,14 @@
  *********************/
 #include "lv_image_private.h"
 #include "../../misc/lv_area_private.h"
+#include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw_image_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 #if LV_USE_IMAGE != 0
 
@@ -37,6 +39,12 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
+static void reset_image_attributes(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+    static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
     static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
     static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
@@ -176,22 +184,20 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMAGE_SRC_UNKNOWN) {
         if(src) LV_LOG_WARN("unknown image type");
-        if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)img->src);
-        }
-        img->src      = NULL;
-        img->src_type = LV_IMAGE_SRC_UNKNOWN;
+        reset_image_attributes(obj);
         return;
     }
 
     lv_image_header_t header;
     lv_result_t res = lv_image_decoder_get_info(src, &header);
     if(res != LV_RESULT_OK) {
-#if LV_USE_LOG
-        char buf[24];
-        LV_LOG_WARN("failed to get image info: %s",
-                    src_type == LV_IMAGE_SRC_FILE ? (const char *)src : (lv_snprintf(buf, sizeof(buf), "%p", src), buf));
-#endif /*LV_USE_LOG*/
+        if(src_type == LV_IMAGE_SRC_FILE) {
+            LV_LOG_WARN("failed to get image info: %s", (const char *)src);
+        }
+        else {
+            LV_LOG_WARN("failed to get image info: %p", src);
+        }
+        reset_image_attributes(obj);
         return;
     }
 
@@ -234,10 +240,15 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMAGE_SRC_SYMBOL) {
         /*`lv_image_dsc_get_info` couldn't set the width and height of a font so set it here*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        lv_text_attributes_t attributes = {0};
+
+        attributes.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        attributes.line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        attributes.max_width = LV_COORD_MAX;
+        attributes.text_flags = LV_TEXT_FLAG_NONE;
+
         lv_point_t size;
-        lv_text_get_size(&size, src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&size, src, font, &attributes);
         header.w = size.x;
         header.h = size.y;
     }
@@ -648,6 +659,24 @@ const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
     return img->bitmap_mask_src;
 }
 
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, image_src_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -915,8 +944,14 @@ static void draw_image(lv_event_t * e)
             const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
             if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
                 lv_point_t text_size;
-                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
-                                 label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+                lv_text_attributes_t attributes;
+                attributes.letter_space = label_dsc.letter_space;
+                attributes.line_space = label_dsc.line_space;
+                attributes.max_width = LV_COORD_MAX;
+                attributes.text_flags = LV_TEXT_FLAG_NONE;
+
+                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, &attributes);
                 lv_area_set(&aligned_coords, 0, 0, text_size.x, text_size.y);
                 lv_area_align(&obj->coords, &aligned_coords, img->align, img->offset.x, img->offset.y);
                 coords = &aligned_coords;
@@ -1010,6 +1045,32 @@ static void update_align(lv_obj_t * obj)
     }
 }
 
+static void reset_image_attributes(lv_obj_t * obj)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+    if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
+        lv_free((void *)img->src);
+    }
+    img->src = NULL;
+    img->src_type = LV_IMAGE_SRC_UNKNOWN;
+    img->w = 0;
+    img->h = 0;
+    img->cf = LV_COLOR_FORMAT_UNKNOWN;
+    lv_obj_refresh_self_size(obj);
+}
+
+
+#if LV_USE_OBSERVER
+
+static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_POINTER) {
+        lv_image_set_src(observer->target, subject->value.pointer);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
 static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
 {
@@ -1023,5 +1084,6 @@ static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj)
     return pivot;
 }
 #endif
+
 
 #endif

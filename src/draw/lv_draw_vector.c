@@ -91,8 +91,8 @@ void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point)
     float x = point->x;
     float y = point->y;
 
-    point->x = x * matrix->m[0][0] + y * matrix->m[1][0] + matrix->m[0][2];
-    point->y = x * matrix->m[0][1] + y * matrix->m[1][1] + matrix->m[1][2];
+    point->x = x * matrix->m[0][0] + y * matrix->m[0][1] + matrix->m[0][2];
+    point->y = x * matrix->m[1][0] + y * matrix->m[1][1] + matrix->m[1][2];
 }
 
 void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path)

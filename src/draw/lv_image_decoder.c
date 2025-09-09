@@ -21,6 +21,14 @@
 #define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
 #define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
 
+#if LV_USE_OS != LV_OS_NONE
+    #define img_decoder_info_lock_p &(LV_GLOBAL_DEFAULT()->img_decoder_info_lock)
+    #define img_decoder_open_lock_p &(LV_GLOBAL_DEFAULT()->img_decoder_open_lock)
+#else
+    #define img_decoder_info_lock_p NULL
+    #define img_decoder_open_lock_p NULL
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -63,6 +71,9 @@ void lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_coun
     /*Initialize the cache*/
     lv_image_cache_init(image_cache_size);
     lv_image_header_cache_init(image_header_count);
+
+    lv_mutex_init(img_decoder_info_lock_p);
+    lv_mutex_init(img_decoder_open_lock_p);
 }
 
 /**
@@ -72,6 +83,9 @@ void lv_image_decoder_deinit(void)
 {
     lv_cache_destroy(img_cache_p, NULL);
     lv_cache_destroy(img_header_cache_p, NULL);
+
+    lv_mutex_delete(img_decoder_info_lock_p);
+    lv_mutex_delete(img_decoder_open_lock_p);
 
     lv_ll_clear(img_decoder_ll_p);
 }
@@ -83,7 +97,9 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     dsc.src = src;
     dsc.src_type = lv_image_src_get_type(src);
 
+    lv_mutex_lock(img_decoder_info_lock_p);
     lv_image_decoder_t * decoder = image_decoder_get_info(&dsc, header);
+    lv_mutex_unlock(img_decoder_info_lock_p);
     if(decoder == NULL) return LV_RESULT_INVALID;
 
     return LV_RESULT_OK;
@@ -97,6 +113,8 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->src = src;
     dsc->src_type = lv_image_src_get_type(src);
 
+    lv_mutex_lock(img_decoder_open_lock_p);
+
     if(lv_image_cache_is_enabled()) {
         dsc->cache = img_cache_p;
         /*Try cache first, unless we are told to ignore cache.*/
@@ -104,13 +122,19 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
             /*
             * Check the cache first
             * If the image is found in the cache, just return it.*/
-            if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+            if(try_cache(dsc) == LV_RESULT_OK) {
+                lv_mutex_unlock(img_decoder_open_lock_p);
+                return LV_RESULT_OK;
+            }
         }
     }
 
     /*Find the decoder that can open the image source, and get the header info in the same time.*/
     dsc->decoder = image_decoder_get_info(dsc, &dsc->header);
-    if(dsc->decoder == NULL) return LV_RESULT_INVALID;
+    if(dsc->decoder == NULL) {
+        lv_mutex_unlock(img_decoder_open_lock_p);
+        return LV_RESULT_INVALID;
+    }
 
     /*Make a copy of args*/
     dsc->args = args ? *args : (lv_image_decoder_args_t) {
@@ -144,6 +168,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         }
     }
 
+    lv_mutex_unlock(img_decoder_open_lock_p);
     return res;
 }
 
@@ -158,14 +183,20 @@ lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_are
 
 void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
-    if(dsc->decoder) {
-        if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
-
-        if(lv_image_cache_is_enabled() && dsc->cache && dsc->cache_entry) {
-            /*Decoded data is in cache, release it from cache's callback*/
-            lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-        }
+    if(!dsc->decoder) {
+        return;
     }
+
+    lv_mutex_lock(img_decoder_open_lock_p);
+
+    if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+
+    if(lv_image_cache_is_enabled() && dsc->cache && dsc->cache_entry) {
+        /*Decoded data is in cache, release it from cache's callback*/
+        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+    }
+
+    lv_mutex_unlock(img_decoder_open_lock_p);
 }
 
 /**
@@ -269,7 +300,8 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(args->premultiply
        && !LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoded->header.cf)
        && lv_color_format_has_alpha(decoded->header.cf)
-       && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED) /*Hasn't done yet*/
+       && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
+       && decoded->header.cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED /*Hasn't done yet*/
       ) {
         LV_LOG_TRACE("Alpha premultiply.");
         if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {

@@ -80,6 +80,14 @@ Example
             <arg name="delay" type="int" default="0"/>
         </element>
 
+        <element name="play_timeline_event" access="add" type="void">
+            <arg name="trigger" type="lv_event" default="clicked"/>
+            <arg name="target" type="lv_obj"/>
+            <arg name="timeline" type="timeline"/>
+            <arg name="delay" type="int" default="0"/>
+            <arg name="reverse" type="bool" default="false"/>
+        </element>
+
         <element name="subject_set_int_event" access="add" type="void">
             <arg name="subject" type="subject"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
@@ -248,7 +256,7 @@ Example
         <prop name="style_outline_opa" type="opa"/>
         <prop name="style_outline_pad" type="int"/>
 
-        <prop name="style_style_shadow_width" type="int"/>
+        <prop name="style_shadow_width" type="int"/>
         <prop name="style_shadow_color" type="color"/>
         <prop name="style_shadow_opa" type="opa"/>
         <prop name="style_shadow_offset_x" type="int"/>
@@ -288,6 +296,8 @@ Example
         <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
         <prop name="style_flex_grow" type="int"/>
 
+        <prop name="style_grid_column_dsc_array" type="grid_dsc[LV_GRID_TEMPLATE_LAST]"/>
+        <prop name="style_grid_row_dsc_array" type="grid_dsc[LV_GRID_TEMPLATE_LAST]"/>
         <prop name="style_grid_column_align" type="enum:lv_grid_align"/>
         <prop name="style_grid_row_align" type="enum:lv_grid_align"/>
         <prop name="style_grid_cell_column_pos" type="int"/>

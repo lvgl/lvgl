@@ -77,7 +77,7 @@ the tab bar can be moved to any side.
 Setting tab bar size
 --------------------
 
-The size of the tab bar can be adjusted by :cpp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
+The size of the tab bar can be adjusted by :cpp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`.
 When tabs are on the top or bottom, this means the height of the tab bar, and when
 they are on the sides, it means the width.
 

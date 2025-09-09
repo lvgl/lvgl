@@ -133,15 +133,13 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     vg_lite_matrix_t layer_matrix;
     lv_vg_lite_matrix(&layer_matrix, &t->matrix);
     lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
-
-    /* Crop out extra pixels drawn due to scaling accuracy issues */
-    lv_area_t scissor_area = layer->phy_clip_area;
-#else
-    lv_area_t scissor_area = layer->_clip_area;
 #endif
-    lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
-        lv_vg_lite_set_scissor_area(&scissor_area);
+        /* Crop out extra pixels drawn due to scaling accuracy issues */
+        lv_area_t scissor_area = layer->phy_clip_area;
+        lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
+        lv_vg_lite_set_scissor_area(u, &scissor_area);
     }
 
     switch(t->type) {
@@ -223,7 +221,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     draw_execute(u);
 
-    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/

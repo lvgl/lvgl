@@ -106,9 +106,6 @@ typedef struct _lv_obj_t lv_obj_t;
 
 typedef lv_obj_t * (*lv_screen_create_cb_t)(void);
 
-typedef uint16_t lv_state_t;
-typedef uint32_t lv_part_t;
-
 typedef uint8_t lv_opa_t;
 
 typedef uint8_t lv_style_prop_t;
@@ -132,6 +129,8 @@ typedef struct _lv_timer_t lv_timer_t;
 typedef struct _lv_theme_t lv_theme_t;
 
 typedef struct _lv_anim_t lv_anim_t;
+
+typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
 
 typedef struct _lv_font_t lv_font_t;
 typedef struct _lv_font_class_t lv_font_class_t;
@@ -279,6 +278,10 @@ typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
+typedef struct _lv_gltf_t lv_gltf_t;
+
+typedef struct _lv_gltf_model_t lv_gltf_model_t;
+
 typedef struct _lv_observer_t lv_observer_t;
 
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
@@ -347,8 +350,8 @@ typedef struct _lv_rlottie_t lv_rlottie_t;
 
 typedef struct _lv_ffmpeg_player_t lv_ffmpeg_player_t;
 
-typedef struct _lv_glfw_window_t lv_glfw_window_t;
-typedef struct _lv_glfw_texture_t lv_glfw_texture_t;
+typedef struct _lv_opengles_window_t lv_opengles_window_t;
+typedef struct _lv_opengles_window_texture_t lv_opengles_window_texture_t;
 
 typedef uint32_t lv_prop_id_t;
 
@@ -387,6 +390,10 @@ typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 typedef struct _lv_translation_tag_dsc_t lv_translation_tag_dsc_t;
 
 typedef struct _lv_translation_pack_t lv_translation_pack_t;
+#endif
+
+#if LV_USE_DRAW_EVE
+typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif
 
 #endif /*__ASSEMBLY__*/

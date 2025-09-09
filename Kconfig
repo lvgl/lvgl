@@ -143,6 +143,8 @@ menu "LVGL configuration"
 				bool "5: WINDOWS"
 			config LV_OS_MQX
 				bool "6: MQX"
+			config LV_OS_SDL2
+				bool "7: SDL2"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -496,6 +498,16 @@ menu "LVGL configuration"
 			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+			bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
+			bool "Disable linear gradient extension for some older versions of drivers."
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
@@ -536,6 +548,16 @@ menu "LVGL configuration"
 		bool "Use Espressif's PPA accelerator for Image draw"
 		default n
 		depends on LV_USE_PPA
+
+		config LV_USE_DRAW_EVE
+			bool "Use EVE FT81X GPU."
+			default n
+
+		config LV_DRAW_EVE_EVE_GENERATION
+			int "EVE_GEN value"
+			default 4
+			range 2 4
+			depends on LV_USE_DRAW_EVE
 
 	endmenu
 
@@ -2036,6 +2058,17 @@ menu "LVGL configuration"
 			help
 				Set the step size of the mouse movement in pixels.
 
+		config LV_USE_NUTTX_TRACE_FILE
+			bool "Use NuttX trace file"
+			depends on LV_USE_NUTTX
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
+
+		config LV_NUTTX_TRACE_FILE_PATH
+			depends on LV_USE_NUTTX_TRACE_FILE
+			string "NuttX trace file path"
+			default "/data/lvgl-trace.log"
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n
@@ -2043,6 +2076,14 @@ menu "LVGL configuration"
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
 			default n
+
+		config LV_USE_LOVYAN_GFX
+			bool "Use LovyanGFX driver"
+			default n
+		config LV_LGFX_USER_INCLUDE
+			string "Header for LovyanGFX user configuration"
+			default "lv_lgfx_user.hpp"
+			depends on LV_USE_LOVYAN_GFX
 
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"

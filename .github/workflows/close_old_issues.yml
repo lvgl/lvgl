@@ -18,16 +18,22 @@ jobs:
             Now we mark this as "Abandoned" because there was no activity here for 14 days.
 
             Remove the "Stale" label or comment else this will be closed in 7 days.
+
+            cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           stale-pr-message: |
             We need some feedback on this pull request.
 
             Now we mark this as "Abandoned" because there was no activity here for 14 days.
 
             Remove the "Abandoned" label or comment else this will be closed in 7 days.
+
+            cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           close-issue-message: |
             As there was no activity here for a while we close this issue. But don't worry, the conversation is still here and you can get back to it at any time.
 
             Feel free to comment if you have remarks or ideas on this topic.
+
+            cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           days-before-stale: 14
           days-before-close: 7
           exempt-issue-labels: '🔥 Important'

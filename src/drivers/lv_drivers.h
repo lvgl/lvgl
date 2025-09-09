@@ -24,6 +24,7 @@ extern "C" {
 #include "display/fb/lv_linux_fbdev.h"
 
 #include "display/tft_espi/lv_tft_espi.h"
+#include "display/lovyan_gfx/lv_lovyan_gfx.h"
 
 #include "display/lcd/lv_lcd_generic_mipi.h"
 #include "display/ili9341/lv_ili9341.h"
@@ -34,6 +35,9 @@ extern "C" {
 #include "display/renesas_glcdc/lv_renesas_glcdc.h"
 #include "display/st_ltdc/lv_st_ltdc.h"
 #include "display/ft81x/lv_ft81x.h"
+
+#include "draw/eve/lv_draw_eve_display.h"
+#include "draw/eve/lv_draw_eve_display_defines.h"
 
 #include "nuttx/lv_nuttx_entry.h"
 #include "nuttx/lv_nuttx_fbdev.h"
@@ -47,9 +51,11 @@ extern "C" {
 #include "windows/lv_windows_input.h"
 #include "windows/lv_windows_display.h"
 
-#include "glfw/lv_glfw_window.h"
-#include "glfw/lv_opengles_texture.h"
-#include "glfw/lv_opengles_driver.h"
+#include "opengles/lv_opengles_window.h"
+#include "opengles/lv_opengles_texture.h"
+#include "opengles/lv_opengles_driver.h"
+#include "opengles/lv_opengles_glfw.h"
+#include "opengles/lv_opengles_egl.h"
 
 #include "qnx/lv_qnx.h"
 

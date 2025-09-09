@@ -29,21 +29,38 @@ extern "C" {
  **********************/
 
 /**
+ * Give the length of a text with a given font with text flags
+ * @param txt a '\0' terminate string
+ * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
+ * UTF-8)
+ * @param font pointer to font of the text
+ * @param attributes the text attributes, flags for line break behaviour, spacing etc
+ * @return length of a char_num long text
+ */
+int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font,
+                          const lv_text_attributes_t * attributes);
+
+/**
+ * Check if c is command state
+ * @param state
+ * @param c
+ * @return True if c is state
+ */
+bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
+
+/**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
  * @param len length of 'txt' in bytes
  * @param font pointer to a font
- * @param letter_space letter space
- * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
- * line breaks
  * @param used_width When used_width != NULL, save the width of this line if
  * flag == LV_TEXT_FLAG_NONE, otherwise save -1.
- * @param flag settings for the text from 'txt_flag_type' enum
- * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
- * they are different)
+ * @param attributes text attributes, flags to control line break behaviour, spacing etc
+ * @return the index of the first char of the new line
+ *         (in byte index not letter index. With UTF-8  they are different)
  */
-uint32_t lv_text_get_next_line(const char * txt, uint32_t len, const lv_font_t * font, int32_t letter_space,
-                               int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
+uint32_t lv_text_get_next_line(const char * txt, uint32_t len, const lv_font_t * font, int32_t * used_width,
+                               lv_text_attributes_t * attributes);
 
 /**
  * Insert a string into another
@@ -63,7 +80,7 @@ void lv_text_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 void lv_text_cut(char * txt, uint32_t pos, uint32_t len);
 
 /**
- * return a new formatted text. Memory will be allocated to store the text.
+ * Return a new formatted text. Memory will be allocated to store the text.
  * @param fmt `printf`-like format
  * @param ap items to print
 

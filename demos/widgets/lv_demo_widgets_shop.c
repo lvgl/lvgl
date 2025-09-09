@@ -31,8 +31,6 @@ static void shop_chart_event_cb(lv_event_t * e);
  **********************/
 static lv_obj_t * chart3;
 
-static lv_chart_series_t * ser4;
-
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -66,19 +64,21 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
     lv_obj_set_style_text_color(hint, lv_palette_main(LV_PALETTE_GREEN), 0);
 
     chart3 = lv_chart_create(panel1);
-    lv_chart_set_type(chart3, LV_CHART_TYPE_BAR);
+    lv_chart_set_type(chart3, LV_CHART_TYPE_STACKED);
     lv_chart_set_div_line_count(chart3, 6, 0);
     lv_chart_set_point_count(chart3, 7);
     lv_obj_add_event_cb(chart3, shop_chart_event_cb, LV_EVENT_ALL, NULL);
 
-    ser4 = lv_chart_add_series(chart3, lv_theme_get_color_primary(chart3), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
+    lv_chart_series_t * ser4 = lv_chart_add_series(chart3, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser5 = lv_chart_add_series(chart3, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser6 = lv_chart_add_series(chart3, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+
+    uint32_t i;
+    for(i = 0; i < 8; i++) {
+        lv_chart_set_next_value(chart3, ser4, lv_rand(20, 40));
+        lv_chart_set_next_value(chart3, ser5, lv_rand(15, 30));
+        lv_chart_set_next_value(chart3, ser6, lv_rand(15, 30));
+    }
 
     if(disp_size == DISP_LARGE) {
         static int32_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -199,7 +199,8 @@ void lv_demo_widgets_shop_create(lv_obj_t * parent)
 
     cb = lv_checkbox_create(notifications);
     lv_checkbox_set_text_static(cb, "Milestone reached");
-    lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
+    lv_obj_add_state(cb, LV_STATE_CHECKED);
+    lv_obj_add_state(cb, LV_STATE_DISABLED);
 
     cb = lv_checkbox_create(notifications);
     lv_checkbox_set_text_static(cb, "Out of stock");

@@ -76,7 +76,9 @@ inherit the base direction.
 
 ``pad_left/right/top/bottom`` sets the spacing around the scrollbars,
 ``width`` sets the scrollbar's width and ``length`` sets the scrollbar's length:
-If `length` is not set or left at `0` the scrollbar's length will be set automatically according to the length of the content.  
+If `length` is not set or left at `0` the scrollbar's length will be set automatically
+according to the length of the content.
+
 .. code-block:: c
 
    static lv_style_t style_scrollbar;

@@ -14,6 +14,8 @@
 #include "../../core/lv_group.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
+#include "../../misc/lv_text_private.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../draw/lv_draw_arc.h"
 
 /*********************
@@ -68,6 +70,11 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
 static void scale_free_line_needle_points_cb(lv_event_t * e);
 
 static bool scale_is_major_tick(lv_scale_t * scale, uint32_t tick_idx);
+
+#if LV_USE_OBSERVER
+    static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+    static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -516,6 +523,42 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
  * Other functions
  *====================*/
 
+#if LV_USE_OBSERVER
+
+lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_min_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, scale_section_max_value_observer_cb, obj, section);
+
+    return observer;
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -630,6 +673,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     label_dsc.base.layer = layer;
     /* Formatting the labels with the configured style for LV_PART_INDICATOR */
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -1272,10 +1316,22 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
+    lv_text_attributes_t attributes = {0};
+    attributes.letter_space = label_dsc->letter_space;
+    attributes.line_space = label_dsc->line_space;
+    attributes.max_width = LV_COORD_MAX;
+    attributes.text_flags = LV_TEXT_FLAG_NONE;
+
     /* Reserve appropriate size for the tick label */
     lv_point_t label_size;
-    lv_text_get_size(&label_size, label_dsc->text,
-                     label_dsc->font, label_dsc->letter_space, label_dsc->line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+    if(label_dsc->text != NULL) {
+        lv_text_get_size(&label_size, label_dsc->text, label_dsc->font, &attributes);
+    }
+    else {
+        label_size.x = 0;
+        label_size.y = 0;
+    }
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -1704,5 +1760,22 @@ static bool scale_is_major_tick(lv_scale_t * scale, uint32_t tick_idx)
 {
     return scale->major_tick_every != 0 && tick_idx % scale->major_tick_every == 0;
 }
+
+#if LV_USE_OBSERVER
+
+static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_min_value(observer->target, section, subject->value.num);
+}
+
+static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_scale_section_t * section = observer->user_data;
+    lv_scale_set_section_max_value(observer->target, section, subject->value.num);
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

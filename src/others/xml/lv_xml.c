@@ -37,17 +37,20 @@
 #include "parsers/lv_xml_textarea_parser.h"
 #include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_arc_parser.h"
+#include "parsers/lv_xml_switch_parser.h"
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 #include "../../core/lv_global.h"
+#include "../../misc/lv_anim_timeline_private.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define xml_path_prefix LV_GLOBAL_DEFAULT()->xml_path_prefix
+#define lv_event_xml_store_timeline LV_GLOBAL_DEFAULT()->lv_event_xml_store_timeline
 
 /**********************
  *      TYPEDEFS
@@ -58,6 +61,8 @@
  **********************/
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs);
 static void view_end_element_handler(void * user_data, const char * name);
+static void get_timeline_from_event_cb(lv_event_t * e);
+static void free_timelines_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,6 +80,9 @@ void lv_xml_init(void)
 {
     xml_path_prefix = lv_strdup("");
 
+    /*It will be sued to store animation time lines in user_data*/
+    lv_event_xml_store_timeline = lv_event_register_id();
+
     lv_xml_component_init();
 
     lv_xml_register_font(NULL, "lv_font_default", lv_font_get_default());
@@ -88,6 +96,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
     lv_xml_widget_register("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
     lv_xml_widget_register("lv_tabview-tab", lv_xml_tabview_tab_create, lv_xml_tabview_tab_apply);
+    lv_xml_widget_register("lv_tabview-tab_button", lv_xml_tabview_tab_button_create, lv_xml_tabview_tab_button_apply);
     lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
     lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
@@ -106,6 +115,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
     lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
     lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
+    lv_xml_widget_register("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
     lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
     lv_xml_widget_register("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
     lv_xml_widget_register("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);
@@ -129,6 +139,8 @@ void lv_xml_init(void)
                            lv_obj_xml_screen_load_event_apply);
     lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
                            lv_obj_xml_screen_create_event_apply);
+    lv_xml_widget_register("lv_obj-play_timeline_event", lv_obj_xml_play_timeline_event_create,
+                           lv_obj_xml_play_timeline_event_apply);
 
     lv_xml_widget_register("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
     lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
@@ -201,6 +213,35 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
         }
     }
 #endif
+
+    /*Create the timelines as well*/
+    if(!lv_ll_is_empty(&scope->timeline_ll)) {
+        lv_xml_timeline_t * at_xml;
+        lv_anim_timeline_t ** timeline_array;
+        timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t *));
+        uint32_t i = 0;
+        LV_LL_READ(&scope->timeline_ll, at_xml) {
+            lv_anim_timeline_t * at = lv_anim_timeline_create();
+            at->user_data = lv_strdup(at_xml->name);
+
+            lv_anim_t * a_stored;
+            LV_LL_READ(&at_xml->anims_ll, a_stored) {
+                int32_t delay = -a_stored->act_time;
+                lv_anim_timeline_add(at, delay, a_stored);
+            }
+
+            at->base_obj = state.view;
+            timeline_array[i] = at;
+            i++;
+        }
+
+
+        timeline_array[i] = NULL; /*Closing to avoid storing the length*/
+
+
+        lv_obj_add_event_cb(state.view, get_timeline_from_event_cb, lv_event_xml_store_timeline, timeline_array);
+        lv_obj_add_event_cb(state.view, free_timelines_event_cb, LV_EVENT_DELETE, timeline_array);
+    }
 
     lv_ll_clear(&state.parent_ll);
     XML_ParserFree(parser);
@@ -298,7 +339,7 @@ lv_result_t lv_xml_register_font(lv_xml_component_scope_t * scope, const char * 
     lv_xml_font_t * f;
     LV_LL_READ(&scope->font_ll, f) {
         if(lv_streq(f->name, name)) {
-            LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Font `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -342,11 +383,10 @@ lv_result_t lv_xml_register_subject(lv_xml_component_scope_t * scope, const char
         return LV_RESULT_INVALID;
     }
 
-
     lv_xml_subject_t * s;
     LV_LL_READ(&scope->subjects_ll, s) {
         if(lv_streq(s->name, name)) {
-            LV_LOG_INFO("Subject %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Subject `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -382,6 +422,54 @@ lv_subject_t * lv_xml_get_subject(lv_xml_component_scope_t * scope, const char *
     return NULL;
 }
 
+
+lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const char * name)
+{
+    if(scope == NULL) scope = lv_xml_component_get_scope("globals");
+    if(scope == NULL) {
+        LV_LOG_WARN("No component found to register subject `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_timeline_t * at;
+    LV_LL_READ(&scope->timeline_ll, at) {
+        if(lv_streq(at->name, name)) {
+            LV_LOG_INFO("Animation timeline `%s` is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    at = lv_ll_ins_head(&scope->timeline_ll);
+    at->name = lv_strdup(name);
+    lv_ll_init(&at->anims_ll, sizeof(lv_anim_t));
+
+    return LV_RESULT_OK;
+}
+
+void * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name)
+{
+    lv_xml_timeline_t * at;
+    if(scope) {
+        LV_LL_READ(&scope->timeline_ll, at) {
+            if(lv_streq(at->name, name)) return at;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if((scope == NULL || scope->name == NULL) || !lv_streq(scope->name, "globals")) {
+        scope = lv_xml_component_get_scope("globals");
+        if(scope) {
+            LV_LL_READ(&scope->timeline_ll, at) {
+                if(lv_streq(at->name, name)) return at;
+            }
+        }
+    }
+
+    LV_LOG_WARN("No timeline was found with name \"%s\".", name);
+    return NULL;
+}
+
+
 lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char * name, const char * value)
 {
     if(scope == NULL) scope = lv_xml_component_get_scope("globals");
@@ -393,7 +481,7 @@ lv_result_t lv_xml_register_const(lv_xml_component_scope_t * scope, const char *
     lv_xml_const_t * cnst;
     LV_LL_READ(&scope->const_ll, cnst) {
         if(lv_streq(cnst->name, name)) {
-            LV_LOG_INFO("Const %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Const `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -446,7 +534,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_scope_t * scope, const char *
     lv_xml_image_t * img;
     LV_LL_READ(&scope->image_ll, img) {
         if(lv_streq(img->name, name)) {
-            LV_LOG_INFO("Image %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Image `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -503,7 +591,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const cha
     lv_xml_event_cb_t * e;
     LV_LL_READ(&scope->event_ll, e) {
         if(lv_streq(e->name, name)) {
-            LV_LOG_INFO("Event_cb %s is already registered. Don't register it again.", name);
+            LV_LOG_INFO("Event_cb `%s` is already registered. Don't register it again.", name);
             return LV_RESULT_OK;
         }
     }
@@ -636,8 +724,8 @@ static void view_start_element_handler(void * user_data, const char * name, cons
 {
     lv_xml_parser_state_t * state = (lv_xml_parser_state_t *)user_data;
     state->tag_name = name;
-    bool is_view = false;
 
+    bool is_view = false;
     if(lv_streq(name, "view")) {
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         name = extends ? extends : "lv_obj";
@@ -647,7 +735,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     lv_obj_t ** current_parent_p = lv_ll_get_tail(&state->parent_ll);
     if(current_parent_p == NULL) {
         if(state->parent == NULL) {
-            LV_LOG_ERROR("There is no parent object available for %s. This also should never happen.", name);
+            LV_LOG_ERROR("There is no parent object available for %s. This should never happen.", name);
             return;
         }
         else {
@@ -721,5 +809,21 @@ static void view_end_element_handler(void * user_data, const char * name)
     }
 }
 
+static void get_timeline_from_event_cb(lv_event_t * e)
+{
+    void ** out = lv_event_get_param(e);
+    *out = lv_event_get_user_data(e);
+}
+
+static void free_timelines_event_cb(lv_event_t * e)
+{
+    lv_anim_timeline_t ** at_array = lv_event_get_user_data(e);
+    uint32_t i;
+    for(i = 0; at_array[i]; i++) {
+        lv_free(lv_anim_timeline_get_user_data(at_array[i]));
+        lv_anim_timeline_delete(at_array[i]);
+    }
+    lv_free(at_array);
+}
 
 #endif /* LV_USE_XML */

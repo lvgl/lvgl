@@ -22,6 +22,7 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -58,6 +59,11 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+    static void dropdown_value_changed_event_cb(lv_event_t * e);
+    static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -636,6 +642,27 @@ bool lv_dropdown_is_open(lv_obj_t * obj)
     return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
 }
 
+#if LV_USE_OBSERVER
+
+lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -868,6 +895,7 @@ static void draw_main(lv_event_t * e)
     int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
 
+    lv_text_attributes_t attributes = {0};
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
     symbol_dsc.base.layer = layer;
@@ -886,14 +914,19 @@ static void draw_main(lv_event_t * e)
     if(dropdown->dir == LV_DIR_LEFT) symbol_to_left = true;
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
+    int32_t symbol_w = -1;
     if(dropdown->symbol) {
         lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
-        int32_t symbol_w;
         int32_t symbol_h;
         if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
             lv_point_t size;
-            lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
-                             symbol_dsc.flag);
+
+            attributes.letter_space = symbol_dsc.letter_space;
+            attributes.line_space = symbol_dsc.line_space;
+            attributes.max_width = LV_COORD_MAX;
+            attributes.text_flags = symbol_dsc.flag;
+
+            lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, &attributes);
             symbol_w = size.x;
             symbol_h = size.y;
         }
@@ -942,26 +975,40 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
+    label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
+
+    attributes.letter_space = label_dsc.letter_space;
+    attributes.max_width = LV_COORD_MAX;
+    attributes.line_space = label_dsc.line_space;
+    attributes.text_flags = label_dsc.flag;
 
     lv_point_t size;
-    lv_text_get_size(&size, opt_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                     label_dsc.flag);
+    lv_text_get_size(&size, opt_txt, label_dsc.font, &attributes);
 
     lv_area_t txt_area;
-    txt_area.x1 = obj->coords.x1;
-    txt_area.x2 = txt_area.x1 + size.x - 1;
+    txt_area.x1 = obj->coords.x1 + left;
+    txt_area.x2 = obj->coords.x2 - right;
     txt_area.y1 = obj->coords.y1;
     txt_area.y2 = txt_area.y1 + size.y - 1;
+    lv_area_align(&obj->coords, &txt_area, LV_ALIGN_CENTER, 0, 0);
+
     /*Center align the text if no symbol*/
-    if(dropdown->symbol == NULL) {
-        lv_area_align(&obj->coords, &txt_area, LV_ALIGN_CENTER, 0, 0);
+    if(dropdown->symbol == NULL && label_dsc.align == LV_TEXT_ALIGN_AUTO) {
+        label_dsc.align = LV_TEXT_ALIGN_CENTER;
     }
     else {
+        /*Add some space between the label and symbol*/
+        symbol_w += lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+
         /*Text to the right*/
         if(symbol_to_left) {
+            if(label_dsc.align == LV_TEXT_ALIGN_AUTO) label_dsc.align = LV_TEXT_ALIGN_RIGHT;
+            txt_area.x1 += symbol_w;
             lv_area_align(&obj->coords, &txt_area, LV_ALIGN_RIGHT_MID, -right, 0);
         }
         else {
+            if(label_dsc.align == LV_TEXT_ALIGN_AUTO) label_dsc.align = LV_TEXT_ALIGN_LEFT;
+            txt_area.x2 -= symbol_w;
             lv_area_align(&obj->coords, &txt_area, LV_ALIGN_LEFT_MID, left, 0);
         }
     }
@@ -1030,6 +1077,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
 
     /*Draw the selected*/
     lv_obj_t * label = get_label(dropdown_obj);
+    LV_ASSERT_NULL(label);
     lv_area_t rect_area;
     rect_area.y1 = label->coords.y1;
     rect_area.y1 += id * (font_h + line_space);
@@ -1235,5 +1283,23 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
 
     return lv_obj_get_child(dropdown->list, 0);
 }
+
+#if LV_USE_OBSERVER
+
+static void dropdown_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * dropdown = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    lv_subject_set_int(subject, lv_dropdown_get_selected(dropdown));
+}
+
+static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_dropdown_set_selected(observer->target, subject->value.num);
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

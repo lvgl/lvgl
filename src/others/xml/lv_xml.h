@@ -21,6 +21,7 @@ extern "C" {
 #include "lv_xml_test.h"
 #include "lv_xml_translation.h"
 #include "lv_xml_component.h"
+#include "lv_xml_widget.h"
 
 /*********************
  *      DEFINES
@@ -90,6 +91,10 @@ const char * lv_xml_get_const(lv_xml_component_scope_t * scope, const char * nam
 lv_result_t lv_xml_register_event_cb(lv_xml_component_scope_t * scope, const char * name, lv_event_cb_t cb);
 
 lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_scope_t * scope, const char * name);
+
+lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const char * name);
+
+void * lv_xml_get_timeline(lv_xml_component_scope_t * scope, const char * name);
 
 /**********************
  *      MACROS

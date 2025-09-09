@@ -324,8 +324,8 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * bytes_align);
 
 static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
-static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
-static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
+static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_matrix_t * grad_matrix,
+                                       const vg_lite_matrix_t * path_matrix);
 
 /**********************
  *  STATIC VARIABLES
@@ -501,6 +501,13 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra2222_t> conv_bgra2222_to_bgr
     }
 });
 
+/* Used to copy images with inconsistent strides but the same color format */
+static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgra8888_to_bgra8888(
+    [](vg_color32_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    memcpy(dest, src, sizeof(vg_color32_t) * px_size);
+});
+
 /**********************
  *      MACROS
  **********************/
@@ -657,13 +664,19 @@ extern "C" {
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
+        vg_lite_matrix_t new_matrix = *matrix;
+        if(rect->x || rect->y) {
+            /* simulate hardware device clipping behavior */
+            vg_lite_translate(-rect->x, -rect->y, &new_matrix);
+        }
+
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_rect(shape, target, rect));
-        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(&new_matrix)));
 
         auto picture = tvg::Picture::gen();
         TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, source, color));
-        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(picture->transform(matrix_conv(&new_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
@@ -1457,10 +1470,13 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        vg_lite_matrix_t grad_matrix;
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, path_matrix));
+
         auto linearGrad = LinearGradient::gen();
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->linear(grad->linear_grad.X0, grad->linear_grad.Y0, grad->linear_grad.X1,
                                                      grad->linear_grad.Y1));
-        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(linearGrad->spread(fill_spread_conv(grad->spread_mode)));
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_COLOR_RAMP_STOPS];
@@ -1912,9 +1928,7 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
         vg_lite_matrix_t grad_matrix;
-        vg_lite_identity(&grad_matrix);
-        vg_lite_matrix_inverse(&grad_matrix, matrix);
-        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, matrix));
 
         vg_lite_fpoint_t p1 = {0.0f, 0.0f};
         vg_lite_fpoint_t p2 = {1.0f, 0};
@@ -1975,8 +1989,11 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
+        vg_lite_matrix_t grad_matrix;
+        TVG_CHECK_RETURN_VG_ERROR(vg_lite_grad_matrix_conv(&grad_matrix, &grad->matrix, path_matrix));
+
         auto radialGrad = RadialGradient::gen();
-        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad_matrix)));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->radial(grad->radial_grad.cx, grad->radial_grad.cy, grad->radial_grad.r));
         TVG_CHECK_RETURN_VG_ERROR(radialGrad->spread(fill_spread_conv(grad->spread_mode)));
 
@@ -2181,6 +2198,15 @@ static vg_lite_error_t vg_lite_error_conv(Result result)
 
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix)
 {
+    static const Matrix identity = {
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    };
+    if(!matrix) {
+        return identity;
+    }
+
     return *(Matrix *)matrix;
 }
 
@@ -2491,13 +2517,21 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     ctx->target_px_size = target->width * target->height;
 
     void * canvas_target_buffer;
+    uint32_t stride = 0;
+
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
         canvas_target_buffer = target->memory;
+
+        /* support target stride */
+        LV_ASSERT(target->stride >= target->width);
+        LV_ASSERT(VG_LITE_IS_ALIGNED(target->stride, sizeof(uint32_t)));
+        stride = target->stride / sizeof(uint32_t);
     }
     else {
         /* if target format is not supported by VG, use internal buffer */
         canvas_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
+        stride = target->width;
     }
 
     /* Prevent repeated target setting */
@@ -2509,7 +2543,7 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 
     TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
                                 (uint32_t *)ctx->tvg_target_buffer,
-                                target->width,
+                                stride,
                                 target->width,
                                 target->height,
                                 SwCanvas::ARGB8888));
@@ -2524,29 +2558,16 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     return Result::Success;
 }
 
-static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
-{
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
-        w = VG_LITE_ALIGN(w, 16);
-    }
-
-    vg_lite_uint32_t mul, div, align;
-    get_format_bytes(color_format, &mul, &div, &align);
-    return VG_LITE_ALIGN((w * mul / div), align);
-}
-
 static bool decode_indexed_line(
     vg_lite_buffer_format_t color_format,
     const vg_lite_uint32_t * palette,
     int32_t x, int32_t y,
-    int32_t w_px, const uint8_t * in, vg_lite_uint32_t * out)
+    int32_t w_px, uint32_t stride, const uint8_t * in, vg_lite_uint32_t * out)
 {
     uint8_t px_size;
     uint16_t mask;
 
-    vg_lite_uint32_t w_byte = width_to_stride(w_px, color_format);
-
-    in += w_byte * y; /*First pixel*/
+    in += stride * y; /*First pixel*/
     out += w_px * y;
 
     int8_t shift = 0;
@@ -2596,19 +2617,22 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                            vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
 
-#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->width, 16));
-#endif
+    /* At least 8-byte alignment */
+    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, 8));
 
-    if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
+    /**
+     * Since ThorVG's picture->load does not support stride,
+     * reconversion is required when the stride and width do not match.
+     */
+    if(source->format == VG_LITE_BGRA8888
+       && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE
+       && (size_t)source->stride == (size_t)(source->width * sizeof(vg_lite_uint32_t))) {
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
         vg_lite_uint32_t width = source->width;
         vg_lite_uint32_t height = source->height;
-        vg_lite_uint32_t px_size = width * height;
         image_buffer = ctx->get_image_buffer(width, height);
 
         vg_lite_buffer_t target;
@@ -2617,7 +2641,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         target.format = VG_LITE_BGRA8888;
         target.width = width;
         target.height = height;
-        target.stride = width_to_stride(width, target.format);
+        target.stride = width * sizeof(vg_lite_uint32_t);
 
         switch(source->format) {
             case VG_LITE_INDEX_1:
@@ -2626,7 +2650,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
             case VG_LITE_INDEX_8: {
                     const vg_lite_uint32_t * clut_colors = ctx->get_CLUT(source->format);
                     for(vg_lite_uint32_t y = 0; y < height; y++) {
-                        decode_indexed_line(source->format, clut_colors, 0, y, width, (uint8_t *)source->memory, image_buffer);
+                        decode_indexed_line(source->format, clut_colors, 0, y, width, source->stride, (uint8_t *)source->memory, image_buffer);
                     }
                 }
                 break;
@@ -2691,7 +2715,8 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
             case VG_LITE_BGRA8888: {
-                    memcpy(image_buffer, source->memory, px_size * sizeof(vg_color32_t));
+                    /* For stride conversion */
+                    conv_bgra8888_to_bgra8888.convert(&target, source);
                 }
                 break;
 
@@ -2704,6 +2729,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         /* multiply color */
         if(source->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE && !VG_LITE_IS_ALPHA_FORMAT(source->format)) {
             vg_color32_t * dest = (vg_color32_t *)image_buffer;
+            vg_lite_uint32_t px_size = width * height;
             while(px_size--) {
                 dest->alpha = UDIV255(dest->alpha * A(color));
                 dest->red = UDIV255(dest->red * B(color));
@@ -2983,6 +3009,27 @@ static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_mat
 
     /* Copy temporary matrix into result. */
     lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
+}
+
+static Result vg_lite_grad_matrix_conv(vg_lite_matrix_t * result, const vg_lite_matrix_t * grad_matrix,
+                                       const vg_lite_matrix_t * path_matrix)
+{
+    /**
+     * Since Thorvg internally multiplies the path (shape) matrix with the gradient matrix to produce
+     * the rendering result, and VG-Lite's gradient matrix and path matrix are completely independent,
+     * requiring a previous multiplication to achieve the same rendering result,
+     * for the VG-Lite emulator, it is necessary to offset the gradient matrix to obtain the user's original gradient matrix
+     * to simulate hardware behavior:
+     * matrix_out = path_matrix * gradient_matrix
+     * =>
+     * gradient_matrix = inv(path_matrix) * matrix_out
+     */
+    if(!vg_lite_matrix_inverse(result, path_matrix)) {
+        return Result::InvalidArguments;
+    }
+
+    vg_lite_matrix_multiply(result, grad_matrix);
+    return Result::Success;
 }
 
 #endif

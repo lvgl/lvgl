@@ -398,8 +398,12 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
 void lv_vg_lite_path_close(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
+#if LV_VG_LITE_DISABLE_VLC_OP_CLOSE
+    LV_UNUSED(path);
+#else
     lv_vg_lite_path_reserve_space(path, 1 * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_CLOSE);
+#endif
 }
 
 void lv_vg_lite_path_end(lv_vg_lite_path_t * path)
@@ -643,6 +647,7 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 {
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(cb);
+    LV_PROFILER_DRAW_BEGIN;
 
     uint8_t fmt_len = lv_vg_lite_path_format_len(path->format);
     uint8_t * cur = path->path;
@@ -684,6 +689,8 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 
         cb(user_data, op_code, tmp_data, arg_len);
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src)

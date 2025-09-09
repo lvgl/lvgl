@@ -122,6 +122,10 @@ typedef struct _lv_global_t {
                                                             * can be managed by image cache. */
 
     lv_ll_t img_decoder_ll;
+#if LV_USE_OS != LV_OS_NONE
+    lv_mutex_t img_decoder_info_lock;
+    lv_mutex_t img_decoder_open_lock;
+#endif
 
     lv_cache_t * img_cache;
     lv_cache_t * img_header_cache;
@@ -261,6 +265,11 @@ typedef struct _lv_global_t {
 
 #if LV_USE_XML
     const char * xml_path_prefix;
+    uint32_t lv_event_xml_store_timeline;
+#endif
+
+#if LV_USE_DRAW_EVE
+    lv_draw_eve_unit_t * draw_eve_unit;
 #endif
 
     void * user_data;

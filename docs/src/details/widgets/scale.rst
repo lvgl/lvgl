@@ -4,6 +4,7 @@
 Scale (lv_scale)
 ================
 
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Overview
 ********
@@ -120,7 +121,7 @@ Or both of the above can be done at the same time:
 
 Some labels of the Scale might be drawn upside down (to match the tick) if the Scale includes a certain angle range.
 If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used.
-Labels that would be upside down are then rotated 180
+Labels that would be upside down are then rotated 180\ |deg|
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR)`.
 Labels can also be moved a fixed distance in X and Y pixels using
 :cpp:expr:`lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR)`.
@@ -182,6 +183,25 @@ range, the Scale will only use that portion of the Section that overlaps the Sca
 range.  If a Section's range is not within the Scale's range at all, it will not be
 used in drawing.  That can be useful to temporarily "disable" a Section, e.g.
 :cpp:expr:`lv_scale_section_set_range(section, 0, -1)`.)
+
+Data binding
+~~~~~~~~~~~~
+
+To get familiar with observers, subjects, and data bindings in general, visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
+minimum or maximum values directly.  Note that this is a one-way binding (Subject ==> Widget)
+as the Scale Section's boundaries are not interactive.
+
+
+It supports only integer subjects.
+
+- :cpp:expr:`lv_scale_bind_section_min_value(scale, section1, &subject)`
+- :cpp:expr:`lv_scale_bind_section_max_value(scale, section1, &subject)`
+
+
+.. _change_subject_on_event:
 
 
 .. _scale_styling_sections:

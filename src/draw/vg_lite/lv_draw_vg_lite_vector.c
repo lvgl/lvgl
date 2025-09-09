@@ -165,15 +165,6 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 vg_lite_matrix_t grad_matrix = *matrix;
-
-#if LV_USE_VG_LITE_THORVG
-                /* Workaround inconsistent radial gradient matrix behavior between device and ThorVG */
-                if(dsc->fill_dsc.gradient.style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-                    /* Restore matrix to identity */
-                    vg_lite_identity(&grad_matrix);
-                }
-#endif
-
                 vg_lite_matrix_t fill_matrix;
                 lv_vg_lite_matrix(&fill_matrix, &dsc->fill_dsc.matrix);
                 lv_vg_lite_matrix_multiply(&grad_matrix, &fill_matrix);
@@ -276,15 +267,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     /* clear area */
     if(!path) {
         vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, OPA_MIX(dsc->fill_dsc.opa, u->task_act->opa));
-        vg_lite_rectangle_t rect;
-        lv_vg_lite_rect(&rect, &scissor_area);
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c), {
-            lv_vg_lite_buffer_dump_info(&u->target_buffer);
-            LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
-            lv_vg_lite_color_dump_info(c);
-        });
-        LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
+        lv_vg_lite_clear(&u->target_buffer, &scissor_area, c);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -309,7 +292,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         /* set scissor area */
-        lv_vg_lite_set_scissor_area(&scissor_area);
+        lv_vg_lite_set_scissor_area(u, &scissor_area);
         LV_LOG_TRACE("Set scissor area: X1:%" LV_PRId32 ", Y1:%" LV_PRId32 ", X2:%" LV_PRId32 ", Y2:%" LV_PRId32,
                      scissor_area.x1, scissor_area.y1, scissor_area.x2, scissor_area.y2);
     }

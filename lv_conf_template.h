@@ -340,6 +340,12 @@
 
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
+
+    /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
+    #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
+
+    /** Disable linear gradient extension for some older versions of drivers. */
+    #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
@@ -354,14 +360,27 @@
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #define LV_USE_DRAW_OPENGLES 0
+
+#if LV_USE_DRAW_OPENGLES
+    #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+#endif
 
 /** Draw using espressif PPA accelerator */
 #define LV_USE_PPA  0
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG 0
 #endif
+
+/* Use EVE FT81X GPU. */
+#define LV_USE_DRAW_EVE 0
+
+#if LV_USE_DRAW_EVE
+    /* EVE_GEN value: 2, 3, or 4 */
+    #define LV_DRAW_EVE_EVE_GENERATION 4
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -524,6 +543,22 @@
 
     /** Enable multi-thread render */
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+#endif
+
+/* Enable usage of the LVGL's vg_lite spec driver */
+#define LV_USE_VG_LITE_DRIVER  0
+
+#if LV_USE_VG_LITE_DRIVER
+
+    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+    #define LV_VG_LITE_HAL_GPU_SERIES gc255
+
+    /* Used to pick the correct GPU revision header it depends on the vendor */
+    #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+
+    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+
 #endif
 
 /* Enable the multi-touch gesture recognition feature */
@@ -971,6 +1006,9 @@
 /** Rlottie library */
 #define LV_USE_RLOTTIE 0
 
+/** Requires `LV_USE_3DTEXTURE = 1` */
+#define LV_USE_GLTF  0
+
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
 #define LV_USE_VECTOR_GRAPHIC  0
@@ -1256,6 +1294,13 @@
 
     /** Mouse movement step (pixels) */
     #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
+
+    /*NuttX trace file and its path*/
+    #define LV_USE_NUTTX_TRACE_FILE 0
+    #if LV_USE_NUTTX_TRACE_FILE
+        #define LV_NUTTX_TRACE_FILE_PATH "/data/lvgl-trace.log"
+    #endif
+
 #endif
 
 /** Driver for /dev/dri/card */
@@ -1268,10 +1313,20 @@
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
+
+    #define LV_LINUX_DRM_USE_EGL     0
 #endif
 
 /** Interface for TFT_eSPI */
 #define LV_USE_TFT_ESPI         0
+
+/** Interface for Lovyan_GFX */
+#define LV_USE_LOVYAN_GFX         0
+
+#if LV_USE_LOVYAN_GFX
+    #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
+
+#endif /*LV_USE_LOVYAN_GFX*/
 
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
@@ -1326,11 +1381,15 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
 #endif
+
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
+#define LV_USE_GLFW   0
+
 
 /** QNX Screen display and input drivers */
 #define LV_USE_QNX              0
@@ -1386,6 +1445,9 @@
 
     /** Vector graphic demo */
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
+    /** GLTF demo */
+    #define LV_USE_DEMO_GLTF            0
 
     /*---------------------------
      * Demos from lvgl/lv_demos

@@ -23,6 +23,7 @@ extern "C" {
 #include "../../font/lv_symbol_def.h"
 #include "../../misc/lv_text.h"
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -84,26 +85,28 @@ lv_obj_t * lv_label_create(lv_obj_t * parent);
  * Set a new text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
  * @param text          '\0' terminated character string. NULL to refresh with the current text.
+ * @note If `LV_USE_ARABIC_PERSIAN_CHARS` is enabled the text will be modified to have the correct Arabic
+ * characters in it.
  */
 void lv_label_set_text(lv_obj_t * obj, const char * text);
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
- * @param fmt           `printf`-like format
- *
+ * @param fmt           `printf`-like format string
  * Example:
  * @code
  * lv_label_set_text_fmt(label1, "%d user", user_num);
  * @endcode
+ * @note If `LV_USE_ARABIC_PERSIAN_CHARS` is enabled the text will be modified to have the correct Arabic characters in it.
  */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
- * @param fmt           `printf`-like format
- * @param args          variadic argments list
+ * @param fmt           `printf`-like format string
+ * @param args          variadic arguments list
  *
  * Example:
  * @code
@@ -112,6 +115,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
  * lv_label_set_text_vfmt(label1, fmt, args);
  * va_end(args);
  * @endcode
+ * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
  */
 void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
 
@@ -120,6 +124,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
  * has to be 'alive' while the label exists.
  * @param obj           pointer to a label object
  * @param text          pointer to a text. NULL to refresh with the current text.
+ * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
  */
 void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 
@@ -223,6 +228,21 @@ bool lv_label_get_recolor(const lv_obj_t * obj);
  * Other functions
  *====================*/
 
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer, string, or pointer Subject to a Label.
+ * @param obj       pointer to Label
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
+ *                  as text as they are, integers as %d, floats as %0.1f
+ */
+lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
+#endif
+
+
 /**
  * Insert a text to a label. The label text cannot be static.
  * @param obj       pointer to a label object
@@ -240,6 +260,8 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
  * @param cnt       number of characters to cut
  */
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt);
+
+
 
 /**********************
  *      MACROS

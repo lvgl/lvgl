@@ -530,60 +530,6 @@ lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, 
  */
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 
-#if LV_USE_LABEL
-/**
- * Bind an integer, string, or pointer Subject to a Label.
- * @param obj       pointer to Label
- * @param subject   pointer to Subject
- * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
- * @return          pointer to newly-created Observer
- * @note            `fmt == NULL` can be used only with string and pointer Subjects.
- * @note            If Subject is a pointer and `fmt == NULL`, pointer must point
- *                  to a `\0` terminated string.
- */
-lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
-#endif
-
-#if LV_USE_ARC
-/**
- * Bind an integer subject to an Arc's value.
- * @param obj       pointer to Arc
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_SLIDER
-/**
- * Bind an integer Subject to a Slider's value.
- * @param obj       pointer to Slider
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_ROLLER
-/**
- * Bind an integer Subject to a Roller's value.
- * @param obj       pointer to Roller
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_DROPDOWN
-/**
- * Bind an integer Subject to a Dropdown's value.
- * @param obj       pointer to Dropdown
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
 
 /**********************
  *      MACROS

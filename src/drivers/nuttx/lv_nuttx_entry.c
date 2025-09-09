@@ -111,6 +111,10 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 #if LV_USE_NUTTX_MOUSE
     dsc->mouse_path = "/dev/mouse0";
 #endif
+
+#if LV_USE_NUTTX_TRACE_FILE
+    dsc->trace_path = LV_NUTTX_TRACE_FILE_PATH;
+#endif
 }
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
@@ -131,6 +135,9 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_nuttx_profiler_init();
+#if LV_USE_NUTTX_TRACE_FILE
+    lv_nuttx_profiler_set_file(dsc->trace_path);
+#endif
 #endif
 
     if(result) {
@@ -254,6 +261,9 @@ void lv_nuttx_deinit(lv_nuttx_result_t * result)
         lv_nuttx_cache_deinit();
         lv_nuttx_image_cache_deinit();
 
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+        lv_nuttx_profiler_deinit();
+#endif
         lv_free(nuttx_ctx_p);
         nuttx_ctx_p = NULL;
     }

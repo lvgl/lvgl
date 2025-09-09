@@ -37,56 +37,63 @@ Each chart has the following attributes (over and above attributes found in
 :ref:`all Widgets <base_widget>`):
 
 Type (governs how a chart's data series are drawn)
-    - Can be LINE (default), BAR, SCATTER, or none.
-    - You can change the chart's type at any point during its life.
+
+- Can be LINE (default), BAR, STACKED, SCATTER, or NONE.
+- You can change the chart's type at any point during its life.
 
 Horizontal and Vertical division lines
-    - default 3 and 5 respectively
-    - can be any non-negative value including 0
+
+- default 3 and 5 respectively
+- can be any non-negative value including 0
 
 2 Y axes and 2 X axes (the latter are used with SCATTER charts)
-    - All 4 axes come with each chart automatically (they do not have to be created).
-    - Their default ranges are [0..100].  If you need a different range, set it before
-      chart is drawn.
-    - You "use" an axis by associating it with a data series, which happens when the
-      data series is created (more on this below).  More than one data series can be
-      associated with each axis.
+
+- All 4 axes come with each chart automatically (they do not have to be created).
+- Their default ranges are [0..100].  If you need a different range, set it before
+  chart is drawn.
+- You "use" an axis by associating it with a data series, which happens when the
+  data series is created (more on this below).  More than one data series can be
+  associated with each axis.
 
 Point count (number of data points in all data series added to the chart)
-    - default 10
-    - If you provide your own data-value arrays, each array so provided must contain
-      at least this number of values.
-    - For LINE- and BAR-charts, this is the number of points on the X axis.
-    - LINE- and BAR-charts require only one data-value array to supply Y-values for each data point.
-    - For SCATTER charts, this is the number of scatter-points in the data series.
-    - SCATTER charts have separate data-value arrays for both X-values and Y-values.
+
+- default 10
+- If you provide your own data-value arrays, each array so provided must contain
+  at least this number of values.
+- For LINE-, BAR-, STACKED-charts, this is the number of points on the X axis.
+- LINE-, BAR-, STACKED-charts require only one data-value array to supply Y-values for each data point.
+- For SCATTER charts, this is the number of scatter-points in the data series.
+- SCATTER charts have separate data-value arrays for both X-values and Y-values.
 
 Any number of data series
-    - After a chart is created, it initially contains no data series.  You have to add them.
-    - You can add and remove data series at any time during a chart's life.
-    - When a data series is created, it comes with pre-allocated values array(s)
-      based on its chart type and ``point_count``.  (All chart types use an array of
-      Y-values.  SCATTER-type charts also use an array of X-values.).  All Y-values so
-      allocated are set to :c:macro:`LV_CHART_POINT_NONE`, which causes that point to be hidden.
-    - To get points to be drawn on the chart, you must set their Y-values to something
-      other than :c:macro:`LV_CHART_POINT_NONE`.
-    - You can hide a point by setting its Y-value to :c:macro:`LV_CHART_POINT_NONE`.
-    - If desired, you can tell a data series to instead use a value array you
-      provide.  If you do:
 
-      - Pre-allocated value arrays are automatically freed.
-      - That data series will continue to use *your* array from that time onward.
-      - The values in your array must remain available through the life of that data series.
-      - You must ensure each array provided contains at least ``point_count`` ``int32_t`` elements.
-      - Management of the life any value arrays you provide is up to you.
+- After a chart is created, it initially contains no data series.  You have to add them.
+- You can add and remove data series at any time during a chart's life.
+- When a data series is created, it comes with pre-allocated values array(s)
+  based on its chart type and ``point_count``.  (All chart types use an array of
+  Y-values.  SCATTER-type charts also use an array of X-values.).  All Y-values so
+  allocated are set to :c:macro:`LV_CHART_POINT_NONE`, which causes that point to be hidden.
+- To get points to be drawn on the chart, you must set their Y-values to something
+  other than :c:macro:`LV_CHART_POINT_NONE`.
+- You can hide a point by setting its Y-value to :c:macro:`LV_CHART_POINT_NONE`.
+- If desired, you can tell a data series to instead use a value array you
+  provide.  If you do:
+
+  - Pre-allocated value arrays are automatically freed.
+  - That data series will continue to use *your* array from that time onward.
+  - The values in your array must remain available through the life of that data series.
+  - You must ensure each array provided contains at least ``point_count`` ``int32_t`` elements.
+  - Management of the life any value arrays you provide is up to you.
 
 Any number of cursors
-    - After a chart is created, it initially contains no cursors.  You have to add them
-      if you want to use them.
-    - You can add, show, hide or remove cursors at any time during a chart's life.
+
+- After a chart is created, it initially contains no cursors.  You have to add them
+  if you want to use them.
+- You can add, show, hide or remove cursors at any time during a chart's life.
 
 Update mode
-    - :ref:`See below <chart_update_modes>`
+
+- :ref:`See below <chart_update_modes>`
 
 
 Chart layers
@@ -114,7 +121,7 @@ Parts and Styles
 
 -  :cpp:enumerator:`LV_PART_MAIN` The background of the chart. Uses the :ref:`typical
    background <typical bg props>` and line style properties (for division lines).
-   *Padding* makes the series area smaller. For BAR charts ``pad_column`` sets the
+   *Padding* makes the series area smaller. For BAR and STACKED charts ``pad_column`` sets the
    space between bars in the same data series.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` A scrollbar used if the chart is zoomed. See
    :ref:`base_widget`'s documentation for details.
@@ -150,7 +157,9 @@ A chart can be one of the following types:
   can also be illustrated if their ``width``, ``height``, ``bg_color`` and ``radius``
   styles (for :cpp:enumerator:`LV_PART_ITEMS`) are set and both ``width`` and
   ``height`` have non-zero values.
-- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
+- :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw individual vertical bars for each point in each series.
+- :cpp:enumerator:`LV_CHART_TYPE_STACKED`: Draw vertical stacked bars where multiple data series
+  are displayed as segments within a single bar for each data point. Supports only positive values.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and optionally
   lines between the points if line-width style values for
   :cpp:enumerator:`LV_PART_ITEMS` is a non-zero value, and the point's Y-value is

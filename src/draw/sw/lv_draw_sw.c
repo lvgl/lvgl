@@ -329,7 +329,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     draw_sw_unit->task_act = t;
 
     execute_drawing(t);
-    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     draw_sw_unit->task_act = NULL;
 
     /*The draw unit is free now. Request a new dispatching as it can get a new task*/
@@ -366,7 +366,7 @@ static void render_thread_cb(void * ptr)
 #if LV_USE_PARALLEL_DRAW_DEBUG
         parallel_debug_draw(thread_dsc->task_act, thread_dsc->idx);
 #endif
-        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_READY;
+        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
         thread_dsc->task_act = NULL;
 
         /*The draw unit is free now. Request a new dispatching as it can get a new task*/
@@ -437,6 +437,13 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
+        lv_text_attributes_t attributes = {0};
+
+        attributes.text_flags = LV_TEXT_FLAG_NONE;
+        attributes.line_space = 0;
+        attributes.letter_space = 0;
+        attributes.max_width = 100;
+
         if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area)) return;
 
         lv_draw_fill_dsc_t fill_dsc;
@@ -453,7 +460,7 @@ static void parallel_debug_draw(lv_draw_task_t * t, uint32_t idx)
         lv_draw_sw_border(t, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, &attributes);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
