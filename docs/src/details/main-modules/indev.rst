@@ -657,7 +657,7 @@ overwrite ``data->timestamp``. By default, this is initialized to
 :cpp:func:`lv_tick_get()` just before invoking ``read_cb``.
 
 
-.. _indev event mode::
+.. _indev event mode:
 
 Switching the Input Device to Event-Driven Mode
 -----------------------------------------------
