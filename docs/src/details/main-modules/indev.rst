@@ -397,7 +397,7 @@ device *when* the knob is being turned, and *in which direction*.
 With an encoder your application can receive events from the following:
 
 1.  press of its button,
-2.  oong-press of its button,
+2.  long-press of its button,
 3.  turn left, and
 4.  turn right.
 

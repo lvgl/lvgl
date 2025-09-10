@@ -278,6 +278,10 @@ typedef struct _lv_win_t lv_win_t;
 
 typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
+typedef struct _lv_gltf_t lv_gltf_t;
+
+typedef struct _lv_gltf_model_t lv_gltf_model_t;
+
 typedef struct _lv_observer_t lv_observer_t;
 
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
@@ -346,8 +350,8 @@ typedef struct _lv_rlottie_t lv_rlottie_t;
 
 typedef struct _lv_ffmpeg_player_t lv_ffmpeg_player_t;
 
-typedef struct _lv_glfw_window_t lv_glfw_window_t;
-typedef struct _lv_glfw_texture_t lv_glfw_texture_t;
+typedef struct _lv_opengles_window_t lv_opengles_window_t;
+typedef struct _lv_opengles_window_texture_t lv_opengles_window_texture_t;
 
 typedef uint32_t lv_prop_id_t;
 

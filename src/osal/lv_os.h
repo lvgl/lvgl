@@ -187,6 +187,12 @@ lv_result_t lv_lock_isr(void);
  */
 void lv_unlock(void);
 
+/**
+ * Sleeps the current thread by an amount of miliseconds.
+ * @param ms     amount of miliseconds to sleep the current thread.
+ */
+void lv_sleep_ms(uint32_t ms);
+
 #else
 
 /* Since compilation does not necessarily optimize cross-file empty functions well
@@ -287,6 +293,13 @@ static inline void lv_unlock(void)
 {
     /*Do nothing*/
 }
+
+static inline void lv_sleep_ms(uint32_t ms)
+{
+    LV_UNUSED(ms);
+    /*Do nothing */
+}
+
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 

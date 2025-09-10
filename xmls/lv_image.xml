@@ -29,5 +29,6 @@ Example
 	    <prop name="scale_y" type="int" help=""/>
     	<prop name="pivot_x" type="int" help=""/>
     	<prop name="pivot_y" type="int" help=""/>
+        <prop name="bind_src" type="subject" />
 	</api>
 </widget>

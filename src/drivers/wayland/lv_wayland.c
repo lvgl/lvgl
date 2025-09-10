@@ -18,12 +18,12 @@
     #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
 #endif
 
-#if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
-    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
+#if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 2
+    #error "Wayland with DMABUF only supports 2 LV_WAYLAND_BUF_COUNT"
 #endif
 
-#if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_WINDOW_DECORATIONS
-    #error "LV_WAYLAND_USE_DMABUF doesn't support LV_WAYLAND_WINDOW_DECORATIONS"
+#if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
+    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
 #endif
 
 #ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
@@ -126,15 +126,31 @@ uint32_t lv_wayland_timer_handler(void)
         LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
         if(window != NULL && window->resize_pending) {
+#if LV_WAYLAND_USE_DMABUF
+            /* Check surface configuration state before resizing */
+            if(!window->surface_configured) {
+                LV_LOG_TRACE("Deferring resize - surface not configured yet");
+                continue;
+            }
+#endif
+            LV_LOG_TRACE("Processing resize: %dx%d -> %dx%d",
+                         window->width, window->height,
+                         window->resize_width, window->resize_height);
+
             if(lv_wayland_window_resize(window, window->resize_width, window->resize_height) == LV_RESULT_OK) {
                 window->resize_width   = window->width;
                 window->resize_height  = window->height;
                 window->resize_pending = false;
-
+#if LV_WAYLAND_USE_DMABUF
+                /* Reset synchronization flags after successful resize */
+                window->surface_configured = false;
+                window->dmabuf_resize_pending = false;
+#endif
+                LV_LOG_TRACE("Window resize completed successfully: %dx%d",
+                             window->width, window->height);
             }
             else {
-
-                LV_LOG_TRACE("Failed to resize window frame: %d", window->frame_counter);
+                LV_LOG_ERROR("Failed to resize window frame: %d", window->frame_counter);
             }
         }
         else if(window->shall_close == true) {

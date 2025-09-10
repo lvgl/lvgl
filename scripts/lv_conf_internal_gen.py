@@ -215,6 +215,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
+#if LV_USE_LINUX_DRM == 0
+    #define LV_LINUX_DRM_USE_EGL     0
+#endif /*LV_USE_LINUX_DRM*/
+
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
@@ -256,6 +260,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_USE_THORVG 0
     #endif
 #endif
+
+#ifndef LV_USE_EGL
+	#define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+#endif /* LV_USE_EGL */
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)

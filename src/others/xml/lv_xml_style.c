@@ -163,6 +163,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
         else SET_STYLE_IF(max_height, lv_xml_to_size(value));
         else SET_STYLE_IF(length, lv_xml_to_size(value));
         else SET_STYLE_IF(radius, lv_xml_to_size(value));
+        else SET_STYLE_IF(radial_offset, lv_xml_atoi(value));
+        else SET_STYLE_IF(align, lv_xml_align_to_enum(value));
 
         else SET_STYLE_IF(pad_left, lv_xml_atoi(value));
         else SET_STYLE_IF(pad_right, lv_xml_atoi(value));

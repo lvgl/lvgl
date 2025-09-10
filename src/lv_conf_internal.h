@@ -1009,12 +1009,22 @@
     #endif
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #ifndef LV_USE_DRAW_OPENGLES
     #ifdef CONFIG_LV_USE_DRAW_OPENGLES
         #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
     #else
         #define LV_USE_DRAW_OPENGLES 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    #ifndef LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+        #ifdef CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+            #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
+        #else
+            #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+        #endif
     #endif
 #endif
 
@@ -1546,6 +1556,46 @@
             #define LV_VG_LITE_THORVG_THREAD_RENDER 0
         #endif
     #endif
+#endif
+
+/* Enable usage of the LVGL's vg_lite spec driver */
+#ifndef LV_USE_VG_LITE_DRIVER
+    #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
+        #define LV_USE_VG_LITE_DRIVER CONFIG_LV_USE_VG_LITE_DRIVER
+    #else
+        #define LV_USE_VG_LITE_DRIVER  0
+    #endif
+#endif
+
+#if LV_USE_VG_LITE_DRIVER
+
+    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+    #ifndef LV_VG_LITE_HAL_GPU_SERIES
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+            #define LV_VG_LITE_HAL_GPU_SERIES CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+        #else
+            #define LV_VG_LITE_HAL_GPU_SERIES gc255
+        #endif
+    #endif
+
+    /* Used to pick the correct GPU revision header it depends on the vendor */
+    #ifndef LV_VG_LITE_HAL_GPU_REVISION
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+            #define LV_VG_LITE_HAL_GPU_REVISION CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+        #else
+            #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+        #endif
+    #endif
+
+    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+        #else
+            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+        #endif
+    #endif
+
 #endif
 
 /* Enable the multi-touch gesture recognition feature */
@@ -3029,6 +3079,14 @@
     #endif
 #endif
 
+/** GStreamer library */
+#ifndef LV_USE_GSTREAMER
+    #ifdef CONFIG_LV_USE_GSTREAMER
+        #define LV_USE_GSTREAMER CONFIG_LV_USE_GSTREAMER
+    #else
+        #define LV_USE_GSTREAMER 0
+    #endif
+#endif
 
 /** Decode bin images to RAM */
 #ifndef LV_BIN_DECODER_RAM_LOAD
@@ -3134,6 +3192,15 @@
         #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
     #else
         #define LV_USE_RLOTTIE 0
+    #endif
+#endif
+
+/** Requires `LV_USE_3DTEXTURE = 1` */
+#ifndef LV_USE_GLTF
+    #ifdef CONFIG_LV_USE_GLTF
+        #define LV_USE_GLTF CONFIG_LV_USE_GLTF
+    #else
+        #define LV_USE_GLTF  0
     #endif
 #endif
 
@@ -4159,6 +4226,14 @@
             #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
     #endif
+
+    #ifndef LV_LINUX_DRM_USE_EGL
+        #ifdef CONFIG_LV_LINUX_DRM_USE_EGL
+            #define LV_LINUX_DRM_USE_EGL CONFIG_LV_LINUX_DRM_USE_EGL
+        #else
+            #define LV_LINUX_DRM_USE_EGL     0
+        #endif
+    #endif
 #endif
 
 /** Interface for TFT_eSPI */
@@ -4169,6 +4244,26 @@
         #define LV_USE_TFT_ESPI         0
     #endif
 #endif
+
+/** Interface for Lovyan_GFX */
+#ifndef LV_USE_LOVYAN_GFX
+    #ifdef CONFIG_LV_USE_LOVYAN_GFX
+        #define LV_USE_LOVYAN_GFX CONFIG_LV_USE_LOVYAN_GFX
+    #else
+        #define LV_USE_LOVYAN_GFX         0
+    #endif
+#endif
+
+#if LV_USE_LOVYAN_GFX
+    #ifndef LV_LGFX_USER_INCLUDE
+        #ifdef CONFIG_LV_LGFX_USER_INCLUDE
+            #define LV_LGFX_USER_INCLUDE CONFIG_LV_LGFX_USER_INCLUDE
+        #else
+            #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
+        #endif
+    #endif
+
+#endif /*LV_USE_LOVYAN_GFX*/
 
 /** Driver for evdev input devices */
 #ifndef LV_USE_EVDEV
@@ -4347,7 +4442,7 @@
     #endif
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES
         #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
@@ -4368,6 +4463,16 @@
         #endif
     #endif
 #endif
+
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
+#ifndef LV_USE_GLFW
+    #ifdef CONFIG_LV_USE_GLFW
+        #define LV_USE_GLFW CONFIG_LV_USE_GLFW
+    #else
+        #define LV_USE_GLFW   0
+    #endif
+#endif
+
 
 /** QNX Screen display and input drivers */
 #ifndef LV_USE_QNX
@@ -4538,6 +4643,15 @@
         #endif
     #endif
 
+    /** GLTF demo */
+    #ifndef LV_USE_DEMO_GLTF
+        #ifdef CONFIG_LV_USE_DEMO_GLTF
+            #define LV_USE_DEMO_GLTF CONFIG_LV_USE_DEMO_GLTF
+        #else
+            #define LV_USE_DEMO_GLTF            0
+        #endif
+    #endif
+
     /*---------------------------
      * Demos from lvgl/lv_demos
       ---------------------------*/
@@ -4651,6 +4765,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
+#if LV_USE_LINUX_DRM == 0
+    #define LV_LINUX_DRM_USE_EGL     0
+#endif /*LV_USE_LINUX_DRM*/
+
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
@@ -4692,6 +4810,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_USE_THORVG 0
     #endif
 #endif
+
+#ifndef LV_USE_EGL
+	#define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+#endif /* LV_USE_EGL */
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)

@@ -169,6 +169,11 @@ uint32_t lv_os_get_idle_percent(void)
     return lv_timer_get_idle();
 }
 
+void lv_sleep_ms(uint32_t ms)
+{
+    _time_delay(ms);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

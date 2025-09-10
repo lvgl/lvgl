@@ -79,7 +79,7 @@ void lv_eve_vertex_2f(int16_t x, int16_t y);
 void lv_eve_color_mask(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void lv_eve_stencil_func(uint8_t func, uint8_t ref, uint8_t mask);
 void lv_eve_stencil_op(uint8_t sfail, uint8_t spass);
-void lv_eve_blend_func(uint8_t sfail, uint8_t spass);
+void lv_eve_blend_func(uint8_t src, uint8_t dst);
 
 void lv_eve_draw_circle_simple(int16_t coord_x1, int16_t coord_y1, uint16_t radius_t);
 void lv_eve_draw_rect_simple(int16_t coord_x1, int16_t coord_y1, int16_t coord_x2, int16_t coord_y2,

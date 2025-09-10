@@ -1,8 +1,8 @@
-.. _xml_build_ui:
+.. _xml_building_uis:
 
-=========
-Build UIs
-=========
+============
+Building UIs
+============
 
 .. toctree::
     :class:    toctree-1-deep

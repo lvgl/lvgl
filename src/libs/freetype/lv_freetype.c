@@ -117,6 +117,10 @@ lv_result_t lv_freetype_init(uint32_t max_glyph_cnt)
 void lv_freetype_uninit(void)
 {
     lv_freetype_context_t * ctx = lv_freetype_get_context();
+    if(!ctx) {
+        return;
+    }
+
     lv_freetype_cleanup(ctx);
 
     lv_free(ft_ctx);

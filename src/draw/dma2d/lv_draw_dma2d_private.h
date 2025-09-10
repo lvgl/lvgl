@@ -120,7 +120,6 @@ typedef struct {
     lv_draw_dma2d_cache_area_t writing_area;
 #endif
 #if LV_DRAW_DMA2D_ASYNC
-    lv_thread_t thread;
     lv_thread_sync_t interrupt_signal;
 #endif
 } lv_draw_dma2d_unit_t;

@@ -73,6 +73,20 @@ The Bar can be one of the following modes:
   :cpp:expr:`lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start
   value must be smaller than the end value.
 
+Data binding
+------------
+
+To get familiar with observers, subjects, and data bindings in general visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to an integer Subject affects a Bar Widget's integer
+value directly.  Note that this is a one-way binding (Subject ==> Widget) so when
+the subject changes the Bar will be updated too.
+
+It supports integer and float subjects.
+
+- :cpp:expr:`lv_bar_bind_value(bar, &subject)`
+
 
 
 .. _lv_bar_events:
