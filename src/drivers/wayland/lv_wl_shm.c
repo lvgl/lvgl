@@ -16,6 +16,7 @@
 #include <src/drivers/wayland/lv_wayland_smm.h>
 #include <src/misc/lv_types.h>
 #include <wayland-cursor.h>
+#include <unistd.h>
 
 /*********************
  *      DEFINES
@@ -247,6 +248,7 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
     wl_surface_damage(window->body->surface, area->x1, area->y1, src_width, src_height);
 
     lv_wayland_cache_add_area(window, buf, area);
+	usleep(10000);
 
     if(lv_display_flush_is_last(disp)) {
         /* Finally, attach buffer and commit to surface */
