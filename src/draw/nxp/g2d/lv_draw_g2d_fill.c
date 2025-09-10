@@ -94,8 +94,8 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
     void * handle = g2d_get_handle();
 
     if(has_opa) {
-        struct g2d_buf * tmp_buf = g2d_alloc(lv_area_get_width(&blend_area) * lv_area_get_height(&blend_area) * sizeof(
-                                                 lv_color32_t), 1);
+        struct g2d_buf * tmp_buf = g2d_alloc(lv_area_get_width(&blend_area) * lv_area_get_height(
+                                                 &blend_area) * lv_color_format_get_size(draw_buf->header.cf), 1);
         G2D_ASSERT_MSG(tmp_buf, "Failed to alloc temporary buffer.");
         struct g2d_surface src_surf;
         _g2d_set_src_surf(&src_surf, tmp_buf, &blend_area, dsc->color, dsc->opa, draw_buf->header.cf);
