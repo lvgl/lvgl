@@ -19,6 +19,35 @@ extern "C" {
 #include "../../lv_draw_private.h"
 #include "bsp_api.h"
 #include "dave_driver.h"
+
+#if LV_USE_FLOAT
+
+/* We need to redefine some of D2 fixed point math macros to deal with lv_precise_t being float now */
+#undef D2_FIX4
+#undef D2_INT4
+#undef D2_FLOOR4
+#undef D2_CEIL4
+#undef D2_FRAC4
+#undef D2_FIX16
+#undef D2_INT16
+#undef D2_FLOOR16
+#undef D2_CEIL16
+#undef D2_FRAC16
+
+#define D2_FIX4(x)      (((int32_t)(x)) << 4)
+#define D2_INT4(x)      (((int32_t)(x))(x) >> 4)
+#define D2_FLOOR4(x)    (((int32_t)(x))((d2_u32)(x)) & ~15u)
+#define D2_CEIL4(x)     ((((d2_u32)(x)) + 15u) & ~15u)
+#define D2_FRAC4(x)     (((d2_u32)(x)) & 15u)
+#define D2_FIX16(x)     (((int32_t)(x)) << 16)
+#define D2_INT16(x)     (((int32_t)(x)) >> 16)
+#define D2_FLOOR16(x)   (((d2_u32)(x)) & ~65535u)
+#define D2_CEIL16(x)    ((((d2_u32)(x)) + 65535u) & ~65535u)
+#define D2_FRAC16(x)    (((d2_u32)(x)) & 65535u)
+
+/* It also should be included here before the other LVGL Dave2D files */
+#endif
+
 #include "lv_draw_dave2d_utils.h"
 #include "../../lv_draw_rect.h"
 #include "../../lv_draw_line.h"
