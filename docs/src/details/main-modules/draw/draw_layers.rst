@@ -62,8 +62,8 @@ the widget as possible, but due to the nature of transformations no slicing is
 possible in this case.
 
 
-Clip Corner
------------
+Clip Corner Layers
+------------------
 
 The ``clip_corner`` style property causes the corners of the parent Widget to clip the
 corners of child Widgets whose corners would otherwise overflow a rounded corner of

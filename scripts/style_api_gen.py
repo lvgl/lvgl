@@ -371,7 +371,7 @@ props = [
 
 {'name': 'CLIP_CORNER',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`." },
+ 'dsc': "Enable clipping content that overflows the rounded corner of parent Widget. Can be `true` or `false`." },
 
 {'name': 'OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
