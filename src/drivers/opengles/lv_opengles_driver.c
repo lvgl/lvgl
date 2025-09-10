@@ -385,12 +385,19 @@ static unsigned int lv_opengles_shader_compile(unsigned int type, const char * s
     int result;
     GL_CALL(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
     if(result == GL_FALSE) {
-        int length;
-        GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
-        char * message = lv_malloc_zeroed(length * sizeof(char));
-        GL_CALL(glGetShaderInfoLog(id, length, &length, message));
         LV_LOG_ERROR("Failed to compile %s shader!", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
-        LV_LOG_ERROR("%s", message);
+        LV_LOG_ERROR("source:\n%s", source);
+        int length = 0;
+        GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
+        if(length > 0) {
+            char * message = lv_malloc_zeroed(length * sizeof(char));
+            LV_ASSERT_MALLOCS(message);
+            GL_CALL(glGetShaderInfoLog(id, length, &length, message));
+
+            LV_LOG_ERROR("%s", message);
+            lv_free(message);
+        }
+
         GL_CALL(glDeleteShader(id));
         return 0;
     }
