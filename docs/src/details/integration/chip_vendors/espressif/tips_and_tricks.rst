@@ -2,8 +2,9 @@
 Tips and tricks
 ===============
 
+
 Improving LVGL speed of execution
----------------------------------
+*********************************
 
 The IDF project in general are configured to optimize the final application image
 in respect of its size. For some LVGL applications this may not be desired or will
@@ -51,7 +52,7 @@ experimental options to true:
 
 
 Configuring the PSRAM on ESP32 supported devices
-------------------------------------------------
+************************************************
 
 Some of the high-end chips of ESP32 features an external memory on its module, it is 
 Pseudo-Static Random Access Memory, the PSRAM. In general values from 4 to 16MB are
@@ -75,7 +76,7 @@ These options can reside on the IDF project `sdkconfig.defaults`, the last optio
 
 
 Application crashes when enabling PPA
--------------------------------------
+*************************************
 
 Is it possible to happen of an application to start crashing because the user
 enabled `CONFIG_LV_USE_PPA` option. The typical symptom is the appearance of 
@@ -94,8 +95,8 @@ cache L1 line size, that is it, set its value to `64` instead of the default of 
         CONFIG_LV_DRAW_BUF_ALIGN=64
 
 
-ESP32-P4 monitor log reports buffer underrun and frame-rate decreases
----------------------------------------------------------------------
+EPS32-P4 monitor log reports buffer underrun and frame-rate decreases
+*********************************************************************
 
 In cases when the PSRAM is enabled and the PPA is used, it is common to see
 frame-rate degradation followed by a message on the log that reports the display
@@ -110,7 +111,7 @@ To fix that behavior just add to the `sdkconfig.defaults` the following option:
 
 
 Enabling LVGL logs on IDF project
----------------------------------
+*********************************
 
 The LVGL logs are not enabled by default, for enable it, add the following
 options on the `sdkconfig.defaults`:
@@ -125,7 +126,7 @@ The logging subsystem of LVGL relies on the ESP-IDF presence of the
 printf.
 
 Using the File System under ESP-IDF
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+***********************************
 
 ESP-IDF uses the standard C file operation functions (``fopen``, ``fread``) in all its storage related APIs.
 This allows seamless interoperability with LVGL when enabling the :c:macro:`LV_USE_FS_STDIO` configuration.

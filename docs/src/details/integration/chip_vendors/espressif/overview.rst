@@ -17,7 +17,7 @@ some of its components.
 
 
 Application Development
------------------------
+***********************
 
 The LVGL is supported by Espressif SDK, that is it, the IDF as mentioned before, 
 therefore ESP32 series of chips are supported on a different sets of frameworks
@@ -37,7 +37,7 @@ On the pages above users would be able to check the respective getting started o
 these platforms where ESP32, and other chips are abstracted by the framework.
 
 Ready to use projects
----------------------
+*********************
 
 For a quick start with LVGL and ESP32, the LVGL maintains an demo project compatible to
 several ESP32 boards under its `LV Port for ESP32 <https://github.com/lvgl/lv_esp_idf>`.
@@ -50,7 +50,7 @@ Additional BSPs and examples are available in the `esp-bsp <https://github.com/e
 
 
 LVGL Support for ESP32 Graphical Peripherals
---------------------------------------------
+********************************************
 
 Some of the ESP32 chips like the ESP32P4 family have built-in support
 for driving display through standard interfaces like RGB and MIPI, 

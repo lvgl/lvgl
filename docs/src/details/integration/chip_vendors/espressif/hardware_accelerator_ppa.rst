@@ -4,6 +4,9 @@
 PPA (Pixel Processing Accelerator) Support
 ==========================================
 
+Overview
+********
+
 Some ESP32 chip series, like the ESP32-P4 support the Pixel Processing Accelerator hardware (PPA), which is capable of
 speeding-up the filling and image blending operations, this peripheral works with the
 DMA-2D hardware which is responsible to move the input/output buffers into/from the PPA processing engine.
@@ -17,7 +20,7 @@ The Espressif targets that support the PPA are:
 
 
 Using the LVGL PPA draw unit on your ESP-IDF project
-----------------------------------------------------
+****************************************************
 
 LVGL supports, in experimental level, the filling and the image blending
 acceleration through the PPA, the user can enable it in their ``sdkconfig.defaults`` by
@@ -49,7 +52,7 @@ the initial cause for that according to the PPA section from reference manual is
 
 
 Using the Espressif LVGL component PPA features
------------------------------------------------
+***********************************************
 
 The Espressif IDF LVGL port component also offers hardware acceleration
 for the display operations, that is it, once the LVGL render completes 

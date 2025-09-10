@@ -4,6 +4,9 @@
 2D Direct Memory Access (DMA2D) Support
 =======================================
 
+Overview
+********
+
 Some chips from Espressif such as the ESP32-P4 family features a peripheral
 that enhances the copy of 2-D data from a place to another, including output
 this 2-D data to other peripherals.
