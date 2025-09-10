@@ -494,6 +494,7 @@ static void window_update_handler(lv_timer_t * t)
         /* render each texture in the window */
         lv_opengles_window_texture_t * texture;
         LV_LL_READ(&window->textures, texture) {
+            const lv_color_format_t disp_cf = lv_display_get_color_format(texture->disp);
             if(texture->texture_id == 0) { /* it's a window display */
 #if LV_USE_DRAW_OPENGLES
                 lv_display_set_render_mode(texture->disp,
@@ -513,7 +514,7 @@ static void window_update_handler(lv_timer_t * t)
                 GLenum internal_format;
                 GLenum format;
                 GLenum type;
-                lv_color_format_to_gl_color_format(lv_display_get_color_format(texture->disp), &internal_format, &format, &type);
+                lv_color_format_to_gl_color_format(disp_cf, &internal_format, &format, &type);
                 GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, lv_area_get_width(&texture->area),
                                      lv_area_get_height(&texture->area),
                                      0, format, type, texture->fb));
@@ -523,7 +524,7 @@ static void window_update_handler(lv_timer_t * t)
                 GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
                 lv_opengles_render_texture(window_display_texture, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                                           &texture->area, window->h_flip, window->v_flip, disp_cf);
 #endif
             }
             else {
@@ -541,10 +542,10 @@ static void window_update_handler(lv_timer_t * t)
 
 #if LV_USE_DRAW_OPENGLES
                 lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
+                                           &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip, disp_cf);
 #else
                 lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                                           &texture->area, window->h_flip, window->v_flip, disp_cf);
 #endif
             }
         }
