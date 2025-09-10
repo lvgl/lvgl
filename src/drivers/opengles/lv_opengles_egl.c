@@ -61,7 +61,7 @@ struct _lv_opengles_window_texture_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t lv_egl_init(void);
+static lv_result_t lv_egl_init(bool use_pbuffer);
 static void lv_egl_timer_init(void);
 static void window_update_handler(lv_timer_t * t);
 static void window_display_delete_cb(lv_event_t * e);
@@ -85,19 +85,6 @@ static void * backend_device;
     static unsigned int window_display_texture;
 #endif
 
-static EGLint const attribute_list[] = {
-    EGL_RED_SIZE, 8,
-    EGL_GREEN_SIZE, 8,
-    EGL_BLUE_SIZE, 8,
-    EGL_ALPHA_SIZE, 8,
-    EGL_NONE
-};
-
-static EGLint const context_attribute_list[] = {
-    EGL_CONTEXT_CLIENT_VERSION, 2,
-    EGL_NONE
-};
-
 /**********************
  *      MACROS
  **********************/
@@ -113,7 +100,8 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
                                                      lv_opengles_egl_window_cb_t post2)
 {
     backend_device = device;
-    if(lv_egl_init() == LV_RESULT_INVALID) {
+    bool use_pbuffer = native_window_handle ? false : true;
+    if(lv_egl_init(use_pbuffer) == LV_RESULT_INVALID) {
         return NULL;
     }
 
@@ -122,11 +110,23 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
     if(window == NULL) return NULL;
     lv_memzero(window, sizeof(*window));
 
-    /* Create window with graphics context */
-    window->surface = eglCreateWindowSurface(egl_display, egl_config, (EGLNativeWindowType)(uintptr_t)native_window_handle,
-                                             NULL);
+    if(use_pbuffer) {
+        const EGLint pbuffer_attribs[] = {
+            EGL_WIDTH, hor_res,
+            EGL_HEIGHT, ver_res,
+            EGL_NONE
+        };
+
+        window->surface = eglCreatePbufferSurface(egl_display, egl_config, pbuffer_attribs);
+    }
+    else {
+        /* Create window with graphics context */
+        window->surface = eglCreateWindowSurface(egl_display, egl_config, (EGLNativeWindowType)(uintptr_t)native_window_handle,
+                                                 NULL);
+    }
+
     if(window->surface == EGL_NO_SURFACE) {
-        LV_LOG_ERROR("eglCreateWindowSurface failed.");
+        LV_LOG_ERROR("create window surface failed.");
         lv_ll_remove(&egl_window_ll, window);
         lv_free(window);
         return NULL;
@@ -340,7 +340,7 @@ lv_indev_t * lv_opengles_window_texture_get_mouse_indev(lv_opengles_window_textu
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t lv_egl_init(void)
+static lv_result_t lv_egl_init(bool use_pbuffer)
 {
     if(egl_inited) {
         return LV_RESULT_OK;
@@ -366,14 +366,36 @@ static lv_result_t lv_egl_init(void)
         return LV_RESULT_INVALID;
     }
 
+    static EGLint const attribute_list[] = {
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_NONE
+    };
+
+    static EGLint const attribute_list_pbuffer[] = {
+        EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_NONE
+    };
+
     /* get an appropriate EGL frame buffer configuration */
     EGLint num_config;
-    res = eglChooseConfig(egl_display, attribute_list, &egl_config, 1, &num_config);
+    res = eglChooseConfig(egl_display, use_pbuffer ? attribute_list_pbuffer : attribute_list, &egl_config, 1, &num_config);
     if(res == EGL_FALSE) {
         LV_LOG_ERROR("eglChooseConfig failed.");
         eglTerminate(egl_display);
         return LV_RESULT_INVALID;
     }
+
+    static EGLint const context_attribute_list[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE
+    };
 
     /* create an EGL rendering context */
     egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, context_attribute_list);
