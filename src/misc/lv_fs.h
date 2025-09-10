@@ -97,6 +97,13 @@ typedef struct {
     lv_fs_drv_t * drv;
 } lv_fs_dir_t;
 
+
+/** Extended path object to specify buffer for memory-mapped files */
+typedef struct {
+    char path[64];   /**<  Store the driver letter address and size*/
+} lv_fs_path_ex_t;
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

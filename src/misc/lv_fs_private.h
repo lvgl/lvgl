@@ -31,11 +31,6 @@ struct _lv_fs_file_cache_t {
     void * buffer;
 };
 
-/** Extended path object to specify buffer for memory-mapped files */
-struct _lv_fs_path_ex_t {
-    char path[64];   /**<  Store the driver letter address and size*/
-};
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
