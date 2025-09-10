@@ -421,16 +421,27 @@ else()
     find_package(OpenGL)
     find_package(GLEW)
     find_package(glfw3)
+    
+    # Try find_package first
+    find_package(EGL QUIET)
+    
+    # If find_package failed, try manual configuration
+    if(NOT EGL_FOUND)
+        message(STATUS "EGL not found via find_package, trying manual configuration")
+        find_path(EGL_INCLUDE_DIRS NAMES EGL/egl.h PATHS /usr/include)
+        find_library(EGL_LIBRARIES NAMES EGL PATHS /usr/lib/x86_64-linux-gnu)
+    endif()
 
-    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND)
+    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND AND ((EGL_FOUND) OR (EGL_INCLUDE_DIRS AND EGL_LIBRARIES)))
         # Include directories
         include_directories(${OPENGL_INCLUDE_DIR})
         include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
+        include_directories(${EGL_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
         set(TEST_ENABLE_OPENGLES 1)
     else()
-        message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
+        message("OpenGL, GLEW, glfw3 or EGL not found, defaulting to 0")
         add_definitions(-DLV_USE_OPENGLES=0)
     endif()
 endif()
@@ -533,7 +544,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 
     if (TEST_ENABLE_OPENGLES)
         target_link_libraries(${test_name} PRIVATE
-            ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+            ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw ${EGL_LIBRARIES})
     endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
