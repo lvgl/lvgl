@@ -249,7 +249,7 @@ this field.  The possible "json_type" values are:
   - ``"args"``: array of ``"arg"`` json types.  (See definition above.)
 
 
-- ``"stdlib_type"``:  C type (int, unsigned int, float, etc.)
+- ``"stdlib_type"``:  C type (name of type comes from stdlib.h or stdint.h)
 
   Fields:
 
