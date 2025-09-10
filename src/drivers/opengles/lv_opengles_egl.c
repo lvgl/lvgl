@@ -453,24 +453,13 @@ static void window_update_handler(lv_timer_t * t)
 
                 GL_CALL(glBindTexture(GL_TEXTURE_2D, window_display_texture));
 
-                /* set the dimensions and format to complete the texture */
-                /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 8
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_RED, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 16
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                                     texture->fb));
-#elif LV_COLOR_DEPTH == 24
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_BGR, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 32
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_BGRA, GL_UNSIGNED_BYTE, texture->fb));
-#else
-#error("Unsupported color format")
-#endif
+                GLenum internal_format;
+                GLenum format;
+                GLenum type;
+                lv_color_format_to_gl_color_format(lv_display_get_color_format(texture->disp), &internal_format, &format, &type);
+                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, lv_area_get_width(&texture->area),
+                                     lv_area_get_height(&texture->area),
+                                     0, format, type, texture->fb));
 
                 GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
