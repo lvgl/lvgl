@@ -299,7 +299,6 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
-    const uint8_t * src_buf = decoder_dsc.decoded->data;
     const lv_image_header_t * header = &decoder_dsc.decoded->header;
     lv_color_format_t cf = header->cf;
 
@@ -309,8 +308,21 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
+    const uint32_t tvg_stride = header->w * sizeof(uint32_t);
+    if(header->stride != tvg_stride) {
+        LV_LOG_WARN("img_stride != tvg_stride (%" LV_PRIu32 " != %" LV_PRIu32 "), width = %" LV_PRIu32,
+                    (uint32_t)header->stride,
+                    tvg_stride, (uint32_t)header->w);
+        lv_result_t result = lv_draw_buf_adjust_stride((lv_draw_buf_t *)decoder_dsc.decoded, tvg_stride);
+        if(result != LV_RESULT_OK) {
+            lv_image_decoder_close(&decoder_dsc);
+            LV_LOG_ERROR("Failed to adjust stride");
+            return;
+        }
+    }
+
     Tvg_Paint * img = tvg_picture_new();
-    tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, true);
+    tvg_picture_load_raw(img, (uint32_t *)decoder_dsc.decoded->data, header->w, header->h, true);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
     tvg_paint_set_opacity(img, LV_UDIV255(p->opa * opa));
