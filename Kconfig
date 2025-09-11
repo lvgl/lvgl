@@ -1921,6 +1921,26 @@ menu "LVGL configuration"
 			bool "Use DMA buffers for frame buffers"
 			depends on LV_USE_WAYLAND && LV_USE_G2D
 
+		menu "DMA Heap configuration"
+			depends on LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
+
+			config DMA_HEAP_SYSTEM
+				string "System DMA Heap path"
+				default "/dev/dma_heap/system"
+
+			config DMA_HEAP_CMA
+				string "Linux CMA DMA Heap path"
+				default "/dev/dma_heap/linux,cma"
+
+			config DMA_HEAP_CMA_UNCACHED
+				string "Linux CMA Uncached DMA Heap path"
+				default "/dev/dma_heap/linux,cma-uncached"
+
+			config LV_DMA_HEAP_PATH
+				string "DMA Heap path used by DMABUF implementation when G2D is not enabled"
+				default DMA_HEAP_CMA
+		endmenu
+
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
 			default n

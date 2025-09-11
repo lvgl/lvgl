@@ -17,8 +17,12 @@
 #include "../../draw/nxp/g2d/lv_g2d_utils.h"
 #include <stdio.h>
 #include <sys/mman.h>
-#include <unistd.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <linux/dma-heap.h>
+#include <linux/dma-buf.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
 
 /*********************
  *      INCLUDES
@@ -27,6 +31,15 @@
 /*********************
  *      DEFINES
  *********************/
+
+#if !LV_USE_G2D
+#ifndef LV_DMA_HEAP_PATH
+#error "LV_DMA_HEAP_PATH must be defined to use DMABUF without G2D \
+            /dev/dma_heap/linux,cma-uncached  \
+            /dev/dma_heap/linux,cma \
+            /dev/dma_heap/system "
+#endif
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -89,6 +102,28 @@ static const struct zwp_linux_dmabuf_v1_listener dmabuf_listener    = {.format =
 /**********************
  *   PRIVATE FUNCTIONS
  **********************/
+
+static int dmabuf_allocate_dma_heap_buffer(const char * heap_path, size_t size)
+{
+    int heap_fd = open(heap_path, O_RDWR | O_CLOEXEC);
+    LV_ASSERT_MSG(heap_fd > 0, "Failed to open dma_heap device");
+
+    struct dma_heap_allocation_data alloc = {
+        .len = size,
+        .fd_flags = O_RDWR | O_CLOEXEC,
+        .heap_flags = 0,
+    };
+
+    int res = ioctl(heap_fd, DMA_HEAP_IOCTL_ALLOC, &alloc);
+
+    if(res < 0) {
+        close(heap_fd);
+        LV_ASSERT_MSG(res > 0, "DMA_HEAP_IOCTL_ALLOC failed");
+    }
+
+    close(heap_fd);
+    return alloc.fd;
+}
 
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context)
 {
@@ -172,11 +207,11 @@ static void dmabuf_wait_swap_buf(lv_display_t * disp)
         return;
     }
 
+    int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % LV_WAYLAND_BUF_COUNT;
+
 #if LV_USE_G2D
 #if LV_USE_ROTATE_G2D
-    int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % (LV_WAYLAND_BUF_COUNT - 1);
-#else
-    int buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % LV_WAYLAND_BUF_COUNT;
+    buf_nr = (window->wl_ctx->dmabuf_ctx.last_used + 1) % (LV_WAYLAND_BUF_COUNT - 1);
 #endif
 #endif
 
@@ -216,6 +251,11 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
 #if LV_USE_ROTATE_G2D
     lv_draw_buf_invalidate_cache(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, NULL);
 #endif
+#else
+    struct dma_buf_sync sync = {
+        .flags = DMA_BUF_SYNC_END | DMA_BUF_SYNC_WRITE,
+    };
+    ioctl(buf->dmabuf_fds[0], DMA_BUF_IOCTL_SYNC, &sync);
 #endif
 
     /* Mark surface damage */
@@ -394,8 +434,23 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
         buffers[i].lv_draw_buf =
             lv_draw_buf_create(w, h, lv_display_get_color_format(window->lv_disp), stride);
         buffers[i].strides[0]    = stride;
+#if LV_USE_G2D
         buffers[i].dmabuf_fds[0] = g2d_get_buf_fd(buffers[i].lv_draw_buf);
         buffers[i].buf_base[0]   = buffers[i].lv_draw_buf->data;
+#else
+        buffers[i].dmabuf_fds[0] = dmabuf_allocate_dma_heap_buffer(LV_DMA_HEAP_PATH, stride * h);
+        void * mapped = mmap(NULL, stride * h, PROT_READ | PROT_WRITE, MAP_SHARED,
+                             buffers[i].dmabuf_fds[0], 0);
+        if(mapped == MAP_FAILED) {
+            LV_LOG_ERROR("Failed to mmap DMA buffer: %s", strerror(errno));
+            LV_ASSERT(mapped != MAP_FAILED);
+        };
+
+        // We need to store the buffer original data pointer to restore it later for lv_draw_buf_destroy
+        buffers[i].original_data = buffers[i].lv_draw_buf->data;
+        buffers[i].lv_draw_buf->data = mapped;
+        buffers[i].buf_base[0] = mapped;
+#endif
         params                   = zwp_linux_dmabuf_v1_create_params(window->wl_ctx->dmabuf_ctx.handler);
 
         zwp_linux_buffer_params_v1_add(params, buffers[i].dmabuf_fds[0], 0, buffers[i].offsets[0], buffers[i].strides[0], 0,
@@ -415,6 +470,15 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
 
 static void buffer_free(struct buffer * buf)
 {
+#if !LV_USE_G2D
+    buf->lv_draw_buf->data = buf->original_data;
+    if(buf->buf_base[0] != NULL) {
+        size_t size = buf->strides[0] * buf->height;
+        munmap(buf->buf_base[0], size);
+    }
+    close(buf->dmabuf_fds[0]);
+#endif
+
     if(buf->buffer) wl_buffer_destroy(buf->buffer);
 
     if(buf->lv_draw_buf) lv_draw_buf_destroy(buf->lv_draw_buf);
@@ -644,7 +708,12 @@ static void create_decorators_buf(struct window * window, struct graphic_object 
     window->decorators_buf[id]->strides[0]    = stride;
     window->decorators_buf[id]->width        = decoration->width;
     window->decorators_buf[id]->height       = decoration->height;
+#if LV_USE_G2D
     window->decorators_buf[id]->dmabuf_fds[0] = g2d_get_buf_fd(window->decorators_buf[id]->lv_draw_buf);
+#else
+    window->decorators_buf[id]->dmabuf_fds[0] = dmabuf_allocate_dma_heap_buffer(LV_DMA_HEAP_PATH,
+                                                                                stride * decoration->height);
+#endif
     window->decorators_buf[id]->buf_base[0]   = window->decorators_buf[id]->lv_draw_buf->data;
     params                   = zwp_linux_dmabuf_v1_create_params(window->wl_ctx->dmabuf_ctx.handler);
 

@@ -1258,6 +1258,15 @@
                                                                              /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
     #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
     #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
+
+    #if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
+        /** Based on the environment, the following DMA Heaps might be available */
+        #define DMA_HEAP_SYSTEM "/dev/dma_heap/system"
+        #define DMA_HEAP_CMA "/dev/dma_heap/linux,cma"
+        #define DMA_HEAP_CMA_UNCACHED "/dev/dma_heap/linux,cma-uncached"
+
+        #define LV_DMA_HEAP_PATH DMA_HEAP_CMA    /**< When not using G2D with DMABUF, DMA_HEAP_PATH must be set*/
+    #endif
 #endif
 
 /** Driver for /dev/fb */

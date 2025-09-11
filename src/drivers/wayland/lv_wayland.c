@@ -36,10 +36,6 @@
     #endif
 #endif
 
-#if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
-    #error "LV_WAYLAND_USE_DMABUF requires LV_USE_G2D"
-#endif
-
 #ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
     /* FIXME: Hacky fix else building fails with -Wundef=error*/
     #define LV_DISPLAY_RENDER_MODE_PARTIAL 0
