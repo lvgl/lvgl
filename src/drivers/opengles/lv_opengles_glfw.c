@@ -43,6 +43,7 @@ struct _lv_opengles_window_t {
     lv_indev_state_t mouse_last_state;
     uint8_t use_indev : 1;
     uint8_t closing : 1;
+    uint8_t has_flushed : 1;
 #if LV_USE_DRAW_OPENGLES
     uint8_t direct_render_invalidated: 1;
 #endif
@@ -471,11 +472,20 @@ static void window_update_handler(lv_timer_t * t)
         }
     }
 
+    lv_display_refr_timer(NULL);
+
     /* render each window */
     LV_LL_READ(&glfw_window_ll, window) {
+
+        if(!window->has_flushed)  {
+            continue;
+        }
+        window->has_flushed = false;
+
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
 
+#if 0
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_window_texture_t * textures_head;
         bool window_display_direct_render =
@@ -566,6 +576,7 @@ static void window_update_handler(lv_timer_t * t)
 #endif
             }
         }
+#endif
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window->window);
@@ -674,6 +685,12 @@ static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area,
 {
     LV_UNUSED(area);
     LV_UNUSED(px_map);
+
+    if(lv_display_flush_is_last(disp)) {
+        lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
+        dsc->window->has_flushed = true;
+    }
+
     lv_display_flush_ready(disp);
 }
 
