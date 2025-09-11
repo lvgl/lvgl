@@ -35,7 +35,7 @@ lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 
     if(lfs == NULL) {
         return LV_RESULT_INVALID; /*Invalid LittleFS handle*/
-    }   
+    }
 
     if(LV_FS_IS_VALID_LETTER(letter) == false) {
         return LV_RESULT_INVALID; /*Invalid letter*/

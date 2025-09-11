@@ -369,10 +369,9 @@ void lv_init(void)
 
     if(lfs_err < 0) {
         //should only happen the first time
-       lfs_err = lfs_format(lfs, config);
+        lfs_err = lfs_format(lfs, config);
 
-       if(lfs_err == 0)
-       {
+        if(lfs_err == 0) {
          lfs_err = lfs_mount(lfs, config);
        }
     }
