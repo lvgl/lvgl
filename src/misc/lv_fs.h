@@ -134,8 +134,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv);
 lv_fs_drv_t * lv_fs_get_drv(char letter);
 
 /**
- * @brief Remove a drive and call its remove function if available
- * 
+ * Remove a drive and call its remove function if available
  * @param letter letter identifier of the drive to remove
  */
 void lv_fs_remove_drive(char letter);

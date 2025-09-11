@@ -359,15 +359,15 @@ void lv_init(void)
 
 #if LV_USE_FS_LITTLEFS && defined (LV_FS_LITTLEFS_BD_GET_DRIVER_DATA_FUNC)
 
-    extern void LV_FS_LITTLEFS_BD_GET_DRIVER_DATA_FUNC(lfs_t **out_lfs, struct lfs_config **out_config);
+    extern void LV_FS_LITTLEFS_BD_GET_DRIVER_DATA_FUNC(lfs_t ** out_lfs, struct lfs_config ** out_config);
 
-    lfs_t *lfs;
-    struct lfs_config *config;
+    lfs_t * lfs;
+    struct lfs_config * config;
     LV_FS_LITTLEFS_BD_GET_DRIVER_DATA_FUNC(&lfs, &config);
 
     int lfs_err = lfs_mount(lfs, config);
-    if(lfs_err < 0)
-    {
+
+    if(lfs_err < 0) {
         //should only happen the first time
        lfs_err = lfs_format(lfs, config);
 
@@ -377,12 +377,10 @@ void lv_init(void)
        }
     }
 
-    if(lfs_err < 0)
-    {
+    if(lfs_err < 0) {
         LV_LOG_ERROR("lfs mount failed");
     }
-    else
-    {
+    else {
         lv_fs_littlefs_register_drive(lfs, LV_FS_LITTLEFS_LETTER);
     }
 #endif

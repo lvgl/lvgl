@@ -51,7 +51,7 @@ void lv_fs_memfs_init(void);
 
 #if LV_USE_FS_LITTLEFS
 #include "lfs.h"
-lv_result_t lv_fs_littlefs_register_drive(lfs_t *lfs, char letter);
+lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter);
 #endif
 
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS

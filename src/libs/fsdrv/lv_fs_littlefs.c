@@ -30,21 +30,18 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 /**
  * Register a drive for the LittleFS File System interface
  */
-lv_result_t lv_fs_littlefs_register_drive(lfs_t *lfs, char letter)
+lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
-    if(lfs == NULL)
-    {
+    if(lfs == NULL) {
         return LV_RESULT_INVALID; /*Invalid LittleFS handle*/
     }   
 
-    if(LV_FS_IS_VALID_LETTER(letter) == false)
-    {
+    if(LV_FS_IS_VALID_LETTER(letter) == false) {
         return LV_RESULT_INVALID; /*Invalid letter*/
     }
 
-    if(lv_fs_get_drv(letter) != NULL)
-    {
+    if(lv_fs_get_drv(letter) != NULL) {
         return LV_RESULT_INVALID; /*Already registered*/
     }
 
