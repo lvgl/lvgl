@@ -378,6 +378,8 @@ typedef struct _lv_xml_component_scope_t lv_xml_component_scope_t;
 
 typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
 
+typedef struct _lv_xml_load_t lv_xml_load_t;
+
 #if LV_USE_EVDEV
 typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
 #endif
