@@ -71,6 +71,8 @@ struct _lv_fs_drv_t {
     uint32_t cache_size;
     bool (*ready_cb)(lv_fs_drv_t * drv);
 
+    void(*remove_cb)(lv_fs_drv_t * drv); /*Optional*/
+
     void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
     lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
@@ -130,6 +132,13 @@ void lv_fs_drv_register(lv_fs_drv_t * drv);
  * @return          pointer to a driver or NULL if not found
  */
 lv_fs_drv_t * lv_fs_get_drv(char letter);
+
+/**
+ * @brief Remove a drive and call its remove function if available
+ * 
+ * @param letter letter identifier of the drive to remove
+ */
+void lv_fs_remove_drive(char letter);
 
 /**
  * Test if a drive is ready or not. If the `ready` function was not initialized `true` will be
