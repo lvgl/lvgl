@@ -18,7 +18,7 @@ extern "C" {
 
 #include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_gesture.h"
-#if LV_USE_WAYLAND && LV_USE_GESTURE_RECOGNITION
+#if LV_USE_WAYLAND
 
 /*********************
  *      DEFINES
