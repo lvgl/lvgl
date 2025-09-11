@@ -372,8 +372,8 @@ void lv_init(void)
         lfs_err = lfs_format(lfs, config);
 
         if(lfs_err == 0) {
-         lfs_err = lfs_mount(lfs, config);
-       }
+            lfs_err = lfs_mount(lfs, config);
+        }
     }
 
     if(lfs_err < 0) {
