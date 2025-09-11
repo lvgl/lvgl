@@ -89,7 +89,7 @@ Example:
 
     Without Clip Corner Style
 
-You can see the the parent's corners do not clip the children. But if you add this
+You can see that the parent's corners do not clip the children. But if you add this
 line, it will:
 
 .. code-block:: c
