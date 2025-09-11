@@ -18,7 +18,7 @@ Compile UIs to HTML (Emscripten)
 
 Instead of producing a binary, Emscripten produces WebAssembly, which is supported across modern browsers.
 
-The `lv_web_emscripten <https://github.com/lvgl/lv_web_emscripten/>`__ project provides a ready-to-use setup for compiling any LVGL UI into a browser-capable HTML file.
+The `lv_web_emscripten <https://github.com/lvgl/lv_web_emscripten>`__ project provides a ready-to-use setup for compiling any LVGL UI into a browser-capable HTML file.
 
 It uses a specialized, :ref:`build_cmake`‑based build system—check the README for full setup details.
 

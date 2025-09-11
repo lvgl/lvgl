@@ -24,7 +24,8 @@ Install SDL according to your platform:
 
 - Linux: ``sudo apt install libsdl2-dev``
 - macOS: ``brew install sdl2``
-- Windows: ``vcpkg install sdl2``
+- Windows: Recommended: ``vcpkg install sdl2``  
+  Alternatively, you can download prebuilt SDL2 binaries from the `SDL website <https://www.libsdl.org/download-2.0.php>`__ and follow their installation instructions.
 
 Configuration
 *************
