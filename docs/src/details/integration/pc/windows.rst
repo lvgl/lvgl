@@ -10,7 +10,7 @@ LVGL comes with built-in drivers for Windows, covering:
 - Display, mouse, and keyboard support
 - Operating system drivers
 
-Using these or other drivers, multiple repositories are available to get started easily.
+Using these or other drivers, multiple repositories are available to help you get started easily.
 Just follow the README of the repositories listed below.
 
 Ready-to-Use Projects
@@ -24,7 +24,7 @@ LVGL is available for `VSCode <https://code.visualstudio.com/>`__, a well-known 
 It uses `SDL <https://www.libsdl.org/>`__ to open a window, show the rendered content, and manage mouse and keyboard.
 
 A ready-to-use LVGL project for VSCode is available at
-`https://github.com/lvgl/lv_port_pc_vscode <https://github.com/lvgl/lv_port_pc_vscode>`__.
+https://github.com/lvgl/lv_port_pc_vscode\ .
 
 The project uses :ref:`build_cmake` to compile LVGL, so it also serves as a CMake example.
 
@@ -62,7 +62,7 @@ To learn more about the SDL driver, visit :ref:`sdl_driver`.
 
 Details of the Windows driver are provided below.
 
-The **Windows** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/windows>`__
+The **Windows** display/input `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/windows>`__
 offers support for simulating the LVGL display and keyboard/mouse inputs in a Windows Win32 window.
 
 Modes
@@ -82,17 +82,17 @@ Both simulator mode and application mode:
 
 However, **Simulator Mode**:
 
-- Is designed for simulating LVGL rendering on hardware-like displays
-- Keeps LVGL display resolution constant to simulate production UI layouts
-- Uses Windows DPI scaling to stretch content
+- is designed for simulating LVGL rendering on hardware-like displays,
+- keeps LVGL display resolution constant to simulate production UI layouts, and
+- uses Windows DPI scaling to stretch content,
 
-While **Application Mode**:
+whereas **Application Mode**:
 
-- Is designed for native Windows desktop application development
-- Supports dynamic window resizing with corresponding changes to LVGL display resolution
-- Updates LVGL display DPI when Windows DPI changes
-- Uses window size (not client area) when setting resolution via `lv_windows_create_display`
-- Requires apps to handle display resolution changes properly
+- is designed for native Windows desktop application development,
+- supports dynamic window resizing with corresponding changes to LVGL display resolution,
+- updates LVGL display DPI when Windows DPI changes,
+- uses window size (not client area) when setting resolution via :cpp:func:`lv_windows_create_display`, and
+- requires apps to handle display resolution changes properly.
 
 The mode can be selected by calling :cpp:expr:`lv_windows_create_display`.
 

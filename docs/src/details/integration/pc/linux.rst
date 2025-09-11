@@ -11,7 +11,7 @@ LVGL comes with a lot of built-in Linux-related drivers and support:
 - ``pthread`` integration
 - :ref:`build_cmake` support
 
-Using these or other drivers, multiple repositories are available to get started easily.
+Multiple repositories are available to help you get started easily.
 Just follow the README of the repositories listed below.
 
 Ready-to-Use Projects
