@@ -44,8 +44,11 @@ typedef union {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
 
 uint32_t lv_os_get_proc_idle_percent(void);
+
+#endif
 
 /**********************
  *      MACROS
