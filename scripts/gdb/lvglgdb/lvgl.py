@@ -257,11 +257,12 @@ class LVDrawBuf(Value):
 
             # Get buffer metadata
             header = self.super_value("header")
-            width = int(header["w"])
+            stride = int(header["stride"])
             height = int(header["h"])
             cf_info = self.color_format_info()
             data_ptr = self.super_value("data")
             data_size = int(self.super_value("data_size"))
+            width = (stride * 8) // cf_info["bpp"] if cf_info["bpp"] else 0
 
             # Validate buffer data
             if not data_ptr:
