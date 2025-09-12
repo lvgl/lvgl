@@ -235,3 +235,7 @@ and behavior are exactly the same as if it were created from C code.
 Registering XML Components and creating instances are neither memory hungry nor slow.
 The biggest memory overhead is that the ``<view>`` of the Components is saved in RAM
 (typically 1–2 kB/component).
+
+:cpp:expr:`lv_xml_load_all_from_path("A:path/to/dir")`
+will traverse a directory and register all the XML components,
+screens, globals, and translations.

@@ -195,6 +195,34 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);
 
 /**
+ * Get the size in bytes of an open file.
+ * The file read/write position will not be affected.
+ * @param file_p    pointer to a lv_fs_file_t variable
+ * @param size_res  pointer to store the file size
+ * @return          LV_FS_RES_OK or any error from `lv_fs_res_t`
+ */
+lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res);
+
+/**
+ * Get the size in bytes of a file at the given path.
+ * @param path      the path of the file
+ * @param size_res  pointer to store the file size
+ * @return          LV_FS_RES_OK or any error from `lv_fs_res_t`
+ */
+lv_fs_res_t lv_fs_path_get_size(const char * path, uint32_t * size_res);
+
+/**
+ * Read the contents of a file at the given path into a buffer.
+ * @param buf        a buffer to read the contents of the file into
+ * @param buf_size   the size of the buffer and the amount to read from the file
+ * @param path       the path of the file
+ * @return           LV_FS_RES_OK on success, LV_FS_RES_UNKNOWN if fewer than
+ *                   `buf_size` bytes could be read from the file,
+ *                   or any error from `lv_fs_res_t`
+ */
+lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path);
+
+/**
  * Initialize a 'fs_dir_t' variable for directory reading
  * @param rddir_p   pointer to a 'lv_fs_dir_t' variable
  * @param path      path to a directory
@@ -246,6 +274,19 @@ char * lv_fs_up(char * path);
  * @return          pointer to the beginning of the last element in the path
  */
 const char * lv_fs_get_last(const char * path);
+
+/**
+ * Concatenate two path components and automatically add/remove a separator as needed.
+ * buf, buf_sz, and the return value are analogous to lv_snprintf
+ * @param buf     the buffer to place the result in
+ * @param buf_sz  the size of buf. At most buf_sz - 1 characters will be written to buf,
+ *                and a null terminator
+ * @param base    the first path component
+ * @param end     the second path component
+ * @return        the number of characters (not including the null terminator)
+ *                that would be written to buf, even if buf_sz-1 was smaller
+ */
+int lv_fs_path_join(char * buf, size_t buf_sz, const char * base, const char * end);
 
 /**********************
  *      MACROS

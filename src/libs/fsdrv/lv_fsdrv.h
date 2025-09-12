@@ -67,6 +67,29 @@ void lv_fs_arduino_sd_init(void);
 void lv_fs_uefi_init(void);
 #endif
 
+#if LV_USE_FS_FROGFS
+void lv_fs_frogfs_init(void);
+void lv_fs_frogfs_deinit(void);
+
+/**
+ * Mount a frogfs blob at the path prefix. If there is a file "foo.txt"
+ * in the blob and the blob is registered with `path_prefix` as "my_blob",
+ * it can be opened later at path "my_blob/foo.txt".
+ * @param blob         a frogfs blob/image from mkfrogfs.py
+ * @param path_prefix  a prefix that will be used to refer to this blob when accessing it.
+ * @return             LV_RESULT_OK or LV_RESULT_INVALID if there was an issue with the blob
+ */
+lv_result_t lv_fs_frogfs_register_blob(const void * blob, const char * path_prefix);
+
+/**
+ * Unmount a frogfs blob that was previously mounted by `lv_fs_frogfs_register_blob`.
+ * All files and dirs should be closed before calling this.
+ * @param path_prefix  the path prefix that the blob was registered with
+ */
+void lv_fs_frogfs_unregister_blob(const char * path_prefix);
+
+#endif /*LV_USE_FS_FROGFS*/
+
 /**********************
  *      MACROS
  **********************/

@@ -301,6 +301,78 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
     return res;
 }
 
+lv_fs_res_t lv_fs_get_size(lv_fs_file_t * file_p, uint32_t * size_res)
+{
+    uint32_t original_pos;
+    lv_fs_res_t ret = lv_fs_tell(file_p, &original_pos);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_seek(file_p, 0, LV_FS_SEEK_END);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_tell(file_p, size_res);
+
+    if(ret != LV_FS_RES_OK || *size_res != original_pos) {
+        lv_fs_res_t seek_res = lv_fs_seek(file_p, original_pos, LV_FS_SEEK_SET);
+        if(ret == LV_FS_RES_OK) {
+            ret = seek_res;
+        }
+    }
+
+    return ret;
+}
+
+lv_fs_res_t lv_fs_path_get_size(const char * path, uint32_t * size_res)
+{
+    lv_fs_file_t file;
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    ret = lv_fs_seek(&file, 0, LV_FS_SEEK_END);
+
+    if(ret == LV_FS_RES_OK) {
+        ret = lv_fs_tell(&file, size_res);
+    }
+
+    lv_fs_res_t close_res = lv_fs_close(&file);
+    if(ret == LV_FS_RES_OK) {
+        ret = close_res;
+    }
+
+    return ret;
+}
+
+lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path)
+{
+    lv_fs_file_t file;
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        return ret;
+    }
+
+    uint32_t bytes_read;
+    ret = lv_fs_read(&file, buf, buf_size, &bytes_read);
+
+    if(ret == LV_FS_RES_OK && bytes_read != buf_size) {
+        LV_LOG_WARN("Only %"LV_PRIu32" bytes out of %"LV_PRIu32" were read from the file to the buffer",
+                    bytes_read, buf_size);
+        ret = LV_FS_RES_UNKNOWN;
+    }
+
+    lv_fs_res_t close_res = lv_fs_close(&file);
+    if(ret == LV_FS_RES_OK) {
+        ret = close_res;
+    }
+
+    return ret;
+}
+
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
     if(path == NULL) return LV_FS_RES_INV_PARAM;
@@ -497,6 +569,31 @@ const char * lv_fs_get_last(const char * path)
 
     return &path[i + 1];
 }
+
+int lv_fs_path_join(char * buf, size_t buf_sz, const char * base, const char * end)
+{
+    if(base[0] == '\0') return lv_strlcpy(buf, end, buf_sz);
+    if(end[0] == '\0') return lv_strlcpy(buf, base, buf_sz);
+
+    size_t base_len = lv_strlen(base);
+    char base_end_char = base_len ? base[base_len - 1] : '\0';
+
+    bool base_has_sep = base_end_char == '/' || base_end_char == '\\';
+    bool end_has_sep = end[0] == '/' || end[0] == '\\';
+
+    if(base_has_sep && end_has_sep) {
+        end++;
+        end_has_sep = false;
+    }
+
+    const char * sep = "/";
+    if(base_has_sep || end_has_sep) {
+        sep = "";
+    }
+
+    return lv_snprintf(buf, buf_sz, "%s%s%s", base, sep, end);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
