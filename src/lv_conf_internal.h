@@ -4016,13 +4016,6 @@
             #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
         #endif
     #endif
-    #ifndef LV_WAYLAND_WL_SHELL
-        #ifdef CONFIG_LV_WAYLAND_WL_SHELL
-            #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
-        #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
-        #endif
-    #endif
 #endif
 
 /** Driver for /dev/fb */
@@ -4762,7 +4755,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #if LV_USE_WAYLAND == 0
     #define LV_WAYLAND_USE_DMABUF           0
     #define LV_WAYLAND_WINDOW_DECORATIONS   0
-    #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0

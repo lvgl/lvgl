@@ -9,14 +9,8 @@
 #include "lv_wayland.h"
 
 #if LV_USE_WAYLAND
-/*
- * LV_WAYLAND_XDG_SHELL is automatically defined if LV_WAYLAND_WL_SHELL is not set
- * inside lv_wayland_private.h so we need include this header file before checking
- * for LV_WAYLAND_XDG_SHELL
- */
 #include "lv_wayland_private.h"
 
-#if LV_WAYLAND_XDG_SHELL
 
 #include <linux/input-event-codes.h>
 #include "wayland_xdg_shell.h"
@@ -498,5 +492,4 @@ static void xdg_wm_base_ping(void * data, struct xdg_wm_base * xdg_wm_base, uint
     return;
 }
 
-#endif /* LV_WAYLAND_XDG_SHELL */
 #endif /* LV_USE_WAYLAND */

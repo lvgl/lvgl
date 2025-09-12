@@ -282,11 +282,7 @@ void lv_wayland_deinit(void)
     lv_wayland_dmabuf_deinit(&lv_wl_ctx.dmabuf_ctx);
 #endif
 
-#if LV_WAYLAND_WL_SHELL
-    lv_wayland_wl_shell_deinit();
-#elif LV_WAYLAND_XDG_SHELL
     lv_wayland_xdg_shell_deinit();
-#endif
 
     if(lv_wl_ctx.wl_seat) {
         wl_seat_destroy(lv_wl_ctx.wl_seat);
@@ -355,18 +351,11 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         app->wl_seat = wl_registry_bind(app->registry, name, &wl_seat_interface, 1);
         wl_seat_add_listener(app->wl_seat, lv_wayland_seat_get_listener(), app);
     }
-#if LV_WAYLAND_WL_SHELL
-    else if(strcmp(interface, wl_shell_interface.name) == 0) {
-        app->wl_shell = wl_registry_bind(registry, name, &wl_shell_interface, 1);
-    }
-#endif
-#if LV_WAYLAND_XDG_SHELL
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
         /* supporting version 2 of the XDG protocol - ensures greater compatibility */
         app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, lv_wayland_xdg_shell_get_wm_base_listener(), app);
     }
-#endif
 #if LV_WAYLAND_USE_DMABUF
     else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
         lv_wayland_dmabuf_set_interface(&app->dmabuf_ctx, app->registry, name, interface, version);
