@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-#include "../lv_draw.h"
+#if LV_USE_DRAW_NANOVG
 
 /*********************
  *      DEFINES
@@ -35,6 +35,8 @@ void lv_draw_nanovg_init(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DRAW_NANOVG*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
