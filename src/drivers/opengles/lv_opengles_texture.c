@@ -86,20 +86,11 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
-    /* set the dimensions and format to complete the texture */
-    /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 8
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, NULL));
-#elif LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                         NULL));
-#elif LV_COLOR_DEPTH == 24
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL));
-#else
-#error("Unsupported color format")
-#endif
+    GLenum internal_format;
+    GLenum format;
+    GLenum type;
+    lv_color_format_to_gl_color_format(lv_display_get_color_format(disp), &internal_format, &format, &type);
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, disp->hor_res, disp->ver_res, 0, format, type, NULL));
 
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
@@ -159,19 +150,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
         GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
-        /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 8
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
-#elif LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             dsc->fb1));
-#elif LV_COLOR_DEPTH == 24
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
-#elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, dsc->fb1));
-#else
-#error("Unsupported color format")
-#endif
+
+        GLenum internal_format;
+        GLenum format;
+        GLenum type;
+        lv_color_format_to_gl_color_format(lv_display_get_color_format(disp), &internal_format, &format, &type);
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, internal_format, disp->hor_res, disp->ver_res, 0, format, type, dsc->fb1));
     }
 #endif /* !LV_USE_DRAW_OPENGLES */
 

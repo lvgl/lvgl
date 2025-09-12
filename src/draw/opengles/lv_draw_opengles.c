@@ -430,7 +430,7 @@ static void blend_texture_layer(lv_draw_task_t * t)
     }
 #endif
     lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &t->clip_area, h_flip,
-                               !v_flip);
+                               !v_flip, t->target_layer->color_format);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -527,7 +527,8 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     lv_area_move(&t->clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
     lv_area_t render_area = t->_real_area;
     lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
-    lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip);
+    lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &t->clip_area, h_flip, v_flip,
+                               t->target_layer->color_format);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -657,7 +658,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     lv_area_move(&clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
 
     lv_opengles_render_texture(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, dsc->h_flip,
-                               !dsc->v_flip);
+                               !dsc->v_flip, t->target_layer->color_format);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));

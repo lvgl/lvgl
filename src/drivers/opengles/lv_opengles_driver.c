@@ -33,7 +33,7 @@
  **********************/
 static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                                        bool h_flip, bool v_flip, lv_color_t fill_color);
+                                        bool h_flip, bool v_flip, lv_color_t fill_color, lv_color_format_t cf);
 static void lv_opengles_enable_blending(void);
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size);
 static void lv_opengles_vertex_buffer_deinit(void);
@@ -81,7 +81,7 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor" };
+static const char * shader_names[] = { "u_Texture", "u_IsGray", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor" };
 static int shader_location[] = { 0, 0, 0, 0, 0, 0 };
 
 static const char * vertex_shader =
@@ -112,7 +112,7 @@ static const char * fragment_shader =
     "in vec2 v_TexCoord;\n"
     "\n"
     "uniform sampler2D u_Texture;\n"
-    "uniform float u_ColorDepth;\n"
+    "uniform bool u_IsGray;\n"
     "uniform float u_Opa;\n"
     "uniform bool u_IsFill;\n"
     "uniform vec3 u_FillColor;\n"
@@ -125,7 +125,7 @@ static const char * fragment_shader =
     "    } else {\n"
     "        texColor = texture(u_Texture, v_TexCoord);\n"
     "    }\n"
-    "    if (abs(u_ColorDepth - 8.0) < 0.1) {\n"
+    "    if (u_IsGray) {\n"
     "        float gray = texColor.r;\n"
     "        color = vec4(gray, gray, gray, u_Opa);\n"
     "    } else {\n"
@@ -185,18 +185,19 @@ void lv_opengles_deinit(void)
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_format_t cf)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                                lv_color_black());
+                                lv_color_black(), cf);
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
+void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h,
+                             lv_color_format_t cf)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color);
+    lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color, cf);
     LV_PROFILER_DRAW_END;
 }
 
@@ -219,7 +220,8 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
  **********************/
 
 static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color)
+                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color,
+                                        lv_color_format_t cf)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -266,7 +268,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     }
 
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i("u_IsGray", cf == LV_COLOR_FORMAT_L8);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);

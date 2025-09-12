@@ -53,9 +53,10 @@ void lv_opengles_deinit(void);
  * @param disp_h         height of the window/framebuffer being rendered to
  * @param h_flip         horizontal flip
  * @param v_flip         vertical flip
+ * @param cf             color format of the texture
  */
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_format_t cf);
 
 /**
  * Render a fill
@@ -64,8 +65,10 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
  * @param opa            opacity to blend the fill with existing contents
  * @param disp_w         width of the window/framebuffer being rendered to
  * @param disp_h         height of the window/framebuffer being rendered to
+ * @param cf             color format of the fill
  */
-void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h);
+void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h,
+                             lv_color_format_t cf);
 
 /**
  * Clear the window/display
