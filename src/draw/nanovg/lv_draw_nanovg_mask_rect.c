@@ -9,7 +9,7 @@
 
 #include "lv_draw_nanovg_private.h"
 
-#if LV_USE_DRAW_NANOVG && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_DRAW_NANOVG
 
 /*********************
 *      DEFINES
