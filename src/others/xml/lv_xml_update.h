@@ -27,7 +27,7 @@ extern "C" {
 /**
  * Load the styles, constants, another data of the component. It needs to be called only once for each component.
  * @param xml_def   the XML definition of the component as a NULL terminated string
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_update_from_data(const char * xml_def);
 
