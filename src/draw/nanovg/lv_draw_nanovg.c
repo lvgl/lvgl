@@ -13,6 +13,18 @@
 
 #include "lv_draw_nanovg_private.h"
 
+#define NANOVG_GLEW 1
+#define NANOVG_GL_USE_UNIFORMBUFFER 0
+
+#ifdef NANOVG_GLEW
+    #include <GL/glew.h>
+#endif
+#define GLFW_INCLUDE_GLEXT
+#include <GLFW/glfw3.h>
+
+#define NANOVG_GL2_IMPLEMENTATION
+#include "../../libs/nanovg/nanovg_gl.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -108,7 +120,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_nanove_arc(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_arc(t, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_TRIANGLE:

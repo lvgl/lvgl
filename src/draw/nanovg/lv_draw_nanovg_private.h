@@ -40,19 +40,7 @@ extern "C" {
 #error "Require LV_USE_MATRIX = 1"
 #endif
 
-#define NANOVG_GLEW 1
-#define NANOVG_GL_USE_UNIFORMBUFFER 0
-
-#ifdef NANOVG_GLEW
-#include <GL/glew.h>
-#endif
-#define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
-
 #include "../../libs/nanovg/nanovg.h"
-
-#define NANOVG_GL2_IMPLEMENTATION
-#include "../../libs/nanovg/nanovg_gl.h"
 
 /*********************
  *      DEFINES
