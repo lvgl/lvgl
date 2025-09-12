@@ -80,7 +80,7 @@ void lv_draw_nanovg_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
         u->vg,
         winding,
         NVG_SOURCE_OVER,
-        lv_nanovg_color_convert(dsc->color, dsc->opa, true));
+        lv_nanovg_color_convert(dsc->color, dsc->opa));
 
     LV_PROFILER_DRAW_END;
 }

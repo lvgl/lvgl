@@ -31,34 +31,24 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    float xform[6];
-} lv_nanovg_matrixt_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-static inline void lv_nanovg_matrix_convert(lv_nanovg_matrixt_t * dest, const lv_matrix_t * src)
+static inline void lv_nanovg_matrix_convert(float * xform, const lv_matrix_t * matrix)
 {
-    LV_ASSERT_NULL(dest);
-    LV_ASSERT_NULL(src);
-    dest->xform[0] = src->m[0][0];
-    dest->xform[1] = src->m[1][0];
-    dest->xform[2] = src->m[0][1];
-    dest->xform[3] = src->m[1][1];
-    dest->xform[4] = src->m[0][2];
-    dest->xform[5] = src->m[1][2];
+    LV_ASSERT_NULL(xform);
+    LV_ASSERT_NULL(matrix);
+    xform[0] = matrix->m[0][0];
+    xform[1] = matrix->m[1][0];
+    xform[2] = matrix->m[0][1];
+    xform[3] = matrix->m[1][1];
+    xform[4] = matrix->m[0][2];
+    xform[5] = matrix->m[1][2];
 }
 
-static inline NVGcolor lv_nanovg_color_convert(lv_color_t color, lv_opa_t opa, bool pre_mul)
+static inline NVGcolor lv_nanovg_color_convert(lv_color_t color, lv_opa_t opa)
 {
-    if(pre_mul && opa < LV_OPA_COVER) {
-        color.red = LV_UDIV255(color.red * opa);
-        color.green = LV_UDIV255(color.green * opa);
-        color.blue = LV_UDIV255(color.blue * opa);
-    }
-
     return nvgRGBA(color.red, color.green, color.blue, opa);
 }
 

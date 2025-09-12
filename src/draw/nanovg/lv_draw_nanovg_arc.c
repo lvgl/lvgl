@@ -74,7 +74,7 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
     else {
         nvgBeginPath(u->vg);
         nvgArc(u->vg, dsc->center.x, dsc->center.y, dsc->radius, MATH_RADIANS(start_angle), MATH_RADIANS(end_angle), NVG_CW);
-        nvgStrokeColor(u->vg, lv_nanovg_color_convert(dsc->color, dsc->opa, true));
+        nvgStrokeColor(u->vg, lv_nanovg_color_convert(dsc->color, dsc->opa));
         nvgStrokeWidth(u->vg, dsc->width);
         nvgLineCap(u->vg, dsc->rounded ? NVG_ROUND : NVG_BUTT);
         nvgStroke(u->vg);
