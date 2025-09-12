@@ -167,7 +167,43 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  * @param dsc pointer to a vector descriptor
  */
 void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
-#endif
+
+
+/**
+ * @brief Draw a gradient
+ * @param ctx the nanovg context
+ * @param grad the gradient descriptor
+ * @param grad_matrix the gradient matrix
+ * @param matrix the matrix to apply to the gradient
+ * @param winding the fill rule
+ * @param composite_operation the blend mode
+ */
+void lv_nanovg_draw_grad(
+    NVGcontext * ctx,
+    const lv_vector_gradient_t * grad,
+    const lv_matrix_t * grad_matrix,
+    const lv_matrix_t * matrix,
+    enum NVGwinding winding,
+    enum NVGcompositeOperation composite_operation);
+
+/**
+ * @brief Draw a gradient with helper
+ * @param ctx the nanovg context
+ * @param area the area to draw the gradient on
+ * @param grad_dsc the gradient descriptor
+ * @param matrix the matrix to apply to the gradient
+ * @param winding the fill rule
+ * @param composite_operation the blend mode
+ */
+void lv_nanovg_draw_grad_helper(
+    NVGcontext * ctx,
+    const lv_area_t * area,
+    const lv_grad_dsc_t * grad_dsc,
+    const lv_matrix_t * matrix,
+    enum NVGwinding winding,
+    enum NVGcompositeOperation composite_operation);
+
+#endif /*LV_USE_VECTOR_GRAPHIC*/
 
 /**********************
  *      MACROS
