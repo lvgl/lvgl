@@ -656,6 +656,9 @@ If the driver can provide precise timestamps for buffered events, it can
 overwrite ``data->timestamp``. By default, this is initialized to
 :cpp:func:`lv_tick_get()` just before invoking ``read_cb``.
 
+
+.. _indev event mode:
+
 Switching the Input Device to Event-Driven Mode
 -----------------------------------------------
 
@@ -679,6 +682,64 @@ You can do this by:
 .. note:: :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` cannot run at the same time.
 
 .. note:: For devices in event-driven mode, `data->continue_reading` is ignored.
+
+
+Pausing the Indev Timer
+-----------------------
+
+It's not always possible to take an indev reading directly inside
+a raw interrupt handler. Typically a flag would be set inside the interrupt handler
+which would be checked and reset inside the indev read callback where the reading
+would actually be taken. This works fine, but the indev read callback is constantly
+"polling" a flag which may go for long periods unset. We cannot use :ref:`indev event mode`
+because :cpp:func:`lv_indev_read` should not be called in an interrupt handler.
+
+For this situation you can use the timer-based indev read callback as usual but
+pause the indev timer if there hasn't been an interrupt in a while.
+Resuming a timer is typically safe in an interrupt handler.
+Care must be taken to avoid race conditions.
+
+.. code-block:: c
+
+    volatile bool interrupt_occurred;
+    lv_timer_t * volatile indev_timer;
+
+    void interrupt_handler(void)
+    {
+        interrupt_occurred = true;
+        if(indev_timer) lv_timer_resume(indev_timer);
+    }
+
+    uint32_t last_interrupt_tick;
+
+    void my_input_read(lv_indev_t * indev, lv_indev_data_t * data)
+    {
+        uint32_t tick_now = lv_tick_get();
+
+        /* if no interrupt has happened in the past 100 ms, pause the indev timer */
+        if(lv_tick_diff(tick_now, last_interrupt_tick) > 100) {
+            lv_timer_pause(indev_timer);
+        }
+
+        if(interrupt_occurred) {
+            interrupt_occurred = false;
+            last_interrupt_tick = tick_now;
+            /* 
+             * Ensure the timer is running in case an interrupt occurred
+             * just after the timer was paused. Without this, a race condition
+             * could leave the timer paused and input events would not be processed.
+             */
+            lv_timer_resume(indev_timer);
+        }
+
+        /* perform the reading */
+        /* ... */
+    }
+
+.. code-block:: c
+
+    /* in your setup code */
+    indev_timer = lv_indev_get_read_timer(indev);
 
 
 .. admonition::  Further Reading
