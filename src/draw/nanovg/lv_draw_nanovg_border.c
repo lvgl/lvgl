@@ -119,40 +119,47 @@ static enum NVGwinding path_append_inner_rect(NVGcontext * ctx,
         return NVG_CW;
     }
 
-    /* no-radius case, simple inner rect */
-    if(dsc->radius <= 0) {
-        int32_t x_offset = 0;
-        int32_t y_offset = 0;
-        int32_t w_inner = w;
-        int32_t h_inner = h;
-
-        if(dsc->side & LV_BORDER_SIDE_TOP) {
-            y_offset += border_w;
-            h_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_LEFT) {
-            x_offset += border_w;
-            w_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
-            h_inner -= border_w;
-        }
-        if(dsc->side & LV_BORDER_SIDE_RIGHT) {
-            w_inner -= border_w;
-        }
-
-        lv_nanovg_path_append_rect(ctx,
-                                   x + x_offset,
-                                   y + y_offset,
-                                   w_inner,
-                                   h_inner,
-                                   0);
-        LV_PROFILER_DRAW_END;
-        return NVG_CW;
-    }
-
     /* reset outer rect path */
     nvgBeginPath(ctx);
+
+    /* no-radius case */
+    if(dsc->radius <= 0) {
+        if(dsc->side & LV_BORDER_SIDE_TOP) {
+            lv_nanovg_path_append_rect(ctx,
+                                       x,
+                                       y,
+                                       w,
+                                       border_w,
+                                       0);
+        }
+        if(dsc->side & LV_BORDER_SIDE_LEFT) {
+            lv_nanovg_path_append_rect(ctx,
+                                       x,
+                                       y,
+                                       border_w,
+                                       h,
+                                       0);
+        }
+        if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
+            lv_nanovg_path_append_rect(ctx,
+                                       x,
+                                       y + h - border_w,
+                                       w,
+                                       border_w,
+                                       0);
+        }
+        if(dsc->side & LV_BORDER_SIDE_RIGHT) {
+            lv_nanovg_path_append_rect(ctx,
+                                       x + w - border_w,
+                                       y,
+                                       border_w,
+                                       h,
+                                       0);
+        }
+
+        LV_PROFILER_DRAW_END;
+        return NVG_CCW;
+    }
 
     /* coordinate reference map: https://github.com/lvgl/lvgl/pull/6796 */
     const float c1_x = x + r;
