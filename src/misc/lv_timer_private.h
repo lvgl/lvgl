@@ -33,7 +33,7 @@ struct _lv_timer_t {
     lv_timer_cb_t timer_cb;    /**< Timer function */
     void * user_data;          /**< Custom user data */
     int32_t repeat_count;      /**< 1: One time;  -1 : infinity;  n>0: residual times */
-    volatile uint8_t paused;
+    volatile int paused;
     uint32_t auto_delete : 1;
 };
 

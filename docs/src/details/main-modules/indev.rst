@@ -707,7 +707,7 @@ Care must be taken to avoid race conditions.
     void interrupt_handler(void)
     {
         interrupt_occurred = true;
-        lv_timer_resume(indev_timer);
+        if(indev_timer) lv_timer_resume(indev_timer);
     }
 
     uint32_t last_interrupt_tick;
@@ -724,7 +724,11 @@ Care must be taken to avoid race conditions.
         if(interrupt_occurred) {
             interrupt_occurred = false;
             last_interrupt_tick = tick_now;
-            /* bypass a race condition */
+            /* 
+             * Ensure the timer is running in case an interrupt occurred
+             * just after the timer was paused. Without this, a race condition
+             * could leave the timer paused and input events would not be processed.
+             */
             lv_timer_resume(indev_timer);
         }
 
