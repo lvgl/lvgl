@@ -1,0 +1,188 @@
+/**
+ * @file lv_nanovg_utils.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "lv_nanovg_utils.h"
+
+#if LV_USE_DRAW_NANOVG
+
+#include "lv_draw_nanovg_private.h"
+#include "lv_nanovg_math.h"
+#include <float.h>
+#include <math.h>
+
+/*********************
+*      DEFINES
+*********************/
+
+/* Magic number from https://spencermortensen.com/articles/bezier-circle/ */
+#define PATH_ARC_MAGIC 0.55191502449351f
+
+#define SIGN(x) (math_zero(x) ? 0 : ((x) > 0 ? 1 : -1))
+
+/**********************
+*      TYPEDEFS
+**********************/
+
+/**********************
+*  STATIC PROTOTYPES
+**********************/
+
+/**********************
+*  STATIC VARIABLES
+**********************/
+
+/**********************
+*      MACROS
+**********************/
+
+/**********************
+*   GLOBAL FUNCTIONS
+**********************/
+
+void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
+{
+    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NULL(matrix);
+
+    nvgResetTransform(ctx);
+    nvgTransform(ctx,
+                 matrix->m[0][0],
+                 matrix->m[1][0],
+                 matrix->m[0][1],
+                 matrix->m[1][1],
+                 matrix->m[0][2],
+                 matrix->m[1][2]);
+}
+
+void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r)
+{
+    LV_ASSERT_NULL(ctx);
+
+    if(r > 0) {
+        const float half_w = w / 2.0f;
+        const float half_h = h / 2.0f;
+
+        /*clamping cornerRadius by minimum size*/
+        const float r_max = LV_MIN(half_w, half_h);
+
+        nvgRoundedRect(ctx, x, y, w, h, r > r_max ? r_max : r);
+        return;
+    }
+
+    nvgRect(ctx, x, y, w, h);
+}
+
+void lv_nanovg_path_append_arc_right_angle(NVGcontext * ctx,
+                                           float start_x, float start_y,
+                                           float center_x, float center_y,
+                                           float end_x, float end_y)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    float dx1 = center_x - start_x;
+    float dy1 = center_y - start_y;
+    float dx2 = end_x - center_x;
+    float dy2 = end_y - center_y;
+
+    float c = SIGN(dx1 * dy2 - dx2 * dy1) * PATH_ARC_MAGIC;
+
+    nvgBezierTo(ctx,
+                start_x - c * dy1, start_y + c * dx1,
+                end_x - c * dy2, end_y + c * dx2,
+                end_x, end_y);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_nanovg_path_append_arc(NVGcontext * ctx,
+                               float cx, float cy,
+                               float radius,
+                               float start_angle,
+                               float sweep,
+                               bool pie)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    /* just circle */
+    if(sweep >= 360.0f || sweep <= -360.0f) {
+        nvgCircle(ctx, cx, cy, radius);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    start_angle = MATH_RADIANS(start_angle);
+    sweep = MATH_RADIANS(sweep);
+
+    int n_curves = (int)ceil(MATH_FABSF(sweep / MATH_HALF_PI));
+    float sweep_sign = sweep < 0 ? -1.f : 1.f;
+    float fract = fmodf(sweep, MATH_HALF_PI);
+    fract = (math_zero(fract)) ? MATH_HALF_PI * sweep_sign : fract;
+
+    /* Start from here */
+    float start_x = radius * MATH_COSF(start_angle);
+    float start_y = radius * MATH_SINF(start_angle);
+
+    if(pie) {
+        nvgMoveTo(ctx, cx, cy);
+        nvgLineTo(ctx, start_x + cx, start_y + cy);
+    }
+
+    for(int i = 0; i < n_curves; ++i) {
+        float end_angle = start_angle + ((i != n_curves - 1) ? MATH_HALF_PI * sweep_sign : fract);
+        float end_x = radius * MATH_COSF(end_angle);
+        float end_y = radius * MATH_SINF(end_angle);
+
+        /* variables needed to calculate bezier control points */
+
+        /** get bezier control points using article:
+         * (http://itc.ktu.lt/index.php/ITC/article/view/11812/6479)
+         */
+        float ax = start_x;
+        float ay = start_y;
+        float bx = end_x;
+        float by = end_y;
+        float q1 = ax * ax + ay * ay;
+        float q2 = ax * bx + ay * by + q1;
+        float k2 = (4.0f / 3.0f) * ((MATH_SQRTF(2 * q1 * q2) - q2) / (ax * by - ay * bx));
+
+        /* Next start point is the current end point */
+        start_x = end_x;
+        start_y = end_y;
+
+        end_x += cx;
+        end_y += cy;
+
+        float ctrl1_x = ax - k2 * ay + cx;
+        float ctrl1_y = ay + k2 * ax + cy;
+        float ctrl2_x = bx + k2 * by + cx;
+        float ctrl2_y = by - k2 * bx + cy;
+
+        nvgBezierTo(ctx, ctrl1_x, ctrl1_y, ctrl2_x, ctrl2_y, end_x, end_y);
+        start_angle = end_angle;
+    }
+
+    if(pie) {
+        nvgClosePath(ctx);
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcompositeOperation composite_operation,
+                    NVGcolor color)
+{
+    LV_ASSERT_NULL(ctx);
+    nvgPathWinding(ctx, winding);
+    nvgGlobalCompositeOperation(ctx, composite_operation);
+    nvgFillColor(ctx, color);
+    nvgFill(ctx);
+}
+
+/**********************
+*   STATIC FUNCTIONS
+**********************/
+
+#endif /* LV_USE_DRAW_NANOVG */
