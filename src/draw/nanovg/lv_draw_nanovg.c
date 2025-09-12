@@ -87,6 +87,8 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     lv_matrix_multiply(&u->global_matrix, &layer_matrix);
 #endif
 
+    lv_nanovg_transform(u->vg, &u->global_matrix);
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_nanovg_fill(t, t->draw_dsc, &t->area);
@@ -128,7 +130,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            lv_draw_nanovg_mask_rect(t, t->draw_dsc, &t->area);
+            lv_draw_nanovg_mask_rect(t, t->draw_dsc);
             break;
 
 #if LV_USE_VECTOR_GRAPHIC
