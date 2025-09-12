@@ -62,10 +62,20 @@ static lv_image_dsc_t * get_image_dsc(void)
     image_dsc.header.w = IMAGE_WIDTH;
     image_dsc.header.h = IMAGE_HEIGHT;
     image_dsc.header.stride = IMAGE_WIDTH * sizeof(lv_color32_t);
+    image_dsc.header.flags = 0;
     image_dsc.data_size = sizeof(image_map);
     image_dsc.data = image_map;
 
     return &image_dsc;
+}
+
+static lv_image_decoder_dsc_t * get_image_decoder_dsc(void)
+{
+    static lv_image_decoder_dsc_t decoder_dsc = { 0 };
+    decoder_dsc.src_type = LV_IMAGE_SRC_FILE;
+    decoder_dsc.src = NULL;
+    decoder_dsc.header.flags = 0;
+    return &decoder_dsc;
 }
 
 void bin_decoder_tile(const void * src, const char * screenshot)
@@ -106,6 +116,10 @@ void test_bin_decoder_argb8888_tile(void)
 {
     LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
     bin_decoder_tile(&test_image_cogwheel_argb8888, "libs/bin_decoder_4.png");
+}
+void test_bin_decoder_bin_file(void)
+{
+    bin_decoder("A:src/test_files/binimages/cogwheel.ARGB8888.bin", "libs/cogwheel.ARGB8888.png");
 }
 void test_bin_decoder_image_dsc_error_handling(void)
 {
@@ -209,4 +223,98 @@ void test_bin_decoder_flush_cache(void)
 #endif
 }
 
+void test_bin_decoder_decoder_dsc_error_handling(void)
+{
+    lv_image_decoder_dsc_t * decoder_dsc = get_image_decoder_dsc();
+
+    /* Test info invalid file exension */
+    decoder_dsc->src = "test_image.png";
+    lv_result_t result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test info file read error */
+    decoder_dsc->src = "non_existing.bin";
+    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test info unknown src type */
+    decoder_dsc->src = "A:src/test_files/binimages/cogwheel.ARGB8888.bin";
+    decoder_dsc->src_type = LV_IMAGE_SRC_UNKNOWN;
+    result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open invalid file extension */
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = "test_image.png";
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open file failure */
+    decoder_dsc->src = "non_existing.bin";
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open variable image with NULL data */
+    lv_image_dsc_t * image_dsc = get_image_dsc();
+    image_dsc->data = NULL;
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+
+    /* Test open decompress image with LV_BIN_DECODER_RAM_LOAD == 0 */
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    image_dsc = get_image_dsc();
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.flags = LV_IMAGE_FLAGS_COMPRESSED;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+#endif
+
+    /* Test open with user_flags handling */
+    image_dsc = get_image_dsc();
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.flags = LV_IMAGE_FLAGS_USER_MASK;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, result);
+
+    lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
+}
+
+void test_bin_decoder_open_stride_zero_handling(void)
+{
+    /* Test open image with stride zero */
+    lv_image_dsc_t * image_dsc = get_image_dsc();
+    image_dsc->header.stride = 0;
+    lv_image_decoder_dsc_t * decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.stride = image_dsc->header.w * sizeof(lv_color32_t);
+
+    lv_result_t result = lv_bin_decoder_open(NULL, decoder_dsc);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, result);
+
+    /* Test open image with stride zero for indexed image */
+    image_dsc = get_image_dsc();
+    image_dsc->header.stride = 0;
+    image_dsc->header.cf = LV_COLOR_FORMAT_I1;
+    decoder_dsc = get_image_decoder_dsc();
+    decoder_dsc->src = image_dsc;
+    decoder_dsc->src_type = LV_IMAGE_SRC_VARIABLE;
+    decoder_dsc->header.stride = image_dsc->header.w * sizeof(lv_color32_t);
+    decoder_dsc->args.use_indexed = 1;
+    result = lv_bin_decoder_open(NULL, decoder_dsc);
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
+#else
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, result);
+#endif
+
+    lv_bin_decoder_close(decoder_dsc->decoder, decoder_dsc);
+}
 #endif
