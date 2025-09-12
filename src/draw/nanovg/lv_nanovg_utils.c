@@ -60,6 +60,16 @@ void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
                  matrix->m[1][2]);
 }
 
+void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area)
+{
+    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NULL(area);
+
+    nvgScissor(ctx,
+               area->x1, area->y1,
+               lv_area_get_width(area), lv_area_get_height(area));
+}
+
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r)
 {
     LV_ASSERT_NULL(ctx);
