@@ -390,6 +390,11 @@
     #define LV_DRAW_EVE_EVE_GENERATION 4
 #endif
 
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_OPENGLES, LV_USE_MATRIX.
+ */
+#define LV_USE_DRAW_NANOVG 0
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -999,6 +1004,9 @@
 
 /** Enable ThorVG by assuming that its installed and linked to the project */
 #define LV_USE_THORVG_EXTERNAL 0
+
+/** Enable NanoVG (vector graphics library) */
+#define LV_USE_NANOVG 0
 
 /** Use lvgl built-in LZ4 lib */
 #define LV_USE_LZ4_INTERNAL  0

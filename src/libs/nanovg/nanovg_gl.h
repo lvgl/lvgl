@@ -18,6 +18,10 @@
 #ifndef NANOVG_GL_H
 #define NANOVG_GL_H
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_NANOVG
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1656,5 +1660,7 @@ GLuint nvglImageHandleGLES3(NVGcontext* ctx, int image)
 	GLNVGtexture* tex = glnvg__findTexture(gl, image);
 	return tex->tex;
 }
+
+#endif /* LV_USE_NANOVG */
 
 #endif /* NANOVG_GL_IMPLEMENTATION */

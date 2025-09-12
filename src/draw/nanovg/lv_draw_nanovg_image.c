@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_nanovg_vector.c
+ * @file lv_draw_nanovg_image.c
  *
  */
 
@@ -35,9 +35,8 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
 {
-
 }
 
 /**********************

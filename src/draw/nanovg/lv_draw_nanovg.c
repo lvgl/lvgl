@@ -7,45 +7,21 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_draw_private.h"
-#include "../../draw/lv_draw_rect.h"
-#include "../../misc/lv_area_private.h"
+#include "lv_draw_nanovg.h"
 
-#if !LV_USE_MATRIX
-    #error "Needs LV_USE_MATRIX = 1"
-#endif
+#if LV_USE_DRAW_NANOVG
 
-#define NANOVG_GLEW 1
-// #define NANOVG_GL3 0
-#define NANOVG_GL_USE_UNIFORMBUFFER 0
-
-#ifdef NANOVG_GLEW
-    #include <GL/glew.h>
-#endif
-#define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
-
-#include "../../libs/nanovg/nanovg.h"
-
-#define NANOVG_GL2_IMPLEMENTATION
-#include "../../libs/nanovg/nanovg_gl.h"
+#include "lv_draw_nanovg_private.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-#define NANOVG_DRAW_UNIT_ID 20
+#define NANOVG_DRAW_UNIT_ID 10
 
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct _lv_draw_nanovg_unit_t {
-    lv_draw_unit_t base_unit;
-    NVGcontext * vg;
-    bool is_started;
-    lv_matrix_t global_matrix;
-} lv_draw_nanovg_unit_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -79,74 +55,9 @@ void lv_draw_nanovg_init(void)
     LV_ASSERT_MSG(unit->vg != NULL, "nvgCreateGL2 init failed");
 }
 
-void lv_draw_nanovg_deinit(void)
-{
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void lv_matrix_to_nvg_transform(float * t, const lv_matrix_t * m)
-{
-    t[0] = m->m[0][0];
-    t[1] = m->m[1][0];
-    t[2] = m->m[0][1];
-    t[3] = m->m[1][1];
-    t[4] = m->m[0][2];
-    t[5] = m->m[1][2];
-}
-
-static void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
-{
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
-
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, coords, &t->clip_area)) {
-        /*Fully clipped, nothing to do*/
-        return;
-    }
-
-    LV_PROFILER_DRAW_BEGIN;
-
-    float xform[6];
-    lv_matrix_to_nvg_transform(xform, &u->global_matrix);
-    nvgResetTransform(u->vg);
-    nvgTransform(u->vg, xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
-
-    // nvgSave(u->vg);
-
-    nvgBeginPath(u->vg);
-
-    const int32_t w = lv_area_get_width(coords);
-    const int32_t h = lv_area_get_height(coords);
-
-    if(dsc->radius > 0) {
-        const float half_w = w / 2.0f;
-        const float half_h = h / 2.0f;
-
-        /*clamping cornerRadius by minimum size*/
-        const float r_max = LV_MIN(half_w, half_h);
-
-        nvgRoundedRect(u->vg, coords->x1, coords->y1, w, h, dsc->radius > r_max ? r_max : dsc->radius);
-    }
-    else {
-        nvgRect(u->vg, coords->x1, coords->y1, w, h);
-    }
-
-    if(0 && dsc->grad.dir != LV_GRAD_DIR_NONE) {
-
-    }
-    else {
-        // nvgPathWinding(u->vg, NVG_CCW);
-        nvgFillColor(u->vg, nvgRGBA(dsc->color.red, dsc->color.green, dsc->color.blue, dsc->opa));
-        nvgFill(u->vg);
-    }
-
-    // nvgRestore(u->vg);
-
-    LV_PROFILER_DRAW_END;
-}
 
 static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
 {
@@ -168,7 +79,53 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_nanovg_fill(t, t->draw_dsc, &t->area);
             break;
+
+        case LV_DRAW_TASK_TYPE_BORDER:
+            lv_draw_nanovg_border(t, t->draw_dsc, &t->area);
+            break;
+
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+            lv_draw_nanovg_box_shadow(t, t->draw_dsc, &t->area);
+            break;
+
+        case LV_DRAW_TASK_TYPE_LETTER:
+            lv_draw_nanovg_letter(t, t->draw_dsc, &t->area);
+            break;
+
+        case LV_DRAW_TASK_TYPE_LABEL:
+            lv_draw_nanovg_label(t, t->draw_dsc, &t->area);
+            break;
+
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, true);
+            break;
+
+        case LV_DRAW_TASK_TYPE_LAYER:
+            break;
+
+        case LV_DRAW_TASK_TYPE_LINE:
+            lv_draw_nanovg_line(t, t->draw_dsc);
+            break;
+
+        case LV_DRAW_TASK_TYPE_ARC:
+            lv_draw_nanove_arc(t, t->draw_dsc, &t->area);
+            break;
+
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            lv_draw_nanovg_triangle(t, t->draw_dsc);
+            break;
+
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+            lv_draw_nanovg_mask_rect(t, t->draw_dsc, &t->area);
+            break;
+
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_TASK_TYPE_VECTOR:
+            lv_draw_nanovg_vector(t, t->draw_dsc);
+            break;
+#endif
         default:
+            LV_LOG_ERROR("unknown draw task type: %d", t->type);
             break;
     }
 }
@@ -225,6 +182,19 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL:
+        case LV_DRAW_TASK_TYPE_BORDER:
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+        case LV_DRAW_TASK_TYPE_LETTER:
+        case LV_DRAW_TASK_TYPE_LABEL:
+        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_TASK_TYPE_LAYER:
+        case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_TASK_TYPE_VECTOR:
+#endif
             break;
 
         default:
@@ -248,3 +218,5 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     unit->vg = NULL;
     return 0;
 }
+
+#endif /* LV_USE_DRAW_NANOVG */
