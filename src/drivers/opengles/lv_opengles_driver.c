@@ -390,7 +390,7 @@ static unsigned int lv_opengles_shader_compile(unsigned int type, const char * s
         GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         if(length > 0) {
             char * message = lv_malloc_zeroed(length * sizeof(char));
-            LV_ASSERT_MALLOCS(message);
+            LV_ASSERT_MALLOC(message);
             GL_CALL(glGetShaderInfoLog(id, length, &length, message));
 
             LV_LOG_ERROR("%s", message);
