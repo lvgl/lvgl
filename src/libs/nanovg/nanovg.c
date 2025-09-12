@@ -16,6 +16,10 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_NANOVG
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -2909,3 +2913,5 @@ void nvgTextMetrics(NVGcontext* ctx, float* ascender, float* descender, float* l
 		*lineh *= invscale;
 }
 // vim: ft=c nu noet ts=4
+
+#endif /* LV_USE_NANOVG */
