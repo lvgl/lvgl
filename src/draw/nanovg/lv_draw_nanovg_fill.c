@@ -11,7 +11,7 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "lv_draw_nanovg_utils.h"
+#include "lv_nanovg_utils.h"
 
 /*********************
  *      DEFINES
@@ -64,9 +64,7 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
 
     }
     else {
-        nvgPathWinding(u->vg, NVG_CCW);
-        nvgFillColor(u->vg, nvgRGBA(dsc->color.red, dsc->color.green, dsc->color.blue, dsc->opa));
-        nvgFill(u->vg);
+        lv_nanovg_fill(u->vg, NVG_CCW, NVG_SOURCE_OVER, lv_nanovg_color_convert(dsc->color, dsc->opa, true));
     }
 
     // nvgRestore(u->vg);
