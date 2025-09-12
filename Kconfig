@@ -1881,10 +1881,6 @@ menu "LVGL configuration"
 			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
 			depends on LV_USE_WAYLAND
 			default n
-		config LV_WAYLAND_WL_SHELL
-			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
-			depends on LV_USE_WAYLAND
-			default n
 		config LV_WAYLAND_BUF_COUNT
 			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
 			depends on LV_USE_WAYLAND
