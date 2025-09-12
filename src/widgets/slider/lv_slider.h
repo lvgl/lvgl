@@ -118,8 +118,8 @@ void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode);
 
 /**
  * Set the orientation of slider.
- * @param obj           pointer to a slider object
- * @param orientation   slider  orientation from `lv_slider_orientation_t`
+ * @param obj       pointer to a slider object
+ * @param orientation    slider  orientation from `lv_slider_orientation_t`
  */
 void lv_slider_set_orientation(lv_obj_t * obj, lv_slider_orientation_t orientation);
 
@@ -164,7 +164,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj);
 
 /**
  * Get the mode of the slider.
- * @param slider       pointer to a slider object
+ * @param slider    pointer to a slider object
  * @return          see `lv_slider_mode_t`
  */
 lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider);
@@ -188,7 +188,7 @@ bool lv_slider_is_symmetrical(lv_obj_t * obj);
 /**
  * Bind an integer or float Subject to a Slider's value.
  * @param obj       pointer to Slider
- * @param subject   pointer to Subject
+ * @param subject    pointer to Subject
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);

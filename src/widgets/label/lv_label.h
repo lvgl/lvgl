@@ -83,8 +83,8 @@ lv_obj_t * lv_label_create(lv_obj_t * parent);
 
 /**
  * Set a new text for a label. Memory will be allocated to store the text by the label.
- * @param obj           pointer to a label object
- * @param text          '\0' terminated character string. NULL to refresh with the current text.
+ * @param obj       pointer to a label object
+ * @param text      '\0' terminated character string. NULL to refresh with the current text.
  * @note If `LV_USE_ARABIC_PERSIAN_CHARS` is enabled the text will be modified to have the correct Arabic
  * characters in it.
  */
@@ -92,8 +92,8 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
- * @param obj           pointer to a label object
- * @param fmt           `printf`-like format string
+ * @param obj       pointer to a label object
+ * @param fmt       `printf`-like format string
  * Example:
  * @code
  * lv_label_set_text_fmt(label1, "%d user", user_num);
@@ -104,9 +104,9 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
 
 /**
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
- * @param obj           pointer to a label object
- * @param fmt           `printf`-like format string
- * @param args          variadic arguments list
+ * @param obj       pointer to a label object
+ * @param fmt       `printf`-like format string
+ * @param args      variadic arguments list
  *
  * Example:
  * @code
@@ -122,16 +122,16 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args);
 /**
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exists.
- * @param obj           pointer to a label object
- * @param text          pointer to a text. NULL to refresh with the current text.
+ * @param obj       pointer to a label object
+ * @param text      pointer to a text. NULL to refresh with the current text.
  * @note It ignores `LV_USE_ARABIC_PERSIAN_CHARS`
  */
 void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
  * Set the behavior of the label with text longer than the object size
- * @param obj           pointer to a label object
- * @param long_mode     the new mode from 'lv_label_long_mode' enum.
+ * @param obj       pointer to a label object
+ * @param long_mode    the new mode from 'lv_label_long_mode' enum.
  *                      In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function
  */
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode);
@@ -152,8 +152,8 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
 
 /**
  * Enable the recoloring by in-line commands
- * @param obj           pointer to a label object
- * @param en            true: enable recoloring, false: disable
+ * @param obj       pointer to a label object
+ * @param en        true: enable recoloring, false: disable
  * Example: "This is a #ff0000 red# word"
  */
 void lv_label_set_recolor(lv_obj_t * obj, bool en);
@@ -179,7 +179,7 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
 /**
  * Get the relative x and y coordinates of a letter
  * @param obj       pointer to a label object
- * @param char_id   index of the character [0 ... text length - 1].
+ * @param char_id    index of the character [0 ... text length - 1].
  *                  Expressed in character index, not byte index (different in UTF-8)
  * @param pos       store the result here (E.g. index = 0 gives 0;0 coordinates if the text if aligned to the left)
  */
@@ -232,7 +232,7 @@ bool lv_label_get_recolor(const lv_obj_t * obj);
 /**
  * Bind an integer, string, or pointer Subject to a Label.
  * @param obj       pointer to Label
- * @param subject   pointer to Subject
+ * @param subject    pointer to Subject
  * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
  *                  or NULL to bind to the value directly.
  * @return          pointer to newly-created Observer

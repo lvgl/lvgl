@@ -55,8 +55,8 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent);
 
 /**
  * Set the orientation of switch.
- * @param obj           pointer to switch object
- * @param orientation   switch orientation from `lv_switch_orientation_t`
+ * @param obj       pointer to switch object
+ * @param orientation    switch orientation from `lv_switch_orientation_t`
  */
 void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation);
 

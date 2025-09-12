@@ -96,7 +96,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[]);
  * The control map array will be copied and so may be deallocated after this
  * function returns.
  * @param obj       pointer to a button matrix object
- * @param ctrl_map  pointer to an array of `lv_button_ctrl_t` control bytes. The
+ * @param ctrl_map    pointer to an array of `lv_button_ctrl_t` control bytes. The
  *                  length of the array and position of the elements must match
  *                  the number and order of the individual buttons (i.e. excludes
  *                  newline entries).
@@ -107,8 +107,8 @@ void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t c
 
 /**
  * Set the selected buttons
- * @param obj        pointer to button matrix object
- * @param btn_id     0 based index of the button to modify. (Not counting new lines)
+ * @param obj       pointer to button matrix object
+ * @param btn_id    0 based index of the button to modify. (Not counting new lines)
  */
 void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint32_t btn_id);
 

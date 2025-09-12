@@ -35,7 +35,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 
 /**
  * Create a canvas object
- * @param parent     pointer to an object, it will be the parent of the new canvas
+ * @param parent    pointer to an object, it will be the parent of the new canvas
  * @return           pointer to the created canvas
  */
 lv_obj_t * lv_canvas_create(lv_obj_t * parent);
@@ -49,15 +49,15 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  *
  * Use lv_canvas_set_draw_buf() instead if you need to set a buffer with alignment requirement.
  *
- * @param obj    pointer to a canvas object
- * @param buf    buffer where content of canvas will be.
+ * @param obj       pointer to a canvas object
+ * @param buf       buffer where content of canvas will be.
  *                 The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
  *                 It can be allocated with `lv_malloc()` or
  *                 it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
  *                 it can be an address in RAM or external SRAM
- * @param w      width of canvas
- * @param h      height of canvas
- * @param cf     color format. `LV_COLOR_FORMAT...`
+ * @param w         width of canvas
+ * @param h         height of canvas
+ * @param cf        color format. `LV_COLOR_FORMAT...`
  */
 void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
@@ -66,17 +66,17 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
  * or defined statically by `LV_DRAW_BUF_DEFINE_STATIC`. When buffer start address and stride has alignment
  * requirement, it's recommended to use `lv_draw_buf_create`.
  * @param obj       pointer to a canvas object
- * @param draw_buf  pointer to a draw buffer
+ * @param draw_buf    pointer to a draw buffer
  */
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
 
 /**
  * Set a pixel's color and opacity
- * @param obj   pointer to a canvas
- * @param x     X coordinate of the pixel
- * @param y     Y coordinate of the pixel
- * @param color the color
- * @param opa   the opacity
+ * @param obj       pointer to a canvas
+ * @param x         X coordinate of the pixel
+ * @param y         Y coordinate of the pixel
+ * @param color     the color
+ * @param opa       the opacity
  * @note        The following color formats are supported
  *              LV_COLOR_FORMAT_I1/2/4/8, LV_COLOR_FORMAT_A8,
  *              LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888,
@@ -104,9 +104,9 @@ lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj);
 
 /**
  * Get a pixel's color and opacity
- * @param obj   pointer to a canvas
- * @param x     X coordinate of the pixel
- * @param y     Y coordinate of the pixel
+ * @param obj       pointer to a canvas
+ * @param x         X coordinate of the pixel
+ * @param y         Y coordinate of the pixel
  * @return      ARGB8888 color of the pixel
  */
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
@@ -133,10 +133,10 @@ const void * lv_canvas_get_buf(lv_obj_t * canvas);
 
 /**
  * Copy a buffer to the canvas
- * @param obj           pointer to a canvas object
- * @param canvas_area   the area of the canvas to copy
- * @param dest_buf      pointer to a buffer to store the copied data
- * @param dest_area     the area of the destination buffer to copy to. If omitted NULL, copy to the whole `dest_buf`
+ * @param obj       pointer to a canvas object
+ * @param canvas_area    the area of the canvas to copy
+ * @param dest_buf    pointer to a buffer to store the copied data
+ * @param dest_area    the area of the destination buffer to copy to. If omitted NULL, copy to the whole `dest_buf`
  */
 void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf,
                         const lv_area_t * dest_area);

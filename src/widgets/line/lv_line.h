@@ -32,7 +32,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_line_class;
 
 /**
  * Create a line object
- * @param parent pointer to an object, it will be the parent of the new line
+ * @param parent    pointer to an object, it will be the parent of the new line
  * @return pointer to the created line
  */
 lv_obj_t * lv_line_create(lv_obj_t * parent);
@@ -43,17 +43,17 @@ lv_obj_t * lv_line_create(lv_obj_t * parent);
 
 /**
  * Set an array of points. The line object will connect these points.
- * @param obj           pointer to a line object
- * @param points        an array of points. Only the address is saved, so the array needs to be alive while the line exists
- * @param point_num     number of points in 'point_a'
+ * @param obj       pointer to a line object
+ * @param points    an array of points. Only the address is saved, so the array needs to be alive while the line exists
+ * @param point_num    number of points in 'point_a'
  */
 void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num);
 
 /**
  * Set a non-const array of points. Identical to `lv_line_set_points` except the array may be retrieved by `lv_line_get_points_mutable`.
- * @param obj           pointer to a line object
- * @param points        a non-const array of points. Only the address is saved, so the array needs to be alive while the line exists.
- * @param point_num     number of points in 'point_a'
+ * @param obj       pointer to a line object
+ * @param points    a non-const array of points. Only the address is saved, so the array needs to be alive while the line exists.
+ * @param point_num    number of points in 'point_a'
  */
 void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num);
 
@@ -72,28 +72,28 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en);
 
 /**
  * Get the pointer to the array of points.
- * @param obj           pointer to a line object
+ * @param obj       pointer to a line object
  * @return              const pointer to the array of points
  */
 const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj);
 
 /**
  * Get the number of points in the array of points.
- * @param obj           pointer to a line object
+ * @param obj       pointer to a line object
  * @return              number of points in array of points
  */
 uint32_t lv_line_get_point_count(lv_obj_t * obj);
 
 /**
  * Check the mutability of the stored point array pointer.
- * @param obj           pointer to a line object
+ * @param obj       pointer to a line object
  * @return              true: the point array pointer is mutable, false: constant
  */
 bool lv_line_is_point_array_mutable(lv_obj_t * obj);
 
 /**
  * Get a pointer to the mutable array of points or NULL if it is not mutable
- * @param obj           pointer to a line object
+ * @param obj       pointer to a line object
  * @return              pointer to the array of points. NULL if not mutable.
  */
 lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj);

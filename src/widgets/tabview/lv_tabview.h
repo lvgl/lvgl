@@ -47,7 +47,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name);
  * Change the name of the tab
  * @param obj       pointer to a tabview widget
  * @param idx       the index of the tab to rename
- * @param new_name  the new name as a string
+ * @param new_name    the new name as a string
  */
 void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name);
 
@@ -55,7 +55,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name);
  * Show a tab
  * @param obj       pointer to a tabview widget
  * @param idx       the index of the tab to show
- * @param anim_en   LV_ANIM_ON/OFF
+ * @param anim_en    LV_ANIM_ON/OFF
  */
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en);
 

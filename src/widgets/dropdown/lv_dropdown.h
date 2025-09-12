@@ -56,7 +56,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;
 
 /**
  * Create a drop-down list object
- * @param parent pointer to an object, it will be the parent of the new drop-down list
+ * @param parent    pointer to an object, it will be the parent of the new drop-down list
  * @return pointer to the created drop-down list
  */
 lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
@@ -78,7 +78,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt);
  * Set the options in a drop-down list from a string.
  * The options will be copied and saved in the object so the `options` can be destroyed after calling this function
  * @param obj       pointer to drop-down list object
- * @param options   a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * @param options    a string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options);
 
@@ -86,7 +86,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options);
  * Set the options in a drop-down list from a static string (global, static or dynamically allocated).
  * Only the pointer of the option string will be saved.
  * @param obj       pointer to drop-down list object
- * @param options   a static string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * @param options    a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options);
 
@@ -107,7 +107,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj);
 /**
  * Set the selected option
  * @param obj       pointer to drop-down list object
- * @param sel_opt   id of the selected option (0 ... number of option - 1);
+ * @param sel_opt    id of the selected option (0 ... number of option - 1);
  */
 void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt);
 
@@ -147,7 +147,7 @@ lv_obj_t * lv_dropdown_get_list(lv_obj_t * obj);
 
 /**
  * Get text of the drop-down list's button.
- * @param obj   pointer to a drop-down list object
+ * @param obj       pointer to a drop-down list object
  * @return      the text as string, `NULL` if no text
  */
 const char * lv_dropdown_get_text(lv_obj_t * obj);
@@ -177,7 +177,7 @@ uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj);
  * Get the current selected option as a string
  * @param obj       pointer to drop-down object
  * @param buf       pointer to an array to store the string
- * @param buf_size  size of `buf` in bytes. 0: to ignore it.
+ * @param buf_size    size of `buf` in bytes. 0: to ignore it.
  */
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
 
@@ -216,7 +216,7 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj);
 
 /**
  * Open the drop.down list
- * @param dropdown_obj       pointer to drop-down list object
+ * @param dropdown_obj    pointer to drop-down list object
  */
 void lv_dropdown_open(lv_obj_t * dropdown_obj);
 
@@ -238,7 +238,7 @@ bool lv_dropdown_is_open(lv_obj_t * obj);
 /**
  * Bind an integer Subject to a Dropdown's value.
  * @param obj       pointer to Dropdown
- * @param subject   pointer to Subject
+ * @param subject    pointer to Subject
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);

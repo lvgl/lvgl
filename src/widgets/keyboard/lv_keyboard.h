@@ -104,7 +104,7 @@ void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
  * @param mode      the mode to assign the new map to (see 'lv_keyboard_mode_t')
  * @param map       pointer to a string array describing the button map
  *                  see 'lv_buttonmatrix_set_map()' for more details
- * @param ctrl_map  pointer to the control map. See 'lv_buttonmatrix_set_ctrl_map()'
+ * @param ctrl_map    pointer to the control map. See 'lv_buttonmatrix_set_ctrl_map()'
 
  */
 void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * const map[],

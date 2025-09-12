@@ -120,7 +120,7 @@ void lv_arclabel_set_offset(lv_obj_t * obj, int32_t offset);
 /**
  * Set the type of arc.
  * @param obj       pointer to and arc label object
- * @param dir      arc label's direction
+ * @param dir       arc label's direction
  */
 void lv_arclabel_set_dir(lv_obj_t * obj, lv_arclabel_dir_t dir);
 

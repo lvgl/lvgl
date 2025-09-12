@@ -49,7 +49,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_bar_class;
 
 /**
  * Create a bar object
- * @param parent        pointer to an object, it will be the parent of the new bar
+ * @param parent    pointer to an object, it will be the parent of the new bar
  * @return              pointer to the created bar
  */
 lv_obj_t * lv_bar_create(lv_obj_t * parent);
@@ -60,17 +60,17 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent);
 
 /**
  * Set a new value on the bar
- * @param obj           pointer to a bar object
- * @param value         new value
- * @param anim          LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param obj       pointer to a bar object
+ * @param value     new value
+ * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
  * Set a new start value on the bar
- * @param obj             pointer to a bar object
- * @param start_value     new start value
- * @param anim            LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param obj       pointer to a bar object
+ * @param start_value    new start value
+ * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim);
 
@@ -106,8 +106,8 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode);
 
 /**
  * Set the orientation of bar.
- * @param obj           pointer to bar object
- * @param orientation   bar orientation from `lv_bar_orientation_t`
+ * @param obj       pointer to bar object
+ * @param orientation    bar orientation from `lv_bar_orientation_t`
  */
 void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orientation);
 
@@ -168,7 +168,7 @@ bool lv_bar_is_symmetrical(lv_obj_t * obj);
 /**
  * Bind an integer or float Subject to a Bar's value.
  * @param obj       pointer to Bar
- * @param subject   pointer to Subject
+ * @param subject    pointer to Subject
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_bar_bind_value(lv_obj_t * obj, lv_subject_t * subject);
