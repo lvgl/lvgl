@@ -348,6 +348,10 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_VSYNC);
             ENUM_CASE(EVENT_VSYNC_REQUEST);
 
+#if LV_USE_TRANSLATION
+            ENUM_CASE(EVENT_TRANSLATION_LANGUAGE_CHANGED);
+#endif /*LV_USE_TRANSLATION*/
+
         /* Special event flags */
         case LV_EVENT_LAST:
         case LV_EVENT_PREPROCESS:
