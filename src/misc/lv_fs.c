@@ -520,9 +520,9 @@ void lv_fs_remove_drive(char letter)
     lv_fs_drv_t ** drv;
     LV_LL_READ(fsdrv_ll_p, drv) {
         if((*drv)->letter == letter) {
-            lv_ll_remove(fsdrv_ll_p, drv); // remove the drive from the list of registered drives
+            lv_ll_remove(fsdrv_ll_p, drv); /* remove the drive from the list of registered drives */
             if((*drv)->remove_cb) {
-                (*drv)->remove_cb(*drv); // call the remove callback if available
+                (*drv)->remove_cb(*drv); /* call the remove callback if available */
             }
         }
     }
