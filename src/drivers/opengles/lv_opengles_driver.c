@@ -386,7 +386,6 @@ static unsigned int lv_opengles_shader_compile(unsigned int type, const char * s
     GL_CALL(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
     if(result == GL_FALSE) {
         LV_LOG_ERROR("Failed to compile %s shader!", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
-        LV_LOG_ERROR("source:\n%s", source);
         int length = 0;
         GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         if(length > 0) {
