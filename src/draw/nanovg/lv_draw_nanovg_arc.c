@@ -7,30 +7,41 @@
  *      INCLUDES
  *********************/
 
+#include "lv_draw_nanovg_private.h"
+
+#if LV_USE_DRAW_NANOVG
+
 /*********************
- *      DEFINES
- *********************/
+*      DEFINES
+*********************/
 
 /**********************
- *      TYPEDEFS
- **********************/
+*      TYPEDEFS
+**********************/
 
 /**********************
- *  STATIC PROTOTYPES
- **********************/
+*  STATIC PROTOTYPES
+**********************/
 
 /**********************
- *  STATIC VARIABLES
- **********************/
+*  STATIC VARIABLES
+**********************/
 
 /**********************
- *      MACROS
- **********************/
+*      MACROS
+**********************/
 
 /**********************
- *   GLOBAL FUNCTIONS
- **********************/
+*   GLOBAL FUNCTIONS
+**********************/
+
+void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+
+}
 
 /**********************
- *   STATIC FUNCTIONS
- **********************/
+*   STATIC FUNCTIONS
+**********************/
+
+#endif /* LV_USE_DRAW_NANOVG */

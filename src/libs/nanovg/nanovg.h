@@ -23,6 +23,10 @@
 extern "C" {
 #endif
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_NANOVG
+
 #define NVG_PI 3.14159265358979323846264338327f
 
 #ifdef _MSC_VER
@@ -689,6 +693,8 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 #endif
 
 #define NVG_NOTUSED(v) for (;;) { (void)(1 ? (void)0 : ( (void)(v) ) ); break; }
+
+#endif // LV_USE_NANOVG
 
 #ifdef __cplusplus
 }

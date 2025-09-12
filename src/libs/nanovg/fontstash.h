@@ -19,6 +19,10 @@
 #ifndef FONS_H
 #define FONS_H
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_NANOVG
+
 #define FONS_INVALID -1
 
 enum FONSflags {
@@ -1788,5 +1792,6 @@ int fonsResetAtlas(FONScontext* stash, int width, int height)
 	return 1;
 }
 
+#endif // LV_USE_NANOVG
 
 #endif

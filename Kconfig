@@ -563,6 +563,11 @@ menu "LVGL configuration"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_NANOVG
+			bool "Use NanoVG Renderer."
+			default n
+			depends on LV_USE_NANOVG && LV_USE_MATRIX
+
 	endmenu
 
 	menu "Feature Configuration"
@@ -1522,6 +1527,10 @@ menu "LVGL configuration"
 				config LV_USE_THORVG_EXTERNAL
 					bool "Use ThorVG external"
 			endchoice
+
+		config LV_USE_NANOVG
+			bool "NanoVG library"
+			default n
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"

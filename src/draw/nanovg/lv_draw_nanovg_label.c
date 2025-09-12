@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_nanovg_vector.c
+ * @file lv_draw_nanovg_label.c
  *
  */
 
@@ -35,7 +35,22 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
+void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u)
+{
+
+}
+
+void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u)
+{
+
+}
+
+void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+{
+
+}
+
+void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
 
 }
