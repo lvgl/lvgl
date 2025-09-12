@@ -263,6 +263,9 @@ struct buffer {
     uint32_t height;
     void * buf_base[MAX_BUFFER_PLANES];
     lv_draw_buf_t * lv_draw_buf;
+#if !LV_USE_G2D
+    uint8_t * original_data;
+#endif
 };
 #endif
 

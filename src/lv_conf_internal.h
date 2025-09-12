@@ -827,15 +827,37 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#ifndef LV_USE_DRAW_G2D
-    #ifdef CONFIG_LV_USE_DRAW_G2D
-        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+#ifndef LV_USE_G2D
+    #ifdef CONFIG_LV_USE_G2D
+        #define LV_USE_G2D CONFIG_LV_USE_G2D
     #else
-        #define LV_USE_DRAW_G2D 0
+        #define LV_USE_G2D 0
     #endif
 #endif
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+    /** Use G2D for drawing. **/
+    #ifndef LV_USE_DRAW_G2D
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_G2D
+                #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+            #else
+                #define LV_USE_DRAW_G2D 0
+            #endif
+        #else
+            #define LV_USE_DRAW_G2D 1
+        #endif
+    #endif
+
+    /** Use G2D to rotate display. **/
+    #ifndef LV_USE_ROTATE_G2D
+        #ifdef CONFIG_LV_USE_ROTATE_G2D
+            #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
+        #else
+            #define LV_USE_ROTATE_G2D 0
+        #endif
+    #endif
+
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #ifndef LV_G2D_HASH_TABLE_SIZE
@@ -846,7 +868,7 @@
         #endif
     #endif
 
-    #if LV_USE_OS
+    #if LV_USE_DRAW_G2D && LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #ifndef LV_USE_G2D_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
@@ -4021,6 +4043,39 @@
             #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
         #else
             #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
+        #endif
+    #endif
+
+    #if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
+        /** Based on the environment, the following DMA Heaps might be available */
+        #ifndef DMA_HEAP_SYSTEM
+            #ifdef CONFIG_DMA_HEAP_SYSTEM
+                #define DMA_HEAP_SYSTEM CONFIG_DMA_HEAP_SYSTEM
+            #else
+                #define DMA_HEAP_SYSTEM "/dev/dma_heap/system"
+            #endif
+        #endif
+        #ifndef DMA_HEAP_CMA
+            #ifdef CONFIG_DMA_HEAP_CMA
+                #define DMA_HEAP_CMA CONFIG_DMA_HEAP_CMA
+            #else
+                #define DMA_HEAP_CMA "/dev/dma_heap/linux,cma"
+            #endif
+        #endif
+        #ifndef DMA_HEAP_CMA_UNCACHED
+            #ifdef CONFIG_DMA_HEAP_CMA_UNCACHED
+                #define DMA_HEAP_CMA_UNCACHED CONFIG_DMA_HEAP_CMA_UNCACHED
+            #else
+                #define DMA_HEAP_CMA_UNCACHED "/dev/dma_heap/linux,cma-uncached"
+            #endif
+        #endif
+
+        #ifndef LV_DMA_HEAP_PATH
+            #ifdef CONFIG_LV_DMA_HEAP_PATH
+                #define LV_DMA_HEAP_PATH CONFIG_LV_DMA_HEAP_PATH
+            #else
+                #define LV_DMA_HEAP_PATH DMA_HEAP_CMA    /**< When not using G2D with DMABUF, DMA_HEAP_PATH must be set*/
+            #endif
         #endif
     #endif
 #endif
