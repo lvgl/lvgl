@@ -14,6 +14,46 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_DRAW_NANOVG
+#include "../lv_draw.h"
+#include "../lv_draw_private.h"
+#include "../../draw/lv_draw_vector.h"
+#include "../../draw/lv_draw_arc.h"
+#include "../../draw/lv_draw_rect.h"
+#include "../../draw/lv_draw_image.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_line.h"
+#include "../../draw/lv_draw_triangle.h"
+#include "../../misc/lv_area_private.h"
+
+#if !LV_USE_NANOVG
+#error "Require LV_USE_NANOVG = 1"
+#endif
+
+#if !LV_USE_OPENGLES
+#error "Require LV_USE_OPENGLES = 1"
+#endif
+
+#if !LV_USE_MATRIX
+#error "Require LV_USE_MATRIX = 1"
+#endif
+
+#define NANOVG_GLEW 1
+#define NANOVG_GL_USE_UNIFORMBUFFER 0
+
+#ifdef NANOVG_GLEW
+#include <GL/glew.h>
+#endif
+#define GLFW_INCLUDE_GLEXT
+#include <GLFW/glfw3.h>
+
+#include "../../libs/nanovg/nanovg.h"
+
+#define NANOVG_GL2_IMPLEMENTATION
+#include "../../libs/nanovg/nanovg_gl.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -22,9 +62,124 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct _lv_draw_nanovg_unit_t {
+    lv_draw_unit_t base_unit;
+    NVGcontext * vg;
+    bool is_started;
+    lv_matrix_t global_matrix;
+} lv_draw_nanovg_unit_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Draw arc on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to an arc descriptor
+ * @param coords the coordinates of the arc
+ */
+void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw border on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a border descriptor
+ * @param coords the coordinates of the border
+ */
+void lv_draw_nanovg_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw box on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a box descriptor
+ * @param coords the coordinates of the box
+ */
+void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Fill a rectangle on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a fill descriptor
+ * @param coords the coordinates of the rectangle
+ */
+void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw image on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to an image descriptor
+ * @param coords the coordinates of the image
+ * @param no_cache true: draw the image directly without caching
+ */
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache);
+
+/**
+ * Initialize draw label on a NanoVG context
+ * @param u pointer to a NanoVG unit
+ */
+void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Deinitialize draw label on a NanoVG context
+ * @param u pointer to a NanoVG unit
+ */
+void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u);
+
+/**
+ * Draw letter on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a letter descriptor
+ * @param coords the coordinates of the letter
+ */
+void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw label on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a label descriptor
+ * @param coords the coordinates of the label
+ */
+void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw layer on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param draw_dsc pointer to an image descriptor
+ * @param coords the coordinates of the layer
+ */
+void lv_draw_nanovg_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
+
+/**
+ * Draw line on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a line descriptor
+ */
+void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc);
+
+/**
+ * Draw triangle on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a triangle descriptor
+ */
+void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc);
+
+/**
+ * Draw mask rectangles on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a mask descriptor
+ * @param coords the coordinates of the mask
+ */
+void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords);
+
+#if LV_USE_VECTOR_GRAPHIC
+/**
+ * Draw vector graphics on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a vector descriptor
+ */
+void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
+#endif
 
 /**********************
  *      MACROS
@@ -33,5 +188,7 @@ extern "C" {
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
+
+#endif /*LV_USE_DRAW_NANOVG*/
 
 #endif /*LV_DRAW_NANOVG_PRIVATE_H*/
