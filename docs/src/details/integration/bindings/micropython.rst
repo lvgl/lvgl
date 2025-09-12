@@ -52,8 +52,8 @@ Here are some advantages of using LVGL in MicroPython:
 
 - Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
 - Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of
-  **``Change code`` > ``Build`` > ``Flash`` > ``Run``**. In MicroPython it's just
-  **``Change code`` > ``Run``** ! You can even run commands interactively using the
+  ``Change code`` > ``Build`` > ``Flash`` > ``Run``. In MicroPython it's just
+  ``Change code`` > ``Run``\ ! You can even run commands interactively using the
   `REPL <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`__ (the interactive prompt)
 
 
