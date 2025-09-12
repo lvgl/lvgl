@@ -267,6 +267,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 bg_image_dsc->recolor = dsc->bg_image_recolor;
                 bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
                 bg_image_dsc->tile = dsc->bg_image_tiled;
+                bg_image_dsc->colorkey = dsc->bg_image_colorkey;
                 bg_image_dsc->header = header;
                 bg_image_dsc->clip_radius = dsc->radius;
                 bg_image_dsc->image_area = *coords;
