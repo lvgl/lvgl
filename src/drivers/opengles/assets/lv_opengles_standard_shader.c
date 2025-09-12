@@ -116,7 +116,7 @@ static const char *src_fragment_shader = R"(
     }
 )";
 
-const size_t src_includes_count = sizeof src_includes / sizeof src_includes[0];
+static const size_t src_includes_count = sizeof src_includes / sizeof src_includes[0];
 
 /**********************
  *   GLOBAL FUNCTIONS

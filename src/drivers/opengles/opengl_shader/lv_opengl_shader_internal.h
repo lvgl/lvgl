@@ -92,10 +92,10 @@ lv_opengl_shader_program_t * lv_opengl_shader_program_create(uint32_t id);
 void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program);
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program);
 
-lv_opengl_shader_manager_t * lv_opengl_shader_manager_create(const lv_opengl_shader_t * sources,
-                                                             size_t len, const char * vert_src,
-                                                             const char * frag_src);
-void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager);
+void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const lv_opengl_shader_t * sources,
+                                   size_t len, const char * vert_src,
+                                   const char * frag_src);
+void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager);
 uint32_t lv_opengl_shader_hash(const char * value);
 GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager, uint32_t hash);
 void lv_opengl_shader_manager_store_texture(lv_opengl_shader_manager_t * manager, uint32_t hash, GLuint id);
