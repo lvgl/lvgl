@@ -48,15 +48,16 @@ void lv_nanovg_draw_grad(
     enum NVGcompositeOperation composite_operation)
 {
     LV_PROFILER_DRAW_BEGIN;
-    NVGpaint paint;
+
     if(grad->stops_count < 2) {
         LV_LOG_WARN("stops_count(%d) should be 2 for gradient", grad->stops_count);
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    NVGcolor icol = lv_nanovg_color_convert(grad->stops[0].color, grad->stops[0].opa);
-    NVGcolor ocol = lv_nanovg_color_convert(grad->stops[1].color, grad->stops[1].opa);
+    NVGpaint paint;
+    const NVGcolor icol = lv_nanovg_color_convert(grad->stops[0].color, grad->stops[0].opa);
+    const NVGcolor ocol = lv_nanovg_color_convert(grad->stops[1].color, grad->stops[1].opa);
 
     switch(grad->style) {
         case LV_VECTOR_GRADIENT_STYLE_LINEAR:
