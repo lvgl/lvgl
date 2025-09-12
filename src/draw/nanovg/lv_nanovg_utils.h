@@ -54,6 +54,8 @@ static inline NVGcolor lv_nanovg_color_convert(lv_color_t color, lv_opa_t opa)
 
 void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix);
 
+void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area);
+
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r);
 
 void lv_nanovg_path_append_arc_right_angle(NVGcontext * ctx,
