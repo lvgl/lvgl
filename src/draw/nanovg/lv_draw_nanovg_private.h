@@ -158,7 +158,7 @@ void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
  * @param dsc pointer to a mask descriptor
  * @param coords the coordinates of the mask
  */
-void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
 
 #if LV_USE_VECTOR_GRAPHIC
 /**

@@ -76,8 +76,6 @@ void lv_draw_nanovg_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
     /* inner rect */
     enum NVGwinding winding = path_append_inner_rect(u->vg, dsc, coords->x1, coords->y1, w, h, r_out);
 
-    lv_nanovg_transform(u->vg, &u->global_matrix);
-
     lv_nanovg_fill(
         u->vg,
         winding,

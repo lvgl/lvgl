@@ -49,8 +49,6 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
         return;
     }
 
-    lv_nanovg_transform(u->vg, &u->global_matrix);
-
     // nvgSave(u->vg);
 
     nvgBeginPath(u->vg);
