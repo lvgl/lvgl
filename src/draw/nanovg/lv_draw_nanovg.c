@@ -90,6 +90,8 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
 
     lv_nanovg_transform(u->vg, &u->global_matrix);
 
+    lv_nanovg_set_clip_area(u->vg, &t->clip_area);
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_nanovg_fill(t, t->draw_dsc, &t->area);
