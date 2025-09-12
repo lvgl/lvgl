@@ -119,6 +119,11 @@ lv_translation_pack_t * lv_translation_add_dynamic(void)
     return pack;
 }
 
+const char * lv_translation_get_language(void)
+{
+    return selected_lang;
+}
+
 void lv_translation_set_language(const char * lang)
 {
     if(selected_lang) lv_free((void *)selected_lang);
