@@ -70,7 +70,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * parent);
  * If set to `NULL` the selected option's text will be displayed on the button.
  * If set to a specific text then that text will be shown regardless of the selected option.
  * @param obj       pointer to a drop-down list object
- * @param txt       the text as a string (Only its pointer is saved)
+ * @param txt       the text as a string (Only the pointer is saved)
  */
 void lv_dropdown_set_text(lv_obj_t * obj, const char * txt);
 
