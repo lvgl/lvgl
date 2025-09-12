@@ -965,6 +965,10 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 {
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+
+    /*Do not refresh invisible objects */
+    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) <= LV_OPA_MIN) return;
+
     lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(draw_ctx, obj);
