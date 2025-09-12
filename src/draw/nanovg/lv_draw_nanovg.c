@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_NANOVG
 
 #include "lv_draw_nanovg_private.h"
+#include "lv_nanovg_utils.h"
 
 #define NANOVG_GLEW 1
 #define NANOVG_GL_USE_UNIFORMBUFFER 0
