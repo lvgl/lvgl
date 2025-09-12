@@ -18,7 +18,7 @@ OpenGL Support in LVGL
 
 The OpenGL integration consists of two main components:
 
-- OpenGL Display Drivers: Handle output by creating textures for embedding LVGL content in applications or managing windows/displays directly
+- OpenGL Display Drivers: Handle output by showing the LVGL rendered content on the display, window, or texture in OpenGL-based environments
 - OpenGL Draw Unit: When enabled, LVGL uses OpenGL for hardware-accelerated rendering operations, including texture caching for improved performance
 
 OpenGL support addresses several key use cases:
@@ -78,5 +78,4 @@ This extension requires OpenGL ES 3.0 and provides comprehensive 3D rendering ca
 animations, and interactive camera controls for embedded 3D visualization.
 
 For complete implementation details, see :ref:`glTF <gltf>`.
-
 
