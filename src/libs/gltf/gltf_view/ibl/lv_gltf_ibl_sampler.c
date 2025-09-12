@@ -49,13 +49,13 @@ static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_
 static GLuint ibl_load_texture_hdr(lv_gltf_ibl_sampler_t * sampler, const lv_gltf_ibl_image_t * image);
 static GLuint ibl_create_cubemap_texture(const lv_gltf_ibl_sampler_t * sampler, bool with_mipmaps);
 static uint32_t ibl_create_lut_texture(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
+static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
                              uint32_t target_mip_level, GLuint target_texture, uint32_t sample_count, float lod_bias);
-static void ibl_cubemap_to_lambertian(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
+static void ibl_cubemap_to_lambertian(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_cubemap_to_ggx(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_cubemap_to_sheen(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
                            uint32_t currentTextureSize);
 static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sample_charlie_lut(lv_gltf_ibl_sampler_t * sampler);
@@ -108,9 +108,10 @@ static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
     sampler->lut_resolution = 1024;
     sampler->lut_sample_count = 64;
     sampler->scale_value = 1.0;
-    lv_gltf_view_shader_t env_shader;
-    lv_gltf_view_shader_get_env(&env_shader);
-    sampler->shader_manager = lv_opengl_shader_manager_create(env_shader.shader_list, env_shader.count, NULL, NULL);
+    lv_opengl_shader_portions_t env_shader_portions;
+    lv_gltf_view_shader_get_env(&env_shader_portions);
+    lv_opengl_shader_manager_init(&sampler->shader_manager, env_shader_portions.all, env_shader_portions.count, NULL,
+                                  NULL);
 }
 
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
@@ -191,7 +192,7 @@ static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
-    lv_opengl_shader_manager_destroy(sampler->shader_manager);
+    lv_opengl_shader_manager_deinit(&sampler->shader_manager);
 }
 
 static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_texture_t * texture,
@@ -300,7 +301,7 @@ static GLuint ibl_create_lut_texture(const lv_gltf_ibl_sampler_t * sampler)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     return texture;
 }
-static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler)
 {
     for(int32_t i = 0; i < 6; ++i) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, sampler->framebuffer));
@@ -317,10 +318,10 @@ static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
         GL_CALL(glClearColor(1.0, 0.0, 0.0, 0.0));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
+            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0);
+        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_opengl_shader_program_get_id(program);
 
         GL_CALL(glUseProgram(program_id));
@@ -339,7 +340,7 @@ static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, sampler->cubemap_texture_id));
     GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 }
-static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
+static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
                              uint32_t target_mip_level, GLuint target_texture, uint32_t sample_count, float lod_bias)
 {
     uint32_t current_texture_size = sampler->texture_size >> target_mip_level;
@@ -353,10 +354,10 @@ static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t dis
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
+            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
+        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_opengl_shader_program_get_id(program);
 
         GL_CALL(glUseProgram(program_id));
@@ -382,11 +383,11 @@ static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t dis
         GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
     }
 }
-static void ibl_cubemap_to_lambertian(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_lambertian(lv_gltf_ibl_sampler_t * sampler)
 {
     ibl_apply_filter(sampler, 0, 0.0, 0, sampler->lambertian_texture_id, sampler->lambertian_sample_count, 0.0);
 }
-static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_ggx(lv_gltf_ibl_sampler_t * sampler)
 {
     LV_ASSERT(sampler->mipmap_levels != 1);
     for(uint32_t current_mip_level = 0; current_mip_level <= sampler->mipmap_levels; ++current_mip_level) {
@@ -395,7 +396,7 @@ static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler)
                          0.0);
     }
 }
-static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_sheen(lv_gltf_ibl_sampler_t * sampler)
 {
     LV_ASSERT(sampler->mipmap_levels != 1);
     for(uint32_t current_mip_level = 0; current_mip_level <= sampler->mipmap_levels; ++current_mip_level) {
@@ -404,7 +405,7 @@ static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler)
                          sampler->sheen_sample_count, 0.0);
     }
 }
-static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
+static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
                            uint32_t currentTextureSize)
 {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, sampler->framebuffer));
@@ -414,9 +415,9 @@ static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distr
     GL_CALL(glClearColor(0.0, 1.0, 1.0, 0.0));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-    uint32_t frag_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-    uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader,
+    uint32_t frag_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
+    uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader,
                                                                                 vert_shader);
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 
