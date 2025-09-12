@@ -63,6 +63,10 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     a.x2 = dsc->center.x + dsc->radius - 1;
     a.y2 = dsc->center.y + dsc->radius - 1;
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_ARC);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

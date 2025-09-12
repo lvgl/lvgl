@@ -99,6 +99,14 @@ void * lv_draw_create_unit(size_t size)
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    /* When the rendered content has no intersection with the clipping area, skip drawing */
+    lv_area_t cliped_area;
+    if(!lv_area_intersect(&cliped_area, coords, &layer->_clip_area)) {
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
+
     size_t dsc_size = get_draw_dsc_size(type);
     LV_ASSERT_FORMAT_MSG(dsc_size > 0, "Draw task size is 0 for type %d", type);
     lv_draw_task_t * new_task = lv_malloc_zeroed(LV_ALIGN_UP(sizeof(lv_draw_task_t), 8) + dsc_size);

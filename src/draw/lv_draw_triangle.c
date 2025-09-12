@@ -70,6 +70,10 @@ void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
     a.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_TRIANGLE);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

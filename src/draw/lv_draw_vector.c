@@ -909,16 +909,25 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 
 void lv_draw_vector(lv_vector_dsc_t * dsc)
 {
+    LV_PROFILER_DRAW_BEGIN;
     if(!dsc->tasks.task_list) {
+        LV_PROFILER_DRAW_END;
         return;
     }
 
     lv_layer_t * layer = dsc->layer;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_TASK_TYPE_VECTOR);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));
     lv_draw_finalize_task_creation(layer, t);
     dsc->tasks.task_list = NULL;
+
+    LV_PROFILER_DRAW_END;
 }
 
 /* draw dsc transform */

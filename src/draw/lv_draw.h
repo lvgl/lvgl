@@ -193,7 +193,8 @@ void * lv_draw_create_unit(size_t size);
  * @param layer     pointer to a layer
  * @param coords    the coordinates of the draw task
  * @return          the created draw task which needs to be
- *                  further configured e.g. by added a draw descriptor
+ *                  further configured e.g. by added a draw descriptor.
+ *                  If NULL is returned, the drawing is skipped.
  */
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type);
 

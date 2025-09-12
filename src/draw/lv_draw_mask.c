@@ -56,6 +56,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_m
     LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area, LV_DRAW_TASK_TYPE_MASK_RECTANGLE);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

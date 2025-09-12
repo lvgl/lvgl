@@ -64,6 +64,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     a.y2 = (int32_t)LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LINE);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 

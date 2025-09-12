@@ -75,6 +75,10 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
 
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_FILL);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -101,6 +105,10 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
 
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -126,6 +134,10 @@ void lv_draw_box_shadow(lv_layer_t * layer, const lv_draw_box_shadow_dsc_t * dsc
 
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BOX_SHADOW);
+    if(!t) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
 
@@ -186,22 +198,24 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(has_shadow) {
         /*Check whether the shadow is visible*/
         t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BOX_SHADOW);
-        lv_draw_box_shadow_dsc_t * shadow_dsc = t->draw_dsc;
+        if(t) {
+            lv_draw_box_shadow_dsc_t * shadow_dsc = t->draw_dsc;
 
-        lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
-        lv_area_increase(&t->_real_area, dsc->shadow_width, dsc->shadow_width);
-        lv_area_move(&t->_real_area, dsc->shadow_offset_x, dsc->shadow_offset_y);
-        shadow_dsc->base = dsc->base;
-        shadow_dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
-        shadow_dsc->radius = dsc->radius;
-        shadow_dsc->color = dsc->shadow_color;
-        shadow_dsc->width = dsc->shadow_width;
-        shadow_dsc->spread = dsc->shadow_spread;
-        shadow_dsc->opa = dsc->shadow_opa;
-        shadow_dsc->ofs_x = dsc->shadow_offset_x;
-        shadow_dsc->ofs_y = dsc->shadow_offset_y;
-        shadow_dsc->bg_cover = bg_cover;
-        lv_draw_finalize_task_creation(layer, t);
+            lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
+            lv_area_increase(&t->_real_area, dsc->shadow_width, dsc->shadow_width);
+            lv_area_move(&t->_real_area, dsc->shadow_offset_x, dsc->shadow_offset_y);
+            shadow_dsc->base = dsc->base;
+            shadow_dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
+            shadow_dsc->radius = dsc->radius;
+            shadow_dsc->color = dsc->shadow_color;
+            shadow_dsc->width = dsc->shadow_width;
+            shadow_dsc->spread = dsc->shadow_spread;
+            shadow_dsc->opa = dsc->shadow_opa;
+            shadow_dsc->ofs_x = dsc->shadow_offset_x;
+            shadow_dsc->ofs_y = dsc->shadow_offset_y;
+            shadow_dsc->bg_cover = bg_cover;
+            lv_draw_finalize_task_creation(layer, t);
+        }
     }
 
     /*Background*/
@@ -216,17 +230,19 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         }
 
         t = lv_draw_add_task(layer, &bg_coords, LV_DRAW_TASK_TYPE_FILL);
-        lv_draw_fill_dsc_t * bg_dsc = t->draw_dsc;
+        if(t) {
+            lv_draw_fill_dsc_t * bg_dsc = t->draw_dsc;
 
-        lv_draw_fill_dsc_init(bg_dsc);
-        bg_dsc->base = dsc->base;
-        bg_dsc->base.dsc_size = sizeof(lv_draw_fill_dsc_t);
-        bg_dsc->radius = dsc->radius;
-        bg_dsc->color = dsc->bg_color;
-        bg_dsc->grad = dsc->bg_grad;
-        bg_dsc->opa = dsc->bg_opa;
+            lv_draw_fill_dsc_init(bg_dsc);
+            bg_dsc->base = dsc->base;
+            bg_dsc->base.dsc_size = sizeof(lv_draw_fill_dsc_t);
+            bg_dsc->radius = dsc->radius;
+            bg_dsc->color = dsc->bg_color;
+            bg_dsc->grad = dsc->bg_grad;
+            bg_dsc->opa = dsc->bg_opa;
 
-        lv_draw_finalize_task_creation(layer, t);
+            lv_draw_finalize_task_creation(layer, t);
+        }
     }
 
     /*Background image*/
@@ -257,20 +273,22 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                     t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_IMAGE);
                 }
 
-                lv_draw_image_dsc_t * bg_image_dsc = t->draw_dsc;
+                if(t) {
+                    lv_draw_image_dsc_t * bg_image_dsc = t->draw_dsc;
 
-                lv_draw_image_dsc_init(bg_image_dsc);
-                bg_image_dsc->base = dsc->base;
-                bg_image_dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
-                bg_image_dsc->src = dsc->bg_image_src;
-                bg_image_dsc->opa = dsc->bg_image_opa;
-                bg_image_dsc->recolor = dsc->bg_image_recolor;
-                bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
-                bg_image_dsc->tile = dsc->bg_image_tiled;
-                bg_image_dsc->header = header;
-                bg_image_dsc->clip_radius = dsc->radius;
-                bg_image_dsc->image_area = *coords;
-                lv_draw_finalize_task_creation(layer, t);
+                    lv_draw_image_dsc_init(bg_image_dsc);
+                    bg_image_dsc->base = dsc->base;
+                    bg_image_dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
+                    bg_image_dsc->src = dsc->bg_image_src;
+                    bg_image_dsc->opa = dsc->bg_image_opa;
+                    bg_image_dsc->recolor = dsc->bg_image_recolor;
+                    bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
+                    bg_image_dsc->tile = dsc->bg_image_tiled;
+                    bg_image_dsc->header = header;
+                    bg_image_dsc->clip_radius = dsc->radius;
+                    bg_image_dsc->image_area = *coords;
+                    lv_draw_finalize_task_creation(layer, t);
+                }
             }
             else {
                 lv_point_t s;
@@ -286,17 +304,18 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
                 t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LABEL);
+                if(t) {
+                    lv_draw_label_dsc_t * bg_label_dsc = t->draw_dsc;
 
-                lv_draw_label_dsc_t * bg_label_dsc = t->draw_dsc;
-
-                lv_draw_label_dsc_init(bg_label_dsc);
-                bg_label_dsc->base = dsc->base;
-                bg_label_dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
-                bg_label_dsc->color = dsc->bg_image_recolor;
-                bg_label_dsc->font = dsc->bg_image_symbol_font;
-                bg_label_dsc->text = dsc->bg_image_src;
-                t->type = LV_DRAW_TASK_TYPE_LABEL;
-                lv_draw_finalize_task_creation(layer, t);
+                    lv_draw_label_dsc_init(bg_label_dsc);
+                    bg_label_dsc->base = dsc->base;
+                    bg_label_dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
+                    bg_label_dsc->color = dsc->bg_image_recolor;
+                    bg_label_dsc->font = dsc->bg_image_symbol_font;
+                    bg_label_dsc->text = dsc->bg_image_src;
+                    t->type = LV_DRAW_TASK_TYPE_LABEL;
+                    lv_draw_finalize_task_creation(layer, t);
+                }
             }
         }
     }
@@ -304,16 +323,18 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     /*Border*/
     if(has_border) {
         t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
-        lv_draw_border_dsc_t * border_dsc = t->draw_dsc;
+        if(t) {
+            lv_draw_border_dsc_t * border_dsc = t->draw_dsc;
 
-        border_dsc->base = dsc->base;
-        border_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
-        border_dsc->radius = dsc->radius;
-        border_dsc->color = dsc->border_color;
-        border_dsc->opa = dsc->border_opa;
-        border_dsc->width = dsc->border_width;
-        border_dsc->side = dsc->border_side;
-        lv_draw_finalize_task_creation(layer, t);
+            border_dsc->base = dsc->base;
+            border_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
+            border_dsc->radius = dsc->radius;
+            border_dsc->color = dsc->border_color;
+            border_dsc->opa = dsc->border_opa;
+            border_dsc->width = dsc->border_width;
+            border_dsc->side = dsc->border_side;
+            lv_draw_finalize_task_creation(layer, t);
+        }
     }
 
     /*Outline*/
@@ -321,18 +342,20 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         lv_area_t outline_coords = *coords;
         lv_area_increase(&outline_coords, dsc->outline_width + dsc->outline_pad, dsc->outline_width + dsc->outline_pad);
         t = lv_draw_add_task(layer, &outline_coords, LV_DRAW_TASK_TYPE_BORDER);
-        lv_draw_border_dsc_t * outline_dsc = t->draw_dsc;
-        lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
-        lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);
-        outline_dsc->base = dsc->base;
-        outline_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
-        outline_dsc->radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +
-                              dsc->outline_pad;
-        outline_dsc->color = dsc->outline_color;
-        outline_dsc->opa = dsc->outline_opa;
-        outline_dsc->width = dsc->outline_width;
-        outline_dsc->side = LV_BORDER_SIDE_FULL;
-        lv_draw_finalize_task_creation(layer, t);
+        if(t) {
+            lv_draw_border_dsc_t * outline_dsc = t->draw_dsc;
+            lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
+            lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);
+            outline_dsc->base = dsc->base;
+            outline_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
+            outline_dsc->radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +
+                                  dsc->outline_pad;
+            outline_dsc->color = dsc->outline_color;
+            outline_dsc->opa = dsc->outline_opa;
+            outline_dsc->width = dsc->outline_width;
+            outline_dsc->side = LV_BORDER_SIDE_FULL;
+            lv_draw_finalize_task_creation(layer, t);
+        }
     }
 
     LV_ASSERT_MEM_INTEGRITY();
