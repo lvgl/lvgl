@@ -179,7 +179,7 @@ void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
         u->vg,
         NVG_CCW,
         NVG_SOURCE_OVER,
-        lv_nanovg_color_convert(dsc->color, dsc->opa, true));
+        lv_nanovg_color_convert(dsc->color, dsc->opa));
 
     LV_PROFILER_DRAW_END;
 }
