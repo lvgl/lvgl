@@ -9,7 +9,7 @@ Drivers
 
     fbdev
     drm
-    opengl
+    opengl_driver
     glfw
     egl
     wayland

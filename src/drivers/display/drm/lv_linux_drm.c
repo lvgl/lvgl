@@ -327,7 +327,9 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     /* create a display that flushes to a texture */
     lv_display_t * texture = lv_opengles_texture_create(hor_res, ver_res);
     lv_display_set_default(texture);
-
+#if LV_USE_DRAW_OPENGLES
+    lv_display_delete_refr_timer(texture);
+#endif
     /* add the texture to the window */
     unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
     lv_opengles_window_add_texture(window, texture_id, hor_res, ver_res);
