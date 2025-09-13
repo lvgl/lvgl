@@ -8,5 +8,6 @@ Running under Embedded Linux
     :maxdepth: 2
 
     overview
+    opengl
     os/index
     drivers/index
