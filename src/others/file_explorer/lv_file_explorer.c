@@ -51,6 +51,7 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j);
 static void file_explorer_sort(lv_obj_t * obj);
 static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi);
 static bool is_end_with(const char * str1, const char * str2);
+static void clear_table_cells_user_data(lv_file_explorer_t * explorer);
 
 /**********************
  *  STATIC VARIABLES
@@ -578,6 +579,22 @@ static void browser_file_event_handler(lv_event_t * e)
     else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_table_set_column_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
+    else if(code == LV_EVENT_DELETE) {
+        clear_table_cells_user_data(explorer);
+    }
+}
+
+static void clear_table_cells_user_data(lv_file_explorer_t * explorer)
+{
+    const uint32_t row_count = lv_table_get_row_count(explorer->file_table);
+    const uint32_t col_count = lv_table_get_column_count(explorer->file_table);
+
+    for(uint32_t i = 0; i < row_count; ++i) {
+        for(uint32_t j = 0; j < col_count; ++j) {
+            void * file_entry = lv_table_get_cell_user_data(explorer->file_table, i, j);
+            lv_free(file_entry);
+        }
+    }
 }
 
 static void show_dir(lv_obj_t * obj, const char * path)
@@ -596,6 +613,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
         return;
     }
 
+    clear_table_cells_user_data(explorer);
     lv_table_set_cell_value(explorer->file_table, index++, 0, LV_SYMBOL_LEFT "  " LV_FILE_NAVIGATION_PARENT_DIR);
     file_entry_user_data = lv_malloc(sizeof(lv_file_explorer_file_table_entry_data_t));
     LV_ASSERT_MALLOC(file_entry_user_data);
