@@ -58,7 +58,7 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf);
 /**
  * Set a draw buffer for the animation. It also defines the size of the animation
  * @param obj       pointer to a lottie widget
- * @param draw_buf  an initialized draw buffer with ARGB8888 color format
+ * @param draw_buf    an initialized draw buffer with ARGB8888 color format
  */
 void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
 
@@ -66,7 +66,7 @@ void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
  * Set the source for the animation as an array
  * @param obj       pointer to a lottie widget
  * @param src       the lottie animation converted to an nul terminated array
- * @param src_size  size of the source array in bytes
+ * @param src_size    size of the source array in bytes
  */
 void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size);
 

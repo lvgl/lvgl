@@ -81,7 +81,7 @@ enum _lv_property_image_id_t {
 
 /**
  * Create an image object
- * @param parent pointer to an object, it will be the parent of the new image
+ * @param parent    pointer to an object, it will be the parent of the new image
  * @return pointer to the created image
  */
 lv_obj_t * lv_image_create(lv_obj_t * parent);
@@ -191,7 +191,7 @@ void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
 
 /**
  * Set the blend mode of an image.
- * @param obj           pointer to an image object
+ * @param obj       pointer to an image object
  * @param blend_mode    the new blend mode
  */
 void lv_image_set_blend_mode(lv_obj_t * obj, lv_blend_mode_t blend_mode);
@@ -200,7 +200,7 @@ void lv_image_set_blend_mode(lv_obj_t * obj, lv_blend_mode_t blend_mode);
  * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not.
  * The quality is better with anti-aliasing looks better but slower.
  * @param obj       pointer to an image object
- * @param antialias true: anti-aliased; false: not anti-aliased
+ * @param antialias    true: anti-aliased; false: not anti-aliased
  */
 void lv_image_set_antialias(lv_obj_t * obj, bool antialias);
 
@@ -285,28 +285,28 @@ int32_t lv_image_get_scale_y(lv_obj_t * obj);
 
 /**
  * Get the width of an image before any transformations.
- * @param obj Pointer to an image object.
+ * @param obj       Pointer to an image object.
  * @return The width of the image.
  */
 int32_t lv_image_get_src_width(lv_obj_t * obj);
 
 /**
  * Get the height of an image before any transformations.
- * @param obj Pointer to an image object.
+ * @param obj       Pointer to an image object.
  * @return The height of the image.
  */
 int32_t lv_image_get_src_height(lv_obj_t * obj);
 
 /**
  * Get the transformed width of an image object.
- * @param obj Pointer to an image object.
+ * @param obj       Pointer to an image object.
  * @return The transformed width of the image.
  */
 int32_t lv_image_get_transformed_width(lv_obj_t * obj);
 
 /**
  * Get the transformed height of an image object.
- * @param obj Pointer to an image object.
+ * @param obj       Pointer to an image object.
  * @return The transformed height of the image.
  */
 int32_t lv_image_get_transformed_height(lv_obj_t * obj);
@@ -344,7 +344,7 @@ const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
 /**
  * Bind a pointer Subject to an Image's source.
  * @param obj       pointer to Image
- * @param subject   pointer to Subject
+ * @param subject    pointer to Subject
  * @return          pointer to newly-created Observer
  */
 lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
