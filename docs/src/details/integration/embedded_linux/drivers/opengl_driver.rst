@@ -69,15 +69,14 @@ Basic Usage
 
         /* NOTE: OpenGL context must be created before this point */
 
-        /* create a display that flushes to a texture */
+        /* Create a display that flushes to a texture. The OpenGL texture will be created for you */
         lv_display_t * texture = lv_opengles_texture_create(WIDTH, HEIGHT);
-        /*  If you already have an OpenGL texture ready, you can create a LVGL display from it. */
-        //lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id);
+        /* If you already have an OpenGL texture ready, you can use it instead:
+         * lv_display_t * texture = lv_opengles_texture_create_from_texture_id(WIDTH, HEIGHT, my_texture_id); */
 
         /* Set the display render mode and flush callback 
          * lv_display_set_render_mode(texture, LV_DISPLAY_RENDER_MODE_FULL);
-         * lv_display_set_flush_cb(texture, flush_cb);
-         */
+         * lv_display_set_flush_cb(texture, flush_cb); */
 
         /* get the texture ID for use in your application */
         unsigned int texture_id = lv_opengles_texture_get_texture_id(texture);
