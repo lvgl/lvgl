@@ -1,0 +1,20 @@
+.. _LVGL:               https://docs.lvgl.io/master/
+.. _All Widgets:        https://docs.lvgl.io/master/details/widgets/
+.. _XML Module:         https://docs.lvgl.io/master/details/xml/
+.. _Figma:              https://www.figma.com/
+.. _XML View Tag:       https://docs.lvgl.io/master/details/xml/build_ui/main_tags/view.html
+.. _LVGL Styles:        https://docs.lvgl.io/master/details/common-widget-features/styles/
+.. _Observer:
+.. _LVGL Observer:      https://docs.lvgl.io/master/details/auxiliary-modules/observer/
+.. _Subject:
+.. _Subjects:
+.. _LVGL Subject:       https://docs.lvgl.io/master/details/auxiliary-modules/observer/observer.html#subject
+.. _Screen:
+.. _Screens:            https://docs.lvgl.io/master/details/common-widget-features/basics.html#screens
+.. _Animation Timeline: https://docs.lvgl.io/master/details/main-modules/animation.html#timeline
+.. _File System:        https://docs.lvgl.io/master/details/main-modules/fs.html
+.. _XML Constants:      https://docs.lvgl.io/master/details/xml/build_ui/main_tags/consts.html
+.. _VSCode Simulator:   https://github.com/lvgl/lv_port_pc_vscode
+
+.. _Manage personal access tokens:  https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens
+

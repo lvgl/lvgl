@@ -1,0 +1,151 @@
+.. -------- Common Typographical Entities --------
+.. |ndash|           unicode:: U+02013 .. EN DASH
+.. |mdash|           unicode:: U+02014 .. EM DASH
+.. |---|             unicode:: U+02014 .. EM DASH
+    :trim:
+.. |nbsp|            unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
+.. |nbhyph|          unicode:: U+02011 .. NO-BREAK HYPHEN
+    :trim:
+.. |shy|             unicode:: U+000AD .. SOFT HYPHEN
+    :trim:
+.. |ensp|            unicode:: U+02002 .. EN SPACE
+.. |emsp|            unicode:: U+02003 .. EM SPACE
+.. |thinsp|          unicode:: U+02009 .. THIN SPACE
+.. |vthinsp|         unicode:: U+0200A .. VERY THIN SPACE
+.. -------- Common Symbols --------
+.. |pound|           unicode:: U+000A3 .. BRITISH POUNDS STERLING
+.. |copy|            unicode:: U+000A9 .. COPYRIGHT
+.. |reg|             unicode:: U+000AE .. REGISTERED TRADEMARK
+.. |trade|           unicode:: U+02122 .. TRADE MARK SIGN
+.. |deg|             unicode:: U+000B0 .. DEGREE SYMBOL
+.. |sup2|            unicode:: U+000B2 .. SUPERSCRIPT TWO
+.. |sup3|            unicode:: U+000B3 .. SUPERSCRIPT THREE
+.. |micro|           unicode:: U+000B5 .. MICRO UNITS
+.. |sup1|            unicode:: U+000B9 .. SUPERSCRIPT ONE
+.. |frac14|          unicode:: U+000BC .. 1/4
+.. |half|            unicode:: U+000BD .. 1/2
+.. |frac34|          unicode:: U+000BE .. 3/4
+.. |ohm|             unicode:: U+02126 .. OHM SIGN
+.. |frac13|          unicode:: U+02153 .. 1/3
+.. |frac23|          unicode:: U+02154 .. 2/3
+.. |equiv|           unicode:: U+02261 .. IDENTICAL TO
+.. |check|           unicode:: U+02713 .. CHECK MARK
+.. -------- Arrows --------
+.. |larr|            unicode:: U+02190 .. LEFTWARDS ARROW
+.. |rarr|            unicode:: U+02192 .. RIGHTWARDS ARROW
+.. |lrarr|           unicode:: U+02194 .. LEFT RIGHT ARROW
+.. |lArr|            unicode:: U+021D0 .. LEFTWARDS DOUBLE ARROW
+.. |Leftarrow|       unicode:: U+021D0 .. LEFTWARDS DOUBLE ARROW
+.. |rArr|            unicode:: U+021D2 .. RIGHTWARDS DOUBLE ARROW
+.. |Implies|         unicode:: U+021D2 .. RIGHTWARDS DOUBLE ARROW
+.. |iff|             unicode:: U+021D4 .. LEFT RIGHT DOUBLE ARROW
+.. |Leftrightarrow|  unicode:: U+021D4 .. LEFT RIGHT DOUBLE ARROW
+.. |lAarr|           unicode:: U+021DA .. LEFTWARDS TRIPLE ARROW
+.. |Lleftarrow|      unicode:: U+021DA .. LEFTWARDS TRIPLE ARROW
+.. |rAarr|           unicode:: U+021DB .. RIGHTWARDS TRIPLE ARROW
+.. |Rrightarrow|     unicode:: U+021DB .. RIGHTWARDS TRIPLE ARROW
+.. |ldashedarrow|    unicode:: U+021E0 .. LEFTWARDS DASHED ARROW
+.. |rdashedarrow|    unicode:: U+021E2 .. RIGHTWARDS DASHED ARROW
+.. |lwhitearrow|     unicode:: U+021E6 .. LEFTWARDS WHITE ARROW
+.. |rwhitearrow|     unicode:: U+021E8 .. RIGHTWARDS WHITE ARROW
+.. |lindexblack|     unicode:: U+0261A .. LEFT-POINTING INDEX FINGER, BLACK
+.. |rindexblack|     unicode:: U+0261B .. RIGHT-POINTING INDEX FINGER, BLACK
+.. |lindexwhite|     unicode:: U+0261C .. LEFT-POINTING INDEX FINGER, WHITE
+.. |rindexwhite|     unicode:: U+0261E .. RIGHT-POINTING INDEX FINGER, WHITE
+.. -------- Symbols for Unprintable ASCII Range --------
+.. |nul|             unicode:: U+02400 .. NUL
+.. |soh|             unicode:: U+02401 .. SOH START OF HEADER
+.. |stx|             unicode:: U+02402 .. STX START OF TEXT
+.. |etx|             unicode:: U+02403 .. ETX END OF TEXT
+.. |eot|             unicode:: U+02404 .. EOT END OF TRANSMISSION
+.. |enq|             unicode:: U+02405 .. ENQ ENQUIRY
+.. |ack|             unicode:: U+02406 .. ACK ACKNOWLEDGE
+.. |bel|             unicode:: U+02407 .. BEL BELL
+.. |bs|              unicode:: U+02408 .. BS  BACKSPACE
+.. |ht|              unicode:: U+02409 .. HT  HORIZONTAL TAB
+.. |lf|              unicode:: U+0240A .. LF  LINE FEED
+.. |vt|              unicode:: U+0240B .. VT  VERTICAL TAB
+.. |ff|              unicode:: U+0240C .. FF  FORM FEED
+.. |cr|              unicode:: U+0240D .. CR  CARRIAGE RETURN
+.. |so|              unicode:: U+0240E .. SO  SHIFT OUT
+.. |si|              unicode:: U+0240F .. SI  SHIFT IN
+.. |dle|             unicode:: U+02410 .. DLE DATA LINK ESCAPE
+.. |dc1|             unicode:: U+02411 .. DC1 DEVICE CONTROL 1
+.. |dc2|             unicode:: U+02412 .. DC2 DEVICE CONTROL 2
+.. |dc3|             unicode:: U+02413 .. DC3 DEVICE CONTROL 3
+.. |dc4|             unicode:: U+02414 .. DC4 DEVICE CONTROL 4
+.. |nak|             unicode:: U+02415 .. NAK NEGATIVE ACKNOWLEDGE
+.. |syn|             unicode:: U+02416 .. SYN SYNCHRONOUS IDLE
+.. |etb|             unicode:: U+02417 .. ETB END OF TRANSMISSION BLOCK
+.. |can|             unicode:: U+02418 .. CAN CANCEL
+.. |em|              unicode:: U+02419 .. EM  END OF MEDIUM
+.. |sub|             unicode:: U+0241A .. SUB SUBSTITUTE
+.. |esc|             unicode:: U+0241B .. ESC ESCAPE
+.. |fs|              unicode:: U+0241C .. FS  FILE SEPARATOR
+.. |gs|              unicode:: U+0241D .. GS  GROUP SEPARATOR
+.. |rs|              unicode:: U+0241E .. RS  RECORD SEPARATOR
+.. |us|              unicode:: U+0241F .. US  UNIT SEPARATOR
+.. |sp|              unicode:: U+02420 .. SP  SPACE
+.. |del|             unicode:: U+02421 .. DEL ASCII 0x7F
+.. -------- UI Controls --------
+.. |rbchecked|       unicode:: U+025C9 .. RADIO BUTTON CHECKED / FISHEYE
+.. |rbunchecked|     unicode:: U+025CB .. RADIO BUTTON UNCHECKED / WHITE CIRCLE
+.. |cbunchecked|     unicode:: U+02610 .. CHECKBOX UNCHECKED / BALLOT BOX EMPTY
+.. |cbchecked|       unicode:: U+02611 .. CHECKBOX CHECKED / BALLOT BOX WITH CHECK
+.. |cbexxed|         unicode:: U+02612 .. CHECKBOX WITH X / BALLOT BOX WITH X
+.. -------- Trigraphs --------
+.. |triheaven|       unicode:: U+02630 .. HEAVEN   (SOLID, SOLID, SOLID)  (looks like menu icon)
+.. |trilake|         unicode:: U+02631 .. LAKE     (BROKEN, SOLID, SOLID)
+.. |trifire|         unicode:: U+02632 .. FIRE     (SOLID, BROKEN, SOLID)
+.. |trithunder|      unicode:: U+02633 .. THUNDER  (BROKEN, BROKEN, SOLID)
+.. |triwind|         unicode:: U+02634 .. WIND     (SOLID, SOLID, BROKEN)
+.. |triwater|        unicode:: U+02635 .. WATER    (BROKEN, SOLID, BROKEN)
+.. |trimountain|     unicode:: U+02636 .. MOUNTAIN (SOLID, BROKEN, BROKEN)
+.. |triearth|        unicode:: U+02637 .. EARTH    (BROKEN, BROKEN, BROKEN)
+.. -------- Ornaments --------
+.. |ornnwleaf|       unicode:: U+1F650 .. NORTH-WEST POINTING LEAF
+.. |ornswleaf|       unicode:: U+1F651 .. SOUTH-WEST POINTING LEAF
+.. |ornneleaf|       unicode:: U+1F652 .. NORTH-EAST POINTING LEAF
+.. |ornseleaf|       unicode:: U+1F653 .. SOUTH-EAST POINTING LEAF
+.. |ornnwturnedleaf| unicode:: U+1F654 .. TURNED NORTH-WEST POINTING LEAF
+.. |ornswturnedleaf| unicode:: U+1F655 .. TURNED SOUTH-WEST POINTING LEAF
+.. |ornneturnedleaf| unicode:: U+1F656 .. TURNED NORTH-EAST POINTING LEAF
+.. |ornseturnedleaf| unicode:: U+1F657 .. TURNED SOUTH-EAST POINTING LEAF
+.. |ornnwvineleaf|   unicode:: U+1F658 .. NORTH-WEST POINTING VINE LEAF
+.. |ornswvineleaf|   unicode:: U+1F659 .. SOUTH-WEST POINTING VINE LEAF
+.. |ornnevineleaf|   unicode:: U+1F65A .. NORTH-EAST POINTING VINE LEAF
+.. |ornsevineleaf|   unicode:: U+1F65B .. SOUTH-EAST POINTING VINE LEAF
+.. |ornnwvineleafh|  unicode:: U+1F65C .. HEAVY NORTH-WEST POINTING VINE LEAF
+.. |ornswvineleafh|  unicode:: U+1F65D .. HEAVY SOUTH-WEST POINTING VINE LEAF
+.. |ornnevineleafh|  unicode:: U+1F65E .. HEAVY NORTH-EAST POINTING VINE LEAF
+.. |ornsevineleafh|  unicode:: U+1F65F .. HEAVY SOUTH-EAST POINTING VINE LEAF
+.. |ornnwbud|        unicode:: U+1F660 .. NORTH-WEST POINTING BUD
+.. |ornswbud|        unicode:: U+1F661 .. SOUTH-WEST POINTING BUD
+.. |ornnebud|        unicode:: U+1F662 .. NORTH-EAST POINTING BUD
+.. |ornsebud|        unicode:: U+1F663 .. SOUTH-EAST POINTING BUD
+.. |ornnwbudh|       unicode:: U+1F664 .. HEAVY NORTH-WEST POINTING BUD
+.. |ornswbudh|       unicode:: U+1F665 .. HEAVY SOUTH-WEST POINTING BUD
+.. |ornnebudh|       unicode:: U+1F666 .. HEAVY NORTH-EAST POINTING BUD
+.. |ornsebudh|       unicode:: U+1F667 .. HEAVY SOUTH-EAST POINTING BUD
+.. -------- Raw HTML --------
+.. |endofsection|    raw:: html
+
+    <center><font size="+3">&#x1F650;</font></center>
+.. |endofchapter|    raw:: html
+
+    <center><font size="+3">&#x1F65C;</font></center>
+.. |endofbook|    raw:: html
+
+    <center><font size="+3">&#x1F667;</font></center>
+.. |br|              raw:: html
+
+    <br />
+.. |hr|              raw:: html
+
+    <hr style="width: 33%; height: 1px; text-align: center; margin-left: auto;
+    margin-right: auto; border:none; background-color:#808080; color: #808080;
+    clear:none;" />
+.. include:: custom_roles.txt
+.. include:: external_links.txt
+.. include:: custom_subs.txt
