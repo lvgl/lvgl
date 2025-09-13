@@ -32,6 +32,8 @@ Note, only following color formats are supported at this time:
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB4444`
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB1555`
 
+Support for color formats depends on the drawing unit. Please check your drawing unit.
+
 Freeing the Image
 -----------------
 
