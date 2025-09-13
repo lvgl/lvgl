@@ -134,13 +134,13 @@ void lv_example_scale_10(void)
 
     lv_scale_set_line_needle_value(scale, needle_line, 0, current_hr);
 
-    lv_obj_t * circle = lv_obj_create(lv_scr_act());
+    lv_obj_t * circle = lv_obj_create(lv_screen_active());
     lv_obj_set_size(circle, 130, 130);
     lv_obj_center(circle);
 
     lv_obj_set_style_radius(circle, LV_RADIUS_CIRCLE, 0);
 
-    lv_obj_set_style_bg_color(circle, lv_obj_get_style_bg_color(lv_scr_act(), LV_PART_MAIN), 0);
+    lv_obj_set_style_bg_color(circle, lv_obj_get_style_bg_color(lv_screen_active(), LV_PART_MAIN), 0);
     lv_obj_set_style_bg_opa(circle, LV_OPA_COVER, 0);
     lv_obj_set_style_border_width(circle, 0, LV_PART_MAIN);
 

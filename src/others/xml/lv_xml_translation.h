@@ -27,14 +27,14 @@ extern "C" {
 /**
  * Register translations from an XML file
  * @param path      path to an XML file (staring with a driver letter)
- * @return          LV_RES_OK: no error
+ * @return          LV_RESULT_OK: no error
  */
 lv_result_t lv_xml_translation_register_from_file(const char * path);
 
 /**
  * Register translations from an XML string
  * @param xml_def   the XML definition as a string
- * @return          LV_RES_OK: no error
+ * @return          LV_RESULT_OK: no error
  */
 lv_result_t lv_xml_translation_register_from_data(const char * xml_def);
 

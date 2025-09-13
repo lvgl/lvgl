@@ -163,7 +163,7 @@ void test_lottie_no_jump_when_visible_again(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_1.png"); /*Empty screen*/
 
     /*Should be on the same frame*/
-    lv_obj_clear_flag(lottie, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(lottie, LV_OBJ_FLAG_HIDDEN);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/lottie_2.png");
 
     lv_test_fast_forward(750);

@@ -61,7 +61,7 @@ static void arc_click_cb(lv_event_t * e)
         lv_anim_init(&a);
         lv_anim_set_var(&a, anim_back);
         lv_anim_set_exec_cb(&a, anim_move_cb);
-        lv_anim_set_time(&a, 200);
+        lv_anim_set_duration(&a, 200);
         lv_anim_set_values(&a, 0, 100);
         lv_anim_set_deleted_cb(&a, anim_cleanup_cb);
         lv_anim_start(&a);
@@ -94,7 +94,7 @@ static void arc_click_cb(lv_event_t * e)
     lv_anim_init(&a);
     lv_anim_set_var(&a, anim_data);
     lv_anim_set_exec_cb(&a, anim_move_cb);
-    lv_anim_set_time(&a, 200);
+    lv_anim_set_duration(&a, 200);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_deleted_cb(&a, anim_cleanup_cb);
     lv_anim_start(&a);

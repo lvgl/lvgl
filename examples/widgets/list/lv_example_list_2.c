@@ -38,7 +38,7 @@ static void event_handler_top(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
         if(currentButton == NULL) return;
-        lv_obj_move_background(currentButton);
+        lv_obj_move_to_index(currentButton, 0);
         lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }
@@ -87,7 +87,7 @@ static void event_handler_bottom(lv_event_t * e)
     const lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
         if(currentButton == NULL) return;
-        lv_obj_move_foreground(currentButton);
+        lv_obj_move_to_index(currentButton, -1);
         lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
     }
 }

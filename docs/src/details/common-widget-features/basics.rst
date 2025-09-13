@@ -107,10 +107,10 @@ You can iterate through a parent Widget's children like this:
 :cpp:expr:`lv_obj_get_index(widget)` returns the index of the Widget in its parent.
 It is equivalent to the number of older children in the parent.
 
-You can bring a Widget to the foreground or send it to the background with
-:cpp:expr:`lv_obj_move_foreground(widget)` and :cpp:expr:`lv_obj_move_background(widget)`.
-
 You can change the index of a Widget in its parent using :cpp:expr:`lv_obj_move_to_index(widget, index)`.
+
+You can bring a Widget to the foreground or send it to the background with
+:cpp:expr:`lv_obj_move_to_index(widget, -1)` and :cpp:expr:`lv_obj_move_to_index(widget, 0)`.   
 
 You can swap the position of two Widgets with :cpp:expr:`lv_obj_swap(widget1, widget2)`.
 

@@ -98,14 +98,14 @@ wider than the Label's width can be manipulated according to several
 long mode policies. Similarly, the policies can be applied if the height
 of the text is greater than the height of the Label.
 
-- :cpp:enumerator:`LV_LABEL_LONG_WRAP` Wrap lines that are too long. If the height is :c:macro:`LV_SIZE_CONTENT` the Label's
+- :cpp:enumerator:`LV_LABEL_LONG_MODE_WRAP` Wrap lines that are too long. If the height is :c:macro:`LV_SIZE_CONTENT` the Label's
   height will be expanded, otherwise the text will be clipped. (Default)
-- :cpp:enumerator:`LV_LABEL_LONG_DOT` Replaces the last 3 characters from bottom right corner of the Label with dots (``.``)
-- :cpp:enumerator:`LV_LABEL_LONG_SCROLL` If the text is wider than the label, scroll it horizontally back and forth. If it's
+- :cpp:enumerator:`LV_LABEL_LONG_MODE_DOTS` Replaces the last 3 characters from bottom right corner of the Label with dots (``.``)
+- :cpp:enumerator:`LV_LABEL_LONG_MODE_SCROLL` If the text is wider than the label, scroll it horizontally back and forth. If it's
   higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- :cpp:enumerator:`LV_LABEL_LONG_SCROLL_CIRCULAR` If the text is wider than the Label, scroll it horizontally continuously. If it's
+- :cpp:enumerator:`LV_LABEL_LONG_MODE_SCROLL_CIRCULAR` If the text is wider than the Label, scroll it horizontally continuously. If it's
   higher, scroll vertically. Only one direction is scrolled and horizontal scrolling has higher precedence.
-- :cpp:enumerator:`LV_LABEL_LONG_CLIP` Simply clip the parts of the text outside the Label.
+- :cpp:enumerator:`LV_LABEL_LONG_MODE_CLIP` Simply clip the parts of the text outside the Label.
 
 You can specify the long mode with :cpp:expr:`lv_label_set_long_mode(label, LV_LABEL_LONG_...)`
 

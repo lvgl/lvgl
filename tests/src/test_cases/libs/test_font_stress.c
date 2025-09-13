@@ -118,7 +118,7 @@ static void font_stress_label_delete(font_stress_ctx_t * ctx, lv_obj_t * label)
 {
     const lv_font_t * font = lv_obj_get_style_text_font(label, LV_PART_MAIN);
     TEST_ASSERT_NOT_NULL(font);
-    lv_obj_del(label);
+    lv_obj_delete(label);
     ctx->font_delete_cb(ctx, (lv_font_t *)font);
 }
 

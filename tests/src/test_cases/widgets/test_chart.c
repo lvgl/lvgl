@@ -207,8 +207,8 @@ void test_chart_scatter(void)
 
     lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);
 
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_X, 50, 100);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 20);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_X, 50, 100);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 20);
 
     lv_chart_set_point_count(chart, 3);
     lv_chart_series_t * ser = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_PRIMARY_Y);

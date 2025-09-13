@@ -37,14 +37,14 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
  * Load the styles, constants, another data of the component. It needs to be called only once for each component.
  * @param name      the name as the component will be referenced later in other components
  * @param xml_def   the XML definition of the component as a NULL terminated string
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def);
 
 /**
  * Load the styles, constants, another data of the component. It needs to be called only once for each component.
  * @param path      path to an XML file
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_component_register_from_file(const char * path);
 

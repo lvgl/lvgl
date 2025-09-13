@@ -97,8 +97,8 @@ registered for each Widget. The XML parser for the label Widget looks like this:
     /* Helper to convert strings to enum values */
     static lv_label_long_mode_t long_mode_text_to_enum(const char * txt)
     {
-        if(lv_streq("wrap", txt)) return LV_LABEL_LONG_WRAP;
-        if(lv_streq("scroll", txt)) return LV_LABEL_LONG_SCROLL;
+        if(lv_streq("wrap", txt)) return LV_LABEL_LONG_MODE_WRAP;
+        if(lv_streq("scroll", txt)) return LV_LABEL_LONG_MODE_SCROLL;
 
         LV_LOG_WARN("%s is an unknown value for label's long_mode", txt);
         return 0; /* Return 0 in the absence of a better option. */
