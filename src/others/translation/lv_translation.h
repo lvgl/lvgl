@@ -70,6 +70,12 @@ lv_translation_pack_t * lv_translation_add_dynamic(void);
 void lv_translation_set_language(const char * lang);
 
 /**
+ * Get the current selected language
+ * @return the current selected language
+ */
+const char * lv_translation_get_language(void);
+
+/**
  * Get the translated version of a tag on the selected language
  * @param tag       the tag to translate
  * @return          the translation
