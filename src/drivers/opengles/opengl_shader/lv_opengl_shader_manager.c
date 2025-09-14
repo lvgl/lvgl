@@ -78,49 +78,42 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_opengl_shader_manager_t * lv_opengl_shader_manager_create(const lv_opengl_shader_t * sources,
-                                                             size_t len, const char * vert_src,
-                                                             const char * frag_src)
+void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const lv_opengl_shader_t * sources,
+                                   size_t len, const char * vert_src,
+                                   const char * frag_src)
 {
-    lv_opengl_shader_manager_t * shader =
-        (lv_opengl_shader_manager_t *)lv_malloc_zeroed(sizeof(*shader));
-    LV_ASSERT_MALLOC(shader);
-    if(!shader) {
-        return NULL;
-    }
 
-    shader->sources_map = create_shader_map(sources, len);
+    manager->sources_map = create_shader_map(sources, len);
     if(vert_src != NULL) {
         lv_opengl_shader_t entry = { "__MAIN__.vert", lv_strdup(vert_src) };
-        lv_rb_node_t * node = lv_rb_insert(&shader->sources_map, &entry);
+        lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node,
                       "Failed to insert shader source to source map");
         lv_memcpy(node->data, &entry, sizeof(entry));
     }
     if(frag_src != NULL) {
         lv_opengl_shader_t entry = { "__MAIN__.frag", lv_strdup(frag_src) };
-        lv_rb_node_t * node = lv_rb_insert(&shader->sources_map, &entry);
+        lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
         lv_memcpy(node->data, &entry, sizeof(entry));
     }
 
-    lv_rb_init(&shader->compiled_shaders_map,
+    lv_rb_init(&manager->compiled_shaders_map,
                (lv_rb_compare_t)compiled_shader_compare_cb,
                sizeof(lv_opengl_compiled_shader_t));
 
     /* Textures and compiled shaders share the same compare function */
-    lv_rb_init(&shader->textures_map,
+    lv_rb_init(&manager->textures_map,
                (lv_rb_compare_t)compiled_shader_compare_cb,
                sizeof(lv_opengl_shader_texture_t));
 
-    lv_rb_init(&shader->programs_map,
+    lv_rb_init(&manager->programs_map,
                (lv_rb_compare_t)shader_program_compare_cb,
                sizeof(lv_opengl_program_map_key_t));
 
-    shader->bg_index_buf = 0;
-    shader->bg_vertex_buf = 0;
-    shader->bg_program = 0;
-    return shader;
+    manager->bg_index_buf = 0;
+    manager->bg_vertex_buf = 0;
+    manager->bg_program = 0;
 }
 
 uint32_t lv_opengl_shader_hash(const char * value)
@@ -275,7 +268,7 @@ lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
     return program;
 }
 
-void lv_opengl_shader_manager_destroy(lv_opengl_shader_manager_t * manager)
+void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
 {
     LV_LOG_INFO("Destroying shader cache");
 

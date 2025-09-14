@@ -56,7 +56,7 @@ typedef struct {
     float scale_value;
     uint32_t mipmap_levels;
 
-    lv_opengl_shader_manager_t * shader_manager;
+    lv_opengl_shader_manager_t shader_manager;
 } lv_gltf_ibl_sampler_t;
 
 typedef struct {
