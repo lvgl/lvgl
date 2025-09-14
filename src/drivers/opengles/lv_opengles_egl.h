@@ -12,7 +12,6 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-
 #if LV_USE_EGL
 
 #include "../../misc/lv_types.h"

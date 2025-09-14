@@ -12,34 +12,21 @@ static const lv_opengl_shader_t src_includes[] = {
         uniform float u_Saturation;
         uniform float u_Value;
 
-        vec3 rgb2hsv(vec3 c){
-            float M = max(max(c.r,c.g),c.b);
-            float m = min(min(c.r,c.g),c.b);
-            float d = M - m;
-            float h = 0.0;
-            if(d > 0.00001){
-                if(M == c.r) h = mod((c.g - c.b)/d, 6.0);
-                else if(M == c.g) h = (c.b - c.r)/d + 2.0;
-                else h = (c.r - c.g)/d + 4.0;
-                h /= 6.0;
-            }
-            float s = (M <= 0.00001) ? 0.0 : d / M;
-            return vec3(h, s, M);
+        // Convert RGB to HSV
+        vec3 rgb2hsv(vec3 c) {
+            vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+            vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+            vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+            float d = q.x - min(q.w, q.y);
+            float e = 1.0e-10;
+            return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
         }
 
-        vec3 hsv2rgb(vec3 c){
-            float h = c.x * 6.0;
-            float i = floor(h);
-            float f = h - i;
-            float p = c.z * (1.0 - c.y);
-            float q = c.z * (1.0 - c.y * f);
-            float t = c.z * (1.0 - c.y * (1.0 - f));
-            if(i == 0.0) return vec3(c.z, t, p);
-            if(i == 1.0) return vec3(q, c.z, p);
-            if(i == 2.0) return vec3(p, c.z, t);
-            if(i == 3.0) return vec3(p, q, c.z);
-            if(i == 4.0) return vec3(t, p, c.z);
-            return vec3(c.z, p, q);
+        // Convert HSV to RGB
+        vec3 hsv2rgb(vec3 c) {
+            vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+            vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+            return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
         }
 
         vec3 adjustHSV(vec3 color){
@@ -98,6 +85,10 @@ static const char *src_fragment_shader = R"(
     uniform bool u_IsFill;
     uniform vec3 u_FillColor;
     
+    #ifdef HSV_ADJUST
+#include <hsv_adjust.glsl>
+    #endif
+
     void main()
     {
         vec4 texColor;
@@ -113,6 +104,9 @@ static const char *src_fragment_shader = R"(
             float combinedAlpha = texColor.a * u_Opa;
             color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
         }
+        #ifdef HSV_ADJUST
+        color.rgb = adjustHSV(color.rgb);
+        #endif
     }
 )";
 

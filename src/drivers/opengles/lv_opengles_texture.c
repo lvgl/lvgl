@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 
+#include <stdio.h> /* MK TEMP */
 /*********************
  *      DEFINES
  *********************/
@@ -105,6 +106,7 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
 
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_set_driver_data(disp, dsc);

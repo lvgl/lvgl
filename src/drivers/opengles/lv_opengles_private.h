@@ -17,7 +17,10 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 
-#if LV_USE_EGL
+#if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
+#include "egl_adapter/common/opengl_headers.h"
+#include <EGL/egl.h>
+#elif LV_USE_EGL
 #include <GLES/gl.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
@@ -26,8 +29,9 @@ extern "C" {
 #else
 /* For now, by default we add glew and glfw.
    In the future we need to consider adding a config for setting these includes*/
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+//#include <GL/glew.h>
+//#include <GLFW/glfw3.h>
+#include "../display/drm/egl_adapter/common/opengl_headers.h"
 #endif /*LV_USE_EGL*/
 
 /*********************

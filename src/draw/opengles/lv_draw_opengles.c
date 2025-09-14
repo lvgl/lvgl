@@ -552,7 +552,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
     t->draw_unit = (lv_draw_unit_t *)u;
 
     /* the shader-based fill is not working reliably with EGL. */
-#if !LV_USE_EGL
+    //#if !LV_USE_EGL
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
         if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
@@ -581,7 +581,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             return;
         }
     }
-#endif /*!LV_USE_EGL*/
+    //#endif /*!LV_USE_EGL*/
 
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         blend_texture_layer(t);

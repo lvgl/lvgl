@@ -87,14 +87,16 @@ GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)
  *   STATIC FUNCTIONS
  **********************/
 
+#define _GL_INVALID_INDEX 0xFFFFFFFFu
+
 static void update_uniform_1i(lv_opengl_shader_program_t * program, const char * prop,
                               int value)
 {
     GLuint location = glGetUniformLocation(program->id, prop);
-    LV_ASSERT_FORMAT_MSG(location != GL_INVALID_INDEX,
+    LV_ASSERT_FORMAT_MSG(location != _GL_INVALID_INDEX,
                          "Uniform '%s' not found in program %d",
                          prop, program->id);
-    if(location == GL_INVALID_INDEX) {
+    if(location == _GL_INVALID_INDEX) {
         LV_LOG_ERROR("Uniform '%s' not found in program %d", prop,
                      program->id);
         return;
@@ -107,10 +109,10 @@ static void update_uniform_1f(lv_opengl_shader_program_t * program, const char *
 {
     GLuint location = glGetUniformLocation(program->id, prop);
 
-    LV_ASSERT_FORMAT_MSG(location != GL_INVALID_INDEX,
+    LV_ASSERT_FORMAT_MSG(location != _GL_INVALID_INDEX,
                          "Uniform '%s' not found in program %d",
                          prop, program->id);
-    if(location == GL_INVALID_INDEX) {
+    if(location == _GL_INVALID_INDEX) {
         LV_LOG_ERROR("Uniform '%s' not found in program %d", prop,
                      program->id);
         return;
