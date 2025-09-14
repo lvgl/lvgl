@@ -73,7 +73,7 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title);
 
 /**
  * Create a menu cont object
- * @param parent    pointer to a menu page object, it will be the parent of the new menu cont object
+ * @param parent    pointer to a menu page or menu section object, it will be the parent of the new menu cont object
  * @return          pointer to the created menu cont
  */
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent);
