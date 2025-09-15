@@ -348,7 +348,19 @@ static lv_result_t lv_egl_init(void)
 
     /* get an EGL display connection */
     if(backend_device) {
-        egl_display = eglGetDisplay(backend_device);
+#ifdef LV_USE_LINUX_DRM_GBM_BUFFERS
+        PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT =
+            (PFNEGLGETPLATFORMDISPLAYEXTPROC) eglGetProcAddress("eglGetPlatformDisplayEXT");
+        egl_display = EGL_NO_DISPLAY;
+        if(eglGetPlatformDisplayEXT) {
+            egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_KHR, backend_device, NULL);
+        }
+        /* fallback to generic eglGetDisplay() */
+        if(egl_display == EGL_NO_DISPLAY)
+#endif
+        {
+            egl_display = eglGetDisplay(backend_device);
+        }
     }
     else {
         egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
