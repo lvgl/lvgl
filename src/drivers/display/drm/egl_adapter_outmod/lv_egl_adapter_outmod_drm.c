@@ -309,7 +309,7 @@ drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(void * nativedrm_ptr, str
 {
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
     if(!bo) {
-        printf("lv_egl_adapter_outmod_drm_fb_get_from_bo -> (NULL bo NULL)\n");
+        LV_LOG_ERROR("variable bo is null\n");
         return NULL;
     }
     drmfb_state_t fb = (drmfb_state_t)gbm_bo_get_user_data(bo);
@@ -375,7 +375,7 @@ void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
 
     if(!drm_out->crtc_isset && drmSetMaster(drm_out->fd) < 0) {
-        printf("ERROR: Failed to become DRM master (hint: must be run in a VT, shut down Wayland / X first )\n");
+        LV_LOG_ERROR("Failed to become DRM master (hint: must be run in a VT, shut down Wayland / X first )");
         drm_out->quit_flag = true;
         return;
     }
@@ -384,11 +384,11 @@ void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
     drm_out->gbm_bo_pending = gbm_surface_lock_front_buffer(drm_out->gbm_surface);
 
     if(!drm_out->gbm_bo_pending)
-        printf("lv_egl_adapter_outmod_drm_flip()-> gbm_bo_pending = NULL\n");
+        LV_LOG_ERROR("gbm_bo_pending = NULL");
 
     drmfb_state_t pending_fb = lv_egl_adapter_outmod_drm_fb_get_from_bo(drm_out, drm_out->gbm_bo_pending);
     if(!drm_out->gbm_bo_pending || !pending_fb) {
-        printf("ERROR: Failed to get gbm front buffer\n");
+        LV_LOG_ERROR("Failed to get gbm front buffer");
         return;
     }
 
@@ -413,7 +413,7 @@ void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
                 drm_out->gbm_bo_pending = NULL;
             }
             else {
-                printf("ERROR: Failed to set crtc: %d\n", status);
+                LV_LOG_ERROR("Failed to set crtc: %d", status);
             }
             return;
         }
@@ -424,7 +424,7 @@ void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
 
         int status = drmModePageFlip(drm_out->fd, drm_out->drm_encoder->crtc_id, pending_fb->fb_id, flip_flags, drm_out);
         if(status < 0) {
-            printf("ERROR: Failed to enqueue page flip: %d\n", status);
+            LV_LOG_ERROR("Failed to enqueue page flip: %d", status);
             return;
         }
 
@@ -593,7 +593,7 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
 
 
     if(!drm_out->drm_mode) {
-        printf("ERROR: Failed to find a suitable mode\n");
+        LV_LOG_ERROR("Failed to find a suitable mode");
         print_grouped_modes(drm_out->drm_connector);
         return false;
     }
@@ -999,10 +999,10 @@ static int open_drm_with_module_checking(void)
     for(size_t m = 0; m < num_modules; ++m) {
         fd = drmOpen(drm_modules[m], NULL);
         if(fd < 0) {
-            printf("DEBUG: Failed to open DRM module '%s'\n", drm_modules[m]);
+            LV_LOG_INFO("Failed to open DRM module '%s'", drm_modules[m]);
             continue;
         }
-        printf("INFO: Opened DRM module '%s'\n", drm_modules[m]);
+        LV_LOG_INFO("Opened DRM module '%s'", drm_modules[m]);
         break;
     }
 
@@ -1313,15 +1313,12 @@ static void print_grouped_modes_ex(drmModeConnectorPtr conn, uint32_t current_id
         if(banner_count > cb->height) {
             /* print summary and the corresponding banner line */
             int pad = 2;
-            //printf("%s", summary);
             int left_width = pad + BOX_WIDTH + 4;
-            //for (int p = 0; p < left_width; ++p) putchar(' ');
             // first pad added by cap_bar bottom of only shown resolution block
             printf("%s\n", banner_lines[cb->height]);
             /* print remaining banner lines if any */
             for(int r = cb->height + 1; r < banner_count; ++r) {
                 /* pad left area */
-                //int left_width = (int)strlen(summary) + pad;
                 if((r == banner_count - 1) && (at_least_one_blank_line)) {
                     printf("%s     ", summary_header);
                     printed_summary_header = true;
@@ -1332,11 +1329,6 @@ static void print_grouped_modes_ex(drmModeConnectorPtr conn, uint32_t current_id
                 }
                 printf("%s\n", banner_lines[r]);
             }
-        }
-        else {
-            /* simply print summary on its own line */
-            //printf("%s\n", summary);
-            /* if banner taller than that (unlikely here), we would pad — but we've handled earlier */
         }
         if(!printed_summary_header) {
             if(!at_least_one_blank_line) {
