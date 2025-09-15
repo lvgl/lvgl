@@ -302,10 +302,4 @@ static void next_frame_task_cb(lv_timer_t * t)
     lv_obj_invalidate(obj);
 }
 
-/**********************
- *   INLINE INCLUDES
- **********************/
-
-#include "AnimatedGIF/src/gif.inl"
-
 #endif /*LV_USE_GIF*/
