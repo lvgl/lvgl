@@ -64,9 +64,6 @@ typedef struct drmfb_state * drmfb_state_t;
 struct lv_egl_adapter_outmod_drm {
     lv_egl_adapter_output_core_t core;
     int fd;
-    int mouse_fd;
-    int pointer_x;
-    int pointer_y;
     drmModeRes * drm_resources;
     drmModeConnector * drm_connector;
     drmModeEncoder * drm_encoder;
@@ -124,30 +121,6 @@ void lv_egl_adapter_outmod_drm_page_flip_handler(int fd, unsigned int frame, uns
         gbm_surface_release_buffer(drm_out->gbm_surface, drm_out->gbm_bo_presented);
     drm_out->gbm_bo_presented = drm_out->gbm_bo_flipped;
     drm_out->gbm_bo_flipped = NULL;
-
-    /* Begin temporary mouse / pointer input handling */
-
-    if(drm_out->mouse_fd > -1) {
-        struct input_event ie = {};
-        bool reloop = (read(drm_out->mouse_fd, &ie, sizeof(struct input_event)) > 0);
-        while(reloop) {
-            if(ie.type == 2) {
-                if(ie.code == 0) {
-                    drm_out->pointer_x += ie.value;
-                    int maxX = drm_out->drm_mode->hdisplay;
-                    drm_out->pointer_x = (drm_out->pointer_x < 0) ? 0 : (drm_out->pointer_x >= maxX) ? maxX : drm_out->pointer_x;
-                }
-                else if(ie.code == 1) {
-                    drm_out->pointer_y += ie.value;
-                    int maxY = drm_out->drm_mode->vdisplay;
-                    drm_out->pointer_y = (drm_out->pointer_y < 0) ? 0 : (drm_out->pointer_y >= maxY) ? maxY : drm_out->pointer_y;
-                }
-            }
-            reloop = (read(drm_out->mouse_fd, &ie, sizeof(struct input_event)) > 0);
-        }
-    }
-
-    /* End temporary mouse / pointer input handling */
 
 }
 
@@ -269,20 +242,6 @@ bool lv_egl_adapter_outmod_drm_should_quit(void * nativedrm_ptr)
     //lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
     (void)nativedrm_ptr;
     return lv_egl_adapter_outmod_drm_should_quit_flag != 0;
-}
-
-/* pointer getters */
-int lv_egl_adapter_outmod_drm_get_last_pointer_x(void * nativedrm_ptr)
-{
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
-    if(!drm_out) return 0;
-    return drm_out->pointer_x;
-}
-int lv_egl_adapter_outmod_drm_get_last_pointer_y(void * nativedrm_ptr)
-{
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
-    if(!drm_out) return 0;
-    return drm_out->pointer_y;
 }
 
 /* fb_destroy_callback equivalent: frees DRMFBState and removes fb if set.
@@ -553,12 +512,12 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
 {
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
     /* temporary mouse handling */
-    int mfd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK);
-    if(mfd < 0) {
-        fprintf(stderr, "Error opening device\n");
-        drm_out->mouse_fd = -1;
-    }
-    drm_out->mouse_fd = mfd;
+    //int mfd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK);
+    //if(mfd < 0) {
+    //    fprintf(stderr, "Error opening device\n");
+    //    drm_out->mouse_fd = -1;
+    //}
+    //drm_out->mouse_fd = mfd;
     /* ************************ */
 
     int fd = -1;
@@ -737,8 +696,6 @@ bool lv_egl_adapter_outmod_drm_init_display(void * nativedrm_ptr, int * x_res, i
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
     if(!drm_out) return false;
     if(drm_out->gbm_dev == NULL) {
-        /* forward-declared internal init; assume implemented elsewhere as lv_egl_adapter_outmod_drm_init */
-        // extern bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, float refr_rate);
         lv_egl_adapter_outmod_drm_init(drm_out, twidth, theight, refr_rate);
     }
     return (drm_out->gbm_dev != NULL);
@@ -751,9 +708,6 @@ lv_egl_adapter_outmod_drm_t lv_egl_adapter_outmod_drm_create(void)
     if(!drm_out) return NULL;
     populate_output_core(drm_out);
     drm_out->fd = 0;
-    drm_out->mouse_fd = -1;
-    drm_out->pointer_x = 0;
-    drm_out->pointer_y = 0;
     drm_out->drm_resources = NULL;
     drm_out->drm_connector = NULL;
     drm_out->drm_encoder = NULL;
@@ -788,8 +742,6 @@ static void populate_output_core(void * outmod_ptr)
     drm_out->core->visible            = lv_egl_adapter_outmod_drm_visible;
     drm_out->core->should_quit        = lv_egl_adapter_outmod_drm_should_quit;
     drm_out->core->flip               = lv_egl_adapter_outmod_drm_flip;
-    drm_out->core->get_last_pointer_x = lv_egl_adapter_outmod_drm_get_last_pointer_x;
-    drm_out->core->get_last_pointer_y = lv_egl_adapter_outmod_drm_get_last_pointer_y;
 }
 
 static size_t distance_uint32_array(uint32_t * arr, size_t len, uint32_t value)

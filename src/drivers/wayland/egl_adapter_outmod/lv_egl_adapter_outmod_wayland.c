@@ -45,9 +45,6 @@ typedef struct my_output * OutputsVector;
 typedef struct lv_egl_adapter_outmod_wayland {
     lv_egl_adapter_output_core_t core;
 
-    int pointer_x;
-    int pointer_y;
-
     struct my_display {
         struct wl_display * display;
         struct wl_registry * registry;
@@ -178,17 +175,6 @@ struct my_output * add_output(void * void_self, struct wl_output * output)
     return get_output(state, state->display_->outputs_count - 1);
 }
 
-int lv_egl_adapter_outmod_wayland_get_last_pointer_x(void * data)
-{
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
-    return (that) ? that->pointer_x : 100;
-}
-int lv_egl_adapter_outmod_wayland_get_last_pointer_y(void * data)
-{
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
-    return (that) ? that->pointer_y : 100;
-}
-
 lv_egl_adapter_output_core_t lv_egl_adapter_outmod_wayland_get_core(void * void_self)
 {
     lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t) void_self;
@@ -196,7 +182,6 @@ lv_egl_adapter_output_core_t lv_egl_adapter_outmod_wayland_get_core(void * void_
 }
 
 // Destructor for lv_egl_adapter_outmod_wayland
-//void lv_egl_adapter_outmod_wayland_destroy(void *void_self) {
 void lv_egl_adapter_outmod_wayland_destroy(void ** nativewayland_ptr)
 {
     lv_egl_adapter_outmod_wayland_t state = *(lv_egl_adapter_outmod_wayland_t *)nativewayland_ptr;
@@ -439,8 +424,6 @@ lv_egl_adapter_outmod_wayland_t lv_egl_adapter_outmod_wayland_create()
         state->cursor_  = NULL;
         state->display_ = NULL;
         state->window_  = NULL;
-        state->pointer_x = 0;
-        state->pointer_y = 0;
         populate_output_core(state);
     }
     return state;
@@ -462,8 +445,6 @@ static void populate_output_core(void * outmod_ptr)
     wayland_out->core->visible            = lv_egl_adapter_outmod_wayland_visible;
     wayland_out->core->should_quit        = lv_egl_adapter_outmod_wayland_should_quit;
     wayland_out->core->flip               = lv_egl_adapter_outmod_wayland_flip;
-    wayland_out->core->get_last_pointer_x = lv_egl_adapter_outmod_wayland_get_last_pointer_x;
-    wayland_out->core->get_last_pointer_y = lv_egl_adapter_outmod_wayland_get_last_pointer_y;
 }
 
 // Define the wl_pointer_listener
@@ -510,9 +491,10 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
     lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
-    that->pointer_x = (int)sx >> 8;
-    that->pointer_y = (int)sy >> 8;
+    //that->pointer_x = (int)sx >> 8;
+    //that->pointer_y = (int)sy >> 8;
 }
+
 static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, uint32_t serial, uint32_t time,
                                   uint32_t button,
                                   uint32_t state)

@@ -207,20 +207,6 @@ int lv_egl_adapter_interface_width(void * cnvs_ptr);
 int lv_egl_adapter_interface_height(void * cnvs_ptr);
 
 /**
- * @brief Get the last known pointer (mouse/touch) X coordinate on the canvas.
- * @param cnvs_ptr Opaque pointer to the canvas instance.
- * @return X coordinate in pixels, or -1 if unavailable.
- */
-int lv_egl_adapter_interface_get_last_pointer_x(void * cnvs_ptr);
-
-/**
- * @brief Get the last known pointer (mouse/touch) Y coordinate on the canvas.
- * @param cnvs_ptr Opaque pointer to the canvas instance.
- * @return Y coordinate in pixels, or -1 if unavailable.
- */
-int lv_egl_adapter_interface_get_last_pointer_y(void * cnvs_ptr);
-
-/**
  * @brief Read the RGBA color of a pixel from the canvas.
  * @param x X coordinate of the pixel (0..width-1).
  * @param y Y coordinate of the pixel (0..height-1).

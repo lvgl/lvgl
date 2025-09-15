@@ -39,8 +39,6 @@ typedef void (*set_visible_func)(void * self, bool v);
 typedef bool (*should_quit_func)(void * self);
 typedef void (*flip_func)(void * self, bool vsync);
 typedef void (*native_state_destroy_func)(void ** self);
-typedef int (*get_last_pointer_x_func)(void * self);
-typedef int (*get_last_pointer_y_func)(void * self);
 
 // Define the native_state struct with function pointers
 struct lv_egl_adapter_output_core {
@@ -52,8 +50,6 @@ struct lv_egl_adapter_output_core {
     set_visible_func visible;
     should_quit_func should_quit;
     flip_func flip;
-    get_last_pointer_x_func get_last_pointer_x;
-    get_last_pointer_y_func get_last_pointer_y;
 };
 
 /* Window properties (matches original NativeState::WindowProperties) */
