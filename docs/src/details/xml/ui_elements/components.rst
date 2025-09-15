@@ -9,48 +9,47 @@ Overview
 
 Components are one of the main building blocks for creating new UI elements.
 
-``<component>`` elements may contain the following child elements:
+``<component>``\ s support the following child XML tags:
 
 - :ref:`<consts> <xml_consts>`
 - :ref:`<api> <xml_api>`
-- :ref:`<styles> <xml_styles>`, and
+- :ref:`<styles> <xml_styles>`
 - :ref:`<view> <xml_view>`
 - :ref:`<previews> <xml_preview>`
 
 Although they can't contain C code, they are very powerful:
 
-- They can extend another Component or Widget (an "inherited" base Component or
-  Widget can be specified).
-- Components can be built from Widgets and/or other Components.
-- A custom API can be defined.
-- Local styles can be defined, and global styles can be referenced.
-- Local constants can be defined, and global constants can be referenced.
-- Events can be added as function calls, or responses to changes of Subject values,
-  or responses to Screens being created or loaded.  See :ref:`XML Events <xml_events>`.
-- Previews can be defined to preview the components in various settings.
+- They can extend another Component or Widget (the base can be defined)
+- Components can be built from Widgets and other Components
+- A custom API can be defined
+- Local styles can be defined, and global styles can be used
+- Local constants can be defined, and global constants can be used
+- Function calls, subject changes, or screen load/create events can be added. See :ref:`XML Events <xml_events>`
+- Previews can be defined to preview the components in various settings in the UI Editor
+
+When a Component is created, it can extend another Component or Widget like ``<view extends="lv_slider">``.
+If a Widget is extended, the component can use the Widget's API, e.g., ``<view extends="lv_slider" min_value="20">``.
+If a Component is extended, the ``<api>`` properties can be used: ``<view extends="my_button" button_text="Apply">``.
 
 Unlike Widgets (which are always compiled into the application), Components can either:
 
 1. be loaded at runtime from XML, or
-2. be exported to C code and compiled with the application.
+2. be exported to C code by LVGL's UI Editor and compiled with the application.
 
-
-
-Using Components from XML
-*************************
-
+Using the XML files
+*******************
 
 In XML Files
 ------------
 
-Using Components in XMLs is very intuitive. The name of the components can be used as
-the name of the XML tag in the ``<view>`` of other Components, Screens, and Widgets.
+Using Components in XML is very intuitive. The name of the Component can be used as an XML tag
+in the ``<view>`` of other Components, Screens, and Widgets.
 
 The Component properties are just XML attributes.
 
-To load Components from file, it's assumed that the XML files are saved to the device
-either as data (byte array) or as a file. Once the data is saved, each component
-can be registered, after which instances of that Component can be created.
+To load Components from files, it's assumed that the XML files are saved to the device
+either as data (byte array) or as files. Once the data is saved, each Component
+can be registered, and instances can be created after that.
 
 .. code-block:: xml
 
@@ -62,9 +61,8 @@ can be registered, after which instances of that Component can be created.
         </view>
     </component>
 
-:ref:`Styles <xml_styles>`, :ref:`Constants <xml_consts>`, and a
-:ref:`custom API <component_custom_properties>` can also be described in the XML files.
-
+:ref:`Styles <xml_styles>`, :ref:`Constants <xml_consts>`, and :ref:`custom API <component_custom_api>`
+can also be described in the XML files.
 
 Registration
 ------------
@@ -74,18 +72,15 @@ Once a Component is created (e.g., ``my_button``), it can be registered by calli
 - :cpp:expr:`lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml")`
 - :cpp:expr:`lv_xml_component_register_from_data("my_button", xml_data_of_my_button)`
 
-These registration functions process the XML data and store relevant information
-internally by name.  When loaded from a file, the file name is used as the Component
-name.
+These registration functions process the XML data and store relevant information internally.
+This is required to make LVGL recognize the Component by name.
 
-During registration, the ``<view>`` of the Component is saved in RAM as a template for
-creating instances of that Component.
+Note that the "A:" in the above path is a file system "driver identifier letter" from
+:ref:`file_system` and used accordingly. See that documentation for details.
 
-.. note::
+When loaded from a file, the file name is used as the Component name.
 
-    Note that the "A:" in the above path is a file system "driver identifier letter" from
-    :ref:`file_system` and used accordingly. See that documentation for details.
-
+During registration, the ``<view>`` of the Component is saved in RAM.
 
 Instantiation
 -------------
@@ -96,7 +91,7 @@ After registration, a new instance of any registered Component can be created wi
 
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "my_button", NULL);
 
-The created Widget is a normal LVGL Widget that can be used like any other Widget.
+The created Widget is a normal LVGL Widget that can be used like any other manually-created Widget.
 
 The last parameter can be ``NULL`` or an attribute list, like this:
 
@@ -112,55 +107,45 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
+Using the Exported Code
+***********************
 
+If loading XML at runtime is not needed, LVGL's UI Editor can be used to export C and H files from the XML files of the Components.
+The resulting code is completely self-sufficient and the XML files are not needed anymore. The resulting code is similar to what one could write by hand as well.
 
-Using Components from Exported C Code
-*************************************
-
-From each Component XML file, a C and H file is exported with a single function inside:
+The exported code looks like this:
 
 .. code-block:: c
 
     lv_obj_t * component_name_create(lv_obj_t * parent, ...api properties...);
 
-where 'component_name' (in the function above) is replaced by the Component's XML
+where ``component_name`` is replaced by the Component's XML
 file name.
 
 When a Component is used in another Component's XML code and the code is exported,
 this ``create`` function will be called. This means that Components do not have a
-detailed set/get API but can be created with a fixed set of parameters.
+detailed set/get API, but are created with a fixed set of parameters.
 
-If the user needs to access or modify values dynamically, it is recommended to use a
-:ref:`Data bindings via Subject  <xml_subjects>`.
+If the user needs to access or modify values dynamically, it is recommended to use
+:ref:`Data bindings via Subject <xml_subjects>`.
 
 The user can also call these ``..._create()`` functions at any time from application code
-to create new components on demand.
+to create new Components on demand.
 
-
-
-Extending
-*********
-
-When a Component is defined as "extending" a Widget, it effectively inherits that
-Widget's attributes, and they can be used with that Component.
-(See ``<view extends="...">`` in the code examples below.)
-
-
-
-.. _component_custom_properties:
+.. _component_custom_api:
 
 Custom Properties
 *****************
 
-The properties of child elements can be set directly, such as:
+The properties of child elements can be adjusted, such as:
 
 .. code-block:: xml
 
     <my_button x="10" width="200"/>
 
-It is also possible to define custom properties in the ``<api>`` tag.
-Those properties then can thereafter be referenced in any properties of the children
-by using a ``$`` prefix with its name.  Example:
+However, it's also possible to define custom properties in the ``<api>`` tag.
+These properties can then be passed to any properties of the children by
+referencing them using ``$``. For example:
 
 .. code-block:: xml
 
@@ -175,7 +160,7 @@ by using a ``$`` prefix with its name.  Example:
         </view>
     </component>
 
-And it can be used by other Components like this:
+And it can be used like:
 
 .. code-block:: xml
 
@@ -188,22 +173,20 @@ And it can be used by other Components like this:
         </view>
     </component>
 
-In this setup, the ``btn_text`` property is mandatory, however it can be made optional
-by providing a default value like this:
+In this setup, the ``btn_text`` property is mandatory. However, it can be made optional
+by setting a default value:
 
 .. code-block:: xml
 
     <prop name="btn_text" type="string" default="Title"/>
 
-See :ref:`<api> <xml_api>` for more details, and :ref:`XML Syntax <xml_syntax>` for all the supported types.
-
-
+See :ref:`<api> <xml_api>` for more details and :ref:`XML Syntax <xml_syntax>` for all the supported types.
 
 Examples
 ********
 
 The following example demonstrates parameter passing and the use of the
-``text`` label property in a Component. Styles and Constants are also shown.
+``text`` label property on a Component. Styles and Constants are also shown.
 
 .. code-block:: xml
 
@@ -241,28 +224,16 @@ The following example demonstrates parameter passing and the use of the
     lv_xml_component_register_from_file("A:path/to/h3.xml");
     lv_xml_component_register_from_file("A:path/to/red_button.xml");
 
-    /* Create a button with "None" text. */
+    /* Creates a button with "None" text */
     lv_xml_create(lv_screen_active(), "red_button", NULL);
 
-    /* Use attributes to set the button text. */
+    /* Use attributes to set the button text */
     const char * attrs[] = {
         "btn_text", "Click here",
         NULL, NULL,
     };
     lv_xml_create(lv_screen_active(), "red_button", attrs);
 
-
-
-Live Example
-*************
-
-.. include:: ../../../../../../examples/others/xml/index.rst
-
-
-
 API
 ***
 
-.. API startswith:  lv_xml_component_
-
-.. API equals:  lv_xml_create

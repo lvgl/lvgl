@@ -51,16 +51,13 @@ For example, ``callback="my_callback_1"`` will be exported as:
 
 The ``user_data`` is optional. If omitted, ``NULL`` will be passed.
 
-
 .. _xml_events_screen:
-
-
 
 Screen Load and Create events
 *****************************
 
-By using the ``<screen_load_event>`` and ``<screen_create_event>`` tags as a child
-of a widget or component, screens can be loaded or created on a trigger (e.g. click).
+By using the ``<screen_load_event>`` and ``<screen_create_event>`` tags as children
+of a widget or component, screens can be loaded or created on a trigger (e.g., click).
 
 The difference between load and create is that:
 
@@ -71,8 +68,8 @@ The difference between load and create is that:
 
 Both tags support the following optional attributes:
 
-- ``trigger``: Event code that triggers the action (e.g. ``"clicked"``, ``"long_pressed"``, etc). Default: ``"clicked"``.
-- ``anim_type``: Describes how the screen is loaded (e.g. ``"move_right"``, ``"fade_in"``). Default: ``"none"``.
+- ``trigger``: Event code that triggers the action (e.g., ``"clicked"``, ``"long_pressed"``, etc.). Default: ``"clicked"``.
+- ``anim_type``: Describes how the screen is loaded (e.g., ``"move_right"``, ``"fade_in"``). Default: ``"none"``.
 - ``duration``: Length of the animation in milliseconds. Default: ``0``. Only used if ``anim_type`` is not ``"none"``.
 - ``delay``: Wait time before loading the screen in milliseconds. Default: ``0``.
 
@@ -107,7 +104,7 @@ This is a simple example of both load and create:
     lv_xml_component_register_from_data("screen1", screen1_xml);
     lv_xml_component_register_from_data("screen2", screen2_xml);
 
-    /*Create an instance of screen_1 so that it can loaded from screen2.*/
+    /* Create an instance of screen1 so that it can be loaded from screen2. */
     lv_obj_t * screen1 = lv_xml_create(NULL, "screen1", NULL);
     lv_screen_load(screen1);
 
@@ -153,3 +150,4 @@ If ``step`` is **negative**, the subject's value will be decremented.
 Only integer ``step`` values are supported now.
 
 **Note:** Only integer subjects are supported by ``<subject_increment>``.
+

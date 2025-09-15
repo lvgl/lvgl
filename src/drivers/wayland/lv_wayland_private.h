@@ -106,6 +106,11 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
+#else
+    struct {
+        lv_point_t point;
+        lv_indev_state_t state;
+    } touch;
 #endif
 };
 
@@ -136,6 +141,7 @@ typedef struct {
     struct buffer * buffers;
     struct zwp_linux_dmabuf_v1 * handler;
     uint32_t format;
+    uint8_t last_used;
 } dmabuf_ctx_t;
 
 typedef struct {
@@ -370,13 +376,15 @@ lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_displa
 lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int width, int height);
 lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
-struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
 void destroy_decorators_buf(struct window * window, struct graphic_object * decoration);
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p);
 
+#if LV_WAYLAND_WINDOW_DECORATIONS
+struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
+#endif
 /**********************
  *      SME
  **********************/

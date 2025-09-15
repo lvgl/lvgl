@@ -265,7 +265,7 @@ char * lv_xml_split_str(char ** src, char delimiter)
 {
     /*Skip multiple delimiters*/
     while(*src[0] == delimiter) {
-        src++;
+        (*src)++;
     }
 
     if(*src[0] == '\0') return NULL;
