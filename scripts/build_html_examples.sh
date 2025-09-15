@@ -30,7 +30,6 @@ cd ..
 # Generate lv_conf
 LV_CONF_PATH=`pwd`/lvgl/configs/ci/docs/lv_conf_docs.h
 
-cp lvgl/lv_conf_template.h $LV_CONF_PATH
 python ./lvgl/scripts/generate_lv_conf.py \
   --template lvgl/lv_conf_template.h \
   --config $LV_CONF_PATH \

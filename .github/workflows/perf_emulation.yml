@@ -58,7 +58,6 @@ jobs:
           fetch-depth: 0
       - name: Generate lv_conf.h
         run: |
-          cp lv_conf_template.h configs/ci/perf/lv_conf_perf.h
           python scripts/generate_lv_conf.py \
             --template lv_conf_template.h \
             --config configs/ci/perf/lv_conf_perf.h \
