@@ -54,6 +54,12 @@ lv_result_t lv_lock_isr(void);
  */
 void lv_unlock(void);
 
+/**
+ * Sleeps the current thread by an amount of milliseconds.
+ * @param ms     amount of milliseconds to sleep the current thread.
+ */
+void lv_sleep_ms(uint32_t ms);
+
 /**********************
  *      MACROS
  **********************/

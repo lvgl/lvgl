@@ -82,14 +82,11 @@ void lv_delay_set_cb(lv_delay_cb_t cb);
  */
 void lv_tick_set_cb(lv_tick_get_cb_t cb);
 
-
 /**
  * Get the custom callback for 'lv_tick_get'
  * @return      call this callback on 'lv_tick_get'
  */
 lv_tick_get_cb_t lv_tick_get_cb(void);
-
-
 
 /**********************
  *      MACROS

@@ -9,6 +9,7 @@
 #include "lv_os_private.h"
 #include "lv_os_private.h"
 #include "../core/lv_global.h"
+#include "../tick/lv_tick.h"
 
 /*********************
  *      DEFINES
@@ -76,6 +77,12 @@ void lv_unlock(void)
 {
     /*No nothing*/
 }
+
+void lv_sleep_ms(uint32_t ms)
+{
+    lv_delay_ms(ms);
+}
+
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
 

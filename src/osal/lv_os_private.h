@@ -170,13 +170,6 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync);
  */
 lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync);
 
-
-/**
- * Sleeps the current thread by an amount of milliseconds.
- * @param ms     amount of milliseconds to sleep the current thread.
- */
-void lv_sleep_ms(uint32_t ms);
-
 #else
 
 /* Since compilation does not necessarily optimize cross-file empty functions well
@@ -261,11 +254,6 @@ static inline lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
     LV_UNUSED(sync);
     return LV_RESULT_INVALID;
-}
-
-static inline void lv_sleep_ms(uint32_t ms)
-{
-    lv_delay_ms(ms);
 }
 
 #endif /*LV_USE_OS != LV_OS_NONE*/
