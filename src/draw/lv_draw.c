@@ -12,6 +12,7 @@
  *********************/
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_assert.h"
+#include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
 #include "lv_draw_mask_private.h"
 #include "lv_draw_vector_private.h"
@@ -383,6 +384,29 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     }
     LV_PROFILER_DRAW_END;
     return cnt;
+}
+
+void lv_draw_unit_send_event(const char * name, lv_event_code_t code, void * param)
+{
+    LV_PROFILER_DRAW_BEGIN;
+
+    lv_event_t event = { 0 };
+    event.code = code;
+    event.param = param;
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        if(u->event_cb && (!name || lv_strcmp(name, u->name) == 0)) {
+            event.current_target = event.original_target = u;
+            LV_PROFILER_DRAW_BEGIN_TAG("event_cb");
+            LV_PROFILER_DRAW_BEGIN_TAG(u->name);
+            u->event_cb(&event);
+            LV_PROFILER_DRAW_END_TAG(u->name);
+            LV_PROFILER_DRAW_END_TAG("event_cb");
+        }
+        u = u->next;
+    }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_layer_init(lv_layer_t * layer)
