@@ -65,7 +65,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
-            COMMIT_REF="${{ github.event.pull_request.head.sha }}"
+            COMMIT_REF="${{ github.sha }}"
           else
             REPO_URL="${{ github.server_url }}/${{ github.repository }}"
             COMMIT_REF="${{ github.sha }}"
