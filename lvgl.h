@@ -37,7 +37,7 @@ extern "C" {
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
 
-#include "src/osal/lv_os_private.h"
+#include "src/osal/lv_os.h"
 
 #include "src/tick/lv_tick.h"
 
