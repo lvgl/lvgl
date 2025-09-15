@@ -167,8 +167,8 @@ static bool calc_min_size(lv_obj_t * cont, int32_t * req_size, bool width, void 
 
     int32_t cont_space_start =
         (f.row ? lv_obj_get_style_space_left(cont, LV_PART_MAIN) : lv_obj_get_style_space_top(cont, LV_PART_MAIN));
-    // int32_t cont_space_end =
-    //  (f.row ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN));
+    int32_t cont_space_end =
+        (f.row ? lv_obj_get_style_space_right(cont, LV_PART_MAIN) : lv_obj_get_style_space_bottom(cont, LV_PART_MAIN));
 
     int32_t track_first_item = f.rev ? cont->spec_attr->child_cnt - 1 : 0;
     int32_t next_track_first_item;
@@ -176,20 +176,17 @@ static bool calc_min_size(lv_obj_t * cont, int32_t * req_size, bool width, void 
     while(track_first_item < (int32_t)cont->spec_attr->child_cnt && track_first_item >= 0) {
         /*Search the first item of the next row*/
         track_t t;
-        t.grow_dsc_calc = 1;
+        t.grow_dsc_calc = 0;
         next_track_first_item = find_track_end(cont, &f, track_first_item, 0, item_gap, &t);
 
         int32_t req_track_size = t.track_fix_main_size + t.track_grow_min_size;
-
-        lv_free(t.grow_dsc);
-        t.grow_dsc = NULL;
 
         track_first_item = next_track_first_item;
 
         *req_size = LV_MAX(*req_size, req_track_size);
     }
 
-    *req_size += cont_space_start;
+    *req_size += (cont_space_start + cont_space_end);
 
     // (*req_size)++;
     return true;
@@ -349,14 +346,15 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                 int32_t max_size = f->row ? calc_dynamic_width(item, LV_STYLE_MAX_WIDTH, NULL)
                                    : calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT, NULL);
                 int32_t req_size = min_size;
-                if(item_id != item_start_id)
+                if(item_id != item_start_id) {
                     req_size += item_gap; /*No gap before the first item*/
+                }
 
                 /*Wrap if can't fit*/
                 if(f->wrap && t->track_fix_main_size + t->track_grow_min_size + req_size > max_main_size)
                     break;
 
-                t->track_grow_min_size += req_size;
+                t->track_grow_min_size += min_size;
                 if(item_id != item_start_id) {
                     t->track_fix_main_size += item_gap; /*The gap is always taken from the space*/
                 }
