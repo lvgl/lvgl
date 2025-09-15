@@ -20,6 +20,8 @@ extern "C" {
 #include LV_STDINT_INCLUDE
 #if LV_USE_GIF
 
+#include "../../misc/lv_color.h"
+
 /*********************
  *      DEFINES
  *********************/

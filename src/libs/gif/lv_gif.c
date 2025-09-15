@@ -6,11 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_gif_private.h"
+#include "lv_gif.h"
 #if LV_USE_GIF
 #include "../../misc/lv_timer_private.h"
 #include "../../misc/cache/lv_cache.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../widgets/image/lv_image_private.h"
+#include "AnimatedGIF/src/AnimatedGIF.h"
 
 /*********************
  *      DEFINES
@@ -23,6 +25,17 @@
 
 /* the type of the AnimatedGIF pallete type passed to `GIF_begin` */
 typedef unsigned char animatedgif_color_format_t;
+
+typedef struct {
+    lv_image_t img;
+    GIFIMAGE gif;
+    const void * src;
+    lv_color_format_t color_format;
+    lv_timer_t * timer;
+    lv_image_dsc_t imgdsc;
+    int32_t loop_count;
+    uint32_t is_open : 1;
+} lv_gif_t;
 
 /**********************
  *  STATIC PROTOTYPES
