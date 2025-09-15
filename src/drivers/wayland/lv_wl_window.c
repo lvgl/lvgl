@@ -122,6 +122,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     }
 #endif
 
+    lv_wayland_xdg_shell_configure_surface(window);
+
     lv_display_set_user_data(window->lv_disp, window);
 
     lv_display_set_render_mode(window->lv_disp, LV_WAYLAND_RENDER_MODE);
@@ -151,16 +153,12 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("failed to register pointeraxis indev");
     }
 
-#if LV_USE_GESTURE_RECOGNITION
-
     window->lv_indev_touch = lv_wayland_touch_create();
     lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
 
     if(!window->lv_indev_touch) {
         LV_LOG_ERROR("failed to register touch indev");
     }
-
-#endif /* END LV_USE_GESTURE_RECOGNITION */
 
     window->lv_indev_keyboard = lv_wayland_keyboard_create();
     lv_indev_set_display(window->lv_indev_keyboard, window->lv_disp);
@@ -287,7 +285,6 @@ void lv_wayland_window_draw(struct window * window, uint32_t width, uint32_t hei
 lv_result_t lv_wayland_window_resize(struct window * window, int width, int height)
 {
 
-
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
         width -= (2 * BORDER_SIZE);
@@ -297,7 +294,7 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
 
 #if LV_WAYLAND_USE_DMABUF
     {
-        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window);
+        lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }

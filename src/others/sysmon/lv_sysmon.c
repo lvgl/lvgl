@@ -331,7 +331,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     lv_label_set_text_fmt(
         label,
-        "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU, %" LV_PRIu32 "%% Self\n"
+        "%" LV_PRIu32" FPS | CPU (%" LV_PRIu32 "%% | %" LV_PRIu32 "%%)\n"
         "%" LV_PRIu32" ms (%" LV_PRIu32" | %" LV_PRIu32")",
         perf->calculated.fps, perf->calculated.cpu, perf->calculated.cpu_proc,
         perf->calculated.render_avg_time + perf->calculated.flush_avg_time,
@@ -384,7 +384,7 @@ static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
 
-    size_t used_size = mon->total_size - mon->free_size;;
+    size_t used_size = mon->total_size - mon->free_size;
     size_t used_kb = used_size / 1024;
     size_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
     size_t max_used_kb = mon->max_used / 1024;

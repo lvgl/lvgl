@@ -14,8 +14,15 @@
 /*********************
  *      DEFINES
  *********************/
-#define DRAW_UNIT_ID_DAVE2D     4
+#define DRAW_UNIT_ID_DAVE2D         4
+/* The amount of tasks exercising pressure to the currrent to get finished
+ * This one is used as the main signal to start to render a block of tasks.
+ */
+#define DAVE2D_MAX_DRAW_PRESSURE    256
 
+#if (DAVE2D_MAX_DRAW_PRESSURE < 256)
+    #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -23,12 +30,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_OS
-    static void _dave2d_render_thread_cb(void * ptr);
-#endif
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
-
 #if defined(RENESAS_CORTEX_M85)
     #if (BSP_CFG_DCACHE_ENABLED)
         static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
@@ -36,13 +39,12 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
 #endif
 
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
-
+static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit);
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 static d2_s32 lv_dave2d_init(void);
-
 static void lv_draw_buf_dave2d_init_handlers(void);
-
+static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_format);
 void dave2d_execute_dlist_and_flush(void);
 
 /**********************
@@ -53,11 +55,16 @@ void dave2d_execute_dlist_and_flush(void);
  *  STATIC VARIABLES
  **********************/
 
-d2_device * _d2_handle;
-d2_renderbuffer * _renderbuffer;
-d2_renderbuffer * _blit_renderbuffer;
+static d2_device * _d2_handle;
 
-lv_ll_t  _ll_Dave2D_Tasks;
+/* Main render buffer, used to carry the block of dave commands for any shape */
+static d2_renderbuffer * _renderbuffer;
+
+/* Label dedicated render buffer, used to carry only label related dave commands */
+static d2_renderbuffer * _label_renderbuffer;
+
+static lv_ll_t  draw_tasks_on_dlist;
+static uint32_t draw_pressure = 0;
 
 #if LV_USE_OS
     lv_mutex_t xd2Semaphore;
@@ -80,6 +87,7 @@ void lv_draw_dave2d_init(void)
     lv_draw_dave2d_unit_t * draw_dave2d_unit = lv_draw_create_unit(sizeof(lv_draw_dave2d_unit_t));
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
+    draw_dave2d_unit->base_unit.wait_for_finish_cb = _dave2d_wait_finish;
     draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
@@ -90,19 +98,13 @@ void lv_draw_dave2d_init(void)
     lv_result_t res;
     res =  lv_mutex_init(&xd2Semaphore);
     LV_ASSERT(LV_RESULT_OK == res);
-
     draw_dave2d_unit->pd2Mutex    = &xd2Semaphore;
 #endif
 
     draw_dave2d_unit->d2_handle = _d2_handle;
     draw_dave2d_unit->renderbuffer = _renderbuffer;
-    lv_ll_init(&_ll_Dave2D_Tasks, 4);
-
-#if LV_USE_OS
-    lv_thread_init(&draw_dave2d_unit->thread, "dave2d", LV_DRAW_THREAD_PRIO, _dave2d_render_thread_cb, 8 * 1024,
-                   draw_dave2d_unit);
-#endif
-
+    draw_dave2d_unit->label_renderbuffer = _label_renderbuffer;
+    lv_ll_init(&draw_tasks_on_dlist, sizeof(uintptr_t));
 }
 
 /**********************
@@ -211,6 +213,26 @@ static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, 
 }
 #endif
 
+static bool lv_draw_dave2d_image_color_format_supported(lv_color_format_t color_format)
+{
+    bool supported = false;
+
+    switch(color_format) {
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            supported = true;
+            break;
+        default:
+            break;
+    }
+
+    return supported;
+}
+
 #define USE_D2 (1)
 
 static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
@@ -251,8 +273,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if((dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) || (dsc->header.cf == LV_COLOR_FORMAT_RGB888) ||
-                   (dsc->header.cf == LV_COLOR_FORMAT_RGB565A8)) {
+                if(!lv_draw_dave2d_image_color_format_supported(dsc->header.cf)) {
                     ret = 0;
                     break;
                 }
@@ -345,103 +366,105 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     return ret;
 }
 
-#define DAVE2D_REFERRING_WATERMARK  10
 
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
-#if  (0 == D2_RENDER_EACH_OPERATION)
-    static uint32_t ref_count = 0;
-#endif
+    uint32_t deps = 0;
 
-    /*Return immediately if it's busy with draw task*/
-    if(draw_dave2d_unit->task_act) return 0;
+    if(draw_dave2d_unit->task_act) {
+        /* Return immediately if it's busy with draw task */
+        return LV_DRAW_UNIT_IDLE;
+    }
 
     lv_draw_task_t * t = NULL;
-    t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
-    while(t && t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D) {
-        t->state = LV_DRAW_TASK_STATE_FINISHED;
-        t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
-    }
-
+    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     if(t == NULL) {
-#if  (0 == D2_RENDER_EACH_OPERATION)
-        if(false == lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
-            ref_count = 0;
+        /* No valid task, but there are tasks waiting to be rendered,
+         * start to draw then immediatelly.
+         */
+        if(false == lv_ll_is_empty(&draw_tasks_on_dlist)) {
+            draw_pressure = 0;
             dave2d_execute_dlist_and_flush();
         }
-#endif
-        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
+        return LV_DRAW_UNIT_IDLE;  /* This task is not for us. */
     }
 
-    /* Return if target buffer format is not supported. */
-    if(!lv_draw_dave2d_is_dest_cf_supported(layer->color_format)) {
-        return LV_DRAW_UNIT_IDLE; /*Couldn't start rendering*/
-    }
+    if((t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D)) return LV_DRAW_UNIT_IDLE;
+    if(!lv_draw_dave2d_is_dest_cf_supported(layer->color_format)) return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) {
-        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
-    }
+    if(buf == NULL) return LV_DRAW_UNIT_IDLE;
 
-#if  (0 == D2_RENDER_EACH_OPERATION)
-    ref_count += lv_draw_get_dependent_count(t);
+    deps = lv_draw_get_dependent_count(t);
+    if(deps > 0 || draw_pressure > 0) {
+        draw_pressure += deps;
+        if(draw_pressure < DAVE2D_MAX_DRAW_PRESSURE) {
+            /* No other tasks are pressuring to get the current block
+             * of tasks including the latest one, just accumulate it
+             * and tells the drawing pipeline to send a new one if there is any
+             */
+            lv_draw_task_t ** p_new_list_entry;
+            p_new_list_entry = lv_ll_ins_tail(&draw_tasks_on_dlist);
+            *p_new_list_entry = t;
 
-    if(DAVE2D_REFERRING_WATERMARK < ref_count) {
-        ref_count = 0;
-        dave2d_execute_dlist_and_flush();
-    }
+            draw_dave2d_unit->task_act = t;
+            draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
+            execute_drawing(draw_dave2d_unit);
 
-    lv_draw_task_t ** p_new_list_entry;
-    p_new_list_entry = lv_ll_ins_tail(&_ll_Dave2D_Tasks);
-    *p_new_list_entry = t;
-#endif
+            draw_dave2d_unit->task_act = NULL;
+            lv_draw_dispatch_request();
 
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_dave2d_unit->task_act = t;
-
-#if LV_USE_OS
-    /*Let the render thread work*/
-    lv_thread_sync_signal(&draw_dave2d_unit->sync);
-#else
-    execute_drawing(draw_dave2d_unit);
-#if  (D2_RENDER_EACH_OPERATION)
-    draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-#endif
-    draw_dave2d_unit->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
-#endif
-    return 1;
-}
-
-#if LV_USE_OS
-static void _dave2d_render_thread_cb(void * ptr)
-{
-    lv_draw_dave2d_unit_t * u = ptr;
-
-    lv_thread_sync_init(&u->sync);
-
-    while(1) {
-        while(u->task_act == NULL) {
-            lv_thread_sync_wait(&u->sync);
+            return 1;
         }
+        /* If the pressure for drawing value was maxed-out, it is time to render
+         * return IDLE to force the drawing pipeline to wait while the Dave
+         * draw the block of tasks in a single row
+         */
+        return LV_DRAW_UNIT_IDLE;
+    }
+    else {
+        /* Handles a special case when there is no sufficient draw pressure
+         * But the actual task did not carry any extra pressure to get drew
+         * in this case, the drawing pipeline have a few set of tasks that
+         * don't make sense to accumulate them, just do a run to completion
+         * here, that is it, render the incoming task immediately.
+         */
+        draw_dave2d_unit->task_act = t;
+        draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
+        d2_selectrenderbuffer(_d2_handle, _renderbuffer);
+        execute_drawing(draw_dave2d_unit);
+        d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
+        d2_flushframe(_d2_handle);
 
-        execute_drawing(u);
-
-        /*Cleanup*/
-#if  (D2_RENDER_EACH_OPERATION)
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-#endif
-        u->task_act = NULL;
-
-        /*The draw unit is free now. Request a new dispatching as it can get a new task*/
+        draw_dave2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+        draw_dave2d_unit->task_act = NULL;
         lv_draw_dispatch_request();
+
+        return 1;
     }
 }
-#endif
+
+static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
+{
+    /* If the drawing pipeline is waiting it means the pressure for drawing
+     * has been maxed out, defer the block of tasks to be rendered by the
+     * Dave and wait for its interrupt. (Dave2D driver is RTOS aware, no need for semaphores);
+     */
+    lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
+
+    if(!draw_pressure) {
+        /* It reached here because Dave2D Draw Unit was not suitable to take a task
+         * While there is nothing being rendered, prevent the dead lock
+         * by flushing the GPU command buffer empty and just return.
+         */
+        return 0;
+    }
+    dave2d_execute_dlist_and_flush();
+    draw_pressure = 0;
+
+    return 0;
+}
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u)
 {
@@ -510,6 +533,11 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             break;
     }
 
+#if defined(RENESAS_CORTEX_M85)
+#if (BSP_CFG_DCACHE_ENABLED)
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
+#endif
+#endif
 }
 
 static d2_s32 lv_dave2d_init(void)
@@ -544,23 +572,23 @@ static d2_s32 lv_dave2d_init(void)
     result = d2_setlinejoin(_d2_handle, d2_lj_miter);
 
     /* set blocksize for default displaylist */
-    result = d2_setdlistblocksize(_d2_handle, 25);
+    result = d2_setdlistblocksize(_d2_handle, 20);
     if(D2_OK != result) {
         LV_LOG_ERROR("Could NOT d2_setdlistblocksize");
         d2_closedevice(_d2_handle);
         return result;
     }
 
-    _blit_renderbuffer = d2_newrenderbuffer(_d2_handle, 20, 20);
-    if(!_blit_renderbuffer) {
+    _renderbuffer = d2_newrenderbuffer(_d2_handle, 250, 25);
+    if(!_renderbuffer) {
         LV_LOG_ERROR("NO renderbuffer");
         d2_closedevice(_d2_handle);
 
         return D2_NOMEMORY;
     }
 
-    _renderbuffer = d2_newrenderbuffer(_d2_handle, 20, 20);
-    if(!_renderbuffer) {
+    _label_renderbuffer = d2_newrenderbuffer(_d2_handle, 250, 25);
+    if(!_label_renderbuffer) {
         LV_LOG_ERROR("NO renderbuffer");
         d2_closedevice(_d2_handle);
 
@@ -578,6 +606,10 @@ static d2_s32 lv_dave2d_init(void)
 
 void dave2d_execute_dlist_and_flush(void)
 {
+    d2_s32 result;
+    lv_draw_task_t ** p_list_entry;
+    lv_draw_task_t * p_list_entry1;
+
 #if LV_USE_OS
     lv_result_t  status;
 
@@ -585,11 +617,6 @@ void dave2d_execute_dlist_and_flush(void)
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
-    d2_s32     result;
-    lv_draw_task_t ** p_list_entry;
-    lv_draw_task_t * p_list_entry1;
-
-    // Execute render operations
     result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
     LV_ASSERT(D2_OK == result);
 
@@ -599,11 +626,11 @@ void dave2d_execute_dlist_and_flush(void)
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
     LV_ASSERT(D2_OK == result);
 
-    while(false == lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
-        p_list_entry = lv_ll_get_tail(&_ll_Dave2D_Tasks);
+    while(false == lv_ll_is_empty(&draw_tasks_on_dlist)) {
+        p_list_entry = lv_ll_get_tail(&draw_tasks_on_dlist);
         p_list_entry1 = *p_list_entry;
         p_list_entry1->state = LV_DRAW_TASK_STATE_FINISHED;
-        lv_ll_remove(&_ll_Dave2D_Tasks, p_list_entry);
+        lv_ll_remove(&draw_tasks_on_dlist, p_list_entry);
         lv_free(p_list_entry);
     }
 

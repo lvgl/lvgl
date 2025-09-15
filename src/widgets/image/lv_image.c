@@ -13,8 +13,9 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 #if LV_USE_IMAGE != 0
 
@@ -38,6 +39,12 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
+static void reset_image_attributes(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+    static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
     static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
     static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
@@ -177,22 +184,20 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMAGE_SRC_UNKNOWN) {
         if(src) LV_LOG_WARN("unknown image type");
-        if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)img->src);
-        }
-        img->src      = NULL;
-        img->src_type = LV_IMAGE_SRC_UNKNOWN;
+        reset_image_attributes(obj);
         return;
     }
 
     lv_image_header_t header;
     lv_result_t res = lv_image_decoder_get_info(src, &header);
     if(res != LV_RESULT_OK) {
-#if LV_USE_LOG
-        char buf[24];
-        LV_LOG_WARN("failed to get image info: %s",
-                    src_type == LV_IMAGE_SRC_FILE ? (const char *)src : (lv_snprintf(buf, sizeof(buf), "%p", src), buf));
-#endif /*LV_USE_LOG*/
+        if(src_type == LV_IMAGE_SRC_FILE) {
+            LV_LOG_WARN("failed to get image info: %s", (const char *)src);
+        }
+        else {
+            LV_LOG_WARN("failed to get image info: %p", src);
+        }
+        reset_image_attributes(obj);
         return;
     }
 
@@ -654,6 +659,24 @@ const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
     return img->bitmap_mask_src;
 }
 
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, image_src_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -1022,6 +1045,32 @@ static void update_align(lv_obj_t * obj)
     }
 }
 
+static void reset_image_attributes(lv_obj_t * obj)
+{
+    lv_image_t * img = (lv_image_t *)obj;
+    if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
+        lv_free((void *)img->src);
+    }
+    img->src = NULL;
+    img->src_type = LV_IMAGE_SRC_UNKNOWN;
+    img->w = 0;
+    img->h = 0;
+    img->cf = LV_COLOR_FORMAT_UNKNOWN;
+    lv_obj_refresh_self_size(obj);
+}
+
+
+#if LV_USE_OBSERVER
+
+static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_POINTER) {
+        lv_image_set_src(observer->target, subject->value.pointer);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
 static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
 {
@@ -1035,5 +1084,6 @@ static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj)
     return pivot;
 }
 #endif
+
 
 #endif

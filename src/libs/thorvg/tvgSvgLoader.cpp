@@ -3756,7 +3756,7 @@ static bool _svgLoaderParserForValidCheckXmlOpen(SvgLoaderData* loader, const ch
 static bool _svgLoaderParserForValidCheck(void* data, SimpleXMLType type, const char* content, unsigned int length)
 {
     SvgLoaderData* loader = (SvgLoaderData*)data;
-    bool res = true;;
+    bool res = true;
 
     switch (type) {
         case SimpleXMLType::Open:

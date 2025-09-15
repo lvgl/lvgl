@@ -122,8 +122,8 @@ this implementation detail is unnoticed. This is not the case with
 Text recolor
 ------------
 
-In the text, you can use commands to recolor parts of the text. 
-For example: ``Write a #ff0000 red# word``. This feature can be enabled 
+In the text, you can use commands to recolor parts of the text.
+For example: ``Write a #ff0000 red# word``. This feature can be enabled
 individually for each label by :cpp:expr:`lv_label_set_recolor(label, en)`
 function. In the context of word-wrapped text, any Recoloring started on a
 line will be terminated at the end of the line where the line is wrapped if it
@@ -155,6 +155,7 @@ Note that this has a visible effect only if:
 - the Label Widget's width is larger than the width of the longest line of text, and
 - the text has multiple lines with different line lengths.
 
+
 .. _lv_label_very_long_texts:
 
 Very long text
@@ -182,6 +183,74 @@ Symbols
 
 The Labels can display symbols alongside letters (or on their own). Read
 the :ref:`font` section to learn more about symbols.
+
+
+
+.. _lv_label_data_binding:
+
+Data binding
+------------
+
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
+
+To get familiar with observers, subjects, and data bindings in general visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to a Subject affects a Label Widget's
+``text``.  The Subject can be a STRING, POINTER, INTEGER, or FLOAT type.
+
+When the subscription occurs, and each time the Subject's value is changed thereafter,
+the Subject's value is used to update the Label's text as follows:
+
+:string Subject:    Subject's string is used to directly update the Label's text.
+
+:pointer Subject:   If NULL is passed as the ``format_string`` argument when
+                    subscribing, the Subject's pointer value is assumed to point to a
+                    NUL-terminated string and is used to directly update the Label's
+                    text.  See :ref:`observer_format_string` for other options.
+
+:integer Subject:   Subject's integer value is used with the ``format_string`` argument.
+                    See :ref:`observer_format_string` for details.
+
+
+:float Subject:     Subject's float value is used with the ``format_string`` argument.
+                    Requires ``LV_USE_FLOAT``.
+                    See :ref:`observer_format_string` for details.
+
+Note that this is a one-way binding (Subject ===> Widget).
+
+- :cpp:expr:`lv_label_bind_text(label, &subject, format_string)`
+
+.. _observer_format_string:
+
+The ``format_string`` Argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``format_string`` argument is optional and if provided, must contain exactly 1
+printf-like format specifier and be one of the following:
+
+:string or pointer Subject:  "%s" to format the new pointer value as a string or "%p"
+                             to format the pointer as a pointer (typically the
+                             pointer's address value is spelled out with 4, 8 or 16
+                             hexadecimal characters depending on the platform).
+
+:integer Subject:            "%d" format specifier (``"%" PRIdxx`` --- a
+                             cross-platform equivalent where ``xx`` can be ``8``,
+                             ``16``, ``32`` or ``64``, depending on the platform).
+
+:float Subject:              "%f" format specifier, e.g. "%0.2f", to display two digits
+                             after the decimal point.
+
+If ``NULL`` is passed for the ``format_string`` argument:
+
+:string or pointer Subject:  Updates expect the pointer to point to a NUL-terminated string.
+:integer Subject:            The Label will simply display the number. Equivalent to "%d".
+:float Subject:            The Label will display the value with "%0.1f" format string.
+
+**Example:**  "%d |deg|\ C"
+
+As usual with format strings, ``%%`` is used to get ``%``. For example ``%d%%``
+
 
 
 

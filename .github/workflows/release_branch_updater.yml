@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout LVGL
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: lvgl
           fetch-depth: 0   # fetch all

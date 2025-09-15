@@ -217,7 +217,7 @@ void test_font_stress(void)
 
     static const char * font_name_arr[] = {
         "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-        "../src/libs/freetype/arial.ttf",
+        "../src/libs/freetype/LiberationSans-Regular.ttf",
         "./src/test_files/fonts/Montserrat-Bold.ttf",
         "UNKNOWN_FONT_NAME"
     };
@@ -251,14 +251,15 @@ void test_font_manager_stress(void)
     lv_font_manager_add_src_static(g_ctx.font_manager, "NotoSansSC-Regular",
                                    "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                    &lv_freetype_font_class);
-    lv_font_manager_add_src_static(g_ctx.font_manager, "Arial", "../src/libs/freetype/arial.ttf", &lv_freetype_font_class);
+    lv_font_manager_add_src_static(g_ctx.font_manager, "LiberationSans-Regular",
+                                   "../src/libs/freetype/LiberationSans-Regular.ttf", &lv_freetype_font_class);
     lv_font_manager_add_src(g_ctx.font_manager, "Montserrat-Bold", "./src/test_files/fonts/Montserrat-Bold.ttf",
                             &lv_freetype_font_class);
     lv_font_manager_add_src(g_ctx.font_manager, "UNKNOWN", "UNKNOWN_FONT_PATH", &lv_freetype_font_class);
 
     static const char * font_name_arr[] = {
-        "NotoSansSC-Regular,Arial",
-        "Arial",
+        "NotoSansSC-Regular,LiberationSans-Regular",
+        "LiberationSans-Regular",
         "Montserrat-Bold",
         "UNKNOWN"
     };
@@ -282,7 +283,7 @@ void test_font_manager_stress(void)
 
     font_stress_label_delete_all(&g_ctx);
 
-    bool remove_ok = lv_font_manager_remove_src(g_ctx.font_manager, "Arial");
+    bool remove_ok = lv_font_manager_remove_src(g_ctx.font_manager, "LiberationSans-Regular");
     TEST_ASSERT_TRUE(remove_ok);
 
     remove_ok = lv_font_manager_remove_src(g_ctx.font_manager, "UNKNOWN");

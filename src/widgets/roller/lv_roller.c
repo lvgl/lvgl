@@ -22,6 +22,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -51,6 +52,11 @@ static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
+
+#if LV_USE_OBSERVER
+    static void roller_value_changed_event_cb(lv_event_t * e);
+    static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -327,6 +333,25 @@ uint32_t lv_roller_get_option_count(const lv_obj_t * obj)
         return roller->option_cnt;
     }
 }
+
+#if LV_USE_OBSERVER
+
+lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -914,5 +939,25 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     scale_y = 256 * 256 / scale_y;
     lv_point_transform(vect, -angle, scale_x, scale_y, &pivot, false);
 }
+
+#if LV_USE_OBSERVER
+
+static void roller_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * roller = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    lv_subject_set_int(subject, lv_roller_get_selected(roller));
+}
+
+static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
+        lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

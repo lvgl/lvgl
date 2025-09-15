@@ -203,7 +203,7 @@ static void _handle_collision(unsigned long index, lv_map_item_t * item)
 {
     if(table->overflow_list[index] == NULL) {
         /* Create the list. */
-        lv_array_t * list = (lv_array_t *) lv_malloc(sizeof(lv_array_t));;
+        lv_array_t * list = (lv_array_t *) lv_malloc(sizeof(lv_array_t));
         lv_array_init(list, LV_ARRAY_DEFAULT_CAPACITY, sizeof(lv_map_item_t));
         lv_array_push_back(list, item);
         table->overflow_list[index] = list;

@@ -419,6 +419,11 @@ uint32_t lv_os_get_idle_percent(void)
     return pct;
 }
 
+void lv_sleep_ms(uint32_t ms)
+{
+    vTaskDelay(ms / portTICK_PERIOD_MS);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

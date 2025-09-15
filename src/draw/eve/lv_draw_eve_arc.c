@@ -299,23 +299,25 @@ static void draw_eve_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, cons
     lv_eve_draw_circle_simple(center.x, center.y, radius_in); /* radius_in */
 
     lv_eve_stencil_func(EVE_NOTEQUAL, 1, 0XFF);
+    lv_eve_stencil_op(EVE_KEEP, EVE_KEEP);
     lv_eve_blend_func(EVE_SRC_ALPHA, EVE_ONE_MINUS_SRC_ALPHA);
 
     lv_eve_color_opa(opa);
     lv_eve_draw_circle_simple(center.x, center.y, radius_out); /* radius_out */
 
-    lv_eve_restore_context();
-
     if(dsc->rounded) {
-        lv_eve_save_context();
-        lv_eve_color_opa(opa);
-        lv_eve_color(color);
+        lv_eve_stencil_func(EVE_EQUAL, 1, 0XFF);
+        if(opa < 255) {
+            lv_eve_stencil_op(EVE_ZERO, EVE_ZERO);
+        }
+
         int32_t half_width = width / 2;
         int32_t adjusted_radius = radius_out - half_width;
         draw_rounded_end(center, adjusted_radius, end_angle, half_width);
         draw_rounded_end(center, adjusted_radius, start_angle, half_width);
-        lv_eve_restore_context();
     }
+
+    lv_eve_restore_context();
 }
 
 

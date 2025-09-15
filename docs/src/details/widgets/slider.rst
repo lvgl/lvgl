@@ -93,6 +93,20 @@ feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` flag:
 Any extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`)
 increases the knob's click area.
 
+Data binding
+------------
+
+To get familiar with observers, subjects, and data bindings in general, visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to an integer Subject affects a Slider Widget's integer
+value directly.  Note that this is a two-way binding (Subject <===> Widget), so an end
+user's direct interaction with the Slider Widget updates the Subject's value and vice
+versa.
+
+It supports integer and float subjects.
+
+- :cpp:expr:`lv_slider_bind_value(slider, &subject)`
 
 
 .. _lv_slider_events:

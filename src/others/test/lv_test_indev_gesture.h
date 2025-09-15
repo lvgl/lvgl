@@ -38,6 +38,11 @@ extern "C" {
 void lv_test_indev_gesture_create(void);
 
 /**
+ * Delete the touch (pointer) indevs.
+ */
+void lv_test_indev_gesture_delete(void);
+
+/**
  * Get one of the indev created in `lv_test_indev_gesture_create`
  * @param type  type of the indev to get
  * @return      the indev
