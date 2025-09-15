@@ -610,7 +610,7 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
             "|_______ \\___/  \\______  /_______ \\ /\\ |__|\\____/ ",
             "        \\/             \\/        \\/ \\/            "
         };
-        print_grouped_modes_ex(drm_out->drm_connector, (uint32_t)match_mode_num, DISP_MINIMAL, banner, 6);
+        //print_grouped_modes_ex(drm_out->drm_connector, (uint32_t)match_mode_num, DISP_MINIMAL, banner, 6);
     }
 
     /* Find a suitable encoder */
@@ -1418,21 +1418,35 @@ static void print_grouped_modes_ex(drmModeConnectorPtr conn, uint32_t current_id
 
         /* free per-column lines */
         for(int c = 0; c < cols; ++c) {
-            for(int i = 0; i < col_line_counts[c]; ++i) free(col_lines[c][i]);
+            for(int i = 0; i < col_line_counts[c]; ++i) {
+                LV_LOG_WARN("Freeing column line #%d", i);
+                free(col_lines[c][i]);
+            }
             free(col_lines[c]);
         }
+        LV_LOG_WARN("Freeing column lines collection");
         free(col_lines);
+        LV_LOG_WARN("Freeing column line counts");
         free(col_line_counts);
+        LV_LOG_WARN("Freeing column blocks");
         free(col_blocks);
+        LV_LOG_WARN("Freeing column counts");
         free(col_counts);
+        LV_LOG_WARN("Freeing column heights");
         free(col_heights);
     }
 
     /* cleanup blocks */
     for(int i = 0; i < nblocks; ++i) {
-        for(int j = 0; j < blocks[i].height; ++j) free(blocks[i].lines[j]);
+        for(int j = 0; j < blocks[i].height; ++j) {
+            LV_LOG_WARN("Freeing block #%d, line #%d", i, j);
+            free(blocks[i].lines[j]);
+        }
+        LV_LOG_WARN("Freeing block #%d lines", i);
         free(blocks[i].lines);
+        LV_LOG_WARN("Freeing block #%d refreshes", i);
         free(blocks[i].refreshes);
     }
+    LV_LOG_WARN("Freeing blocks");
     free(blocks);
 }
