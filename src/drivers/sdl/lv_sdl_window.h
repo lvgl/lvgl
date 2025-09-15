@@ -57,6 +57,8 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
 void lv_sdl_quit(void);
 
+void * lv_sdl_window_get_window(lv_display_t *disp);
+
 /**********************
  *      MACROS
  **********************/
