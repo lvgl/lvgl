@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_types.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

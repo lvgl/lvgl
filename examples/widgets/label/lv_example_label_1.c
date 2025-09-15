@@ -6,6 +6,7 @@
  */
 void lv_example_label_1(void)
 {
+    lv_lock()
     lv_obj_t * label1 = lv_label_create(lv_screen_active());
     lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_WRAP);     /*Break the long lines*/
     lv_label_set_recolor(label1, true);                      /*Enable re-coloring by commands in the text*/

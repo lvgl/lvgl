@@ -14,7 +14,7 @@
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_math.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 #include "../../core/lv_global.h"
 
 #ifdef LV_MEM_POOL_INCLUDE

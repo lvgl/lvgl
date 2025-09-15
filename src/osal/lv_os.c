@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
+#include "lv_os_private.h"
 #include "lv_os_private.h"
 #include "../core/lv_global.h"
 
@@ -59,9 +59,28 @@ void lv_unlock(void)
     lv_mutex_unlock(&lv_general_mutex);
 }
 
+#else /*LV_USE_OS != LV_OS_NONE*/
+
+void lv_lock(void)
+{
+    /*No nothing*/
+}
+
+lv_result_t lv_lock_isr(void)
+{
+    /*No nothing*/
+    return LV_RESULT_OK;
+}
+
+void lv_unlock(void)
+{
+    /*No nothing*/
+}
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 
-#endif /*LV_USE_OS != LV_OS_NONE*/

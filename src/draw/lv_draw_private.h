@@ -19,7 +19,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw.h"
-#include "../osal/lv_os.h"
+#include "../osal/lv_os_private.h"
 #include "../misc/cache/lv_cache.h"
 
 /*********************
