@@ -9,6 +9,8 @@
 
 #include "../../../lv_conf_internal.h"
 #include "../../../misc/lv_array.h"
+#include "../../../misc/lv_log.h"
+
 #include "lv_egl_adapter_interface.h"
 #include <stdlib.h>
 #include <string.h>
@@ -85,8 +87,8 @@ bool lv_egl_adapter_interface_reset(void * cnvs_ptr)
     if(!interface_resize_output(interface, interface->width, interface->height)) return false;
     if(!interface_fbos_apply(interface)) return false;
     if(!interface_confirm_gl2_support()) {
-        FALSE_ERROR("Glmark2 needs OpenGL(ES) version >= 2.0 to run (but version string is:");
-        printf("%s\n", (const char *)glGetString(GL_VERSION));
+        FALSE_ERROR("OpenGL(ES) >= 2.0 required, but version string is:");
+        LV_LOG_ERROR("%s", (const char *)glGetString(GL_VERSION));
         return false;
     }
     glViewport(0, 0, interface->width, interface->height);
@@ -127,9 +129,9 @@ void lv_egl_adapter_interface_print_info(void * cnvs_ptr)
     const char * gl_vendor = (const char *)(glGetString(GL_VENDOR));
     const char * gl_renderer = (const char *)(glGetString(GL_RENDERER));
     const char * gl_version = (const char *)(glGetString(GL_VERSION));
-    printf("    GL_VENDOR:      %s\n", gl_vendor);
-    printf("    GL_RENDERER:    %s\n", gl_renderer);
-    printf("    GL_VERSION:     %s\n", gl_version);
+    LV_LOG_INFO("GL_VENDOR:   %s", gl_vendor);
+    LV_LOG_INFO("GL_RENDERER: %s", gl_renderer);
+    LV_LOG_INFO("GL_VERSION:  %s", gl_version);
 }
 void lv_egl_adapter_interface_read_pixel(int x, int y, uint8_t * r, uint8_t * g, uint8_t * b, uint8_t * a)
 {
@@ -317,12 +319,12 @@ FBO_newstruct_t FBO_newstruct_create(GLsizei width, GLsizei height, GLuint color
 }
 void FBO_newstruct_destroy(void ** fbostruct_ptr)
 {
-    FBO_newstruct_t interface = * (FBO_newstruct_t *)fbostruct_ptr;
-    if(interface) {
-        if(interface->fbo) glDeleteFramebuffers(1, &(interface->fbo));
-        if(interface->color_renderbuffer) glDeleteRenderbuffers(1, &(interface->color_renderbuffer));
-        if(interface->depth_renderbuffer) glDeleteRenderbuffers(1, &(interface->depth_renderbuffer));
-        free(interface);
+    FBO_newstruct_t fbostruct = * (FBO_newstruct_t *)fbostruct_ptr;
+    if(fbostruct) {
+        if(fbostruct->fbo) glDeleteFramebuffers(1, &(fbostruct->fbo));
+        if(fbostruct->color_renderbuffer) glDeleteRenderbuffers(1, &(fbostruct->color_renderbuffer));
+        if(fbostruct->depth_renderbuffer) glDeleteRenderbuffers(1, &(fbostruct->depth_renderbuffer));
+        free(fbostruct);
     }
     *fbostruct_ptr = 0;
 }
@@ -487,9 +489,9 @@ static bool interface_confirm_pixel_format(void * cnvs_ptr)
     interface->format_color = determine_color_format(vc, supports_rgba8, supports_rgb8);
     interface->format_depth = determine_depth_format(vc, supports_depth32, supports_depth24);
 
-    printf("DEBUG: Selected Renderbuffer ColorFormat: %s DepthFormat: %s\n",
-           interface_gl_format_str(interface->format_color),
-           interface_gl_format_str(interface->format_depth));
+    LV_LOG_INFO("Selected Renderbuffer ColorFormat: %s DepthFormat: %s",
+                interface_gl_format_str(interface->format_color),
+                interface_gl_format_str(interface->format_depth));
 
     free(vc);
     return (interface->format_color);// && interface->format_depth);
@@ -501,7 +503,7 @@ static bool interface_fbos_confirm(void * cnvs_ptr)
         interface_fbos_reset(interface->fbos);
         if(!interface_confirm_pixel_format(interface)) return false;
         for(unsigned int i = 0; i < interface->offscreen_fbo_count; ++i) {
-            printf("Creating FBO #%d\n", i);
+            LV_LOG_INFO("Creating FBO #%d", i);
             lv_array_push_back(interface->fbos, FBO_newstruct_create(interface->width, interface->height, interface->format_color,
                                                                      interface->format_depth));
         }
@@ -525,7 +527,7 @@ static bool interface_fbos_apply(void * cnvs_ptr)
         if(!interface->is_sync_supported) {
             static bool warned = false;
             if(!warned) {
-                printf("WARN: Sync objects not supported, falling back to glFinish");
+                LV_LOG_WARN("Sync objects not supported, falling back to glFinish");
                 warned = true;
             }
         }
@@ -602,7 +604,7 @@ static inline lv_egl_adapter_output_core_t CORE(void * cnvs_ptr)
 }
 static bool FALSE_ERROR(const char * desc)
 {
-    printf("ERROR: %s\n", desc);
+    LV_LOG_ERROR(desc);
     return false;
 }
 /* Unused for now, this will take a mouse x/y, a scanned depth at that pixel

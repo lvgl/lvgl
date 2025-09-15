@@ -11,7 +11,7 @@
  *      DEFINES
  *********************/
 #define LV_EXTRA_EGL_INFO
-//#define LV_EXTRA_EGL_INFO_MORE
+#define LV_EXTRA_EGL_INFO_MORE
 #ifdef LV_EXTRA_EGL_INFO_MORE
     #ifndef LV_EXTRA_EGL_INFO
         #define LV_EXTRA_EGL_INFO

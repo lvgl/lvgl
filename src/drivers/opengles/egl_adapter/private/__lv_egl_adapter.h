@@ -39,7 +39,7 @@ struct lv_egl_adapter {
     EGLConfig                       egl_config;
     EGLContext                      egl_context;
     EGLSurface                      egl_surface;
-    lv_egl_adapter_mode_t           best_config_;
+    lv_egl_adapter_mode_t           best_config;
     void * egl_extern_handle;
     void * gl_extern_handle;
     lv_egl_adapter_config_t          requested_visual_config;

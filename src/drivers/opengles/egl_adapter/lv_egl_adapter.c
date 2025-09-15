@@ -8,6 +8,7 @@
  *********************/
 
 #include "../../../lv_conf_internal.h"
+#include "../../../misc/lv_log.h"
 
 #include "private/glad/include/glad/egl.h"
 #include <stdarg.h>
@@ -102,7 +103,7 @@ bool lv_egl_adapter_init_display(void * adapter_ptr, void * native_display)
 
     const char * libnames[] = { "libEGL.so", "libEGL.so.1" };
     if(!external_open(&adapter_ref->egl_extern_handle, libnames, 2)) {
-        printf("ERROR: Error loading EGL library\n");
+        LV_LOG_ERROR("Unable to load EGL library");
         return false;
     }
     adapter_ref->egl_native_display = (EGLNativeDisplayType)native_display;
@@ -120,15 +121,15 @@ bool lv_egl_adapter_init_extensions(void * adapter_ptr)
 #if LV_EGL_ADAPTED_WITH_GLESV2
     int version_result = gladLoadGLES2UserPtr(load_proc, adapter_ref->gl_extern_handle);
     if(!version_result) {
-        printf("ERROR:Loading GLESv2 entry points failed.\n");
+        LV_LOG_ERROR("Loading GLESv2 entry points failed.");
         return false;
     }
     else {
-        printf("INFO:GLES2 loaded with version result: %d.\n", version_result);
+        LV_LOG_INFO("GLES2 loaded with version result: %d.", version_result);
     }
 #elif LV_EGL_ADAPTED_WITH_GL
     if(!gladLoadGLUserPtr(load_proc, adapter_ref->gl_extern_handle)) {
-        printf("ERROR:Loading GL entry points failed.\n");
+        LV_LOG_ERROR("Loading GL entry points failed.");
         return false;
     }
 #endif
@@ -149,11 +150,11 @@ bool lv_egl_adapter_is_valid(void * adapter_ptr)
     if(eglGetCurrentContext && adapter_ref->egl_context == eglGetCurrentContext()) return true;
     if(!eglMakeCurrent(adapter_ref->egl_display, adapter_ref->egl_surface, adapter_ref->egl_surface,
                        adapter_ref->egl_context)) {
-        printf("ERROR:GLState::valid()->eglMakeCurrent failed with error: 0x%x\n", eglGetError());
+        LV_LOG_ERROR("eglMakeCurrent failed with error: 0x%x", eglGetError());
         return false;
     }
     if(!set_zero_swap_interval(adapter_ref))
-        printf("WARN:** Failed to set swap interval. Results may be bounded above by refresh rate.\n");
+        LV_LOG_WARN("Failed to set swap interval. Results may be bounded above by refresh rate.\n");
     if(!lv_egl_adapter_init_extensions(adapter_ref)) return false;
     return true;
 }
@@ -170,7 +171,7 @@ bool lv_egl_adapter_reset(void * adapter_ptr)
     if(eglGetCurrentContext &&
        adapter_ref->egl_context == eglGetCurrentContext()) eglMakeCurrent(adapter_ref->egl_display, 0, 0, 0);
     if(EGL_FALSE == eglDestroyContext(adapter_ref->egl_display,
-                                      adapter_ref->egl_context)) printf("WARN: GLState::reset()->eglDestroyContext failed with error: 0x%x\n", eglGetError());
+                                      adapter_ref->egl_context)) LV_LOG_WARN("eglDestroyContext failed with error: 0x%x", eglGetError());
     adapter_ref->egl_context = 0;
     return true;
 }
@@ -215,22 +216,22 @@ bool lv_egl_adapter_got_native_config(void * adapter_ptr, EGLint * vid, lv_array
     if(!egl_config_is_valid(adapter_ref)) return false;
     EGLint native_id;
     if(!eglGetConfigAttrib(adapter_ref->egl_display, adapter_ref->egl_config, EGL_NATIVE_VISUAL_ID, &native_id)) {
-        printf("DEBUG:Failed to get native visual id for EGLConfig %x\n", lv_egl_adapter_mode_get_id(adapter_ref->egl_config));
+        LV_LOG_INFO("Failed to get native visual id for EGLConfig %x", lv_egl_adapter_mode_get_id(adapter_ref->egl_config));
         return false;
     }
     if(eglQueryDmaBufModifiersEXT) {
         EGLint num_mods = 0;
         if(eglQueryDmaBufModifiersEXT(adapter_ref->egl_display, native_id, 0, NULL, NULL, &num_mods) && num_mods > 0) {
-            uint64_t _mods_buffer[num_mods];
-            if(!eglQueryDmaBufModifiersEXT(adapter_ref->egl_display, native_id, num_mods, _mods_buffer, NULL, &num_mods) ||
+            uint64_t mods_buffer[num_mods];
+            if(!eglQueryDmaBufModifiersEXT(adapter_ref->egl_display, native_id, num_mods, mods_buffer, NULL, &num_mods) ||
                num_mods <= 0) {
-                printf("Driver does not support eglQueryDmaBufModifiersEXT.\n");
+                LV_LOG_INFO("Driver does not support eglQueryDmaBufModifiersEXT.");
             }
             else {
-                if(_mods_buffer[0] != 0) {
-                    lv_array_init_from_buf(mods, _mods_buffer, num_mods, sizeof(uint64_t));
-                    printf("This driver supports eglQueryDmaBufModifiersEXT, with %lu defined modifiers:\n", (size_t)num_mods);
-                    for(size_t i = 0; i < (size_t)num_mods; i++) printf("+->#%lu = %lu\n", i, _mods_buffer[i]);
+                if(mods_buffer[0] != 0) {
+                    lv_array_init_from_buf(mods, mods_buffer, num_mods, sizeof(uint64_t));
+                    LV_LOG_INFO("This driver supports eglQueryDmaBufModifiersEXT, with %lu defined modifiers:", (size_t)num_mods);
+                    for(size_t i = 0; i < (size_t)num_mods; i++) LV_LOG_INFO("+->#%lu = %lu", i, mods_buffer[i]);
                 }
             }
         }
@@ -243,15 +244,15 @@ void lv_egl_adapter_cleanup(void ** adapter_ptr, void ** config_ptr, void ** cnv
     lv_egl_adapter_t adapter_ref = * (lv_egl_adapter_t *)adapter_ptr;
     if(adapter_ref) {
         lv_egl_adapter_reset(adapter_ref);
-        free(adapter_ref->best_config_);
+        free(adapter_ref->best_config);
         if(adapter_ref->egl_display != NULL)
             if(!eglTerminate(adapter_ref->egl_display))
-                printf("ERROR:eglTerminate failed\n");
+                LV_LOG_ERROR("eglTerminate failed");
         if(adapter_ref->owns_config) {
             lv_egl_adapter_config_cleanup((void **) & (adapter_ref->requested_visual_config));
         }
     }
-    if(eglReleaseThread && !eglReleaseThread()) printf("ERROR:eglReleaseThread failed\n");
+    if(eglReleaseThread && !eglReleaseThread()) LV_LOG_ERROR("eglReleaseThread failed");
     if(cnvs_ptr) interface_destroy_internal(cnvs_ptr);
     if(config_ptr) lv_egl_adapter_config_cleanup(config_ptr);
     if(adapter_ref) free(adapter_ref);
@@ -344,8 +345,8 @@ EGLConfig select_best_config(void * adapter_ptr, size_t num_configs, EGLConfig *
 #ifdef LV_EGL_ADAPTER_STRICT_MATCH
         return NULL;
 #endif
-        printf("WARN:Unable to find a good EGL config, will continue with the best match,\n"
-               "but you should verify that the config values are acceptable.\n");
+        LV_LOG_WARN("WARN:Unable to find a good EGL config, will continue with the best match,\n"
+                    "but you should verify that the config values are acceptable.\n");
     }
     return best_config;
 }
@@ -380,11 +381,10 @@ bool egl_display_is_valid(void * adapter_ptr)
 
     char const * __restrict const supported_extensions = egl_query_string(EGL_NO_DISPLAY, EGL_EXTENSIONS);
 
-    printf("\n");
-    printf("EGL Platform Display Extensions Valid: ");
+    bool extensions_supported = false;
     if(GLMARK2_NATIVE_EGL_DISPLAY_ENUM != 0 && supported_extensions &&
        strstr(supported_extensions, "EGL_EXT_platform_base")) {
-        printf("[ Yes ]");
+        extensions_supported = true;
         PFNEGLGETPLATFORMDISPLAYEXTPROC egl_get_platform_display =
             (PFNEGLGETPLATFORMDISPLAYEXTPROC)
             egl_get_proc_address("eglGetPlatformDisplayEXT");
@@ -394,45 +394,40 @@ bool egl_display_is_valid(void * adapter_ptr)
                                                                                 (void *)adapter_ref->egl_native_display, NULL);
 
         if(!adapter_ref->egl_display) {
-            printf("DEBUG:eglGetPlatformDisplayEXT() failed with error: 0x%x\n",
-                   egl_get_error());
+            LV_LOG_WARN("eglGetPlatformDisplayEXT() failed with error: 0x%x",
+                        egl_get_error());
         }
     }
-    else {
-        printf("[ No ]");
-    }
-    printf("\n");
-    // Just in case get_platform_display failed... //
+    LV_LOG_INFO("EGL Platform Display Extensions Valid: ", extensions_supported ? "[ Yes ]" : "[ No ]");
+
     if(!adapter_ref->egl_display) {
-        printf("DEBUG:Falling back to eglGetDisplay()\n");
+        LV_LOG_INFO("Falling back to eglGetDisplay()");
         adapter_ref->egl_display = egl_get_display(adapter_ref->egl_native_display);
     }
 
     if(!adapter_ref->egl_display) {
-        printf("ERROR:eglGetDisplay() failed with error: 0x%x\n", egl_get_error());
+        LV_LOG_ERROR("eglGetDisplay() failed with error: 0x%x", egl_get_error());
         return false;
     }
 
     int egl_major = -1;
     int egl_minor = -1;
     if(!egl_initialize(adapter_ref->egl_display, &egl_major, &egl_minor)) {
-        printf("ERROR:eglInitialize() failed with error: 0x%x\n", egl_get_error());
+        LV_LOG_ERROR("eglInitialize() failed with error: 0x%x", egl_get_error());
         adapter_ref->egl_display = 0;
         return false;
     }
 
-    // Initialize GLAD with a known display //
     if(gladLoadEGLUserPtr(adapter_ref->egl_display, load_proc, adapter_ref->egl_extern_handle) == 0) {
-        printf("ERROR:Loading EGL entry points failed\n");
+        LV_LOG_ERROR("Loading EGL entry points failed");
         return false;
     }
 
-    // From this point on we can use the normal EGL function calls. //
 #if LV_EGL_ADAPTED_WITH_GL
     EGLenum apiType = EGL_OPENGL_API;
     const char * libNames[] = { "libGL.so", "libGL.so.1" };
     if(!GLAD_EGL_VERSION_1_4) {
-        printf("ERROR: EGL version %d.%d does not support the OpenGL API\n", egl_major, egl_minor);
+        LV_LOG_ERROR("EGL version %d.%d does not support the OpenGL API", egl_major, egl_minor);
         return false;
     }
 #else // LV_EGL_ADAPTED_WITH_GLESV2
@@ -441,12 +436,12 @@ bool egl_display_is_valid(void * adapter_ptr)
 #endif
 
     if(eglBindAPI && !eglBindAPI(apiType)) {
-        printf("ERROR:Failed to bind api\n");
+        LV_LOG_ERROR("Failed to bind api");
         return false;
     }
 
     if(!external_open(&adapter_ref->gl_extern_handle, libNames, 2)) {
-        printf("ERROR:Error loading GL library\n");
+        LV_LOG_ERROR("Unable to load GL library");
         return false;
     }
 
@@ -471,13 +466,13 @@ bool egl_config_is_valid(void * adapter_ptr)
     // Find out how many configs match the attributes.
     EGLint num_configs = 0;
     if(!eglChooseConfig(adapter_ref->egl_display, config_attribs, 0, 0, &num_configs)) {
-        printf("ERROR:eglChooseConfig() (count query) failed with error: %d\n",
-               eglGetError());
+        LV_LOG_ERROR("eglChooseConfig() (count query) failed with error: %d",
+                     eglGetError());
         return false;
     }
 
     if(num_configs == 0) {
-        printf("ERROR:eglChooseConfig() didn't return any configs\n");
+        LV_LOG_ERROR("eglChooseConfig() didn't return any configs");
         return false;
     }
 
@@ -486,42 +481,39 @@ bool egl_config_is_valid(void * adapter_ptr)
 
     if(!eglChooseConfig(adapter_ref->egl_display, config_attribs, _EGLConfig_struct_buffer,
                         num_configs, &num_configs)) {
-        printf("ERROR:eglChooseConfig() failed with error: %d\n",
-               eglGetError());
+        LV_LOG_ERROR("eglChooseConfig() failed with error: %d",
+                     eglGetError());
         return false;
     }
 
     // Select the best matching config
     adapter_ref->egl_config = select_best_config(adapter_ref, (size_t)num_configs, &_EGLConfig_struct_buffer[0]);
     if(!adapter_ref->egl_config) {
-        printf("ERROR:Failed to find suitable EGL config\n");
+        LV_LOG_ERROR("Failed to find suitable EGL config");
         return false;
     }
 
     for(size_t i = 0; i < (size_t)num_configs; i++) {
         if(_EGLConfig_struct_buffer[i] == adapter_ref->egl_config) {
             lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
-            adapter_ref->best_config_ = cfg;
+            adapter_ref->best_config = cfg;
             break;
         }
     }
 #ifdef LV_EXTRA_EGL_INFO
-    printf("Found (%u) buffer configs. Best match: [ 0x%x ]\n", num_configs,
-           lv_egl_adapter_mode_get_id(adapter_ref->best_config_));
+    LV_LOG_INFO("Found (%u) buffer configs. Best match: [ 0x%x ]", num_configs,
+                lv_egl_adapter_mode_get_id(adapter_ref->best_config));
 #ifndef LV_EXTRA_EGL_INFO_MORE
     lv_egl_adapter_mode_print_header();
-    lv_egl_adapter_mode_print(adapter_ref->best_config_, false);
+    lv_egl_adapter_mode_print(adapter_ref->best_config, false);
     lv_egl_adapter_mode_print_bar();
 #else
-    // Print out the config information, and let the user know the decision
-    // about the "best" one with respect to the options.
     unsigned int lineNumber = 0;
-
     bool is_best = false;
     for(size_t i = 0; i < (size_t)num_configs; i++) {
         lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
         if(!lineNumber) lv_egl_adapter_mode_print_header();
-        is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config_) == lv_egl_adapter_mode_get_id(cfg);
+        is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
         if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
         lv_egl_adapter_mode_print(cfg, is_best);
         if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
@@ -529,9 +521,8 @@ bool egl_config_is_valid(void * adapter_ptr)
         free(cfg);
     }
     if(!is_best) lv_egl_adapter_mode_print_bar();
-    printf("    [*] = Best EGLConfig ID: 0x%x\n", lv_egl_adapter_mode_get_id(adapter_ref->best_config_));
+    LV_LOG_INFO("    [*] = Best EGLConfig ID: 0x%x\n", lv_egl_adapter_mode_get_id(adapter_ref->best_config));
 #endif
-    printf("\n");
 #endif
 
     return true;
@@ -545,7 +536,7 @@ bool egl_surface_is_valid(void * adapter_ptr)
     adapter_ref->egl_surface = eglCreateWindowSurface(adapter_ref->egl_display, adapter_ref->egl_config,
                                                       adapter_ref->egl_native_window, 0);
     if(!adapter_ref->egl_surface) {
-        printf("ERROR:eglCreateWindowSurface failed with error: 0x%x\n", eglGetError());
+        LV_LOG_ERROR("eglCreateWindowSurface failed with error: 0x%x\n", eglGetError());
         return false;
     }
     return true;
@@ -573,8 +564,8 @@ bool egl_context_is_valid(void * adapter_ptr)
     adapter_ref->egl_context = eglCreateContext(adapter_ref->egl_display, adapter_ref->egl_config,
                                                 EGL_NO_CONTEXT, context_attribs);
     if(!adapter_ref->egl_context) {
-        printf("ERROR:eglCreateContext() failed with error: 0x%x\n",
-               eglGetError());
+        LV_LOG_ERROR("eglCreateContext() failed with error: 0x%x",
+                     eglGetError());
         return false;
     }
 
