@@ -214,7 +214,7 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp)
     return dsc->renderer;
 }
 
-void * lv_sdl_window_get_window(lv_display_t *disp)
+void * lv_sdl_window_get_window(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     return dsc->window;
