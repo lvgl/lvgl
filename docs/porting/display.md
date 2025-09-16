@@ -61,10 +61,10 @@ Therefore the 2 buffers needs to synchronized in `flush_cb` like this:
 2. Copy the redrawn areas from `color_p` to the other buffer.
 
 The get the redrawn areas to copy use the following functions
-`_lv_refr_get_disp_refreshing()` returns the display being refreshed
-`disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
-`disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
-`disp->inv_p` number of valid elements in `inv_areas`
+- `_lv_refr_get_disp_refreshing()` returns the display being refreshed
+- `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
+- `disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
+- `disp->inv_p` number of valid elements in `inv_areas`
 
 ## Display driver
 
@@ -81,7 +81,8 @@ In the most simple case only the following fields of `lv_disp_drv_t` need to be 
 - `hor_res` horizontal resolution of the display in pixels.
 - `ver_res` vertical resolution of the display in pixels.
 - `flush_cb` a callback function to copy a buffer's content to a specific area of the display.
-`lv_disp_flush_ready(&disp_drv)` needs to be called when flushing is ready.
+- `lv_disp_flush_ready(&disp_drv)` needs to be called when flushing is ready.
+
 LVGL might render the screen in multiple chunks and therefore call `flush_cb` multiple times. To see if the current one is the last chunk of rendering use `lv_disp_flush_is_last(&disp_drv)`.
 
 ### Optional fields
