@@ -1290,16 +1290,15 @@ static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
     lv_label_t * label = (lv_label_t *)obj;
     LV_ASSERT_MSG(label->dot_begin == LV_LABEL_DOT_BEGIN_INV, "Label dots already set");
     if(dot_begin != LV_LABEL_DOT_BEGIN_INV) {
-        /* setting dots modifies the string so the string must be modifiable */
+        label->dot_begin = dot_begin;
+
         if(label->static_txt) {
-            label->text = lv_strdup(label->text);
-            LV_ASSERT_MALLOC(label->text);
-            label->static_txt = 0;
+            LV_LOG_WARN("Long mode \"dots\" is not supported with static text.");
+            return;
         }
 
         /*Save characters*/
         lv_strncpy(label->dot, &label->text[dot_begin], LV_LABEL_DOT_NUM + 1);
-        label->dot_begin = dot_begin;
 
         /*Overwrite up to LV_LABEL_DOT_NUM + 1 characters with dots and null terminator*/
         int i = 0;
