@@ -511,14 +511,6 @@ inline static int node_path_is_valid(const char * path)
 bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, float refr_rate)
 {
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
-    /* temporary mouse handling */
-    //int mfd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK);
-    //if(mfd < 0) {
-    //    fprintf(stderr, "Error opening device\n");
-    //    drm_out->mouse_fd = -1;
-    //}
-    //drm_out->mouse_fd = mfd;
-    /* ************************ */
 
     int fd = -1;
     char * drm_device = TEMP_get_default_drm_device_path(drm_out);
@@ -1092,7 +1084,6 @@ static void print_grouped_modes(drmModeConnectorPtr conn)
             m++;
         }
         /* end of this resolution block */
-        //        printf("%s\n", topbot);
     }
     printf("  %s\n", onlybot);
 }

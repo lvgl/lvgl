@@ -12,8 +12,6 @@
 #include "../../../../lv_conf_internal.h"
 #include "../../../../misc/lv_array.h"
 
-//#include "../temp_migrate_util/mk_array.h"
-
 /*********************
  *      DEFINES
  *********************/

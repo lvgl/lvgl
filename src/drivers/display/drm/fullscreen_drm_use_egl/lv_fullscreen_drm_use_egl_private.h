@@ -33,7 +33,7 @@ extern "C" {
 struct _lv_fullscreen_drm_use_egl_t {
     lv_egl_adapter_interface_t  egl_adapter_interface;
     lv_display_t * display_texture;
-    mk_drm_texture_t * window_texture;
+    lv_drm_use_egl_texture_t * window_texture;
     int32_t hor_res;
     int32_t ver_res;
     bool h_flip;
@@ -41,11 +41,10 @@ struct _lv_fullscreen_drm_use_egl_t {
     lv_ll_t textures;
     lv_point_t mouse_last_point;
     lv_indev_state_t mouse_last_state;
-    uint8_t use_indev : 1;
     uint8_t closing : 1;
 };
 
-struct _mk_drm_texture_t {
+struct _lv_drm_use_egl_texture_t {
     lv_fullscreen_drm_use_egl_t * window;
     unsigned int texture_id;
     lv_area_t area;

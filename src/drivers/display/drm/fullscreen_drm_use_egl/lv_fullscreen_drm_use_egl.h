@@ -37,7 +37,7 @@ extern "C" {
  **********************/
 
 typedef struct _lv_fullscreen_drm_use_egl_t lv_fullscreen_drm_use_egl_t;
-typedef struct _mk_drm_texture_t mk_drm_texture_t;
+typedef struct _lv_drm_use_egl_texture_t lv_drm_use_egl_texture_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -84,7 +84,7 @@ void lv_fullscreen_drm_use_egl_set_flip(lv_fullscreen_drm_use_egl_t * window, bo
  * @param window        MK_DRM output to return the handle of
  * @return              the MK_DRM output handle
  */
-void * lv_fullscreen_drm_use_egl_get_mk_drmwindow(lv_fullscreen_drm_use_egl_t * window);
+void * lv_fullscreen_drm_use_egl_get_drm_window(lv_fullscreen_drm_use_egl_t * window);
 
 /**
  * Add a texture to the MK_DRM output. It can be an LVGL display texture, or any OpenGL texture
@@ -94,36 +94,37 @@ void * lv_fullscreen_drm_use_egl_get_mk_drmwindow(lv_fullscreen_drm_use_egl_t * 
  * @param h             height in pixels of the texture
  * @return              the new texture handle
  */
-mk_drm_texture_t * lv_fullscreen_drm_use_egl_add_texture(lv_fullscreen_drm_use_egl_t * window, unsigned int texture_id,
-                                                         int32_t w,
-                                                         int32_t h);
+lv_drm_use_egl_texture_t * lv_fullscreen_drm_use_egl_add_texture(lv_fullscreen_drm_use_egl_t * window,
+                                                                 unsigned int texture_id,
+                                                                 int32_t w,
+                                                                 int32_t h);
 
 /**
  * Remove a texture from its MK_DRM output and delete it
  * @param texture    handle of a MK_DRM output texture
  */
-void mk_drm_texture_remove(mk_drm_texture_t * texture);
+void lv_drm_use_egl_texture_remove(lv_drm_use_egl_texture_t * texture);
 
 /**
  * Set the x position of a texture within its MK_DRM output
  * @param texture    handle of a MK_DRM output texture
  * @param x          new x position of the texture
  */
-void mk_drm_texture_set_x(mk_drm_texture_t * texture, int32_t x);
+void lv_drm_use_egl_texture_set_x(lv_drm_use_egl_texture_t * texture, int32_t x);
 
 /**
  * Set the y position of a texture within its MK_DRM output
  * @param texture    handle of a MK_DRM output texture
  * @param y          new y position of the texture
  */
-void mk_drm_texture_set_y(mk_drm_texture_t * texture, int32_t y);
+void lv_drm_use_egl_texture_set_y(lv_drm_use_egl_texture_t * texture, int32_t y);
 
 /**
  * Set the opacity of a texture in a MK_DRM output
  * @param texture    handle of a MK_DRM output texture
  * @param opa        new opacity of the texture
  */
-void mk_drm_texture_set_opa(mk_drm_texture_t * texture, lv_opa_t opa);
+void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t opa);
 
 /**
  * Get the mouse indev associated with a texture in a MK_DRM output, if it exists
@@ -133,7 +134,7 @@ void mk_drm_texture_set_opa(mk_drm_texture_t * texture, lv_opa_t opa);
  *                   LVGL display texture and the window was created with
  *                   `use_mouse_indev` as `true`
  */
-lv_indev_t * mk_drm_texture_get_mouse_indev(mk_drm_texture_t * texture);
+lv_indev_t * lv_drm_use_egl_texture_get_mouse_indev(lv_drm_use_egl_texture_t * texture);
 
 /**********************
  *      MACROS

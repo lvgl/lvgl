@@ -20,13 +20,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-//#include "temp_migrate_util/mk_array.h"
 #ifdef __cplusplus
 }
 #endif
 
 #include "private/lv_egl_adapter_output_core.h"
-//#include "private/__lv_egl_adapter.h"
 
 /**********************
  *      TYPEDEFS
