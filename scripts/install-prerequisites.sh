@@ -14,4 +14,4 @@ sudo apt update
 cat $SCRIPT_DIR/prerequisites-apt.txt | xargs sudo apt install -y
 pip3 install --user -r $SCRIPT_DIR/prerequisites-pip.txt
 
-./$SCRIPT_DIR/install_pngquant.sh
+.$SCRIPT_DIR/install_pngquant.sh
