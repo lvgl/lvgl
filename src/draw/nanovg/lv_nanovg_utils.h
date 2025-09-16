@@ -31,6 +31,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct _lv_draw_nanovg_unit_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -72,6 +74,8 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
 
 void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcompositeOperation composite_operation,
                     NVGcolor color);
+
+void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u);
 
 /**********************
  *      MACROS

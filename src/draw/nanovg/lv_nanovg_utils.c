@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_NANOVG
 
 #include "lv_draw_nanovg_private.h"
+#include "lv_nanovg_pending.h"
 #include "lv_nanovg_math.h"
 #include <float.h>
 #include <math.h>
@@ -189,6 +190,16 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
     nvgGlobalCompositeOperation(ctx, composite_operation);
     nvgFillColor(ctx, color);
     nvgFill(ctx);
+}
+
+void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    nvgEndFrame(u->vg);
+
+    lv_nanovg_pending_remove_all(u->letter_pending);
+
+    u->is_started = false;
 }
 
 /**********************

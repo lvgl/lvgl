@@ -66,6 +66,8 @@ void lv_draw_nanovg_init(void)
 
     unit->vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     LV_ASSERT_MSG(unit->vg != NULL, "nvgCreateGL2 init failed");
+
+    lv_draw_nanovg_label_init(unit);
 }
 
 /**********************
@@ -147,17 +149,6 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     }
 }
 
-static void on_start(lv_draw_nanovg_unit_t * u, float w, float h)
-{
-    glViewport(0, 0, w, h);
-    nvgBeginFrame(u->vg, w, h, 1.0f);
-}
-
-static void on_end(lv_draw_nanovg_unit_t * u)
-{
-    nvgEndFrame(u->vg);
-}
-
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
@@ -165,8 +156,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, NANOVG_DRAW_UNIT_ID);
     if(!t || t->preferred_draw_unit_id != NANOVG_DRAW_UNIT_ID) {
         if(u->is_started) {
-            on_end(u);
-            u->is_started = false;
+            lv_nanovg_end_frame(u);
         }
         return LV_DRAW_UNIT_IDLE;
     }
@@ -177,7 +167,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(!u->is_started) {
-        on_start(u, layer->draw_buf->header.w, layer->draw_buf->header.h);
+        nvgBeginFrame(u->vg, layer->draw_buf->header.w, layer->draw_buf->header.h, 1.0f);
         u->is_started = true;
     }
 
@@ -231,6 +221,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
+    lv_draw_nanovg_label_init(unit);
     nvgDeleteGL2(unit->vg);
     unit->vg = NULL;
     return 0;
