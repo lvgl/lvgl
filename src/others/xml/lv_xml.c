@@ -291,49 +291,66 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
     }
 #endif
 
-    /*Create the timelines as well*/
+    /*Create timeline instances for this component instance as well.
+     *At this stage all children are created so any UI elements that
+     *the animations and timelines can reference are exist. */
     if(!lv_ll_is_empty(&scope->timeline_ll)) {
         lv_xml_timeline_t * at_xml;
+
+        /*Create an array to store the created timeline pointers*/
         lv_anim_timeline_t ** timeline_array;
         timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t *));
+
+        /*Read the timeline descriptors of the component and create
+         *timeline instances based on them.
+         *(The timeline instances were created when the component was registered)*/
         uint32_t i = 0;
         LV_LL_READ(&scope->timeline_ll, at_xml) {
+            /*Save the name of the timeline. It will reference by this name in XML
+             * (e.g. <play_animation_event target="comp_name" timeline="timeline_name">)*/
             lv_anim_timeline_t * my_timeline = lv_anim_timeline_create();
             my_timeline->user_data = lv_strdup(at_xml->name);
 
+            /*Check all saved animation or incluce_timeline data of the component
+             *and add them to the timeline instance. */
             lv_xml_anim_timeline_child_t * timeline_child;
             LV_LL_READ(&at_xml->anims_ll, timeline_child) {
-                /*Add all the animation descriptors to instance's timeline*/
+                /*Simple add the animation descriptors to instance's timeline*/
                 if(timeline_child->is_anim) {
-                    int32_t delay = -timeline_child->data.anim.act_time;
-                    lv_anim_timeline_add(my_timeline, delay, &timeline_child->data.anim);
+                    lv_anim_t * a = &timeline_child->data.anim;
+                    lv_obj_t * target = NULL;
+                    if(lv_streq(a->var, "self")) target = state.view;
+                    else target = lv_obj_find_by_name(state.view, a->var);
 
+                    if(target == NULL) {
+                        LV_LOG_WARN("No target widget is found with `%s` name", a->var);
+                        continue;
+                    }
+
+                    int32_t delay = -a->act_time;
+                    lv_anim_timeline_add(my_timeline, delay, a);
+
+                    /*Once the animation descriptor is duplicated and saved in the timeline
+                     *replace the target name a pointer to the target.
+                     *TODO add an event to every referenced widget to remove their anim from the
+                     *     timeline when they are deleted.*/
                     lv_anim_t * new_a = &my_timeline->anim_dsc[my_timeline->anim_dsc_cnt - 1].anim;
-                    if(lv_streq(new_a->var, "self")) {
-                        new_a->var = state.view;//lv_strdup(new_var_name);
-                    }
-                    else {
-                        new_a->var = lv_obj_find_by_name(state.view, new_a->var);//lv_strdup(new_var_name);
-                    }
+                    new_a->var = target;
                 }
-                /*Or include (merge) to referenced timelines*/
+                /*Or include (merge) the referenced timelines*/
                 else {
                     lv_xml_anim_timeline_include_t * incl = &timeline_child->data.incl;
                     /*Get the target first*/
                     lv_obj_t * target;
-                    if(lv_streq(incl->target_name, "self")) {
-                        target = state.view;
-                    }
-                    else {
-                        target = lv_obj_find_by_name(state.view, incl->target_name);
-                    }
+                    if(lv_streq(incl->target_name, "self")) target = state.view;
+                    else target = lv_obj_find_by_name(state.view, incl->target_name);
 
                     if(target == NULL) {
                         LV_LOG_WARN("No target widget is found with `%s` name", incl->target_name);
                         continue;
                     }
 
-                    /*Get the timeline with the given name*/
+                    /*Get all the timelines of the target*/
                     lv_anim_timeline_t ** timeline_array = NULL;
                     lv_obj_send_event(target, lv_event_xml_store_timeline, &timeline_array);
                     if(timeline_array == NULL) {
@@ -341,6 +358,7 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
                         continue;
                     }
 
+                    /*Find the timeline with the requested timeline name*/
                     uint32_t i;
                     lv_anim_timeline_t * include_timeline = NULL;
                     for(i = 0; timeline_array[i]; i++) {
@@ -356,7 +374,7 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
                         continue;
                     }
 
-                    /*Merge the include_timeline of the target to this one*/
+                    /*Copy all animations of include_timeline to this instance's timeline*/
                     uint32_t m;
                     for(m = 0; m < include_timeline->anim_dsc_cnt; m++) {
                         uint32_t delay = include_timeline->anim_dsc[m].start_time;
