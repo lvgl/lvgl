@@ -301,13 +301,27 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     int32_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     int32_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
 
+    lv_obj_t * parent = lv_obj_get_parent(cont);
+    bool ignore_size_content = false;
+    if(parent != NULL) {
+        bool parent_is_flex = lv_obj_get_style_layout(parent, LV_PART_MAIN) == LV_LAYOUT_FLEX;
+        uint8_t grow_value = lv_obj_get_style_flex_grow(cont, LV_PART_MAIN);
+
+        /* If the obj is grown then the size in that direction is known and overrides LV_SIZE_CONTENT if it is set. In
+         * the next `if` statement we no longer need to prevent wrapping if the width/height (depending on flow) is
+         * `LV_SIZE_CONTENT`, since it is not used.
+         */
+        ignore_size_content = parent_is_flex && (grow_value > 0);
+    }
+
     /*Can't wrap if the size is auto (i.e. the size depends on the children)*/
-    if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT))) {
+    if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT)) &&
+       !ignore_size_content) {
         f->wrap = false;
     }
-    int32_t(*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
-    int32_t(*get_cross_size)(const lv_obj_t *) = (!f->row ? lv_obj_get_width_with_margin :
-                                                  lv_obj_get_height_with_margin);
+    int32_t (*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
+    int32_t (*get_cross_size)(const lv_obj_t *) =
+        (!f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
 
     t->track_main_size = 0;
     t->track_fix_main_size = 0;
