@@ -61,9 +61,6 @@ void lv_grad_vertical_init(lv_grad_dsc_t * dsc)
     dsc->dir = LV_GRAD_DIR_VER;
 }
 
-
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
-
 void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y,
                          lv_grad_extend_t extend)
 {
@@ -112,8 +109,6 @@ void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t cen
     dsc->params.radial.focal_extent.x = center_x + radius;
     dsc->params.radial.focal_extent.y = center_y;
 }
-
-#endif /* LV_USE_DRAW_SW_COMPLEX_GRADIENTS */
 
 /**********************
  *   STATIC FUNCTIONS
