@@ -36,58 +36,43 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_os_init(void)
+{
 #if LV_USE_OS != LV_OS_NONE
-void lv_os_init(void)
-{
     lv_mutex_init(&lv_general_mutex);
+#endif
 }
 
 
 void lv_lock(void)
 {
+#if LV_USE_OS != LV_OS_NONE
     lv_mutex_lock(&lv_general_mutex);
+#endif
 }
 
 lv_result_t lv_lock_isr(void)
 {
+#if LV_USE_OS != LV_OS_NONE
     return lv_mutex_lock_isr(&lv_general_mutex);
-}
-
-void lv_unlock(void)
-{
-    lv_mutex_unlock(&lv_general_mutex);
-}
-
-#else /*LV_USE_OS != LV_OS_NONE*/
-
-void lv_os_init(void)
-{
-    /*Do nothing*/
-}
-
-void lv_lock(void)
-{
-    /*Do nothing*/
-}
-
-lv_result_t lv_lock_isr(void)
-{
-    /*Do nothing*/
+#else
     return LV_RESULT_OK;
+#endif
 }
 
 void lv_unlock(void)
 {
-    /*Do nothing*/
+#if LV_USE_OS != LV_OS_NONE
+    lv_mutex_unlock(&lv_general_mutex);
+#endif
 }
 
+#if LV_USE_OS == LV_OS_NONE
 void lv_sleep_ms(uint32_t ms)
 {
     lv_delay_ms(ms);
 }
-
-
-#endif /*LV_USE_OS != LV_OS_NONE*/
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
