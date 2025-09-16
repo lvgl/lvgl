@@ -1,0 +1,42 @@
+<component>
+	<previews>
+		<preview name="light" style_pad_all="20" />
+		<preview name="dark" style_pad_all="20" style_bg_color="0x888">
+			<set_subject name="dark_theme" value="1" />
+		</preview>
+	</previews>
+
+	<api>
+		<prop name="title" type="string" default="Title" />
+		<prop name="subject" type="subject" default="volume" />
+		<prop name="unit" type="string" default="%d" />
+	</api>
+
+	<styles>
+		<style name="style_dark" bg_color="0x333" text_color="0xfff" border_color="0x111" />
+	</styles>
+
+	<consts>
+		<int name="width" value="200" help="Width of the whole slider box" />
+	</consts>
+
+	<view width="#width" height="content" flex_flow="row" style_flex_cross_place="center">
+		<bind_style name="style_dark" subject="dark_theme" ref_value="1" />
+
+		<!-- Just show the title from the API property -->
+		<lv_label text="$title" width="100%" style_text_align="center" />
+
+		<!-- The round button just needs a subject and a text and it will incrememnt
+        that subject accordingly. Check out it's implementation too.  -->
+		<round_button text="-" flex_in_new_track="true" subject="$subject" step="-1" />
+
+		<!-- Bind the label's text to the subject. As format string use the unit -->
+		<lv_label flex_grow="1" bind_text="$subject" bind_text-fmt="$unit" style_text_align="center" />
+
+		<!-- Same as the previous button, but with positive step. -->
+		<round_button text="+" subject="$subject" step="1" />
+
+		<!-- Bind the subject to the slider too -->
+		<lv_slider bind_value="$subject" flex_in_new_track="true" width="100%" />
+	</view>
+</component>

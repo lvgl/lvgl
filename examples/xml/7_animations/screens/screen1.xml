@@ -1,0 +1,25 @@
+<!-- Use all our components to create a screen with a column layout -->
+<screen>
+	<view flex_flow="column" style_pad_all="#unit_small" style_flex_cross_place="center">
+		<button_normal label_text="Show" name="show">
+			<play_timeline_event target="button_normal_0" timeline="show_up" delay="0" />
+			<play_timeline_event target="button_normal_1" timeline="show_up" delay="100" />
+			<play_timeline_event target="button_normal_2" timeline="show_up" delay="200" />
+			<play_timeline_event target="button_normal_3" timeline="show_up" delay="300" />
+			<play_timeline_event target="button_normal_4" timeline="show_up" delay="400" />
+		</button_normal>
+		<button_normal label_text="Hide" name="hide">
+			<play_timeline_event target="button_normal_4" timeline="show_up" delay="0" reverse="true" />
+			<play_timeline_event target="button_normal_3" timeline="show_up" delay="100" reverse="true" />
+			<play_timeline_event target="button_normal_2" timeline="show_up" delay="200" reverse="true" />
+			<play_timeline_event target="button_normal_1" timeline="show_up" delay="300" reverse="true" />
+			<play_timeline_event target="button_normal_0" timeline="show_up" delay="400" reverse="true" />
+		</button_normal>
+
+		<button_normal label_text="Button 0" />
+		<button_normal label_text="Button 1" />
+		<button_normal label_text="Button 2" />
+		<button_normal label_text="Button 3" />
+		<button_normal label_text="Button 4" />
+	</view>
+</screen>

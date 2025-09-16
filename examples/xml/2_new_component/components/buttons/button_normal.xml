@@ -1,0 +1,40 @@
+<component>
+	<api>
+		<!-- Create a new property. It will be passed by "$label_text" to <lv_label> below.
+             When an instance is created it can be used as: <my_button label_text="hello"> -->
+		<prop name="label_text" type="string" default="Click me" />
+	</api>
+
+	<styles>
+		<!-- The base style will be set used when the button is released.
+			 Constants are referenced from globals.xml like "#...." -->
+		<style
+			name="style_base"
+			bg_opa="100%"
+			bg_color="#dark_blue"
+			width="content"
+			height="content"
+			radius="#unit_medium"
+			pad_hor="#unit_large"
+			pad_ver="#unit_medium"
+			text_color="0xfff"
+		/>
+
+		<!-- Mix a little bit of white to all colors when the butto nis pressed -->
+		<style name="style_pressed" recolor="0xfff" recolor_opa="20%" />
+	</styles>
+
+	<!-- Make it extend LVGL's built in button widget. `
+         If extends` is not set `lv_obj` will be extended -->
+	<view extends="lv_button">
+		<!-- Remove all the default styles to have clean start -->
+		<remove_style_all />
+
+		<!-- Apply the styles -->
+		<style name="style_base" />
+		<style name="style_pressed" selector="pressed" />
+
+		<!-- Add a label as child. Also map the "label_text" API property to its text. -->
+		<lv_label text="$label_text" align="center" />
+	</view>
+</component>

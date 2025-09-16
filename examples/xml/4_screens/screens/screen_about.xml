@@ -1,0 +1,29 @@
+<!-- If the permanent is not set, the default "false" will be applied.
+     It means the screen is created dynamically when it's opened
+     and deleted when it's closed.
+     It also mean that the widget states are lost-->
+<screen>
+	<view style_bg_color="0x041d3a" style_text_color="0xfff">
+		<lv_label text="About screen (dynamically created)" align="top_mid" y="10" />
+
+		<!-- If set value on this slider, go to About screen and come back here
+		     the value will remain as the "permanent" screens are not recreated. -->
+		<lv_slider align="center" />
+
+		<!-- Jusr to explain what should happen -->
+		<lv_label
+			text="I'm NOT on a permanent screed,&#10; so my state will be lost"
+			y="-30"
+			align="center"
+			style_text_align="center"
+		/>
+
+		<!-- This button should open the About screen  -->
+		<lv_button align="bottom_mid" y="-10">
+			<lv_label text="Back" />
+			<!-- Since the Main screen is permanent <screen_load_event>
+			     shall be used just o load the already existing screen.  -->
+			<screen_load_event screen="screen_main" anim_type="move_bottom" duration="1000" />
+		</lv_button>
+	</view>
+</screen>

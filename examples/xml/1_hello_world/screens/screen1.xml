@@ -1,0 +1,13 @@
+<screen>
+	<styles>
+		<style name="style_main" bg_color="0x00688a" />
+	</styles>
+
+	<view>
+		<style name="style_main" />
+
+		<lv_button align="center" style_bg_color="0x111">
+			<lv_label text="Hello world" style_text_font="font_medium" />
+		</lv_button>
+	</view>
+</screen>

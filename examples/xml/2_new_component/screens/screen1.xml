@@ -1,0 +1,13 @@
+<!-- Use all our components to create a screen with a column layout -->
+<screen>
+	<view flex_flow="column" style_pad_all="#unit_small" style_flex_cross_place="center">
+		<section text="Normal buttons" />
+		<button_normal />
+		<button_normal label_text="Custom text" />
+		<button_normal label_text="Full width" width="100%" />
+
+		<section text="Warning buttons" />
+		<button_warning />
+		<button_warning label_text="Upps!" />
+	</view>
+</screen>
