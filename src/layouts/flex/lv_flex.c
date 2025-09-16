@@ -32,7 +32,6 @@ typedef struct {
 
 typedef struct {
     lv_obj_t * item;
-    bool first_item;
     int32_t min_size;
     int32_t max_size;
     int32_t final_size;
@@ -369,7 +368,6 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                                        : lv_obj_calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT, NULL);
 
                     new_dsc[t->grow_item_cnt - 1].item = item;
-                    new_dsc[t->grow_item_cnt - 1].first_item = first_item;
                     new_dsc[t->grow_item_cnt - 1].min_size = min_size;
                     new_dsc[t->grow_item_cnt - 1].max_size = max_size;
                     new_dsc[t->grow_item_cnt - 1].grow_value = grow_value;
@@ -454,8 +452,6 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 LV_ASSERT(grow_value_sum != 0);
                 grow_unit = grow_max_size / grow_value_sum;
                 int32_t size = grow_unit * t->grow_dsc[i].grow_value;
-                // if (t->grow_dsc[i].first_item == false){
-                // size -= item_gap;}
                 int32_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
 
                 if(size_clamp != size) {
