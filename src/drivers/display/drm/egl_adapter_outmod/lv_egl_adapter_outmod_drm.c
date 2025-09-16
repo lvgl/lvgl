@@ -496,7 +496,7 @@ bool lv_egl_adapter_outmod_drm_create_window(void * nativedrm_ptr, native_window
         return false;
     }
 
-    LV_LOG_USER("Created gbm_surface with format=0x%x and %s modifiers\n",
+    LV_LOG_USER("Created gbm_surface with format=0x%x and %s modifiers",
                 format, lv_array_is_empty(validated_mods) ? "implicit" : "explicit");
 
     lv_array_deinit(validated_mods);
@@ -518,11 +518,13 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
         drm_device = find_drm_device_path();
     }
     if(node_path_is_valid(drm_device)) {
-        LV_LOG_USER("Trying to use DRM node %s", drm_device);
         fd = open(drm_device, O_RDWR);
         if(!(fd >= 0)) {
             LV_LOG_WARN("Tried to use '%s' but failed.\nReason : %s", drm_device, strerror(errno));
             return false;
+        }
+        else {
+            LV_LOG_USER("Using DRM path: %s", drm_device);
         }
     }
     if(!(fd >= 0)) fd = open_drm_with_module_checking();
@@ -592,16 +594,16 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
     else {
         float refresh_hertz = (drm_out->drm_mode->clock * 1000.f) / (float)(drm_out->drm_mode->htotal *
                                                                             drm_out->drm_mode->vtotal);
-        printf("Using display mode:  #%d: %d x %d @ %.2fhz\n", (match_mode_num + 1), drm_out->drm_mode->hdisplay,
-               drm_out->drm_mode->vdisplay, refresh_hertz);
-        const char * banner[] = {
+        LV_LOG_USER("Using display mode #%d: %d x %d @ %.1fhz", (match_mode_num + 1), drm_out->drm_mode->hdisplay,
+                    drm_out->drm_mode->vdisplay, refresh_hertz);
+        /*const char * banner[] = {
             ".____ ____   ____________.____         .__        ",
             "|    |\\   \\ /   /  _____/|    |        |__| ____  ",
             "|    | \\   Y   /   \\  ___|    |        |  |/  _ \\ ",
             "|    |__\\     /\\    \\_\\  \\    |___     |  (  <_> )",
             "|_______ \\___/  \\______  /_______ \\ /\\ |__|\\____/ ",
             "        \\/             \\/        \\/ \\/            "
-        };
+        };*/
         //print_grouped_modes_ex(drm_out->drm_connector, (uint32_t)match_mode_num, DISP_MINIMAL, banner, 6);
     }
 
@@ -766,7 +768,6 @@ static char * TEMP_get_default_drm_device_path(void * nativedrm_ptr)
 
 static char * find_drm_device_path()
 {
-    //(void)nativedrm_ptr;
     const int max_cards = 8;
     char path[64];
     int found_index = 0;

@@ -345,8 +345,9 @@ EGLConfig select_best_config(void * adapter_ptr, size_t num_configs, EGLConfig *
 #ifdef LV_EGL_ADAPTER_STRICT_MATCH
         return NULL;
 #endif
-        LV_LOG_WARN("WARN:Unable to find a good EGL config, will continue with the best match,\n"
-                    "but you should verify that the config values are acceptable.\n");
+        if(adapter_ref->requested_visual_config->id != 0x0)
+            LV_LOG_WARN("No perfect match for the specified EGL config #%d, using best match.",
+                        adapter_ref->requested_visual_config->id);
     }
     return best_config;
 }
@@ -398,7 +399,10 @@ bool egl_display_is_valid(void * adapter_ptr)
                         egl_get_error());
         }
     }
-    LV_LOG_INFO("EGL Platform Display Extensions Valid: ", extensions_supported ? "[ Yes ]" : "[ No ]");
+    if(extensions_supported)
+        LV_LOG_USER("EGL Platform Display Extensions Valid: [ Yes ]");
+    else
+        LV_LOG_USER("EGL Platform Display Extensions Valid: [ No ]");
 
     if(!adapter_ref->egl_display) {
         LV_LOG_INFO("Falling back to eglGetDisplay()");

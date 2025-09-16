@@ -106,25 +106,11 @@ lv_drm_use_egl_texture_t * lv_fullscreen_drm_use_egl_add_texture(lv_fullscreen_d
 void lv_drm_use_egl_texture_remove(lv_drm_use_egl_texture_t * texture);
 
 /**
- * Set the x position of a texture within its MK_DRM output
- * @param texture    handle of a MK_DRM output texture
- * @param x          new x position of the texture
- */
-void lv_drm_use_egl_texture_set_x(lv_drm_use_egl_texture_t * texture, int32_t x);
-
-/**
- * Set the y position of a texture within its MK_DRM output
- * @param texture    handle of a MK_DRM output texture
- * @param y          new y position of the texture
- */
-void lv_drm_use_egl_texture_set_y(lv_drm_use_egl_texture_t * texture, int32_t y);
-
-/**
  * Set the opacity of a texture in a MK_DRM output
  * @param texture    handle of a MK_DRM output texture
  * @param opa        new opacity of the texture
  */
-void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t opa);
+//void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t opa);
 
 /**
  * Get the mouse indev associated with a texture in a MK_DRM output, if it exists
@@ -134,7 +120,7 @@ void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t
  *                   LVGL display texture and the window was created with
  *                   `use_mouse_indev` as `true`
  */
-lv_indev_t * lv_drm_use_egl_texture_get_mouse_indev(lv_drm_use_egl_texture_t * texture);
+//lv_indev_t * lv_drm_use_egl_texture_get_mouse_indev(lv_drm_use_egl_texture_t * texture);
 
 /**********************
  *      MACROS

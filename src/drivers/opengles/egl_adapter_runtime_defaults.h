@@ -16,8 +16,8 @@
  * the value you define below, or the user specified override.
  */
 
-#define __LV_EGL_HOR_RES 640
-#define __LV_EGL_VER_RES 480
+#define __LV_EGL_HOR_RES 1024
+#define __LV_EGL_VER_RES 768
 #define __LV_EGL_REFR 60.0
 #define __LV_EGL_SYNC 1
 #define __LV_EGL_DEVICE ""
@@ -28,7 +28,7 @@
  */
 
 //#define __LV_EGL_BUFFER_MODE 0x0      // Best all-purpose auto
-#define __LV_EGL_BUFFER_MODE 0x13     // R5-G6-B5-A0-D0
+//#define __LV_EGL_BUFFER_MODE 0x13     // R5-G6-B5-A0-D0
 //#define __LV_EGL_BUFFER_MODE 0x16     // R5-G6-B5-A0-D24
 //#define __LV_EGL_BUFFER_MODE 0x4      // R8-G8-B8-A8-D24
 //#define __LV_EGL_BUFFER_MODE 0xd      // R8-G8-B8-A0-D24

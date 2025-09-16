@@ -201,16 +201,7 @@ void lv_drm_use_egl_texture_remove(lv_drm_use_egl_texture_t * texture)
     lv_free(texture);
 }
 
-void lv_drm_use_egl_texture_set_x(lv_drm_use_egl_texture_t * texture, int32_t x)
-{
-    lv_area_set_pos(&texture->area, x, texture->area.y1);
-}
-
-void lv_drm_use_egl_texture_set_y(lv_drm_use_egl_texture_t * texture, int32_t y)
-{
-    lv_area_set_pos(&texture->area, texture->area.x1, y);
-}
-
+/*
 void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t opa)
 {
     texture->opa = opa;
@@ -220,7 +211,7 @@ lv_indev_t * lv_drm_use_egl_texture_get_mouse_indev(lv_drm_use_egl_texture_t * t
 {
     return texture->indev;
 }
-
+*/
 /**********************
  *   STATIC FUNCTIONS
  **********************/
