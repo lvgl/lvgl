@@ -327,9 +327,8 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
         if(!lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) {
             uint8_t grow_value = lv_obj_get_style_flex_grow(item, LV_PART_MAIN);
             if(grow_value) {
-                int32_t min_size = f->row ? lv_obj_get_style_min_width(item, LV_PART_MAIN)
-                                   : lv_obj_get_style_min_height(item, LV_PART_MAIN);
-
+                int32_t min_size = f->row ? lv_obj_calc_dynamic_width(item, LV_STYLE_MIN_WIDTH, NULL)
+                                   : lv_obj_calc_dynamic_height(item, LV_STYLE_MIN_HEIGHT, NULL);
                 int32_t req_size = min_size;
                 if(item_id != item_start_id) {
                     req_size += item_gap; /*No gap before the first item*/
@@ -351,6 +350,9 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                     LV_ASSERT_MALLOC(new_dsc);
                     if(new_dsc == NULL)
                         return item_id;
+
+                    int32_t max_size = f->row ? lv_obj_calc_dynamic_width(item, LV_STYLE_MAX_WIDTH, NULL)
+                                       : lv_obj_calc_dynamic_height(item, LV_STYLE_MAX_HEIGHT, NULL);
 
                     new_dsc[t->grow_item_cnt - 1].item = item;
                     new_dsc[t->grow_item_cnt - 1].first_item = first_item;
