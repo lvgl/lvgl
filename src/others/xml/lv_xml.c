@@ -298,23 +298,79 @@ void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * pare
         timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t *));
         uint32_t i = 0;
         LV_LL_READ(&scope->timeline_ll, at_xml) {
-            lv_anim_timeline_t * at = lv_anim_timeline_create();
-            at->user_data = lv_strdup(at_xml->name);
+            lv_anim_timeline_t * my_timeline = lv_anim_timeline_create();
+            my_timeline->user_data = lv_strdup(at_xml->name);
 
-            lv_anim_t * a_stored;
-            LV_LL_READ(&at_xml->anims_ll, a_stored) {
-                int32_t delay = -a_stored->act_time;
-                lv_anim_timeline_add(at, delay, a_stored);
+            lv_xml_anim_timeline_child_t * timeline_child;
+            LV_LL_READ(&at_xml->anims_ll, timeline_child) {
+                /*Add all the animation descriptors to instance's timeline*/
+                if(timeline_child->is_anim) {
+                    int32_t delay = -timeline_child->data.anim.act_time;
+                    lv_anim_timeline_add(my_timeline, delay, &timeline_child->data.anim);
+
+                    lv_anim_t * new_a = &my_timeline->anim_dsc[my_timeline->anim_dsc_cnt - 1].anim;
+                    if(lv_streq(new_a->var, "self")) {
+                        new_a->var = state.view;//lv_strdup(new_var_name);
+                    }
+                    else {
+                        new_a->var = lv_obj_find_by_name(state.view, new_a->var);//lv_strdup(new_var_name);
+                    }
+                }
+                /*Or include (merge) to referenced timelines*/
+                else {
+                    lv_xml_anim_timeline_include_t * incl = &timeline_child->data.incl;
+                    /*Get the target first*/
+                    lv_obj_t * target;
+                    if(lv_streq(incl->target_name, "self")) {
+                        target = state.view;
+                    }
+                    else {
+                        target = lv_obj_find_by_name(state.view, incl->target_name);
+                    }
+
+                    if(target == NULL) {
+                        LV_LOG_WARN("No target widget is found with `%s` name", incl->target_name);
+                        continue;
+                    }
+
+                    /*Get the timeline with the given name*/
+                    lv_anim_timeline_t ** timeline_array = NULL;
+                    lv_obj_send_event(target, lv_event_xml_store_timeline, &timeline_array);
+                    if(timeline_array == NULL) {
+                        LV_LOG_WARN("No time lines are stored in `%s`", incl->target_name);
+                        continue;
+                    }
+
+                    uint32_t i;
+                    lv_anim_timeline_t * include_timeline = NULL;
+                    for(i = 0; timeline_array[i]; i++) {
+                        const char * name = lv_anim_timeline_get_user_data(timeline_array[i]);
+                        if(lv_streq(name, incl->timeline_name)) {
+                            include_timeline = timeline_array[i];
+                            break;
+                        }
+                    }
+
+                    if(include_timeline == NULL) {
+                        LV_LOG_WARN("No timeline is found for `%s` with `%s` name", incl->target_name, incl->timeline_name);
+                        continue;
+                    }
+
+                    /*Merge the include_timeline of the target to this one*/
+                    uint32_t m;
+                    for(m = 0; m < include_timeline->anim_dsc_cnt; m++) {
+                        uint32_t delay = include_timeline->anim_dsc[m].start_time;
+                        delay += incl->delay;
+                        lv_anim_timeline_add(my_timeline, delay, &include_timeline->anim_dsc[m].anim);
+                    }
+                }
             }
 
-            at->base_obj = state.view;
-            timeline_array[i] = at;
+            timeline_array[i] = my_timeline;
             i++;
         }
 
-
         timeline_array[i] = NULL; /*Closing to avoid storing the length*/
-
 
         lv_obj_add_event_cb(state.view, get_timeline_from_event_cb, lv_event_xml_store_timeline, timeline_array);
         lv_obj_add_event_cb(state.view, free_timelines_event_cb, LV_EVENT_DELETE, timeline_array);
@@ -518,7 +574,7 @@ lv_result_t lv_xml_register_timeline(lv_xml_component_scope_t * scope, const cha
 
     at = lv_ll_ins_head(&scope->timeline_ll);
     at->name = lv_strdup(name);
-    lv_ll_init(&at->anims_ll, sizeof(lv_anim_t));
+    lv_ll_init(&at->anims_ll, sizeof(lv_xml_anim_timeline_child_t));
 
     return LV_RESULT_OK;
 }
