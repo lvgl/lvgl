@@ -14,16 +14,10 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 
-#define NANOVG_GLEW 1
+#include <GLES2/gl2.h>
+
 #define NANOVG_GL_USE_UNIFORMBUFFER 0
-
-#ifdef NANOVG_GLEW
-    #include <GL/glew.h>
-#endif
-#define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
-
-#define NANOVG_GL2_IMPLEMENTATION
+#define NANOVG_GLES2_IMPLEMENTATION
 #include "../../libs/nanovg/nanovg_gl.h"
 
 /*********************
@@ -64,8 +58,8 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.delete_cb = draw_delete;
     unit->base_unit.name = "NANOVG";
 
-    unit->vg = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-    LV_ASSERT_MSG(unit->vg != NULL, "nvgCreateGL2 init failed");
+    unit->vg = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+    LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
 
     lv_draw_nanovg_label_init(unit);
 }
@@ -222,7 +216,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
     lv_draw_nanovg_label_init(unit);
-    nvgDeleteGL2(unit->vg);
+    nvgDeleteGLES2(unit->vg);
     unit->vg = NULL;
     return 0;
 }

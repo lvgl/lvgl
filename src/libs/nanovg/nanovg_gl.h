@@ -1538,7 +1538,7 @@ static void glnvg__renderDelete(void* uptr)
 
 	glnvg__deleteShader(&gl->shader);
 
-#if NANOVG_GL3
+#if defined NANOVG_GL3
 #if NANOVG_GL_USE_UNIFORMBUFFER
 	if (gl->fragBuf != 0)
 		glDeleteBuffers(1, &gl->fragBuf);
