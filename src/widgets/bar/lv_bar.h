@@ -20,6 +20,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_anim.h"
 #include "../label/lv_label.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -162,6 +163,16 @@ lv_bar_orientation_t lv_bar_get_orientation(lv_obj_t * obj);
  * @return          true: in symmetrical mode false : not in
 */
 bool lv_bar_is_symmetrical(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer or float Subject to a Bar's value.
+ * @param obj       pointer to Bar
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_bar_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
 /**********************
  *      MACROS

@@ -25,6 +25,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_fs.h"
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -337,6 +338,17 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
  * @return          an lv_image_dsc_t bitmap mask source.
  */
 const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
+
+
+#if LV_USE_OBSERVER
+/**
+ * Bind a pointer Subject to an Image's source.
+ * @param obj       pointer to Image
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
 /**********************
  *      MACROS

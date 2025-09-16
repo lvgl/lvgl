@@ -11,6 +11,7 @@
 
 #if LV_USE_QRCODE
 
+#include "../../misc/cache/lv_cache.h"
 #include "qrcodegen.h"
 
 /*********************

@@ -183,6 +183,17 @@ lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider);
 */
 bool lv_slider_is_symmetrical(lv_obj_t * obj);
 
+
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer or float Subject to a Slider's value.
+ * @param obj       pointer to Slider
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
+
 /**********************
  *      MACROS
  **********************/

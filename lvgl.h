@@ -36,7 +36,6 @@ extern "C" {
 #include "src/misc/lv_iter.h"
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
-#include "src/misc/cache/lv_cache.h"
 
 #include "src/tick/lv_tick.h"
 
@@ -110,6 +109,7 @@ extern "C" {
 #include "src/libs/gltf/gltf_data/lv_gltf_model.h"
 #include "src/libs/gltf/gltf_view/lv_gltf.h"
 #include "src/libs/gif/lv_gif.h"
+#include "src/libs/gstreamer/lv_gstreamer.h"
 #include "src/libs/qrcode/lv_qrcode.h"
 #include "src/libs/tjpgd/lv_tjpgd.h"
 #include "src/libs/libjpeg_turbo/lv_libjpeg_turbo.h"

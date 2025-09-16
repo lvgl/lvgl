@@ -16,7 +16,7 @@ Prerequisites
 -------------
 
 - This driver relies on the presence of the MCUx SDK from NXP in the same project
-- Activate the diver by setting :c:macro:`LV_USE_NXP_ELCDIF` to ``1`` in your *"lv_conf.h"*.
+- Activate the driver by setting :c:macro:`LV_USE_NXP_ELCDIF` to ``1`` in your *"lv_conf.h"*.
 
 Usage
 -----
@@ -25,7 +25,7 @@ The LVGL driver for eLCDIF assumes the platform already configured the display l
 set the pin-mux, clocks, etc. It also requires the base address of the peripheral and configuration
 structure already set.
 
-The following code demonstrates using the diver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` mode,
+The following code demonstrates using the driver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` mode,
 please notice in this mode of operation the application is responsible to allocate the framebuffers space
 and pass them to the display, in the example below `buffer1` and `buffer2` are the current and the next
 buffers that will be copied to the display screen, being swapped at each flush operation (managed

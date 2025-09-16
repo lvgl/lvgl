@@ -1,7 +1,7 @@
 .. _tiny_ttf:
 
 ====================
-Tiny TTF font engine
+Tiny TTF Font Engine
 ====================
 
 The lv_tiny_ttf extension allows using TrueType fonts in LVGL using the

@@ -14,9 +14,10 @@
 #include "../../../../misc/lv_math.h"
 #include "../../../../misc/lv_log.h"
 #include "../../../../stdlib/lv_string.h"
-#include "../../../../drivers/glfw/lv_opengles_debug.h"
+#include "../../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../../drivers/opengles/lv_opengles_debug.h"
 
-#include "../../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../lv_gltf_view_internal.h"
 #include "../assets/lv_gltf_view_shader.h"
 

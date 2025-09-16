@@ -13,16 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 
 #if LV_USE_GLTF
 
 /*********************
  *      DEFINES
  *********************/
-
-#define GLSL_VERSION_PREFIX "#version 300 es\n"
 
 /**********************
  *      TYPEDEFS

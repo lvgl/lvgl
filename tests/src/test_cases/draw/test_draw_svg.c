@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../src/misc/cache/lv_cache.h"
 
 #include <string.h>
 

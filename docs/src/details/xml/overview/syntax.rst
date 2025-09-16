@@ -164,12 +164,12 @@ width: ``type="px|%|content"``.
 Limiting accepted values
 ------------------------
 
+
+**Not supported yet; the examples below illustrate the planned syntax.**
+
 It is also possible to limit the possible options the user can select from an enum.
 For example:
 
 - Enums: ``type="dir(top bottom)"``
 - Colors: ``type="color(0xff0000 0x00ff00 0x0000ff)"``
 - Strings: ``type="string('Ok' 'Cancel')``
-
-Limiting accepted values is not supported yet, however in the UI |nbsp| Editor if
-an invalid option is selected, it will be highlighted as an error.

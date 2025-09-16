@@ -360,8 +360,12 @@
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #define LV_USE_DRAW_OPENGLES 0
+
+#if LV_USE_DRAW_OPENGLES
+    #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+#endif
 
 /** Draw using espressif PPA accelerator */
 #define LV_USE_PPA  0
@@ -543,6 +547,19 @@
 
 /* Enable usage of the LVGL's vg_lite spec driver */
 #define LV_USE_VG_LITE_DRIVER  0
+
+#if LV_USE_VG_LITE_DRIVER
+
+    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+    #define LV_VG_LITE_HAL_GPU_SERIES gc255
+
+    /* Used to pick the correct GPU revision header it depends on the vendor */
+    #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+
+    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+
+#endif
 
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
@@ -953,6 +970,8 @@
     #define LV_GIF_CACHE_DECODE_DATA 0
 #endif
 
+/** GStreamer library */
+#define LV_USE_GSTREAMER 0
 
 /** Decode bin images to RAM */
 #define LV_BIN_DECODER_RAM_LOAD 0
@@ -1296,10 +1315,20 @@
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
+
+    #define LV_LINUX_DRM_USE_EGL     0
 #endif
 
 /** Interface for TFT_eSPI */
 #define LV_USE_TFT_ESPI         0
+
+/** Interface for Lovyan_GFX */
+#define LV_USE_LOVYAN_GFX         0
+
+#if LV_USE_LOVYAN_GFX
+    #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
+
+#endif /*LV_USE_LOVYAN_GFX*/
 
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
@@ -1354,11 +1383,15 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
 #endif
+
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
+#define LV_USE_GLFW   0
+
 
 /** QNX Screen display and input drivers */
 #define LV_USE_QNX              0
