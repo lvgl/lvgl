@@ -62,7 +62,7 @@ void lv_unlock(void)
 
 void lv_os_init(void)
 {
-
+    /*Do nothing*/
 }
 
 void lv_lock(void)
