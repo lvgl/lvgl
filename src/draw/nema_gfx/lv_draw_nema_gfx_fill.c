@@ -149,20 +149,15 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
                 y1 = rel_coords.y2;
             }
             else {
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
                 x0 = rel_coords.x1 + lv_pct_to_px(dsc->grad.params.linear.start.x, lv_area_get_width(coords));
                 x1 = rel_coords.x1 + lv_pct_to_px(dsc->grad.params.linear.end.x, lv_area_get_width(coords));
                 y0 = rel_coords.y1 + lv_pct_to_px(dsc->grad.params.linear.start.y, lv_area_get_height(coords));
                 y1 = rel_coords.y1 + lv_pct_to_px(dsc->grad.params.linear.end.y, lv_area_get_height(coords));
-#else
-                return;
-#endif
             }
 
             nema_vg_paint_set_grad_linear(draw_nema_gfx_unit->paint, draw_nema_gfx_unit->gradient, x0, y0, x1, y1,
                                           extend_type | NEMA_FILTER_BL);
         }
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
         else if(dsc->grad.dir == LV_GRAD_DIR_RADIAL) {
             nema_vg_paint_set_type(draw_nema_gfx_unit->paint, NEMA_VG_PAINT_GRAD_RADIAL);
 
@@ -172,10 +167,6 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
                                           LV_ABS(dsc->grad.params.radial.end_extent.x - dsc->grad.params.radial.end.x),
                                           extend_type | NEMA_FILTER_BL);
         }
-#endif /*LV_USE_DRAW_SW_COMPLEX_GRADIENTS*/
-        else {
-            return;
-        }
 
         if(radius > 0.f)
             nema_vg_draw_rounded_rect(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, radius, radius, NULL,
@@ -183,7 +174,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
         else
             nema_vg_draw_rect(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, NULL, draw_nema_gfx_unit->paint);
     }
-#endif /*LV_USE_NEMA_VG*/
+#endif
 
     nema_cl_submit(&(draw_nema_gfx_unit->cl));
 
