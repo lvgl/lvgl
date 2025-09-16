@@ -154,6 +154,7 @@ void lv_indev_delete(lv_indev_t * indev)
     LV_ASSERT_NULL(indev);
 
     lv_indev_send_event(indev, LV_EVENT_DELETE, NULL);
+    lv_event_mark_deleted(indev);
     lv_event_remove_all(&(indev->event_list));
 
     /*Clean up the read timer first*/
@@ -671,21 +672,7 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
 
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param)
 {
-
-    lv_event_t e;
-    lv_memzero(&e, sizeof(e));
-    e.code = code;
-    e.current_target = indev;
-    e.original_target = indev;
-    e.param = param;
-    lv_result_t res;
-    res = lv_event_send(&indev->event_list, &e, true);
-    if(res != LV_RESULT_OK) return res;
-
-    res = lv_event_send(&indev->event_list, &e, false);
-    if(res != LV_RESULT_OK) return res;
-
-    return res;
+    return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
 
 /**********************

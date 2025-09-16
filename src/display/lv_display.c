@@ -178,6 +178,7 @@ void lv_display_delete(lv_display_t * disp)
     if(disp == lv_refr_get_disp_refreshing()) was_refr = true;
 
     lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
+    lv_event_mark_deleted(disp);
     lv_event_remove_all(&(disp->event_list));
 
     /*Detach the input devices*/
@@ -914,21 +915,7 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
 
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param)
 {
-
-    lv_event_t e;
-    lv_memzero(&e, sizeof(e));
-    e.code = code;
-    e.current_target = disp;
-    e.original_target = disp;
-    e.param = param;
-    lv_result_t res;
-    res = lv_event_send(&disp->event_list, &e, true);
-    if(res != LV_RESULT_OK) return res;
-
-    res = lv_event_send(&disp->event_list, &e, false);
-    if(res != LV_RESULT_OK) return res;
-
-    return res;
+    return lv_event_push_and_send(&disp->event_list, code, disp, param);
 }
 
 lv_area_t * lv_event_get_invalidated_area(lv_event_t * e)

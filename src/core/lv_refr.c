@@ -384,7 +384,12 @@ void lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
+    lv_result_t res = lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
+    if(res == LV_RESULT_INVALID) {
+        LV_TRACE_REFR("deleted");
+        LV_PROFILER_REFR_END;
+        return;
+    }
 
     /*Refresh the screen's layout if required*/
     LV_PROFILER_LAYOUT_BEGIN_TAG("layout");
