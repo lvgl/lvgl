@@ -504,30 +504,49 @@ bool egl_config_is_valid(void * adapter_ptr)
             break;
         }
     }
-#ifdef LV_EXTRA_EGL_INFO
-    LV_LOG_INFO("Found (%u) buffer configs. Best match: [ 0x%x ]", num_configs,
-                lv_egl_adapter_mode_get_id(adapter_ref->best_config));
-#ifndef LV_EXTRA_EGL_INFO_MORE
-    lv_egl_adapter_mode_print_header();
-    lv_egl_adapter_mode_print(adapter_ref->best_config, false);
-    lv_egl_adapter_mode_print_bar();
-#else
-    unsigned int lineNumber = 0;
-    bool is_best = false;
-    for(size_t i = 0; i < (size_t)num_configs; i++) {
-        lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
-        if(!lineNumber) lv_egl_adapter_mode_print_header();
-        is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
-        if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
-        lv_egl_adapter_mode_print(cfg, is_best);
-        if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
-        lineNumber++;
-        free(cfg);
+    //#ifdef LV_EXTRA_EGL_INFO
+    if((adapter_ref->requested_visual_config->id == 0x0) ||
+       (lv_egl_adapter_mode_get_id(adapter_ref->best_config) != adapter_ref->requested_visual_config->id)) {
+        LV_LOG_USER("Found (%u) buffer configs. Best match: [ 0x%x ]", num_configs,
+                    lv_egl_adapter_mode_get_id(adapter_ref->best_config));
+        unsigned int lineNumber = 0;
+        bool is_best = false;
+        for(size_t i = 0; i < (size_t)num_configs; i++) {
+            lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
+            if(!lineNumber) lv_egl_adapter_mode_print_header();
+            is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
+            if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
+            lv_egl_adapter_mode_print(cfg, is_best);
+            if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
+            lineNumber++;
+            free(cfg);
+        }
+        if(!is_best) lv_egl_adapter_mode_print_bar();
     }
-    if(!is_best) lv_egl_adapter_mode_print_bar();
-    LV_LOG_INFO("    [*] = Best EGLConfig ID: 0x%x\n", lv_egl_adapter_mode_get_id(adapter_ref->best_config));
-#endif
-#endif
+    else {
+        LV_LOG_USER("Using specified buffer config id: [ 0x%x ]", lv_egl_adapter_mode_get_id(adapter_ref->best_config));
+    }
+    /*#ifndef LV_EXTRA_EGL_INFO_MORE
+        lv_egl_adapter_mode_print_header();
+        lv_egl_adapter_mode_print(adapter_ref->best_config, false);
+        lv_egl_adapter_mode_print_bar();
+    #else
+        unsigned int lineNumber = 0;
+        bool is_best = false;
+        for(size_t i = 0; i < (size_t)num_configs; i++) {
+            lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
+            if(!lineNumber) lv_egl_adapter_mode_print_header();
+            is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
+            if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
+            lv_egl_adapter_mode_print(cfg, is_best);
+            if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
+            lineNumber++;
+            free(cfg);
+        }
+        if(!is_best) lv_egl_adapter_mode_print_bar();
+        LV_LOG_INFO("    [*] = Best EGLConfig ID: 0x%x\n", lv_egl_adapter_mode_get_id(adapter_ref->best_config));
+    #endif
+    #endif */
 
     return true;
 }

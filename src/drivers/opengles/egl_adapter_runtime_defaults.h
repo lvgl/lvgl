@@ -27,10 +27,14 @@
  * option with an alpha channel and depth buffer.
  */
 
-//#define __LV_EGL_BUFFER_MODE 0x0      // Best all-purpose auto
-//#define __LV_EGL_BUFFER_MODE 0x13     // R5-G6-B5-A0-D0
-//#define __LV_EGL_BUFFER_MODE 0x16     // R5-G6-B5-A0-D24
-//#define __LV_EGL_BUFFER_MODE 0x4      // R8-G8-B8-A8-D24
-//#define __LV_EGL_BUFFER_MODE 0xd      // R8-G8-B8-A0-D24
+//#define __LV_EGL_BUFFER_MODE 0x0      // Select best all-purpose auto
+
+// This define is platform specific and the actual value may vary.
+// To see a full list of available options, don't set this value
+// and make sure LV_LOG_LEVEL is at least 2, to show USER level
+// messages.   That message is not displayed if this value is
+// defined below (and is a valid mode).
+#define __LV_EGL_BUFFER_MODE 0xd        // R5-G6-B5-A0-D0 (on this device)
+
 
 #endif /* MK_CONF_H_ */
