@@ -36,14 +36,12 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_OS != LV_OS_NONE
 void lv_os_init(void)
 {
-#if LV_USE_OS != LV_OS_NONE
     lv_mutex_init(&lv_general_mutex);
-#endif /*LV_USE_OS != LV_OS_NONE*/
 }
 
-#if LV_USE_OS != LV_OS_NONE
 
 void lv_lock(void)
 {
@@ -62,20 +60,25 @@ void lv_unlock(void)
 
 #else /*LV_USE_OS != LV_OS_NONE*/
 
+void lv_os_init(void)
+{
+
+}
+
 void lv_lock(void)
 {
-    /*No nothing*/
+    /*Do nothing*/
 }
 
 lv_result_t lv_lock_isr(void)
 {
-    /*No nothing*/
+    /*Do nothing*/
     return LV_RESULT_OK;
 }
 
 void lv_unlock(void)
 {
-    /*No nothing*/
+    /*Do nothing*/
 }
 
 void lv_sleep_ms(uint32_t ms)
