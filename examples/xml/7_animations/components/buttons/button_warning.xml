@@ -7,6 +7,6 @@
 		<prop name="label_text" type="string" default="Warning!" />
 	</api>
 
-	<!-- Extend the normala button, and use it's API pass properties -->
+	<!-- Extend the normal button, and use its API pass properties -->
 	<view extends="button_normal" style_bg_color="#yellow" label_text="$label_text" />
 </component>

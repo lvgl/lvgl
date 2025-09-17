@@ -8,9 +8,9 @@
 		     the value will remain as the "permanent" screens are not recreated. -->
 		<lv_slider align="center" />
 
-		<!-- Jusr to explain what should happen -->
+			<!-- Just to explain what should happen -->
 		<lv_label
-			text="I'm on a permanent screed,&#10; so my state will stay"
+				text="I'm on a permanent screen,&#10; so my state will stay"
 			y="-30"
 			align="center"
 			style_text_align="center"
