@@ -118,9 +118,11 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 
 static void letter_release_cb(void * entry, void * user_data)
 {
+    LV_PROFILER_DRAW_BEGIN;
     NVGcontext * ctx = user_data;
     int image_handle = *(int *)entry;
     nvgDeleteImage(ctx, image_handle);
+    LV_PROFILER_DRAW_END;
 }
 
 static inline void convert_letter_matrix(lv_matrix_t * matrix, const lv_draw_glyph_dsc_t * dsc)
@@ -171,6 +173,7 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
 
 static void convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
 {
+    LV_PROFILER_DRAW_BEGIN;
     for(uint32_t y = 0; y < src->header.h; y++) {
         nvg_color32_t * dest_data = lv_draw_buf_goto_xy(dest, 0, y);
         const uint8_t * src_data = lv_draw_buf_goto_xy(src, 0, y);
@@ -185,6 +188,8 @@ static void convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * s
             src_data++;
         }
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, const lv_draw_buf_t * src_buf)
@@ -202,13 +207,6 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     lv_matrix_t matrix = u->global_matrix;
     convert_letter_matrix(&matrix, dsc);
-
-    /* Check if the data has cache and add it to the pending list */
-    if(dsc->g->entry) {
-        /* Increment the cache reference count */
-        lv_cache_entry_acquire_data(dsc->g->entry);
-        lv_nanovg_pending_add(u->letter_pending, dsc->g);
-    }
 
     const uint32_t stride = dsc->g->box_w * sizeof(uint32_t);
     lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->letter_buf, LV_COLOR_FORMAT_ARGB8888, dsc->g->box_w, dsc->g->box_h,
@@ -230,7 +228,9 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     convert_a8_to_nvgcolor(u->letter_buf, src_buf, lv_color_to_32(dsc->color, dsc->opa));
 
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
     int image_handle = nvgCreateImageRGBA(u->vg, dsc->g->box_w, dsc->g->box_h, 0, lv_draw_buf_goto_xy(u->letter_buf, 0, 0));
+    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
 
     if(!dsc->rotation) {
         float x = dsc->letter_coords->x1;

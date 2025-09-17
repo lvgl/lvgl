@@ -50,6 +50,7 @@ void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
 {
     LV_ASSERT_NULL(ctx);
     LV_ASSERT_NULL(matrix);
+    LV_PROFILER_DRAW_BEGIN;
 
     nvgResetTransform(ctx);
     nvgTransform(ctx,
@@ -59,21 +60,28 @@ void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
                  matrix->m[1][1],
                  matrix->m[0][2],
                  matrix->m[1][2]);
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area)
 {
     LV_ASSERT_NULL(ctx);
     LV_ASSERT_NULL(area);
+    LV_PROFILER_DRAW_BEGIN;
 
     nvgScissor(ctx,
                area->x1, area->y1,
                lv_area_get_width(area), lv_area_get_height(area));
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r)
 {
     LV_ASSERT_NULL(ctx);
+
+    LV_PROFILER_DRAW_BEGIN;
 
     if(r > 0) {
         const float half_w = w / 2.0f;
@@ -83,10 +91,13 @@ void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, flo
         const float r_max = LV_MIN(half_w, half_h);
 
         nvgRoundedRect(ctx, x, y, w, h, r > r_max ? r_max : r);
+        LV_PROFILER_DRAW_END;
         return;
     }
 
     nvgRect(ctx, x, y, w, h);
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nanovg_path_append_arc_right_angle(NVGcontext * ctx,
@@ -186,20 +197,28 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
                     NVGcolor color)
 {
     LV_ASSERT_NULL(ctx);
+    LV_PROFILER_DRAW_BEGIN;
     nvgPathWinding(ctx, winding);
     nvgGlobalCompositeOperation(ctx, composite_operation);
     nvgFillColor(ctx, color);
     nvgFill(ctx);
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
+    LV_PROFILER_DRAW_BEGIN;
+
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgEndFrame");
     nvgEndFrame(u->vg);
+    LV_PROFILER_DRAW_END_TAG("nvgEndFrame");
 
     lv_nanovg_pending_remove_all(u->letter_pending);
 
     u->is_started = false;
+
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
