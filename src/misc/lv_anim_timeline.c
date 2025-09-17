@@ -29,7 +29,7 @@
 static void anim_timeline_exec_cb(void * var, int32_t v);
 static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time);
 static int32_t anim_timeline_path_cb(const lv_anim_t * a);
-static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v);
+static void exec_anim(lv_anim_t * a, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -249,7 +249,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             }
 
             value = a->start_value;
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -269,7 +269,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
 
             a->act_time = act_time - start_time;
             value = a->path_cb(a);
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -304,7 +304,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             }
 
             value = a->end_value;
-            exec_anim(at, a, value);
+            exec_anim(a, value);
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
@@ -331,7 +331,7 @@ static void anim_timeline_exec_cb(void * var, int32_t v)
     anim_timeline_set_act_time(at, v);
 }
 
-static void exec_anim(lv_anim_timeline_t * at, lv_anim_t * a, int32_t v)
+static void exec_anim(lv_anim_t * a, int32_t v)
 {
 
     if(a->exec_cb) {
