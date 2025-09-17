@@ -81,6 +81,13 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
 
 void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u);
 
+void lv_nanovg_convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color);
+
+lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u,
+                                               lv_color_format_t cf,
+                                               uint32_t w,
+                                               uint32_t h);
+
 int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color);
 
 /**********************
