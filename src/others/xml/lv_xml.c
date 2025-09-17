@@ -860,6 +860,26 @@ static void view_end_element_handler(void * user_data, const char * name)
     }
 }
 
+static lv_anim_timeline_t * get_timeline_by_name(lv_obj_t * obj, const char * timeline_name)
+{
+    /*Get all the timelines of the target*/
+    lv_anim_timeline_t ** timeline_array = NULL;
+    lv_obj_send_event(obj, lv_event_xml_store_timeline, &timeline_array);
+    if(timeline_array == NULL) {
+        LV_LOG_WARN("No time lines are stored in target");
+        return NULL;
+    }
+
+    /*Find the timeline with the requested timeline name*/
+    uint32_t i;
+    for(i = 0; timeline_array[i]; i++) {
+        const char * name = lv_anim_timeline_get_user_data(timeline_array[i]);
+        if(lv_streq(name, timeline_name)) return timeline_array[i];
+    }
+
+    return NULL;
+}
+
 static void create_timeline_instances(lv_xml_parser_state_t * state)
 {
     /*The timeline descriptors ("blueprints") created when the components was registered
@@ -879,7 +899,7 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
 
     /*Read the timeline descriptors of the component and create
      *timeline instances based on them.*/
-    uint32_t i = 0;
+    uint32_t timeline_index = 0;
     LV_LL_READ(&scope->timeline_ll, timeline_dsc) {
         /*Save the name of the timeline. It will reference by this name in XML
          * (e.g. <play_animation_event target="comp_name" timeline="timeline_name">)*/
@@ -898,7 +918,7 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
                 else target = lv_obj_find_by_name(state->view, a->var);
 
                 if(target == NULL) {
-                    LV_LOG_WARN("No target widget is found with `%s` name", a->var);
+                    LV_LOG_WARN("No target widget is found with `%s` name", (char *)a->var);
                     continue;
                 }
 
@@ -925,27 +945,9 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
                     continue;
                 }
 
-                /*Get all the timelines of the target*/
-                lv_anim_timeline_t ** timeline_array = NULL;
-                lv_obj_send_event(target, lv_event_xml_store_timeline, &timeline_array);
-                if(timeline_array == NULL) {
-                    LV_LOG_WARN("No time lines are stored in `%s`", incl->target_name);
-                    continue;
-                }
-
-                /*Find the timeline with the requested timeline name*/
-                uint32_t i;
-                lv_anim_timeline_t * include_timeline = NULL;
-                for(i = 0; timeline_array[i]; i++) {
-                    const char * name = lv_anim_timeline_get_user_data(timeline_array[i]);
-                    if(lv_streq(name, incl->timeline_name)) {
-                        include_timeline = timeline_array[i];
-                        break;
-                    }
-                }
-
+                lv_anim_timeline_t * include_timeline = get_timeline_by_name(target, incl->timeline_name);
                 if(include_timeline == NULL) {
-                    LV_LOG_WARN("No timeline is found for `%s` with `%s` name", incl->target_name, incl->timeline_name);
+                    LV_LOG_WARN("Timeline `%s` is not found in `%s` component", incl->timeline_name, incl->target_name);
                     continue;
                 }
 
@@ -954,11 +956,11 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
             }
         }
 
-        timeline_array[i] = my_timeline;
-        i++;
+        timeline_array[timeline_index] = my_timeline;
+        timeline_index++;
     }
 
-    timeline_array[i] = NULL; /*Closing to avoid storing the length*/
+    timeline_array[timeline_index] = NULL; /*Closing to avoid storing the length*/
 
     lv_obj_add_event_cb(state->view, get_timeline_from_event_cb, lv_event_xml_store_timeline, timeline_array);
     lv_obj_add_event_cb(state->view, free_timelines_event_cb, LV_EVENT_DELETE, timeline_array);
