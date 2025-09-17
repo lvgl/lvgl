@@ -180,7 +180,6 @@ void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t *
  * @brief Draw a gradient
  * @param ctx the nanovg context
  * @param grad the gradient descriptor
- * @param grad_matrix the gradient matrix
  * @param matrix the matrix to apply to the gradient
  * @param winding the fill rule
  * @param composite_operation the blend mode
@@ -188,7 +187,6 @@ void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t *
 void lv_nanovg_draw_grad(
     NVGcontext * ctx,
     const lv_vector_gradient_t * grad,
-    const lv_matrix_t * grad_matrix,
     const lv_matrix_t * matrix,
     enum NVGwinding winding,
     enum NVGcompositeOperation composite_operation);
