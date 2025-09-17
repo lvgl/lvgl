@@ -161,7 +161,9 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(!u->is_started) {
+        LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
         nvgBeginFrame(u->vg, layer->draw_buf->header.w, layer->draw_buf->header.h, 1.0f);
+        LV_PROFILER_DRAW_END_TAG("nvgBeginFrame");
         u->is_started = true;
     }
 
