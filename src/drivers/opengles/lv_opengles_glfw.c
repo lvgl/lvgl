@@ -426,7 +426,7 @@ static void lv_glfw_window_config(GLFWwindow * window, bool use_mouse_indev)
 {
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
