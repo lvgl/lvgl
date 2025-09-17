@@ -247,6 +247,8 @@ void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
 
     lv_nanovg_pending_remove_all(u->image_pending);
 
+    lv_nanovg_pending_remove_all(u->letter_pending);
+
     u->is_started = false;
 
     LV_PROFILER_DRAW_END;
@@ -261,7 +263,7 @@ static void image_free_cb(void * entry, void * user_data)
     LV_PROFILER_DRAW_END;
 }
 
-static void convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
+void lv_nanovg_convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
 {
     LV_PROFILER_DRAW_BEGIN;
     for(uint32_t y = 0; y < src->header.h; y++) {
@@ -302,16 +304,13 @@ static void convert_argb8888_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf
     LV_PROFILER_DRAW_END;
 }
 
-int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color)
+lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u,
+                                               lv_color_format_t cf,
+                                               uint32_t w,
+                                               uint32_t h)
 {
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(src_buf);
-
-    const uint32_t w = src_buf->header.w;
-    const uint32_t h = src_buf->header.h;
-    const uint32_t stride = w * sizeof(uint32_t);
-
-    lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->image_buf, LV_COLOR_FORMAT_ARGB8888, w, h, stride);
+    uint32_t stride = lv_color_format_get_size(cf) * w;
+    lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->image_buf, cf, w, h, stride);
 
     if(!tmp_buf) {
         if(u->image_buf) {
@@ -319,17 +318,32 @@ int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t 
             u->image_buf = NULL;
         }
 
-        tmp_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888, stride);
+        tmp_buf = lv_draw_buf_create(w, h, cf, stride);
         if(!tmp_buf) {
-            return -1;
+            return NULL;
         }
     }
 
     u->image_buf = tmp_buf;
 
+    return u->image_buf;
+}
+
+int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(src_buf);
+
+    const uint32_t w = src_buf->header.w;
+    const uint32_t h = src_buf->header.h;
+
+    if(!lv_nanovg_reshape_global_image(u, LV_COLOR_FORMAT_ARGB8888, w, h)) {
+        return -1;
+    }
+
     switch(src_buf->header.cf) {
         case LV_COLOR_FORMAT_A8:
-            convert_a8_to_nvgcolor(u->image_buf, src_buf, color);
+            lv_nanovg_convert_a8_to_nvgcolor(u->image_buf, src_buf, color);
             break;
 
         case LV_COLOR_FORMAT_ARGB8888:
