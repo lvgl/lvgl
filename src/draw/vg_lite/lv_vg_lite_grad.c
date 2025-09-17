@@ -140,6 +140,12 @@ struct _lv_vg_lite_pending_t * lv_vg_lite_grad_ctx_get_pending(struct _lv_vg_lit
     return ctx->pending;
 }
 
+struct _lv_cache_t * lv_vg_lite_grad_ctx_get_cache(struct _lv_vg_lite_grad_ctx_t * ctx)
+{
+    LV_ASSERT_NULL(ctx);
+    return ctx->cache;
+}
+
 bool lv_vg_lite_draw_grad(
     struct _lv_vg_lite_grad_ctx_t * ctx,
     vg_lite_buffer_t * buffer,

@@ -52,6 +52,12 @@ void lv_vg_lite_grad_ctx_delete(struct _lv_vg_lite_grad_ctx_t * ctx);
 struct _lv_vg_lite_pending_t * lv_vg_lite_grad_ctx_get_pending(struct _lv_vg_lite_grad_ctx_t * ctx);
 
 /**
+ * @brief Get the cache of gradient items
+ * @param ctx the gradient context
+ */
+struct _lv_cache_t * lv_vg_lite_grad_ctx_get_cache(struct _lv_vg_lite_grad_ctx_t * ctx);
+
+/**
  * @brief Draw a gradient
  * @param ctx the gradient context
  * @param buffer the target buffer
