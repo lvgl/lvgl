@@ -214,9 +214,17 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp)
     return dsc->renderer;
 }
 
-void * lv_sdl_window_get_window(lv_display_t * disp)
+SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
 {
+    if(!disp) {
+        LV_LOG_ERROR("invalid display pointer");
+        return NULL;
+    }
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    if (!dsc) {
+        LV_LOG_ERROR("invalid driver data");
+        return NULL;
+    }
     return dsc->window;
 }
 
