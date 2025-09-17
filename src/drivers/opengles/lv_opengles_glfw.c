@@ -21,6 +21,7 @@
 #include "../../indev/lv_indev.h"
 #include "../../lv_init.h"
 #include "../../misc/lv_area_private.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 #include <stdlib.h>
 
@@ -162,6 +163,10 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
 
     glfwMakeContextCurrent(window->window);
     lv_opengles_init();
+
+#if LV_USE_DRAW_NANOVG
+    lv_draw_nanovg_init();
+#endif
 
     return window;
 }
