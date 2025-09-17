@@ -25,21 +25,12 @@
 *      TYPEDEFS
 **********************/
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-} nvg_color32_t;
-
 /**********************
 *  STATIC PROTOTYPES
 **********************/
 
 static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                            lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
-
-static void letter_release_cb(void * entry, void * user_data);
 
 /**********************
 *  STATIC VARIABLES
@@ -56,21 +47,11 @@ static void letter_release_cb(void * entry, void * user_data);
 void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    u->letter_pending = lv_nanovg_pending_create(sizeof(int), 8);
-    lv_nanovg_pending_set_free_cb(u->letter_pending, letter_release_cb, u->vg);
-
-    if(u->letter_buf) {
-        lv_draw_buf_destroy(u->letter_buf);
-        u->letter_buf = NULL;
-    }
 }
 
 void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(u->letter_pending)
-    lv_nanovg_pending_destroy(u->letter_pending);
-    u->letter_pending = NULL;
 }
 
 void lv_draw_nanovg_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
@@ -115,15 +96,6 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 /**********************
 *   STATIC FUNCTIONS
 **********************/
-
-static void letter_release_cb(void * entry, void * user_data)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    NVGcontext * ctx = user_data;
-    int image_handle = *(int *)entry;
-    nvgDeleteImage(ctx, image_handle);
-    LV_PROFILER_DRAW_END;
-}
 
 static inline void convert_letter_matrix(lv_matrix_t * matrix, const lv_draw_glyph_dsc_t * dsc)
 {
@@ -171,27 +143,6 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
     return true;
 }
 
-static void convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    for(uint32_t y = 0; y < src->header.h; y++) {
-        nvg_color32_t * dest_data = lv_draw_buf_goto_xy(dest, 0, y);
-        const uint8_t * src_data = lv_draw_buf_goto_xy(src, 0, y);
-
-        for(uint32_t x = 0; x < src->header.w; x++) {
-            const uint8_t alpha = *src_data;
-            dest_data->a = LV_UDIV255(color.alpha * alpha);
-            dest_data->r = LV_UDIV255(color.red * alpha);
-            dest_data->g = LV_UDIV255(color.green * alpha);
-            dest_data->b = LV_UDIV255(color.blue * alpha);
-            dest_data++;
-            src_data++;
-        }
-    }
-
-    LV_PROFILER_DRAW_END;
-}
-
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, const lv_draw_buf_t * src_buf)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -205,32 +156,11 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
-    lv_matrix_t matrix = u->global_matrix;
-    convert_letter_matrix(&matrix, dsc);
-
-    const uint32_t stride = dsc->g->box_w * sizeof(uint32_t);
-    lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->letter_buf, LV_COLOR_FORMAT_ARGB8888, dsc->g->box_w, dsc->g->box_h,
-                                                  stride);
-
-    if(!tmp_buf) {
-        if(u->letter_buf) {
-            lv_draw_buf_destroy(u->letter_buf);
-            u->letter_buf = NULL;
-        }
-
-        tmp_buf = lv_draw_buf_create(dsc->g->box_w, dsc->g->box_h, LV_COLOR_FORMAT_ARGB8888, stride);
-        if(!tmp_buf) {
-            return;
-        }
+    int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->color, dsc->opa));
+    if(image_handle < 0) {
+        LV_PROFILER_DRAW_END;
+        return;
     }
-
-    u->letter_buf = tmp_buf;
-
-    convert_a8_to_nvgcolor(u->letter_buf, src_buf, lv_color_to_32(dsc->color, dsc->opa));
-
-    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
-    int image_handle = nvgCreateImageRGBA(u->vg, dsc->g->box_w, dsc->g->box_h, 0, lv_draw_buf_goto_xy(u->letter_buf, 0, 0));
-    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
 
     if(!dsc->rotation) {
         float x = dsc->letter_coords->x1;
@@ -249,7 +179,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
     else {
     }
 
-    lv_nanovg_pending_add(u->letter_pending, &image_handle);
+
 
     LV_PROFILER_DRAW_END;
 }
