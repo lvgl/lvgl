@@ -42,7 +42,6 @@
 void lv_nanovg_draw_grad(
     NVGcontext * ctx,
     const lv_vector_gradient_t * grad,
-    const lv_matrix_t * grad_matrix,
     const lv_matrix_t * matrix,
     enum NVGwinding winding,
     enum NVGcompositeOperation composite_operation)
@@ -73,8 +72,6 @@ void lv_nanovg_draw_grad(
             LV_PROFILER_DRAW_END;
             return;
     }
-
-    lv_nanovg_matrix_convert(paint.xform, grad_matrix);
 
     nvgPathWinding(ctx, winding);
     nvgGlobalCompositeOperation(ctx, composite_operation);
@@ -170,7 +167,7 @@ void lv_nanovg_draw_grad_helper(
             return;
     }
 
-    lv_nanovg_draw_grad(ctx, &grad, matrix, matrix, winding, composite_operation);
+    lv_nanovg_draw_grad(ctx, &grad, matrix, winding, composite_operation);
 }
 
 /**********************
