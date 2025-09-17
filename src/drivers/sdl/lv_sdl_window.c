@@ -214,7 +214,7 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp)
     return dsc->renderer;
 }
 
-SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
+struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
 {
     if(!disp) {
         LV_LOG_ERROR("invalid display pointer");

@@ -22,7 +22,6 @@ extern "C" {
 #include "../../indev/lv_indev.h"
 
 #if LV_USE_SDL
-#include LV_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -35,6 +34,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+ struct SDL_Window;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -58,7 +59,7 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
 void lv_sdl_quit(void);
 
-SDL_Window * lv_sdl_window_get_window(lv_display_t * disp);
+struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp);
 
 /**********************
  *      MACROS
