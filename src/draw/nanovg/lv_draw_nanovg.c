@@ -61,6 +61,7 @@ void lv_draw_nanovg_init(void)
     unit->vg = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
 
+    lv_nanovg_utils_init(unit);
     lv_draw_nanovg_label_init(unit);
 }
 
@@ -217,7 +218,8 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
-    lv_draw_nanovg_label_init(unit);
+    lv_draw_nanovg_label_deinit(unit);
+    lv_nanovg_utils_deinit(unit);
     nvgDeleteGLES2(unit->vg);
     unit->vg = NULL;
     return 0;

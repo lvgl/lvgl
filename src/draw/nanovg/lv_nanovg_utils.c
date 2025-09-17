@@ -30,9 +30,18 @@
 *      TYPEDEFS
 **********************/
 
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    uint8_t a;
+} nvg_color32_t;
+
 /**********************
 *  STATIC PROTOTYPES
 **********************/
+
+static void image_free_cb(void * entry, void * user_data);
 
 /**********************
 *  STATIC VARIABLES
@@ -45,6 +54,28 @@
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
+
+void lv_nanovg_utils_init(struct _lv_draw_nanovg_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT(u->image_pending == NULL);
+
+    u->image_pending = lv_nanovg_pending_create(sizeof(int), 8);
+    lv_nanovg_pending_set_free_cb(u->image_pending, image_free_cb, u->vg);
+}
+
+void lv_nanovg_utils_deinit(struct _lv_draw_nanovg_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(u->image_pending)
+    lv_nanovg_pending_destroy(u->image_pending);
+    u->image_pending = NULL;
+
+    if(u->image_buf) {
+        lv_draw_buf_destroy(u->image_buf);
+        u->image_buf = NULL;
+    }
+}
 
 void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
 {
@@ -214,11 +245,111 @@ void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
     nvgEndFrame(u->vg);
     LV_PROFILER_DRAW_END_TAG("nvgEndFrame");
 
-    lv_nanovg_pending_remove_all(u->letter_pending);
+    lv_nanovg_pending_remove_all(u->image_pending);
 
     u->is_started = false;
 
     LV_PROFILER_DRAW_END;
+}
+
+static void image_free_cb(void * entry, void * user_data)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    NVGcontext * ctx = user_data;
+    int image_handle = *(int *)entry;
+    nvgDeleteImage(ctx, image_handle);
+    LV_PROFILER_DRAW_END;
+}
+
+static void convert_a8_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    for(uint32_t y = 0; y < src->header.h; y++) {
+        nvg_color32_t * dest_data = lv_draw_buf_goto_xy(dest, 0, y);
+        const uint8_t * src_data = lv_draw_buf_goto_xy(src, 0, y);
+
+        for(uint32_t x = 0; x < src->header.w; x++) {
+            const uint8_t alpha = *src_data;
+            dest_data->a = LV_UDIV255(color.alpha * alpha);
+            dest_data->r = color.red;
+            dest_data->g = color.green;
+            dest_data->b = color.blue;
+            dest_data++;
+            src_data++;
+        }
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+static void convert_argb8888_to_nvgcolor(lv_draw_buf_t * dest, const lv_draw_buf_t * src)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    for(uint32_t y = 0; y < src->header.h; y++) {
+        nvg_color32_t * dest_data = lv_draw_buf_goto_xy(dest, 0, y);
+        const lv_color32_t * src_data = lv_draw_buf_goto_xy(src, 0, y);
+
+        for(uint32_t x = 0; x < src->header.w; x++) {
+            dest_data->a = src_data->alpha;
+            dest_data->r = src_data->red;
+            dest_data->g = src_data->green;
+            dest_data->b = src_data->blue;
+            dest_data++;
+            src_data++;
+        }
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
+int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(src_buf);
+
+    const uint32_t w = src_buf->header.w;
+    const uint32_t h = src_buf->header.h;
+    const uint32_t stride = w * sizeof(uint32_t);
+
+    lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->image_buf, LV_COLOR_FORMAT_ARGB8888, w, h, stride);
+
+    if(!tmp_buf) {
+        if(u->image_buf) {
+            lv_draw_buf_destroy(u->image_buf);
+            u->image_buf = NULL;
+        }
+
+        tmp_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_ARGB8888, stride);
+        if(!tmp_buf) {
+            return -1;
+        }
+    }
+
+    u->image_buf = tmp_buf;
+
+    switch(src_buf->header.cf) {
+        case LV_COLOR_FORMAT_A8:
+            convert_a8_to_nvgcolor(u->image_buf, src_buf, color);
+            break;
+
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        case LV_COLOR_FORMAT_XRGB8888:
+            convert_argb8888_to_nvgcolor(u->image_buf, src_buf);
+            break;
+
+        default:
+            LV_LOG_ERROR("Unsupported color format: %d", src_buf->header.cf);
+            return -1;
+    }
+
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
+    int image_handle = nvgCreateImageRGBA(u->vg, w, h, 0, lv_draw_buf_goto_xy(u->image_buf, 0, 0));
+    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
+
+    lv_nanovg_pending_add(u->image_pending, &image_handle);
+
+    return image_handle;
 }
 
 /**********************
