@@ -212,6 +212,16 @@ void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at)
     return at->user_data;
 }
 
+void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay)
+{
+    uint32_t i;
+    for(i = 0; i < src->anim_dsc_cnt; i++) {
+        uint32_t anim_delay = src->anim_dsc[i].start_time + delay;
+        lv_anim_timeline_add(dest, anim_delay, &src->anim_dsc[i].anim);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

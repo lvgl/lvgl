@@ -160,18 +160,13 @@ uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
  */
 void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
 
-
-#if LV_USE_OBJ_NAME
 /**
- * Get base object.
- * If set, it's assumed that the  `var` of animations is a widget name (path).
- * The widget pointer will be retrieved by finding them by name on this widget.
- * @param at        pointer to the animation timeline.
- * @return          pointer to the base widget
+ * Merga (add) all animations of a timeline to another
+ * @param dest      merge animation into this timeline
+ * @param src       merge the animations of this timeline
+ * @param delay     add the animations with this extra delay
  */
-lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at);
-#endif
-
+void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay);
 
 /**********************
  *      MACROS
