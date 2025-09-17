@@ -1383,7 +1383,7 @@ Set a color to mix to the obj.
 recolor_opa
 ~~~~~~~~~~~
 
-Set intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
+Sets the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent. A value of  255, `LV_OPA_100` or `LV_OPA_COVER` means fully opaque. Intermediate values like LV_OPA_10, LV_OPA_20, etc result in semi-transparency.
 
 .. raw:: html
 
