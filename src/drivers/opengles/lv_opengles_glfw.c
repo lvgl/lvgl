@@ -461,10 +461,13 @@ static void lv_glfw_window_quit(void)
 static void window_update_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
+    LV_PROFILER_REFR_BEGIN;
 
     lv_opengles_window_t * window;
 
+    LV_PROFILER_REFR_BEGIN_TAG("glfwPollEvents");
     glfwPollEvents();
+    LV_PROFILER_REFR_END_TAG("glfwPollEvents");
 
     /* delete windows that are ready to close */
     window = lv_ll_get_head(&glfw_window_ll);
@@ -584,8 +587,12 @@ static void window_update_handler(lv_timer_t * t)
 #endif
 
         /* Swap front and back buffers */
+        LV_PROFILER_REFR_BEGIN_TAG("glfwSwapBuffers");
         glfwSwapBuffers(window->window);
+        LV_PROFILER_REFR_END_TAG("glfwSwapBuffers");
     }
+
+    LV_PROFILER_REFR_END;
 }
 
 static void glfw_error_cb(int error, const char * description)
