@@ -37,6 +37,10 @@ struct _lv_draw_nanovg_unit_t;
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_nanovg_utils_init(struct _lv_draw_nanovg_unit_t * u);
+
+void lv_nanovg_utils_deinit(struct _lv_draw_nanovg_unit_t * u);
+
 static inline void lv_nanovg_matrix_convert(float * xform, const lv_matrix_t * matrix)
 {
     LV_ASSERT_NULL(xform);
@@ -76,6 +80,8 @@ void lv_nanovg_fill(NVGcontext * ctx, enum NVGwinding winding, enum NVGcomposite
                     NVGcolor color);
 
 void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u);
+
+int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color);
 
 /**********************
  *      MACROS

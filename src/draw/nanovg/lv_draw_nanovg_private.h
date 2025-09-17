@@ -57,8 +57,7 @@ typedef struct _lv_draw_nanovg_unit_t {
     NVGcontext * vg;
     bool is_started;
     lv_matrix_t global_matrix;
-    struct _lv_nanovg_pending_t * letter_pending;
-    lv_draw_buf_t * letter_buf;
+    lv_draw_buf_t * image_buf;
     struct _lv_nanovg_pending_t * image_pending;
 } lv_draw_nanovg_unit_t;
 
