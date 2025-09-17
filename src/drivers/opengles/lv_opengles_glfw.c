@@ -485,7 +485,7 @@ static void window_update_handler(lv_timer_t * t)
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
 
-#if 0
+#if !LV_USE_DRAW_NANOVG
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_window_texture_t * textures_head;
         bool window_display_direct_render =
