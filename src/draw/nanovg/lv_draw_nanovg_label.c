@@ -75,7 +75,7 @@ void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u)
         .free_cb = (lv_cache_free_cb_t)letter_free_cb,
     };
 
-    u->letter_cache = lv_cache_create(&lv_cache_class_lru_ll_count, sizeof(letter_item_t), LETTER_CACHE_CNT, ops);
+    u->letter_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(letter_item_t), LETTER_CACHE_CNT, ops);
     lv_cache_set_name(u->letter_cache, "NVG_LETTER");
     u->letter_pending = lv_nanovg_pending_create(sizeof(lv_cache_entry_t *), 4);
     lv_nanovg_pending_set_free_cb(u->letter_pending, letter_cache_release_cb, u->letter_cache);
