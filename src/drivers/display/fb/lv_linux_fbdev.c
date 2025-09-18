@@ -28,6 +28,7 @@
 
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -335,8 +336,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         color_p = dsc->rotated_buf;
     }
 
-    /* Ensure that we're within the framebuffer's bounds */
-    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    lv_area_t display_area;
+    /* vinfo.xres and vinfo.yres will already be 1 less than the actual resolution. i.e: 1023x767 on a 1024x768 screen */
+    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres, dsc->vinfo.yres);
+
+    /* TODO: Consider rendering the clipped area*/
+    if(!lv_area_is_in(area, &display_area, 0)) {
         lv_display_flush_ready(disp);
         return;
     }
