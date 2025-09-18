@@ -950,14 +950,10 @@
     /** Use ThorVG (a software vector library) as VG-Lite driver to allow testing VGLite on PC
      *  Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
     #ifndef LV_USE_VG_LITE_THORVG
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_VG_LITE_THORVG
-                #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
-            #else
-                #define LV_USE_VG_LITE_THORVG 0
-            #endif
+        #ifdef CONFIG_LV_USE_VG_LITE_THORVG
+            #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
         #else
-            #define LV_USE_VG_LITE_THORVG  1
+            #define LV_USE_VG_LITE_THORVG   0
         #endif
     #endif
     #if LV_USE_VG_LITE_THORVG
@@ -3136,28 +3132,20 @@
 /** Enable Vector Graphic APIs
  *  Requires `LV_USE_MATRIX = 1` */
 #ifndef LV_USE_VECTOR_GRAPHIC
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
-            #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
-        #else
-            #define LV_USE_VECTOR_GRAPHIC 0
-        #endif
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
     #else
-        #define LV_USE_VECTOR_GRAPHIC  1
+        #define LV_USE_VECTOR_GRAPHIC  0
     #endif
 #endif
 
 /** Enable ThorVG (vector graphics library) from the src/libs folder.
  *  Requires LV_USE_VECTOR_GRAPHIC */
 #ifndef LV_USE_THORVG_INTERNAL
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
-        #else
-            #define LV_USE_THORVG_INTERNAL 0
-        #endif
+    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
     #else
-        #define LV_USE_THORVG_INTERNAL 1
+        #define LV_USE_THORVG_INTERNAL 0
     #endif
 #endif
 
