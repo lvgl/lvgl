@@ -66,7 +66,7 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
     const NVGcolor icol = lv_nanovg_color_convert(dsc->color, dsc->opa);
-    const NVGcolor ocol = lv_nanovg_color_convert(dsc->color, 0);
+    const NVGcolor ocol = lv_nanovg_color_convert(lv_color_black(), 0);
 
     const int32_t w = lv_area_get_width(&draw_area);
     const int32_t h = lv_area_get_height(&draw_area);
@@ -75,11 +75,10 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
                          u->vg,
                          shadow_area.x1, shadow_area.y1,
                          w, h,
-                         dsc->radius, 1, icol, ocol);
+                         dsc->radius, dsc->width, icol, ocol);
 
     nvgBeginPath(u->vg);
     lv_nanovg_path_append_rect(u->vg, shadow_area.x1, shadow_area.y1, w, h, dsc->radius);
-
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 
