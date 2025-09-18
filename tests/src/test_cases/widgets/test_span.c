@@ -491,7 +491,7 @@ void test_spangroup_set_right_align_on_overflow(void)
 
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_RIGHT);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, "China is a beautiful country.");
     lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
 
@@ -510,7 +510,7 @@ void test_spangroup_rtl_mode_set_default_align(void)
     lv_obj_set_style_base_dir(spangroup, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, message);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_11.png");
@@ -529,7 +529,7 @@ void test_spangroup_rtl_mode_set_left_align(void)
     lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_LEFT);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, message);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_12.png");
@@ -548,7 +548,7 @@ void test_spangroup_rtl_mode_set_center_align(void)
     lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, message);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_13.png");
@@ -577,7 +577,7 @@ void test_spangroup_set_line_space(void)
     lv_obj_set_style_text_line_space(spangroup, 2, 0);
     lv_obj_set_style_text_font(spangroup, font, 0);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text(span, test_text);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_14.png");
@@ -596,7 +596,7 @@ void test_spangroup_less_letter_overflow(void)
     lv_obj_set_width(spangroup, 25);
     lv_obj_set_height(spangroup, 20);
 
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_t * span = lv_spangroup_add_span(spangroup);
     lv_span_set_text_static(span, "less");
     lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
 

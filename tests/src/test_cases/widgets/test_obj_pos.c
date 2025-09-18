@@ -20,7 +20,7 @@ void tearDown(void)
  */
 void test_content_parent_pct_child_pos_1(void)
 {
-    lv_obj_t * parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_pos(parent, 20, 20);
     lv_obj_set_size(parent, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_style_pad_all(parent, 10, 0);
@@ -53,7 +53,7 @@ void test_content_parent_pct_child_pos_1(void)
 
 void test_style_min_size(void)
 {
-    lv_obj_t * parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_size(parent, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     // lv_obj_set_style_pad_all(parent, 10, 0);
 
