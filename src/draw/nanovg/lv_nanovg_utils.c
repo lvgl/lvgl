@@ -83,7 +83,6 @@ void lv_nanovg_transform(NVGcontext * ctx, const lv_matrix_t * matrix)
     LV_ASSERT_NULL(matrix);
     LV_PROFILER_DRAW_BEGIN;
 
-    nvgResetTransform(ctx);
     nvgTransform(ctx,
                  matrix->m[0][0],
                  matrix->m[1][0],

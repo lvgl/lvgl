@@ -67,6 +67,36 @@ const lv_draw_buf_t * lv_nanovg_buffer_open_image(lv_image_decoder_dsc_t * decod
     return decoded;
 }
 
+static void lv_nanovg_image_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(matrix);
+    LV_ASSERT_NULL(dsc);
+
+    int32_t rotation = dsc->rotation;
+    int32_t scale_x = dsc->scale_x;
+    int32_t scale_y = dsc->scale_y;
+
+    lv_matrix_translate(matrix, x, y);
+
+    if(rotation != 0 || scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
+        lv_point_t pivot = dsc->pivot;
+        lv_matrix_translate(matrix, pivot.x, pivot.y);
+
+        if(rotation != 0) {
+            lv_matrix_rotate(matrix, rotation * 0.1f);
+        }
+
+        if(scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
+            lv_matrix_scale(
+                matrix,
+                (float)scale_x / LV_SCALE_NONE,
+                (float)scale_y / LV_SCALE_NONE);
+        }
+
+        lv_matrix_translate(matrix, -pivot.x, -pivot.y);
+    }
+}
+
 void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -93,16 +123,21 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
         return;
     }
 
+    /* original image matrix */
+    lv_matrix_t image_matrix;
+    lv_matrix_identity(&image_matrix);
+    lv_nanovg_image_matrix(&image_matrix, coords->x1, coords->y1, dsc);
+    lv_nanovg_transform(u->vg, &image_matrix);
+
     /* Use coords as the fallback image width and height */
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
     const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
-    NVGpaint paint = nvgImagePattern(u->vg, coords->x1, coords->y1, img_w, img_h, 0, image_handle,
+    NVGpaint paint = nvgImagePattern(u->vg, 0, 0, img_w, img_h, 0, image_handle,
                                      dsc->opa / (float)LV_OPA_COVER);
 
     nvgBeginPath(u->vg);
-    nvgRect(u->vg, coords->x1, coords->y1, img_w, img_h);
-    nvgFillColor(u->vg, nvgRGBA(0, 0, 0, 0));
+    lv_nanovg_path_append_rect(u->vg, 0, 0, img_w, img_h, dsc->clip_radius);
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 
