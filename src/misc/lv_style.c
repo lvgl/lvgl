@@ -474,6 +474,15 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             return (lv_style_value_t) {
                 .num = 256
             };
+
+#if LV_USE_GRID
+        case LV_STYLE_GRID_CELL_ROW_SPAN:
+        case LV_STYLE_GRID_CELL_COLUMN_SPAN:
+            return (lv_style_value_t) {
+                .num = 1
+            };
+#endif
+
         default:
             return (lv_style_value_t) {
                 .ptr = NULL
