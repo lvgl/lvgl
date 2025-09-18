@@ -55,6 +55,8 @@ static lv_eve_drawing_context_t ct = {
 
 static lv_eve_drawing_context_t ct_temp;
 
+static lv_eve_drawing_state_t st;
+
 /**********************
  *      MACROS
  **********************/
@@ -213,6 +215,45 @@ void lv_eve_mask_round(int16_t coord_x1, int16_t coord_y1, int16_t coord_x2, int
     lv_eve_draw_rect_simple(coord_x1, coord_y1, coord_x2, coord_y2, radius);
     lv_eve_color_mask(1, 1, 1, 0);
     lv_eve_blend_func(EVE_DST_ALPHA, EVE_ONE_MINUS_DST_ALPHA);
+}
+
+void lv_eve_bitmap_source(uint32_t addr)
+{
+    uint32_t bitmap_source = BITMAP_SOURCE(addr);
+    if(st.bitmap_source != bitmap_source) {
+        EVE_cmd_dl_burst(bitmap_source);
+        st.bitmap_source = bitmap_source;
+    }
+}
+
+void lv_eve_bitmap_size(uint8_t filter, uint8_t wrapx, uint8_t wrapy, uint16_t width, uint16_t height)
+{
+    uint32_t bitmap_size = BITMAP_SIZE(filter, wrapx, wrapy, width, height);
+    if(st.bitmap_size != bitmap_size) {
+        EVE_cmd_dl_burst(bitmap_size);
+        st.bitmap_size = bitmap_size;
+    }
+    /* set the high bits too, of the width and height */
+    uint32_t bitmap_size_h = BITMAP_SIZE_H(width, height);
+    if(st.bitmap_size_h != bitmap_size_h) {
+        EVE_cmd_dl_burst(bitmap_size_h);
+        st.bitmap_size_h = bitmap_size_h;
+    }
+}
+
+void lv_eve_bitmap_layout(uint8_t format, uint16_t linestride, uint16_t height)
+{
+    uint32_t bitmap_layout = BITMAP_LAYOUT(format, linestride, height);
+    if(st.bitmap_layout != bitmap_layout) {
+        EVE_cmd_dl_burst(bitmap_layout);
+        st.bitmap_layout = bitmap_layout;
+    }
+    /* set the high bits too, of the linestride and height */
+    uint32_t bitmap_layout_h = BITMAP_LAYOUT_H(linestride, height);
+    if(st.bitmap_layout_h != bitmap_layout_h) {
+        EVE_cmd_dl_burst(bitmap_layout_h);
+        st.bitmap_layout_h = bitmap_layout_h;
+    }
 }
 
 
