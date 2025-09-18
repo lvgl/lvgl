@@ -21,9 +21,18 @@ the image descriptor which can be used as an Image Widget's image source using
 Note, only following color formats are supported at this time:
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8565`
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_A8`
+- :cpp:enumerator:`LV_COLOR_FORMAT_L8`
+- :cpp:enumerator:`LV_COLOR_FORMAT_I1`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB2222`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB4444`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB1555`
+
+Support for color formats depends on the drawing unit. Please check your drawing unit.
 
 Freeing the Image
 -----------------
