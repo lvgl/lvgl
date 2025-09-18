@@ -27,7 +27,7 @@ extern "C" {
 #include "../misc/lv_log.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
-#include "../osal/lv_os.h"
+#include "../osal/lv_os_private.h"
 #include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 

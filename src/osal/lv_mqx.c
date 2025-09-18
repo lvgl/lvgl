@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
+#include "lv_os_private.h"
 
 #if LV_USE_OS == LV_OS_MQX
 
