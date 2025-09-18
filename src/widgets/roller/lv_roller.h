@@ -129,6 +129,15 @@ const char * lv_roller_get_options(const lv_obj_t * obj);
  */
 uint32_t lv_roller_get_option_count(const lv_obj_t * obj);
 
+/**
+ * Get an option as a string.
+ * @param obj       pointer to roller object
+ * @param option    index of chosen option
+ * @param buf       pointer to an array to store the string
+ * @param buf_size  size of `buf` in bytes. 0: to ignore it.
+ * @return          LV_RESULT_OK if option found
+ */
+lv_result_t lv_roller_get_option_str(const lv_obj_t * obj, uint32_t option, char * buf, uint32_t buf_size);
 
 #if LV_USE_OBSERVER
 /**
