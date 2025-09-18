@@ -59,7 +59,7 @@ its children.
 Changing Order
 --------------
 
-There are four explicit ways to bring a Widget to the foreground:
+There are three explicit ways to bring a Widget to the foreground:
 
 - Use :cpp:expr:`lv_obj_move_to_index(widget, idx)` to move a Widget to a given index in the order of children.
 
