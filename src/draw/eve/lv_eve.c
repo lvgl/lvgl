@@ -233,6 +233,7 @@ void lv_eve_bitmap_size(uint8_t filter, uint8_t wrapx, uint8_t wrapy, uint16_t w
         EVE_cmd_dl_burst(bitmap_size);
         st.bitmap_size = bitmap_size;
     }
+    /* set the high bits too, of the width and height */
     uint32_t bitmap_size_h = BITMAP_SIZE_H(width, height);
     if(st.bitmap_size_h != bitmap_size_h) {
         EVE_cmd_dl_burst(bitmap_size_h);
@@ -247,6 +248,7 @@ void lv_eve_bitmap_layout(uint8_t format, uint16_t linestride, uint16_t height)
         EVE_cmd_dl_burst(bitmap_layout);
         st.bitmap_layout = bitmap_layout;
     }
+    /* set the high bits too, of the linestride and height */
     uint32_t bitmap_layout_h = BITMAP_LAYOUT_H(linestride, height);
     if(st.bitmap_layout_h != bitmap_layout_h) {
         EVE_cmd_dl_burst(bitmap_layout_h);
