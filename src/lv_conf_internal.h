@@ -701,74 +701,6 @@
     #endif
 #endif
 
-/** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
-#ifndef LV_USE_DRAW_VGLITE
-    #ifdef CONFIG_LV_USE_DRAW_VGLITE
-        #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
-    #else
-        #define LV_USE_DRAW_VGLITE 0
-    #endif
-#endif
-
-#if LV_USE_DRAW_VGLITE
-    /** Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
-    #ifndef LV_USE_VGLITE_BLIT_SPLIT
-        #ifdef CONFIG_LV_USE_VGLITE_BLIT_SPLIT
-            #define LV_USE_VGLITE_BLIT_SPLIT CONFIG_LV_USE_VGLITE_BLIT_SPLIT
-        #else
-            #define LV_USE_VGLITE_BLIT_SPLIT 0
-        #endif
-    #endif
-
-    #if LV_USE_OS
-        /** Use additional draw thread for VG-Lite processing. */
-        #ifndef LV_USE_VGLITE_DRAW_THREAD
-            #ifdef LV_KCONFIG_PRESENT
-                #ifdef CONFIG_LV_USE_VGLITE_DRAW_THREAD
-                    #define LV_USE_VGLITE_DRAW_THREAD CONFIG_LV_USE_VGLITE_DRAW_THREAD
-                #else
-                    #define LV_USE_VGLITE_DRAW_THREAD 0
-                #endif
-            #else
-                #define LV_USE_VGLITE_DRAW_THREAD 1
-            #endif
-        #endif
-
-        #if LV_USE_VGLITE_DRAW_THREAD
-            /** Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
-            #ifndef LV_USE_VGLITE_DRAW_ASYNC
-                #ifdef LV_KCONFIG_PRESENT
-                    #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
-                        #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
-                    #else
-                        #define LV_USE_VGLITE_DRAW_ASYNC 0
-                    #endif
-                #else
-                    #define LV_USE_VGLITE_DRAW_ASYNC 1
-                #endif
-            #endif
-        #endif
-    #endif
-
-    /** Enable VGLite asserts. */
-    #ifndef LV_USE_VGLITE_ASSERT
-        #ifdef CONFIG_LV_USE_VGLITE_ASSERT
-            #define LV_USE_VGLITE_ASSERT CONFIG_LV_USE_VGLITE_ASSERT
-        #else
-            #define LV_USE_VGLITE_ASSERT 0
-        #endif
-    #endif
-
-    /** Enable VGLite error checks. */
-    #ifndef LV_USE_VGLITE_CHECK_ERROR
-        #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
-            #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
-        #else
-            #define LV_USE_VGLITE_CHECK_ERROR 0
-        #endif
-    #endif
-#endif
-
 /** Use NXP's PXP on iMX RTxxx platforms. */
 #ifndef LV_USE_PXP
     #ifdef CONFIG_LV_USE_PXP
@@ -897,7 +829,6 @@
         #define LV_USE_DRAW_VG_LITE 0
     #endif
 #endif
-
 #if LV_USE_DRAW_VG_LITE
     /** Enable VG-Lite custom external 'gpu_init()' function */
     #ifndef LV_VG_LITE_USE_GPU_INIT
@@ -977,6 +908,117 @@
             #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
         #endif
     #endif
+
+    /** Enable usage of the LVGL's built-in vg_lite driver */
+    #ifndef LV_USE_VG_LITE_DRIVER
+        #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
+            #define LV_USE_VG_LITE_DRIVER CONFIG_LV_USE_VG_LITE_DRIVER
+        #else
+            #define LV_USE_VG_LITE_DRIVER  0
+        #endif
+    #endif
+    #if LV_USE_VG_LITE_DRIVER
+        /** Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+        #ifndef LV_VG_LITE_HAL_GPU_SERIES
+            #ifdef CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+                #define LV_VG_LITE_HAL_GPU_SERIES CONFIG_LV_VG_LITE_HAL_GPU_SERIES
+            #else
+                #define LV_VG_LITE_HAL_GPU_SERIES gc255
+            #endif
+        #endif
+
+        /** Used to pick the correct GPU revision header it depends on the vendor */
+        #ifndef LV_VG_LITE_HAL_GPU_REVISION
+            #ifdef CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+                #define LV_VG_LITE_HAL_GPU_REVISION CONFIG_LV_VG_LITE_HAL_GPU_REVISION
+            #else
+                #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+            #endif
+        #endif
+
+        /** Base memory address of the GPU IP it depends on SoC,
+         *  default value is for NXP based devices */
+        #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+            #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+                #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
+            #else
+                #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+            #endif
+        #endif
+    #endif /*LV_USE_VG_LITE_DRIVER*/
+
+    /** Use ThorVG (a software vector library) as VG-Lite driver to allow testing VGLite on PC
+     *  Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+    #ifndef LV_USE_VG_LITE_THORVG
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_VG_LITE_THORVG
+                #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
+            #else
+                #define LV_USE_VG_LITE_THORVG 0
+            #endif
+        #else
+            #define LV_USE_VG_LITE_THORVG  1
+        #endif
+    #endif
+    #if LV_USE_VG_LITE_THORVG
+        /** Enable LVGL's blend mode support */
+        #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+            #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+                #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+            #else
+                #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+            #endif
+        #endif
+
+        /** Enable YUV color format support */
+        #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
+            #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+                #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+            #else
+                #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+            #endif
+        #endif
+
+        /** Enable Linear gradient extension support */
+        #ifndef LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            #ifdef CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+                #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            #else
+                #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+            #endif
+        #endif
+
+        /** Enable alignment on 16 pixels */
+        #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+                    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+                #else
+                    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+                #endif
+            #else
+                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+            #endif
+        #endif
+
+        /** Buffer address alignment */
+        #ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+            #ifdef CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+                #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+            #else
+                #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+            #endif
+        #endif
+
+        /** Enable multi-thread render */
+        #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
+            #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+                #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+            #else
+                #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+            #endif
+        #endif
+    #endif /*LV_USE_VG_LITE_THORVG*/
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
@@ -987,7 +1029,6 @@
         #define LV_USE_DRAW_DMA2D 0
     #endif
 #endif
-
 #if LV_USE_DRAW_DMA2D
     #ifndef LV_DRAW_DMA2D_HAL_INCLUDE
         #ifdef CONFIG_LV_DRAW_DMA2D_HAL_INCLUDE
@@ -1017,7 +1058,6 @@
         #define LV_USE_DRAW_OPENGLES 0
     #endif
 #endif
-
 #if LV_USE_DRAW_OPENGLES
     #ifndef LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
         #ifdef CONFIG_LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT
@@ -1054,7 +1094,6 @@
         #define LV_USE_DRAW_EVE 0
     #endif
 #endif
-
 #if LV_USE_DRAW_EVE
     /* EVE_GEN value: 2, 3, or 4 */
     #ifndef LV_DRAW_EVE_EVE_GENERATION
@@ -1486,116 +1525,6 @@
     #else
         #define LV_USE_OBJ_PROPERTY_NAME 1
     #endif
-#endif
-
-/* Use VG-Lite Simulator.
- * - Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-#ifndef LV_USE_VG_LITE_THORVG
-    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
-        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
-    #else
-        #define LV_USE_VG_LITE_THORVG  0
-    #endif
-#endif
-
-#if LV_USE_VG_LITE_THORVG
-    /** Enable LVGL's blend mode support */
-    #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-        #else
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
-        #endif
-    #endif
-
-    /** Enable YUV color format support */
-    #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-        #else
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
-        #endif
-    #endif
-
-    /** Enable Linear gradient extension support */
-    #ifndef LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-        #else
-            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
-        #endif
-    #endif
-
-    /** Enable alignment on 16 pixels */
-    #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-            #else
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
-            #endif
-        #else
-            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
-        #endif
-    #endif
-
-    /** Buffer address alignment */
-    #ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-        #ifdef CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-        #else
-            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
-        #endif
-    #endif
-
-    /** Enable multi-thread render */
-    #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
-        #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
-            #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
-        #else
-            #define LV_VG_LITE_THORVG_THREAD_RENDER 0
-        #endif
-    #endif
-#endif
-
-/* Enable usage of the LVGL's vg_lite spec driver */
-#ifndef LV_USE_VG_LITE_DRIVER
-    #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
-        #define LV_USE_VG_LITE_DRIVER CONFIG_LV_USE_VG_LITE_DRIVER
-    #else
-        #define LV_USE_VG_LITE_DRIVER  0
-    #endif
-#endif
-
-#if LV_USE_VG_LITE_DRIVER
-
-    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
-    #ifndef LV_VG_LITE_HAL_GPU_SERIES
-        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_SERIES
-            #define LV_VG_LITE_HAL_GPU_SERIES CONFIG_LV_VG_LITE_HAL_GPU_SERIES
-        #else
-            #define LV_VG_LITE_HAL_GPU_SERIES gc255
-        #endif
-    #endif
-
-    /* Used to pick the correct GPU revision header it depends on the vendor */
-    #ifndef LV_VG_LITE_HAL_GPU_REVISION
-        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_REVISION
-            #define LV_VG_LITE_HAL_GPU_REVISION CONFIG_LV_VG_LITE_HAL_GPU_REVISION
-        #else
-            #define LV_VG_LITE_HAL_GPU_REVISION 0x40
-        #endif
-    #endif
-
-    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
-    #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
-        #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
-            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
-        #else
-            #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
-        #endif
-    #endif
-
 #endif
 
 /* Enable the multi-touch gesture recognition feature */
@@ -3205,21 +3134,40 @@
 #endif
 
 /** Enable Vector Graphic APIs
- *  - Requires `LV_USE_MATRIX = 1` */
+ *  Requires `LV_USE_MATRIX = 1` */
 #ifndef LV_USE_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
-        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+            #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+        #else
+            #define LV_USE_VECTOR_GRAPHIC 0
+        #endif
     #else
-        #define LV_USE_VECTOR_GRAPHIC  0
+        #define LV_USE_VECTOR_GRAPHIC  1
     #endif
 #endif
 
-/** Enable ThorVG (vector graphics library) from the src/libs folder */
+/** Enable ThorVG (vector graphics library) from the src/libs folder.
+ *  Requires LV_USE_VECTOR_GRAPHIC */
 #ifndef LV_USE_THORVG_INTERNAL
-    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+        #else
+            #define LV_USE_THORVG_INTERNAL 0
+        #endif
     #else
-        #define LV_USE_THORVG_INTERNAL 0
+        #define LV_USE_THORVG_INTERNAL 1
+    #endif
+#endif
+
+/** Enable ThorVG by assuming that its installed and linked to the project
+ *  Requires LV_USE_VECTOR_GRAPHIC */
+#ifndef LV_USE_THORVG_EXTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+    #else
+        #define LV_USE_THORVG_EXTERNAL 0
     #endif
 #endif
 
