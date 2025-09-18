@@ -22,6 +22,7 @@ extern "C" {
 #include "lv_xml_translation.h"
 #include "lv_xml_component.h"
 #include "lv_xml_widget.h"
+#include "lv_xml_load.h"
 
 /*********************
  *      DEFINES
