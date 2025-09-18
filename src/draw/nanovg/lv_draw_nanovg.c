@@ -85,6 +85,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     lv_matrix_multiply(&u->global_matrix, &layer_matrix);
 #endif
 
+    nvgResetTransform(u->vg);
     lv_nanovg_transform(u->vg, &u->global_matrix);
 
     lv_nanovg_set_clip_area(u->vg, &t->clip_area);
