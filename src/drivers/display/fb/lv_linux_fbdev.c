@@ -346,10 +346,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
     const int32_t w = lv_area_get_width(area);
+    const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
     for(int32_t y = area->y1; y <= area->y2; y++) {
         write_to_fb(dsc, fb_pos, color_p, w * px_size);
         fb_pos += dsc->finfo.line_length;
-        color_p += w * px_size;
+        color_p += stride;
     }
 
     if(dsc->force_refresh) {
