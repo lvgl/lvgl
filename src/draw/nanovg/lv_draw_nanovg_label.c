@@ -286,7 +286,9 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    lv_nanovg_convert_a8_to_nvgcolor(image_buf, &src_buf, item->color);
+    if(!lv_nanovg_buf_convert(image_buf, &src_buf, item->color)) {
+        return false;
+    }
 
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
     item->image_handle = nvgCreateImageRGBA(item->u->vg, w, h, 0, lv_draw_buf_goto_xy(image_buf, 0, 0));
