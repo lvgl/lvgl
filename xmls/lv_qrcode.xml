@@ -1,0 +1,13 @@
+<!--
+Example
+<lv_qrcode size="150" dark_color="0x2596be" light_color="0xffffff" data="https://lvgl.io"/>
+-->
+
+<widget>
+    <api>
+        <prop name="size" type="int" help="QR canvas edge length in px (use this instead of width/height)"/>
+        <prop name="dark_color" type="color" help="Foreground color for QR modules"/>
+        <prop name="light_color" type="color" help="Background color"/>
+        <prop name="data" type="string" help="UTF-8 payload encoded into the QR code"/>
+    </api>
+</widget>
