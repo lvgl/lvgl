@@ -71,16 +71,10 @@ Some optional settings depend on whether DMA buffer support is enabled (`LV_WAYL
      - `1` or `0`
      - `0`
 
-   * - `LV_WAYLAND_WL_SHELL` (**Deprecated**)
-     - Optional (`1` or `0`)
-     - Optional (`1` or `0`)
-
-
 Additional notes
 
 * DMABUF support (`LV_WAYLAND_USE_DMABUF`) improves performance and enables more render modes but has specific requirements and restrictions.
 * `LV_WAYLAND_WINDOW_DECORATIONS` is only required for some compositors (e.g., GNOME/Mutter or Weston).
-* `LV_WAYLAND_WL_SHELL` Enables support for the deprecated `wl_shell`. Only useful when the BSP on the target has weston ``9.x``. (**Deprecated** and will be removed in a future release)
 
 Example
 -------

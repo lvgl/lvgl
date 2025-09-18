@@ -1137,7 +1137,6 @@
         #define LV_USE_WAYLAND          0
         #if LV_USE_WAYLAND
             #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
         #endif
 
         /** Driver for /dev/fb */

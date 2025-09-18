@@ -80,7 +80,6 @@ bool lv_wayland_window_decoration_attach(struct window * window, struct graphic_
             pos_x = parent->width - 1 * (BUTTON_MARGIN + BUTTON_SIZE);
             pos_y = -1 * (BUTTON_MARGIN + BUTTON_SIZE + (BORDER_SIZE / 2));
             break;
-#if LV_WAYLAND_XDG_SHELL
         case OBJECT_BUTTON_MAXIMIZE:
             pos_x = parent->width - 2 * (BUTTON_MARGIN + BUTTON_SIZE);
             pos_y = -1 * (BUTTON_MARGIN + BUTTON_SIZE + (BORDER_SIZE / 2));
@@ -89,7 +88,6 @@ bool lv_wayland_window_decoration_attach(struct window * window, struct graphic_
             pos_x = parent->width - 3 * (BUTTON_MARGIN + BUTTON_SIZE);
             pos_y = -1 * (BUTTON_MARGIN + BUTTON_SIZE + (BORDER_SIZE / 2));
             break;
-#endif
         case OBJECT_BORDER_TOP:
             pos_x = -BORDER_SIZE;
             pos_y = -(BORDER_SIZE + TITLE_BAR_HEIGHT);
@@ -191,7 +189,6 @@ bool lv_wayland_window_decoration_create(struct window * window, struct graphic_
             decoration->width  = BUTTON_SIZE;
             decoration->height = BUTTON_SIZE;
             break;
-#if LV_WAYLAND_XDG_SHELL
         case OBJECT_BUTTON_MAXIMIZE:
             decoration->width  = BUTTON_SIZE;
             decoration->height = BUTTON_SIZE;
@@ -200,7 +197,6 @@ bool lv_wayland_window_decoration_create(struct window * window, struct graphic_
             decoration->width  = BUTTON_SIZE;
             decoration->height = BUTTON_SIZE;
             break;
-#endif
         case OBJECT_BORDER_TOP:
             decoration->width  = window_width + 2 * (BORDER_SIZE);
             decoration->height = BORDER_SIZE;
@@ -272,7 +268,6 @@ bool lv_wayland_window_decoration_create(struct window * window, struct graphic_
                 }
             }
             break;
-#if LV_WAYLAND_XDG_SHELL
         case OBJECT_BUTTON_MAXIMIZE:
             color_fill(buf_base, lv_color_make(0xCC, 0xCC, 0xCC), decoration->width, decoration->height);
             for(y = 0; y < decoration->height; y++) {
@@ -303,7 +298,6 @@ bool lv_wayland_window_decoration_create(struct window * window, struct graphic_
                 }
             }
             break;
-#endif
         case OBJECT_BORDER_TOP:
         /* fallthrough */
         case OBJECT_BORDER_BOTTOM:
