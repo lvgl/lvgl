@@ -1,6 +1,12 @@
+<!-- This screen contains many nested layouts.
+     By pressing Ctrl or Cmd you can visualize the bounding box of the UI elements -->
 <screen>
+	<styles>
+		<style name="asd" bg_color="0xf11" text_color="0xaaa" />
+	</styles>
+
 	<view>
-		<!-- The while screen is a column layout: header on the top and some content below it -->
+		<!-- The whole screen is a column layout: header on the top and some content below it -->
 		<column width="100%">
 			<!-- A header where the children are placed in a row.
 			     "space_between" uses the whole space evenly -->
@@ -20,7 +26,8 @@
 			<column style_pad_all="8" style_pad_row="8">
 				<lv_checkbox text="First" />
 				<lv_checkbox text="Second" />
-				<lv_checkbox text="Third" />
+				<!-- By adding "ignore_layout" the component can be positioned freely -->
+				<lv_checkbox text="Third" ignore_layout="true" x="142" y="15" />
 				<lv_checkbox text="Forth" />
 				<lv_checkbox text="Fifth" />
 				<lv_checkbox text="Sixts" />
@@ -28,9 +35,18 @@
 				<lv_checkbox text="Eighth" />
 				<lv_checkbox text="Nine" />
 				<lv_checkbox text="Tenth" />
-				<!-- By adding "ignore_layout" the coompoent can be positioned freely -->
-				<lv_label text="Select some options" ignore_layout="true" x="142" />
 			</column>
+
+			<row
+				width="100%"
+				style_flex_main_place="space_between"
+				style_pad_all="8"
+				style_bg_opa="100%"
+				style_bg_color="0x111"
+				style_text_color="0xddd"
+			>
+				<lv_label text="Made by LVGL's UI editor" />
+			</row>
 		</column>
 
 		<!-- This floating button won't be scrolled -->
