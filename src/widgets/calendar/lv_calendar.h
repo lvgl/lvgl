@@ -57,7 +57,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * parent);
 
 /**
  * Set the today's year, month and day at once
- * @param obj  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @param year      today's year
  * @param month     today's month [1..12]
  * @param day       today's day [1..31]
@@ -66,60 +66,60 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
 
 /**
  * Set the today's year
- * @param obj  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @param year      today's year
  */
 void lv_calendar_set_today_year(lv_obj_t * obj, uint32_t year);
 
 /**
  * Set the today's year
- * @param obj  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @param month     today's month [1..12]
  */
 void lv_calendar_set_today_month(lv_obj_t * obj, uint32_t month);
 
 /**
  * Set the today's year
- * @param obj  pointer to a calendar object
+ * @param obj       pointer to a calendar object
  * @param day       today's day [1..31]
  */
 void lv_calendar_set_today_day(lv_obj_t * obj, uint32_t day);
 
 /**
  * Set the currently shown year and month at once
- * @param obj           pointer to a calendar object
- * @param year          shown year
- * @param month         shown month [1..12]
+ * @param obj       pointer to a calendar object
+ * @param year      shown year
+ * @param month     shown month [1..12]
  */
 void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month);
 
 /**
  * Set the currently shown year
- * @param obj           pointer to a calendar object
- * @param year          shown year
+ * @param obj       pointer to a calendar object
+ * @param year      shown year
  */
 void lv_calendar_set_shown_year(lv_obj_t * obj, uint32_t year);
 
 /**
  * Set the currently shown month
- * @param obj           pointer to a calendar object
- * @param month         shown month [1..12]
+ * @param obj       pointer to a calendar object
+ * @param month     shown month [1..12]
  */
 void lv_calendar_set_shown_month(lv_obj_t * obj, uint32_t month);
 
 /**
  * Set the highlighted dates
- * @param obj           pointer to a calendar object
- * @param highlighted   pointer to an `lv_calendar_date_t` array containing the dates.
+ * @param obj       pointer to a calendar object
+ * @param highlighted    pointer to an `lv_calendar_date_t` array containing the dates.
  *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
- * @param date_num number of dates in the array
+ * @param date_num    number of dates in the array
  */
 void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num);
 
 /**
  * Set the name of the days
- * @param obj           pointer to a calendar object
- * @param day_names     pointer to an array with the names.
+ * @param obj       pointer to a calendar object
+ * @param day_names    pointer to an array with the names.
  *                      E.g. `const char * days[7] = {"Sun", "Mon", ...}`
  *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
  */
@@ -139,35 +139,35 @@ lv_obj_t * lv_calendar_get_btnmatrix(const lv_obj_t * obj);
 
 /**
  * Get the today's date
- * @param calendar  pointer to a calendar object
+ * @param calendar    pointer to a calendar object
  * @return          return pointer to an `lv_calendar_date_t` variable containing the date of today.
  */
 const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
 
 /**
  * Get the currently showed
- * @param calendar  pointer to a calendar object
+ * @param calendar    pointer to a calendar object
  * @return          pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
 const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 
 /**
  * Get the highlighted dates
- * @param calendar  pointer to a calendar object
+ * @param calendar    pointer to a calendar object
  * @return          pointer to an `lv_calendar_date_t` array containing the dates.
  */
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar);
 
 /**
  * Get the number of the highlighted dates
- * @param calendar  pointer to a calendar object
+ * @param calendar    pointer to a calendar object
  * @return          number of highlighted days
  */
 size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
 
 /**
  * Get the currently pressed day
- * @param calendar  pointer to a calendar object
+ * @param calendar    pointer to a calendar object
  * @param date      store the pressed date here
  * @return          LV_RESULT_OK: there is a valid pressed date
  *                  LV_RESULT_INVALID: there is no pressed data

@@ -51,7 +51,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_table_class;
 
 /**
  * Create a table object
- * @param parent        pointer to an object, it will be the parent of the new table
+ * @param parent    pointer to an object, it will be the parent of the new table
  * @return              pointer to the created table
  */
 lv_obj_t * lv_table_create(lv_obj_t * parent);
@@ -62,20 +62,20 @@ lv_obj_t * lv_table_create(lv_obj_t * parent);
 
 /**
  * Set the value of a cell.
- * @param obj           pointer to a Table object
- * @param row           id of the row [0 .. row_cnt -1]
- * @param col           id of the column [0 .. col_cnt -1]
- * @param txt           text to display in the cell. It will be copied and saved so this variable is not required after this function call.
+ * @param obj       pointer to a Table object
+ * @param row       id of the row [0 .. row_cnt -1]
+ * @param col       id of the column [0 .. col_cnt -1]
+ * @param txt       text to display in the cell. It will be copied and saved so this variable is not required after this function call.
  * @note                New roes/columns are added automatically if required
  */
 void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const char * txt);
 
 /**
  * Set the value of a cell.  Memory will be allocated to store the text by the table.
- * @param obj           pointer to a Table object
- * @param row           id of the row [0 .. row_cnt -1]
- * @param col           id of the column [0 .. col_cnt -1]
- * @param fmt           `printf`-like format
+ * @param obj       pointer to a Table object
+ * @param row       id of the row [0 .. row_cnt -1]
+ * @param col       id of the column [0 .. col_cnt -1]
+ * @param fmt       `printf`-like format
  * @note                New roes/columns are added automatically if required
  */
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt,
@@ -83,15 +83,15 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
 
 /**
  * Set the number of rows
- * @param obj           table pointer to a Table object
- * @param row_cnt       number of rows
+ * @param obj       table pointer to a Table object
+ * @param row_cnt    number of rows
  */
 void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt);
 
 /**
  * Set the number of columns
  * @param obj       table pointer to a Table object
- * @param col_cnt   number of columns.
+ * @param col_cnt    number of columns.
  */
 void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt);
 
@@ -126,7 +126,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
  * @param obj       pointer to a Table object
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
- * @param user_data pointer to the new user_data.
+ * @param user_data    pointer to the new user_data.
  *                  Should be allocated by `lv_malloc`,
  *                  and it will be freed automatically when the table is deleted or
  *                  when the cell is dropped due to lower row or column count.
