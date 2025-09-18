@@ -42,8 +42,10 @@ makes UI development much faster by providing features like:
     The UI editor and the XML loader are still under development and not
     production-ready. Consider them as open beta or experimental features.
 
-Using the XML files
-*******************
+
+
+Using XML Files
+***************
 
 If writing XMLs by hand, the concept is very simple:
 
@@ -55,10 +57,13 @@ If writing XMLs by hand, the concept is very simple:
 3. The widgets created from XML look like any normal widgets, so functions of the C API can be applied
    to them. E.g., start an animation, add a special style, etc.
 
+
+
 UI Elements
 ***********
 
 It is important to distinguish between :dfn:`Widgets`, :dfn:`Components`, and :dfn:`Screens`.
+
 
 Widgets
 -------
@@ -74,6 +79,7 @@ but rather compiled into the application as C code. The main characteristics of 
 - A custom XML parser is needed to map XML properties to API function calls.
 - They can be compound, containing other Widgets (e.g., ``Tabview``'s tabs, ``Dropdown``'s lists).
 - In the UI editor, they can also be described in XML to create visuals more quickly and export C code.
+
 
 Components
 ----------
@@ -95,6 +101,7 @@ defining Components can be registered in LVGL, and after that, instances can be 
 In other words, LVGL can read the XML files, "learn" the Components from them, and
 thereafter create children as part of Screens and other Components.
 
+
 Screens
 -------
 
@@ -105,6 +112,8 @@ Screens
 - They can be loaded from XML at runtime since they describe only visual aspects of the UI.
 - They do not have an API.
 - They can be referenced in screen load events.
+
+
 
 Global data
 ***********
@@ -121,6 +130,8 @@ can be defined.
 
 Multiple ``globals.xml`` files can be loaded if needed, but each will be saved in the same global scope,
 meaning duplicated items will be added only once.
+
+
 
 Usage Teaser
 ************
@@ -142,6 +153,7 @@ can be children of these root elements:
             by Widgets and Components later.
 :<view>:    Specifies the appearance of the Widget, Component, or Screen by describing the
             children and their properties.
+
 
 An XML component
 ----------------
@@ -175,6 +187,7 @@ Note that only the basic features are shown here.
                    align="center"/>
         </view>
     </component>
+
 
 Load the UI from XML
 --------------------

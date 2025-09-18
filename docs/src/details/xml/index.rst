@@ -1,8 +1,8 @@
 .. _xml_main:
 
-====================
-XML - Declarative UI
-====================
+=======================================================
+XML - :term:`Declarative UI` Input Format and UI Editor
+=======================================================
 
 
 .. toctree::
@@ -14,3 +14,4 @@ XML - Declarative UI
     assets/index
     features/index
     license
+    editor/index
