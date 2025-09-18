@@ -1,8 +1,8 @@
 .. _xml_main:
 
-====================
-XML - Declarative UI
-====================
+=================
+UI Editor and XML
+=================
 
 
 .. toctree::
@@ -10,7 +10,10 @@ XML - Declarative UI
     :maxdepth: 2
 
     overview/index
+    learn_by_examples
+    integration/index
     ui_elements/index
     assets/index
     features/index
-    license
+    tools/index
+    license/index

@@ -1,8 +1,8 @@
 .. _lvgl_xml_license:
 
-=======
-License
-=======
+===========
+XML License
+===========
 
 **Version 1.0 – June 2025**
 
