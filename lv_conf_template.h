@@ -338,7 +338,7 @@
 
     /** Use ThorVG (a software vector library) as VG-Lite driver to allow testing VGLite on PC
      *  Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-    #define LV_USE_VG_LITE_THORVG  1
+    #define LV_USE_VG_LITE_THORVG   0
     #if LV_USE_VG_LITE_THORVG
         /** Enable LVGL's blend mode support */
         #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
@@ -982,11 +982,11 @@
 
 /** Enable Vector Graphic APIs
  *  Requires `LV_USE_MATRIX = 1` */
-#define LV_USE_VECTOR_GRAPHIC  1
+#define LV_USE_VECTOR_GRAPHIC  0
 
 /** Enable ThorVG (vector graphics library) from the src/libs folder.
  *  Requires LV_USE_VECTOR_GRAPHIC */
-#define LV_USE_THORVG_INTERNAL 1
+#define LV_USE_THORVG_INTERNAL 0
 
 /** Enable ThorVG by assuming that its installed and linked to the project
  *  Requires LV_USE_VECTOR_GRAPHIC */
