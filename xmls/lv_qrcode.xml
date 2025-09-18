@@ -9,5 +9,6 @@ Example
         <prop name="dark_color" type="color" help="Foreground color for QR modules"/>
         <prop name="light_color" type="color" help="Background color"/>
         <prop name="data" type="string" help="UTF-8 payload encoded into the QR code"/>
+        <prop name="quiet_zone" type="bool" help="Add quiet zone (border) around the QR code"/>
     </api>
 </widget>
