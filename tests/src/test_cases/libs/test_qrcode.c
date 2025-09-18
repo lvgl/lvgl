@@ -19,7 +19,7 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-void test_barcode_normal(void)
+void test_qrcode_normal(void)
 {
     lv_color_t bg_color = lv_palette_lighten(LV_PALETTE_LIGHT_BLUE, 5);
     lv_color_t fg_color = lv_palette_darken(LV_PALETTE_BLUE, 4);
@@ -52,7 +52,7 @@ void tearDown(void)
 {
 }
 
-void test_barcode_normal(void)
+void test_qrcode_normal(void)
 {
 }
 
