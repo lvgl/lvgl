@@ -321,9 +321,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
             rotated_area = *area;
         }
+
         lv_display_rotate_area(disp, &rotated_area);
         const uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
-        const size_t buf_size = lv_area_get_width(&rotated_area) * lv_area_get_height(&rotated_area) * px_size;
+        const size_t buf_size = dest_stride * lv_area_get_height(&rotated_area);
         if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
             dsc->rotated_buf = lv_realloc(dsc->rotated_buf, buf_size);
             LV_ASSERT_MALLOC(dsc->rotated_buf);
