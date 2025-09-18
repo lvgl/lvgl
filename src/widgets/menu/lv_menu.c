@@ -144,8 +144,8 @@ lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 {
     LV_ASSERT_NULL(parent);
     if(!parent || (LV_USE_ASSERT_OBJ &&
-                   !(lv_obj_has_class(parent->class_p, &lv_menu_page_class)
-                     || lv_obj_has_class(parent->class_p, &lv_menu_section_class)))) {
+                   !(lv_obj_has_class(parent, &lv_menu_page_class)
+                     || lv_obj_has_class(parent, &lv_menu_section_class)))) {
         LV_LOG_WARN("Invalid parent object type for menu container object");
         return NULL;
     }
