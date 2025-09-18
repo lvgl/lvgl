@@ -60,6 +60,7 @@ void lv_xml_qrcode_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("dark_color", name)) lv_qrcode_set_dark_color(item, lv_xml_to_color(value));
         else if(lv_streq("light_color", name)) lv_qrcode_set_light_color(item, lv_xml_to_color(value));
         else if(lv_streq("data", name)) data_txt = value;
+        else if(lv_streq("quiet_zone", name)) lv_qrcode_set_quiet_zone(item, lv_xml_to_bool(value));
     }
 
     if(data_txt) {

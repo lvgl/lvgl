@@ -27,7 +27,22 @@ void test_xml_qrcode_with_attrs(void)
     };
 
     lv_obj_t * qrcode = lv_xml_create(scr, "lv_qrcode", qrcode_attrs);
-    lv_obj_center(qrcode);
+    lv_obj_align(qrcode, LV_ALIGN_CENTER, -100, 0);
+
+    const char * qrcode_attrs_quiet_zone[] = {
+        "size", "150",
+        "dark_color", "0x000000",
+        "light_color", "0xFFFFFF",
+        "data", "https://lvgl.io",
+        "quiet_zone", "true",
+        "style_border_width", "1",
+        "style_border_color", "0x000000",
+        NULL, NULL,
+    };
+
+    lv_obj_t * qrcode_quiet_zone = lv_xml_create(scr, "lv_qrcode", qrcode_attrs_quiet_zone);
+    lv_obj_center(qrcode_quiet_zone);
+    lv_obj_align(qrcode_quiet_zone, LV_ALIGN_CENTER, 100, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/lv_qrcode.png");
 }
