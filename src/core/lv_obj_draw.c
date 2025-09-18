@@ -132,6 +132,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
                     draw_dsc->bg_image_recolor = lv_color_make(result.red, result.green, result.blue);
                     draw_dsc->bg_image_tiled = lv_obj_get_style_bg_image_tiled(obj, part);
                 }
+
+                draw_dsc->bg_image_colorkey = lv_obj_get_style_image_colorkey(obj, part);
             }
         }
     }
@@ -233,6 +235,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
     lv_color32_t result = image_apply_layer_recolor(obj, part, &draw_dsc->base, recolor, recolor_opa);
     draw_dsc->recolor_opa = result.alpha;
     draw_dsc->recolor = lv_color_make(result.red, result.green, result.blue);
+
+    draw_dsc->colorkey = lv_obj_get_style_image_colorkey(obj, part);
 
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 

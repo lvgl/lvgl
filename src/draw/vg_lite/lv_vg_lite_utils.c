@@ -1402,6 +1402,31 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_PROFILER_DRAW_END;
 }
 
+void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey)
+{
+    if(!vg_lite_query_feature(gcFEATURE_BIT_VG_COLOR_KEY)) {
+        LV_LOG_TRACE("vg_lite_set_color_key not support");
+        return;
+    }
+
+    vg_lite_color_key4_t vg_colorkey;
+    lv_memzero(&vg_colorkey, sizeof(vg_colorkey));
+    if(colorkey) {
+        vg_lite_color_key_t key0 = {
+            .enable = true,
+            .low_r = colorkey->low.red,
+            .low_g = colorkey->low.green,
+            .low_b = colorkey->low.blue,
+            .alpha = 0,
+            .hign_r = colorkey->high.red,
+            .hign_g = colorkey->high.green,
+            .hign_b = colorkey->high.blue,
+        };
+        vg_colorkey[0] = key0;
+    }
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_color_key(vg_colorkey), {});
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
