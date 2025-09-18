@@ -64,36 +64,6 @@ d2_color  lv_draw_dave2d_lv_colour_to_d2_colour(lv_color_t color)
            | (blue) << 0UL;
 }
 
-d2_s32 lv_draw_dave2d_cf_fb_get(void)
-{
-    d2_s32 d2_fb_mode = 0;
-    switch(g_display0_cfg.input->format) {
-        case    DISPLAY_IN_FORMAT_16BITS_RGB565: ///< RGB565,   16 bits
-            d2_fb_mode = d2_mode_rgb565;
-            break;
-        case DISPLAY_IN_FORMAT_32BITS_ARGB8888: ///< ARGB8888, 32 bits
-            d2_fb_mode = d2_mode_argb8888;
-            break;
-        case DISPLAY_IN_FORMAT_32BITS_RGB888: ///< RGB888,   32 bits
-            d2_fb_mode = d2_mode_argb8888; //GLCDC ignores Alpha when configured for RGB888
-            break;
-        case  DISPLAY_IN_FORMAT_16BITS_ARGB4444: ///< ARGB4444, 16 bits
-            d2_fb_mode = d2_mode_argb4444;
-            break;
-        case DISPLAY_IN_FORMAT_16BITS_ARGB1555: ///< ARGB1555, 16 bits
-        case DISPLAY_IN_FORMAT_CLUT8 : ///< CLUT8
-        case DISPLAY_IN_FORMAT_CLUT4  : ///< CLUT4
-        case  DISPLAY_IN_FORMAT_CLUT1  : ///< CLUT1
-            //Not supported as a FB format by Dave2D
-            break;
-
-        default:
-            break;
-    }
-
-    return d2_fb_mode;
-}
-
 d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
 {
     d2_u32 d2_lvgl_mode = 0;

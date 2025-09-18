@@ -56,8 +56,6 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
             y2 = (float)LV_MAX(coordinates.y1, coordinates.y2);
 
             if(a1 < a2) {
-                /* TODO */
-                LV_ASSERT(0);
                 y0 = 0.0f;//silence the compiler warning
                 y3 = 0.0f;
 
@@ -74,8 +72,6 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
                                 (d2_point)D2_FIX4((y3_i - y0_i)));
         }
         else if(LV_GRAD_DIR_HOR == dsc->grad.dir) {
-            /* TODO */
-            LV_ASSERT(0);
 
             float x1;
             float x2;
@@ -92,8 +88,6 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
             x2 = (float)LV_MAX(coordinates.x1, coordinates.x2);
 
             if(a1 < a2) {
-                /* TODO */
-                LV_ASSERT(0);
                 x0 = 0.0f;//silence the compiler warning
                 x3 = 0.0f;
 

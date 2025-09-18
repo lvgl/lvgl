@@ -46,11 +46,6 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     bool dashed = dsc->dash_gap && dsc->dash_width;
 
-    if(dashed) {
-        /* TODO */
-        LV_ASSERT(0);
-    }
-
     //
     // Generate render operations
     //
