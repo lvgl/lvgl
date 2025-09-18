@@ -379,6 +379,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
 
+    if(x >= buf->header.w || y >= buf->header.h) {
+        LV_LOG_ERROR("coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32, x, y,
+                     (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+        return NULL;
+    }
+
     uint8_t * data = buf->data;
 
     /*Skip palette*/
