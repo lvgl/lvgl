@@ -75,18 +75,19 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     t->draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = t->target_layer;
 
-    lv_matrix_identity(&u->global_matrix);
+    lv_matrix_t global_matrix;
+    lv_matrix_identity(&global_matrix);
     if(layer->buf_area.x1 || layer->buf_area.y1) {
-        lv_matrix_translate(&u->global_matrix, -layer->buf_area.x1, -layer->buf_area.y1);
+        lv_matrix_translate(&global_matrix, -layer->buf_area.x1, -layer->buf_area.y1);
     }
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_t layer_matrix = t->matrix;
-    lv_matrix_multiply(&u->global_matrix, &layer_matrix);
+    lv_matrix_multiply(&global_matrix, &layer_matrix);
 #endif
 
     nvgResetTransform(u->vg);
-    lv_nanovg_transform(u->vg, &u->global_matrix);
+    lv_nanovg_transform(u->vg, &global_matrix);
 
     lv_nanovg_set_clip_area(u->vg, &t->clip_area);
 
