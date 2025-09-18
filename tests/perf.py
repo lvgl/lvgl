@@ -522,6 +522,7 @@ def run_tests(
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
+    lvgl_private_h_path = os.path.join(lvgl_test_dir, "..", "lvgl_private.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
     docker_image_name = perf_test_options[options_name]["image_name"]
 
@@ -533,6 +534,7 @@ def run_tests(
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
         volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),
+        volume(lvgl_private_h_path, so3_usr_lib("lvgl/lvgl_private.h")),
         # We also need to add the current "lvgl.h" and mount it in the correct path
         # As there's a `#include "../../lvgl.h"` in the `unity_support.h` file
         volume(lvgl_h_path, "/so3/usr/lvgl.h"),
