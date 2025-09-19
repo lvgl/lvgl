@@ -174,6 +174,13 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  */
 void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
 
+/**
+ * @brief Convert a gradient to a paint
+ * @param ctx the nanovg context
+ * @param grad the gradient descriptor
+ * @param paint the paint to store the result
+ */
+bool lv_nanovg_grad_to_paint(NVGcontext * ctx, const lv_vector_gradient_t * grad, NVGpaint * paint);
 
 /**
  * @brief Draw a gradient
