@@ -48,7 +48,11 @@ void lv_example_translation_2(void)
 
     lv_obj_t * container   = lv_obj_create(lv_screen_active());
     lv_obj_center(container);
-    lv_obj_set_size(container, LV_PCT(50), LV_PCT(50));
+    lv_obj_set_size(container, LV_PCT(100), LV_PCT(100));
+
+    lv_obj_set_flex_flow(container, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(container, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_gap(container, 20, 0);
 
     lv_obj_t * language_dropdown = lv_dropdown_create(lv_screen_active());
     lv_obj_align_to(language_dropdown, container, LV_ALIGN_TOP_MID, 0, 20);
@@ -69,7 +73,8 @@ void lv_example_translation_2(void)
 
         /* Bind to the language change event so that we can change the label when the language changes */
         lv_obj_add_event_cb(label, on_language_change, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, (void *)tags[i]);
-        lv_obj_set_pos(label, (i / 2) * 200, (i % 2) * 50);
+        lv_obj_set_style_min_width(label, LV_PCT(30), 0);
+        lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     }
 
     lv_translation_set_language("English");
