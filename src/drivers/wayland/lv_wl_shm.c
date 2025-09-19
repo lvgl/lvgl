@@ -143,7 +143,7 @@ lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * wi
         return LV_RESULT_INVALID;
     }
 
-    /* Moves the buffers to the the unused list of the group */
+    /* Moves the buffers to the unused list of the group */
     smm_release(body_buf1);
     smm_release(body_buf2);
 

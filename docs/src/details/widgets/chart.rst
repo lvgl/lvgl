@@ -322,7 +322,7 @@ Zoom
 ----
 
 To zoom the chart all you need to do is wrap it in a parent container and set the
-chart's width and/or height to a larger value.  Doing this will cause the the chart
+chart's width and/or height to a larger value.  Doing this will cause the chart
 to be scrollable in its parent --- the parent container provides the scrollable "view
 window".
 

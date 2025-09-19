@@ -181,7 +181,7 @@ Multi-touch gestures overview
 
 To recognize multi touch gestures, recognizers are used. The structure ``lv_indev_t`` contains
 an array of recognizers, one per gesture type. These recognizers are initialized internally by ``lv_indev_create`` by calling
-``lv_indev_gesture_init_recognizers`` after the indev device is created. The the recognizers can then be configured to
+``lv_indev_gesture_init_recognizers`` after the indev device is created. The recognizers can then be configured to
 modify the gestures thresholds. These thresholds are used to be able to recognize the gesture only after the threshold
 have been reached. They can be set-up like this:
 

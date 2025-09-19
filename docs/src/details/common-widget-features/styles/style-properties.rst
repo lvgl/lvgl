@@ -1299,7 +1299,7 @@ Move start point of object (e.g. scale tick) radially
 clip_corner
 ~~~~~~~~~~~
 
-Enable to clip the overflowed content on the rounded corner. Can be `true` or `false`.
+Enable clipping of content that overflows rounded corners of parent Widget. Can be `true` or `false`.
 
 .. raw:: html
 

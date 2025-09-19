@@ -29,7 +29,7 @@ Configure UEFI driver
 
     #define LV_USE_UEFI  1
 
-- Enable the the memory core functions, which are wrappers around AllocatePool and FreePool (using memory of type *EfiBootServicesData*) if you do not wan't to use your own implementations
+- Enable the memory core functions, which are wrappers around AllocatePool and FreePool (using memory of type *EfiBootServicesData*) if you do not wan't to use your own implementations
 
 .. code-block:: c
 

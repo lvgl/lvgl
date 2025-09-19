@@ -120,7 +120,7 @@ typedef struct {
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
 
-    /**Color of the the shadow */
+    /**Color of shadow */
     lv_color_t color;
 
     /**Width of the shadow. (radius of the blur)*/

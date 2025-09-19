@@ -315,7 +315,7 @@ html_show_sphinx = False          # Default = True; adds "Created using Sphinx" 
 
 # Link images that have been resized with a scale option (scale, width, or height)
 # to their original full-resolution image.  This will not overwrite any link given
-# by the target option on the the image directive, if present.
+# by the target option on the image directive, if present.
 #
 # Tip
 #

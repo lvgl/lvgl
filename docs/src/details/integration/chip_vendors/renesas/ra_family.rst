@@ -23,8 +23,8 @@ Run the Project
   README.md files in the applicable repositories for info. FSPs can be downloaded
   `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
   Please notice from FSP version 6.0 and above, LVGL is now part of the middleware section
-  of components.  Therefore when cloning the the latest versions of the supported LVGL board
-  repositories, recursive updating of the the git submodules is no longer needed.
+  of components.  Therefore when cloning the latest versions of the supported LVGL board
+  repositories, recursive updating of the git submodules is no longer needed.
 
 - JLink is used for debugging, it can be downloaded `here
   <https://www.segger.com/downloads/jlink/>`__.

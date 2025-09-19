@@ -114,7 +114,7 @@ void lv_example_scroll_7(void)
     lv_obj_align(low_label, LV_ALIGN_BOTTOM_LEFT, 10, -10);
 
     load_item(obj, 3);
-    /* These counters hold the the highest/lowest number currently loaded. */
+    /* These counters hold the highest/lowest number currently loaded. */
     top_num = 3;
     bottom_num = 3;
 

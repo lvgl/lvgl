@@ -37,7 +37,7 @@ typedef enum {
 
     /**Simple layer means that the layer can be rendered in chunks.
      * For example with opa_layered = 140 it's possible to render only 10 lines
-     * from the layer. When it's ready go the the next 10 lines.
+     * from the layer. When it's ready go to the next 10 lines.
      * It avoids large memory allocations for the layer buffer.
      * The buffer size for a chunk can be set by `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` in lv_conf.h.*/
     LV_LAYER_TYPE_SIMPLE,

@@ -315,7 +315,7 @@ The inner circle (focal point) can be set with:
 Conic Gradients
 ---------------
 
-The conic gradient is defined between the angles of a circle, and colors are mapped
+The conic gradient is defined between two angles within a circle, and colors are mapped
 to each angle.
 
 After initializing the stops with :cpp:func:`lv_grad_init_stops`, the conic gradient
@@ -495,7 +495,8 @@ for controlling text rendering:
 :letter_space:  Additional space between characters.
 :ofs_x:         Horizontal text offset.
 :ofs_y:         Vertical text offset.
-:sel_start:     Index of the first character for selection (not byte index).
+:sel_start:     Index of the first character for selection (character index, not byte
+                index, since some characters can be multi-byte characters).
                 ``LV_DRAW_LABEL_NO_TXT_SEL`` means no selection.
 :sel_end:       Index of the last character for selection.
 :sel_color:     Color of selected characters.
@@ -505,7 +506,7 @@ for controlling text rendering:
                 See :cpp:type:`lv_base_dir_t`.
 :decor:         Text decoration, e.g., underline. See :cpp:type:`lv_text_decor_t`.
 :flag:          Flags for text rendering. See :cpp:type:`lv_text_flag_t`.
-:text_length:   Number of characters to render (0 means render until `\0`).
+:text_length:   Number of characters to render (0 means render until `\\0`).
 :text_local:    Set to 1 to allocate a buffer and copy the text.
 :text_static:   Indicates ``text`` is constant and its pointer can be cached.
 :hint:          Pointer to externally stored data to speed up rendering.
@@ -574,8 +575,8 @@ these fields:
 :color:        Line color.
 :width:        Line thickness.
 :opa:          Line opacity (0--255).
-:dash_width:   Length of dashes (0 means no dashes).
-:dash_gap:     Length of gaps between dashes (0 means no dashes).
+:dash_width:   Length of dashes (0 means no dashes --- a continuous line).
+:dash_gap:     Length of gaps between dashes (0 means no gaps --- a continuous line).
 :round_start:  Rounds the line start.
 :round_end:    Rounds the line end.
 :raw_end:      Set to 1 to skip end calculations if they are unnecessary.

@@ -1110,9 +1110,15 @@ figure figcaption .caption-text {
   font-size: 0.8rem;
 }
 
+/* Whitespace below figures and images... */
 article figure,
 article img {
   margin-bottom: 2rem;
+}
+
+/* ...except when the image is part of a figure. */
+article figure img {
+  margin-bottom: 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -1126,7 +1132,6 @@ body[data-theme="dark"] .highlight .p {
 /*-------------------------------------------------------------------------
  * Glossary
  *-------------------------------------------------------------------------*/
-
 .glossary {
   display: flex;
   flex-direction: column;
