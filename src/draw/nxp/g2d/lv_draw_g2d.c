@@ -124,7 +124,7 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
-static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_format_t cf)
+static inline bool _g2d_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
 
@@ -190,7 +190,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
 
-                if(!_g2d_src_cf_supported(u, draw_dsc->header.cf))
+                if(!_g2d_src_cf_supported(draw_dsc->header.cf))
                     return 0;
 
                 if(!_g2d_draw_img_supported(draw_dsc))
@@ -261,10 +261,12 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 {
-    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
     lv_result_t res = LV_RESULT_OK;
 
-#if LV_USE_G2D_DRAW_THREAD
+#if !LV_USE_G2D_DRAW_THREAD
+    LV_UNUSED(draw_unit);
+#else
+    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
     LV_LOG_INFO("Cancel G2D draw thread.");
     thread_dsc->exit_status = true;
