@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 
-#if LV_USE_TRANSLATION && LV_BUILD_EXAMPLES
+#if LV_USE_TRANSLATION && LV_USE_DROPDOWN && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
 static const char * languages[] = {"English", "Deutsch", "Español", NULL};
@@ -80,4 +80,4 @@ void lv_example_translation_2(void)
     lv_translation_set_language("English");
 }
 
-#endif /*LV_USE_TRANSLATION && LV_BUILD_EXAMPLES*/
+#endif /*LV_USE_TRANSLATION && LV_USE_DROPDOWN && LV_USE_LABEL && LV_BUILD_EXAMPLES*/
