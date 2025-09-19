@@ -39,6 +39,44 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
+bool lv_nanovg_grad_to_paint(NVGcontext * ctx, const lv_vector_gradient_t * grad, NVGpaint * paint)
+{
+    LV_PROFILER_DRAW_BEGIN;
+
+    LV_ASSERT_NULL(grad);
+    LV_ASSERT_NULL(paint);
+
+    if(grad->stops_count < 2) {
+        LV_LOG_WARN("stops_count(%d) should be 2 for gradient", grad->stops_count);
+        LV_PROFILER_DRAW_END;
+        return false;
+    }
+
+    const NVGcolor icol = lv_nanovg_color_convert(grad->stops[0].color, grad->stops[0].opa);
+    const NVGcolor ocol = lv_nanovg_color_convert(grad->stops[1].color, grad->stops[1].opa);
+
+    switch(grad->style) {
+        case LV_VECTOR_GRADIENT_STYLE_LINEAR:
+            *paint = nvgLinearGradient(ctx, grad->x1, grad->y1, grad->x2, grad->y2, icol, ocol);
+            break;
+
+        case LV_VECTOR_GRADIENT_STYLE_RADIAL: {
+                const float inr = grad->cr * grad->stops[0].frac / 255;
+                const float outr = grad->cr * grad->stops[1].frac / 255;
+                *paint = nvgRadialGradient(ctx, grad->cx, grad->cy, inr, outr, icol, ocol);
+            }
+            break;
+
+        default:
+            LV_LOG_WARN("Unsupported gradient style: %d", grad->style);
+            LV_PROFILER_DRAW_END;
+            return false;
+    }
+
+    LV_PROFILER_DRAW_END;
+    return true;
+}
+
 void lv_nanovg_draw_grad(
     NVGcontext * ctx,
     const lv_vector_gradient_t * grad,
@@ -47,29 +85,10 @@ void lv_nanovg_draw_grad(
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    if(grad->stops_count < 2) {
-        LV_LOG_WARN("stops_count(%d) should be 2 for gradient", grad->stops_count);
+    NVGpaint paint;
+    if(!lv_nanovg_grad_to_paint(ctx, grad, &paint)) {
         LV_PROFILER_DRAW_END;
         return;
-    }
-
-    NVGpaint paint;
-    const NVGcolor icol = lv_nanovg_color_convert(grad->stops[0].color, grad->stops[0].opa);
-    const NVGcolor ocol = lv_nanovg_color_convert(grad->stops[1].color, grad->stops[1].opa);
-
-    switch(grad->style) {
-        case LV_VECTOR_GRADIENT_STYLE_LINEAR:
-            paint = nvgLinearGradient(ctx, grad->x1, grad->y1, grad->x2, grad->y2, icol, ocol);
-            break;
-
-        case LV_VECTOR_GRADIENT_STYLE_RADIAL:
-            paint = nvgRadialGradient(ctx, grad->cx, grad->cy, grad->cr, grad->cr, icol, ocol);
-            break;
-
-        default:
-            LV_LOG_WARN("Unsupported gradient style: %d", grad->style);
-            LV_PROFILER_DRAW_END;
-            return;
     }
 
     nvgPathWinding(ctx, winding);
