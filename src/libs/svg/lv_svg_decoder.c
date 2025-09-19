@@ -352,6 +352,10 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(layer);
+
+    /*Save the widget so that `LV_EVENT_DRAW_TASK_ADDED` can be sent to it in `lv_draw_vector`*/
+    ctx->base.obj = image_dsc->base.obj;
+
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
