@@ -277,8 +277,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
-    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT  ||
-                                     LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
+    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
     const bool is_last_flush = lv_display_flush_is_last(disp);
     const bool skip_flush = wait_for_last_flush && !is_last_flush;
 
@@ -303,6 +302,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
          * To do that, we use the display's resolution and as the area
          *  we also grab the current draw buffer so that we can rotate the whole display */
         if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+            if(!is_last_flush) {
+                /* We need to wait for the last flush when using direct render mode with rotation*/
+                lv_display_flush_ready(disp);
+                return;
+            }
             lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
             src_w = lv_display_get_horizontal_resolution(disp);
             src_h = lv_display_get_vertical_resolution(disp);
@@ -350,12 +354,26 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (area->x1 + dsc->vinfo.xoffset) * px_size +
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
+
     const int32_t w = lv_area_get_width(area);
-    const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
-    for(int32_t y = area->y1; y <= area->y2; y++) {
-        write_to_fb(dsc, fb_pos, color_p, w * px_size);
-        fb_pos += dsc->finfo.line_length;
-        color_p += stride;
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
+        uint32_t color_pos =
+            area->x1 * px_size +
+            area->y1 * disp->hor_res * px_size;
+
+        for(int32_t y = area->y1; y <= area->y2; y++) {
+            write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_pos += disp->hor_res * px_size;
+        }
+    }
+    else {
+        const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
+        for(int32_t y = area->y1; y <= area->y2; y++) {
+            write_to_fb(dsc, fb_pos, color_p, w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_p += stride;
+        }
     }
 
     if(dsc->force_refresh) {
