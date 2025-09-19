@@ -1479,12 +1479,12 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
-			bool "Tiny ttf cache entries count"
+			int "Tiny ttf cache entries count"
 			default 128
 			depends on LV_USE_TINY_TTF
 
 		config LV_TINY_TTF_CACHE_KERNING_CNT
-			bool "Tiny ttf kerning cache entries count"
+			int "Tiny ttf kerning cache entries count"
 			default 256
 			depends on LV_USE_TINY_TTF
 
