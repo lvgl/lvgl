@@ -53,6 +53,12 @@ static void remove_anim(void * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    #if LV_USE_OS
+        static lv_mutex_t lv_anim_mutex;
+    #endif
+    static lv_anim_t * lv_running_anim = NULL;
+#endif
 
 /**********************
  *      MACROS
@@ -69,6 +75,9 @@ static void remove_anim(void * a);
 
 void lv_anim_core_init(void)
 {
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR && LV_USE_OS
+    lv_mutex_init(&lv_anim_mutex);
+#endif
     lv_ll_init(anim_ll_p, sizeof(lv_anim_t));
     state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
@@ -79,6 +88,9 @@ void lv_anim_core_init(void)
 void lv_anim_core_deinit(void)
 {
     lv_anim_delete_all();
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR && LV_USE_OS
+    lv_mutex_delete(&lv_anim_mutex);
+#endif
 }
 
 void lv_anim_enable_vsync_mode(bool enable)
@@ -114,6 +126,10 @@ void lv_anim_init(lv_anim_t * a)
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    a->destructor = NULL;
+    a->ext_data = NULL;
+#endif
 }
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
@@ -139,6 +155,16 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
 
     /*Set the start value*/
     if(new_anim->early_apply) {
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+#if LV_USE_OS
+        lv_mutex_lock(&lv_anim_mutex);
+#endif
+        lv_running_anim = new_anim;
+#if LV_USE_OS
+        lv_mutex_unlock(&lv_anim_mutex);
+#endif
+#endif
+
         if(new_anim->get_value_cb) {
             int32_t v_ofs = new_anim->get_value_cb(new_anim);
             new_anim->start_value += v_ofs;
@@ -155,6 +181,16 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
         if(new_anim->custom_exec_cb) {
             new_anim->custom_exec_cb(new_anim, new_anim->current_value);
         }
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+#if LV_USE_OS
+        lv_mutex_lock(&lv_anim_mutex);
+#endif
+        lv_running_anim = NULL;
+#if LV_USE_OS
+        lv_mutex_unlock(&lv_anim_mutex);
+#endif
+#endif
     }
 
     /*Creating an animation changed the linked list.
@@ -555,6 +591,21 @@ void lv_anim_resume(lv_anim_t * a)
     a->run_round = state.anim_run_round;
 }
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+lv_anim_t * lv_anim_get_running_anim(void)
+{
+    return lv_running_anim;
+}
+
+void lv_anim_set_external_data(lv_anim_t * a, void * ext_data, void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(a);
+
+    a->ext_data = ext_data;
+    a->destructor = destructor;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -680,6 +731,12 @@ static void anim_completed_handler(lv_anim_t * a)
         /*Call the callback function at the end*/
         if(a->completed_cb != NULL) a->completed_cb(a);
         if(a->deleted_cb != NULL) a->deleted_cb(a);
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+        if(a->destructor && a->ext_data) {
+            a->destructor(a->ext_data);
+            a->ext_data = NULL;
+        }
+#endif
         lv_free(a);
     }
     /*If the animation is not deleted then restart it*/
@@ -797,6 +854,12 @@ static bool remove_concurrent_anims(const lv_anim_t * a_current)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
             lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+            if(a->destructor && a->ext_data) {
+                a->destructor(a->ext_data);
+                a->ext_data = NULL;
+            }
+#endif
             lv_free(a);
             /*Read by `anim_timer`. It need to know if a delete occurred in the linked list*/
             anim_mark_list_change();
@@ -818,5 +881,11 @@ static void remove_anim(void * a)
     lv_anim_t * anim = a;
     lv_ll_remove(anim_ll_p, a);
     if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    if(anim->destructor && anim->ext_data) {
+        anim->destructor(anim->ext_data);
+        anim->ext_data = NULL;
+    }
+#endif
     lv_free(a);
 }

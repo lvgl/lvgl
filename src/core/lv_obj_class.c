@@ -135,6 +135,15 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
 void lv_obj_destruct(lv_obj_t * obj)
 {
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    for(int i = 0; i < LV_EXT_DATA_MAX_NUM; i++) {
+        if(obj->destructor && obj->ext_data[i]) {
+            obj->destructor(obj->ext_data[i]);
+            obj->ext_data[i] = NULL;
+        }
+    }
+#endif
+
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
     if(obj->class_p->base_class) {
@@ -170,12 +179,56 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
     return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE;
 }
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+void lv_obj_set_external_data(lv_obj_t * obj, void * ext_data[], int ext_data_num,
+                              void (* destructor)(void * ext_data))
+{
+    LV_ASSERT_NULL(obj);
+    if(ext_data_num > LV_EXT_DATA_MAX_NUM) {
+        LV_LOG_WARN("ext_data_num (%d) exceeds LV_EXT_DATA_MAX_NUM (%d), truncating input array.",
+                    ext_data_num, LV_EXT_DATA_MAX_NUM);
+    }
+
+    int num = ext_data_num < LV_EXT_DATA_MAX_NUM ? ext_data_num : LV_EXT_DATA_MAX_NUM;
+
+    for(int i = 0; i < num; i++) {
+        bool exists = false;
+        for(int c = 0; c < LV_EXT_DATA_MAX_NUM; c++) {
+            if(ext_data[i] != NULL && obj->ext_data[c] == ext_data[i]) {
+                exists = true;
+                break;
+            }
+        }
+
+        if(!exists && ext_data[i] != NULL) {
+            for(int c = 0; c < LV_EXT_DATA_MAX_NUM; c++) {
+                if(obj->ext_data[c] == NULL) {
+                    obj->ext_data[c] = ext_data[i];
+                    break;
+                }
+            }
+        }
+    }
+
+    if(destructor) {
+        obj->destructor = destructor;
+    }
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    obj->destructor = NULL;
+    for(int i = 0; i < LV_EXT_DATA_MAX_NUM; i++) {
+        obj->ext_data[i] = NULL;
+    }
+#endif
+
     if(obj->class_p->base_class) {
         const lv_obj_class_t * original_class_p = obj->class_p;
 
