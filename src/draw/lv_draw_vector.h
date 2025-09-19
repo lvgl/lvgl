@@ -260,263 +260,263 @@ void lv_vector_path_append_path(lv_vector_path_shape_t * path, const lv_vector_p
  * @param layer         pointer to a layer
  * @return              pointer to the created descriptor
  */
-lv_draw_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer);
+lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer);
 
 /**
  * Delete the vector graphic descriptor
  * @param dsc              pointer to a vector graphic descriptor
  */
-void lv_vector_dsc_delete(lv_draw_vector_dsc_t * dsc);
+void lv_draw_vector_dsc_delete(lv_draw_vector_dsc_t * dsc);
 
 /**
  * Set a matrix to current transformation matrix.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this matrix.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this matrix.
  * @param dsc              pointer to a vector graphic descriptor
  * @param matrix           pointer to a matrix
  */
-void lv_vector_dsc_set_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
+void lv_draw_vector_dsc_set_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
 
 /**
  * Set blend mode for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this blend mode.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this blend mode.
  * @param dsc              pointer to a vector graphic descriptor
  * @param blend            the blend mode to be set in `lv_vector_blend_t`
  */
-void lv_vector_dsc_set_blend_mode(lv_draw_vector_dsc_t * dsc, lv_vector_blend_t blend);
+void lv_draw_vector_dsc_set_blend_mode(lv_draw_vector_dsc_t * dsc, lv_vector_blend_t blend);
 
 /**
  * Set the fill color for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this color.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this color.
  * @param dsc              pointer to a vector graphic descriptor
  * @param color            the color to be set in lv_color32_t format
  */
-void lv_vector_dsc_set_fill_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color);
+void lv_draw_vector_dsc_set_fill_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color);
 
 /**
  * Set fill color for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this color.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this color.
  * @param dsc              pointer to a vector graphic descriptor
  * @param color            the color to be set in lv_color_t format
  */
-void lv_vector_dsc_set_fill_color(lv_draw_vector_dsc_t * dsc, lv_color_t color);
+void lv_draw_vector_dsc_set_fill_color(lv_draw_vector_dsc_t * dsc, lv_color_t color);
 
 /**
  * Set fill opacity for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this opacity.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this opacity.
  * @param dsc              pointer to a vector graphic descriptor
  * @param opa              the opacity to be set in lv_opa_t format
  */
-void lv_vector_dsc_set_fill_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa);
+void lv_draw_vector_dsc_set_fill_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa);
 
 /**
  * Set fill rule for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this fill rule.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this fill rule.
  * @param dsc              pointer to a vector graphic descriptor
  * @param rule             the fill rule to be set in lv_vector_fill_t format
  */
-void lv_vector_dsc_set_fill_rule(lv_draw_vector_dsc_t * dsc, lv_vector_fill_t rule);
+void lv_draw_vector_dsc_set_fill_rule(lv_draw_vector_dsc_t * dsc, lv_vector_fill_t rule);
 
 /**
  * Set the fill units for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this fill units.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this fill units.
  * @param dsc              pointer to a vector graphic descriptor
  * @param units            the units to be set in lv_vector_fill_units_t format
  * @note The units can be either relative to the object bounding box or absolute in user space.
  *       This API specifically affects the drawing position of the fill image and does not impact other elements.
  */
-void lv_vector_dsc_set_fill_units(lv_draw_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
+void lv_draw_vector_dsc_set_fill_units(lv_draw_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
 
 /**
  * Set fill image for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this fill image.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this fill image.
  * @param dsc              pointer to a vector graphic descriptor
  * @param img_dsc          pointer to a `lv_draw_image_dsc_t` variable
  */
-void lv_vector_dsc_set_fill_image(lv_draw_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc);
+void lv_draw_vector_dsc_set_fill_image(lv_draw_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc);
 
 /**
  * Set fill linear gradient for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient.
  * @param dsc pointer to a vector graphic descriptor
  * @param x1 the x for start point
  * @param y1 the y for start point
  * @param x2 the x for end point
  * @param y2 the y for end point
  */
-void lv_vector_dsc_set_fill_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2);
+void lv_draw_vector_dsc_set_fill_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2);
 
 /**
 
  * Set fill radial gradient radius for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient.
  * @param dsc pointer to a vector graphic descriptor
  * @param cx the x for center of the circle
  * @param cy the y for center of the circle
  * @param radius the radius for circle
  */
-void lv_vector_dsc_set_fill_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius);
+void lv_draw_vector_dsc_set_fill_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius);
 
 /**
  * Set fill radial gradient spread for descriptor
  * @param dsc pointer to a vector graphic descriptor
  * @param spread the gradient spread to be set in lv_vector_gradient_spread_t format
  */
-void lv_vector_dsc_set_fill_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread);
+void lv_draw_vector_dsc_set_fill_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread);
 
 /**
  * Set fill gradient color stops for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient color stops.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient color stops.
  * @param dsc              pointer to a vector graphic descriptor
  * @param stops            an array of `lv_grad_stop_t` variables
  * @param count            the number of stops in the array, range: 0..LV_GRADIENT_MAX_STOPS
  */
-void lv_vector_dsc_set_fill_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
-                                                 uint16_t count);
+void lv_draw_vector_dsc_set_fill_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
+                                                      uint16_t count);
 
 /**
  * Set a matrix to current fill transformation matrix
- * The new path shapes added by `lv_vector_dsc_add_path` will use this matrix.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this matrix.
  * @param dsc              pointer to a vector graphic descriptor
  * @param matrix           pointer to a matrix
  */
-void lv_vector_dsc_set_fill_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
+void lv_draw_vector_dsc_set_fill_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
 
 /**
  * Set stroke color for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this color.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this color.
  * @param dsc              pointer to a vector graphic descriptor
  * @param color            the color to be set in lv_color32_t format
  */
-void lv_vector_dsc_set_stroke_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color);
+void lv_draw_vector_dsc_set_stroke_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color);
 
 /**
  * Set stroke color for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this color.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this color.
  * @param dsc              pointer to a vector graphic descriptor
  * @param color            the color to be set in lv_color_t format
  */
-void lv_vector_dsc_set_stroke_color(lv_draw_vector_dsc_t * dsc, lv_color_t color);
+void lv_draw_vector_dsc_set_stroke_color(lv_draw_vector_dsc_t * dsc, lv_color_t color);
 
 /**
  * Set stroke opacity for descriptor
  * @param dsc              pointer to a vector graphic descriptor
  * @param opa              the opacity to be set in lv_opa_t format
  */
-void lv_vector_dsc_set_stroke_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa);
+void lv_draw_vector_dsc_set_stroke_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa);
 
 /**
  * Set stroke line width for descriptor.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this stroke width.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this stroke width.
  * @param dsc              pointer to a vector graphic descriptor
  * @param width            the stroke line width
  */
-void lv_vector_dsc_set_stroke_width(lv_draw_vector_dsc_t * dsc, float width);
+void lv_draw_vector_dsc_set_stroke_width(lv_draw_vector_dsc_t * dsc, float width);
 
 /**
  * Set stroke line dash pattern for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this dash.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this dash.
  * @param dsc              pointer to a vector graphic descriptor
  * @param dash_pattern     an array of values that specify the segments of dash line
  * @param dash_count       the length of dash pattern array
  */
-void lv_vector_dsc_set_stroke_dash(lv_draw_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count);
+void lv_draw_vector_dsc_set_stroke_dash(lv_draw_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count);
 
 /**
  * Set stroke line cap style for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this line cap.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this line cap.
  * @param dsc              pointer to a vector graphic descriptor
  * @param cap              the line cap to be set in lv_vector_stroke_cap_t format
  */
-void lv_vector_dsc_set_stroke_cap(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_cap_t cap);
+void lv_draw_vector_dsc_set_stroke_cap(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_cap_t cap);
 
 /**
  * Set stroke line join style for descriptor
  * @param dsc              pointer to a vector graphic descriptor
  * @param join             the line join to be set in lv_vector_stroke_join_t format
  */
-void lv_vector_dsc_set_stroke_join(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_join_t join);
+void lv_draw_vector_dsc_set_stroke_join(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_join_t join);
 
 /**
  * Set stroke miter limit for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this miter limit.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this miter limit.
  * @param dsc              pointer to a vector graphic descriptor
  * @param miter_limit      the stroke miter_limit
  */
-void lv_vector_dsc_set_stroke_miter_limit(lv_draw_vector_dsc_t * dsc, uint16_t miter_limit);
+void lv_draw_vector_dsc_set_stroke_miter_limit(lv_draw_vector_dsc_t * dsc, uint16_t miter_limit);
 
 /**
  * Set stroke linear gradient for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient.
  * @param dsc              pointer to a vector graphic descriptor
  * @param x1               the x for start point
  * @param y1               the y for start point
  * @param x2               the x for end point
  * @param y2               the y for end point
  */
-void lv_vector_dsc_set_stroke_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2);
+void lv_draw_vector_dsc_set_stroke_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2);
 /**
  * Set stroke radial gradient for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient.
  * @param dsc              pointer to a vector graphic descriptor
  * @param cx               the x for center of the circle
  * @param cy               the y for center of the circle
  * @param radius           the radius for circle
  */
-void lv_vector_dsc_set_stroke_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius);
+void lv_draw_vector_dsc_set_stroke_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius);
 
 /**
  * Set stroke color stops for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this gradient spread.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this gradient spread.
  * @param dsc              pointer to a vector graphic descriptor
  * @param spread           the gradient spread to be set in lv_vector_gradient_spread_t format
  */
-void lv_vector_dsc_set_stroke_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread);
+void lv_draw_vector_dsc_set_stroke_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread);
 
 /**
  * Set stroke color stops for descriptor
- * The new path shapes added by `lv_vector_dsc_add_path` will use this color stops.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this color stops.
  * @param dsc              pointer to a vector graphic descriptor
  * @param stops            an array of `lv_grad_stop_t` variables
  * @param count            the number of stops in the array
  */
-void lv_vector_dsc_set_stroke_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
-                                                   uint16_t count);
+void lv_draw_vector_dsc_set_stroke_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
+                                                        uint16_t count);
 
 /**
  * Set a matrix to current stroke transformation matrix.
- * The new path shapes added by `lv_vector_dsc_add_path` will use this matrix.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this matrix.
  * @param dsc              pointer to a vector graphic descriptor
  * @param matrix           pointer to a matrix
  */
-void lv_vector_dsc_set_stroke_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
+void lv_draw_vector_dsc_set_stroke_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix);
 
 /**
  * Set current transformation matrix to identity matrix
- * The new path shapes added by `lv_vector_dsc_add_path` will use this matrix.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this matrix.
  * @param dsc           pointer to a vector graphic descriptor
  */
-void lv_vector_dsc_identity(lv_draw_vector_dsc_t * dsc);
+void lv_draw_vector_dsc_identity(lv_draw_vector_dsc_t * dsc);
 
 /**
  * Change the scale factor of current transformation matrix
- * The new path shapes added by `lv_vector_dsc_add_path` will use this scale.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this scale.
  * @param dsc           pointer to a vector graphic descriptor
  * @param scale_x       the scale factor for the X direction
  * @param scale_y       the scale factor for the Y direction
  */
-void lv_vector_dsc_scale(lv_draw_vector_dsc_t * dsc, float scale_x, float scale_y);
+void lv_draw_vector_dsc_scale(lv_draw_vector_dsc_t * dsc, float scale_x, float scale_y);
 
 /**
  * Rotate current transformation matrix with origin
- * The new path shapes added by `lv_vector_dsc_add_path` will use this rotation.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this rotation.
  * @param dsc           pointer to a vector graphic descriptor
  * @param degree        angle to rotate
  */
-void lv_vector_dsc_rotate(lv_draw_vector_dsc_t * dsc, float degree);
+void lv_draw_vector_dsc_rotate(lv_draw_vector_dsc_t * dsc, float degree);
 
 /**
  * Translate current transformation matrix to new position
- * The new path shapes added by `lv_vector_dsc_add_path` will use this rotation.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this rotation.
  * @param dsc           pointer to a vector graphic descriptor
  * @param tx            the amount of translate in x direction
  * @param tx            the amount of translate in y direction
@@ -525,19 +525,19 @@ void lv_draw_vector_dsc_translate(lv_draw_vector_dsc_t * dsc, float tx, float ty
 
 /**
  * Change the skew factor of current transformation matrix
- * The new path shapes added by `lv_vector_dsc_add_path` will use this skew.
+ * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this skew.
  * @param dsc           pointer to a vector graphic descriptor
  * @param skew_x        the skew factor for x direction
  * @param skew_y        the skew factor for y direction
  */
-void lv_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float skew_y);
+void lv_draw_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float skew_y);
 
 /**
  * Add a graphic path to the draw list
  * @param dsc           pointer to a vector graphic descriptor
  * @param path          pointer to a path
  */
-void lv_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_path_shape_t * path);
+void lv_draw_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_path_shape_t * path);
 
 /**
  * Clear a rectangle area use current fill color

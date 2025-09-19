@@ -274,7 +274,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
     lv_matrix_identity(&matrix);
 
-    vector_dsc = lv_vector_dsc_create(&layer);
+    vector_dsc = lv_draw_vector_dsc_create(&layer);
 
     int32_t offset_x;
     int32_t offset_y;
@@ -286,20 +286,20 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_matrix_scale(&matrix, 1, -1);
     lv_matrix_translate(&matrix, -offset_x, -h - offset_y);
     lv_matrix_scale(&matrix, scale, scale);
-    lv_vector_dsc_set_transform(vector_dsc, &matrix);
+    lv_draw_vector_dsc_set_transform(vector_dsc, &matrix);
 
     /*Set attributes color, line width etc*/
     if(cf == LV_COLOR_FORMAT_ARGB8888) {
 
         if(glyph_dsc->outline_stroke_width > 0) {
-            lv_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->outline_stroke_color);
-            lv_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
-            lv_vector_dsc_add_path(vector_dsc, glyph_paths->outside_path);
+            lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->outline_stroke_color);
+            lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
+            lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->outside_path);
         }
 
-        lv_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
-        lv_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
-        lv_vector_dsc_add_path(vector_dsc, glyph_paths->inside_path);
+        lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
+        lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
+        lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->inside_path);
 
     }
     else {
@@ -347,7 +347,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     img_dsc.src = draw_buf;
     lv_draw_sw_image(t, &img_dsc, &letter_coords);
 
-    lv_vector_dsc_delete(vector_dsc);
+    lv_draw_vector_dsc_delete(vector_dsc);
     lv_draw_buf_destroy(draw_buf);
 
 }

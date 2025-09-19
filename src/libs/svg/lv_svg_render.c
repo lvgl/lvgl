@@ -1303,7 +1303,7 @@ static void _render_viewport(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc
         lv_area_t rc = {0, 0, (int32_t)view->width, (int32_t)view->height};
         lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
         lv_vector_path_append_rect(path, &rc, 0, 0);
-        lv_vector_dsc_add_path(dsc, path);
+        lv_draw_vector_dsc_add_path(dsc, path);
         lv_vector_path_delete(path);
     }
 }
@@ -1327,7 +1327,7 @@ static void _render_rect(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     lv_vector_path_append_rect(path, &rc, rect->rx, rect->ry);
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_add_path(dsc, path);
     lv_vector_path_delete(path);
 
     _restore_matrix(&mtx, dsc);
@@ -1348,7 +1348,7 @@ static void _render_circle(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t
     lv_vector_path_append_circle(path, &cp, circle->r, circle->r);
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_add_path(dsc, path);
     lv_vector_path_delete(path);
 
     _restore_matrix(&mtx, dsc);
@@ -1369,7 +1369,7 @@ static void _render_ellipse(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_
     lv_vector_path_append_circle(path, &cp, ellipse->rx, ellipse->ry);
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_add_path(dsc, path);
     lv_vector_path_delete(path);
 
     _restore_matrix(&mtx, dsc);
@@ -1392,7 +1392,7 @@ static void _render_line(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     lv_vector_path_line_to(path, &ep);
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_add_path(dsc, path);
     lv_vector_path_delete(path);
 
     _restore_matrix(&mtx, dsc);
@@ -1410,7 +1410,7 @@ static void _render_poly(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, poly->path);
+    lv_draw_vector_dsc_add_path(dsc, poly->path);
 
     _restore_matrix(&mtx, dsc);
 }
@@ -1535,11 +1535,11 @@ static void _render_image(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t 
             break;
     }
 
-    lv_vector_dsc_set_fill_transform(dsc, &mtx);
-    lv_vector_dsc_set_fill_image(dsc, &image->img_dsc);
+    lv_draw_vector_dsc_set_fill_transform(dsc, &mtx);
+    lv_draw_vector_dsc_set_fill_image(dsc, &image->img_dsc);
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, path);
+    lv_draw_vector_dsc_add_path(dsc, path);
     lv_vector_path_delete(path);
 
     _restore_matrix(&imtx, dsc);
@@ -1660,7 +1660,7 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     }
 
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, text->path);
+    lv_draw_vector_dsc_add_path(dsc, text->path);
 
     _restore_matrix(&tmtx, dsc);
 }
@@ -1725,7 +1725,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
         lv_vector_path_get_bounding(span->path, &span->bounds);
     }
     _copy_draw_dsc_from_ref(dsc, obj);
-    lv_vector_dsc_add_path(dsc, span->path);
+    lv_draw_vector_dsc_add_path(dsc, span->path);
 
     _copy_draw_dsc(&(dsc->current_dsc), &(save_dsc.dsc));
 }
@@ -2576,12 +2576,12 @@ void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
         return;
     }
 
-    lv_draw_vector_dsc_t * dsc = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
     lv_svg_render_obj_t * list = lv_svg_render_create(svg_doc);
     lv_draw_svg_render(dsc, list);
     lv_draw_vector(dsc);
     lv_svg_render_delete(list);
-    lv_vector_dsc_delete(dsc);
+    lv_draw_vector_dsc_delete(dsc);
 }
 
 /**********************
