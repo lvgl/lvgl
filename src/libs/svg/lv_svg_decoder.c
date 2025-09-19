@@ -351,7 +351,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * ctx = lv_draw_vector_dsc_create(layer);
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
@@ -368,10 +368,10 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
         lv_matrix_scale(&matrix, image_dsc->scale_x / 256.0f, image_dsc->scale_y / 256.0f);
         lv_matrix_translate(&matrix, -image_dsc->pivot.x, -image_dsc->pivot.y);
     }
-    lv_vector_dsc_set_transform(ctx, &matrix);
+    lv_draw_vector_dsc_set_transform(ctx, &matrix);
     lv_draw_svg_render(ctx, list);
     lv_draw_vector(ctx);
-    lv_vector_dsc_delete(ctx);
+    lv_draw_vector_dsc_delete(ctx);
 
     LV_PROFILER_DRAW_END;
 }
