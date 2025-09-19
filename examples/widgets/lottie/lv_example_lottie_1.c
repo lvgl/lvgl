@@ -20,7 +20,7 @@ void lv_example_lottie_1(void)
     lv_lottie_set_buffer(lottie, 64, 64, buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
     lv_lottie_set_draw_buf(lottie, &draw_buf);
 #endif
 

@@ -19,7 +19,7 @@
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_utils.h"
 #include "../../../misc/lv_log.h"
-#include "../../../osal/lv_os.h"
+#include "../../../osal/lv_os_private.h"
 #include "fsl_pxp.h"
 
 #if defined(SDK_OS_FREE_RTOS)

@@ -205,4 +205,37 @@ void test_display_triple_buffer(void)
     lv_draw_buf_destroy(buf3);
 }
 
+static void refr_event_handler(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    int * called = lv_event_get_user_data(e);
+    (*called)++;
+    /* We should not receive the LV_EVENT_REFR_READY event as the display was deleted*/
+    TEST_ASSERT_EQUAL(code, LV_EVENT_REFR_START);
+    lv_display_delete(lv_event_get_current_target(e));
+}
+
+static void never_called(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(disp);
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+    TEST_FAIL();
+}
+
+void test_displa_deleted_during_event(void)
+{
+    lv_display_t * disp = lv_display_create(480, 320);
+    lv_display_set_flush_cb(disp, never_called);
+    lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);
+    lv_display_set_draw_buffers(disp, buf1, NULL);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    int called = 0;
+    lv_display_add_event_cb(disp, refr_event_handler, LV_EVENT_REFR_START, &called);
+    lv_display_add_event_cb(disp, refr_event_handler, LV_EVENT_REFR_READY, &called);
+    lv_refr_now(disp);
+    TEST_ASSERT_EQUAL(called, 1);
+    lv_draw_buf_destroy(buf1);
+}
+
 #endif

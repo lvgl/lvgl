@@ -19,6 +19,7 @@ if [ -n "$REPO_URL" ] && [ -n "$COMMIT_REF" ]; then
   echo "Using provided repo URL: $REPO_URL and commit ref: $COMMIT_REF for lvgl submodule"
   git remote set-url origin "$REPO_URL"
   git fetch origin
+  git fetch origin '+refs/pull/*:refs/remotes/origin/pull/*'
   git checkout "$COMMIT_REF"
 else
   CURRENT_REF="$(git rev-parse HEAD)"
