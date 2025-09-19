@@ -317,16 +317,16 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     /*Can't call lv_draw_vector() as it would create a new draw task while
      *the main thread also can create draw tasks. So create a dummy draw task
      *manually to draw the outline*/
-    if(vector_dsc->tasks.task_list) {
-        vector_dsc->tasks.base.layer = vector_dsc->layer;
+    if(vector_dsc->task_list) {
+        vector_dsc->base.layer = vector_dsc->base.layer;
         lv_draw_task_t dummy_t;
         lv_memzero(&dummy_t, sizeof(lv_draw_task_t));
-        dummy_t.area = vector_dsc->layer->_clip_area;
-        dummy_t._real_area = vector_dsc->layer->_clip_area;
-        dummy_t.clip_area = vector_dsc->layer->_clip_area;
-        dummy_t.target_layer = vector_dsc->layer;
+        dummy_t.area = vector_dsc->base.layer->_clip_area;
+        dummy_t._real_area = vector_dsc->base.layer->_clip_area;
+        dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
+        dummy_t.target_layer = vector_dsc->base.layer;
         dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
-        dummy_t.draw_dsc = &vector_dsc->tasks;
+        dummy_t.draw_dsc = &vector_dsc;
         lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
     }
 
