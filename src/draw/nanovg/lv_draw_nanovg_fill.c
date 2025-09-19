@@ -49,8 +49,6 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
         return;
     }
 
-    // nvgSave(u->vg);
-
     nvgBeginPath(u->vg);
 
     lv_nanovg_path_append_rect(u->vg,
@@ -68,8 +66,6 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     else {
         lv_nanovg_fill(u->vg, NVG_CCW, NVG_SOURCE_OVER, lv_nanovg_color_convert(dsc->color, dsc->opa));
     }
-
-    // nvgRestore(u->vg);
 
     LV_PROFILER_DRAW_END;
 }

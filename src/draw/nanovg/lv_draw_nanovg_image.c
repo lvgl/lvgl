@@ -28,6 +28,8 @@
 *  STATIC PROTOTYPES
 **********************/
 
+static void image_dsc_to_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
+
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -40,34 +42,58 @@
 *   GLOBAL FUNCTIONS
 **********************/
 
-const lv_draw_buf_t * lv_nanovg_buffer_open_image(lv_image_decoder_dsc_t * decoder_dsc, const void * src,
-                                                  bool no_cache, bool premultiply)
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
 {
-    LV_ASSERT_NULL(decoder_dsc);
-    LV_ASSERT_NULL(src);
+    LV_PROFILER_DRAW_BEGIN;
 
-    lv_image_decoder_args_t args;
-    lv_memzero(&args, sizeof(lv_image_decoder_args_t));
-    args.premultiply = premultiply;
-    args.no_cache = no_cache;
-
-    lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to open image");
-        return NULL;
+    lv_area_t clip_area;
+    if(!lv_area_intersect(&clip_area, &t->_real_area, &t->clip_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
     }
 
-    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
-    if(decoded == NULL || decoded->data == NULL) {
-        lv_image_decoder_close(decoder_dsc);
-        LV_LOG_ERROR("image data is NULL");
-        return NULL;
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+
+    lv_image_decoder_dsc_t decoder_dsc;
+    const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(&decoder_dsc, dsc->src, no_cache, false);
+
+    if(!src_buf) {
+        LV_PROFILER_DRAW_END;
+        return;
     }
 
-    return decoded;
+    int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa));
+    if(image_handle < 0) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    /* original image matrix */
+    lv_matrix_t image_matrix;
+    lv_matrix_identity(&image_matrix);
+    image_dsc_to_matrix(&image_matrix, coords->x1, coords->y1, dsc);
+    lv_nanovg_transform(u->vg, &image_matrix);
+
+    /* Use coords as the fallback image width and height */
+    const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
+    const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
+
+    NVGpaint paint = nvgImagePattern(u->vg, 0, 0, img_w, img_h, 0, image_handle,
+                                     dsc->opa / (float)LV_OPA_COVER);
+
+    nvgBeginPath(u->vg);
+    lv_nanovg_path_append_rect(u->vg, 0, 0, img_w, img_h, dsc->clip_radius);
+    nvgFillPaint(u->vg, paint);
+    nvgFill(u->vg);
+
+    LV_PROFILER_DRAW_END;
 }
 
-static void lv_nanovg_image_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
+/**********************
+*   STATIC FUNCTIONS
+**********************/
+
+static void image_dsc_to_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
 {
     LV_ASSERT_NULL(matrix);
     LV_ASSERT_NULL(dsc);
@@ -96,56 +122,5 @@ static void lv_nanovg_image_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, c
         lv_matrix_translate(matrix, -pivot.x, -pivot.y);
     }
 }
-
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
-{
-    LV_PROFILER_DRAW_BEGIN;
-
-    lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &t->_real_area, &t->clip_area)) {
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
-
-    lv_image_decoder_dsc_t decoder_dsc;
-    const lv_draw_buf_t * src_buf = lv_nanovg_buffer_open_image(&decoder_dsc, dsc->src, no_cache, false);
-
-    if(!src_buf) {
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa));
-    if(image_handle < 0) {
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
-    /* original image matrix */
-    lv_matrix_t image_matrix;
-    lv_matrix_identity(&image_matrix);
-    lv_nanovg_image_matrix(&image_matrix, coords->x1, coords->y1, dsc);
-    lv_nanovg_transform(u->vg, &image_matrix);
-
-    /* Use coords as the fallback image width and height */
-    const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
-    const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
-
-    NVGpaint paint = nvgImagePattern(u->vg, 0, 0, img_w, img_h, 0, image_handle,
-                                     dsc->opa / (float)LV_OPA_COVER);
-
-    nvgBeginPath(u->vg);
-    lv_nanovg_path_append_rect(u->vg, 0, 0, img_w, img_h, dsc->clip_radius);
-    nvgFillPaint(u->vg, paint);
-    nvgFill(u->vg);
-
-    LV_PROFILER_DRAW_END;
-}
-
-/**********************
-*   STATIC FUNCTIONS
-**********************/
 
 #endif /* LV_USE_DRAW_NANOVG */
