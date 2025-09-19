@@ -234,7 +234,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 {
 
     lv_draw_sw_letter_outlines_t * glyph_paths;
-    lv_vector_dsc_t * vector_dsc;
+    lv_draw_vector_dsc_t * vector_dsc;
     lv_draw_buf_t * draw_buf;
     lv_matrix_t matrix;
     lv_layer_t layer;

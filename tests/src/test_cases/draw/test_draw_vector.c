@@ -34,7 +34,7 @@ void tearDown(void)
 
 static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
     lv_vector_dsc_set_transform(ctx, transform);
 
     lv_area_t rect = {0, 0, 640, 480};
@@ -53,19 +53,19 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
 
     lv_vector_path_clear(path);
     lv_vector_path_append_rect(path, &rect1, 20, 20);
-    lv_vector_dsc_translate(ctx, 150, 0);
+    lv_draw_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0x00, 0x00, 0xff));
     lv_vector_dsc_add_path(ctx, path);
 
     lv_fpoint_t pc = {100, 100};
     lv_vector_path_clear(path);
     lv_vector_path_append_circle(path, &pc, 50, 50);
-    lv_vector_dsc_translate(ctx, 150, 0);
+    lv_draw_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_fill_color32(ctx, lv_color_to_32(lv_color_make(0x00, 0xff, 0x00), 0x80));
     lv_vector_dsc_add_path(ctx, path);
 
     lv_vector_dsc_set_transform(ctx, transform);
-    lv_vector_dsc_translate(ctx, 0, 150);
+    lv_draw_vector_dsc_translate(ctx, 0, 150);
 
     lv_grad_stop_t stops[2];
     lv_memzero(stops, sizeof(stops));
@@ -85,7 +85,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_vector_dsc_add_path(ctx, path);
 
     lv_vector_dsc_set_transform(ctx, transform);
-    lv_vector_dsc_translate(ctx, 150, 150);
+    lv_draw_vector_dsc_translate(ctx, 150, 150);
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
     LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
@@ -101,7 +101,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_vector_dsc_add_path(ctx, path);
 
     lv_vector_dsc_set_transform(ctx, transform);
-    lv_vector_dsc_translate(ctx, 300, 150);
+    lv_draw_vector_dsc_translate(ctx, 300, 150);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xff, 0x00, 0x00));
     lv_vector_dsc_add_path(ctx, path);
 
@@ -109,7 +109,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_vector_path_append_rect(path, &rect1, 20, 20);
     lv_area_t rect2 = {80, 80, 120, 120};
     lv_vector_path_append_rect(path, &rect2, 15, 15);
-    lv_vector_dsc_translate(ctx, 50, 0);
+    lv_draw_vector_dsc_translate(ctx, 50, 0);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0x00, 0x80, 0xff));
     lv_vector_dsc_set_blend_mode(ctx, LV_VECTOR_BLEND_MULTIPLY);
     lv_vector_dsc_set_fill_rule(ctx, LV_VECTOR_FILL_EVENODD);
@@ -189,7 +189,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
 
 static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
     lv_vector_dsc_set_transform(ctx, transform);
 
     lv_area_t rect = {0, 0, 640, 480};
@@ -237,11 +237,11 @@ static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_vector_dsc_set_stroke_join(ctx, LV_VECTOR_STROKE_JOIN_MITER);
     lv_vector_dsc_add_path(ctx, path);
 
-    lv_vector_dsc_translate(ctx, 150, 0);
+    lv_draw_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_stroke_join(ctx, LV_VECTOR_STROKE_JOIN_BEVEL);
     lv_vector_dsc_add_path(ctx, path);
 
-    lv_vector_dsc_translate(ctx, 150, 0);
+    lv_draw_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_stroke_join(ctx, LV_VECTOR_STROKE_JOIN_ROUND);
     lv_vector_dsc_add_path(ctx, path);
 
@@ -253,11 +253,11 @@ static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_vector_dsc_set_stroke_cap(ctx, LV_VECTOR_STROKE_CAP_BUTT);
     lv_vector_dsc_add_path(ctx, path);
 
-    lv_vector_dsc_translate(ctx, 0, 40);
+    lv_draw_vector_dsc_translate(ctx, 0, 40);
     lv_vector_dsc_set_stroke_cap(ctx, LV_VECTOR_STROKE_CAP_SQUARE);
     lv_vector_dsc_add_path(ctx, path);
 
-    lv_vector_dsc_translate(ctx, 0, 40);
+    lv_draw_vector_dsc_translate(ctx, 0, 40);
     lv_vector_dsc_set_stroke_cap(ctx, LV_VECTOR_STROKE_CAP_ROUND);
     lv_vector_dsc_add_path(ctx, path);
 

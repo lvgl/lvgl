@@ -312,7 +312,7 @@ typedef struct _lv_vector_path_attr_t lv_vector_path_attr_t;
 
 typedef struct _lv_draw_vector_dsc_t lv_draw_vector_dsc_t;
 
-typedef struct _lv_vector_dsc_t lv_vector_dsc_t;
+typedef struct _lv_draw_vector_dsc_t lv_draw_vector_dsc_t;
 
 typedef struct _lv_xkb_t lv_xkb_t;
 
