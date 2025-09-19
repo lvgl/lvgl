@@ -64,7 +64,6 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_draw_g2d_unit_t * u = (lv_draw_g2d_unit_t *)t->draw_unit;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     lv_area_t * coords = &t->area;
