@@ -1,0 +1,7 @@
+*.c
+*.h
+*.cmake
+**/preview-bin/
+**/preview-build/
+**/CMakeLists.txt
+

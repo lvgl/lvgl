@@ -1,0 +1,30 @@
+<globals name="ui_lib">
+	<api>
+		<!-- Add <enumdefs> here -->
+	</api>
+
+	<consts>
+		<!-- Add <px>, <int>, <color> etc here -->
+		<color name="dark_blue" value="0x003762" />
+		<color name="yellow" value="0xda9d19" />
+		<int name="unit_small" value="6" />
+		<int name="unit_medium" value="12" />
+		<int name="unit_large" value="24" />
+	</consts>
+
+	<styles>
+		<!-- Add <style> tags here -->
+	</styles>
+
+	<subjects>
+		<!-- Add <int>, <string>, or <float> subjects here -->
+	</subjects>
+
+	<images>
+		<!-- Add <file> or <data> tags here -->
+	</images>
+
+	<fonts>
+		<!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
+	</fonts>
+</globals>

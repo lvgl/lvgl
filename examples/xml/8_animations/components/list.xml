@@ -1,0 +1,9 @@
+<component>
+	<view>
+		<button_normal label_text="Button 0" />
+		<button_normal label_text="Button 1" />
+		<button_normal label_text="Button 2" />
+		<button_normal label_text="Button 3" />
+		<button_normal label_text="Button 4" />
+	</view>
+</component>

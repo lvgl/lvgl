@@ -1,0 +1,11 @@
+<screen>
+	<!-- Create some label with translated text.
+		 Try out the "Translations" panel under the Preview
+	     See translations.xml to see from where the translations are coming. -->
+	<view flex_flow="column">
+		<lv_label text-translated="dog" />
+		<lv_label text-translated="cat" />
+		<lv_label text-translated="house" />
+		<lv_label text-translated="person" />
+	</view>
+</screen>

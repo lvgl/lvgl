@@ -1,0 +1,8 @@
+<component>
+	<api>
+		<prop name="text" type="string" />
+	</api>
+	<view extends="lv_button">
+		<lv_label text="$text" />
+	</view>
+</component>

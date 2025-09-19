@@ -1,0 +1,9 @@
+<screen>
+	<view flex_flow="column">
+		<!-- Just the components with the simple API
+		     Also check the Subject panel under the preview. -->
+		<sliderbox subject="volume" title="Volume" unit="%d%%" />
+		<sliderbox subject="timeout" title="Timeout" unit="%d ms" />
+		<sliderbox subject="max_current" title="Max. current" unit="%d mA" />
+	</view>
+</screen>

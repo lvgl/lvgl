@@ -1,0 +1,6 @@
+<translations languages="en de">
+	<translation tag="dog" char_count="40" en="This is a dog" de="Das ist ein Hund"/>
+	<translation tag="cat" char_count="40" en="A curious little cat" de="Eine neugierige kleine Katze"/>
+	<translation tag="house" char_count="40" en="The house is cozy and warm" de="Das Haus ist gemütlich und warm"/>
+	<translation char_count="60" tag="person" en="A kind person with a bright smile" de="Eine freundliche Person mit einem strahlenden Lächeln"/>
+</translations>
