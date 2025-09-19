@@ -28,6 +28,7 @@
 
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -276,8 +277,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
-    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT  ||
-                                     LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
+    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
     const bool is_last_flush = lv_display_flush_is_last(disp);
     const bool skip_flush = wait_for_last_flush && !is_last_flush;
 
@@ -302,6 +302,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
          * To do that, we use the display's resolution and as the area
          *  we also grab the current draw buffer so that we can rotate the whole display */
         if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+            if(!is_last_flush) {
+                /* We need to wait for the last flush when using direct render mode with rotation*/
+                lv_display_flush_ready(disp);
+                return;
+            }
             lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
             src_w = lv_display_get_horizontal_resolution(disp);
             src_h = lv_display_get_vertical_resolution(disp);
@@ -321,9 +326,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
             rotated_area = *area;
         }
+
         lv_display_rotate_area(disp, &rotated_area);
         const uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
-        const size_t buf_size = lv_area_get_width(&rotated_area) * lv_area_get_height(&rotated_area) * px_size;
+        const size_t buf_size = dest_stride * lv_area_get_height(&rotated_area);
         if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
             dsc->rotated_buf = lv_realloc(dsc->rotated_buf, buf_size);
             LV_ASSERT_MALLOC(dsc->rotated_buf);
@@ -334,8 +340,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         color_p = dsc->rotated_buf;
     }
 
-    /* Ensure that we're within the framebuffer's bounds */
-    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    lv_area_t display_area;
+    /* vinfo.xres and vinfo.yres will already be 1 less than the actual resolution. i.e: 1023x767 on a 1024x768 screen */
+    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres, dsc->vinfo.yres);
+
+    /* TODO: Consider rendering the clipped area*/
+    if(!lv_area_is_in(area, &display_area, 0)) {
         lv_display_flush_ready(disp);
         return;
     }
@@ -344,11 +354,26 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (area->x1 + dsc->vinfo.xoffset) * px_size +
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
+
     const int32_t w = lv_area_get_width(area);
-    for(int32_t y = area->y1; y <= area->y2; y++) {
-        write_to_fb(dsc, fb_pos, color_p, w * px_size);
-        fb_pos += dsc->finfo.line_length;
-        color_p += w * px_size;
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
+        uint32_t color_pos =
+            area->x1 * px_size +
+            area->y1 * disp->hor_res * px_size;
+
+        for(int32_t y = area->y1; y <= area->y2; y++) {
+            write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_pos += disp->hor_res * px_size;
+        }
+    }
+    else {
+        const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
+        for(int32_t y = area->y1; y <= area->y2; y++) {
+            write_to_fb(dsc, fb_pos, color_p, w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_p += stride;
+        }
     }
 
     if(dsc->force_refresh) {
