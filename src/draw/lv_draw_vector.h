@@ -112,47 +112,47 @@ void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point);
  * @param matrix           pointer to a matrix
  * @param path             pointer to a path
  */
-void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path);
+void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_shape_t * path);
 
 /**
  * Create a vector graphic path object
  * @param quality       the quality hint of path
  * @return              pointer to the created path object
  */
-lv_vector_path_t * lv_vector_path_create(lv_vector_path_quality_t quality);
+lv_vector_path_shape_t * lv_vector_path_create(lv_vector_path_quality_t quality);
 
 /**
  * Copy a path data to another
  * @param target_path       pointer to a path
  * @param path              pointer to source path
  */
-void lv_vector_path_copy(lv_vector_path_t * target_path, const lv_vector_path_t * path);
+void lv_vector_path_copy(lv_vector_path_shape_t * target_path, const lv_vector_path_shape_t * path);
 
 /**
  * Clear path data
  * @param path              pointer to a path
  */
-void lv_vector_path_clear(lv_vector_path_t * path);
+void lv_vector_path_clear(lv_vector_path_shape_t * path);
 
 /**
  * Delete the graphic path object
  * @param path              pointer to a path
  */
-void lv_vector_path_delete(lv_vector_path_t * path);
+void lv_vector_path_delete(lv_vector_path_shape_t * path);
 
 /**
  * Begin a new sub path and set a point to path
  * @param path              pointer to a path
  * @param p                 pointer to a `lv_fpoint_t` variable
  */
-void lv_vector_path_move_to(lv_vector_path_t * path, const lv_fpoint_t * p);
+void lv_vector_path_move_to(lv_vector_path_shape_t * path, const lv_fpoint_t * p);
 
 /**
  * Add a line to the path from last point to the point
  * @param path              pointer to a path
  * @param p                 pointer to a `lv_fpoint_t` variable
  */
-void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p);
+void lv_vector_path_line_to(lv_vector_path_shape_t * path, const lv_fpoint_t * p);
 
 /**
  * Add a quadratic bezier line to the path from last point to the point
@@ -160,7 +160,7 @@ void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p);
  * @param p1                pointer to a `lv_fpoint_t` variable for control point
  * @param p2                pointer to a `lv_fpoint_t` variable for end point
  */
-void lv_vector_path_quad_to(lv_vector_path_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2);
+void lv_vector_path_quad_to(lv_vector_path_shape_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2);
 
 /**
  * Add a cubic bezier line to the path from last point to the point
@@ -169,7 +169,7 @@ void lv_vector_path_quad_to(lv_vector_path_t * path, const lv_fpoint_t * p1, con
  * @param p2                pointer to a `lv_fpoint_t` variable for second control point
  * @param p3                pointer to a `lv_fpoint_t` variable for end point
  */
-void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2,
+void lv_vector_path_cubic_to(lv_vector_path_shape_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2,
                              const lv_fpoint_t * p3);
 
 /**
@@ -182,21 +182,22 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
  * @param clockwise         true for clockwise, otherwise anticlockwise
  * @param p                 pointer to a `lv_fpoint_t` variable for end point
  */
-void lv_vector_path_arc_to(lv_vector_path_t * path, float radius_x, float radius_y, float rotate_angle, bool large_arc,
+void lv_vector_path_arc_to(lv_vector_path_shape_t * path, float radius_x, float radius_y, float rotate_angle,
+                           bool large_arc,
                            bool clockwise, const lv_fpoint_t * p);
 
 /**
  * Close the sub path
  * @param path              pointer to a path
  */
-void lv_vector_path_close(lv_vector_path_t * path);
+void lv_vector_path_close(lv_vector_path_shape_t * path);
 
 /**
  * Get the bounding box of a path
  * @param path              pointer to a path
  * @param area              pointer to a `lv_area_t` variable for bounding box
  */
-void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area);
+void lv_vector_path_get_bounding(const lv_vector_path_shape_t * path, lv_area_t * area);
 
 /**
  * Add a rectangle to the path by x/y/w/h. rx/ry are corner radii
@@ -233,7 +234,7 @@ static inline void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_
  * @param rx                the horizontal radius for circle
  * @param ry                the vertical radius for circle
  */
-void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry);
+void lv_vector_path_append_circle(lv_vector_path_shape_t * path, const lv_fpoint_t * c, float rx, float ry);
 
 /**
  * Add a arc to the path
@@ -244,7 +245,7 @@ void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c
  * @param sweep             the sweep angle for arc, could be negative
  * @param pie               true: draw a pie, false: draw a arc
  */
-void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, float radius, float start_angle,
+void lv_vector_path_append_arc(lv_vector_path_shape_t * path, const lv_fpoint_t * c, float radius, float start_angle,
                                float sweep, bool pie);
 
 /**
@@ -252,7 +253,7 @@ void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, f
  * @param path              pointer to a path
  * @param subpath           pointer to another path which will be added
  */
-void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t * subpath);
+void lv_vector_path_append_path(lv_vector_path_shape_t * path, const lv_vector_path_shape_t * subpath);
 
 /**
  * Create a vector graphic descriptor
@@ -508,7 +509,7 @@ void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y);
  * @param dsc           pointer to a vector graphic descriptor
  * @param path          pointer to a path
  */
-void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path);
+void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_shape_t * path);
 
 /**
  * Clear a rectangle area use current fill color
@@ -524,7 +525,7 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect);
 void lv_draw_vector(lv_vector_dsc_t * dsc);
 
 /* Traverser for task list */
-typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
+typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_shape_t * path, const lv_vector_path_attr_t * dsc);
 
 #endif /* LV_USE_VECTOR_GRAPHIC */
 

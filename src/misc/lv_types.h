@@ -300,7 +300,7 @@ typedef struct _lv_fpoint_t lv_fpoint_t;
 
 typedef struct _lv_matrix_t lv_matrix_t;
 
-typedef struct _lv_vector_path_t lv_vector_path_t;
+typedef struct _lv_vector_path_shape_t lv_vector_path_shape_t;
 
 typedef struct _lv_vector_gradient_t lv_vector_gradient_t;
 
@@ -308,9 +308,9 @@ typedef struct _lv_vector_fill_dsc_t lv_vector_fill_dsc_t;
 
 typedef struct _lv_vector_stroke_dsc_t lv_vector_stroke_dsc_t;
 
-typedef struct _lv_vector_draw_dsc_t lv_vector_draw_dsc_t;
+typedef struct _lv_vector_path_attr_t lv_vector_path_attr_t;
 
-typedef struct _lv_draw_vector_task_dsc_t lv_draw_vector_task_dsc_t;
+typedef struct _lv_draw_vector_dsc_t lv_draw_vector_dsc_t;
 
 typedef struct _lv_vector_dsc_t lv_vector_dsc_t;
 
