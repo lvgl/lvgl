@@ -26,7 +26,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_vector_path_t {
+/**
+ * Stores the shape of the path as an arrays of operations and points.
+ * For example move to 10;20 then draw a line to 30;40 and draw an
+ * arc with 30 radius and 70° sweep.
+ *
+ * `lv_vector_path_attr_t` is also required to describe how to fill and stroke the path.
+ */
+struct _lv_vector_path_shape_t {
     lv_vector_path_quality_t quality;
     lv_array_t ops;
     lv_array_t points;
@@ -70,7 +77,10 @@ struct _lv_vector_stroke_dsc_t {
     lv_matrix_t matrix;
 };
 
-struct _lv_vector_draw_dsc_t {
+/**
+ * Stores how to fill, stroke, transform etc a given path
+ */
+struct _lv_vector_path_attr_t {
     lv_vector_fill_dsc_t fill_dsc;
     lv_vector_stroke_dsc_t stroke_dsc;
     lv_matrix_t matrix;
@@ -78,22 +88,42 @@ struct _lv_vector_draw_dsc_t {
     lv_area_t scissor_area;
 };
 
-struct _lv_draw_vector_task_dsc_t {
+struct _lv_draw_vector_dsc_t {
     lv_draw_dsc_base_t base;
-    lv_ll_t * task_list; /*draw task list.*/
+
+    lv_vector_path_attr_t current_dsc;
+
+    /**
+     * Store a path shapes and their attributes
+     * in a list as `lv_draw_vector_subtask_t`. */
+    lv_ll_t * task_list;
 };
 
-struct _lv_vector_dsc_t {
-    lv_layer_t * layer;
-    lv_vector_draw_dsc_t current_dsc;
-    /* private data */
-    lv_draw_vector_task_dsc_t tasks;
-};
+
+/**
+ * Contains a path shape and its attributes together.
+ * It's a task that will be passed to the vector rendering engine.
+ * It's used in the `task_list` of `lv_draw_vector_dsc_t`.
+ */
+typedef struct {
+    lv_vector_path_shape_t * shape;
+    lv_vector_path_attr_t attr;
+} lv_draw_vector_subtask_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * This is the main function to draw the accumulated vector tasks by passing them
+ * to a vector renderer callback.
+ * When the callback returns the processed vector task will be destroyed.
+ * @param task_list     pointer to the linked list in `lv_draw_vector_dsc_t` that stores
+ *                      the path shapes and and their attributes.
+ * @param cb            the callback used to iterate through the task
+ * @param user_data     a custom pointer that will be passed to the callback
+ */
 void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
 
 /**********************
