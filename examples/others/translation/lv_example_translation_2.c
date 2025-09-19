@@ -3,10 +3,10 @@
 #if LV_USE_TRANSLATION && LV_BUILD_EXAMPLES
 
 static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+static const char * languages[] = {"English", "Deutsch", "Español", NULL};
 
 static void add_static(void)
 {
-    static const char * languages[]    = {"en", "de", "es", NULL};
     static const char * translations[] = {
         "The Tiger",    "Der Tiger",     "El Tigre",
         "The Lion",     "Der Löwe",      "El León",
@@ -28,23 +28,13 @@ static void on_language_change(lv_event_t * e)
     lv_label_set_text(label, lv_tr(tag));
 }
 
-static void language_change_timer(lv_timer_t * timer)
+static void language_change_cb(lv_event_t * e)
 {
-    LV_UNUSED(timer);
-    lv_obj_t * language_label = (lv_obj_t *)lv_timer_get_user_data(timer);
+    static char selected_lang[20];
 
-    if(lv_streq(lv_translation_get_language(), "en")) {
-        lv_translation_set_language("de");
-        lv_label_set_text_static(language_label, "Deutsch");
-    }
-    else if(lv_streq(lv_translation_get_language(), "de")) {
-        lv_translation_set_language("es");
-        lv_label_set_text_static(language_label, "Español");
-    }
-    else {
-        lv_translation_set_language("en");
-        lv_label_set_text_static(language_label, "English");
-    }
+    lv_obj_t * dropdown = lv_event_get_target_obj(e);
+    lv_dropdown_get_selected_str(dropdown, selected_lang, sizeof(selected_lang));
+    lv_translation_set_language(selected_lang);
 }
 
 /**
@@ -54,13 +44,24 @@ void lv_example_translation_2(void)
 {
     add_static();
     const size_t tag_count = sizeof(tags) / sizeof(tags[0]) - 1;
+    const size_t lang_count = sizeof(languages) / sizeof(languages[0]) - 1;
 
     lv_obj_t * container   = lv_obj_create(lv_screen_active());
     lv_obj_center(container);
     lv_obj_set_size(container, LV_PCT(50), LV_PCT(50));
 
-    lv_obj_t * language_label = lv_label_create(lv_screen_active());
-    lv_obj_align_to(language_label, container, LV_ALIGN_OUT_TOP_MID, 0, -20);
+    lv_obj_t * language_dropdown = lv_dropdown_create(lv_screen_active());
+    lv_obj_align_to(language_dropdown, container, LV_ALIGN_TOP_MID, 0, 20);
+
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
+    lv_dropdown_clear_options(language_dropdown);
+#endif /*LV_WIDGETS_HAS_DEFAULT_VALUE*/
+
+    for(size_t i = 0; i < lang_count; ++i) {
+        lv_dropdown_add_option(language_dropdown, languages[i], i);
+    }
+
+    lv_obj_add_event_cb(language_dropdown, language_change_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
     /* We create a label for each tag */
     for(size_t i = 0; i < tag_count; ++i) {
@@ -71,10 +72,7 @@ void lv_example_translation_2(void)
         lv_obj_set_pos(label, (i / 2) * 200, (i % 2) * 50);
     }
 
-    lv_translation_set_language("en");
-    lv_label_set_text_static(language_label, "English");
-
-    lv_timer_create(language_change_timer, 1000, language_label);
+    lv_translation_set_language("English");
 }
 
 #endif /*LV_USE_TRANSLATION && LV_BUILD_EXAMPLES*/
