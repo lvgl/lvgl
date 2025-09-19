@@ -95,7 +95,7 @@ struct _lv_draw_vector_dsc_t {
 
     /**
      * Store a path shapes and their attributes
-     * in a list as `lv_draw_vector_path_task_t`. */
+     * in a list as `lv_draw_vector_subtask_t`. */
     lv_ll_t * task_list;
 };
 
@@ -108,7 +108,7 @@ struct _lv_draw_vector_dsc_t {
 typedef struct {
     lv_vector_path_shape_t * shape;
     lv_vector_path_attr_t attr;
-} lv_draw_vector_path_task_t;
+} lv_draw_vector_subtask_t;
 
 
 /**********************
