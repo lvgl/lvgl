@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_pattern(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_pattern(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -42,13 +42,13 @@ static void draw_pattern(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
     img_dsc.src = &img_demo_vector_avatar;
 
     lv_vector_dsc_set_fill_image(ctx, &img_dsc);
-    lv_vector_dsc_translate(ctx, 250, 250);
+    lv_draw_vector_dsc_translate(ctx, 250, 250);
     lv_vector_dsc_rotate(ctx, 25);
-    lv_vector_dsc_translate(ctx, -250, -250);
+    lv_draw_vector_dsc_translate(ctx, -250, -250);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
-static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_gradient(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -78,7 +78,7 @@ static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
-static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_radial_gradient(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -105,7 +105,7 @@ static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_shape_t *
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
-static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_shapes(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -145,7 +145,7 @@ static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
     lv_vector_path_delete(path2);
 }
 
-static void draw_lines(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_lines(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -169,7 +169,7 @@ static void draw_lines(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
     lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
 }
 
-static void draw_blend(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_blend(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -185,7 +185,7 @@ static void draw_blend(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
-static void draw_arc(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
+static void draw_arc(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 {
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -218,7 +218,7 @@ static void draw_arc(lv_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 
 static void draw_vector(lv_layer_t * layer)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_draw_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
 
     lv_area_t rect = {0, 100, 300, 300};
     lv_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));

@@ -91,17 +91,12 @@ struct _lv_vector_path_attr_t {
 struct _lv_draw_vector_dsc_t {
     lv_draw_dsc_base_t base;
 
+    lv_vector_path_attr_t current_dsc;
+
     /**
      * Store a path shapes and their attributes
      * in a list as `lv_vector_path_shape_task_t`. */
     lv_ll_t * task_list;
-};
-
-struct _lv_vector_dsc_t {
-    lv_layer_t * layer;
-    lv_vector_path_attr_t current_dsc;
-    /* private data */
-    lv_draw_vector_dsc_t tasks;
 };
 
 /**********************
