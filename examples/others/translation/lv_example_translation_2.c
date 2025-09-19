@@ -8,8 +8,10 @@ static void add_static(void)
 {
     static const char * languages[]    = {"en", "de", "es", NULL};
     static const char * translations[] = {
-        "The Tiger",  "Der Tiger",     "El Tigre",  "The Lion",     "Der Löwe",    "El León",
-        "The Rabbit", "Das Kaninchen", "El Conejo", "The Elephant", "Der Elefant", "El Elefante",
+        "The Tiger",    "Der Tiger",     "El Tigre",
+        "The Lion",     "Der Löwe",      "El León",
+        "The Rabbit",   "Das Kaninchen", "El Conejo",
+        "The Elephant", "Der Elefant",   "El Elefante",
     };
 
     lv_translation_add_static(languages, tags, translations);
