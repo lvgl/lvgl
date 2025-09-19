@@ -64,6 +64,8 @@ void lv_nanovg_set_clip_area(NVGcontext * ctx, const lv_area_t * area);
 
 void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, float h, float r);
 
+void lv_nanovg_path_append_area(NVGcontext * ctx, const lv_area_t * area);
+
 void lv_nanovg_path_append_arc_right_angle(NVGcontext * ctx,
                                            float start_x, float start_y,
                                            float center_x, float center_y,
@@ -87,6 +89,9 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
                                                lv_color_format_t cf,
                                                uint32_t w,
                                                uint32_t h);
+
+const lv_draw_buf_t * lv_nanovg_open_image_buffer(lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+                                                  bool no_cache, bool premultiply);
 
 int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color);
 

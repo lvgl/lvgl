@@ -11,6 +11,7 @@
 
 #if LV_USE_DRAW_NANOVG
 
+#include "../lv_image_decoder_private.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_pending.h"
 #include "lv_nanovg_math.h"
@@ -126,6 +127,17 @@ void lv_nanovg_path_append_rect(NVGcontext * ctx, float x, float y, float w, flo
     }
 
     nvgRect(ctx, x, y, w, h);
+
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_nanovg_path_append_area(NVGcontext * ctx, const lv_area_t * area)
+{
+    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NULL(area);
+    LV_PROFILER_DRAW_BEGIN;
+
+    nvgRect(ctx, area->x1, area->y1, lv_area_get_width(area), lv_area_get_height(area));
 
     LV_PROFILER_DRAW_END;
 }
@@ -364,6 +376,33 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
     u->image_buf = tmp_buf;
 
     return u->image_buf;
+}
+
+const lv_draw_buf_t * lv_nanovg_open_image_buffer(lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+                                                  bool no_cache, bool premultiply)
+{
+    LV_ASSERT_NULL(decoder_dsc);
+    LV_ASSERT_NULL(src);
+
+    lv_image_decoder_args_t args;
+    lv_memzero(&args, sizeof(lv_image_decoder_args_t));
+    args.premultiply = premultiply;
+    args.no_cache = no_cache;
+
+    lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to open image");
+        return NULL;
+    }
+
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    if(decoded == NULL || decoded->data == NULL) {
+        lv_image_decoder_close(decoder_dsc);
+        LV_LOG_ERROR("image data is NULL");
+        return NULL;
+    }
+
+    return decoded;
 }
 
 int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color)
