@@ -12,12 +12,15 @@
 #if LV_USE_MSGBOX
 
 #include "../label/lv_label.h"
-#include "../button/lv_button.h"
 #include "../image/lv_image.h"
 #include "../../misc/lv_assert.h"
 #include "../../display/lv_display.h"
 #include "../../layouts/flex/lv_flex.h"
 #include "../../stdlib/lv_string.h"
+
+#if LV_USE_LABEL == 0
+    #error "lv_mbox: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+#endif
 
 /*********************
  *      DEFINES
