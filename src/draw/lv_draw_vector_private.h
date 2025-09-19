@@ -95,14 +95,35 @@ struct _lv_draw_vector_dsc_t {
 
     /**
      * Store a path shapes and their attributes
-     * in a list as `lv_vector_path_shape_task_t`. */
+     * in a list as `lv_draw_vector_path_task_t`. */
     lv_ll_t * task_list;
 };
+
+
+/**
+ * Contains a path shape and its attributes together.
+ * It's a task that will be passed to the vector rendering engine.
+ * It's used in the `task_list` of `lv_draw_vector_dsc_t`.
+ */
+typedef struct {
+    lv_vector_path_shape_t * shape;
+    lv_vector_path_attr_t attr;
+} lv_draw_vector_path_task_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * This is the main function to draw the accumulated vector tasks by passing them
+ * to a vector renderer callback.
+ * When the callback returns the processed vector task will be destroyed.
+ * @param task_list     pointer to the linked list in `lv_draw_vector_dsc_t` that stores
+ *                      the path shapes and and their attributes.
+ * @param cb            the callback used to iterate through the task
+ * @param user_data     a custom pointer that will be passed to the callback
+ */
 void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
 
 /**********************
