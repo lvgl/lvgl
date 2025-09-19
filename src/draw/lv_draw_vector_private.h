@@ -26,7 +26,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_vector_path_t {
+/**
+ * Stores the shape of the path as an arrays of operations and points.
+ * For example move to 10;20 then draw a line to 30;40 and draw an
+ * arc with 30 radius and 70° sweep.
+ *
+ * `lv_vector_path_attr_t` is also required to describe how to fill and stroke the path.
+ */
+struct _lv_vector_path_shape_t {
     lv_vector_path_quality_t quality;
     lv_array_t ops;
     lv_array_t points;
@@ -70,7 +77,10 @@ struct _lv_vector_stroke_dsc_t {
     lv_matrix_t matrix;
 };
 
-struct _lv_vector_draw_dsc_t {
+/**
+ * Stores how to fill, stroke, transform etc a given path
+ */
+struct _lv_vector_path_attr_t {
     lv_vector_fill_dsc_t fill_dsc;
     lv_vector_stroke_dsc_t stroke_dsc;
     lv_matrix_t matrix;
@@ -78,16 +88,20 @@ struct _lv_vector_draw_dsc_t {
     lv_area_t scissor_area;
 };
 
-struct _lv_draw_vector_task_dsc_t {
+struct _lv_draw_vector_dsc_t {
     lv_draw_dsc_base_t base;
-    lv_ll_t * task_list; /*draw task list.*/
+
+    /**
+     * Store a path shapes and their attributes
+     * in a list as `lv_vector_path_shape_task_t`. */
+    lv_ll_t * task_list;
 };
 
 struct _lv_vector_dsc_t {
     lv_layer_t * layer;
-    lv_vector_draw_dsc_t current_dsc;
+    lv_vector_path_attr_t current_dsc;
     /* private data */
-    lv_draw_vector_task_dsc_t tasks;
+    lv_draw_vector_dsc_t tasks;
 };
 
 /**********************
