@@ -16,6 +16,7 @@
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
 #include "../../core/lv_global.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * lang);
 
 /**********************
  *  STATIC VARIABLES
@@ -119,10 +122,16 @@ lv_translation_pack_t * lv_translation_add_dynamic(void)
     return pack;
 }
 
+const char * lv_translation_get_language(void)
+{
+    return selected_lang;
+}
+
 void lv_translation_set_language(const char * lang)
 {
     if(selected_lang) lv_free((void *)selected_lang);
     selected_lang = lv_strdup(lang);
+    lv_obj_tree_walk(NULL, send_language_change_event, (void *)lang);
 }
 
 const char * lv_translation_get(const char * tag)
@@ -279,5 +288,11 @@ lv_result_t lv_translation_set_tag_translation(lv_translation_pack_t * pack, lv_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_obj_tree_walk_res_t send_language_change_event(lv_obj_t * obj, void * lang)
+{
+    lv_obj_send_event(obj, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, lang);
+    return LV_OBJ_TREE_WALK_NEXT;
+}
 
 #endif /*LV_USE_TRANSLATION*/
