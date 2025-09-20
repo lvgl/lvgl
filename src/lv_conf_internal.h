@@ -4682,6 +4682,15 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #undef LV_KCONFIG_PRESENT
 
+/* Disable VGLite drivers if VGLite drawing is disabled */
+#ifndef LV_USE_VG_LITE_DRIVER
+    #define LV_USE_VG_LITE_DRIVER 0
+#endif
+
+#ifndef LV_USE_VG_LITE_THORVG
+    #define LV_USE_VG_LITE_THORVG 0
+#endif
+
 /* Set some defines if a dependency is disabled. */
 #if LV_USE_LOG == 0
     #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
