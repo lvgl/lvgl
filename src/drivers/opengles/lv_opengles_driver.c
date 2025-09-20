@@ -253,10 +253,10 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
 
         float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
             -1.f,  1.0f, clip_x1, clip_y2,
-            1.0f,  1.0f, clip_x2, clip_y2,
-            1.0f, -1.0f, clip_x2, clip_y1,
-            -1.f, -1.0f, clip_x1, clip_y1
-        };
+                1.0f,  1.0f, clip_x2, clip_y2,
+                1.0f, -1.0f, clip_x2, clip_y1,
+                -1.f, -1.0f, clip_x1, clip_y1
+            };
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }
 
