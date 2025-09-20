@@ -47,7 +47,7 @@ typedef struct {
 } lv_xml_event_cb_t;
 
 /**
- * Store the date of <include_timeline>
+ * Store the data of <include_timeline>
  */
 typedef struct {
     const char * target_name;  /**< Include the timeline of this widget*/
