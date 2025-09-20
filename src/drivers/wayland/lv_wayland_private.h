@@ -142,6 +142,16 @@ typedef struct {
     uint32_t format;
 } shm_ctx_t;
 
+struct output_info {
+    struct wl_output * wl_output;
+    char name[64];
+    int width;
+    int height;
+    int refresh;
+    int scale;
+    int flags;
+};
+
 struct lv_wayland_context {
     struct wl_display * display;
     struct wl_registry * registry;
@@ -151,6 +161,8 @@ struct lv_wayland_context {
     struct wl_cursor_theme * cursor_theme;
     struct wl_surface * cursor_surface;
     shm_ctx_t shm_ctx;
+    struct output_info outputs[8];
+    int wl_output_count;
 
 #if LV_WAYLAND_USE_DMABUF
     dmabuf_ctx_t dmabuf_ctx;
@@ -218,6 +230,7 @@ struct window {
     bool maximized;
     bool fullscreen;
     uint32_t frame_counter;
+    bool is_window_configured;
 
 #if LV_WAYLAND_USE_DMABUF
     /* XDG/DMABUF synchronization fields */
@@ -292,7 +305,7 @@ const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(
 const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
 lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maximized);
 lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window);
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen);
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, int display);
 #if LV_WAYLAND_USE_DMABUF
 void lv_wayland_xdg_shell_ack_configure(struct window * window, uint32_t serial);
 #endif
