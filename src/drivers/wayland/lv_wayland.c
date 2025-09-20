@@ -121,7 +121,7 @@ static const struct wl_output_listener output_listener = {
 
 struct wl_output * lv_wayland_get_wl_output(int display)
 {
-    if(display > lv_wl_ctx.wl_output_count || < 0)
+    if(display > lv_wl_ctx.wl_output_count || display < 0)
         return NULL;
 
     return lv_wl_ctx.outputs[display].wl_output;
@@ -347,6 +347,15 @@ static void output_geometry(void * data, struct wl_output * output, int32_t x, i
                             int32_t physical_height,
                             int32_t subpixel, const char * make, const char * model, int32_t transform)
 {
+    LV_UNUSED(output);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(physical_width);
+    LV_UNUSED(physical_height);
+    LV_UNUSED(subpixel);
+    LV_UNUSED(make);
+    LV_UNUSED(transform);
+
     struct output_info * info = data;
     snprintf(info->name, sizeof(info->name), "%s", model);
 }
@@ -354,6 +363,8 @@ static void output_geometry(void * data, struct wl_output * output, int32_t x, i
 static void output_mode(void * data, struct wl_output * wl_output, uint32_t flags, int32_t width, int32_t height,
                         int32_t refresh)
 {
+    LV_UNUSED(wl_output);
+ 
     struct output_info * info = data;
 
     if(flags & WL_OUTPUT_MODE_CURRENT) {
@@ -367,10 +378,13 @@ static void output_mode(void * data, struct wl_output * wl_output, uint32_t flag
 static void output_done(void * data, struct wl_output * output)
 {
     // called when all geometry/mode info for this output has been sent
+    LV_UNUSED(data);
+    LV_UNUSED(output);
 }
 
 static void output_scale(void * data, struct wl_output * output, int32_t factor)
 {
+    LV_UNUSED(output);
     struct output_info * info = data;
     info->scale = factor;
 }
