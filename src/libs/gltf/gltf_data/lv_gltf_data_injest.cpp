@@ -94,7 +94,7 @@ static void make_small_magenta_texture(uint32_t new_magenta_tex);
 template <typename T, typename Func>
 static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_model_t * data,
                                    const fastgltf::Primitive * prim, const char * attrib_id, GLuint primitive_vertex_buffer,
-                                   size_t offset, Func && functor);
+                                   size_t offset, Func &&functor);
 
 static int32_t injest_get_any_image_index(fastgltf::Optional<fastgltf::Texture> tex);
 static bool injest_check_any_image_index_valid(fastgltf::Optional<fastgltf::Texture> tex);
@@ -789,7 +789,7 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
 template <typename T, typename Func>
 static size_t injest_vec_attribute(uint8_t vec_size, int32_t current_attrib_index, lv_gltf_model_t * data,
                                    const fastgltf::Primitive * prim, const char * attrib_id, GLuint primitive_vertex_buffer,
-                                   size_t offset, Func && functor
+                                   size_t offset, Func &&functor
 
                                   )
 {
