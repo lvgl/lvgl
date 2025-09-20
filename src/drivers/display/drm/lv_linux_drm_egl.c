@@ -1,5 +1,5 @@
 /**
- * @file lv_linux_drm_use_egl.c
+ * @file lv_linux_drm_egl.c
  *
  */
 
@@ -9,7 +9,7 @@
 #include "lv_linux_drm.h"
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 #define CLOCK_USE_MONOTONIC 0
-#include "lv_linux_drm_use_egl_private.h"
+#include "lv_linux_drm_egl_private.h"
 #include <stdlib.h>
 #include "../../../core/lv_refr.h"
 #include "../../../stdlib/lv_string.h"
@@ -153,11 +153,6 @@ void lv_drm_egl_delete(lv_drm_egl_t * window)
         lv_drm_egl_quit();
     }
 }
-
-//void * lv_drm_egl_get_drm_window(lv_drm_egl_t * window)
-//{
-//    return (void *)(window->egl_adapter_interface);
-//}
 
 void lv_drm_egl_set_flip(lv_drm_egl_t * window, bool h_flip, bool v_flip)
 {

@@ -1,5 +1,5 @@
 /**
- * @file lv_fullscreen_drm_use_egl.h
+ * @file lv_drm_egl.h
  *
  */
 
@@ -44,7 +44,7 @@ typedef struct _lv_drm_use_egl_texture_t lv_drm_use_egl_texture_t;
  **********************/
 
 /**
- * Create a MK_DRM output with no textures and initialize OpenGL
+ * Create an lv_drm_egl output with no textures and initialize OpenGL
  * @param hor_res            width in pixels of the window
  * @param ver_res            height in pixels of the window
  * @param use_mouse_indev    send pointer indev input to LVGL display textures
@@ -53,7 +53,7 @@ typedef struct _lv_drm_use_egl_texture_t lv_drm_use_egl_texture_t;
 lv_drm_egl_t * lv_drm_egl_create();
 
 /**
- * Create a MK_DRM output with no textures and initialize OpenGL
+ * Create an lv_drm_egl output with no textures and initialize OpenGL
  * @param hor_res            width in pixels of the window
  * @param ver_res            height in pixels of the window
  * @param use_mouse_indev    send pointer indev input to LVGL display textures
@@ -66,25 +66,18 @@ lv_drm_egl_t * lv_drm_egl_create_ex(bool use_mouse_indev, bool h_flip, bool v_fl
 lv_display_t * lv_drm_egl_get_display(lv_drm_egl_t * window);
 
 /**
- * Delete a MK_DRM output. If it is the last one, the process will exit
+ * Delete an lv_drm_egl output. If it is the last one, the process will exit
  * @param window    MK_DRM output to delete
  */
 void lv_drm_egl_delete(lv_drm_egl_t * window);
 
 /**
- * Set the horizontal / vertical flipping of a MK_DRM output
+ * Set the horizontal / vertical flipping of an lv_drm_egl output
  * @param window    MK_DRM output to configure
  * @param h_flip    Should the window contents be horizontally mirrored?
  * @param v_flip    Should the window contents be vertically mirrored?
  */
 void lv_drm_egl_set_flip(lv_drm_egl_t * window, bool h_flip, bool v_flip);
-
-/**
- * Get the MK_DRM output handle for an lv_fullscreen_drm_use_egl
- * @param window        MK_DRM output to return the handle of
- * @return              the MK_DRM output handle
- */
-//void * lv_drm_egl_get_drm_window(lv_drm_egl_t * window);
 
 /**
  * Add a texture to the MK_DRM output. It can be an LVGL display texture, or any OpenGL texture
@@ -101,26 +94,9 @@ lv_drm_use_egl_texture_t * lv_drm_egl_add_texture(lv_drm_egl_t * window,
 
 /**
  * Remove a texture from its MK_DRM output and delete it
- * @param texture    handle of a MK_DRM output texture
+ * @param texture    handle of an lv_drm_egl output texture
  */
 void lv_drm_use_egl_texture_remove(lv_drm_use_egl_texture_t * texture);
-
-/**
- * Set the opacity of a texture in a MK_DRM output
- * @param texture    handle of a MK_DRM output texture
- * @param opa        new opacity of the texture
- */
-//void lv_drm_use_egl_texture_set_opa(lv_drm_use_egl_texture_t * texture, lv_opa_t opa);
-
-/**
- * Get the mouse indev associated with a texture in a MK_DRM output, if it exists
- * @param texture    handle of a MK_DRM output texture
- * @return           the indev or `NULL`
- * @note             there will only be an indev if the texture is based on an
- *                   LVGL display texture and the window was created with
- *                   `use_mouse_indev` as `true`
- */
-//lv_indev_t * lv_drm_use_egl_texture_get_mouse_indev(lv_drm_use_egl_texture_t * texture);
 
 /**********************
  *      MACROS

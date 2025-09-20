@@ -15,7 +15,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_linux_drm_use_egl.h"
+#include "lv_linux_drm_egl.h"
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
 #include "../../../misc/lv_area.h"
