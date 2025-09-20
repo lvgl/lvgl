@@ -14,13 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../../lv_conf_internal.h"
+#include "../../../lv_conf_internal.h"
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
-#include "../../../../misc/lv_types.h"
-#include "../../../../display/lv_display.h"
+#include "../../../misc/lv_types.h"
+#include "../../../display/lv_display.h"
 
-#include "../../../opengles/egl_adapter/common/opengl_headers.h"
+#include "../../opengles/egl_adapter/common/opengl_headers.h"
 
 //#include "../egl_adapter_outmod/lv_egl_adapter_outmod_drm.h"
 
@@ -29,14 +29,14 @@ extern "C" {
  *********************/
 
 #define __LV_OUTMOD_CLASS_T lv_egl_adapter_outmod_drm_t
-#define __LV_OUTMOD_CLASS_INCLUDE_T "../../display/drm/egl_adapter_outmod/lv_egl_adapter_outmod_drm.h"
-#include "../../../opengles/egl_adapter/lv_egl_adapter_interface.h"
+#define __LV_OUTMOD_CLASS_INCLUDE_T "../display/drm/egl_adapter_outmod/lv_egl_adapter_outmod_drm.h"
+#include "../../opengles/egl_adapter/lv_egl_adapter_interface.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_fullscreen_drm_use_egl_t lv_fullscreen_drm_use_egl_t;
+typedef struct _lv_drm_egl_t lv_drm_egl_t;
 typedef struct _lv_drm_use_egl_texture_t lv_drm_use_egl_texture_t;
 
 /**********************
@@ -50,7 +50,7 @@ typedef struct _lv_drm_use_egl_texture_t lv_drm_use_egl_texture_t;
  * @param use_mouse_indev    send pointer indev input to LVGL display textures
  * @return                   the new MK_DRM output handle
  */
-lv_fullscreen_drm_use_egl_t * lv_fullscreen_drm_use_egl_create();
+lv_drm_egl_t * lv_drm_egl_create();
 
 /**
  * Create a MK_DRM output with no textures and initialize OpenGL
@@ -61,15 +61,15 @@ lv_fullscreen_drm_use_egl_t * lv_fullscreen_drm_use_egl_create();
  * @param v_flip             Should the window contents be vertically mirrored?
  * @return                   the new MK_DRM output handle
  */
-lv_fullscreen_drm_use_egl_t * lv_fullscreen_drm_use_egl_create_ex(bool use_mouse_indev, bool h_flip, bool v_flip);
+lv_drm_egl_t * lv_drm_egl_create_ex(bool use_mouse_indev, bool h_flip, bool v_flip);
 
-lv_display_t * lv_fullscreen_drm_use_egl_get_display(lv_fullscreen_drm_use_egl_t * window);
+lv_display_t * lv_drm_egl_get_display(lv_drm_egl_t * window);
 
 /**
  * Delete a MK_DRM output. If it is the last one, the process will exit
  * @param window    MK_DRM output to delete
  */
-void lv_fullscreen_drm_use_egl_delete(lv_fullscreen_drm_use_egl_t * window);
+void lv_drm_egl_delete(lv_drm_egl_t * window);
 
 /**
  * Set the horizontal / vertical flipping of a MK_DRM output
@@ -77,14 +77,14 @@ void lv_fullscreen_drm_use_egl_delete(lv_fullscreen_drm_use_egl_t * window);
  * @param h_flip    Should the window contents be horizontally mirrored?
  * @param v_flip    Should the window contents be vertically mirrored?
  */
-void lv_fullscreen_drm_use_egl_set_flip(lv_fullscreen_drm_use_egl_t * window, bool h_flip, bool v_flip);
+void lv_drm_egl_set_flip(lv_drm_egl_t * window, bool h_flip, bool v_flip);
 
 /**
  * Get the MK_DRM output handle for an lv_fullscreen_drm_use_egl
  * @param window        MK_DRM output to return the handle of
  * @return              the MK_DRM output handle
  */
-void * lv_fullscreen_drm_use_egl_get_drm_window(lv_fullscreen_drm_use_egl_t * window);
+//void * lv_drm_egl_get_drm_window(lv_drm_egl_t * window);
 
 /**
  * Add a texture to the MK_DRM output. It can be an LVGL display texture, or any OpenGL texture
@@ -94,10 +94,10 @@ void * lv_fullscreen_drm_use_egl_get_drm_window(lv_fullscreen_drm_use_egl_t * wi
  * @param h             height in pixels of the texture
  * @return              the new texture handle
  */
-lv_drm_use_egl_texture_t * lv_fullscreen_drm_use_egl_add_texture(lv_fullscreen_drm_use_egl_t * window,
-                                                                 unsigned int texture_id,
-                                                                 int32_t w,
-                                                                 int32_t h);
+lv_drm_use_egl_texture_t * lv_drm_egl_add_texture(lv_drm_egl_t * window,
+                                                  unsigned int texture_id,
+                                                  int32_t w,
+                                                  int32_t h);
 
 /**
  * Remove a texture from its MK_DRM output and delete it

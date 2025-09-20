@@ -1,5 +1,5 @@
 /**
- * @file lv_fullscreen_drm_use_egl_private.h
+ * @file lv_drm_egl_private.h
  *
  */
 
@@ -15,12 +15,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_fullscreen_drm_use_egl.h"
+#include "lv_linux_drm_use_egl.h"
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
-#include "../../../../misc/lv_area.h"
-#include "../../../../display/lv_display.h"
-#include "../../../../indev/lv_indev.h"
+#include "../../../misc/lv_area.h"
+#include "../../../display/lv_display.h"
+#include "../../../indev/lv_indev.h"
 
 /*********************
  *      DEFINES
@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_fullscreen_drm_use_egl_t {
+struct _lv_drm_egl_t {
     lv_egl_adapter_interface_t  egl_adapter_interface;
     lv_display_t * display_texture;
     lv_drm_use_egl_texture_t * window_texture;
@@ -45,7 +45,7 @@ struct _lv_fullscreen_drm_use_egl_t {
 };
 
 struct _lv_drm_use_egl_texture_t {
-    lv_fullscreen_drm_use_egl_t * window;
+    lv_drm_egl_t * window;
     unsigned int texture_id;
     lv_area_t area;
     lv_opa_t opa;
@@ -61,8 +61,6 @@ struct _lv_drm_use_egl_texture_t {
 /**********************
  *      MACROS
  **********************/
-
-//#endif /*LV_USE_OPENGLES*/
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/
 
