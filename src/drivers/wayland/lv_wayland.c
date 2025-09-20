@@ -119,13 +119,13 @@ static const struct wl_output_listener output_listener = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-struct wl_output * lv_get_wl_output(int display)
+struct wl_output * lv_wayland_get_wl_output(int display)
 {
-    if(display > lv_wl_ctx.wl_output_count)
+    if(display > lv_wl_ctx.wl_output_count || < 0)
         return NULL;
 
     return lv_wl_ctx.outputs[display].wl_output;
-};
+}
 
 /**
  * Get Wayland display file descriptor
