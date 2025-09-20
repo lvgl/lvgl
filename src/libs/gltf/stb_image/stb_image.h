@@ -6403,7 +6403,7 @@ static void * stbi__tga_load(stbi__context * s, int * x, int * y, int * comp, in
     //   the things I do to get rid of an error message, and yet keep
     //   Microsoft's C compilers happy... [8^(
     tga_palette_start = tga_palette_len = tga_palette_bits =
-    tga_x_origin = tga_y_origin = 0;
+                                              tga_x_origin = tga_y_origin = 0;
     STBI_NOTUSED(tga_palette_start);
     //   OK, done
     return tga_data;
