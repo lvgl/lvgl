@@ -364,7 +364,7 @@ static void output_mode(void * data, struct wl_output * wl_output, uint32_t flag
                         int32_t refresh)
 {
     LV_UNUSED(wl_output);
- 
+
     struct output_info * info = data;
 
     if(flags & WL_OUTPUT_MODE_CURRENT) {
