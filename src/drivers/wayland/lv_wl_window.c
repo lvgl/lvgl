@@ -222,7 +222,7 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
     window->flush_pending = true;
 }
 
-void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
+void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen, int display)
 {
     struct window * window = lv_display_get_user_data(disp);
     lv_result_t err        = LV_RESULT_INVALID;
@@ -233,7 +233,7 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
     if(window->fullscreen == fullscreen) {
         return;
     }
-    err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen);
+    err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen, display);
 
     if(err == LV_RESULT_INVALID) {
         LV_LOG_WARN("Failed to set wayland window to fullscreen");

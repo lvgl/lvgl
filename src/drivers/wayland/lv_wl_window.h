@@ -61,8 +61,9 @@ bool lv_wayland_window_is_open(lv_display_t * disp);
  * Sets the fullscreen state of the window
  * @param disp Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
+ * @param display physical display number 0 first display, 2 second display, ..
  */
-void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
+void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen, int display);
 
 /**
  * Sets the maximized state of the window

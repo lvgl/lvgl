@@ -92,6 +92,13 @@ static void handle_output(void);
 
 static uint32_t tick_get_cb(void);
 
+static void output_scale(void * data, struct wl_output * output, int32_t factor);
+static void output_mode(void * data, struct wl_output * output, uint32_t flags, int32_t width, int32_t height,
+                        int32_t refresh);
+static void output_done(void * data, struct wl_output * output);
+static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
+                            int32_t physical_height, int32_t subpixel, const char * make, const char * model, int32_t transform);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -101,9 +108,24 @@ static const struct wl_registry_listener registry_listener = {.global        = h
            .global_remove = handle_global_remove
 };
 
+static const struct wl_output_listener output_listener = {
+    .geometry = output_geometry,
+    .mode = output_mode,
+    .done = output_done,
+    .scale = output_scale
+};
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+struct wl_output * lv_get_wl_output(int display)
+{
+    if(display > lv_wl_ctx.wl_output_count)
+        return NULL;
+
+    return lv_wl_ctx.outputs[display].wl_output;
+};
 
 /**
  * Get Wayland display file descriptor
@@ -320,6 +342,38 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+// --- wl_output listener callbacks ---
+static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
+                            int32_t physical_height,
+                            int32_t subpixel, const char * make, const char * model, int32_t transform)
+{
+    struct output_info * info = data;
+    snprintf(info->name, sizeof(info->name), "%s", model);
+}
+
+static void output_mode(void * data, struct wl_output * wl_output, uint32_t flags, int32_t width, int32_t height,
+                        int32_t refresh)
+{
+    struct output_info * info = data;
+
+    if(flags & WL_OUTPUT_MODE_CURRENT) {
+        info->height = height;
+        info->width = width;
+        info->refresh = refresh;
+        info->flags = flags;
+    }
+}
+
+static void output_done(void * data, struct wl_output * output)
+{
+    // called when all geometry/mode info for this output has been sent
+}
+
+static void output_scale(void * data, struct wl_output * output, int32_t factor)
+{
+    struct output_info * info = data;
+    info->scale = factor;
+}
 
 static uint32_t tick_get_cb(void)
 {
@@ -335,6 +389,16 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
 
     LV_UNUSED(version);
     LV_UNUSED(data);
+
+    if(strcmp(interface, "wl_output") == 0) {
+        if(app->wl_output_count < 8) {
+            memset(&app->outputs[app->wl_output_count], 0, sizeof(struct output_info));
+            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
+            app->outputs[app->wl_output_count].wl_output = out;
+            wl_output_add_listener(out, &output_listener, &app->outputs[app->wl_output_count].wl_output);
+            app->wl_output_count++;
+        }
+    }
 
     if(strcmp(interface, wl_compositor_interface.name) == 0) {
         app->compositor = wl_registry_bind(registry, name, &wl_compositor_interface, 1);

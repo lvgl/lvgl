@@ -47,7 +47,6 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
 };
 
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {.ping = xdg_wm_base_ping};
-static bool is_window_configured                              = false;
 
 /**********************
  *      MACROS
@@ -96,14 +95,14 @@ const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(
  *   Shell Window
  **********************/
 
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen)
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, int display)
 {
 
     if(!window->xdg_toplevel) {
         return LV_RESULT_INVALID;
     }
     if(fullscreen) {
-        xdg_toplevel_set_fullscreen(window->xdg_toplevel, NULL);
+        xdg_toplevel_set_fullscreen(window->xdg_toplevel, lv_get_wl_output(display));
     }
     else {
         xdg_toplevel_unset_fullscreen(window->xdg_toplevel);
@@ -181,10 +180,10 @@ void lv_wayland_xdg_shell_configure_surface(struct window * window)
     // XDG surfaces need to be configured before a buffer can be attached.
     // An (XDG) surface commit (without an attached buffer) triggers this
     // configure event
-    is_window_configured = false;
+    window->is_window_configured = false;
     wl_surface_commit(window->body->surface);
     wl_display_roundtrip(lv_wl_ctx.display);
-    LV_ASSERT_MSG(is_window_configured, "Failed to receive the xdg_surface configuration event");
+    LV_ASSERT_MSG(window->is_window_configured, "Failed to receive the xdg_surface configuration event");
 }
 
 lv_result_t lv_wayland_xdg_shell_destroy_window_surface(struct window * window)
@@ -425,7 +424,7 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
 #else
     xdg_surface_ack_configure(xdg_surface, serial);
 #endif
-    if(!is_window_configured) {
+    if(!window->is_window_configured) {
         /* This branch is executed at launch */
         if(!window->resize_pending) {
             /* Use the size passed to the create_window function */
@@ -442,7 +441,7 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
             window->resize_pending = false;
         }
     }
-    is_window_configured = true;
+    window->is_window_configured = true;
 }
 
 static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg_toplevel, int32_t width,
