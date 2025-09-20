@@ -46,6 +46,22 @@ typedef struct {
     lv_event_cb_t cb;
 } lv_xml_event_cb_t;
 
+/**
+ * Store the data of <include_timeline>
+ */
+typedef struct {
+    const char * target_name;  /**< Include the timeline of this widget*/
+    const char * timeline_name;   /**< Include this timeline */
+    int32_t delay;
+} lv_xml_anim_timeline_include_t;
+
+typedef struct {
+    bool is_anim;
+    union {
+        lv_anim_t anim;
+        lv_xml_anim_timeline_include_t incl;
+    } data;
+} lv_xml_anim_timeline_child_t;
 
 /**********************
  * GLOBAL PROTOTYPES
