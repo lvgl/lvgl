@@ -10,7 +10,7 @@
  *      INCLUDES
  *********************/
 
-//#include "lv_egl_adapter_shared_library.h"
+#include "lv_egl_adapter_typedefs.h"
 #include "../lv_egl_adapter_config.h"
 #include "lv_egl_adapter_output_core.h"
 
@@ -21,16 +21,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-#ifndef __LV_EGL_ADAPTER_MODE_DEFINED
-    #define __LV_EGL_ADAPTER_MODE_DEFINED
-    typedef struct lv_egl_adapter_mode * lv_egl_adapter_mode_t;
-#endif /* __LV_EGL_ADAPTER_MODE_DEFINED */
-
-#ifndef __LV_EGL_ADAPTER_CORE_DEFINED
-    #define __LV_EGL_ADAPTER_CORE_DEFINED
-    typedef struct lv_egl_adapter_output_core * lv_egl_adapter_output_core_t;
-#endif /* __LV_EGL_ADAPTER_CORE_DEFINED */
 
 struct lv_egl_adapter {
     EGLNativeDisplayType            egl_native_display;
@@ -47,21 +37,10 @@ struct lv_egl_adapter {
     bool                            owns_config;
 };
 
-#ifndef __LV_EGL_ADAPTER_DEFINED
-    #define __LV_EGL_ADAPTER_DEFINED
-    typedef struct lv_egl_adapter * lv_egl_adapter_t;
-#endif /* __LV_EGL_ADAPTER_DEFINED */
-
-
 struct lv_egl_adapter_sync {
     EGLDisplay display;
     EGLSync sync;
 };
-
-#ifndef __LV_EGL_ADAPTER_SYNC_DEFINED
-    #define __LV_EGL_ADAPTER_SYNC_DEFINED
-    typedef struct lv_egl_adapter_sync * lv_egl_adapter_sync_t;
-#endif /* __LV_EGL_ADAPTER_SYNC_DEFINED */
 
 #ifdef __cplusplus
 extern "C" {

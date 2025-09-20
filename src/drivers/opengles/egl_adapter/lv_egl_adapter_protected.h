@@ -24,26 +24,17 @@ extern "C" {
 }
 #endif
 
+#include "private/lv_egl_adapter_typedefs.h"
 #include "private/lv_egl_adapter_output_core.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-#ifndef __LV_EGL_ADAPTER_CONFIG_DEFINED
-    #define __LV_EGL_ADAPTER_CONFIG_DEFINED
-    typedef struct lv_egl_adapter_config * lv_egl_adapter_config_t;
-#endif /* __LV_EGL_ADAPTER_CONFIG_DEFINED */
-
 struct lv_egl_adapter_sync {
     EGLDisplay display;
     EGLSync sync;
 };
-
-#ifndef __LV_EGL_ADAPTER_SYNC_DEFINED
-    #define __LV_EGL_ADAPTER_SYNC_DEFINED
-    typedef struct lv_egl_adapter_sync * lv_egl_adapter_sync_t;
-#endif /* __LV_EGL_ADAPTER_SYNC_DEFINED */
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,11 +53,6 @@ void lv_egl_adapter_destroy_sync(struct lv_egl_adapter_sync * s);
 
 /* ------------------------- */
 
-#ifndef __LV_EGL_ADAPTER_MODE_DEFINED
-    #define __LV_EGL_ADAPTER_MODE_DEFINED
-    typedef struct lv_egl_adapter_mode * lv_egl_adapter_mode_t;
-#endif /* __LV_EGL_ADAPTER_MODE_DEFINED */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -80,11 +66,6 @@ EGLint lv_egl_adapter_mode_get_id(void *);
 #endif
 
 /* ------------------------- */
-
-#ifndef __LV_EGL_ADAPTER_DEFINED
-    #define __LV_EGL_ADAPTER_DEFINED
-    typedef struct lv_egl_adapter * lv_egl_adapter_t;
-#endif /* __LV_EGL_ADAPTER_CONFIG_DEFINED */
 
 #ifdef __cplusplus
 extern "C" {

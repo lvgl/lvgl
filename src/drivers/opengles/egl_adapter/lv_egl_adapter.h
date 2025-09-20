@@ -22,19 +22,11 @@
  *      INCLUDES
  *********************/
 
+#include "private/lv_egl_adapter_typedefs.h"
+
 /**********************
  *      TYPEDEFS
  **********************/
-
-#ifndef __LV_EGL_ADAPTER_CONFIG_DEFINED
-    #define __LV_EGL_ADAPTER_CONFIG_DEFINED
-    typedef struct lv_egl_adapter_config * lv_egl_adapter_config_t;
-#endif /* __LV_EGL_ADAPTER_CONFIG_DEFINED */
-
-#ifndef __LV_EGL_ADAPTER_DEFINED
-    #define __LV_EGL_ADAPTER_DEFINED
-    typedef struct lv_egl_adapter * lv_egl_adapter_t;
-#endif /* __LV_EGL_ADAPTER_CONFIG_DEFINED */
 
 #ifdef __cplusplus
 extern "C" {

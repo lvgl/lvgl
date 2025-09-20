@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-//#include "private/__lv_egl_adapter.h"
+#include "private/lv_egl_adapter_typedefs.h"
 
 /**********************
  *      TYPEDEFS
@@ -52,11 +52,6 @@ struct lv_egl_adapter_config {
 
 };
 
-#ifndef __LV_EGL_ADAPTER_CONFIG_DEFINED
-    #define __LV_EGL_ADAPTER_CONFIG_DEFINED
-    typedef struct lv_egl_adapter_config * lv_egl_adapter_config_t;
-#endif /* __LV_EGL_ADAPTER_CONFIG_DEFINED */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,10 +61,8 @@ extern "C" {
  **********************/
 
 void lv_egl_adapter_config_make_default(void *);
-//int lv_egl_adapter_config_match_score(lv_egl_adapter_config_t actual, lv_egl_adapter_config_t target);
 int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t target);
 
-//int judge_viability(int component, int target, int scale);
 lv_egl_adapter_config_t lv_egl_adapter_config_create();
 lv_egl_adapter_config_t lv_egl_adapter_config_by_id(uint32_t requested_mode_config_id);
 void lv_egl_adapter_config_cleanup(void ** viscon_ptr);

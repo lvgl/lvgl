@@ -11,6 +11,7 @@
  *********************/
 #include "../../../../lv_conf_internal.h"
 #include "../../../../misc/lv_array.h"
+#include "../../egl_adapter/private/lv_egl_adapter_typedefs.h"
 
 /*********************
  *      DEFINES
@@ -19,11 +20,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-#ifndef __LV_EGL_ADAPTER_CORE_DEFINED
-    #define __LV_EGL_ADAPTER_CORE_DEFINED
-    typedef struct lv_egl_adapter_output_core * lv_egl_adapter_output_core_t;
-#endif /* __LV_EGL_ADAPTER_CORE_DEFINED */
 
 // Define the native_state struct
 typedef struct native_window_properties * native_window_properties_t;

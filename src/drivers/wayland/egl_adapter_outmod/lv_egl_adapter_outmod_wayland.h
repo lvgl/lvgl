@@ -9,6 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../egl_adapter/private/lv_egl_adapter_typedefs.h"
 
 /*********************
  *      DEFINES
@@ -19,11 +20,6 @@
  **********************/
 
 typedef struct lv_egl_adapter_outmod_wayland * lv_egl_adapter_outmod_wayland_t;
-
-#ifndef __LV_EGL_ADAPTER_CORE_DEFINED
-    #define __LV_EGL_ADAPTER_CORE_DEFINED
-    typedef struct lv_egl_adapter_output_core * lv_egl_adapter_output_core_t;
-#endif /* __LV_EGL_ADAPTER_CORE_DEFINED */
 
 /**********************
  * GLOBAL PROTOTYPES

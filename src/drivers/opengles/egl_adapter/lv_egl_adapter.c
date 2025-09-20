@@ -23,6 +23,7 @@
 
 #include "lv_egl_adapter.h"
 #include "private/__lv_egl_adapter.h"
+#include "private/lv_egl_adapter_typedefs.h"
 #include "private/lv_egl_adapter_output_core.h"
 
 
@@ -58,16 +59,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-#ifndef __LV_EGL_ADAPTER_MODE_DEFINED
-    #define __LV_EGL_ADAPTER_MODE_DEFINED
-    typedef struct lv_egl_adapter_mode * lv_egl_adapter_mode_t;
-#endif /* __LV_EGL_ADAPTER_MODE_DEFINED */
-
-#ifndef __LV_EGL_ADAPTER_SYNC_DEFINED
-    #define __LV_EGL_ADAPTER_SYNC_DEFINED
-    typedef struct lv_egl_adapter_sync * lv_egl_adapter_sync_t;
-#endif /* __LV_EGL_ADAPTER_SYNC_DEFINED */
 
 /**********************
  *  STATIC PROTOTYPES

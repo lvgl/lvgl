@@ -30,6 +30,7 @@
 /* Only continue if an output module was successfully negotiated */
 #ifdef __LV_OUTMOD_SETUP_COMPLETE
 
+#include "private/lv_egl_adapter_typedefs.h"
 #include "../egl_adapter_runtime_defaults.h"
 #include "../egl_adapter_runtime_defaults_internal.h"
 
@@ -47,19 +48,6 @@
 
 typedef struct FBO_newstruct * FBO_newstruct_t;
 
-#ifndef __LV_EGL_ADAPTER_SYNC_DEFINED
-    #define __LV_EGL_ADAPTER_SYNC_DEFINED
-    typedef struct lv_egl_adapter_sync * lv_egl_adapter_sync_t;
-#endif /* __LV_EGL_ADAPTER_SYNC_DEFINED */
-/*
-enum FrameEnd {
-    FrameEndDefault,
-    FrameEndNone,
-    FrameEndSwap,
-    FrameEndFinish,
-    FrameEndReadPixels
-};
-*/
 struct lv_egl_adapter_interface {
     lv_egl_adapter_t egl_adapter;
     __LV_OUTMOD_CLASS_T output_module;
@@ -80,12 +68,6 @@ struct lv_egl_adapter_interface {
     GLenum format_depth;
     bool owns_adapter;
 };
-
-
-#ifndef __LV_EGL_ADAPTER_INTERFACE_DEFINED
-    #define __LV_EGL_ADAPTER_INTERFACE_DEFINED
-    typedef struct lv_egl_adapter_interface * lv_egl_adapter_interface_t;
-#endif /* __LV_EGL_ADAPTER_INTERFACE_DEFINED */
 
 #ifdef __cplusplus
 extern "C" {
