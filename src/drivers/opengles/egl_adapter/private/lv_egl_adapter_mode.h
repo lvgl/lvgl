@@ -103,7 +103,7 @@ struct lv_egl_adapter_mode {
 
 };
 
-typedef struct lv_egl_adapter_mode * lv_egl_adapter_mode_t;
+typedef struct lv_egl_adapter_mode lv_egl_adapter_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES

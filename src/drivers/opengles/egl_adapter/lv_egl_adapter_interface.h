@@ -49,7 +49,7 @@
 typedef struct FBO_newstruct * FBO_newstruct_t;
 
 struct lv_egl_adapter_interface {
-    lv_egl_adapter_t egl_adapter;
+    lv_egl_adapter_t * egl_adapter;
     __LV_OUTMOD_CLASS_T output_module;
     int width;
     int height;
@@ -90,10 +90,10 @@ extern "C" {
  * is responsible for cleaning up the canvas via the appropriate adapter destroy
  * or reset API (if provided).
  */
-lv_egl_adapter_interface_t lv_egl_adapter_interface_create(lv_egl_adapter_t egl_adapter, int width, int height,
-                                                           float refresh_rate);
+lv_egl_adapter_interface_t * lv_egl_adapter_interface_create(lv_egl_adapter_t * egl_adapter, int width, int height,
+                                                             float refresh_rate);
 
-lv_egl_adapter_interface_t lv_egl_adapter_interface_auto(void);
+lv_egl_adapter_interface_t * lv_egl_adapter_interface_auto(void);
 
 /**
  * @brief Initialize resources for an existing canvas instance.

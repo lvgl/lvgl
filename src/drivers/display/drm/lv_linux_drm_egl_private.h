@@ -31,7 +31,7 @@ extern "C" {
  **********************/
 
 struct _lv_drm_egl_t {
-    lv_egl_adapter_interface_t  egl_adapter_interface;
+    lv_egl_adapter_interface_t * egl_adapter_interface;
     lv_display_t * display_texture;
     lv_drm_use_egl_texture_t * window_texture;
     int32_t hor_res;

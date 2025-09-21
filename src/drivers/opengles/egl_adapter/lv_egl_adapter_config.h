@@ -61,10 +61,10 @@ extern "C" {
  **********************/
 
 void lv_egl_adapter_config_make_default(void *);
-int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t target);
+int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t * target);
 
-lv_egl_adapter_config_t lv_egl_adapter_config_create();
-lv_egl_adapter_config_t lv_egl_adapter_config_by_id(uint32_t requested_mode_config_id);
+lv_egl_adapter_config_t * lv_egl_adapter_config_create();
+lv_egl_adapter_config_t * lv_egl_adapter_config_by_id(uint32_t requested_mode_config_id);
 void lv_egl_adapter_config_cleanup(void ** viscon_ptr);
 
 void lv_egl_adapter_config_set_config_id(void * viscon_ptr, uint32_t requested_mode_config_id);

@@ -67,7 +67,7 @@
 bool lv_egl_adapter_init_extensions(void * state_ptr);
 bool set_zero_swap_interval(void * adapter_ptr);
 void interface_destroy_internal(void ** cnvs_ptr);
-void get_glvisualconfig(void * adapter_ptr, EGLConfig config, lv_egl_adapter_config_t visual_config);
+void get_glvisualconfig(void * adapter_ptr, EGLConfig config, lv_egl_adapter_config_t * visual_config);
 EGLConfig select_best_config(void * adapter_ptr, size_t num_configs, EGLConfig * configs);
 GLADapiproc load_proc(void * userdata, const char * name);
 bool egl_display_is_valid(void * adapter_ptr);
@@ -90,7 +90,7 @@ void * external_load(void * extern_handle, const char * symbol);
 
 bool lv_egl_adapter_init_display(void * adapter_ptr, void * native_display)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
 
     const char * libnames[] = { "libEGL.so", "libEGL.so.1" };
     if(!external_open(&adapter_ref->egl_extern_handle, libnames, 2)) {
@@ -102,13 +102,13 @@ bool lv_egl_adapter_init_display(void * adapter_ptr, void * native_display)
 }
 bool lv_egl_adapter_init_surface(void * adapter_ptr, void * native_window)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     adapter_ref->egl_native_window = (EGLNativeWindowType)native_window;
     return egl_surface_is_valid(adapter_ref);
 }
 bool lv_egl_adapter_init_extensions(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
 #if LV_EGL_ADAPTED_WITH_GLESV2
     int version_result = gladLoadGLES2UserPtr(load_proc, adapter_ref->gl_extern_handle);
     if(!version_result) {
@@ -126,14 +126,14 @@ bool lv_egl_adapter_init_extensions(void * adapter_ptr)
 #endif
     return true;
 }
-lv_egl_adapter_output_core_t lv_egl_adapter_get_output_core(void * adapter_ptr)
+lv_egl_adapter_output_core_t * lv_egl_adapter_get_output_core(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     return adapter_ref->output_core;
 }
 bool lv_egl_adapter_is_valid(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(!egl_display_is_valid(adapter_ref)) return false;
     if(!egl_config_is_valid(adapter_ref)) return false;
     if(!egl_surface_is_valid(adapter_ref)) return false;
@@ -149,14 +149,14 @@ bool lv_egl_adapter_is_valid(void * adapter_ptr)
     if(!lv_egl_adapter_init_extensions(adapter_ref)) return false;
     return true;
 }
-void lv_egl_adapter_set_output_core(void * adapter_ptr, lv_egl_adapter_output_core_t core_ptr)
+void lv_egl_adapter_set_output_core(void * adapter_ptr, lv_egl_adapter_output_core_t * core_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     adapter_ref->output_core = core_ptr;
 }
 bool lv_egl_adapter_reset(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(!egl_display_is_valid(adapter_ref)) return false;
     if(!adapter_ref->egl_context) return true;
     if(eglGetCurrentContext &&
@@ -168,18 +168,18 @@ bool lv_egl_adapter_reset(void * adapter_ptr)
 }
 void lv_egl_adapter_swap(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     eglSwapBuffers(adapter_ref->egl_display, adapter_ref->egl_surface);
 }
-void lv_egl_adapter_got_visual_config(void * adapter_ptr, lv_egl_adapter_config_t vc)
+void lv_egl_adapter_got_visual_config(void * adapter_ptr, lv_egl_adapter_config_t * vc)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(!egl_config_is_valid(adapter_ref)) return;
     get_glvisualconfig(adapter_ref, adapter_ref->egl_config, vc);
 }
-void lv_egl_adapter_init(void * adapter_ptr, lv_egl_adapter_config_t config)
+void lv_egl_adapter_init(void * adapter_ptr, lv_egl_adapter_config_t * config)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     adapter_ref->egl_native_display = 0;
     adapter_ref->egl_native_window = 0;
     adapter_ref->egl_display = 0;
@@ -198,12 +198,12 @@ bool lv_egl_adapter_supports_sync()
 }
 bool lv_egl_adapter_prefers_sync(void * adapter_ptr)
 {
-    return lv_egl_adapter_config_get_vsync(((lv_egl_adapter_t)adapter_ptr)->requested_visual_config);
+    return lv_egl_adapter_config_get_vsync(((lv_egl_adapter_t *)adapter_ptr)->requested_visual_config);
 }
 bool lv_egl_adapter_got_native_config(void * adapter_ptr, EGLint * vid, lv_array_t * mods)
 {
     lv_array_deinit(mods);
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(!egl_config_is_valid(adapter_ref)) return false;
     EGLint native_id;
     if(!eglGetConfigAttrib(adapter_ref->egl_display, adapter_ref->egl_config, EGL_NATIVE_VISUAL_ID, &native_id)) {
@@ -232,7 +232,7 @@ bool lv_egl_adapter_got_native_config(void * adapter_ptr, EGLint * vid, lv_array
 }
 void lv_egl_adapter_cleanup(void ** adapter_ptr, void ** config_ptr, void ** cnvs_ptr)
 {
-    lv_egl_adapter_t adapter_ref = * (lv_egl_adapter_t *)adapter_ptr;
+    lv_egl_adapter_t * adapter_ref = * (lv_egl_adapter_t * *)adapter_ptr;
     if(adapter_ref) {
         lv_egl_adapter_reset(adapter_ref);
         free(adapter_ref->best_config);
@@ -249,17 +249,17 @@ void lv_egl_adapter_cleanup(void ** adapter_ptr, void ** config_ptr, void ** cnv
     if(adapter_ref) free(adapter_ref);
     *adapter_ptr = NULL;
 }
-lv_egl_adapter_t lv_egl_adapter_create(lv_egl_adapter_config_t config)
+lv_egl_adapter_t * lv_egl_adapter_create(lv_egl_adapter_config_t * config)
 {
-    lv_egl_adapter_t adapter = (lv_egl_adapter_t)malloc(sizeof(struct lv_egl_adapter));
+    lv_egl_adapter_t * adapter = (lv_egl_adapter_t *)malloc(sizeof(struct lv_egl_adapter));
     if(adapter) lv_egl_adapter_init(adapter, config);
     return adapter;
 }
-lv_egl_adapter_t lv_egl_adapter_create_auto(void)
+lv_egl_adapter_t * lv_egl_adapter_create_auto(void)
 {
-    lv_egl_adapter_config_t _egl_options = lv_egl_adapter_config_by_id(LV_EGL_BUFFER_MODE);
+    lv_egl_adapter_config_t * _egl_options = lv_egl_adapter_config_by_id(LV_EGL_BUFFER_MODE);
     lv_egl_adapter_config_set_vsync(_egl_options, LV_EGL_SYNC);
-    lv_egl_adapter_t adapter = (lv_egl_adapter_t)malloc(sizeof(struct lv_egl_adapter));
+    lv_egl_adapter_t * adapter = (lv_egl_adapter_t *)malloc(sizeof(struct lv_egl_adapter));
     if(adapter) {
         lv_egl_adapter_init(adapter, _egl_options);
         adapter->owns_config = true;
@@ -268,7 +268,7 @@ lv_egl_adapter_t lv_egl_adapter_create_auto(void)
 }
 struct lv_egl_adapter_sync * lv_egl_adapter_create_sync(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)adapter_ptr;
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)adapter_ptr;
     struct lv_egl_adapter_sync * s = malloc(sizeof(*s));
     if(!s) return NULL;
     s->display = adapter_ref->egl_display;
@@ -277,9 +277,9 @@ struct lv_egl_adapter_sync * lv_egl_adapter_create_sync(void * adapter_ptr)
 }
 void lv_egl_adapter_sync_wait(void * lv_egl_adapter_sync_ptr)
 {
-    lv_egl_adapter_sync_t adapter_ref = (lv_egl_adapter_sync_t)lv_egl_adapter_sync_ptr;
-    if(adapter_ref && adapter_ref->sync)
-        eglClientWaitSync(adapter_ref->display, adapter_ref->sync, EGL_SYNC_FLUSH_COMMANDS_BIT, EGL_FOREVER);
+    lv_egl_adapter_sync_t * sync_ref = (lv_egl_adapter_sync_t *)lv_egl_adapter_sync_ptr;
+    if(sync_ref && sync_ref->sync)
+        eglClientWaitSync(sync_ref->display, sync_ref->sync, EGL_SYNC_FLUSH_COMMANDS_BIT, EGL_FOREVER);
 }
 void lv_egl_adapter_destroy_sync(struct lv_egl_adapter_sync * s)
 {
@@ -292,7 +292,7 @@ void lv_egl_adapter_destroy_sync(struct lv_egl_adapter_sync * s)
 }
 bool set_zero_swap_interval(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)adapter_ptr;
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)adapter_ptr;
     if(!lv_egl_adapter_config_get_vsync(adapter_ref->requested_visual_config) &&
        (!eglSwapInterval || !eglSwapInterval(adapter_ref->egl_display, 0))) return false;
     return true;
@@ -302,9 +302,9 @@ bool set_zero_swap_interval(void * adapter_ptr)
  *   STATIC FUNCTIONS
  **********************/
 
-void get_glvisualconfig(void * adapter_ptr, EGLConfig config, lv_egl_adapter_config_t visual_config)
+void get_glvisualconfig(void * adapter_ptr, EGLConfig config, lv_egl_adapter_config_t * visual_config)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     eglGetConfigAttrib(adapter_ref->egl_display, config, EGL_CONFIG_ID, &visual_config->id);
     eglGetConfigAttrib(adapter_ref->egl_display, config, EGL_BUFFER_SIZE, &visual_config->buffer);
     eglGetConfigAttrib(adapter_ref->egl_display, config, EGL_RED_SIZE, &visual_config->red);
@@ -317,12 +317,12 @@ void get_glvisualconfig(void * adapter_ptr, EGLConfig config, lv_egl_adapter_con
 }
 EGLConfig select_best_config(void * adapter_ptr, size_t num_configs, EGLConfig * configs)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     int best_score = -111111;
     EGLConfig best_config = 0;
     for(size_t i = 0; i < num_configs; i++) {
         const EGLConfig config = configs[i];
-        lv_egl_adapter_config_t vc = lv_egl_adapter_config_create();
+        lv_egl_adapter_config_t * vc = lv_egl_adapter_config_create();
         int score;
         get_glvisualconfig(adapter_ref, config, vc);
         score = lv_egl_adapter_config_match_score(vc, adapter_ref->requested_visual_config);
@@ -354,7 +354,7 @@ GLADapiproc load_proc(void * userdata, const char * name)
 }
 bool egl_display_is_valid(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(adapter_ref->egl_display)
         return true;
 
@@ -444,7 +444,7 @@ bool egl_display_is_valid(void * adapter_ptr)
 }
 bool egl_config_is_valid(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(adapter_ref->egl_config) {
         return true;
     }
@@ -490,7 +490,7 @@ bool egl_config_is_valid(void * adapter_ptr)
 
     for(size_t i = 0; i < (size_t)num_configs; i++) {
         if(_EGLConfig_struct_buffer[i] == adapter_ref->egl_config) {
-            lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
+            lv_egl_adapter_mode_t * cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
             adapter_ref->best_config = cfg;
             break;
         }
@@ -503,7 +503,7 @@ bool egl_config_is_valid(void * adapter_ptr)
         unsigned int lineNumber = 0;
         bool is_best = false;
         for(size_t i = 0; i < (size_t)num_configs; i++) {
-            lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
+            lv_egl_adapter_mode_t * cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
             if(!lineNumber) lv_egl_adapter_mode_print_header();
             is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
             if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
@@ -525,7 +525,7 @@ bool egl_config_is_valid(void * adapter_ptr)
         unsigned int lineNumber = 0;
         bool is_best = false;
         for(size_t i = 0; i < (size_t)num_configs; i++) {
-            lv_egl_adapter_mode_t cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
+            lv_egl_adapter_mode_t * cfg = lv_egl_adapter_mode_create(adapter_ref->egl_display, _EGLConfig_struct_buffer[i]);
             if(!lineNumber) lv_egl_adapter_mode_print_header();
             is_best = lv_egl_adapter_mode_get_id(adapter_ref->best_config) == lv_egl_adapter_mode_get_id(cfg);
             if(is_best && (lineNumber > 0)) lv_egl_adapter_mode_print_bar();
@@ -543,7 +543,7 @@ bool egl_config_is_valid(void * adapter_ptr)
 }
 bool egl_surface_is_valid(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
     if(adapter_ref->egl_surface) return true;
     if(!egl_display_is_valid(adapter_ref)) return false;
     if(!egl_config_is_valid(adapter_ref)) return false;
@@ -557,7 +557,7 @@ bool egl_surface_is_valid(void * adapter_ptr)
 }
 bool egl_context_is_valid(void * adapter_ptr)
 {
-    lv_egl_adapter_t adapter_ref = (lv_egl_adapter_t)(adapter_ptr);
+    lv_egl_adapter_t * adapter_ref = (lv_egl_adapter_t *)(adapter_ptr);
 
     if(adapter_ref->egl_context)
         return true;

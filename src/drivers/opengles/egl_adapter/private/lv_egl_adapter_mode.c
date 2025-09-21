@@ -85,7 +85,7 @@ static void get_egl_config_ints(EGLDisplay dpy, EGLConfig handle, int startIndex
 
 void lv_egl_adapter_mode_zero(void * config_ptr)
 {
-    lv_egl_adapter_mode_t adapter_mode = (lv_egl_adapter_mode_t)config_ptr;
+    lv_egl_adapter_mode_t * adapter_mode = (lv_egl_adapter_mode_t *)config_ptr;
 
     adapter_mode->handle_ = 0;//EGLConfig(config); // ??handle_(config)??,
     adapter_mode->buffer_size = 0;
@@ -123,7 +123,7 @@ void lv_egl_adapter_mode_zero(void * config_ptr)
 
 void lv_egl_adapter_mode_init(void * config_ptr, EGLDisplay D, EGLConfig config)
 {
-    lv_egl_adapter_mode_t adapter_mode = (lv_egl_adapter_mode_t)config_ptr;
+    lv_egl_adapter_mode_t * adapter_mode = (lv_egl_adapter_mode_t *)config_ptr;
 
     uint32_t E = 0;
     adapter_mode->handle_ = config;//EGLConfig(config); // ??handle_(config)??,
@@ -179,18 +179,18 @@ void lv_egl_adapter_mode_init(void * config_ptr, EGLDisplay D, EGLConfig config)
     if(E) unpack_egl_config_errors(E);
 }
 
-lv_egl_adapter_mode_t lv_egl_adapter_mode_blank()
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_blank()
 {
-    lv_egl_adapter_mode_t local_config = (lv_egl_adapter_mode_t)malloc(sizeof(struct lv_egl_adapter_mode));
+    lv_egl_adapter_mode_t * local_config = (lv_egl_adapter_mode_t *)malloc(sizeof(struct lv_egl_adapter_mode));
     if(local_config) {
         lv_egl_adapter_mode_zero(local_config);
     }
     return local_config;
 }
 
-lv_egl_adapter_mode_t lv_egl_adapter_mode_create(EGLDisplay dpy, EGLConfig config)
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_create(EGLDisplay dpy, EGLConfig config)
 {
-    lv_egl_adapter_mode_t local_config = (lv_egl_adapter_mode_t)malloc(sizeof(struct lv_egl_adapter_mode));
+    lv_egl_adapter_mode_t * local_config = (lv_egl_adapter_mode_t *)malloc(sizeof(struct lv_egl_adapter_mode));
     if(local_config) {
         lv_egl_adapter_mode_zero(local_config);
         lv_egl_adapter_mode_init(local_config, dpy, config);
@@ -205,7 +205,7 @@ void lv_egl_adapter_mode_print_bar()
 
 void lv_egl_adapter_mode_print_header()
 {
-    //lv_egl_adapter_mode* adapter_mode = (lv_egl_adapter_mode_t)(lv_egl_adapter_mode_ptr);
+    //lv_egl_adapter_mode* adapter_mode = (lv_egl_adapter_mode_t *)(lv_egl_adapter_mode_ptr);
     printf(" ________ ____ _____ _______________ ____ ___ ______ ______ ________ ________ ______ _________ \n");
     printf("| config  bufr  rgb/   colorbuffer   dep  stn config native   max      max   surface  samples |\n");
     printf("|    id   size  lum   r   g   b   a   th  clr caveat render  width    height   type  buf  ns  |\n");
@@ -214,7 +214,7 @@ void lv_egl_adapter_mode_print_header()
 
 void lv_egl_adapter_mode_print(void * lv_egl_adapter_mode_ptr, bool is_active)
 {
-    lv_egl_adapter_mode_t adapter_mode = (lv_egl_adapter_mode_t)lv_egl_adapter_mode_ptr;
+    lv_egl_adapter_mode_t * adapter_mode = (lv_egl_adapter_mode_t *)lv_egl_adapter_mode_ptr;
     const char * caveat = "None";
 
     switch(adapter_mode->config_caveat) {
@@ -253,17 +253,17 @@ void lv_egl_adapter_mode_print(void * lv_egl_adapter_mode_ptr, bool is_active)
 
 bool lv_egl_adapter_mode_is_window(void * lv_egl_adapter_mode_ptr)
 {
-    lv_egl_adapter_mode_t adapter_mode = (lv_egl_adapter_mode_t)(lv_egl_adapter_mode_ptr);
+    lv_egl_adapter_mode_t * adapter_mode = (lv_egl_adapter_mode_t *)(lv_egl_adapter_mode_ptr);
     return adapter_mode->surface_type & EGL_WINDOW_BIT;
 }
 
 EGLint lv_egl_adapter_mode_get_id(void * lv_egl_adapter_mode_ptr)
 {
-    lv_egl_adapter_mode_t adapter_mode = (lv_egl_adapter_mode_t)(lv_egl_adapter_mode_ptr);
+    lv_egl_adapter_mode_t * adapter_mode = (lv_egl_adapter_mode_t *)(lv_egl_adapter_mode_ptr);
     return adapter_mode->config_id;
 }
 
-lv_egl_adapter_mode_t lv_egl_adapter_mode_cleanup(void * config_ptr)
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_cleanup(void * config_ptr)
 {
     if(config_ptr != NULL) {
         free(config_ptr);

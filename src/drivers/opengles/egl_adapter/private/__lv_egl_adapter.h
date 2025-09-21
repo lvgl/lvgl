@@ -29,11 +29,11 @@ struct lv_egl_adapter {
     EGLConfig                       egl_config;
     EGLContext                      egl_context;
     EGLSurface                      egl_surface;
-    lv_egl_adapter_mode_t           best_config;
+    lv_egl_adapter_mode_t      *      best_config;
     void * egl_extern_handle;
     void * gl_extern_handle;
-    lv_egl_adapter_config_t          requested_visual_config;
-    lv_egl_adapter_output_core_t    output_core;
+    lv_egl_adapter_config_t    *    requested_visual_config;
+    lv_egl_adapter_output_core_t  * output_core;
     bool                            owns_config;
 };
 
@@ -59,9 +59,9 @@ extern "C" {
 bool lv_egl_adapter_mode_is_window(void * config_ptr);
 EGLint lv_egl_adapter_mode_get_id(void * config_ptr);
 void lv_egl_adapter_mode_init(void * config_ptr, EGLDisplay dpy, EGLConfig config);
-lv_egl_adapter_mode_t lv_egl_adapter_mode_blank();
-lv_egl_adapter_mode_t lv_egl_adapter_mode_create(EGLDisplay dpy, EGLConfig config);
-lv_egl_adapter_mode_t lv_egl_adapter_mode_cleanup(void * config_ptr);
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_blank();
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_create(EGLDisplay dpy, EGLConfig config);
+lv_egl_adapter_mode_t * lv_egl_adapter_mode_cleanup(void * config_ptr);
 
 void lv_egl_adapter_mode_print(void * config_ptr, bool is_active);
 void lv_egl_adapter_mode_print_header();

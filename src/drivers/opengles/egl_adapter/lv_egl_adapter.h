@@ -47,7 +47,7 @@ extern "C" {
  * lv_egl_adapter_cleanup() to release the adapter and any associated resources
  * when no longer needed.
  */
-lv_egl_adapter_t lv_egl_adapter_create(lv_egl_adapter_config_t config);
+lv_egl_adapter_t * lv_egl_adapter_create(lv_egl_adapter_config_t * config);
 
 /**
  * @brief Create and initialize an lv_egl_adapter instance with automatic configuration.
@@ -59,7 +59,7 @@ lv_egl_adapter_t lv_egl_adapter_create(lv_egl_adapter_config_t config);
  * of this one assumes ownership of the lv_egl_adapter_config_t and will
  * free it automatically during cleanup.
  */
-lv_egl_adapter_t lv_egl_adapter_create_auto(void);
+lv_egl_adapter_t * lv_egl_adapter_create_auto(void);
 
 /**
  * @brief Cleanup and free adapter, config, and canvas resources.

@@ -38,8 +38,8 @@ struct FBO_newstruct {
  *  STATIC PROTOTYPES
  **********************/
 
-static GLenum determine_color_format(const lv_egl_adapter_config_t vc, bool supports_rgba8, bool supports_rgb8);
-static GLenum determine_depth_format(const lv_egl_adapter_config_t vc, bool supports_depth32, bool supports_depth24);
+static GLenum determine_color_format(const lv_egl_adapter_config_t * vc, bool supports_rgba8, bool supports_rgb8);
+static GLenum determine_depth_format(const lv_egl_adapter_config_t * vc, bool supports_depth32, bool supports_depth24);
 static bool determine_gl_extension_support(const char * ext);
 static const char * interface_gl_format_str(GLenum f);
 static void interface_fbos_reset(void * fboarray_ptr);
@@ -49,8 +49,8 @@ static bool interface_fbos_confirm(void * cnvs_ptr);
 static bool interface_fbos_apply(void * cnvs_ptr);
 static void interface_fbos_deinit(void * cnvs_ptr);
 static bool interface_resize_output(void * cnvs_ptr, int width, int height);
-static inline lv_egl_adapter_interface_t CAST(void * _cnvs_ptr);
-static inline lv_egl_adapter_output_core_t CORE(void * cnvs_ptr);
+static inline lv_egl_adapter_interface_t * CAST(void * _cnvs_ptr);
+static inline lv_egl_adapter_output_core_t * CORE(void * cnvs_ptr);
 static bool FALSE_ERROR(const char * desc);
 /* static void unproject_pixel_world(float mouse_x, float mouse_y, float w, float h,
  *                                 const float invVP[16], float nd, float out[3]);
@@ -66,11 +66,11 @@ static bool FALSE_ERROR(const char * desc);
 
 bool lv_egl_adapter_interface_init(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
 #if LV_ADAPTED_ON_WAYLAND
-    lv_egl_adapter_output_core_t core = lv_egl_adapter_outmod_wayland_get_core(interface->output_module);
+    lv_egl_adapter_output_core_t * core = lv_egl_adapter_outmod_wayland_get_core(interface->output_module);
 #else
-    lv_egl_adapter_output_core_t core = lv_egl_adapter_outmod_drm_get_core(interface->output_module);
+    lv_egl_adapter_output_core_t * core = lv_egl_adapter_outmod_drm_get_core(interface->output_module);
 #endif
     lv_egl_adapter_set_output_core(interface->egl_adapter, core);
     if(!core->init_display(interface->output_module, &(interface->width), &(interface->height),
@@ -81,7 +81,7 @@ bool lv_egl_adapter_interface_init(void * cnvs_ptr)
 }
 bool lv_egl_adapter_interface_reset(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     interface_fbos_deinit(interface);
     if(!lv_egl_adapter_reset(interface->egl_adapter)) return false;
     if(!interface_resize_output(interface, interface->width, interface->height)) return false;
@@ -107,7 +107,7 @@ bool lv_egl_adapter_interface_reset(void * cnvs_ptr)
 }
 void lv_egl_adapter_interface_visible(void * cnvs_ptr, bool visible)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     if(visible && !interface->offscreen_fbo_count) CORE(interface)->visible(interface->output_module, visible);
 }
 void lv_egl_adapter_interface_clear()
@@ -148,11 +148,11 @@ float lv_egl_adapter_interface_read_depth(int x, int y)
     glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
     return (float)(pixel[0] + (pixel[1] << 8));
 }
-lv_egl_adapter_interface_t interface_create_internal(lv_egl_adapter_t egl_adapter, int width, int height,
-                                                     float refresh_rate)
+lv_egl_adapter_interface_t * interface_create_internal(lv_egl_adapter_t * egl_adapter, int width, int height,
+                                                       float refresh_rate)
 {
-    lv_egl_adapter_interface_t interface;
-    interface = (lv_egl_adapter_interface_t)malloc(sizeof(*interface));
+    lv_egl_adapter_interface_t * interface;
+    interface = (lv_egl_adapter_interface_t *)malloc(sizeof(*interface));
 
     /* NOTE: do not try the GBM option yet, the GBM class has not been converted */
     interface->output_module =
@@ -179,24 +179,24 @@ lv_egl_adapter_interface_t interface_create_internal(lv_egl_adapter_t egl_adapte
     interface->owns_adapter = false;
 
     lv_array_init(interface->fbos, 1, sizeof(FBO_newstruct_t));
-    lv_array_init(interface->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t));
+    lv_array_init(interface->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t *));
 
     return interface;
 }
-lv_egl_adapter_interface_t lv_egl_adapter_interface_create(lv_egl_adapter_t egl_adapter, int width, int height,
-                                                           float refresh_rate)
+lv_egl_adapter_interface_t * lv_egl_adapter_interface_create(lv_egl_adapter_t * egl_adapter, int width, int height,
+                                                             float refresh_rate)
 {
-    lv_egl_adapter_interface_t interface = interface_create_internal(egl_adapter, width, height, refresh_rate);
+    lv_egl_adapter_interface_t * interface = interface_create_internal(egl_adapter, width, height, refresh_rate);
     interface->owns_adapter = false;
     return interface;
 }
-lv_egl_adapter_interface_t lv_egl_adapter_interface_auto(void)
+lv_egl_adapter_interface_t * lv_egl_adapter_interface_auto(void)
 {
-    lv_egl_adapter_config_t _egl_options = lv_egl_adapter_config_by_id(LV_EGL_BUFFER_MODE);
+    lv_egl_adapter_config_t * _egl_options = lv_egl_adapter_config_by_id(LV_EGL_BUFFER_MODE);
     lv_egl_adapter_config_set_vsync(_egl_options, LV_EGL_SYNC);
-    lv_egl_adapter_t _egl_adapter = lv_egl_adapter_create(_egl_options);
-    lv_egl_adapter_interface_t interface = interface_create_internal(_egl_adapter, LV_EGL_HOR_RES, LV_EGL_VER_RES,
-                                                                         LV_EGL_REFR);
+    lv_egl_adapter_t * _egl_adapter = lv_egl_adapter_create(_egl_options);
+    lv_egl_adapter_interface_t * interface = interface_create_internal(_egl_adapter, LV_EGL_HOR_RES, LV_EGL_VER_RES,
+                                                                           LV_EGL_REFR);
     interface->owns_adapter = true;
     if(!lv_egl_adapter_interface_init(interface)) {
         lv_egl_adapter_interface_destroy((void **)&interface);
@@ -206,7 +206,7 @@ lv_egl_adapter_interface_t lv_egl_adapter_interface_auto(void)
 }
 void interface_destroy_internal(void ** cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = *((lv_egl_adapter_interface_t *)(cnvs_ptr));
+    lv_egl_adapter_interface_t * interface = *((lv_egl_adapter_interface_t **)(cnvs_ptr));
     if(interface) {
         interface_fbos_reset(interface->fbos);
         lv_array_deinit(interface->fbos);
@@ -218,10 +218,10 @@ void interface_destroy_internal(void ** cnvs_ptr)
 }
 void lv_egl_adapter_interface_destroy(void ** cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = *((lv_egl_adapter_interface_t *)(cnvs_ptr));
+    lv_egl_adapter_interface_t * interface = *((lv_egl_adapter_interface_t **)(cnvs_ptr));
     if(interface) {
         if(interface->owns_adapter) {
-            lv_egl_adapter_t this_adapter = interface->egl_adapter;
+            lv_egl_adapter_t * this_adapter = interface->egl_adapter;
             interface_destroy_internal(cnvs_ptr);
             lv_egl_adapter_cleanup((void **)&this_adapter, 0, 0);
         }
@@ -232,14 +232,15 @@ void lv_egl_adapter_interface_destroy(void ** cnvs_ptr)
 }
 void lv_egl_adapter_interface_update(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     if(interface->offscreen_fbo_count <= 0) {
         lv_egl_adapter_swap(interface->egl_adapter);
         CORE(interface)->flip(interface->output_module, lv_egl_adapter_prefers_sync(interface->egl_adapter));
         return;
     }
     if(interface->is_sync_supported) {
-        lv_egl_adapter_destroy_sync((lv_egl_adapter_sync_t)lv_array_at(interface->fbos_syncs, interface->offscreen_fbo_index));
+        lv_egl_adapter_destroy_sync((lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
+                                                                         interface->offscreen_fbo_index));
         lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
                         lv_egl_adapter_create_sync(interface->egl_adapter));
     }
@@ -248,8 +249,8 @@ void lv_egl_adapter_interface_update(void * cnvs_ptr)
     }
     //interface->offscreen_fbo_index = (interface->offscreen_fbo_index + 1) % lv_array_size(interface->fbos);
     interface->offscreen_fbo_index = (interface->offscreen_fbo_index + 1) % interface->offscreen_fbo_count;
-    lv_egl_adapter_sync_t current_sync = (lv_egl_adapter_sync_t)lv_array_at(interface->fbos_syncs,
-                                                                            interface->offscreen_fbo_index);
+    lv_egl_adapter_sync_t * current_sync = (lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
+                                                                                interface->offscreen_fbo_index);
     if(current_sync) {
         lv_egl_adapter_sync_wait(current_sync);
         lv_egl_adapter_destroy_sync(current_sync);
@@ -269,7 +270,7 @@ int lv_egl_adapter_interface_height(void * cnvs_ptr)
 }
 void lv_egl_adapter_interface_switch_to_primary_fbo(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     (void)interface;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -327,7 +328,7 @@ void FBO_newstruct_destroy(void ** fbostruct_ptr)
  *   STATIC FUNCTIONS
  **********************/
 
-static GLenum determine_color_format(const lv_egl_adapter_config_t vc, bool supports_rgba8, bool supports_rgb8)
+static GLenum determine_color_format(const lv_egl_adapter_config_t * vc, bool supports_rgba8, bool supports_rgb8)
 {
     if(vc->buffer == 32) {
         return supports_rgba8 ? GL_RGBA8 : GL_RGBA4;
@@ -348,7 +349,7 @@ static GLenum determine_color_format(const lv_egl_adapter_config_t vc, bool supp
     }
     return 0;
 }
-static GLenum determine_depth_format(const lv_egl_adapter_config_t vc, bool supports_depth32, bool supports_depth24)
+static GLenum determine_depth_format(const lv_egl_adapter_config_t * vc, bool supports_depth32, bool supports_depth24)
 {
     if(vc->depth == 32 && supports_depth32)
         return GL_DEPTH_COMPONENT32;
@@ -454,9 +455,9 @@ static bool interface_confirm_gl2_support(void)
 }
 static bool interface_confirm_pixel_format(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     if(interface->format_color && interface->format_depth) return true;
-    lv_egl_adapter_config_t vc = lv_egl_adapter_config_create();
+    lv_egl_adapter_config_t * vc = lv_egl_adapter_config_create();
     lv_egl_adapter_config_make_default(vc);
     lv_egl_adapter_got_visual_config(interface->egl_adapter, vc);
     interface->format_color = 0;
@@ -492,7 +493,7 @@ static bool interface_confirm_pixel_format(void * cnvs_ptr)
 }
 static bool interface_fbos_confirm(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     if(lv_array_size(interface->fbos) != interface->offscreen_fbo_count) {
         interface_fbos_reset(interface->fbos);
         if(!interface_confirm_pixel_format(interface)) return false;
@@ -508,7 +509,7 @@ static bool interface_fbos_confirm(void * cnvs_ptr)
 }
 static bool interface_fbos_apply(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     if(!interface->is_window_initialized) return
             FALSE_ERROR("glwindow has never been initialized, check native-state code\nit should not return a valid window until create_window() is called");
     lv_egl_adapter_init_surface(interface->egl_adapter, interface->output_internal_data);
@@ -531,7 +532,7 @@ static bool interface_fbos_apply(void * cnvs_ptr)
 }
 static void interface_fbos_deinit(void * cnvs_ptr)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
     interface_fbos_reset(interface->fbos);
     lv_array_deinit(interface->fbos_syncs);
     interface->format_color = 0;
@@ -540,8 +541,8 @@ static void interface_fbos_deinit(void * cnvs_ptr)
 }
 static bool interface_resize_output(void * cnvs_ptr, int width, int height)
 {
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
-    lv_egl_adapter_output_core_t core = CORE(interface);
+    lv_egl_adapter_interface_t * interface = CAST(cnvs_ptr);
+    lv_egl_adapter_output_core_t * core = CORE(interface);
 
     bool request_fullscreen = (width == -1 && height == -1);
     intptr_t vid;
@@ -588,11 +589,11 @@ static bool interface_resize_output(void * cnvs_ptr, int width, int height)
     lv_array_deinit(new_mods);
     return true;
 }
-static inline lv_egl_adapter_interface_t CAST(void * _cnvs_ptr)
+static inline lv_egl_adapter_interface_t * CAST(void * _cnvs_ptr)
 {
-    return (lv_egl_adapter_interface_t)_cnvs_ptr;
+    return (lv_egl_adapter_interface_t *)_cnvs_ptr;
 }
-static inline lv_egl_adapter_output_core_t CORE(void * cnvs_ptr)
+static inline lv_egl_adapter_output_core_t * CORE(void * cnvs_ptr)
 {
     return lv_egl_adapter_get_output_core(CAST(cnvs_ptr)->egl_adapter);
 }

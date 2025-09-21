@@ -35,7 +35,7 @@ int judge_viability(int actual, int goal, bool least_over);
 
 void lv_egl_adapter_config_make_default(void * viscon_ptr)
 {
-    lv_egl_adapter_config_t adapter_config = (lv_egl_adapter_config_t)viscon_ptr;
+    lv_egl_adapter_config_t * adapter_config = (lv_egl_adapter_config_t *)viscon_ptr;
     adapter_config->id = 0;
     adapter_config->red = 1;
     adapter_config->green = 1;
@@ -51,32 +51,32 @@ void lv_egl_adapter_config_make_default(void * viscon_ptr)
 
 void lv_egl_adapter_config_set_config_id(void * viscon_ptr, uint32_t requested_mode_config_id)
 {
-    ((lv_egl_adapter_config_t)viscon_ptr)->id = requested_mode_config_id;
+    ((lv_egl_adapter_config_t *)viscon_ptr)->id = requested_mode_config_id;
 }
 void lv_egl_adapter_config_set_vsync(void * viscon_ptr, bool enabled)
 {
-    ((lv_egl_adapter_config_t)viscon_ptr)->vsync = enabled;
+    ((lv_egl_adapter_config_t *)viscon_ptr)->vsync = enabled;
 }
 bool lv_egl_adapter_config_get_vsync(void * viscon_ptr)
 {
-    return ((lv_egl_adapter_config_t)viscon_ptr)->vsync;
+    return ((lv_egl_adapter_config_t *)viscon_ptr)->vsync;
 }
 void lv_egl_adapter_config_set_alpha_bit_count(void * viscon_ptr, uint32_t alpha_bits)
 {
-    ((lv_egl_adapter_config_t)viscon_ptr)->alpha = alpha_bits;
+    ((lv_egl_adapter_config_t *)viscon_ptr)->alpha = alpha_bits;
 }
 void lv_egl_adapter_config_set_depth_bit_count(void * viscon_ptr, uint32_t depth_bits)
 {
-    ((lv_egl_adapter_config_t)viscon_ptr)->depth = depth_bits;
+    ((lv_egl_adapter_config_t *)viscon_ptr)->depth = depth_bits;
 }
 void lv_egl_adapter_config_set_sample_count(void * viscon_ptr, uint32_t num_samples)
 {
-    ((lv_egl_adapter_config_t)viscon_ptr)->samples = num_samples;
+    ((lv_egl_adapter_config_t *)viscon_ptr)->samples = num_samples;
 }
 void lv_egl_adapter_config_set_rgb_bit_count(void * viscon_ptr, uint32_t red_bits, uint32_t green_bits,
                                              uint32_t blue_bits)
 {
-    lv_egl_adapter_config_t adapter_config = (lv_egl_adapter_config_t)viscon_ptr;
+    lv_egl_adapter_config_t * adapter_config = (lv_egl_adapter_config_t *)viscon_ptr;
     adapter_config->red = red_bits;
     adapter_config->green = green_bits;
     adapter_config->blue = blue_bits;
@@ -88,7 +88,7 @@ void lv_egl_adapter_config_set_rgba_bit_count(void * viscon_ptr, uint32_t red_bi
     lv_egl_adapter_config_set_alpha_bit_count(viscon_ptr, alpha_bits);
 }
 
-int bugged_lv_egl_adapter_config_match_score(lv_egl_adapter_config_t actual, lv_egl_adapter_config_t target)
+int bugged_lv_egl_adapter_config_match_score(lv_egl_adapter_config_t * actual, lv_egl_adapter_config_t * target)
 {
     int score = 0;
 
@@ -176,9 +176,9 @@ int lv_egl_adapter_config_score_component(int component, int target, int scale) 
     return score;
 }
 
-int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t target)
+int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t * target)
 {
-    lv_egl_adapter_config_t adapter_config = (lv_egl_adapter_config_t)viscon_ptr;
+    lv_egl_adapter_config_t * adapter_config = (lv_egl_adapter_config_t *)viscon_ptr;
     int score = 0;
 
     /* A target config id trumps all other considerations and must match
@@ -203,18 +203,18 @@ int lv_egl_adapter_config_match_score(void * viscon_ptr, lv_egl_adapter_config_t
 }
 
 
-lv_egl_adapter_config_t lv_egl_adapter_config_create()
+lv_egl_adapter_config_t * lv_egl_adapter_config_create()
 {
-    lv_egl_adapter_config_t local_visual_config = (lv_egl_adapter_config_t)malloc(sizeof(struct lv_egl_adapter_config));
+    lv_egl_adapter_config_t * local_visual_config = (lv_egl_adapter_config_t *)malloc(sizeof(struct lv_egl_adapter_config));
     if(local_visual_config) {
         lv_egl_adapter_config_make_default(local_visual_config);
     }
     return local_visual_config;
 }
 
-lv_egl_adapter_config_t lv_egl_adapter_config_by_id(uint32_t requested_mode_config_id)
+lv_egl_adapter_config_t * lv_egl_adapter_config_by_id(uint32_t requested_mode_config_id)
 {
-    lv_egl_adapter_config_t local_visual_config = (lv_egl_adapter_config_t)malloc(sizeof(struct lv_egl_adapter_config));
+    lv_egl_adapter_config_t * local_visual_config = (lv_egl_adapter_config_t *)malloc(sizeof(struct lv_egl_adapter_config));
     if(local_visual_config) {
         lv_egl_adapter_config_make_default(local_visual_config);
         lv_egl_adapter_config_set_config_id(local_visual_config, requested_mode_config_id);
@@ -224,7 +224,7 @@ lv_egl_adapter_config_t lv_egl_adapter_config_by_id(uint32_t requested_mode_conf
 
 void lv_egl_adapter_config_cleanup(void ** viscon_ptr)
 {
-    lv_egl_adapter_config_t adapter_config = * (lv_egl_adapter_config_t *)viscon_ptr;
+    lv_egl_adapter_config_t * adapter_config = *(lv_egl_adapter_config_t **)viscon_ptr;
     if(adapter_config) free(adapter_config);
     *viscon_ptr = NULL;
 }

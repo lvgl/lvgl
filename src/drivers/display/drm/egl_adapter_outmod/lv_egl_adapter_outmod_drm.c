@@ -62,7 +62,7 @@ typedef struct drmfb_state * drmfb_state_t;
 
 /* internal struct definition (matches header's opaque typedef) */
 struct lv_egl_adapter_outmod_drm {
-    lv_egl_adapter_output_core_t core;
+    lv_egl_adapter_output_core_t * core;
     int fd;
     drmModeRes * drm_resources;
     drmModeConnector * drm_connector;
@@ -184,7 +184,7 @@ void lv_egl_adapter_outmod_drm_destroy(void ** nativedrm_ptr)
     *nativedrm_ptr = NULL;
 }
 
-lv_egl_adapter_output_core_t lv_egl_adapter_outmod_drm_get_core(void * nativedrm_ptr)
+lv_egl_adapter_output_core_t * lv_egl_adapter_outmod_drm_get_core(void * nativedrm_ptr)
 {
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
     return drm_out->core;
@@ -703,7 +703,7 @@ lv_egl_adapter_outmod_drm_t lv_egl_adapter_outmod_drm_create(void)
 static void populate_output_core(void * outmod_ptr)
 {
     lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)outmod_ptr;
-    drm_out->core = (lv_egl_adapter_output_core_t)malloc(sizeof(*(drm_out->core)));
+    drm_out->core = (lv_egl_adapter_output_core_t *)malloc(sizeof(*(drm_out->core)));
     drm_out->core->destroy            = lv_egl_adapter_outmod_drm_destroy;
     drm_out->core->init_display       = lv_egl_adapter_outmod_drm_init_display;
     drm_out->core->display            = lv_egl_adapter_outmod_drm_display;

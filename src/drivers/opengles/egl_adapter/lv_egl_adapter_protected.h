@@ -73,11 +73,11 @@ extern "C" {
 bool lv_egl_adapter_init_display(void * adapter_ptr, void * native_display);
 bool lv_egl_adapter_init_surface(void * adapter_ptr, void * native_window);
 bool lv_egl_adapter_init_extensions(void * adapter_ptr);
-lv_egl_adapter_output_core_t lv_egl_adapter_get_output_core(void * adapter_ptr);
-void lv_egl_adapter_set_output_core(void * adapter_ptr, lv_egl_adapter_output_core_t core_ptr);
+lv_egl_adapter_output_core_t * lv_egl_adapter_get_output_core(void * adapter_ptr);
+void lv_egl_adapter_set_output_core(void * adapter_ptr, lv_egl_adapter_output_core_t * core_ptr);
 /* Performs a config search, returning a native visual ID on success */
 bool lv_egl_adapter_got_native_config(void * adapter_ptr, EGLint * vid, lv_array_t * mods);
-void lv_egl_adapter_got_visual_config(void * adapter_ptr, lv_egl_adapter_config_t vc);
+void lv_egl_adapter_got_visual_config(void * adapter_ptr, lv_egl_adapter_config_t * vc);
 bool lv_egl_adapter_is_valid(void * adapter_ptr);
 bool lv_egl_adapter_reset(void * adapter_ptr);
 void lv_egl_adapter_swap(void * adapter_ptr);
