@@ -11,7 +11,9 @@
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN && LV_USE_PROFILER_BUILTIN_POSIX
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    #include <windows.h>
+#else
     #include <pthread.h>
 #endif
 
@@ -73,9 +75,29 @@ void lv_profiler_builtin_posix_init(void)
 
 static uint64_t tick_get_cb(void)
 {
+#if defined(_WIN32)
+    static LARGE_INTEGER frequency = {0};
+    LARGE_INTEGER counter;
+
+    if(frequency.QuadPart == 0) {
+        if(!QueryPerformanceFrequency(&frequency)) {
+            fprintf(stderr, "QueryPerformanceFrequency failed\n");
+            return 0;
+        }
+    }
+
+    if(!QueryPerformanceCounter(&counter)) {
+        fprintf(stderr, "QueryPerformanceCounter failed\n");
+        return 0;
+    }
+
+    /* Convert counter to nanoseconds */
+    return counter.QuadPart * 1000000000ULL / frequency.QuadPart;
+#else
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (uint64_t)ts.tv_sec * 1000000000ULL + (uint64_t)ts.tv_nsec;
+#endif
 }
 
 static void flush_cb(const char * buf)
@@ -100,6 +122,7 @@ static int cpu_get_cb(void)
     unsigned cpu;
     int result = syscall(SYS_getcpu, &cpu, NULL, NULL);
     if(result < 0) {
+        fprintf(stderr, "getcpu failed\n");
         return -1;
     }
     return (int)cpu;
