@@ -11,7 +11,10 @@
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN && LV_USE_PROFILER_BUILTIN_POSIX
 
-#include <pthread.h>
+#if !defined(_WIN32)
+    #include <pthread.h>
+#endif
+
 #include <stdio.h>
 #include <time.h>
 
@@ -84,8 +87,10 @@ static int tid_get_cb(void)
 {
 #if defined(__linux__)
     return (int)syscall(SYS_gettid);
-#else
+#elif !defined(_WIN32)
     return (int)pthread_self();
+#else
+    return 1;
 #endif
 }
 
