@@ -161,7 +161,7 @@ struct lv_wayland_context {
     struct wl_cursor_theme * cursor_theme;
     struct wl_surface * cursor_surface;
     shm_ctx_t shm_ctx;
-    struct output_info outputs[8];
+    struct output_info outputs[LV_WAYLAND_MAX_OUTPUTS];
     int wl_output_count;
 
 #if LV_WAYLAND_USE_DMABUF

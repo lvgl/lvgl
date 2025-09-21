@@ -121,7 +121,7 @@ static const struct wl_output_listener output_listener = {
 
 struct wl_output * lv_wayland_get_wl_output(int display)
 {
-    if(display > lv_wl_ctx.wl_output_count || display < 0)
+    if(display >= lv_wl_ctx.wl_output_count || display < 0)
         return NULL;
 
     return lv_wl_ctx.outputs[display].wl_output;
@@ -405,7 +405,7 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
     LV_UNUSED(data);
 
     if(strcmp(interface, "wl_output") == 0) {
-        if(app->wl_output_count < 8) {
+        if(app->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
             memset(&app->outputs[app->wl_output_count], 0, sizeof(struct output_info));
             struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
             app->outputs[app->wl_output_count].wl_output = out;
