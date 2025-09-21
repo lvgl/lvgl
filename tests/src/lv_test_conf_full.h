@@ -108,6 +108,7 @@
 #define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
+#define LV_USE_PROFILER_BUILTIN_POSIX 1
 #define LV_USE_GRIDNAV          1
 #define LV_USE_XML              1
 #define LV_USE_TRANSLATION      1

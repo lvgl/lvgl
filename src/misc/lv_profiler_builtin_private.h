@@ -43,6 +43,15 @@ struct _lv_profiler_builtin_config_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+#if LV_USE_PROFILER_BUILTIN_POSIX
+
+/**
+ * Initialize the built-in profiler with POSIX functions.
+ */
+void lv_profiler_builtin_posix_init(void);
+
+#endif /* LV_USE_PROFILER_BUILTIN_POSIX */
+
 /**********************
  *      MACROS
  **********************/

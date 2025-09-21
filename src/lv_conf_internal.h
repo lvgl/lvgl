@@ -3445,6 +3445,13 @@
                 #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
             #endif
         #endif
+        #ifndef LV_USE_PROFILER_BUILTIN_POSIX
+            #ifdef CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+                #define LV_USE_PROFILER_BUILTIN_POSIX CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+            #else
+                #define LV_USE_PROFILER_BUILTIN_POSIX 0 /**< Enable POSIX profiler port */
+            #endif
+        #endif
     #endif
 
     /** Header to include for profiler */
