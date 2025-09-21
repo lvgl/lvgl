@@ -46,11 +46,11 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct FBO_newstruct * FBO_newstruct_t;
+typedef struct lv_egl_adapter_fbo lv_egl_adapter_fbo_t;
 
 struct lv_egl_adapter_interface {
     lv_egl_adapter_t * egl_adapter;
-    __LV_OUTMOD_CLASS_T output_module;
+    __LV_OUTMOD_CLASS_T * output_module;
     int width;
     int height;
     float refresh_rate;
@@ -224,8 +224,9 @@ void lv_egl_adapter_interface_destroy(void ** cnvs_ptr);
 
 // only referenced locally / internally
 void interface_destroy_internal(void ** cnvs_ptr);
-FBO_newstruct_t FBO_newstruct_create(GLsizei width, GLsizei height, GLuint color_format, GLuint depth_format);
-void FBO_newstruct_destroy(void ** fbostruct_ptr);
+lv_egl_adapter_fbo_t * lv_egl_adapter_fbo_create(GLsizei width, GLsizei height, GLuint color_format,
+                                                 GLuint depth_format);
+void lv_egl_adapter_fbo_destroy(void ** fbostruct_ptr);
 
 #ifdef __cplusplus
 }

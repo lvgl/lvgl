@@ -152,7 +152,7 @@ static struct my_output * my_main_output;
 
 struct my_output * get_output(void * void_self, size_t index)
 {
-    lv_egl_adapter_outmod_wayland_t state = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * state = (lv_egl_adapter_outmod_wayland_t *)void_self;
     if(index < state->display_->outputs_count) {
         return &(state->display_->outputs[index]); // Return the output at the specified index
     }
@@ -161,7 +161,7 @@ struct my_output * get_output(void * void_self, size_t index)
 
 struct my_output * add_output(void * void_self, struct wl_output * output)
 {
-    lv_egl_adapter_outmod_wayland_t state = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * state = (lv_egl_adapter_outmod_wayland_t *)void_self;
     if(state->display_->outputs_count >= 10) return false;  // Limit reached
     struct my_output new_output;
     new_output.output = output;
@@ -175,14 +175,14 @@ struct my_output * add_output(void * void_self, struct wl_output * output)
 
 lv_egl_adapter_output_core_t lv_egl_adapter_outmod_wayland_get_core(void * void_self)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t) void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *) void_self;
     return wayland_out ? wayland_out->core : NULL;
 }
 
 // Destructor for lv_egl_adapter_outmod_wayland
 void lv_egl_adapter_outmod_wayland_destroy(void ** nativewayland_ptr)
 {
-    lv_egl_adapter_outmod_wayland_t state = *(lv_egl_adapter_outmod_wayland_t *)nativewayland_ptr;
+    lv_egl_adapter_outmod_wayland_t * state = *(lv_egl_adapter_outmod_wayland_t **)nativewayland_ptr;
     if(state) {
         if(state->window_) {
             if(state->window_->xdg_toplevel)
@@ -248,7 +248,7 @@ void lv_egl_adapter_outmod_wayland_destroy(void ** nativewayland_ptr)
 
 void lv_egl_adapter_outmod_wayland_flush(void * void_self)
 {
-    lv_egl_adapter_outmod_wayland_t state = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * state = (lv_egl_adapter_outmod_wayland_t *)void_self;
     if(state->window_->surface) {
         struct my_output * temp_output = get_output(state, 0);
         wl_surface_damage(state->window_->surface, 0, 0,
@@ -265,7 +265,7 @@ void lv_egl_adapter_outmod_wayland_flush(void * void_self)
 // Initialize display
 bool lv_egl_adapter_outmod_wayland_init_display(void * void_self, int * x_res, int * y_res, float refr_rate)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)void_self;
 
     wayland_out->display_ = malloc(sizeof(struct my_display));
     if(!wayland_out->display_) {
@@ -292,14 +292,14 @@ bool lv_egl_adapter_outmod_wayland_init_display(void * void_self, int * x_res, i
 // Return the display
 void * lv_egl_adapter_outmod_wayland_display(void * void_self)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)void_self;
     return (void *)(wayland_out->display_->display);
 }
 
 // Create a window
 bool lv_egl_adapter_outmod_wayland_create_window(void * void_self, native_window_properties_t properties)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)void_self;
     struct my_output * output = NULL;
     if(!wayland_out->display_->outputs_count == 0) output = get_output(wayland_out, 0);
 
@@ -341,7 +341,7 @@ bool lv_egl_adapter_outmod_wayland_create_window(void * void_self, native_window
 // Return the window
 void * lv_egl_adapter_outmod_wayland_window(void * void_self, native_window_properties_t properties)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)void_self;
     if(wayland_out->window_) {
         //*properties = wayland_out->window_->properties;
         properties->width = wayland_out->window_->properties.width;
@@ -358,13 +358,13 @@ void * lv_egl_adapter_outmod_wayland_window(void * void_self, native_window_prop
 void lv_egl_adapter_outmod_wayland_visible(void * void_self, bool v)
 {
     // Implementation for visibility (if needed)
-    //lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t )void_self;
+    //lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t * )void_self;
 }
 
 // Flip the display
 void lv_egl_adapter_outmod_wayland_flip(void * void_self, bool sync)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)void_self;
     if(wl_display_roundtrip(wayland_out->display_->display) == -1) {
         // Exit app immediately
     }
@@ -373,7 +373,7 @@ void lv_egl_adapter_outmod_wayland_flip(void * void_self, bool sync)
 // Handle seat capabilities
 void lv_egl_adapter_outmod_wayland_seat_handle_capabilities(void * data, struct wl_seat * seat, uint32_t caps)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
 
     if((caps & WL_SEAT_CAPABILITY_POINTER) && !that->display_->pointer) {
         that->display_->pointer = wl_seat_get_pointer(seat);
@@ -395,9 +395,9 @@ void lv_egl_adapter_outmod_wayland_seat_handle_capabilities(void * data, struct 
 }
 
 // Constructor for lv_egl_adapter_outmod_wayland
-lv_egl_adapter_outmod_wayland_t lv_egl_adapter_outmod_wayland_create()
+lv_egl_adapter_outmod_wayland_t * lv_egl_adapter_outmod_wayland_create()
 {
-    lv_egl_adapter_outmod_wayland_t state = malloc(sizeof(lv_egl_adapter_outmod_wayland));
+    lv_egl_adapter_outmod_wayland_t * state = malloc(sizeof(lv_egl_adapter_outmod_wayland));
     if(state) {
         state->cursor_  = NULL;
         state->display_ = NULL;
@@ -413,7 +413,7 @@ lv_egl_adapter_outmod_wayland_t lv_egl_adapter_outmod_wayland_create()
 
 static void populate_output_core(void * outmod_ptr)
 {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)outmod_ptr;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t *)outmod_ptr;
     wayland_out->core = (lv_egl_adapter_output_core_t)malloc(sizeof(*(wayland_out->core)));
     wayland_out->core->destroy            = lv_egl_adapter_outmod_wayland_destroy;
     wayland_out->core->init_display       = lv_egl_adapter_outmod_wayland_init_display;
@@ -428,7 +428,7 @@ static void populate_output_core(void * outmod_ptr)
 static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint32_t serial, struct wl_surface * surface,
                                  wl_fixed_t sx, wl_fixed_t sy)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
 
     struct wl_buffer * buffer;
     struct my_cursor * my_cursor = that->cursor_;
@@ -467,7 +467,7 @@ static void pointer_handle_leave(void * data, struct wl_pointer * pointer, uint3
 }
 static void pointer_handle_motion(void * data, struct wl_pointer * pointer, uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
     //that->pointer_x = (int)sx >> 8;
     //that->pointer_y = (int)sy >> 8;
 }
@@ -477,7 +477,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
                                   uint32_t state)
 {
     // Cast data to lv_egl_adapter_outmod_wayland
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
 
     if(!that->window_)  // Ensure window_ is not NULL
         return;
@@ -541,7 +541,7 @@ static const struct wl_keyboard_listener keyboard_listener = {
 // Define the wl_seat_listener
 static void seat_handle_capabilities(void * data, struct wl_seat * seat, uint32_t caps)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
     if((caps & WL_SEAT_CAPABILITY_POINTER) && !that->display_->pointer) {
         that->display_->pointer = wl_seat_get_pointer(seat);
         wl_pointer_add_listener(that->display_->pointer, &pointer_listener, that);
@@ -616,7 +616,7 @@ static void registry_handle_global(void * data, struct wl_registry * registry,
                                    uint32_t id, const char * interface,
                                    uint32_t version)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
 
     if(strcmp(interface, "wl_compositor") == 0) {
         that->display_->compositor =
@@ -657,7 +657,7 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
                                           int32_t width, int32_t height,
                                           struct wl_array * states)
 {
-    lv_egl_adapter_outmod_wayland_t that = (lv_egl_adapter_outmod_wayland_t)data;
+    lv_egl_adapter_outmod_wayland_t * that = (lv_egl_adapter_outmod_wayland_t *)data;
     uint32_t * state;
     bool want_fullscreen = true; //false;
     bool want_maximized = false;
@@ -721,7 +721,7 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
 
 /*
 void setup_cursor(void *void_self) {
-    lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t )void_self;
+    lv_egl_adapter_outmod_wayland_t * wayland_out = (lv_egl_adapter_outmod_wayland_t * )void_self;
     if (!wayland_out->display_->shm)
         return;
 

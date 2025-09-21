@@ -16,14 +16,6 @@
 
 #include "private/glad/include/glad/egl.h"
 #include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef __cplusplus
-}
-#endif
-
 #include "private/lv_egl_adapter_typedefs.h"
 #include "private/lv_egl_adapter_output_core.h"
 
@@ -47,29 +39,13 @@ extern "C" {
 void lv_egl_adapter_sync_wait(void *);
 struct lv_egl_adapter_sync * lv_egl_adapter_create_sync(void * adapter_ptr);
 void lv_egl_adapter_destroy_sync(struct lv_egl_adapter_sync * s);
-#ifdef __cplusplus
-}
-#endif
 
-/* ------------------------- */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 void lv_egl_adapter_mode_print(void *, bool is_active);
 void lv_egl_adapter_mode_print_header();
 void lv_egl_adapter_mode_print_bar();
 bool lv_egl_adapter_mode_is_window(void *);
 EGLint lv_egl_adapter_mode_get_id(void *);
-#ifdef __cplusplus
-}
-#endif
 
-/* ------------------------- */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 bool lv_egl_adapter_init_display(void * adapter_ptr, void * native_display);
 bool lv_egl_adapter_init_surface(void * adapter_ptr, void * native_window);
 bool lv_egl_adapter_init_extensions(void * adapter_ptr);

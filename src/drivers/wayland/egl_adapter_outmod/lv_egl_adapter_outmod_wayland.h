@@ -19,13 +19,13 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_egl_adapter_outmod_wayland * lv_egl_adapter_outmod_wayland_t;
+typedef struct lv_egl_adapter_outmod_wayland lv_egl_adapter_outmod_wayland_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_egl_adapter_outmod_wayland_t lv_egl_adapter_outmod_wayland_create();
+lv_egl_adapter_outmod_wayland_t * lv_egl_adapter_outmod_wayland_create();
 lv_egl_adapter_output_core_t * lv_egl_adapter_outmod_wayland_get_core(void * self);
 
 /**********************

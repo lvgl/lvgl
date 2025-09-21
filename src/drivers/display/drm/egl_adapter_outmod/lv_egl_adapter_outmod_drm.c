@@ -112,7 +112,7 @@ void lv_egl_adapter_outmod_drm_page_flip_handler(int fd, unsigned int frame, uns
     (void)usec;
     //(void)data;
 
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)data;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)data;
 
     if(drm_out->gbm_bo_presented)
         gbm_surface_release_buffer(drm_out->gbm_surface, drm_out->gbm_bo_presented);
@@ -123,7 +123,7 @@ void lv_egl_adapter_outmod_drm_page_flip_handler(int fd, unsigned int frame, uns
 
 void lv_egl_adapter_outmod_drm_cleanup(void * nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out) return;
 
     if(drm_out->drm_crtc) {
@@ -177,7 +177,7 @@ void lv_egl_adapter_outmod_drm_cleanup(void * nativedrm_ptr)
 
 void lv_egl_adapter_outmod_drm_destroy(void ** nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = * (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = * (lv_egl_adapter_outmod_drm_t * *) nativedrm_ptr;
     if(!drm_out) return;
     lv_egl_adapter_outmod_drm_cleanup(drm_out);
     free(drm_out);
@@ -186,14 +186,14 @@ void lv_egl_adapter_outmod_drm_destroy(void ** nativedrm_ptr)
 
 lv_egl_adapter_output_core_t * lv_egl_adapter_outmod_drm_get_core(void * nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     return drm_out->core;
 }
 
 /* display: return internal gbm_device pointer as void* */
 void * lv_egl_adapter_outmod_drm_display(void * nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out) return NULL;
     return (void *) drm_out->gbm_dev;
 }
@@ -201,7 +201,7 @@ void * lv_egl_adapter_outmod_drm_display(void * nativedrm_ptr)
 /* window: populate properties with mode size and return gbm_surface* as void* */
 void * lv_egl_adapter_outmod_drm_window(void * nativedrm_ptr, native_window_properties_t const properties)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out || !properties) return NULL;
     if(drm_out->drm_mode) {
         properties->width = drm_out->drm_mode->hdisplay;
@@ -236,7 +236,7 @@ void lv_egl_adapter_outmod_drm_fb_destroy_callback(struct gbm_bo * bo, void * da
 /* init_gbm: create gbm device from fd */
 bool lv_egl_adapter_outmod_drm_init_gbm(void * nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out) return false;
     drm_out->gbm_dev = gbm_create_device(drm_out->fd);
     if(!drm_out->gbm_dev) {
@@ -249,7 +249,7 @@ bool lv_egl_adapter_outmod_drm_init_gbm(void * nativedrm_ptr)
 /* check_for_page_flip: select() on fd and handle drm events */
 int lv_egl_adapter_outmod_drm_check_for_page_flip(void * nativedrm_ptr, int timeout_ms)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out) return -1;
 
     fd_set fds;
@@ -283,7 +283,7 @@ int lv_egl_adapter_outmod_drm_check_for_page_flip(void * nativedrm_ptr, int time
 
 drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(void * nativedrm_ptr, struct gbm_bo * bo)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)nativedrm_ptr;
     if(!bo) {
         LV_LOG_ERROR("variable bo is null\n");
         return NULL;
@@ -348,7 +348,7 @@ drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(void * nativedrm_ptr, str
 
 void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
 
     if(!drm_out->crtc_isset && drmSetMaster(drm_out->fd) < 0) {
         LV_LOG_ERROR("Failed to become DRM master (hint: must be run in a VT, shut down Wayland / X first )");
@@ -418,7 +418,7 @@ void lv_egl_adapter_outmod_drm_flip(void * nativedrm_ptr, bool vsync)
 bool lv_egl_adapter_outmod_drm_create_window(void * nativedrm_ptr, native_window_properties_t const properties)
 {
 
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)nativedrm_ptr;
     if(!drm_out->gbm_dev) {
         LV_LOG_ERROR("DRM device has not been initialized!");
         return false;
@@ -486,7 +486,7 @@ inline static int node_path_is_valid(const char * path)
 
 bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, float refr_rate)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)nativedrm_ptr;
 
     int fd = -1;
     char * drm_device = TEMP_get_default_drm_device_path(drm_out);
@@ -663,7 +663,7 @@ bool lv_egl_adapter_outmod_drm_init_display(void * nativedrm_ptr, int * x_res, i
     int theight = *y_res;
     *x_res = -1;
     *y_res = -1;
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
     if(!drm_out) return false;
     if(drm_out->gbm_dev == NULL) {
         lv_egl_adapter_outmod_drm_init(drm_out, twidth, theight, refr_rate);
@@ -671,10 +671,10 @@ bool lv_egl_adapter_outmod_drm_init_display(void * nativedrm_ptr, int * x_res, i
     return (drm_out->gbm_dev != NULL);
 }
 
-lv_egl_adapter_outmod_drm_t lv_egl_adapter_outmod_drm_create(void)
+lv_egl_adapter_outmod_drm_t * lv_egl_adapter_outmod_drm_create(void)
 {
-    lv_egl_adapter_outmod_drm_t drm_out;
-    drm_out = (lv_egl_adapter_outmod_drm_t)calloc(1, sizeof(*drm_out));
+    lv_egl_adapter_outmod_drm_t * drm_out;
+    drm_out = (lv_egl_adapter_outmod_drm_t *)calloc(1, sizeof(*drm_out));
     if(!drm_out) return NULL;
     populate_output_core(drm_out);
     drm_out->fd = 0;
@@ -702,7 +702,7 @@ lv_egl_adapter_outmod_drm_t lv_egl_adapter_outmod_drm_create(void)
 
 static void populate_output_core(void * outmod_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)outmod_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)outmod_ptr;
     drm_out->core = (lv_egl_adapter_output_core_t *)malloc(sizeof(*(drm_out->core)));
     drm_out->core->destroy            = lv_egl_adapter_outmod_drm_destroy;
     drm_out->core->init_display       = lv_egl_adapter_outmod_drm_init_display;
@@ -726,7 +726,7 @@ static size_t distance_uint32_array(uint32_t * arr, size_t len, uint32_t value)
  */
 static char * TEMP_get_default_drm_device_path(void * nativedrm_ptr)
 {
-    lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t)nativedrm_ptr;
+    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *)nativedrm_ptr;
     (void)drm_out;
 
     const char * s = LV_EGL_DEVICE;

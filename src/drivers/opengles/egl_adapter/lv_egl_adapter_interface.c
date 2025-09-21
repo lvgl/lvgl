@@ -28,7 +28,7 @@
  *      TYPEDEFS
  **********************/
 
-struct FBO_newstruct {
+struct lv_egl_adapter_fbo {
     GLuint color_renderbuffer;
     GLuint depth_renderbuffer;
     GLuint fbo;
@@ -178,7 +178,7 @@ lv_egl_adapter_interface_t * interface_create_internal(lv_egl_adapter_t * egl_ad
     interface->fbos_syncs = &interface->fbos_syncs_data;
     interface->owns_adapter = false;
 
-    lv_array_init(interface->fbos, 1, sizeof(FBO_newstruct_t));
+    lv_array_init(interface->fbos, 1, sizeof(lv_egl_adapter_fbo_t *));
     lv_array_init(interface->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t *));
 
     return interface;
@@ -258,7 +258,8 @@ void lv_egl_adapter_interface_update(void * cnvs_ptr)
         lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
                         lv_egl_adapter_create_sync(interface->egl_adapter));
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, ((FBO_newstruct_t)lv_array_at(interface->fbos, interface->offscreen_fbo_index))->fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, ((lv_egl_adapter_fbo_t *)lv_array_at(interface->fbos,
+                                                                           interface->offscreen_fbo_index))->fbo);
 }
 int lv_egl_adapter_interface_width(void * cnvs_ptr)
 {
@@ -287,9 +288,10 @@ void lv_egl_adapter_interface_offscreen(void * cnvs_ptr, unsigned int offscreen)
 {
     CAST(cnvs_ptr)->offscreen_fbo_count = offscreen;
 }
-FBO_newstruct_t FBO_newstruct_create(GLsizei width, GLsizei height, GLuint color_format, GLuint depth_format)
+lv_egl_adapter_fbo_t * lv_egl_adapter_fbo_create(GLsizei width, GLsizei height, GLuint color_format,
+                                                 GLuint depth_format)
 {
-    FBO_newstruct_t interface = (FBO_newstruct_t)malloc(sizeof(struct FBO_newstruct));
+    lv_egl_adapter_fbo_t * interface = (lv_egl_adapter_fbo_t *)malloc(sizeof(struct lv_egl_adapter_fbo));
     interface->color_renderbuffer = 0;
     interface->depth_renderbuffer = 0;
     interface->fbo = 0;
@@ -312,9 +314,9 @@ FBO_newstruct_t FBO_newstruct_create(GLsizei width, GLsizei height, GLuint color
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind the framebuffer
     return interface;
 }
-void FBO_newstruct_destroy(void ** fbostruct_ptr)
+void lv_egl_adapter_fbo_destroy(void ** fbostruct_ptr)
 {
-    FBO_newstruct_t fbostruct = * (FBO_newstruct_t *)fbostruct_ptr;
+    lv_egl_adapter_fbo_t * fbostruct = *(lv_egl_adapter_fbo_t **)fbostruct_ptr;
     if(fbostruct) {
         if(fbostruct->fbo) glDeleteFramebuffers(1, &(fbostruct->fbo));
         if(fbostruct->color_renderbuffer) glDeleteRenderbuffers(1, &(fbostruct->color_renderbuffer));
@@ -418,8 +420,8 @@ static void interface_fbos_reset(void * fboarray_ptr)
     if(_array) {
         if(!lv_array_is_empty(_array)) {
             for(uint32_t i = 0; i < lv_array_size(_array); i++) {
-                FBO_newstruct_t _tfbo = (FBO_newstruct_t)lv_array_at(_array, i);
-                FBO_newstruct_destroy((void **)&_tfbo);
+                lv_egl_adapter_fbo_t * _tfbo = (lv_egl_adapter_fbo_t *)lv_array_at(_array, i);
+                lv_egl_adapter_fbo_destroy((void **)&_tfbo);
             }
             lv_array_clear(_array);
         }
@@ -499,8 +501,9 @@ static bool interface_fbos_confirm(void * cnvs_ptr)
         if(!interface_confirm_pixel_format(interface)) return false;
         for(unsigned int i = 0; i < interface->offscreen_fbo_count; ++i) {
             LV_LOG_INFO("Creating FBO #%d", i);
-            lv_array_push_back(interface->fbos, FBO_newstruct_create(interface->width, interface->height, interface->format_color,
-                                                                     interface->format_depth));
+            lv_array_push_back(interface->fbos, lv_egl_adapter_fbo_create(interface->width, interface->height,
+                                                                          interface->format_color,
+                                                                          interface->format_depth));
         }
         lv_array_resize(interface->fbos_syncs, interface->offscreen_fbo_count);
         interface->offscreen_fbo_index = 0;
@@ -526,7 +529,8 @@ static bool interface_fbos_apply(void * cnvs_ptr)
                 warned = true;
             }
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, ((FBO_newstruct_t)lv_array_at(interface->fbos, interface->offscreen_fbo_index))->fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, ((lv_egl_adapter_fbo_t *)lv_array_at(interface->fbos,
+                                                                               interface->offscreen_fbo_index))->fbo);
     }
     return true;
 }
