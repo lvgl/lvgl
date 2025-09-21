@@ -92,7 +92,12 @@ static int tid_get_cb(void)
 static int cpu_get_cb(void)
 {
 #if defined(__linux__)
-    return (int)syscall(SYS_getcpu);
+    unsigned cpu;
+    int result = syscall(SYS_getcpu, &cpu, NULL, NULL);
+    if (result < 0) {
+        return -1;
+    }
+    return (int)cpu;
 #else
     return 0;
 #endif
