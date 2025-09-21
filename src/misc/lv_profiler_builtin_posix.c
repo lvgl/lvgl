@@ -109,10 +109,10 @@ static int tid_get_cb(void)
 {
 #if defined(__linux__)
     return (int)syscall(SYS_gettid);
-#elif !defined(_WIN32)
-    return (int)pthread_self();
+#elif defined(_WIN32)
+    return (int)GetCurrentThreadId();
 #else
-    return 1;
+    return (int)pthread_self();
 #endif
 }
 
