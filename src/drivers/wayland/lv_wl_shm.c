@@ -199,6 +199,7 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
     int32_t w                 = lv_display_get_horizontal_resolution(disp);
     int32_t h                 = lv_display_get_vertical_resolution(disp);
     const uint8_t cf          = lv_display_get_color_format(disp);
+    const int32_t stride      = lv_draw_buf_width_to_stride(src_width, cf);
 
     /* TODO actually test what happens if the rotation is 90 or 270 or 180 ? */
     int32_t hres = (rot == LV_DISPLAY_ROTATION_0) ? w : h;
@@ -240,7 +241,7 @@ void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * ar
             }
         }
         memcpy(((char *)buf_base) + ((((area->y1 + y) * hres) + area->x1) * bpp), color_p, src_width * bpp);
-        color_p += src_width * bpp;
+        color_p += stride;
     }
 
     /* Mark surface damage */
