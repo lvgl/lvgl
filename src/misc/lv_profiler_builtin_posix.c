@@ -72,7 +72,7 @@ static uint64_t tick_get_cb(void)
 {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec * 1000000000 + ts.tv_nsec;
+    return (uint64_t)ts.tv_sec * 1000000000ULL + (uint64_t)ts.tv_nsec;
 }
 
 static void flush_cb(const char * buf)
@@ -94,7 +94,7 @@ static int cpu_get_cb(void)
 #if defined(__linux__)
     unsigned cpu;
     int result = syscall(SYS_getcpu, &cpu, NULL, NULL);
-    if (result < 0) {
+    if(result < 0) {
         return -1;
     }
     return (int)cpu;
