@@ -95,9 +95,6 @@ static void populate_output_core(void * outmod_ptr);
  *  STATIC VARIABLES
  **********************/
 
-/* Signal flag (kept as internal static) */
-static volatile sig_atomic_t lv_egl_adapter_outmod_drm_should_quit_flag = 0;
-
 /**********************
  *      MACROS
  **********************/
@@ -193,14 +190,6 @@ lv_egl_adapter_output_core_t lv_egl_adapter_outmod_drm_get_core(void * nativedrm
     return drm_out->core;
 }
 
-/* quit handler - sets flag */
-void lv_egl_adapter_outmod_drm_quit_handler(int signum)
-{
-    //lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
-    (void)signum;
-    lv_egl_adapter_outmod_drm_should_quit_flag = 1;
-}
-
 /* display: return internal gbm_device pointer as void* */
 void * lv_egl_adapter_outmod_drm_display(void * nativedrm_ptr)
 {
@@ -235,19 +224,6 @@ void lv_egl_adapter_outmod_drm_visible(void * nativedrm_ptr, bool v)
     (void)nativedrm_ptr;
     (void)v;
 }
-
-/* should_quit: return internal static flag */
-bool lv_egl_adapter_outmod_drm_should_quit(void * nativedrm_ptr)
-{
-    //lv_egl_adapter_outmod_drm_t drm_out = (lv_egl_adapter_outmod_drm_t) nativedrm_ptr;
-    (void)nativedrm_ptr;
-    return lv_egl_adapter_outmod_drm_should_quit_flag != 0;
-}
-
-/* fb_destroy_callback equivalent: frees DRMFBState and removes fb if set.
-   We implement a C-style callback suitable for gbm_bo_set_user_ptr/free patterns.
-   Note: original used delete; here we free.
-*/
 
 void lv_egl_adapter_outmod_drm_fb_destroy_callback(struct gbm_bo * bo, void * data)
 {
@@ -676,7 +652,7 @@ bool lv_egl_adapter_outmod_drm_init(void * nativedrm_ptr, int x_res, int y_res, 
     drm_out->async_flip = false;
 #endif
 
-    signal(SIGINT, lv_egl_adapter_outmod_drm_quit_handler);
+    //signal(SIGINT, lv_egl_adapter_outmod_drm_quit_handler);
     return true;
 }
 
@@ -734,7 +710,6 @@ static void populate_output_core(void * outmod_ptr)
     drm_out->core->create_window      = lv_egl_adapter_outmod_drm_create_window;
     drm_out->core->window             = lv_egl_adapter_outmod_drm_window;
     drm_out->core->visible            = lv_egl_adapter_outmod_drm_visible;
-    drm_out->core->should_quit        = lv_egl_adapter_outmod_drm_should_quit;
     drm_out->core->flip               = lv_egl_adapter_outmod_drm_flip;
 }
 

@@ -30,7 +30,6 @@ typedef void * (*get_display_func)(void * self);
 typedef bool (*create_window_func)(void * self, native_window_properties_t const properties);
 typedef void * (*get_window_func)(void * self, native_window_properties_t properties);
 typedef void (*set_visible_func)(void * self, bool v);
-typedef bool (*should_quit_func)(void * self);
 typedef void (*flip_func)(void * self, bool vsync);
 typedef void (*native_state_destroy_func)(void ** self);
 
@@ -42,7 +41,6 @@ struct lv_egl_adapter_output_core {
     create_window_func create_window;
     get_window_func window;
     set_visible_func visible;
-    should_quit_func should_quit;
     flip_func flip;
 };
 

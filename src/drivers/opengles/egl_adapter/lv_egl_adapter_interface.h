@@ -146,16 +146,6 @@ void lv_egl_adapter_interface_clear();
 void lv_egl_adapter_interface_update(void * cnvs_ptr);
 
 /**
- * @brief Query whether the canvas requests termination of its main loop.
- * @param cnvs_ptr Opaque pointer to the canvas instance.
- * @return true if the canvas indicates it should quit, false otherwise.
- *
- * Typically used by host applications to decide whether to exit their render
- * or event loop (for example, when a window close event was received).
- */
-bool lv_egl_adapter_interface_should_quit(void * cnvs_ptr);
-
-/**
  * @brief Switch the current GL context/bindings to the primary FBO for the canvas.
  * @param cnvs_ptr Opaque pointer to the canvas instance.
  *

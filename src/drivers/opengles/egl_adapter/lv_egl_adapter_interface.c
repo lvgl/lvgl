@@ -259,12 +259,6 @@ void lv_egl_adapter_interface_update(void * cnvs_ptr)
     }
     glBindFramebuffer(GL_FRAMEBUFFER, ((FBO_newstruct_t)lv_array_at(interface->fbos, interface->offscreen_fbo_index))->fbo);
 }
-bool lv_egl_adapter_interface_should_quit(void * cnvs_ptr)
-{
-    lv_egl_adapter_interface_t interface = CAST(cnvs_ptr);
-    return CORE(interface)->should_quit(interface->output_module);
-}
-
 int lv_egl_adapter_interface_width(void * cnvs_ptr)
 {
     return CAST(cnvs_ptr)->width;

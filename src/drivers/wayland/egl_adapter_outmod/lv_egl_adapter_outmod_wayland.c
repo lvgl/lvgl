@@ -73,7 +73,6 @@ typedef struct lv_egl_adapter_outmod_wayland {
         struct xdg_toplevel * xdg_toplevel;
     } * window_;
 
-    volatile bool should_quit_;
 } lv_egl_adapter_outmod_wayland;
 
 
@@ -141,7 +140,6 @@ static const struct wl_output_listener output_listener;
 static const struct wl_registry_listener registry_listener;
 static const struct xdg_toplevel_listener xdg_toplevel_listener;
 static const struct xdg_surface_listener xdg_surface_listener;
-static volatile bool should_quit = false;
 static struct my_output * my_main_output;
 
 /**********************
@@ -264,23 +262,10 @@ void lv_egl_adapter_outmod_wayland_flush(void * void_self)
     }
 }
 
-// Quit handler
-void lv_egl_adapter_outmod_wayland_quit_handler(int /*signum*/)
-{
-    should_quit = true;
-}
-
 // Initialize display
 bool lv_egl_adapter_outmod_wayland_init_display(void * void_self, int * x_res, int * y_res, float refr_rate)
 {
     lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
-    struct sigaction sa;
-    sa.sa_handler = &lv_egl_adapter_outmod_wayland_quit_handler;
-    sa.sa_flags = 0;
-    sigemptyset(&sa.sa_mask);
-
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
 
     wayland_out->display_ = malloc(sizeof(struct my_display));
     if(!wayland_out->display_) {
@@ -300,7 +285,6 @@ bool lv_egl_adapter_outmod_wayland_init_display(void * void_self, int * x_res, i
     wayland_out->display_->registry = wl_display_get_registry(wayland_out->display_->display);
     wl_registry_add_listener(wayland_out->display_->registry, &registry_listener, wayland_out);
     wl_display_roundtrip(wayland_out->display_->display);
-    //setup_cursor(wayland_out);
 
     return true;
 }
@@ -377,19 +361,13 @@ void lv_egl_adapter_outmod_wayland_visible(void * void_self, bool v)
     //lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t )void_self;
 }
 
-// Check if should quit
-bool lv_egl_adapter_outmod_wayland_should_quit(void * void_self)
-{
-    //lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t )void_self;
-    return should_quit;
-}
-
 // Flip the display
 void lv_egl_adapter_outmod_wayland_flip(void * void_self, bool sync)
 {
     lv_egl_adapter_outmod_wayland_t wayland_out = (lv_egl_adapter_outmod_wayland_t)void_self;
-    int ret = wl_display_roundtrip(wayland_out->display_->display);
-    should_quit = (ret == -1) || should_quit;
+    if(wl_display_roundtrip(wayland_out->display_->display) == -1) {
+        // Exit app immediately
+    }
 }
 
 // Handle seat capabilities
@@ -443,7 +421,6 @@ static void populate_output_core(void * outmod_ptr)
     wayland_out->core->create_window      = lv_egl_adapter_outmod_wayland_create_window;
     wayland_out->core->window             = lv_egl_adapter_outmod_wayland_window;
     wayland_out->core->visible            = lv_egl_adapter_outmod_wayland_visible;
-    wayland_out->core->should_quit        = lv_egl_adapter_outmod_wayland_should_quit;
     wayland_out->core->flip               = lv_egl_adapter_outmod_wayland_flip;
 }
 
@@ -543,8 +520,9 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
                                 uint32_t state)
 {
     if(state == WL_KEYBOARD_KEY_STATE_PRESSED &&
-       (key == KEY_ESC || key == KEY_Q))
-        should_quit = true;
+       (key == KEY_ESC || key == KEY_Q)) {
+        /* Exit app immediately */
+    }
 }
 static void keyboard_handle_modifiers(void * data, struct wl_keyboard * keyboard, uint32_t serial,
                                       uint32_t mods_depressed,
@@ -734,7 +712,7 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
 }
 static void xdg_toplevel_handle_close(void * data, struct xdg_toplevel * xdg_toplevel)
 {
-    should_quit = true;
+    /* Exit app immediately */
 }
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
     xdg_toplevel_handle_configure,
