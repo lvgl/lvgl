@@ -113,7 +113,8 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
 
 #if LV_USE_DRAW_OPENGLES
-    lv_display_delete_refr_timer(disp);
+    /* MK - Commented out momentarily */
+    //lv_display_delete_refr_timer(disp);
 #endif
 
     return disp;
