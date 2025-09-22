@@ -386,7 +386,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
     int32_t place_gap = 0;
     place_content(f->main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
-    if(f->row && rtl) main_pos += lv_obj_get_content_width(cont);
+    if(f->row && rtl) main_pos = max_main_size - main_pos;
 
     lv_obj_t * item = lv_obj_get_child(cont, item_first_id);
     /*Reposition the children*/
