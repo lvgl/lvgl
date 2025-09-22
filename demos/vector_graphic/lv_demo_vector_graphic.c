@@ -192,7 +192,7 @@ static void draw_arc(lv_draw_vector_dsc_t * ctx, lv_vector_path_shape_t * path)
 
     lv_area_t rect = {100, 0, 150, 50};
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
-    lv_vector_clear_area(ctx, &rect); // clear screen
+    lv_draw_vector_clear_area(ctx, &rect); // clear screen
 
     lv_fpoint_t p = {100, 50}; /* Center */
     lv_draw_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0xff, 0xff));
@@ -222,7 +222,7 @@ static void draw_vector(lv_layer_t * layer)
 
     lv_area_t rect = {0, 100, 300, 300};
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
-    lv_vector_clear_area(ctx, &rect); // clear screen
+    lv_draw_vector_clear_area(ctx, &rect); // clear screen
 
     lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 

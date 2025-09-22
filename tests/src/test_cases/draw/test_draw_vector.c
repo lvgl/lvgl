@@ -40,7 +40,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_area_t rect = {0, 0, 640, 480};
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_white());
     rect = lv_matrix_transform_area(transform, &rect);
-    lv_vector_clear_area(ctx, &rect);
+    lv_draw_vector_clear_area(ctx, &rect);
 
     lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -124,7 +124,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     };
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
     rect = lv_matrix_transform_area(transform, &rect);
-    lv_vector_clear_area(ctx, &rect); // clear screen
+    lv_draw_vector_clear_area(ctx, &rect); // clear screen
 
     lv_fpoint_t p = {500, 100}; /* Center */
     lv_draw_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0xff, 0xff));
@@ -195,7 +195,7 @@ static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
     lv_area_t rect = {0, 0, 640, 480};
     lv_draw_vector_dsc_set_fill_color(ctx, lv_color_white());
     rect = lv_matrix_transform_area(transform, &rect);
-    lv_vector_clear_area(ctx, &rect);
+    lv_draw_vector_clear_area(ctx, &rect);
 
     lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 

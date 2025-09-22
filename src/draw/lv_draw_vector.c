@@ -879,7 +879,7 @@ void lv_draw_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_pat
     new_task->attr.scissor_area = rect;
 }
 
-void lv_vector_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect)
+void lv_draw_vector_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect)
 {
     lv_area_t r;
     if(!lv_area_intersect(&r, &(dsc->base.layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
