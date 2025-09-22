@@ -519,7 +519,7 @@ void lv_draw_vector_dsc_rotate(lv_draw_vector_dsc_t * dsc, float degree);
  * The new path shapes added by `lv_draw_vector_dsc_add_path` will use this rotation.
  * @param dsc           pointer to a vector graphic descriptor
  * @param tx            the amount of translate in x direction
- * @param tx            the amount of translate in y direction
+ * @param ty            the amount of translate in y direction
  */
 void lv_draw_vector_dsc_translate(lv_draw_vector_dsc_t * dsc, float tx, float ty);
 

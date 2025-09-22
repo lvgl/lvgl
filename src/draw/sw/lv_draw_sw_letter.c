@@ -326,7 +326,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
         dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
         dummy_t.target_layer = vector_dsc->base.layer;
         dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
-        dummy_t.draw_dsc = &vector_dsc;
+        dummy_t.draw_dsc = vector_dsc;
         lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
     }
 
