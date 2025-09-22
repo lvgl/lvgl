@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_BUILD_EXAMPLES
+#if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
 /*This the only interface between the UI and the application*/
 static lv_subject_t engine_subject;
