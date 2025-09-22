@@ -887,11 +887,11 @@ void lv_draw_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_pat
     lv_draw_vector_subtask_t * new_task = (lv_draw_vector_subtask_t *)lv_ll_ins_tail(dsc->task_list);
     lv_memset(new_task, 0, sizeof(lv_draw_vector_subtask_t));
 
-    new_task->shape = lv_vector_path_create(0);
+    new_task->path = lv_vector_path_create(0);
 
-    _copy_draw_dsc(&(new_task->attr), dsc->ctx);
-    lv_vector_path_copy(new_task->shape, path);
-    new_task->attr.scissor_area = rect;
+    _copy_draw_dsc(&(new_task->ctx), dsc->ctx);
+    lv_vector_path_copy(new_task->path, path);
+    new_task->ctx.scissor_area = rect;
 }
 
 void lv_draw_vector_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect)
@@ -915,9 +915,9 @@ void lv_draw_vector_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rec
     lv_draw_vector_subtask_t * new_task = (lv_draw_vector_subtask_t *)lv_ll_ins_tail(dsc->task_list);
     lv_memset(new_task, 0, sizeof(lv_draw_vector_subtask_t));
 
-    new_task->attr.fill_dsc.color = dsc->ctx->fill_dsc.color;
-    new_task->attr.fill_dsc.opa = dsc->ctx->fill_dsc.opa;
-    lv_area_copy(&(new_task->attr.scissor_area), &final_rect);
+    new_task->ctx.fill_dsc.color = dsc->ctx->fill_dsc.color;
+    new_task->ctx.fill_dsc.opa = dsc->ctx->fill_dsc.opa;
+    lv_area_copy(&(new_task->ctx.scissor_area), &final_rect);
 }
 
 void lv_draw_vector(lv_draw_vector_dsc_t * dsc)
@@ -972,13 +972,13 @@ void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb c
         lv_ll_remove(task_list, task);
 
         if(cb) {
-            cb(data, task->shape, &(task->attr));
+            cb(data, task->path, &task->ctx);
         }
 
-        if(task->shape) {
-            lv_vector_path_delete(task->shape);
+        if(task->path) {
+            lv_vector_path_delete(task->path);
         }
-        lv_array_deinit(&(task->attr.stroke_dsc.dash_pattern));
+        lv_array_deinit(&(task->ctx.stroke_dsc.dash_pattern));
 
         lv_free(task);
         task = next_task;

@@ -108,8 +108,8 @@ struct _lv_draw_vector_dsc_t {
  * It's used in the `task_list` of `lv_draw_vector_dsc_t`.
  */
 typedef struct {
-    lv_vector_path_t * shape;
-    lv_vector_path_ctx_t attr;
+    lv_vector_path_t * path;
+    lv_vector_path_ctx_t ctx;
 } lv_draw_vector_subtask_t;
 
 
