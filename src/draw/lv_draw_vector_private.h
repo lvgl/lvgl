@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 /**
- * Stores the shape of the path as an arrays of operations and points.
+ * Stores the shape of the path as arrays of operations and points.
  * For example move to 10;20 then draw a line to 30;40 and draw an
  * arc with 30 radius and 70° sweep.
  *
