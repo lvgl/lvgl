@@ -35,6 +35,7 @@ typedef struct {
     lv_image_dsc_t imgdsc;
     int32_t loop_count;
     uint32_t is_open : 1;
+    uint32_t is_visible_dec : 1;
 } lv_gif_t;
 
 /**********************
@@ -172,6 +173,13 @@ void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
     gifobj->loop_count = count;
 }
 
+void lv_gif_set_decode_invisible(lv_obj_t * obj, bool decode_invisible)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    gifobj->is_visible_dec = !decode_invisible;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -184,6 +192,7 @@ static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     gifobj->color_format = LV_COLOR_FORMAT_ARGB8888;
     gifobj->is_open = 0;
+    gifobj->is_visible_dec = 1;
     gifobj->timer = lv_timer_create(next_frame_task_cb, 10, obj);
     lv_timer_pause(gifobj->timer);
 }
@@ -291,6 +300,10 @@ static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->is_visible_dec && !lv_obj_is_visible(obj)) {
+        return;
+    }
 
     int ms_delay_next;
     int has_next = GIF_playFrame(&gifobj->gif, &ms_delay_next, gifobj);
