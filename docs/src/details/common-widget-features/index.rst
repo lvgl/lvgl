@@ -10,7 +10,11 @@ The following details apply to all types of Widgets.
     :maxdepth:  3
 
     basics
+    api
+    tree
+    screens
     coordinates
+    parts_and_states
     layers
     styles/index
     events

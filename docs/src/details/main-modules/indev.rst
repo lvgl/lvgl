@@ -5,6 +5,16 @@ Input Device (lv_indev)
 =======================
 
 
+.. _extending_click_area:
+
+Extending the click area
+------------------------
+
+By default, Widgets can be clicked only within their bounding area.  However,
+especially with small Widgets, it can be helpful to make a Widget's "clickable" area
+larger.  You can do this with :cpp:expr:`lv_obj_set_ext_click_area(widget, size)`.
+
+
 .. _indev_creation:
 
 Creating an Input Device
@@ -724,7 +734,7 @@ Care must be taken to avoid race conditions.
         if(interrupt_occurred) {
             interrupt_occurred = false;
             last_interrupt_tick = tick_now;
-            /* 
+            /*
              * Ensure the timer is running in case an interrupt occurred
              * just after the timer was paused. Without this, a race condition
              * could leave the timer paused and input events would not be processed.
