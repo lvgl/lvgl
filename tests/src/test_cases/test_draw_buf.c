@@ -114,4 +114,17 @@ void test_draw_buf_stride_adjust(void)
 #endif
 }
 
+void test_draw_buf_xy_access(void)
+{
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+
+    uint8_t * ret = lv_draw_buf_goto_xy(&draw_buf, 50, 50);
+    TEST_ASSERT_NOT_NULL(ret);
+    ret = lv_draw_buf_goto_xy(&draw_buf, 100, 100);
+    TEST_ASSERT_NULL(ret);
+    ret = lv_draw_buf_goto_xy(&draw_buf, -10, -10);
+    TEST_ASSERT_NULL(ret);
+}
+
 #endif
