@@ -31,9 +31,9 @@ extern "C" {
  * For example move to 10;20 then draw a line to 30;40 and draw an
  * arc with 30 radius and 70° sweep.
  *
- * `lv_vector_path_attr_t` is also required to describe how to fill and stroke the path.
+ * `lv_vector_path_ctx_t` is also required to describe how to fill and stroke the path.
  */
-struct _lv_vector_path_shape_t {
+struct _lv_vector_path_t {
     lv_vector_path_quality_t quality;
     lv_array_t ops;
     lv_array_t points;
@@ -80,7 +80,7 @@ struct _lv_vector_stroke_dsc_t {
 /**
  * Stores how to fill, stroke, transform etc a given path
  */
-struct _lv_vector_path_attr_t {
+struct _lv_vector_path_ctx_t {
     lv_vector_fill_dsc_t fill_dsc;
     lv_vector_stroke_dsc_t stroke_dsc;
     lv_matrix_t matrix;
@@ -91,7 +91,7 @@ struct _lv_vector_path_attr_t {
 struct _lv_draw_vector_dsc_t {
     lv_draw_dsc_base_t base;
 
-    lv_vector_path_attr_t current_dsc;
+    lv_vector_path_ctx_t current_dsc;
 
     /**
      * Store path shapes and their attributes
@@ -106,8 +106,8 @@ struct _lv_draw_vector_dsc_t {
  * It's used in the `task_list` of `lv_draw_vector_dsc_t`.
  */
 typedef struct {
-    lv_vector_path_shape_t * shape;
-    lv_vector_path_attr_t attr;
+    lv_vector_path_t * shape;
+    lv_vector_path_ctx_t attr;
 } lv_draw_vector_subtask_t;
 
 

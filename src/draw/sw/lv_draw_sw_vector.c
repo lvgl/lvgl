@@ -96,7 +96,7 @@ static void _set_paint_matrix(Tvg_Paint * obj, const Tvg_Matrix * m)
     tvg_paint_set_transform(obj, m);
 }
 
-static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_shape_t * p)
+static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
 {
     uint32_t pidx = 0;
     lv_vector_path_op_t * op = lv_array_front(&p->ops);
@@ -429,7 +429,7 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
     }
 }
 
-static void _task_draw_cb(void * ctx, const lv_vector_path_shape_t * path, const lv_vector_path_attr_t * dsc)
+static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc)
 {
     _tvg_draw_state * state = (_tvg_draw_state *)ctx;
     Tvg_Canvas * canvas = (Tvg_Canvas *)state->canvas;

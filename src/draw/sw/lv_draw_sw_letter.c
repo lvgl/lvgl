@@ -39,9 +39,9 @@
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
 typedef struct {
-    lv_vector_path_shape_t * inside_path;     /*The regular glyph*/
-    lv_vector_path_shape_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
-    lv_vector_path_shape_t * cur_path;
+    lv_vector_path_t * inside_path;     /*The regular glyph*/
+    lv_vector_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
+    lv_vector_path_t * cur_path;
 } lv_draw_sw_letter_outlines_t;
 
 #endif /* LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG */
@@ -361,7 +361,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
     lv_fpoint_t ctrl_pnt1;
     lv_fpoint_t ctrl_pnt2;
     lv_draw_sw_letter_outlines_t * glyph_paths;
-    lv_vector_path_shape_t * path;
+    lv_vector_path_t * path;
     lv_freetype_outline_event_param_t * outline_event;
 
     outline_event = lv_event_get_param(e);

@@ -25,7 +25,7 @@ void lv_example_canvas_8(void)
     lv_canvas_init_layer(canvas, &layer);
 
     lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(&layer);
-    lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
     lv_fpoint_t pts[] = {{10, 10}, {130, 130}, {10, 130}};
     lv_vector_path_move_to(path, &pts[0]);

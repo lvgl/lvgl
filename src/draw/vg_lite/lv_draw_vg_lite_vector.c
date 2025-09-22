@@ -39,8 +39,8 @@ typedef void (*path_drop_func_t)(struct _lv_draw_vg_lite_unit_t *, path_drop_dat
  *  STATIC PROTOTYPES
  **********************/
 
-static void task_draw_cb(void * ctx, const lv_vector_path_shape_t * path, const lv_vector_path_attr_t * dsc);
-static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_shape_t * src, lv_fpoint_t * offset,
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
+static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src, lv_fpoint_t * offset,
                           float expand_bound);
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend);
 static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
@@ -90,7 +90,7 @@ static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 
 static void draw_fill(lv_draw_vg_lite_unit_t * u,
                       lv_vg_lite_path_t * lv_vg_path,
-                      const lv_vector_path_attr_t * dsc,
+                      const lv_vector_path_ctx_t * dsc,
                       vg_lite_matrix_t * matrix,
                       const lv_fpoint_t * offset,
                       const lv_opa_t opa)
@@ -200,9 +200,9 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
 }
 
 static void draw_stroke(lv_draw_vg_lite_unit_t * u,
-                        const lv_vector_path_shape_t * path,
+                        const lv_vector_path_t * path,
                         lv_vg_lite_path_t * lv_vg_path,
-                        const lv_vector_path_attr_t * dsc,
+                        const lv_vector_path_ctx_t * dsc,
                         vg_lite_matrix_t * matrix,
                         const lv_opa_t opa)
 {
@@ -252,7 +252,7 @@ static void draw_stroke(lv_draw_vg_lite_unit_t * u,
     LV_PROFILER_DRAW_END;
 }
 
-static void task_draw_cb(void * ctx, const lv_vector_path_shape_t * path, const lv_vector_path_attr_t * dsc)
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_vg_lite_unit_t * u = ctx;
@@ -351,7 +351,7 @@ static vg_lite_quality_t lv_quality_to_vg(lv_vector_path_quality_t quality)
     }
 }
 
-static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_shape_t * src, lv_fpoint_t * offset,
+static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src, lv_fpoint_t * offset,
                           float expand_bound)
 {
     LV_PROFILER_DRAW_BEGIN;

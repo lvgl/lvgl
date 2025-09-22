@@ -42,7 +42,7 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     rect = lv_matrix_transform_area(transform, &rect);
     lv_draw_vector_clear_area(ctx, &rect);
 
-    lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
     lv_area_t rect1 = {50, 50, 150, 150};
     lv_draw_vector_dsc_set_transform(ctx, transform);
@@ -197,7 +197,7 @@ static void draw_lines(lv_layer_t * layer, const lv_matrix_t * transform)
     rect = lv_matrix_transform_area(transform, &rect);
     lv_draw_vector_clear_area(ctx, &rect);
 
-    lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
     lv_draw_vector_dsc_set_stroke_opa(ctx, LV_OPA_COVER);
     lv_draw_vector_dsc_set_fill_opa(ctx, LV_OPA_0);
@@ -332,7 +332,7 @@ void test_transform(void)
     TEST_ASSERT_EQUAL_FLOAT(110.0f, p.x);
     TEST_ASSERT_EQUAL_FLOAT(110.0f, p.y);
 
-    lv_vector_path_shape_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
     lv_vector_path_move_to(path, &p);
 
     lv_fpoint_t p2 = {20, 20};
