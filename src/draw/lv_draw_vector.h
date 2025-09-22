@@ -533,7 +533,9 @@ void lv_draw_vector_dsc_translate(lv_draw_vector_dsc_t * dsc, float tx, float ty
 void lv_draw_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float skew_y);
 
 /**
- * Add a graphic path to the draw list
+ * Add a graphic path to the draw list.
+ * It will use colors, opacity, matrix and other parameters set
+ * by `lv_draw_vector_dsc_set_fill_color()` and similar functions.
  * @param dsc           pointer to a vector graphic descriptor
  * @param path          pointer to a path
  */

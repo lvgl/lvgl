@@ -91,7 +91,9 @@ struct _lv_vector_path_ctx_t {
 struct _lv_draw_vector_dsc_t {
     lv_draw_dsc_base_t base;
 
-    lv_vector_path_ctx_t current_dsc;
+    /** The current colors, opacities, matrix, etc for the next task to be added
+     * by */
+    lv_vector_path_ctx_t * ctx;
 
     /**
      * Store path shapes and their attributes

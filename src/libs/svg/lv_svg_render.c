@@ -1017,7 +1017,7 @@ static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_
 
 static void _copy_draw_dsc_from_ref(lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * obj)
 {
-    lv_vector_path_ctx_t * dst = &(dsc->current_dsc);
+    lv_vector_path_ctx_t * dst = dsc->ctx;
     if(obj->fill_ref) {
         lv_svg_render_obj_t * list = obj->head;
         while(list) {
@@ -1230,24 +1230,24 @@ static void _init_gradient(lv_svg_render_obj_t * obj, const lv_svg_node_t * node
 
 static void _setup_matrix(lv_matrix_t * matrix, lv_draw_vector_dsc_t * dsc, const lv_svg_render_obj_t * obj)
 {
-    lv_memcpy(matrix, &dsc->current_dsc.matrix, sizeof(lv_matrix_t));
-    lv_matrix_multiply(&dsc->current_dsc.matrix, &obj->matrix);
+    lv_memcpy(matrix, &dsc->ctx->matrix, sizeof(lv_matrix_t));
+    lv_matrix_multiply(&dsc->ctx->matrix, &obj->matrix);
 }
 
 static void _restore_matrix(lv_matrix_t * matrix, lv_draw_vector_dsc_t * dsc)
 {
-    lv_memcpy(&dsc->current_dsc.matrix, matrix, sizeof(lv_matrix_t));
+    lv_memcpy(&dsc->ctx->matrix, matrix, sizeof(lv_matrix_t));
 }
 
 static void _prepare_render(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t * dsc)
 {
-    _copy_draw_dsc(&(dsc->current_dsc), &(obj->dsc));
+    _copy_draw_dsc(dsc->ctx, &(obj->dsc));
 }
 
 static void _special_render(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t * dsc)
 {
     const lv_vector_path_ctx_t * src = &(obj->dsc);
-    lv_vector_path_ctx_t * dst = &(dsc->current_dsc);
+    lv_vector_path_ctx_t * dst = dsc->ctx;
 
     if(obj->flags & _RENDER_ATTR_FILL) {
         lv_memcpy(&(dst->fill_dsc), &(src->fill_dsc), sizeof(lv_vector_fill_dsc_t));
@@ -1298,7 +1298,7 @@ static void _render_viewport(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc
     LV_UNUSED(matrix);
 
     lv_svg_render_viewport_t * view = (lv_svg_render_viewport_t *)obj;
-    lv_matrix_multiply(&dsc->current_dsc.matrix, &obj->matrix);
+    lv_matrix_multiply(&dsc->ctx->matrix, &obj->matrix);
     if(view->viewport_fill) {
         lv_area_t rc = {0, 0, (int32_t)view->width, (int32_t)view->height};
         lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
@@ -1314,7 +1314,7 @@ static void _render_rect(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     _setup_matrix(&mtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_rect_t * rect = (lv_svg_render_rect_t *)obj;
@@ -1339,7 +1339,7 @@ static void _render_circle(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t
     _setup_matrix(&mtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_circle_t * circle = (lv_svg_render_circle_t *)obj;
@@ -1360,7 +1360,7 @@ static void _render_ellipse(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_
     _setup_matrix(&mtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_ellipse_t * ellipse = (lv_svg_render_ellipse_t *)obj;
@@ -1381,7 +1381,7 @@ static void _render_line(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     _setup_matrix(&mtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_line_t * line = (lv_svg_render_line_t *)obj;
@@ -1404,7 +1404,7 @@ static void _render_poly(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     _setup_matrix(&mtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
@@ -1428,10 +1428,10 @@ static void _render_group(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t 
         lv_svg_render_obj_t * list = *((lv_svg_render_obj_t **)lv_array_at(&group->items, i));
 
         if(list->clz->render && (list->flags & _RENDER_IN_GROUP)) {
-            _copy_draw_dsc(&(save_dsc.dsc), &(dsc->current_dsc));
+            _copy_draw_dsc(&(save_dsc.dsc), dsc->ctx);
             _special_render(list, dsc);
             list->clz->render(list, dsc, matrix);
-            _copy_draw_dsc(&(dsc->current_dsc), &(save_dsc.dsc));
+            _copy_draw_dsc(dsc->ctx, &(save_dsc.dsc));
         }
     }
 
@@ -1444,7 +1444,7 @@ static void _render_image(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t 
     _setup_matrix(&imtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     lv_svg_render_image_t * image = (lv_svg_render_image_t *)obj;
@@ -1606,7 +1606,7 @@ static void _render_text(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t *
     _setup_matrix(&tmtx, dsc, obj);
 
     if(matrix) {
-        lv_matrix_multiply(&dsc->current_dsc.matrix, matrix);
+        lv_matrix_multiply(&dsc->ctx->matrix, matrix);
     }
 
     bool build_path = false;
@@ -1689,9 +1689,9 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
 
     struct _lv_svg_draw_dsc save_dsc;
     lv_memzero(&save_dsc, sizeof(struct _lv_svg_draw_dsc));
-    _copy_draw_dsc(&(save_dsc.dsc), &(dsc->current_dsc));
+    _copy_draw_dsc(&(save_dsc.dsc), dsc->ctx);
 
-    _copy_draw_dsc(&(dsc->current_dsc), &(obj->dsc));
+    _copy_draw_dsc(dsc->ctx, &(obj->dsc));
 
     if(lv_array_size(&span->path->ops) == 0) { /* empty path */
         lv_vector_path_t * glyph_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
@@ -1727,7 +1727,7 @@ static void _render_span(const lv_svg_render_content_t * content, lv_draw_vector
     _copy_draw_dsc_from_ref(dsc, obj);
     lv_draw_vector_dsc_add_path(dsc, span->path);
 
-    _copy_draw_dsc(&(dsc->current_dsc), &(save_dsc.dsc));
+    _copy_draw_dsc(dsc->ctx, &(save_dsc.dsc));
 }
 #endif
 

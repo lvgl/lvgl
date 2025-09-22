@@ -2064,25 +2064,25 @@ static void _process_anim_attr_values(lv_svg_node_t * node, lv_svg_attr_type_t t
         attr->val_type = LV_SVG_ATTR_VALUE_PTR;
         struct _parse_value_list_context ctx = {.mem_size = 0, .list_count = 0, .list = NULL};
         _parse_anim_value_list(node, attr, val_start, val_end, dpi, _anim_values_cb, &ctx);
-        attr->value.val = ctx.list;
+        attr->value.val = ctx->list;
     }
     else if(type == LV_SVG_ATTR_KEY_TIMES || type == LV_SVG_ATTR_KEY_POINTS) {
         attr->val_type = LV_SVG_ATTR_VALUE_PTR;
         struct _parse_value_list_context ctx = {.mem_size = 0, .list_count = 0, .list = NULL};
         _parse_anim_value_list(node, attr, val_start, val_end, dpi, _anim_keys_cb, &ctx);
-        attr->value.val = ctx.list;
+        attr->value.val = ctx->list;
     }
     else if(type == LV_SVG_ATTR_KEY_SPLINES) {
         attr->val_type = LV_SVG_ATTR_VALUE_PTR;
         struct _parse_value_list_context ctx = {.mem_size = 0, .list_count = 0, .list = NULL};
         _parse_anim_value_list(node, attr, val_start, val_end, dpi, _anim_key_splines_cb, &ctx);
-        attr->value.val = ctx.list;
+        attr->value.val = ctx->list;
     }
     else if(type == LV_SVG_ATTR_BEGIN || type == LV_SVG_ATTR_END) {
         attr->val_type = LV_SVG_ATTR_VALUE_PTR;
         struct _parse_value_list_context ctx = {.mem_size = 0, .list_count = 0, .list = NULL};
         _parse_anim_value_list(node, attr, val_start, val_end, dpi, _anim_begin_end_cb, &ctx);
-        attr->value.val = ctx.list;
+        attr->value.val = ctx->list;
     }
     else {
         _parse_anim_value(node, attr, val_start, val_end, dpi);
