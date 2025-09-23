@@ -222,11 +222,11 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
     window->flush_pending = true;
 }
 
-void lv_wayland_assign_physical_display(lv_display_t *disp, int display)
+void lv_wayland_assign_physical_display(lv_display_t * disp, int display)
 {
-    struct window *window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_user_data(disp);
     lv_result_t err = LV_RESULT_INVALID;
-    if (!window || window->closed) {
+    if(!window || window->closed) {
         return;
     }
     
