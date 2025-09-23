@@ -546,7 +546,7 @@ void lv_draw_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_pat
  * @param dsc           pointer to a vector graphic descriptor
  * @param rect          the area to clear in the buffer
  */
-void lv_draw_vector_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect);
+void lv_draw_vector_dsc_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect);
 
 /**
  * Draw all the vector graphic paths
