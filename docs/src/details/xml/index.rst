@@ -1,4 +1,4 @@
-.. _xml_main:
+.. _editor_and_xml:
 
 =================
 UI Editor and XML
