@@ -1,11 +1,29 @@
-from .value import *
-from .lvgl import *
-from .lv_global import set_lvgl_instance
-from .core.lv_obj import DumpObj
-from .display.lv_display import DumpDisplayBuf
-from .draw.lv_draw import InfoDrawUnit
-from .misc.lv_style import InfoStyle
-from .debugger import *
+import gdb
+
+from .lvgl import curr_inst, LVDisplay, LVDrawBuf, LVList, LVObject, dump_style_info
+from .gdb_cmds import DumpObj, DumpDisplayBuf, InfoDrawUnit, InfoStyle
+from .debugger import Debugger
+from .value import Value
+
+__all__ = [
+    "curr_inst",
+    "LVDisplay",
+    "LVDrawBuf",
+    "LVList",
+    "LVObject",
+    "dump_style_info",
+    "DumpObj",
+    "DumpDisplayBuf",
+    "InfoDrawUnit",
+    "InfoStyle",
+    "Value",
+]
+
+# Set pagination off and python print-stack full
+gdb.execute("set pagination off")
+gdb.write("set pagination off\n")
+gdb.execute("set python print-stack full")
+gdb.write("set python print-stack full\n")
 
 # Debugger
 Debugger()
@@ -17,6 +35,3 @@ DumpDisplayBuf()
 # Infos
 InfoStyle()
 InfoDrawUnit()
-
-# Set instance
-set_lvgl_instance(None)

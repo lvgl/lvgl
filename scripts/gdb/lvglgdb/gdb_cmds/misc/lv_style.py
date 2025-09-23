@@ -1,8 +1,9 @@
 import argparse
 import gdb
 
-from ..value import Value
-from ..core.lv_obj import LVObject
+from lvglgdb.value import Value
+from lvglgdb.lvgl import LVObject
+from lvglgdb.lvgl import dump_style_info
 
 
 class InfoStyle(gdb.Command):
@@ -37,9 +38,3 @@ class InfoStyle(gdb.Command):
         for style in LVObject(obj).styles:
             print("  ", end="")
             dump_style_info(style)
-
-
-def dump_style_info(style: Value):
-    prop = int(style.prop)
-    value = style.value
-    print(f"{prop} = {value}")
