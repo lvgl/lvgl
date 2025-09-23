@@ -203,9 +203,13 @@ void lv_init(void)
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+#if LV_USE_PROFILER_BUILTIN_POSIX
+    lv_profiler_builtin_posix_init();
+#else
     lv_profiler_builtin_config_t profiler_config;
     lv_profiler_builtin_config_init(&profiler_config);
     lv_profiler_builtin_init(&profiler_config);
+#endif
 #endif
 
     lv_os_init();

@@ -40,6 +40,8 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
+static void draw_event_cb(lv_event_t * e);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -70,6 +72,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
+    unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.name = "VG_LITE";
 
     lv_vg_lite_image_dsc_init(unit);
@@ -299,6 +302,30 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     lv_vg_lite_decoder_deinit();
     lv_draw_vg_lite_label_deinit(unit);
     return 1;
+}
+
+static void draw_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    switch(code) {
+        case LV_EVENT_CANCEL: {
+#if LV_USE_VECTOR_GRAPHIC
+                /**
+                 * Because VG-Lite will deinitialize the context (including the GPU independent heap)
+                 * before the GPU goes to sleep, it is necessary to first discard and dereference
+                 * all caches that depend on the independent heap.
+                 */
+                lv_draw_vg_lite_unit_t * unit = lv_event_get_current_target(e);
+                lv_cache_drop_all(lv_vg_lite_grad_ctx_get_cache(unit->grad_ctx), NULL);
+                lv_cache_drop_all(unit->stroke_cache, NULL);
+                LV_LOG_INFO("dropt all cache");
+#endif
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_os.h"
+#include "lv_os_private.h"
 
 #if LV_USE_OS != LV_OS_NONE && defined(__linux__)
 
@@ -28,8 +28,10 @@
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
 
 #define last_proc_stat LV_GLOBAL_DEFAULT()->linux_last_proc_stat
-#define last_self_ticks LV_GLOBAL_DEFAULT()->linux_last_self_proc_time_ticks
-#define last_system_total_ticks_stat LV_GLOBAL_DEFAULT()->linux_last_system_total_ticks_stat
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    #define last_self_ticks LV_GLOBAL_DEFAULT()->linux_last_self_proc_time_ticks
+    #define last_system_total_ticks_stat LV_GLOBAL_DEFAULT()->linux_last_system_total_ticks_stat
+#endif
 
 #define LV_SELF_PROC_STAT_BUFFER_SIZE 512
 /**********************
@@ -84,6 +86,8 @@ uint32_t lv_os_get_idle_percent(void)
 
     return (proc_stat.fields.idle * 100) / total;
 }
+
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
 
 uint32_t lv_os_get_proc_idle_percent(void)
 {
@@ -170,6 +174,8 @@ uint32_t lv_os_get_proc_idle_percent(void)
 
     return 100 - cpu_usage_percent;
 }
+
+#endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
 
 /**********************
  *   STATIC FUNCTIONS

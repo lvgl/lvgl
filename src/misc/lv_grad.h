@@ -64,7 +64,6 @@ typedef struct {
                                                          * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
     lv_grad_extend_t     extend : 3;                    /**< Behaviour outside the defined range.
                                                          * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     union {
         /*Linear gradient parameters*/
         struct {
@@ -87,7 +86,6 @@ typedef struct {
         } conical;
     } params;
     void * state;
-#endif
 } lv_grad_dsc_t;
 
 
@@ -117,8 +115,6 @@ void lv_grad_horizontal_init(lv_grad_dsc_t * dsc);
  * @param dsc      gradient descriptor
  */
 void lv_grad_vertical_init(lv_grad_dsc_t * dsc);
-
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
  * Helper function to initialize linear gradient
@@ -168,8 +164,6 @@ void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t cen
  */
 void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t start_angle,
                           int32_t end_angle, lv_grad_extend_t extend);
-
-#endif /*LV_USE_DRAW_SW_COMPLEX_GRADIENTS*/
 
 /**********************
  *      MACROS

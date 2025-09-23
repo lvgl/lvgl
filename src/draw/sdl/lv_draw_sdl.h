@@ -20,7 +20,7 @@ extern "C" {
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../display/lv_display.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_rect.h"
 #include "../../draw/lv_draw_arc.h"

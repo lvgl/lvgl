@@ -170,6 +170,11 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                         }
                         else {
                             glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                            if(glyph_draw_dsc->glyph_data == NULL) {
+                                LV_LOG_WARN("Couldn't get the bitmap of a glyph");
+                                break;
+                            }
+
                             mask_area.x2 = mask_area.x1 + lv_draw_buf_width_to_stride(lv_area_get_width(&mask_area), LV_COLOR_FORMAT_A8) - 1;
                             lv_draw_sw_blend_dsc_t blend_dsc;
                             lv_memzero(&blend_dsc, sizeof(blend_dsc));

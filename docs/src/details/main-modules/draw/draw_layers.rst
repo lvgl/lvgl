@@ -62,11 +62,58 @@ the widget as possible, but due to the nature of transformations no slicing is
 possible in this case.
 
 
-Clip Corner
------------
+Clip Corner Layers
+------------------
 
-The ``clip_corner`` style property also causes LVGL to create a 2 layers with radius
-height for the top and bottom parts of the Widget.
+The ``clip_corner`` style property causes the corners of the parent Widget to clip the
+corners of child Widgets whose corners would otherwise overflow a rounded corner of
+the parent.
+
+Example:
+
+.. code-block:: c
+
+    lv_obj_t * clipper_obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_style_bg_color(clipper_obj, lv_palette_main(LV_PALETTE_GREY), 0);
+    lv_obj_center(clipper_obj);
+    lv_obj_set_style_pad_all(clipper_obj, 0, 0);
+    lv_obj_set_style_radius(clipper_obj, 40, 0);
+
+    lv_obj_t * clipped_obj = lv_obj_create(clipper_obj);
+    lv_obj_set_style_bg_color(clipped_obj, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_size(clipped_obj, 80, 80);
+
+.. figure:: /_static/images/clip_corner_1_problem_being_solved.png
+    :align: center
+    :alt: Without Clip Corner Style
+
+    Without Clip Corner Style
+
+You can see that the parent's corners do not clip the children. But if you add this
+line, it will:
+
+.. code-block:: c
+
+    lv_obj_set_style_clip_corner(clipper_obj, true, 0);
+
+.. figure:: /_static/images/clip_corner_2_result.png
+    :align: center
+    :alt: Result of Clip Corner Style
+
+    Result of Clip Corner Style
+
+There is a temporary RAM cost to doing this.  With ``LV_USE_LAYER_DEBUG`` on...
+
+.. figure:: /_static/images/clip_corner_3_layers_created.png
+    :align: center
+    :alt: Layers Created to Implement Clip Corner Style While Rendering
+
+    Layers Created to Implement Clip Corner Style While Rendering
+
+...you can see that in order to clip the children, two intermediate layer work areas
+have to be temporarily allocated, each having a height equal to the radius-style value
+currently held by the parent.  These layer work areas are returned to the heap once
+rendering is complete.
 
 
 
@@ -176,7 +223,7 @@ To save memory, LVGL can render certain types of layers in smaller chunks:
     chunk is set using :c:macro:`LV_DRAW_LAYER_SIMPLE_BUF_SIZE` in ``lv_conf.h``.
 
 2.  **Transform Layers**:
-    Transform Widgets cannot be rendered in chunks because transformations
+    Transformed Widgets cannot be rendered in chunks because transformations
     often affect pixels outside the given area. For such layers, LVGL allocates
     a buffer large enough to render the entire transformed area without limits.
 

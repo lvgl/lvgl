@@ -23,6 +23,12 @@ void setUp(void)
 
 void tearDown(void)
 {
+    /* Test the cleanup of a specified name */
+    lv_draw_unit_send_event("VG_LITE", LV_EVENT_CANCEL, NULL);
+
+    /* Test all cleanup */
+    lv_draw_unit_send_event(NULL, LV_EVENT_CANCEL, NULL);
+
     lv_obj_clean(lv_screen_active());
 }
 
@@ -156,6 +162,24 @@ static void draw_shapes(lv_layer_t * layer, const lv_matrix_t * transform)
     /* Aligned with translate. Image resolution is 100x100, cropped to 50% of width and height */
     lv_area_t img_area = {50, 350, 50 + 50, 350 + 50};
     lv_vector_path_append_rect(path, &img_area, 0, 0);
+    lv_vector_dsc_add_path(ctx, path);
+
+    /* Test PNG image file */
+    lv_vector_path_clear(path);
+    lv_area_t rect3 = {200, 360, 0, 0};
+    lv_area_set_width(&rect3, 200);
+    lv_area_set_height(&rect3, 100);
+    lv_vector_path_append_rect(path, &rect3, 0, 0);
+
+    lv_draw_image_dsc_init(&img_dsc);
+    img_dsc.src = "A:src/test_assets/test_img_lvgl_logo.png";
+    lv_vector_dsc_set_transform(ctx, transform);
+    lv_vector_dsc_set_fill_units(ctx, LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX);
+    lv_vector_dsc_set_fill_image(ctx, &img_dsc);
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+
+    lv_matrix_identity(&mt);
+    lv_vector_dsc_set_fill_transform(ctx, &mt);
     lv_vector_dsc_add_path(ctx, path);
 
     lv_draw_vector(ctx);

@@ -169,18 +169,10 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
     struct window * window = app->touch_obj->window;
     switch(app->touch_obj->type) {
         case OBJECT_TITLEBAR:
-#if LV_WAYLAND_XDG_SHELL
             if(window->xdg_toplevel) {
                 xdg_toplevel_move(window->xdg_toplevel, app->wl_seat, serial);
                 window->flush_pending = true;
             }
-#endif
-#if LV_WAYLAND_WL_SHELL
-            if(window->wl_shell_surface) {
-                wl_shell_surface_move(window->wl_shell_surface, app->wl_seat, serial);
-                window->flush_pending = true;
-            }
-#endif
             break;
         default:
             break;
@@ -221,7 +213,6 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
         case OBJECT_BUTTON_CLOSE:
             window->shall_close = true;
             break;
-#if LV_WAYLAND_XDG_SHELL
         case OBJECT_BUTTON_MAXIMIZE:
             if(window->xdg_toplevel) {
                 if(window->maximized) {
@@ -238,7 +229,6 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
                 xdg_toplevel_set_minimized(window->xdg_toplevel);
                 window->flush_pending = true;
             }
-#endif /* LV_WAYLAND_XDG_SHELL */
         default:
             break;
     }

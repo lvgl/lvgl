@@ -16,7 +16,7 @@
 
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

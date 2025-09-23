@@ -32,50 +32,11 @@ Configure profiler
 
 To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and configure the following options:
 
-1. Enable the built-in profiler functionality by setting :c:macro:`LV_USE_PROFILER_BUILTIN`.
+1. Enable the built-in profiler functionality by setting :c:macro:`LV_USE_PROFILER_BUILTIN`. If you have POSIX environment support, you can enable :c:macro:`LV_USE_PROFILER_BUILTIN_POSIX`.
 
 2. Buffer configuration: Set the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE` to configure the buffer size. A larger buffer can store more trace event information, reducing interference with rendering. However, it also results in higher memory consumption.
 
 3. Timestamp configuration: LVGL uses the :cpp:func:`lv_tick_get` function with a precision of 1ms by default to obtain timestamps when events occur. Therefore, it cannot accurately measure intervals below 1ms. If your system environment can provide higher precision (e.g., 1us), you can configure the profiler as follows:
-
-- Recommended configuration in **UNIX** environments:
-
-    .. code-block:: c
-
-        #include <sys/syscall.h>
-        #include <sys/types.h>
-        #include <time.h>
-        #include <unistd.h>
-
-        static uint64_t my_get_tick_cb(void)
-        {
-            struct timespec ts;
-            clock_gettime(CLOCK_MONOTONIC, &ts);
-            return ts.tv_sec * 1000000000 + ts.tv_nsec;
-        }
-
-        static int my_get_tid_cb(void)
-        {
-            return (int)syscall(SYS_gettid);
-        }
-
-        static int my_get_cpu_cb(void)
-        {
-            int cpu_id = 0;
-            syscall(SYS_getcpu, &cpu_id, NULL);
-            return cpu_id;
-        }
-
-        void my_profiler_init(void)
-        {
-            lv_profiler_builtin_config_t config;
-            lv_profiler_builtin_config_init(&config);
-            config.tick_per_sec = 1000000000; /* One second is equal to 1000000000 nanoseconds */
-            config.tick_get_cb = my_get_tick_cb;
-            config.tid_get_cb = my_get_tid_cb;
-            config.cpu_get_cb = my_get_cpu_cb;
-            lv_profiler_builtin_init(&config);
-        }
 
 - Recommended configuration in **Arduino** environments:
 

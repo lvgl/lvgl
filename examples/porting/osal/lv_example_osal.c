@@ -76,7 +76,7 @@ static void increment_thread_entry(void * user_data)
     uint32_t press_count = 0;
 
     lv_lock();
-    counter_label = lv_label_create(lv_scr_act());
+    counter_label = lv_label_create(lv_screen_active());
     lv_obj_align(counter_label, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text_fmt(counter_label, "Pressed %" LV_PRIu32 " times", press_count);
     lv_unlock();

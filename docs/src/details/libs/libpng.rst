@@ -4,7 +4,7 @@
 libpng Decoder
 ==============
 
-**libpng** is an LVGL interface to the the official PNG reference library, which
+**libpng** is an LVGL interface to the official PNG reference library, which
 supports almost all PNG features, is extensible, and has been extensively tested for
 over 28 years.
 

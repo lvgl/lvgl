@@ -384,7 +384,12 @@ void lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
+    lv_result_t res = lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
+    if(res == LV_RESULT_INVALID) {
+        LV_TRACE_REFR("deleted");
+        LV_PROFILER_REFR_END;
+        return;
+    }
 
     /*Refresh the screen's layout if required*/
     LV_PROFILER_LAYOUT_BEGIN_TAG("layout");
@@ -856,7 +861,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     }
     else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
             disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
-        /*In direct mode and full mode the the buffer area is always the whole screen, not considering rotation*/
+        /*In direct mode and full mode the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
         if(lv_display_get_matrix_rotation(disp_refr)) {
@@ -874,7 +879,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     uint32_t tile_cnt = 1;
     int32_t tile_h = lv_area_get_height(area_p);
     if(LV_COLOR_FORMAT_IS_INDEXED(layer->color_format) == false) {
-        /* Assume that the the buffer size (can be screen sized or smaller in case of partial mode)
+        /* Assume that the buffer size (can be screen sized or smaller in case of partial mode)
          * and max tile size are the optimal scenario. From this calculate the ideal tile size
          * and set the tile count and tile height accordingly.
          */

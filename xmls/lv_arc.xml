@@ -15,6 +15,7 @@ Example
 	    <prop name="end_angle" type="int" help="End angles of the indicator"/>
 	    <prop name="bg_start_angle" type="int" help="Start angles of the background"/>
 	    <prop name="bg_end_angle" type="int" help="End angles of the background"/>
+		<prop name="rotation" type="int" help="Rotation angle of the whole arc"/>
 	    <prop name="min_value" type="int"/>
 	    <prop name="max_value" type="int"/>
 	    <prop name="value" type="int" help="The current value"/>
