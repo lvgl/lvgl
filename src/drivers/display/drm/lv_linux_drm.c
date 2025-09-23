@@ -76,6 +76,7 @@ typedef struct {
 #if LV_LINUX_DRM_USE_EGL
     uint32_t fb_id;
 #endif
+    struct gbm_bo * bo;
 } drm_buffer_t;
 
 #if LV_LINUX_DRM_USE_EGL
@@ -117,7 +118,6 @@ typedef struct {
     int kms_out_fence_fd;
     EGLSyncKHR kms_fence;
     EGLSyncKHR gpu_fence;
-    struct gbm_bo * bo;
 
     egl_wait_sync_khr_t egl_wait_sync_khr;
     egl_dup_native_fence_fd_android_t egl_dup_native_fence_fd_android;
@@ -939,6 +939,16 @@ err:
 }
 
 #if !LV_USE_LINUX_DRM_GBM_BUFFERS
+/* Allocate a "dumb" KMS buffer, mmap it, and create an FB object around it.
+ * Ownership model:
+ *  - buf->handle holds the GEM dumb-handle returned by CREATE_DUMB
+ *  - buf->map is the user-space mmap() of that dumb buffer
+ *  - buf->fb_handle is the KMS FB id created with AddFB2
+ * Cleanup order (reverse of creation):
+ *  1) drmModeRmFB(fd, buf->fb_handle)
+ *  2) munmap(buf->map, buf->size)
+ *  3) DRM_IOCTL_MODE_DESTROY_DUMB on buf->handle
+ */
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     struct drm_mode_create_dumb creq;
@@ -946,142 +956,200 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
     uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
     int ret;
 
-    /* create dumb buffer */
+    if(!drm_dev || !buf) return -1;
+
+    /* Create dumb buffer */
     lv_memzero(&creq, sizeof(creq));
-    creq.width = drm_dev->width;
+    creq.width  = drm_dev->width;
     creq.height = drm_dev->height;
-    creq.bpp = LV_COLOR_DEPTH;
+    creq.bpp    = LV_COLOR_DEPTH;
     ret = drmIoctl(drm_dev->fd, DRM_IOCTL_MODE_CREATE_DUMB, &creq);
     if(ret < 0) {
-        LV_LOG_ERROR("DRM_IOCTL_MODE_CREATE_DUMB fail");
+        LV_LOG_ERROR("DRM_IOCTL_MODE_CREATE_DUMB failed: %s", strerror(errno));
         return -1;
     }
 
-    buf->handle = creq.handle;
-    buf->pitch = creq.pitch;
-    buf->size = creq.size;
+    /* Stash basic geometry/resources in buf */
+    buf->handle = creq.handle;     /* GEM handle of the dumb BO */
+    buf->pitch  = creq.pitch;
+    buf->offset = 0;
+    buf->size   = creq.size;
+    buf->map    = NULL;
+    buf->fb_handle = 0;
 
-    /* prepare buffer for memory mapping */
+    /* Ask kernel for the mmap offset */
     lv_memzero(&mreq, sizeof(mreq));
     mreq.handle = creq.handle;
     ret = drmIoctl(drm_dev->fd, DRM_IOCTL_MODE_MAP_DUMB, &mreq);
     if(ret) {
-        LV_LOG_ERROR("DRM_IOCTL_MODE_MAP_DUMB fail");
-        return -1;
+        LV_LOG_ERROR("DRM_IOCTL_MODE_MAP_DUMB failed: %s", strerror(errno));
+        goto err_destroy_dumb;
     }
 
     buf->offset = mreq.offset;
     LV_LOG_INFO("size %lu pitch %u offset %u", buf->size, buf->pitch, buf->offset);
 
-    /* perform actual memory mapping */
-    buf->map = mmap(0, creq.size, PROT_READ | PROT_WRITE, MAP_SHARED, drm_dev->fd, mreq.offset);
+    /* Map the dumb buffer into userspace */
+    buf->map = mmap(NULL, creq.size, PROT_READ | PROT_WRITE, MAP_SHARED, drm_dev->fd, mreq.offset);
     if(buf->map == MAP_FAILED) {
-        LV_LOG_ERROR("mmap fail");
-        return -1;
+        buf->map = NULL;
+        LV_LOG_ERROR("mmap(dumb) failed: %s", strerror(errno));
+        goto err_destroy_dumb;
     }
 
-    /* clear the framebuffer to 0 (= full transparency in ARGB8888) */
+    /* Initialize to zeros so the first frame doesn't show garbage */
     lv_memzero(buf->map, creq.size);
 
-    /* create framebuffer object for the dumb-buffer */
+    /* Create KMS framebuffer object (FB) wrapping the dumb buffer */
     handles[0] = creq.handle;
     pitches[0] = creq.pitch;
     offsets[0] = 0;
-    ret = drmModeAddFB2(drm_dev->fd, drm_dev->width, drm_dev->height, drm_dev->fourcc,
-                        handles, pitches, offsets, &buf->fb_handle, 0);
+
+    ret = drmModeAddFB2(drm_dev->fd,
+                        drm_dev->width, drm_dev->height,
+                        drm_dev->fourcc, /* should match LV_COLOR_DEPTH mapping */
+                        handles, pitches, offsets,
+                        &buf->fb_handle, 0);
     if(ret) {
-        LV_LOG_ERROR("drmModeAddFB fail");
-        return -1;
+        LV_LOG_ERROR("drmModeAddFB2(dumb) failed: %s", strerror(errno));
+        goto err_munmap;
     }
 
     return 0;
+
+err_munmap:
+    munmap(buf->map, buf->size);
+    buf->map = NULL;
+
+err_destroy_dumb:
+    {
+        struct drm_mode_destroy_dumb d = { .handle = buf->handle };
+        (void)drmIoctl(drm_dev->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &d);
+        buf->handle = 0;
+        buf->pitch = buf->offset = 0;
+        buf->size = 0;
+    }
+    return -1;
 }
 #endif /*!LV_USE_LINUX_DRM_GBM_BUFFERS*/
 
 #if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
-
+/* Create a linear GBM BO, export a dma-buf (prime fd), mmap it locally,
+ * convert prime fd to a GEM handle and create an FB with AddFB2.
+ * Ownership model:
+ *  - buf->bo holds the GBM BO (must be destroyed with gbm_bo_destroy)
+ *  - buf->handle holds the PRIME fd (dma-buf) to use for DMA_BUF_SYNC ioctls
+ *  - buf->map is a userspace mapping of the PRIME fd
+ *  - buf->fb_handle is the KMS FB id created with AddFB2
+ *
+ * Cleanup order (reverse of creation):
+ *  1) drmModeRmFB(fd, buf->fb_handle)
+ *  2) munmap(buf->map, buf->size)
+ *  3) close(buf->handle)   // PRIME fd
+ *  4) gbm_bo_destroy(buf->bo)
+ */
 static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
+#if LV_COLOR_DEPTH != 32
+    LV_LOG_ERROR("Unsupported color format: LV_COLOR_DEPTH must be 32 for XRGB8888/ARGB8888");
+    return -1;
+#endif
 
-    struct gbm_bo * gbm_bo;
-    int prime_fd;
-    uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
-    uint32_t n_planes;
-    int res;
+    if(!drm_dev || !buf || !drm_dev->gbm_device) return -1;
 
-    /* gbm_bo_format does not define anything other than ARGB8888 or XRGB8888 */
-    if(LV_COLOR_DEPTH != 32) {
-        LV_LOG_ERROR("Unsupported color format");
-        return -1;
-    }
-
-    /* Create a linear GBM buffer object - best practice when modifiers are not used */
-    if(!(gbm_bo = gbm_bo_create(drm_dev->gbm_device,
-                                drm_dev->width, drm_dev->height, GBM_BO_FORMAT_XRGB8888,
-                                GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR))) {
-
+    struct gbm_bo *bo = gbm_bo_create(drm_dev->gbm_device,
+                                      drm_dev->width, drm_dev->height,
+                                      GBM_BO_FORMAT_XRGB8888,
+                                      GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR);
+    if(!bo) {
         LV_LOG_ERROR("Unable to create gbm buffer object");
         return -1;
     }
 
+    buf->bo = bo;
+
+    uint32_t h = gbm_bo_get_height(gbm_bo);
+    buf->pitch  = gbm_bo_get_stride_for_plane(bo, 0);
+    buf->offset = gbm_bo_get_offset(bo, 0);
+    buf->size   = (unsigned long)h * buf->pitch;
+    buf->map    = NULL;
+    buf->fb_handle = 0;
+    buf->handle = 0; /* will store PRIME fd */
+
     /* Currently only, one plane per dma-buf/prime fd is supported - but some GPUs feature
      * several planes (multiple fds or sometimes a single fd for multiple planes).
      * current implementation is kept simple for now */
-
-    n_planes = gbm_bo_get_plane_count(gbm_bo);
-
-    if(n_planes != 1) {
-        LV_LOG_ERROR("The current implementation only supports a single plane per fd");
-        return -1;
+    if(gbm_bo_get_plane_count(bo) != 1) {
+        LV_LOG_ERROR("The current implementation only supports a single plane per fd"); /* Only single-plane GBM BOs are supported */
+        goto err_bo;
     }
 
-    uint32_t h = gbm_bo_get_height(gbm_bo);
-    pitches[0] = buf->pitch = gbm_bo_get_stride_for_plane(gbm_bo, 0);
-    offsets[0] = buf->offset = gbm_bo_get_offset(gbm_bo, 0);
-    buf->size = h * buf->pitch;
-
-    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
-                buf->size, buf->pitch, buf->offset, drmGetFormatName(format));
-
-    prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
-
+    /* Export a dma-buf (prime fd) for plane 0 */
+#if defined(GBM_BO_FD_FOR_PLANE) /* gbm >= 22 has gbm_bo_get_fd_for_plane */
+    int prime_fd = gbm_bo_get_fd_for_plane(bo, 0);
+#else
+    int prime_fd = gbm_bo_get_fd(bo); /* classic single-plane path */
+#endif
     if(prime_fd < 0) {
-        LV_LOG_ERROR("Failed to get prime fd for plane 0");
-        return -1;
+        LV_LOG_ERROR("Failed to export PRIME fd from GBM BO");
+        goto err_bo;
+    }
+    buf->handle = (uint32_t)prime_fd; /* stored as u32 in struct; cast back to int when using */
 
+    /* Map the dma-buf locally for CPU access */
+    void *map = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, prime_fd, 0);
+    if(map == MAP_FAILED) {
+        LV_LOG_ERROR("mmap(PRIME) dma-buf fd failed: %s", strerror(errno));
+        close(prime_fd);
+        buf->handle = 0;
+        goto err_bo;
+    }
+    buf->map = (uint8_t *)map;
+
+    /* Convert PRIME fd to a GEM handle for AddFB2 */
+    uint32_t gem_handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
+    pitches[0] = buf->pitch;
+    offsets[0] = buf->offset;
+
+    if(drmPrimeFDToHandle(drm_dev->fd, prime_fd, &gem_handles[0]) != 0) {
+        LV_LOG_ERROR("drmPrimeFDToHandle failed: %s", strerror(errno));
+        goto err_mmap;
     }
 
-    buf->map = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, prime_fd, 0);
-
-    if(buf->map == MAP_FAILED) {
-        LV_LOG_ERROR("Failed to mmap dma-buf fd.");
-        return -1;
+    if(drmModeAddFB2(drm_dev->fd,
+                     drm_dev->width, drm_dev->height,
+                     drm_dev->fourcc,     /* should be DRM_FORMAT_XRGB8888 */
+                     gem_handles, pitches, offsets,
+                     &buf->fb_handle, 0) != 0) {
+        LV_LOG_ERROR("drmModeAddFB2(GBM) failed: %s", strerror(errno));
+        (void)drmCloseBufferHandle(drm_dev->fd, gem_handles[0]);
+        goto err_mmap;
     }
 
-    /* Used to perform DMA_BUF_SYNC ioctl calls during the rendering cycle */
-    buf->handle = prime_fd;
-
-    /* Convert prime fd to a libdrm buffer handle */
-    drmPrimeFDToHandle(drm_dev->fd, buf->handle, &handles[0]);
-
-    /* create libdrm framebuffer */
-    res = drmModeAddFB2(drm_dev->fd, drm_dev->width, drm_dev->height, drm_dev->fourcc,
-                        handles, pitches, offsets, &buf->fb_handle, 0);
-
-    if(res) {
-        LV_LOG_ERROR("drmModeAddFB2 failed");
-        return -1;
+    /* Close the temporary GEM handle — the FB holds a reference internally */
+    if(drmCloseBufferHandle(drm_dev->fd, gem_handles[0]) != 0) {
+        LV_LOG_ERROR("drmCloseBufferHandle failed: %s", strerror(errno));
+        goto err_fb;
     }
 
-    if(drmCloseBufferHandle(drm_dev->fd, handles[0]) != 0) {
-        LV_LOG_ERROR("drmCloseBufferHandle failed");
-        return -1;
-    }
-
+    /* Log a concise summary */
+    LV_LOG_INFO("Created GBM BO: size=%lu pitch=%u offset=%u fourcc=0x%08x",
+                buf->size, buf->pitch, buf->offset, drm_dev->fourcc);
     return 0;
 
-}
+err_fb:
+    (void)drmModeRmFB(drm_dev->fd, buf->fb_handle);
+    buf->fb_handle = 0;
 
+err_mmap:
+    if(buf->map && buf->size) { munmap(buf->map, buf->size); buf->map = NULL; }
+    if((int)buf->handle > 0) { close((int)buf->handle); buf->handle = 0; }
+
+err_bo:
+    if(buf->bo) { gbm_bo_destroy(buf->bo); buf->bo = NULL; }
+    buf->size = buf->pitch = buf->offset = 0;
+    return -1;
+}
 #endif /* LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL*/
 
 #if !LV_LINUX_DRM_USE_EGL
@@ -1365,5 +1433,123 @@ static uint32_t tick_get_cb(void)
     uint64_t time_ms = t.tv_sec * 1000 + (t.tv_nsec / 1000000);
     return time_ms;
 }
+
+/* Tear down all DRM/GBM resources safely.
+ * This function is idempotent and can be called on partially-initialized state.
+ * Order matters (release FBs and mappings before destroying buffers/devices).
+ */
+static void drm_cleanup(drm_dev_t *drm)
+{
+    if(!drm) return;
+
+    /* Try to blank output (optional but correct) */
+    if(drm->fd >= 0 && drm->crtc_id && drm->plane_id) {
+        drmModeAtomicReq *req = drmModeAtomicAlloc();
+        if(req) {
+            /* Remove FB from the plane and disable the CRTC
+             * Zero values in atomic mean "reset" the property */
+            uint32_t zero = 0;
+            /* plane: FB_ID=0, CRTC_ID=0 */
+            (void)drmModeAtomicAddProperty(req, drm->plane_id,
+                                           get_plane_property_id(drm, "FB_ID"), zero);
+            (void)drmModeAtomicAddProperty(req, drm->plane_id,
+                                           get_plane_property_id(drm, "CRTC_ID"), zero);
+            /* crtc: ACTIVE=0 */
+            (void)drmModeAtomicAddProperty(req, drm->crtc_id,
+                                           get_crtc_property_id(drm, "ACTIVE"), zero);
+            /* connector: CRTC_ID=0 (detach) */
+            (void)drmModeAtomicAddProperty(req, drm->conn_id,
+                                           get_conn_property_id(drm, "CRTC_ID"), zero);
+
+            (void)drmModeAtomicCommit(drm->fd, req,
+                                      DRM_MODE_ATOMIC_NONBLOCK | DRM_MODE_PAGE_FLIP_EVENT,
+                                      NULL);
+            drmModeAtomicFree(req);
+        }
+    }
+
+    /* Remove mode blob if present */
+    if(drm->blob_id) {
+        (void)drmModeDestroyPropertyBlob(drm->fd, drm->blob_id);
+        drm->blob_id = 0;
+    }
+
+    /* Per-buffer cleanup */
+    for(int i = 0; i < BUFFER_CNT; ++i) {
+        drm_buffer_t *b = &drm->drm_bufs[i];
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
+        /* Remove FB first so KMS drops internal GEM refs */
+        if(b->fb_handle) { (void)drmModeRmFB(drm->fd, b->fb_handle); b->fb_handle = 0; }
+        /* GBM path (no EGL): unmap, close PRIME fd, destroy GBM BO */
+        if(b->map && b->size) { munmap(b->map, b->size); b->map = NULL; }
+        if((int)b->handle > 0) { close((int)b->handle); b->handle = 0; } /* PRIME fd */
+        if(b->bo) { gbm_bo_destroy(b->bo); b->bo = NULL; }
+#endif
+
+#if !LV_USE_LINUX_DRM_GBM_BUFFERS
+        /* Remove FB first so KMS drops internal GEM refs */
+        if(b->fb_handle) { (void)drmModeRmFB(drm->fd, b->fb_handle); b->fb_handle = 0; }
+        /* Dumb-buffer path: unmap and destroy dumb BO by GEM handle */
+        if(b->map && b->size) { munmap(b->map, b->size); b->map = NULL; }
+        if(b->handle) {
+            struct drm_mode_destroy_dumb d = { .handle = b->handle };
+            (void)drmIoctl(drm->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &d);
+            b->handle = 0;
+        }
+#endif
+
+        b->size = b->pitch = b->offset = 0;
+    }
+
+#if LV_USE_LINUX_DRM_GBM_BUFFERS
+    /* Destroy GBM device last, after all BOs/surfaces are gone */
+    if(drm->gbm_device) {
+        gbm_device_destroy(drm->gbm_device);
+        drm->gbm_device = NULL;
+    }
+#endif
+
+    /* Free property lists if you cached them (optional, depends on your code) */
+    for(uint32_t i = 0; i < drm->count_plane_props; ++i) {
+        if(drm->plane_props[i]) { drmModeFreeProperty(drm->plane_props[i]); drm->plane_props[i] = NULL; }
+    }
+    for(uint32_t i = 0; i < drm->count_crtc_props; ++i) {
+        if(drm->crtc_props[i]) { drmModeFreeProperty(drm->crtc_props[i]); drm->crtc_props[i] = NULL; }
+    }
+    for(uint32_t i = 0; i < drm->count_conn_props; ++i) {
+        if(drm->conn_props[i]) { drmModeFreeProperty(drm->conn_props[i]); drm->conn_props[i] = NULL; }
+    }
+
+    /* Close the DRM device fd last */
+    if(drm->fd >= 0) { close(drm->fd); drm->fd = -1; }
+}
+
+void lv_linux_drm_cleanup(lv_display_t * disp)
+{
+    if(!disp) return;
+
+#if LV_LINUX_DRM_USE_EGL
+    /* In the EGL branch, in create() we did:
+     * disp = (lv_display_t *)drm_dev */
+    drm_dev_t * drm_dev = (drm_dev_t *)disp;
+    if(drm_dev) {
+        drm_cleanup(drm_dev);
+        lv_free(drm_dev);
+    }
+#else
+    /* Normal branch: drm_dev is stored in the display's driver_data */
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+    if(drm_dev) {
+        drm_cleanup(drm_dev);
+        lv_free(drm_dev);
+        /* To avoid a dangling pointer inside LVGL */
+        lv_display_set_driver_data(disp, NULL);
+    }
+    /* Delete the LVGL display object itself */
+    lv_display_delete(disp);
+#endif
+}
+
 
 #endif /*LV_USE_LINUX_DRM*/
