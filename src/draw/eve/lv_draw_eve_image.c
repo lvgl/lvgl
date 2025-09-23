@@ -107,11 +107,11 @@ void lv_draw_eve_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
     }
 
     lv_eve_primitive(LV_EVE_PRIMITIVE_BITMAPS);
-    EVE_cmd_dl_burst(BITMAP_SOURCE(ramg_addr));
+    lv_eve_bitmap_source(ramg_addr);
     /*real height and width is mandatory for rotation and scale (Clip Area)*/
-    EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, src_w, src_h));
+    lv_eve_bitmap_size(EVE_NEAREST, EVE_BORDER, EVE_BORDER, src_w, src_h);
 
-    EVE_cmd_dl_burst(BITMAP_LAYOUT(eve_format, eve_stride, src_h));
+    lv_eve_bitmap_layout(eve_format, eve_stride, src_h);
 
     if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
         EVE_cmd_dl_burst(CMD_LOADIDENTITY);

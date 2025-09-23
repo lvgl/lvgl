@@ -17,7 +17,6 @@ jobs:
       - uses: actions/checkout@v5
       - name: Generate lv_conf.h
         run: |
-          cp lv_conf_template.h lv_conf.h
           python ./scripts/generate_lv_conf.py \
             --template lv_conf_template.h \
             --config lv_conf.h \

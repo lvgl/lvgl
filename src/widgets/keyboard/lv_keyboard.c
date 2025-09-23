@@ -15,6 +15,15 @@
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 
+/*Testing of dependencies*/
+#if LV_USE_BUTTONMATRIX == 0
+    #error "lv_buttonmatrix is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
+#endif
+
+#if LV_USE_TEXTAREA == 0
+    #error "lv_textarea is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#endif
+
 /*********************
  *      DEFINES
  *********************/

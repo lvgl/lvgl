@@ -14,6 +14,7 @@
 #if LV_USE_BAR != 0
 
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_math.h"
@@ -57,6 +58,10 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
 static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
 static void lv_bar_anim_completed(lv_anim_t * a);
+
+#if LV_USE_OBSERVER
+    static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -248,6 +253,22 @@ bool lv_bar_is_symmetrical(lv_obj_t * obj)
     return  bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
             bar->start_value == bar->min_value;
 }
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_bar_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, bar_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -711,5 +732,21 @@ static void lv_bar_init_anim(lv_obj_t * obj, lv_bar_anim_t * bar_anim)
     bar_anim->anim_end = 0;
     bar_anim->anim_state = LV_BAR_ANIM_STATE_INV;
 }
+
+#if LV_USE_OBSERVER
+
+static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_INT) {
+        lv_bar_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+    }
+#if LV_USE_FLOAT
+    else {
+        lv_bar_set_value(observer->target, (int32_t)subject->value.float_v, LV_ANIM_OFF);
+    }
+#endif
+}
+
+#endif /*LV_USE_OBSERVER*/
 
 #endif

@@ -12,8 +12,6 @@
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../misc/lv_types.h"
@@ -143,7 +141,7 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     GL_CALL(glBlendEquation(state->blend_equation));
     GL_CALL(glDepthMask(GL_TRUE));
     GL_CALL(glClearColor(state->clear_color[0], state->clear_color[1], state->clear_color[2], state->clear_color[3]));
-    GL_CALL(glClearDepth(state->clear_depth));
+    GL_CALL(glClearDepthf(state->clear_depth));
 }
 
 static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg)
@@ -761,7 +759,7 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
 
-        GL_CALL(glClearDepth(1.0f));
+        GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
@@ -1084,7 +1082,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
-        GL_CALL(glClearDepth(1.0f));
+        GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;

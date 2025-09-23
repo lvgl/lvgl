@@ -149,7 +149,7 @@ want:
 - RGB332 for 8-bit color depth
 - RGB565 for 16-bit color depth
 - RGB565 Swap for 16-bit color depth (two bytes are swapped)
-- RGB888 for 32-bit color depth
+- RGB888 for 24-bit color depth (8-bit channels without an alpha channel)
 
 
 Manually creating an image

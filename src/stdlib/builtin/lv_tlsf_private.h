@@ -17,7 +17,7 @@ extern "C" {
  *********************/
 
 #include "lv_tlsf.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

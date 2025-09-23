@@ -27,7 +27,7 @@ extern "C" {
 #include "../misc/lv_log.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
-#include "../osal/lv_os.h"
+#include "../osal/lv_os_private.h"
 #include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
@@ -73,9 +73,7 @@ struct _snippet_stack;
 struct _lv_freetype_context_t;
 #endif
 
-#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 struct _lv_profiler_builtin_ctx_t;
-#endif
 
 #if LV_USE_NUTTX
 struct _lv_nuttx_ctx_t;
@@ -207,9 +205,12 @@ typedef struct _lv_global_t {
     struct _snippet_stack * span_snippet_stack;
 #endif
 
-#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+    /**
+     * Since LV_USE_PROFILER is an option that needs to be turned on and off
+     * frequently, this pointer is always reserved as a placeholder to prevent the
+     * lv_global_t size mismatch affecting the static library.
+     */
     struct _lv_profiler_builtin_ctx_t * profiler_context;
-#endif
 
 #if LV_USE_FILE_EXPLORER != 0
     lv_style_t fe_list_button_style;

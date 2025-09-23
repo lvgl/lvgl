@@ -452,6 +452,14 @@ static int32_t _dave2d_wait_finish(lv_draw_unit_t * draw_unit)
      * Dave and wait for its interrupt. (Dave2D driver is RTOS aware, no need for semaphores);
      */
     lv_draw_dave2d_unit_t * draw_dave2d_unit = (lv_draw_dave2d_unit_t *) draw_unit;
+
+    if(!draw_pressure) {
+        /* It reached here because Dave2D Draw Unit was not suitable to take a task
+         * While there is nothing being rendered, prevent the dead lock
+         * by flushing the GPU command buffer empty and just return.
+         */
+        return 0;
+    }
     dave2d_execute_dlist_and_flush();
     draw_pressure = 0;
 

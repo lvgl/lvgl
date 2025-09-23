@@ -79,7 +79,7 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 
 /**
- * Set the time to wait before starting the the animation.
+ * Set the time to wait before starting the animation.
  * Applies only when playing from the very start, or reverse from the very end.
  * @param at        pointer to an animation timeline
  * @param delay     the delay time in milliseconds

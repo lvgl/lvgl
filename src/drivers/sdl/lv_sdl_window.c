@@ -158,6 +158,12 @@ void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
     SDL_SetWindowResizable(dsc->window, value);
 }
 
+void lv_sdl_window_set_size(lv_display_t * disp, int32_t hor_res, int32_t ver_res)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_SetWindowSize(dsc->window, hor_res, ver_res);
+}
+
 void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
@@ -368,7 +374,7 @@ static void window_create(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    int flag = SDL_WINDOW_RESIZABLE;
+    int flag = 0;
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif

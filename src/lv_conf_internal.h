@@ -3079,6 +3079,14 @@
     #endif
 #endif
 
+/** GStreamer library */
+#ifndef LV_USE_GSTREAMER
+    #ifdef CONFIG_LV_USE_GSTREAMER
+        #define LV_USE_GSTREAMER CONFIG_LV_USE_GSTREAMER
+    #else
+        #define LV_USE_GSTREAMER 0
+    #endif
+#endif
 
 /** Decode bin images to RAM */
 #ifndef LV_BIN_DECODER_RAM_LOAD
@@ -3435,6 +3443,13 @@
                 #endif
             #else
                 #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
+            #endif
+        #endif
+        #ifndef LV_USE_PROFILER_BUILTIN_POSIX
+            #ifdef CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+                #define LV_USE_PROFILER_BUILTIN_POSIX CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+            #else
+                #define LV_USE_PROFILER_BUILTIN_POSIX 0 /**< Enable POSIX profiler port */
             #endif
         #endif
     #endif
@@ -4006,13 +4021,6 @@
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
             #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_WL_SHELL
-        #ifdef CONFIG_LV_WAYLAND_WL_SHELL
-            #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
-        #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
         #endif
     #endif
 #endif
@@ -4754,7 +4762,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #if LV_USE_WAYLAND == 0
     #define LV_WAYLAND_USE_DMABUF           0
     #define LV_WAYLAND_WINDOW_DECORATIONS   0
-    #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0
@@ -4809,7 +4816,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
     #endif
 
     #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)

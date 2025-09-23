@@ -10,7 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_types.h"
-#include "../../osal/lv_os.h"
+#include "../../osal/lv_os_private.h"
 #include "../../misc/lv_math.h"
 
 /*********************

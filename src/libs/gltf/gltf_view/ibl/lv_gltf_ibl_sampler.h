@@ -17,7 +17,7 @@ extern "C" {
 
 #if LV_USE_GLTF
 #include "../../../../misc/lv_types.h"
-#include "../../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../lv_gltf_view_internal.h"
 
 /*********************

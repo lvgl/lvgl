@@ -164,8 +164,6 @@ typedef struct _lv_cache_entry_t lv_cache_entry_t;
 
 typedef struct _lv_fs_file_cache_t lv_fs_file_cache_t;
 
-typedef struct _lv_fs_path_ex_t lv_fs_path_ex_t;
-
 typedef struct _lv_image_decoder_args_t lv_image_decoder_args_t;
 
 typedef struct _lv_image_cache_data_t lv_image_cache_data_t;
@@ -291,8 +289,6 @@ typedef struct _lv_ime_pinyin_t lv_ime_pinyin_t;
 typedef struct _lv_file_explorer_t lv_file_explorer_t;
 
 typedef struct _lv_barcode_t lv_barcode_t;
-
-typedef struct _lv_gif_t lv_gif_t;
 
 typedef struct _lv_qrcode_t lv_qrcode_t;
 

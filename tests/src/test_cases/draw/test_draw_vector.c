@@ -23,6 +23,12 @@ void setUp(void)
 
 void tearDown(void)
 {
+    /* Test the cleanup of a specified name */
+    lv_draw_unit_send_event("VG_LITE", LV_EVENT_CANCEL, NULL);
+
+    /* Test all cleanup */
+    lv_draw_unit_send_event(NULL, LV_EVENT_CANCEL, NULL);
+
     lv_obj_clean(lv_screen_active());
 }
 

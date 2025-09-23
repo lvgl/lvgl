@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 #include "../../core/lv_obj.h"
+#include "../../others/observer/lv_observer.h"
 
 #if LV_USE_SPAN != 0
 
@@ -333,6 +334,23 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * po
  * @param obj   pointer to a spangroup object.
  */
 void lv_spangroup_refresh(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+
+/**
+ * Bind an integer, string, or pointer Subject to a Spangroup's Span.
+ * @param obj       pointer to Spangroup
+ * @param span      pointer to Span
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
+ *                  as text as they are, integers as %d, floats as %0.1f
+ */
+lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt);
+
+#endif
 
 /**********************
  *      MACROS

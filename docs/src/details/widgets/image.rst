@@ -194,7 +194,19 @@ To automatically scale or tile the image, pass one of these ``align`` values:
 - :cpp:enumerator:`LV_IMAGE_ALIGN_CONTAIN` The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area.
 - :cpp:enumerator:`LV_IMAGE_ALIGN_COVER` The image keeps its aspect ratio and fills the Widget's area.
 
+Data binding
+------------
 
+To get familiar with observers, subjects, and data bindings in general visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+This method of subscribing to a pointer Subject affects a Image Widget's source (``src``)
+value directly.  Note that this is a one-way binding (Subject ==> Widget) so when
+the subject changes, the Image will be updated too.
+
+It supports only pointer subjects.
+
+- :cpp:expr:`lv_image_bind_src(img, &subject)`
 
 .. _lv_image_events:
 
