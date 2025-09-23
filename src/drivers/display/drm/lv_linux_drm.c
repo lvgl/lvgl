@@ -1021,8 +1021,7 @@ err_munmap:
     munmap(buf->map, buf->size);
     buf->map = NULL;
 
-err_destroy_dumb:
-    {
+err_destroy_dumb: {
         struct drm_mode_destroy_dumb d = { .handle = buf->handle };
         (void)drmIoctl(drm_dev->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &d);
         buf->handle = 0;
@@ -1057,10 +1056,10 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     if(!drm_dev || !buf || !drm_dev->gbm_device) return -1;
 
-    struct gbm_bo *bo = gbm_bo_create(drm_dev->gbm_device,
-                                      drm_dev->width, drm_dev->height,
-                                      GBM_BO_FORMAT_XRGB8888,
-                                      GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR);
+    struct gbm_bo * bo = gbm_bo_create(drm_dev->gbm_device,
+                                       drm_dev->width, drm_dev->height,
+                                       GBM_BO_FORMAT_XRGB8888,
+                                       GBM_BO_USE_SCANOUT | GBM_BO_USE_LINEAR);
     if(!bo) {
         LV_LOG_ERROR("Unable to create gbm buffer object");
         return -1;
@@ -1097,7 +1096,7 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     buf->handle = (uint32_t)prime_fd; /* stored as u32 in struct; cast back to int when using */
 
     /* Map the dma-buf locally for CPU access */
-    void *map = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, prime_fd, 0);
+    void * map = mmap(NULL, buf->size, PROT_READ | PROT_WRITE, MAP_SHARED, prime_fd, 0);
     if(map == MAP_FAILED) {
         LV_LOG_ERROR("mmap(PRIME) dma-buf fd failed: %s", strerror(errno));
         close(prime_fd);
@@ -1142,11 +1141,20 @@ err_fb:
     buf->fb_handle = 0;
 
 err_mmap:
-    if(buf->map && buf->size) { munmap(buf->map, buf->size); buf->map = NULL; }
-    if((int)buf->handle > 0) { close((int)buf->handle); buf->handle = 0; }
+    if(buf->map && buf->size) {
+        munmap(buf->map, buf->size);
+        buf->map = NULL;
+    }
+    if((int)buf->handle > 0) {
+        close((int)buf->handle);
+        buf->handle = 0;
+    }
 
 err_bo:
-    if(buf->bo) { gbm_bo_destroy(buf->bo); buf->bo = NULL; }
+    if(buf->bo) {
+        gbm_bo_destroy(buf->bo);
+        buf->bo = NULL;
+    }
     buf->size = buf->pitch = buf->offset = 0;
     return -1;
 }
@@ -1438,13 +1446,13 @@ static uint32_t tick_get_cb(void)
  * This function is idempotent and can be called on partially-initialized state.
  * Order matters (release FBs and mappings before destroying buffers/devices).
  */
-static void drm_cleanup(drm_dev_t *drm)
+static void drm_cleanup(drm_dev_t * drm)
 {
     if(!drm) return;
 
     /* Try to blank output (optional but correct) */
     if(drm->fd >= 0 && drm->crtc_id && drm->plane_id) {
-        drmModeAtomicReq *req = drmModeAtomicAlloc();
+        drmModeAtomicReq * req = drmModeAtomicAlloc();
         if(req) {
             /* Remove FB from the plane and disable the CRTC
              * Zero values in atomic mean "reset" the property */
@@ -1476,22 +1484,40 @@ static void drm_cleanup(drm_dev_t *drm)
 
     /* Per-buffer cleanup */
     for(int i = 0; i < BUFFER_CNT; ++i) {
-        drm_buffer_t *b = &drm->drm_bufs[i];
+        drm_buffer_t * b = &drm->drm_bufs[i];
 
 #if LV_USE_LINUX_DRM_GBM_BUFFERS && !LV_LINUX_DRM_USE_EGL
         /* Remove FB first so KMS drops internal GEM refs */
-        if(b->fb_handle) { (void)drmModeRmFB(drm->fd, b->fb_handle); b->fb_handle = 0; }
+        if(b->fb_handle) {
+            (void)drmModeRmFB(drm->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
         /* GBM path (no EGL): unmap, close PRIME fd, destroy GBM BO */
-        if(b->map && b->size) { munmap(b->map, b->size); b->map = NULL; }
-        if((int)b->handle > 0) { close((int)b->handle); b->handle = 0; } /* PRIME fd */
-        if(b->bo) { gbm_bo_destroy(b->bo); b->bo = NULL; }
+        if(b->map && b->size) {
+            munmap(b->map, b->size);
+            b->map = NULL;
+        }
+        if((int)b->handle > 0) {
+            close((int)b->handle);    /* PRIME fd */
+            b->handle = 0;
+        }
+        if(b->bo) {
+            gbm_bo_destroy(b->bo);
+            b->bo = NULL;
+        }
 #endif
 
 #if !LV_USE_LINUX_DRM_GBM_BUFFERS
         /* Remove FB first so KMS drops internal GEM refs */
-        if(b->fb_handle) { (void)drmModeRmFB(drm->fd, b->fb_handle); b->fb_handle = 0; }
+        if(b->fb_handle) {
+            (void)drmModeRmFB(drm->fd, b->fb_handle);
+            b->fb_handle = 0;
+        }
         /* Dumb-buffer path: unmap and destroy dumb BO by GEM handle */
-        if(b->map && b->size) { munmap(b->map, b->size); b->map = NULL; }
+        if(b->map && b->size) {
+            munmap(b->map, b->size);
+            b->map = NULL;
+        }
         if(b->handle) {
             struct drm_mode_destroy_dumb d = { .handle = b->handle };
             (void)drmIoctl(drm->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &d);
@@ -1512,17 +1538,29 @@ static void drm_cleanup(drm_dev_t *drm)
 
     /* Free property lists if you cached them (optional, depends on your code) */
     for(uint32_t i = 0; i < drm->count_plane_props; ++i) {
-        if(drm->plane_props[i]) { drmModeFreeProperty(drm->plane_props[i]); drm->plane_props[i] = NULL; }
+        if(drm->plane_props[i]) {
+            drmModeFreeProperty(drm->plane_props[i]);
+            drm->plane_props[i] = NULL;
+        }
     }
     for(uint32_t i = 0; i < drm->count_crtc_props; ++i) {
-        if(drm->crtc_props[i]) { drmModeFreeProperty(drm->crtc_props[i]); drm->crtc_props[i] = NULL; }
+        if(drm->crtc_props[i]) {
+            drmModeFreeProperty(drm->crtc_props[i]);
+            drm->crtc_props[i] = NULL;
+        }
     }
     for(uint32_t i = 0; i < drm->count_conn_props; ++i) {
-        if(drm->conn_props[i]) { drmModeFreeProperty(drm->conn_props[i]); drm->conn_props[i] = NULL; }
+        if(drm->conn_props[i]) {
+            drmModeFreeProperty(drm->conn_props[i]);
+            drm->conn_props[i] = NULL;
+        }
     }
 
     /* Close the DRM device fd last */
-    if(drm->fd >= 0) { close(drm->fd); drm->fd = -1; }
+    if(drm->fd >= 0) {
+        close(drm->fd);
+        drm->fd = -1;
+    }
 }
 
 void lv_linux_drm_cleanup(lv_display_t * disp)
