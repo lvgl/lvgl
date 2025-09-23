@@ -48,11 +48,6 @@ uint32_t lv_wayland_timer_handler(void);
  */
 int lv_wayland_get_fd(void);
 
-/**
- * Return wl_output based on index
- */
-struct wl_output * lv_wayland_get_wl_output(int display);
-
 /**********************
  *      MACROS
  **********************/
