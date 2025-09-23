@@ -226,10 +226,11 @@ void lv_wayland_assign_physical_display(lv_display_t * disp, int display)
 {
     struct window * window = lv_display_get_user_data(disp);
     lv_result_t err = LV_RESULT_INVALID;
+    
     if(!window || window->closed) {
         return;
     }
-    
+
     if(display >= window->wl_ctx->wl_output_count || display < 0) {
         LV_LOG_WARN("Failed to assign display");
         return;
