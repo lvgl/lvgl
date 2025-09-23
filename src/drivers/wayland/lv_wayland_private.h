@@ -231,6 +231,7 @@ struct window {
     bool fullscreen;
     uint32_t frame_counter;
     bool is_window_configured;
+    int physical_display;
 
 #if LV_WAYLAND_USE_DMABUF
     /* XDG/DMABUF synchronization fields */

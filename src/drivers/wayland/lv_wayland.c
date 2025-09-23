@@ -119,14 +119,6 @@ static const struct wl_output_listener output_listener = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-struct wl_output * lv_wayland_get_wl_output(int display)
-{
-    if(display >= lv_wl_ctx.wl_output_count || display < 0)
-        return NULL;
-
-    return lv_wl_ctx.outputs[display].wl_output;
-}
-
 /**
  * Get Wayland display file descriptor
  * @return Wayland display file descriptor
@@ -207,6 +199,14 @@ uint32_t lv_wayland_timer_handler(void)
 /**********************
  *   PRIVATE FUNCTIONS
  **********************/
+
+struct wl_output * lv_wayland_get_wl_output(int display)
+{
+    if(display >= lv_wl_ctx.wl_output_count || display < 0)
+        return NULL;
+
+    return lv_wl_ctx.outputs[display].wl_output;
+}
 
 void lv_wayland_init(void)
 {
