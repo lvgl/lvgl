@@ -146,6 +146,7 @@ static int find_plane(drm_dev_t * drm_dev, unsigned int fourcc, uint32_t * plane
 static int drm_find_connector(drm_dev_t * drm_dev, int64_t connector_id);
 static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
+static void drm_cleanup_cb(lv_event_t * e);
 
 static uint32_t tick_get_cb(void);
 
@@ -215,6 +216,8 @@ lv_display_t * lv_linux_drm_create(void)
     drm_dev->kms_out_fence_fd = -1;
 
 #endif
+
+    lv_display_add_event_cb(disp, drm_cleanup_cb, LV_EVENT_DELETE, NULL);
 
     return disp;
 }
@@ -1563,8 +1566,9 @@ static void drm_cleanup(drm_dev_t * drm)
     }
 }
 
-void lv_linux_drm_cleanup(lv_display_t * disp)
+static void drm_cleanup_cb(lv_event_t * e)
 {
+    lv_display_t * disp = lv_event_get_current_target(e);
     if(!disp) return;
 
 #if LV_LINUX_DRM_USE_EGL

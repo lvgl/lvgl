@@ -33,8 +33,6 @@ lv_display_t * lv_linux_drm_create(void);
 
 void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id);
 
-void lv_linux_drm_cleanup(lv_display_t * disp);
-
 /**********************
  *      MACROS
  **********************/
