@@ -16,4 +16,5 @@ Drivers
     X11
     evdev
     libinput
+    m2d
 
