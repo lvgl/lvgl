@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_XML && LV_USE_TRANSLATION
+#if LV_BUILD_EXAMPLES && LV_USE_XML && LV_USE_TRANSLATION && LV_FONT_MONTSERRAT_18
 
 void lv_example_xml_2(void)
 {

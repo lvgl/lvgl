@@ -1587,7 +1587,7 @@
         #endif
     #endif
 
-    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
     #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
         #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
             #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
@@ -3353,7 +3353,7 @@
                 #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
             #endif
         #endif
-    #endif 
+    #endif
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
@@ -3809,7 +3809,7 @@
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
- * Requires libpng and a few MB of extra RAM. */
+ * Requires lodepng and a few MB of extra RAM. */
 #ifndef LV_USE_TEST_SCREENSHOT_COMPARE
     #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
         #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
