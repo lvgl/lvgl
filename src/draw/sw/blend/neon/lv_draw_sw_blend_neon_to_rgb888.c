@@ -820,7 +820,7 @@ lv_result_t lv_draw_sw_blend_neon_rgb888_to_rgb888_with_mask(lv_draw_sw_blend_im
     const int32_t h = dsc->dest_h;
     const int32_t dest_stride = dsc->dest_stride;
     const int32_t src_stride = dsc->src_stride;
-    const int32_t mask_stride = dsc->src_stride;
+    const int32_t mask_stride = dsc->mask_stride;
     const uint8_t * mask_buf_8 = dsc->mask_buf;
 
     /* Fallback to sw implementation*/
