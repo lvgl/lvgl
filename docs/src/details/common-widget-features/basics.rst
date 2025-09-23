@@ -4,18 +4,17 @@
 Overview
 ========
 
-
-What is a widget?
+What is a Widget?
 *****************
 
 A Widget is the **basic building block** of the LVGL user interface.
 
-Examples of Widgets:  :ref:`Base Widget (and Screen) <base_widget>`,
+Examples of Widgets: :ref:`Base Widget (and Screen) <base_widget>`,
 :ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
 :ref:`Image <lv_image>`, :ref:`List <lv_list>`,
-:ref:`Chart <lv_chart>` and :ref:`Text Area <lv_textarea>`.
+:ref:`Chart <lv_chart>`, and :ref:`Text Area <lv_textarea>`.
 
-See :ref:`widgets` to see all Widget types.
+See :ref:`widgets` to view all widget types.
 
 .. _base_widget:
 .. _lv_obj:
@@ -23,19 +22,19 @@ See :ref:`widgets` to see all Widget types.
 Base Widget
 ***********
 
-The most fundamental of all Widgets is the Base Widget, on which all other widgets
-are based.  From an Object-Oriented perspective, think of the Base Widget as the
-Widget class from which all other Widgets inherit.
+The most fundamental of all widgets is the Base Widget, on which all other widgets
+are based. From an object-oriented perspective, think of the Base Widget as the
+widget class from which all other widgets inherit.
 
-By this mechanism, all Widgets carry the features of the Base Widget.
+By this mechanism, all widgets carry the features of the Base Widget.
 Therefore, the functions and functionalities of the Base
-Widget can be used with other widgets as well. For example
+Widget can be used with other widgets as well. For example:
 :cpp:expr:`lv_obj_set_width(slider, 100)`.
 
-The Base Widget although it's just a simple rectangle it's the most
-powerful widget as it supports all the featuers other widgets can do.
+Although it's just a simple rectangle, the Base Widget is the most
+powerful widget, as it supports all the features that other widgets can use.
 
-The base widget can have
+The Base Widget can have:
 
 - Children
 - Position and Size
@@ -49,17 +48,16 @@ The base widget can have
 - States
 - And many more
 
+A Slider widget, for example, uses these features to realize slider-like behavior, but it’s all based on the
+same style, event, layout, and other concepts supported by the Base Widget.
 
-A Slider widget just uses these features to realize a Slider-like behaviour, however it's all based on the
-same style, event, layout, etc concepts that are supported by the base widget too.
-All these versatile features are introduced in detail in the upciming sections.
+All these versatile features are introduced in detail in the upcoming sections.
 
-
-In HTML terms, think of it as a ``<div>``, that with some CSS and JS is a very verstile
-building block in HTML too.
-
+In HTML terms, think of it as a ``<div>``—a very versatile
+building block that, with some CSS and JS, can become almost anything.
 
 API
 ***
 
 .. API startswith:  lv_obj_
+

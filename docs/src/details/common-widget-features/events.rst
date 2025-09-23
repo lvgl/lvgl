@@ -1,4 +1,5 @@
 .. _events:
+.. _lv_obj_events:
 
 ======
 Events
@@ -114,6 +115,8 @@ are sent,
 *Custom events* are added by the user and are never sent by LVGL.
 
 The following event codes exist:
+
+.. _indev_events:
 
 Input Device Events
 -------------------

@@ -1,4 +1,3 @@
-
 ===========
 Widget Tree
 ===========
@@ -6,31 +5,33 @@ Widget Tree
 Parents and Children
 ********************
 
-LVGL stores the widgets in a parent-child structure (tree).
-The root element is screen which has no parent.
+LVGL stores widgets in a parent-child structure (tree).
+The root element is the screen, which has no parent.
 
-When a widget is created a pointer to its parent is passed to the create function.
+When a widget is created, a pointer to its parent is passed to the create function.
 
-LVGL provides many useful function the modify the widget tree and get information about it:
+LVGL provides many useful functions to modify the widget tree and get information about it:
 
-- :cpp:expr:`lv_obj_get_screen(widget)`: Get a Widget's Screen ("root" parent).
-- :cpp:expr:`lv_obj_get_parent(widget)`: Gets a Widget's current parent.
-- `lv_obj_set_parent(widget, new_parent)`: Moves the Widget to a new parent.
-   The widget will be the top-most (last/youngest child of the new parent)
-- :cpp:expr:`lv_obj_get_child(parent, idx)`: Returns a specific child of a parent.
+- :cpp:expr:`lv_obj_get_screen(widget)`: Get a widget's screen ("root" parent).
+- :cpp:expr:`lv_obj_get_parent(widget)`: Get the widget's current parent.
+- `lv_obj_set_parent(widget, new_parent)`: Move the widget to a new parent.
+  The widget will become the top-most (last/youngest) child of the new parent.
+- :cpp:expr:`lv_obj_get_child(parent, idx)`: Return a specific child of a parent.
   Some examples for ``idx``:
 
-     - ``0`` get the child created first
-     - ``1`` get the child created second
-     - ``-1`` get the child created last
-- :cpp:expr:`lv_obj_find_by_name(parent, "text")`: Find a Widget with a given name on a parent. Doesn't have to be the direct children.
-- :cpp:expr:`lv_obj_get_child_by_name(parent, "container/button/text")`: Gets the Widget considering parent names too (separated by ``/``)
-- :cpp:expr:`lv_obj_get_index(widget)` returns the index of the Widget in its parent.
-It is equivalent to the number of older children in the parent.
-- :cpp:expr:`lv_obj_move_to_index(widget, idx)`: Move the widget to an index. 0: is the oldest child's position, -1 (the first from the back)
-  is the youngest.
-- :cpp:expr:`lv_obj_swap(widget1, widget2)`: Swaps the position of two Widgets.
-- To iterate through a parent Widget's children:
+  - ``0``: get the first created child
+  - ``1``: get the second created child
+  - ``-1``: get the last created child
+
+- :cpp:expr:`lv_obj_find_by_name(parent, "text")`: Find a widget with a given name under a parent. It does not have to be a direct child.
+- :cpp:expr:`lv_obj_get_child_by_name(parent, "container/button/text")`: Get a widget by navigating a path using parent names (separated by ``/``).
+- :cpp:expr:`lv_obj_get_index(widget)`: Return the index of the widget in its parent.
+  It is equivalent to the number of older siblings in the parent.
+- :cpp:expr:`lv_obj_move_to_index(widget, idx)`: Move the widget to a specified index.
+  ``0`` is the oldest child's position, ``-1`` is the youngest.
+- :cpp:expr:`lv_obj_swap(widget1, widget2)`: Swap the positions of two widgets.
+
+To iterate through a parent widget's children:
 
 .. code-block:: c
 
@@ -49,14 +50,13 @@ Names
 
 When a widget is created, its reference can be stored in an :cpp:expr:`lv_obj_t *` pointer
 variable. To use this widget in multiple places in the code, the variable can be passed
-as a function parameter or made a global variable. However, this approach has some drawbacks:
+as a function parameter or made global. However, this approach has some drawbacks:
 
 - Using global variables is not clean and generally not recommended.
 - It's not scalable. Passing references to 20 widgets as function parameters is not ideal.
 - It's hard to track whether a widget still exists or has been deleted.
 
-
-Setting names
+Setting Names
 -------------
 
 To address these issues, LVGL introduces a powerful widget naming system that can be enabled
@@ -71,7 +71,7 @@ If a name ends with ``#``, LVGL will automatically replace it with an index base
 number of siblings with the same base name. If no name is provided, the default is
 ``<widget_type>_#``.
 
-Below is an example showing how manually- and automatically-assigned names are resolved:
+Below is an example showing how manually and automatically assigned names are resolved:
 
 - Main ``lv_obj`` container named ``"cont"``: "cont"
 
@@ -93,40 +93,12 @@ Below is an example showing how manually- and automatically-assigned names are r
     - ``lv_button`` named ``mybtn_#``: "mybtn_2"
     - ``lv_button`` named ``mybtn_#``: "mybtn_3"
 
-
-Finding widgets
+Finding Widgets
 ---------------
 
 Widgets can be found by name in two ways:
 
 1. **Get a direct child by name** using :cpp:expr:`lv_obj_get_child_by_name(parent, "child_name")`.
    Example:
-   :cpp:expr:`lv_obj_get_child_by_name(header, "title")`
-   You can also use a "path" to find nested children:
-   :cpp:expr:`lv_obj_get_child_by_name(cont, "buttons/mybtn_2")`
-
-2. **Find a descendant at any level** using :cpp:expr:`lv_obj_find_by_name(parent, "child_name")`.
-   Example:
-   :cpp:expr:`lv_obj_find_by_name(cont, "mybtn_1")`
-   Note that ``"mybtn_1"`` is a child of ``buttons``, not a direct child of ``cont``.
-   This is useful when you want to ignore hierarchy and search by name alone.
-
-Since both functions start searching from a specific parent, it’s possible to have multiple widget
-subtrees with identical names under different parents.
-
-For example, if ``my_listitem_create(parent)`` creates a widget named ``"list_item_#"``
-with children like ``"icon"``, ``"title"``, ``"ok_button"``, and ``"lv_label_0"``,
-and it's called 10 times, a specific ``"ok_button"`` can be found like this:
-
-.. code-block:: c
-
-    lv_obj_t * item = lv_obj_find_by_name(lv_screen_active(), "list_item_5");
-    lv_obj_t * ok_btn = lv_obj_find_by_name(item, "ok_button");
-
-    // Or
-    lv_obj_t * ok_btn = lv_obj_get_child_by_name(some_list_container, "list_item_5/ok_button");
-
-Names are resolved **when they are retrieved**, not when they are set.
-This means the indices always reflect the current state of the widget tree
-at the time the name is used.
-
+   :cpp:expr:`lv_obj_get_child_by_name(header, "title"_
+s
