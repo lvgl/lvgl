@@ -10,13 +10,12 @@ void lv_example_svg_1(void)
     static const char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
                                    "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
 
-    static const lv_image_dsc_t svg_dsc = {
-        .header.magic = LV_IMAGE_HEADER_MAGIC,
-        .header.w = 450,
-        .header.h = 150,
-        .data_size = sizeof(svg_data) - 1,
-        .data = (const uint8_t *) svg_data,
-    };
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 450;
+    svg_dsc.header.h = 150;
+    svg_dsc.data_size = sizeof(svg_data) - 1;
+    svg_dsc.data = (const uint8_t *) svg_data;
 
     lv_obj_t * svg = lv_image_create(lv_screen_active());
     lv_image_set_src(svg, &svg_dsc);
