@@ -66,7 +66,8 @@ void g2d_set_handle(void * handle);
 void * g2d_get_handle(void);
 
 #if LV_USE_ROTATE_G2D
-void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32_t height, lv_color_format_t cf);
+void g2d_rotate(lv_draw_buf_t * buf1, lv_draw_buf_t * buf2, int32_t width, int32_t height, uint32_t rotation,
+                lv_color_format_t cf);
 #endif
 /**********************
  *      MACROS

@@ -187,16 +187,18 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
 {
     struct window * window = lv_display_get_driver_data(disp);
     struct buffer * buf;
-    int32_t src_width, src_height;
+    int32_t src_width = lv_area_get_width(area);
+    int32_t src_height = lv_area_get_height(area);
 #if LV_USE_ROTATE_G2D
     LV_UNUSED(color_p);
     buf    = get_next_buffer(&window->wl_ctx->dmabuf_ctx);
-    src_width  = lv_area_get_height(area);
-    src_height = lv_area_get_width(area);
+    uint32_t rotation = lv_display_get_rotation(window->lv_disp);
+    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+        src_width  = lv_area_get_height(area);
+        src_height = lv_area_get_width(area);
+    }
 #else
     buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
-    src_width  = lv_area_get_width(area);
-    src_height = lv_area_get_height(area);
 #endif
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
@@ -213,8 +215,8 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
 
     if(lv_display_flush_is_last(disp)) {
 #if LV_USE_ROTATE_G2D
-        g2d_rotate(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, buf->lv_draw_buf,
-                   window->width, window->height, lv_display_get_color_format(window->lv_disp));
+        g2d_rotate(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, buf->lv_draw_buf, window->width, window->height,
+                   lv_display_get_rotation(window->lv_disp), lv_display_get_color_format(window->lv_disp));
 #endif
         /* Finally, attach buffer and commit to surface */
         wl_surface_attach(window->body->surface, buf->buffer, 0, 0);
@@ -370,10 +372,13 @@ static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct win
     for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
         uint32_t w = width;
         uint32_t h = height;
-        if(LV_USE_ROTATE_G2D && i == 2) {
+#if LV_USE_ROTATE_G2D
+        uint32_t rotation = lv_display_get_rotation(window->lv_disp);
+        if(i == 2 && (rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270)) {
             w = height;
             h = width;
         }
+#endif
         stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(window->lv_disp));
 
         buffers[i].window = window;
