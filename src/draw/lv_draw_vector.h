@@ -199,13 +199,32 @@ void lv_vector_path_close(lv_vector_path_t * path);
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area);
 
 /**
- * Add a rectangle to the path
+ * Add a rectangle to the path by x/y/w/h. rx/ry are corner radii
+ * @param path              pointer to a path
+ * @param x                 the x coordinate of the top-left corner of the rectangle
+ * @param y                 the y coordinate of the top-left corner of the rectangle
+ * @param w                 the width of the rectangle
+ * @param h                 the height of the rectangle
+ * @param rx                the horizontal radius for rounded rectangle
+ * @param ry                the vertical radius for rounded rectangle
+ */
+void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry);
+
+/**
+ * Add a rectangle to the path (legacy api, recommend use lv_vector_path_append_rectangle instead)
  * @param path              pointer to a path
  * @param rect              pointer to a `lv_area_t` variable
  * @param rx                the horizontal radius for rounded rectangle
  * @param ry                the vertical radius for rounded rectangle
  */
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry);
+static inline void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(rect);
+
+    lv_vector_path_append_rectangle(path, rect->x1, rect->y1, (float)lv_area_get_width(rect),
+                                    (float)lv_area_get_height(rect), rx, ry);
+}
 
 /**
  * Add a circle to the path
