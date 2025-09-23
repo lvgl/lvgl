@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_opengles_texture.h"
+#include "lv_opengles_texture_private.h"
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
@@ -17,7 +18,6 @@
 
 #include <stdlib.h>
 
-#include <stdio.h> /* MK TEMP */
 /*********************
  *      DEFINES
  *********************/
@@ -25,11 +25,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    unsigned int texture_id;
-    uint8_t * fb1;
-} lv_opengles_texture_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -66,6 +61,7 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
 #if LV_USE_DRAW_OPENGLES
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(disp, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+    dsc->fb1 = NULL;
 #else
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
     uint32_t buf_size = stride * h;

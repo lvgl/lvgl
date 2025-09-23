@@ -164,6 +164,8 @@ lv_egl_adapter_interface_t * interface_create_internal(lv_egl_adapter_t * egl_ad
             lv_egl_adapter_outmod_drm_create
 #endif
             ();
+    //interface->display_texture_desc = (lv_opengles_texture_t *)malloc(sizeof(*interface->display_texture_desc));;
+    //interface->display_texture_desc = (lv_opengles_texture_t *)lv_malloc(sizeof(*interface->display_texture_desc));;
     interface->width = width;
     interface->height = height;
     interface->refresh_rate = refresh_rate;
@@ -247,7 +249,6 @@ void lv_egl_adapter_interface_update(void * cnvs_ptr)
     else {
         glFinish();
     }
-    //interface->offscreen_fbo_index = (interface->offscreen_fbo_index + 1) % lv_array_size(interface->fbos);
     interface->offscreen_fbo_index = (interface->offscreen_fbo_index + 1) % interface->offscreen_fbo_count;
     lv_egl_adapter_sync_t * current_sync = (lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
                                                                                 interface->offscreen_fbo_index);

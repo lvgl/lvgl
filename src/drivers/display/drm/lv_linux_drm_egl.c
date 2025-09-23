@@ -118,6 +118,12 @@ lv_drm_egl_t * lv_drm_egl_create_ex(bool use_mouse_indev, bool h_flip, bool v_fl
 
     window->display_texture = lv_opengles_texture_create(hor_res, ver_res);
     lv_display_set_default(window->display_texture);
+
+    lv_opengles_texture_t * display_desc = (lv_opengles_texture_t *)lv_display_get_driver_data(window->display_texture);
+    window->egl_adapter_interface->display_texture_desc.texture_id = display_desc->texture_id;
+    window->egl_adapter_interface->display_texture_desc.fb1 = display_desc->fb1;
+    lv_display_set_driver_data(window->display_texture, window->egl_adapter_interface);
+
     /* add the texture to the window */
     window->window_texture = lv_drm_egl_add_texture(window,
                                                     lv_opengles_texture_get_texture_id(window->display_texture), hor_res, ver_res);

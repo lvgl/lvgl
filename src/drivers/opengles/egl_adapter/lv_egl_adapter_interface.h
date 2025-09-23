@@ -11,6 +11,8 @@
 
 #include "../../../lv_conf_internal.h"
 #include "../../../misc/lv_array.h"
+#include "../lv_opengles_texture_private.h"
+#include "../../../stdlib/lv_mem.h"
 
 #if defined(LV_LINUX_DRM_USE_EGL) || defined(LV_LINUX_WAYLAND_USE_EGL)
 
@@ -49,6 +51,7 @@
 typedef struct lv_egl_adapter_fbo lv_egl_adapter_fbo_t;
 
 struct lv_egl_adapter_interface {
+    lv_opengles_texture_t display_texture_desc;
     lv_egl_adapter_t * egl_adapter;
     __LV_OUTMOD_CLASS_T * output_module;
     int width;
