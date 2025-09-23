@@ -417,6 +417,7 @@ lv_result_t lv_draw_sw_blend_neon_l8_to_rgb888(lv_draw_sw_blend_image_dsc_t * ds
                 row_byte_ptr[dest_x + 0] = src_row[src_x];
                 row_byte_ptr[dest_x + 1] = src_row[src_x];
                 row_byte_ptr[dest_x + 2] = src_row[src_x];
+                row_byte_ptr[dest_x + 3] = src_row[src_x];
             }
             dest_buf_8 = drawbuf_next_row(dest_buf_8, dest_stride);
             src_buf_l8 = drawbuf_next_row(src_buf_l8, src_stride);
