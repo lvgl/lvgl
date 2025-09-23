@@ -1619,6 +1619,10 @@ menu "LVGL configuration"
 			bool "Enable built-in profiler by default"
 			depends on LV_USE_PROFILER_BUILTIN
 			default y
+		config LV_USE_PROFILER_BUILTIN_POSIX
+			bool "Enable POSIX profiler port"
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			default "lvgl/src/misc/lv_profiler_builtin.h"
