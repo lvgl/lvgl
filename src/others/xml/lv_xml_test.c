@@ -314,7 +314,7 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         int32_t y = step->param.mouse_pos.y;
         click_at(x, y, slowdown);
     }
-    else if(step->type == LV_XML_TEST_STEP_TYPE_CLICK_AT) {
+    else if(step->type == LV_XML_TEST_STEP_TYPE_CLICK_ON) {
         const char * name = step->param.str;
         lv_obj_t * obj = lv_obj_find_by_name(lv_screen_active(), name);
         if(obj == NULL) {
@@ -466,8 +466,8 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     }
     else if(lv_streq(name, "click_on")) {
         test.step_cnt++;
-        const char * name = lv_xml_get_value_of(attrs, "name");
-        if(name == NULL) {
+        const char * obj_name = lv_xml_get_value_of(attrs, "name");
+        if(obj_name == NULL) {
             LV_LOG_WARN("No name is set in test step");
             return;
         }
@@ -475,7 +475,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_ON;
-        test.steps[idx].param.str = lv_strdup(name);
+        test.steps[idx].param.str = lv_strdup(obj_name);
     }
     else if(lv_streq(name, "move_to")) {
         test.step_cnt++;
@@ -569,8 +569,8 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     }
     else if(lv_streq(name, "set_language")) {
         test.step_cnt++;
-        const char * name = lv_xml_get_value_of(attrs, "name");
-        if(name == NULL) {
+        const char * obj_name = lv_xml_get_value_of(attrs, "name");
+        if(obj_name == NULL) {
             LV_LOG_WARN("No name is set in test step");
             return;
         }
@@ -578,7 +578,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SET_LANGUAGE;
-        test.steps[idx].param.str = lv_strdup(name);
+        test.steps[idx].param.str = lv_strdup(obj_name);
     }
 }
 
