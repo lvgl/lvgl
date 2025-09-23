@@ -3,27 +3,26 @@
 #if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
 
 /**
- * Load an SVG from data
+ * Draw SVG data in a draw event
  */
-void lv_example_svg_1(void)
+static void event_cb(lv_event_t * e)
 {
     static const char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
                                    "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
 
-    static const lv_image_dsc_t svg_dsc = {
-        .header.magic = LV_IMAGE_HEADER_MAGIC,
-        .header.w = 450,
-        .header.h = 150,
-        .data_size = sizeof(svg_data) - 1,
-        .data = (const uint8_t *) svg_data,
-    };
+    lv_layer_t * layer = lv_event_get_layer(e);
+    lv_svg_node_t * svg = lv_svg_load_data(svg_data, sizeof(svg_data) / sizeof(char));
+    lv_draw_svg(layer, svg);
+    lv_svg_node_delete(svg);
+}
 
-    lv_obj_t * svg = lv_image_create(lv_screen_active());
-    lv_image_set_src(svg, &svg_dsc);
+void lv_example_svg_3(void)
+{
+    lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);
 }
 #else
 
-void lv_example_svg_1(void)
+void lv_example_svg_3(void)
 {
     /*TODO
      *fallback for online examples*/
