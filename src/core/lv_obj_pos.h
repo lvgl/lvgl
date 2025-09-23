@@ -345,6 +345,32 @@ int32_t lv_obj_get_self_width(const lv_obj_t * obj);
 int32_t lv_obj_get_self_height(const lv_obj_t * obj);
 
 /**
+ * Get the style width actually used by the object after clamping the width within the min max range.
+ * @param obj       pointer to an object
+ * @return          the min/max/normal width set by `lv_obj_set_style_<min/max>_width()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj);
+
+/**
+ * Get the style height actually used by the object after clamping the height within the min max range.
+ * @param obj       pointer to an objects
+ * @return          the min/max/normal height set by `lv_obj_set_style_<min/max>_height()`
+ * @note            This is not the calculated size, so if the size was set as `LV_SIZE_CONTENT` or `LV_PCT()`
+ *                  then that value will be returned.
+ */
+int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj);
+
+bool lv_obj_is_width_min(const lv_obj_t * obj);
+
+bool lv_obj_is_height_min(const lv_obj_t * obj);
+
+bool lv_obj_is_width_max(const lv_obj_t * obj);
+
+bool lv_obj_is_height_max(const lv_obj_t * obj);
+
+/**
  * Handle if the size of the internal ("virtual") content of an object has changed.
  * @param obj       pointer to an object
  * @return          false: nothing happened; true: refresh happened
@@ -461,6 +487,30 @@ int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int3
  * @return              the clamped height
  */
 int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height);
+
+/**
+ * @brief Calculates the width in pixels of an LVGL object based on its style and parent for a given width `prop`.
+ * @param obj Pointer to the LVGL object whose width is being calculated.
+ * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
+ * LV_STYLE_MAX_WIDTH.
+ * @return The computed width for the object:
+ * @note If the style width is a fixed value, that value is returned.
+ * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
+ * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
+ */
+int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop);
+
+/**
+ * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
+ * @param obj Pointer to the LVGL object whose height is being calculated.
+ * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
+ * LV_STYLE_MAX_HEIGHT.
+ * @return The computed height for the object:
+ * @note If the style height is a fixed value, that value is returned.
+ * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
+ * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
+ */
+int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop);
 
 /**********************
  *      MACROS
