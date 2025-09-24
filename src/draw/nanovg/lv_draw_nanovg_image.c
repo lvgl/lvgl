@@ -54,8 +54,7 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
-    lv_image_decoder_dsc_t decoder_dsc;
-    const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(&decoder_dsc, dsc->src, no_cache, false);
+    const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, dsc->src, no_cache, false);
 
     if(!src_buf) {
         LV_PROFILER_DRAW_END;

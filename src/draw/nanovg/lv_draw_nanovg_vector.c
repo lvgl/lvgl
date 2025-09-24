@@ -95,9 +95,8 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
             }
             break;
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
-                lv_image_decoder_dsc_t decoder_dsc;
                 const lv_draw_image_dsc_t * img_dsc = &fill_dsc->img_dsc;
-                const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(&decoder_dsc, img_dsc->src, false, false);
+                const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, img_dsc->src, false, false);
 
                 if(!src_buf) {
                     LV_PROFILER_DRAW_END;
