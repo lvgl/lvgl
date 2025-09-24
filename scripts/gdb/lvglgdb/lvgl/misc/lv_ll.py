@@ -1,7 +1,7 @@
 from typing import Union
 import gdb
 
-from ..value import Value
+from lvglgdb.value import Value
 
 
 class LVList(Value):

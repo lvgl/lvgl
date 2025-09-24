@@ -5,7 +5,7 @@ import gdb
 import numpy as np
 from PIL import Image
 
-from ..value import Value
+from lvglgdb.value import Value
 
 
 class LVDrawBuf(Value):
@@ -143,7 +143,7 @@ class LVDrawBuf(Value):
             return False
 
     def _convert_to_image(
-            self, pixel_data: bytes, width: int, height: int, color_format: int
+        self, pixel_data: bytes, width: int, height: int, color_format: int
     ) -> Optional[Image.Image]:
         """
         Convert raw pixel data to PIL Image based on color format.
@@ -162,14 +162,18 @@ class LVDrawBuf(Value):
                 # Convert RGB565 to RGB888
                 arr = np.frombuffer(pixel_data, dtype=np.uint8)
                 arr = arr.reshape((height, width, 2))
-                rgb565 = np.frombuffer(pixel_data, dtype=np.uint16).reshape((height, width))
+                rgb565 = np.frombuffer(pixel_data, dtype=np.uint16).reshape(
+                    (height, width)
+                )
                 r = (((rgb565 & 0xF800) >> 11) << 3).astype(np.uint8)
                 g = ((rgb565 & 0x07E0) >> 3).astype(np.uint8)
                 b = ((rgb565 & 0x001F) << 3).astype(np.uint8)
                 return Image.fromarray(np.dstack((r, g, b)), "RGB")
 
             elif color_format == self._color_formats["RGB888"]:
-                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(height, width, 3)
+                arr = np.frombuffer(pixel_data, dtype=np.uint8).reshape(
+                    height, width, 3
+                )
                 rgb_arr = arr[:, :, [2, 1, 0]]  # BGR -> RGB
                 return Image.fromarray(rgb_arr, "RGB")
 

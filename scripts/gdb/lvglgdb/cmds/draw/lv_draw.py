@@ -1,7 +1,7 @@
 import gdb
 
-from .. import lv_global
-from ..value import Value
+from lvglgdb.value import Value
+from lvglgdb.lvgl import curr_inst
 
 
 class InfoDrawUnit(gdb.Command):
@@ -46,5 +46,5 @@ class InfoDrawUnit(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        for unit in lv_global.g_lvgl_instance.draw_units():
+        for unit in curr_inst().draw_units():
             self.dump_draw_unit(unit)
