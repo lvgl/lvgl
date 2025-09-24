@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_xml_button_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_BUTTON
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
 

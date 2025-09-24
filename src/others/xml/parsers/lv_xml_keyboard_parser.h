@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_xml.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_KEYBOARD
 
 /**********************
  *      TYPEDEFS
