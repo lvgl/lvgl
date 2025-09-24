@@ -16,6 +16,7 @@
 #include "../lv_draw_image_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_pending.h"
+#include "../../libs/freetype/lv_freetype.h"
 
 /*********************
 *      DEFINES
