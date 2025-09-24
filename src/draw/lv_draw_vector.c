@@ -387,11 +387,7 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
     area->y2 = lroundf(y2);
 }
 
-<<<<<<< HEAD
 void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry)
-=======
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
->>>>>>> 1627d1f87 (path_attr->path_ctx and path_shape->path)
 {
     if(w <= 0.0f || h <= 0.0f) return;
 
