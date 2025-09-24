@@ -170,6 +170,12 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
                                bool pie)
 {
     LV_PROFILER_DRAW_BEGIN;
+
+    if(radius <= 0) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     /* just circle */
     if(sweep >= 360.0f || sweep <= -360.0f) {
         nvgCircle(ctx, cx, cy, radius);
