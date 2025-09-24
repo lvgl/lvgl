@@ -11,11 +11,11 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "lv_nanovg_pending.h"
 #include "lv_nanovg_utils.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
+#include "../../misc/lv_pending.h"
 
 /*********************
 *      DEFINES
@@ -77,8 +77,8 @@ void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u)
 
     u->letter_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(letter_item_t), LETTER_CACHE_CNT, ops);
     lv_cache_set_name(u->letter_cache, "NVG_LETTER");
-    u->letter_pending = lv_nanovg_pending_create(sizeof(lv_cache_entry_t *), 4);
-    lv_nanovg_pending_set_free_cb(u->letter_pending, letter_cache_release_cb, u->letter_cache);
+    u->letter_pending = lv_pending_create(sizeof(lv_cache_entry_t *), 4);
+    lv_pending_set_free_cb(u->letter_pending, letter_cache_release_cb, u->letter_cache);
 }
 
 void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u)
@@ -87,7 +87,7 @@ void lv_draw_nanovg_label_deinit(lv_draw_nanovg_unit_t * u)
     LV_ASSERT(u->letter_cache);
     LV_ASSERT(u->letter_pending);
 
-    lv_nanovg_pending_destroy(u->letter_pending);
+    lv_pending_destroy(u->letter_pending);
     u->letter_pending = NULL;
 
     lv_cache_destroy(u->letter_cache, NULL);
@@ -248,7 +248,7 @@ static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_gly
     }
 
     /* Add the new entry to the pending list */
-    lv_nanovg_pending_add(u->letter_pending, &cache_node_entry);
+    lv_pending_add(u->letter_pending, &cache_node_entry);
 
     letter_item_t * letter_item = lv_cache_entry_get_data(cache_node_entry);
 
