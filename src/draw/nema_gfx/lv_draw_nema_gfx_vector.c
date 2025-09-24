@@ -31,7 +31,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -45,7 +45,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc,
+void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc,
                              const lv_area_t * coords)
 {
     ctx_t c;
@@ -81,7 +81,7 @@ void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t
  *   STATIC FUNCTIONS
  **********************/
 
-static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc)
 {
     ctx_t * c = ctx;
     lv_draw_nema_gfx_unit_t * u = c->u;
