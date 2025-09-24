@@ -568,13 +568,13 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps[idx].param.subject_compare.value = lv_strdup(value_str);
     }
     else if(lv_streq(name, "set_language")) {
-        test.step_cnt++;
         const char * obj_name = lv_xml_get_value_of(attrs, "name");
         if(obj_name == NULL) {
             LV_LOG_WARN("No name is set in test step");
             return;
         }
 
+        test.step_cnt++;
         test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SET_LANGUAGE;
