@@ -46,5 +46,5 @@ class InfoDrawUnit(gdb.Command):
         )
 
     def invoke(self, args, from_tty):
-        for unit in curr_inst.draw_units():
+        for unit in curr_inst().draw_units():
             self.dump_draw_unit(unit)

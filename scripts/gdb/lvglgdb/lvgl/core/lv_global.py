@@ -99,4 +99,9 @@ class _LVGLSingleton:
         self._ready = False
 
 
-curr_inst = _LVGLSingleton()
+__curr_inst = _LVGLSingleton()
+
+
+def curr_inst() -> _LVGLSingleton:
+    """Get the global instance of LVGL"""
+    return __curr_inst

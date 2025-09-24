@@ -36,7 +36,7 @@ class DumpDisplayBuf(gdb.Command):
         except SystemExit:
             return
 
-        display = curr_inst.disp_default()
+        display = curr_inst().disp_default()
         if not display:
             print("Error: Invalid display pointer")
             return

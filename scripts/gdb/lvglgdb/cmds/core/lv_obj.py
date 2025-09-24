@@ -56,7 +56,7 @@ class DumpObj(gdb.Command):
         else:
             # dump all displays
             depth = 0
-            for disp in curr_inst.displays():
+            for disp in curr_inst().displays():
                 print(f"Display {hex(disp)}")
                 for screen in disp.screens:
                     print(f'{"  " * (depth + 1)}Screen@{hex(screen)}')
