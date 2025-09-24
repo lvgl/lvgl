@@ -41,8 +41,6 @@ remove the misleading guide above this code segment.
 ```
 4. Remove macro definitions for
 
-   - LV_USE_DEMO_WIDGETS
-   - LV_USE_DEMO_BENCHMARK
    - LV_USE_IME_PINYIN
    - LV_USE_OS
    - LV_USE_FILE_EXPLORER
