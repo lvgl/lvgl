@@ -26,7 +26,7 @@
 /**
  * \brief       Filesystem header
  */
-typedef struct __attribute__((packed)) frogfs_head_t {
+typedef struct frogfs_head_t {
     uint32_t magic; /**< filesystem magic */
     uint8_t ver_major; /**< major version */
     uint8_t ver_minor; /**< minor version */
@@ -37,7 +37,7 @@ typedef struct __attribute__((packed)) frogfs_head_t {
 /**
  * \brief       Hash table entry
  */
-typedef struct __attribute__((packed)) frogfs_hash_t {
+typedef struct frogfs_hash_t {
     uint32_t hash; /**< path hash */
     uint32_t offs; /**< object offset */
 } frogfs_hash_t;
@@ -45,7 +45,7 @@ typedef struct __attribute__((packed)) frogfs_hash_t {
 /**
  * \brief       Entry header
  */
-struct __attribute__((packed)) frogfs_entry_t {
+struct frogfs_entry_t {
     uint32_t parent; /**< parent entry offset */
     union {
         uint16_t child_count; /**< child entry count */
@@ -58,7 +58,7 @@ struct __attribute__((packed)) frogfs_entry_t {
 /**
  * \brief       Directory object header
  */
-typedef struct __attribute__((packed)) frogfs_dir_t {
+typedef struct frogfs_dir_t {
     const frogfs_entry_t entry;
     uint32_t children[];
 } frogfs_dir_t;
@@ -66,7 +66,7 @@ typedef struct __attribute__((packed)) frogfs_dir_t {
 /**
  * \brief       File object header
  */
-typedef struct __attribute__((packed)) frogfs_file_t {
+typedef struct frogfs_file_t {
     const frogfs_entry_t entry;
     uint32_t data_offs;
     uint32_t data_sz;
@@ -75,7 +75,7 @@ typedef struct __attribute__((packed)) frogfs_file_t {
 /**
  * \brief       Compressed file object header
  */
-typedef struct __attribute__((packed)) frogfs_comp_t {
+typedef struct frogfs_comp_t {
     const frogfs_entry_t entry;
     uint32_t data_offs;
     uint32_t data_sz; /**< data size (before alignment) */
@@ -85,6 +85,6 @@ typedef struct __attribute__((packed)) frogfs_comp_t {
 /**
  * \brief       Filesystem footer
  */
-typedef struct __attribute__((packed)) frogfs_foot_t {
+typedef struct frogfs_foot_t {
     uint32_t crc32; /**< crc32 of entire file without this field */
 } frogfs_foot_t;
