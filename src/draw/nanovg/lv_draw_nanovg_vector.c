@@ -221,8 +221,8 @@ static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fp
 
     float min_x = FLT_MAX;
     float min_y = FLT_MAX;
-    float max_x = FLT_MIN;
-    float max_y = FLT_MIN;
+    float max_x = -FLT_MAX;
+    float max_y = -FLT_MAX;
 
 #define CMP_BOUNDS(point)                           \
     do {                                            \

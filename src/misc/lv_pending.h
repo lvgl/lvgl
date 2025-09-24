@@ -63,13 +63,13 @@ void lv_pending_set_free_cb(lv_pending_t * pending, lv_pending_free_cb_t free_cb
 void lv_pending_add(lv_pending_t * pending, void * obj);
 
 /**
- * Remove all objects from the active pending list
+ * Remove all objects from both pending lists
  * @param pending pointer to the pending list
  */
 void lv_pending_remove_all(lv_pending_t * pending);
 
 /**
- * Remove all old objects reference and swap new objects reference
+ * Remove all old object references and swap new object references
  * @param pending pointer to the pending list
  */
 void lv_pending_swap(lv_pending_t * pending);

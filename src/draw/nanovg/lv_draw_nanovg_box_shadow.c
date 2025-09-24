@@ -57,8 +57,8 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
 
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
-    lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, &shadow_area, &t->clip_area)) {
+    lv_area_t clip_area;
+    if(!lv_area_intersect(&clip_area, &shadow_area, &t->clip_area)) {
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -68,8 +68,8 @@ void lv_draw_nanovg_box_shadow(lv_draw_task_t * t, const lv_draw_box_shadow_dsc_
     const NVGcolor icol = lv_nanovg_color_convert(dsc->color, dsc->opa);
     const NVGcolor ocol = lv_nanovg_color_convert(lv_color_black(), 0);
 
-    const int32_t w = lv_area_get_width(&draw_area);
-    const int32_t h = lv_area_get_height(&draw_area);
+    const int32_t w = lv_area_get_width(&shadow_area);
+    const int32_t h = lv_area_get_height(&shadow_area);
 
     NVGpaint paint = nvgBoxGradient(
                          u->vg,

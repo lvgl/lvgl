@@ -77,7 +77,7 @@ static inline float math_fast_inv_sqrtf(float number)
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_VG_LITE*/
+#endif /*LV_USE_DRAW_NANOVG*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
