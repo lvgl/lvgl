@@ -50,17 +50,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_nanovg_pending_t;
+struct _lv_pending_t;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
     NVGcontext * vg;
     bool is_started;
     lv_draw_buf_t * image_buf;
-    struct _lv_nanovg_pending_t * image_pending;
+    struct _lv_pending_t * image_pending;
 
     lv_cache_t * letter_cache;
-    struct _lv_nanovg_pending_t * letter_pending;
+    struct _lv_pending_t * letter_pending;
 } lv_draw_nanovg_unit_t;
 
 /**********************

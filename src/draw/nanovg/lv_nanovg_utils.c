@@ -12,8 +12,8 @@
 #if LV_USE_DRAW_NANOVG
 
 #include "../lv_image_decoder_private.h"
+#include "../../misc/lv_pending.h"
 #include "lv_draw_nanovg_private.h"
-#include "lv_nanovg_pending.h"
 #include "lv_nanovg_math.h"
 #include <float.h>
 #include <math.h>
@@ -61,15 +61,15 @@ void lv_nanovg_utils_init(struct _lv_draw_nanovg_unit_t * u)
     LV_ASSERT_NULL(u);
     LV_ASSERT(u->image_pending == NULL);
 
-    u->image_pending = lv_nanovg_pending_create(sizeof(int), 8);
-    lv_nanovg_pending_set_free_cb(u->image_pending, image_free_cb, u->vg);
+    u->image_pending = lv_pending_create(sizeof(int), 8);
+    lv_pending_set_free_cb(u->image_pending, image_free_cb, u->vg);
 }
 
 void lv_nanovg_utils_deinit(struct _lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(u->image_pending)
-    lv_nanovg_pending_destroy(u->image_pending);
+    lv_pending_destroy(u->image_pending);
     u->image_pending = NULL;
 
     if(u->image_buf) {
@@ -256,9 +256,9 @@ void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
     nvgEndFrame(u->vg);
     LV_PROFILER_DRAW_END_TAG("nvgEndFrame");
 
-    lv_nanovg_pending_remove_all(u->image_pending);
+    lv_pending_remove_all(u->image_pending);
 
-    lv_nanovg_pending_remove_all(u->letter_pending);
+    lv_pending_remove_all(u->letter_pending);
 
     u->is_started = false;
 
@@ -425,7 +425,7 @@ int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t 
     int image_handle = nvgCreateImageRGBA(u->vg, w, h, 0, lv_draw_buf_goto_xy(u->image_buf, 0, 0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
 
-    lv_nanovg_pending_add(u->image_pending, &image_handle);
+    lv_pending_add(u->image_pending, &image_handle);
 
     return image_handle;
 }
