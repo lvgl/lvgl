@@ -62,6 +62,7 @@ typedef struct {
 typedef struct {
     lv_subject_t * subject;
     int32_t step;
+    bool rollover;
 } subject_increment_user_data_t;
 
 /**********************
@@ -217,7 +218,7 @@ float lv_subject_get_previous_float(lv_subject_t * subject)
 
 void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value)
 {
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
         return;
     }
@@ -227,7 +228,7 @@ void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value)
 
 void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
 {
-    if(subject->type != LV_SUBJECT_TYPE_INT) {
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
         return;
     }
@@ -575,7 +576,8 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
-void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step)
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        bool rollover)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
         LV_LOG_WARN("Subject type must be `int` or `float` (was %d)", subject->type);
@@ -591,6 +593,7 @@ void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, 
 
     user_data->step = step;
     user_data->subject = subject;
+    user_data->rollover = rollover;
     lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
     lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
@@ -851,13 +854,33 @@ static void subject_increment_cb(lv_event_t * e)
     if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
         int32_t value = lv_subject_get_int(user_data->subject);
         value += user_data->step;
+
+        if(user_data->rollover) {
+            if(value > user_data->subject->max_value.num) {
+                value = user_data->subject->min_value.num;
+            }
+            else if(value < user_data->subject->min_value.num) {
+                value = user_data->subject->max_value.num;
+            }
+        }
+
         lv_subject_set_int(user_data->subject, value);
     }
 #if LV_USE_FLOAT
     else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
         float value = lv_subject_get_float(user_data->subject);
+
+        if(user_data->rollover) {
+            if(value > user_data->subject->max_value.float_v) {
+                value = user_data->subject->min_value.float_v;
+            }
+            else if(value < user_data->subject->min_value.float_v) {
+                value = user_data->subject->max_value.float_v;
+            }
+        }
+
         value += (float)user_data->step;
-        lv_subject_set_float(user_data->subject, (float)value);
+        lv_subject_set_float(user_data->subject, value);
     }
 #endif
 }

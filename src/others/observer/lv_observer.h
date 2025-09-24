@@ -108,7 +108,7 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject);
 
 
 /**
- * Set a minimum value for a integer subject
+ * Set a minimum value for an integer subject
  * @param subject   pointer to Subject
  * @param min_value the minimum value
  */
@@ -379,8 +379,11 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param subject   pointer to a subject to change
  * @param trigger   the trigger on which the subject should be changed
  * @param step      value to add on trigger
+ * @param rollover  if true and the subject's maximum value is exceeded the minimum value is set,
+ *                  if the minimum value is reached, the maximum value will be set on rollover.
  */
-void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step);
+void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
+                                        bool rollover);
 
 /**
  * Toggle the value of an integer subject on an event. If it was != 0 it will be 0.

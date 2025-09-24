@@ -298,7 +298,7 @@ void lv_obj_xml_subject_toggle_apply(lv_xml_parser_state_t * state, const char *
     lv_event_code_t trigger = LV_EVENT_CLICKED;
     if(trigger_str) trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
     if(trigger == LV_EVENT_LAST)  {
-        LV_LOG_WARN("Couldn't apply <subject_toggle_event> because `%s` trigger is invalid.", trigger_str);
+        LV_LOG_WARN("Couldn't apply <lv_obj-subject_toggle_event> because `%s` trigger is invalid.", trigger_str);
         return;
     }
 
@@ -403,6 +403,7 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
     const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
     const char * step_str =  lv_xml_get_value_of(attrs, "step");
+    const char * rollover_str =  lv_xml_get_value_of(attrs, "rollover");
 
     if(subject_str == NULL) {
         LV_LOG_WARN("`subject` is missing in <lv_obj-subject_increment>");
@@ -410,11 +411,12 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     }
 
     if(step_str == NULL) step_str = "1";
+    if(rollover_str == NULL) rollover_str = "false";
 
     lv_event_code_t trigger = LV_EVENT_CLICKED;
     if(trigger_str) trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
     if(trigger == LV_EVENT_LAST)  {
-        LV_LOG_WARN("Couldn't apply <subject_increment> because `%s` trigger is invalid.", trigger_str);
+        LV_LOG_WARN("Couldn't apply <lv_obj-subject_increment> because `%s` trigger is invalid.", trigger_str);
         return;
     }
 
@@ -432,7 +434,8 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     void * item = lv_xml_state_get_item(state);
 
     int32_t step = lv_xml_atoi(step_str);
-    lv_obj_add_subject_increment_event(item, subject, trigger, step);
+    bool rollover = lv_xml_to_bool(rollover_str);
+    lv_obj_add_subject_increment_event(item, subject, trigger, step, rollover);
 }
 
 void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs)
