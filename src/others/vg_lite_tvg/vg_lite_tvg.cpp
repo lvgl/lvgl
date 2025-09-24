@@ -2476,7 +2476,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
     float x_max = path->bounding_box[2];
     float y_max = path->bounding_box[3];
 
-    if(math_equal(x_min, FLT_MIN) && math_equal(y_min, FLT_MIN)
+    if(math_equal(x_min, -FLT_MAX) && math_equal(y_min, -FLT_MAX)
        && math_equal(x_max, FLT_MAX) && math_equal(y_max, FLT_MAX)) {
         return Result::Success;
     }

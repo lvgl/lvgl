@@ -359,8 +359,8 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 
     float min_x = FLT_MAX;
     float min_y = FLT_MAX;
-    float max_x = FLT_MIN;
-    float max_y = FLT_MIN;
+    float max_x = -FLT_MAX;
+    float max_y = -FLT_MAX;
 
 #define CMP_BOUNDS(point)                           \
     do {                                            \
