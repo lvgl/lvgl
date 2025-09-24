@@ -1,5 +1,5 @@
 /**
- * @file lv_nanovg_pending.c
+ * @file lv_pending.c
  *
  */
 
@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nanovg_pending.h"
-
-#if LV_USE_DRAW_NANOVG
+#include "lv_pending.h"
+#include "lv_array.h"
+#include "lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -19,11 +19,11 @@
  *      TYPEDEFS
  **********************/
 
-struct _lv_nanovg_pending_t {
+struct _lv_pending_t {
     lv_array_t * arr_act;
     lv_array_t arr_1;
     lv_array_t arr_2;
-    lv_nanovg_pending_free_cb_t free_cb;
+    lv_pending_free_cb_t free_cb;
     void * user_data;
 };
 
@@ -31,7 +31,7 @@ struct _lv_nanovg_pending_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static inline void lv_nanovg_pending_array_clear(lv_nanovg_pending_t * pending, lv_array_t * arr);
+static inline void lv_pending_array_clear(lv_pending_t * pending, lv_array_t * arr);
 
 /**********************
  *  STATIC VARIABLES
@@ -45,9 +45,9 @@ static inline void lv_nanovg_pending_array_clear(lv_nanovg_pending_t * pending, 
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_nanovg_pending_t * lv_nanovg_pending_create(size_t obj_size, uint32_t capacity_default)
+lv_pending_t * lv_pending_create(size_t obj_size, uint32_t capacity_default)
 {
-    lv_nanovg_pending_t * pending = lv_malloc_zeroed(sizeof(lv_nanovg_pending_t));
+    lv_pending_t * pending = lv_malloc_zeroed(sizeof(lv_pending_t));
     LV_ASSERT_MALLOC(pending);
     lv_array_init(&pending->arr_1, capacity_default, obj_size);
     lv_array_init(&pending->arr_2, capacity_default, obj_size);
@@ -55,18 +55,18 @@ lv_nanovg_pending_t * lv_nanovg_pending_create(size_t obj_size, uint32_t capacit
     return pending;
 }
 
-void lv_nanovg_pending_destroy(lv_nanovg_pending_t * pending)
+void lv_pending_destroy(lv_pending_t * pending)
 {
     LV_ASSERT_NULL(pending);
-    lv_nanovg_pending_remove_all(pending);
+    lv_pending_remove_all(pending);
     lv_array_deinit(&pending->arr_1);
     lv_array_deinit(&pending->arr_2);
-    lv_memzero(pending, sizeof(lv_nanovg_pending_t));
+    lv_memzero(pending, sizeof(lv_pending_t));
     lv_free(pending);
 }
 
-void lv_nanovg_pending_set_free_cb(lv_nanovg_pending_t * pending, lv_nanovg_pending_free_cb_t free_cb,
-                                   void * user_data)
+void lv_pending_set_free_cb(lv_pending_t * pending, lv_pending_free_cb_t free_cb,
+                            void * user_data)
 {
     LV_ASSERT_NULL(pending);
     LV_ASSERT_NULL(free_cb);
@@ -74,32 +74,32 @@ void lv_nanovg_pending_set_free_cb(lv_nanovg_pending_t * pending, lv_nanovg_pend
     pending->user_data = user_data;
 }
 
-void lv_nanovg_pending_add(lv_nanovg_pending_t * pending, void * obj)
+void lv_pending_add(lv_pending_t * pending, void * obj)
 {
     LV_ASSERT_NULL(pending);
     LV_ASSERT_NULL(obj);
     lv_array_push_back(pending->arr_act, obj);
 }
 
-void lv_nanovg_pending_remove_all(lv_nanovg_pending_t * pending)
+void lv_pending_remove_all(lv_pending_t * pending)
 {
     LV_ASSERT_NULL(pending);
 
-    lv_nanovg_pending_array_clear(pending, &pending->arr_1);
-    lv_nanovg_pending_array_clear(pending, &pending->arr_2);
+    lv_pending_array_clear(pending, &pending->arr_1);
+    lv_pending_array_clear(pending, &pending->arr_2);
 }
 
-void lv_nanovg_pending_swap(lv_nanovg_pending_t * pending)
+void lv_pending_swap(lv_pending_t * pending)
 {
     pending->arr_act = (pending->arr_act == &pending->arr_1) ? &pending->arr_2 : &pending->arr_1;
-    lv_nanovg_pending_array_clear(pending, pending->arr_act);
+    lv_pending_array_clear(pending, pending->arr_act);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static inline void lv_nanovg_pending_array_clear(lv_nanovg_pending_t * pending, lv_array_t * arr)
+static inline void lv_pending_array_clear(lv_pending_t * pending, lv_array_t * arr)
 {
     LV_ASSERT_NULL(pending->free_cb);
 
@@ -115,5 +115,3 @@ static inline void lv_nanovg_pending_array_clear(lv_nanovg_pending_t * pending, 
 
     lv_array_clear(arr);
 }
-
-#endif /*LV_USE_DRAW_NANOVG*/
