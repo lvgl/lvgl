@@ -1,8 +1,7 @@
 .. _running_on_pc:
-
-=============
 .. _simulator:
 
+=============
 Running on PC
 =============
 
