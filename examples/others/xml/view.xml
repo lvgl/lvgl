@@ -9,26 +9,21 @@
 		<style name="btn_pr_style" bg_opa="255"/>
 	</styles>
 
-	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue"
-        style_layout="grid" style_grid_column_dsc_array="100 fr(1)" style_grid_row_dsc_array="50 200"
+    <subjects>
+        <int name="asd" value="123"/>
+    </subjects>
 
-    >
-        <lv_obj style_grid_cell_column_pos="0" style_grid_cell_column_span="1" style_grid_cell_x_align="stretch"
-                style_grid_cell_row_pos="0" style_grid_cell_row_span="1"  style_grid_cell_y_align="stretch">
-            <lv_label text="0/0"/>
-        </lv_obj>
-        <lv_obj style_grid_cell_column_pos="0" style_grid_cell_column_span="1" style_grid_cell_x_align="stretch"
-                style_grid_cell_row_pos="1" style_grid_cell_row_span="1"  style_grid_cell_y_align="stretch">
-            <lv_label text="0/1"/>
-        </lv_obj>
-        <lv_obj style_grid_cell_column_pos="1" style_grid_cell_column_span="1" style_grid_cell_x_align="stretch"
-                style_grid_cell_row_pos="0" style_grid_cell_row_span="1"  style_grid_cell_y_align="stretch">
-            <lv_label text="1/0"/>
-        </lv_obj>
-        <lv_obj style_grid_cell_column_pos="1" style_grid_cell_column_span="1" style_grid_cell_x_align="stretch"
-                style_grid_cell_row_pos="1" style_grid_cell_row_span="1"  style_grid_cell_y_align="stretch">
-            <lv_label text="1/1"/>
-        </lv_obj>
+	<view extends="lv_obj" flex_flow="column" height="200">
+
+    <lv_button>
+<!--         <subject_toggle_event subject="asd" trigger="clicked"/> -->
+<subject_increment_event subject="asd" step="1"/>
+        <lv_label bind_text="asd"/>
+    </lv_button>
+
+    <lv_slider>
+        <bind_flag_if_eq flag="hidden" subject="asd" ref_value="1"/>
+    </lv_slider>
 
 	</view>
 </component>
