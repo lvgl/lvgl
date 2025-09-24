@@ -224,9 +224,15 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 
 void lv_wayland_assign_physical_display(lv_display_t * disp, int display)
 {
+    if(!disp) {
+        LV_LOG_ERROR("Invalid display");
+        return;
+    }
+
     struct window * window = lv_display_get_user_data(disp);
 
     if(!window || window->closed) {
+        LV_LOG_ERROR("Invalid wind");
         return;
     }
 
