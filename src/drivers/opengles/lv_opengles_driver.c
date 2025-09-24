@@ -20,6 +20,7 @@
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_standard_shader.h"
 #include <stdio.h> /* MK TEMP */
+#include <math.h> /* MK TEMP */
 
 /*********************
  *      DEFINES
@@ -155,6 +156,129 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
     lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color);
     LV_PROFILER_DRAW_END;
 }
+
+void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_area_t intersection;
+    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
+    GL_CALL(glActiveTexture(GL_TEXTURE0));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+
+    float hor_scale = 1.0f;
+    float ver_scale = 1.0f;
+    float hor_translate = 0.0f;
+    float ver_translate = 0.0f;
+    hor_scale = h_flip ? -hor_scale : hor_scale;
+    ver_scale = v_flip ? ver_scale : -ver_scale;
+/*
+ *   Normal
+ */
+    float matrix[9] = {
+        hor_scale, 0.0f,      hor_translate,
+        0.0f,      ver_scale, ver_translate,
+        0.0f,      0.0f,      1.0f
+    };
+
+/*
+static float tangle = 0.0f;
+tangle += 0.001f;
+if (tangle > 2.0f) tangle = 0.f;
+
+float angle = 3.14159263f * 0.5f;//tangle;
+float tempsin = sin(angle);
+float tempcos = cos(angle);
+
+//hor_scale *= 1.15f;
+//ver_scale *= 1.15f;
+
+//LV_LOG("ANGLE: %.2f  sin: %.3f  cos: %.3f  hor_scale: %.3f  ver_scale: %.3f  hor_trans: %.3f  ver_trans: %.3f\n", angle * (180.f / 3.14159f),  tempsin, tempcos, hor_scale, ver_scale, hor_translate, ver_translate);
+float matrix[9] = {
+        tempcos * hor_scale, -tempsin * hor_scale, hor_translate,
+        tempsin * ver_scale, tempcos * ver_scale,  ver_translate,
+        0.0f,       0.0f,      1.0f
+    };*/
+
+    if(texture != 0) {
+        /*
+        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, 0.f, 1.f);
+        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, 0.f, 1.f);
+        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, 0.f, 1.f);
+        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, 0.f, 1.f)
+                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
+        */
+        //LV_LOG("CLIP X1/Y1: (%f, %f) X2/Y2: (%f, %f)\n", clip_x1, clip_y1, clip_x2, clip_y2);
+        float clip_x1 = 0.f;//clip_x1 > 1.0f ? 1.0f : clip_x1; 
+        float clip_y1 = 0.f;//clip_y1 > 1.0f ? 1.0f : clip_y1; 
+        float clip_x2 = 1.f;//clip_x2 > 1.0f ? 1.0f : clip_x2; 
+        float clip_y2 = 1.f;//clip_y2 > 1.0f ? 1.0f : clip_y2;
+
+        lv_display_rotation_t rotation = lv_display_get_rotation(lv_display_get_default());
+        switch(rotation) {
+            case LV_DISPLAY_ROTATION_90:
+                float rotated_90_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+                     1.0f,  1.0f, clip_x1, clip_y2,
+                     1.0f, -1.0f, clip_x2, clip_y2,
+                    -1.0f, -1.0f, clip_x2, clip_y1,
+                    -1.0f,  1.0f, clip_x1, clip_y1
+                };
+                lv_opengles_vertex_buffer_init(rotated_90_positions, sizeof(rotated_90_positions));
+                break;
+            case LV_DISPLAY_ROTATION_180:
+                float rotated_180_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+                     1.0f, -1.0f, clip_x1, clip_y2,
+                    -1.0f, -1.0f, clip_x2, clip_y2,
+                    -1.0f,  1.0f, clip_x2, clip_y1,
+                     1.0f,  1.0f, clip_x1, clip_y1
+                };
+                lv_opengles_vertex_buffer_init(rotated_180_positions, sizeof(rotated_180_positions));
+                break;
+            case LV_DISPLAY_ROTATION_270:
+                float rotated_270_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+                    -1.0f, -1.0f, clip_x1, clip_y2,
+                    -1.0f,  1.0f, clip_x2, clip_y2,
+                     1.0f,  1.0f, clip_x2, clip_y1,
+                     1.0f, -1.0f, clip_x1, clip_y1
+                };
+                lv_opengles_vertex_buffer_init(rotated_270_positions, sizeof(rotated_270_positions));
+                break;
+            default: //LV_DISPLAY_ROTATION_0
+                float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
+                    -1.f,  1.0f, clip_x1, clip_y2,
+                    1.0f,  1.0f, clip_x2, clip_y2,
+                    1.0f, -1.0f, clip_x2, clip_y1,
+                    -1.f, -1.0f, clip_x1, clip_y1
+                };
+                lv_opengles_vertex_buffer_init(positions, sizeof(positions));
+                break;
+            }
+    }
+
+    lv_opengles_shader_bind();
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i("u_Texture", 0);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
+    lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
+    lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
+
+#if TEST_SHADER_DEFINE
+    lv_opengles_shader_set_uniform1f("u_Hue", 0.75f);
+    lv_opengles_shader_set_uniform1f("u_Saturation", 1.5f);
+    lv_opengles_shader_set_uniform1f("u_Value", 1.25f);
+#endif /*TEST_SHADER_DEFINE*/
+
+    lv_opengles_render_draw();
+    LV_PROFILER_DRAW_END;
+}
+
 
 void lv_opengles_render_clear(void)
 {

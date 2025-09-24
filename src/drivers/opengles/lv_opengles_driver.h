@@ -81,6 +81,8 @@ void lv_opengles_render_clear(void);
  */
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 
+void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
+
 /**********************
  *      MACROS
  **********************/

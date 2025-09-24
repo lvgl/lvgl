@@ -53,6 +53,9 @@ unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp);
  */
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id);
 
+void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t height);
+void lv_opengles_texture_into_placeholder(lv_display_t * placeholder, int32_t w, int32_t h);
+
 /**********************
  *      MACROS
  **********************/

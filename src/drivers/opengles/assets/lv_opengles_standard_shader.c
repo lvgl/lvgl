@@ -95,7 +95,8 @@ static const char *src_fragment_shader = R"(
         if (u_IsFill) {
             texColor = vec4(u_FillColor, 1.0);
         } else {
-            texColor = texture(u_Texture, v_TexCoord);
+            //texColor = texture(u_Texture, v_TexCoord);
+            texColor = textureLod(u_Texture, v_TexCoord, 0.0);  // If the vertices have been transformed, and mipmaps have not been generated, some rotation angles (notably 90 and 270) require using textureLod() to mitigate derivative calculation errors from increments flipping direction
         }
         if (abs(u_ColorDepth - 8.0) < 0.1) {
             float gray = texColor.r;
