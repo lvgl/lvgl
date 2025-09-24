@@ -15,6 +15,6 @@ graph TD
     gdb_cmds --> lvgl
 
     classDef pkg fill:white,stroke:gray
-    classDef core fill:#white,stroke:#gray
+    classDef core fill:white,stroke:gray
     class lvglgdb,lvgl,gdb_cmds pkg
 ```

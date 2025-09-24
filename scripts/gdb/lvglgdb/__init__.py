@@ -1,7 +1,7 @@
 import gdb
 
 from .lvgl import curr_inst, LVDisplay, LVDrawBuf, LVList, LVObject, dump_style_info
-from .gdb_cmds import DumpObj, DumpDisplayBuf, InfoDrawUnit, InfoStyle
+from .cmds import DumpObj, DumpDisplayBuf, InfoDrawUnit, InfoStyle
 from .debugger import Debugger
 from .value import Value
 
