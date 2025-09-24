@@ -210,8 +210,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif  /*LV_USE_LOG*/
 
 #if LV_USE_WAYLAND == 0
-    #define LV_WAYLAND_USE_DMABUF           0
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0
+    #define LV_WAYLAND_USE_DMABUF                       0
+    #define LV_WAYLAND_WINDOW_DECORATIONS               0
+    #define LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS   0
 #endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0

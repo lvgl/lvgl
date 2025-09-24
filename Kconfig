@@ -1885,6 +1885,10 @@ menu "LVGL configuration"
 			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
 			depends on LV_USE_WAYLAND
 			default n
+		config LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+			bool "Use server side window decorations, only necessary on Mutter (GNOME)"
+			depends on LV_USE_WAYLAND && !LV_WAYLAND_WINDOW_DECORATIONS
+			default n
 		config LV_WAYLAND_BUF_COUNT
 			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
 			depends on LV_USE_WAYLAND

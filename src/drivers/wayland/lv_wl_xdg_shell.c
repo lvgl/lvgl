@@ -14,6 +14,9 @@
 
 #include <linux/input-event-codes.h>
 #include "wayland_xdg_shell.h"
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    #include "wayland_xdg_decoration.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -67,7 +70,11 @@ static bool is_window_configured                              = false;
 
 void lv_wayland_xdg_shell_deinit(void)
 {
-
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    if(lv_wl_ctx.xdg_decoration_manager) {
+        zxdg_decoration_manager_v1_destroy(lv_wl_ctx.xdg_decoration_manager);
+    }
+#endif
     if(lv_wl_ctx.xdg_wm) {
         xdg_wm_base_destroy(lv_wl_ctx.xdg_wm);
     }
@@ -169,6 +176,16 @@ lv_result_t lv_wayland_xdg_shell_create_window(struct lv_wayland_context * app, 
         return LV_RESULT_INVALID;
     }
 
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    if(app->xdg_decoration_manager && !app->opt_disable_decorations) {
+        window->xdg_decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(app->xdg_decoration_manager,
+                                                                                    window->xdg_toplevel);
+        if(window->xdg_decoration) {
+            zxdg_toplevel_decoration_v1_set_mode(window->xdg_decoration, ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+        }
+    }
+#endif
+
     xdg_toplevel_add_listener(window->xdg_toplevel, lv_wayland_xdg_shell_get_toplevel_listener(), window);
     xdg_toplevel_set_title(window->xdg_toplevel, title);
     xdg_toplevel_set_app_id(window->xdg_toplevel, title);
@@ -199,7 +216,12 @@ lv_result_t lv_wayland_xdg_shell_destroy_window_surface(struct window * window)
 
 lv_result_t lv_wayland_xdg_shell_destroy_window_toplevel(struct window * window)
 {
-
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    if(window->xdg_decoration) {
+        zxdg_toplevel_decoration_v1_destroy(window->xdg_decoration);
+        window->xdg_decoration = NULL;
+    }
+#endif
     if(!window->xdg_toplevel) {
         return LV_RESULT_INVALID;
     }
