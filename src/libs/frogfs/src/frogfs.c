@@ -54,7 +54,7 @@ static inline uint32_t djb2_hash(const char *s)
 static const char *get_name(const frogfs_entry_t *entry)
 {
     if (FROGFS_IS_DIR(entry)) {
-        return (const void *) entry + 8 + (entry->child_count * 4);
+        return (const void *) entry + 8 + (entry->u.child_count * 4);
     } else if (FROGFS_IS_FILE(entry) && !FROGFS_IS_COMP(entry)) {
         return (const void *) entry + 16;
     } else {
@@ -234,7 +234,7 @@ void frogfs_stat(const frogfs_fs_t *fs, const frogfs_entry_t *entry,
     } else {
         st->type = FROGFS_ENTRY_TYPE_FILE;
         const frogfs_file_t *file = (const void *) entry;
-        st->compression = entry->compression;
+        st->compression = entry->u.compression;
         if (st->compression) {
             const frogfs_comp_t *comp = (const void *) entry;
             st->compressed_sz = comp->data_sz;
@@ -273,32 +273,32 @@ frogfs_fh_t *frogfs_open(const frogfs_fs_t *fs, const frogfs_entry_t *entry,
     fh->data_sz = file->data_sz;
     fh->flags = flags;
 
-    if (entry->compression == 0 || flags & FROGFS_OPEN_RAW) {
+    if (entry->u.compression == 0 || flags & FROGFS_OPEN_RAW) {
         fh->real_sz = file->data_sz;
         fh->decomp_funcs = &frogfs_decomp_raw;
     }
 #if CONFIG_FROGFS_USE_MINIZ == 1
-    else if ((entry->compression == FROGFS_COMP_ALGO_GZIP) ||
-            (entry->compression == FROGFS_COMP_ALGO_ZLIB)) {
+    else if ((entry->u.compression == FROGFS_COMP_ALGO_GZIP) ||
+            (entry->u.compression == FROGFS_COMP_ALGO_ZLIB)) {
         fh->real_sz = ((frogfs_comp_t *) file)->real_sz;
         fh->decomp_funcs = &frogfs_decomp_miniz;
     }
 #endif
 #if CONFIG_FROGFS_USE_ZLIB == 1
-    else if ((entry->compression == FROGFS_COMP_ALGO_GZIP) ||
-            (entry->compression == FROGFS_COMP_ALGO_ZLIB)) {
+    else if ((entry->u.compression == FROGFS_COMP_ALGO_GZIP) ||
+            (entry->u.compression == FROGFS_COMP_ALGO_ZLIB)) {
         fh->real_sz = ((frogfs_comp_t *) file)->real_sz;
         fh->decomp_funcs = &frogfs_decomp_zlib;
     }
 #endif
 #if CONFIG_FROGFS_USE_HEATSHRINK == 1
-    else if (entry->compression == FROGFS_COMP_ALGO_HEATSHRINK) {
+    else if (entry->u.compression == FROGFS_COMP_ALGO_HEATSHRINK) {
         fh->real_sz = ((frogfs_comp_t *) file)->real_sz;
         fh->decomp_funcs = &frogfs_decomp_heatshrink;
     }
 #endif
     else {
-        LV_LOG_ERROR("unsupported compression type %d", entry->compression);
+        LV_LOG_ERROR("unsupported compression type %d", entry->u.compression);
         goto err_out;
     }
 
@@ -419,7 +419,7 @@ const frogfs_entry_t *frogfs_readdir(frogfs_dh_t *dh)
         return NULL;
     }
 
-    if (dh->index < dh->dir->entry.child_count) {
+    if (dh->index < dh->dir->entry.u.child_count) {
         entry = (const void *) dh->fs->head + dh->dir->children[dh->index];
         dh->index++;
     }
@@ -432,10 +432,10 @@ void frogfs_seekdir(frogfs_dh_t *dh, long loc)
     LV_ASSERT_NULL(dh);
     LV_ASSERT(loc >= 0);
 
-    if (loc < dh->dir->entry.child_count) {
+    if (loc < dh->dir->entry.u.child_count) {
         dh->index = loc;
     } else {
-        dh->index = dh->dir->entry.child_count;
+        dh->index = dh->dir->entry.u.child_count;
     }
 }
 

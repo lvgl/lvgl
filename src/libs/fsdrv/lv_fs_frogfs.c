@@ -191,7 +191,8 @@ static bool get_blob_and_entry(const char * path, blob_t ** blob_dst, const frog
     return true;
 }
 
-static void destroy_blob(blob_t * blob) {
+static void destroy_blob(blob_t * blob)
+{
     lv_fs_drv_t * fs_drv_p = frogfs_fs_drv;
     fs_drv_data_t * data = fs_drv_p->user_data;
 

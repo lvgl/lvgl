@@ -85,18 +85,18 @@ typedef struct frogfs_fh_t frogfs_fh_t;
 /**
  * \brief       A frogfs directory handle
  */
-typedef struct frogfs_dh_t {
+struct frogfs_dh_t {
     const frogfs_fs_t *fs; /**< filesystem handle */
     frogfs_entry_t *entry; /**< directory entry */
-} frogfs_dh_t;
+};
 
 /**
  * \brief       A frogfs file handle
  */
-typedef struct frogfs_fh_t {
+struct frogfs_fh_t {
     const frogfs_fs_t *fs; /**< filesystem handle */
     frogfs_entry_t *entry; /**< file entry */
-} frogfs_fh_t;
+};
 #endif
 
 /**

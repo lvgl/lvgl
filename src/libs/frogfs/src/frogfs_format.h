@@ -11,17 +11,17 @@
 /**
  * \brief       Is entry a directory?
  */
-#define FROGFS_IS_DIR(e) (e->child_count < 0xFF00)
+#define FROGFS_IS_DIR(e) (e->u.child_count < 0xFF00)
 
 /**
  * \brief       Is entry a file?
  */
-#define FROGFS_IS_FILE(e) (e->child_count >= 0xFF00)
+#define FROGFS_IS_FILE(e) (e->u.child_count >= 0xFF00)
 
 /**
  * \brief       Is entry a compressed file?
  */
-#define FROGFS_IS_COMP(e) (e->child_count > 0xFF00)
+#define FROGFS_IS_COMP(e) (e->u.child_count > 0xFF00)
 
 /**
  * \brief       Filesystem header
@@ -45,18 +45,15 @@ typedef struct __attribute__((packed)) frogfs_hash_t {
 /**
  * \brief       Entry header
  */
-typedef struct __attribute__((packed)) frogfs_entry_t {
+struct __attribute__((packed)) frogfs_entry_t {
     uint32_t parent; /**< parent entry offset */
     union {
         uint16_t child_count; /**< child entry count */
-        struct {
-            uint8_t compression; /**< compression algorithm */
-            uint8_t _reserved;
-        };
-    };
+        uint8_t compression; /**< compression algorithm */
+    } u;
     uint8_t seg_sz; /**< path segment size (before alignment) */
     uint8_t opts; /**< compression opts */
-} frogfs_entry_t;
+};
 
 /**
  * \brief       Directory object header

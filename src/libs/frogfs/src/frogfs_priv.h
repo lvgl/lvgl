@@ -7,16 +7,16 @@
 #include "../include/frogfs/frogfs_types.h"
 
 #define FROGFS_PRIVATE_STRUCTS
+#include "../include/frogfs/frogfs.h"
 #include "frogfs_format.h"
 
 
-typedef struct frogfs_fs_t frogfs_fs_t;
 typedef struct frogfs_decomp_funcs_t frogfs_decomp_funcs_t;
 
 /**
  * \brief       Structure describing a frogfs file entry
  */
-typedef struct frogfs_fh_t {
+struct frogfs_fh_t {
     const frogfs_fs_t *fs; /**< frogfs fs pointer */
     const frogfs_file_t *file; /**< file header pointer */
     const void *data_start; /**< data start pointer */
@@ -26,27 +26,27 @@ typedef struct frogfs_fh_t {
     unsigned int flags; /** open flags */
     const frogfs_decomp_funcs_t *decomp_funcs; /**< decompresor funcs */
     void *decomp_priv; /**< decompressor private data */
-} frogfs_fh_t;
+};
 
 /**
  * \brief       Structure describing a frogfs directory entry
  */
-typedef struct frogfs_dh_t {
+struct frogfs_dh_t {
     const frogfs_fs_t *fs; /**< frogfs fs pointer */
     const frogfs_dir_t *dir; /**< frogfs entry */
     long index; /**< current index */
-} frogfs_dh_t;
+};
 
 /**
  * \brief       Structure of function pointers that describe a decompressor
  */
-typedef struct frogfs_decomp_funcs_t {
+struct frogfs_decomp_funcs_t {
     int (*open)(frogfs_fh_t *f, unsigned int flags);
     void (*close)(frogfs_fh_t *f);
     ssize_t (*read)(frogfs_fh_t *f, void *buf, size_t len);
     ssize_t (*seek)(frogfs_fh_t *f, long offset, int mode);
     size_t (*tell)(frogfs_fh_t *f);
-} frogfs_decomp_funcs_t;
+};
 
 /**
  * \brief       Raw decompressor functions
