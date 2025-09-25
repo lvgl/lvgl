@@ -101,8 +101,8 @@ This is a simple example of both load and create:
 
 .. code-block:: c
 
-    lv_xml_component_register_from_data("screen1", screen1_xml);
-    lv_xml_component_register_from_data("screen2", screen2_xml);
+    lv_xml_register_component_from_data("screen1", screen1_xml);
+    lv_xml_register_component_from_data("screen2", screen2_xml);
 
     /* Create an instance of screen1 so that it can be loaded from screen2. */
     lv_obj_t * screen1 = lv_xml_create(NULL, "screen1", NULL);

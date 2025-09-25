@@ -39,7 +39,7 @@ For example:
     </globals>
 
 When registering ``globals.xml`` with
-:cpp:expr:`lv_xml_component_register_from_file("A:path/to/globals.xml")`,
+:cpp:expr:`lv_xml_register_component_from_file("A:path/to/globals.xml")`,
 fonts are automatically created with the selected font engine and mapped to the given names.
 
 The fonts can have relative paths in ``globals.xml``. Before registering ``globals.xml``,

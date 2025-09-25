@@ -39,18 +39,18 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
  * @param xml_def   the XML definition of the component as a NULL terminated string
  * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
-lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def);
+lv_result_t lv_xml_register_component_from_data(const char * name, const char * xml_def);
 
 /**
  * Load the styles, constants, another data of the component. It needs to be called only once for each component.
  * @param path      path to an XML file
  * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
-lv_result_t lv_xml_component_register_from_file(const char * path);
+lv_result_t lv_xml_register_component_from_file(const char * path);
 
 /**
  * Get the scope of a component which was registered by
- * `lv_xml_component_register_from_data` or `lv_xml_component_register_from_file`
+ * `lv_xml_register_component_from_data` or `lv_xml_register_component_from_file`
  * @param component_name    name of the component
  * @return                  pointer the scope or NULL if not found
  */

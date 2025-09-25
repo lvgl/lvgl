@@ -183,7 +183,7 @@ Load the UI from XML
 The Component XML can be loaded, and any number of instances can be created at runtime.
 
 In the simplest case, a Component can be registered with
-:cpp:expr:`lv_xml_component_register_from_file("A:path/to/my_button.xml")` and an instance can be created with
+:cpp:expr:`lv_xml_register_component_from_file("A:path/to/my_button.xml")` and an instance can be created with
 :cpp:expr:`lv_obj_t * obj = lv_xml_create(parent, "my_button", NULL)`.
 :cpp:expr:`lv_xml_load_all_from_path("A:path/to/dir")`
 will traverse a directory and register all the XML components,

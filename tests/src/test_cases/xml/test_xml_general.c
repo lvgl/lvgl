@@ -58,7 +58,7 @@ void test_xml_widget_create_from_component(void)
         "</view>"
         "</component>";
 
-    lv_xml_component_register_from_data("red_slider", red_slider_xml);
+    lv_xml_register_component_from_data("red_slider", red_slider_xml);
 
     lv_obj_t * slider;
 
@@ -104,8 +104,8 @@ void test_xml_nesting(void)
         "</view>"
         "</component>";
 
-    lv_xml_component_register_from_data("red_button", red_button_xml);
-    lv_xml_component_register_from_data("card", card_xml);
+    lv_xml_register_component_from_data("red_button", red_button_xml);
+    lv_xml_register_component_from_data("card", card_xml);
 
     lv_obj_t * card;
     card = lv_xml_create(lv_screen_active(), "card", NULL);
@@ -162,9 +162,9 @@ void test_xml_component_params(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("h3", h3_xml);
-    lv_xml_component_register_from_data("red_button", red_button_xml);
-    lv_xml_component_register_from_data("card", card_xml);
+    lv_xml_register_component_from_data("h3", h3_xml);
+    lv_xml_register_component_from_data("red_button", red_button_xml);
+    lv_xml_register_component_from_data("card", card_xml);
 
     lv_xml_create(lv_screen_active(), "card", NULL);
 
@@ -199,7 +199,7 @@ void test_xml_component_consts(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("h3", h3_xml);
+    lv_xml_register_component_from_data("h3", h3_xml);
 
     lv_xml_create(lv_screen_active(), "h3", NULL);
 
@@ -221,7 +221,7 @@ void test_xml_component_styles(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("my_btn", my_btn_xml);
+    lv_xml_register_component_from_data("my_btn", my_btn_xml);
 
     lv_xml_create(lv_screen_active(), "my_btn", NULL);
     lv_obj_t * btn = lv_xml_create(lv_screen_active(), "my_btn", NULL);
@@ -255,7 +255,7 @@ void test_xml_error_resilience_syntax_ok(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("my_btn", my_btn_xml);
+    lv_xml_register_component_from_data("my_btn", my_btn_xml);
 
     lv_obj_t * btn = lv_xml_create(lv_screen_active(), "my_btn", NULL);
     if(btn) lv_obj_set_pos(btn, 0, 100);
@@ -291,7 +291,7 @@ void test_xml_image_and_font(void)
     lv_xml_register_font(NULL, "lv_montserrat_16", &lv_font_montserrat_16);
     lv_xml_register_font(NULL, "lv_montserrat_18", &lv_font_montserrat_18);
 
-    lv_xml_component_register_from_data("btn", btn_xml);
+    lv_xml_register_component_from_data("btn", btn_xml);
 
     lv_obj_t * btn;
     btn = lv_xml_create(lv_screen_active(), "btn", NULL);
@@ -311,7 +311,7 @@ void test_xml_error_resilience_not_closed_tag(void)
         "<lv_label/>"
         "</component>";
 
-    lv_xml_component_register_from_data("my_btn", my_btn_xml);
+    lv_xml_register_component_from_data("my_btn", my_btn_xml);
 
     lv_obj_t * btn = lv_xml_create(lv_screen_active(), "my_btn", NULL);
     if(btn) lv_obj_set_pos(btn, 0, 100);
@@ -325,7 +325,7 @@ void test_xml_error_resilience_string(void)
         "<lv_label/>"
         "</component>";
 
-    lv_xml_component_register_from_data("my_btn", my_btn_xml);
+    lv_xml_register_component_from_data("my_btn", my_btn_xml);
 
     lv_obj_t * btn = lv_xml_create(lv_screen_active(), "my_btn", NULL);
     if(btn) lv_obj_set_pos(btn, 0, 100);
@@ -333,10 +333,10 @@ void test_xml_error_resilience_string(void)
 
 void test_xml_complex(void)
 {
-    lv_xml_component_register_from_file("A:src/test_assets/xml/my_h3.xml");
-    lv_xml_component_register_from_file("A:src/test_assets/xml/my_card.xml");
-    lv_xml_component_register_from_file("A:src/test_assets/xml/my_button.xml");
-    lv_xml_component_register_from_file("A:src/test_assets/xml/view.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/my_h3.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/my_card.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/my_button.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/view.xml");
 
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "view", NULL);
     lv_obj_set_pos(obj, 10, 10);

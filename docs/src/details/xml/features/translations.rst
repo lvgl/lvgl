@@ -38,7 +38,7 @@ Translations may be omitted --- fallbacks will be applied when needed. See :ref:
 
 To register XML translations:
 
-- :cpp:expr:`lv_xml_translation_register_from_file("path/to/file.xml")`
-- :cpp:expr:`lv_xml_translation_register_from_data(xml_string)`
+- :cpp:expr:`lv_xml_register_translation_from_file("path/to/file.xml")`
+- :cpp:expr:`lv_xml_register_translation_from_data(xml_string)`
 
 Multiple XML sources can be registered; they will be merged and searched collectively.
