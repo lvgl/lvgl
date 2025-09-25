@@ -31,3 +31,12 @@ To set a local property use functions like
 
 
 
+..  Hyperlinks
+
+.. _pseudo-elements:
+.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
+.. _pseudo-classes:
+.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
+
+
+

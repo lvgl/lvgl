@@ -14,7 +14,7 @@ This includes touch, mouse, cursor, keyboard, external buttons, encoder, navigat
 Input devices can trigger a wide variety of events such as press, release, click, double or triple click,
 scroll, hover, and others. To see the full list, check out :ref:`indev_events`.
 
-Input devices can also change the :ref:`State <parts_and_states>` of widgets. Some of the state changes are
+Input devices can also change the :ref:`State <widget_states>` of widgets. Some of the state changes are
 indev-type specific. However, the most basic one is that pressed widgets will automatically have
 :cpp:enumerator:`LV_STATE_PRESSED`. See :ref:`styles` for more details.
 

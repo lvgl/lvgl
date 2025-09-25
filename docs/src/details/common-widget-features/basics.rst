@@ -56,8 +56,4 @@ All these versatile features are introduced in detail in the upcoming sections.
 In HTML terms, think of it as a ``<div>``—a very versatile
 building block that, with some CSS and JS, can become almost anything.
 
-API
-***
-
-.. API startswith:  lv_obj_
 

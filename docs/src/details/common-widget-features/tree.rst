@@ -100,5 +100,4 @@ Widgets can be found by name in two ways:
 
 1. **Get a direct child by name** using :cpp:expr:`lv_obj_get_child_by_name(parent, "child_name")`.
    Example:
-   :cpp:expr:`lv_obj_get_child_by_name(header, "title"_
-s
+   :cpp:expr:`lv_obj_get_child_by_name(header, "title")`

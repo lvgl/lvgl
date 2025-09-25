@@ -5,7 +5,6 @@ UI Elements
 ===========
 
 .. toctree::
-    :class:    toctree-1-deep
     :maxdepth: 2
 
     components

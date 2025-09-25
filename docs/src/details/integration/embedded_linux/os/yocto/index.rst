@@ -18,9 +18,7 @@ concepts of Yocto and to help beginners to start with Yocto.
 
 
 .. toctree::
-   :class:    toctree-1-deep
-   :titlesonly:
-   :maxdepth: 1
+   :maxdepth: 2
 
    core_components
    lvgl_recipe

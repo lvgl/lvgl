@@ -29,7 +29,7 @@ border width, font, text color and so on. It's similar to a ``class`` in CSS.
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the Widget changes state.
 
-
+For the full list of style properties click :ref:`here <style_properties>`.
 
 .. _style_states:
 
@@ -233,6 +233,39 @@ case ARGB rendering needs to be used, a widget might not cover its area
 if it has radius, ``bg_opa < 255``, has shadow, outline, etc.
 
 The click area of the widget is also transformed accordingly.
+
+.. _typical bg props:
+
+Typically background properties
+*****************************
+
+In documentation of widgets you will see sentences like "This Widget uses the typical background style properties".  These "typical
+background properties" are the properties being referred to:
+
+- Background
+- Border
+- Outline
+- Shadow
+- Padding
+- Width and height transformation
+- X and Y translation
+
+See :ref:`boxing_model` for the meanings of these terms.
+
+
+
+Examples
+********
+
+.. include:: ../../../examples/styles/index.rst
+
+..  Hyperlinks
+
+.. _pseudo-elements:
+.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
+.. _pseudo-classes:
+.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
+
 
 
 

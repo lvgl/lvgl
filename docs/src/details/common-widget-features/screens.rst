@@ -1,4 +1,4 @@
-.. _screen:
+.. _screens:
 
 =======
 Screens
