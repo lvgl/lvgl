@@ -237,7 +237,7 @@ The click area of the widget is also transformed accordingly.
 .. _typical bg props:
 
 Typically background properties
-*****************************
+*******************************
 
 In documentation of widgets you will see sentences like "This Widget uses the typical background style properties".  These "typical
 background properties" are the properties being referred to:
@@ -251,8 +251,6 @@ background properties" are the properties being referred to:
 - X and Y translation
 
 See :ref:`boxing_model` for the meanings of these terms.
-
-
 
 Examples
 ********
