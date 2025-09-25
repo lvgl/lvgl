@@ -269,10 +269,19 @@ void lv_nanovg_end_frame(struct _lv_draw_nanovg_unit_t * u)
     nvgEndFrame(u->vg);
     LV_PROFILER_DRAW_END_TAG("nvgEndFrame");
 
+    lv_nanovg_clean_up(u);
+
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_nanovg_clean_up(struct _lv_draw_nanovg_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    LV_PROFILER_DRAW_BEGIN;
+
     lv_pending_remove_all(u->image_handle_pending);
     lv_pending_remove_all(u->image_dsc_pending);
     lv_pending_remove_all(u->letter_pending);
-
     u->is_started = false;
 
     LV_PROFILER_DRAW_END;
