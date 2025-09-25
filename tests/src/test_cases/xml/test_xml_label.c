@@ -71,7 +71,7 @@ void test_xml_label_translation_tag(void)
 
     lv_obj_t * scr = lv_screen_active();
     const char * label1_attrs[] = {
-        "translation-tag", "tiger",
+        "translation_tag", "tiger",
         NULL, NULL,
     };
     lv_obj_t * label = lv_xml_create(scr, "lv_label", label1_attrs);
