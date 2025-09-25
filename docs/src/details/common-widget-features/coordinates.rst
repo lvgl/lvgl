@@ -4,22 +4,29 @@
 Position and Size
 =================
 
-Similar to many other parts of LVGL, the concept of setting coordinates is inspired by CSS. LVGL does not implement CSS completely, but a comparable subset is provided (sometimes with minor adjustments).
+Similar to many other parts of LVGL, the concept of setting coordinates is inspired
+by CSS. LVGL does not implement CSS completely, but a comparable subset is provided
+(sometimes with minor adjustments).
 
 In short, this means:
 
 - If the position of a parent changes, its children will move along with it.
-- If a child is partially or fully outside its parent, the parts outside will not be visible.
+- If a child is partially or fully outside its parent, the parts outside will not be
+  visible.
 - Explicitly set coordinates are stored in styles (position, size, layout, etc.).
-- Supports min-width, max-width, min-height, max-height.
-- Supports pixel, percentage, and "content" units.
-- `x=0`, `y=0` means the top-left corner of the parent, plus the parent's left/top padding and border width.
-- Width/height represent the full size. The "content area" is smaller due to padding and border width.
+- Supports ``min-width``, ``max-width``, ``min-height``, and ``max-height``.
+- Supports pixel, percentage, and ``content`` units.
+- ``x = 0``, ``y = 0`` means the top-left corner of the parent, plus the parent's
+  left/top padding and border width.
+- ``width`` and ``height`` represent the full size. The content area is smaller due
+  to padding and border width.
 - A subset of Flexbox and Grid layouts is supported.
 
 Under the hood, position, size, and alignment are all style properties.
 
-For simplicity, there are dedicated API functions to set position and size. However, to keep LVGL's API leaner, less commonly used coordinate-related functions are only available via style properties.
+For simplicity, there are dedicated API functions to set position and size. However,
+to keep LVGL's API leaner, less commonly used coordinate-related functions are only
+available via style properties.
 
 Here’s how to set position and size directly:
 
@@ -45,10 +52,13 @@ Or via styles:
 
 Advantages of using styles:
 
-- Easily apply width/height/etc. to multiple widgets. E.g., make all sliders 100×10 pixels.
+- Easily apply width/height/etc. to multiple widgets. E.g., make all sliders 100×10 px.
 - Centralized control over values (modify in one place).
-- Values can be selectively overridden. E.g., one style sets a widget to 100×50, another overrides only the width.
-- Widget position or size can change by state. E.g., 100 px wide in :cpp:enumerator:`LV_STATE_DEFAULT` but 120 px in :cpp:enumerator:`LV_STATE_PRESSED`.
+- Values can be selectively overridden. E.g., one style sets a widget to 100×50,
+  another overrides only the width.
+- Widget position or size can change by state. E.g., 100 px wide in
+  :cpp:enumerator:`LV_STATE_DEFAULT` but 120 px in
+  :cpp:enumerator:`LV_STATE_PRESSED`.
 - Enables style transitions to animate size/position changes between states.
 
 Important Notes
@@ -61,11 +71,16 @@ This section describes special cases where LVGL's behavior might be unexpected.
 Postponed Coordinate Calculation
 --------------------------------
 
-LVGL does **not** recalculate coordinates immediately after a change. Instead, widgets are marked as "dirty." LVGL recalculates dirty widgets’ positions, sizes, and layouts just before redrawing the screen.
+LVGL does **not** recalculate coordinates immediately after a change. Instead,
+widgets are marked as "dirty." LVGL recalculates dirty widgets’ positions, sizes,
+and layouts just before redrawing the screen.
 
-So, if you change a widget’s position or size and then immediately read it, call :cpp:func:`lv_obj_update_layout()` first to ensure the values are up to date.
+So, if you change a widget’s position or size and then immediately read it, call
+:cpp:func:`lv_obj_update_layout()` first to ensure the values are up to date.
 
-Note: Since layout and size may depend on the parent, :cpp:func:`lv_obj_update_layout()` recalculates coordinates for **all** widgets on the screen of the given object.
+Note: Since layout and size may depend on the parent,
+:cpp:func:`lv_obj_update_layout()` recalculates coordinates for **all** widgets on
+the screen of the given object.
 
 .. _coord_removing_styles:
 
@@ -78,17 +93,10 @@ Coordinates are stored as style properties under the hood. So if you use:
 
    lv_obj_set_x(widget, 20);
 
-LVGL saves `x = 20` in the widget’s local style.
+LVGL saves ``x = 20`` in the widget’s local style.
 
-Normally this is transparent to the user, but if you remove a widget’s styles, its coordinates may be removed too:
-
-.. code-block:: c
-
-   lv_obj_remove_style_all(widget);
-   /* OR */
-   lv_obj_remove_style(widget, NULL, LV_PART_MAIN);
-
-For example:
+Normally this is not important for the user, but if you remove a widget’s styles, its
+coordinates may be removed too:
 
 .. code-block:: c
 
@@ -105,7 +113,9 @@ For example:
 Boxing Model
 ************
 
-LVGL follows the CSS `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__ model.
+LVGL follows the CSS ``border-box`` model:
+
+https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
 
 A widget's "box" includes:
 
@@ -118,7 +128,8 @@ A widget's "box" includes:
 .. image:: /_static/images/boxmodel.png
    :alt: Box model in LVGL
 
-The border is drawn **inside** the bounding box, and padding is applied **inside** the border. The outline (if any) is drawn **outside** the bounding box.
+The border is drawn **inside** the bounding box, and padding is applied **inside**
+the border. The outline (if any) is drawn **outside** the bounding box.
 
 Use:
 
@@ -126,7 +137,8 @@ Use:
 
    lv_obj_set_content_width(widget, 50);
 
-This sets the width of the *content*, and the actual widget width will include padding and border.
+This sets the width of the *content*, and the actual widget width will include
+padding and border.
 
 To retrieve size information:
 
@@ -148,7 +160,8 @@ The simplest way to position a widget is by pixel values:
    lv_obj_set_y(widget, 20);          /* From the top */
    lv_obj_set_pos(widget, 10, 20);    /* Set both */
 
-These values are relative to the parent's top-left corner, including the parent’s padding and border.
+These values are relative to the parent's top-left corner, including the parent’s
+padding and border.
 
 Dynamic Positioning
 *******************
@@ -191,16 +204,18 @@ Align to a different reference widget:
 
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
-This places `label` 10 px above `btn`.
+This places ``label`` 10 px above ``btn``.
 
-Unlike `lv_obj_align`, this alignment is not persistent—repositioning `btn` won’t update `label`.
+Unlike ``lv_obj_align``, this alignment is not persistent—repositioning ``btn`` won’t
+update ``label``.
 
 .. image:: /_static/images/align.png
 
 Layouts
 -------
 
-:ref:`Flex <flex>` and :ref:`Grid <grid>` layouts can automatically position widgets in rows, columns, or 2D grids. They are fully responsive.
+:ref:`Flex <flex>` and :ref:`Grid <grid>` layouts can automatically position widgets
+in rows, columns, or 2D grids. They are fully responsive.
 
 Percentage
 ----------
@@ -211,7 +226,7 @@ You can use percentages for dynamic positioning:
 
    lv_obj_set_x(widget, lv_pct(50));
 
-100% means the parent's content area (excluding padding and border).
+``100%`` means the parent's content area (the size excluding padding and border).
 
 Static Sizing
 *************
@@ -234,12 +249,13 @@ Set width or height as a percentage of the parent’s content area:
 
    lv_obj_set_height(widget, lv_pct(100));
 
-Responsive: will update automatically as the parent’s size changes.
+It also works in a responsive way, meaning the Widget's size will be updated
+automatically as the parent’s size changes.
 
 Content
 -------
 
-Use `LV_SIZE_CONTENT` to size the widget based on its children:
+Use ``LV_SIZE_CONTENT`` to size the widget based on its children:
 
 .. code-block:: c
 
@@ -247,7 +263,8 @@ Use `LV_SIZE_CONTENT` to size the widget based on its children:
    lv_obj_t * label = lv_label_create(cont);
    lv_label_set_text(label, "Some text");
 
-Ignored for hidden (`LV_OBJ_FLAG_HIDDEN`) or floating (`LV_OBJ_FLAG_FLOATING`) widgets.
+Ignored for hidden (``LV_OBJ_FLAG_HIDDEN``) or floating (``LV_OBJ_FLAG_FLOATING``)
+widgets.
 
 Layouts
 -------
@@ -259,9 +276,9 @@ Flex and Grid layouts can also stretch widgets to control both position and size
 Min and Max Size
 ****************
 
-LVGL supports `min-width`, `max-width`, `min-height`, and `max-height`.
+LVGL supports ``min-width``, ``max-width``, ``min-height``, and ``max-height``.
 
-Use them to set limits when using `LV_SIZE_CONTENT` or percentage sizes:
+Use them to set limits when using ``LV_SIZE_CONTENT`` or percentage sizes:
 
 .. code-block:: c
 
@@ -279,7 +296,8 @@ You can also use percentages:
 Translate Position
 ******************
 
-To visually move a widget from its current position without changing its base coordinates:
+To visually move a widget from its current position without changing its base
+coordinates:
 
 .. code-block:: c
 
@@ -289,7 +307,8 @@ Useful for hover or press effects.
 
 Percentage-based translation is relative to the widget’s own size (not the parent).
 
-Coordinate translation applies after layout and affects scrollbars and `LV_SIZE_CONTENT`.
+Coordinate translation applies after layout and affects scrollbars and
+``LV_SIZE_CONTENT``.
 
 .. _coord_transformation:
 
@@ -303,8 +322,33 @@ You can also visually increase the widget size without affecting layout:
    lv_style_set_transform_width(&style_pressed, 10);
    lv_style_set_transform_height(&style_pressed, 10);
 
-Unlike `translate`, this is a visual-only effect and does **not** affect layout, scrollbar behavior, or container resizing.
+Unlike ``translate``, this is a visual-only effect and does **not** affect layout,
+scrollbar behavior, or container resizing.
 
-.. _coord_example:
+DPI Independent Unit
+********************
 
+If just an integer is used as a size or position unit, it means the number of physical
+pixels on the display. This also means that if the display is changed to a new one
+with the same size but higher pixel density, everything will appear smaller.
+
+By using :cpp:expr:`lv_dpx(n)`, the values are scaled based on the DPI of the display
+to make the result independent of pixel density.
+
+The reference DPI is 160, on which ``lv_dpx(100)`` returns ``100``.
+If the DPI were only 80, ``lv_dpx(100)`` would return ``50``—only 50 pixels.
+
+The default DPI of the displays is set by :c:macro:`LV_DPI_DEF` in ``lv_conf.h``,
+but it can be modified with:
+
+:cpp:expr:`lv_display_set_dpi(disp, new_dpi)`
+
+``lv_dpx`` can be used anywhere a pixel value is needed (``x``, ``y``, ``width``,
+``height``, ``radius``, ``padding``, etc.).
+
+Note that ``lv_dpx`` is evaluated only once, so if the DPI changes afterward, the value
+won’t be updated automatically.
+
+With the help of ``lv_dpx``, only the pixel values can be scaled. Images and fonts
+still need to be changed manually to adapt to a new DPI.
 
