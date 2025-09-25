@@ -27,7 +27,7 @@ static void language_change_cb(lv_event_t * e)
 }
 
 /**
- * Bind a translation tag to a label
+ * Use a translation tag in labels
  */
 void lv_example_label_7(void)
 {

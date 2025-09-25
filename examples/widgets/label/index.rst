@@ -35,8 +35,8 @@ Monospace font
 .. lv_example:: widgets/label/lv_example_label_6
   :language: c
 
-Bind a translation tag to a label
----------------------------------
+Assign a translation tag to a label
+-----------------------------------
 
 .. lv_example:: widgets/label/lv_example_label_7
   :language: c

@@ -161,8 +161,8 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en);
 #if LV_USE_TRANSLATION
 
 /**
- * Bind a translation tag to this label. Memory will be allocated to store the tag by the label.
- * The label text will automatically update when the language changes
+ * Assign a translation tag for this label. Memory will be allocated to store the tag by the label.
+ * The label text will automatically update when the language is changed via `lv_translation_set_language`.
  * @param obj           pointer to a label object
  * @param tag          '\0' terminated character string. NULL to refresh with the current tag.
  */
