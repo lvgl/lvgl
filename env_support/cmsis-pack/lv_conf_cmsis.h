@@ -365,14 +365,11 @@
 #endif
 
 /** Draw using espressif PPA accelerator */
-#define LV_USE_PPA  0
 #if LV_USE_PPA
     #define LV_USE_PPA_IMG 0
 #endif
 
 /* Use EVE FT81X GPU. */
-#define LV_USE_DRAW_EVE 0
-
 #if LV_USE_DRAW_EVE
     /* EVE_GEN value: 2, 3, or 4 */
     #define LV_DRAW_EVE_EVE_GENERATION 4
@@ -543,8 +540,6 @@
 #endif
 
 /* Enable usage of the LVGL's vg_lite spec driver */
-#define LV_USE_VG_LITE_DRIVER  0
-
 #if LV_USE_VG_LITE_DRIVER
 
     /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
@@ -941,9 +936,6 @@
     #define LV_GIF_CACHE_DECODE_DATA 0
 #endif
 
-/** GStreamer library */
-#define LV_USE_GSTREAMER 0
-
 /** Decode bin images to RAM */
 #define LV_BIN_DECODER_RAM_LOAD 0
 
@@ -964,9 +956,6 @@
     #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
     #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 #endif
-
-/** Requires `LV_USE_3DTEXTURE = 1` */
-#define LV_USE_GLTF  0
 
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
@@ -1148,9 +1137,6 @@
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
 #endif /*LV_USE_TEST*/
 
-/** 1: Enable text translation support */
-#define LV_USE_TRANSLATION 0
-
 /*1: Enable color filter style*/
 #define LV_USE_COLOR_FILTER     0
 
@@ -1254,8 +1240,6 @@
 #endif
 
 /** Interface for Lovyan_GFX */
-#define LV_USE_LOVYAN_GFX         0
-
 #if LV_USE_LOVYAN_GFX
     #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
 
@@ -1290,9 +1274,6 @@
     /* Only used for partial. */
     #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
 #endif
-
-/** Driver for NXP ELCDIF */
-#define LV_USE_NXP_ELCDIF   0
 
 /** LVGL UEFI backend */
 #define LV_USE_UEFI 0
@@ -1346,9 +1327,6 @@
         #define LV_DEMO_MUSIC_LARGE     0
         #define LV_DEMO_MUSIC_AUTO_PLAY 0
     #endif
-
-    /** GLTF demo */
-    #define LV_USE_DEMO_GLTF            0
 
 #endif /* LV_BUILD_DEMOS */
 
