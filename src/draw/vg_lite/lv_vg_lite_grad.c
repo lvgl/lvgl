@@ -166,13 +166,13 @@ bool lv_vg_lite_draw_grad(
     /* check radial gradient is supported */
     if(grad->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
-            LV_LOG_INFO("radial gradient is not supported");
+            LV_LOG_WARN("radial gradient is not supported");
             return false;
         }
 
         /* check if the radius is valid */
         if(grad->cr <= 0) {
-            LV_LOG_INFO("radius: %f is not valid", grad->cr);
+            LV_LOG_WARN("radius: %f is not valid", grad->cr);
             return false;
         }
     }
@@ -180,7 +180,7 @@ bool lv_vg_lite_draw_grad(
     /* check spread mode is supported */
     if(grad->spread == LV_VECTOR_GRADIENT_SPREAD_REPEAT || grad->spread == LV_VECTOR_GRADIENT_SPREAD_REFLECT) {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_REPEAT_REFLECT)) {
-            LV_LOG_INFO("repeat/reflect spread(%d) is not supported", grad->spread);
+            LV_LOG_WARN("repeat/reflect spread(%d) is not supported", grad->spread);
             return false;
         }
     }
