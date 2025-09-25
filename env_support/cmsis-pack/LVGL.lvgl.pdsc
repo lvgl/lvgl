@@ -40,7 +40,7 @@
       - LVGL 9.4.0
       - See Change Log
     </release>
-    <release date="2025-06-02" version="9.3.0" url="https://github.com/lvgl/lvgl/raw/v9.2.2/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
+    <release date="2025-06-02" version="9.3.0" url="https://github.com/lvgl/lvgl/raw/v9.3.0/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
       - LVGL 9.3.0
       - See Change Log
     </release>
