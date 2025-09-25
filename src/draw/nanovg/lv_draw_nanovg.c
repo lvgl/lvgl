@@ -19,6 +19,7 @@
 #define NANOVG_GL_USE_UNIFORMBUFFER 0
 #define NANOVG_GLES2_IMPLEMENTATION
 #include "../../libs/nanovg/nanovg_gl.h"
+#include "../../libs/nanovg/nanovg_gl_utils.h"
 
 /*********************
  *      DEFINES
@@ -37,6 +38,7 @@
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t draw_delete(lv_draw_unit_t * draw_unit);
+static void draw_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -56,6 +58,7 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
+    unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.name = "NANOVG";
 
     unit->vg = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
@@ -63,6 +66,18 @@ void lv_draw_nanovg_init(void)
 
     lv_nanovg_utils_init(unit);
     lv_draw_nanovg_label_init(unit);
+}
+
+void lv_draw_nanovg_event_param_init(lv_draw_nanovg_event_param_t * param)
+{
+    LV_ASSERT_NULL(param);
+    lv_memzero(param, sizeof(lv_draw_nanovg_event_param_t));
+}
+
+int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
+{
+    LV_ASSERT_NULL(fb);
+    return fb->image;
 }
 
 /**********************
@@ -113,10 +128,11 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, true);
+            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, true, -1);
             break;
 
         case LV_DRAW_TASK_TYPE_LAYER:
+            lv_draw_nanovg_layer(t, t->draw_dsc, &t->area);
             break;
 
         case LV_DRAW_TASK_TYPE_LINE:
@@ -164,6 +180,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(!u->is_started) {
+        glViewport(0, 0, layer->draw_buf->header.w, layer->draw_buf->header.h);
         LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
         nvgBeginFrame(u->vg, layer->draw_buf->header.w, layer->draw_buf->header.h, 1.0f);
         LV_PROFILER_DRAW_END_TAG("nvgBeginFrame");
@@ -225,6 +242,36 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     nvgDeleteGLES2(unit->vg);
     unit->vg = NULL;
     return 0;
+}
+
+static void draw_event_cb(lv_event_t * e)
+{
+    lv_draw_nanovg_unit_t * u = lv_event_get_current_target(e);
+    lv_draw_nanovg_event_param_t * param = lv_event_get_param(e);
+
+    switch(lv_event_get_code(e)) {
+        case LV_EVENT_CANCEL:
+            nvgCancelFrame(u->vg);
+            lv_nanovg_clean_up(u);
+            break;
+        case LV_EVENT_CHILD_CREATED:
+            param->fb = nvgluCreateFramebuffer(u->vg, param->width, param->height, 0);
+            if(!param->fb) {
+                LV_LOG_ERROR("Failed to create framebuffer");
+            }
+            break;
+        case LV_EVENT_CHILD_CHANGED:
+            nvgluBindFramebuffer(param->fb);
+            break;
+        case LV_EVENT_CHILD_DELETED:
+            if(param->fb) {
+                nvgluDeleteFramebuffer(param->fb);
+                param->fb = NULL;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 #endif /* LV_USE_DRAW_NANOVG */
