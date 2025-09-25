@@ -31,7 +31,7 @@
 *  STATIC PROTOTYPES
 **********************/
 
-static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc);
 static void lv_path_to_nvg(NVGcontext * ctx, const lv_vector_path_t * src, lv_fpoint_t * offset);
 static enum NVGcompositeOperation lv_blend_to_nvg(lv_vector_blend_t blend);
 static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule);
@@ -48,7 +48,7 @@ static enum NVGwinding lv_fill_to_nvg(lv_vector_fill_t fill_rule);
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
+void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
     if(dsc->task_list == NULL) {
@@ -169,7 +169,7 @@ static void draw_stroke(lv_draw_nanovg_unit_t * u, const lv_vector_stroke_dsc_t 
     LV_PROFILER_DRAW_END;
 }
 
-static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
+static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_nanovg_unit_t * u = ctx;
