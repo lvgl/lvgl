@@ -36,7 +36,7 @@ typedef struct _lv_widget_processor_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_result_t lv_xml_widget_register(const char * name, lv_xml_widget_create_cb_t create_cb,
+lv_result_t lv_xml_register_widget(const char * name, lv_xml_widget_create_cb_t create_cb,
                                    lv_xml_widget_apply_cb_t apply_cb);
 
 lv_widget_processor_t * lv_xml_widget_get_processor(const char * name);

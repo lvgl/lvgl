@@ -49,10 +49,10 @@ void test_xml_names(void)
         "  </view>"
         "</screen>";
 
-    lv_xml_component_register_from_data("my_btn", my_btn_xml);
-    lv_xml_component_register_from_data("base_label", base_label_xml);
-    lv_xml_component_register_from_data("my_label", my_label_xml);
-    lv_xml_component_register_from_data("main_screen", main_screen_xml);
+    lv_xml_register_component_from_data("my_btn", my_btn_xml);
+    lv_xml_register_component_from_data("base_label", base_label_xml);
+    lv_xml_register_component_from_data("my_label", my_label_xml);
+    lv_xml_register_component_from_data("main_screen", main_screen_xml);
 
     lv_obj_t * main_screen = lv_xml_create(NULL, "main_screen", NULL);
 

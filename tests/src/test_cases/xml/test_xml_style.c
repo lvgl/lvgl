@@ -32,7 +32,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("lin_grad", lin_grad_xml);
+    lv_xml_register_component_from_data("lin_grad", lin_grad_xml);
     lv_xml_create(lv_screen_active(), "lin_grad", NULL);
 
     const char * rad_grad_def_xml =
@@ -48,7 +48,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("rad_grad_def", rad_grad_def_xml);
+    lv_xml_register_component_from_data("rad_grad_def", rad_grad_def_xml);
     lv_xml_create(lv_screen_active(), "rad_grad_def", NULL);
 
     const char * rad_grad_ofs_xml =
@@ -65,7 +65,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("rad_grad_ofs", rad_grad_ofs_xml);
+    lv_xml_register_component_from_data("rad_grad_ofs", rad_grad_ofs_xml);
     lv_xml_create(lv_screen_active(), "rad_grad_ofs", NULL);
 
     const char * con_grad_def_xml =
@@ -81,7 +81,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("con_grad_def", con_grad_def_xml);
+    lv_xml_register_component_from_data("con_grad_def", con_grad_def_xml);
     lv_xml_create(lv_screen_active(), "con_grad_def", NULL);
 
     const char * con_grad_xml =
@@ -97,7 +97,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("con_grad", con_grad_xml);
+    lv_xml_register_component_from_data("con_grad", con_grad_xml);
     lv_xml_create(lv_screen_active(), "con_grad", NULL);
 
     const char * hor_grad_xml =
@@ -113,7 +113,7 @@ void test_xml_style_gradients(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("hor_grad", hor_grad_xml);
+    lv_xml_register_component_from_data("hor_grad", hor_grad_xml);
     lv_xml_create(lv_screen_active(), "hor_grad", NULL);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/gradients.png");
@@ -135,7 +135,7 @@ void test_xml_style_same_name(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("comp1", comp1);
+    lv_xml_register_component_from_data("comp1", comp1);
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
     TEST_ASSERT_EQUAL(20, lv_obj_get_style_bg_opa(obj, LV_PART_MAIN));
 }
@@ -161,7 +161,7 @@ void test_xml_style_remove(void)
         "  </view>"
         "</component>";
 
-    lv_xml_component_register_from_data("comp1", comp1);
+    lv_xml_register_component_from_data("comp1", comp1);
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
     /*The first remove_style removed the main style, so the radius should be the default 0*/
@@ -198,7 +198,7 @@ void test_xml_style_binding(void)
         "</component>"
     };
 
-    lv_xml_component_register_from_data("comp1", comp1_xml);
+    lv_xml_register_component_from_data("comp1", comp1_xml);
 
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
