@@ -49,7 +49,7 @@ lv_result_t lv_xml_load_all_from_path(const char * path);
 lv_xml_load_t * lv_xml_load_all_from_data(const void * buf, uint32_t buf_size);
 
 /**
- * Mount a data blob located at `path` in a filesystem and recurse through it,
+ * Mount a data blob located at `file_path` in a filesystem and recurse through it,
  * loading all XML components, screens, globals, and translations.
  * @param file_path   the path of the data blob
  * @return            a handle that can be used to unload it later

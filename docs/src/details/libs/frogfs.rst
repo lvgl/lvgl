@@ -19,7 +19,7 @@ of blobs in LVGL.
 Create a frogfs blob
 ********************
 
-You can create a forgfs blob for use in LVGL by using the upstream
+You can create a frogfs blob for use in LVGL by using the upstream
 frogfs project. Get it from `GitHub <https://github.com/jkent/frogfs>`__
 with ``git clone``.
 

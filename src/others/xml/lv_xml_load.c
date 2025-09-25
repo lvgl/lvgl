@@ -102,6 +102,7 @@ lv_xml_load_t * lv_xml_load_all_from_data(const void * buf, uint32_t buf_size)
 
     lv_xml_load_t * load = lv_ll_ins_head(&xml_loads);
     LV_ASSERT_MALLOC(load);
+    if(load == NULL) return NULL;
     lv_memzero(load, sizeof(*load));
 
     char path_prefix_with_letter[PATH_PREFIX_BUF_SIZE];
