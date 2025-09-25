@@ -26,22 +26,22 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define MATH_PI  3.14159265358979323846f
-#define MATH_HALF_PI 1.57079632679489661923f
-#define MATH_TWO_PI 6.28318530717958647692f
-#define DEG_TO_RAD 0.017453292519943295769236907684886f
-#define RAD_TO_DEG 57.295779513082320876798154814105f
+#define NVG_MATH_PI  3.14159265358979323846f
+#define NVG_MATH_HALF_PI 1.57079632679489661923f
+#define NVG_MATH_TWO_PI 6.28318530717958647692f
+#define NVG_DEG_TO_RAD 0.017453292519943295769236907684886f
+#define NVG_RAD_TO_DEG 57.295779513082320876798154814105f
 
-#define MATH_TANF(x) tanf(x)
-#define MATH_SINF(x) sinf(x)
-#define MATH_COSF(x) cosf(x)
-#define MATH_ASINF(x) asinf(x)
-#define MATH_ACOSF(x) acosf(x)
-#define MATH_FABSF(x) fabsf(x)
-#define MATH_SQRTF(x) sqrtf(x)
+#define NVG_MATH_TANF(x) tanf(x)
+#define NVG_MATH_SINF(x) sinf(x)
+#define NVG_MATH_COSF(x) cosf(x)
+#define NVG_MATH_ASINF(x) asinf(x)
+#define NVG_MATH_ACOSF(x) acosf(x)
+#define NVG_MATH_FABSF(x) fabsf(x)
+#define NVG_MATH_SQRTF(x) sqrtf(x)
 
-#define MATH_RADIANS(deg) ((deg) * DEG_TO_RAD)
-#define MATH_DEGREES(rad) ((rad) * RAD_TO_DEG)
+#define NVG_MATH_RADIANS(deg) ((deg) * NVG_DEG_TO_RAD)
+#define NVG_MATH_DEGREES(rad) ((rad) * NVG_RAD_TO_DEG)
 
 /**********************
  *      TYPEDEFS
@@ -51,17 +51,17 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-static inline bool math_zero(float a)
+static inline bool nvg_math_is_zero(float a)
 {
-    return (MATH_FABSF(a) < FLT_EPSILON);
+    return (NVG_MATH_FABSF(a) < FLT_EPSILON);
 }
 
-static inline bool math_equal(float a, float b)
+static inline bool nvg_math_is_equal(float a, float b)
 {
-    return math_zero(a - b);
+    return nvg_math_is_zero(a - b);
 }
 
-static inline float math_fast_inv_sqrtf(float number)
+static inline float nvg_math_inv_sqrtf(float number)
 {
     /* From https://en.wikipedia.org/wiki/Fast_inverse_square_root#Avoiding_undefined_behavior */
     union {
