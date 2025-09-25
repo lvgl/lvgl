@@ -99,6 +99,7 @@ class LVDrawBuf(Value):
             data_ptr = self.super_value("data")
             data_size = int(self.super_value("data_size"))
             width = (stride * 8) // cf_info["bpp"] if cf_info["bpp"] else 0
+            expected_data_size = stride * height
 
             # Validate buffer data
             if not data_ptr:
@@ -107,10 +108,14 @@ class LVDrawBuf(Value):
                 raise ValueError(f"Invalid dimensions: {width}x{height}")
             if data_size <= 0:
                 raise ValueError(f"Invalid data size: {data_size}")
+            if data_size < expected_data_size:
+                raise ValueError(f"Data size mismatch: expected {expected_data_size}, got {data_size}")
+            elif data_size > expected_data_size:
+                gdb.write(f"\033[93mData size mismatch: expected {expected_data_size}, got {data_size}\033[0m\n")
 
             # Read pixel data
             pixel_data = (
-                gdb.selected_inferior().read_memory(int(data_ptr), data_size).tobytes()
+                gdb.selected_inferior().read_memory(int(data_ptr), expected_data_size).tobytes()
             )
             if not pixel_data:
                 raise ValueError("Failed to read pixel data")
