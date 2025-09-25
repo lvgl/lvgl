@@ -54,7 +54,6 @@ void lv_example_label_7(void)
         lv_obj_t * label = lv_label_create(lv_screen_active());
         lv_label_set_translation_tag(label, tags[i]);
     }
-
 }
 
 #endif /*LV_USE_TRANSLATION && LV_USE_DROPDOWN && LV_USE_LABEL && LV_BUILD_EXAMPLES*/
