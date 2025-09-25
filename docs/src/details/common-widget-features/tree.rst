@@ -1,3 +1,5 @@
+.. _obj_tree:
+
 ===========
 Widget Tree
 ===========
@@ -22,7 +24,8 @@ LVGL provides many useful functions to modify the widget tree and get informatio
   - ``0``: get the first created child
   - ``1``: get the second created child
   - ``-1``: get the last created child
-
+- :cpp:expr:`lv_obj_get_child_by_type(parent, idx, &lv_slider_class)`: Similar to :cpp:expr:`lv_obj_get_child` but filters to children
+  with a given type.
 - :cpp:expr:`lv_obj_find_by_name(parent, "text")`: Find a widget with a given name under a parent. It does not have to be a direct child.
 - :cpp:expr:`lv_obj_get_child_by_name(parent, "container/button/text")`: Get a widget by navigating a path using parent names (separated by ``/``).
 - :cpp:expr:`lv_obj_get_index(widget)`: Return the index of the widget in its parent.

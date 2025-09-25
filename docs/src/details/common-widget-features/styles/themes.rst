@@ -51,5 +51,5 @@ E.g. default theme -> custom theme -> dark theme.
 :cpp:expr:`lv_theme_set_parent(new_theme, base_theme)` extends the
 ``base_theme`` with the ``new_theme``.
 
-There is an example of this below.
+There is an example of this among the :ref:`Style examples <style_examples>`.
 

@@ -252,6 +252,8 @@ background properties" are the properties being referred to:
 
 See :ref:`boxing_model` for the meanings of these terms.
 
+.. _style_examples:
+
 Examples
 ********
 
