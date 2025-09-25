@@ -44,17 +44,3 @@ To register XML translations:
 - :cpp:expr:`lv_xml_translation_register_from_data(xml_string)`
 
 Multiple XML sources can be registered; they will be merged and searched collectively.
-
-
-
-Usage in XML
-************
-
-Some widget properties support a ``*-translated`` suffix to refer to translation tags. For example:
-
-.. code-block:: xml
-
-    <lv_label text-translated="dog"/>
-
-This sets the label's text to the translated string for ``"dog"``.
-

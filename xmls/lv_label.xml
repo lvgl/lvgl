@@ -15,7 +15,6 @@ Example
 
 	    <prop name="text"  type="string" />
 	    <prop name="translation-tag"  type="string" />
-	    <prop name="text-translated"  type="string" />
 	    <prop name="long_mode" type="enum:lv_label_long_mode" />
 	    <prop name="bind_text">
 	    	<param name="bind_text" type="subject" />
