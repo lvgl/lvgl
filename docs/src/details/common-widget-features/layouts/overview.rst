@@ -24,7 +24,7 @@ Built-in layouts
 LVGL comes with two very powerful layouts:
 
 * Flexbox: arrange Widgets into rows or columns, with support for wrapping and expanding items.
-* Grid: arrange Widgets into fixed positions in 2D table.
+* Grid: arrange Widgets into fixed positions in a 2D table.
 
 Both are heavily inspired by the CSS layouts with the same name.
 Layouts are described in detail in their own section of documentation.
@@ -60,7 +60,7 @@ LVGL can be freely extended by a custom layout like this:
 
    void my_layout_update(lv_obj_t * widget, void * user_data)
    {
-       /* Will be called automatically if it's required to reposition/resize the children of "obj" */
+       /* Will be called automatically if it's required to reposition/resize the children of "widget" */
    }
 
 Custom style properties can be added which can be retrieved and used in
@@ -68,10 +68,10 @@ the update callback. For example:
 
 .. code-block:: c
 
-   uint32_t MY_PROP;
+   uint32_t LV_STYLE_MY_PROP;
    ...
 
-   LV_STYLE_MY_PROP = lv_style_register_prop();
+   LV_STYLE_MY_PROP = lv_style_register_prop(LV_STYLE_PROP_FLAG_NONE);
 
    ...
    static inline void lv_style_set_my_prop(lv_style_t * style, uint32_t value)

@@ -97,7 +97,7 @@ Here is a generic example of the ``read_cb``:
        /* Get the touch points */
        touch_cnt = my_read_touch_points(touches);
 
-       lv_indev_update_recognizers(indev, touches, touch_cnt);
+       lv_indev_gesture_recognizers_update(indev, touches, touch_cnt);
        lv_indev_gesture_recognizers_set_data(indev, data);
 
        /* Also process normal touch */
@@ -123,7 +123,7 @@ gather more information about the gesture:
 
 - :cpp:expr:`lv_event_get_gesture_type(lv_event_t * e)`: Get the type of the gesture. Use this to check which multi-touch gesture is currently reported.
 - :cpp:expr:`lv_event_get_gesture_state(lv_event_t * e, lv_indev_gesture_type_t type)`: Get the
-  state of the gesture as :cpp:expr`lv_indev_gesture_state_t `. It can be one of:
+  state of the gesture as :cpp:expr`lv_indev_gesture_state_t` . It can be one of:
 
   - :cpp:enumerator:`LV_INDEV_GESTURE_STATE_NONE`: The gesture is not active.
   - :cpp:enumerator:`LV_INDEV_GESTURE_STATE_RECOGNIZED`: The gesture is recognized and can be used.
@@ -153,7 +153,7 @@ The gesture recognizers can be configured to modify the gesture thresholds:
 libinput Example
 ----------------
 
-In the case of ``libinput``, touch events are received asynchronously. The handle it the touch array and touch count needs to be global variables:
+In the case of ``libinput``, touch events are received asynchronously. To handle it, the touch array and touch count need to be global variables:
 
 
 .. code-block:: c
@@ -250,6 +250,4 @@ In the case of ``libinput``, touch events are received asynchronously. The handl
       }
    }
 
-.. note::
-   A touch event is rep
 

@@ -7,7 +7,7 @@ Screens
 Screens are simply any Widgets created with ``NULL`` set as parent in the create function.
 As such, they form the "root" of a Widget Tree.
 
-Typcally the Base Widget is used for this purpose since it has all the features most
+Typically the Base Widget is used for this purpose since it has all the features most
 Screens need.  But an :ref:`lv_image` Widget can also be used to create a image as a
 wallpaper background for the Widget Tree.
 
@@ -36,7 +36,7 @@ delete the :ref:`active_screen`.
 Active Screen
 *************
 
-While each :ref:`display` object can have any number of Screens Widgets associated
+While each :ref:`display` object can have any number of Screen Widgets associated
 with it, only one of those Screens is considered "Active" at any given time.  That
 Screen is referred to as the Display's "Active Screen".  For this reason, only one
 Screen and its child Widgets will ever be shown on a display at one time.
@@ -54,7 +54,7 @@ To set a Screen to be the "Active Screen", call :cpp:func:`lv_screen_load` or
 Loading Screens
 ***************
 
-In order to make a screens constant visible it needs to  "loaded".
+To make a screen visible, it needs to be "loaded".
 
 The simplest way to load a screen is using :cpp:expr:`lv_screen_load(scr1)`.
 This sets ``scr1`` as the Active Screen.
@@ -75,7 +75,7 @@ The following transition types exist:
 The new screen will become active (returned by :cpp:func:`lv_screen_active`) when
 the animation starts after ``delay`` time.
 
-All inputs device events (e.g. touch, keys, etc) are disabled during the screen animation.
+All input device events (e.g. touch, keys, etc) are disabled during the screen animation.
 
 
 API

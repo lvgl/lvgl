@@ -53,7 +53,7 @@ Pointer input devices can have a cursor too.
    lv_image_set_src(cursor_obj, &mouse_cursor_icon);             /* Set image source. */
    lv_indev_set_cursor(mouse_indev, cursor_obj);                 /* Connect image to input device. */
 
-When the cursor is added, it will be placed on the system layer (:cpp:expr:`lv_sys_layer()`)
+When the cursor is added, it will be placed on the system layer (:cpp:expr:`lv_layer_sys()`) and positioned at the last read coordinate.
 and positioned at the last read coordinate.
 
 Multi-touch
@@ -80,10 +80,10 @@ Parameters
 
 The timing and limits of input devices can be configured via the following fields of :cpp:expr:`lv_indev_t`:
 
-- ``indev->long_press_time``: Time required to send :cpp:enumerator:`LV_EVENT_LONG_PRESSED` (in milliseconds)
-- ``indev->long_press_repeat_time``: Interval between :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` events (in milliseconds)
-- ``indev->scroll_limit``: Number of pixels to move before scrolling the widget
-- ``indev->scroll_throw``: Scroll throw (momentum) slow-down in [%]. A greater value means faster slow-down.
+- :cpp:expr:`lv_indev_set_long_press_time(indev, ms)`: Time required to send :cpp:enumerator:`LV_EVENT_LONG_PRESSED` (in milliseconds)
+- :cpp:expr:`lv_indev_set_long_press_repeat_time(indev, ms)`: Interval between :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` events (in milliseconds)
+- :cpp:expr:`lv_indev_set_scroll_limit(indev, pixels)`: Number of pixels to move before scrolling the widget
+- :cpp:expr:`lv_indev_set_scroll_throw(indev, percent)`: Scroll throw (momentum) slow-down in [%]. A greater value means faster slow-down.
 
 .. _indev_crown:
 
@@ -97,7 +97,7 @@ the last clicked widget will either be scrolled or its value will be incremented
 (e.g., in the case of a slider).
 
 As this behavior is tightly related to the last clicked widget, crown support is
-an extension of the pointer input device. Just set ``data->diff`` to the number of
+an extension of the pointer input device. Just set ``data->enc_diff`` to the number of
 rotary steps, and LVGL will automatically send the :cpp:enumerator:`LV_EVENT_ROTARY`
 event or scroll the widget based on the ``editable`` flag in the widget's class.
 Non-editable widgets are scrolled, and for editable widgets, the event is sent.
@@ -112,7 +112,7 @@ The rotary sensitivity can be adjusted at two levels:
 
 The final diff is calculated as:
 
-``diff_final = diff_in * (indev_sensitivity / 256) + (widget_sensitivity / 256);``
+``diff_final = diff_in * (indev_sensitivity / 256) * (widget_sensitivity / 256);``
 
 For example, if both the indev and widget sensitivity are set to 128 (0.5), the input
 diff will be multiplied by 0.25. The value of the widget will be incremented by that

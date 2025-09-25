@@ -33,7 +33,7 @@ going back to default slowly.
 Usage
 *****
 
-To describe a transition an :cpp:struct:`lv_transition_dsc_t` variable needs to be
+To describe a transition an :cpp:struct:`lv_style_transition_dsc_t` variable needs to be
 initialized and added to a style:
 
 .. code-block:: c

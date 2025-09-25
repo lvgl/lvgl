@@ -59,7 +59,7 @@ Here is a complete example:
 
        /* Is there a button press? */
        if(btn_pr >= 0) {
-          last_btn = btn_pr;           /* Save the ID of the pressed button */
+          data->btn_id = btn_pr;           /* Save the ID of the pressed button */
           data->state = LV_INDEV_STATE_PRESSED;  /* Set the pressed state */
        } else {
           data->state = LV_INDEV_STATE_RELEASED; /* Set the released state */
