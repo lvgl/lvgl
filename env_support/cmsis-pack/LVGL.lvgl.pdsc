@@ -1517,7 +1517,7 @@
             </component>
 
 
-            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="libnemagfx-float-abi-hard-wc1" condition="LVGL-GPU-NEMA-GFX">
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX NemaPVG"  Cvariant="libnemagfx-float-abi-hard-wc16" condition="LVGL-GPU-NEMA-GFX">
               <description>TSi's aka (Think Silicon) NemaGFX</description>
               <files>
                 <!-- src/draw/nema_gfx/ -->
