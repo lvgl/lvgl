@@ -44,6 +44,7 @@ struct _lv_opengles_window_t {
     lv_indev_state_t mouse_last_state;
     uint8_t use_indev : 1;
     uint8_t closing : 1;
+    uint8_t refr_request : 1;
     uint8_t has_flushed : 1;
 #if LV_USE_DRAW_OPENGLES
     uint8_t direct_render_invalidated: 1;
@@ -82,6 +83,7 @@ static void proc_mouse(lv_opengles_window_t * window);
 static void indev_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 static void framebuffer_size_callback(GLFWwindow * window, int width, int height);
 static void window_display_delete_cb(lv_event_t * e);
+static void window_display_refr_request_cb(lv_event_t * e);
 static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 #if !LV_USE_DRAW_OPENGLES
     static void ensure_init_window_display_texture(void);
@@ -330,6 +332,7 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     lv_display_delete_refr_timer(disp);
     lv_display_set_flush_cb(disp, window_display_flush_cb);
     lv_display_add_event_cb(disp, window_display_delete_cb, LV_EVENT_DELETE, disp);
+    lv_display_add_event_cb(disp, window_display_refr_request_cb, LV_EVENT_REFR_REQUEST, disp);
 
 #if LV_USE_DRAW_OPENGLES
     window->direct_render_invalidated = 1;
@@ -431,7 +434,7 @@ static void lv_glfw_window_config(GLFWwindow * window, bool use_mouse_indev)
 {
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -461,13 +464,10 @@ static void lv_glfw_window_quit(void)
 static void window_update_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    LV_PROFILER_REFR_BEGIN;
 
     lv_opengles_window_t * window;
 
-    LV_PROFILER_REFR_BEGIN_TAG("glfwPollEvents");
     glfwPollEvents();
-    LV_PROFILER_REFR_END_TAG("glfwPollEvents");
 
     /* delete windows that are ready to close */
     window = lv_ll_get_head(&glfw_window_ll);
@@ -480,20 +480,20 @@ static void window_update_handler(lv_timer_t * t)
         }
     }
 
-    lv_display_refr_timer(NULL);
-
     /* render each window */
     LV_LL_READ(&glfw_window_ll, window) {
-
-        if(!window->has_flushed)  {
+        if(!window->refr_request) {
             continue;
         }
-        window->has_flushed = false;
 
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
 
-#if !LV_USE_DRAW_NANOVG
+#if LV_USE_DRAW_NANOVG
+        lv_display_refr_timer(NULL);
+        LV_UNUSED(ensure_init_window_display_texture);
+#else
+
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_window_texture_t * textures_head;
         bool window_display_direct_render =
@@ -584,15 +584,17 @@ static void window_update_handler(lv_timer_t * t)
 #endif
             }
         }
-#endif
 
-        /* Swap front and back buffers */
-        LV_PROFILER_REFR_BEGIN_TAG("glfwSwapBuffers");
-        glfwSwapBuffers(window->window);
-        LV_PROFILER_REFR_END_TAG("glfwSwapBuffers");
+#endif /* LV_USE_DRAW_NANOVG */
+
+        if(window->has_flushed) {
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window->window);
+            window->has_flushed = false;
+        }
+
+        window->refr_request = false;
     }
-
-    LV_PROFILER_REFR_END;
 }
 
 static void glfw_error_cb(int error, const char * description)
@@ -691,6 +693,13 @@ static void window_display_delete_cb(lv_event_t * e)
     lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
     free(dsc->fb);
     lv_opengles_window_texture_remove(dsc);
+}
+
+static void window_display_refr_request_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
+    dsc->window->refr_request = true;
 }
 
 static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
