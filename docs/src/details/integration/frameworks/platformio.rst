@@ -14,6 +14,7 @@ Note that you need to choose a board powerful enough to run LVGL and
 your GUI. See the :ref:`requirements of LVGL <requirements>`.
 
 For example, the ESP32 family is a good candidate to create UIs with LVGL.
+Recommended boards include the ESP32 (original dual-core) and the ESP32-S3.
 
 Get the LVGL library
 --------------------
@@ -55,6 +56,10 @@ In PlatformIO, you’ll add both ``LVGL`` and ``LovyanGFX`` as dependencies in y
         lvgl/lvgl
         lovyan03/LovyanGFX
 
+Another popular option is the ``TFT_eSPI library``, which supports a wide range of displays.
+
+In addition, LVGL also provides its own inbuilt display drivers that can be used directly in your project.
+See the :ref:`supported drivers section <display controllers>` for a full list.
 
 Display Configuration
 ---------------------
@@ -62,14 +67,14 @@ Display Configuration
 You’ll need to create a display configuration file, such as ``my_display.hpp`` similar to the example in
 `LovyanGFX user_setting.ino <https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino>`__.
 
-In PlatformIO, you can place this file in the include/ folder of your project (e.g., include/my_display.hpp).
+In PlatformIO, you can place this file in the ``include/`` folder of your project (e.g., ``include/my_display.hpp``).
 
 If you prefer not to use LovyanGFX, you can integrate other graphics libraries as well by 
 implementing a wrapper class in the same way LovyanGFX is handled;
 `lv_lgfx_user.hpp <https://github.com/lvgl/lvgl/blob/master/src/drivers/display/lovyan_gfx/lv_lgfx_user.hpp>`__ 
 provides a good example of this.
 
-Once your configuration file is ready, update `lv_conf.h` to include it, for example:
+Once your configuration file is ready, update ``lv_conf.h`` to include it, for example:
 
 .. code-block:: c
 
