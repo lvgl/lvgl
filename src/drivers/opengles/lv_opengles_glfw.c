@@ -767,12 +767,13 @@ static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * lay
     lv_draw_nanovg_event_param_t param;
     lv_draw_nanovg_event_param_init(&param);
 
+    param.fb = NULL;
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CHANGED, &param);
+
     param.fb = layer->user_data;
     lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, &param);
     layer->user_data = NULL;
     param.fb = NULL;
-
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CHANGED, &param);
 #else
     LV_UNUSED(disp);
     LV_UNUSED(layer);

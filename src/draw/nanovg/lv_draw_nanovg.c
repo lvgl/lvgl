@@ -14,10 +14,26 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 
-#include <GLES2/gl2.h>
-
-#define NANOVG_GL_USE_UNIFORMBUFFER 0
 #define NANOVG_GLES2_IMPLEMENTATION
+
+#if defined(NANOVG_GL2_IMPLEMENTATION)
+#include <GL/glew.h>
+#define NVG_CTX_CREATE nvgCreateGL2
+#define NVG_CTX_DELETE nvgDeleteGL2
+#elif defined(NANOVG_GL3_IMPLEMENTATION)
+#include <GL/glew.h>
+#define NVG_CTX_CREATE nvgCreateGL3
+#define NVG_CTX_DELETE nvgDeleteGL3
+#elif defined(NANOVG_GLES2_IMPLEMENTATION)
+#include <GLES2/gl2.h>
+#define NVG_CTX_CREATE nvgCreateGLES2
+#define NVG_CTX_DELETE nvgDeleteGLES2
+#elif defined(NANOVG_GLES3_IMPLEMENTATION)
+#include <GLES3/gl3.h>
+#define NVG_CTX_CREATE nvgCreateGLES3
+#define NVG_CTX_DELETE nvgDeleteGLES3
+#endif
+
 #include "../../libs/nanovg/nanovg_gl.h"
 #include "../../libs/nanovg/nanovg_gl_utils.h"
 
@@ -61,7 +77,7 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.name = "NANOVG";
 
-    unit->vg = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+    unit->vg = NVG_CTX_CREATE(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
 
     lv_nanovg_utils_init(unit);
@@ -174,15 +190,13 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(!buf) {
-        return LV_DRAW_UNIT_IDLE;
-    }
+   const int32_t buf_w = lv_area_get_width(&layer->buf_area);
+   const int32_t buf_h = lv_area_get_height(&layer->buf_area);
 
     if(!u->is_started) {
-        glViewport(0, 0, layer->draw_buf->header.w, layer->draw_buf->header.h);
+        glViewport(0, 0, buf_w, buf_h);
         LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
-        nvgBeginFrame(u->vg, layer->draw_buf->header.w, layer->draw_buf->header.h, 1.0f);
+        nvgBeginFrame(u->vg, buf_w, buf_h, 1.0f);
         LV_PROFILER_DRAW_END_TAG("nvgBeginFrame");
         u->is_started = true;
     }
@@ -239,7 +253,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
     lv_draw_nanovg_label_deinit(unit);
     lv_nanovg_utils_deinit(unit);
-    nvgDeleteGLES2(unit->vg);
+    NVG_CTX_DELETE(unit->vg);
     unit->vg = NULL;
     return 0;
 }
