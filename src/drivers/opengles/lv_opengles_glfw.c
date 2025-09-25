@@ -259,10 +259,6 @@ lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window
 
 void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 {
-    if(texture->texture_id == 0) {
-        LV_LOG_WARN("window displays should be deleted with `lv_display_delete`");
-        return;
-    }
     if(texture->indev != NULL) {
         lv_indev_delete(texture->indev);
     }
