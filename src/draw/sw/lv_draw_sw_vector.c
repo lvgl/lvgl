@@ -429,7 +429,7 @@ static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area
     }
 }
 
-static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
+static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_path_ctx_t * dsc)
 {
     _tvg_draw_state * state = (_tvg_draw_state *)ctx;
     Tvg_Canvas * canvas = (Tvg_Canvas *)state->canvas;
@@ -481,7 +481,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_task_dsc_t * dsc)
+void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
         return;

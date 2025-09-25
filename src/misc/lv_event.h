@@ -114,6 +114,9 @@ typedef enum {
 
     LV_EVENT_VSYNC,
     LV_EVENT_VSYNC_REQUEST,
+#if LV_USE_TRANSLATION
+    LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, /**< Sent when the translation language changed. */
+#endif /*LV_USE_TRANSLATION*/
 
     LV_EVENT_LAST,                 /** Number of default events */
 

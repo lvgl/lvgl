@@ -84,6 +84,28 @@ the tag itself will be returned.
 
 If the tag is not found at all, the tag itself will be used as a fallback as well.
 
+Dynamically Updating UI Text
+****************************
+
+When :cpp:expr:`lv_translation_set_language("language")` is called, LVGL sends ``LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`` to every widget, allowing you to update text automatically.
+
+Basic Example
+-------------
+
+.. code-block:: c
+
+    static void on_language_change(lv_event_t * e)
+    {
+        lv_obj_t * label = lv_event_get_target_obj(e);
+        const char * tag = (const char *) lv_event_get_user_data(e);
+        lv_label_set_text(label, lv_tr(tag));
+    }
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_obj_add_event_cb(label, on_language_change, LV_EVENT_TRANSLATION_LANGUAGE_CHANGED, "tag1");
+
+See the the bottom of this page for a complete example.
+
 .. _lv_translation_example:
 
 

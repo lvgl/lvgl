@@ -556,7 +556,7 @@
     /* Used to pick the correct GPU revision header it depends on the vendor */
     #define LV_VG_LITE_HAL_GPU_REVISION 0x40
 
-    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
     #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
 
 #endif
@@ -1064,7 +1064,7 @@
         /** Get the applications idle percentage.
          * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
         #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
-    #endif 
+    #endif
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
@@ -1204,7 +1204,7 @@
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
- * Requires libpng and a few MB of extra RAM. */
+ * Requires lodepng and a few MB of extra RAM. */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
 #endif /*LV_USE_TEST*/
 

@@ -308,11 +308,9 @@ typedef struct _lv_vector_fill_dsc_t lv_vector_fill_dsc_t;
 
 typedef struct _lv_vector_stroke_dsc_t lv_vector_stroke_dsc_t;
 
-typedef struct _lv_vector_draw_dsc_t lv_vector_draw_dsc_t;
+typedef struct _lv_vector_path_ctx_t lv_vector_path_ctx_t;
 
-typedef struct _lv_draw_vector_task_dsc_t lv_draw_vector_task_dsc_t;
-
-typedef struct _lv_vector_dsc_t lv_vector_dsc_t;
+typedef struct _lv_draw_vector_dsc_t lv_draw_vector_dsc_t;
 
 typedef struct _lv_xkb_t lv_xkb_t;
 
