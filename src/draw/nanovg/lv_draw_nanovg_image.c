@@ -42,7 +42,8 @@ static void image_dsc_to_matrix(lv_matrix_t * matrix, int32_t x, int32_t y, cons
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache)
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache,
+                          int image_handle)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -54,14 +55,16 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
 
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
-    const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, dsc->src, no_cache, false);
+    if(image_handle < 0) {
+        const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, dsc->src, no_cache, false);
 
-    if(!src_buf) {
-        LV_PROFILER_DRAW_END;
-        return;
+        if(!src_buf) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
+        image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa));
     }
 
-    int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa));
     if(image_handle < 0) {
         LV_PROFILER_DRAW_END;
         return;

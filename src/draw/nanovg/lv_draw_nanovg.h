@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../misc/lv_types.h"
 
 #if LV_USE_DRAW_NANOVG
 
@@ -26,11 +26,26 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    void * fb;
+    int32_t width;
+    int32_t height;
+} lv_draw_nanovg_event_param_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize NanoVG rendering
+ */
 void lv_draw_nanovg_init(void);
+
+/**
+ * Initialize event parameter for NanoVG rendering
+ * @param param pointer to an initialized `lv_draw_nanovg_event_param_t` struct
+ */
+void lv_draw_nanovg_event_param_init(lv_draw_nanovg_event_param_t * param);
 
 /**********************
  *      MACROS

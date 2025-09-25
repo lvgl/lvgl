@@ -106,8 +106,10 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
  * @param dsc pointer to an image descriptor
  * @param coords the coordinates of the image
  * @param no_cache true: draw the image directly without caching
+ * @param image_handle the handle of the image to draw
  */
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache);
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache,
+                          int image_handle);
 
 /**
  * Initialize draw label on a NanoVG context
@@ -165,6 +167,9 @@ void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
  * @param dsc pointer to a mask descriptor
  */
 void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
+
+struct NVGLUframebuffer;
+int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb);
 
 #if LV_USE_VECTOR_GRAPHIC
 /**
