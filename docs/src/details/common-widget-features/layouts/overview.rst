@@ -5,12 +5,12 @@ Overview
 ========
 
 
-Layouts can update the position and size of a Widget's children. They
-can be used to automatically arrange the children into a line or column,
-or in much more complicated forms.
+Layouts assigned to a Widget manage the positions and in some cases the sizes of that
+Widget's children. They can be used to automatically arrange the children into a line,
+a column, or into more complicated patterns.
 
-The position and size set by the layout overwrites the "normal" x, y,
-width, and height settings.
+The position and size set by the layout overwrites the "normal" x, y, and in some
+cases the width, and height settings.
 
 There is only one function that is the same for every layout:
 :cpp:func:`lv_obj_set_layout` ``(widget, <LAYOUT_NAME>)`` sets the layout on a Widget.
@@ -18,13 +18,13 @@ For further settings of the parent and children see the documentation of
 the given layout.
 
 
-Built-in layouts
+Built-In Layouts
 ****************
 
 LVGL comes with two very powerful layouts:
 
-* Flexbox: arrange Widgets into rows or columns, with support for wrapping and expanding items.
-* Grid: arrange Widgets into fixed positions in a 2D table.
+* Flexbox: arranges child Widgets into rows or columns, with support for wrapping and expanding items.
+* Grid: arranges child Widgets into fixed positions in a 2D table.
 
 Both are heavily inspired by the CSS layouts with the same name.
 Layouts are described in detail in their own section of documentation.
@@ -43,7 +43,7 @@ behave with layouts:
 These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(widget, FLAG)` and :cpp:expr:`lv_obj_remove_flag(widget, FLAG)`
 
 
-Adding new layouts
+Adding New Layouts
 ******************
 
 LVGL can be freely extended by a custom layout like this:

@@ -4,7 +4,7 @@
 Screens
 =======
 
-Screens are simply any Widgets created with ``NULL`` set as parent in the create function.
+Screens are simply any Widgets created with ``NULL`` passed as parent in the create function.
 As such, they form the "root" of a Widget Tree.
 
 Typically the Base Widget is used for this purpose since it has all the features most
@@ -61,8 +61,10 @@ This sets ``scr1`` as the Active Screen.
 
 By using :cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`
 screen loading can be performed
-- with a transition
-- if ``auto_del`` is ``true`` automatically deleting the previous screen when the transition animation finishes.
+
+- with an optional transition
+- if ``auto_del`` is ``true`` the previous screen is automatically deleted when any transition animation finishes.
+
 
 The following transition types exist:
 
@@ -72,10 +74,10 @@ The following transition types exist:
 - :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_LEFT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_RIGHT`, :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_TOP` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_MOVE_BOTTOM`: Move both the current and new screens towards the given direction
 - :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCREEN_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
 
-The new screen will become active (returned by :cpp:func:`lv_screen_active`) when
+The new Screen will become active (returned by :cpp:func:`lv_screen_active`) when
 the animation starts after ``delay`` time.
 
-All input device events (e.g. touch, keys, etc) are disabled during the screen animation.
+All input device events (e.g. touch, keys, etc) are disabled during the Screen's animation.
 
 
 API

@@ -36,7 +36,8 @@ To iterate through a parent widget's children:
 .. code-block:: c
 
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_count(parent); i++) {
+    uint32_t count = lv_obj_get_child_count(parent);
+    for(i = 0; i < count; i++) {
         lv_obj_t * child = lv_obj_get_child(parent, i);
         /* Do something with `child`. */
     }
@@ -52,9 +53,9 @@ When a widget is created, its reference can be stored in an :cpp:expr:`lv_obj_t 
 variable. To use this widget in multiple places in the code, the variable can be passed
 as a function parameter or made global. However, this approach has some drawbacks:
 
-- Using global variables is not clean and generally not recommended.
+- Using global variables adds names to the global namespace and is thus generally not recommended.
 - It's not scalable. Passing references to 20 widgets as function parameters is not ideal.
-- It's hard to track whether a widget still exists or has been deleted.
+- Tracking whether a widget still exists or has been deleted requires extra logic and can be tricky.
 
 Setting Names
 -------------
@@ -63,8 +64,8 @@ To address these issues, LVGL introduces a powerful widget naming system that ca
 by setting ``LV_USE_OBJ_NAME`` in ``lv_conf.h``.
 
 A custom name can be assigned using :cpp:expr:`lv_obj_set_name(obj, "name")` or
-:cpp:expr:`lv_obj_set_name_static(obj, "name")`. The "static" variant means the passed name
-must remain valid while the widget exists, as only the pointer is stored. Otherwise, LVGL will
+:cpp:expr:`lv_obj_set_name_static(obj, "name")`. The "static" variant requires that the passed
+name remains valid while the widget exists, since only the pointer is stored. Otherwise, LVGL will
 allocate memory to store a copy of the name.
 
 If a name ends with ``#``, LVGL will automatically replace it with an index based on the

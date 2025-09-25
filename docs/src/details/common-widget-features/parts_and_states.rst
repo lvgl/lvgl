@@ -10,8 +10,8 @@ Parts
 *****
 
 Widgets are built from multiple parts. For example, a
-:ref:`Base Widget <base_widget>` uses the main and scrollbar parts, while a
-:ref:`Slider <lv_slider>` uses the main, indicator, and knob parts.
+:ref:`Base Widget <base_widget>` has "main" and "scrollbar" parts, while a
+:ref:`Slider <lv_slider>` has "main", "indicator", and "knob" parts.
 Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:
@@ -55,7 +55,7 @@ However, states can also be modified manually. To set or clear a given state (wh
 - :cpp:expr:`lv_obj_add_state(widget, LV_STATE_...)`
 - :cpp:expr:`lv_obj_remove_state(widget, LV_STATE_...)`
 
-In both cases, you can OR multiple state values. For example:
+In both cases, you can bit-wise OR multiple state values. For example:
 :cpp:expr:`lv_obj_add_state(widget, LV_STATE_PRESSED | LV_STATE_CHECKED)`
 
 To learn more about states, see the related section in :ref:`styles_overview`.

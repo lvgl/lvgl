@@ -50,18 +50,18 @@ functions. For example, for a :ref:`Slider <lv_slider>`:
    lv_slider_set_range(slider1, 0, 100);               /* Set the min and max values */
    lv_slider_set_value(slider1, 40, LV_ANIM_ON);       /* Set the current value (position) */
 
-The API of the widgets is described in their
-:ref:`Documentation <widgets>`, but you can also check the respective
-header files (e.g., *widgets/lv_slider.h*).
+The API of the Widgets is described in their :ref:`Documentation <widgets>`, but you can
+also consult each Widget's respective header file (e.g., *widgets/lv_slider.h*) to find a quick
+reference to function prototypes with brief documentation about each.
 
 Widget Creation
 ***************
 
-Widgets can be created and deleted dynamically at runtime. This
-means only currently created (existing) widgets consume RAM.
+Widgets can be created and deleted dynamically at runtime.
+Only currently created (existing) Widgets consume RAM.
 
-This allows you to create a screen only when a button is clicked
-to open it, and to delete screens when a new screen is loaded.
+This allows you to create a Screen only when a button is clicked
+to open it, and to delete Screens when a new screen is loaded.
 
 UIs can be created based on the current environment of the device. For
 example, you can create meters, charts, bars, and sliders based on the
@@ -92,7 +92,7 @@ can't delete the widget immediately, you can use
 :cpp:expr:`lv_obj_delete_async(widget)` which will perform the deletion on the next
 call of :cpp:func:`lv_timer_handler`. This is useful, for example, if you want to
 delete the parent of a widget in the child's :cpp:enumerator:`LV_EVENT_DELETE`
-handler.
+handler. Once deleted, the RAM a Widget occupies is freed.
 
 You can remove all the children of a widget (but not the widget itself)
 using :cpp:expr:`lv_obj_clean(widget)`.
@@ -104,7 +104,7 @@ By calling :cpp:expr:`lv_obj_null_on_delete(&widget)`, the ``lv_obj_t *``
 variable of the widget will be set to NULL when the widget is deleted.
 This makes it easy to check whether the widget exists or not.
 
-Here is an example of some of the functions above:
+Here is an example that uses some of the functions above:
 
 .. code:: c
 

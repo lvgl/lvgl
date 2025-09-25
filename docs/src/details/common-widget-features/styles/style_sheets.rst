@@ -12,7 +12,7 @@ Initializing Styles
 
 Styles are stored in :cpp:type:`lv_style_t` variables. Style variables should be
 ``static``, global or dynamically allocated. In other words they cannot
-be local variables in functions which are destroyed when the function
+be local variables in functions which are no longer valid after the function
 exits. Before using a style it should be initialized with
 :cpp:expr:`lv_style_init(&my_style)`. After initializing a style, properties can
 be added or changed.
@@ -57,13 +57,13 @@ on the type of property it is applied to:
 - :cpp:member:`color`: for color properties
 - :cpp:member:`ptr`: for pointer properties
 
-To reset a style (free all its data) use:
+To reset a style (freeing all its data) use:
 
 .. code-block:: c
 
    lv_style_reset(&style);
 
-Styles can be built as ``const`` as well to save RAM:
+If a style will not need to be changed at runtime, styles can be created as ``const`` variables as well to save RAM:
 
 .. code-block:: c
 
@@ -82,8 +82,8 @@ new properties cannot be added.
 
 .. _style_add_remove:
 
-Add Styles to Widgets
-*********************
+Adding Styles to Widgets
+************************
 
 A style on its own has no effect until it is added (assigned) to a Widget.
 
@@ -106,27 +106,27 @@ Using :cpp:func:`lv_obj_add_style`:
    lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);        /* Overwrite only some colors to red when pressed */
 
 
-Remove Styles
-**************
+Removing Styles
+****************
 
 To remove all styles from a Widget use :cpp:expr:`lv_obj_remove_style_all(widget)`.
 
 To remove specific styles use
-:cpp:expr:`lv_obj_remove_style(widget, style, selector)`. This function will remove
+``lv_obj_remove_style(widget, &style, selector)``. This function will remove
 ``style`` only if the ``selector`` matches with the ``selector`` used in
-:cpp:func:`lv_obj_add_style`. ``style`` can be ``NULL`` to check only the
-``selector`` and remove all matching styles. The ``selector`` can use
+:cpp:func:`lv_obj_add_style`. The ``style`` argument can be ``NULL`` to match only the
+``selector`` and remove all matching styles. The ``selector`` can also use
 the :cpp:enumerator:`LV_STATE_ANY` and :cpp:enumerator:`LV_PART_ANY` values to remove the style from
 any state or part.
 
 
-Replace Styles
-**************
+Replacing Styles
+****************
 
 To replace a specific style of a Widget use
 :cpp:expr:`lv_obj_replace_style(widget, old_style, new_style, selector)`. This
 function will only replace ``old_style`` with ``new_style`` if the
-``selector`` matches the ``selector`` used in ``lv_obj_add_style``. Both
+``selector`` matches the ``selector`` used in :cpp:func:`lv_obj_add_style`. Both
 ``old_style`` and ``new_style`` must not be ``NULL``.  Separate functions exist for
 adding and removing styles.  If the combination of
 ``old_style`` and ``selector`` exists multiple times in ``obj``\ 's

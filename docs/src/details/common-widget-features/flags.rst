@@ -51,10 +51,10 @@ Some examples:
 
 .. code-block:: c
 
-    /* Hide a widget */
+    /* Hide a Widget */
     lv_obj_add_flag(widget, LV_OBJ_FLAG_HIDDEN);
 
-    /* Make a widget non-clickable */
+    /* Make a Widget non-clickable */
     lv_obj_remove_flag(widget, LV_OBJ_FLAG_CLICKABLE);
 
     /* Check if it is clickable */

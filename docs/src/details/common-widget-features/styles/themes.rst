@@ -7,7 +7,8 @@ Themes
 Overview
 ********
 
-Themes are a collection of styles. If there is an active theme LVGL
+A Theme is a collection of styles with the knowledge of which subset of styles
+are applied to which types of Widgets. If there is an active theme LVGL
 applies it to every newly-created widget. This will give a default appearance
 to the UI which can then be modified by adding further styles.
 
@@ -17,8 +18,8 @@ display.
 
 To set a theme for a display, two steps are required:
 
-1. Initialize a theme
-2. Assign the initialized theme to a display.
+1. Initialize the theme.
+2. Assign the initialized theme to the display.
 
 Theme initialization functions can have different prototypes. This
 example shows how to set the "default" theme:
