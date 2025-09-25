@@ -62,5 +62,21 @@ void test_xml_label_with_attrs(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/lv_label.png");
 }
+void test_xml_label_translation_tag(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * scr = lv_screen_active();
+    const char * label1_attrs[] = {
+        "translation-tag", "tiger",
+        NULL, NULL,
+    };
+    lv_obj_t * label = lv_xml_create(scr, "lv_label", label1_attrs);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+}
 
 #endif
