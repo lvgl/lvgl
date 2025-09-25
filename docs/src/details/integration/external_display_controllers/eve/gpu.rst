@@ -204,13 +204,14 @@ note that RGB565A8 and ARGB8888 are converted to ARGB4444 before being uploaded 
 implication of this is that a reduced color depth will be realized on the display compared
 to the original asset. The initial asset upload time may also be longer.
 
-The only supported font format is 4 bpp. The stride is converted to 1 before it's
-uploaded to EVE. If a provided font has a stride of 1, the font will be uploaded
-directly without being converted. It can improve the asset upload time. To generate a font
-with a specific stride like 1, you should use the
+The only supported font format is 4 bpp. If the font's stride is not 1, it will be converted
+to stride 1 before being uploaded to EVE. If the font already has a stride of 1, it will be
+uploaded directly without conversion, which can improve asset upload time.
+
+To generate a font with a specific stride (such as 1), you should use the
 `offline font converter <https://github.com/lvgl/lv_font_conv>`__ and specify a stride
 argument on the command line, e.g. ``--stride 1``. A stride of 0 is the default. This means
-that the bits are packed even across rows. EVE cannot use fonts that are packed across rows.
+that the bits are packed even across rows, but EVE cannot use fonts that are packed across rows.
 
 
 .. _eve register access:
