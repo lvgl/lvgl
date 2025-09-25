@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_calendar_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_CALENDAR
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
@@ -63,6 +63,7 @@ void lv_xml_calendar_apply(lv_xml_parser_state_t * state, const char ** attrs)
     }
 }
 
+#if  LV_USE_CALENDAR_HEADER_DROPDOWN
 void * lv_xml_calendar_header_dropdown_create(lv_xml_parser_state_t * state, const char ** attrs)
 {
     LV_UNUSED(attrs);
@@ -74,7 +75,9 @@ void lv_xml_calendar_header_dropdown_apply(lv_xml_parser_state_t * state, const 
 {
     lv_xml_obj_apply(state, attrs); /*Apply the common properties, e.g. width, height, styles flags etc*/
 }
+#endif
 
+#if  LV_USE_CALENDAR_HEADER_ARROW
 void * lv_xml_calendar_header_arrow_create(lv_xml_parser_state_t * state, const char ** attrs)
 {
     LV_UNUSED(attrs);
@@ -87,6 +90,7 @@ void lv_xml_calendar_header_arrow_apply(lv_xml_parser_state_t * state, const cha
 {
     lv_xml_obj_apply(state, attrs); /*Apply the common properties, e.g. width, height, styles flags etc*/
 }
+#endif
 
 
 /**********************

@@ -57,7 +57,9 @@ class Debugger(gdb.Command):
             print("pydevd_pycharm module not found. Please install it using pip.")
             return
 
-        pydevd_pycharm.settrace(self.__host, port=self.__port, stdoutToServer=True, stderrToServer=True)
+        pydevd_pycharm.settrace(
+            self.__host, port=self.__port, stdoutToServer=True, stderrToServer=True
+        )
 
     def connect_to_vscode(self):
         try:

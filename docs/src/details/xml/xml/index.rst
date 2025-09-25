@@ -1,13 +1,13 @@
-.. _xml_overview:
+.. _xml_main:
 
-========
-Overview
-========
+============
+XML Overview
+============
+
 
 .. toctree::
     :class:    toctree-1-deep
     :maxdepth: 2
 
-    intro
+    overview
     syntax
-
