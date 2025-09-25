@@ -256,8 +256,8 @@ static enum NVGwinding path_append_inner_rect(NVGcontext * ctx,
     /* When border_w < r, Calculate the intersection of an arc and a line */
 
     /* r^2 - r_in^2 = offset^2 */
-    const float offset = MATH_SQRTF((2 * r - border_w) * border_w);
-    const float sweep_alpha = MATH_DEGREES(MATH_ACOSF(r_in / r));
+    const float offset = NVG_MATH_SQRTF((2 * r - border_w) * border_w);
+    const float sweep_alpha = NVG_MATH_DEGREES(NVG_MATH_ACOSF(r_in / r));
     const float sweep_beta = 90 - sweep_alpha;
 
     const float p1_x = x + border_w;

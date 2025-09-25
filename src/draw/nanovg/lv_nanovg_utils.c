@@ -25,7 +25,7 @@
 /* Magic number from https://spencermortensen.com/articles/bezier-circle/ */
 #define PATH_ARC_MAGIC 0.55191502449351f
 
-#define SIGN(x) (math_zero(x) ? 0 : ((x) > 0 ? 1 : -1))
+#define SIGN(x) (nvg_math_is_zero(x) ? 0 : ((x) > 0 ? 1 : -1))
 
 /**********************
 *      TYPEDEFS
@@ -190,17 +190,17 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
         return;
     }
 
-    start_angle = MATH_RADIANS(start_angle);
-    sweep = MATH_RADIANS(sweep);
+    start_angle = NVG_MATH_RADIANS(start_angle);
+    sweep = NVG_MATH_RADIANS(sweep);
 
-    int n_curves = (int)ceil(MATH_FABSF(sweep / MATH_HALF_PI));
+    int n_curves = (int)ceil(NVG_MATH_FABSF(sweep / NVG_MATH_HALF_PI));
     float sweep_sign = sweep < 0 ? -1.f : 1.f;
-    float fract = fmodf(sweep, MATH_HALF_PI);
-    fract = (math_zero(fract)) ? MATH_HALF_PI * sweep_sign : fract;
+    float fract = fmodf(sweep, NVG_MATH_HALF_PI);
+    fract = (nvg_math_is_zero(fract)) ? NVG_MATH_HALF_PI * sweep_sign : fract;
 
     /* Start from here */
-    float start_x = radius * MATH_COSF(start_angle);
-    float start_y = radius * MATH_SINF(start_angle);
+    float start_x = radius * NVG_MATH_COSF(start_angle);
+    float start_y = radius * NVG_MATH_SINF(start_angle);
 
     if(pie) {
         nvgMoveTo(ctx, cx, cy);
@@ -208,9 +208,9 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
     }
 
     for(int i = 0; i < n_curves; ++i) {
-        float end_angle = start_angle + ((i != n_curves - 1) ? MATH_HALF_PI * sweep_sign : fract);
-        float end_x = radius * MATH_COSF(end_angle);
-        float end_y = radius * MATH_SINF(end_angle);
+        float end_angle = start_angle + ((i != n_curves - 1) ? NVG_MATH_HALF_PI * sweep_sign : fract);
+        float end_x = radius * NVG_MATH_COSF(end_angle);
+        float end_y = radius * NVG_MATH_SINF(end_angle);
 
         /* variables needed to calculate bezier control points */
 
@@ -223,7 +223,7 @@ void lv_nanovg_path_append_arc(NVGcontext * ctx,
         float by = end_y;
         float q1 = ax * ax + ay * ay;
         float q2 = ax * bx + ay * by + q1;
-        float k2 = (4.0f / 3.0f) * ((MATH_SQRTF(2 * q1 * q2) - q2) / (ax * by - ay * bx));
+        float k2 = (4.0f / 3.0f) * ((NVG_MATH_SQRTF(2 * q1 * q2) - q2) / (ax * by - ay * bx));
 
         /* Next start point is the current end point */
         start_x = end_x;

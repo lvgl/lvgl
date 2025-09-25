@@ -74,7 +74,7 @@ void lv_draw_nanovg_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     float dx = p2_x - p1_x;
     float dy = p2_y - p1_y;
-    float inv_dl = math_fast_inv_sqrtf(SQ(dx) + SQ(dy));
+    float inv_dl = nvg_math_inv_sqrtf(SQ(dx) + SQ(dy));
     float w_dx = dsc->width * dy * inv_dl;
     float w_dy = dsc->width * dx * inv_dl;
     float w2_dx = w_dx / 2;
