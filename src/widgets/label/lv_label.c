@@ -205,6 +205,9 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
+    if(!tag) {
+        return;
+    }
     char * new_tag = lv_strdup(tag);
     if(!new_tag) {
         LV_LOG_WARN("Failed to allocate memory for new tag");
