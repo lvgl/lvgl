@@ -63,7 +63,7 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
     }
 
     /*If the angles are the same then there is nothing to draw*/
-    if(math_zero(sweep_angle)) {
+    if(nvg_math_is_zero(sweep_angle)) {
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -77,7 +77,7 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
 
     enum NVGwinding winding = NVG_CCW;
 
-    if(math_equal(sweep_angle, 360)) {
+    if(nvg_math_is_equal(sweep_angle, 360)) {
         nvgCircle(u->vg, cx, cy, radius_out);
 
         /* radius_in <= 0, normal fill circle */
@@ -87,17 +87,17 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
         winding = NVG_CW;
     }
     else {
-        float start_angle_rad = MATH_RADIANS(start_angle);
-        float end_angle_rad = MATH_RADIANS(end_angle);
+        float start_angle_rad = NVG_MATH_RADIANS(start_angle);
+        float end_angle_rad = NVG_MATH_RADIANS(end_angle);
 
         if(radius_in > 0) {
             /* radius_out start point */
-            float start_x = radius_out * MATH_COSF(start_angle_rad) + cx;
-            float start_y = radius_out * MATH_SINF(start_angle_rad) + cy;
+            float start_x = radius_out * NVG_MATH_COSF(start_angle_rad) + cx;
+            float start_y = radius_out * NVG_MATH_SINF(start_angle_rad) + cy;
 
             /* radius_in start point */
-            float end_x = radius_in * MATH_COSF(end_angle_rad) + cx;
-            float end_y = radius_in * MATH_SINF(end_angle_rad) + cy;
+            float end_x = radius_in * NVG_MATH_COSF(end_angle_rad) + cx;
+            float end_y = radius_in * NVG_MATH_SINF(end_angle_rad) + cy;
 
             nvgMoveTo(u->vg, start_x, start_y);
 
@@ -132,12 +132,12 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
         if(dsc->rounded && dsc->width > 0) {
             float round_radius = radius_out > dsc->width ? dsc->width / 2.0f : radius_out / 2.0f;
             float round_center = radius_out - round_radius;
-            float rcx1 = cx + round_center * MATH_COSF(end_angle_rad);
-            float rcy1 = cy + round_center * MATH_SINF(end_angle_rad);
+            float rcx1 = cx + round_center * NVG_MATH_COSF(end_angle_rad);
+            float rcy1 = cy + round_center * NVG_MATH_SINF(end_angle_rad);
             nvgCircle(u->vg, rcx1, rcy1, round_radius);
 
-            float rcx2 = cx + round_center * MATH_COSF(start_angle_rad);
-            float rcy2 = cy + round_center * MATH_SINF(start_angle_rad);
+            float rcx2 = cx + round_center * NVG_MATH_COSF(start_angle_rad);
+            float rcy2 = cy + round_center * NVG_MATH_SINF(start_angle_rad);
             nvgCircle(u->vg, rcx2, rcy2, round_radius);
         }
     }
