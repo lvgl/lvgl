@@ -384,7 +384,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
-                    lv_draw_nanovg_image(t, &image_dsc, glyph_draw_dsc->letter_coords, false);
+                    lv_draw_nanovg_image(t, &image_dsc, glyph_draw_dsc->letter_coords, false, -1);
                 }
                 break;
 
