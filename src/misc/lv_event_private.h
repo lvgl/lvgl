@@ -56,6 +56,10 @@ void lv_event_push(lv_event_t * e);
 
 void lv_event_pop(lv_event_t * e);
 
+
+lv_result_t lv_event_push_and_send(lv_event_list_t * event_list, lv_event_code_t code, void * original_target,
+                                   void * param);
+
 /**
  * Nested events can be called and one of them might belong to an object that is being deleted.
  * Mark this object's `event_temp_data` deleted to know that its `lv_obj_send_event` should return `LV_RESULT_INVALID`

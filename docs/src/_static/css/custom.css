@@ -962,9 +962,8 @@ table.docutils th p {
 }
 
 /*-------------------------------------------------------------------------
- * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
- *-------------------------------------------------------------------------
- */
+ * API Pages
+ *-------------------------------------------------------------------------*/
 .lv-api-expansion-button {
   padding: 4px;
 }
@@ -1111,8 +1110,15 @@ figure figcaption .caption-text {
   font-size: 0.8rem;
 }
 
-article figure {
+/* Whitespace below figures and images... */
+article figure,
+article img {
   margin-bottom: 2rem;
+}
+
+/* ...except when the image is part of a figure. */
+article figure img {
+  margin-bottom: 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -1126,21 +1132,20 @@ body[data-theme="dark"] .highlight .p {
 /*-------------------------------------------------------------------------
  * Glossary
  *-------------------------------------------------------------------------*/
-
 .glossary {
   display: flex;
   flex-direction: column;
   margin-top: 4rem;
 }
 
-.glossary > .dt {
+.glossary > dt {
   font-weight: 800 !important;
   font-size: 1.25rem;
   line-height: 1.25;
   margin-top: 0;
 }
 
-.glossary > .dt:first-child {
+.glossary > dt:first-child {
   margin-top: 2rem;
 }
 

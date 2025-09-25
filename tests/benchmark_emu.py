@@ -162,7 +162,6 @@ def generate_config(config_name: str) -> None:
 
     output_path = os.path.join(build_dir, "lv_conf.h")
     generate_script = os.path.join(lvgl_root_dir, "scripts", "generate_lv_conf.py")
-    shutil.copy(template_path, output_path)
 
     cmd = [
         sys.executable,

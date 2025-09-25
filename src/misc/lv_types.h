@@ -164,8 +164,6 @@ typedef struct _lv_cache_entry_t lv_cache_entry_t;
 
 typedef struct _lv_fs_file_cache_t lv_fs_file_cache_t;
 
-typedef struct _lv_fs_path_ex_t lv_fs_path_ex_t;
-
 typedef struct _lv_image_decoder_args_t lv_image_decoder_args_t;
 
 typedef struct _lv_image_cache_data_t lv_image_cache_data_t;
@@ -292,8 +290,6 @@ typedef struct _lv_file_explorer_t lv_file_explorer_t;
 
 typedef struct _lv_barcode_t lv_barcode_t;
 
-typedef struct _lv_gif_t lv_gif_t;
-
 typedef struct _lv_qrcode_t lv_qrcode_t;
 
 typedef struct _lv_freetype_outline_vector_t lv_freetype_outline_vector_t;
@@ -312,11 +308,9 @@ typedef struct _lv_vector_fill_dsc_t lv_vector_fill_dsc_t;
 
 typedef struct _lv_vector_stroke_dsc_t lv_vector_stroke_dsc_t;
 
-typedef struct _lv_vector_draw_dsc_t lv_vector_draw_dsc_t;
+typedef struct _lv_vector_path_ctx_t lv_vector_path_ctx_t;
 
-typedef struct _lv_draw_vector_task_dsc_t lv_draw_vector_task_dsc_t;
-
-typedef struct _lv_vector_dsc_t lv_vector_dsc_t;
+typedef struct _lv_draw_vector_dsc_t lv_draw_vector_dsc_t;
 
 typedef struct _lv_xkb_t lv_xkb_t;
 

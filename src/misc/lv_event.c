@@ -69,6 +69,29 @@ void lv_event_pop(lv_event_t * e)
     event_head = e->prev;
 }
 
+lv_result_t lv_event_push_and_send(lv_event_list_t * event_list, lv_event_code_t code, void * original_target,
+                                   void * param)
+{
+    LV_ASSERT_NULL(event_list);
+    lv_event_t e;
+    lv_memzero(&e, sizeof(e));
+    e.code = code;
+    e.current_target = original_target;
+    e.original_target = original_target;
+    e.param = param;
+
+    lv_event_push(&e);
+    lv_result_t res = lv_event_send(event_list, &e, true);
+    if(res != LV_RESULT_OK) goto ret;
+
+    res = lv_event_send(event_list, &e, false);
+    if(res != LV_RESULT_OK) goto ret;
+
+ret:
+    lv_event_pop(&e);
+    return res;
+}
+
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
 {
     if(list == NULL) return LV_RESULT_OK;
@@ -347,6 +370,10 @@ const char * lv_event_code_get_name(lv_event_code_t code)
 
             ENUM_CASE(EVENT_VSYNC);
             ENUM_CASE(EVENT_VSYNC_REQUEST);
+
+#if LV_USE_TRANSLATION
+            ENUM_CASE(EVENT_TRANSLATION_LANGUAGE_CHANGED);
+#endif /*LV_USE_TRANSLATION*/
 
         /* Special event flags */
         case LV_EVENT_LAST:

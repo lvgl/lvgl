@@ -1587,7 +1587,7 @@
         #endif
     #endif
 
-    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
     #ifndef LV_VG_LITE_HAL_GPU_BASE_ADDRESS
         #ifdef CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
             #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS CONFIG_LV_VG_LITE_HAL_GPU_BASE_ADDRESS
@@ -3079,6 +3079,14 @@
     #endif
 #endif
 
+/** GStreamer library */
+#ifndef LV_USE_GSTREAMER
+    #ifdef CONFIG_LV_USE_GSTREAMER
+        #define LV_USE_GSTREAMER CONFIG_LV_USE_GSTREAMER
+    #else
+        #define LV_USE_GSTREAMER 0
+    #endif
+#endif
 
 /** Decode bin images to RAM */
 #ifndef LV_BIN_DECODER_RAM_LOAD
@@ -3345,7 +3353,7 @@
                 #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
             #endif
         #endif
-    #endif 
+    #endif
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
@@ -3435,6 +3443,13 @@
                 #endif
             #else
                 #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
+            #endif
+        #endif
+        #ifndef LV_USE_PROFILER_BUILTIN_POSIX
+            #ifdef CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+                #define LV_USE_PROFILER_BUILTIN_POSIX CONFIG_LV_USE_PROFILER_BUILTIN_POSIX
+            #else
+                #define LV_USE_PROFILER_BUILTIN_POSIX 0 /**< Enable POSIX profiler port */
             #endif
         #endif
     #endif
@@ -3794,7 +3809,7 @@
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
- * Requires libpng and a few MB of extra RAM. */
+ * Requires lodepng and a few MB of extra RAM. */
 #ifndef LV_USE_TEST_SCREENSHOT_COMPARE
     #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
         #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
@@ -4006,13 +4021,6 @@
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
             #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_WL_SHELL
-        #ifdef CONFIG_LV_WAYLAND_WL_SHELL
-            #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
-        #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
         #endif
     #endif
 #endif
@@ -4754,7 +4762,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #if LV_USE_WAYLAND == 0
     #define LV_WAYLAND_USE_DMABUF           0
     #define LV_WAYLAND_WINDOW_DECORATIONS   0
-    #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0
@@ -4809,7 +4816,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
     #endif
 
     #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)

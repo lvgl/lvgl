@@ -212,7 +212,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #if LV_USE_WAYLAND == 0
     #define LV_WAYLAND_USE_DMABUF           0
     #define LV_WAYLAND_WINDOW_DECORATIONS   0
-    #define LV_WAYLAND_WL_SHELL             0
 #endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0
@@ -267,7 +266,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
-        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+        #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
     #endif
 
     #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)

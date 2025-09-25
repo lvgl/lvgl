@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_TEXTAREA && LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
-static void create_styled_textarea_cursor(const char * txt, lv_coord_t y_ofs, lv_style_t * cursor_style)
+static void create_styled_textarea_cursor(const char * txt, int32_t y_ofs, lv_style_t * cursor_style)
 {
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());
     lv_textarea_set_text(ta, txt);

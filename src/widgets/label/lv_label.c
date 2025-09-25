@@ -193,6 +193,8 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
     lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
 
+    lv_label_revert_dots(obj);
+
     /*If text is NULL then refresh*/
     if(fmt == NULL) {
         lv_label_refr_text(obj);
@@ -1277,12 +1279,12 @@ static void lv_label_refr_text(lv_obj_t * obj)
 static void lv_label_revert_dots(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
-    if(label->dot_begin != LV_LABEL_DOT_BEGIN_INV) {
+    if(label->dot_begin != LV_LABEL_DOT_BEGIN_INV && !label->static_txt) {
         for(int i = 0; i < LV_LABEL_DOT_NUM + 1 && label->dot[i]; i++) {
             label->text[label->dot_begin + i] = label->dot[i];
         }
-        label->dot_begin = LV_LABEL_DOT_BEGIN_INV;
     }
+    label->dot_begin = LV_LABEL_DOT_BEGIN_INV;
 }
 
 static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
@@ -1290,9 +1292,15 @@ static void lv_label_set_dots(lv_obj_t * obj, uint32_t dot_begin)
     lv_label_t * label = (lv_label_t *)obj;
     LV_ASSERT_MSG(label->dot_begin == LV_LABEL_DOT_BEGIN_INV, "Label dots already set");
     if(dot_begin != LV_LABEL_DOT_BEGIN_INV) {
+        label->dot_begin = dot_begin;
+
+        if(label->static_txt) {
+            LV_LOG_WARN("Long mode \"dots\" is not supported with static text.");
+            return;
+        }
+
         /*Save characters*/
         lv_strncpy(label->dot, &label->text[dot_begin], LV_LABEL_DOT_NUM + 1);
-        label->dot_begin = dot_begin;
 
         /*Overwrite up to LV_LABEL_DOT_NUM + 1 characters with dots and null terminator*/
         int i = 0;

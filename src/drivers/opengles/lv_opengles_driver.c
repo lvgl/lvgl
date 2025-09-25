@@ -157,7 +157,8 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                        const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -175,33 +176,33 @@ void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * 
     float ver_translate = 0.0f;
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
-/*
- *   Normal
- */
+    /*
+     *   Normal
+     */
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
         0.0f,      0.0f,      1.0f
     };
 
-/*
-static float tangle = 0.0f;
-tangle += 0.001f;
-if (tangle > 2.0f) tangle = 0.f;
+    /*
+    static float tangle = 0.0f;
+    tangle += 0.001f;
+    if (tangle > 2.0f) tangle = 0.f;
 
-float angle = 3.14159263f * 0.5f;//tangle;
-float tempsin = sin(angle);
-float tempcos = cos(angle);
+    float angle = 3.14159263f * 0.5f;//tangle;
+    float tempsin = sin(angle);
+    float tempcos = cos(angle);
 
-//hor_scale *= 1.15f;
-//ver_scale *= 1.15f;
+    //hor_scale *= 1.15f;
+    //ver_scale *= 1.15f;
 
-//LV_LOG("ANGLE: %.2f  sin: %.3f  cos: %.3f  hor_scale: %.3f  ver_scale: %.3f  hor_trans: %.3f  ver_trans: %.3f\n", angle * (180.f / 3.14159f),  tempsin, tempcos, hor_scale, ver_scale, hor_translate, ver_translate);
-float matrix[9] = {
-        tempcos * hor_scale, -tempsin * hor_scale, hor_translate,
-        tempsin * ver_scale, tempcos * ver_scale,  ver_translate,
-        0.0f,       0.0f,      1.0f
-    };*/
+    //LV_LOG("ANGLE: %.2f  sin: %.3f  cos: %.3f  hor_scale: %.3f  ver_scale: %.3f  hor_trans: %.3f  ver_trans: %.3f\n", angle * (180.f / 3.14159f),  tempsin, tempcos, hor_scale, ver_scale, hor_translate, ver_translate);
+    float matrix[9] = {
+            tempcos * hor_scale, -tempsin * hor_scale, hor_translate,
+            tempsin * ver_scale, tempcos * ver_scale,  ver_translate,
+            0.0f,       0.0f,      1.0f
+        };*/
 
     if(texture != 0) {
         /*
@@ -215,17 +216,17 @@ float matrix[9] = {
                         : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
         */
         //LV_LOG("CLIP X1/Y1: (%f, %f) X2/Y2: (%f, %f)\n", clip_x1, clip_y1, clip_x2, clip_y2);
-        float clip_x1 = 0.f;//clip_x1 > 1.0f ? 1.0f : clip_x1; 
-        float clip_y1 = 0.f;//clip_y1 > 1.0f ? 1.0f : clip_y1; 
-        float clip_x2 = 1.f;//clip_x2 > 1.0f ? 1.0f : clip_x2; 
+        float clip_x1 = 0.f;//clip_x1 > 1.0f ? 1.0f : clip_x1;
+        float clip_y1 = 0.f;//clip_y1 > 1.0f ? 1.0f : clip_y1;
+        float clip_x2 = 1.f;//clip_x2 > 1.0f ? 1.0f : clip_x2;
         float clip_y2 = 1.f;//clip_y2 > 1.0f ? 1.0f : clip_y2;
 
         lv_display_rotation_t rotation = lv_display_get_rotation(lv_display_get_default());
         switch(rotation) {
             case LV_DISPLAY_ROTATION_90:
                 float rotated_90_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                     1.0f,  1.0f, clip_x1, clip_y2,
-                     1.0f, -1.0f, clip_x2, clip_y2,
+                    1.0f,  1.0f, clip_x1, clip_y2,
+                    1.0f, -1.0f, clip_x2, clip_y2,
                     -1.0f, -1.0f, clip_x2, clip_y1,
                     -1.0f,  1.0f, clip_x1, clip_y1
                 };
@@ -233,10 +234,10 @@ float matrix[9] = {
                 break;
             case LV_DISPLAY_ROTATION_180:
                 float rotated_180_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                     1.0f, -1.0f, clip_x1, clip_y2,
+                    1.0f, -1.0f, clip_x1, clip_y2,
                     -1.0f, -1.0f, clip_x2, clip_y2,
                     -1.0f,  1.0f, clip_x2, clip_y1,
-                     1.0f,  1.0f, clip_x1, clip_y1
+                    1.0f,  1.0f, clip_x1, clip_y1
                 };
                 lv_opengles_vertex_buffer_init(rotated_180_positions, sizeof(rotated_180_positions));
                 break;
@@ -244,8 +245,8 @@ float matrix[9] = {
                 float rotated_270_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
                     -1.0f, -1.0f, clip_x1, clip_y2,
                     -1.0f,  1.0f, clip_x2, clip_y2,
-                     1.0f,  1.0f, clip_x2, clip_y1,
-                     1.0f, -1.0f, clip_x1, clip_y1
+                    1.0f,  1.0f, clip_x2, clip_y1,
+                    1.0f, -1.0f, clip_x1, clip_y1
                 };
                 lv_opengles_vertex_buffer_init(rotated_270_positions, sizeof(rotated_270_positions));
                 break;
@@ -258,7 +259,7 @@ float matrix[9] = {
                 };
                 lv_opengles_vertex_buffer_init(positions, sizeof(positions));
                 break;
-            }
+        }
     }
 
     lv_opengles_shader_bind();

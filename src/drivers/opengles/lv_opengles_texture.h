@@ -33,11 +33,24 @@ extern "C" {
 
 /**
  * Create a display that flushes to an OpenGL texture
+ * If you already have a texture and want to bind it to the display,
+ *    see `lv_opengles_texture_create_from_texture_id`
  * @param w    width in pixels of the texture
  * @param h    height in pixels of the texture
- * @return     the new display
+ * @return     the new display or NULL on failure
  */
 lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h);
+
+/**
+ * Create a display that flushes to the provided OpenGL texture
+ * If you don't have a texture to bind it to the display,
+ *    see `lv_opengles_texture_create`
+ * @param w         width in pixels of the texture
+ * @param h         height in pixels of the texture
+ * @param texture_id    the texture LVGL will render to
+ * @return     the new display or NULL on failure
+ */
+lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, unsigned int texture_id);
 
 /**
  * Get the OpenGL texture ID of the display
@@ -54,7 +67,6 @@ unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp);
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id);
 
 void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t height);
-void lv_opengles_texture_into_placeholder(lv_display_t * placeholder, int32_t w, int32_t h);
 
 /**********************
  *      MACROS

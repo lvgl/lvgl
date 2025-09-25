@@ -556,7 +556,7 @@
     /* Used to pick the correct GPU revision header it depends on the vendor */
     #define LV_VG_LITE_HAL_GPU_REVISION 0x40
 
-    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
     #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
 
 #endif
@@ -970,6 +970,8 @@
     #define LV_GIF_CACHE_DECODE_DATA 0
 #endif
 
+/** GStreamer library */
+#define LV_USE_GSTREAMER 0
 
 /** Decode bin images to RAM */
 #define LV_BIN_DECODER_RAM_LOAD 0
@@ -1062,7 +1064,7 @@
         /** Get the applications idle percentage.
          * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
         #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
-    #endif 
+    #endif
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
@@ -1092,6 +1094,7 @@
         /** Default profiler trace buffer size */
         #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /**< [bytes] */
         #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
+        #define LV_USE_PROFILER_BUILTIN_POSIX 0 /**< Enable POSIX profiler port */
     #endif
 
     /** Header to include for profiler */
@@ -1201,7 +1204,7 @@
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
- * Requires libpng and a few MB of extra RAM. */
+ * Requires lodepng and a few MB of extra RAM. */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
 #endif /*LV_USE_TEST*/
 
@@ -1249,7 +1252,6 @@
     #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
                                                                              /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
     #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
-    #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
 #endif
 
 /** Driver for /dev/fb */
