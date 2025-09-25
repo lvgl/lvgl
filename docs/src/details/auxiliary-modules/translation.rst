@@ -76,6 +76,8 @@ These return a translated string which can be used with widgets:
     lv_dropdown_set_options(dd, lv_tr("color_list"));
 
 
+.. _translation_fallbacks:
+
 Fallbacks
 ---------
 
