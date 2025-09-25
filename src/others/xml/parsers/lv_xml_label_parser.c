@@ -60,7 +60,6 @@ void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
 #if LV_USE_TRANSLATION
         else if(lv_streq("translation-tag", name)) lv_label_set_translation_tag(item, value);
 #endif
-        else if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
         else if(lv_streq("bind_text", name)) {
             lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject == NULL) {
