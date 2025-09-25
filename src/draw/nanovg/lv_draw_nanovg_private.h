@@ -172,7 +172,7 @@ void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t 
  * @param t pointer to a drawing task
  * @param dsc pointer to a vector descriptor
  */
-void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
+void lv_draw_nanovg_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc);
 
 /**
  * @brief Convert a gradient to a paint
