@@ -27,6 +27,7 @@
 #include "lv_xml_style.h"
 #include "lv_xml_translation.h"
 #include "lv_xml_utils.h"
+#include "lv_xml_load_private.h"
 #include "lv_xml_private.h"
 #include "parsers/lv_xml_obj_parser.h"
 #include "parsers/lv_xml_button_parser.h"
@@ -233,6 +234,8 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_obj-bind_state_if_lt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
     lv_xml_widget_register("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
     lv_xml_widget_register("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+
+    lv_xml_load_init();
 }
 
 void lv_xml_deinit(void)
@@ -240,6 +243,8 @@ void lv_xml_deinit(void)
 #if LV_USE_TEST
     lv_xml_test_unregister();
 #endif
+
+    lv_xml_load_deinit();
 
     lv_free((void *)xml_path_prefix);
 }

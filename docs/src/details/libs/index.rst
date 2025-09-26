@@ -15,6 +15,7 @@
     bmp
     ffmpeg
     freetype
+    frogfs
     fs
     gif
     gstreamer

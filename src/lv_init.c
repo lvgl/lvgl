@@ -369,6 +369,10 @@ void lv_init(void)
     lv_fs_uefi_init();
 #endif
 
+#if LV_USE_FS_FROGFS
+    lv_fs_frogfs_init();
+#endif
+
     /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
@@ -499,8 +503,6 @@ void lv_deinit(void)
 
     lv_layout_deinit();
 
-    lv_fs_deinit();
-
     lv_timer_core_deinit();
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
@@ -518,6 +520,12 @@ void lv_deinit(void)
 #if LV_USE_TRANSLATION
     lv_translation_deinit();
 #endif
+
+#if LV_USE_FS_FROGFS
+    lv_fs_frogfs_deinit();
+#endif
+
+    lv_fs_deinit();
 
     lv_mem_deinit();
 

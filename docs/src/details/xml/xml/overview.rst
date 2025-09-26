@@ -197,6 +197,33 @@ Registering XML files and creating instances is not memory-hungry nor slow. The 
 memory overhead is that the ``<view>`` of the Components is saved in RAM (typically
 1–2 kB per component).
 
+Load many XML files and assets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned, :cpp:expr:`lv_xml_load_all_from_path("A:path/to/dir")`
+will traverse a directory and register all the XML components,
+screens, globals, and translations.
+
+There are some additional XML loading functions available when using :ref:`frogfs`.
+If you have a frogfs blob you just want to load all the XMLs and assets from,
+you can directly load from the blob using :cpp:func:`lv_xml_load_all_from_data`
+without registering it with :cpp:func:`lv_fs_frogfs_register_blob` first.
+
+.. code-block:: c
+
+    extern const unsigned char frogfs_bin[];
+    extern unsigned int frogfs_bin_len;
+    lv_xml_load_t * handle = lv_xml_load_all_from_data(frogfs_bin, frogfs_bin_len);
+    /* `handle` can optionally be passed to `lv_xml_unload` later */
+
+There is one more function provided for the special use case when a frogfs blob
+is in another filesystem like an SD card.
+
+.. code-block:: c
+
+    lv_xml_load_t * handle = lv_xml_load_all_from_file("A:path/to/frogfs.bin");
+    /* `handle` can optionally be passed to `lv_xml_unload` later */
+
 Export C and H Files
 --------------------
 
