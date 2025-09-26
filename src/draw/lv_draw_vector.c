@@ -12,8 +12,8 @@
 
 #if LV_USE_VECTOR_GRAPHIC
 
-#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE)
-    #error "LV_USE_VECTOR_GRAPHIC requires either (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE"
+#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_GFX && LV_USE_NEMA_VG))
+    #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG)"
 #endif
 
 #include "../misc/lv_ll.h"
