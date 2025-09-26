@@ -51,13 +51,12 @@ void lv_xml_deinit(void);
  * @return          pointer to the created UI element
  * @example         if `name` is "lv_slider" and
  *                  `attrs` is {"width", "100", "value", "30", NULL, NULL};
- *                  it's equivalent to `<lv_slider width="100" value30/>`
+ *                  it's equivalent to `<lv_slider width="100" value="30"/>`
  * @example         not only components can be created this way but e.g
  *                  - `name`="lv_chart-series", `attrs`={"color", "0xf00", "axis", "primary_y", NULL, NULL}
  *                  - `name`="style", `attrs`={"name", "style1", "selector", "pressed|knob", NULL, NULL}
  *                  - `name`="bind_flag_if_eq",
  *                    `attrs`={"subject", "subject1", "flag", "hidden", "ref_value", "1", NULL, NULL}
- *                    `
  */
 void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
 
