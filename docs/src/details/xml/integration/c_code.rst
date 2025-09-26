@@ -104,9 +104,10 @@ with a decimal point:
 
         char buf[64];
         lv_snprintf(buf, sizeof(buf), "%d.%d", int_part, fract_part);
+        lv_subject_copy_string(&subject_temperature_string, buf);
     }
 
-    lv_subject_add_observer(&subject_temperature_string,
+    lv_subject_add_observer(&subject_temperature_int,
                             temperature_to_string_observer_cb, NULL);
 
 Component wrapper
@@ -133,8 +134,8 @@ manually create new C and H files for a ``super_button`` with a function like:
 CMake integration
 *****************
 
-A skeleton ``CMakeList.txt`` file is generated which can be easily integrated into
+A skeleton ``CMakeLists.txt`` file is generated which can be easily integrated into
 any project.
 
-A file called ``file_list_gen.cmake`` is generated and used by ``CMakeList.txt``.
+A file called ``file_list_gen.cmake`` is generated and used by ``CMakeLists.txt``.
 It ensures that only the appropriate files are included.

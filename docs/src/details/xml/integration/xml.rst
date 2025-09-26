@@ -102,8 +102,8 @@ application.
 descriptor" that can be used to register data available only for a given component.
 
 Besides events, it's common to register images and fonts stored in the application code
-by :cpp:expr:`lv_xml_register_image(scope, path_or_pointer)` and
-:cpp:expr:`lv_xml_register_font(scope, path_or_pointer)`.
+by :cpp:expr:`lv_xml_register_image(scope, "image_name", path_or_pointer)` and
+:cpp:expr:`lv_xml_register_font(scope, "font_name", path_or_pointer)`.
 
 Registering Widgets
 -------------------
@@ -161,7 +161,7 @@ Or a custom component:
         NULL, NULL
     };
 
-    lv_obj_t * my_button_1 = lv_xml_create(lv_screen_active(), "my_slider", attrs);
+    lv_obj_t * my_button_1 = lv_xml_create(lv_screen_active(), "my_button", attrs);
 
 Or to create non-``lv_obj_t`` children:
 

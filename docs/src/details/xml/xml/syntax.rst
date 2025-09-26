@@ -83,10 +83,10 @@ This means that the actual values need to be bound to the names when the UI is l
 from XML, otherwise, LVGL will not know what a name means.
 
 Most of these connections are done automatically (e.g., for styles, fonts, images,
-animations, gradients, etc.) when the componentns and ``globals.xml``\ s
-are regsigered.
+animations, gradients, etc.) when the components and ``globals.xml``\ s
+are registered.
 
-However, other need to be connected manually. For example the event callbacks where
+However, others need to be connected manually. For example the event callbacks where
 the callback itself is available only in the code, or fonts or images if they are
 referring to data stored in memory.
 
@@ -97,11 +97,11 @@ Arrays
 
 An array of any type can be defined in four ways:
 
-:int[count]:        An integer array. The number of elements in will be passed as a separate parameter.
+:int[count]:        An integer array. The number of elements will be passed as a separate parameter.
 :string[NULL]:      An array terminated with a ``NULL`` element.
 :string[]:          No ``NULL`` termination and no count parameter. Used when the
                     number of elements is not known or delivered via another
-                    mechanism, such as via an other setting.
+                    mechanism, such as via another setting.
 
 Enums
 -----
