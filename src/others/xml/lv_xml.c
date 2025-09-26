@@ -246,7 +246,7 @@ void lv_xml_init(void)
     lv_xml_register_widget("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
     lv_xml_register_widget("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
 
-	lv_xml_load_init();
+    lv_xml_load_init();
 }
 
 void lv_xml_deinit(void)
