@@ -17,7 +17,7 @@ For example, the ESP32 family is a good candidate to create UIs with LVGL.
 Recommended boards include the ESP32 (original dual-core) and the ESP32-S3.
 
 Get the LVGL library
---------------------
+********************
 
 The recommended way to add LVGL and display drivers is through the PlatformIO Home GUI in VS Code:
 
@@ -44,7 +44,7 @@ If you prefer manual installation, you can also clone the LVGL repository
 into the ``lib/`` directory of your PlatformIO project.
 
 Set up drivers
---------------
+**************
 
 To get started, the recommended option is to use the ``LovyanGFX library`` as the TFT driver, 
 since it makes testing much easier.
@@ -62,7 +62,7 @@ In addition, LVGL also provides its own inbuilt display drivers that can be used
 See the :ref:`supported drivers section <display controllers>` for a full list.
 
 Display Configuration
----------------------
+*********************
 
 You’ll need to create a display configuration file, such as ``my_display.hpp`` similar to the example in
 `LovyanGFX user_setting.ino <https://github.com/lovyan03/LovyanGFX/blob/master/examples/HowToUse/2_user_setting/2_user_setting.ino>`__.
@@ -122,7 +122,7 @@ For example:
 This approach keeps your configuration under version control.
 
 Configure LVGL
---------------
+**************
 
 - Using ``lv_conf.h``
 
@@ -152,7 +152,7 @@ Alternatively, you can define LVGL configuration macros directly in ``platformio
 This avoids maintaining a separate ``lv_conf.h`` file.
 
 Initialize and run LVGL
------------------------
+***********************
 
 In your ``main.cpp``, initialize LVGL and the display driver:
 
@@ -192,7 +192,7 @@ In your ``main.cpp``, initialize LVGL and the display driver:
 
 
 Use the examples and demos
---------------------------
+**************************
 
 LVGL comes with a wide range of examples and demo applications that you can try out in PlatformIO.
 These are included with the library under the ``examples`` and ``demos`` folders.
@@ -216,7 +216,7 @@ how to set up and run LVGL on different targets, including ESP32, STM32, and a P
 This can be very helpful when exploring how LVGL behaves across platforms.
 
 Debugging and logging
----------------------
+*********************
 
 LVGL can display debug information in case of trouble.
 In PlatformIO you can enable logging by editing the ``lv_conf.h`` file (or by adding defines in ``platformio.ini``).
