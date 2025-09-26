@@ -623,7 +623,8 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
 
 static void process_include_timeline_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
-    if(state->context == NULL) {
+    lv_xml_timeline_t * at = state->context;
+    if(at == NULL) {
         LV_LOG_INFO("No parent timeline is set, skipping");
         return;
     }
@@ -653,17 +654,26 @@ static void process_include_timeline_element(lv_xml_parser_state_t * state, cons
         return;
     }
 
-    lv_xml_timeline_t * at = state->context;
-    if(at == NULL) {
-        LV_LOG_WARN("There was no parent timeline for the animation");
+    lv_xml_anim_timeline_child_t * child = lv_ll_ins_tail(&at->anims_ll);
+    LV_ASSERT_MALLOC(child);
+    if(child == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
         return;
     }
 
-    lv_xml_anim_timeline_child_t * child = lv_ll_ins_tail(&at->anims_ll);
     child->is_anim = false;
     child->data.incl.delay = lv_xml_atoi(delay_str);
     child->data.incl.target_name = lv_strdup(target_str);
+    LV_ASSERT_MALLOC(child->data.incl.target_name);
     child->data.incl.timeline_name = lv_strdup(timeline_str);
+    LV_ASSERT_MALLOC(child->data.incl.timeline_name);
+
+    if(child->data.incl.target_name == NULL || child->data.incl.timeline_name == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+        lv_free((void *)child->data.incl.target_name);
+        lv_free((void *)child->data.incl.timeline_name);
+        lv_ll_remove(&at->anims_ll, child);
+    }
 }
 
 static void process_grad_element(lv_xml_parser_state_t * state, const char * tag_name, const char ** attrs)

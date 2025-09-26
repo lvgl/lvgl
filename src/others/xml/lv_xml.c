@@ -896,6 +896,11 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
     /*Create an array to store the created timeline pointers*/
     lv_anim_timeline_t ** timeline_array;
     timeline_array = lv_malloc((lv_ll_get_len(&scope->timeline_ll) + 1) * sizeof(lv_anim_timeline_t *));
+    LV_ASSERT_MALLOC(timeline_array);
+    if(timeline_array == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+        return;
+    }
 
     /*Read the timeline descriptors of the component and create
      *timeline instances based on them.*/
@@ -905,7 +910,12 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
          * (e.g. <play_animation_event target="comp_name" timeline="timeline_name">)*/
         lv_anim_timeline_t * my_timeline = lv_anim_timeline_create();
         my_timeline->user_data = lv_strdup(timeline_dsc->name);
-
+        LV_ASSERT_MALLOC(my_timeline->user_data);
+        if(my_timeline->user_data == NULL) {
+            lv_anim_timeline_delete(my_timeline);
+            LV_LOG_WARN("Couldn't allocate memory");
+            return;
+        }
         /*Check all saved animation or incluce_timeline data of the component
          *and add them to the timeline instance. */
         lv_xml_anim_timeline_child_t * timeline_child;

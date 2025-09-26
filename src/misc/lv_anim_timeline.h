@@ -161,7 +161,7 @@ uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
 void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
 
 /**
- * Merga (add) all animations of a timeline to another
+ * Merge (add) all animations of a timeline to another
  * @param dest      merge animation into this timeline
  * @param src       merge the animations of this timeline
  * @param delay     add the animations with this extra delay
