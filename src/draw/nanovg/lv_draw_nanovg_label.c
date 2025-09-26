@@ -349,7 +349,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                             return;
                         }
 
-                        image_handle = lv_nanovg_push_image(u, glyph_draw_dsc->glyph_data, color);
+                        image_handle = lv_nanovg_push_image(u, glyph_draw_dsc->glyph_data, color, 0);
                     }
 
                     if(image_handle < 0) {

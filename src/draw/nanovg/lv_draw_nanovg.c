@@ -17,21 +17,21 @@
 #define NANOVG_GLES2_IMPLEMENTATION
 
 #if defined(NANOVG_GL2_IMPLEMENTATION)
-#include <GL/glew.h>
-#define NVG_CTX_CREATE nvgCreateGL2
-#define NVG_CTX_DELETE nvgDeleteGL2
+    #include <GL/glew.h>
+    #define NVG_CTX_CREATE nvgCreateGL2
+    #define NVG_CTX_DELETE nvgDeleteGL2
 #elif defined(NANOVG_GL3_IMPLEMENTATION)
-#include <GL/glew.h>
-#define NVG_CTX_CREATE nvgCreateGL3
-#define NVG_CTX_DELETE nvgDeleteGL3
+    #include <GL/glew.h>
+    #define NVG_CTX_CREATE nvgCreateGL3
+    #define NVG_CTX_DELETE nvgDeleteGL3
 #elif defined(NANOVG_GLES2_IMPLEMENTATION)
-#include <GLES2/gl2.h>
-#define NVG_CTX_CREATE nvgCreateGLES2
-#define NVG_CTX_DELETE nvgDeleteGLES2
+    #include <GLES2/gl2.h>
+    #define NVG_CTX_CREATE nvgCreateGLES2
+    #define NVG_CTX_DELETE nvgDeleteGLES2
 #elif defined(NANOVG_GLES3_IMPLEMENTATION)
-#include <GLES3/gl3.h>
-#define NVG_CTX_CREATE nvgCreateGLES3
-#define NVG_CTX_DELETE nvgDeleteGLES3
+    #include <GLES3/gl3.h>
+    #define NVG_CTX_CREATE nvgCreateGLES3
+    #define NVG_CTX_DELETE nvgDeleteGLES3
 #endif
 
 #include "../../libs/nanovg/nanovg_gl.h"
@@ -190,8 +190,8 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
     }
 
-   const int32_t buf_w = lv_area_get_width(&layer->buf_area);
-   const int32_t buf_h = lv_area_get_height(&layer->buf_area);
+    const int32_t buf_w = lv_area_get_width(&layer->buf_area);
+    const int32_t buf_h = lv_area_get_height(&layer->buf_area);
 
     if(!u->is_started) {
         glViewport(0, 0, buf_w, buf_h);

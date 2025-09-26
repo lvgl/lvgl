@@ -436,7 +436,8 @@ const lv_draw_buf_t * lv_nanovg_open_image_buffer(struct _lv_draw_nanovg_unit_t 
     return decoded;
 }
 
-int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color)
+int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color,
+                         int imageFlags)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(src_buf);
@@ -453,7 +454,7 @@ int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t 
     }
 
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
-    int image_handle = nvgCreateImageRGBA(u->vg, w, h, 0, lv_draw_buf_goto_xy(u->image_buf, 0, 0));
+    int image_handle = nvgCreateImageRGBA(u->vg, w, h, imageFlags, lv_draw_buf_goto_xy(u->image_buf, 0, 0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
 
     lv_pending_add(u->image_handle_pending, &image_handle);
