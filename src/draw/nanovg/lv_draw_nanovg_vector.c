@@ -103,7 +103,7 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
                     return;
                 }
 
-                int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(img_dsc->recolor, img_dsc->recolor_opa));
+                int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(img_dsc->recolor, img_dsc->recolor_opa), 0);
                 if(image_handle < 0) {
                     LV_PROFILER_DRAW_END;
                     return;
