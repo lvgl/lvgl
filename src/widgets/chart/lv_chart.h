@@ -255,8 +255,9 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
 /**
  * Remove a cursor 
  * @param obj       pointer to chart object
- * @param cursor    pointer to the cursor
-void lv_chart_remove_cursor(lv_obj_t *obj, lv_chart_cursor_t *cursor);
+ * @param cursor    pointer to the cursor 
+ */
+void lv_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor);
 
 /**
  * Set the coordinate of the cursor with respect to the paddings
