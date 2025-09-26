@@ -579,6 +579,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         uint32_t idx = test.step_cnt - 1;
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SET_LANGUAGE;
         test.steps[idx].param.str = lv_strdup(obj_name);
+        LV_ASSERT_MALLOC(test.steps[idx].param.str);
     }
 }
 
