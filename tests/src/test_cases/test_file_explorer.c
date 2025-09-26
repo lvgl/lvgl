@@ -4,7 +4,9 @@
 
 #include "unity/unity.h"
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * file_explorer_obj;
@@ -22,6 +24,12 @@ void setUp(void)
 
     mkdir("src/test_files/test_file_explorer_folder", 0777);
     mkdir("src/test_files/test_file_explorer_folder/dev", 0777);
+    int fd = open("src/test_files/test_file_explorer_folder/video.mp4", O_CREAT | O_RDWR, 0777);
+    close(fd);
+    fd = open("src/test_files/test_file_explorer_folder/audio.mp3", O_CREAT | O_RDWR, 0777);
+    close(fd);
+    fd = open("src/test_files/test_file_explorer_folder/image.jpg", O_CREAT | O_RDWR, 0777);
+    close(fd);
     mkdir("src/test_files/test_file_explorer_folder/dev/shm", 0777);
     mkdir("src/test_files/test_file_explorer_folder/home", 0777);
     mkdir("src/test_files/test_file_explorer_folder/home/web_user", 0777);
@@ -32,11 +40,14 @@ void tearDown(void)
     /* Is there a way to destroy a chart without having to call remove_series for each of it series? */
     lv_obj_clean(active_screen);
 
-    rmdir("src/test_files/test_file_explorer_folder/dev/shm");
-    rmdir("src/test_files/test_file_explorer_folder/dev");
-    rmdir("src/test_files/test_file_explorer_folder/home/web_user");
-    rmdir("src/test_files/test_file_explorer_folder/home");
-    rmdir("src/test_files/test_file_explorer_folder");
+    remove("src/test_files/test_file_explorer_folder/dev/shm");
+    remove("src/test_files/test_file_explorer_folder/dev");
+    remove("src/test_files/test_file_explorer_folder/home/web_user");
+    remove("src/test_files/test_file_explorer_folder/home");
+    remove("src/test_files/test_file_explorer_folder/video.mp4");
+    remove("src/test_files/test_file_explorer_folder/audio.mp3");
+    remove("src/test_files/test_file_explorer_folder/image.jpg");
+    remove("src/test_files/test_file_explorer_folder");
 }
 
 void test_file_explorer_read_dir(void)
@@ -54,11 +65,11 @@ void test_file_explorer_read_dir_sorted(void)
 
 static void read_dir(void)
 {
-    uint8_t back_row = 0, dev_row = 0, shm_row = 0, home_row = 0, user_row = 0;
+    uint32_t back_row = 0, dev_row = 0, shm_row = 0, home_row = 0, user_row = 0;
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    for(uint32_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_LEFT "  Back") == 0) {
             back_row = i;
         }
@@ -77,7 +88,7 @@ static void read_dir(void)
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    for(uint32_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  shm") == 0) {
             shm_row = i;
         }
@@ -103,7 +114,7 @@ static void read_dir(void)
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    for(uint32_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  web_user") == 0) {
             user_row = i;
         }
