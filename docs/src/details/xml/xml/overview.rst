@@ -8,7 +8,7 @@ Overview
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
-LVGL' XML Module implements LVGL's Declarative UI by making it possible to
+LVGL's XML Module implements LVGL's Declarative UI by making it possible to
 describe UIs in XML.
 
 Describing the UI in XML in a declarative manner offers several advantages:
