@@ -209,6 +209,7 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
         return;
     }
     char * new_tag = lv_strdup(tag);
+    LV_ASSERT_MALLOC(new_tag);
     if(!new_tag) {
         LV_LOG_WARN("Failed to allocate memory for new tag");
         return;
