@@ -83,7 +83,7 @@ This means that the actual values need to be bound to the names when the UI is l
 from XML, otherwise, LVGL will not know what a name means.
 
 Most of these connections are done automatically (e.g., for styles, fonts, images,
-animations, gradients, etc.) when the componentns and ``globals.xml``s
+animations, gradients, etc.) when the componentns and ``globals.xml``\ s
 are regsigered.
 
 However, other need to be connected manually. For example the event callbacks where
