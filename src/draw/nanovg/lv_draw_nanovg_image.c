@@ -56,13 +56,15 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
 
     if(image_handle < 0) {
+        const int imageFlags = dsc->tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0;
+
         const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, dsc->src, no_cache, false);
 
         if(!src_buf) {
             LV_PROFILER_DRAW_END;
             return;
         }
-        image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa));
+        image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa), imageFlags);
     }
 
     if(image_handle < 0) {
@@ -80,11 +82,31 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
     const uint32_t img_w = dsc->header.w ? dsc->header.w : lv_area_get_width(coords);
     const uint32_t img_h = dsc->header.h ? dsc->header.h : lv_area_get_height(coords);
 
-    NVGpaint paint = nvgImagePattern(u->vg, 0, 0, img_w, img_h, 0, image_handle,
+    int32_t img_ofs_x = 0;
+    int32_t img_ofs_y = 0;
+    int32_t rect_w = img_w;
+    int32_t rect_h = img_h;
+
+    if(dsc->tile) {
+        lv_area_t tile_area;
+        if(lv_area_get_width(&dsc->image_area) >= 0) {
+            tile_area = dsc->image_area;
+        }
+        else {
+            tile_area = *coords;
+        }
+
+        img_ofs_x = tile_area.x1 - coords->x1;
+        img_ofs_y = tile_area.y1 - coords->y1;
+        rect_w = lv_area_get_width(coords);
+        rect_h = lv_area_get_height(coords);
+    }
+
+    NVGpaint paint = nvgImagePattern(u->vg, img_ofs_x, img_ofs_y, img_w, img_h, 0, image_handle,
                                      dsc->opa / (float)LV_OPA_COVER);
 
     nvgBeginPath(u->vg);
-    lv_nanovg_path_append_rect(u->vg, 0, 0, img_w, img_h, dsc->clip_radius);
+    lv_nanovg_path_append_rect(u->vg, 0, 0, rect_w, rect_h, dsc->clip_radius);
     nvgFillPaint(u->vg, paint);
     nvgFill(u->vg);
 
