@@ -79,7 +79,7 @@ they are stored in ROM memory, which is always accessible.
 Set translation tag
 -------------------
 
-When using LVGL's translation module, you can bind a translation tag to a label directly with lv_label_set_translation_tag(label, tag).
+When using LVGL's translation module, you can bind a translation tag to a label directly with :cpp:expr:`lv_label_set_translation_tag(label, tag)`.
 After this function is called, future changes to the language will automatically update the label's text to display the corresponding translation
 for that tag in the new language.
 
