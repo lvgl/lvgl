@@ -83,6 +83,9 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     int32_t window_width;
     int32_t window_height;
 
+    uint32_t width = hor_res;
+    uint32_t height = ver_res;
+
     lv_wayland_init();
 
     window_width  = hor_res;
@@ -104,7 +107,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     window->close_cb = close_cb;
 
     /* Initialize display driver */
-    window->lv_disp = lv_display_create(hor_res, ver_res);
+    window->lv_disp = lv_display_create(width, height);
     if(window->lv_disp == NULL) {
         LV_LOG_ERROR("failed to create lvgl display");
         return NULL;
