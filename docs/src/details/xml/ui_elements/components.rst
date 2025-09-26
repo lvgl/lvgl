@@ -69,8 +69,8 @@ Registration
 
 Once a Component is created (e.g., ``my_button``), it can be registered by calling either:
 
-- :cpp:expr:`lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml")`
-- :cpp:expr:`lv_xml_component_register_from_data("my_button", xml_data_of_my_button)`
+- :cpp:expr:`lv_xml_register_component_from_file("A:lvgl/examples/others/xml/my_button.xml")`
+- :cpp:expr:`lv_xml_register_component_from_data("my_button", xml_data_of_my_button)`
 
 These registration functions process the XML data and store relevant information internally.
 This is required to make LVGL recognize the Component by name.
@@ -221,8 +221,8 @@ The following example demonstrates parameter passing and the use of the
 
 .. code-block:: c
 
-    lv_xml_component_register_from_file("A:path/to/h3.xml");
-    lv_xml_component_register_from_file("A:path/to/red_button.xml");
+    lv_xml_register_component_from_file("A:path/to/h3.xml");
+    lv_xml_register_component_from_file("A:path/to/red_button.xml");
 
     /* Creates a button with "None" text */
     lv_xml_create(lv_screen_active(), "red_button", NULL);

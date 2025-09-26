@@ -38,7 +38,7 @@ static lv_widget_processor_t * widget_processor_head;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_xml_widget_register(const char * name, lv_xml_widget_create_cb_t create_cb,
+lv_result_t lv_xml_register_widget(const char * name, lv_xml_widget_create_cb_t create_cb,
                                    lv_xml_widget_apply_cb_t apply_cb)
 {
     lv_widget_processor_t * p = lv_malloc(sizeof(lv_widget_processor_t));

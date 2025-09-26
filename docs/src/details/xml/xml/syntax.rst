@@ -4,6 +4,8 @@
 Syntax
 ======
 
+
+
 Naming conventions
 ******************
 
@@ -52,7 +54,7 @@ The following simple built-in types are supported:
 
 :content:   Means ``LV_SIZE_CONTENT``.
 
-:string:    Simple NUL-terminated string.  When multiple strings are used in a
+:string:    Simple ``\0``-terminated string.  When multiple strings are used in a
             property or string array, ``'`` should be used.  E.g. ``foo="'a' 'b'"``.
 
 :color:     A color stored as 24-bit RGB (:cpp:expr:`lv_color_t`).
@@ -78,57 +80,28 @@ names.  For example, a style is defined like ``<style name="red" bg_color="0xff0
 Later, they can be referenced by their names.
 
 This means that the actual values need to be bound to the names when the UI is loaded
-from XML, otherwise, LVGL wouldn't know what a name means.
+from XML, otherwise, LVGL will not know what a name means.
 
 Most of these connections are done automatically (e.g., for styles, fonts, images,
-animations, gradients, etc.), but others need to be connected manually (e.g., event
-callbacks where the callback itself is available only in the code).
+animations, gradients, etc.) when the components and ``globals.xml``\ s
+are registered.
 
-For fonts and images, the connections are created automatically if the source is a file.
-If the font or image is compiled into the application (as a C array), the user needs
-to specify which variable a given name refers to.
+However, others need to be connected manually. For example the event callbacks where
+the callback itself is available only in the code, or fonts or images if they are
+referring to data stored in memory.
 
-To create these connections, functions like
-
-- ``lv_xml_register_image(scope, name, pointer)``
-- ``lv_xml_register_font(scope, name, pointer)``
-- ``lv_xml_register_event_cb(scope, name, callback)``
-- etc.
-
-can be used.  Later, a pointer to the object can be retrieved by
-
-- ``lv_xml_get_image(scope, name)``
-- ``lv_xml_get_font(scope, name)``
-- ``lv_xml_get_event_cb(scope, name)``
-- etc.
-
-``scope`` can be ``NULL`` to use the global scope or :cpp:expr:`lv_xml_component_get_scope("my_component")`
-returns the a component's local scope.
-
-:style:     Name of a style. :cpp:expr:`lv_xml_get_style_by_name(&ctx, name)` returns an :cpp:expr:`lv_style_t *`.
-:font:      Name of a font. :cpp:expr:`lv_xml_get_font(&ctx, name)` returns an :cpp:expr:`lv_font_t *`.
-:image:     Name of an image. :cpp:expr:`lv_xml_get_image(&ctx, name)` returns an :cpp:expr:`const void *`,
-            which can be :cpp:expr:`lv_image_dsc_t *` or a NUL-terminated string path to a file.
-:animation: Name of an animation descriptor. :cpp:expr:`lv_xml_get_anim(&ctx, name)` returns an :cpp:expr:`lv_anim_t *`.
-:subject:   Name of a :ref:`Subject <observer_subject>`. :cpp:expr:`lv_xml_get_subject(&ctx, name)` returns an :cpp:expr:`lv_subject_t *`.
-:grad:      Name of a gradient. :cpp:expr:`lv_xml_get_grad(&ctx, name)` returns an :cpp:expr:`lv_grad_dsc_t *`.
-:event_cb:  Name of an event callback. :cpp:expr:`lv_xml_get_event_cb(&ctx, name)` returns an :cpp:expr:`lv_event_cb_t`.
-:screen_create_cb:  In XML it's the name of a screen XML file. In exported code it's a function like ``lv_obj_t * my_screen_create(void)``
+To learn more about how to register the name-data pairs visit :ref:`editor_integration_xml`.
 
 Arrays
 ------
 
 An array of any type can be defined in four ways:
 
-:int[N]:            An integer array with ``N`` elements.
-                    In the exported code ``N`` is passed a parameter after the array.
-:string[...NULL]:   An array terminated with a ``NULL`` element. ``NULL`` can be
-                    replaced by any value.
-:string[5]:         An array that must have exactly 5 elements. In the exported code only the array will be passed
-                    as the Widget assumes the given number of elements.
-:string[]:          No ``NULL`` termination and no count parameter, used when the
+:int[count]:        An integer array. The number of elements will be passed as a separate parameter.
+:string[NULL]:      An array terminated with a ``NULL`` element.
+:string[]:          No ``NULL`` termination and no count parameter. Used when the
                     number of elements is not known or delivered via another
-                    mechanism, such as via a function parameter.
+                    mechanism, such as via another setting.
 
 Enums
 -----

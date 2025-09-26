@@ -39,8 +39,8 @@ void test_xml_screen_event_1(void)
     };
 
 
-    lv_xml_component_register_from_data("screen1", screen1_xml);
-    lv_xml_component_register_from_data("screen2", screen2_xml);
+    lv_xml_register_component_from_data("screen1", screen1_xml);
+    lv_xml_register_component_from_data("screen2", screen2_xml);
 
     lv_obj_t * default_screen = lv_screen_active();
 

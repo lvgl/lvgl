@@ -67,7 +67,7 @@ void test_xml_slider_component(void)
                        "</view>"
                        "</component>";
 
-    lv_xml_component_register_from_data("slider_test", xml);
+    lv_xml_register_component_from_data("slider_test", xml);
 
     test_with_attrs("slider_test");
 }

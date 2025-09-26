@@ -24,7 +24,7 @@ void test_xml_translation(void)
         "</translations>"
     };
 
-    lv_xml_translation_register_from_data(translations_xml);
+    lv_xml_register_translation_from_data(translations_xml);
 
 
     static const char * languages[] = {"en", "de", "es", NULL};

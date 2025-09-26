@@ -128,7 +128,7 @@ lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_nam
     return NULL;
 }
 
-lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def)
+lv_result_t lv_xml_register_component_from_data(const char * name, const char * xml_def)
 {
     bool globals = false;
     if(lv_streq(name, "globals")) globals = true;
@@ -190,7 +190,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
 }
 
 
-lv_result_t lv_xml_component_register_from_file(const char * path)
+lv_result_t lv_xml_register_component_from_file(const char * path)
 {
     /* Extract component name from path */
     /* Create a copy of the filename to modify */
@@ -237,7 +237,7 @@ lv_result_t lv_xml_component_register_from_file(const char * path)
     xml_buf[rn] = '\0';
 
     /* Register the component */
-    lv_result_t res = lv_xml_component_register_from_data(filename, xml_buf);
+    lv_result_t res = lv_xml_register_component_from_data(filename, xml_buf);
 
     /* Housekeeping */
     lv_free(filename);
