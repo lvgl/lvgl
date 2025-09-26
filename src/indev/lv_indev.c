@@ -194,7 +194,6 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = LV_KEY_ENTER;
     }
 
-
     if(indev->read_cb) {
         LV_TRACE_INDEV("calling indev_read_cb");
         indev->read_cb(indev, data);
