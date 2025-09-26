@@ -253,6 +253,13 @@ lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_ch
 lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir);
 
 /**
+ * Remove a cursor
+ * @param obj       pointer to chart object
+ * @param cursor    pointer to the cursor
+ */
+void lv_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor);
+
+/**
  * Set the coordinate of the cursor with respect to the paddings
  * @param chart     pointer to a chart object
  * @param cursor    pointer to the cursor
