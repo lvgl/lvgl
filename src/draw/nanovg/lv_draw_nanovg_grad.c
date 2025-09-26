@@ -118,7 +118,6 @@ void lv_nanovg_draw_grad_helper(
     lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_grad_stop_t) * grad_dsc->stops_count);
 
     /*convert to spread mode*/
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     switch(grad_dsc->extend) {
         case LV_GRAD_EXTEND_PAD:
             grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
@@ -134,9 +133,6 @@ void lv_nanovg_draw_grad_helper(
             grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
             break;
     }
-#else
-    grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
-#endif
 
     switch(grad_dsc->dir) {
         case LV_GRAD_DIR_VER:
@@ -153,7 +149,6 @@ void lv_nanovg_draw_grad_helper(
             grad.y2 = area->y1;
             break;
 
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
         case LV_GRAD_DIR_LINEAR: {
                 int32_t w = lv_area_get_width(area);
                 int32_t h = lv_area_get_height(area);
@@ -177,7 +172,6 @@ void lv_nanovg_draw_grad_helper(
                 grad.cr = LV_MAX(end_extent_x - grad.cx, end_extent_y - grad.cy);
             }
             break;
-#endif
 
         default:
             LV_LOG_WARN("Unsupported gradient direction: %d", grad_dsc->dir);
