@@ -75,7 +75,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 /**
  * Helper function to set the data of a QR code object
  * @param obj pointer to a QR code object
- * @param data data to display
+ * @param data data to display as a string
  */
 void lv_qrcode_set_data(lv_obj_t * obj, const char * data);
 
