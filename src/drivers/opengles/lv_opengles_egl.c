@@ -6,552 +6,493 @@
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_opengles_egl.h"
+#include <EGL/egl.h>
+
 #if LV_USE_EGL
 
-#include "lv_opengles_window.h"
-#include "lv_opengles_driver.h"
-#include "lv_opengles_texture.h"
-#include "lv_opengles_private.h"
+#include <dlfcn.h>
+
+#include <string.h>
 #include "lv_opengles_debug.h"
 
-#include "../../core/lv_refr_private.h"
-#include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
-#include "../../display/lv_display_private.h"
-#include "../../indev/lv_indev.h"
-#include "../../lv_init.h"
-#include "../../misc/lv_area_private.h"
+#include "../../drivers/opengles/egl_adapter/private/glad/include/glad/egl.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_log.h"
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_types.h"
+#include "../../stdlib/lv_mem.h"
 
-#include <stdlib.h>
 
 /*********************
- *      DEFINES
- *********************/
+*      DEFINES
+*********************/
 
 /**********************
- *      TYPEDEFS
- **********************/
+*      TYPEDEFS
+**********************/
 
-struct _lv_opengles_window_t {
-    EGLSurface surface;
-    int32_t hor_res;
-    int32_t ver_res;
-    lv_ll_t textures;
-    lv_opengles_egl_window_cb_t pre;
-    lv_opengles_egl_window_cb_t post1;
-    lv_opengles_egl_window_cb_t post2;
-    void * user_data;
-#if LV_USE_DRAW_OPENGLES
-    uint8_t direct_render_invalidated: 1;
-#endif
-};
+typedef struct {
+    GLuint color_renderbuffer;
+    GLuint depth_renderbuffer;
+    GLuint fbo;
+} lv_egl_adapter_fbo_t;
 
-struct _lv_opengles_window_texture_t {
-    lv_opengles_window_t * window;
-    unsigned int texture_id; /* 0 if it's a window display */
-    lv_display_t * disp; /* non-NULL if it's a display texture or a window display */
-    uint8_t * fb; /* non-NULL if it's a window display and !DRAW_OPENGLES */
-    lv_area_t area;
-    lv_opa_t opa;
-};
+typedef struct {
+    EGLDisplay display;
+    EGLSync sync;
+} lv_egl_adapter_sync_t;
 
 /**********************
- *  STATIC PROTOTYPES
- **********************/
+*  STATIC PROTOTYPES
+**********************/
 
-static lv_result_t lv_egl_init(void);
-static void lv_egl_timer_init(void);
-static void window_update_handler(lv_timer_t * t);
-static void window_display_delete_cb(lv_event_t * e);
-static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
-#if !LV_USE_DRAW_OPENGLES
-    static void ensure_init_window_display_texture(void);
-#endif
+static lv_result_t load_egl(lv_egl_ctx_t * ctx);
 
-/**********************
- *  STATIC VARIABLES
- **********************/
+static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx);
+static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx);
+static EGLContext create_egl_context(lv_egl_ctx_t * ctx);
+static EGLConfig create_egl_config(lv_egl_ctx_t * ctx);
+static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
+                                                 EGLConfig egl_config);
 
-static bool egl_inited;
-static lv_timer_t * update_handler_timer;
-static lv_ll_t egl_window_ll;
-static EGLDisplay egl_display;
-static EGLContext egl_config;
-static EGLContext egl_context;
-static void * backend_device;
-#if !LV_USE_DRAW_OPENGLES
-    static unsigned int window_display_texture;
-#endif
+static GLADapiproc glad_egl_load_cb(void * userdata, const char * name);
 
-static EGLint const attribute_list[] = {
-    EGL_RED_SIZE, 8,
-    EGL_GREEN_SIZE, 8,
-    EGL_BLUE_SIZE, 8,
-    EGL_ALPHA_SIZE, 8,
-    EGL_NONE
-};
-
-static EGLint const context_attribute_list[] = {
-    EGL_CONTEXT_CLIENT_VERSION, 2,
-    EGL_NONE
-};
+typedef struct {
+    int id;
+    int r_bits, g_bits, b_bits, a_bits;
+    int depth;
+    int stencil;
+    int buffer;
+    int samples;
+    bool vsync;
+} lv_egl_visual_config_t;
 
 /**********************
- *      MACROS
- **********************/
+*  STATIC VARIABLES
+**********************/
 
 /**********************
- *   GLOBAL FUNCTIONS
- **********************/
+*      MACROS
+**********************/
 
-lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle,
-                                                     void * device,
-                                                     lv_opengles_egl_window_cb_t pre,
-                                                     lv_opengles_egl_window_cb_t post1,
-                                                     lv_opengles_egl_window_cb_t post2)
+/**********************
+*   GLOBAL FUNCTIONS
+**********************/
+
+lv_egl_ctx_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interface)
 {
-    backend_device = device;
-    if(lv_egl_init() == LV_RESULT_INVALID) {
+    lv_egl_ctx_t * ctx = lv_zalloc(sizeof(*ctx));
+    LV_ASSERT_MALLOC(ctx);
+    if(!ctx) {
+        LV_LOG_ERROR("Failed to create egl context");
         return NULL;
     }
+    ctx->interface = *interface;
 
-    lv_opengles_window_t * window = lv_ll_ins_tail(&egl_window_ll);
-    LV_ASSERT_MALLOC(window);
-    if(window == NULL) return NULL;
-    lv_memzero(window, sizeof(*window));
-
-    /* Create window with graphics context */
-    window->surface = eglCreateWindowSurface(egl_display, egl_config, (EGLNativeWindowType)(uintptr_t)native_window_handle,
-                                             NULL);
-    if(window->surface == EGL_NO_SURFACE) {
-        LV_LOG_ERROR("eglCreateWindowSurface failed.");
-        lv_ll_remove(&egl_window_ll, window);
-        lv_free(window);
+#if 0 /* TODO: this is to be initialized before calling the egl context function */
+    ctx->native_display = interface->create_display(interface->driver_data,
+                                                        ctx->config.hres,
+                                                        ctx->config.vres);
+    if(!ctx->native_display) {
+        LV_LOG_ERROR("Failed to create egl output display");
+        lv_free(ctx);
         return NULL;
     }
-
-    window->hor_res = hor_res;
-    window->ver_res = ver_res;
-    lv_ll_init(&window->textures, sizeof(lv_opengles_window_texture_t));
-
-    window->pre = pre;
-    window->post1 = post1;
-    window->post2 = post2;
-
-#if LV_USE_DRAW_OPENGLES
-    window->direct_render_invalidated = 1;
 #endif
 
-    lv_egl_timer_init();
+    lv_array_init(&ctx->fbos, 1, sizeof(lv_egl_adapter_fbo_t));
+    lv_array_init(&ctx->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t));
 
-    EGLBoolean res = eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
-    if(res == EGL_FALSE) {
-        LV_LOG_ERROR("eglMakeCurrent failed.");
+    lv_result_t res = load_egl(ctx);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to load egl ");
+        lv_free(ctx);
+        lv_array_deinit(&ctx->fbos);
+        lv_array_deinit(&ctx->fbos_syncs);
         return NULL;
     }
+    return ctx;
+}
 
-    res = eglSwapInterval(egl_display, 0);
-    if(res == EGL_FALSE) {
-        LV_LOG_ERROR("eglSwapInterval failed.");
-        return NULL;
+void lv_opengles_egl_context_deinit(lv_egl_ctx_t * ctx)
+{
+    if(ctx->egl_lib_handle) {
+        dlclose(ctx->egl_lib_handle);
     }
-
-    lv_opengles_init();
-
-    return window;
+    if(ctx->opengl_lib_handle) {
+        dlclose(ctx->opengl_lib_handle);
+    }
 }
-
-void * lv_opengles_egl_window_get_surface(lv_opengles_window_t * window)
+void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
 {
-    return (void *)(uintptr_t)window->surface;
-}
-
-void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window)
-{
-    LV_UNUSED(window);
-    return (void *)(uintptr_t)egl_display;
-}
-
-void lv_opengles_egl_window_set_user_data(lv_opengles_window_t * window, void * user_data)
-{
-    window->user_data = user_data;
-}
-
-void * lv_opengles_egl_window_get_user_data(lv_opengles_window_t * window)
-{
-    return window->user_data;
-}
-
-void lv_opengles_window_delete(lv_opengles_window_t * window)
-{
-    EGLBoolean res = eglDestroySurface(egl_display, window->surface);
-    if(res == EGL_FALSE) {
-        LV_LOG_ERROR("eglDestroySurface failed.");
+#if 0
+    if(ctx->offscreen_fbo_count <= 0) {
+        eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
+        ctx->interface.flip(ctx->interface.driver_data, true);
         return;
     }
-
-    lv_opengles_window_texture_t * texture;
-    while((texture = lv_ll_get_head(&window->textures))) {
-        if(texture->texture_id) {
-            lv_opengles_window_texture_remove(texture);
-        }
-        else {
-            lv_display_delete(texture->disp);
-        }
-    }
-
-    lv_ll_remove(&egl_window_ll, window);
-    lv_free(window);
-
-#if !LV_USE_DRAW_OPENGLES
-    if(lv_ll_is_empty(&egl_window_ll)) {
-        GL_CALL(glDeleteTextures(1, &window_display_texture));
-        window_display_texture = 0;
-    }
 #endif
-}
-
-lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window_t * window, unsigned int texture_id,
-                                                              int32_t w, int32_t h)
-{
-    lv_opengles_window_texture_t * texture = lv_ll_ins_tail(&window->textures);
-    LV_ASSERT_MALLOC(texture);
-    if(texture == NULL) return NULL;
-    lv_memzero(texture, sizeof(*texture));
-    texture->window = window;
-    texture->texture_id = texture_id;
-    texture->disp = lv_opengles_texture_get_from_texture_id(texture_id);
-    lv_area_set(&texture->area, 0, 0, w - 1, h - 1);
-    texture->opa = LV_OPA_COVER;
-
-#if LV_USE_DRAW_OPENGLES
-    window->direct_render_invalidated = 1;
-#endif
-
-    return texture;
-}
-
-void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
-{
-    if(texture->texture_id == 0) {
-        LV_LOG_WARN("window displays should be deleted with `lv_display_delete`");
-        return;
-    }
-
-#if LV_USE_DRAW_OPENGLES
-    texture->window->direct_render_invalidated = 1;
-#endif
-
-    lv_ll_remove(&texture->window->textures, texture);
-    lv_free(texture);
-}
-
-lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, int32_t w, int32_t h)
-{
-    lv_display_t * disp = lv_display_create(w, h);
-    if(disp == NULL) {
-        return NULL;
-    }
-
-    lv_opengles_window_texture_t * dsc = lv_ll_ins_tail(&window->textures);
-    LV_ASSERT_MALLOC(dsc);
-    if(dsc == NULL) {
-        lv_display_delete(disp);
-        return NULL;
-    }
-    lv_memzero(dsc, sizeof(*dsc));
-    dsc->window = window;
-    dsc->disp = disp;
-    lv_area_set(&dsc->area, 0, 0, w - 1, h - 1);
-    dsc->opa = LV_OPA_COVER;
-
-#if LV_USE_DRAW_OPENGLES
-    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
-    lv_display_set_buffers(disp, &dummy_buf, NULL, h * lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_ARGB8888),
-                           LV_DISPLAY_RENDER_MODE_FULL);
-#else
-    uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
-    uint32_t buf_size = stride * h;
-    dsc->fb = malloc(buf_size);
-    LV_ASSERT_MALLOC(dsc->fb);
-    if(dsc->fb == NULL) {
-        lv_display_delete(disp);
-        lv_ll_remove(&window->textures, dsc);
-        lv_free(dsc);
-        return NULL;
-    }
-    lv_display_set_buffers(disp, dsc->fb, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-#endif
-
-    lv_display_set_driver_data(disp, dsc);
-    lv_display_delete_refr_timer(disp);
-    lv_display_set_flush_cb(disp, window_display_flush_cb);
-    lv_display_add_event_cb(disp, window_display_delete_cb, LV_EVENT_DELETE, disp);
-
-#if LV_USE_DRAW_OPENGLES
-    window->direct_render_invalidated = 1;
-#endif
-
-    return disp;
-}
-
-lv_opengles_window_texture_t * lv_opengles_window_display_get_window_texture(lv_display_t * window_display)
-{
-    return lv_display_get_driver_data(window_display);
-}
-
-void lv_opengles_window_texture_set_x(lv_opengles_window_texture_t * texture, int32_t x)
-{
-    lv_area_set_pos(&texture->area, x, texture->area.y1);
-
-#if LV_USE_DRAW_OPENGLES
-    texture->window->direct_render_invalidated = 1;
-#endif
-}
-
-void lv_opengles_window_texture_set_y(lv_opengles_window_texture_t * texture, int32_t y)
-{
-    lv_area_set_pos(&texture->area, texture->area.x1, y);
-
-#if LV_USE_DRAW_OPENGLES
-    texture->window->direct_render_invalidated = 1;
-#endif
-}
-
-void lv_opengles_window_texture_set_opa(lv_opengles_window_texture_t * texture, lv_opa_t opa)
-{
-    texture->opa = opa;
-
-#if LV_USE_DRAW_OPENGLES
-    texture->window->direct_render_invalidated = 1;
-#endif
-}
-
-lv_indev_t * lv_opengles_window_texture_get_mouse_indev(lv_opengles_window_texture_t * texture)
-{
-    LV_UNUSED(texture);
-    LV_LOG_WARN("EGL does not create indevs. Returning NULL.");
-    return NULL;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static lv_result_t lv_egl_init(void)
-{
-    if(egl_inited) {
-        return LV_RESULT_OK;
-    }
-
-    /* get an EGL display connection */
-    if(backend_device) {
-        egl_display = eglGetDisplay(backend_device);
+#if 0
+    if(ctx->is_sync_supported) {
+        lv_egl_adapter_destroy_sync((lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
+                                                                         interface->offscreen_fbo_index));
+        lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
+                        lv_egl_adapter_create_sync(interface->egl_adapter));
     }
     else {
-        egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+#endif
+        glFinish();
+
+#if 0
+    }
+    ctx->offscreen_fbo_index = (ctx->offscreen_fbo_index + 1) % ctx->offscreen_fbo_count;
+    lv_egl_adapter_sync_t * current_sync = (lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
+                                                                                interface->offscreen_fbo_index);
+    if(current_sync) {
+        lv_egl_adapter_sync_wait(current_sync);
+        lv_egl_adapter_destroy_sync(current_sync);
+        current_sync = NULL;
+        lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
+                        lv_egl_adapter_create_sync(interface->egl_adapter));
+    }
+#endif
+    lv_egl_adapter_fbo_t * fbo = (lv_egl_adapter_fbo_t *)lv_array_at(&ctx->fbos, ctx->offscreen_fbo_index);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
+
+}
+
+
+/**********************
+*   STATIC FUNCTIONS
+**********************/
+
+static void * load_lib(const char ** libs, size_t count)
+{
+    const int mode = RTLD_NOW | RTLD_NODELETE;
+    for(size_t i = 0; i < count; ++i) {
+
+        void * handle = dlopen(libs[i], mode);
+        if(handle) {
+            return handle;
+        }
+    }
+    return NULL;
+}
+static void * load_egl_lib(void)
+{
+    const char * egl_libs[] = {"libEGL.so", "libEGL.so.1"};
+    return load_lib(egl_libs, sizeof(egl_libs) / sizeof(egl_libs[0]));
+}
+static void * load_gl_lib(void)
+{
+    const char * gl_libs[] = {"libGLESv2.so", "libGLESv2.so.2"};
+    return load_lib(gl_libs, sizeof(gl_libs) / sizeof(gl_libs[0]));
+}
+
+static lv_result_t load_egl(lv_egl_ctx_t * ctx)
+{
+    ctx->egl_lib_handle = load_egl_lib();
+    if(!ctx->egl_lib_handle) {
+        LV_LOG_ERROR("Failed to load egl shared lib: %s", dlerror());
+        goto err;
     }
 
-    if(egl_display == EGL_NO_DISPLAY) {
-        LV_LOG_ERROR("eglGetDisplay failed.");
+    ctx->egl_display = create_egl_display(ctx);
+    if(!ctx->egl_display) {
+        LV_LOG_ERROR("Failed to create egl display");
+        goto egl_display_err;
+    }
+
+    if(!gladLoadEGLUserPtr(ctx->egl_display, glad_egl_load_cb, ctx->egl_lib_handle)) {
+        LV_LOG_ERROR("Failed to load EGL entry points");
+        goto load_egl_functions_err;
+    }
+
+    if(eglBindAPI && !eglBindAPI(EGL_OPENGL_ES_API)) {
+        LV_LOG_ERROR("Failed to bind api");
+        goto err;
+    }
+
+    ctx->opengl_lib_handle = load_gl_lib();
+    if(!ctx->opengl_lib_handle) {
+        LV_LOG_ERROR("Failed to load OpenGL library. %s", dlerror());
+        goto opengl_lib_err;
+    }
+    ctx->egl_config = create_egl_config(ctx);
+    if(!ctx->egl_config) {
+        LV_LOG_ERROR("Failed to create EGL config. Error code: %#x", eglGetError());
+        goto egl_config_err;
+    }
+    ctx->egl_surface = create_egl_surface(ctx);
+    if(!ctx->egl_surface) {
+        LV_LOG_ERROR("Failed to create EGL surface. Error code: %#x", eglGetError());
+        goto egl_surface_err;
+    }
+
+    ctx->egl_context = create_egl_context(ctx);
+    if(!ctx->egl_context) {
+        LV_LOG_ERROR("Failed to create EGL context. Error code: %#x", eglGetError());
+        goto egl_context_err;
+    }
+
+    if(!eglMakeCurrent(ctx->egl_display, ctx->egl_surface, ctx->egl_surface, ctx->egl_context)) {
+        LV_LOG_ERROR("Failed to set current egl context. Error code: %#x", eglGetError());
+        goto egl_make_current_context_err;
+    }
+    if(!eglSwapInterval || !eglSwapInterval(ctx->egl_display, 0)) {
+        LV_LOG_WARN("Can't set egl swap interval");
+    }
+
+    if(!gladLoadGLES2UserPtr(glad_egl_load_cb, ctx->opengl_lib_handle)) {
+        LV_LOG_ERROR("Failed to load load OpenGL entry points");
+        goto load_opengl_functions_err;
+    }
+
+    lv_egl_config_t current_config;
+
+    lv_egl_config_from_egl_config(ctx, &current_config, ctx->egl_config);
+#if 0
+    glViewport(0, 0, current_config.hres, current_config.vres);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+#endif
+
+    lv_opengles_egl_clear(ctx);
+
+    return LV_RESULT_OK;
+
+load_opengl_functions_err:
+    eglMakeCurrent(ctx->egl_display, NULL, NULL, NULL);
+    eglDestroyContext(ctx->egl_display, ctx->egl_context);
+egl_make_current_context_err:
+    ctx->egl_context = NULL;
+egl_context_err:
+    ctx->egl_surface = NULL;
+egl_surface_err:
+    ctx->egl_config = NULL;
+egl_config_err:
+    dlclose(ctx->opengl_lib_handle);
+    ctx->opengl_lib_handle = NULL;
+
+opengl_lib_err:
+    ctx->egl_display = NULL;
+load_egl_functions_err:
+egl_display_err:
+    dlclose(ctx->egl_lib_handle);
+    ctx->egl_lib_handle = NULL;
+err:
+    return LV_RESULT_INVALID;
+}
+
+static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx)
+{
+    EGLDisplay display = NULL;
+    PFNEGLQUERYSTRINGPROC egl_query_string = (PFNEGLQUERYSTRINGPROC)(dlsym(ctx->egl_lib_handle, "eglQueryString"));
+    PFNEGLGETPROCADDRESSPROC egl_get_proc_address = (PFNEGLGETPROCADDRESSPROC)(dlsym(ctx->egl_lib_handle,
+                                                                                     "eglGetProcAddress"));
+    PFNEGLGETERRORPROC egl_get_error = (PFNEGLGETERRORPROC)(dlsym(ctx->egl_lib_handle, "eglGetError"));
+    PFNEGLGETDISPLAYPROC egl_get_display = (PFNEGLGETDISPLAYPROC)(dlsym(ctx->egl_lib_handle, "eglGetDisplay"));
+    PFNEGLINITIALIZEPROC egl_initialize = (PFNEGLINITIALIZEPROC)(dlsym(ctx->egl_lib_handle, "eglInitialize"));
+
+    if(!egl_query_string || !egl_get_proc_address || !egl_get_error || !egl_get_proc_address || !egl_get_display ||
+       !egl_initialize) {
+        LV_LOG_ERROR("Failed to get handle to egl function. %s", dlerror());
+        return NULL;
+    }
+
+    char const * supported_extensions = egl_query_string(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+
+    bool has_platform_display_ext_support = ctx->interface.egl_platform != 0 && supported_extensions &&
+                                            strstr(supported_extensions, "EGL_EXT_platform_base");
+    if(has_platform_display_ext_support) {
+        PFNEGLGETPLATFORMDISPLAYEXTPROC egl_get_platform_display = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+                                                                   egl_get_proc_address("eglGetPlatformDisplayEXT");
+        if(egl_get_platform_display) {
+            display = egl_get_platform_display(ctx->interface.egl_platform, (void *)ctx->native_display, NULL);
+        }
+        if(!display) {
+            LV_LOG_WARN("Failed to get egl display from eglGetPlatformDisplay. Error code: %#x", egl_get_error());
+        }
+    }
+
+    if(!display) {
+        LV_LOG_INFO("Falling back to eglGetDisplay()");
+        display = egl_get_display(ctx->native_display);
+    }
+
+    if(!display) {
+        LV_LOG_ERROR("Failed to get egl display from eglGetDisplay. Error code: %#x", egl_get_error());
+        return NULL;
+    }
+
+    int egl_major = -1;
+    int egl_minor = -1;
+    if(!egl_initialize(display, &egl_major, &egl_minor)) {
+        LV_LOG_ERROR("Failed to initialize egl. Error code: %#x", egl_get_error());
+        return NULL;
+    }
+    LV_LOG_USER("Egl version %d.%d", egl_major, egl_minor);
+
+    if(!gladLoadEGLUserPtr(display, glad_egl_load_cb, ctx->egl_lib_handle)) {
+        LV_LOG_ERROR("Failed to load load EGL entry points");
+        return NULL;
+    }
+
+    return display;
+}
+
+static GLADapiproc glad_egl_load_cb(void * userdata, const char * name)
+{
+    if(!eglGetProcAddress) {
+        GLADapiproc sym = (GLADapiproc)eglGetProcAddress(name);
+        if(sym) {
+            return sym;
+        }
+    }
+    return (GLADapiproc)dlsym(userdata, name);
+}
+
+static EGLConfig create_egl_config(lv_egl_ctx_t * ctx)
+{
+    const EGLint config_attribs[] = {
+        EGL_RENDERABLE_TYPE,
+        EGL_OPENGL_ES2_BIT,
+        EGL_NONE
+    };
+
+    EGLint num_configs = 0;
+    if(!eglChooseConfig(ctx->egl_display, config_attribs, 0, 0, &num_configs)) {
+        LV_LOG_ERROR("Failed to get number of configs: %d", eglGetError());
+        return NULL;
+    }
+
+    if(num_configs == 0) {
+        LV_LOG_ERROR("No valid configs");
+        return NULL;
+    }
+
+    EGLConfig * egl_configs = lv_malloc(num_configs * sizeof(EGLConfig));
+    LV_ASSERT_MALLOC(egl_configs);
+    if(!egl_configs) {
+        LV_LOG_ERROR("Failed to allocate memory for possible configs");
+        return NULL;
+    }
+
+    if(!eglChooseConfig(ctx->egl_display, config_attribs, egl_configs, num_configs, &num_configs)) {
+        LV_LOG_ERROR("Failed to get configs: %d", eglGetError());
+        return NULL;
+    }
+
+    lv_egl_config_t * configs = lv_malloc(num_configs * sizeof(lv_egl_config_t));
+    LV_ASSERT_MALLOC(configs);
+    if(!configs) {
+        LV_LOG_ERROR("Failed to allocate memory for configs");
+        lv_free(egl_configs);
+        return NULL;
+    }
+    size_t valid_config_count = 0;
+    for(size_t i = 0; i < (size_t)num_configs; ++i) {
+        lv_result_t err = lv_egl_config_from_egl_config(ctx, configs + i, egl_configs[i]);
+        if(err == LV_RESULT_OK) {
+            valid_config_count ++;
+        }
+    }
+
+    if(valid_config_count == 0) {
+        LV_LOG_ERROR("Failed to parse available EGL configs");
+        lv_free(egl_configs);
+        lv_free(configs);
+        return NULL;
+    }
+
+    size_t config_id = ctx->interface.select_config(ctx->interface.driver_data, configs, valid_config_count);
+
+    if(config_id >= (size_t)num_configs) {
+        LV_LOG_ERROR("Failed to find suitable EGL config");
+        lv_free(egl_configs);
+        lv_free(configs);
+        return NULL;
+    }
+    EGLConfig config = egl_configs[config_id];
+    lv_free(configs);
+    lv_free(egl_configs);
+    return config;
+}
+
+static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx)
+{
+    LV_ASSERT_NULL(ctx->egl_display);
+    LV_ASSERT_NULL(ctx->egl_config);
+    return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->egl_native_window, 0);
+}
+
+static EGLContext create_egl_context(lv_egl_ctx_t * ctx)
+{
+    static const EGLint context_attribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE
+    };
+    return eglCreateContext(ctx->egl_display, ctx->egl_config,
+                            EGL_NO_CONTEXT, context_attribs);
+}
+
+static lv_color_format_t color_format_from_props(int r_bits, int g_bits, int b_bits, int a_bits)
+{
+    if(r_bits == 5 && g_bits == 6 && b_bits == 5) {
+        if(a_bits == 8) {
+            return LV_COLOR_FORMAT_RGB565A8;
+        }
+        else {
+            return LV_COLOR_FORMAT_RGB565;
+        }
+    }
+    if(r_bits == 8 && g_bits == 8 && b_bits == 8) {
+        if(a_bits == 8) {
+            return LV_COLOR_FORMAT_ARGB8888;
+        }
+        else {
+
+            return LV_COLOR_FORMAT_RGB888;
+        }
+    }
+    LV_LOG_INFO("Unhandled color format (RGBA) (%d %d %d %d)", r_bits, g_bits, b_bits, a_bits);
+    return LV_COLOR_FORMAT_UNKNOWN;
+}
+
+static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
+                                                 EGLConfig egl_config)
+{
+    int err = 0, r_bits, g_bits, b_bits, a_bits, width, height;
+
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &r_bits));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &g_bits));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &b_bits));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_ALPHA_SIZE, &a_bits));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_WIDTH, &width));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_HEIGHT, &height));
+
+#if 0
+    int buffer_size, depth, stencil, samples;
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BUFFER_SIZE, &buffer_size));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_DEPTH_SIZE, &depth));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &stencil));
+    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &samples));
+#endif
+
+    if(err) {
+        LV_LOG_WARN("Failed to fetch egl config properties");
         return LV_RESULT_INVALID;
     }
 
-    /* initialize the EGL display connection */
-    EGLBoolean res = eglInitialize(egl_display, NULL, NULL);
-    if(res == EGL_FALSE) {
-        LV_LOG_ERROR("eglInitialize failed.");
+    lv_color_format_t cf = color_format_from_props(r_bits,  g_bits,  b_bits,  a_bits);
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
         return LV_RESULT_INVALID;
     }
-
-    /* get an appropriate EGL frame buffer configuration */
-    EGLint num_config;
-    res = eglChooseConfig(egl_display, attribute_list, &egl_config, 1, &num_config);
-    if(res == EGL_FALSE) {
-        LV_LOG_ERROR("eglChooseConfig failed.");
-        eglTerminate(egl_display);
-        return LV_RESULT_INVALID;
-    }
-
-    /* create an EGL rendering context */
-    egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, context_attribute_list);
-    if(egl_context == EGL_NO_CONTEXT) {
-        LV_LOG_ERROR("eglCreateContext failed.");
-        eglTerminate(egl_display);
-        return LV_RESULT_INVALID;
-    }
-
-    lv_ll_init(&egl_window_ll, sizeof(lv_opengles_window_t));
-
-    egl_inited = true;
+    lv_egl_config->cf = cf;
+    lv_egl_config->hres = width;
+    lv_egl_config->vres = height;
     return LV_RESULT_OK;
 }
-
-static void lv_egl_timer_init(void)
-{
-    if(update_handler_timer == NULL) {
-        update_handler_timer = lv_timer_create(window_update_handler, LV_DEF_REFR_PERIOD, NULL);
-    }
-}
-
-static void window_update_handler(lv_timer_t * t)
-{
-    LV_UNUSED(t);
-    lv_opengles_window_t * window;
-
-    /* render each window */
-    LV_LL_READ(&egl_window_ll, window) {
-        if(window->pre) window->pre(window);
-
-        EGLBoolean res = eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
-        if(res == EGL_FALSE) {
-            LV_LOG_ERROR("eglMakeCurrent failed.");
-            return;
-        }
-
-        lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
-
-#if LV_USE_DRAW_OPENGLES
-        lv_opengles_window_texture_t * textures_head;
-        bool window_display_direct_render =
-            !window->direct_render_invalidated
-            && (textures_head = lv_ll_get_head(&window->textures))
-            && textures_head->texture_id == 0 /* it's a window display */
-            && lv_ll_get_next(&window->textures, textures_head) == NULL /* it's the only one */
-            && textures_head->opa == LV_OPA_COVER
-            && textures_head->area.x1 == 0
-            && textures_head->area.y1 == 0
-            && textures_head->area.x2 == window->hor_res - 1
-            && textures_head->area.y2 == window->ver_res - 1
-            ;
-        window->direct_render_invalidated = 0;
-        if(!window_display_direct_render) {
-            lv_opengles_render_clear();
-        }
-#else
-        lv_opengles_render_clear();
-#endif
-
-        /* render each texture in the window */
-        lv_opengles_window_texture_t * texture;
-        LV_LL_READ(&window->textures, texture) {
-            if(texture->texture_id == 0) { /* it's a window display */
-#if LV_USE_DRAW_OPENGLES
-                lv_display_set_render_mode(texture->disp,
-                                           window_display_direct_render ? LV_DISPLAY_RENDER_MODE_DIRECT : LV_DISPLAY_RENDER_MODE_FULL);
-#endif
-
-                lv_display_t * default_save = lv_display_get_default();
-                lv_display_set_default(texture->disp);
-                lv_display_refr_timer(NULL);
-                lv_display_set_default(default_save);
-
-#if !LV_USE_DRAW_OPENGLES
-                ensure_init_window_display_texture();
-
-                GL_CALL(glBindTexture(GL_TEXTURE_2D, window_display_texture));
-
-                /* set the dimensions and format to complete the texture */
-                /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
-#if LV_COLOR_DEPTH == 8
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_RED, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 16
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                                     texture->fb));
-#elif LV_COLOR_DEPTH == 24
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_BGR, GL_UNSIGNED_BYTE, texture->fb));
-#elif LV_COLOR_DEPTH == 32
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_BGRA, GL_UNSIGNED_BYTE, texture->fb));
-#else
-#error("Unsupported color format")
-#endif
-
-                GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-
-                GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-
-                lv_opengles_render_texture(window_display_texture, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, false);
-#endif
-            }
-            else {
-                /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
-                if(texture->disp != NULL) {
-#if LV_USE_DRAW_OPENGLES
-                    lv_display_t * default_save = lv_display_get_default();
-                    lv_display_set_default(texture->disp);
-                    lv_display_refr_timer(NULL);
-                    lv_display_set_default(default_save);
-#else
-                    lv_refr_now(texture->disp);
-#endif
-                }
-
-#if LV_USE_DRAW_OPENGLES
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, texture->disp != NULL);
-#else
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, false, false);
-#endif
-            }
-        }
-
-        if(window->post1) window->post1(window);
-
-        /* Swap front and back buffers */
-        res = eglSwapBuffers(egl_display, window->surface);
-        if(res == EGL_FALSE) {
-            LV_LOG_ERROR("eglSwapBuffers failed.");
-            return;
-        }
-
-        if(window->post2) window->post2(window);
-    }
-}
-
-static void window_display_delete_cb(lv_event_t * e)
-{
-    lv_display_t * disp = lv_event_get_target(e);
-    lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
-    free(dsc->fb);
-    lv_opengles_window_texture_remove(dsc);
-}
-
-static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
-{
-    LV_UNUSED(area);
-    LV_UNUSED(px_map);
-    lv_display_flush_ready(disp);
-}
-
-#if !LV_USE_DRAW_OPENGLES
-static void ensure_init_window_display_texture(void)
-{
-    if(window_display_texture) {
-        return;
-    }
-
-    GL_CALL(glGenTextures(1, &window_display_texture));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, window_display_texture));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-}
-#endif
 
 #endif /*LV_USE_EGL*/

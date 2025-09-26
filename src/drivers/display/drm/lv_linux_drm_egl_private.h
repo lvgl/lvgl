@@ -20,7 +20,7 @@ extern "C" {
 
 #include "../../../misc/lv_area.h"
 #include "../../../display/lv_display.h"
-#include "../../../indev/lv_indev.h"
+#include <xf86drmMode.h>
 
 /*********************
  *      DEFINES
@@ -31,28 +31,30 @@ extern "C" {
  **********************/
 
 struct _lv_drm_egl_t {
-    lv_egl_adapter_interface_t * egl_adapter_interface;
-    lv_display_t * display_texture;
-    lv_drm_use_egl_texture_t * window_texture;
-    int32_t hor_res;
-    int32_t ver_res;
+    lv_opengles_texture_t texture;
+    lv_egl_adapter_interface_t * egl_interface;
+    lv_display_t * display;
     bool h_flip;
     bool v_flip;
-    lv_ll_t textures;
-    lv_point_t mouse_last_point;
-    lv_indev_state_t mouse_last_state;
-    uint8_t closing : 1;
 };
 
-struct _lv_drm_use_egl_texture_t {
-    lv_drm_egl_t * window;
-    unsigned int texture_id;
-    lv_area_t area;
-    lv_opa_t opa;
-    lv_indev_t * indev;
-    lv_point_t indev_last_point;
-    lv_indev_state_t indev_last_state;
+struct lv_egl_adapter_outmod_drm {
+    lv_egl_adapter_output_core_t * core;
+    int fd;
+    drmModeRes * drm_resources;
+    drmModeConnector * drm_connector;
+    drmModeEncoder * drm_encoder;
+    drmModeCrtcPtr drm_crtc;
+    drmModeModeInfo * drm_mode;
+    struct gbm_device * gbm_dev;
+    struct gbm_surface * gbm_surface;
+    struct gbm_bo * gbm_bo_pending;
+    struct gbm_bo * gbm_bo_flipped;
+    struct gbm_bo * gbm_bo_presented;
+    bool crtc_isset;
+    bool async_flip;
 };
+
 
 /**********************
  * GLOBAL PROTOTYPES

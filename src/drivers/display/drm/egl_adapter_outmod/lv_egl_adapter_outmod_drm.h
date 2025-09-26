@@ -26,7 +26,6 @@ typedef struct lv_egl_adapter_outmod_drm lv_egl_adapter_outmod_drm_t;
  **********************/
 
 lv_egl_adapter_outmod_drm_t * lv_egl_adapter_outmod_drm_create(void);
-lv_egl_adapter_output_core_t  * lv_egl_adapter_outmod_drm_get_core(void * nativedrm_ptr);
 
 /**********************
  *      MACROS

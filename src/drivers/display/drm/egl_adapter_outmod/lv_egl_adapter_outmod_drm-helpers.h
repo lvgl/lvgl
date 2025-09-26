@@ -35,8 +35,6 @@ typedef int (*udev_test_fn_t)(struct udev * udev, struct udev_device * device, c
  * GLOBAL PROTOTYPES
  **********************/
 
-/* Return a malloc'd C string. Caller must free(). */
-static char * TEMP_get_default_drm_device_path(void * nativedrm_ptr);
 
 /* Return 1 and set *out_value when found, otherwise 0.
    Ownership: out_value is set by value; no heap ownership issues.
@@ -49,10 +47,6 @@ static int drm_get_prop_value(int drm_fd, drmModeObjectProperties * props, const
 static uint64_t * drm_get_format_mods(int drm_fd, uint32_t format, uint32_t crtc_index,
                                       size_t * out_count);
 
-static char * find_drm_device_path(void);
-
-/* Fallback: try drmOpen on known modules; returns fd or -1 on failure. */
-static int open_drm_with_module_checking(void);
 
 #ifdef __cplusplus
 }

@@ -7,10 +7,22 @@
  *      INCLUDES
  *********************/
 #include "lv_linux_drm.h"
+#include <src/display/lv_display.h>
+#include <src/drivers/display/drm/lv_linux_drm_egl.h>
+#include <src/drivers/opengles/egl_adapter/lv_egl_adapter_interface.h>
+#include <src/drivers/opengles/lv_opengles_texture_private.h>
+#include <src/lv_conf_internal.h>
+#include <src/misc/lv_event.h>
+#include <src/misc/lv_types.h>
+
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
-#define CLOCK_USE_MONOTONIC 0
-#include "lv_linux_drm_egl_private.h"
+
 #include <stdlib.h>
+#include <stdint.h>
+#include <gbm.h>
+#include <xf86drm.h>
+
+#include "lv_linux_drm_egl_private.h"
 #include "../../../core/lv_refr.h"
 #include "../../../stdlib/lv_string.h"
 #include "../../../core/lv_global.h"
@@ -19,15 +31,10 @@
 #include "../../../lv_init.h"
 #include "../../../misc/lv_area_private.h"
 #include "../../opengles/egl_adapter/common/opengl_headers.h"
+#include "../../opengles/egl_adapter/lv_egl_adapter.h"
 #include "../../opengles/lv_opengles_driver.h"
 #include "../../opengles/lv_opengles_texture.h"
-
-#if CLOCK_USE_MONOTONIC
-    #include <time.h>
-#else
-    #include <sys/time.h>
-#endif /* CLOCK_USE_MONOTONIC */
-#include <stdint.h>
+#include "../../../drivers/opengles/lv_opengles_debug.h"
 
 /**********************
  *      TYPEDEFS
@@ -36,18 +43,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void window_update_handler(lv_timer_t * t);
-static uint32_t lv_drm_egl_tick_count_callback(void);
-static int lv_drm_egl_init(void);
-static void lv_drm_egl_timer_init(void);
-static void lv_drm_egl_quit(void);
+
+static uint32_t tick_cb(void);
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+static void event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_drm_egl_inited;
-static lv_timer_t * update_handler_timer;
-static lv_ll_t lv_drm_egl_window_ll;
 
 /**********************
  *      MACROS
@@ -57,211 +60,76 @@ static lv_ll_t lv_drm_egl_window_ll;
  *   GLOBAL FUNCTIONS
  **********************/
 
-#define CLOCK_USE_MONOTONIC 0
-#if CLOCK_USE_MONOTONIC
-static uint32_t lv_drm_egl_tick_count_callback(void)
+lv_display_t * lv_linux_drm_create(void)
 {
-    struct timespec ts;
-    if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        return 0;
-    }
-    uint64_t ms = (uint64_t)ts.tv_sec * 1000ull + (uint64_t)ts.tv_nsec / 1000000ull;
-    return (uint32_t)ms;
-}
-#else
-/*
- * fallback for systems without clock_gettime (older libc), using gettimeofday:
- */
-static uint32_t lv_drm_egl_tick_count_callback(void)
-{
-    struct timeval tv;
-    if(gettimeofday(&tv, NULL) != 0) return 0;
-    uint64_t ms = (uint64_t)tv.tv_sec * 1000ull + (uint64_t)tv.tv_usec / 1000ull;
-    return (uint32_t)ms;
-}
-#endif
-
-static void display_resolution_change_event_cb(lv_event_t * e)
-{
-    lv_display_t * disp = lv_event_get_target(e);
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_drm_egl_t * window = lv_event_get_user_data(e);
-    LV_ASSERT_NULL(window);
-    LV_LOG("RESOLUTION CHANGE EVENT RECIEVED\n");
-    //return;
-
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-    int32_t hor_res = lv_egl_adapter_interface_width(window->egl_adapter_interface);
-    int32_t ver_res = lv_egl_adapter_interface_height(window->egl_adapter_interface);
-
-    //LV_LOG("Removing previous egl_texture..\n");
-    lv_drm_use_egl_texture_remove(window->window_texture);
-
-    lv_display_remove_event_cb_with_user_data(window->display_texture, display_resolution_change_event_cb, window);
-
-    //LV_LOG("Creating new window texture\n");
-    /* add the texture to the window */
-    window->window_texture = lv_drm_egl_add_texture(window,
-                                                    lv_opengles_texture_get_texture_id(window->display_texture), ver_res, hor_res);
-
-    //lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
-    switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
-            break;
-        case LV_DISPLAY_ROTATION_90:
-            break;
-        case LV_DISPLAY_ROTATION_180:
-            break;
-        case LV_DISPLAY_ROTATION_270:
-            break;
-    }
-    lv_display_set_resolution(disp, hor_res, ver_res);
-    //lv_display_set_resolution(disp, ver_res, hor_res);
-    lv_opengles_texture_reshape(disp, hor_res, ver_res);
-    //lv_opengles_texture_reshape(disp, ver_res, hor_res);
-    //lv_display_set_rotation(disp, rotation);
-
-    //lv_display_set_resolution(disp, hor_res, ver_res);
-    //lv_display_set_rotation(disp, rotation);
-    lv_display_add_event_cb(window->display_texture, display_resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED,
-                            window);
+    lv_tick_set_cb(tick_cb);
 
 
-#if 0
-    LV_LOG("Deleting previous display..\n");
-    //lv_display_remove_event_cb_with_user_data(window->display_texture, display_resolution_change_event_cb, window);
-    lv_display_delete(window->display_texture);
-
-    lv_display_t * new_display;
-    switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
-            LV_LOG("Creating display with default rotation and size: %dx%d\n", hor_res, ver_res);
-            new_display = lv_opengles_texture_create(hor_res, ver_res);
-            break;
-        case LV_DISPLAY_ROTATION_90:
-            LV_LOG("Creating display with 90 rotation and size: %dx%d\n", ver_res, hor_res);
-            new_display = lv_opengles_texture_create(ver_res, hor_res);
-            break;
-        case LV_DISPLAY_ROTATION_180:
-            LV_LOG("Creating display with 180 rotation and size: %dx%d\n", hor_res, ver_res);
-            new_display = lv_opengles_texture_create(hor_res, ver_res);
-            break;
-        case LV_DISPLAY_ROTATION_270:
-            LV_LOG("Creating display with 270 rotation and size: %dx%d\n", ver_res, hor_res);
-            new_display = lv_opengles_texture_create(ver_res, hor_res);
-            break;
-    }
-    LV_LOG("Removing previous egl_texture..\n");
-    lv_drm_use_egl_texture_remove(window->window_texture);
-    LV_LOG("Setting new display..\n");
-    window->display_texture = new_display;
-    lv_display_set_default(window->display_texture);
-    lv_display_set_rotation(window->display_texture, rotation);
-
-    //LV_LOG("Clearing linked-list of egl textures...\n");
-    //lv_ll_clear(&window->textures);
-
-    LV_LOG("Replacing display desc with egl_adapter_interface...\n");
-    lv_opengles_texture_t * display_desc = (lv_opengles_texture_t *)lv_display_get_driver_data(window->display_texture);
-    window->egl_adapter_interface->display_texture_desc.texture_id = display_desc->texture_id;
-    window->egl_adapter_interface->display_texture_desc.fb1 = display_desc->fb1;
-    lv_display_set_driver_data(window->display_texture, window->egl_adapter_interface);
-
-    LV_LOG("Creating new window texture\n");
-    /* add the texture to the window */
-    window->window_texture = lv_drm_egl_add_texture(window,
-                                                    lv_opengles_texture_get_texture_id(window->display_texture), hor_res, ver_res);
-
-    //  MK TEMP - and then re-register the display turn event
-#endif
-    LV_LOG("OUT\n");
-}
-
-lv_drm_egl_t * lv_drm_egl_create_ex(lv_display_t * display, bool use_mouse_indev, bool h_flip, bool v_flip)
-{
-    if(lv_drm_egl_init() != 0) {
-        LV_LOG_ERROR("Failed to init lv_drm_egl_ output");
-        return NULL;
-    }
-
-    lv_drm_egl_t * window = lv_ll_ins_tail(&lv_drm_egl_window_ll);
-    LV_ASSERT_MALLOC(window);
-    if(window == NULL) {
+    LV_LOG_USER("Create ctx");
+    lv_drm_egl_t * ctx = lv_zalloc(sizeof(*ctx));
+    LV_ASSERT_MALLOC(ctx);
+    if(!ctx) {
         LV_LOG_ERROR("Failed to create lv_drm_egl_ output");
         return NULL;
     }
-    lv_memzero(window, sizeof(*window));
 
+    LV_LOG_USER("Create display");
 
-    window->egl_adapter_interface = lv_egl_adapter_interface_auto();
-    int32_t hor_res = lv_egl_adapter_interface_width(window->egl_adapter_interface);
-    int32_t ver_res = lv_egl_adapter_interface_height(window->egl_adapter_interface);
-    if(window->egl_adapter_interface == NULL) {
-        LV_LOG_ERROR("lv_drm_egl_ output CreateWindow fail");
-        lv_ll_remove(&lv_drm_egl_window_ll, window);
-        lv_free(window);
+    ctx->display = lv_display_create(1024, 768);
+    if(!ctx->display) {
+        LV_LOG_ERROR("Failed to create display texture");
+        lv_free(ctx);
         return NULL;
     }
 
-    window->h_flip = h_flip;
-    window->v_flip = v_flip;
-    window->hor_res = hor_res;
-    window->ver_res = ver_res;
-
-    lv_ll_init(&window->textures, sizeof(lv_drm_use_egl_texture_t));
-    lv_drm_egl_timer_init();
-    lv_opengles_init();
-
-    lv_opengles_texture_init_display(display, hor_res, ver_res);
-    lv_opengles_texture_reshape(display, hor_res, ver_res);
-    window->display_texture = display;
-    //window->display_texture = lv_opengles_texture_create(ver_res, hor_res);  // rotated test, 90 degrees
-    lv_display_set_default(window->display_texture);
-
-    lv_opengles_texture_t * display_desc = (lv_opengles_texture_t *)lv_display_get_driver_data(window->display_texture);
-    window->egl_adapter_interface->display_texture_desc.texture_id = display_desc->texture_id;
-
-    lv_display_set_driver_data(window->display_texture, window->egl_adapter_interface);
-
-    /* add the texture to the window */
-    window->window_texture = lv_drm_egl_add_texture(window,
-                                                    lv_opengles_texture_get_texture_id(window->display_texture), hor_res, ver_res);
-
-
-    /* register resolution changed event callback for display rotation */
-    lv_display_add_event_cb(window->display_texture, display_resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED,
-                            window);
-
-    return window;
+    lv_display_set_driver_data(ctx->display, ctx);
+    lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
+    return ctx->display;
 }
 
-lv_display_t * lv_drm_egl_get_display(lv_drm_egl_t * window, lv_display_t * placeholder_display)
+void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t connector_id)
 {
-    if(window == NULL) {
-        window = lv_drm_egl_create(placeholder_display);
+    LV_UNUSED(file);
+    LV_UNUSED(connector_id);
+
+    lv_drm_egl_t * ctx = lv_display_get_driver_data(display);
+    LV_LOG_USER("Ctx is %p", ctx);
+
+    lv_egl_adapter_config_t * egl_options = lv_egl_adapter_config_create();
+    lv_egl_adapter_config_set_vsync(egl_options, true);
+    lv_egl_adapter_t * egl_adapter = lv_egl_adapter_create(egl_options);
+
+    ctx->egl_interface = lv_egl_adapter_interface_create(egl_adapter, lv_display_get_horizontal_resolution(display),
+                                                         lv_display_get_vertical_resolution(display),
+                                                         1000. / LV_DEF_REFR_PERIOD);
+    if(!ctx->egl_interface) {
+        LV_LOG_ERROR("Failed to create egl interface");
+        return;
     }
-    return (window) ? window->display_texture : NULL;
-}
+    int32_t h_res = lv_display_get_horizontal_resolution(ctx->display);
+    int32_t v_res = lv_display_get_vertical_resolution(ctx->display);
+    LV_LOG_USER("Using %dx%d", h_res, v_res);
 
-lv_drm_egl_t * lv_drm_egl_create(lv_display_t * placeholder_display)
-{
-    bool use_mouse_indev = false;
-    return lv_drm_egl_create_ex(placeholder_display, use_mouse_indev, false, false);
-}
-
-void lv_drm_egl_delete(lv_drm_egl_t * window)
-{
-    // FREE window->display_texture
-    // FREE window->window_texture
-
-    lv_egl_adapter_interface_destroy((void **)&window->egl_adapter_interface);
-    lv_ll_clear(&window->textures);
-    lv_ll_remove(&lv_drm_egl_window_ll, window);
-    lv_free(window);
-
-    if(lv_ll_is_empty(&lv_drm_egl_window_ll)) {
-        lv_drm_egl_quit();
+    lv_result_t res = lv_opengles_texture_create_from_display(display, h_res, v_res);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to initialize opengl texture");
+        lv_egl_adapter_interface_deinit(ctx->egl_interface);
+        ctx->egl_interface = NULL;
+        return;
     }
+
+    /* Driver data gets set by opengles_texture. We overwrite it with our own by keeping the first attribute the same*/
+    lv_opengles_texture_t * texture = lv_display_get_driver_data(display);
+    ctx->texture = *texture;
+    lv_display_set_driver_data(display, ctx);
+
+    LV_LOG_USER("Ctx is %p", ctx);
+
+    ctx->h_flip = false;
+    ctx->v_flip = false;
+    lv_display_set_flush_cb(display, flush_cb);
+    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 }
 
 void lv_drm_egl_set_flip(lv_drm_egl_t * window, bool h_flip, bool v_flip)
@@ -270,146 +138,123 @@ void lv_drm_egl_set_flip(lv_drm_egl_t * window, bool h_flip, bool v_flip)
     window->v_flip = v_flip;
 }
 
-lv_drm_use_egl_texture_t * lv_drm_egl_add_texture(lv_drm_egl_t * window,
-                                                  unsigned int texture_id,
-                                                  int32_t w,
-                                                  int32_t h)
-{
-    lv_drm_use_egl_texture_t * texture = lv_ll_ins_tail(&window->textures);
-    LV_ASSERT_MALLOC(texture);
-    if(texture == NULL) return NULL;
-    lv_memzero(texture, sizeof(*texture));
-    texture->window = window;
-    texture->texture_id = texture_id;
-    lv_area_set(&texture->area, 0, 0, w - 1, h - 1);
-    texture->opa = LV_OPA_COVER;
-    return texture;
-}
-
-void lv_drm_use_egl_texture_remove(lv_drm_use_egl_texture_t * texture)
-{
-    if(texture->indev != NULL) {
-        lv_indev_delete(texture->indev);
-    }
-    lv_ll_remove(&texture->window->textures, texture);
-    lv_free(texture);
-}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static int lv_drm_egl_init(void)
+static void event_cb(lv_event_t * e)
 {
-    if(lv_drm_egl_inited) {
+    lv_event_code_t code = lv_event_get_code(e);
+    LV_LOG_USER("Event");
+    lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
+    lv_drm_egl_t * ctx = lv_display_get_driver_data(display);
+    switch(code) {
+        case LV_EVENT_DELETE:
+            lv_egl_adapter_reset(ctx->egl_interface->egl_adapter);
+            lv_egl_adapter_interface_deinit(ctx->egl_interface);
+            lv_free(ctx);
+            break;
+        case LV_EVENT_RESOLUTION_CHANGED:
+            lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
+                                        lv_display_get_vertical_resolution(display));
+            break;
+        default:
+            return;
+    }
+}
+
+static uint32_t tick_cb(void)
+{
+    struct timespec ts;
+    if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
         return 0;
     }
-
-    lv_ll_init(&lv_drm_egl_window_ll, sizeof(lv_drm_egl_t));
-    lv_drm_egl_inited = true;
-    return 0;
+    uint64_t ms = (uint64_t)ts.tv_sec * 1000ull + (uint64_t)ts.tv_nsec / 1000000ull;
+    return (uint32_t)ms;
 }
 
-static void lv_drm_egl_timer_init(void)
+#if LV_USE_DRAW_OPENGLES
+
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    if(update_handler_timer == NULL) {
-        update_handler_timer = lv_timer_create(window_update_handler, LV_DEF_REFR_PERIOD, NULL);
-        lv_tick_set_cb(lv_drm_egl_tick_count_callback);
-    }
-}
-
-static void lv_drm_egl_quit(void)
-{
-    lv_timer_delete(update_handler_timer);
-    update_handler_timer = NULL;
-    lv_drm_egl_inited = false;
-    lv_deinit();
-    exit(0);
-}
-
-static void window_update_handler(lv_timer_t * t)
-{
-    LV_UNUSED(t);
-
-    lv_drm_egl_t * window;
-
-    /* delete windows that are ready to close */
-    window = lv_ll_get_head(&lv_drm_egl_window_ll);
-    while(window) {
-        lv_drm_egl_t * window_to_delete = window->closing ? window : NULL;
-        window = lv_ll_get_next(&lv_drm_egl_window_ll, window);
-        if(window_to_delete) {
-            lv_drm_egl_delete(window_to_delete);
-        }
-    }
-
-    /* render each window */
-    LV_LL_READ(&lv_drm_egl_window_ll, window) {
-        //lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
-        //lv_opengles_viewport(0, 0, 480-1, 800-1);
-        //lv_opengles_viewport(0, 0, 800-1, 480-1);
-        lv_opengles_viewport(0, 0, lv_display_get_physical_horizontal_resolution(window->display_texture),
-                             lv_display_get_physical_vertical_resolution(window->display_texture));
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
+    if(lv_display_flush_is_last(disp)) {
+        const int32_t disp_width = lv_display_get_horizontal_resolution(disp);
+        const int32_t disp_height = lv_display_get_vertical_resolution(disp);
+        lv_area_t full_area;
+        lv_area_set(&full_area, 0, 0, disp_width, disp_height);
+        lv_drm_egl_t * ctx = lv_display_get_driver_data(disp);
+        lv_opengles_viewport(0, 0, disp_width, disp_height);
         lv_egl_adapter_interface_clear();
 
-        /* render each texture in the window */
-        lv_drm_use_egl_texture_t * texture;
-        LV_LL_READ(&window->textures, texture) {
-            /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
-            lv_display_t * texture_disp = lv_opengles_texture_get_from_texture_id(texture->texture_id);
-            bool is_disp = false;
-            if(texture_disp != NULL) {
-                lv_refr_now(texture_disp);
-                is_disp = true;
-            }
-            //lv_area_set(&texture->area, 0, 0,480 - 1, 800 - 1);
-            //lv_area_set(&texture->area, 0, 0,800 - 1, 480 - 1);
-            lv_area_t clip_area = texture->area;
-            if(is_disp) {
-#if LV_USE_DRAW_OPENGLES
-                lv_opengles_render_display_texture(texture->texture_id, &texture->area, texture->opa,
-                                                   &clip_area, window->h_flip, !window->v_flip);
+        LV_LOG_USER("Texture id is %d %d %d %d %d %d %d", ctx->opengl_texture.texture_id, full_area.x1, full_area.x2,
+                    full_area.y1,
+                    full_area.y2, disp_width, disp_height);
+        lv_opengles_render_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER, disp_width, disp_height,
+                                   area, ctx->h_flip,
+                                   !ctx->v_flip);
+        lv_egl_adapter_interface_update(ctx->egl_interface);
+    }
+    lv_display_flush_ready(disp);
+}
+
 #else
-                lv_opengles_render_display_texture(texture->texture_id, &texture->area, texture->opa,
-                                                   &clip_area, window->h_flip, window->v_flip);
-#endif
-            }
-            else {
-                /* It's never not the display texture so far in my tests - mk*/
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &clip_area, window->h_flip, window->v_flip);
-                LV_LOG("*********** IT WASN'T DISP ***********\n");
-            }
 
-        }
-
-        /* Swap front and back buffers */
-        lv_egl_adapter_interface_update(window->egl_adapter_interface);
-    }
-}
-
-
-lv_display_t * lv_linux_drm_create(void)
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    //return lv_drm_egl_get_display(NULL);
-    lv_display_t * placeholder = lv_display_create(64, 64);
-#if LV_USE_DRAW_OPENGLES
-    //lv_display_delete_refr_timer(placeholder);
+    LV_UNUSED(px_map);
+    LV_UNUSED(area);
+    if(lv_display_flush_is_last(disp)) {
+        lv_drm_egl_t * ctx = lv_display_get_driver_data(disp);
+        LV_LOG_USER("Ctx is %p", ctx);
+        const int32_t disp_width = lv_display_get_horizontal_resolution(disp);
+        const int32_t disp_height = lv_display_get_vertical_resolution(disp);
+
+        LV_LOG_USER("Viewport");
+        lv_opengles_viewport(0, 0, disp_width, disp_height);
+        LV_LOG_USER("Clear");
+        lv_egl_adapter_interface_clear();
+
+        lv_color_format_t cf = lv_display_get_color_format(disp);
+        uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, ctx->texture.texture_id));
+
+        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+        GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
+        /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+#if LV_COLOR_DEPTH == 8
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
+#elif LV_COLOR_DEPTH == 16
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+                             dsc->fb1));
+#elif LV_COLOR_DEPTH == 24
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
+#elif LV_COLOR_DEPTH == 32
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+                             ctx->texture.fb1));
+#else
+#error("Unsupported color format")
 #endif
-    return placeholder;
-}
 
-void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
-{
-    LV_UNUSED(disp);
-    LV_UNUSED(file);
-    LV_UNUSED(connector_id);
+        LV_LOG_USER("Render texture");
+        lv_area_t full_area;
+        lv_area_set(&full_area, 0, 0, disp_width, disp_height);
+        lv_opengles_render_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER, disp_width, disp_height,
+                                   &full_area, ctx->h_flip,
+                                   ctx->v_flip);
 
-    if((lv_egl_adapter_interface_t *)lv_display_get_user_data(disp) == NULL) {
-        lv_drm_egl_get_display(NULL, disp);
-        //lv_display_t * new_display = lv_drm_egl_get_display(NULL, disp);
+        LV_LOG_USER("Update");
+        lv_egl_adapter_interface_update(ctx->egl_interface);
+
+        LV_LOG_USER("update done");
     }
-    //LV_LOG_INFO(file);
+    lv_display_flush_ready(disp);
 }
+#endif
+
+
+
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/

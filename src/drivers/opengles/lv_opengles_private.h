@@ -18,7 +18,7 @@ extern "C" {
 #if LV_USE_OPENGLES
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
-#include "egl_adapter/common/opengl_headers.h"
+#include "egl_adapter/private/glad/include/glad/gles2.h"
 #include <EGL/egl.h>
 #elif LV_USE_EGL
 #include <GLES/gl.h>
