@@ -54,6 +54,7 @@ struct _lv_pending_t;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
+    lv_layer_t * current_layer;
     NVGcontext * vg;
     bool is_started;
     lv_draw_buf_t * image_buf;

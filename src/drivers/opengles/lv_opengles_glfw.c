@@ -741,43 +741,14 @@ static void ensure_init_window_display_texture(void)
 
 static void window_display_layer_init_cb(lv_display_t * disp, lv_layer_t * layer)
 {
-#if LV_USE_DRAW_NANOVG
-    lv_draw_nanovg_event_param_t param;
-    lv_draw_nanovg_event_param_init(&param);
-    param.width = lv_area_get_width(&layer->buf_area);
-    param.height = lv_area_get_height(&layer->buf_area);
-
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, &param);
-    if(!param.fb) {
-        return;
-    }
-
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CHANGED, &param);
-
-    layer->user_data = param.fb;
-#else
     LV_UNUSED(disp);
-    LV_UNUSED(layer);
-#endif
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 }
 
 static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * layer)
 {
-#if LV_USE_DRAW_NANOVG
-    lv_draw_nanovg_event_param_t param;
-    lv_draw_nanovg_event_param_init(&param);
-
-    param.fb = NULL;
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CHANGED, &param);
-
-    param.fb = layer->user_data;
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, &param);
-    layer->user_data = NULL;
-    param.fb = NULL;
-#else
     LV_UNUSED(disp);
-    LV_UNUSED(layer);
-#endif
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
 }
 
 #endif /*LV_USE_GLFW*/

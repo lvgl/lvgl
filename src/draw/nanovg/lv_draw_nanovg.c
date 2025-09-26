@@ -84,12 +84,6 @@ void lv_draw_nanovg_init(void)
     lv_draw_nanovg_label_init(unit);
 }
 
-void lv_draw_nanovg_event_param_init(lv_draw_nanovg_event_param_t * param)
-{
-    LV_ASSERT_NULL(param);
-    lv_memzero(param, sizeof(lv_draw_nanovg_event_param_t));
-}
-
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
 {
     LV_ASSERT_NULL(fb);
@@ -178,16 +172,39 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     }
 }
 
+static void on_layer_changed(lv_draw_nanovg_unit_t * u, lv_layer_t * new_layer)
+{
+    LV_PROFILER_DRAW_BEGIN;
+
+    NVGLUframebuffer * fb = new_layer->user_data;
+    LV_PROFILER_BEGIN_TAG("nvgBindFramebuffer");
+    nvgluBindFramebuffer(fb);
+    LV_PROFILER_END_TAG("nvgBindFramebuffer");
+
+    /* Clear the off-screen framebuffer */
+    if(fb) {
+        LV_PROFILER_DRAW_BEGIN_TAG("glClear");
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        LV_PROFILER_DRAW_END_TAG("glClear");
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)draw_unit;
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, NANOVG_DRAW_UNIT_ID);
     if(!t || t->preferred_draw_unit_id != NANOVG_DRAW_UNIT_ID) {
-        if(u->is_started) {
-            lv_nanovg_end_frame(u);
-        }
+        lv_nanovg_end_frame(u);
         return LV_DRAW_UNIT_IDLE;
+    }
+
+    if(u->current_layer != layer) {
+        on_layer_changed(u, layer);
+        u->current_layer = layer;
     }
 
     const int32_t buf_w = lv_area_get_width(&layer->buf_area);
@@ -261,26 +278,39 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 static void draw_event_cb(lv_event_t * e)
 {
     lv_draw_nanovg_unit_t * u = lv_event_get_current_target(e);
-    lv_draw_nanovg_event_param_t * param = lv_event_get_param(e);
+    lv_layer_t * layer = lv_event_get_param(e);
 
     switch(lv_event_get_code(e)) {
         case LV_EVENT_CANCEL:
+            LV_PROFILER_DRAW_BEGIN_TAG("nvgCancelFrame");
             nvgCancelFrame(u->vg);
+            LV_PROFILER_DRAW_END_TAG("nvgCancelFrame");
             lv_nanovg_clean_up(u);
             break;
-        case LV_EVENT_CHILD_CREATED:
-            param->fb = nvgluCreateFramebuffer(u->vg, param->width, param->height, 0);
-            if(!param->fb) {
-                LV_LOG_ERROR("Failed to create framebuffer");
+        case LV_EVENT_CHILD_CREATED: {
+                LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateFramebuffer");
+                NVGLUframebuffer * fb = nvgluCreateFramebuffer(u->vg,
+                                                               lv_area_get_width(&layer->buf_area),
+                                                               lv_area_get_height(&layer->buf_area),
+                                                               0);
+                LV_PROFILER_DRAW_END_TAG("nvgCreateFramebuffer");
+
+                if(!fb) {
+                    LV_LOG_ERROR("Failed to create framebuffer");
+                    return;
+                }
+
+                layer->user_data = fb;
             }
             break;
-        case LV_EVENT_CHILD_CHANGED:
-            nvgluBindFramebuffer(param->fb);
-            break;
-        case LV_EVENT_CHILD_DELETED:
-            if(param->fb) {
-                nvgluDeleteFramebuffer(param->fb);
-                param->fb = NULL;
+        case LV_EVENT_CHILD_DELETED: {
+                NVGLUframebuffer * fb = layer->user_data;
+                if(fb) {
+                    LV_PROFILER_DRAW_BEGIN_TAG("nvgDeleteFramebuffer");
+                    nvgluDeleteFramebuffer(fb);
+                    LV_PROFILER_DRAW_END_TAG("nvgDeleteFramebuffer");
+                    layer->user_data = NULL;
+                }
             }
             break;
         default:
