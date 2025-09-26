@@ -39,7 +39,7 @@ Similarly, translations can be registered by
 
 Fonts and images are registered automatically when ``globals.xml`` is registered.
 
-Batch registration from a folder
+Batch Registration from a Folder
 --------------------------------
 
 Instead of calling the register functions one by one, it's also possible to load many
@@ -48,7 +48,7 @@ XML files and assets at once.
 :cpp:expr:`lv_xml_load_all_from_path("A:path/to/dir")` will traverse a directory and
 register all XML components, screens, globals, and translations.
 
-Registering from blob
+Registering from Blob
 ---------------------
 
 There are some additional XML loading functions available when using :ref:`frogfs`.
@@ -75,7 +75,7 @@ If the blob is saved as a file (e.g., on an SD card), use
     lv_xml_load_t * handle = lv_xml_load_all_from_file("A:path/to/frogfs.bin");
     /* `handle` can optionally be passed to `lv_xml_unload` later */
 
-Registering external data
+Registering External Data
 -------------------------
 
 The only thing that cannot be learned from the XML files is the data stored in the
@@ -105,7 +105,7 @@ Besides events, it's common to register images and fonts stored in the applicati
 by :cpp:expr:`lv_xml_register_image(scope, path_or_pointer)` and
 :cpp:expr:`lv_xml_register_font(scope, path_or_pointer)`.
 
-Registering widgets
+Registering Widgets
 -------------------
 
 Although widgets are compiled into the application, they need to be registered so the
@@ -115,10 +115,10 @@ Use :cpp:expr:`lv_xml_register_widget("widget_name", create_cb, apply_cb)` for t
 
 Note that the built-in widgets of LVGL are registered automatically.
 
-Creating instances
+Creating Instances
 ******************
 
-Creating screens
+Creating Screens
 ----------------
 
 By default, no widget or screen is created. The user needs to create the permanent
@@ -130,7 +130,7 @@ file or the name used when the XML data was registered.
 It returns an ``lv_obj_t *`` that can be loaded as any regular :ref:`screens` using
 :cpp:expr:`lv_screen_load()`.
 
-Creating components
+Creating Components
 -------------------
 
 Use :cpp:expr:`lv_xml_create(parent, "name", attributes)` to create any widget,
@@ -187,7 +187,7 @@ Or to add styles:
 
     lv_xml_create(button1, "style", attrs);
 
-The whole flow
+The Whole Flow
 ***************
 
 To load everything at runtime correctly, the steps need to be executed in this order:
