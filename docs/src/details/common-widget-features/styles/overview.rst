@@ -226,3 +226,41 @@ in ``lv_conf.h``:
   :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
 
 If transformation properties were also used the layer cannot be rendered in chunks
+
+
+
+.. _typical bg props:
+
+Typical Background Properties
+*****************************
+
+In documentation of widgets you will see sentences like "XY Widget
+uses the typical background style properties".  These "typical
+background properties" are the properties being referred to:
+
+- Background
+- Border
+- Outline
+- Shadow
+- Padding
+- Width and height transformation
+- X and Y translation
+
+
+.. _style_examples:
+
+Examples
+********
+
+.. include:: ../../../examples/styles/index.rst
+
+
+
+..  Hyperlinks
+
+.. _pseudo-elements:
+.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
+.. _pseudo-classes:
+.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
+
+

@@ -158,7 +158,7 @@ To retrieve size information:
 
 
 Static Positioning
-***************
+******************
 
 The simplest way to position a widget is by pixel values:
 
@@ -174,7 +174,7 @@ padding and border.
 
 
 Dynamic Positioning
-***************
+*******************
 
 Align to the Parent
 -------------------
@@ -252,7 +252,7 @@ Set fixed size in pixels:
 
 
 Dynamic Sizing
-***************
+**************
 
 Percentage
 ----------
@@ -290,7 +290,7 @@ Flex and Grid layouts can also stretch widgets to control both position and size
 .. _coord_min_max_size:
 
 Min and Max Size
-***************
+****************
 
 LVGL supports ``min-width``, ``max-width``, ``min-height``, and ``max-height``.
 
@@ -312,7 +312,7 @@ You can also use percentages:
 .. _coord_translation:
 
 Translate Position
-***************
+******************
 
 To visually move a widget from its current position without changing its base
 coordinates:
@@ -333,7 +333,7 @@ Coordinate translation applies after layout and affects scrollbars and
 .. _coord_transformation:
 
 Transform Size
-***************
+**************
 
 You can also visually increase the widget size without affecting layout:
 
@@ -348,7 +348,7 @@ scrollbar behavior, or container resizing.
 
 
 DPI Independent Unit
-***************
+********************
 
 If just an integer is used as a size or position unit, it means the number of physical
 pixels on the display. This also means that if the display is changed to a new one
