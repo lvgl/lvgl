@@ -53,8 +53,8 @@ Pointer input devices can have a cursor too.
    lv_image_set_src(cursor_obj, &mouse_cursor_icon);             /* Set image source. */
    lv_indev_set_cursor(mouse_indev, cursor_obj);                 /* Connect image to input device. */
 
-When the cursor is added, it will be placed on the system layer (:cpp:expr:`lv_layer_sys()`) and positioned at the last read coordinate.
-and positioned at the last read coordinate.
+When the cursor is added, it will be placed on the system layer (:cpp:expr:`lv_layer_sys()`)
+and positioned at the last coordinate read.
 
 Multi-touch
 ***********

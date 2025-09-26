@@ -123,7 +123,7 @@ gather more information about the gesture:
 
 - :cpp:expr:`lv_event_get_gesture_type(lv_event_t * e)`: Get the type of the gesture. Use this to check which multi-touch gesture is currently reported.
 - :cpp:expr:`lv_event_get_gesture_state(lv_event_t * e, lv_indev_gesture_type_t type)`: Get the
-  state of the gesture as :cpp:expr`lv_indev_gesture_state_t` . It can be one of:
+  state of the gesture as :cpp:type:`lv_indev_gesture_state_t` . It can be one of:
 
   - :cpp:enumerator:`LV_INDEV_GESTURE_STATE_NONE`: The gesture is not active.
   - :cpp:enumerator:`LV_INDEV_GESTURE_STATE_RECOGNIZED`: The gesture is recognized and can be used.
