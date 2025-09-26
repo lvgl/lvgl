@@ -27,15 +27,15 @@ Registering Manually
 --------------------
 
 Use :cpp:expr:`lv_xml_register_component_from_data(name, xml_string)` and
-`lv_xml_register_component_from_file("A:path/to/my.xml")` to register the XMLs of
+:cpp:expr:`lv_xml_register_component_from_file("A:path/to/my.xml")` to register the XMLs of
 components, screens, and ``globals.xml`` either as strings or file paths.
 
-As a result, LVGL will know all the ``<view>``s, ``<style>``s, ``<const>``s, etc., i.e.,
+As a result, LVGL will know all the ``<view>``\ s, ``<style>``\ s, ``<const>``\ s, etc., i.e.,
 the full content of these XML files needed to create instances later.
 
 Similarly, translations can be registered by
 :cpp:expr:`lv_xml_register_translation_from_data()` and
-`lv_xml_register_translation_from_file()`.
+:cpp:expr:`lv_xml_register_translation_from_file()`.
 
 Fonts and images are registered automatically when ``globals.xml`` is registered.
 
@@ -58,7 +58,7 @@ all XMLs, images, and fonts. Having a single blob is easier to manage than many 
 files.
 
 If the blob is saved in memory mapped to addressable memory (flash, RAM, etc.), use
-:cpp:func:`lv_xml_load_all_from_data`:
+:cpp:expr:`lv_xml_load_all_from_data`:
 
 .. code-block:: c
 
@@ -127,7 +127,7 @@ screens and any other required screens to get started.
 Use :cpp:expr:`lv_xml_create_screen("name")`, where ``"name"`` is the name of the XML
 file or the name used when the XML data was registered.
 
-It returns an ``lv_obj_t *`` that can be loaded as any regular :ref:`screen` using
+It returns an ``lv_obj_t *`` that can be loaded as any regular :ref:`screens` using
 :cpp:expr:`lv_screen_load()`.
 
 Creating components

@@ -125,7 +125,7 @@ manually create new C and H files for a ``super_button`` with a function like:
     {
         lv_obj_t * my_button = my_button_create(parent, ...);
 
-        ...do something with the created `my_button`
+        //...do something with the created `my_button`
 
         return my_button;
     }
