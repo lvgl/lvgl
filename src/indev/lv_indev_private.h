@@ -129,6 +129,11 @@ struct _lv_indev_t {
     void * gesture_data[LV_INDEV_GESTURE_CNT];
     lv_indev_gesture_type_t gesture_type[LV_INDEV_GESTURE_CNT];
 #endif
+
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 /**********************
