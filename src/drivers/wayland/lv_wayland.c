@@ -363,6 +363,11 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         wl_display_roundtrip(app->display);
     }
 #endif
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    else if(strcmp(interface, zxdg_decoration_manager_v1_interface.name) == 0) {
+        app->xdg_decoration_manager = wl_registry_bind(app->registry, name, &zxdg_decoration_manager_v1_interface, 1);
+    }
+#endif
 }
 
 static void handle_global_remove(void * data, struct wl_registry * registry, uint32_t name)

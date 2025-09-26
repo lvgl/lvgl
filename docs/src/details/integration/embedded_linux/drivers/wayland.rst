@@ -71,6 +71,10 @@ Some optional settings depend on whether DMA buffer support is enabled (`LV_WAYL
      - `1` or `0`
      - `0`
 
+   * - `LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS`
+     - `1` or `0`
+     - `0`
+
 Additional notes
 
 * DMABUF support (`LV_WAYLAND_USE_DMABUF`) improves performance and enables more render modes but has specific requirements and restrictions.
@@ -170,6 +174,13 @@ When `LV_WAYLAND_USE_DMABUF` is set to `1`, the following protocols must also be
 
    wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.h
    wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml wayland_linux_dmabuf.c
+
+When `LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS` is set to `1`, the following protocols must also be generated:
+
+.. code-block:: sh
+
+   wayland-scanner client-header $SYSROOT/usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml wayland_xdg_decoration.h
+   wayland-scanner private-code $SYSROOT/usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml wayland_xdg_decoration.c
 
 
 The resulting files can then be integrated into the project, it's better to re-run ``wayland-scanner`` on

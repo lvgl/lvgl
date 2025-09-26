@@ -22,6 +22,9 @@ extern "C" {
 #include <sys/poll.h>
 #include <wayland-client-protocol.h>
 #include <wayland_xdg_shell.h>
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+#include <wayland_xdg_decoration.h>
+#endif
 
 #if LV_WAYLAND_USE_DMABUF
 #include <sys/mman.h>
@@ -158,6 +161,9 @@ struct lv_wayland_context {
 #endif
 
     struct xdg_wm_base * xdg_wm;
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    struct zxdg_decoration_manager_v1 * xdg_decoration_manager;
+#endif
 
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
@@ -191,6 +197,9 @@ struct window {
 
     struct xdg_surface * xdg_surface;
     struct xdg_toplevel * xdg_toplevel;
+#if LV_WAYLAND_WINDOW_SERVER_SIDE_DECORATIONS
+    struct zxdg_toplevel_decoration_v1 * xdg_decoration;
+#endif
     uint32_t wm_capabilities;
 
     struct graphic_object * body;
