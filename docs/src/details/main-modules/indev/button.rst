@@ -4,12 +4,14 @@
 Hardware Button
 ===============
 
+
+
 Overview
 ********
 
-A *Hardware Button* is an external button typically located next to the screen
-and assigned to specific coordinates on the screen. If a button is pressed, it
-simulates a press at the assigned coordinate, similar to a touchpad.
+A *Hardware Button* is an external button typically located next to the screen and
+assigned to specific coordinates on the screen. If a button is pressed, it simulates a
+press at the assigned coordinate, similar to a touchpad.
 
 To assign Hardware Buttons to coordinates, use
 :cpp:expr:`lv_indev_set_button_points(my_indev, points_array)`.
@@ -25,12 +27,15 @@ To assign Hardware Buttons to coordinates, use
 
 .. admonition:: Important:
 
-    ``points_array`` must not go out of scope. Declare it either as a
-    global variable or as a static variable inside a function.
+    ``points_array`` must not go out of scope. Declare it either as a global variable
+    or as a static variable inside a function.
 
 The index of the pressed button should be set in ``data->btn_id`` in the ``read_cb``.
 
-``data->state`` should also be set to either ``LV_INDEV_STATE_PRESSED`` or ``LV_INDEV_STATE_RELEASED``.
+``data->state`` should also be set to either ``LV_INDEV_STATE_PRESSED`` or
+``LV_INDEV_STATE_RELEASED``.
+
+
 
 Example
 *******
@@ -65,4 +70,3 @@ Here is a complete example:
           data->state = LV_INDEV_STATE_RELEASED; /* Set the released state */
        }
    }
-

@@ -61,10 +61,13 @@ Advantages of using styles:
   :cpp:enumerator:`LV_STATE_PRESSED`.
 - Enables style transitions to animate size/position changes between states.
 
+
+
 Important Notes
 ***************
 
 This section describes special cases where LVGL's behavior might be unexpected.
+
 
 .. _coord_postponed_coordinate_calculation:
 
@@ -81,6 +84,7 @@ So, if you change a widget’s position or size and then immediately read it, ca
 Note: Since layout and size may depend on the parent,
 :cpp:func:`lv_obj_update_layout()` recalculates coordinates for **all** widgets on
 the screen of the given object.
+
 
 .. _coord_removing_styles:
 
@@ -107,6 +111,8 @@ coordinates may be removed too:
    /* widget2 will have 200×100 size in the end */
    lv_obj_remove_style_all(widget2);
    lv_obj_set_size(widget2, 200, 100);
+
+
 
 .. _boxing_model:
 
@@ -149,8 +155,10 @@ To retrieve size information:
    int32_t content_w = lv_obj_get_content_width(widget);
    int32_t content_h = lv_obj_get_content_height(widget);
 
+
+
 Static Positioning
-******************
+***************
 
 The simplest way to position a widget is by pixel values:
 
@@ -163,8 +171,10 @@ The simplest way to position a widget is by pixel values:
 These values are relative to the parent's top-left corner, including the parent’s
 padding and border.
 
+
+
 Dynamic Positioning
-*******************
+***************
 
 Align to the Parent
 -------------------
@@ -228,8 +238,10 @@ You can use percentages for dynamic positioning:
 
 ``100%`` means the parent's content area (the size excluding padding and border).
 
+
+
 Static Sizing
-*************
+***************
 
 Set fixed size in pixels:
 
@@ -237,8 +249,10 @@ Set fixed size in pixels:
 
    lv_obj_set_size(widget, 200, 100);
 
+
+
 Dynamic Sizing
-**************
+***************
 
 Percentage
 ----------
@@ -271,10 +285,12 @@ Layouts
 
 Flex and Grid layouts can also stretch widgets to control both position and size.
 
+
+
 .. _coord_min_max_size:
 
 Min and Max Size
-****************
+***************
 
 LVGL supports ``min-width``, ``max-width``, ``min-height``, and ``max-height``.
 
@@ -291,10 +307,12 @@ You can also use percentages:
 
    lv_style_set_max_height(&style, lv_pct(50));
 
+
+
 .. _coord_translation:
 
 Translate Position
-******************
+***************
 
 To visually move a widget from its current position without changing its base
 coordinates:
@@ -310,10 +328,12 @@ Percentage-based translation is relative to the widget’s own size (not the par
 Coordinate translation applies after layout and affects scrollbars and
 ``LV_SIZE_CONTENT``.
 
+
+
 .. _coord_transformation:
 
 Transform Size
-**************
+***************
 
 You can also visually increase the widget size without affecting layout:
 
@@ -325,8 +345,10 @@ You can also visually increase the widget size without affecting layout:
 Unlike ``translate``, this is a visual-only effect and does **not** affect layout,
 scrollbar behavior, or container resizing.
 
+
+
 DPI Independent Unit
-********************
+***************
 
 If just an integer is used as a size or position unit, it means the number of physical
 pixels on the display. This also means that if the display is changed to a new one
@@ -351,4 +373,3 @@ won’t be updated automatically.
 
 With the help of ``lv_dpx``, only the pixel values can be scaled. Images and fonts
 still need to be changed manually to adapt to a new DPI.
-
