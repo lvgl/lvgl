@@ -57,7 +57,7 @@ static EGLConfig create_egl_config(lv_egl_ctx_t * ctx);
 static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config);
 
-static void * create_window(lv_egl_ctx_t * ctx);
+static void * create_native_window(lv_egl_ctx_t * ctx);
 static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count);
 
 static GLADapiproc glad_egl_load_cb(void * userdata, const char * name);
@@ -126,7 +126,6 @@ void lv_opengles_egl_clear(lv_egl_ctx_t * ctx)
 
 void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
 {
-    LV_LOG_USER("%p %p %p", eglSwapBuffers, ctx->egl_display, ctx->egl_surface);
     eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
     ctx->interface.flip_cb(ctx->interface.driver_data, ctx->vsync);
 }
@@ -201,7 +200,7 @@ static lv_result_t load_egl(lv_egl_ctx_t * ctx)
         goto egl_config_err;
     }
 
-    ctx->native_window = create_window(ctx);
+    ctx->native_window = (EGLNativeWindowType)create_native_window(ctx);
     if(!ctx->native_window) {
         LV_LOG_ERROR("Failed to create native window");
         goto create_window_err;
@@ -256,8 +255,8 @@ egl_make_current_context_err:
 egl_context_err:
     ctx->egl_surface = NULL;
 egl_surface_err:
-    ctx->interface.destroy_window_cb(ctx->interface.driver_data, ctx->native_window);
-    ctx->native_window = NULL;
+    ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+    ctx->native_window = 0;
 create_window_err:
     ctx->egl_config = NULL;
 egl_config_err:
@@ -298,7 +297,7 @@ static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx)
         PFNEGLGETPLATFORMDISPLAYEXTPROC egl_get_platform_display = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
                                                                    egl_get_proc_address("eglGetPlatformDisplayEXT");
         if(egl_get_platform_display) {
-            display = egl_get_platform_display(ctx->interface.egl_platform, (void *)ctx->native_display, NULL);
+            display = egl_get_platform_display(ctx->interface.egl_platform, (void *)ctx->interface.native_display, NULL);
         }
         if(!display) {
             LV_LOG_WARN("Failed to get egl display from eglGetPlatformDisplay. Error code: %#x", egl_get_error());
@@ -307,7 +306,7 @@ static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx)
 
     if(!display) {
         LV_LOG_INFO("Falling back to eglGetDisplay()");
-        display = egl_get_display(ctx->native_display);
+        display = egl_get_display(ctx->interface.native_display);
     }
 
     if(!display) {
@@ -413,9 +412,7 @@ static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx)
     LV_ASSERT_NULL(ctx->egl_config);
     LV_ASSERT_NULL(ctx->native_window);
     LV_LOG_USER("Create egl surface %p %p %p", ctx->egl_display, ctx->egl_config, ctx->native_window);
-    return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config,
-                                  (EGLNativeWindowType)ctx->native_window,
-                                  NULL);
+    return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }
 
 static EGLContext create_egl_context(lv_egl_ctx_t * ctx)
@@ -490,7 +487,7 @@ static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_conf
     return LV_RESULT_OK;
 }
 
-static void * create_window(lv_egl_ctx_t * ctx)
+static void * create_native_window(lv_egl_ctx_t * ctx)
 {
     EGLint native_config_id;
     uint64_t * mods;

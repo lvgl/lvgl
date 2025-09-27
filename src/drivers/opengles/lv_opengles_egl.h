@@ -70,6 +70,7 @@ typedef size_t (*lv_egl_select_config_t)(void * driver_data, lv_egl_config_t * c
 typedef struct {
     lv_egl_select_config_t select_config;
     void * driver_data;
+    void * native_display;
     uint16_t egl_platform;
     lv_create_window_t create_window_cb;
     lv_destroy_window_t destroy_window_cb;
@@ -77,14 +78,13 @@ typedef struct {
 } lv_egl_interface_t;
 
 typedef struct {
-    EGLNativeDisplayType native_display;
+    EGLNativeWindowType native_window;
     EGLDisplay egl_display;
     EGLConfig  egl_config;
     EGLContext egl_context;
     EGLSurface egl_surface;
     void * egl_lib_handle;
     void * opengl_lib_handle;
-    void * native_window;
     lv_egl_interface_t interface;
 
     int32_t width;
