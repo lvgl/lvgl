@@ -22,8 +22,6 @@
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
 
-#define quick_access_list_button_style (LV_GLOBAL_DEFAULT()->fe_list_button_style)
-
 #define LV_FILE_NAVIGATION_CURRENT_DIR  "."
 #define LV_FILE_NAVIGATION_PARENT_DIR   "Back"
 
@@ -35,6 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_file_explorer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void init_style(lv_obj_t * obj);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
@@ -54,8 +53,15 @@ static bool is_end_with(const char * str1, const char * str2);
  *  STATIC VARIABLES
  **********************/
 
+#if LV_FILE_EXPLORER_QUICK_ACCESS
+    static lv_style_t quick_access_style;
+#endif
+
+static size_t file_explorer_count;
+
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
+    .destructor_cb = lv_file_explorer_destructor,
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
@@ -337,7 +343,20 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*Initialize style*/
     init_style(obj);
 
+    file_explorer_count++;
     LV_TRACE_OBJ_CREATE("finished");
+}
+
+static void lv_file_explorer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    LV_UNUSED(obj);
+    file_explorer_count--;
+#if LV_FILE_EXPLORER_QUICK_ACCESS
+    if(file_explorer_count == 0) {
+        lv_style_reset(&quick_access_style);
+    }
+#endif
 }
 
 static void init_style(lv_obj_t * obj)
@@ -402,9 +421,11 @@ static void init_style(lv_obj_t * obj)
     lv_obj_set_style_pad_all(explorer->list_places, 0, 0);
 
     /*Style of the quick access list btn in the quick access bar*/
-    lv_style_init(&quick_access_list_button_style);
-    lv_style_set_border_width(&quick_access_list_button_style, 0);
-    lv_style_set_bg_color(&quick_access_list_button_style, lv_color_hex(0xf2f1f6));
+    if(file_explorer_count == 0) {
+        lv_style_init(&quick_access_style);
+        lv_style_set_border_width(&quick_access_style, 0);
+        lv_style_set_bg_color(&quick_access_style, lv_color_hex(0xf2f1f6));
+    }
 
     uint32_t ch_cnt = lv_obj_get_child_count(explorer->quick_access_area);
 
@@ -417,7 +438,7 @@ static void init_style(lv_obj_t * obj)
             for(uint32_t j = 0; j < list_ch_cnt; j++) {
                 lv_obj_t * list_child = lv_obj_get_child(child, j);
                 if(lv_obj_check_type(list_child, &lv_list_button_class)) {
-                    lv_obj_add_style(list_child, &quick_access_list_button_style, 0);
+                    lv_obj_add_style(list_child, &quick_access_style, 0);
                 }
             }
         }
