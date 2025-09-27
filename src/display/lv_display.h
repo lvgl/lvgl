@@ -358,6 +358,7 @@ void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt);
 uint32_t lv_display_get_tile_cnt(lv_display_t * disp);
 
 /**
+ * Disabling anti-aliasing is not supported since v9. This function will be removed.
  * Enable anti-aliasing for the render engine
  * @param disp      pointer to a display
  * @param en        true/false

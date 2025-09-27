@@ -593,6 +593,8 @@ uint32_t lv_display_get_tile_cnt(lv_display_t * disp)
 
 void lv_display_set_antialiasing(lv_display_t * disp, bool en)
 {
+    LV_LOG_WARN("Disabling anti-aliasing is not supported since v9. This function will be removed.");
+
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
