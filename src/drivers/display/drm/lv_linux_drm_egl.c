@@ -561,7 +561,7 @@ lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
     }
     LV_ASSERT(ctx->drm_connector->count_modes > 0);
     /* During testing, the first mode is always the screen resolution so we use that*/
-    ctx->drm_mode = &ctx->drm_connector->modes[0];
+    ctx->drm_mode = &ctx->drm_connector->modes[17];
     for(int i = 0; i < ctx->drm_connector->count_modes; ++i) {
         float refresh_hertz = (ctx->drm_connector->modes[i].clock * 1000.f) / (float)(ctx->drm_connector->modes[i].htotal *
                                                                                       ctx->drm_connector->modes[i].vtotal);
@@ -918,8 +918,6 @@ static void * drm_create_window(void * driver_data, const lv_native_window_prope
     if(properties->mod_count != 0) {
         size_t drm_mods_count = 0;
         uint64_t * drm_mods = drm_get_format_mods(ctx->fd, format, crtc_index, &drm_mods_count);
-
-
         for(size_t di = 0; di < drm_mods_count; ++di) {
             uint64_t mod = drm_mods[di];
             for(size_t i = 0; i < properties->mod_count; ++i) {
