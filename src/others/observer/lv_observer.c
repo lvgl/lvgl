@@ -18,6 +18,10 @@
  *      DEFINES
  *********************/
 
+#ifndef FLT_MAX
+    #define FLT_MAX 3.402823466e+38F /* float max value */
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -58,16 +62,15 @@ typedef struct {
 typedef struct {
     lv_subject_t * subject;
     int32_t step;
-    int32_t min;
-    int32_t max;
+    bool rollover;
 } subject_increment_user_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
+static void subject_toggle_cb(lv_event_t * e);
 static void subject_set_int_cb(lv_event_t * e);
-
 #if LV_USE_FLOAT
     static void subject_set_float_cb(lv_event_t * e);
 #endif
@@ -107,6 +110,8 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     subject->type = LV_SUBJECT_TYPE_INT;
     subject->value.num = value;
     subject->prev_value.num = value;
+    subject->min_value.num = INT32_MIN;
+    subject->max_value.num = INT32_MAX;
     lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
@@ -116,6 +121,8 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value)
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
         return;
     }
+
+    value = LV_CLAMP(subject->min_value.num, value, subject->max_value.num);
 
     subject->prev_value.num = subject->value.num;
     subject->value.num = value;
@@ -142,6 +149,26 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject)
     return subject->prev_value.num;
 }
 
+void lv_subject_set_min_value_int(lv_subject_t * subject, int32_t min_value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return;
+    }
+
+    subject->min_value.num = min_value;
+}
+
+void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return;
+    }
+
+    subject->max_value.num = max_value;
+}
+
 #if LV_USE_FLOAT
 
 void lv_subject_init_float(lv_subject_t * subject, float value)
@@ -150,6 +177,8 @@ void lv_subject_init_float(lv_subject_t * subject, float value)
     subject->type = LV_SUBJECT_TYPE_FLOAT;
     subject->value.float_v = value;
     subject->prev_value.float_v = value;
+    subject->min_value.float_v = -FLT_MAX;
+    subject->max_value.float_v = FLT_MAX;
     lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
@@ -159,6 +188,8 @@ void lv_subject_set_float(lv_subject_t * subject, float value)
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
         return;
     }
+
+    value = LV_CLAMP(subject->min_value.float_v, value, subject->max_value.float_v);
 
     subject->prev_value.float_v = subject->value.float_v;
     subject->value.float_v = value;
@@ -184,6 +215,27 @@ float lv_subject_get_previous_float(lv_subject_t * subject)
 
     return subject->prev_value.float_v;
 }
+
+void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
+
+    subject->min_value.float_v = min_value;
+}
+
+void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value)
+{
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_FLOAT");
+        return;
+    }
+
+    subject->max_value.float_v = max_value;
+}
+
 
 #endif /*LV_USE_FLOAT*/
 
@@ -525,8 +577,13 @@ void lv_subject_notify(lv_subject_t * subject)
 }
 
 void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
-                                        int32_t min, int32_t max)
+                                        bool rollover)
 {
+    if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type must be `int` or `float` (was %d)", subject->type);
+        return;
+    }
+
     subject_increment_user_data_t * user_data = lv_malloc(sizeof(subject_increment_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
@@ -535,15 +592,28 @@ void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, 
     }
 
     user_data->step = step;
-    user_data->min = min;
-    user_data->max = max;
     user_data->subject = subject;
+    user_data->rollover = rollover;
     lv_obj_add_event_cb(obj, subject_increment_cb, trigger, user_data);
     lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
+void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger)
+{
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
+        return;
+    }
+    lv_obj_add_event_cb(obj, subject_toggle_cb, trigger, subject);
+}
+
 void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t value)
 {
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
+        return;
+    }
+
     subject_set_int_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
@@ -561,6 +631,11 @@ void lv_obj_add_subject_set_int_event(lv_obj_t * obj, lv_subject_t * subject, lv
 #if LV_USE_FLOAT
 void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, float value)
 {
+    if(subject->type != LV_SUBJECT_TYPE_FLOAT) {
+        LV_LOG_WARN("Subject type must be `float` (was %d)", subject->type);
+        return;
+    }
+
     subject_set_float_user_data_t * user_data = lv_malloc(sizeof(subject_set_float_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
@@ -579,6 +654,12 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
 void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
                                          const char * value)
 {
+
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type must be `string` (was %d)", subject->type);
+        return;
+    }
+
     subject_set_string_user_data_t * user_data = lv_malloc(sizeof(subject_set_int_user_data_t));
     if(user_data == NULL) {
         LV_ASSERT_MALLOC(user_data);
@@ -601,7 +682,7 @@ lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_s
     LV_ASSERT_NULL(obj);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
-        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        LV_LOG_WARN("Subject type must be `int` (was %d)", subject->type);
         return NULL;
     }
 
@@ -729,7 +810,6 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 void * lv_observer_get_user_data(const lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
-
     return observer->user_data;
 }
 
@@ -737,12 +817,21 @@ void * lv_observer_get_user_data(const lv_observer_t * observer)
  *   STATIC FUNCTIONS
  **********************/
 
+static void subject_toggle_cb(lv_event_t * e)
+{
+    lv_subject_t * subject = lv_event_get_user_data(e);
+    int32_t v = lv_subject_get_int(subject);
+    v = !v;
+
+    lv_subject_set_int(subject, v);
+}
 
 static void subject_set_int_cb(lv_event_t * e)
 {
     subject_set_int_user_data_t * user_data = lv_event_get_user_data(e);
     lv_subject_set_int(user_data->subject, user_data->value);
 }
+
 
 #if LV_USE_FLOAT
 static void subject_set_float_cb(lv_event_t * e)
@@ -762,19 +851,36 @@ static void subject_increment_cb(lv_event_t * e)
 {
     subject_increment_user_data_t * user_data = lv_event_get_user_data(e);
 
-
     if(user_data->subject->type == LV_SUBJECT_TYPE_INT) {
         int32_t value = lv_subject_get_int(user_data->subject);
         value += user_data->step;
-        value = LV_CLAMP(user_data->min, value, user_data->max);
+
+        if(user_data->rollover) {
+            if(value > user_data->subject->max_value.num) {
+                value = user_data->subject->min_value.num;
+            }
+            else if(value < user_data->subject->min_value.num) {
+                value = user_data->subject->max_value.num;
+            }
+        }
+
         lv_subject_set_int(user_data->subject, value);
     }
 #if LV_USE_FLOAT
     else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
         float value = lv_subject_get_float(user_data->subject);
+
+        if(user_data->rollover) {
+            if(value > user_data->subject->max_value.float_v) {
+                value = user_data->subject->min_value.float_v;
+            }
+            else if(value < user_data->subject->min_value.float_v) {
+                value = user_data->subject->max_value.float_v;
+            }
+        }
+
         value += (float)user_data->step;
-        value = LV_CLAMP(user_data->min, value, user_data->max);
-        lv_subject_set_float(user_data->subject, (float)value);
+        lv_subject_set_float(user_data->subject, value);
     }
 #endif
 }

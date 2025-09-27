@@ -39,6 +39,9 @@ void lv_obj_xml_remove_style_all_apply(lv_xml_parser_state_t * state, const char
 void * lv_obj_xml_event_cb_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
+void * lv_obj_xml_subject_toggle_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_subject_toggle_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
 void * lv_obj_xml_subject_set_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_subject_set_apply(lv_xml_parser_state_t * state, const char ** attrs);
 

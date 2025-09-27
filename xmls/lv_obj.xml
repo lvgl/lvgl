@@ -88,6 +88,11 @@ Example
             <arg name="reverse" type="bool" default="false"/>
         </element>
 
+        <element name="subject_toggle_event" access="add" type="void">
+            <arg name="subject" type="subject"/>
+            <arg name="trigger" type="lv_event" default="clicked"/>
+        </element>
+
         <element name="subject_set_int_event" access="add" type="void">
             <arg name="subject" type="subject"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
@@ -110,8 +115,7 @@ Example
             <arg name="subject" type="subject"/>
             <arg name="trigger" type="lv_event" default="clicked"/>
             <arg name="step" type="int" default="1"/>
-            <arg name="min" type="int" default="-2000000"/>
-            <arg name="max" type="int" default="2000000"/>
+            <arg name="rollover" type="bool" default="false"/>
         </element>
 
         <element name="bind_flag_if_eq" access="custom" type="void">

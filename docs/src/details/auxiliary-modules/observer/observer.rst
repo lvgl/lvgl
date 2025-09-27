@@ -160,7 +160,17 @@ The following functions are used to get a Subject's previous value:
 :Pointer: const void * :cpp:expr:`lv_subject_get_previous_pointer(subject)`
 :Color:   lv_color_t   :cpp:expr:`lv_subject_get_previous_color(subject)`
 
+Setting a Range for a Subject
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The range of the integer and float subjects can be limited by setting minimum and maximum values:
+
+- :cpp:expr:`lv_subject_set_min_value_int(subject, value)`
+- :cpp:expr:`lv_subject_set_max_value_int(subject, value)`
+- :cpp:expr:`lv_subject_set_min_value_float(subject, value)`
+- :cpp:expr:`lv_subject_set_max_value_float(subject, value)`
+
+The default range is the smallest and largest possible values, so there is no limit by default.
 
 .. _observer_observer:
 
@@ -469,20 +479,44 @@ To simplify this, *subject set* and *increment* actions can be attached directly
 Internally, these are implemented as special event callbacks.
 Note: these callbacks are **not** automatically removed when a subject is de-initialized.
 
-Increment
-~~~~~~~~~
 
-:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, step, min, max)`
-Increments the subject's value by `step`, clamped between `min` and `max`.
+Toggle
+~~~~~~
+
+:cpp:expr:`lv_obj_add_subject_toggle_event(obj, subject)`
+
+Toggle the subjects value when the trigger happens. IF the value was not 0, it will be 0.
+If it was 0 it will be 1.
 
 For example:
 
-:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80)`
+:cpp:expr:`lv_obj_add_subject_toggle_event(button1, subject1, LV_EVENT_CLICKED)`
 
-This will increment `subject1` by 5 when `button1` is clicked.
-The resulting value will be constrained to the range -10 to 80.
+This will toggle `subject1` between 0 and 1 each time `button1` is clicked.
+
+Increment
+~~~~~~~~~
+
+:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step, rollover)`
+increments an integer subject's value by `step`.
+
+It works on both integer and float subject.
+
+``rollover`` can be ``true`` or ``false``. If ``true`` and the subject's minimum or maximum
+value is exceeded, the other end value is set. That is, going beyond
+the maximum value sets the minimum value, and vice versa.
 
 Using a negative `step` will decrement the value instead.
+
+
+For example:
+
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, false)`
+
+This will increment `subject1` by 5 when `button1` is clicked, stopping at the limits set by
+:cpp:expr:`lv_subject_set_min_value_int()` and :cpp:expr:`lv_subject_set_max_value_int()`
+(same for float subjects).
+
 
 Set to a Value
 ~~~~~~~~~~~~~~
