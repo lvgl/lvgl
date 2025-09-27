@@ -40,7 +40,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display, int32_t w, int32_t h);
+lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display);
 void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t height);
 
 /**********************

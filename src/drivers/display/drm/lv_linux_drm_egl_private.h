@@ -15,12 +15,15 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_linux_drm_egl.h"
+#include "../../../lv_conf_internal.h"
+
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
 #include "../../../misc/lv_area.h"
 #include "../../../display/lv_display.h"
 #include <xf86drmMode.h>
+#include <src/drivers/opengles/lv_opengles_texture_private.h>
+#include <src/drivers/opengles/lv_opengles_egl.h>
 
 /*********************
  *      DEFINES
@@ -30,30 +33,30 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_drm_egl_t {
+typedef struct {
     lv_opengles_texture_t texture;
-    lv_egl_adapter_interface_t * egl_interface;
     lv_display_t * display;
-    bool h_flip;
-    bool v_flip;
-};
+    lv_egl_ctx_t * egl_ctx;
+    lv_egl_interface_t egl_interface;
 
-struct lv_egl_adapter_outmod_drm {
-    lv_egl_adapter_output_core_t * core;
-    int fd;
     drmModeRes * drm_resources;
     drmModeConnector * drm_connector;
     drmModeEncoder * drm_encoder;
-    drmModeCrtcPtr drm_crtc;
+    drmModeCrtc * drm_crtc;
     drmModeModeInfo * drm_mode;
+
     struct gbm_device * gbm_dev;
     struct gbm_surface * gbm_surface;
     struct gbm_bo * gbm_bo_pending;
     struct gbm_bo * gbm_bo_flipped;
     struct gbm_bo * gbm_bo_presented;
+
+    int fd;
+    bool h_flip;
+    bool v_flip;
     bool crtc_isset;
-    bool async_flip;
-};
+} lv_drm_ctx_t;
+
 
 
 /**********************

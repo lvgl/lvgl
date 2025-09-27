@@ -90,17 +90,6 @@ lv_egl_ctx_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interfa
     }
     ctx->interface = *interface;
 
-#if 0 /* TODO: this is to be initialized before calling the egl context function */
-    ctx->native_display = interface->create_display(interface->driver_data,
-                                                        ctx->config.hres,
-                                                        ctx->config.vres);
-    if(!ctx->native_display) {
-        LV_LOG_ERROR("Failed to create egl output display");
-        lv_free(ctx);
-        return NULL;
-    }
-#endif
-
     lv_array_init(&ctx->fbos, 1, sizeof(lv_egl_adapter_fbo_t));
     lv_array_init(&ctx->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t));
 
@@ -124,15 +113,23 @@ void lv_opengles_egl_context_deinit(lv_egl_ctx_t * ctx)
         dlclose(ctx->opengl_lib_handle);
     }
 }
+
+void lv_opengles_egl_clear(lv_egl_ctx_t * ctx)
+{
+    LV_UNUSED(ctx);
+    GL_CALL(glClearColor(0.19f, 0.195f, 0.2f, 1.0f));
+    GL_CALL(glDepthRangef(-1.0, 1.0));
+    GL_CALL(glDepthFunc(GL_ALWAYS));
+    GL_CALL(glClearDepthf(1.0f));
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+}
+
 void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
 {
-#if 0
-    if(ctx->offscreen_fbo_count <= 0) {
-        eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
-        ctx->interface.flip(ctx->interface.driver_data, true);
-        return;
-    }
-#endif
+    LV_LOG_USER("%p %p %p", eglSwapBuffers, ctx->egl_display, ctx->egl_surface);
+    eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
+    ctx->interface.flip_cb(ctx->interface.driver_data, true);
+    return;
 #if 0
     if(ctx->is_sync_supported) {
         lv_egl_adapter_destroy_sync((lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
@@ -158,7 +155,7 @@ void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
     }
 #endif
     lv_egl_adapter_fbo_t * fbo = (lv_egl_adapter_fbo_t *)lv_array_at(&ctx->fbos, ctx->offscreen_fbo_index);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo));
 
 }
 
@@ -192,71 +189,85 @@ static void * load_gl_lib(void)
 
 static lv_result_t load_egl(lv_egl_ctx_t * ctx)
 {
+    LV_LOG_USER("loading egl lib");
     ctx->egl_lib_handle = load_egl_lib();
     if(!ctx->egl_lib_handle) {
         LV_LOG_ERROR("Failed to load egl shared lib: %s", dlerror());
         goto err;
     }
 
+    LV_LOG_USER("Creating egl display");
     ctx->egl_display = create_egl_display(ctx);
     if(!ctx->egl_display) {
         LV_LOG_ERROR("Failed to create egl display");
         goto egl_display_err;
     }
 
+    LV_LOG_USER("Loading egl entry points %p", (void *)eglGetConfigAttrib);
     if(!gladLoadEGLUserPtr(ctx->egl_display, glad_egl_load_cb, ctx->egl_lib_handle)) {
         LV_LOG_ERROR("Failed to load EGL entry points");
         goto load_egl_functions_err;
     }
 
+    LV_LOG_USER("Bind opengles api %p", (void *)eglGetConfigAttrib);
     if(eglBindAPI && !eglBindAPI(EGL_OPENGL_ES_API)) {
         LV_LOG_ERROR("Failed to bind api");
         goto err;
     }
 
+    LV_LOG_USER("Loading opengl lib %p", (void *)eglGetConfigAttrib);
     ctx->opengl_lib_handle = load_gl_lib();
     if(!ctx->opengl_lib_handle) {
         LV_LOG_ERROR("Failed to load OpenGL library. %s", dlerror());
         goto opengl_lib_err;
     }
+
+    LV_LOG_USER("Creating egl config %p", (void *)eglGetConfigAttrib);
     ctx->egl_config = create_egl_config(ctx);
     if(!ctx->egl_config) {
         LV_LOG_ERROR("Failed to create EGL config. Error code: %#x", eglGetError());
         goto egl_config_err;
     }
+
+    LV_LOG_USER("Creating egl surface");
     ctx->egl_surface = create_egl_surface(ctx);
     if(!ctx->egl_surface) {
         LV_LOG_ERROR("Failed to create EGL surface. Error code: %#x", eglGetError());
         goto egl_surface_err;
     }
 
+    LV_LOG_USER("Creating egl context");
     ctx->egl_context = create_egl_context(ctx);
     if(!ctx->egl_context) {
         LV_LOG_ERROR("Failed to create EGL context. Error code: %#x", eglGetError());
         goto egl_context_err;
     }
 
+    LV_LOG_USER("Making egl context current");
     if(!eglMakeCurrent(ctx->egl_display, ctx->egl_surface, ctx->egl_surface, ctx->egl_context)) {
         LV_LOG_ERROR("Failed to set current egl context. Error code: %#x", eglGetError());
         goto egl_make_current_context_err;
     }
+
+    LV_LOG_USER("Setting swap interval");
     if(!eglSwapInterval || !eglSwapInterval(ctx->egl_display, 0)) {
         LV_LOG_WARN("Can't set egl swap interval");
     }
 
+    LV_LOG_USER("Loading opengl entry points");
     if(!gladLoadGLES2UserPtr(glad_egl_load_cb, ctx->opengl_lib_handle)) {
         LV_LOG_ERROR("Failed to load load OpenGL entry points");
         goto load_opengl_functions_err;
     }
 
     lv_egl_config_t current_config;
-
     lv_egl_config_from_egl_config(ctx, &current_config, ctx->egl_config);
-#if 0
-    glViewport(0, 0, current_config.hres, current_config.vres);
+    glViewport(0, 0, 1024, 600);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+#if 0
 #endif
+    LV_LOG_USER("EGL clear");
 
     lv_opengles_egl_clear(ctx);
 
@@ -333,18 +344,12 @@ static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx)
         return NULL;
     }
     LV_LOG_USER("Egl version %d.%d", egl_major, egl_minor);
-
-    if(!gladLoadEGLUserPtr(display, glad_egl_load_cb, ctx->egl_lib_handle)) {
-        LV_LOG_ERROR("Failed to load load EGL entry points");
-        return NULL;
-    }
-
     return display;
 }
 
 static GLADapiproc glad_egl_load_cb(void * userdata, const char * name)
 {
-    if(!eglGetProcAddress) {
+    if(eglGetProcAddress) {
         GLADapiproc sym = (GLADapiproc)eglGetProcAddress(name);
         if(sym) {
             return sym;
@@ -372,7 +377,7 @@ static EGLConfig create_egl_config(lv_egl_ctx_t * ctx)
         return NULL;
     }
 
-    EGLConfig * egl_configs = lv_malloc(num_configs * sizeof(EGLConfig));
+    EGLConfig * egl_configs = lv_malloc(num_configs * sizeof(*egl_configs));
     LV_ASSERT_MALLOC(egl_configs);
     if(!egl_configs) {
         LV_LOG_ERROR("Failed to allocate memory for possible configs");
@@ -383,14 +388,18 @@ static EGLConfig create_egl_config(lv_egl_ctx_t * ctx)
         LV_LOG_ERROR("Failed to get configs: %d", eglGetError());
         return NULL;
     }
+    for(int i = 0; i < num_configs; i++) {
+        LV_LOG_USER("Config %d: %p", i, (void *)egl_configs[i]);
+    }
 
-    lv_egl_config_t * configs = lv_malloc(num_configs * sizeof(lv_egl_config_t));
+    lv_egl_config_t * configs = lv_malloc(num_configs * sizeof(*configs));
     LV_ASSERT_MALLOC(configs);
     if(!configs) {
         LV_LOG_ERROR("Failed to allocate memory for configs");
         lv_free(egl_configs);
         return NULL;
     }
+
     size_t valid_config_count = 0;
     for(size_t i = 0; i < (size_t)num_configs; ++i) {
         lv_result_t err = lv_egl_config_from_egl_config(ctx, configs + i, egl_configs[i]);
@@ -424,7 +433,10 @@ static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx)
 {
     LV_ASSERT_NULL(ctx->egl_display);
     LV_ASSERT_NULL(ctx->egl_config);
-    return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->egl_native_window, 0);
+    LV_LOG_USER("Create egl surface %p %p %p", ctx->egl_display, ctx->egl_config, ctx->interface.native_window);
+    return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config,
+                                  (EGLNativeWindowType)ctx->interface.native_window,
+                                  NULL);
 }
 
 static EGLContext create_egl_context(lv_egl_ctx_t * ctx)
@@ -463,24 +475,23 @@ static lv_color_format_t color_format_from_props(int r_bits, int g_bits, int b_b
 static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config)
 {
-    int err = 0, r_bits, g_bits, b_bits, a_bits, width, height;
+    int res = 1, r_bits, g_bits, b_bits, a_bits, width, height, buffer_size, depth, stencil, samples, surface_type,
+        renderable_type;
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &r_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &g_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &b_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_ALPHA_SIZE, &a_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_WIDTH, &width);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_HEIGHT, &height);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BUFFER_SIZE, &buffer_size);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_DEPTH_SIZE, &depth);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &stencil);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &samples);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SURFACE_TYPE, &surface_type);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RENDERABLE_TYPE, &renderable_type);
 
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &r_bits));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &g_bits));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &b_bits));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_ALPHA_SIZE, &a_bits));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_WIDTH, &width));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_HEIGHT, &height));
 
-#if 0
-    int buffer_size, depth, stencil, samples;
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BUFFER_SIZE, &buffer_size));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_DEPTH_SIZE, &depth));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &stencil));
-    GL_CALL(err |= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &samples));
-#endif
-
-    if(err) {
+    if(!res) {
         LV_LOG_WARN("Failed to fetch egl config properties");
         return LV_RESULT_INVALID;
     }
@@ -490,8 +501,13 @@ static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_conf
         return LV_RESULT_INVALID;
     }
     lv_egl_config->cf = cf;
-    lv_egl_config->hres = width;
-    lv_egl_config->vres = height;
+    lv_egl_config->max_width = width;
+    lv_egl_config->max_height = height;
+    lv_egl_config->buffer_size = buffer_size;
+    lv_egl_config->depth = depth;
+    lv_egl_config->stencil = stencil;
+    lv_egl_config->samples = samples;
+    lv_egl_config->surface_type = surface_type;
     return LV_RESULT_OK;
 }
 

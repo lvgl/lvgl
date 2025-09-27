@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_opengles_texture.h"
+#include <src/display/lv_display.h>
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
@@ -106,9 +107,10 @@ void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t hei
     dsc->texture_id = new_texture;
 }
 
-lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display, int32_t w, int32_t h)
+lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display)
 {
-    return init_display(display, w, h);
+    return init_display(display, lv_display_get_horizontal_resolution(display),
+                        lv_display_get_vertical_resolution(display));
 }
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)

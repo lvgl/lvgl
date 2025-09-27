@@ -38,8 +38,13 @@ extern "C" {
 
 
 typedef struct {
-    int32_t hres;
-    int32_t vres;
+    int32_t max_width;
+    int32_t max_height;
+    int32_t buffer_size;
+    int32_t depth;
+    int32_t stencil;
+    int32_t samples;
+    int32_t surface_type;
     lv_color_format_t cf;
 } lv_egl_config_t;
 
@@ -64,11 +69,13 @@ typedef struct {
     lv_egl_select_config_t select_config;
     void * driver_data;
     uint16_t egl_platform;
+    void * native_window;
+    lv_create_window_t create_window_cb;
+    lv_egl_flip_t flip_cb;
 } lv_egl_interface_t;
 
 typedef struct {
     EGLNativeDisplayType native_display;
-    EGLNativeWindowType egl_native_window;
     EGLDisplay egl_display;
     EGLConfig  egl_config;
     EGLContext egl_context;
