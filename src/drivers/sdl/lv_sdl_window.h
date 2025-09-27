@@ -35,7 +35,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
- struct SDL_Window;
+struct SDL_Window;
 
 /**********************
  * GLOBAL PROTOTYPES

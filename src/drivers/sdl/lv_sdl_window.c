@@ -221,7 +221,7 @@ struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp)
         return NULL;
     }
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    if (!dsc) {
+    if(!dsc) {
         LV_LOG_ERROR("invalid driver data");
         return NULL;
     }
