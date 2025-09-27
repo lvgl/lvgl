@@ -14,6 +14,7 @@
 #include <src/drivers/opengles/lv_opengles_egl.h>
 #include <src/drivers/opengles/lv_opengles_texture_private.h>
 #include <src/lv_conf_internal.h>
+#include <src/misc/lv_array.h>
 #include <src/misc/lv_color.h>
 #include <src/misc/lv_event.h>
 #include <src/misc/lv_types.h>
@@ -58,7 +59,8 @@ static drmModeEncoder * drm_get_encoder(lv_drm_ctx_t * ctx);
 static drmModeCrtc * drm_get_crtc(lv_drm_ctx_t * ctx);
 static lv_color_format_t drm_get_default_color_format(lv_drm_ctx_t * ctx);
 static uint32_t drm_color_format(lv_color_format_t cf);
-static bool drm_create_window(void * driver_data, const lv_native_window_properties_t * window_properties);
+static void * drm_create_window(void * driver_data, const lv_native_window_properties_t * properties);
+static void drm_destroy_window(void * driver_data, void * native_window);
 
 /**********************
  *  STATIC VARIABLES
@@ -799,9 +801,9 @@ static lv_egl_interface_t drm_get_egl_interface(lv_drm_ctx_t * ctx)
         .select_config = drm_egl_select_config_cb,
         .driver_data = ctx,
         .egl_platform = EGL_PLATFORM_GBM_KHR,
-        .native_window = ctx->gbm_surface,
         .flip_cb = drm_flip_cb,
         .create_window_cb = drm_create_window,
+        .destroy_window_cb = drm_destroy_window,
     };
 }
 
@@ -978,9 +980,9 @@ static uint64_t * drm_get_format_mods(int drm_fd, uint32_t format, uint32_t crtc
             if(modifiers[m].formats & fmt_mask) {
                 if(mods_len + 1 > mods_cap) {
                     size_t new_cap = mods_cap == 0 ? 8 : mods_cap * 2;
-                    uint64_t * tmp = realloc(mods_arr, new_cap * sizeof(uint64_t));
+                    uint64_t * tmp = lv_realloc(mods_arr, new_cap * sizeof(uint64_t));
                     if(!tmp) {
-                        free(mods_arr);
+                        lv_free(mods_arr);
                         mods_arr = NULL;
                         mods_cap = mods_len = 0;
                         break;
@@ -1002,14 +1004,14 @@ static uint64_t * drm_get_format_mods(int drm_fd, uint32_t format, uint32_t crtc
     drmModeFreePlaneResources(res);
 
     if(mods_len == 0) {
-        free(mods_arr);
+        lv_free(mods_arr);
         *out_count = 0;
         return NULL;
     }
 
     /* shrink to fit */
     {
-        uint64_t * tmp = realloc(mods_arr, mods_len * sizeof(uint64_t));
+        uint64_t * tmp = lv_realloc(mods_arr, mods_len * sizeof(uint64_t));
         if(tmp) mods_arr = tmp;
     }
 
@@ -1054,7 +1056,7 @@ static uint32_t drm_color_format(lv_color_format_t cf)
     }
 }
 
-static bool drm_create_window(void * driver_data, const lv_native_window_properties_t * properties)
+static void * drm_create_window(void * driver_data, const lv_native_window_properties_t * properties)
 {
 
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
@@ -1065,49 +1067,53 @@ static bool drm_create_window(void * driver_data, const lv_native_window_propert
                                                  ctx->drm_crtc->crtc_id));
 
     uint32_t format = properties->visual_id;
-    size_t drm_mods_count = 0;
-    uint64_t * drm_mods_buffer = drm_get_format_mods(ctx->fd, format, crtc_index, &drm_mods_count);
-    lv_array_t validated_mods_struct;
-    lv_array_t * validated_mods = &validated_mods_struct;
-    lv_array_init(validated_mods, 1, sizeof(uint64_t));
+    lv_array_t valid_mods;
+    lv_array_init(&valid_mods, 0, sizeof(uint64_t));
+    if(properties->mod_count != 0) {
+        size_t drm_mods_count = 0;
+        uint64_t * drm_mods = drm_get_format_mods(ctx->fd, format, crtc_index, &drm_mods_count);
 
-    if(lv_array_size(&properties->modifiers) != 0) {
+
         for(size_t di = 0; di < drm_mods_count; ++di) {
-            uint64_t mod = drm_mods_buffer[di];
-            for(size_t i = 0; i < lv_array_size(&properties->modifiers); ++i) {
-                uint64_t pm = *(uint64_t *)lv_array_at(&properties->modifiers, i);
-                if(mod == pm) {
-                    lv_array_push_back(validated_mods, lv_array_at(&properties->modifiers, i));
+            uint64_t mod = drm_mods[di];
+            for(size_t i = 0; i < properties->mod_count; ++i) {
+                if(mod == properties->mods[i]) {
+                    lv_array_push_back(&valid_mods, &properties->mods[i]);
                 }
             }
         }
+        free(drm_mods);
     }
-    free(drm_mods_buffer);
+    const bool has_valid_mods = lv_array_size(&valid_mods) >= 1 &&
+                                *(uint64_t *)lv_array_at(&valid_mods, 0) != DRM_FORMAT_MOD_INVALID;
 
-    if(lv_array_is_empty(validated_mods) ||
-       (lv_array_size(validated_mods) == 1 && (*(uint64_t *)lv_array_at(validated_mods, 0)) == DRM_FORMAT_MOD_INVALID)) {
+    if(!has_valid_mods) {
         ctx->gbm_surface = gbm_surface_create(ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay, format,
                                               GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
     }
     else {
         ctx->gbm_surface = gbm_surface_create_with_modifiers2(
                                ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay,
-                               format, (const uint64_t *)lv_array_at(validated_mods, 0), lv_array_size(validated_mods),
+                               format, (uint64_t *)valid_mods.data, lv_array_size(&valid_mods),
                                GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
     }
+    lv_array_deinit(&valid_mods);
 
     if(!ctx->gbm_surface) {
         LV_LOG_ERROR("Failed to create GBM surface");
-        lv_array_deinit(validated_mods);
-        return false;
+        return NULL;
     }
+    LV_LOG_USER("GBM surface on initialization: %p", ctx->gbm_surface);
 
-    LV_LOG_USER("Created gbm_surface with format=0x%x and %s modifiers",
-                format, lv_array_is_empty(validated_mods) ? "implicit" : "explicit");
+    return (void *)ctx->gbm_surface;
 
-    lv_array_deinit(validated_mods);
-    return true;
-
+}
+static void drm_destroy_window(void * driver_data, void * native_window)
+{
+    lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
+    LV_ASSERT(native_window == ctx->gbm_surface);
+    gbm_surface_destroy(ctx->gbm_surface);
+    ctx->gbm_surface = NULL;
 }
 
 // ########################################################################

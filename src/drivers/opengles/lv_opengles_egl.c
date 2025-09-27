@@ -8,6 +8,7 @@
  *********************/
 #include "lv_opengles_egl.h"
 #include <EGL/egl.h>
+#include <stdint.h>
 
 #if LV_USE_EGL
 
@@ -56,6 +57,9 @@ static EGLConfig create_egl_config(lv_egl_ctx_t * ctx);
 static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config);
 
+static void * create_window(lv_egl_ctx_t * ctx);
+static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count);
+
 static GLADapiproc glad_egl_load_cb(void * userdata, const char * name);
 
 typedef struct {
@@ -89,16 +93,12 @@ lv_egl_ctx_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interfa
         return NULL;
     }
     ctx->interface = *interface;
-
-    lv_array_init(&ctx->fbos, 1, sizeof(lv_egl_adapter_fbo_t));
-    lv_array_init(&ctx->fbos_syncs, 1, sizeof(lv_egl_adapter_sync_t));
+    ctx->vsync = true;
 
     lv_result_t res = load_egl(ctx);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to load egl ");
         lv_free(ctx);
-        lv_array_deinit(&ctx->fbos);
-        lv_array_deinit(&ctx->fbos_syncs);
         return NULL;
     }
     return ctx;
@@ -128,35 +128,7 @@ void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
 {
     LV_LOG_USER("%p %p %p", eglSwapBuffers, ctx->egl_display, ctx->egl_surface);
     eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
-    ctx->interface.flip_cb(ctx->interface.driver_data, true);
-    return;
-#if 0
-    if(ctx->is_sync_supported) {
-        lv_egl_adapter_destroy_sync((lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
-                                                                         interface->offscreen_fbo_index));
-        lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
-                        lv_egl_adapter_create_sync(interface->egl_adapter));
-    }
-    else {
-#endif
-        glFinish();
-
-#if 0
-    }
-    ctx->offscreen_fbo_index = (ctx->offscreen_fbo_index + 1) % ctx->offscreen_fbo_count;
-    lv_egl_adapter_sync_t * current_sync = (lv_egl_adapter_sync_t *)lv_array_at(interface->fbos_syncs,
-                                                                                interface->offscreen_fbo_index);
-    if(current_sync) {
-        lv_egl_adapter_sync_wait(current_sync);
-        lv_egl_adapter_destroy_sync(current_sync);
-        current_sync = NULL;
-        lv_array_assign(interface->fbos_syncs, interface->offscreen_fbo_index,
-                        lv_egl_adapter_create_sync(interface->egl_adapter));
-    }
-#endif
-    lv_egl_adapter_fbo_t * fbo = (lv_egl_adapter_fbo_t *)lv_array_at(&ctx->fbos, ctx->offscreen_fbo_index);
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, fbo->fbo));
-
+    ctx->interface.flip_cb(ctx->interface.driver_data, ctx->vsync);
 }
 
 
@@ -229,6 +201,12 @@ static lv_result_t load_egl(lv_egl_ctx_t * ctx)
         goto egl_config_err;
     }
 
+    ctx->native_window = create_window(ctx);
+    if(!ctx->native_window) {
+        LV_LOG_ERROR("Failed to create native window");
+        goto create_window_err;
+
+    }
     LV_LOG_USER("Creating egl surface");
     ctx->egl_surface = create_egl_surface(ctx);
     if(!ctx->egl_surface) {
@@ -265,9 +243,6 @@ static lv_result_t load_egl(lv_egl_ctx_t * ctx)
     glViewport(0, 0, 1024, 600);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-#if 0
-#endif
-    LV_LOG_USER("EGL clear");
 
     lv_opengles_egl_clear(ctx);
 
@@ -281,6 +256,9 @@ egl_make_current_context_err:
 egl_context_err:
     ctx->egl_surface = NULL;
 egl_surface_err:
+    ctx->interface.destroy_window_cb(ctx->interface.driver_data, ctx->native_window);
+    ctx->native_window = NULL;
+create_window_err:
     ctx->egl_config = NULL;
 egl_config_err:
     dlclose(ctx->opengl_lib_handle);
@@ -433,9 +411,10 @@ static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx)
 {
     LV_ASSERT_NULL(ctx->egl_display);
     LV_ASSERT_NULL(ctx->egl_config);
-    LV_LOG_USER("Create egl surface %p %p %p", ctx->egl_display, ctx->egl_config, ctx->interface.native_window);
+    LV_ASSERT_NULL(ctx->native_window);
+    LV_LOG_USER("Create egl surface %p %p %p", ctx->egl_display, ctx->egl_config, ctx->native_window);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config,
-                                  (EGLNativeWindowType)ctx->interface.native_window,
+                                  (EGLNativeWindowType)ctx->native_window,
                                   NULL);
 }
 
@@ -508,6 +487,64 @@ static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_conf
     lv_egl_config->stencil = stencil;
     lv_egl_config->samples = samples;
     lv_egl_config->surface_type = surface_type;
+    return LV_RESULT_OK;
+}
+
+static void * create_window(lv_egl_ctx_t * ctx)
+{
+    EGLint native_config_id;
+    uint64_t * mods;
+    size_t mod_count;
+    lv_result_t res = get_native_config(ctx, &native_config_id, &mods, &mod_count);
+
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_ERROR("Failed to get native config");
+        return NULL;
+    }
+
+    lv_native_window_properties_t properties = {
+        .mods = mods,
+        .mod_count = mod_count,
+        .visual_id = native_config_id,
+    };
+
+    void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
+    if(!native_window) {
+        LV_LOG_ERROR("Faield to create window");
+        lv_free(mods);
+        return NULL;
+    }
+    lv_free(mods);
+    return native_window;
+}
+
+static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count)
+{
+    EGLint num_mods;
+
+    if(!eglGetConfigAttrib(ctx->egl_display, ctx->egl_config, EGL_NATIVE_VISUAL_ID, native_id)) {
+        LV_LOG_ERROR("Failed to get native visual id for egl config");
+        return LV_RESULT_INVALID;
+    }
+
+    if(!eglQueryDmaBufModifiersEXT || !eglQueryDmaBufModifiersEXT(ctx->egl_display, *native_id, 0, NULL, NULL, &num_mods)) {
+        LV_LOG_WARN("Failed to get native modifiers");
+        return LV_RESULT_OK;
+    }
+
+    if(num_mods <= 0) {
+        LV_LOG_INFO("No native modifiers");
+        return LV_RESULT_OK;
+    }
+
+    *mods = lv_malloc(num_mods * sizeof(*mods));
+    LV_ASSERT_MALLOC(mods);
+    eglQueryDmaBufModifiersEXT(ctx->egl_display, *native_id, num_mods, *mods, NULL, &num_mods);
+    if(*mods[0] == 0) {
+        lv_free(mods);
+        return LV_RESULT_OK;
+    }
+    *count = (size_t) num_mods;
     return LV_RESULT_OK;
 }
 

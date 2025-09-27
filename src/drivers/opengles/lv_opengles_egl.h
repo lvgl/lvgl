@@ -53,13 +53,15 @@ typedef struct  {
     int height;
     bool fullscreen;
     intptr_t visual_id;
-    lv_array_t modifiers; /* ownership: caller owns; lv_egl_adapter_outmod_drm may read it but will not free */
+    uint64_t * mods;
+    size_t mod_count;
 } lv_native_window_properties_t;
 
 typedef void * (*lv_egl_init_display_t)(void * driver_data, int32_t width, int32_t height);
 typedef void * (*lv_egl_get_display_t)(void * driver_data);
-typedef bool (*lv_create_window_t)(void * driver_data, const lv_native_window_properties_t  * properties);
-typedef void * (*lv_egl_get_window_t)(void * driver_data, const lv_native_window_properties_t * properties);
+typedef void * (*lv_create_window_t)(void * driver_data, const lv_native_window_properties_t  * properties);
+typedef void (*lv_destroy_window_t)(void * driver_data, void * native_window);
+
 typedef void (*lv_egl_set_visible_t)(void * driver_data, bool v);
 typedef void (*lv_egl_flip_t)(void * driver_data, bool vsync);
 typedef void (*lv_egl_native_state_deinit_t)(void ** driver_data);
@@ -69,8 +71,8 @@ typedef struct {
     lv_egl_select_config_t select_config;
     void * driver_data;
     uint16_t egl_platform;
-    void * native_window;
     lv_create_window_t create_window_cb;
+    lv_destroy_window_t destroy_window_cb;
     lv_egl_flip_t flip_cb;
 } lv_egl_interface_t;
 
@@ -82,6 +84,7 @@ typedef struct {
     EGLSurface egl_surface;
     void * egl_lib_handle;
     void * opengl_lib_handle;
+    void * native_window;
     lv_egl_interface_t interface;
 
     int32_t width;
@@ -91,11 +94,10 @@ typedef struct {
     int offscreen_fbo_index;
     bool is_sync_supported;
     bool is_window_initialized;
-    lv_array_t fbos;
-    lv_array_t fbos_syncs;
     GLuint depth_texture;
     GLenum format_color;
     GLenum format_depth;
+    bool vsync;
 } lv_egl_ctx_t;
 
 /**********************
