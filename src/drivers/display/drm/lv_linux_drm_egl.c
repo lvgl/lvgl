@@ -562,6 +562,13 @@ lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
     LV_ASSERT(ctx->drm_connector->count_modes > 0);
     /* During testing, the first mode is always the screen resolution so we use that*/
     ctx->drm_mode = &ctx->drm_connector->modes[0];
+    for(int i = 0; i < ctx->drm_connector->count_modes; ++i) {
+        float refresh_hertz = (ctx->drm_connector->modes[i].clock * 1000.f) / (float)(ctx->drm_connector->modes[i].htotal *
+                                                                                      ctx->drm_connector->modes[i].vtotal);
+
+        LV_LOG_USER("Found modes %dx%d @ %f", ctx->drm_connector->modes[i].hdisplay,  ctx->drm_connector->modes[i].vdisplay,
+                    refresh_hertz);
+    }
 
     ctx->drm_encoder = drm_get_encoder(ctx);
     if(!ctx->drm_encoder) {
