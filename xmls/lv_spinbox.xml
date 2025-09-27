@@ -1,6 +1,6 @@
 <!--
 Example
-<lv_slider mode="range" value="30"/>
+<lv_spinbox digit_count="5" dec_point_pos="3" value="12345"/>
  -->
 
 <widget>

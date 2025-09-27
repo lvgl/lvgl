@@ -110,7 +110,7 @@ void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value);
 /**
  * Set the maximum value
  * @param obj       pointer to spinbox
- * @param min_value the maximum value
+ * @param max_value the maximum value
  */
 void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value);
 
