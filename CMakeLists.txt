@@ -37,8 +37,15 @@ endif()
     We can do this by using CMakes INTERFACE and PRIVATE keyword.
   ]]
 if (MSVC)
-  target_compile_definitions(lvgl
-    INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
-    PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
-  )
+  if (BUILD_SHARED_LIBS)
+    target_compile_definitions(lvgl
+      INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec(dllimport)
+      PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec(dllexport)
+    )
+  else()
+    target_compile_definitions(lvgl
+      INTERFACE LV_ATTRIBUTE_EXTERN_DATA=
+      PRIVATE LV_ATTRIBUTE_EXTERN_DATA=
+    )
+  endif()
 endif()
