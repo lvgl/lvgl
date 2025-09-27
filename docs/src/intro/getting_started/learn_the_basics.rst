@@ -315,7 +315,7 @@ After that, properties can be added to configure the style. For example:
     lv_style_set_bg_color(&style1, lv_color_hex(0xa03080));
     lv_style_set_border_width(&style1, 2);
 
-See :ref:`style_properties_overview` for more details.
+See :ref:`styles_overview` for more details.
 
 See :ref:`style_properties` to see the full list.
 

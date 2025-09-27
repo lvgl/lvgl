@@ -7,12 +7,17 @@ Common Widget Features
 The following details apply to all types of Widgets.
 
 .. toctree::
-    :maxdepth:  3
+    :maxdepth:  2
 
     basics
+    api
+    tree
+    screens
     coordinates
+    parts_and_states
     layers
     styles/index
     events
+    flags
     layouts/index
     scrolling

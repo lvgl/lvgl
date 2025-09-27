@@ -8,7 +8,7 @@ Main Modules
     :maxdepth: 2
 
     display/index
-    indev
+    indev/index
     color
     font
     image

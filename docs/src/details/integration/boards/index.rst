@@ -6,8 +6,7 @@ Board Support
 
 
 .. toctree::
-    :class:    toctree-1-deep
-    :maxdepth: 1
+    :maxdepth: 2
 
 
     lvgl_supported
