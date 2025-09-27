@@ -315,9 +315,15 @@ lv_result_t lv_xml_component_unregister(const char * name)
 
     lv_xml_timeline_t * timeline;
     LV_LL_READ(&scope->timeline_ll, timeline) {
-        lv_anim_t * a;
-        LV_LL_READ(&timeline->anims_ll, a) {
-            lv_free(a->var); /*It was the name of the target object*/
+        lv_xml_anim_timeline_child_t * child;
+        LV_LL_READ(&timeline->anims_ll, child) {
+            if(child->is_anim) {
+                lv_free(child->data.anim.var); /*It was the name of the target object*/
+            }
+            else {
+                lv_free((void *) child->data.incl.target_name);
+                lv_free((void *) child->data.incl.timeline_name);
+            }
         }
         lv_ll_clear(&timeline->anims_ll);
         lv_free((char *)timeline->name);
@@ -579,11 +585,6 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     int32_t start = anim_value_to_int(prop_type, start_str);
     int32_t end = anim_value_to_int(prop_type, end_str);
 
-    lv_xml_timeline_t * at = state->context;
-    if(at == NULL) {
-        LV_LOG_WARN("There was no parent timeline for the animation");
-        return;
-    }
 
     if(target_str[0] == '#') target_str = lv_xml_get_const(&state->scope, &target_str[1]);
     if(prop_str[0] == '#') prop_str = lv_xml_get_const(&state->scope, &prop_str[1]);
@@ -593,6 +594,12 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     if(delay_str[0] == '#') delay_str = lv_xml_get_const(&state->scope, &delay_str[1]);
     if(early_apply_str[0] == '#') early_apply_str = lv_xml_get_const(&state->scope, &early_apply_str[1]);
 
+    lv_xml_timeline_t * at = state->context;
+    if(at == NULL) {
+        LV_LOG_WARN("There was no parent timeline for the animation");
+        return;
+    }
+
     if(!target_str || !prop_str || !start_str || !end_str || !duration_str || !delay_str || !early_apply_str) {
         LV_LOG_WARN("Couldn't resolve one or more constants. Skipping the animation.");
         return;
@@ -600,7 +607,9 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
 
     uint32_t selector_and_prop = ((prop & 0xff) << 24) | selector;
 
-    lv_anim_t * a = lv_ll_ins_tail(&at->anims_ll);
+    lv_xml_anim_timeline_child_t * child = lv_ll_ins_tail(&at->anims_ll);
+    child->is_anim = true;
+    lv_anim_t * a = &child->data.anim;
 
     lv_anim_init(a);
     lv_anim_set_var(a, lv_strdup(target_str));
@@ -610,6 +619,61 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     lv_anim_set_delay(a, lv_xml_atoi(delay_str));
     lv_anim_set_early_apply(a, lv_xml_to_bool(early_apply_str));
     lv_anim_set_user_data(a, (void *)((uintptr_t)selector_and_prop));
+}
+
+static void process_include_timeline_element(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    lv_xml_timeline_t * at = state->context;
+    if(at == NULL) {
+        LV_LOG_INFO("No parent timeline is set, skipping");
+        return;
+    }
+
+    const char * target_str = lv_xml_get_value_of(attrs, "target");
+    const char * timeline_str = lv_xml_get_value_of(attrs, "timeline");
+    const char * delay_str = lv_xml_get_value_of(attrs, "delay");
+
+
+    if(target_str == NULL) {
+        LV_LOG_WARN("'target' is missing from timeline include");
+        return;
+    }
+
+    if(timeline_str == NULL) {
+        LV_LOG_WARN("'timeline' is missing from timeline include");
+        return;
+    }
+
+    if(delay_str == NULL) delay_str = "0";
+    if(target_str[0] == '#') target_str = lv_xml_get_const(&state->scope, &target_str[1]);
+    if(timeline_str[0] == '#') timeline_str = lv_xml_get_const(&state->scope, &timeline_str[1]);
+    if(delay_str[0] == '#') delay_str = lv_xml_get_const(&state->scope, &delay_str[1]);
+
+    if(!target_str || !timeline_str || !delay_str) {
+        LV_LOG_WARN("Couldn't resolve one or more constants. Skipping the timeline include.");
+        return;
+    }
+
+    lv_xml_anim_timeline_child_t * child = lv_ll_ins_tail(&at->anims_ll);
+    LV_ASSERT_MALLOC(child);
+    if(child == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+        return;
+    }
+
+    child->is_anim = false;
+    child->data.incl.delay = lv_xml_atoi(delay_str);
+    child->data.incl.target_name = lv_strdup(target_str);
+    LV_ASSERT_MALLOC(child->data.incl.target_name);
+    child->data.incl.timeline_name = lv_strdup(timeline_str);
+    LV_ASSERT_MALLOC(child->data.incl.timeline_name);
+
+    if(child->data.incl.target_name == NULL || child->data.incl.timeline_name == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+        lv_free((void *)child->data.incl.target_name);
+        lv_free((void *)child->data.incl.timeline_name);
+        lv_ll_remove(&at->anims_ll, child);
+    }
 }
 
 static void process_grad_element(lv_xml_parser_state_t * state, const char * tag_name, const char ** attrs)
@@ -845,6 +909,9 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
             break;
         case LV_XML_PARSER_SECTION_ANIMATION:
             process_animation_element(state, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_INCLUDE_TIMELINE:
+            process_include_timeline_element(state, attrs);
             break;
         default:
             break;
