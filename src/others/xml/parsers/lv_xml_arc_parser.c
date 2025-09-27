@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_arc_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_ARC
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"

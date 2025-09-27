@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_table_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_TABLE
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"

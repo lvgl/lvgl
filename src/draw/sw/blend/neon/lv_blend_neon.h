@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "lv_draw_sw_blend_neon_to_rgb565.h"
+#include "lv_draw_sw_blend_neon_to_rgb888.h"
 
 /*********************
  *      DEFINES

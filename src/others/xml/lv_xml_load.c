@@ -7,15 +7,23 @@
  *      INCLUDES
  *********************/
 
-#include "lv_xml_load.h"
+#include "lv_xml_load_private.h"
 #if LV_USE_XML
 
 #include "lv_xml_private.h"
+#include "../../core/lv_global.h"
+#include "../../misc/lv_fs.h"
+#include "../../libs/fsdrv/lv_fsdrv.h"
+#include "../../misc/lv_ll.h"
 #include "../../libs/expat/expat.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#define xml_loads LV_GLOBAL_DEFAULT()->xml_loads
+#define PATH_PREFIX_BUF_SIZE 32
+#define PATH_PREFIX_FMT      "__LV_XML_%p"
 
 /**********************
  *      TYPEDEFS
@@ -30,16 +38,20 @@ typedef enum {
 typedef struct {
     XML_Parser parser;
     lv_xml_type_t type;
-} load_from_file_parser_data_t;
+} load_from_path_parser_data_t;
+
+struct _lv_xml_load_t {
+    const void * blob;
+};
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
 static lv_result_t load_all_recursive(char * path_buf, const char * path);
-static void load_from_file(const char * path);
+static void load_from_path(const char * path);
 static char * path_filename_without_extension(const char * path);
-static void load_from_file_start_element_handler(void * user_data, const char * name, const char ** attrs);
+static void load_from_path_start_element_handler(void * user_data, const char * name, const char ** attrs);
 
 /**********************
  *  STATIC VARIABLES
@@ -52,6 +64,18 @@ static void load_from_file_start_element_handler(void * user_data, const char * 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void lv_xml_load_init(void)
+{
+    lv_ll_init(&xml_loads, sizeof(lv_xml_load_t));
+}
+
+void lv_xml_load_deinit(void)
+{
+#if LV_USE_FS_FROGFS
+    lv_xml_unload(NULL);
+#endif
+}
 
 lv_result_t lv_xml_load_all_from_path(const char * path)
 {
@@ -70,6 +94,93 @@ lv_result_t lv_xml_load_all_from_path(const char * path)
 
     return load_all_recursive(path_buf, path);
 }
+
+#if LV_USE_FS_FROGFS
+lv_xml_load_t * lv_xml_load_all_from_data(const void * buf, uint32_t buf_size)
+{
+    LV_UNUSED(buf_size); /* keep it as a parameter for future implementations */
+
+    lv_xml_load_t * load = lv_ll_ins_head(&xml_loads);
+    LV_ASSERT_MALLOC(load);
+    if(load == NULL) return NULL;
+    lv_memzero(load, sizeof(*load));
+
+    char path_prefix_with_letter[PATH_PREFIX_BUF_SIZE];
+    lv_snprintf(path_prefix_with_letter, sizeof(path_prefix_with_letter), "%c:"PATH_PREFIX_FMT, LV_FS_FROGFS_LETTER, load);
+    char * path_prefix = path_prefix_with_letter + 2;
+
+    lv_result_t res = lv_fs_frogfs_register_blob(buf, path_prefix);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("could not register the XML data blob");
+        lv_ll_remove(&xml_loads, load);
+        lv_free(load);
+        return NULL;
+    }
+
+    res = lv_xml_load_all_from_path(path_prefix_with_letter);
+    if(res != LV_RESULT_OK) {
+        lv_fs_frogfs_unregister_blob(path_prefix);
+        lv_ll_remove(&xml_loads, load);
+        lv_free(load);
+        return NULL;
+    }
+
+    return load;
+}
+
+lv_xml_load_t * lv_xml_load_all_from_file(const char * file_path)
+{
+    lv_fs_res_t fs_res;
+
+    uint32_t blob_size;
+    fs_res = lv_fs_path_get_size(file_path, &blob_size);
+    if(fs_res != LV_FS_RES_OK) {
+        LV_LOG_WARN("could not get the size of the file to load XML data from");
+        return NULL;
+    }
+
+    void * blob = lv_malloc(blob_size);
+    LV_ASSERT_MALLOC(blob);
+    if(blob == NULL) {
+        LV_LOG_WARN("could not allocate memory for the XML file blob");
+        return NULL;
+    }
+
+    fs_res = lv_fs_load_to_buf(blob, blob_size, file_path);
+    if(fs_res != LV_FS_RES_OK) {
+        LV_LOG_WARN("could not read the XML file blob");
+        lv_free(blob);
+        return NULL;
+    }
+
+    lv_xml_load_t * load = lv_xml_load_all_from_data(blob, blob_size);
+    if(load == NULL) {
+        lv_free(blob);
+        return NULL;
+    }
+
+    load->blob = blob;
+
+    return load;
+}
+
+void lv_xml_unload(lv_xml_load_t * load)
+{
+    if(load == NULL) {
+        lv_ll_clear_custom(&xml_loads, (void (*)(void *)) lv_xml_unload);
+        return;
+    }
+
+    char path_prefix[PATH_PREFIX_BUF_SIZE];
+    lv_snprintf(path_prefix, sizeof(path_prefix), PATH_PREFIX_FMT, load);
+
+    lv_fs_frogfs_unregister_blob(path_prefix);
+
+    lv_free((void *) load->blob); /* it may be NULL */
+    lv_ll_remove(&xml_loads, load);
+    lv_free(load);
+}
+#endif /*LV_USE_FS_FROGFS*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -108,7 +219,7 @@ static lv_result_t load_all_recursive(char * path_buf, const char * path)
             ret = load_all_recursive(path_buf, full_path);
         }
         else {
-            load_from_file(full_path);
+            load_from_path(full_path);
         }
 
         lv_free(full_path);
@@ -128,7 +239,7 @@ dir_close_out:
     return ret;
 }
 
-static void load_from_file(const char * path)
+static void load_from_path(const char * path)
 {
     const char * ext = lv_fs_get_ext(path);
 
@@ -170,7 +281,7 @@ static void load_from_file(const char * path)
         /* Null-terminate the buffer */
         xml_buf[rn] = '\0';
 
-        load_from_file_parser_data_t parser_data;
+        load_from_path_parser_data_t parser_data;
 
         XML_Memory_Handling_Suite mem_handlers;
         mem_handlers.malloc_fcn = lv_malloc;
@@ -180,7 +291,7 @@ static void load_from_file(const char * path)
         parser_data.parser = parser;
         parser_data.type = LV_XML_TYPE_UNKNOWN;
         XML_SetUserData(parser, &parser_data);
-        XML_SetStartElementHandler(parser, load_from_file_start_element_handler);
+        XML_SetStartElementHandler(parser, load_from_path_start_element_handler);
 
         /* Parse the XML */
         enum XML_Status parser_res = XML_Parse(parser, xml_buf, file_size, XML_TRUE);
@@ -232,10 +343,10 @@ static char * path_filename_without_extension(const char * path)
     return filename;
 }
 
-static void load_from_file_start_element_handler(void * user_data, const char * name, const char ** attrs)
+static void load_from_path_start_element_handler(void * user_data, const char * name, const char ** attrs)
 {
     LV_UNUSED(attrs);
-    load_from_file_parser_data_t * data = user_data;
+    load_from_path_parser_data_t * data = user_data;
 
     if(lv_streq(name, "component") || lv_streq(name, "screen") || lv_streq(name, "globals")) {
         data->type = LV_XML_TYPE_COMPONENT;

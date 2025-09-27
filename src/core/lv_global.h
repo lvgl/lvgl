@@ -193,6 +193,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t arduino_sd_fs_drv;
 #endif
 
+#if LV_USE_FS_FROGFS
+    lv_fs_drv_t frogfs_fs_drv;
+#endif
+
 #if LV_USE_FREETYPE
     struct _lv_freetype_context_t * ft_context;
 #endif
@@ -267,6 +271,7 @@ typedef struct _lv_global_t {
 #if LV_USE_XML
     const char * xml_path_prefix;
     uint32_t lv_event_xml_store_timeline;
+    lv_ll_t xml_loads;
 #endif
 
 #if LV_USE_DRAW_EVE
