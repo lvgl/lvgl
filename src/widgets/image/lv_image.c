@@ -295,7 +295,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
         angle = 0;
     }
     else {
@@ -340,7 +340,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
         x = 0;
         y = 0;
     }
@@ -401,7 +401,7 @@ void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_x && zoom == img->scale_y) return;
 
@@ -417,7 +417,7 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_x) return;
 
@@ -433,7 +433,7 @@ void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_y) return;
 
@@ -898,7 +898,7 @@ static void draw_image(lv_event_t * e)
             draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
 
             lv_area_t coords;
-            if(img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+            if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
                 coords = draw_dsc.image_area;
             }
@@ -941,7 +941,7 @@ static void draw_image(lv_event_t * e)
             const bool needs_inner_alignment = img->align > LV_IMAGE_ALIGN_TOP_LEFT
                                                && !image_area_is_same_as_coords;
             const bool has_offset = img->offset.x || img->offset.y;
-            const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
+            const bool inner_alignment_is_transforming = img->align >= _LV_IMAGE_ALIGN_AUTO_TRANSFORM;
             if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
                 lv_point_t text_size;
 
