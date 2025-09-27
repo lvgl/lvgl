@@ -138,7 +138,6 @@ typedef struct {
 } dmabuf_ctx_t;
 
 typedef struct {
-    lv_draw_buf_t * lv_draw_buf;
     struct wl_shm * handler;
     uint32_t format;
 } shm_ctx_t;
@@ -185,8 +184,9 @@ struct window {
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
 
-    lv_wayland_display_close_f_t close_cb;
+    lv_draw_buf_t * lv_draw_buf;
 
+    lv_wayland_display_close_f_t close_cb;
     struct lv_wayland_context * wl_ctx;
 
     struct xdg_surface * xdg_surface;
@@ -316,7 +316,7 @@ void lv_wayland_shm_set_interface(shm_ctx_t * context, struct wl_registry * regi
 
 struct graphic_object * lv_wayland_shm_on_graphical_object_creation(shm_ctx_t * context, struct graphic_object * obj);
 void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct graphic_object * obj);
-lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display);
+lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display, struct window * window);
 lv_result_t lv_wayland_shm_create_draw_buffers(shm_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * window, int32_t width, int32_t height);
 lv_result_t lv_wayland_shm_is_ready(shm_ctx_t * context);

@@ -125,6 +125,7 @@ void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct 
 
 lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * window, int32_t width, int32_t height)
 {
+    LV_UNUSED(context);
     const uint8_t bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
     /* Update size for newly allocated buffers */
@@ -156,36 +157,37 @@ lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * wi
     if(window->lv_disp != NULL) {
         /* Resize draw buffer */
         const uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(window->lv_disp));
-        context->lv_draw_buf  = lv_draw_buf_reshape(context->lv_draw_buf, lv_display_get_color_format(window->lv_disp),
-                                                    width, height / LVGL_DRAW_BUFFER_DIV, stride);
+        window->lv_draw_buf = lv_draw_buf_reshape(window->lv_draw_buf, lv_display_get_color_format(window->lv_disp),
+                                                  width, height / LVGL_DRAW_BUFFER_DIV, stride);
     }
 
     return LV_RESULT_OK;
 }
 lv_result_t lv_wayland_shm_create_draw_buffers(shm_ctx_t * context, struct window * window)
 {
-
+    LV_UNUSED(context);
     const uint32_t stride = lv_draw_buf_width_to_stride(window->width, lv_display_get_color_format(window->lv_disp));
 
-    context->lv_draw_buf = lv_draw_buf_create(window->width, window->height / LVGL_DRAW_BUFFER_DIV,
-                                              lv_display_get_color_format(window->lv_disp), stride);
-    return LV_RESULT_OK;
+    window->lv_draw_buf = lv_draw_buf_create(window->width, window->height / LVGL_DRAW_BUFFER_DIV,
+                                             lv_display_get_color_format(window->lv_disp), stride);
+    return window->lv_draw_buf ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display)
+lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display, struct window * window)
 {
+    LV_UNUSED(context);
     if(LV_WAYLAND_BUF_COUNT != 1) {
         LV_LOG_ERROR("Wayland without dmabuf only supports 1 drawbuffer for now.");
         return LV_RESULT_INVALID;
     }
-    lv_display_set_draw_buffers(display, context->lv_draw_buf, NULL);
+    lv_display_set_draw_buffers(display, window->lv_draw_buf, NULL);
     return LV_RESULT_OK;
 }
 
 void lv_wayland_shm_delete_draw_buffers(shm_ctx_t * context, struct window * window)
 {
-    LV_UNUSED(window);
-    lv_draw_buf_destroy(context->lv_draw_buf);
+    LV_UNUSED(context);
+    if(window->lv_draw_buf) lv_draw_buf_destroy(window->lv_draw_buf);
 }
 void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
