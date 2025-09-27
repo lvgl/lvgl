@@ -23,6 +23,7 @@ Limitations
 
 - Image format, size, and count limit.
 - Font format, size, and count limit.
+- Only 4 bpp fonts are supported for now.
 - The total number of tasks rendered per refresh has an upper limit.
 - Layers are not supported.
 
@@ -193,6 +194,24 @@ It can be called multiple times with different strings.
     lv_draw_eve_pre_upload_font_text(disp, &lv_font_montserrat_48, "The current time is");
     lv_draw_eve_pre_upload_font_range(disp, &lv_font_montserrat_48, '0', '9');
     lv_draw_eve_pre_upload_font_range(disp, &lv_font_montserrat_48, ':', ':');
+
+
+Supported Asset Formats
+-----------------------
+
+The supported image color formats are RGB565, RGB565A8, ARGB8888, and L8. It's good to
+note that RGB565A8 and ARGB8888 are converted to ARGB4444 before being uploaded to EVE. The
+implication of this is that a reduced color depth will be realized on the display compared
+to the original asset. The initial asset upload time may also be longer.
+
+The only supported font format is 4 bpp. If the font's stride is not 1, it will be converted
+to stride 1 before being uploaded to EVE. If the font already has a stride of 1, it will be
+uploaded directly without conversion, which can improve asset upload time.
+
+To generate a font with a specific stride (such as 1), you should use the
+`offline font converter <https://github.com/lvgl/lv_font_conv>`__ and specify a stride
+argument on the command line, e.g. ``--stride 1``. A stride of 0 is the default. This means
+that the bits are packed even across rows, but EVE cannot use fonts that are packed across rows.
 
 
 .. _eve register access:
