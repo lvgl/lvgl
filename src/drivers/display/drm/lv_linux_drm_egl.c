@@ -208,9 +208,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_area_t full_area;
         lv_area_set(&full_area, 0, 0, disp_width, disp_height);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        LV_LOG_USER("Texture id is %d %d %d %d %d %d %d", ctx->texture.texture_id, full_area.x1, full_area.x2,
-                    full_area.y1,
-                    full_area.y2, disp_width, disp_height);
         lv_opengles_viewport(0, 0, disp_width, disp_height);
         lv_opengles_egl_clear(ctx->egl_ctx);
 
@@ -246,7 +243,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
 #elif LV_COLOR_DEPTH == 16
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             dsc->fb1));
+                             ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 24
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
 #elif LV_COLOR_DEPTH == 32
@@ -371,34 +368,6 @@ void * drm_get_display_cb(void * driver_data)
     return (void *)ctx->gbm_dev;
 }
 
-#if 0 /* TODO: Figure out if this is used */
-/* window: populate properties with mode size and return gbm_surface* as void* */
-void * lv_egl_adapter_outmod_drm_window(void * nativedrm_ptr, native_window_properties_t const properties)
-{
-    lv_egl_adapter_outmod_drm_t * drm_out = (lv_egl_adapter_outmod_drm_t *) nativedrm_ptr;
-    if(!drm_out || !properties) return NULL;
-    if(drm_out->drm_mode) {
-        properties->width = drm_out->drm_mode->hdisplay;
-        properties->height = drm_out->drm_mode->vdisplay;
-        properties->fullscreen = true;
-    }
-    else {
-        properties->width = 0;
-        properties->height = 0;
-        properties->fullscreen = false;
-    }
-    properties->visual_id = 0;
-    lv_array_init(&properties->modifiers, 1, sizeof(uint64_t));
-    return (void *) drm_out->gbm_surface;
-}
-
-/* visible: no-op */
-void lv_egl_adapter_outmod_drm_visible(void * nativedrm_ptr, bool v)
-{
-    (void)nativedrm_ptr;
-    (void)v;
-}
-#endif
 void drm_fb_destroy_cb(struct gbm_bo * bo, void * data)
 {
     LV_UNUSED(bo);
@@ -407,7 +376,6 @@ void drm_fb_destroy_cb(struct gbm_bo * bo, void * data)
     free(fb);
 }
 
-/* check_for_page_flip: select() on fd and handle drm events */
 int drm_check_for_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
 {
     fd_set fds;
@@ -550,8 +518,6 @@ void drm_flip_cb(void * driver_data, bool vsync)
             LV_LOG_ERROR("Failed to enqueue page flip: %d", status);
             return;
         }
-
-
         ctx->gbm_bo_flipped = ctx->gbm_bo_pending;
         ctx->gbm_bo_pending = NULL;
     }
@@ -562,75 +528,6 @@ void drm_flip_cb(void * driver_data, bool vsync)
           drm_check_for_page_flip(ctx, -1) >= 0) continue;
 }
 
-#if 0
-bool lv_egl_adapter_outmod_drm_create_window(void * nativedrm_ptr, native_window_properties_t const properties)
-{
-
-    if(!drm_out->gbm_dev) {
-        LV_LOG_ERROR("DRM device has not been initialized!");
-        return false;
-    }
-
-    int crtc_index = (int)(distance_uint32_array(drm_out->drm_resources->crtcs,
-                                                 drm_out->drm_resources->count_crtcs,
-                                                 drm_out->drm_crtc->crtc_id));
-
-    uint32_t format = properties->visual_id;
-    size_t drm_mods_count = 0;
-    uint64_t * drm_mods_buffer = drm_get_format_mods(drm_out->fd, format, crtc_index, &drm_mods_count);
-    lv_array_t validated_mods_struct;
-    lv_array_t * validated_mods = &validated_mods_struct;
-    lv_array_init(validated_mods, 1, sizeof(uint64_t));
-
-    if(lv_array_size(&properties->modifiers) != 0) {
-        for(size_t di = 0; di < drm_mods_count; ++di) {
-            uint64_t mod = drm_mods_buffer[di];
-            for(size_t i = 0; i < lv_array_size(&properties->modifiers); ++i) {
-                uint64_t pm = *(uint64_t *)lv_array_at(&properties->modifiers, i);
-                if(mod == pm) {
-                    lv_array_push_back(validated_mods, lv_array_at(&properties->modifiers, i));
-                }
-            }
-        }
-    }
-    free(drm_mods_buffer);
-
-    if(lv_array_is_empty(validated_mods) ||
-       (lv_array_size(validated_mods) == 1 && (*(uint64_t *)lv_array_at(validated_mods, 0)) == DRM_FORMAT_MOD_INVALID)) {
-        drm_out->gbm_surface = gbm_surface_create(drm_out->gbm_dev, drm_out->drm_mode->hdisplay, drm_out->drm_mode->vdisplay,
-                                                  format, GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-    }
-    else {
-#if HAVE_GBM_SURFACE_CREATE_WITH_MODIFIERS2
-        drm_out->gbm_surface = gbm_surface_create_with_modifiers2(
-                                   drm_out->gbm_dev, drm_out->drm_mode->hdisplay, drm_out->drm_mode->vdisplay,
-                                   format, (const uint64_t *)lv_array_at(validated_mods, 0), lv_array_size(validated_mods),
-                                   GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-#else
-        drm_out->gbm_surface = gbm_surface_create_with_modifiers(drm_out->gbm_dev, drm_out->drm_mode->hdisplay,
-                                                                 drm_out->drm_mode->vdisplay,
-                                                                 format, (const uint64_t *)lv_array_at(validated_mods, 0), lv_array_size(validated_mods));
-#endif
-    }
-
-    if(!drm_out->gbm_surface) {
-        LV_LOG_ERROR("Failed to create GBM surface");
-        lv_array_deinit(validated_mods);
-        return false;
-    }
-
-    LV_LOG_USER("Created gbm_surface with format=0x%x and %s modifiers",
-                format, lv_array_is_empty(validated_mods) ? "implicit" : "explicit");
-
-    lv_array_deinit(validated_mods);
-    return true;
-}
-#endif
-
-inline static int node_path_is_valid(const char * path)
-{
-    return path && path[0] != '\0';
-}
 
 lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
 {
@@ -718,26 +615,27 @@ size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, s
     int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);
     int32_t target_h = lv_display_get_vertical_resolution(ctx->display);
     lv_color_format_t target_cf = lv_display_get_color_format(ctx->display);
-    if(target_cf == LV_COLOR_FORMAT_NATIVE) {
-
-    }
 
     for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_USER("Got config %zu %dx%d cf %d  buffer size %d depth %d  samples %d stencil %d surface type %d",
-                    i,
+        LV_LOG_USER("Got config %zu %#x %dx%d cf %d  buffer size %d depth %d  samples %d stencil %d surface type %d",
+                    i, configs[i].id,
                     configs[i].max_width, configs[i].max_height, configs[i].cf,
                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
     }
 
     for(size_t i = 0; i < config_count; ++i) {
-        if(configs[i].max_width >= target_w &&
-           configs[i].max_height >= target_h &&
-           configs[i].cf == target_cf &&
-           configs[i].surface_type & EGL_WINDOW_BIT
-          ) {
-            LV_LOG_USER("Choosing config %zu", i);
+        if(configs[i].id == 0xd) {
+            LV_LOG_USER("Choosing config %zu %d", i, configs[i].id);
             return i;
         }
+        // if(configs[i].max_width >= target_w &&
+        //    configs[i].max_height >= target_h &&
+        //    configs[i].cf == target_cf &&
+        //    configs[i].surface_type & EGL_WINDOW_BIT
+        //   ) {
+        //     LV_LOG_USER("Choosing config %zu", i);
+        //     return i;
+        // }
     }
     return config_count;
 }

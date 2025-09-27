@@ -451,8 +451,9 @@ static lv_color_format_t color_format_from_props(int r_bits, int g_bits, int b_b
 static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config)
 {
-    int res = 1, r_bits, g_bits, b_bits, a_bits, width, height, buffer_size, depth, stencil, samples, surface_type,
+    int res = 1, id, r_bits, g_bits, b_bits, a_bits, width, height, buffer_size, depth, stencil, samples, surface_type,
         renderable_type;
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_CONFIG_ID, &id);
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &r_bits);
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &g_bits);
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &b_bits);
@@ -476,6 +477,8 @@ static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_conf
     if(cf == LV_COLOR_FORMAT_UNKNOWN) {
         return LV_RESULT_INVALID;
     }
+
+    lv_egl_config->id = id;
     lv_egl_config->cf = cf;
     lv_egl_config->max_width = width;
     lv_egl_config->max_height = height;

@@ -38,6 +38,7 @@ extern "C" {
 
 
 typedef struct {
+    int32_t id;
     int32_t max_width;
     int32_t max_height;
     int32_t buffer_size;
