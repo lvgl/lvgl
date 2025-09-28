@@ -6,6 +6,9 @@
 #include <string.h>
 #include "../include/glad/gles2.h"
 
+#include "../../lv_opengles_egl.h"
+#if LV_USE_EGL
+
 #ifndef GLAD_IMPL_UTIL_C_
     #define GLAD_IMPL_UTIL_C_
 
@@ -520,3 +523,5 @@ int gladLoadGLES2(GLADloadfunc load)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /*LV_USE_EGL*/
