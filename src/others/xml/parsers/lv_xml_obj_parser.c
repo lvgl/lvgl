@@ -277,6 +277,41 @@ void lv_obj_xml_event_cb_apply(lv_xml_parser_state_t * state, const char ** attr
     if(user_data) lv_obj_add_event_cb(obj, lv_event_free_user_data_cb, LV_EVENT_DELETE, user_data);
 }
 
+void * lv_obj_xml_subject_toggle_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_subject_toggle_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    /*If the tag_name is */
+    const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
+    const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in <lv_obj-subject_toggle_event>");
+        return;
+    }
+
+    lv_event_code_t trigger = LV_EVENT_CLICKED;
+    if(trigger_str) trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
+    if(trigger == LV_EVENT_LAST)  {
+        LV_LOG_WARN("Couldn't apply <lv_obj-subject_toggle_event> because `%s` trigger is invalid.", trigger_str);
+        return;
+    }
+
+    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+    if(subject == NULL) {
+        LV_LOG_WARN("Subject `%s` doesn't exist in <lv_obj-subject_toggle>", subject_str);
+        return;
+    }
+
+    void * item = lv_xml_state_get_item(state);
+    lv_obj_add_subject_toggle_event(item, subject, trigger);
+}
+
 void * lv_obj_xml_subject_set_create(lv_xml_parser_state_t * state, const char ** attrs)
 {
     LV_UNUSED(attrs);
@@ -368,8 +403,7 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
     const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
     const char * step_str =  lv_xml_get_value_of(attrs, "step");
-    const char * min_str =  lv_xml_get_value_of(attrs, "min");
-    const char * max_str =  lv_xml_get_value_of(attrs, "max");
+    const char * rollover_str =  lv_xml_get_value_of(attrs, "rollover");
 
     if(subject_str == NULL) {
         LV_LOG_WARN("`subject` is missing in <lv_obj-subject_increment>");
@@ -377,11 +411,12 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     }
 
     if(step_str == NULL) step_str = "1";
+    if(rollover_str == NULL) rollover_str = "false";
 
     lv_event_code_t trigger = LV_EVENT_CLICKED;
     if(trigger_str) trigger = lv_xml_trigger_text_to_enum_value(trigger_str);
     if(trigger == LV_EVENT_LAST)  {
-        LV_LOG_WARN("Couldn't apply <subject_increment> because `%s` trigger is invalid.", trigger_str);
+        LV_LOG_WARN("Couldn't apply <lv_obj-subject_increment> because `%s` trigger is invalid.", trigger_str);
         return;
     }
 
@@ -399,9 +434,8 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     void * item = lv_xml_state_get_item(state);
 
     int32_t step = lv_xml_atoi(step_str);
-    int32_t min_v = min_str ? lv_xml_atoi(min_str) : INT32_MIN;
-    int32_t max_v = max_str ? lv_xml_atoi(max_str) : INT32_MAX;
-    lv_obj_add_subject_increment_event(item, subject, trigger, step, min_v, max_v);
+    bool rollover = lv_xml_to_bool(rollover_str);
+    lv_obj_add_subject_increment_event(item, subject, trigger, step, rollover);
 }
 
 void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs)

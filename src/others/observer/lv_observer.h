@@ -58,6 +58,8 @@ typedef struct {
     lv_ll_t subs_ll;                     /**< Subscribers */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
+    lv_subject_value_t min_value;        /**< Minimum value for min. int or float*/
+    lv_subject_value_t max_value;        /**< Maximum value for max. int or float*/
     void * user_data;                    /**< Additional parameter, can be used freely by user */
     uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
     uint32_t size                 : 24;  /**< String buffer size or group length */
@@ -104,6 +106,21 @@ int32_t lv_subject_get_int(lv_subject_t * subject);
  */
 int32_t lv_subject_get_previous_int(lv_subject_t * subject);
 
+
+/**
+ * Set a minimum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_int(lv_subject_t * subject, int32_t min_value);
+
+/**
+ * Set a maximum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value);
+
 #if LV_USE_FLOAT
 
 /**
@@ -133,6 +150,20 @@ float lv_subject_get_float(lv_subject_t * subject);
  * @return          current value
  */
 float lv_subject_get_previous_float(lv_subject_t * subject);
+
+/**
+ * Set a minimum value for a float subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value);
+
+/**
+ * Set a maximum value for a float subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
 
 #endif /*LV_USE_FLOAT*/
 
@@ -348,11 +379,20 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param subject   pointer to a subject to change
  * @param trigger   the trigger on which the subject should be changed
  * @param step      value to add on trigger
- * @param min       the minimum value
- * @param max       the maximum value
+ * @param rollover  if true and the subject's maximum value is exceeded the minimum value is set,
+ *                  if the minimum value is reached, the maximum value will be set on rollover.
  */
 void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
-                                        int32_t min, int32_t max);
+                                        bool rollover);
+
+/**
+ * Toggle the value of an integer subject on an event. If it was != 0 it will be 0.
+ * If it was 0, it will be 1.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to toggle
+ * @param trigger   the trigger on which the subject should be changed
+ */
+void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger);
 
 /**
  * Set the value of an integer subject.
