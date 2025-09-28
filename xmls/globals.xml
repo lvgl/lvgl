@@ -262,7 +262,7 @@
         <prop name="margin_top" type="int" help="Keep distance above the widget when used in a layout"/>
         <prop name="margin_bottom" type="int" help="Keep distance below the widget when used in a layout"/>
         <prop name="margin_left" type="int" help="Keep distance to the left of the widget when used in a layout"/>
-        <prop name="margin_right" type="int" help="Keep distance the the right of the widget when used in a layout"/>
+        <prop name="margin_right" type="int" help="Keep distance to the right of the widget when used in a layout"/>
         <prop name="margin_hor" type="int" help="Set both left and right margin"/>
         <prop name="margin_ver" type="int" help="Set both top and bottom margin"/>
         <prop name="margin_all" type="int" help="Set margins in all 4 directions"/>
