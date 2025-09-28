@@ -611,11 +611,6 @@ open_err:
     return LV_RESULT_INVALID;
 }
 
-void lv_drm_ctx_create(lv_drm_ctx_t * ctx)
-{
-    lv_memset(ctx, 0, sizeof(*ctx));
-}
-
 size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
