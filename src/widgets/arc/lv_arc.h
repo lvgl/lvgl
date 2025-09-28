@@ -32,7 +32,7 @@ extern "C" {
  * In which direction the indicator should grow.
  */
 typedef enum {
-    LV_ARC_MODE_NORMAL,      /**< Clock-wise */               
+    LV_ARC_MODE_NORMAL,      /**< Clock-wise */
     LV_ARC_MODE_SYMMETRICAL, /**< Left/right from the midpoint */
     LV_ARC_MODE_REVERSE      /**< Counterclock-wise */
 } lv_arc_mode_t;
