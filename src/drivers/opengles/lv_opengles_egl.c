@@ -85,17 +85,34 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
 {
     if(ctx->egl_display) {
-        eglMakeCurrent(ctx->egl_display, NULL, NULL, NULL);
+        eglMakeCurrent(ctx->egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if(ctx->egl_context) {
             eglDestroyContext(ctx->egl_display, ctx->egl_context);
         }
+        ctx->egl_context = EGL_NO_CONTEXT;
     }
+    if(ctx->egl_surface && ctx->egl_display) {
+        eglDestroySurface(ctx->egl_display, ctx->egl_surface);
+        ctx->egl_surface = EGL_NO_SURFACE;
+    }
+
     if(ctx->egl_lib_handle) {
         dlclose(ctx->egl_lib_handle);
     }
     if(ctx->opengl_lib_handle) {
         dlclose(ctx->opengl_lib_handle);
     }
+
+    if(ctx->native_window && ctx->interface.destroy_window_cb) {
+        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+        ctx->native_window = 0;
+    }
+    if(ctx->egl_display) {
+        eglTerminate(ctx->egl_display);
+        ctx->egl_display = EGL_NO_DISPLAY;
+    }
+    ctx->egl_config = NULL;
+    lv_free(ctx);
 }
 
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx)
