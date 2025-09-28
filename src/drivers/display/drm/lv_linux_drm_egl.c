@@ -112,7 +112,6 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
 
     lv_display_set_resolution(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
-    LV_LOG_USER("Create egl context");
     ctx->egl_interface = drm_get_egl_interface(ctx);
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
     if(!ctx->egl_ctx) {
@@ -147,7 +146,6 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
 static void event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    LV_LOG_USER("Event");
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
     switch(code) {
@@ -400,7 +398,7 @@ static void drm_flip_cb(void * driver_data, bool vsync)
     ctx->gbm_bo_pending = gbm_surface_lock_front_buffer(ctx->gbm_surface);
 
     if(!ctx->gbm_bo_pending) {
-        LV_LOG_USER("Failed to lock front buffer");
+        LV_LOG_ERROR("Failed to lock front buffer");
         return;
     }
 
@@ -421,7 +419,6 @@ static void drm_flip_cb(void * driver_data, bool vsync)
 
     if(!ctx->gbm_bo_flipped) {
         if(!ctx->crtc_isset) {
-            LV_LOG_USER("using drmModeSetCrtc");
             int status = drmModeSetCrtc(ctx->fd, ctx->drm_encoder->crtc_id, pending_fb->fb_id, 0, 0,
                                         &(ctx->drm_connector->connector_id), 1, ctx->drm_mode);
             if(status < 0) {
@@ -551,10 +548,10 @@ static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t
     lv_color_format_t target_cf = lv_display_get_color_format(ctx->display);
 
     for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_USER("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
-                    i, configs[i].id,
-                    configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
-                    configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
+        LV_LOG_TRACE("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
+                     i, configs[i].id,
+                     configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
+                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
     }
 
     for(size_t i = 0; i < config_count; ++i) {
@@ -564,7 +561,7 @@ static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t
            config_cf == target_cf &&
            configs[i].surface_type & EGL_WINDOW_BIT
           ) {
-            LV_LOG_USER("Choosing config %zu", i);
+            LV_LOG_TRACE("Choosing config %zu", i);
             return i;
         }
     }
