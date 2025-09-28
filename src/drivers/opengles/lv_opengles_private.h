@@ -37,10 +37,6 @@ extern "C" {
 #define GL_BGRA GL_BGRA_EXT
 #endif /*GL_BGRA*/
 
-#ifndef GL_BGR
-#define GL_BGR GL_BGR_EXT
-#endif /*GL_BGR*/
-
 #ifndef GL_TEXTURE_MAX_LEVEL
 #define GL_TEXTURE_MAX_LEVEL GL_TEXTURE_MAX_LEVEL_APPLE
 #endif /*GL_TEXTURE_MAX_LEVEL*/
