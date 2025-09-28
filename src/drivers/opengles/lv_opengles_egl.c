@@ -161,40 +161,34 @@ static void * load_gl_lib(void)
 
 static lv_result_t load_egl(lv_opengles_egl_t * ctx)
 {
-    LV_LOG_USER("loading egl lib");
     ctx->egl_lib_handle = load_egl_lib();
     if(!ctx->egl_lib_handle) {
         LV_LOG_ERROR("Failed to load egl shared lib: %s", dlerror());
         goto err;
     }
 
-    LV_LOG_USER("Creating egl display");
     ctx->egl_display = create_egl_display(ctx);
     if(!ctx->egl_display) {
         LV_LOG_ERROR("Failed to create egl display");
         goto egl_display_err;
     }
 
-    LV_LOG_USER("Loading egl entry points %p", (void *)eglGetConfigAttrib);
     if(!gladLoadEGLUserPtr(ctx->egl_display, glad_egl_load_cb, ctx->egl_lib_handle)) {
         LV_LOG_ERROR("Failed to load EGL entry points");
         goto load_egl_functions_err;
     }
 
-    LV_LOG_USER("Bind opengles api %p", (void *)eglGetConfigAttrib);
     if(eglBindAPI && !eglBindAPI(EGL_OPENGL_ES_API)) {
         LV_LOG_ERROR("Failed to bind api");
         goto err;
     }
 
-    LV_LOG_USER("Loading opengl lib %p", (void *)eglGetConfigAttrib);
     ctx->opengl_lib_handle = load_gl_lib();
     if(!ctx->opengl_lib_handle) {
         LV_LOG_ERROR("Failed to load OpenGL library. %s", dlerror());
         goto opengl_lib_err;
     }
 
-    LV_LOG_USER("Creating egl config %p", (void *)eglGetConfigAttrib);
     ctx->egl_config = create_egl_config(ctx);
     if(!ctx->egl_config) {
         LV_LOG_ERROR("Failed to create EGL config. Error code: %#x", eglGetError());
@@ -207,46 +201,31 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto create_window_err;
 
     }
-    LV_LOG_USER("Creating egl surface");
     ctx->egl_surface = create_egl_surface(ctx);
     if(!ctx->egl_surface) {
         LV_LOG_ERROR("Failed to create EGL surface. Error code: %#x", eglGetError());
         goto egl_surface_err;
     }
 
-    LV_LOG_USER("Creating egl context");
     ctx->egl_context = create_egl_context(ctx);
     if(!ctx->egl_context) {
         LV_LOG_ERROR("Failed to create EGL context. Error code: %#x", eglGetError());
         goto egl_context_err;
     }
 
-    LV_LOG_USER("Making egl context current");
     if(!eglMakeCurrent(ctx->egl_display, ctx->egl_surface, ctx->egl_surface, ctx->egl_context)) {
         LV_LOG_ERROR("Failed to set current egl context. Error code: %#x", eglGetError());
         goto egl_make_current_context_err;
     }
 
-    LV_LOG_USER("Setting swap interval");
     if(!eglSwapInterval || !eglSwapInterval(ctx->egl_display, 0)) {
         LV_LOG_WARN("Can't set egl swap interval");
     }
 
-    LV_LOG_USER("Loading opengl entry points");
     if(!gladLoadGLES2UserPtr(glad_egl_load_cb, ctx->opengl_lib_handle)) {
         LV_LOG_ERROR("Failed to load load OpenGL entry points");
         goto load_opengl_functions_err;
     }
-
-    lv_egl_config_t current_config;
-    lv_egl_config_from_egl_config(ctx, &current_config, ctx->egl_config);
-    glViewport(0, 0, 1024, 600);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    lv_opengles_egl_clear(ctx);
-    lv_opengles_egl_update(ctx);
-
 
     return LV_RESULT_OK;
 
@@ -316,13 +295,14 @@ static EGLDisplay create_egl_display(lv_opengles_egl_t * ctx)
         return NULL;
     }
 
-    int egl_major = -1;
-    int egl_minor = -1;
+    EGLint egl_major;
+    EGLint egl_minor;
     if(!egl_initialize(display, &egl_major, &egl_minor)) {
         LV_LOG_ERROR("Failed to initialize egl. Error code: %#x", egl_get_error());
         return NULL;
     }
-    LV_LOG_USER("Egl version %d.%d", egl_major, egl_minor);
+    LV_LOG_INFO("Egl version %d.%d", egl_major, egl_minor);
+
     return display;
 }
 
@@ -366,9 +346,6 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
     if(!eglChooseConfig(ctx->egl_display, config_attribs, egl_configs, num_configs, &num_configs)) {
         LV_LOG_ERROR("Failed to get configs: %d", eglGetError());
         return NULL;
-    }
-    for(int i = 0; i < num_configs; i++) {
-        LV_LOG_USER("Config %d: %p", i, (void *)egl_configs[i]);
     }
 
     lv_egl_config_t * configs = lv_malloc(num_configs * sizeof(*configs));
