@@ -31,8 +31,8 @@
             <prop name="min_value" type="int" help="Set section min"/>
             <prop name="max_value" type="int" help="Set section max"/>
             <prop name="style_main" type="style" help="Set main line style"/>
-            <prop name="style_indicator" type="style" help="Set indicator line style"/>
-            <prop name="style_items" type="style" help="Set ticks/labels style"/>
+            <prop name="style_indicator" type="style" help="Set major line and text style"/>
+            <prop name="style_items" type="style" help="Set minor ticks' style"/>
             <prop name="bind_min_value" type="subject" help="Bind section min to subject"/>
             <prop name="bind_max_value" type="subject" help="Bind section max to subject"/>
         </element>

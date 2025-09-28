@@ -10,7 +10,7 @@ Example
     <api>
         <enumdef name="lv_span_overflow" help="How to handle overflowing text">
             <enum name="clip" help="Clip at boundary"/>
-            <enum name="ellipses" help="Replace with (…)"/>
+            <enum name="ellipsis" help="Replace overflowing words with ..."/>
         </enumdef>
 
         <prop name="overflow" type="enum:lv_span_overflow" help="Set overflow mode"/>

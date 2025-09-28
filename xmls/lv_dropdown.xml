@@ -7,7 +7,7 @@ Example
 
 <widget>
     <api>
-        <prop name="text" type="string" help="Set placeholder text"/>
+        <prop name="text" type="string" help="Set text displayed instead of the selected option label"/>
         <prop name="options" type="string" help="Set options as a newline (`\n`) separated string"/>
         <prop name="selected" type="int" help="Select an option by index (0-based)"/>
         <prop name="symbol" type="string" help="Set a symbol shown next to the dropdown"/>

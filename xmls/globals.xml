@@ -240,12 +240,12 @@
         <!-- Position and size -->
         <prop name="x" type="coords" help="Set X position (px, or %)"/>
         <prop name="y" type="coords" help="Set Y position (px, or %)"/>
-        <prop name="height" type="coords" help="Set height (px, %. or content)"/>
-        <prop name="min_height" type="coords" help="Set min height (px, %. or content)"/>
-        <prop name="max_height" type="coords" help="Set max height (px, %. or content)"/>
-        <prop name="width" type="coords" help="Set width (px, %. or content)"/>
-        <prop name="min_width" type="coords" help="Set min width (px, %. or content)"/>
-        <prop name="max_width" type="coords" help="Set max width (px, %. or content)"/>
+        <prop name="height" type="coords" help="Set height (px, %, or content)"/>
+        <prop name="min_height" type="coords" help="Set min height (px, %, or content)"/>
+        <prop name="max_height" type="coords" help="Set max height (px, %, or content)"/>
+        <prop name="width" type="coords" help="Set width (px, %, or content)"/>
+        <prop name="min_width" type="coords" help="Set min width (px, %, or content)"/>
+        <prop name="max_width" type="coords" help="Set max width (px, %, or content)"/>
         <prop name="length" type="coords" help="Set length (used by some widgets)"/>
 
         <!-- Padding and margin -->
@@ -254,15 +254,15 @@
         <prop name="pad_left" type="int" help="Keep this distance on the left from the content inside"/>
         <prop name="pad_right" type="int" help="Keep this distance on the right from the content inside"/>
         <prop name="pad_hor" type="int" help="Set both left and right padding"/>
-        <prop name="pad_ver" type="int" help="Set bith top and bottom padding"/>
+        <prop name="pad_ver" type="int" help="Set both top and bottom padding"/>
         <prop name="pad_all" type="int" help="Set padding in all 4 directions"/>
         <prop name="pad_row" type="int" help="Set padding between rows of layouts"/>
         <prop name="pad_column" type="int" help="Set padding between columns of layouts"/>
         <prop name="pad_radial" type="int" help="Set radial padding"/>
         <prop name="margin_top" type="int" help="Keep distance above the widget when used in a layout"/>
-        <prop name="margin_bottom" type="int" help="Keep distance bottom the widget when used in a layout"/>
-        <prop name="margin_left" type="int" help="Keep distance left the widget when used in a layout"/>
-        <prop name="margin_right" type="int" help="Keep distance right the widget when used in a layout"/>
+        <prop name="margin_bottom" type="int" help="Keep distance below the widget when used in a layout"/>
+        <prop name="margin_left" type="int" help="Keep distance to the left of the widget when used in a layout"/>
+        <prop name="margin_right" type="int" help="Keep distance the the right of the widget when used in a layout"/>
         <prop name="margin_hor" type="int" help="Set both left and right margin"/>
         <prop name="margin_ver" type="int" help="Set both top and bottom margin"/>
         <prop name="margin_all" type="int" help="Set margins in all 4 directions"/>
@@ -358,17 +358,17 @@
         <prop name="grid_cell_x_align" type="enum:lv_grid_align" help="How to align the cell horizontally"/>
         <prop name="grid_cell_row_pos" type="int" help="Set cell's row"/>
         <prop name="grid_cell_row_span" type="int" help="How many rows the cell should span"/>
-        <prop name="grid_cell_y_align" type="enum:lv_grid_align" help="How to align the cell vetically"/>
+        <prop name="grid_cell_y_align" type="enum:lv_grid_align" help="How to align the cell vertically"/>
 
         <!-- Misc -->
-        <prop name="opa" type="opa" help="Scale down the  opacity of the wiget and all its children"/>
+        <prop name="opa" type="opa" help="Scale down the opacity of the widget and all its children"/>
         <prop name="opa_layered" type="opa" help="Create a snapshot from the widget and blend it with opacity"/>
         <prop name="anim_duration" type="int" help="Set animation duration in ms (e.g. for label scroll)"/>
         <prop name="blend_mode" type="enum:lv_blend_mode" help="Set how to blend colors"/>
         <prop name="transform_width" type="int" help="Change the width without affecting the layouts"/>
         <prop name="transform_height" type="int" help="Change the height without affecting the layouts"/>
-        <prop name="translate_x" type="int" help="Offset in X without after the layouts are calculated"/>
-        <prop name="translate_y" type="int" help="Offset in Y without after the layouts are calculated"/>
+        <prop name="translate_x" type="int" help="Offset in X after the layouts are calculated"/>
+        <prop name="translate_y" type="int" help="Offset in Y after the layouts are calculated"/>
         <prop name="translate_radial" type="int" help="Translate radial"/>
         <prop name="transform_scale_x" type="int" help="Scale X (256=100%)"/>
         <prop name="transform_scale_y" type="int" help="Scale Y (256=100%)"/>
@@ -378,7 +378,7 @@
         <prop name="transform_skew_x" type="int" help="Skew X (no SW render)"/>
         <prop name="transform_skew_y" type="int" help="Skew Y (no SW render)"/>
         <prop name="bitmap_mask_src" type="image" help="Set bitmap mask (A8 or L8)"/>
-        <prop name="rotary_sensitivity" type="int" help="Set rotary sensitivity for Chrown input devices"/>
+        <prop name="rotary_sensitivity" type="int" help="Set rotary sensitivity for Crown input devices"/>
         <prop name="recolor" type="color" help="Mix this color to the widget and all its children"/>
         <prop name="recolor_opa" type="opa" help="The intensity of recoloring"/>
     </styledef>
