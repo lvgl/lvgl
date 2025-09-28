@@ -382,22 +382,20 @@ int drm_check_for_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
     FD_ZERO(&fds);
     FD_SET(ctx->fd, &fds);
 
-    drmEventContext evCtx;
-    lv_memset(&evCtx, 0, sizeof(evCtx));
-    evCtx.version = 2;
-    evCtx.page_flip_handler = drm_page_flip_handler;
+    drmEventContext event_ctx;
+    lv_memset(&event_ctx, 0, sizeof(event_ctx));
+    event_ctx.version = 2;
+    event_ctx.page_flip_handler = drm_page_flip_handler;
 
     struct timeval timeout;
-    struct timeval * timeout_ptr = NULL;
     if(timeout_ms >= 0) {
         timeout.tv_sec = timeout_ms / 1000;
         timeout.tv_usec = (timeout_ms % 1000) * 1000;
-        timeout_ptr = &timeout;
     }
 
-    int status = select(ctx->fd + 1, &fds, NULL, NULL, timeout_ptr);
+    int status = select(ctx->fd + 1, &fds, NULL, NULL, &timeout);
     if(status == 1) {
-        drmHandleEvent(ctx->fd, &evCtx);
+        drmHandleEvent(ctx->fd, &event_ctx);
     }
     return status;
 }
@@ -464,10 +462,6 @@ drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(lv_drm_ctx_t * ctx, struc
 void drm_flip_cb(void * driver_data, bool vsync)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *) driver_data;
-    if(!ctx->crtc_isset && drmSetMaster(ctx->fd) < 0) {
-        LV_LOG_ERROR("Failed to become DRM master (hint: must be run in a VT, shut down Wayland / X first )");
-        return;
-    }
 
     if(ctx->gbm_bo_pending) {
         gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_pending);
@@ -582,6 +576,11 @@ lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
         goto gbm_create_device_err;
     }
 
+    if(drmSetMaster(ctx->fd) < 0) {
+        LV_LOG_ERROR("Failed to become DRM master");
+        goto set_master_err;
+    }
+
     ctx->drm_crtc = drm_get_crtc(ctx);
     if(!ctx->drm_crtc) {
         LV_LOG_ERROR("Failed to get crtc");
@@ -593,6 +592,7 @@ lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
 get_crtc_err:
     gbm_device_destroy(ctx->gbm_dev);
     ctx->gbm_dev = NULL;
+set_master_err:
 gbm_create_device_err:
     drmModeFreeEncoder(ctx->drm_encoder);
     ctx->drm_encoder = NULL;
