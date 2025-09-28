@@ -62,7 +62,7 @@ static void drm_flip_cb(void * driver_data, bool vsync);
 
 static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties);
 static void drm_destroy_window(void * driver_data, void * native_window);
-static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count);
+static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 
 /**********************
  *  STATIC VARIABLES
@@ -543,7 +543,7 @@ open_err:
     return LV_RESULT_INVALID;
 }
 
-static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count)
+static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);

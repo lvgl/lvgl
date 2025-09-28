@@ -23,6 +23,7 @@
 #include "../../misc/lv_types.h"
 #include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
+#include "lv_opengles_egl_private.h"
 #include "lv_opengles_driver.h"
 
 /*********************

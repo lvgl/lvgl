@@ -22,6 +22,7 @@ extern "C" {
 #include <xf86drmMode.h>
 #include "../../opengles/lv_opengles_texture_private.h"
 #include "../../opengles/lv_opengles_egl.h"
+#include "../../opengles/lv_opengles_egl_private.h"
 
 /*********************
  *      DEFINES
