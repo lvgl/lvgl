@@ -129,7 +129,7 @@ typedef struct {
 
     lv_opa_t opa;
     lv_text_decor_t decor : 3;
-    lv_blend_mode_t blend_mode : 3;
+    lv_blend_mode_t blend_mode : 4;
 
     /* Properties of the letter outlines */
     lv_opa_t outline_stroke_opa;
