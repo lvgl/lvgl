@@ -118,7 +118,7 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx)
 {
     LV_UNUSED(ctx);
-    GL_CALL(glClearColor(0.19f, 0.195f, 0.2f, 1.0f));
+    GL_CALL(glClearColor(0.f, 0.f, 0.f, 1.0f));
     GL_CALL(glDepthRangef(-1.0, 1.0));
     GL_CALL(glDepthFunc(GL_ALWAYS));
     GL_CALL(glClearDepthf(1.0f));
