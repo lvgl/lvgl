@@ -330,7 +330,6 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
     if(size > draw_buf->data_size) {
-        /* MK Temp note: this occurs at same time as slow-down in widgets demo when using OpenGLES draw unit */
         LV_LOG_TRACE("Draw buf too small for new shape");
         LV_PROFILER_DRAW_END;
         return NULL;
