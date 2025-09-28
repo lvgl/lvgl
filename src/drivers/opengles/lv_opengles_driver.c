@@ -20,14 +20,12 @@
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_standard_shader.h"
 #include <stdio.h> /* MK TEMP */
-#include <math.h> /* MK TEMP */
 
 /*********************
  *      DEFINES
  *********************/
 
 #define LV_OPENGLES_VERTEX_BUFFER_LEN 16
-#define TEST_SHADER_DEFINE 0
 
 /**********************
  *      TYPEDEFS
@@ -271,12 +269,6 @@ void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * 
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
 
-#if TEST_SHADER_DEFINE
-    lv_opengles_shader_set_uniform1f("u_Hue", 0.75f);
-    lv_opengles_shader_set_uniform1f("u_Saturation", 1.5f);
-    lv_opengles_shader_set_uniform1f("u_Value", 1.25f);
-#endif /*TEST_SHADER_DEFINE*/
-
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
 }
@@ -355,12 +347,6 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
-
-#if TEST_SHADER_DEFINE
-    lv_opengles_shader_set_uniform1f("u_Hue", 0.75f);
-    lv_opengles_shader_set_uniform1f("u_Saturation", 1.5f);
-    lv_opengles_shader_set_uniform1f("u_Value", 1.25f);
-#endif /*TEST_SHADER_DEFINE*/
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -476,19 +462,8 @@ static void lv_opengles_shader_manager_init(void)
 
 static void lv_opengles_shader_program_init(void)
 {
-    /* To add defines:  lv_opengl_shader_define_t frag_defs[1] = { { "PLACEHOLDER", NULL, false} }; */
-    lv_opengl_shader_define_t frag_defs[] = {
-#if TEST_SHADER_DEFINE
-        { "HSV_ADJUST", NULL, false },
-#endif /*TEST_SHADER_DEFINE*/
-        { "UNUSED_PLACEHOLDER", NULL, false },
-    };
-    uint32_t def_count = sizeof(frag_defs) / sizeof(lv_opengl_shader_define_t);
-
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.frag", frag_defs,
-                                                                       def_count - 1);
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.vert", frag_defs,
-                                                                       def_count - 1);
+    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.frag", NULL, 0);
+    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.vert", NULL, 0);
 
     lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(shader_manager, frag_shader_hash,
                                                                                 vert_shader_hash);
