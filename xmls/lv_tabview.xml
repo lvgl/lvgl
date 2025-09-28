@@ -3,7 +3,7 @@ Example
 <lv_tabview active="3">
     <lv_tabview-tab text="First">
         <lv_button/>
-    </lv_tabview-tab/>
+    </lv_tabview-tab>
 </lv_tabview>
  -->
 
