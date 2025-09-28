@@ -2,13 +2,14 @@
  * SPDX-License-Identifier: (WTFPL OR CC0-1.0) AND Apache-2.0
  */
 
-#include "../../../../../../lv_conf_internal.h"
-#if LV_EGL_ADAPTED_WITH_GL
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../include/glad/gl.h"
+
+#include "../../../../lv_conf_internal.h"
+
+#if LV_USE_GLFW
 
 #ifndef GLAD_IMPL_UTIL_C_
     #define GLAD_IMPL_UTIL_C_
@@ -1503,12 +1504,8 @@ int gladLoadGL(GLADloadfunc load)
     return gladLoadGLUserPtr(glad_gl_get_proc_from_userptr, GLAD_GNUC_EXTENSION(void *) load);
 }
 
-
-
-
-
-
 #ifdef __cplusplus
 }
 #endif
-#endif /* LV_EGL_ADAPTED_WITH_GL */
+
+#endif /*LV_USE_GLFW*/

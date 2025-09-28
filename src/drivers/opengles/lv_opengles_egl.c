@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_egl.h"
-#include <EGL/egl.h>
 #include <stdint.h>
 
 #if LV_USE_EGL
@@ -17,13 +16,13 @@
 #include <string.h>
 #include "lv_opengles_debug.h"
 
-#include "../../drivers/opengles/egl_adapter/private/glad/include/glad/egl.h"
+#include "glad/include/glad/egl.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_types.h"
 #include "../../stdlib/lv_mem.h"
-
+#include "lv_opengles_private.h"
 
 /*********************
 *      DEFINES
@@ -33,44 +32,20 @@
 *      TYPEDEFS
 **********************/
 
-typedef struct {
-    GLuint color_renderbuffer;
-    GLuint depth_renderbuffer;
-    GLuint fbo;
-} lv_egl_adapter_fbo_t;
-
-typedef struct {
-    EGLDisplay display;
-    EGLSync sync;
-} lv_egl_adapter_sync_t;
-
 /**********************
 *  STATIC PROTOTYPES
 **********************/
 
-static lv_result_t load_egl(lv_egl_ctx_t * ctx);
-
-static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx);
-static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx);
-static EGLContext create_egl_context(lv_egl_ctx_t * ctx);
-static EGLConfig create_egl_config(lv_egl_ctx_t * ctx);
-static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
+static lv_result_t load_egl(lv_opengles_egl_t * ctx);
+static EGLDisplay create_egl_display(lv_opengles_egl_t * ctx);
+static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx);
+static EGLContext create_egl_context(lv_opengles_egl_t * ctx);
+static EGLConfig create_egl_config(lv_opengles_egl_t * ctx);
+static lv_result_t lv_egl_config_from_egl_config(lv_opengles_egl_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config);
-
-static void * create_native_window(lv_egl_ctx_t * ctx);
-static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count);
-
+static void * create_native_window(lv_opengles_egl_t * ctx);
+static lv_result_t get_native_config(lv_opengles_egl_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count);
 static GLADapiproc glad_egl_load_cb(void * userdata, const char * name);
-
-typedef struct {
-    int id;
-    int r_bits, g_bits, b_bits, a_bits;
-    int depth;
-    int stencil;
-    int buffer;
-    int samples;
-    bool vsync;
-} lv_egl_visual_config_t;
 
 /**********************
 *  STATIC VARIABLES
@@ -84,16 +59,16 @@ typedef struct {
 *   GLOBAL FUNCTIONS
 **********************/
 
-lv_egl_ctx_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interface)
+lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interface)
 {
-    lv_egl_ctx_t * ctx = lv_zalloc(sizeof(*ctx));
+    lv_opengles_egl_t * ctx = lv_zalloc(sizeof(*ctx));
     LV_ASSERT_MALLOC(ctx);
     if(!ctx) {
         LV_LOG_ERROR("Failed to create egl context");
         return NULL;
     }
     ctx->interface = *interface;
-    ctx->vsync = true;
+    ctx->vsync = false;
 
     lv_result_t res = load_egl(ctx);
     if(res != LV_RESULT_OK) {
@@ -104,7 +79,7 @@ lv_egl_ctx_t * lv_opengles_egl_context_create(const lv_egl_interface_t * interfa
     return ctx;
 }
 
-void lv_opengles_egl_context_deinit(lv_egl_ctx_t * ctx)
+void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
 {
     if(ctx->egl_lib_handle) {
         dlclose(ctx->egl_lib_handle);
@@ -114,7 +89,7 @@ void lv_opengles_egl_context_deinit(lv_egl_ctx_t * ctx)
     }
 }
 
-void lv_opengles_egl_clear(lv_egl_ctx_t * ctx)
+void lv_opengles_egl_clear(lv_opengles_egl_t * ctx)
 {
     LV_UNUSED(ctx);
     GL_CALL(glClearColor(0.19f, 0.195f, 0.2f, 1.0f));
@@ -124,7 +99,7 @@ void lv_opengles_egl_clear(lv_egl_ctx_t * ctx)
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void lv_opengles_egl_update(lv_egl_ctx_t * ctx)
+void lv_opengles_egl_update(lv_opengles_egl_t * ctx)
 {
     eglSwapBuffers(ctx->egl_display, ctx->egl_surface);
     ctx->interface.flip_cb(ctx->interface.driver_data, ctx->vsync);
@@ -158,7 +133,7 @@ static void * load_gl_lib(void)
     return load_lib(gl_libs, sizeof(gl_libs) / sizeof(gl_libs[0]));
 }
 
-static lv_result_t load_egl(lv_egl_ctx_t * ctx)
+static lv_result_t load_egl(lv_opengles_egl_t * ctx)
 {
     LV_LOG_USER("loading egl lib");
     ctx->egl_lib_handle = load_egl_lib();
@@ -244,6 +219,8 @@ static lv_result_t load_egl(lv_egl_ctx_t * ctx)
     glDisable(GL_CULL_FACE);
 
     lv_opengles_egl_clear(ctx);
+    lv_opengles_egl_update(ctx);
+
 
     return LV_RESULT_OK;
 
@@ -273,7 +250,7 @@ err:
     return LV_RESULT_INVALID;
 }
 
-static EGLDisplay create_egl_display(lv_egl_ctx_t * ctx)
+static EGLDisplay create_egl_display(lv_opengles_egl_t * ctx)
 {
     EGLDisplay display = NULL;
     PFNEGLQUERYSTRINGPROC egl_query_string = (PFNEGLQUERYSTRINGPROC)(dlsym(ctx->egl_lib_handle, "eglQueryString"));
@@ -335,7 +312,7 @@ static GLADapiproc glad_egl_load_cb(void * userdata, const char * name)
     return (GLADapiproc)dlsym(userdata, name);
 }
 
-static EGLConfig create_egl_config(lv_egl_ctx_t * ctx)
+static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
 {
     const EGLint config_attribs[] = {
         EGL_RENDERABLE_TYPE,
@@ -406,16 +383,15 @@ static EGLConfig create_egl_config(lv_egl_ctx_t * ctx)
     return config;
 }
 
-static EGLSurface create_egl_surface(lv_egl_ctx_t * ctx)
+static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
 {
     LV_ASSERT_NULL(ctx->egl_display);
     LV_ASSERT_NULL(ctx->egl_config);
-    LV_ASSERT_NULL(ctx->native_window);
-    LV_LOG_USER("Create egl surface %p %p %p", ctx->egl_display, ctx->egl_config, ctx->native_window);
+    LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }
 
-static EGLContext create_egl_context(lv_egl_ctx_t * ctx)
+static EGLContext create_egl_context(lv_opengles_egl_t * ctx)
 {
     static const EGLint context_attribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 2,
@@ -425,18 +401,18 @@ static EGLContext create_egl_context(lv_egl_ctx_t * ctx)
                             EGL_NO_CONTEXT, context_attribs);
 }
 
-static lv_color_format_t color_format_from_props(int r_bits, int g_bits, int b_bits, int a_bits)
+lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_config_t * config)
 {
-    if(r_bits == 5 && g_bits == 6 && b_bits == 5) {
-        if(a_bits == 8) {
+    if(config->r_bits == 5 && config->g_bits == 6 && config->b_bits == 5) {
+        if(config->a_bits == 8) {
             return LV_COLOR_FORMAT_RGB565A8;
         }
         else {
             return LV_COLOR_FORMAT_RGB565;
         }
     }
-    if(r_bits == 8 && g_bits == 8 && b_bits == 8) {
-        if(a_bits == 8) {
+    if(config->r_bits == 8 && config->g_bits == 8 && config->b_bits == 8) {
+        if(config->a_bits == 8) {
             return LV_COLOR_FORMAT_ARGB8888;
         }
         else {
@@ -448,53 +424,35 @@ static lv_color_format_t color_format_from_props(int r_bits, int g_bits, int b_b
     return LV_COLOR_FORMAT_UNKNOWN;
 }
 
-static lv_result_t lv_egl_config_from_egl_config(lv_egl_ctx_t * ctx, lv_egl_config_t * lv_egl_config,
+static lv_result_t lv_egl_config_from_egl_config(lv_opengles_egl_t * ctx, lv_egl_config_t * lv_egl_config,
                                                  EGLConfig egl_config)
 {
-    int res = 1, id, r_bits, g_bits, b_bits, a_bits, width, height, buffer_size, depth, stencil, samples, surface_type,
-        renderable_type;
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_CONFIG_ID, &id);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &r_bits);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &g_bits);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &b_bits);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_ALPHA_SIZE, &a_bits);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_WIDTH, &width);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_HEIGHT, &height);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BUFFER_SIZE, &buffer_size);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_DEPTH_SIZE, &depth);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &stencil);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &samples);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SURFACE_TYPE, &surface_type);
-    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RENDERABLE_TYPE, &renderable_type);
-
+    int res = 1;
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_CONFIG_ID, &lv_egl_config->id);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RED_SIZE, &lv_egl_config->r_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_GREEN_SIZE, &lv_egl_config->g_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BLUE_SIZE, &lv_egl_config->b_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_ALPHA_SIZE, &lv_egl_config->a_bits);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_WIDTH, &lv_egl_config->max_width);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_MAX_PBUFFER_HEIGHT, &lv_egl_config->max_height);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_BUFFER_SIZE, &lv_egl_config->buffer_size);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_DEPTH_SIZE, &lv_egl_config->depth);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &lv_egl_config->stencil);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &lv_egl_config->samples);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SURFACE_TYPE, &lv_egl_config->surface_type);
 
     if(!res) {
         LV_LOG_WARN("Failed to fetch egl config properties");
         return LV_RESULT_INVALID;
     }
-
-    lv_color_format_t cf = color_format_from_props(r_bits,  g_bits,  b_bits,  a_bits);
-    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
-        return LV_RESULT_INVALID;
-    }
-
-    lv_egl_config->id = id;
-    lv_egl_config->cf = cf;
-    lv_egl_config->max_width = width;
-    lv_egl_config->max_height = height;
-    lv_egl_config->buffer_size = buffer_size;
-    lv_egl_config->depth = depth;
-    lv_egl_config->stencil = stencil;
-    lv_egl_config->samples = samples;
-    lv_egl_config->surface_type = surface_type;
     return LV_RESULT_OK;
 }
 
-static void * create_native_window(lv_egl_ctx_t * ctx)
+static void * create_native_window(lv_opengles_egl_t * ctx)
 {
     EGLint native_config_id;
-    uint64_t * mods;
-    size_t mod_count;
+    uint64_t * mods = NULL;
+    size_t mod_count = 0;
     lv_result_t res = get_native_config(ctx, &native_config_id, &mods, &mod_count);
 
     if(res == LV_RESULT_INVALID) {
@@ -502,11 +460,7 @@ static void * create_native_window(lv_egl_ctx_t * ctx)
         return NULL;
     }
 
-    lv_native_window_properties_t properties = {
-        .mods = mods,
-        .mod_count = mod_count,
-        .visual_id = native_config_id,
-    };
+    lv_egl_native_window_properties_t properties = { .visual_id = native_config_id };
 
     void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
     if(!native_window) {
@@ -518,7 +472,7 @@ static void * create_native_window(lv_egl_ctx_t * ctx)
     return native_window;
 }
 
-static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count)
+static lv_result_t get_native_config(lv_opengles_egl_t * ctx, EGLint * native_id, uint64_t ** mods, size_t * count)
 {
     EGLint num_mods;
 
@@ -526,6 +480,7 @@ static lv_result_t get_native_config(lv_egl_ctx_t * ctx, EGLint * native_id, uin
         LV_LOG_ERROR("Failed to get native visual id for egl config");
         return LV_RESULT_INVALID;
     }
+    return LV_RESULT_OK;
 
     if(!eglQueryDmaBufModifiersEXT || !eglQueryDmaBufModifiersEXT(ctx->egl_display, *native_id, 0, NULL, NULL, &num_mods)) {
         LV_LOG_WARN("Failed to get native modifiers");

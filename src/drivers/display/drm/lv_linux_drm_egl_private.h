@@ -36,7 +36,7 @@ extern "C" {
 typedef struct {
     lv_opengles_texture_t texture;
     lv_display_t * display;
-    lv_egl_ctx_t * egl_ctx;
+    lv_opengles_egl_t * egl_ctx;
     lv_egl_interface_t egl_interface;
 
     drmModeRes * drm_resources;
@@ -52,8 +52,6 @@ typedef struct {
     struct gbm_bo * gbm_bo_presented;
 
     int fd;
-    bool h_flip;
-    bool v_flip;
     bool crtc_isset;
 } lv_drm_ctx_t;
 

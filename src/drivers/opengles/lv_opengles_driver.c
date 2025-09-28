@@ -163,6 +163,7 @@ void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * 
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
     if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
+        LV_LOG_USER("Return early");
         LV_PROFILER_DRAW_END;
         return;
     }

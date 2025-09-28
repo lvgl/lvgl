@@ -6,6 +6,10 @@
 #include <string.h>
 #include "../include/glad/egl.h"
 
+#include "../../../../lv_conf_internal.h"
+
+#if LV_USE_EGL
+
 #ifndef GLAD_IMPL_UTIL_C_
     #define GLAD_IMPL_UTIL_C_
 
@@ -296,9 +300,8 @@ int gladLoadEGL(EGLDisplay display, GLADloadfunc load)
     return gladLoadEGLUserPtr(display, glad_egl_get_proc_from_userptr, GLAD_GNUC_EXTENSION(void *) load);
 }
 
-
-
-
 #ifdef __cplusplus
 }
 #endif
+
+#endif /*LV_USE_EGL*/

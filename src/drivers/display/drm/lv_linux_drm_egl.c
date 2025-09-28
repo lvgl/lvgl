@@ -7,43 +7,37 @@
  *      INCLUDES
  *********************/
 #include "lv_linux_drm.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <src/display/lv_display.h>
-#include <src/drivers/opengles/egl_adapter/private/glad/include/glad/egl.h>
-#include <src/drivers/opengles/lv_opengles_egl.h>
-#include <src/drivers/opengles/lv_opengles_texture_private.h>
-#include <src/lv_conf_internal.h>
-#include <src/misc/lv_array.h>
-#include <src/misc/lv_color.h>
-#include <src/misc/lv_event.h>
-#include <src/misc/lv_types.h>
-#include <string.h>
-#include <xf86drmMode.h>
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
+#include <fcntl.h>
+#include <string.h>
+#include <xf86drmMode.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <gbm.h>
 #include <drm_fourcc.h>
 #include <xf86drm.h>
+#include <time.h>
+#include <unistd.h>
 #include "lv_linux_drm_egl_private.h"
 
-#include "../../../core/lv_refr.h"
-#include "../../../stdlib/lv_string.h"
-#include "../../../core/lv_global.h"
-#include "../../../display/lv_display_private.h"
-#include "../../../indev/lv_indev.h"
-#include "../../../lv_init.h"
-#include "../../../misc/lv_area_private.h"
 #include "../../opengles/lv_opengles_driver.h"
 #include "../../opengles/lv_opengles_texture.h"
-#include "../../../drivers/opengles/lv_opengles_debug.h"
+#include "../../opengles/lv_opengles_private.h"
+
+#include "../../../stdlib/lv_string.h"
+#include "../../../display/lv_display.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    int fd;
+    struct gbm_bo * bo;
+    uint32_t fb_id;
+} drm_fb_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -52,17 +46,21 @@
 static uint32_t tick_cb(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void event_cb(lv_event_t * e);
-lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path);
+static lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path);
 static lv_egl_interface_t drm_get_egl_interface(lv_drm_ctx_t * ctx);
 static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx);
+static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx);
 static drmModeEncoder * drm_get_encoder(lv_drm_ctx_t * ctx);
 static drmModeCrtc * drm_get_crtc(lv_drm_ctx_t * ctx);
-static lv_color_format_t drm_get_default_color_format(lv_drm_ctx_t * ctx);
-static uint32_t drm_color_format(lv_color_format_t cf);
-static void * drm_create_window(void * driver_data, const lv_native_window_properties_t * properties);
+static void drm_on_page_flip(int fd, unsigned int frame, unsigned int sec, unsigned int usec, void * data);
+static drm_fb_state_t * drm_fb_state_create(lv_drm_ctx_t * ctx, struct gbm_bo * bo);
+static void drm_fb_state_destroy_cb(struct gbm_bo * bo, void * data);
+static void drm_flip_cb(void * driver_data, bool vsync);
+
+static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties);
 static void drm_destroy_window(void * driver_data, void * native_window);
-static void drm_page_flip_handler(int fd, unsigned int frame, unsigned int sec, unsigned int usec,
-                                  void * data);
+static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -105,15 +103,6 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
 
-    lv_color_format_t cf = drm_get_default_color_format(ctx);
-    if(cf == LV_COLOR_FORMAT_UNKNOWN) {
-        LV_LOG_ERROR("Unsupported color format %#x", lv_display_get_color_format(display));
-        return;
-    }
-    LV_LOG_USER("Setting color format to %d", cf);
-    lv_display_set_color_format(display, cf);
-
-
     LV_LOG_USER("Initializing drm device");
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
@@ -136,7 +125,7 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     lv_result_t res = lv_opengles_texture_create_from_display(display);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize opengl texture");
-        lv_opengles_egl_context_deinit(ctx->egl_ctx);
+        lv_opengles_egl_context_destroy(ctx->egl_ctx);
         ctx->egl_ctx = NULL;
         return;
     }
@@ -147,17 +136,9 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     ctx->texture = *texture;
     lv_display_set_driver_data(display, ctx);
 
-    ctx->h_flip = false;
-    ctx->v_flip = false;
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-}
-
-void lv_drm_egl_set_flip(lv_drm_ctx_t * window, bool h_flip, bool v_flip)
-{
-    window->h_flip = h_flip;
-    window->v_flip = v_flip;
 }
 
 
@@ -173,8 +154,6 @@ static void event_cb(lv_event_t * e)
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
     switch(code) {
         case LV_EVENT_DELETE:
-            // lv_egl_adapter_reset(ctx->egl_interface->egl_adapter);
-            // lv_egl_adapter_interface_deinit(ctx->egl_interface);
             lv_free(ctx);
             break;
         case LV_EVENT_RESOLUTION_CHANGED:
@@ -188,12 +167,9 @@ static void event_cb(lv_event_t * e)
 
 static uint32_t tick_cb(void)
 {
-    struct timespec ts;
-    if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-        return 0;
-    }
-    uint64_t ms = (uint64_t)ts.tv_sec * 1000ull + (uint64_t)ts.tv_nsec / 1000000ull;
-    return (uint32_t)ms;
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return t.tv_sec * 1000 + (t.tv_nsec / 1000000);;
 }
 
 #if LV_USE_DRAW_OPENGLES
@@ -209,11 +185,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_area_set(&full_area, 0, 0, disp_width, disp_height);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
         lv_opengles_viewport(0, 0, disp_width, disp_height);
-        lv_opengles_egl_clear(ctx->egl_ctx);
-
-        lv_opengles_render_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER, disp_width, disp_height,
-                                   area, ctx->h_flip,
-                                   !ctx->v_flip);
+        lv_opengles_render_display_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER,
+                                           area, false, true);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -264,46 +237,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_display_flush_ready(disp);
 }
 #endif
-
-#if 0
-#define BOX_WIDTH 23
-#define MAX_LINE_LEN 256
-
-
-typedef enum { DISP_MINIMAL = 0, DISP_LIST = 1, DISP_TABLED = 2 } display_mode_t;
-
-#endif
-struct drmfb_state {
-    int fd;
-    struct gbm_bo * bo;
-    uint32_t fb_id;
-};
-
-typedef struct drmfb_state * drmfb_state_t;
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-#if 0
-static void print_grouped_modes(drmModeConnectorPtr conn);
-static void print_grouped_modes_ex(drmModeConnectorPtr conn, uint32_t current_idx, display_mode_t mode,
-                                   const char ** banner_lines, int banner_count);
-static size_t distance_uint32_array(uint32_t * arr, size_t len, uint32_t value);
-static void populate_output_core(void * outmod_ptr);
-#endif
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
-
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
-
 
 void lv_egl_adapter_outmod_drm_cleanup(lv_drm_ctx_t * ctx)
 {
@@ -359,24 +292,17 @@ void lv_egl_adapter_outmod_drm_cleanup(lv_drm_ctx_t * ctx)
     ctx->drm_mode = 0;
 }
 
-void * drm_get_display_cb(void * driver_data)
-{
-    lv_drm_ctx_t * ctx = (lv_drm_ctx_t *) driver_data;
-    if(!ctx) {
-        return NULL;
-    }
-    return (void *)ctx->gbm_dev;
-}
-
-void drm_fb_destroy_cb(struct gbm_bo * bo, void * data)
+static void drm_fb_state_destroy_cb(struct gbm_bo * bo, void * data)
 {
     LV_UNUSED(bo);
-    struct drmfb_state * fb = (struct drmfb_state *) data;
-    if(fb && fb->fb_id) drmModeRmFB(fb->fd, fb->fb_id);
-    free(fb);
+    drm_fb_state_t * fb = (drm_fb_state_t *) data;
+    if(fb && fb->fb_id) {
+        drmModeRmFB(fb->fd, fb->fb_id);
+    }
+    lv_free(fb);
 }
 
-int drm_check_for_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
+static int drm_do_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
 {
     fd_set fds;
     FD_ZERO(&fds);
@@ -385,7 +311,7 @@ int drm_check_for_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
     drmEventContext event_ctx;
     lv_memset(&event_ctx, 0, sizeof(event_ctx));
     event_ctx.version = 2;
-    event_ctx.page_flip_handler = drm_page_flip_handler;
+    event_ctx.page_flip_handler = drm_on_page_flip;
 
     struct timeval timeout;
     if(timeout_ms >= 0) {
@@ -400,13 +326,26 @@ int drm_check_for_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
     return status;
 }
 
-drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(lv_drm_ctx_t * ctx, struct gbm_bo * bo)
+static void drm_on_page_flip(int fd, unsigned int frame, unsigned int sec, unsigned int usec, void * data)
 {
-    if(!bo) {
-        LV_LOG_ERROR("variable bo is null\n");
-        return NULL;
+    LV_UNUSED(fd);
+    LV_UNUSED(frame);
+    LV_UNUSED(sec);
+    LV_UNUSED(usec);
+    lv_drm_ctx_t * ctx = (lv_drm_ctx_t *) data;
+
+    if(ctx->gbm_bo_presented) {
+        gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_presented);
     }
-    drmfb_state_t fb = (drmfb_state_t)gbm_bo_get_user_data(bo);
+    ctx->gbm_bo_presented = ctx->gbm_bo_flipped;
+    ctx->gbm_bo_flipped = NULL;
+}
+
+static drm_fb_state_t * drm_fb_state_create(lv_drm_ctx_t * ctx, struct gbm_bo * bo)
+{
+    LV_ASSERT_NULL(bo);
+    drm_fb_state_t * fb = (drm_fb_state_t *)gbm_bo_get_user_data(bo);
+
     if(fb) {
         return fb;
     }
@@ -445,7 +384,7 @@ drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(lv_drm_ctx_t * ctx, struc
         return NULL;
     }
 
-    fb = (drmfb_state_t)malloc(sizeof(*fb));
+    fb = (drm_fb_state_t *)lv_malloc(sizeof(*fb));
     if(!fb) {
         LV_LOG_ERROR("Failed to allocate drmfb_state");
         return NULL;
@@ -455,11 +394,11 @@ drmfb_state_t lv_egl_adapter_outmod_drm_fb_get_from_bo(lv_drm_ctx_t * ctx, struc
     fb->bo = bo;
     fb->fb_id = fb_id;
 
-    gbm_bo_set_user_data(bo, fb, drm_fb_destroy_cb);
+    gbm_bo_set_user_data(bo, fb, drm_fb_state_destroy_cb);
     return fb;
 }
 
-void drm_flip_cb(void * driver_data, bool vsync)
+static void drm_flip_cb(void * driver_data, bool vsync)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *) driver_data;
 
@@ -473,7 +412,7 @@ void drm_flip_cb(void * driver_data, bool vsync)
         return;
     }
 
-    drmfb_state_t pending_fb = lv_egl_adapter_outmod_drm_fb_get_from_bo(ctx, ctx->gbm_bo_pending);
+    drm_fb_state_t * pending_fb = drm_fb_state_create(ctx, ctx->gbm_bo_pending);
 
     if(!ctx->gbm_bo_pending || !pending_fb) {
         LV_LOG_ERROR("Failed to get gbm front buffer");
@@ -481,30 +420,31 @@ void drm_flip_cb(void * driver_data, bool vsync)
     }
 
     if(vsync) {
-        while(ctx->gbm_bo_flipped && drm_check_for_page_flip(ctx, -1) >= 0)
+        while(ctx->gbm_bo_flipped && drm_do_page_flip(ctx, -1) >= 0)
             continue;
     }
     else {
-        drm_check_for_page_flip(ctx, 0);
+        drm_do_page_flip(ctx, 0);
     }
 
     if(!ctx->gbm_bo_flipped) {
         if(!ctx->crtc_isset) {
+            LV_LOG_USER("using drmModeSetCrtc");
             int status = drmModeSetCrtc(ctx->fd, ctx->drm_encoder->crtc_id, pending_fb->fb_id, 0, 0,
                                         &(ctx->drm_connector->connector_id), 1, ctx->drm_mode);
-            if(status >= 0) {
-                ctx->crtc_isset = true;
-                if(ctx->gbm_bo_presented)
-                    gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_presented);
-                ctx->gbm_bo_presented = ctx->gbm_bo_pending;
-                ctx->gbm_bo_flipped = NULL;
-                ctx->gbm_bo_pending = NULL;
-            }
-            else {
+            if(status < 0) {
                 LV_LOG_ERROR("Failed to set crtc: %d", status);
+                return;
             }
+            ctx->crtc_isset = true;
+            if(ctx->gbm_bo_presented)
+                gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_presented);
+            ctx->gbm_bo_presented = ctx->gbm_bo_pending;
+            ctx->gbm_bo_flipped = NULL;
+            ctx->gbm_bo_pending = NULL;
             return;
         }
+
 
         uint32_t flip_flags = DRM_MODE_PAGE_FLIP_EVENT;
         int status = drmModePageFlip(ctx->fd, ctx->drm_encoder->crtc_id, pending_fb->fb_id, flip_flags, ctx);
@@ -519,11 +459,12 @@ void drm_flip_cb(void * driver_data, bool vsync)
     /* We need to ensure our surface has a free buffer, otherwise GL will
      * have no buffer to render on. */
     while(!gbm_surface_has_free_buffers(ctx->gbm_surface) &&
-          drm_check_for_page_flip(ctx, -1) >= 0) continue;
+          drm_do_page_flip(ctx, -1) >= 0) {
+        continue;
+    }
 }
 
-
-lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
+static lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
 {
     if(!path) {
         LV_LOG_ERROR("Device path must not be NULL");
@@ -553,15 +494,11 @@ lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path)
         LV_LOG_ERROR("Failed to find a suitable connector");
         goto get_connector_err;
     }
-    LV_ASSERT(ctx->drm_connector->count_modes > 0);
-    /* During testing, the first mode is always the screen resolution so we use that*/
-    ctx->drm_mode = &ctx->drm_connector->modes[17];
-    for(int i = 0; i < ctx->drm_connector->count_modes; ++i) {
-        float refresh_hertz = (ctx->drm_connector->modes[i].clock * 1000.f) / (float)(ctx->drm_connector->modes[i].htotal *
-                                                                                      ctx->drm_connector->modes[i].vtotal);
 
-        LV_LOG_USER("Found modes %dx%d @ %f", ctx->drm_connector->modes[i].hdisplay,  ctx->drm_connector->modes[i].vdisplay,
-                    refresh_hertz);
+    ctx->drm_mode = drm_get_mode(ctx);
+    if(!ctx->drm_mode) {
+        LV_LOG_ERROR("Failed to find a suitable drm mode");
+        goto get_mode_err;
     }
 
     ctx->drm_encoder = drm_get_encoder(ctx);
@@ -593,12 +530,15 @@ get_crtc_err:
     gbm_device_destroy(ctx->gbm_dev);
     ctx->gbm_dev = NULL;
 set_master_err:
+    /* Nothing special to do */
 gbm_create_device_err:
     drmModeFreeEncoder(ctx->drm_encoder);
     ctx->drm_encoder = NULL;
 get_encoder_err:
     drmModeFreeConnector(ctx->drm_connector);
     ctx->drm_connector = NULL;
+get_mode_err:
+    /* Nothing special to do */
 get_connector_err:
     drmModeFreeResources(ctx->drm_resources);
     ctx->drm_resources = NULL;
@@ -611,7 +551,7 @@ open_err:
     return LV_RESULT_INVALID;
 }
 
-size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count)
+static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, size_t config_count)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);
@@ -619,25 +559,22 @@ size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * configs, s
     lv_color_format_t target_cf = lv_display_get_color_format(ctx->display);
 
     for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_USER("Got config %zu %#x %dx%d cf %d  buffer size %d depth %d  samples %d stencil %d surface type %d",
+        LV_LOG_USER("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
                     i, configs[i].id,
-                    configs[i].max_width, configs[i].max_height, configs[i].cf,
+                    configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil, configs[i].surface_type);
     }
 
     for(size_t i = 0; i < config_count; ++i) {
-        if(configs[i].id == 0xd) {
-            LV_LOG_USER("Choosing config %zu %d", i, configs[i].id);
+        lv_color_format_t config_cf = lv_display_get_color_format(ctx->display);
+        if(configs[i].max_width >= target_w &&
+           configs[i].max_height >= target_h &&
+           config_cf == target_cf &&
+           configs[i].surface_type & EGL_WINDOW_BIT
+          ) {
+            LV_LOG_USER("Choosing config %zu", i);
             return i;
         }
-        // if(configs[i].max_width >= target_w &&
-        //    configs[i].max_height >= target_h &&
-        //    configs[i].cf == target_cf &&
-        //    configs[i].surface_type & EGL_WINDOW_BIT
-        //   ) {
-        //     LV_LOG_USER("Choosing config %zu", i);
-        //     return i;
-        // }
     }
     return config_count;
 }
@@ -660,12 +597,6 @@ static lv_egl_interface_t drm_get_egl_interface(lv_drm_ctx_t * ctx)
     };
 }
 
-static size_t distance_uint32_array(uint32_t * arr, size_t len, uint32_t value)
-{
-    for(size_t i = 0; i < len; i++) if(arr[i] == value) return i;
-    return len;
-}
-
 static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx)
 {
     drmModeConnector * connector = NULL;
@@ -680,6 +611,27 @@ static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx)
         connector = NULL;
     }
     return connector;
+}
+
+static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx)
+{
+    LV_ASSERT_NULL(ctx->drm_connector);
+    drmModeModeInfo * best_mode = NULL;
+    uint32_t best_area = 0;
+
+    for(int i = 0 ; i < ctx->drm_connector->count_modes; ++i) {
+        drmModeModeInfo * mode = &ctx->drm_connector->modes[i];
+        if(mode->type & DRM_MODE_TYPE_PREFERRED) {
+            return mode;
+        }
+        uint32_t area = mode->hdisplay * mode->vdisplay;
+        if(area > best_area) {
+            best_area = area;
+            best_mode = mode;
+        }
+    }
+    LV_LOG_WARN("Failed to find a drm mode with the TYPE_PREFERRED flag. Using the one with the biggest area");
+    return best_mode;
 }
 
 static drmModeCrtc * drm_get_crtc(lv_drm_ctx_t * ctx)
@@ -720,226 +672,15 @@ static drmModeEncoder * drm_get_encoder(lv_drm_ctx_t * ctx)
     return encoder;
 }
 
-/* Search props for property named `name`. If found, write value to out_value and return 1.
-   Returns 0 if not found or on error.
-   Note: drmModeGetProperty / drmModeFreeProperty are used and require linking with libdrm.
-*/
-static int drm_get_prop_value(int drm_fd, drmModeObjectProperties * props, const char * name, uint64_t * out_value)
+static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties)
 {
-    if(!props || !name || !out_value) return 0;
-
-    for(uint32_t i = 0; i < props->count_props; ++i) {
-        drmModePropertyRes * prop = drmModeGetProperty(drm_fd, props->props[i]);
-        if(!prop) continue;
-
-        if(strcmp(prop->name, name) == 0) {
-            *out_value = props->prop_values[i];
-            drmModeFreeProperty(prop);
-            return 1;
-        }
-
-        drmModeFreeProperty(prop);
-    }
-
-    return 0;
-}
-
-/* Returns malloc'd array of modifiers with count in out_count. Caller must free() the returned pointer.
-   Returns NULL and sets *out_count = 0 on error or no modifiers found.
-*/
-static uint64_t * drm_get_format_mods(int drm_fd, uint32_t format, uint32_t crtc_index,
-                                      size_t * out_count)
-{
-    if(!out_count) return NULL;
-    *out_count = 0;
-
-    drmModePlaneRes * res = drmModeGetPlaneResources(drm_fd);
-    if(!res) return NULL;
-
-    uint64_t * mods_arr = NULL;
-    size_t mods_cap = 0;
-    size_t mods_len = 0;
-
-    for(uint32_t i = 0; i < res->count_planes; ++i) {
-        drmModePlane * plane = drmModeGetPlane(drm_fd, res->planes[i]);
-        if(!plane) continue;
-
-        if(!(plane->possible_crtcs & (1u << crtc_index))) {
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        drmModeObjectProperties * props = drmModeObjectGetProperties(drm_fd, res->planes[i], DRM_MODE_OBJECT_PLANE);
-        if(!props) {
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        uint64_t type = 0;
-        uint64_t blob_id = 0;
-        /* Use helper to fetch properties */
-        {
-            uint64_t val = 0;
-            if(drm_get_prop_value(drm_fd, props, "type", &val))
-                type = val;
-            if(type != DRM_PLANE_TYPE_PRIMARY) {
-                drmModeFreeObjectProperties(props);
-                drmModeFreePlane(plane);
-                continue;
-            }
-            if(drm_get_prop_value(drm_fd, props, "IN_FORMATS", &val))
-                blob_id = val;
-        }
-
-        drmModeFreeObjectProperties(props);
-
-        if(!blob_id) {
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        drmModePropertyBlobRes * blob = drmModeGetPropertyBlob(drm_fd, (uint32_t)blob_id);
-        if(!blob) {
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        if(!blob->data) {
-            drmModeFreePropertyBlob(blob);
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        struct drm_format_modifier_blob * data = (struct drm_format_modifier_blob *)blob->data;
-        uint32_t * fmts = (uint32_t *)((char *)data + data->formats_offset);
-        struct drm_format_modifier * modifiers = (struct drm_format_modifier *)((char *)data + data->modifiers_offset);
-
-        uint32_t * fmt_p = NULL;
-        for(uint32_t fi = 0; fi < data->count_formats; ++fi) {
-            if(fmts[fi] == format) {
-                fmt_p = &fmts[fi];
-                break;
-            }
-        }
-        if(!fmt_p) {
-            drmModeFreePropertyBlob(blob);
-            drmModeFreePlane(plane);
-            continue;
-        }
-
-        uint32_t fmt_mask = 1u << (uint32_t)(fmt_p - fmts);
-
-        for(uint32_t m = 0; m < data->count_modifiers; ++m) {
-            if(modifiers[m].formats & fmt_mask) {
-                if(mods_len + 1 > mods_cap) {
-                    size_t new_cap = mods_cap == 0 ? 8 : mods_cap * 2;
-                    uint64_t * tmp = lv_realloc(mods_arr, new_cap * sizeof(uint64_t));
-                    if(!tmp) {
-                        lv_free(mods_arr);
-                        mods_arr = NULL;
-                        mods_cap = mods_len = 0;
-                        break;
-                    }
-                    mods_arr = tmp;
-                    mods_cap = new_cap;
-                }
-                mods_arr[mods_len++] = modifiers[m].modifier;
-            }
-        }
-
-        drmModeFreePropertyBlob(blob);
-        drmModeFreePlane(plane);
-
-        /* behavior in original: break after first matching primary plane */
-        if(mods_len > 0) break;
-    }
-
-    drmModeFreePlaneResources(res);
-
-    if(mods_len == 0) {
-        lv_free(mods_arr);
-        *out_count = 0;
-        return NULL;
-    }
-
-    /* shrink to fit */
-    {
-        uint64_t * tmp = lv_realloc(mods_arr, mods_len * sizeof(uint64_t));
-        if(tmp) mods_arr = tmp;
-    }
-
-    *out_count = mods_len;
-    return mods_arr;
-}
-
-static lv_color_format_t drm_get_default_color_format(lv_drm_ctx_t * ctx)
-{
-    lv_display_t * display = ctx->display;
-
-    lv_color_format_t cf = lv_display_get_color_format(display);
-    if(cf != LV_COLOR_FORMAT_NATIVE) {
-        /* Color format has been set by user keep it*/
-        return cf;
-    }
-
-    switch(LV_COLOR_DEPTH) {
-        case 16:
-            return LV_COLOR_FORMAT_RGB565;
-        case 24:
-            return LV_COLOR_FORMAT_RGB888;
-        case 32:
-            return LV_COLOR_FORMAT_ARGB8888;
-        default:
-            LV_LOG_ERROR("Unsupported color format");
-            return LV_COLOR_FORMAT_UNKNOWN;
-    }
-
-}
-
-static void * drm_create_window(void * driver_data, const lv_native_window_properties_t * properties)
-{
-
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     LV_ASSERT_NULL(ctx->gbm_dev);
-    // uint32_t format = properties->visual_id;
-
-    int crtc_index = (int)(distance_uint32_array(ctx->drm_resources->crtcs,
-                                                 ctx->drm_resources->count_crtcs,
-                                                 ctx->drm_crtc->crtc_id));
 
     uint32_t format = properties->visual_id;
-    lv_array_t valid_mods;
-    lv_array_init(&valid_mods, 0, sizeof(uint64_t));
-    if(properties->mod_count != 0) {
-        size_t drm_mods_count = 0;
-        uint64_t * drm_mods = drm_get_format_mods(ctx->fd, format, crtc_index, &drm_mods_count);
-        for(size_t di = 0; di < drm_mods_count; ++di) {
-            uint64_t mod = drm_mods[di];
-            for(size_t i = 0; i < properties->mod_count; ++i) {
-                if(mod == properties->mods[i]) {
-                    lv_array_push_back(&valid_mods, &properties->mods[i]);
-                }
-            }
-        }
-        free(drm_mods);
-    }
-    const bool has_valid_mods = lv_array_size(&valid_mods) >= 1 &&
-                                *(uint64_t *)lv_array_at(&valid_mods, 0) != DRM_FORMAT_MOD_INVALID;
 
-    if(!has_valid_mods) {
-        LV_LOG_USER("gbm_surface_create without modifiers");
-        ctx->gbm_surface = gbm_surface_create(ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay, format,
-                                              GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-    }
-    else {
-        LV_LOG_USER("gbm_surface_create with modifiers");
-        ctx->gbm_surface = gbm_surface_create_with_modifiers2(
-                               ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay,
-                               format, (uint64_t *)valid_mods.data, lv_array_size(&valid_mods),
-                               GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-    }
-    lv_array_deinit(&valid_mods);
-
+    ctx->gbm_surface = gbm_surface_create(ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay, format,
+                                          GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
     if(!ctx->gbm_surface) {
         LV_LOG_ERROR("Failed to create GBM surface");
         return NULL;
@@ -947,6 +688,7 @@ static void * drm_create_window(void * driver_data, const lv_native_window_prope
     return (void *)ctx->gbm_surface;
 
 }
+
 static void drm_destroy_window(void * driver_data, void * native_window)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
@@ -955,20 +697,5 @@ static void drm_destroy_window(void * driver_data, void * native_window)
     ctx->gbm_surface = NULL;
 }
 
-static void drm_page_flip_handler(int fd, unsigned int frame, unsigned int sec, unsigned int usec,
-                                  void * data)
-{
-    LV_UNUSED(fd);
-    LV_UNUSED(frame);
-    LV_UNUSED(sec);
-    LV_UNUSED(usec);
-    lv_drm_ctx_t * ctx = (lv_drm_ctx_t *) data;
-
-    if(ctx->gbm_bo_presented) {
-        gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_presented);
-    }
-    ctx->gbm_bo_presented = ctx->gbm_bo_flipped;
-    ctx->gbm_bo_flipped = NULL;
-}
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/
