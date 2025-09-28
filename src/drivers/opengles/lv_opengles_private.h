@@ -45,6 +45,18 @@ extern "C" {
 #define GL_UNPACK_ROW_LENGTH GL_UNPACK_ROW_LENGTH_EXT
 #endif /*GL_UNPACK_ROW_LENGTH*/
 
+#ifndef glGenVertexArrays
+#define glGenVertexArrays glGenVertexArraysOES
+#endif
+
+#ifndef glBindVertexArray
+#define glBindVertexArray glBindVertexArrayOES
+#endif
+
+#ifndef glDeleteVertexArrays
+#define glDeleteVertexArrays glDeleteVertexArraysOES
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
