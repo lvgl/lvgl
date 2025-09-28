@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_MK_DRM_WINDOW_PRIVATE_H
-#define LV_MK_DRM_WINDOW_PRIVATE_H
+#ifndef LV_LINUX_DRM_EGL_PRIVATE_H
+#define LV_LINUX_DRM_EGL_PRIVATE_H
 
 
 #ifdef __cplusplus
@@ -19,11 +19,9 @@ extern "C" {
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
-#include "../../../misc/lv_area.h"
-#include "../../../display/lv_display.h"
 #include <xf86drmMode.h>
-#include <src/drivers/opengles/lv_opengles_texture_private.h>
-#include <src/drivers/opengles/lv_opengles_egl.h>
+#include "../../opengles/lv_opengles_texture_private.h"
+#include "../../opengles/lv_opengles_egl.h"
 
 /*********************
  *      DEFINES
@@ -72,4 +70,4 @@ typedef struct {
 #endif
 
 
-#endif /*LV_MK_DRM_WINDOW_PRIVATE_H*/
+#endif /*LV_LINUX_DRM_EGL_PRIVATE_H*/

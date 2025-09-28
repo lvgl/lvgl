@@ -46,7 +46,10 @@ typedef struct {
 static uint32_t tick_cb(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void event_cb(lv_event_t * e);
+
 static lv_result_t drm_device_init(lv_drm_ctx_t * ctx, const char * path);
+static void drm_device_deinit(lv_drm_ctx_t * ctx);
+
 static lv_egl_interface_t drm_get_egl_interface(lv_drm_ctx_t * ctx);
 static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx);
 static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx);
@@ -76,19 +79,17 @@ static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * con
 lv_display_t * lv_linux_drm_create(void)
 {
     lv_tick_set_cb(tick_cb);
-    LV_LOG_USER("Create ctx");
     lv_drm_ctx_t * ctx = lv_zalloc(sizeof(*ctx));
     LV_ASSERT_MALLOC(ctx);
     if(!ctx) {
-        LV_LOG_ERROR("Failed to create lv_drm_egl_ output");
+        LV_LOG_ERROR("Failed to create drm context");
         return NULL;
     }
 
-    LV_LOG_USER("Create display");
+    ctx->display = lv_display_create(1, 1);
 
-    ctx->display = lv_display_create(1024, 768);
     if(!ctx->display) {
-        LV_LOG_ERROR("Failed to create display texture");
+        LV_LOG_ERROR("Failed to create display");
         lv_free(ctx);
         return NULL;
     }
@@ -103,17 +104,15 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
 
-    LV_LOG_USER("Initializing drm device");
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize DRM device");
         return;
     }
 
-    LV_LOG_USER("Setting display resolution");
     lv_display_set_resolution(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
-    LV_LOG_USER("Initializing egl context");
+    LV_LOG_USER("Create egl context");
     ctx->egl_interface = drm_get_egl_interface(ctx);
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
     if(!ctx->egl_ctx) {
@@ -238,56 +237,43 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 }
 #endif
 
-void lv_egl_adapter_outmod_drm_cleanup(lv_drm_ctx_t * ctx)
+void drm_device_deinit(lv_drm_ctx_t * ctx)
 {
-
-    if(!ctx) return;
-
     if(ctx->drm_crtc) {
-        int status = drmModeSetCrtc(ctx->fd,
-                                    ctx->drm_crtc->crtc_id,
-                                    ctx->drm_crtc->buffer_id,
-                                    ctx->drm_crtc->x,
-                                    ctx->drm_crtc->y,
-                                    &ctx->drm_connector->connector_id,
-                                    1,
-                                    &ctx->drm_crtc->mode);
-        if(status < 0) {
-            /* Log.error expected externally; keep silent if not present */
-        }
+        drmModeSetCrtc(ctx->fd,
+                       ctx->drm_crtc->crtc_id,
+                       ctx->drm_crtc->buffer_id,
+                       ctx->drm_crtc->x,
+                       ctx->drm_crtc->y,
+                       &ctx->drm_connector->connector_id,
+                       1,
+                       &ctx->drm_crtc->mode);
         drmModeFreeCrtc(ctx->drm_crtc);
         ctx->drm_crtc = 0;
     }
-
     if(ctx->gbm_surface) {
         gbm_surface_destroy(ctx->gbm_surface);
         ctx->gbm_surface = 0;
     }
-
     if(ctx->gbm_dev) {
         gbm_device_destroy(ctx->gbm_dev);
         ctx->gbm_dev = 0;
     }
-
     if(ctx->drm_connector) {
         drmModeFreeConnector(ctx->drm_connector);
         ctx->drm_connector = 0;
     }
-
     if(ctx->drm_encoder) {
         drmModeFreeEncoder(ctx->drm_encoder);
         ctx->drm_encoder = 0;
     }
-
     if(ctx->drm_resources) {
         drmModeFreeResources(ctx->drm_resources);
         ctx->drm_resources = 0;
     }
-
     if(ctx->fd > 0) {
         drmClose(ctx->fd);
     }
-    // free(ctx->core);
     ctx->fd = 0;
     ctx->drm_mode = 0;
 }
@@ -587,10 +573,10 @@ static size_t drm_egl_select_config_cb(void * driver_data, lv_egl_config_t * con
 static lv_egl_interface_t drm_get_egl_interface(lv_drm_ctx_t * ctx)
 {
     return (lv_egl_interface_t) {
-        .select_config = drm_egl_select_config_cb,
         .driver_data = ctx,
         .native_display = ctx->gbm_dev,
         .egl_platform = EGL_PLATFORM_GBM_KHR,
+        .select_config = drm_egl_select_config_cb,
         .flip_cb = drm_flip_cb,
         .create_window_cb = drm_create_window,
         .destroy_window_cb = drm_destroy_window,
