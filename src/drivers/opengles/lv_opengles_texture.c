@@ -38,7 +38,6 @@ static lv_display_t * lv_opengles_texture_create_common(int32_t w, int32_t h);
 static unsigned int create_texture(int32_t w, int32_t h);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void release_disp_cb(lv_event_t * e);
-static lv_result_t init_display(lv_display_t * disp, int32_t w, int32_t h);
 
 /**********************
  *  STATIC VARIABLES
@@ -87,30 +86,57 @@ void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t hei
         LV_LOG_ERROR("Failed to reshape texture. Couldn't acquire new texture from GPU");
         return;
     }
-
 #if !LV_USE_DRAW_OPENGLES
     uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(disp));
     uint32_t buf_size = stride * height;
     uint8_t * buffer = lv_realloc(dsc->fb1, buf_size);
     LV_ASSERT_MALLOC(buffer);
     if(!buffer) {
-        GL_CALL(glDeleteTextures(1, &dsc->texture_id));
+        GL_CALL(glDeleteTextures(1, &new_texture));
         LV_LOG_ERROR("Failed to reshape texture. Couldn't resize buffer");
         return;
     }
     dsc->fb1 = buffer;
 #endif /*!LV_USE_DRAW_OPENGLES*/
 
-    if(dsc->texture_id != 0) {
+    if(dsc->is_texture_owner && dsc->texture_id != 0) {
         GL_CALL(glDeleteTextures(1, &dsc->texture_id));
     }
     dsc->texture_id = new_texture;
 }
 
-lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display)
+lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display)
 {
-    return init_display(display, lv_display_get_horizontal_resolution(display),
-                        lv_display_get_vertical_resolution(display));
+    int32_t w = lv_display_get_horizontal_resolution(display);
+    int32_t h = lv_display_get_vertical_resolution(display);
+
+#if LV_USE_DRAW_OPENGLES
+    LV_UNUSED(texture);
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    lv_display_set_buffers(display, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+#else
+    uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
+    uint32_t buf_size = stride * h;
+    texture->fb1 = lv_malloc(buf_size);
+    LV_ASSERT_MALLOC(texture->fb1);
+    if(!texture->fb1) {
+        lv_free(texture);
+        return LV_RESULT_INVALID;
+    }
+    lv_display_set_buffers(disp, texture->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+#endif
+    return LV_RESULT_OK;
+}
+
+void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
+{
+#if !LV_USE_DRAW_OPENGLES
+    lv_free(texture->fb1);
+#endif /*!LV_USE_DRAW_OPENGLES*/
+
+    if(texture->is_texture_owner && texture->texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &texture->texture_id));
+    }
 }
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
@@ -135,47 +161,33 @@ lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t init_display(lv_display_t * disp, int32_t w, int32_t h)
-{
-    lv_opengles_texture_t * dsc = lv_malloc_zeroed(sizeof(lv_opengles_texture_t));
-    LV_ASSERT_MALLOC(dsc);
-    if(!dsc) {
-        return LV_RESULT_INVALID;
-    }
-
-#if LV_USE_DRAW_OPENGLES
-    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
-    lv_display_set_buffers(disp, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
-#else
-    uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
-    uint32_t buf_size = stride * h;
-    dsc->fb1 = lv_malloc(buf_size);
-    LV_ASSERT_MALLOC(dsc->fb1);
-    if(!dsc->fb1) {
-        lv_free(dsc);
-        return LV_RESULT_INVALID;
-    }
-    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-#endif
-    lv_display_set_resolution(disp, w, h);
-    lv_display_set_flush_cb(disp, flush_cb);
-    lv_display_set_driver_data(disp, dsc);
-    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
-    lv_opengles_init();
-    return LV_RESULT_OK;
-
-}
 static lv_display_t * lv_opengles_texture_create_common(int32_t w, int32_t h)
 {
     lv_display_t * disp = lv_display_create(w, h);
     if(!disp) {
+        LV_LOG_ERROR("Failed to create display");
         return NULL;
     }
-    lv_result_t res = init_display(disp, w, h);
-    if(res != LV_RESULT_OK) {
+    lv_opengles_texture_t * texture = lv_malloc_zeroed(sizeof(lv_opengles_texture_t));
+    LV_ASSERT_MALLOC(texture);
+    if(!texture) {
+        LV_LOG_ERROR("Failed to create texture");
         lv_display_delete(disp);
         return NULL;
     }
+    lv_result_t res = lv_opengles_texture_create_draw_buffers(texture, disp);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to create draw buffers");
+        lv_free(texture);
+        lv_display_delete(disp);
+        return NULL;
+    }
+    lv_display_set_resolution(disp, w, h);
+    lv_display_set_flush_cb(disp, flush_cb);
+    lv_display_set_driver_data(disp, texture);
+    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
+
+    lv_opengles_init();
     return disp;
 }
 
@@ -259,14 +271,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void release_disp_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_user_data(e);
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
-#if !LV_USE_DRAW_OPENGLES
-    lv_free(dsc->fb1);
-#endif /*!LV_USE_DRAW_OPENGLES*/
-    if(dsc->is_texture_owner) {
-        GL_CALL(glDeleteTextures(1, &dsc->texture_id));
-    }
-    lv_free(dsc);
+    lv_opengles_texture_t * texture = lv_display_get_driver_data(disp);
+    lv_opengles_texture_deinit(texture);
+    lv_free(texture);
 }
 
 #endif /*LV_USE_OPENGLES*/

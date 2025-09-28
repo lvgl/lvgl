@@ -23,6 +23,7 @@
 #include "../../misc/lv_types.h"
 #include "../../stdlib/lv_mem.h"
 #include "lv_opengles_private.h"
+#include "lv_opengles_driver.h"
 
 /*********************
 *      DEFINES
@@ -76,11 +77,18 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
         lv_free(ctx);
         return NULL;
     }
+    lv_opengles_init();
     return ctx;
 }
 
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
 {
+    if(ctx->egl_display) {
+        eglMakeCurrent(ctx->egl_display, NULL, NULL, NULL);
+        if(ctx->egl_context) {
+            eglDestroyContext(ctx->egl_display, ctx->egl_context);
+        }
+    }
     if(ctx->egl_lib_handle) {
         dlclose(ctx->egl_lib_handle);
     }
@@ -239,7 +247,6 @@ create_window_err:
 egl_config_err:
     dlclose(ctx->opengl_lib_handle);
     ctx->opengl_lib_handle = NULL;
-
 opengl_lib_err:
     ctx->egl_display = NULL;
 load_egl_functions_err:

@@ -40,8 +40,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_result_t lv_opengles_texture_create_from_display(lv_display_t * display);
+lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display);
 void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t height);
+void lv_opengles_texture_deinit(lv_opengles_texture_t * texture);
 
 /**********************
  *      MACROS

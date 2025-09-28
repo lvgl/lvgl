@@ -120,24 +120,23 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
         return;
     }
 
-    LV_LOG_USER("Initializing egl context");
-    lv_result_t res = lv_opengles_texture_create_from_display(display);
+    /* Let the opengles texture driver handle the texture lifetime */
+    ctx->texture.is_texture_owner = true;
+    lv_result_t res = lv_opengles_texture_create_draw_buffers(&ctx->texture, display);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to initialize opengl texture");
+        LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
         ctx->egl_ctx = NULL;
         return;
     }
+    /* This creates the texture for the first time*/
     lv_opengles_texture_reshape(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
-    /* Driver data gets set by opengles_texture. We overwrite it with our own by keeping the first attribute the same*/
-    lv_opengles_texture_t * texture = lv_display_get_driver_data(display);
-    ctx->texture = *texture;
-    lv_display_set_driver_data(display, ctx);
-
     lv_display_set_flush_cb(display, flush_cb);
-    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
 }
 
 
@@ -153,7 +152,13 @@ static void event_cb(lv_event_t * e)
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
     switch(code) {
         case LV_EVENT_DELETE:
-            lv_free(ctx);
+            if(ctx) {
+                lv_opengles_egl_context_destroy(ctx->egl_ctx);
+                ctx->egl_ctx = NULL;
+                lv_opengles_texture_deinit(&ctx->texture);
+                drm_device_deinit(ctx);
+                lv_display_set_driver_data(display, NULL);
+            }
             break;
         case LV_EVENT_RESOLUTION_CHANGED:
             lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
@@ -166,9 +171,9 @@ static void event_cb(lv_event_t * e)
 
 static uint32_t tick_cb(void)
 {
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1000 + (t.tv_nsec / 1000000);;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec * 1000 + (ts.tv_nsec / 1000000);;
 }
 
 #if LV_USE_DRAW_OPENGLES
@@ -251,31 +256,30 @@ void drm_device_deinit(lv_drm_ctx_t * ctx)
         drmModeFreeCrtc(ctx->drm_crtc);
         ctx->drm_crtc = 0;
     }
-    if(ctx->gbm_surface) {
-        gbm_surface_destroy(ctx->gbm_surface);
-        ctx->gbm_surface = 0;
-    }
+    drm_destroy_window(ctx, ctx->gbm_surface);
+
     if(ctx->gbm_dev) {
         gbm_device_destroy(ctx->gbm_dev);
-        ctx->gbm_dev = 0;
+        ctx->gbm_dev = NULL;
     }
     if(ctx->drm_connector) {
         drmModeFreeConnector(ctx->drm_connector);
-        ctx->drm_connector = 0;
+        ctx->drm_connector = NULL;
     }
     if(ctx->drm_encoder) {
         drmModeFreeEncoder(ctx->drm_encoder);
-        ctx->drm_encoder = 0;
+        ctx->drm_encoder = NULL;
     }
     if(ctx->drm_resources) {
         drmModeFreeResources(ctx->drm_resources);
-        ctx->drm_resources = 0;
+        ctx->drm_resources = NULL;
     }
     if(ctx->fd > 0) {
         drmClose(ctx->fd);
     }
     ctx->fd = 0;
-    ctx->drm_mode = 0;
+    ctx->drm_mode = NULL;
+    lv_free(ctx);
 }
 
 static void drm_fb_state_destroy_cb(struct gbm_bo * bo, void * data)
@@ -336,15 +340,17 @@ static drm_fb_state_t * drm_fb_state_create(lv_drm_ctx_t * ctx, struct gbm_bo * 
         return fb;
     }
 
-    unsigned int width = gbm_bo_get_width(bo);
-    unsigned int height = gbm_bo_get_height(bo);
-    unsigned int handles[4] = { 0, }, strides[4] = { 0, }, offsets[4] = { 0, };
+    uint32_t width = gbm_bo_get_width(bo);
+    uint32_t height = gbm_bo_get_height(bo);
+    uint32_t handles[4] = {0};
+    uint32_t strides[4] = {0};
+    uint32_t offsets[4] = {0};
     uint64_t modifiers[4] = {0};
-    unsigned int format = gbm_bo_get_format(bo);
+    uint32_t format = gbm_bo_get_format(bo);
     uint64_t modifier = gbm_bo_get_modifier(bo);
-    unsigned int fb_id = 0;
+    uint32_t fb_id = 0;
     uint64_t addfb2_mods = 0;
-    int status;
+    int32_t status;
 
     drmGetCap(ctx->fd, DRM_CAP_ADDFB2_MODIFIERS, &addfb2_mods);
 
@@ -366,7 +372,7 @@ static drm_fb_state_t * drm_fb_state_create(lv_drm_ctx_t * ctx, struct gbm_bo * 
     }
 
     if(status < 0) {
-        LV_LOG_ERROR("Failed to create FB: %d", status);
+        LV_LOG_ERROR("Failed to create drm_fb_state: %d", status);
         return NULL;
     }
 
@@ -679,6 +685,23 @@ static void drm_destroy_window(void * driver_data, void * native_window)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     LV_ASSERT(native_window == ctx->gbm_surface);
+
+    if(!ctx->gbm_surface) {
+        return;
+    }
+
+    if(ctx->gbm_bo_pending) {
+        gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_pending);
+        ctx->gbm_bo_pending = NULL;
+    }
+    if(ctx->gbm_bo_flipped) {
+        gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_flipped);
+        ctx->gbm_bo_flipped = NULL;
+    }
+    if(ctx->gbm_bo_presented) {
+        gbm_surface_release_buffer(ctx->gbm_surface, ctx->gbm_bo_presented);
+        ctx->gbm_bo_presented = NULL;
+    }
     gbm_surface_destroy(ctx->gbm_surface);
     ctx->gbm_surface = NULL;
 }
