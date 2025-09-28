@@ -43,7 +43,11 @@ extern "C" {
 
 #ifndef GL_TEXTURE_MAX_LEVEL
 #define GL_TEXTURE_MAX_LEVEL GL_TEXTURE_MAX_LEVEL_APPLE
-#endif
+#endif /*GL_TEXTURE_MAX_LEVEL*/
+
+#ifndef GL_UNPACK_ROW_LENGTH
+#define GL_UNPACK_ROW_LENGTH GL_UNPACK_ROW_LENGTH_EXT
+#endif /*GL_UNPACK_ROW_LENGTH*/
 
 /**********************
  *      TYPEDEFS

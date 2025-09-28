@@ -26,6 +26,7 @@ extern "C" {
 int GLAD_GL_ES_VERSION_2_0 = 0;
 int GLAD_GL_APPLE_texture_max_level = 0;
 int GLAD_GL_EXT_texture_format_BGRA8888 = 0;
+int GLAD_GL_EXT_unpack_subimage = 0;
 int GLAD_GL_OES_mapbuffer = 0;
 int GLAD_GL_OES_vertex_array_object = 0;
 
@@ -447,6 +448,7 @@ static int glad_gl_find_extensions_gles2(void)
 
     GLAD_GL_APPLE_texture_max_level = glad_gl_has_extension(exts, exts_i, "GL_APPLE_texture_max_level");
     GLAD_GL_EXT_texture_format_BGRA8888 = glad_gl_has_extension(exts, exts_i, "GL_EXT_texture_format_BGRA8888");
+    GLAD_GL_EXT_unpack_subimage = glad_gl_has_extension(exts, exts_i, "GL_EXT_unpack_subimage");
     GLAD_GL_OES_mapbuffer = glad_gl_has_extension(exts, exts_i, "GL_OES_mapbuffer");
     GLAD_GL_OES_vertex_array_object = glad_gl_has_extension(exts, exts_i, "GL_OES_vertex_array_object");
 
