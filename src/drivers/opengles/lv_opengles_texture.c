@@ -115,7 +115,7 @@ lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * text
     static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
     lv_display_set_buffers(display, &dummy_buf, NULL, w * h * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
 #else
-    uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
+    uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(display));
     uint32_t buf_size = stride * h;
     texture->fb1 = lv_malloc(buf_size);
     LV_ASSERT_MALLOC(texture->fb1);
@@ -123,7 +123,7 @@ lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * text
         lv_free(texture);
         return LV_RESULT_INVALID;
     }
-    lv_display_set_buffers(disp, texture->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(display, texture->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif
     return LV_RESULT_OK;
 }
