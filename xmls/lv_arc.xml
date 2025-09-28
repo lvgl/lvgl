@@ -1,6 +1,8 @@
 <!--
 Example
-<lv_arc mode="reverse" angles="100° 200°" bg_angles="30° 150°" min_value="40" max_value="120" value="60"/>
+<lv_arc mode="reverse" bg_start_angle="30" bg_end_ange="150"
+                       min_value="40" max_value="120"
+                       value="60"/>
 -->
 
 <widget>
