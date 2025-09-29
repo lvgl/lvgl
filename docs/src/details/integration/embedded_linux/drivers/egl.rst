@@ -43,19 +43,6 @@ This API is currently private and experimental, and people should expect breakin
 This allows you to use EGL with your own context management or other platforms, but the API may change 
 without notice in future versions.
 
-Render Direct to Window
------------------------
-
-.. warning::
-
-    This feature is incomplete and has bugs.
-
-Performance can be improved if the LVGL OpenGL driver renders its cached textures directly to the window 
-(and :c:macro:`LV_USE_DRAW_OPENGLES` is enabled). This can be done by creating the display with 
-:cpp:func:`lv_opengles_window_display_create` instead of :cpp:func:`lv_opengles_texture_create` + 
-:cpp:func:`lv_opengles_texture_get_texture_id` + :cpp:func:`lv_opengles_window_add_texture`.
-Performance should be better with GLFW than EGL. EGL currently has issues when used this way.
-
 Improving Performance
 ---------------------
 
