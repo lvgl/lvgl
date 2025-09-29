@@ -1,14 +1,14 @@
 .. _editor_integration_c:
 
-=======================
-Use the exported C code
-=======================
+=========================
+Using the Exported C Code
+=========================
 
 Overview
 ********
 
 When C code is exported from LVGL's UI Editor, no XML is needed at all
-(``LV_USE_XML`` can be ``0``), but it's very similar to the case when the C code is
+(``LV_USE_XML`` can be ``0``), and it's very similar to the case when the C code is
 written by hand.
 
 The exported C code can simply be dropped into the project and compiled into the
@@ -25,8 +25,8 @@ located. For example, if a PNG and TTF file are located at
 paths can be prefixed. That is, if ``images/logo.png`` was used in the UI Editor,
 then the full path will be ``"A:my_ui/v2.3/assets/images/logo.png"``.
 
-Note that ``ui_init()`` creates only the permanent screen but doesn't load any
-screens. However, this can be done easily by calling ``lv_screen_load(screen1)``.
+Note that ``ui_init()`` creates only the :ref:`permanent screens <xml_screen_permanent>` but
+doesn't load any screens. However, this can be done easily by calling ``lv_screen_load(screen1)``.
 
 Screens can also be created easily by calling their generated create function,
 e.g. ``main_screen_create()``.
@@ -49,7 +49,7 @@ the name of the file. For example:
 - ``lv_obj_t * my_button_create(lv_obj_t * parent, const char * button_text)``
   from ``my_button.xml``
 
-For components, no setters are created, but all the parameters are passed to the
+For Components, no setters are created, but all the parameters are passed to the
 create function.
 
 From each ``globals.xml``, four files are created:
@@ -59,8 +59,10 @@ From each ``globals.xml``, four files are created:
 - Non-generated C and H files that are just wrappers around the generated ones
   where custom code can be placed.
 
-The name of these files is the name of the parent folder of ``globals.xml`` by
+The name of these files is the name of the folder containing the ``globals.xml`` file by
 default. It can be overridden by ``<globals name="my_lib">``.
+
+
 
 Adding custom code
 ******************
@@ -130,6 +132,8 @@ manually create new C and H files for a ``super_button`` with a function like:
 
         return my_button;
     }
+
+
 
 CMake integration
 *****************

@@ -1,8 +1,8 @@
 .. _editor_integration_xml:
 
-====================
-Load XMLs at runtime
-====================
+=======================
+Loading XMLs at Runtime
+=======================
 
 Overview
 ********
@@ -15,20 +15,23 @@ card, downloaded from a server, or anything else.
 The XML files need to be registered so that LVGL can parse their content. It's like
 saving the blueprint of the components.
 
-After that, instances of the registered components and screens can be created.
+After that, instances of the registered Components and Screens can be created.
 
 Note that :ref:`Widgets in XML <xml_widgets>` cannot be loaded at runtime, as widgets
 are built using C code.
 
+
+
 Registering XMLs
 ****************
+
 
 Registering Manually
 --------------------
 
 Use :cpp:expr:`lv_xml_register_component_from_data(name, xml_string)` and
-:cpp:expr:`lv_xml_register_component_from_file("A:path/to/my.xml")` to register the XMLs of
-components, screens, and ``globals.xml`` either as strings or file paths.
+:cpp:expr:`lv_xml_register_component_from_file("A:path/to/my.xml")` to register the
+XML files defining Components, Screens, and ``globals.xml`` either as strings or file paths.
 
 As a result, LVGL will know all the ``<view>``\ s, ``<style>``\ s, ``<const>``\ s, etc., i.e.,
 the full content of these XML files needed to create instances later.
@@ -37,7 +40,8 @@ Similarly, translations can be registered by
 :cpp:expr:`lv_xml_register_translation_from_data()` and
 :cpp:expr:`lv_xml_register_translation_from_file()`.
 
-Fonts and images are registered automatically when ``globals.xml`` is registered.
+Fonts and Images are registered automatically when ``globals.xml`` is registered.
+
 
 Batch Registration from a Folder
 --------------------------------
@@ -46,10 +50,11 @@ Instead of calling the register functions one by one, it's also possible to load
 XML files and assets at once.
 
 :cpp:expr:`lv_xml_load_all_from_path("A:path/to/dir")` will traverse a directory and
-register all XML components, screens, globals, and translations.
+register all XML Components, Screens, globals, and translations.
 
-Registering from Blob
----------------------
+
+Registering from a Blob
+-----------------------
 
 There are some additional XML loading functions available when using :ref:`frogfs`.
 
@@ -74,6 +79,7 @@ If the blob is saved as a file (e.g., on an SD card), use
 
     lv_xml_load_t * handle = lv_xml_load_all_from_file("A:path/to/frogfs.bin");
     /* `handle` can optionally be passed to `lv_xml_unload` later */
+
 
 Registering External Data
 -------------------------
@@ -105,6 +111,7 @@ Besides events, it's common to register images and fonts stored in the applicati
 by :cpp:expr:`lv_xml_register_image(scope, "image_name", path_or_pointer)` and
 :cpp:expr:`lv_xml_register_font(scope, "font_name", path_or_pointer)`.
 
+
 Registering Widgets
 -------------------
 
@@ -113,28 +120,35 @@ XML parser knows how to create an element like ``<lv_slider>`` when it appears i
 
 Use :cpp:expr:`lv_xml_register_widget("widget_name", create_cb, apply_cb)` for that.
 
+To learn more about Widgets in XML and the callbacks refer to :ref:`xml_widgets`.
+
 Note that the built-in widgets of LVGL are registered automatically.
+
+
 
 Creating Instances
 ******************
 
+
 Creating Screens
 ----------------
 
-By default, no widget or screen is created. The user needs to create the permanent
-screens and any other required screens to get started.
+By default, no Widget or Screen is created. The user needs to create the
+:ref:`xml_screen_permanent <Permanent Screens>` and any other required Screens to
+get started.
 
 Use :cpp:expr:`lv_xml_create_screen("name")`, where ``"name"`` is the name of the XML
 file or the name used when the XML data was registered.
 
-It returns an ``lv_obj_t *`` that can be loaded as any regular :ref:`screens` using
+It returns an ``lv_obj_t *`` that can be loaded as any regular :ref:`Screen <screens>` using
 :cpp:expr:`lv_screen_load()`.
+
 
 Creating Components
 -------------------
 
-Use :cpp:expr:`lv_xml_create(parent, "name", attributes)` to create any widget,
-component, or screen at runtime from the registered XMLs.
+Use :cpp:expr:`lv_xml_create(parent, "name", attributes)` to create any Widget,
+Component, or Screen at runtime from the registered XMLs.
 
 ``attributes`` is an array of property name-value pairs, terminated by ``NULL, NULL``.
 
@@ -187,6 +201,8 @@ Or to add styles:
 
     lv_xml_create(button1, "style", attrs);
 
+
+
 The Whole Flow
 ***************
 
@@ -195,7 +211,7 @@ To load everything at runtime correctly, the steps need to be executed in this o
 1. **Register custom widgets**. These are independent of XML, but XML components rely
    on them. Built-in widgets are registered automatically.
 2. Register events, fonts, images, etc., that are compiled into the code so they are
-   available for the components and screens registered later.
-3. Register the XMLs of ``globals.xml`` files, components, and screens.
-4. Create the permanent screens and other required screens.
+   available for the Components and Screens registered later.
+3.Register ``globals.xml``\ s and those defining Components and Screens.
+4. Create the :ref:`Permanent Screens <xml_screen_permanent>` and other required screens.
 5. Load the start screen.
