@@ -338,6 +338,8 @@ typedef struct _lv_draw_sw_blend_fill_dsc_t lv_draw_sw_blend_fill_dsc_t;
 
 typedef struct _lv_draw_sw_blend_image_dsc_t lv_draw_sw_blend_image_dsc_t;
 
+typedef struct _lv_draw_buf_import_dsc_t lv_draw_buf_import_dsc_t;
+
 typedef struct _lv_draw_buf_handlers_t lv_draw_buf_handlers_t;
 
 typedef struct _lv_rlottie_t lv_rlottie_t;

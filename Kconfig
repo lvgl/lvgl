@@ -528,6 +528,15 @@ menu "LVGL configuration"
 			range 2 4
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_M2D
+			bool "Enable M2D rendering"
+			default n
+			select LV_USE_LINUX_DRM
+			help
+				The libm2d library abstracts 2D GPUs like the Microchip GFX2D or
+				some Vivante GC. libm2d is a linux user-space library that currently
+				relies on the libdrm library and the DRM sub-system of the Linux kernel.
+
 	endmenu
 
 	menu "Feature Configuration"

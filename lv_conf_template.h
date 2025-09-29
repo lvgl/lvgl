@@ -390,6 +390,8 @@
     #define LV_DRAW_EVE_EVE_GENERATION 4
 #endif
 
+/** Use M2D rendering. */
+#define LV_USE_DRAW_M2D 0
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

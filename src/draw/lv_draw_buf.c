@@ -256,7 +256,14 @@ lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, u
                                       lv_color_format_t cf, uint32_t stride)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    lv_draw_buf_t * draw_buf;
+    if(handlers->create_cb) {
+        draw_buf = handlers->create_cb(handlers, w, h, cf, stride);
+        LV_PROFILER_DRAW_END;
+        return draw_buf;
+    }
+
+    draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
     if(draw_buf == NULL) {
         LV_PROFILER_DRAW_END;
@@ -354,8 +361,13 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
         LV_ASSERT_NULL(draw_buf->handlers);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
-        draw_buf_free(handlers, draw_buf->unaligned_data);
-        lv_free(draw_buf);
+        if(handlers->destroy_cb) {
+            handlers->destroy_cb(draw_buf);
+        }
+        else {
+            draw_buf_free(handlers, draw_buf->unaligned_data);
+            lv_free(draw_buf);
+        }
     }
     else {
         LV_LOG_ERROR("draw buffer is not allocated, ignored");

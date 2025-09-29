@@ -72,6 +72,9 @@
 #if LV_USE_DRAW_OPENGLES
     #include "draw/opengles/lv_draw_opengles.h"
 #endif
+#if LV_USE_DRAW_M2D
+    #include "draw/m2d/lv_draw_m2d.h"
+#endif
 #if LV_USE_PPA
     #include "draw/espressif/ppa/lv_draw_ppa.h"
 #endif
@@ -262,6 +265,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_OPENGLES
     lv_draw_opengles_init();
+#endif
+
+#if LV_USE_DRAW_M2D
+    lv_draw_m2d_init();
 #endif
 
 #if LV_USE_PPA
@@ -489,6 +496,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_OPENGLES
     lv_draw_opengles_deinit();
+#endif
+
+#if LV_USE_DRAW_M2D
+    lv_draw_m2d_deinit();
 #endif
 
 #if LV_USE_DRAW_SW
