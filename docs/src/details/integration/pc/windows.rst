@@ -94,7 +94,7 @@ whereas **Application Mode**:
 - uses window size (not client area) when setting resolution via :cpp:func:`lv_windows_create_display`, and
 - requires apps to handle display resolution changes properly.
 
-The mode can be selected by calling :cpp:expr:`lv_windows_create_display`.
+The mode can be selected by calling :cpp:func:`lv_windows_create_display`.
 
 Prerequisites
 -------------
