@@ -1,13 +1,15 @@
 /**
  * SPDX-License-Identifier: (WTFPL OR CC0-1.0) AND Apache-2.0
  */
+
+#include "../../lv_opengles_egl.h"
+
+#if LV_USE_EGL
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../include/glad/gles2.h"
-
-#include "../../lv_opengles_egl.h"
-#if LV_USE_EGL
 
 #ifndef GLAD_IMPL_UTIL_C_
     #define GLAD_IMPL_UTIL_C_
