@@ -134,7 +134,7 @@ Creating Screens
 ----------------
 
 By default, no Widget or Screen is created. The user needs to create the
-:ref:`xml_screen_permanent <Permanent Screens>` and any other required Screens to
+:ref:`Permanent Screens <xml_screen_permanent>` and any other required Screens to
 get started.
 
 Use :cpp:expr:`lv_xml_create_screen("name")`, where ``"name"`` is the name of the XML
@@ -212,6 +212,6 @@ To load everything at runtime correctly, the steps need to be executed in this o
    on them. Built-in widgets are registered automatically.
 2. Register events, fonts, images, etc., that are compiled into the code so they are
    available for the Components and Screens registered later.
-3.Register ``globals.xml``\ s and those defining Components and Screens.
+3. Register ``globals.xml``\ s and those defining Components and Screens.
 4. Create the :ref:`Permanent Screens <xml_screen_permanent>` and other required screens.
 5. Load the start screen.
