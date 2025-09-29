@@ -9,11 +9,6 @@ The LVGL Editor provides a Node-based command line tool, ``lved-cli.js``, for ge
 .. note::
    Pre-release build. Intended for development and CI. Expires end of 2025.
 
-.. toctree::
-   :maxdepth: 2
-   :local:
-
-
 Overview
 ********
 
