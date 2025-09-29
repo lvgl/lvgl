@@ -306,12 +306,16 @@ static int drm_do_page_flip(lv_drm_ctx_t * ctx, int timeout_ms)
     event_ctx.page_flip_handler = drm_on_page_flip;
 
     struct timeval timeout;
+    int status;
     if(timeout_ms >= 0) {
         timeout.tv_sec = timeout_ms / 1000;
         timeout.tv_usec = (timeout_ms % 1000) * 1000;
+        status = select(ctx->fd + 1, &fds, NULL, NULL, &timeout);
+    }
+    else {
+        status = select(ctx->fd + 1, &fds, NULL, NULL, NULL);
     }
 
-    int status = select(ctx->fd + 1, &fds, NULL, NULL, &timeout);
     if(status == 1) {
         drmHandleEvent(ctx->fd, &event_ctx);
     }
