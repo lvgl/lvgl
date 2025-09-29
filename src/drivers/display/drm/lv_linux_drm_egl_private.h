@@ -1,5 +1,5 @@
 /**
- * @file lv_drm_egl_private.h
+ * @file lv_linux_drm_egl_private.h
  *
  */
 

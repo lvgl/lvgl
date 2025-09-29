@@ -53,4 +53,4 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OPENGLES_H*/
+#endif /*LV_OPENGLES_EGL_H*/
