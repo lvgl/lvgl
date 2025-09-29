@@ -4835,15 +4835,4 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif  /*defined(LV_CONF_SKIP)*/
 
-/* Temporary additions to test out the LV_LINUX_DRM_USE_EGL path */
-
-#define LV_EGL_ADAPTED_WITH_GLESV2 1
-#define LV_EGL_ADAPTED_WITH_GL 0
-
-#define LV_ADAPTED_ON_DRM 1
-#define LV_ADAPTED_ON_WAYLAND 0
-#define LV_ADAPTED_ON_GBM 0
-
-#define HAVE_GBM_SURFACE_CREATE_WITH_MODIFIERS2 1
-
 #endif  /*LV_CONF_INTERNAL_H*/
