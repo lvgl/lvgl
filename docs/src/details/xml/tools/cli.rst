@@ -12,9 +12,9 @@ The LVGL Editor provides a Node-based command line tool, ``lved-cli.js``, for ge
 Overview
 ********
 
-- **Binary:** ``lved-cli.js`` (Node script) `Download Here <https://github.com/lvgl/lvgl_editor/releases>`_
+- **Binary:** ``lved-cli.js`` (Node script) `Download CLI <https://github.com/lvgl/lvgl_editor/releases>`_
 - **Platform:** Node 18+ recommended
-- **Container engine:** Podman (if not on Windows, `Download Here <https://github.com/containers/podman/releases>`_)
+- **Container engine:** Podman (if not on Windows, `Download Podman <https://github.com/containers/podman/releases>`_)
 
 
 Quick start
@@ -38,14 +38,14 @@ Validate content of the XML files (limit shown errors):
 
    lved-cli.js validate path/to/project --errorlimit 25
 
-Run the `<test>`(s) from the XML files 
+Run the ``<test>``\ (s) from the XML files
 
 .. code-block:: bash
 
    lved-cli.js run-all-tests path/to/project
    lved-cli.js run-test path/to/project tests/test-file.xml
 
-Synchronize the styles and images from Figma: 
+Synchronize the styles and images from Figma:
 
 .. code-block:: bash
 
