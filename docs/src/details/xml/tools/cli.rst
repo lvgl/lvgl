@@ -51,24 +51,6 @@ Synchronize the styles and images from Figma:
 
    lved-cli.js figma-sync path/to/project --start-service
 
-
-Usage
-*****
-
-.. code-block:: text
-
-   lved-cli.js [command] [options] [arguments]
-
-**Commands**
-
-- ``generate`` – generate code from XML
-- ``compile`` – compile for a target (web/node)
-- ``compare`` – compare two directories (presence + normalized content)
-- ``figma-sync`` – sync project with Figma
-- ``validate`` – validate XML and limit shown errors
-- ``run-test`` – run tests from a single file
-- ``run-all-tests`` – discover and run all ``test*.xml`` files
-
 Commands
 ********
 
