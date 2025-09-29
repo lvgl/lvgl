@@ -12,41 +12,40 @@ The LVGL Editor provides a Node-based command line tool, ``lved-cli.js``, for ge
 Overview
 ********
 
-- **Binary:** ``lved-cli.js`` (Node script)
+- **Binary:** ``lved-cli.js`` (Node script) `Download Here <https://github.com/lvgl/lvgl_editor/releases>`_
 - **Platform:** Node 18+ recommended
-- **Container engine:** Podman
-- **Resources:** unpacked from ``lvgl-resources.zip`` to an internal directory
+- **Container engine:** Podman (if not on Windows, `Download Here <https://github.com/containers/podman/releases>`_)
 
 
 Quick start
 ***********
 
-Generate:
+Generate C and H files from XMLs:
 
 .. code-block:: bash
 
    lved-cli.js generate path/to/project
 
-Compile (web or node):
+Compile (web or node) the runtime Binary for previewing or testing the UI:
 
 .. code-block:: bash
 
    lved-cli.js compile path/to/project --target web --start-service
 
-Validate (limit shown errors):
+Validate content of the XML files (limit shown errors):
 
 .. code-block:: bash
 
    lved-cli.js validate path/to/project --errorlimit 25
 
-Tests:
+Run the `<test>`(s) from the XML files 
 
 .. code-block:: bash
 
    lved-cli.js run-all-tests path/to/project
    lved-cli.js run-test path/to/project tests/test-file.xml
 
-Figma sync:
+Synchronize the styles and images from Figma: 
 
 .. code-block:: bash
 
@@ -69,18 +68,6 @@ Usage
 - ``validate`` – validate XML and limit shown errors
 - ``run-test`` – run tests from a single file
 - ``run-all-tests`` – discover and run all ``test*.xml`` files
-
-**Options**
-
-- ``-ss, --start-service`` – start or refresh the container service before running
-- ``--target <web|node>`` – compile target (``compile``)
-- ``-l, --errorlimit <n>`` – max errors shown (``validate``)
-
-**Common arguments**
-
-- ``<project-path>`` – path to an LVGL Editor project
-- ``<testing-file>`` – test XML relative to ``<project-path>`` (``run-test``)
-
 
 Commands
 ********
@@ -158,6 +145,11 @@ Discover and run all ``test*.xml`` files.
 
    lved-cli.js run-all-tests <project-path>
 
+Common Arguments
+----------------
+
+- ``<project-path>`` – path to an LVGL Editor project
+- ``<testing-file>`` – test XML relative to ``<project-path>`` (``run-test``)
 
 Options
 -------
