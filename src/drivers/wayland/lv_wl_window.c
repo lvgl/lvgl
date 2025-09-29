@@ -232,7 +232,7 @@ void lv_wayland_assign_physical_display(lv_display_t * disp, int display)
     struct window * window = lv_display_get_user_data(disp);
 
     if(!window || window->closed) {
-        LV_LOG_ERROR("Invalid wind");
+        LV_LOG_ERROR("Invalid window");
         return;
     }
 
