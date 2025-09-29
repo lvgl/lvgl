@@ -158,6 +158,19 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
  */
 void lv_label_set_recolor(lv_obj_t * obj, bool en);
 
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for this label. Memory will be allocated to store the tag by the label.
+ * The label text will automatically update when the language is changed via `lv_translation_set_language`.
+ * @param obj           pointer to a label object
+ * @param tag          '\0' terminated character string.
+ */
+void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
+
+
 /*=====================
  * Getter functions
  *====================*/

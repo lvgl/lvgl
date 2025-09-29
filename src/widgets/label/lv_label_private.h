@@ -31,6 +31,9 @@ extern "C" {
 struct _lv_label_t {
     lv_obj_t obj;
     char * text;
+#if LV_USE_TRANSLATION
+    char * translation_tag;
+#endif /*LV_USE_TRANSLATION*/
     char dot[LV_LABEL_DOT_NUM + 1]; /**< Bytes that have been replaced with dots */
     uint32_t dot_begin;  /**< Offset where bytes have been replaced with dots */
 

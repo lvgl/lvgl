@@ -101,7 +101,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, viewer->shader_manager);
+    lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
 }
 
@@ -110,7 +110,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, viewer->shader_manager);
+    lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
 }
 
@@ -472,7 +472,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_gltf_view_shader_get_src(&portions);
     char * vertex_shader = lv_gltf_view_shader_get_vertex();
     char * frag_shader = lv_gltf_view_shader_get_fragment();
-    view->shader_manager = lv_opengl_shader_manager_create(portions.all, portions.count, vertex_shader, frag_shader);
+    lv_opengl_shader_manager_init(&view->shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
@@ -507,7 +507,7 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_gltf_t * view = (lv_gltf_t *)obj;
-    lv_opengl_shader_manager_destroy(view->shader_manager);
+    lv_opengl_shader_manager_deinit(&view->shader_manager);
     using IbmBySkinThenNodeMap = std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>>;
 
     view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
@@ -611,7 +611,7 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
         }
     };
 
-    setup_compile_and_load_bg_shader(viewer->shader_manager);
+    setup_compile_and_load_bg_shader(&viewer->shader_manager);
     fastgltf::iterateSceneNodes(model->asset, 0, fastgltf::math::fmat4x4(), iterate_callback);
 }
 

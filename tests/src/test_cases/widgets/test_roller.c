@@ -57,6 +57,33 @@ void test_roller_get_options(void)
     TEST_ASSERT_EQUAL_STRING(default_roller_options, lv_roller_get_options(roller));
 }
 
+void test_roller_get_option_str(void)
+{
+    lv_result_t res;
+    char option_str[OPTION_BUFFER_SZ] = {0x00};
+    char * expected_strs[] = {"One", "Two", "Three"};
+    uint16_t expected_str_count = sizeof(expected_strs) / sizeof(expected_strs[0]);
+
+    /* Select the last option, index starts at 0 */
+    uint16_t option_count = lv_roller_get_option_count(roller);
+    TEST_ASSERT_EQUAL(expected_str_count, option_count);
+
+    for(uint16_t i = 0; i < option_count; ++i) {
+        memset(option_str, 0x00, sizeof(option_str));
+        res = lv_roller_get_option_str(roller, i, option_str, OPTION_BUFFER_SZ);
+        TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+        TEST_ASSERT_EQUAL_STRING(expected_strs[i], option_str);
+    }
+
+    memset(option_str, 0x00, sizeof(option_str));
+    res = lv_roller_get_option_str(roller, option_count, option_str, OPTION_BUFFER_SZ);
+    TEST_ASSERT_EQUAL(res, LV_RESULT_INVALID);
+
+    memset(option_str, 0x00, sizeof(option_str));
+    res = lv_roller_get_option_str(roller, -1, option_str, OPTION_BUFFER_SZ);
+    TEST_ASSERT_EQUAL(res, LV_RESULT_INVALID);
+}
+
 void test_roller_get_selected_option(void)
 {
     char actual_str[OPTION_BUFFER_SZ] = {0x00};

@@ -6,7 +6,8 @@
 #include <string.h>
 
 static const lv_opengl_shader_t src_includes[] = {
-	{ "hsv_adjust.glsl", R"(
+    {
+        "hsv_adjust.glsl", R"(
         
         uniform float u_Hue;
         uniform float u_Saturation;
@@ -36,23 +37,28 @@ static const lv_opengl_shader_t src_includes[] = {
             hsv.z = clamp(hsv.z * u_Value, 0.0, 1.0);
             return hsv2rgb(hsv);
         }
-    )" },
-	{ "brightness_adjust.glsl", R"(
+    )"
+    },
+    {
+        "brightness_adjust.glsl", R"(
         uniform float u_Brightness; // add/subtract in [ -1.0 .. +1.0 ], 0.0 = no change
 
         vec3 adjustBrightness(vec3 color){
             return clamp(color + vec3(u_Brightness), 0.0, 1.0);
         }
 
-    )" },
-	{ "contrast_adjust.glsl", R"(
+    )"
+    },
+    {
+        "contrast_adjust.glsl", R"(
         uniform float u_Contrast; // 0.0 = mid-gray, 1.0 = no change, >1.0 increases contrast
 
         vec3 adjustContrast(vec3 color){
             // shift to [-0.5..0.5], scale, shift back
             return clamp(((color - 0.5) * u_Contrast) + 0.5, 0.0, 1.0);
         }
-    )" },
+    )"
+    },
 };
 
 static const char * src_vertex_shader = R"(
@@ -127,8 +133,8 @@ char* lv_opengles_standard_shader_get_fragment(void) {
 
 void lv_opengles_standard_shader_get_src(lv_opengl_shader_portions_t *portions)
 {
-	portions->all = src_includes;
-	portions->count = sizeof(src_includes) / sizeof(src_includes[0]);
+    portions->all = src_includes;
+    portions->count = sizeof(src_includes) / sizeof(src_includes[0]);
 }
 
 #endif /*LV_USE_OPENGLES*/

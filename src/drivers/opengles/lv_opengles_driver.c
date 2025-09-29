@@ -19,7 +19,6 @@
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_standard_shader.h"
-#include <stdio.h> /* MK TEMP */
 
 /*********************
  *      DEFINES
@@ -53,7 +52,7 @@ static unsigned int lv_opengles_index_buffer_get_count(void);
 static void lv_opengles_index_buffer_bind(void);
 static void lv_opengles_index_buffer_unbind(void);
 static void lv_opengles_shader_manager_init(void);
-static void lv_opengles_shader_program_init(void);
+static unsigned int lv_opengles_shader_program_init(void);
 static void lv_opengles_shader_init(void);
 static void lv_opengles_shader_deinit(void);
 static void lv_opengles_shader_bind(void);
@@ -78,7 +77,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
  **********************/
 static bool is_init;
 
-static lv_opengl_shader_manager_t * shader_manager;
+static lv_opengl_shader_manager_t shader_manager;
 
 static unsigned int vertex_buffer_id = 0;
 
@@ -269,7 +268,6 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
-
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
 }
@@ -382,29 +380,28 @@ static void lv_opengles_shader_manager_init(void)
     lv_free(frag_shader);
 }
 
-static void lv_opengles_shader_program_init(void)
+static unsigned int lv_opengles_shader_program_init(void)
 {
     uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.frag", NULL, 0);
     uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.vert", NULL, 0);
-
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(shader_manager, frag_shader_hash,
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash,
                                                                                 vert_shader_hash);
-
-    shader_id = lv_opengl_shader_program_get_id(program);
+    return lv_opengl_shader_program_get_id(program);
 }
 
 static void lv_opengles_shader_init(void)
 {
     if(shader_id == 0) {
         lv_opengles_shader_manager_init();
-        lv_opengles_shader_program_init();
+        shader_id = lv_opengles_shader_program_init();
     }
 }
 
 static void lv_opengles_shader_deinit(void)
 {
     if(shader_id == 0) return;
-    GL_CALL(glDeleteProgram(shader_id));
+    /* The program is part of the manager and as such will be destroyed inside */
+    lv_opengl_shader_manager_deinit(&shader_manager);
     shader_id = 0;
 }
 

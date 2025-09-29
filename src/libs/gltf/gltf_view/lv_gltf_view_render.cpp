@@ -253,7 +253,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         }
 
         if(opt_draw_bg) {
-            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+            setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
         render_materials(viewer, model, model->opaque_nodes_by_material_index);
@@ -288,7 +288,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         return vstate->render_state.texture;
     }
     if(opt_draw_bg)
-        setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+        setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
     render_materials(viewer, model, model->opaque_nodes_by_material_index);
 
     for(const auto & node_distance_pair : distance_sort_nodes) {

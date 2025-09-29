@@ -789,5 +789,65 @@ void test_label_wrap_mode_clip(void)
     lv_snprintf(buf, sizeof(buf), "widgets/label_wrap_clip.png");
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
 }
+void test_label_translation_tag(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El Tigre");
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
+}
+
+void test_label_setting_text_disables_translation(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text should unbind the translation tag*/
+    lv_label_set_text(label, "Hello world");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text static should unbind the translation tag*/
+    lv_label_set_text_static(label, "Hello world");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    /* Using set text fmt should unbind the translation tag*/
+    lv_label_set_text_fmt(label, "Hello world %d", 1);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world 1");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+}
 
 #endif
