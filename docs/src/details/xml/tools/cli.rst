@@ -19,7 +19,7 @@ Overview
 
 - **Binary:** ``lved-cli.js`` (Node script)
 - **Platform:** Node 18+ recommended
-- **Container engine:** auto-detected (Podman)
+- **Container engine:** Podman
 - **Resources:** unpacked from ``lvgl-resources.zip`` to an internal directory
 
 
@@ -107,7 +107,7 @@ Compile for a target.
 
 .. code-block:: bash
 
-   lved-cli.js compile <project-path> [--start-service] --target <web|node>
+   lved-cli.js compile <project-path> [--start-service] [--target <web|node>]
 
 - ``--target`` defaults to ``web`` (choices: ``web``, ``node``)
 
@@ -190,7 +190,5 @@ Compile for Node:
 CI/CD
 -----
 
-Minimal GitHub Actions workflow example:
-
-See an example GitHub Actions workflow `Here <https://github.com/lvgl/lvgl_editor/blob/master/.github/workflows/pr-check.yml>`_
+See an example `GitHub Actions workflow <https://github.com/lvgl/lvgl_editor/blob/master/.github/workflows/pr-check.yml>`_
 
