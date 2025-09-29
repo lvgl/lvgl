@@ -85,6 +85,7 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = 0;
         /*Copy the first UTF8 character from the buffer*/
         uint32_t utf8_len = lv_text_encoded_size(dev->buf);
+        if(utf8_len == 0) utf8_len = 1; /*Make sure that at least 1 character is read*/
         lv_memcpy(&data->key, dev->buf, utf8_len);
 
         /*Drop the first character*/
