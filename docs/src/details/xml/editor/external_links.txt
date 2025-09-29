@@ -1,0 +1,3 @@
+.. _VSCode Simulator:   https://github.com/lvgl/lv_port_pc_vscode
+.. _Manage personal access tokens:  https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens
+.. _Figma:              https://www.figma.com/
