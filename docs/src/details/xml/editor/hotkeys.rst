@@ -46,4 +46,10 @@ Preview Pane
 :Two-Fingered Scroll:  Pan preview
 
 
+Pressing the Ctrl key also allows you to:
 
+- visualise bounding box, padding, margins and click area,
+- check size and position by dragging,
+- perform measurement,
+- double click to jump to the XML file,
+- single click to change editor focus to the matching XML element.

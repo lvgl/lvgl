@@ -14,7 +14,7 @@ The first time you launch |lvglpro|, it will pop up a window with the message
 
     "Pulling Container image for LVGL, this may take a few minutes...".
 
-This message means the Editor is downloading a pre-configured a container image that
+This message means the Editor is downloading a pre-configured container image that
 includes all the necessary tools and dependencies for building LVGL projects.
 |lvglpro| handles (and updates) the container automatically in the background.  The
 process can take a few minutes the first time, depending on your internet speed, but
@@ -23,6 +23,28 @@ it only happens once.  After that, the container is reused for future sessions.
 When a new version of the container is published (e.g. with updated toolchains, build
 logic, etc.), the Editor automatically checks for and pulls the latest version.  You
 won’t need to do anything manually, it stays up-to-date in the background.
+
+
+
+Login
+*****
+
+.. TODO
+
+hints:
+- enter your email address
+- you will recevie an email with an OTP (On Time Password)
+- it will create a user for you
+- no password is needed
+
+
+
+Licence Selection
+*****************
+
+.. TODO
+
+After logging in you need select a licence for the list.
 
 
 
@@ -44,24 +66,18 @@ Component Libraries vs Regular Projects
 A Component Library is a set of 1 or more XML files that can be used in any
 |lvglpro| Project.
 
-Regular |lvglpro| Projects use Component Libraries, but Component Libraries do not
-use regular Projects.
+|lvglpro| UI Projects use Component Libraries, but Component Libraries do not
+use UI Projects.
 
 
 The Difference Between the Two
 ------------------------------
 
-The difference between the directory structures two types of |lvglpro| projects
-(Projects vs Component Libraries) is that a Project has a ``project.xml`` file in it
-(which ties together all of its parts), and a Component Library does not.
+The difference between the directory structures of the two types of |lvglpro| projects
+(UI Projects vs Component Libraries) is that a UIProject has a ``project.xml`` file
+in it (which ties together all of its parts), and a Component Library does not.
 
-TODO:  elaborate on what ``project.xml`` describes Gabor
-
-
-Nesting Projects
-----------------
-
-TODO Gabor
+.. TODO: Gabor  elaborate on what ``project.xml`` describes
 
 
 
@@ -120,13 +136,13 @@ Right Panel
 .. _preview pane:
 .. _inspector:
 
-Inspector
-~~~~~~~~~
+Preview Pane and Inspector
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the Editor Pane is editing an XML file defining a Component or Widget, the
-the Inspector shows a live preview of the XML UI definition being edited, pushed
-through *real LVGL rendering* so you can instantly see the results of your work,
-that will match the final result produced by firmware, accurate down to the pixel.
+Preview Pane shows a live preview of the XML UI definition being edited, pushed
+through *real LVGL rendering* so you can instantly see the results of your work, that
+will match the final result produced by firmware, accurate down to the pixel.
 
 Simultaneously, it allows you to interact with that UI to see how it will look and
 feel at runtime.
@@ -143,7 +159,8 @@ How it Works:
   validate the XMLs
 - code is also exported by parsing the XML files
 
-Pressing the Ctrl key also allows you to:
+Turn the Preview Pane into an Inspector by holding down the [Ctrl] key.  The Inspector
+allows you to:
 
 - visualise bounding box, padding, margins and click area
 - check size and position by dragging
@@ -151,7 +168,7 @@ Pressing the Ctrl key also allows you to:
 - double click to jump to the XML file
 - single click to change editor focus to the matching XML element
 
-TODO Gabor 20 sec video to show all these
+.. TODO Gabor 20 sec video to show all these
 
 .. _console/subjects pane:
 
@@ -167,6 +184,8 @@ manage certain lists as part of your project.
                 source files.  Each Subject represents a single "datum" in the
                 application, that UI elements (Widgets and Components) can "observe"
                 and reflect visually. See :ref:`xml_subjects` for more details.
+
+:Test Tab:      TODO:  Description of Test Tab
 
 Tabs Coming Soon:  Tests, Translations, Animations
 

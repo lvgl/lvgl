@@ -12,21 +12,9 @@ Here are the guides to download and install |lvglpro| appropriate for your platf
 Windows
 *******
 
-Navigate to https://github.com/lvgl/lvgl_editor/, scan down the right panel and
-find "Releases".
-
-If the version you want to download is showing, click it to go to the downloads page.
-If not, click on "+ N releases", then find and click on the release you want to
-download.
-
-Note:  this method will change as |lvglpro| reaches commercial-release stage.
-
-Once on the desired download page, right click on the file appropriate for your
-platform and select "Save Link As...", and save it on your workstation.
-
-Extract the file(s) from the compressed archive file and execute the installer to
-install |lvglpro|.  On Windows, that means launch the ``LVGL Pro Setup
-x.x.x.exe`` installer.
+Navigate to https://pro.lvgl.io/#download and press the [Download] button and save the
+resulting image to your workstation.  Then execute the downloaded installer to install
+|lvglpro|.
 
 
 Troubleshooting
@@ -37,7 +25,9 @@ Troubleshooting
 Linux
 *****
 
-TODO Gabor
+Installing |lvglpro| on Linux is as simple as downloading the AppImage, making it
+executable (``chmod +x LVGLPro.AppImage``), and running it.
+
 
 
 Troubleshooting
@@ -53,7 +43,7 @@ Launching on Linux
 
             .. code-block:: bash
 
-                (process:3943): Gtk-ERROR \*\*: 11:45:01.301: GTK 2/3 symbols detected.
+                (process:3943): Gtk-ERROR **: 11:45:01.301: GTK 2/3 symbols detected.
                 Using GTK 2/3 and GTK 4 in the same process is not supported
                 Trace/breakpoint trap (core dumped)
 
@@ -68,7 +58,7 @@ Launching on Linux
 MacOS
 *****
 
-TODO Gabor
+.. TODO Gabor
 
 
 Troubleshooting

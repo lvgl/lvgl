@@ -4,4 +4,4 @@
 Editor license
 ==============
 
-TODO: describe the pricing models and conditions
+.. TODO: describe the pricing models and conditions
