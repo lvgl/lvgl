@@ -9,7 +9,7 @@
 #include "lv_file_explorer_private.h"
 #include "../../misc/lv_fs_private.h"
 #include "../../core/lv_obj_class_private.h"
-#if LV_USE_FILE_EXPLORER != 0
+#if LV_USE_FILE_EXPLORER
 
 #include "../../lvgl.h"
 #include "../../core/lv_global.h"
@@ -24,6 +24,9 @@
 
 #define LV_FILE_NAVIGATION_CURRENT_DIR  "."
 #define LV_FILE_NAVIGATION_PARENT_DIR   "Back"
+
+#define quick_access_style (LV_GLOBAL_DEFAULT()->file_explorer_quick_access_style)
+#define file_explorer_count (LV_GLOBAL_DEFAULT()->file_explorer_count)
 
 /**********************
  *      TYPEDEFS
@@ -53,11 +56,6 @@ static bool is_end_with(const char * str1, const char * str2);
  *  STATIC VARIABLES
  **********************/
 
-#if LV_FILE_EXPLORER_QUICK_ACCESS
-    static lv_style_t quick_access_style;
-#endif
-
-static size_t file_explorer_count;
 
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
@@ -352,11 +350,9 @@ static void lv_file_explorer_destructor(const lv_obj_class_t * class_p, lv_obj_t
     LV_UNUSED(class_p);
     LV_UNUSED(obj);
     file_explorer_count--;
-#if LV_FILE_EXPLORER_QUICK_ACCESS
-    if(file_explorer_count == 0) {
+    if(LV_FILE_EXPLORER_QUICK_ACCESS && file_explorer_count == 0) {
         lv_style_reset(&quick_access_style);
     }
-#endif
 }
 
 static void init_style(lv_obj_t * obj)
