@@ -74,9 +74,15 @@ static char * find_by_class(void)
             continue;
         }
 
-        const size_t buf_size = lv_strlen(LV_DRM_CARD_PATH) + 2;
+        const size_t buf_size = lv_strlen(LV_DRM_CARD_PATH) + 3;
         char * card_path = lv_zalloc(buf_size);
-        lv_snprintf(card_path, buf_size, LV_DRM_CARD_PATH "%c", ent->d_name[4]);
+        if(ent->d_name[5] != '-') {
+            /* Double digit card*/
+            lv_snprintf(card_path, buf_size, LV_DRM_CARD_PATH "%c%c", ent->d_name[4], ent->d_name[5]);
+        }
+        else {
+            lv_snprintf(card_path, buf_size, LV_DRM_CARD_PATH "%c", ent->d_name[4]);
+        }
         closedir(d);
         return card_path;
     }
