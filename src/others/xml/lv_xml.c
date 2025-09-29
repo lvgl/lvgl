@@ -913,6 +913,7 @@ static void create_timeline_instances(lv_xml_parser_state_t * state)
         LV_ASSERT_MALLOC(my_timeline->user_data);
         if(my_timeline->user_data == NULL) {
             lv_anim_timeline_delete(my_timeline);
+            lv_free(timeline_array);
             LV_LOG_WARN("Couldn't allocate memory");
             return;
         }
