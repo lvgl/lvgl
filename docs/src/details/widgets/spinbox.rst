@@ -92,7 +92,7 @@ versa.
 It supports integer subjects.
 
 
-- :cpp:expr:`lv_spinbox_bind_value(arc, &subject)`
+- :cpp:expr:`lv_spinbox_bind_value(spinbox, &subject)`
 
 
 .. _lv_spinbox_keys:
