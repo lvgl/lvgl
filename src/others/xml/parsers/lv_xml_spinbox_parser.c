@@ -60,7 +60,6 @@ void lv_xml_spinbox_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("min_value", name)) lv_spinbox_set_min_value(item, lv_xml_atoi(value));
         else if(lv_streq("max_value", name)) lv_spinbox_set_max_value(item, lv_xml_atoi(value));
         else if(lv_streq("step", name)) lv_spinbox_set_step(item, lv_xml_atoi(value));
-        else if(lv_streq("step", name)) lv_spinbox_set_step(item, lv_xml_atoi(value));
         else if(lv_streq("bind_value", name)) {
             lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject) {

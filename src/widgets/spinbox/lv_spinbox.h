@@ -95,8 +95,8 @@ void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step);
 /**
  * Set spinbox value range
  * @param obj       pointer to spinbox
- * @param min_value maximum value, inclusive
- * @param max_value minimum value, inclusive
+ * @param min_value minimum value, inclusive
+ * @param max_value maximum value, inclusive
  */
 void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value);
 
