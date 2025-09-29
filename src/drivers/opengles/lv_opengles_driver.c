@@ -330,6 +330,7 @@ static void lv_opengles_index_buffer_unbind(void)
 
 static void lv_opengles_shader_manager_init(void)
 {
+    lv_opengl_shader_portions_t portions;
     lv_opengles_standard_shader_get_src(&portions);
     char * vertex_shader = lv_opengles_standard_shader_get_vertex();
     char * frag_shader = lv_opengles_standard_shader_get_fragment();
