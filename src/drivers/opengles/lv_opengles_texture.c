@@ -119,7 +119,6 @@ lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * text
     texture->fb1 = lv_malloc(buf_size);
     LV_ASSERT_MALLOC(texture->fb1);
     if(!texture->fb1) {
-        lv_free(texture);
         return LV_RESULT_INVALID;
     }
     lv_display_set_buffers(display, texture->fb1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
