@@ -377,7 +377,7 @@ static void output_mode(void * data, struct wl_output * wl_output, uint32_t flag
 
 static void output_done(void * data, struct wl_output * output)
 {
-    // called when all geometry/mode info for this output has been sent
+    /* Called when all geometry/mode info for this output has been sent */
     LV_UNUSED(data);
     LV_UNUSED(output);
 }
