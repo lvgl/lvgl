@@ -88,7 +88,7 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         lv_memcpy(&data->key, dev->buf, utf8_len);
 
         /*Drop the first character*/
-        lv_memmove(dev->buf, dev->buf + utf8_len, len);
+        lv_memmove(dev->buf, dev->buf + utf8_len, len - utf8_len + 1);
     }
 }
 
