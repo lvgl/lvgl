@@ -375,15 +375,15 @@ static void lv_opengles_shader_manager_init(void)
     lv_opengles_standard_shader_get_src(&portions);
     char * vertex_shader = lv_opengles_standard_shader_get_vertex();
     char * frag_shader = lv_opengles_standard_shader_get_fragment();
-    shader_manager = lv_opengl_shader_manager_create(portions.all, portions.count, vertex_shader, frag_shader);
+    lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
 }
 
 static unsigned int lv_opengles_shader_program_init(void)
 {
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.frag", NULL, 0);
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(shader_manager, "__MAIN__.vert", NULL, 0);
+    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0);
+    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0);
     lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash,
                                                                                 vert_shader_hash);
     return lv_opengl_shader_program_get_id(program);

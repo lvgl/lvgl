@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_opengles_texture.h"
-#include <src/display/lv_display.h>
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
