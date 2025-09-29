@@ -486,10 +486,20 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     }
 
     lv_subject_t * subject = lv_zalloc(sizeof(lv_subject_t));
+    const char * min_value_str = lv_xml_get_value_of(attrs, "min_value");
+    const char * max_value_str = lv_xml_get_value_of(attrs, "max_value");
 
-    if(lv_streq(type, "int")) lv_subject_init_int(subject, lv_xml_atoi(value));
+    if(lv_streq(type, "int")) {
+        lv_subject_init_int(subject, lv_xml_atoi(value));
+        if(min_value_str) lv_subject_set_min_value_int(subject, lv_xml_atoi(min_value_str));
+        if(max_value_str) lv_subject_set_max_value_int(subject, lv_xml_atoi(max_value_str));
+    }
 #if LV_USE_FLOAT
-    else if(lv_streq(type, "float")) lv_subject_init_float(subject, lv_xml_atof(value));
+    else if(lv_streq(type, "float")) {
+        lv_subject_init_float(subject, lv_xml_atof(value));
+        if(min_value_str) lv_subject_set_min_value_float(subject, lv_xml_atof(min_value_str));
+        if(max_value_str) lv_subject_set_max_value_float(subject, lv_xml_atof(max_value_str));
+    }
 #endif
     else if(lv_streq(type, "color")) lv_subject_init_color(subject, lv_xml_to_color(value));
     else if(lv_streq(type, "string")) {
