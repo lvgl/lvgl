@@ -65,6 +65,9 @@ static void lv_opengles_shader_set_uniform1f(const char * name, float value);
 static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2);
 static void lv_opengles_render_draw(void);
 static float lv_opengles_map_float(float x, float min_in, float max_in, float min_out, float max_out);
+static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN],
+                                   lv_display_rotation_t rotation, bool * h_flip, bool * v_flip,
+                                   float clip_x1, float clip_y1, float clip_x2, float clip_y2);
 
 /***********************
  *   GLOBAL PROTOTYPES
@@ -155,19 +158,18 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
     LV_PROFILER_DRAW_END;
 }
 
-void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                        const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_area_t intersection;
-    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) {
-        LV_LOG_USER("Return early");
-        LV_PROFILER_DRAW_END;
-        return;
-    }
-
+    unsigned int texture = *(unsigned int *)lv_display_get_driver_data(display);
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+
+    lv_display_rotation_t rotation = lv_display_get_rotation(display);
+
+    float vert_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN];
+    populate_vertex_buffer(vert_buffer, rotation, &h_flip, &v_flip, 0.f, 0.f, 1.f, 1.f);
+    lv_opengles_vertex_buffer_init(vert_buffer, sizeof(vert_buffer));
 
     float hor_scale = 1.0f;
     float ver_scale = 1.0f;
@@ -175,104 +177,24 @@ void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * 
     float ver_translate = 0.0f;
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
-    /*
-     *   Normal
-     */
+
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
         0.0f,      0.0f,      1.0f
     };
 
-    /*
-    static float tangle = 0.0f;
-    tangle += 0.001f;
-    if (tangle > 2.0f) tangle = 0.f;
-
-    float angle = 3.14159263f * 0.5f;//tangle;
-    float tempsin = sin(angle);
-    float tempcos = cos(angle);
-
-    //hor_scale *= 1.15f;
-    //ver_scale *= 1.15f;
-
-    //LV_LOG("ANGLE: %.2f  sin: %.3f  cos: %.3f  hor_scale: %.3f  ver_scale: %.3f  hor_trans: %.3f  ver_trans: %.3f\n", angle * (180.f / 3.14159f),  tempsin, tempcos, hor_scale, ver_scale, hor_translate, ver_translate);
-    float matrix[9] = {
-            tempcos * hor_scale, -tempsin * hor_scale, hor_translate,
-            tempsin * ver_scale, tempcos * ver_scale,  ver_translate,
-            0.0f,       0.0f,      1.0f
-        };*/
-
-    if(texture != 0) {
-        /*
-        float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x1, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_x2 = h_flip ? lv_opengles_map_float(texture_clip_area->x1, texture_area->x2, texture_area->x1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->x2, texture_area->x1, texture_area->x2, 0.f, 1.f);
-        float clip_y1 = v_flip ? lv_opengles_map_float(texture_clip_area->y2, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y1, texture_area->y1, texture_area->y2, 0.f, 1.f);
-        float clip_y2 = v_flip ? lv_opengles_map_float(texture_clip_area->y1, texture_area->y2, texture_area->y1, 0.f, 1.f)
-                        : lv_opengles_map_float(texture_clip_area->y2, texture_area->y1, texture_area->y2, 0.f, 1.f);
-        */
-        //LV_LOG("CLIP X1/Y1: (%f, %f) X2/Y2: (%f, %f)\n", clip_x1, clip_y1, clip_x2, clip_y2);
-        float clip_x1 = 0.f;//clip_x1 > 1.0f ? 1.0f : clip_x1;
-        float clip_y1 = 0.f;//clip_y1 > 1.0f ? 1.0f : clip_y1;
-        float clip_x2 = 1.f;//clip_x2 > 1.0f ? 1.0f : clip_x2;
-        float clip_y2 = 1.f;//clip_y2 > 1.0f ? 1.0f : clip_y2;
-
-        lv_display_rotation_t rotation = lv_display_get_rotation(lv_display_get_default());
-        switch(rotation) {
-            case LV_DISPLAY_ROTATION_90:
-                float rotated_90_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                    1.0f,  1.0f, clip_x1, clip_y2,
-                    1.0f, -1.0f, clip_x2, clip_y2,
-                    -1.0f, -1.0f, clip_x2, clip_y1,
-                    -1.0f,  1.0f, clip_x1, clip_y1
-                };
-                lv_opengles_vertex_buffer_init(rotated_90_positions, sizeof(rotated_90_positions));
-                break;
-            case LV_DISPLAY_ROTATION_180:
-                float rotated_180_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                    1.0f, -1.0f, clip_x1, clip_y2,
-                    -1.0f, -1.0f, clip_x2, clip_y2,
-                    -1.0f,  1.0f, clip_x2, clip_y1,
-                    1.0f,  1.0f, clip_x1, clip_y1
-                };
-                lv_opengles_vertex_buffer_init(rotated_180_positions, sizeof(rotated_180_positions));
-                break;
-            case LV_DISPLAY_ROTATION_270:
-                float rotated_270_positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                    -1.0f, -1.0f, clip_x1, clip_y2,
-                    -1.0f,  1.0f, clip_x2, clip_y2,
-                    1.0f,  1.0f, clip_x2, clip_y1,
-                    1.0f, -1.0f, clip_x1, clip_y1
-                };
-                lv_opengles_vertex_buffer_init(rotated_270_positions, sizeof(rotated_270_positions));
-                break;
-            default: //LV_DISPLAY_ROTATION_0
-                float positions[LV_OPENGLES_VERTEX_BUFFER_LEN] = {
-                    -1.f,  1.0f, clip_x1, clip_y2,
-                    1.0f,  1.0f, clip_x2, clip_y2,
-                    1.0f, -1.0f, clip_x2, clip_y1,
-                    -1.f, -1.0f, clip_x1, clip_y1
-                };
-                lv_opengles_vertex_buffer_init(positions, sizeof(positions));
-                break;
-        }
-    }
-
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
-    lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
+    lv_opengles_shader_set_uniform1f("u_Opa", 1);
+    lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
 }
-
 
 void lv_opengles_render_clear(void)
 {
@@ -584,4 +506,97 @@ static float lv_opengles_map_float(float x, float min_in, float max_in, float mi
     return ((x - min_in) * delta_out) / delta_in + min_out;
 }
 
+static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN],
+                                   lv_display_rotation_t rotation, bool * h_flip, bool * v_flip, float clip_x1, float clip_y1, float clip_x2,
+                                   float clip_y2)
+{
+#if !LV_USE_DRAW_OPENGLES
+    LV_UNUSED(h_flip);
+    LV_UNUSED(v_flip);
+#endif
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_0:
+            vertex_buffer[0] = -1.f;
+            vertex_buffer[1] = 1.0f;
+            vertex_buffer[2] = clip_x1;
+            vertex_buffer[3] = clip_y2;
+            vertex_buffer[4] = 1.0f;
+            vertex_buffer[5] = 1.0f;
+            vertex_buffer[6] = clip_x2;
+            vertex_buffer[7] = clip_y2;
+            vertex_buffer[8] = 1.0f;
+            vertex_buffer[9] = -1.0f;
+            vertex_buffer[10] = clip_x2;
+            vertex_buffer[11] = clip_y1;
+            vertex_buffer[12] = -1.f;
+            vertex_buffer[13] = -1.0f;
+            vertex_buffer[14] = clip_x1;
+            vertex_buffer[15] = clip_y1;
+            break;
+
+        case LV_DISPLAY_ROTATION_90:
+#if LV_USE_DRAW_OPENGLES
+            *h_flip = !*h_flip;
+            *v_flip = !*v_flip;
+#endif
+            vertex_buffer[0] = 1.0f;
+            vertex_buffer[1] = 1.0f;
+            vertex_buffer[2] = clip_x1;
+            vertex_buffer[3] = clip_y2;
+            vertex_buffer[4] = 1.0f;
+            vertex_buffer[5] = -1.0f;
+            vertex_buffer[6] = clip_x2;
+            vertex_buffer[7] = clip_y2;
+            vertex_buffer[8] = -1.f;
+            vertex_buffer[9] = -1.0f;
+            vertex_buffer[10] = clip_x2;
+            vertex_buffer[11] = clip_y1;
+            vertex_buffer[12] = -1.f;
+            vertex_buffer[13] = 1.0f;
+            vertex_buffer[14] = clip_x1;
+            vertex_buffer[15] = clip_y1;
+            break;
+
+        case LV_DISPLAY_ROTATION_180:
+            vertex_buffer[0] = 1.0f;
+            vertex_buffer[1] = -1.0f;
+            vertex_buffer[2] = clip_x1;
+            vertex_buffer[3] = clip_y2;
+            vertex_buffer[4] = -1.f;
+            vertex_buffer[5] = -1.0f;
+            vertex_buffer[6] = clip_x2;
+            vertex_buffer[7] = clip_y2;
+            vertex_buffer[8] = -1.f;
+            vertex_buffer[9] = 1.0f;
+            vertex_buffer[10] = clip_x2;
+            vertex_buffer[11] = clip_y1;
+            vertex_buffer[12] = 1.0f;
+            vertex_buffer[13] = 1.0f;
+            vertex_buffer[14] = clip_x1;
+            vertex_buffer[15] = clip_y1;
+            break;
+        case LV_DISPLAY_ROTATION_270:
+#if LV_USE_DRAW_OPENGLES
+            *h_flip = !*h_flip;
+            *v_flip = !*v_flip;
+#endif
+            vertex_buffer[0] = -1.f;
+            vertex_buffer[1] = -1.0f;
+            vertex_buffer[2] = clip_x1;
+            vertex_buffer[3] = clip_y2;
+            vertex_buffer[4] = -1.f;
+            vertex_buffer[5] = 1.0f;
+            vertex_buffer[6] = clip_x2;
+            vertex_buffer[7] = clip_y2;
+            vertex_buffer[8] = 1.0f;
+            vertex_buffer[9] = 1.0f;
+            vertex_buffer[10] = clip_x2;
+            vertex_buffer[11] = clip_y1;
+            vertex_buffer[12] = 1.0f;
+            vertex_buffer[13] = -1.0f;
+            vertex_buffer[14] = clip_x1;
+            vertex_buffer[15] = clip_y1;
+            break;
+    }
+}
 #endif /* LV_USE_OPENGLES */

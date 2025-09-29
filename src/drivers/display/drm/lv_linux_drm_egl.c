@@ -65,6 +65,7 @@ static void drm_flip_cb(void * driver_data, bool vsync);
 static void * drm_create_window(void * driver_data, const lv_egl_native_window_properties_t * properties);
 static void drm_destroy_window(void * driver_data, void * native_window);
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
+static inline void set_viewport(lv_display_t * display);
 
 /**********************
  *  STATIC VARIABLES
@@ -176,6 +177,21 @@ static uint32_t tick_cb(void)
     return ts.tv_sec * 1000 + (ts.tv_nsec / 1000000);;
 }
 
+static inline void set_viewport(lv_display_t * display)
+{
+    const lv_display_rotation_t rotation = lv_display_get_rotation(display);
+    int32_t disp_width, disp_height;
+    if(rotation == LV_DISPLAY_ROTATION_0 || rotation == LV_DISPLAY_ROTATION_180) {
+        disp_width = lv_display_get_horizontal_resolution(display);
+        disp_height = lv_display_get_vertical_resolution(display);
+    }
+    else {
+        disp_width = lv_display_get_vertical_resolution(display) ;
+        disp_height = lv_display_get_horizontal_resolution(display) ;
+    }
+    lv_opengles_viewport(0, 0, disp_width, disp_height);
+}
+
 #if LV_USE_DRAW_OPENGLES
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
@@ -183,14 +199,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     LV_UNUSED(px_map);
     if(lv_display_flush_is_last(disp)) {
-        const int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-        const int32_t disp_height = lv_display_get_vertical_resolution(disp);
-        lv_area_t full_area;
-        lv_area_set(&full_area, 0, 0, disp_width, disp_height);
+        set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        lv_opengles_viewport(0, 0, disp_width, disp_height);
-        lv_opengles_render_display_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER,
-                                           area, false, true);
+        lv_opengles_render_display_texture(disp, false, true);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -204,10 +215,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     if(lv_display_flush_is_last(disp)) {
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        const int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-        const int32_t disp_height = lv_display_get_vertical_resolution(disp);
-        lv_opengles_viewport(0, 0, disp_width, disp_height);
-        lv_opengles_egl_clear(ctx->egl_ctx);
+        int32_t disp_width = lv_display_get_horizontal_resolution(disp);
+        int32_t disp_height = lv_display_get_vertical_resolution(disp);
+
+        set_viewport(disp);
 
         lv_color_format_t cf = lv_display_get_color_format(disp);
         uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
@@ -226,11 +237,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #error("Unsupported color format")
 #endif
 
-        lv_area_t full_area;
-        lv_area_set(&full_area, 0, 0, disp_width, disp_height);
-        lv_opengles_render_display_texture(ctx->texture.texture_id, &full_area, LV_OPA_COVER,
-                                           area, false, false);
-
+        lv_opengles_render_display_texture(disp, false, false);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);

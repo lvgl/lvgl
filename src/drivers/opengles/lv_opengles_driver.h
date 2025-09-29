@@ -58,6 +58,14 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 
 /**
+ * Render a display texture - Supports rotation
+ * @param display           LVGL Texture display. Created with the `lv_opengles_texture` module
+ * @param h_flip            horizontal flip
+ * @param v_flip            vertical flip
+ */
+void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip);
+
+/**
  * Render a fill
  * @param color          the color of the fill
  * @param area           the area in the window to render the fill
@@ -80,8 +88,6 @@ void lv_opengles_render_clear(void);
  * @param h        height of the viewport
  */
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
-
-void lv_opengles_render_display_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 
 /**********************
  *      MACROS
