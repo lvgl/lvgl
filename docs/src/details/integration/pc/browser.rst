@@ -35,12 +35,12 @@ LVGL provides a preconfigured Codespace environment, which you can launch with j
 
 To get started:
 
-1. Navigate to `https://github.com/lvgl/lvgl <https://github.com/lvgl/lvgl>`__
-2. Click the green **Code** button
-3. Select the **Codespaces** tab
-4. Click **Create Codespace on master**
-5. Wait briefly for the workspace to launch
-6. Open the terminal and run `./build_all.sh`
+1. Navigate to `https://github.com/lvgl/lvgl <https://github.com/lvgl/lvgl>`__.
+2. Click the green **Code** button.
+3. Select the **Codespaces** tab.
+4. Click **Create Codespace on master**.
+5. Wait briefly for the workspace to launch.
+6. Open the terminal and run `./build_all.sh`.
 
 This will build LVGL and render the UI in a VSCode tab. You can continue writing and rebuilding simply by running the script again.
 
