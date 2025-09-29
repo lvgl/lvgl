@@ -531,7 +531,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
             vertex_buffer[15] = clip_y1;
             break;
 
-        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
 #if LV_USE_DRAW_OPENGLES
             *h_flip = !*h_flip;
             *v_flip = !*v_flip;
@@ -572,7 +572,7 @@ static void populate_vertex_buffer(float vertex_buffer[LV_OPENGLES_VERTEX_BUFFER
             vertex_buffer[14] = clip_x1;
             vertex_buffer[15] = clip_y1;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_DISPLAY_ROTATION_90:
 #if LV_USE_DRAW_OPENGLES
             *h_flip = !*h_flip;
             *v_flip = !*v_flip;
