@@ -26,7 +26,7 @@ extern "C" {
 
 /**
  * Change the properties of a given widget by processing XML snippets.
- * For example `<lv_slider name="my_slider_1" min_value="30" "style_bg_color="0xff0000"\>`
+ * For example `<lv_slider name="my_slider_1" min_value="30" "style_bg_color="0xff0000"/>`
  * Note that the tag should be the underlying widget's name and the component's name.
  * @param xml_def   the XML to process as a string
  * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
