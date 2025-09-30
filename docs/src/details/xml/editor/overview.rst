@@ -1,63 +1,66 @@
+.. include:: external_links.txt
+.. include:: substitutions.txt
 .. _editor_overview:
 
 ========
 Overview
 ========
 
-TODO: describe the purpose and advantages, it's related to XML, has tools (CLI, online share, figma), 3-4 paragraph
+|lvglpro| accelerates UI development by
 
-Getting started
-***************
+- giving you an instant view of your additions and changes,
+- converting Figma_ designs to LVGL,
+- making it easy to share your UI screens online with collaborators and stakeholders,
+- helping you to write UI tests, and
+- integrating your UI via command-line interface (CLI).
 
-TODO Work on Windows, Linux, MacOS and VSCode. Link the guides.
+Because |lvglpro| allows you to build a UI with a smart XML editor with powerful
+auto-completion, it allows UI designers to efficiently contribute finished UI
+components to firmware projects without having to be C programmers.
 
-Login and Licences (trial, buy licence on pro.lvgl.io, read more on the licences page)
+Simultaneously, |lvglpro| reduces turn-around time between UI changes and seeing the
+actual results to mere seconds, making it practical for UI designer, developers and
+business teams to collaborate on UI content in real time.
 
-Check out the examples (Learn by examples page)
-or learn more about XML
+LVGL itself can load created UI from the generated C code, or load its parts from the
+XML files directly at runtime, requiring no re-flashing.  Assets (images, fonts,
+etc.) and XML UI component definitions can be read from an SD card, Wi-Fi, serial
+port, or any other input source.
 
-User Interface
-**************
+Use the LVGL Figma_ plug-in to import style properties and images as XML code.  It
+also supports automatic downloading of linked styles and images.
 
-Screen shot, briefly describe the main parts
+Tests of the resulting UI can be built in, simulating clicks, waits, and screenshot
+comparisons to instantly prove the UI is working as expected, or quickly highlighting
+anything that needs attention.  This way is a great way to build up an automated and
+thorough regression-testing pipeline for the UI, supporting high confidence with
+every firmware release, small or large.
 
-XML Editor
-----------
+All parts of the development sequence, including code-generation, Figma_ sync, XML
+validation, and test execution, are available in a CLI tool, ready to integrate into
+your workflow.
 
-Autocomplete, validation
+|lvglpro| comes with a simple, scalable and royalty-free licensing model that works
+for open-source projects, startups, and enterprises alike.  `See all plans`_.
 
-Inspector
----------
+|lvglpro| comes in Linux, Windows, and macOS flavors so your team will have few, if
+any, technical barriers to begin using it.
 
-- What is it? (show the rendered content, the user click on it to try out)
-- How to use?  (Press Ctrl or turn on by the button)
+It can be run as:
 
-  - visualise bounding box, padding, maring and click area
-  - chege size and position by dragging
-  - measurement
-  - double click jumps to the XML file
-  - single click focuses the matching XML
-
-20 sec video to show all these
+- a stand-alone application on Windows, Linux, and macOS;
+- a VSCode Extension; and
+- on-line (via a web browser).
 
 
-How does it work?
-*****************
 
-- LVGL has a built-in XML parser that can create UIs at runtime
-- the inspector uses LVGL as it is
-- the editor sends the XML files to LVGL
-- the editor ask LVGL to create an instance of the opened XML file
-- when the xml changes only the opened XML file is uploaded, the screen is cleared, and a new instance is created
-- the XML editor parses the XML files of the LVGL widgets and the user's XML files to validate the XMLs
-- code is also exported by parsing the XML files
+Login and Licensing
+*******************
 
-Project
-*******
+.. TODO Gabor  (trial, buy licence on pro.lvgl.io, read more on the licences page)
 
-- What is a project?
-- What can you describe in project.xml?
-- How does nested projects work?
+
+
 
 
 
