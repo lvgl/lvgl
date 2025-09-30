@@ -553,7 +553,15 @@ static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)driver_data;
     int32_t target_w = lv_display_get_horizontal_resolution(ctx->display);
     int32_t target_h = lv_display_get_vertical_resolution(ctx->display);
-    lv_color_format_t target_cf = lv_display_get_color_format(ctx->display);
+
+#if LV_COLOR_DEPTH == 16
+    lv_color_format_t target_cf = LV_COLOR_FORMAT_RGB565;
+#elif LV_COLOR_DEPTH == 32
+    lv_color_format_t target_cf = LV_COLOR_FORMAT_ARGB8888;
+#else
+#error("Unsupported color format")
+#endif
+
 
     for(size_t i = 0; i < config_count; ++i) {
         LV_LOG_TRACE("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d",
@@ -563,7 +571,7 @@ static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t
     }
 
     for(size_t i = 0; i < config_count; ++i) {
-        lv_color_format_t config_cf = lv_display_get_color_format(ctx->display);
+        lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
         if(configs[i].max_width >= target_w &&
            configs[i].max_height >= target_h &&
            config_cf == target_cf &&
@@ -676,6 +684,10 @@ static void * drm_create_window(void * driver_data, const lv_egl_native_window_p
 
     uint32_t format = properties->visual_id;
 
+    if(format == 0) {
+        LV_LOG_ERROR("Invalid format requested");
+        return NULL;
+    }
     ctx->gbm_surface = gbm_surface_create(ctx->gbm_dev, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay, format,
                                           GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
     if(!ctx->gbm_surface) {
