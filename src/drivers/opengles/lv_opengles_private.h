@@ -57,6 +57,28 @@ extern "C" {
 #define glDeleteVertexArrays glDeleteVertexArraysOES
 #endif
 
+#ifndef glTexStorage2D
+#define glTexStorage2D glTexStorage2DEXT
+#endif
+
+#ifndef GL_DEPTH_COMPONENT24
+#define GL_DEPTH_COMPONENT24 0x81A6
+#endif
+#ifndef GL_RGBA32F
+#define GL_RGBA32F 0x8814
+#endif
+#ifndef GL_NUM_EXTENSIONS
+#define GL_NUM_EXTENSIONS 0x821D
+#endif
+
+#ifndef GL_RGB8
+#define GL_RGB8 0x8051
+#endif
+
+#ifndef GL_RGBA8
+#define GL_RGBA8 0x8058
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

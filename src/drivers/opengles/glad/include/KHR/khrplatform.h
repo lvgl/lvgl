@@ -1,10 +1,6 @@
 #ifndef __khrplatform_h_
 #define __khrplatform_h_
 
-#include "../../../lv_opengles_egl.h"
-
-#if LV_USE_EGL
-
 /*
 ** Copyright (c) 2008-2018 The Khronos Group Inc.
 **
@@ -313,5 +309,3 @@ typedef enum {
 } khronos_boolean_enum_t;
 
 #endif /* __khrplatform_h_ */
-
-#endif /*LV_USE_EGL*/

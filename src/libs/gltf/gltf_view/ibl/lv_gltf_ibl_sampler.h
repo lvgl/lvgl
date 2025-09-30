@@ -57,6 +57,10 @@ typedef struct {
     uint32_t mipmap_levels;
 
     lv_opengl_shader_manager_t shader_manager;
+
+    uint32_t fullscreen_vertex_buffer;
+    uint32_t fullscreen_tex_coord_buffer;
+
 } lv_gltf_ibl_sampler_t;
 
 typedef struct {
