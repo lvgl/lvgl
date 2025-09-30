@@ -86,6 +86,54 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
 static void setup_draw_environment_background(lv_opengl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
 static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
+
+//#include <stdbool.h>
+//#include <stdio.h>
+
+// Function to check for OpenGL errors and state
+/*
+bool check_opengl_diagnostics(GLuint program_id) {
+    // Check if the shader program is valid
+    if (program_id != GL_NONE) {
+        GLint program_linked;
+        glGetProgramiv(program_id, GL_LINK_STATUS, &program_linked);
+        if (program_linked == GL_FALSE) {
+            GLchar infoLog[512];
+            glGetProgramInfoLog(program_id, sizeof(infoLog), NULL, infoLog);
+            LV_LOG("Shader program linking failed: %s\n", infoLog);
+            return false;
+        }
+    } else {
+        //LV_LOG("Shader program checking skipped\n");
+    }
+
+    // Check for OpenGL errors
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        LV_LOG("OpenGL error before rendering: %d\n", error);
+        return false;
+    }
+
+    // Check framebuffer status (if using framebuffers)
+    GLenum framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (framebuffer_status != GL_FRAMEBUFFER_COMPLETE) {
+        LV_LOG("Framebuffer is not complete: %d\n", framebuffer_status);
+        return false;
+    }
+
+    // Check if vertex buffers are bound (you may want to customize this)
+    GLint current_array_buffer;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &current_array_buffer);
+    if (current_array_buffer == 0) {
+        LV_LOG("No vertex buffer is currently bound.\n");
+        return false;
+    }
+
+    // If all checks pass
+    return true;
+}
+*/
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -106,11 +154,15 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
         return GL_NONE;
     }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
-    GLuint texture_id = lv_gltf_view_render_model(viewer, model, true);
+
+    GLuint texture_id = GL_NONE;
+    //if (check_opengl_diagnostics(GL_NONE)) {
+    texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
         lv_gltf_view_render_model(viewer, model, false);
     }
+    //}
     return texture_id;
 }
 
@@ -417,6 +469,10 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     model->last_pass_was_transmission = is_transmission_pass;
 
     const GLuint program = compiled_shader->shaderset.program;
+
+    //if (!check_opengl_diagnostics(program)) {
+    //    LV_ASSERT_NULL(NULL);
+    // }
 
     GL_CALL(glUseProgram(program));
 
@@ -853,10 +909,10 @@ static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 #ifdef __EMSCRIPTEN__
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
@@ -898,11 +954,11 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
 #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
     // For WebGL2
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
     // For Desktop OpenGL
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));

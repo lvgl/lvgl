@@ -61,9 +61,6 @@ extern "C" {
 #define glTexStorage2D glTexStorage2DEXT
 #endif
 
-#ifndef GL_DEPTH_COMPONENT24
-#define GL_DEPTH_COMPONENT24 0x81A6
-#endif
 #ifndef GL_RGBA32F
 #define GL_RGBA32F 0x8814
 #endif
@@ -79,6 +76,18 @@ extern "C" {
 #define GL_RGBA8 0x8058
 #endif
 
+#ifndef LV_GL_PREFERRED_DEPTH
+#ifdef GL_DEPTH_COMPONENT24
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
+#else
+#ifdef xxxGL_DEPTH_COMPONENT24_OES
+/* this will not run correctly yet, it compiles fine but fails to render on RPi3B */
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24_OES
+#else
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT16
+#endif
+#endif
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
