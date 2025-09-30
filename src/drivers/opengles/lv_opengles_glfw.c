@@ -24,6 +24,7 @@
 #include "../../indev/lv_indev.h"
 #include "../../lv_init.h"
 #include "../../misc/lv_area_private.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 #include <stdlib.h>
 
@@ -46,6 +47,8 @@ struct _lv_opengles_window_t {
     lv_indev_state_t mouse_last_state;
     uint8_t use_indev : 1;
     uint8_t closing : 1;
+    uint8_t refr_request : 1;
+    uint8_t has_flushed : 1;
 #if LV_USE_DRAW_OPENGLES
     uint8_t direct_render_invalidated: 1;
 #endif
@@ -83,10 +86,13 @@ static void proc_mouse(lv_opengles_window_t * window);
 static void indev_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 static void framebuffer_size_callback(GLFWwindow * window, int width, int height);
 static void window_display_delete_cb(lv_event_t * e);
+static void window_display_refr_request_cb(lv_event_t * e);
 static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 #if !LV_USE_DRAW_OPENGLES
     static void ensure_init_window_display_texture(void);
 #endif
+static void window_display_layer_init_cb(lv_display_t * disp, lv_layer_t * layer);
+static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * layer);
 
 /**********************
  *  STATIC VARIABLES
@@ -155,6 +161,10 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
     lv_glew_init();
     glfwMakeContextCurrent(window->window);
     lv_opengles_init();
+
+#if LV_USE_DRAW_NANOVG
+    lv_draw_nanovg_init();
+#endif
 
     return window;
 }
@@ -245,10 +255,6 @@ lv_opengles_window_texture_t * lv_opengles_window_add_texture(lv_opengles_window
 
 void lv_opengles_window_texture_remove(lv_opengles_window_texture_t * texture)
 {
-    if(texture->texture_id == 0) {
-        LV_LOG_WARN("window displays should be deleted with `lv_display_delete`");
-        return;
-    }
     if(texture->indev != NULL) {
         lv_indev_delete(texture->indev);
     }
@@ -318,6 +324,10 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     lv_display_delete_refr_timer(disp);
     lv_display_set_flush_cb(disp, window_display_flush_cb);
     lv_display_add_event_cb(disp, window_display_delete_cb, LV_EVENT_DELETE, disp);
+    lv_display_add_event_cb(disp, window_display_refr_request_cb, LV_EVENT_REFR_REQUEST, disp);
+
+    disp->layer_init = window_display_layer_init_cb;
+    disp->layer_deinit = window_display_layer_deinit_cb;
 
 #if LV_USE_DRAW_OPENGLES
     window->direct_render_invalidated = 1;
@@ -467,8 +477,17 @@ static void window_update_handler(lv_timer_t * t)
 
     /* render each window */
     LV_LL_READ(&glfw_window_ll, window) {
+        if(!window->refr_request) {
+            continue;
+        }
+
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
+
+#if LV_USE_DRAW_NANOVG
+        lv_display_refr_timer(NULL);
+        LV_UNUSED(ensure_init_window_display_texture);
+#else
 
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_window_texture_t * textures_head;
@@ -560,8 +579,15 @@ static void window_update_handler(lv_timer_t * t)
             }
         }
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window->window);
+#endif /* LV_USE_DRAW_NANOVG */
+
+        if(window->has_flushed) {
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window->window);
+            window->has_flushed = false;
+        }
+
+        window->refr_request = false;
     }
 }
 
@@ -663,10 +689,23 @@ static void window_display_delete_cb(lv_event_t * e)
     lv_opengles_window_texture_remove(dsc);
 }
 
+static void window_display_refr_request_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
+    dsc->window->refr_request = true;
+}
+
 static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     LV_UNUSED(area);
     LV_UNUSED(px_map);
+
+    if(lv_display_flush_is_last(disp)) {
+        lv_opengles_window_texture_t * dsc = lv_display_get_driver_data(disp);
+        dsc->window->has_flushed = true;
+    }
+
     lv_display_flush_ready(disp);
 }
 
@@ -692,5 +731,17 @@ static void ensure_init_window_display_texture(void)
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 #endif
+
+static void window_display_layer_init_cb(lv_display_t * disp, lv_layer_t * layer)
+{
+    LV_UNUSED(disp);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
+}
+
+static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * layer)
+{
+    LV_UNUSED(disp);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
+}
 
 #endif /*LV_USE_GLFW*/
