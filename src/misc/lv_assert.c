@@ -36,8 +36,6 @@
 void lv_assert_handler(void)
 {
     LV_ASSERT_HANDLER
-
-    LV_UNREACHABLE();
 }
 
 /**********************
