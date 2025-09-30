@@ -18,11 +18,8 @@ extern "C" {
 #if LV_USE_OPENGLES
 
 #if LV_USE_EGL
-#include <GLES/gl.h>
-#include <EGL/egl.h>
-#include <GLES3/gl3.h>
-#include <GLES/glext.h>
-#include <GLES2/gl2ext.h>
+#include "glad/include/glad/gles2.h"
+#include "glad/include/glad/egl.h"
 #else
 /* For now, by default we add glew and glfw.
    In the future we need to consider adding a config for setting these includes*/
@@ -40,9 +37,25 @@ extern "C" {
 #define GL_BGRA GL_BGRA_EXT
 #endif /*GL_BGRA*/
 
-#ifndef GL_BGR
-#define GL_BGR GL_BGR_EXT
-#endif /*GL_BGR*/
+#ifndef GL_TEXTURE_MAX_LEVEL
+#define GL_TEXTURE_MAX_LEVEL GL_TEXTURE_MAX_LEVEL_APPLE
+#endif /*GL_TEXTURE_MAX_LEVEL*/
+
+#ifndef GL_UNPACK_ROW_LENGTH
+#define GL_UNPACK_ROW_LENGTH GL_UNPACK_ROW_LENGTH_EXT
+#endif /*GL_UNPACK_ROW_LENGTH*/
+
+#ifndef glGenVertexArrays
+#define glGenVertexArrays glGenVertexArraysOES
+#endif
+
+#ifndef glBindVertexArray
+#define glBindVertexArray glBindVertexArrayOES
+#endif
+
+#ifndef glDeleteVertexArrays
+#define glDeleteVertexArrays glDeleteVertexArraysOES
+#endif
 
 /**********************
  *      TYPEDEFS
