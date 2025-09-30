@@ -47,6 +47,7 @@
 #include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_arc_parser.h"
 #include "parsers/lv_xml_switch_parser.h"
+#include "parsers/lv_xml_spinbox_parser.h"
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
@@ -118,6 +119,10 @@ void lv_xml_init(void)
 
 #if LV_USE_SLIDER
     lv_xml_widget_register("lv_slider", lv_xml_slider_create, lv_xml_slider_apply);
+#endif
+
+#if LV_USE_SPINBOX
+    lv_xml_widget_register("lv_spinbox", lv_xml_spinbox_create, lv_xml_spinbox_apply);
 #endif
 
 #if LV_USE_TABVIEW
