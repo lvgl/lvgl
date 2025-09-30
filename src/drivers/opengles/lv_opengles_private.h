@@ -80,12 +80,16 @@ extern "C" {
 #ifdef GL_DEPTH_COMPONENT24
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
 #else
-#ifdef xxxGL_DEPTH_COMPONENT24_OES
-/* this will not run correctly yet, it compiles fine but fails to render on RPi3B */
+/*
+ * This will not run correctly yet, it compiles fine but fails to render on RPi3B.  Work in progress.
+ *
+#ifdef GL_DEPTH_COMPONENT24_OES
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24_OES
 #else
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT16
 #endif
+*/
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT16
 #endif
 #endif
 /**********************

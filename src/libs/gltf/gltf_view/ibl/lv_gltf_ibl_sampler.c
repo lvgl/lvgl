@@ -196,6 +196,8 @@ static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_vertex_buffer));
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_tex_coord_buffer));
     lv_opengl_shader_manager_deinit(&sampler->shader_manager);
 }
 
