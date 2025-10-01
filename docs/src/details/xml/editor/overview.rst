@@ -6,13 +6,16 @@
 Overview
 ========
 
+
+
 Introduction
 ************
 
-|lvglpro| is the visual UI editor for LVGL-based firmware projects in which
-you can build UIs in XML, preview them in real time in a pixel-perfect preview,
-handle translations, add anaimations, create UI tests and many more.
+|lvglpro| is the visual UI editor to build embedded UIs with LVGL faster, simpler and better.
 
+
+It's core part is a powerful XML editor, preview them in real time in a pixel-perfect preview,
+handle translations, add anaimations, create UI tests and many more.
 
 In |lvglpro| Components, Screens, Tests, Aniomations, Translations, and basically
 everything is described in XML files.
@@ -23,6 +26,8 @@ just like any handwritten C code.
 It's also possible to extend |lvglpro| also with widgets written in C. To make then work
 in the Editor |lvglpro| can recompile its core preview engine from LVGL + the costom C code.
 This way any custo code can be previewed, run and tested directly in the Editor.
+
+
 
 Advantages
 **********
