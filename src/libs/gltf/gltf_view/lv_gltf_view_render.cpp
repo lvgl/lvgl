@@ -86,54 +86,6 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
 static void setup_draw_environment_background(lv_opengl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
 static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
-
-//#include <stdbool.h>
-//#include <stdio.h>
-
-// Function to check for OpenGL errors and state
-/*
-bool check_opengl_diagnostics(GLuint program_id) {
-    // Check if the shader program is valid
-    if (program_id != GL_NONE) {
-        GLint program_linked;
-        glGetProgramiv(program_id, GL_LINK_STATUS, &program_linked);
-        if (program_linked == GL_FALSE) {
-            GLchar infoLog[512];
-            glGetProgramInfoLog(program_id, sizeof(infoLog), NULL, infoLog);
-            LV_LOG("Shader program linking failed: %s\n", infoLog);
-            return false;
-        }
-    } else {
-        //LV_LOG("Shader program checking skipped\n");
-    }
-
-    // Check for OpenGL errors
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        LV_LOG("OpenGL error before rendering: %d\n", error);
-        return false;
-    }
-
-    // Check framebuffer status (if using framebuffers)
-    GLenum framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (framebuffer_status != GL_FRAMEBUFFER_COMPLETE) {
-        LV_LOG("Framebuffer is not complete: %d\n", framebuffer_status);
-        return false;
-    }
-
-    // Check if vertex buffers are bound (you may want to customize this)
-    GLint current_array_buffer;
-    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &current_array_buffer);
-    if (current_array_buffer == 0) {
-        LV_LOG("No vertex buffer is currently bound.\n");
-        return false;
-    }
-
-    // If all checks pass
-    return true;
-}
-*/
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -684,6 +636,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         }
     }
 
+#if FASTGLTF_ENABLE_DEPRECATED_EXT
     if(gltfMaterial.specularGlossiness) {
         LV_LOG_WARN(
             "Model uses outdated legacy mode pbr_speculargloss. Please update this model to a new shading model ");
@@ -705,6 +658,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                       uniforms->specular_glossiness_uv_transform);
         }
     }
+#endif
 
     if(gltfMaterial.diffuseTransmission) {
         render_uniform_color(uniforms->diffuse_transmission_color_factor,
