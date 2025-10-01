@@ -96,6 +96,19 @@ Notes
 - DRM requires proper modesetting. By default, LVGL will select a preferred display mode.
 
 
+In order to avoid hard codding the device card path, you can ask LVGL to find a connected one for you using :cpp:func:`lv_linux_drm_find_device_path`.
+It will return the first connected card it can find.
+
+.. code-block:: c
+
+    lv_display_t * disp = lv_linux_drm_create();
+
+    /* Find the first connected card in /sys/class/drm */
+    char * device = lv_linux_drm_find_device_path();
+    lv_linux_drm_set_file(disp, device, -1);
+    /* Free the path pointer */
+    lv_free(device);
+
 
 Using DRM with GBM
 ------------------
