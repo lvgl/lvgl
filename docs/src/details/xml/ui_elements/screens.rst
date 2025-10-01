@@ -73,7 +73,7 @@ By using this function, any number of screen instances can be created and loaded
 
 .. _xml_screen_permanent:
 
-Permanent screens
+Permanent Screens
 *****************
 
 The only possible property of the ``<screen>`` tag is ``permanent``, which can be

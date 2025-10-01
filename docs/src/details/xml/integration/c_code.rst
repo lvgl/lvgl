@@ -64,7 +64,7 @@ default. It can be overridden by ``<globals name="my_lib">``.
 
 
 
-Adding custom code
+Adding Custom Code
 ******************
 
 In some cases, it might be necessary to extend the generated code with hand-written
@@ -128,14 +128,14 @@ manually create new C and H files for a ``super_button`` with a function like:
     {
         lv_obj_t * my_button = my_button_create(parent, ...);
 
-        //...do something with the created `my_button`
+        /* ...do something with the created `my_button` */
 
         return my_button;
     }
 
 
 
-CMake integration
+CMake Integration
 *****************
 
 A skeleton ``CMakeLists.txt`` file is generated which can be easily integrated into

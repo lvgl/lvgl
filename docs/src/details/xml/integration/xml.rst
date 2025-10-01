@@ -1,8 +1,8 @@
 .. _editor_integration_xml:
 
-=======================
-Loading XMLs at Runtime
-=======================
+============================
+Loading XML Files at Runtime
+============================
 
 Overview
 ********
@@ -22,8 +22,8 @@ are built using C code.
 
 
 
-Registering XMLs
-****************
+Registering XML Files
+*********************
 
 
 Registering Manually
@@ -70,6 +70,9 @@ If the blob is saved in memory mapped to addressable memory (flash, RAM, etc.), 
     extern const unsigned char my_blob[];
     extern unsigned int my_blob_len;
     lv_xml_load_t * handle = lv_xml_load_all_from_data(my_blob, my_blob_len);
+    if(handle == NULL) {
+        LV_LOG_USER("An error occurred while loading XML content from data");
+    }
     /* `handle` can optionally be passed to `lv_xml_unload` later */
 
 If the blob is saved as a file (e.g., on an SD card), use
@@ -78,6 +81,9 @@ If the blob is saved as a file (e.g., on an SD card), use
 .. code-block:: c
 
     lv_xml_load_t * handle = lv_xml_load_all_from_file("A:path/to/frogfs.bin");
+    if(handle == NULL) {
+        LV_LOG_USER("An error occurred while loading XML content from a file");
+    }
     /* `handle` can optionally be passed to `lv_xml_unload` later */
 
 

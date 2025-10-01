@@ -45,11 +45,11 @@ void lv_xml_deinit(void);
 /**
  * Create a UI element from XML.
  * @param parent    Pointer to the parent
- * @param name      The name of an already registered component or widget
- * @param attrs     Pointer to a list of attribute-value pairs to pass.
+ * @param name      The name of an already-registered Component or Widget
+ * @param attrs     Pointer to a list of attribute/value pairs to pass.
  *                  The last two items should be `NULL`.
- * @return          pointer to the created UI element
- * @example         if `name` is "lv_slider" and
+ * @return          Pointer to the created UI element
+ * @example         If `name` is "lv_slider" and
  *                  `attrs` is {"width", "100", "value", "30", NULL, NULL};
  *                  it's equivalent to `<lv_slider width="100" value="30"/>`
  * @example         not only components can be created this way but e.g
@@ -61,10 +61,10 @@ void lv_xml_deinit(void);
 void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
 
 /**
- * Create a screen from XML.
- * @param name  the name of an already registered screen
- * @return      pointer to the created screen
- * @note        if required can be loaded with `lv_screen_load()`
+ * Create a Screen from XML.
+ * @param name  The name of an already-registered Screen
+ * @return      Pointer to the created Screen
+ * @note        If required, can be loaded with `lv_screen_load()`.
  */
 lv_obj_t * lv_xml_create_screen(const char * name);
 
