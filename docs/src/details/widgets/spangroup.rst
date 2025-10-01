@@ -108,6 +108,8 @@ to set text alignment.
 Modes
 -----
 
+**DEPRECATED**, set the width to ``LV_SIZE_CONTENT`` or fixed value to control expanding/wrapping.
+
 A Spangroup can be set to one the following modes:
 
 - :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes its size.

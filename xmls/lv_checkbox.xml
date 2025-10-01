@@ -4,7 +4,7 @@ Example
 -->
 
 <widget>
-	<api>
-	    <prop name="text" type="string" help="The text of the checkbox"/>
-	</api>
+    <api>
+        <prop name="text" type="string" help="The label text shown next to the checkbox"/>
+    </api>
 </widget>

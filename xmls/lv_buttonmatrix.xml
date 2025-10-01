@@ -4,43 +4,41 @@ Example
 -->
 
 <widget>
-	<api>
-		<enumdef name="lv_buttonmatrix_ctrl" multi="true" help="control flags for the buttons">
-			<enum name="none"      help="No special control"/>
-			<enum name="width_1"   help="Relative width is 1 in its row"/>
-			<enum name="width_2"   help="Relative width is 2 in its row"/>
-			<enum name="width_3"   help="Relative width is 3 in its row"/>
-			<enum name="width_4"   help="Relative width is 4 in its row"/>
-			<enum name="width_5"   help="Relative width is 5 in its row"/>
-			<enum name="width_6"   help="Relative width is 6 in its row"/>
-			<enum name="width_7"   help="Relative width is 7 in its row"/>
-			<enum name="width_8"   help="Relative width is 8 in its row"/>
-			<enum name="width_9"   help="Relative width is 9 in its row"/>
-			<enum name="width_10"   help="Relative width is 10 in its row"/>
-			<enum name="width_11"   help="Relative width is 11 in its row"/>
-			<enum name="width_12"   help="Relative width is 12 in its row"/>
-			<enum name="width_13"   help="Relative width is 13 in its row"/>
-			<enum name="width_14"   help="Relative width is 14 in its row"/>
-			<enum name="width_15"   help="Relative width is 15 in its row"/>
-			<enum name="hidden"      help="Button hidden"/>
-			<enum name="no_repeat"   help="Do not repeat press this button."/>
-			<enum name="disabled"    help="Disable this button."/>
-			<enum name="checkable"   help="The button can be toggled."/>
-			<enum name="checked"     help="Button is currently toggled (e.g. checked)."/>
-			<enum name="click_trig"  help="1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS"/>
-			<enum name="popover"     help="Show a popover when pressing this key"/>
-			<enum name="recolor"     help="Enable text recoloring with `#color`"/>
-			<enum name="reserved_1"  help="Reserved for later use"/>
-			<enum name="reserved_2"  help="Reserved for later use"/>
-			<enum name="custom_1"    help="Custom free to use flag"/>
-			<enum name="custom_2"    help="Custom free to use flag"/>
-		</enumdef>
+    <api>
+        <enumdef name="lv_buttonmatrix_ctrl" multi="true" help="Control flags you can apply to individual buttons">
+            <enum name="none"      help="Make the button use the default state with no special control"/>
+            <enum name="width_1"   help="Make the button take 1 unit of relative width in its row"/>
+            <enum name="width_2"   help="Make the button take 2 units of relative width in its row"/>
+            <enum name="width_3"   help="Make the button take 3 units of relative width in its row"/>
+            <enum name="width_4"   help="Make the button take 4 units of relative width in its row"/>
+            <enum name="width_5"   help="Make the button take 5 units of relative width in its row"/>
+            <enum name="width_6"   help="Make the button take 6 units of relative width in its row"/>
+            <enum name="width_7"   help="Make the button take 7 units of relative width in its row"/>
+            <enum name="width_8"   help="Make the button take 8 units of relative width in its row"/>
+            <enum name="width_9"   help="Make the button take 9 units of relative width in its row"/>
+            <enum name="width_10"  help="Make the button take 10 units of relative width in its row"/>
+            <enum name="width_11"  help="Make the button take 11 units of relative width in its row"/>
+            <enum name="width_12"  help="Make the button take 12 units of relative width in its row"/>
+            <enum name="width_13"  help="Make the button take 13 units of relative width in its row"/>
+            <enum name="width_14"  help="Make the button take 14 units of relative width in its row"/>
+            <enum name="width_15"  help="Make the button take 15 units of relative width in its row"/>
+            <enum name="hidden"      help="Make the button hidden"/>
+            <enum name="no_repeat"   help="Disable long-press repeat on the button"/>
+            <enum name="disabled"    help="Make the button disabled (not clickable)"/>
+            <enum name="checkable"   help="Make the button toggleable when clicked"/>
+            <enum name="checked"     help="Keep the button in the toggled (checked) state"/>
+            <enum name="click_trig"  help="Trigger LV_EVENT_VALUE_CHANGED on CLICK instead of PRESS"/>
+            <enum name="popover"     help="Show a popover when pressing the button"/>
+            <enum name="recolor"     help="Enable text recoloring with inline #color codes"/>
+            <enum name="reserved_1"  help="Reserved flag for future use"/>
+            <enum name="reserved_2"  help="Reserved flag for future use"/>
+            <enum name="custom_1"    help="Custom flag free to use by the user"/>
+            <enum name="custom_2"    help="Custom flag free to use by the user"/>
+        </enumdef>
 
-	    <prop name="map"  type="string[NULL]" help=""/>
-	    <prop name="ctrl_map" type="enum:lv_buttonmatrix_ctrl[]+" help=""/>
-	    <prop name="one_checked" type="bool" help=""/>
-	    <prop name="selected_button" type="int" help=""/>
-
-
-	</api>
+        <prop name="map" type="string[NULL]" help="Set the layout map of the button matrix using text strings and `\n` for line breaks (e.g. 'a' 'b' 'c')"/>
+        <prop name="ctrl_map" type="enum:lv_buttonmatrix_ctrl[]+" help="Set the control flags for each button in the map"/>
+        <prop name="one_checked" type="bool" help="Force exactly one button to stay checked at all times"/>
+        <prop name="selected_button" type="int" help="Select a button by index (new lines do not count)"/>
+    </api>
 </widget>

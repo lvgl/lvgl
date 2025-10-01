@@ -5,10 +5,10 @@ Example
 
 <widget>
     <api>
-        <prop name="size" type="int" help="QR canvas edge length in px (use this instead of width/height)"/>
-        <prop name="dark_color" type="color" help="Foreground color for QR modules"/>
-        <prop name="light_color" type="color" help="Background color"/>
-        <prop name="data" type="string" help="UTF-8 payload encoded into the QR code. Must be called as last property"/>
-        <prop name="quiet_zone" type="bool" help="Add quiet zone (border) around the QR code"/>
+        <prop name="size" type="int" help="Set the QR code size in pixels (instead of width/height)"/>
+        <prop name="dark_color" type="color" help="Set the foreground color"/>
+        <prop name="light_color" type="color" help="Set the background color"/>
+        <prop name="data" type="string" help="Set the encoded UTF-8 data"/>
+        <prop name="quiet_zone" type="bool" help="Add margin around the QR code"/>
     </api>
 </widget>
