@@ -216,7 +216,7 @@ void lv_xml_init(void)
     lv_xml_register_widget("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
 
     lv_xml_register_widget("lv_obj-subject_toggle_event", lv_obj_xml_subject_toggle_create,
-    						lv_obj_xml_subject_toggle_apply);
+                           lv_obj_xml_subject_toggle_apply);
     lv_xml_register_widget("lv_obj-subject_set_int_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
     lv_xml_register_widget("lv_obj-subject_set_float_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
     lv_xml_register_widget("lv_obj-subject_set_string_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
