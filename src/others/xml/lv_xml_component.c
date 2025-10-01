@@ -897,7 +897,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
 
         case LV_XML_PARSER_SECTION_STYLES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
-            lv_xml_style_register(&state->scope, attrs);
+            lv_xml_register_style(&state->scope, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_FONTS:

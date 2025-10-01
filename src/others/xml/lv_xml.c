@@ -122,7 +122,7 @@ void lv_xml_init(void)
 #endif
 
 #if LV_USE_SPINBOX
-    lv_xml_widget_register("lv_spinbox", lv_xml_spinbox_create, lv_xml_spinbox_apply);
+    lv_xml_register_widget("lv_spinbox", lv_xml_spinbox_create, lv_xml_spinbox_apply);
 #endif
 
 #if LV_USE_TABVIEW
