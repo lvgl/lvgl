@@ -33,7 +33,7 @@ Login
 
 hints:
 - enter your email address
-- you will recevie an email with an OTP (On Time Password)
+- you will receive an email with an OTP (On Time Password)
 - it will create a user for you
 - no password is needed
 
@@ -48,8 +48,8 @@ After logging in you need select a licence for the list.
 
 
 
-Initial Display
-***************
+Launch Screen
+*************
 
 .. figure:: /_static/images/editor_initial_ui.png
     :align: center
@@ -60,29 +60,16 @@ Initial Display
     |lvglpro| Opening User Interface
 
 
-Component Libraries vs Regular Projects
----------------------------------------
+The Launch Screen opens up every time you start the Editor and are already logged in.
 
-A Component Library is a set of 1 or more XML files that can be used in any
-|lvglpro| Project.
+Here you can:
 
-|lvglpro| UI Projects use Component Libraries, but Component Libraries do not
-use UI Projects.
+- Open an existing project
+- Create a new project
+- Open any recent project
 
-
-The Difference Between the Two
-------------------------------
-
-The difference between the directory structures of the two types of |lvglpro| projects
-(UI Projects vs Component Libraries) is that a UIProject has a ``project.xml`` file
-in it (which ties together all of its parts), and a Component Library does not.
-
-.. TODO: Gabor  elaborate on what ``project.xml`` describes
-
-
-
-User Interface with Open Project
-********************************
+Working on a Project
+********************
 
 .. figure:: /_static/images/editor_interface.png
     :align: center

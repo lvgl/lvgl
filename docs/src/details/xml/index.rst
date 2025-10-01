@@ -18,4 +18,3 @@ UI Editor and XML
     assets/index
     features/index
     tools/index
-    license/index

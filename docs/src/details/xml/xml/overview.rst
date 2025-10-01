@@ -11,41 +11,25 @@ Overview
 Introduction
 ************
 
-LVGL's XML Module implements LVGL's Declarative UI by making it possible to
-describe UIs in XML.
+LVGL's XML Module implements LVGL's Declarative UI by making it possible to describe
+UIs in XML.
 
-Describing the UI in XML in a declarative manner offers several advantages:
+Using XML instead of pure drag-and-drop editing has several advantages:
 
-Familiar syntax – works like HTML, easy to learn and read
-Version control friendly – plain text with human-readable diffs, no binary files
-Easy to share – copy, paste, and send as text
-Automation ready – scripts and CI/CD can process XML effortlessly
-AI compatible – AI tools can read, generate, and refactor XML
-Modular by design – create reusable components for structured UIs
-Reusable patterns – copy and reuse snippets across projects
-Fast to edit – quicker to type than to drag and drop with a mouse
-Runtime loading – parse XML at runtime without recompiling
-Cross-platform – the same XML works across all LVGL targets
+- **Familiar syntax** works like HTML, easy to learn and read
+- **Version control friendly** plain text with human-readable diffs, no binary files
+- **Easy to share** copy, paste, and send as text
+- **Reusable patterns** copy and reuse snippets across projects
+- **Automation ready** scripts and CI/CD can process XML effortlessly
+- **AI compatible** AI tools can read, generate, and refactor XML
+- **Modular by design** create reusable components for structured UIs
+- **Fast to edit** quicker to type than to drag and drop with a mouse
+- **Runtime loading** parse XML at runtime without recompiling
+- **Cross-platform** the same XML works across all LVGL targets
 
-
-
-- XML files can be loaded at runtime (e.g., from an SD card), allowing you to change
-  the application's UI without changing the firmware.
-- XML files can also be loaded dynamically, enabling use cases such as creating
-  UIs from plugins or apps downloaded by the firmware.
-- XML is simpler to write than C, enabling people with different skill sets to create LVGL UIs.
-- XML is textual data, making it easy to parse and manipulate with a large number of
-  programming and scripting languages.
-- XML can be used to generate LVGL code in any language.
-- XML helps separate the view from the internal logic.
-- The XML syntax uses the same properties as the C API, so it's easy to learn. E.g.,
-  style properties like ``bg_color``, ``line_width``, or widget properties like ``width``,
-  ``height``, label ``text``, etc.
-- A powerful data binding engine allows you to easily bind widgets to global data.
-
-The XML file can be written by hand, but it's highly recommended to use `LVGL's
-UI editor  <https://lvgl.io/editor>`__ to write the XML files. This UI editor
-makes UI development much faster by providing features like:
+The XML file can be written by hand, but it's highly recommended to use `LVGL Pro's
+Editor <editor>` to write the XML files. The Editor makes UI development much faster by
+providing features like:
 
 - Instant preview of the XML files (components, screens)
 - Inspector mode to visualize widget sizes, paddings, etc.
@@ -53,21 +37,6 @@ makes UI development much faster by providing features like:
 - Autocomplete and syntax highlighting
 - Online share/preview for collaboration and testing
 - `Figma <https://www.figma.com/>`__ integration to easily reimplement Figma designs
-
-
-
-Using the XML files
-*******************
-
-If writing XMLs by hand, the concept is very simple:
-
-1. When ``LV_USE_XML`` is enabled, LVGL's built-in widgets and other XML parsers for styles, events,
-   data bindings, etc., are registered automatically.
-2. The XML files created by the user (such as Screens, Components, Images, Fonts, etc.) can be
-   registered (loaded) at runtime, and screen or component instances can also be created based on the
-   XML "blueprints".
-3. The UI elements created from XML look like any normal widgets, so functions of the C API can be applied
-   to them. E.g., start an animation, add a special style, etc.
 
 UI Elements
 ***********
@@ -135,3 +104,17 @@ can be defined.
 
 Multiple ``globals.xml`` files can be loaded if needed, but each will be saved in the same global scope,
 meaning duplicated items will be added only once.
+
+
+Using the XML Files
+*******************
+
+The XML files can be used in two ways:
+
+1. Load them directly at runtime
+2. Convert them to C code by using the Editor or the CLI
+
+Both use cases are covered in detail in the :ref:`Integration <editor_integration>`
+section.
+
+

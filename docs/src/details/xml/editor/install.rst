@@ -5,9 +5,7 @@
 Installation
 ============
 
-Here are the guides to download and install |lvglpro| appropriate for your platform:
-
-
+Here are the guides to download and install |lvglpro| Editor appropriate for your platform:
 
 Windows
 *******
@@ -17,27 +15,16 @@ resulting image to your workstation.  Then execute the downloaded installer to i
 |lvglpro|.
 
 
-Troubleshooting
----------------
-
-
-
 Linux
 *****
 
-Installing |lvglpro| on Linux is as simple as downloading the AppImage, making it
-executable (``chmod +x LVGLPro.AppImage``), and running it.
-
-
+Installing |lvglpro| Editor on Linux is as simple as downloading the AppImage, making it
+executable (``chmod +x LVGL_Pro_Editor.AppImage``), and running it.
 
 Troubleshooting
 ---------------
 
-Launching on Linux
-~~~~~~~~~~~~~~~~~~
-
-:Problem:   Some users have experienced trouble launching |lvglpro| on some Linux
-
+:Problem:   Some users have experienced trouble launching Editor on some Linux
             distributions.  If you double click the ``.AppImage`` file and nothing
             happens, try running it from the terminal.  If you see this error:
 
@@ -58,8 +45,5 @@ Launching on Linux
 MacOS
 *****
 
-.. TODO Gabor
-
-
-Troubleshooting
----------------
+Just download either the ARM for Apple Silicon (AMD) version) and drag the application
+to your Applications folder in Finder.

@@ -13,4 +13,5 @@ Editor
     install
     user_interface
     hotkeys
+    license
 
