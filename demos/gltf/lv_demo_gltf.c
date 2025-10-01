@@ -23,7 +23,7 @@
 #define PAUSE_BTN_COLOR lv_color_hex(0xF9A825)
 
 #ifndef LV_DEMO_GLTF_CAMERA_NUM
-#define LV_DEMO_GLTF_CAMERA_NUM 0
+    #define LV_DEMO_GLTF_CAMERA_NUM 0
 #endif
 
 /**********************
