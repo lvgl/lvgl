@@ -1,8 +1,8 @@
 .. _editor_and_xml:
 
-=================
-UI Editor and XML
-=================
+================
+LVGL Pro and XML
+================
 
 
 .. toctree::
@@ -17,4 +17,3 @@ UI Editor and XML
     assets/index
     features/index
     tools/index
-    license/index

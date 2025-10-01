@@ -10,3 +10,4 @@ XML Overview
 
     overview
     syntax
+    license
