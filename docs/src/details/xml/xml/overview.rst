@@ -8,10 +8,26 @@ Overview
 .. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
     :trim:
 
+Introduction
+************
+
 LVGL's XML Module implements LVGL's Declarative UI by making it possible to
 describe UIs in XML.
 
 Describing the UI in XML in a declarative manner offers several advantages:
+
+Familiar syntax – works like HTML, easy to learn and read
+Version control friendly – plain text with human-readable diffs, no binary files
+Easy to share – copy, paste, and send as text
+Automation ready – scripts and CI/CD can process XML effortlessly
+AI compatible – AI tools can read, generate, and refactor XML
+Modular by design – create reusable components for structured UIs
+Reusable patterns – copy and reuse snippets across projects
+Fast to edit – quicker to type than to drag and drop with a mouse
+Runtime loading – parse XML at runtime without recompiling
+Cross-platform – the same XML works across all LVGL targets
+
+
 
 - XML files can be loaded at runtime (e.g., from an SD card), allowing you to change
   the application's UI without changing the firmware.
