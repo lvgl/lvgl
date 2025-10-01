@@ -1,8 +1,8 @@
 .. _editor_and_xml:
 
-=================
-UI Editor and XML
-=================
+================
+LVGL Pro and XML
+================
 
 
 .. toctree::
