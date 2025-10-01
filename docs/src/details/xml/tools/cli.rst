@@ -101,8 +101,8 @@ Use compilation when you want to run headless tests in a Node environment or pre
 The result of a compile is a prepared runtime in build/ and build/generated that contains the bundled JavaScript/TypeScript runtime and platform-specific entry points (browser vs Node) depending on --target.
 
 - ``--target <web|node>`` – choose the compilation target:
-    - ``web`` (default): Browser-compatible runtime for previewing the UI.
-    - ``node``: Node.js runtime for headless execution and CI tests.
+   - ``web`` (default): Browser-compatible runtime for previewing the UI.
+   - ``node``: Node.js runtime for headless execution and CI tests.
 
 .. code-block:: bash
 
