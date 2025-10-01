@@ -21,7 +21,7 @@ jobs:
         port: ['unix', 'stm32', 'rp2', 'esp32']
     steps:
     - uses: ammaraskar/gcc-problem-matcher@master
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.12'
 
