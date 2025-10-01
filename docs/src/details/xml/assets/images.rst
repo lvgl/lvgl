@@ -30,7 +30,7 @@ they can be simply added to ``globals.xml``:
     </images>
 
 When registering ``globals.xml`` with
-:cpp:expr:`lv_xml_component_register_from_file("A:path/to/globals.xml")`,
+:cpp:expr:`lv_xml_register_component_from_file("A:path/to/globals.xml")`,
 names are automatically mapped to the path.
 
 The images can have relative paths in ``globals.xml``. Before registering ``globals.xml``,

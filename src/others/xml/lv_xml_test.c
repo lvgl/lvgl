@@ -103,7 +103,7 @@ lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * re
     test.ref_image_path_prefix = ref_image_path_prefix;
 
     /*Register as a component first to allow creating the view of the test later*/
-    lv_result_t res = lv_xml_component_register_from_data(LV_TEST_NAME, xml_def);
+    lv_result_t res = lv_xml_register_component_from_data(LV_TEST_NAME, xml_def);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Couldn't register the test as a component");
         return LV_RESULT_INVALID;

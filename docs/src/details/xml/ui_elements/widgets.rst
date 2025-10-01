@@ -114,7 +114,7 @@ A Widget XML processor can be registered as follows:
 
 .. code-block:: c
 
-    lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply);
+    lv_xml_register_widget("lv_label", lv_xml_label_create, lv_xml_label_apply);
 
 After registration, a Widget can be created like this from C code:
 

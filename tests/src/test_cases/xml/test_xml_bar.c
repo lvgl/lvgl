@@ -67,7 +67,7 @@ void test_xml_bar_component(void)
                        "</view>"
                        "</component>";
 
-    lv_xml_component_register_from_data("bar_test", xml);
+    lv_xml_register_component_from_data("bar_test", xml);
 
     test_with_attrs("bar_test");
 }

@@ -308,13 +308,13 @@ static void load_from_path(const char * path)
         switch(parser_data.type) {
             case LV_XML_TYPE_COMPONENT: {
                     char * component_name = path_filename_without_extension(path);
-                    lv_xml_component_register_from_data(component_name, xml_buf);
+                    lv_xml_register_component_from_data(component_name, xml_buf);
                     lv_free(component_name);
                     break;
                 }
             case LV_XML_TYPE_TRANSLATIONS:
 #if LV_USE_TRANSLATION
-                lv_xml_translation_register_from_data(xml_buf);
+                lv_xml_register_translation_from_data(xml_buf);
 #else
                 LV_LOG_WARN("Translation XML found but translations not enabled");
 #endif

@@ -99,149 +99,152 @@ void lv_xml_init(void)
 
     lv_xml_register_font(NULL, "lv_font_default", lv_font_get_default());
 
-    lv_xml_widget_register("lv_obj", lv_xml_obj_create, lv_xml_obj_apply);
+    lv_xml_register_widget("lv_obj", lv_xml_obj_create, lv_xml_obj_apply);
 
 #if LV_USE_BUTTON
-    lv_xml_widget_register("lv_button", lv_xml_button_create, lv_xml_button_apply);
+    lv_xml_register_widget("lv_button", lv_xml_button_create, lv_xml_button_apply);
 #endif
 
 #if LV_USE_LABEL
-    lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply);
+    lv_xml_register_widget("lv_label", lv_xml_label_create, lv_xml_label_apply);
 #endif
 
 #if LV_USE_IMAGE
-    lv_xml_widget_register("lv_image", lv_xml_image_create, lv_xml_image_apply);
+    lv_xml_register_widget("lv_image", lv_xml_image_create, lv_xml_image_apply);
 #endif
 
 #if LV_USE_BAR
-    lv_xml_widget_register("lv_bar", lv_xml_bar_create, lv_xml_bar_apply);
+    lv_xml_register_widget("lv_bar", lv_xml_bar_create, lv_xml_bar_apply);
 #endif
 
 #if LV_USE_SLIDER
-    lv_xml_widget_register("lv_slider", lv_xml_slider_create, lv_xml_slider_apply);
+    lv_xml_register_widget("lv_slider", lv_xml_slider_create, lv_xml_slider_apply);
 #endif
 
 #if LV_USE_SPINBOX
-    lv_xml_widget_register("lv_spinbox", lv_xml_spinbox_create, lv_xml_spinbox_apply);
+    lv_xml_register_widget("lv_spinbox", lv_xml_spinbox_create, lv_xml_spinbox_apply);
 #endif
 
 #if LV_USE_TABVIEW
-    lv_xml_widget_register("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
-    lv_xml_widget_register("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
-    lv_xml_widget_register("lv_tabview-tab", lv_xml_tabview_tab_create, lv_xml_tabview_tab_apply);
-    lv_xml_widget_register("lv_tabview-tab_button", lv_xml_tabview_tab_button_create, lv_xml_tabview_tab_button_apply);
+    lv_xml_register_widget("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
+    lv_xml_register_widget("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
+    lv_xml_register_widget("lv_tabview-tab", lv_xml_tabview_tab_create, lv_xml_tabview_tab_apply);
+    lv_xml_register_widget("lv_tabview-tab_button", lv_xml_tabview_tab_button_create, lv_xml_tabview_tab_button_apply);
 #endif
 
 #if LV_USE_CHART
-    lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
-    lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
-    lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
-    lv_xml_widget_register("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
+    lv_xml_register_widget("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
+    lv_xml_register_widget("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
+    lv_xml_register_widget("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
+    lv_xml_register_widget("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
 #endif
 
 #if LV_USE_TABLE
-    lv_xml_widget_register("lv_table", lv_xml_table_create, lv_xml_table_apply);
-    lv_xml_widget_register("lv_table-column", lv_xml_table_column_create, lv_xml_table_column_apply);
-    lv_xml_widget_register("lv_table-cell", lv_xml_table_cell_create, lv_xml_table_cell_apply);
+    lv_xml_register_widget("lv_table", lv_xml_table_create, lv_xml_table_apply);
+    lv_xml_register_widget("lv_table-column", lv_xml_table_column_create, lv_xml_table_column_apply);
+    lv_xml_register_widget("lv_table-cell", lv_xml_table_cell_create, lv_xml_table_cell_apply);
 #endif
 
 #if LV_USE_DROPDOWN
-    lv_xml_widget_register("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
-    lv_xml_widget_register("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
+    lv_xml_register_widget("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
+    lv_xml_register_widget("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
 #endif
 
 #if LV_USE_ROLLER
-    lv_xml_widget_register("lv_roller", lv_xml_roller_create, lv_xml_roller_apply);
+    lv_xml_register_widget("lv_roller", lv_xml_roller_create, lv_xml_roller_apply);
 #endif
 
 #if LV_USE_SCALE
-    lv_xml_widget_register("lv_scale", lv_xml_scale_create, lv_xml_scale_apply);
-    lv_xml_widget_register("lv_scale-section", lv_xml_scale_section_create, lv_xml_scale_section_apply);
+    lv_xml_register_widget("lv_scale", lv_xml_scale_create, lv_xml_scale_apply);
+    lv_xml_register_widget("lv_scale-section", lv_xml_scale_section_create, lv_xml_scale_section_apply);
 #endif
 
 #if LV_USE_SPAN
-    lv_xml_widget_register("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
-    lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
+    lv_xml_register_widget("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
+    lv_xml_register_widget("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
 #endif
 
 #if LV_USE_BUTTONMATRIX
-    lv_xml_widget_register("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
+    lv_xml_register_widget("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
 #endif
 
 #if LV_USE_TEXTAREA
-    lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
+    lv_xml_register_widget("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
 #endif
 
 #if LV_USE_KEYBOARD
-    lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
+    lv_xml_register_widget("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
 #endif
 
 #if LV_USE_ARC
-    lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
+    lv_xml_register_widget("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
 #endif
 
 #if LV_USE_SWITCH
-    lv_xml_widget_register("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
+    lv_xml_register_widget("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
 #endif
 
 #if LV_USE_CHECKBOX
-    lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
+    lv_xml_register_widget("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
 #endif
 
 #if LV_USE_CANVAS
-    lv_xml_widget_register("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
+    lv_xml_register_widget("lv_canvas", lv_xml_canvas_create, lv_xml_canvas_apply);
 #endif
 
 #if LV_USE_CALENDAR
-    lv_xml_widget_register("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);
+    lv_xml_register_widget("lv_calendar", lv_xml_calendar_create, lv_xml_calendar_apply);
 #if LV_USE_CALENDAR_HEADER_ARROW
-    lv_xml_widget_register("lv_calendar-header_arrow", lv_xml_calendar_header_arrow_create,
+    lv_xml_register_widget("lv_calendar-header_arrow", lv_xml_calendar_header_arrow_create,
                            lv_xml_calendar_header_arrow_apply);
 #endif
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
-    lv_xml_widget_register("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
+    lv_xml_register_widget("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
                            lv_xml_calendar_header_dropdown_apply);
 #endif
 #endif
 
 #if LV_USE_QRCODE
-    lv_xml_widget_register("lv_qrcode", lv_xml_qrcode_create, lv_xml_qrcode_apply);
+    lv_xml_register_widget("lv_qrcode", lv_xml_qrcode_create, lv_xml_qrcode_apply);
 #endif
 
-    lv_xml_widget_register("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
-    lv_xml_widget_register("lv_obj-remove_style", lv_obj_xml_remove_style_create, lv_obj_xml_remove_style_apply);
-    lv_xml_widget_register("lv_obj-remove_style_all", lv_obj_xml_remove_style_all_create,
+    lv_xml_register_widget("lv_obj-style", lv_obj_xml_style_create, lv_obj_xml_style_apply);
+    lv_xml_register_widget("lv_obj-remove_style", lv_obj_xml_remove_style_create, lv_obj_xml_remove_style_apply);
+    lv_xml_register_widget("lv_obj-remove_style_all", lv_obj_xml_remove_style_all_create,
                            lv_obj_xml_remove_style_all_apply);
 
-    lv_xml_widget_register("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
-    lv_xml_widget_register("lv_obj-subject_toggle_event", lv_obj_xml_subject_toggle_create,
+    lv_xml_register_widget("lv_obj-event_cb", lv_obj_xml_event_cb_create, lv_obj_xml_event_cb_apply);
+
+    lv_xml_register_widget("lv_obj-subject_toggle_event", lv_obj_xml_subject_toggle_create,
                            lv_obj_xml_subject_toggle_apply);
-    lv_xml_widget_register("lv_obj-subject_set_int_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_set_float_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_set_string_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
-    lv_xml_widget_register("lv_obj-subject_increment_event", lv_obj_xml_subject_increment_create,
+    lv_xml_register_widget("lv_obj-subject_set_int_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_register_widget("lv_obj-subject_set_float_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_register_widget("lv_obj-subject_set_string_event", lv_obj_xml_subject_set_create, lv_obj_xml_subject_set_apply);
+    lv_xml_register_widget("lv_obj-subject_increment_event", lv_obj_xml_subject_increment_create,
                            lv_obj_xml_subject_increment_apply);
-    lv_xml_widget_register("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
+
+    lv_xml_register_widget("lv_obj-screen_load_event", lv_obj_xml_screen_load_event_create,
                            lv_obj_xml_screen_load_event_apply);
-    lv_xml_widget_register("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
+    lv_xml_register_widget("lv_obj-screen_create_event", lv_obj_xml_screen_create_event_create,
                            lv_obj_xml_screen_create_event_apply);
-    lv_xml_widget_register("lv_obj-play_timeline_event", lv_obj_xml_play_timeline_event_create,
+
+    lv_xml_register_widget("lv_obj-play_timeline_event", lv_obj_xml_play_timeline_event_create,
                            lv_obj_xml_play_timeline_event_apply);
 
-    lv_xml_widget_register("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_lt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_ge", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
-    lv_xml_widget_register("lv_obj-bind_flag_if_le", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_lt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_ge", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
+    lv_xml_register_widget("lv_obj-bind_flag_if_le", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
 
-    lv_xml_widget_register("lv_obj-bind_state_if_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
-    lv_xml_widget_register("lv_obj-bind_state_if_not_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
-    lv_xml_widget_register("lv_obj-bind_state_if_gt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
-    lv_xml_widget_register("lv_obj-bind_state_if_lt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
-    lv_xml_widget_register("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
-    lv_xml_widget_register("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_not_eq", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_gt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_lt", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_ge", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
+    lv_xml_register_widget("lv_obj-bind_state_if_le", lv_obj_xml_bind_state_create, lv_obj_xml_bind_state_apply);
 
     lv_xml_load_init();
 }
@@ -381,6 +384,12 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     return NULL;
 }
 
+
+lv_obj_t * lv_xml_create_screen(const char * name)
+{
+    return lv_xml_create(NULL, name, NULL);
+
+}
 
 void lv_xml_set_default_asset_path(const char * path_prefix)
 {

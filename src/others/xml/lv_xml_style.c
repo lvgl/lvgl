@@ -48,7 +48,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char ** attrs)
+lv_result_t lv_xml_register_style(lv_xml_component_scope_t * scope, const char ** attrs)
 {
     const char * style_name =  lv_xml_get_value_of(attrs, "name");
     if(style_name == NULL) {

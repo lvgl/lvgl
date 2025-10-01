@@ -128,7 +128,7 @@ lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_nam
     return NULL;
 }
 
-lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def)
+lv_result_t lv_xml_register_component_from_data(const char * name, const char * xml_def)
 {
     bool globals = false;
     if(lv_streq(name, "globals")) globals = true;
@@ -190,7 +190,7 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
 }
 
 
-lv_result_t lv_xml_component_register_from_file(const char * path)
+lv_result_t lv_xml_register_component_from_file(const char * path)
 {
     /* Extract component name from path */
     /* Create a copy of the filename to modify */
@@ -237,7 +237,7 @@ lv_result_t lv_xml_component_register_from_file(const char * path)
     xml_buf[rn] = '\0';
 
     /* Register the component */
-    lv_result_t res = lv_xml_component_register_from_data(filename, xml_buf);
+    lv_result_t res = lv_xml_register_component_from_data(filename, xml_buf);
 
     /* Housekeeping */
     lv_free(filename);
@@ -897,7 +897,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
 
         case LV_XML_PARSER_SECTION_STYLES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
-            lv_xml_style_register(&state->scope, attrs);
+            lv_xml_register_style(&state->scope, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_FONTS:

@@ -23,7 +23,7 @@ void test_xml_subject_int(void)
                        "	</subjects>"
                        "</globals>";
 
-    lv_xml_component_register_from_data("globals", xml);
+    lv_xml_register_component_from_data("globals", xml);
 
     lv_subject_t * s1 = lv_xml_get_subject(NULL, "s1");
     lv_subject_t * s2 = lv_xml_get_subject(NULL, "s2");
