@@ -5,8 +5,7 @@ Inactivity Measurement
 ======================
 
 A user's inactivity time is measured and stored with each ``lv_display_t`` object.
-Every use of an :ref:`Input Device <indev>` (if :ref:`associated with the display
-<indev_other_features>`) counts as activity. To get time elapsed since the last
+Every use of an :ref:`Input Device <indev>` counts as activity. To get time elapsed since the last
 activity, use :cpp:expr:`lv_display_get_inactive_time(display1)`. If ``NULL`` is
 passed, the lowest inactivity time among all displays will be returned (in this case
 NULL does *not* mean the :ref:`default_display`).
