@@ -88,6 +88,7 @@ extern "C" {
 #define lv_vector_dsc_skew                          lv_draw_vector_dsc_skew
 #define lv_vector_dsc_add_path                      lv_draw_vector_dsc_add_path
 #define lv_vector_dsc_clear_area                    lv_draw_vector_dsc_clear_area
+#define lv_wayland_timer_handler                    lv_timer_handler
 
 
 #ifdef __cplusplus
