@@ -82,24 +82,25 @@ The NeoChrom VG driver in LVGL can render vector graphics Widgets using NeoChrom
 hardware support for vector graphics drawing. You can display SVG files in your application.
 See the SVG examples for usage.
 
-You should enable the following configs in ``lv_conf.h``.
+To use vector graphics with NeoChrom, you should enable the following configs in ``lv_conf.h``.
 
 .. code-block::
 
     LV_USE_NEMA_GFX 1
     LV_USE_NEMA_VG 1
-    LV_USE_SVG 1
     LV_USE_VECTOR_GRAPHIC 1
     LV_USE_MATRIX 1
     LV_USE_FLOAT 1
-    LV_USE_DEMO_VECTOR_GRAPHIC 1
-    LV_CACHE_DEF_SIZE (350 * 1024)
 
+To use the SVG widget, additionally enable ``LV_USE_SVG``.
+
+If there is RAM available, SVG performance can be increased by enabling the image cache,
+``LV_CACHE_DEF_SIZE``.
 ``LV_CACHE_DEF_SIZE`` is a cache size in bytes. If it is large enough for your SVGs,
 it will cache decoded SVG data so it does not need to be parsed every refresh, significantly
 reducing SVG redraw time.
 
-``LV_USE_DEMO_VECTOR_GRAPHIC`` is a demo which draws some vector graphics shapes.
+``LV_USE_DEMO_VECTOR_GRAPHIC`` is a demo you can enable which draws some vector graphics shapes.
 Gradient and image fills are not supported yet, as well as dashed strokes. These are
 missing from the demo when it is run with the NeoChrom driver.
 
