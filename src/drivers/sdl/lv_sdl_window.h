@@ -35,6 +35,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct SDL_Window;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -56,6 +58,8 @@ void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int
 void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
 void lv_sdl_quit(void);
+
+struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp);
 
 /**********************
  *      MACROS
