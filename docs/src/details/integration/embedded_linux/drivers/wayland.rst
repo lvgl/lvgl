@@ -130,6 +130,7 @@ display, where the ``display`` parameter specifies the physical display number (
 0, 1, 2, etc.):
 
 .. code-block:: c
+
     /* Assign to physical display 0 and full screen on that display */
     lv_wayland_assign_physical_display(disp, 0);  
     lv_wayland_window_set_fullscreen(window, true); 
