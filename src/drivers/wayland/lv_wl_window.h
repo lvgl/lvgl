@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
+typedef bool (*lv_wayland_display_close_cb_t)(lv_display_t * disp);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -42,7 +42,7 @@ typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
  * @return The LVGL display associated to the window
  */
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
-                                        lv_wayland_display_close_f_t close_cb);
+                                        lv_wayland_display_close_cb_t close_cb);
 
 /**
  * Closes the window programmatically
