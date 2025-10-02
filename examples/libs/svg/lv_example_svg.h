@@ -26,6 +26,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_example_svg_1(void);
+void lv_example_svg_2(void);
+void lv_example_svg_3(void);
 
 /**********************
  *      MACROS
