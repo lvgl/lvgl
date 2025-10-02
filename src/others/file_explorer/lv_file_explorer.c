@@ -716,25 +716,14 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
     char * tmp_i_value = lv_malloc(lv_strlen(i_value) + 1);
     LV_ASSERT_MALLOC(tmp_i_value);
     lv_strcpy(tmp_i_value, i_value);
-
-    //*Will be freed when the table is freed. The previous user data is freed when the new one is set*/
-    lv_file_explorer_file_table_entry_data_t * tmp_i_user_data = lv_malloc(sizeof(
-                                                                               lv_file_explorer_file_table_entry_data_t));
-    LV_ASSERT_MALLOC(tmp_i_user_data);
-    lv_memcpy(tmp_i_user_data, lv_table_get_cell_user_data(tb, i, 0), sizeof(lv_file_explorer_file_table_entry_data_t));
-
-    lv_file_explorer_file_table_entry_data_t * tmp_j_user_data = lv_malloc(sizeof(
-                                                                               lv_file_explorer_file_table_entry_data_t));
-    LV_ASSERT_MALLOC(tmp_j_user_data);
-    lv_memcpy(tmp_j_user_data, lv_table_get_cell_user_data(tb, j, 0), sizeof(lv_file_explorer_file_table_entry_data_t));
-
     lv_table_set_cell_value(tb, i, 0, lv_table_get_cell_value(tb, j, 0));
-    lv_table_set_cell_user_data(tb, i, 0, tmp_j_user_data);
-
     lv_table_set_cell_value(tb, j, 0, tmp_i_value);
-    lv_table_set_cell_user_data(tb, j, 0, tmp_i_user_data);
-
     lv_free(tmp_i_value);
+
+    void * old_i_data = lv_table_get_cell_user_data(tb, i, 0);
+    void * old_j_data = lv_table_get_cell_user_data(tb, j, 0);
+    lv_table_set_cell_user_data(tb, j, 0, old_i_data);
+    lv_table_set_cell_user_data(tb, i, 0, old_j_data);
 }
 
 static void file_explorer_sort(lv_obj_t * obj)
