@@ -245,13 +245,22 @@ Fields of lv_event_t
 ********************
 
 :cpp:type:`lv_event_t` is the only parameter passed to the event callback and it
-contains all data about the event. The following values can be gotten from it:
+contains all data about the event. The following values can be retrieved from it:
 
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get Widget to which an event was sent. I.e. the Widget whose event handler is being called.
-- :cpp:expr:`lv_event_get_target(e)`: get Widget that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <event_bubbling>` is enabled)
+- :cpp:expr:`lv_event_get_target(e)`: get the Widget, Display or Indev that originally triggered the event (different from :cpp:func:`lv_event_get_current_target` if :ref:`event bubbling <event_bubbling>` is enabled).
+- :cpp:expr:`lv_event_get_target_obj(e)`: get the Widget that originally triggered the event.
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event_cb`.
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_obj_send_event_cb`
+
+.. tip::
+   When using C++, prefer :cpp:expr:`lv_event_get_target_obj(e)` over :cpp:expr:`lv_event_get_target(e)` 
+   when you know the target is a Widget, as it returns the correct type without requiring a cast.
+
+.. warning::
+   Only call :cpp:expr:`lv_event_get_target_obj(e)` when the event target is known to be a Widget. 
+   Calling it for Display or Indev targets is considered Undefined Behavior.
 
 .. _event_bubbling:
 
