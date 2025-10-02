@@ -95,14 +95,14 @@ const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(
  *   Shell Window
  **********************/
 
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, int display)
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, struct wl_output * output)
 {
 
     if(!window->xdg_toplevel) {
         return LV_RESULT_INVALID;
     }
     if(fullscreen) {
-        xdg_toplevel_set_fullscreen(window->xdg_toplevel, lv_wayland_get_wl_output(display));
+        xdg_toplevel_set_fullscreen(window->xdg_toplevel, output);
     }
     else {
         xdg_toplevel_unset_fullscreen(window->xdg_toplevel);

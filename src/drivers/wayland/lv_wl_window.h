@@ -60,10 +60,10 @@ bool lv_wayland_window_is_open(lv_display_t * disp);
 /**
  * Assigns the window to a specific physical display
  * @param disp Reference to the LVGL display associated to the window
- * @param display Physical display number, 0 for first display,1 for second display, ..
+ * @param display Physical display number
  */
+void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display);
 
-void lv_wayland_assign_physical_display(lv_display_t * disp, int display);
 
 /**
  * Sets the fullscreen state of the window
