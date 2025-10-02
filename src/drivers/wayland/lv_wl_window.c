@@ -32,6 +32,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void refr_start_event(lv_event_t * e);
+static void refr_end_event(lv_event_t * e);
+
 static struct graphic_object * create_graphic_obj(struct window * window, enum object_type type,
                                                   struct graphic_object * parent);
 static void destroy_graphic_obj(struct window * window, struct graphic_object * obj);
@@ -141,6 +144,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 #endif
 
     lv_display_add_event_cb(window->lv_disp, lv_wayland_event_cb, LV_EVENT_RESOLUTION_CHANGED, window);
+    lv_display_add_event_cb(window->lv_disp, refr_start_event, LV_EVENT_REFR_START, window);
+    lv_display_add_event_cb(window->lv_disp, refr_end_event, LV_EVENT_REFR_READY, window);
 
     /* Register input */
     window->lv_indev_pointer = lv_wayland_pointer_create();
@@ -380,6 +385,8 @@ void lv_wayland_window_destroy(struct window * window)
 #endif
 
     destroy_graphic_obj(window, window->body);
+    lv_display_delete(window->lv_disp);
+    lv_ll_remove(&lv_wl_ctx.window_ll, window);
 }
 
 const struct wl_callback_listener * lv_wayland_window_get_wl_surface_frame_listener(void)
@@ -390,6 +397,57 @@ const struct wl_callback_listener * lv_wayland_window_get_wl_surface_frame_liste
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void refr_start_event(lv_event_t * e)
+{
+    struct window * window = lv_event_get_user_data(e);
+    lv_wayland_read_input_events();
+
+    LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
+
+    if(window != NULL && window->resize_pending) {
+#if LV_WAYLAND_USE_DMABUF
+        /* Check surface configuration state before resizing */
+        if(!window->surface_configured) {
+            LV_LOG_TRACE("Deferring resize - surface not configured yet");
+            return;
+        }
+#endif
+        LV_LOG_TRACE("Processing resize: %dx%d -> %dx%d",
+                     window->width, window->height,
+                     window->resize_width, window->resize_height);
+
+        if(lv_wayland_window_resize(window, window->resize_width, window->resize_height) == LV_RESULT_OK) {
+            window->resize_width   = window->width;
+            window->resize_height  = window->height;
+            window->resize_pending = false;
+#if LV_WAYLAND_USE_DMABUF
+            /* Reset synchronization flags after successful resize */
+            window->surface_configured = false;
+            window->dmabuf_resize_pending = false;
+#endif
+            LV_LOG_TRACE("Window resize completed successfully: %dx%d",
+                         window->width, window->height);
+        }
+        else {
+            LV_LOG_ERROR("Failed to resize window frame: %d", window->frame_counter);
+        }
+    }
+    else if(window->shall_close) {
+        /* Destroy graphical context and execute close_cb */
+        lv_wayland_update_window(window);
+        if(lv_ll_is_empty(&lv_wl_ctx.window_ll)) {
+            lv_wayland_deinit();
+
+        }
+    }
+
+}
+static void refr_end_event(lv_event_t * e)
+{
+    struct window * window = lv_event_get_user_data(e);
+    lv_wayland_update_window(window);
+}
 
 static struct window * create_window(struct lv_wayland_context * app, int width, int height, const char * title)
 {

@@ -101,8 +101,6 @@ struct lv_wayland_context lv_wl_ctx;
 static void handle_global(void * data, struct wl_registry * registry, uint32_t name, const char * interface,
                           uint32_t version);
 static void handle_global_remove(void * data, struct wl_registry * registry, uint32_t name);
-static void handle_input(void);
-static void handle_output(void);
 
 static uint32_t tick_get_cb(void);
 
@@ -142,74 +140,6 @@ static const struct wl_output_listener output_listener = {
 int lv_wayland_get_fd(void)
 {
     return wl_display_get_fd(lv_wl_ctx.display);
-}
-
-uint32_t lv_wayland_timer_handler(void)
-{
-    struct window * window;
-
-    /* Wayland input handling - it will also trigger the frame done handler */
-    handle_input();
-
-    /* Ready input timers (to probe for any input received) */
-    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-        LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
-
-        if(window != NULL && window->resize_pending) {
-#if LV_WAYLAND_USE_DMABUF
-            /* Check surface configuration state before resizing */
-            if(!window->surface_configured) {
-                LV_LOG_TRACE("Deferring resize - surface not configured yet");
-                continue;
-            }
-#endif
-            LV_LOG_TRACE("Processing resize: %dx%d -> %dx%d",
-                         window->width, window->height,
-                         window->resize_width, window->resize_height);
-
-            if(lv_wayland_window_resize(window, window->resize_width, window->resize_height) == LV_RESULT_OK) {
-                window->resize_width   = window->width;
-                window->resize_height  = window->height;
-                window->resize_pending = false;
-#if LV_WAYLAND_USE_DMABUF
-                /* Reset synchronization flags after successful resize */
-                window->surface_configured = false;
-                window->dmabuf_resize_pending = false;
-#endif
-                LV_LOG_TRACE("Window resize completed successfully: %dx%d",
-                             window->width, window->height);
-            }
-            else {
-                LV_LOG_ERROR("Failed to resize window frame: %d", window->frame_counter);
-            }
-        }
-        else if(window->shall_close == true) {
-
-            /* Destroy graphical context and execute close_cb */
-            handle_output();
-            lv_wayland_deinit();
-            return 0;
-        }
-    }
-
-    /* LVGL handling */
-    uint32_t idle_time = lv_timer_handler();
-
-    /* Wayland output handling */
-    handle_output();
-
-    /* Set 'errno' if a Wayland flush is outstanding (i.e. data still needs to
-     * be sent to the compositor, but the compositor pipe/connection is unable
-     * to take more data at this time).
-     */
-    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-        if(window->flush_pending) {
-            errno = EAGAIN;
-            break;
-        }
-    }
-
-    return idle_time;
 }
 
 /**********************
@@ -343,7 +273,7 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp)
     uint32_t initial_frame_counter = window->frame_counter;
     while(initial_frame_counter == window->frame_counter) {
         poll(&lv_wl_ctx.wayland_pfd, 1, -1);
-        handle_input();
+        lv_wayland_read_input_events();
     }
 }
 
@@ -489,7 +419,7 @@ static void handle_global_remove(void * data, struct wl_registry * registry, uin
     LV_UNUSED(name);
 }
 
-static void handle_input(void)
+void lv_wayland_read_input_events(void)
 {
     int prepare_read = -1;
 
@@ -501,57 +431,37 @@ static void handle_input(void)
     wl_display_dispatch_pending(lv_wl_ctx.display);
 }
 
-static void handle_output(void)
+void lv_wayland_update_window(struct window * window)
 {
-    struct window * window;
     bool shall_flush = lv_wl_ctx.cursor_flush_pending;
-
-    LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-        if((window->shall_close) && (window->close_cb != NULL)) {
-            window->shall_close = window->close_cb(window->lv_disp);
-        }
-
-        if(window->closed) {
-            continue;
-        }
-        else if(window->shall_close) {
-            window->closed      = true;
-            window->shall_close = false;
-            shall_flush         = true;
-
-            window->body->input.pointer.x            = 0;
-            window->body->input.pointer.y            = 0;
-            window->body->input.pointer.left_button  = LV_INDEV_STATE_RELEASED;
-            window->body->input.pointer.right_button = LV_INDEV_STATE_RELEASED;
-            window->body->input.pointer.wheel_button = LV_INDEV_STATE_RELEASED;
-            window->body->input.pointer.wheel_diff   = 0;
-            if(window->wl_ctx->pointer_obj == window->body) {
-                window->wl_ctx->pointer_obj = NULL;
-            }
-
-            window->body->input.keyboard.key   = 0;
-            window->body->input.keyboard.state = LV_INDEV_STATE_RELEASED;
-            if(window->wl_ctx->keyboard_obj == window->body) {
-                window->wl_ctx->keyboard_obj = NULL;
-            }
-            lv_wayland_window_destroy(window);
-        }
-
-        shall_flush |= window->flush_pending;
+    if((window->shall_close) && (window->close_cb != NULL)) {
+        window->shall_close = window->close_cb(window->lv_disp);
     }
 
-    if(shall_flush) {
-        if(wl_display_flush(lv_wl_ctx.display) == -1) {
-            if(errno != EAGAIN) {
-                LV_LOG_ERROR("failed to flush wayland display");
-            }
+    if(window->closed) {
+        return;
+    }
+
+    if(window->shall_close) {
+        window->closed = true;
+        lv_wayland_window_destroy(window);
+    }
+
+    shall_flush |= window->flush_pending;
+
+    if(!shall_flush) {
+        return;
+    }
+
+    if(wl_display_flush(lv_wl_ctx.display) == -1) {
+        if(errno != EAGAIN) {
+            LV_LOG_ERROR("failed to flush wayland display");
         }
-        else {
-            /* All data flushed */
-            lv_wl_ctx.cursor_flush_pending = false;
-            LV_LL_READ(&lv_wl_ctx.window_ll, window) {
-                window->flush_pending = false;
-            }
+    }
+    else {
+        lv_wl_ctx.cursor_flush_pending = false;
+        LV_LL_READ(&lv_wl_ctx.window_ll, window) {
+            window->flush_pending = false;
         }
     }
 }
