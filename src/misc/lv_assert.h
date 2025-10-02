@@ -30,8 +30,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-LV_NORETURN void lv_assert_handler(void);
-
 /**********************
  *      MACROS
  **********************/
@@ -40,7 +38,7 @@ LV_NORETURN void lv_assert_handler(void);
     do {                                                       \
         if(!(expr)) {                                          \
             LV_LOG_ERROR("Asserted at expression: %s", #expr); \
-            lv_assert_handler();                               \
+            LV_ASSERT_HANDLER                                  \
         }                                                      \
     } while(0)
 
@@ -48,7 +46,7 @@ LV_NORETURN void lv_assert_handler(void);
     do {                                                                 \
         if(!(expr)) {                                                    \
             LV_LOG_ERROR("Asserted at expression: %s (%s)", #expr, msg); \
-            lv_assert_handler();                                         \
+            LV_ASSERT_HANDLER                                            \
         }                                                                \
     } while(0)
 
@@ -56,7 +54,7 @@ LV_NORETURN void lv_assert_handler(void);
     do {                                                                                \
         if(!(expr)) {                                                                   \
             LV_LOG_ERROR("Asserted at expression: %s " format , #expr, __VA_ARGS__);    \
-            lv_assert_handler();                                                        \
+            LV_ASSERT_HANDLER                                                           \
         }                                                                               \
     } while(0)
 
