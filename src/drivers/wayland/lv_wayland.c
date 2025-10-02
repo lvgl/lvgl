@@ -398,16 +398,6 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
     LV_UNUSED(version);
     LV_UNUSED(data);
 
-    if(strcmp(interface, "wl_output") == 0) {
-        if(app->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
-            memset(&app->outputs[app->wl_output_count], 0, sizeof(struct output_info));
-            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
-            app->outputs[app->wl_output_count].wl_output = out;
-            wl_output_add_listener(out, &output_listener, &app->outputs[app->wl_output_count].wl_output);
-            app->wl_output_count++;
-        }
-    }
-
     if(strcmp(interface, wl_compositor_interface.name) == 0) {
         app->compositor = wl_registry_bind(registry, name, &wl_compositor_interface, 1);
     }
@@ -427,6 +417,15 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         /* supporting version 2 of the XDG protocol - ensures greater compatibility */
         app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, lv_wayland_xdg_shell_get_wm_base_listener(), app);
+    }
+    else if(strcmp(interface, wl_output_interface.name) == 0) {
+        if(app->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
+            memset(&app->outputs[app->wl_output_count], 0, sizeof(struct output_info));
+            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
+            app->outputs[app->wl_output_count].wl_output = out;
+            wl_output_add_listener(out, &output_listener, &app->outputs[app->wl_output_count].wl_output);
+            app->wl_output_count++;
+        }
     }
 #if LV_WAYLAND_USE_DMABUF
     else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
