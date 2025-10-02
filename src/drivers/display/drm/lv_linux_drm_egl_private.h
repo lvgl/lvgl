@@ -23,6 +23,7 @@ extern "C" {
 #include "../../opengles/lv_opengles_texture_private.h"
 #include "../../opengles/lv_opengles_egl.h"
 #include "../../opengles/lv_opengles_egl_private.h"
+#include "lv_linux_drm.h"
 
 /*********************
  *      DEFINES
@@ -50,6 +51,7 @@ typedef struct {
     struct gbm_bo * gbm_bo_flipped;
     struct gbm_bo * gbm_bo_presented;
 
+    lv_linux_drm_select_mode_cb_t mode_select_cb;
     int fd;
     bool crtc_isset;
 } lv_drm_ctx_t;
