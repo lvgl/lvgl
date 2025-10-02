@@ -14,7 +14,9 @@ Overview
 
 - **Binary:** ``lved-cli.js`` (Node script) `Download CLI <https://github.com/lvgl/lvgl_editor/releases>`_
 - **Platform:** Node 18+ recommended
-- **Container engine:** Podman (if not on Windows, `Download Podman <https://github.com/containers/podman/releases>`_)
+- **Container engine:** Podman for compiling LVGL projects in a consistent environment across platforms.
+    -  On Windows, Podman comes prepackaged with the CLI.
+    -  On Linux/macOS, Podman requires manual installation. `Download Podman <https://github.com/containers/podman/releases>`_
 
 
 Quick start
@@ -51,8 +53,33 @@ Synchronize the styles and images from Figma:
 
    lved-cli.js figma-sync path/to/project --start-service
 
+Compare to a reference tree:
+
+.. code-block:: bash
+
+   lved-cli.js compare build/generated path/to/reference
+
+CI/CD
+-----
+
+See an example `GitHub Actions workflow <https://github.com/lvgl/lvgl_editor/blob/master/.github/workflows/pr-check.yml>`_
+
+
 Commands
 ********
+
+Common Arguments
+----------------
+
+- ``<project-path>`` – path to an LVGL Editor project
+- ``<testing-file>`` – test XML relative to ``<project-path>`` (``run-test``)
+
+Options
+-------
+
+- ``-ss, --start-service`` – prepare/refresh container image before running
+- ``--target <web|node>`` – compile target (``compile``)
+- ``-l, --errorlimit <n>`` – max errors shown (``validate``)
 
 generate
 --------
@@ -67,7 +94,15 @@ Generate code from XML.
 compile
 -------
 
-Compile for a target.
+Compile the runtime binary for previewing or headless tests.
+
+Use compilation when you want to run headless tests in a Node environment or previewing the project in the LVGL Editor.
+
+The result of a compile is a prepared runtime in build/ and build/generated that contains the bundled JavaScript/TypeScript runtime and platform-specific entry points (browser vs Node) depending on --target.
+
+- ``--target <web|node>`` – choose the compilation target:
+   - ``web`` (default): Browser-compatible runtime for previewing the UI.
+   - ``node``: Node.js runtime for headless execution and CI tests.
 
 .. code-block:: bash
 
@@ -89,7 +124,7 @@ Compare two directories (presence + normalized content).
 figma-sync
 ----------
 
-Sync project with Figma.
+Sync Styles and Images from Figma.
 
 .. code-block:: bash
 
@@ -126,38 +161,3 @@ Discover and run all ``test*.xml`` files.
 .. code-block:: bash
 
    lved-cli.js run-all-tests <project-path>
-
-Common Arguments
-----------------
-
-- ``<project-path>`` – path to an LVGL Editor project
-- ``<testing-file>`` – test XML relative to ``<project-path>`` (``run-test``)
-
-Options
--------
-
-- ``-ss, --start-service`` – prepare/refresh container image before running
-- ``--target <web|node>`` – compile target (``compile``)
-- ``-l, --errorlimit <n>`` – max errors shown (``validate``)
-
-Examples
---------
-
-Compare to a reference tree:
-
-.. code-block:: bash
-
-   lved-cli.js compare build/generated ./ci/reference
-
-Compile for Node:
-
-.. code-block:: bash
-
-   lved-cli.js compile ./examples/my-project --target node --start-service
-
-
-CI/CD
------
-
-See an example `GitHub Actions workflow <https://github.com/lvgl/lvgl_editor/blob/master/.github/workflows/pr-check.yml>`_
-
