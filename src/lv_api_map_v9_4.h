@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +31,8 @@ extern "C" {
  **********************/
 
 #define lv_tabview_rename_tab lv_tabview_set_tab_text
+#define lv_wayland_timer_handler    lv_timer_handler
+#define lv_wayland_display_close_f_t    lv_wayland_display_close_cb_t
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -3998,26 +3998,22 @@
             #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
         #endif
     #endif
-    #ifndef LV_WAYLAND_USE_DMABUF
-        #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
-            #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
-        #else
-            #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_DRAW_USE_G2D */
-        #endif
-    #endif
     #ifndef LV_WAYLAND_RENDER_MODE
         #ifdef CONFIG_LV_WAYLAND_RENDER_MODE
             #define LV_WAYLAND_RENDER_MODE CONFIG_LV_WAYLAND_RENDER_MODE
         #else
-            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
+            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_DIRECT
         #endif
     #endif
-                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
-    #ifndef LV_WAYLAND_WINDOW_DECORATIONS
-        #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
-            #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
+    #ifndef LV_WAYLAND_DIRECT_EXIT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_WAYLAND_DIRECT_EXIT
+                #define LV_WAYLAND_DIRECT_EXIT CONFIG_LV_WAYLAND_DIRECT_EXIT
+            #else
+                #define LV_WAYLAND_DIRECT_EXIT 0
+            #endif
         #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
+            #define LV_WAYLAND_DIRECT_EXIT          1     /**< 1: Exit the application when all Wayland windows are closed */
         #endif
     #endif
 #endif
@@ -4754,10 +4750,22 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
-#if LV_USE_WAYLAND == 0
-    #define LV_WAYLAND_USE_DMABUF           0
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0
-#endif /* LV_USE_WAYLAND */
+#if LV_USE_WAYLAND
+    /*Automatically detect wayland backend*/
+    #if LV_USE_G2D
+        #define LV_WAYLAND_USE_G2D 1
+        #define LV_WAYLAND_USE_SHM 0
+        #define LV_WAYLAND_USE_DMABUF 1
+    #else
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 1
+        #define LV_WAYLAND_USE_DMABUF 0
+    #endif
+#else
+    #define LV_WAYLAND_USE_G2D 0
+    #define LV_WAYLAND_USE_SHM 0
+    #define LV_WAYLAND_USE_DMABUF 0
+#endif
 
 #if LV_USE_LINUX_DRM == 0
     #define LV_LINUX_DRM_USE_EGL     0
