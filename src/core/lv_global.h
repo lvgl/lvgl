@@ -73,13 +73,23 @@ struct _snippet_stack;
 struct _lv_freetype_context_t;
 #endif
 
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 struct _lv_profiler_builtin_ctx_t;
+#endif
 
 #if LV_USE_NUTTX
 struct _lv_nuttx_ctx_t;
 #endif
 
 typedef struct _lv_global_t {
+    /**
+     * User data for the LVGL library. Move from the bottom of the struct
+     * to avoid breaking the ABI. E.g., if the user data is used by a
+     * closed-source library, this can help to avoid re-compiling the library
+     * when the lvgl-related configs are changed.
+     */
+    void * user_data;
+
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
@@ -209,12 +219,9 @@ typedef struct _lv_global_t {
     struct _snippet_stack * span_snippet_stack;
 #endif
 
-    /**
-     * Since LV_USE_PROFILER is an option that needs to be turned on and off
-     * frequently, this pointer is always reserved as a placeholder to prevent the
-     * lv_global_t size mismatch affecting the static library.
-     */
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     struct _lv_profiler_builtin_ctx_t * profiler_context;
+#endif
 
 #if LV_USE_FILE_EXPLORER != 0
     lv_style_t fe_list_button_style;
@@ -277,8 +284,6 @@ typedef struct _lv_global_t {
 #if LV_USE_DRAW_EVE
     lv_draw_eve_unit_t * draw_eve_unit;
 #endif
-
-    void * user_data;
 } lv_global_t;
 
 /**********************
