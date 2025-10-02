@@ -33,6 +33,7 @@ extern "C" {
  *********************/
 
 #define LV_WAYLAND_DEFAULT_CURSOR_NAME "left_ptr"
+#define LV_WAYLAND_MAX_OUTPUTS 8
 
 #define LVGL_DRAW_BUFFER_DIV (8)
 #define DMG_CACHE_CAPACITY (32)
