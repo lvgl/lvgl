@@ -223,8 +223,10 @@ typedef struct _lv_global_t {
     struct _lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
-#if LV_USE_FILE_EXPLORER != 0
-    lv_style_t fe_list_button_style;
+
+#if LV_USE_FILE_EXPLORER
+    lv_style_t file_explorer_quick_access_style;
+    size_t file_explorer_count;
 #endif
 
 #if LV_USE_MEM_MONITOR
