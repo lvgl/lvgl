@@ -58,10 +58,24 @@ void lv_wayland_window_close(lv_display_t * disp);
 bool lv_wayland_window_is_open(lv_display_t * disp);
 
 /**
+ * Assigns the window to a specific physical display
+ * @param disp Reference to the LVGL display associated to the window
+ * @param display Physical display number
+ */
+void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display);
+
+/**
+ * Unassigns the current physical display attached to the window
+ * @param disp Reference to the LVGL display associated to the window
+ */
+void lv_wayland_unassign_physical_display(lv_display_t * disp);
+
+/**
  * Sets the fullscreen state of the window
  * @param disp Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
  */
+
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
 
 /**
