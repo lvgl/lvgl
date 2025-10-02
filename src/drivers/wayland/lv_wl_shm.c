@@ -191,7 +191,7 @@ void lv_wayland_shm_delete_draw_buffers(shm_ctx_t * context, struct window * win
 }
 void lv_wayland_shm_flush_partial_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
-    struct window * window    = lv_display_get_user_data(disp);
+    struct window * window    = lv_display_get_driver_data(disp);
     const uint32_t buf_format = window->wl_ctx->shm_ctx.format;
     smm_buffer_t * buf        = window->body->pending_buffer;
     int32_t src_width         = lv_area_get_width(area);
