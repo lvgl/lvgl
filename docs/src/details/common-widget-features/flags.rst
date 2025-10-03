@@ -60,3 +60,28 @@ Some examples:
     /* Check if it is clickable */
     if(lv_obj_has_flag(widget, LV_OBJ_FLAG_CLICKABLE)) printf("Clickable\n");
 
+Adding and/or Removing Multiple Flags
+*************************************
+
+When adding or removing multiple flags, you have two options:
+
+**Option 1: Multiple calls (Recommended)**
+
+This approach is clearer and works seamlessly in both C and C++:
+
+.. code-block:: c
+
+    lv_obj_add_flag(widget, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(widget, LV_OBJ_FLAG_EVENT_BUBBLE);
+
+**Option 2: Single call with bitwise OR**
+
+You can combine multiple flags in one call using the bitwise OR operator (``|``). When using a C++ compiler, you must cast the result:
+
+.. code-block:: c
+
+    lv_obj_add_flag(widget, (lv_obj_flag_t)(LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_EVENT_BUBBLE));
+
+.. note::
+
+    The cast to ``lv_obj_flag_t`` is required in C++ due to stricter type checking, but is optional in C.
