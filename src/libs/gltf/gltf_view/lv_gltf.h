@@ -26,6 +26,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_GLTF_DEFAULT_CAMERA 0
+
 /**********************
  *      TYPEDEFS
  **********************/

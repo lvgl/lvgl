@@ -61,6 +61,9 @@ static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sample_charlie_lut(lv_gltf_ibl_sampler_t * sampler);
 static int ibl_count_bits(int value);
 
+static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler);
+static void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program_id);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -112,6 +115,7 @@ static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
     lv_gltf_view_shader_get_env(&env_shader_portions);
     lv_opengl_shader_manager_init(&sampler->shader_manager, env_shader_portions.all, env_shader_portions.count, NULL,
                                   NULL);
+    init_fullscreen_quad(sampler);
 }
 
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
@@ -192,6 +196,8 @@ static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_vertex_buffer));
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_tex_coord_buffer));
     lv_opengl_shader_manager_deinit(&sampler->shader_manager);
 }
 
@@ -334,7 +340,7 @@ static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler)
         GL_CALL(glUniform1i(location, 0));
         program->update_uniform_1i(program, "u_currentFace", i);
         //fullscreen triangle
-        GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+        draw_fullscreen_quad(sampler, program_id);
     }
 
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, sampler->cubemap_texture_id));
@@ -380,7 +386,7 @@ static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribut
         program->update_uniform_1i(program, "u_floatTexture", 0);
         program->update_uniform_1f(program, "u_intensityScale", sampler->scale_value);
         //fullscreen triangle
-        GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+        draw_fullscreen_quad(sampler, program_id);
     }
 }
 static void ibl_cubemap_to_lambertian(lv_gltf_ibl_sampler_t * sampler)
@@ -438,7 +444,7 @@ static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distributio
     program->update_uniform_1i(program, "u_currentFace", 0);
     program->update_uniform_1i(program, "u_isGeneratingLUT", 1);
     //fullscreen triangle
-    GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+    draw_fullscreen_quad(sampler, program_id);
 }
 static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler)
 {
@@ -453,12 +459,31 @@ static void ibl_sample_charlie_lut(lv_gltf_ibl_sampler_t * sampler)
 
 static bool ibl_gl_has_extension(const char * extension)
 {
-    int32_t extension_count;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &extension_count);
-    for(uint32_t i = 0; i < (uint32_t)extension_count; i++) {
-        const GLubyte * curr_extension = glGetStringi(GL_EXTENSIONS, i);
-        if(lv_streq((const char *)curr_extension, extension)) {
-            return true;
+    const GLubyte * extensions = glGetString(GL_EXTENSIONS);
+    if(!extensions) {
+        return false;
+    }
+
+    const char * ext_str = (const char *)extensions;
+    const char * current = ext_str;
+    const char * next;
+
+    while(*current) {
+        /* Find the next space or end of string */
+        next = strchr(current, ' ');
+        if(next) {
+            size_t length = next - current;
+            if(length == strlen(extension) && strncmp(current, extension, length) == 0) {
+                return true;
+            }
+            current = next + 1;
+        }
+        else {
+            /* Last extension (no space found) */
+            if(strcmp(current, extension) == 0) {
+                return true;
+            }
+            break;
         }
     }
     return false;
@@ -473,4 +498,50 @@ static int ibl_count_bits(int value)
     }
     return count;
 }
+
+static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
+{
+    /* Vertices go from -1 -1 (left bottom) to 1 1 (right top)*/
+    GLfloat vertices[] = {
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        -1.0f,  1.0f,
+        1.0f,  1.0f
+    };
+
+    /* Texture coords go from 0 0 (left botton) to 1 1 (right top)*/
+    GLfloat texCoords[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    GL_CALL(glGenBuffers(1, &sampler->fullscreen_vertex_buffer));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_vertex_buffer));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+
+    GL_CALL(glGenBuffers(1, &sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW));
+}
+
+void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program_id)
+{
+    GLuint positionAttrib = glGetAttribLocation(program_id, "aPosition");
+    GL_CALL(glEnableVertexAttribArray(positionAttrib));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_vertex_buffer));
+    GL_CALL(glVertexAttribPointer(positionAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void *)0));
+
+    GLuint texCoordAttrib = glGetAttribLocation(program_id, "aTexCoord");
+    GL_CALL(glEnableVertexAttribArray(texCoordAttrib));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void *)0));
+
+    GL_CALL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+    GL_CALL(glDisableVertexAttribArray(positionAttrib));
+    GL_CALL(glDisableVertexAttribArray(texCoordAttrib));
+}
+
 #endif /*LV_USE_GLTF*/

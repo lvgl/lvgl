@@ -57,6 +57,41 @@ extern "C" {
 #define glDeleteVertexArrays glDeleteVertexArraysOES
 #endif
 
+#ifndef glTexStorage2D
+#define glTexStorage2D glTexStorage2DEXT
+#endif
+
+#ifndef GL_RGBA32F
+#define GL_RGBA32F 0x8814
+#endif
+#ifndef GL_NUM_EXTENSIONS
+#define GL_NUM_EXTENSIONS 0x821D
+#endif
+
+#ifndef GL_RGB8
+#define GL_RGB8 0x8051
+#endif
+
+#ifndef GL_RGBA8
+#define GL_RGBA8 0x8058
+#endif
+
+#ifndef LV_GL_PREFERRED_DEPTH
+#ifdef GL_DEPTH_COMPONENT24
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
+#else
+/*
+ * This will not run correctly yet, it compiles fine but fails to render on RPi3B.  Work in progress.
+ *
+#ifdef GL_DEPTH_COMPONENT24_OES
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24_OES
+#else
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT16
+#endif
+*/
+#define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT16
+#endif
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
