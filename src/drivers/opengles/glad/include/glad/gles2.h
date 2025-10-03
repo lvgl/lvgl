@@ -29,6 +29,10 @@
 #ifndef GLAD_GLES2_H_
 #define GLAD_GLES2_H_
 
+#include "../../../lv_opengles_egl.h"
+
+#if LV_USE_EGL
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -1102,4 +1106,6 @@ GLAD_API_CALL int gladLoadGLES2( GLADloadfunc load);
 #ifdef __cplusplus
 }
 #endif
+#endif /*LV_USE_EGL*/
+
 #endif

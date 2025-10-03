@@ -29,6 +29,9 @@
 #ifndef GLAD_EGL_H_
 #define GLAD_EGL_H_
 
+#include "../../../lv_opengles_egl.h"
+
+#if LV_USE_EGL
 
 #define GLAD_EGL
 #define GLAD_OPTION_EGL_ALIAS
@@ -657,4 +660,6 @@ GLAD_API_CALL int gladLoadEGL(EGLDisplay display, GLADloadfunc load);
 #ifdef __cplusplus
 }
 #endif
+#endif /*LV_USE_EGL*/
+
 #endif
