@@ -11,6 +11,8 @@ cmake_minimum_required(VERSION 3.16)
 if(WIN32)
     set(VCPKG_TARGET_TRIPLET "x64-windows")
     include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
+else()
+    add_compile_options(-Og)
 endif()
 
 project(lvgl_tests LANGUAGES C CXX)
