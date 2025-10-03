@@ -6,8 +6,8 @@
 /* clang-format off */
 #if 1 /* Set this to "1" to enable content */
 
-#ifndef LV_CONF_H
-#define LV_CONF_H
+#ifndef LV_CONF_CMSIS_H
+#define LV_CONF_CMSIS_H
 
 #if defined(_RTE_)
 #include "RTE_Components.h"
@@ -527,7 +527,7 @@
     /* Used to pick the correct GPU revision header it depends on the vendor */
     #define LV_VG_LITE_HAL_GPU_REVISION 0x40
 
-    /* Base memory addres of the GPU IP it depends on SoC, default value is for NXP based devices */
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
     #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
 
 #endif
@@ -1309,8 +1309,8 @@
 
 #endif /* LV_BUILD_DEMOS */
 
-/*--END OF LV_CONF_H--*/
+/*--END OF LV_CONF_CMSIS_H--*/
 
-#endif /*LV_CONF_H*/
+#endif /*LV_CONF_CMSIS_H*/
 
 #endif /*End of "Content enable"*/
