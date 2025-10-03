@@ -93,40 +93,36 @@ static char * find_by_class(void)
 
 }
 
-int32_t lv_linux_drm_mode_get_horizontal_resolution(lv_linux_drm_mode_t * mode)
+int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * mode)
 {
-    drmModeModeInfo * drm_mode = (drmModeModeInfo *)mode;
-    if(!drm_mode) {
+    if(!mode) {
         return 0;
     }
-    return drm_mode->hdisplay;
+    return mode->hdisplay;
 }
 
-int32_t lv_linux_drm_mode_get_vertical_resolution(lv_linux_drm_mode_t * mode)
+int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mode)
 {
-    drmModeModeInfo * drm_mode = (drmModeModeInfo *)mode;
-    if(!drm_mode) {
+    if(!mode) {
         return 0;
     }
-    return drm_mode->vdisplay;
+    return mode->vdisplay;
 }
 
-int32_t lv_linux_drm_mode_get_refresh_rate(lv_linux_drm_mode_t * mode)
+int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
 {
-    drmModeModeInfo * drm_mode = (drmModeModeInfo *)mode;
-    if(!drm_mode) {
+    if(!mode) {
         return 0;
     }
-    return drm_mode->vrefresh;
+    return mode->vrefresh;
 }
 
-bool lv_linux_drm_mode_is_preferred(lv_linux_drm_mode_t * mode)
+bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
 {
-    drmModeModeInfo * drm_mode = (drmModeModeInfo *)mode;
-    if(!drm_mode) {
+    if(!mode) {
         return false;
     }
-    return (drm_mode->type & DRM_MODE_TYPE_PREFERRED) != 0;
+    return (mode->type & DRM_MODE_TYPE_PREFERRED) != 0;
 }
 
 #endif /*LV_USE_LINUX_DRM*/

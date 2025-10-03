@@ -17,6 +17,7 @@ extern "C" {
 #include "../../../display/lv_display.h"
 
 #if LV_USE_LINUX_DRM
+#include <xf86drmMode.h>
 
 /*********************
  *      DEFINES
@@ -26,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef void lv_linux_drm_mode_t;
+typedef drmModeModeInfo lv_linux_drm_mode_t;
 
 /**
  * Callback function type for selecting a DRM display mode
@@ -93,28 +94,28 @@ void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t
  * @param mode pointer to the DRM mode object
  * @return horizontal resolution in pixels, or 0 if mode is invalid
  */
-int32_t lv_linux_drm_mode_get_horizontal_resolution(lv_linux_drm_mode_t * mode);
+int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * mode);
 
 /**
  * Get the vertical resolution of a DRM mode
  * @param mode pointer to the DRM mode object
  * @return vertical resolution in pixels, or 0 if mode is invalid
  */
-int32_t lv_linux_drm_mode_get_vertical_resolution(lv_linux_drm_mode_t * mode);
+int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mode);
 
 /**
  * Get the refresh rate of a DRM mode
  * @param mode pointer to the DRM mode object
  * @return refresh rate in Hz, or 0 if mode is invalid
  */
-int32_t lv_linux_drm_mode_get_refresh_rate(lv_linux_drm_mode_t * mode);
+int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode);
 
 /**
  * Check if a DRM mode is the preferred mode for the display
  * @param mode pointer to the DRM mode object
  * @return true if this is the preferred/native mode, false otherwise
  */
-bool lv_linux_drm_mode_is_preferred(lv_linux_drm_mode_t * mode);
+bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode);
 
 /**********************
  *      MACROS
