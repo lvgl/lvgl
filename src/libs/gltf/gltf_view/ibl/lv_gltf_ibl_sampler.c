@@ -461,34 +461,32 @@ static bool ibl_gl_has_extension(const char * extension)
 {
     const GLubyte * extensions = glGetString(GL_EXTENSIONS);
     if(!extensions) {
-        return false; // No extensions available
+        return false;
     }
 
-    // Convert the extensions string to a temporary buffer for parsing
     const char * ext_str = (const char *)extensions;
     const char * current = ext_str;
     const char * next;
 
-    // Loop through the extensions
     while(*current) {
-        // Find the next space or end of string
+        /* Find the next space or end of string */
         next = strchr(current, ' ');
         if(next) {
             size_t length = next - current;
             if(length == strlen(extension) && strncmp(current, extension, length) == 0) {
-                return true; // Found the extension
+                return true;
             }
-            current = next + 1; // Move to the next extension
+            current = next + 1;
         }
         else {
-            // Last extension (no space found)
+            /* Last extension (no space found) */
             if(strcmp(current, extension) == 0) {
-                return true; // Found the extension
+                return true;
             }
-            break; // Exit the loop
+            break;
         }
     }
-    return false; // Extension not found
+    return false;
 }
 
 static int ibl_count_bits(int value)
