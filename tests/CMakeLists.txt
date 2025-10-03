@@ -149,17 +149,15 @@ elseif (OPTIONS_TEST_VG_LITE)
     set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
-
-    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
-    if ($ENV{NON_AMD64_BUILD})
-        # Set a tolerance value for the VG-Lite tests.
-        add_definitions(-DREF_IMG_TOLERANCE=9)
-    endif()
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
 if ($ENV{NON_AMD64_BUILD})
+    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
+    # Set a tolerance value for the VG-Lite tests.
+    add_definitions(-DREF_IMG_TOLERANCE=9)
+
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
     message("Non AMD64 target is specified")
 
