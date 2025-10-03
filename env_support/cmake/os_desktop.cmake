@@ -66,6 +66,9 @@ file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp
                                  ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
 
+# Remove THORVG_SOURCES from SOURCES
+list(REMOVE_ITEM SOURCES ${THORVG_SOURCES})
+
 # Build LVGL library
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
@@ -217,7 +220,7 @@ if(CONFIG_LV_USE_THORVG_INTERNAL)
     set_target_properties(lvgl_thorvg PROPERTIES COMPILE_DEFINITIONS "${COMP_DEF}")
 
     # This tells cmake to link lvgl with lvgl_thorvg
-    # The linker will resolve all dependencies when dynamic linking 
+    # The linker will resolve all dependencies when dynamic linking
     target_link_libraries(lvgl PRIVATE lvgl_thorvg)
     # During static linking, we need to create a cyclic dependency as thorvg also needs lvgl
     if (NOT BUILD_SHARED_LIBS)
@@ -242,7 +245,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 
     # This tells cmake to link lvgl with lvgl_examples
     # PUBLIC allows code linking with LVGL to also use the library
-    # The linker will resolve all dependencies when dynamic linking 
+    # The linker will resolve all dependencies when dynamic linking
     target_link_libraries(lvgl PUBLIC lvgl_examples)
 
     # During static linking, we need to create a cyclic dependency as the examples also needs lvgl
@@ -264,7 +267,7 @@ if(CONFIG_LV_BUILD_DEMOS)
 
     # This tells cmake to link lvgl with lvgl_examples
     # PUBLIC allows code linking with LVGL to also use the library
-    # The linker will resolve all dependencies when dynamic linking 
+    # The linker will resolve all dependencies when dynamic linking
     target_link_libraries(lvgl PUBLIC lvgl_demos)
 
     # During static linking, we need to create a cyclic dependency as the demos also needs lvgl
