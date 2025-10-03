@@ -13,6 +13,10 @@ if(WIN32)
     include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
 else()
     add_compile_options(-Og)
+
+    # Save some space with the test runner tests on linux
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
+    add_link_options(--coverage)
 endif()
 
 project(lvgl_tests LANGUAGES C CXX)
