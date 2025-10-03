@@ -174,7 +174,7 @@ To implement custom mode selection logic, define a callback function and registe
     #include "lvgl/drivers/drm/lv_linux_drm.h"
 
     /* Custom mode selection callback */
-    size_t my_mode_selector(lv_display_t * disp, lv_linux_drm_mode_t * modes, size_t mode_count)
+    size_t my_mode_selector(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
     {
         /* Example: Select the first 1920x1080@60Hz mode */
         for(size_t i = 0; i < mode_count; i++) {
@@ -222,7 +222,7 @@ Example: Selecting Preferred Mode
 
 .. code-block:: c
 
-    size_t select_preferred_mode(lv_display_t * disp, lv_linux_drm_mode_t * modes, size_t mode_count)
+    size_t select_preferred_mode(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
     {
         /* Find and select the preferred mode */
         for(size_t i = 0; i < mode_count; i++) {
@@ -240,7 +240,7 @@ Example: Selecting Highest Resolution
 
 .. code-block:: c
 
-    size_t select_highest_resolution(lv_display_t * disp, lv_linux_drm_mode_t * modes, size_t mode_count)
+    size_t select_highest_resolution(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
     {
         size_t best_index = 0;
         int32_t max_pixels = 0;
