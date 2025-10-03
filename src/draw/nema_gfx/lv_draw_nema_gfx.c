@@ -243,12 +243,18 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
                 }
                 break;
             }
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+        case LV_DRAW_TASK_TYPE_VECTOR: {
+                if(task->preference_score > 80) {
+                    task->preference_score = 80;
+                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
+                }
+                return 1;
+            }
+#endif
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
         case LV_DRAW_TASK_TYPE_MASK_BITMAP:
-#if LV_USE_VECTOR_GRAPHIC
-        case LV_DRAW_TASK_TYPE_VECTOR:
-#endif
         default:
             break;
     }
@@ -328,6 +334,11 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_nema_gfx_border(t, t->draw_dsc, &t->area);
             break;
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+        case LV_DRAW_TASK_TYPE_VECTOR:
+            lv_draw_nema_gfx_vector(t, t->draw_dsc, &t->area);
+            break;
+#endif
         default:
             break;
     }

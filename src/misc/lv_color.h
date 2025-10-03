@@ -329,6 +329,33 @@ lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 lv_color_t lv_color_hex3(uint32_t c);
 
 /**
+ * Check if a color with an RGB888 color is within the color range defined by l_color and h_color.
+ * @param color   the color to check
+ * @param l_color the lower bound color
+ * @param h_color the upper bound color
+ * @return        true: pixel is within the color range
+ */
+static inline bool lv_color_is_in_range(lv_color_t color, lv_color_t l_color, lv_color_t h_color)
+{
+    return (color.red <= h_color.red &&
+            color.green <= h_color.green &&
+            color.blue <= h_color.blue &&
+            color.red >= l_color.red &&
+            color.green >= l_color.green &&
+            color.blue >= l_color.blue);
+}
+
+/**
+ * Convert a RGB565 color to RGB888
+ * @param c       a RGB565 color on lv_color16_t
+ * @return        the color
+ */
+static inline lv_color_t lv_color16_to_color(lv_color16_t c)
+{
+    return lv_color_make(c.red << 3, c.green << 2, c.blue << 3);
+}
+
+/**
  * Convert am RGB888 color to RGB565 stored in `uint16_t`
  * @param color     and RGB888 color
  * @return          `color` as RGB565 on `uin16_t`

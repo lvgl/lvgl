@@ -57,7 +57,7 @@ struct _lv_menu_t {
     uint8_t prev_depth;
     uint8_t sidebar_generated : 1;
     lv_menu_mode_header_t mode_header : 3;
-    lv_menu_mode_root_back_button_t mode_root_back_btn : 1;
+    lv_menu_mode_root_back_button_t mode_root_back_btn : 2;
 };
 
 struct _lv_menu_page_t {

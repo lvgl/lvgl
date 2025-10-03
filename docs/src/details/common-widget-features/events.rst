@@ -1,4 +1,5 @@
 .. _events:
+.. _lv_obj_events:
 
 ======
 Events
@@ -12,7 +13,7 @@ interesting to the user, e.g. when a Widget:
 - has its value changed
 - is redrawn, etc.
 
-Besides Widgets, events can registered from displays and input devices as well.
+Besides Widgets, events can be registered on displays and input devices as well.
 It is not detailed below, but you can do this by changing the prefix of the functions
 from ``lv_obj_`` to ``lv_display_`` or ``lv_indev_``.
 
@@ -114,6 +115,8 @@ are sent,
 *Custom events* are added by the user and are never sent by LVGL.
 
 The following event codes exist:
+
+.. _indev_events:
 
 Input Device Events
 -------------------

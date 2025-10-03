@@ -49,17 +49,20 @@ static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_
 static GLuint ibl_load_texture_hdr(lv_gltf_ibl_sampler_t * sampler, const lv_gltf_ibl_image_t * image);
 static GLuint ibl_create_cubemap_texture(const lv_gltf_ibl_sampler_t * sampler, bool with_mipmaps);
 static uint32_t ibl_create_lut_texture(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
+static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
                              uint32_t target_mip_level, GLuint target_texture, uint32_t sample_count, float lod_bias);
-static void ibl_cubemap_to_lambertian(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler);
-static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
+static void ibl_cubemap_to_lambertian(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_cubemap_to_ggx(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_cubemap_to_sheen(lv_gltf_ibl_sampler_t * sampler);
+static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
                            uint32_t currentTextureSize);
 static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sample_charlie_lut(lv_gltf_ibl_sampler_t * sampler);
 static int ibl_count_bits(int value);
+
+static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler);
+static void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program_id);
 
 /**********************
  *  STATIC VARIABLES
@@ -108,9 +111,11 @@ static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
     sampler->lut_resolution = 1024;
     sampler->lut_sample_count = 64;
     sampler->scale_value = 1.0;
-    lv_gltf_view_shader_t env_shader;
-    lv_gltf_view_shader_get_env(&env_shader);
-    sampler->shader_manager = lv_opengl_shader_manager_create(env_shader.shader_list, env_shader.count, NULL, NULL);
+    lv_opengl_shader_portions_t env_shader_portions;
+    lv_gltf_view_shader_get_env(&env_shader_portions);
+    lv_opengl_shader_manager_init(&sampler->shader_manager, env_shader_portions.all, env_shader_portions.count, NULL,
+                                  NULL);
+    init_fullscreen_quad(sampler);
 }
 
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
@@ -191,7 +196,9 @@ static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler)
 }
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler)
 {
-    lv_opengl_shader_manager_destroy(sampler->shader_manager);
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_vertex_buffer));
+    GL_CALL(glDeleteBuffers(1, &sampler->fullscreen_tex_coord_buffer));
+    lv_opengl_shader_manager_deinit(&sampler->shader_manager);
 }
 
 static void ibl_texture_from_image(lv_gltf_ibl_sampler_t * sampler, lv_gltf_ibl_texture_t * texture,
@@ -300,7 +307,7 @@ static GLuint ibl_create_lut_texture(const lv_gltf_ibl_sampler_t * sampler)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     return texture;
 }
-static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler)
 {
     for(int32_t i = 0; i < 6; ++i) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, sampler->framebuffer));
@@ -317,10 +324,10 @@ static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
         GL_CALL(glClearColor(1.0, 0.0, 0.0, 0.0));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
         uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
+            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0);
+        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_opengl_shader_program_get_id(program);
 
         GL_CALL(glUseProgram(program_id));
@@ -333,13 +340,13 @@ static void ibl_panorama_to_cubemap(const lv_gltf_ibl_sampler_t * sampler)
         GL_CALL(glUniform1i(location, 0));
         program->update_uniform_1i(program, "u_currentFace", i);
         //fullscreen triangle
-        GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+        draw_fullscreen_quad(sampler, program_id);
     }
 
     GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, sampler->cubemap_texture_id));
     GL_CALL(glGenerateMipmap(GL_TEXTURE_CUBE_MAP));
 }
-static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
+static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, float roughness,
                              uint32_t target_mip_level, GLuint target_texture, uint32_t sample_count, float lod_bias)
 {
     uint32_t current_texture_size = sampler->texture_size >> target_mip_level;
@@ -353,10 +360,10 @@ static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t dis
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
+            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
+        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
         GLuint program_id = lv_opengl_shader_program_get_id(program);
 
         GL_CALL(glUseProgram(program_id));
@@ -379,14 +386,14 @@ static void ibl_apply_filter(const lv_gltf_ibl_sampler_t * sampler, uint32_t dis
         program->update_uniform_1i(program, "u_floatTexture", 0);
         program->update_uniform_1f(program, "u_intensityScale", sampler->scale_value);
         //fullscreen triangle
-        GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+        draw_fullscreen_quad(sampler, program_id);
     }
 }
-static void ibl_cubemap_to_lambertian(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_lambertian(lv_gltf_ibl_sampler_t * sampler)
 {
     ibl_apply_filter(sampler, 0, 0.0, 0, sampler->lambertian_texture_id, sampler->lambertian_sample_count, 0.0);
 }
-static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_ggx(lv_gltf_ibl_sampler_t * sampler)
 {
     LV_ASSERT(sampler->mipmap_levels != 1);
     for(uint32_t current_mip_level = 0; current_mip_level <= sampler->mipmap_levels; ++current_mip_level) {
@@ -395,7 +402,7 @@ static void ibl_cubemap_to_ggx(const lv_gltf_ibl_sampler_t * sampler)
                          0.0);
     }
 }
-static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler)
+static void ibl_cubemap_to_sheen(lv_gltf_ibl_sampler_t * sampler)
 {
     LV_ASSERT(sampler->mipmap_levels != 1);
     for(uint32_t current_mip_level = 0; current_mip_level <= sampler->mipmap_levels; ++current_mip_level) {
@@ -404,7 +411,7 @@ static void ibl_cubemap_to_sheen(const lv_gltf_ibl_sampler_t * sampler)
                          sampler->sheen_sample_count, 0.0);
     }
 }
-static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
+static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distribution, uint32_t targetTexture,
                            uint32_t currentTextureSize)
 {
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, sampler->framebuffer));
@@ -414,9 +421,9 @@ static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distr
     GL_CALL(glClearColor(0.0, 1.0, 1.0, 0.0));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-    uint32_t frag_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-    uint32_t vert_shader = lv_opengl_shader_manager_select_shader(sampler->shader_manager, "fullscreen.vert", NULL, 0);
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(sampler->shader_manager, frag_shader,
+    uint32_t frag_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
+    uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
+    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader,
                                                                                 vert_shader);
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 
@@ -437,7 +444,7 @@ static void ibl_sample_lut(const lv_gltf_ibl_sampler_t * sampler, uint32_t distr
     program->update_uniform_1i(program, "u_currentFace", 0);
     program->update_uniform_1i(program, "u_isGeneratingLUT", 1);
     //fullscreen triangle
-    GL_CALL(glDrawArrays(GL_TRIANGLES, 0, 3));
+    draw_fullscreen_quad(sampler, program_id);
 }
 static void ibl_sample_ggx_lut(lv_gltf_ibl_sampler_t * sampler)
 {
@@ -452,12 +459,31 @@ static void ibl_sample_charlie_lut(lv_gltf_ibl_sampler_t * sampler)
 
 static bool ibl_gl_has_extension(const char * extension)
 {
-    int32_t extension_count;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &extension_count);
-    for(uint32_t i = 0; i < (uint32_t)extension_count; i++) {
-        const GLubyte * curr_extension = glGetStringi(GL_EXTENSIONS, i);
-        if(lv_streq((const char *)curr_extension, extension)) {
-            return true;
+    const GLubyte * extensions = glGetString(GL_EXTENSIONS);
+    if(!extensions) {
+        return false;
+    }
+
+    const char * ext_str = (const char *)extensions;
+    const char * current = ext_str;
+    const char * next;
+
+    while(*current) {
+        /* Find the next space or end of string */
+        next = strchr(current, ' ');
+        if(next) {
+            size_t length = next - current;
+            if(length == strlen(extension) && strncmp(current, extension, length) == 0) {
+                return true;
+            }
+            current = next + 1;
+        }
+        else {
+            /* Last extension (no space found) */
+            if(strcmp(current, extension) == 0) {
+                return true;
+            }
+            break;
         }
     }
     return false;
@@ -472,4 +498,50 @@ static int ibl_count_bits(int value)
     }
     return count;
 }
+
+static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
+{
+    /* Vertices go from -1 -1 (left bottom) to 1 1 (right top)*/
+    GLfloat vertices[] = {
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        -1.0f,  1.0f,
+        1.0f,  1.0f
+    };
+
+    /* Texture coords go from 0 0 (left botton) to 1 1 (right top)*/
+    GLfloat texCoords[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f
+    };
+
+    GL_CALL(glGenBuffers(1, &sampler->fullscreen_vertex_buffer));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_vertex_buffer));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+
+    GL_CALL(glGenBuffers(1, &sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW));
+}
+
+void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program_id)
+{
+    GLuint positionAttrib = glGetAttribLocation(program_id, "aPosition");
+    GL_CALL(glEnableVertexAttribArray(positionAttrib));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_vertex_buffer));
+    GL_CALL(glVertexAttribPointer(positionAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void *)0));
+
+    GLuint texCoordAttrib = glGetAttribLocation(program_id, "aTexCoord");
+    GL_CALL(glEnableVertexAttribArray(texCoordAttrib));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_tex_coord_buffer));
+    GL_CALL(glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void *)0));
+
+    GL_CALL(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+    GL_CALL(glDisableVertexAttribArray(positionAttrib));
+    GL_CALL(glDisableVertexAttribArray(texCoordAttrib));
+}
+
 #endif /*LV_USE_GLTF*/

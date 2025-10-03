@@ -48,10 +48,6 @@ struct _lv_anim_timeline_t {
     /** Wait before repeat*/
     uint32_t repeat_delay;
 
-    /** If set, it's assumed that the  `var` of animations is a widget name (path).
-     * The widget pointer will be retrieved by finding them by name on this widget.*/
-    lv_obj_t * base_obj;
-
     /** For any custom data*/
     void * user_data;
 };

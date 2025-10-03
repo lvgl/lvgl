@@ -71,6 +71,29 @@ containing only a single ``lv_obj_t * screen_name_create(void)`` create function
 
 By using this function, any number of screen instances can be created and loaded as needed.
 
+.. _xml_screen_permanent:
+
+Permanent Screens
+*****************
+
+The only possible property of the ``<screen>`` tag is ``permanent``, which can be
+``true`` or ``false`` (default).
+
+This property affects the :ref:`screen load and create events <xml_events_screen>`.
+If a screen is permanent, then when a new screen is loaded, the permanent screen is
+not deleted so that it keeps its state. Non-permanent screens will be deleted and
+created automatically when they are opened and closed.
+
+It's also assumed that permanent screens are created when the UI is initialized. When
+code is exported from the UI Editor, the permanent screens are actually created and
+stored in global pointers.
+
+In light of that, permanent screens only need to be **loaded** by
+``<screen_load_event screen="my_permanent_screen"/>`` and
+non-permanent screens need to be **created** by
+``<screen_create_event screen="my_non_permanent_screen"/>``.
+
+
 .. _xml_screen_preview:
 
 Preview
@@ -99,13 +122,10 @@ Both are supported by adding special XML tags as children of Components or Widge
        <lv_button>
            <lv_label text="Click or Long press me"/>
 
-           <!-- Load an already created screen that has the name "first".
-                Note that here the name of the instance is used,
-                and not the name of the XML file. -->
+           <!-- Create an instance of "screen2" and load it. -->
            <screen_load_event screen="first" trigger="clicked" anim_type="fade"/>
 
-           <!-- Create an instance of "about" and load it.
-                Note that here the name of the XML file is used. -->
+            <!-- Load an already created instance of screen1.-->
            <screen_create_event screen="about" trigger="long_pressed"/>
        </lv_button>
    </view>

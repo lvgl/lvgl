@@ -41,7 +41,7 @@ static void end_handler(void * user_data, const char * name);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_xml_translation_register_from_file(const char * path)
+lv_result_t lv_xml_register_translation_from_file(const char * path)
 {
     lv_fs_res_t fs_res;
     lv_fs_file_t f;
@@ -80,7 +80,7 @@ lv_result_t lv_xml_translation_register_from_file(const char * path)
     xml_buf[rn] = '\0';
 
     /* Register the component */
-    lv_result_t res = lv_xml_translation_register_from_data(xml_buf);
+    lv_result_t res = lv_xml_register_translation_from_data(xml_buf);
 
     /* Housekeeping */
     lv_free(xml_buf);
@@ -89,7 +89,7 @@ lv_result_t lv_xml_translation_register_from_file(const char * path)
     return res;
 }
 
-lv_result_t lv_xml_translation_register_from_data(const char * xml_def)
+lv_result_t lv_xml_register_translation_from_data(const char * xml_def)
 {
     lv_translation_pack_t * pack = lv_translation_add_dynamic();
 

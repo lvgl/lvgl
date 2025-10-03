@@ -133,7 +133,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_wayland_dmabuf_set_draw_buffers(&lv_wl_ctx.dmabuf_ctx, window->lv_disp);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_dmabuf_flush_full_mode);
 #else
-    lv_wayland_shm_set_draw_buffers(&lv_wl_ctx.shm_ctx, window->lv_disp);
+    lv_wayland_shm_set_draw_buffers(&lv_wl_ctx.shm_ctx, window->lv_disp, window);
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_shm_flush_partial_mode);
 #endif
 
@@ -222,6 +222,44 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
     window->flush_pending = true;
 }
 
+void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display_number)
+{
+    if(!disp) {
+        LV_LOG_ERROR("Invalid display");
+        return;
+    }
+
+    struct window * window = lv_display_get_user_data(disp);
+
+    if(!window || window->closed) {
+        LV_LOG_ERROR("Invalid window");
+        return;
+    }
+
+    if(display_number >= window->wl_ctx->wl_output_count) {
+        LV_LOG_WARN("Invalid display number '%d'. Expected '0'..'%d'", display_number, window->wl_ctx->wl_output_count - 1);
+        return;
+    }
+    window->assigned_output = lv_wl_ctx.outputs[display_number].wl_output;
+}
+
+void lv_wayland_unassign_physical_display(lv_display_t * disp)
+{
+
+    if(!disp) {
+        LV_LOG_ERROR("Invalid display");
+        return;
+    }
+
+    struct window * window = lv_display_get_user_data(disp);
+
+    if(!window || window->closed) {
+        LV_LOG_ERROR("Invalid window");
+        return;
+    }
+    window->assigned_output = NULL;
+}
+
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 {
     struct window * window = lv_display_get_user_data(disp);
@@ -233,14 +271,14 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
     if(window->fullscreen == fullscreen) {
         return;
     }
-    err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen);
+    err = lv_wayland_xdg_shell_set_fullscreen(window, fullscreen, window->assigned_output);
 
     if(err == LV_RESULT_INVALID) {
         LV_LOG_WARN("Failed to set wayland window to fullscreen");
         return;
     }
 
-    window->fullscreen    = fullscreen;
+    window->fullscreen = fullscreen;
     window->flush_pending = true;
 }
 

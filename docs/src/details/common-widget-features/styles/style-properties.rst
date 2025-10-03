@@ -954,6 +954,20 @@ Set intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+image_colorkey
+~~~~~~~~~~~~~~
+
+Set image colorkey definition. The lv_image_colorkey_t contains two color values: `high_color` and `low_color`. the color of pixels ranging from `low_color` to `high_color` will be transparent.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 Line
 ----
 

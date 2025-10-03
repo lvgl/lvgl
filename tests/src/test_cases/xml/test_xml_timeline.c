@@ -16,8 +16,8 @@ void tearDown(void)
 
 void test_xml_complex(void)
 {
-    lv_xml_component_register_from_file("A:src/test_assets/xml/my_button_anim.xml");
-    lv_xml_component_register_from_file("A:src/test_assets/xml/list_item_anim.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/my_button_anim.xml");
+    lv_xml_register_component_from_file("A:src/test_assets/xml/list_item_anim.xml");
 
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "list_item_anim", NULL);
 

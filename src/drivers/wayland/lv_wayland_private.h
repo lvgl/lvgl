@@ -33,6 +33,7 @@ extern "C" {
  *********************/
 
 #define LV_WAYLAND_DEFAULT_CURSOR_NAME "left_ptr"
+#define LV_WAYLAND_MAX_OUTPUTS 8
 
 #define LVGL_DRAW_BUFFER_DIV (8)
 #define DMG_CACHE_CAPACITY (32)
@@ -138,10 +139,19 @@ typedef struct {
 } dmabuf_ctx_t;
 
 typedef struct {
-    lv_draw_buf_t * lv_draw_buf;
     struct wl_shm * handler;
     uint32_t format;
 } shm_ctx_t;
+
+struct output_info {
+    struct wl_output * wl_output;
+    char name[64];
+    int width;
+    int height;
+    int refresh;
+    int scale;
+    int flags;
+};
 
 struct lv_wayland_context {
     struct wl_display * display;
@@ -152,6 +162,8 @@ struct lv_wayland_context {
     struct wl_cursor_theme * cursor_theme;
     struct wl_surface * cursor_surface;
     shm_ctx_t shm_ctx;
+    struct output_info outputs[LV_WAYLAND_MAX_OUTPUTS];
+    uint8_t wl_output_count;
 
 #if LV_WAYLAND_USE_DMABUF
     dmabuf_ctx_t dmabuf_ctx;
@@ -185,10 +197,13 @@ struct window {
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
 
-    lv_wayland_display_close_f_t close_cb;
+    lv_draw_buf_t * lv_draw_buf;
 
+    lv_wayland_display_close_f_t close_cb;
     struct lv_wayland_context * wl_ctx;
 
+    /* The current physical assigned output */
+    struct wl_output * assigned_output;
     struct xdg_surface * xdg_surface;
     struct xdg_toplevel * xdg_toplevel;
     uint32_t wm_capabilities;
@@ -218,6 +233,7 @@ struct window {
     bool maximized;
     bool fullscreen;
     uint32_t frame_counter;
+    bool is_window_configured;
 
 #if LV_WAYLAND_USE_DMABUF
     /* XDG/DMABUF synchronization fields */
@@ -264,6 +280,7 @@ extern struct lv_wayland_context lv_wl_ctx;
 void lv_wayland_init(void);
 void lv_wayland_deinit(void);
 void lv_wayland_wait_flush_cb(lv_display_t * disp);
+
 /**********************
  *      Window
  **********************/
@@ -292,7 +309,7 @@ const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(
 const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
 lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maximized);
 lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window);
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen);
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, struct wl_output * output);
 #if LV_WAYLAND_USE_DMABUF
 void lv_wayland_xdg_shell_ack_configure(struct window * window, uint32_t serial);
 #endif
@@ -316,7 +333,7 @@ void lv_wayland_shm_set_interface(shm_ctx_t * context, struct wl_registry * regi
 
 struct graphic_object * lv_wayland_shm_on_graphical_object_creation(shm_ctx_t * context, struct graphic_object * obj);
 void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct graphic_object * obj);
-lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display);
+lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display, struct window * window);
 lv_result_t lv_wayland_shm_create_draw_buffers(shm_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * window, int32_t width, int32_t height);
 lv_result_t lv_wayland_shm_is_ready(shm_ctx_t * context);

@@ -23,7 +23,8 @@ void lv_example_spinbox_1(void)
 {
     spinbox = lv_spinbox_create(lv_screen_active());
     lv_spinbox_set_range(spinbox, -1000, 25000);
-    lv_spinbox_set_digit_format(spinbox, 5, 2);
+    lv_spinbox_set_digit_count(spinbox, 5);
+    lv_spinbox_set_dec_point_pos(spinbox, 2);
     lv_spinbox_step_prev(spinbox);
     lv_obj_set_width(spinbox, 100);
     lv_obj_center(spinbox);

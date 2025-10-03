@@ -106,7 +106,9 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
         return GL_NONE;
     }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
-    GLuint texture_id = lv_gltf_view_render_model(viewer, model, true);
+
+    GLuint texture_id = GL_NONE;
+    texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
         lv_gltf_view_render_model(viewer, model, false);
@@ -253,7 +255,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         }
 
         if(opt_draw_bg) {
-            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+            setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
         render_materials(viewer, model, model->opaque_nodes_by_material_index);
@@ -288,7 +290,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         return vstate->render_state.texture;
     }
     if(opt_draw_bg)
-        setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+        setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
     render_materials(viewer, model, model->opaque_nodes_by_material_index);
 
     for(const auto & node_distance_pair : distance_sort_nodes) {
@@ -628,6 +630,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         }
     }
 
+#if FASTGLTF_ENABLE_DEPRECATED_EXT
     if(gltfMaterial.specularGlossiness) {
         LV_LOG_WARN(
             "Model uses outdated legacy mode pbr_speculargloss. Please update this model to a new shading model ");
@@ -649,6 +652,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                       uniforms->specular_glossiness_uv_transform);
         }
     }
+#endif
 
     if(gltfMaterial.diffuseTransmission) {
         render_uniform_color(uniforms->diffuse_transmission_color_factor,
@@ -853,10 +857,10 @@ static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 #ifdef __EMSCRIPTEN__
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
@@ -898,11 +902,11 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
 #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
     // For WebGL2
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
     // For Desktop OpenGL
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
