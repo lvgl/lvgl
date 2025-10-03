@@ -78,7 +78,7 @@ lv_indev_t * lv_wayland_pointer_create(void)
 
 lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
@@ -100,7 +100,7 @@ const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
 
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
 
     if(!window || window->closed) {
         return;

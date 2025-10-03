@@ -321,7 +321,7 @@ void lv_wayland_deinit(void)
 
 void lv_wayland_wait_flush_cb(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     /* TODO: Figure out why we need this */
     if(window->frame_counter == 0) {
         return;
