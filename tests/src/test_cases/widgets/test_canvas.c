@@ -168,4 +168,194 @@ void test_canvas_fill_and_set_px(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_1.png");
 }
 
+void test_canvas_triangles(void)
+{
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_obj_center(canvas);
+
+    LV_DRAW_BUF_DEFINE_STATIC(buf, 500, 500, LV_COLOR_FORMAT_RGB888);
+    LV_DRAW_BUF_INIT_STATIC(buf);
+    canvas_draw_buf_reshape(&buf);
+    lv_canvas_set_draw_buf(canvas, &buf);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_canvas_fill_bg(canvas, lv_color_hex(0xAFAFAF), LV_OPA_COVER);
+
+    {
+        /* 1. Right-angled with vertical side on left (bottom-left corner at right angle) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0xff0000);
+        tri_dsc.p[0].x = 50;
+        tri_dsc.p[0].y = 50;
+        tri_dsc.p[1].x = 50;
+        tri_dsc.p[1].y = 100;
+        tri_dsc.p[2].x = 100;
+        tri_dsc.p[2].y = 100;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 2. Right-angled with vertical side on right (bottom-right corner at right angle) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x00ff00);
+        tri_dsc.p[0].x = 150;
+        tri_dsc.p[0].y = 50;
+        tri_dsc.p[1].x = 200;
+        tri_dsc.p[1].y = 50;
+        tri_dsc.p[2].x = 200;
+        tri_dsc.p[2].y = 100;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 3. Pointing up (no vertical sides) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x0000ff);
+        tri_dsc.p[0].x = 250;
+        tri_dsc.p[0].y = 50;
+        tri_dsc.p[1].x = 230;
+        tri_dsc.p[1].y = 100;
+        tri_dsc.p[2].x = 270;
+        tri_dsc.p[2].y = 100;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 4. Pointing down (no vertical sides) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0xffff00);
+        tri_dsc.p[0].x = 350;
+        tri_dsc.p[0].y = 50;
+        tri_dsc.p[1].x = 390;
+        tri_dsc.p[1].y = 50;
+        tri_dsc.p[2].x = 370;
+        tri_dsc.p[2].y = 100;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 5. Pointing left (no vertical sides) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0xff00ff);
+        tri_dsc.p[0].x = 50;
+        tri_dsc.p[0].y = 150;
+        tri_dsc.p[1].x = 100;
+        tri_dsc.p[1].y = 130;
+        tri_dsc.p[2].x = 100;
+        tri_dsc.p[2].y = 170;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 6. Pointing right (no vertical sides) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x00ffff);
+        tri_dsc.p[0].x = 150;
+        tri_dsc.p[0].y = 130;
+        tri_dsc.p[1].x = 150;
+        tri_dsc.p[1].y = 170;
+        tri_dsc.p[2].x = 200;
+        tri_dsc.p[2].y = 150;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 7. Obtuse triangle (one angle > 90°) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x800080);
+        tri_dsc.p[0].x = 250;
+        tri_dsc.p[0].y = 150;
+        tri_dsc.p[1].x = 300;
+        tri_dsc.p[1].y = 140;
+        tri_dsc.p[2].x = 280;
+        tri_dsc.p[2].y = 180;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 8. Acute equilateral-ish triangle */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0xffa500);
+        tri_dsc.p[0].x = 350;
+        tri_dsc.p[0].y = 150;
+        tri_dsc.p[1].x = 330;
+        tri_dsc.p[1].y = 180;
+        tri_dsc.p[2].x = 370;
+        tri_dsc.p[2].y = 180;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 9. Very flat wide triangle (horizontal base) */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x008000);
+        tri_dsc.p[0].x = 100;
+        tri_dsc.p[0].y = 250;
+        tri_dsc.p[1].x = 50;
+        tri_dsc.p[1].y = 280;
+        tri_dsc.p[2].x = 150;
+        tri_dsc.p[2].y = 280;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 10. Tall thin triangle */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x000080);
+        tri_dsc.p[0].x = 250;
+        tri_dsc.p[0].y = 230;
+        tri_dsc.p[1].x = 240;
+        tri_dsc.p[1].y = 290;
+        tri_dsc.p[2].x = 260;
+        tri_dsc.p[2].y = 290;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    {
+        /* 11. Y value of last point is the biggest one */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x800000);
+
+        tri_dsc.p[0].x = 350;
+        tri_dsc.p[0].y = 230;
+
+        tri_dsc.p[1].x = 350;
+        tri_dsc.p[1].y = 280;
+        tri_dsc.p[2].x = 390;
+        tri_dsc.p[2].y = 290;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+    {
+        /* 12. Y value of last point is the smallest one */
+        lv_draw_triangle_dsc_t tri_dsc;
+        lv_draw_triangle_dsc_init(&tri_dsc);
+        tri_dsc.color = lv_color_hex(0x808000);
+
+        tri_dsc.p[0].x = 100;
+        tri_dsc.p[0].y = 350;
+
+        tri_dsc.p[1].x = 100;
+        tri_dsc.p[1].y = 400;
+        tri_dsc.p[2].x = 150;
+        tri_dsc.p[2].y = 320;
+        lv_draw_triangle(&layer, &tri_dsc);
+    }
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/canvas_2.png");
+}
+
 #endif
