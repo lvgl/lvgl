@@ -23,7 +23,7 @@
 #define PAUSE_BTN_COLOR lv_color_hex(0xF9A825)
 
 #ifndef LV_DEMO_GLTF_CAMERA_NUM
-    #define LV_DEMO_GLTF_CAMERA_NUM 0
+    #define LV_DEMO_GLTF_CAMERA_NUM LV_GLTF_DEFAULT_CAMERA
 #endif
 
 /**********************
@@ -137,7 +137,6 @@ lv_obj_t * lv_demo_gltf(const char * path)
     lv_obj_add_event_cb(viewer, on_mouse_event, LV_EVENT_PRESS_LOST, mouse_state);
     lv_obj_add_event_cb(viewer, on_mouse_event, LV_EVENT_DELETE, mouse_state);
 
-    /* If the model does not have any cameras, this has no effect.  Value 0 means no camera. */
     lv_gltf_set_camera(viewer, LV_DEMO_GLTF_CAMERA_NUM);
     return viewer;
 }
