@@ -108,13 +108,11 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
 
     GLuint texture_id = GL_NONE;
-    //if (check_opengl_diagnostics(GL_NONE)) {
     texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
         lv_gltf_view_render_model(viewer, model, false);
     }
-    //}
     return texture_id;
 }
 
@@ -421,10 +419,6 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     model->last_pass_was_transmission = is_transmission_pass;
 
     const GLuint program = compiled_shader->shaderset.program;
-
-    //if (!check_opengl_diagnostics(program)) {
-    //    LV_ASSERT_NULL(NULL);
-    // }
 
     GL_CALL(glUseProgram(program));
 

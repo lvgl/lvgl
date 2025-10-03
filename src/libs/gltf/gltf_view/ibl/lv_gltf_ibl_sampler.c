@@ -526,9 +526,6 @@ static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
 
 void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program_id)
 {
-    // Use the shader program
-    // GL_CALL(glUseProgram(program_id));
-
     GLuint positionAttrib = glGetAttribLocation(program_id, "aPosition");
     GL_CALL(glEnableVertexAttribArray(positionAttrib));
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sampler->fullscreen_vertex_buffer));
