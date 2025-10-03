@@ -375,7 +375,8 @@ if(NOT WIN32)
 
         # Add auto generated source required for XDG shell
         include_directories("${LVGL_TEST_DIR}/wayland_protocols")
-        target_sources(test_common PUBLIC "wayland_protocols/wayland_xdg_shell.c")
+        # Hidden symbols need to be compiled inside the library
+        target_sources(lvgl PRIVATE "wayland_protocols/wayland_xdg_shell.c")
     else()
         add_definitions(-DLV_USE_WAYLAND=0)
     endif()
