@@ -160,6 +160,7 @@ if ($ENV{NON_AMD64_BUILD})
     message("Non AMD64 target is specified")
 
     # Ensure 32-bit build
+    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
