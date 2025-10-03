@@ -501,18 +501,20 @@ static int ibl_count_bits(int value)
 
 static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
 {
+    /* Vertices go from -1 -1 (left bottom) to 1 1 (right top)*/
     GLfloat vertices[] = {
-        -1.0f, -1.0f, // Bottom left
-        1.0f, -1.0f, // Bottom right
-        -1.0f,  1.0f, // Top left
-        1.0f,  1.0f  // Top right
+        -1.0f, -1.0f,
+        1.0f, -1.0f,
+        -1.0f,  1.0f,
+        1.0f,  1.0f
     };
 
+    /* Texture coords go from 0 0 (left botton) to 1 1 (right top)*/
     GLfloat texCoords[] = {
-        0.0f, 0.0f, // Bottom left
-        1.0f, 0.0f, // Bottom right
-        0.0f, 1.0f, // Top left
-        1.0f, 1.0f  // Top right
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f
     };
 
     GL_CALL(glGenBuffers(1, &sampler->fullscreen_vertex_buffer));
