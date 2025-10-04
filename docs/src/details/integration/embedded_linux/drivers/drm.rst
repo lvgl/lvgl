@@ -55,7 +55,6 @@ Basic Usage
 
     #include "lvgl/lvgl.h"
     #include "lvgl/demos/lv_demos.h"
-    #include "lvgl/drivers/drm/lv_linux_drm.h"
 
     int main(void)
     {
@@ -171,7 +170,6 @@ To implement custom mode selection logic, define a callback function and registe
 .. code-block:: c
 
     #include "lvgl/lvgl.h"
-    #include "lvgl/drivers/drm/lv_linux_drm.h"
 
     /* Custom mode selection callback */
     size_t my_mode_selector(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
