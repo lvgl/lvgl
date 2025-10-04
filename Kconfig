@@ -797,6 +797,32 @@ menu "LVGL configuration"
 				bool "Enable the multi-touch gesture recognition feature"
 				depends on LV_USE_FLOAT
 				default n
+
+			config LV_EXTERNAL_DATA_AND_DESTRUCTOR
+				bool "External data and destructor"
+				default n
+				help
+					Enable this option to activate external data and destructor functionality,
+					which assists in resource cleanup when objects are freed by either LVGL core
+					or applications. Currently supported features include:
+						- event
+						- object
+						- observer
+						- anim
+						- timer
+						- group
+						- display
+						- indev (input device)
+						- theme
+
+			config LV_EXT_DATA_MAX_NUM
+				int "Maximum number of external data"
+				depends on LV_EXTERNAL_DATA_AND_DESTRUCTOR
+				default 3
+				help
+					The default number of external data arrays is 3, if the number of external data arrays set
+					by lv_obj_set_external_data is greater than 3, you need to reconfigure LV_EXT_DATA_MAX_NUM
+
 		endmenu
 	endmenu
 
