@@ -35,10 +35,6 @@ extern "C" {
 #include "../font/lv_font_fmt_txt_private.h"
 #endif
 
-#if LV_USE_OS != LV_OS_NONE && defined(__linux__)
-#include "../osal/lv_linux_private.h"
-#endif
-
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
@@ -257,12 +253,13 @@ typedef struct _lv_global_t {
 
 #if LV_USE_OS != LV_OS_NONE
     lv_mutex_t lv_general_mutex;
-#if defined(__linux__)
-    lv_proc_stat_t linux_last_proc_stat;
-#if defined LV_SYSMON_PROC_IDLE_AVAILABLE
-    uint64_t linux_last_self_proc_time_ticks;
-    lv_proc_stat_t linux_last_system_total_ticks_stat;
 #endif
+
+#if defined(__linux__)
+    lv_linux_proc_stat_t linux_last_proc_stat;
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    uint64_t linux_last_self_proc_time_ticks;
+    lv_linux_proc_stat_t linux_last_system_total_ticks_stat;
 #endif
 #endif
 

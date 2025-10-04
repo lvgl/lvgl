@@ -37,10 +37,12 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+#ifndef __linux__
 uint32_t lv_os_get_idle_percent(void)
 {
     return lv_timer_get_idle();
 }
+#endif /*__linux__*/
 
 /**********************
  *   STATIC FUNCTIONS

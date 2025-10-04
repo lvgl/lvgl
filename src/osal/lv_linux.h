@@ -1,11 +1,10 @@
-
 /**
- * @file lv_linux_private.h
+ * @file lv_linux.h
  *
  */
 
-#ifndef LV_LINUX_PRIVATE_H
-#define LV_LINUX_PRIVATE_H
+#ifndef LV_LINUX_H
+#define LV_LINUX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../misc/lv_types.h"
-
+#include "lv_os.h"
+#ifdef __linux__
 /*********************
  *      DEFINES
  *********************/
@@ -26,7 +25,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 typedef union {
     struct {
@@ -39,23 +37,20 @@ typedef union {
                  steal /*, guest, guest_nice*/;
     } fields;
     uint32_t buffer[LV_PROC_STAT_PARAMS_LEN];
-} lv_proc_stat_t;
+} lv_linux_proc_stat_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-#if LV_SYSMON_PROC_IDLE_AVAILABLE
-
-uint32_t lv_os_get_proc_idle_percent(void);
-
-#endif
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /*__linux__*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_LINUX_PRIVATE_H*/
+#endif /*LV_LINUX_H*/

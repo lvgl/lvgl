@@ -9,11 +9,11 @@
 
 #include "lv_os_private.h"
 
-#if LV_USE_OS != LV_OS_NONE && defined(__linux__)
+#if defined(__linux__)
 
 #include "../core/lv_global.h"
 #include "../misc/lv_log.h"
-#include "lv_linux_private.h"
+#include "lv_linux.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -42,8 +42,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result);
-static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p);
+static lv_result_t lv_read_proc_stat(lv_linux_proc_stat_t * result);
+static uint32_t lv_proc_stat_get_total(const lv_linux_proc_stat_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,7 +59,7 @@ static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p);
 
 uint32_t lv_os_get_idle_percent(void)
 {
-    lv_proc_stat_t proc_stat;
+    lv_linux_proc_stat_t proc_stat;
     {
         lv_result_t err = lv_read_proc_stat(&proc_stat);
 
@@ -92,8 +92,8 @@ uint32_t lv_os_get_idle_percent(void)
 uint32_t lv_os_get_proc_idle_percent(void)
 {
     uint64_t self_current_time_ticks = 0;
-    lv_proc_stat_t stat_current_system_total_ticks;
-    lv_proc_stat_t stat_delta_system_ticks;
+    lv_linux_proc_stat_t stat_current_system_total_ticks;
+    lv_linux_proc_stat_t stat_delta_system_ticks;
 
     FILE * self = fopen(LV_UPTIME_MONITOR_SELF_FILE, "r");
     if(!self) {
@@ -181,7 +181,7 @@ uint32_t lv_os_get_proc_idle_percent(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result)
+static lv_result_t lv_read_proc_stat(lv_linux_proc_stat_t * result)
 {
     FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
 
@@ -207,7 +207,8 @@ static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result)
     }
     return LV_RESULT_OK;
 }
-static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p)
+
+static uint32_t lv_proc_stat_get_total(const lv_linux_proc_stat_t * p)
 {
     uint32_t sum = 0;
     for(size_t i = 0; i < LV_PROC_STAT_PARAMS_LEN; ++i) {
