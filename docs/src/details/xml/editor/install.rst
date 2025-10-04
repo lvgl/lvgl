@@ -34,8 +34,16 @@ Install Podman
 --------------
 
 The Editor is capable of recompiling the preview to use and run your C code as well.
-We handle the compilation in a container using Podman (similar to Docker). To install
-Podman just type ``sudo apt-get install podman`` in a terminal.
+We handle the compilation in a container using `Podman <https://podman.io/>`__
+(similar to Docker).
+
+The simple way of installing Podman is via Terminal:
+
+- **Debian, Ubuntu, Linux Mint**: ``sudo apt-get install podman``
+- **Fedora**: ``sudo dnf -y install podman``
+- **Arch, Manjaro Linux**: ``sudo pacman -S podman``
+
+For other distos check out https://podman.io/docs/installation#installing-on-linux
 
 Install the Editor
 ------------------
@@ -68,8 +76,11 @@ Install Podman
 --------------
 
 The Editor is capable of recompiling the preview to use and run your C code as well.
-We handle the compilation in a container using Podman (similar to Docker). The simplest
-way to install Podman is via ``brew`` using ``brew install podman``.
+We handle the compilation in a container using `Podman <https://podman.io/>`__
+(similar to Docker). The simplest way to install Podman is via ``brew`` using
+ ``brew install podman``.
+
+For more information visit https://podman.io/docs/installation#macos
 
 Install the Editor
 ------------------

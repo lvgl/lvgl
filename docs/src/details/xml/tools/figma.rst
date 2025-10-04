@@ -7,7 +7,7 @@ Figma integration
 Overview
 ********
 
-LVGL Pro's `Figma <https://www.figma.com/community/plugin/1362005814860504095/
+|lvglpro|\ 's `Figma <https://www.figma.com/community/plugin/1362005814860504095/
 figma-to-lvgl>`__ plugin displays the style properties of selected UI elements in
 Figma.
 
