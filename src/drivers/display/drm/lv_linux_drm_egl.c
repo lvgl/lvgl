@@ -141,6 +141,15 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
 }
 
+void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
+{
+    if(!disp) {
+        LV_LOG_ERROR("Cannot set a mode select callback on a NULL display");
+        return;
+    }
+    lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+    ctx->mode_select_cb = callback;
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -621,6 +630,16 @@ static drmModeConnector * drm_get_connector(lv_drm_ctx_t * ctx)
 static drmModeModeInfo * drm_get_mode(lv_drm_ctx_t * ctx)
 {
     LV_ASSERT_NULL(ctx->drm_connector);
+    if(ctx->mode_select_cb) {
+        size_t mode_index = ctx->mode_select_cb(ctx->display, (lv_linux_drm_mode_t *)ctx->drm_connector->modes,
+                                                (size_t)ctx->drm_connector->count_modes);
+        if(mode_index >= (size_t)ctx->drm_connector->count_modes) {
+            LV_LOG_ERROR("Failed to select drm mode. User select callback return an invalid mode index");
+            return NULL;
+        }
+        return &ctx->drm_connector->modes[mode_index];
+    }
+
     drmModeModeInfo * best_mode = NULL;
     uint32_t best_area = 0;
 
