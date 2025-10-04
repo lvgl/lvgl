@@ -81,7 +81,7 @@ For example:
 
    </component>
 
-Synchronizing style properties
+Synchronizing Style Properties
 ******************************
 
 If you copied the ``figma_node_id="..."`` part from the plugin, the style in the
