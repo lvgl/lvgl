@@ -78,7 +78,7 @@ Install Podman
 The Editor is capable of recompiling the preview to use and run your C code as well.
 We handle the compilation in a container using `Podman <https://podman.io/>`__
 (similar to Docker). The simplest way to install Podman is via ``brew`` using
- ``brew install podman``.
+``brew install podman``.
 
 For more information visit https://podman.io/docs/installation#macos
 
