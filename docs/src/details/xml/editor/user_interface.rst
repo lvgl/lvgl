@@ -30,7 +30,7 @@ Login
 *****
 
 1. enter your email address
-2. you will receive an email with an OTP (On Time Password)
+2. you will receive an email with an OTP (One-Time Password)
 3. it will create a user for you (no password is needed)
 
 
