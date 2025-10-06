@@ -28,19 +28,25 @@ glTF files can be stored as:
 - **.gltf**: JSON format with external binary and image files
 - **.glb**: Binary format with all assets embedded in a single file
 
+
+
 Features
 ********
 
 LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
 
-**File Format Support:**
+
+File Format Support
+-------------------
 
 * Loading glTF (.gltf) and binary GLB (.glb) files from local filesystem
 * Support for hex-encoded bytes in source include files when filesystem is not available
 * JPG, PNG, and WebP compressed texture support
 * External texture files or textures embedded within the glTF source
 
-**Rendering & Lighting:**
+
+Rendering & Lighting
+---------------------
 
 * Image-Based Lighting (IBL) for realistic environmental lighting
 * Punctual lighting support with animated light sources
@@ -51,14 +57,18 @@ LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
   * Normal maps for surface detail
   * Ambient occlusion textures
 
-**Advanced Materials:**
+
+Advanced Materials
+------------------
 
 * Emissive materials for glowing effects and self-illuminated surfaces
 * Refractive materials with realistic distortion effects revealing geometry behind surfaces
 * Clearcoat material support for multi-layer surface effects (like automotive paint finishes)
 * Full transparency support with alpha blending
 
-**Animation System:**
+
+Animation System
+----------------
 
 * Keyframe-based animations for object transformations
 * Single-skeleton skinned character animations
@@ -66,14 +76,18 @@ LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
 * Parameter binding for real-time monitoring and control of object properties (position, rotation, scale)
 * Dynamic parameter override from host application
 
-**Camera & Viewport:**
+
+Camera & Viewport
+-----------------
 
 * Programmatic viewport control with full camera manipulation
 * Support for cameras defined within 3D editor software
 * Multiple camera switching for different scene perspectives
 * Orthographic and perspective projection modes
 
-**Rendering Quality:**
+
+Rendering Quality
+-----------------
 
 * Configurable antialiasing with multiple modes:
   
@@ -86,6 +100,8 @@ LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
   * Environment-based backgrounds using IBL
   * Solid color backgrounds
   * Transparent backgrounds for overlay effects
+
+
 
 Requirements
 ************
@@ -102,12 +118,15 @@ The glTF extension requires the following external libraries:
 :fastgltf:     A C++20 library for parsing glTF files (https://github.com/spnda/fastgltf)
 :libwebp:      WebP image format support for textures (https://github.com/webmproject/libwebp)
 
+
+
 Setup
 *****
 
-1. **Install Dependencies with CMake**
+Install Dependencies with CMake
+--------------------------------
 
-   The recommended way to integrate the required libraries is using CMake's FetchContent:
+The recommended way to integrate the required libraries is using CMake's FetchContent:
 
 .. code-block:: cmake
 
@@ -138,21 +157,27 @@ Setup
     # Link libraries to LVGL
     target_link_libraries(lvgl PUBLIC webp fastgltf)
 
-2. **Enable glTF Support**
 
-   Set :c:macro:`LV_USE_GLTF` to ``1`` in ``lv_conf.h``.
+Enable glTF Support
+-------------------
 
-   Also enable other required dependencies by setting the following defines to ``1``:
+Set :c:macro:`LV_USE_GLTF` to ``1`` in ``lv_conf.h``.
 
-   - :c:macro:`LV_USE_OPENGLES`
-   - :c:macro:`LV_USE_DRAW_OPENGLES`
-   - :c:macro:`LV_USE_3DTEXTURE` 
+Also enable other required dependencies by setting the following defines to ``1``:
 
-3. **Setup OpenGL ES Driver** 
+- :c:macro:`LV_USE_OPENGLES`
+- :c:macro:`LV_USE_DRAW_OPENGLES`
+- :c:macro:`LV_USE_3DTEXTURE` 
 
-   Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure GLFW and OpenGL ES support for your platform.
 
-4. **Basic Setup Example**
+Setup OpenGL ES Driver
+-----------------------
+
+Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure GLFW and OpenGL ES support for your platform.
+
+
+Basic Setup Example
+-------------------
 
 .. code-block:: c
 
@@ -180,6 +205,8 @@ Setup
         return 0;
     }
 
+
+
 Usage
 *****
 
@@ -200,8 +227,9 @@ This demo creates an interactive 3D viewer with:
 - Camera switching
 - Visual settings adjustment
 
+
 Basic glTF Viewer Creation
---------------------------
+---------------------------
 
 Here's how to create a basic glTF viewer and load a model:
 
@@ -218,6 +246,7 @@ Here's how to create a basic glTF viewer and load a model:
         LV_LOG_ERROR("Failed to load glTF model");
         return;
     }
+
 
 Camera Controls
 ---------------
@@ -244,6 +273,7 @@ The glTF viewer provides comprehensive camera controls:
     /* Recenter camera on model */
     lv_gltf_recenter(gltf, model);
 
+
 Animation Control
 -----------------
 
@@ -263,6 +293,7 @@ Control model animations with these functions:
     /* Pause/resume animation */
     lv_gltf_model_pause_animation(model);
     bool is_paused = lv_gltf_model_is_animation_paused(model);
+
 
 Visual Settings
 ---------------
@@ -298,6 +329,7 @@ Load and manage multiple glTF models in a single viewer:
     lv_gltf_model_t * primary = lv_gltf_get_primary_model(gltf);
     lv_gltf_model_t * specific = lv_gltf_get_model_by_index(gltf, 1);
 
+
 Model Inspection
 ----------------
 
@@ -314,6 +346,8 @@ Query model properties to understand its structure:
     size_t scene_count = lv_gltf_model_get_scene_count(model);
     size_t camera_count = lv_gltf_model_get_camera_count(model);
 
+
+
 Widget Architecture
 *******************
 
@@ -321,6 +355,7 @@ The glTF widget extends the ``lv_3dtexture`` widget, which means:
 
 - All standard ``lv_obj`` functions work with glTF widgets (positioning, sizing, styling, etc.)
 - All ``lv_3dtexture`` functions are also available for advanced 3D texture management
+
 
 Animation Speed System
 ----------------------
@@ -332,12 +367,16 @@ Animation speeds use integer values to avoid floating-point arithmetic:
 - Values greater than 1000 speed up animations (e.g., 2000 = 2.0x speed)
 - Values less than 1000 slow down animations (e.g., 500 = 0.5x speed)
 
+
+
 .. _gltf_example:
 
 Examples
 ********
 
 .. include:: ../../examples/libs/gltf/index.rst
+
+
 
 .. _gltf_api:
 
