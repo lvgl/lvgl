@@ -86,6 +86,29 @@ If the width or height is set to a smaller number than its "intrinsic"
 size then the Table becomes scrollable.
 
 
+Set cell user data
+------------------
+
+Custom data can be bound to a table cell. The data lifetime must be managed by the user. If the data is dynamically allocated,
+the user must free it to prevent memory leaks. This can be done by binding to the :cpp:enumerator:`LV_EVENT_DELETE` event.
+
+.. code-block:: c 
+
+    static void table_delete_event_cb(lv_event_t * e) {
+        lv_obj_t * my_table = lv_event_get_target_obj(e);
+        const uint32_t row_count = lv_table_get_row_count(table);
+        const uint32_t col_count = lv_table_get_column_count(table);
+
+        /* Assuming every cell has custom data associated with it*/
+        for(uint32_t i = 0; i < row_count; ++i) {
+            for(uint32_t j = 0; j < col_count; ++j) {
+                void * cell_user_data = lv_table_get_cell_user_data(table, i, j);
+                lv_free(cell_user_data);
+            }
+        }
+    }
+
+    lv_obj_add_event_cb(table, table_delete_event_cb, LV_EVENT_DELETE, NULL);
 
 .. _lv_table_events:
 

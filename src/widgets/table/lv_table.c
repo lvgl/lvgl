@@ -221,10 +221,6 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
         uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
         uint32_t i;
         for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-            if(table->cell_data[i] && table->cell_data[i]->user_data) {
-                lv_free(table->cell_data[i]->user_data);
-                table->cell_data[i]->user_data = NULL;
-            }
             lv_free(table->cell_data[i]);
         }
     }
@@ -277,10 +273,6 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
         int32_t i;
         for(i = 0; i < (int32_t)old_col_cnt - (int32_t)col_cnt; i++) {
             uint32_t idx = old_col_start + min_col_cnt + i;
-            if(table->cell_data[idx] && table->cell_data[idx]->user_data) {
-                lv_free(table->cell_data[idx]->user_data);
-                table->cell_data[idx]->user_data = NULL;
-            }
             lv_free(table->cell_data[idx]);
             table->cell_data[idx] = NULL;
         }
@@ -386,10 +378,6 @@ void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, voi
         table->cell_data[cell]->ctrl = 0;
         table->cell_data[cell]->user_data = NULL;
         table->cell_data[cell]->txt[0] = '\0';
-    }
-
-    if(table->cell_data[cell]->user_data) {
-        lv_free(table->cell_data[cell]->user_data);
     }
 
     table->cell_data[cell]->user_data = user_data;
@@ -536,10 +524,6 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
         if(table->cell_data[i]) {
-            if(table->cell_data[i]->user_data) {
-                lv_free(table->cell_data[i]->user_data);
-                table->cell_data[i]->user_data = NULL;
-            }
             lv_free(table->cell_data[i]);
             table->cell_data[i] = NULL;
         }
