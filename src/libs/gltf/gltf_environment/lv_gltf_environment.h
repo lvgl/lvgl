@@ -1,5 +1,5 @@
 /**
- * @file lv_gltf_ibl_sampler.h
+ * @file lv_gltf_environment.h
  *
  */
 
