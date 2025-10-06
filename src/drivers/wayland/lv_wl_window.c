@@ -124,7 +124,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
     lv_wayland_xdg_shell_configure_surface(window);
 
-    lv_display_set_user_data(window->lv_disp, window);
+    lv_display_set_driver_data(window->lv_disp, window);
 
     lv_display_set_render_mode(window->lv_disp, LV_WAYLAND_RENDER_MODE);
     lv_display_set_flush_wait_cb(window->lv_disp, lv_wayland_wait_flush_cb);
@@ -171,7 +171,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 void lv_wayland_window_close(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window || window->closed) {
         return;
     }
@@ -194,7 +194,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
         }
     }
     else {
-        window = lv_display_get_user_data(disp);
+        window = lv_display_get_driver_data(disp);
         open   = (!window->closed);
     }
 
@@ -203,7 +203,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
 
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     lv_result_t err        = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
@@ -262,7 +262,7 @@ void lv_wayland_unassign_physical_display(lv_display_t * disp)
 
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     lv_result_t err        = LV_RESULT_INVALID;
     if(!window || window->closed) {
         return;
