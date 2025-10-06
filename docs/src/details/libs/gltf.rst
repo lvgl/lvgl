@@ -316,6 +316,97 @@ Customize the visual appearance of your 3D scene:
     /* Anti-aliasing */
     lv_gltf_set_antialiasing_mode(gltf, LV_GLTF_AA_DYNAMIC);
 
+
+Image-Based Lighting (IBL)
+---------------------------
+
+IBL (Image-Based Lighting) uses 360° panoramic images to light and shade 3D models, creating realistic reflections and environmental effects.
+Unlike traditional mathematical lighting (where light sources are calculated with approximation functions),
+IBL captures the entire lighting environment in an image, producing natural-looking results with:
+
+- **Realistic reflections** on shiny surfaces that mirror the environment
+- **Ambient lighting** from all directions with proper color tinting
+- **Subtle lighting effects** like under-lighting and color variation based on viewing angle
+- **Visual cohesiveness** that makes models appear naturally placed in their environment
+
+For example, using an HDR image of a forest will make your 3D model appear to be sitting in a forest.
+
+Default Behavior
+~~~~~~~~~~~~~~~~
+
+By default, each glTF viewer automatically creates an environment using an embedded default image with a texture size of 128. This provides good visual quality for most use cases without any setup.
+
+Custom Environments
+~~~~~~~~~~~~~~~~~~~
+
+For more control over lighting quality, to use custom HDR images, or to share environments across multiple viewers, you can create and manage environments manually:
+
+.. code-block:: c
+
+    /* Create an IBL sampler with custom resolution */
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create(256);
+    
+    /* Create environment from custom HDR/JPEG image (or NULL for default) */
+    lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, "A:path/to/environment.hdr");
+    
+    /* Sampler can be deleted after environment creation */
+    lv_gltf_ibl_sampler_delete(sampler);
+    
+    /* Apply environment to viewer */
+    lv_gltf_set_environment(gltf, env);
+    
+    /* Optionally rotate the environment lighting */
+    lv_gltf_environment_set_angle(env, 45.0f);
+
+
+Sharing Environments
+~~~~~~~~~~~~~~~~~~~~
+
+The same environment can be shared across multiple glTF viewers for consistent lighting and reduced memory usage:
+
+.. code-block:: c
+
+    lv_obj_t * gltf1 = lv_gltf_create(lv_screen_active());
+    lv_obj_t * gltf2 = lv_gltf_create(lv_screen_active());
+    
+    /* Create shared environment */
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create(256);
+    lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, NULL);
+    lv_gltf_ibl_sampler_delete(sampler);
+    
+    /* Apply to multiple viewers */
+    /* Note that the user owns the environment and is responsible for deleting it when
+    all glTF objects are deleted */
+    lv_gltf_set_environment(gltf1, env);
+    lv_gltf_set_environment(gltf2, env);
+
+
+Environment Images
+~~~~~~~~~~~~~~~~~~
+
+- Use equirectangular (360°) panoramic images in HDR or JPEG format
+- Source images are converted to cube map format at the sampler's ``texture_size`` resolution
+- Higher texture sizes (256-512) provide better quality but use more memory
+- Lower texture sizes (64-128) are suitable for embedded systems
+- Free HDR environment maps are widely available online. Choose environments that match the "look" you want (outdoor, studio, warehouse, etc.)
+
+
+How It Works
+~~~~~~~~~~~~
+
+When an environment is created, the source image is processed into a cube map format (6 images representing each face of a cube).
+During rendering, for each pixel of your 3D model, the renderer samples the appropriate point from this cube map data to determine lighting color and intensity.
+The processing cost is paid once during environment creation.
+
+
+Performance Notes
+~~~~~~~~~~~~~~~~~
+
+- Environment creation processes the source image into cube map data, which may take time with larger texture sizes
+- The texture size determines the resolution of the internal cube map (6 faces × size²)
+- Processing time increases with both source image resolution and texture size
+
+
 Multi-Model Support
 -------------------
 
