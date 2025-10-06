@@ -12,6 +12,7 @@
 #if LV_USE_LINUX_DRM
 
 #include <dirent.h>
+#include <xf86drmMode.h>
 
 #include "lv_linux_drm.h"
 #include "../../../stdlib/lv_sprintf.h"
@@ -90,6 +91,38 @@ static char * find_by_class(void)
     closedir(d);
     return NULL;
 
+}
+
+int32_t lv_linux_drm_mode_get_horizontal_resolution(const lv_linux_drm_mode_t * mode)
+{
+    if(!mode) {
+        return 0;
+    }
+    return mode->hdisplay;
+}
+
+int32_t lv_linux_drm_mode_get_vertical_resolution(const lv_linux_drm_mode_t * mode)
+{
+    if(!mode) {
+        return 0;
+    }
+    return mode->vdisplay;
+}
+
+int32_t lv_linux_drm_mode_get_refresh_rate(const lv_linux_drm_mode_t * mode)
+{
+    if(!mode) {
+        return 0;
+    }
+    return mode->vrefresh;
+}
+
+bool lv_linux_drm_mode_is_preferred(const lv_linux_drm_mode_t * mode)
+{
+    if(!mode) {
+        return false;
+    }
+    return (mode->type & DRM_MODE_TYPE_PREFERRED) != 0;
 }
 
 #endif /*LV_USE_LINUX_DRM*/
