@@ -1,8 +1,8 @@
 .. _xml_events:
 
-======
-Events
-======
+=============
+Events in XML
+=============
 
 Overview
 ********
