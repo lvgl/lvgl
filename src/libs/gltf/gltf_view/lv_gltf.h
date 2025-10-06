@@ -70,11 +70,21 @@ typedef lv_3dplane_t lv_3dray_t;
  **********************/
 
 /**
- * Create a GLTF viewer object
+ * Create a glTF viewer object
  * @param parent pointer to the parent object
  * @return pointer to the created GLTF viewer object
  */
 lv_obj_t * lv_gltf_create(lv_obj_t * parent);
+
+/**
+ * Assign an environment to a glTF object for IBL rendering
+ * @param obj pointer to a glTF viewer object
+ * @param environment pointer to the environment to use
+ * @note The environment can be shared across multiple glTF objects
+ * @note If no environment is set before attempting to load a file,
+ *       a default one will be created for you
+ */
+void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * environment);
 
 /**
  * Load a GLTF model from a file into the viewer

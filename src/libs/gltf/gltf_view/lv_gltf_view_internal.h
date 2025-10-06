@@ -81,16 +81,6 @@ typedef struct {
     GLfloat clear_color[4];
 } lv_opengl_state_t;
 
-typedef struct {
-    uint32_t diffuse;
-    uint32_t specular;
-    uint32_t sheen;
-    uint32_t ggxLut;
-    uint32_t charlie_lut;
-    uint32_t mip_count;
-    float ibl_intensity_scale;
-    float angle;
-} lv_gltf_view_env_textures_t;
 
 #ifdef __cplusplus
 }
@@ -107,14 +97,14 @@ struct _lv_gltf_t {
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
     lv_opengl_shader_manager_t shader_manager;
-    lv_gltf_view_env_textures_t env_textures;
+    lv_gltf_environment_t * environment;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;
     fastgltf::math::fmat4x4 view_projection_matrix;
     fastgltf::math::fvec3 camera_pos;
 
     std::map<int32_t, std::map<fastgltf::Node *, fastgltf::math::fmat4x4>> ibm_by_skin_then_node;
-
+    bool owns_environment;
 };
 
 /**********************

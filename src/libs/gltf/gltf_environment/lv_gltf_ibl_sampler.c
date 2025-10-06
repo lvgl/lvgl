@@ -7,22 +7,22 @@
  *      INCLUDES
  *********************/
 
-#include "lv_gltf_ibl_sampler.h"
+#include "lv_gltf_environment_private.h"
 
 #if LV_USE_GLTF
 
-#include "../../../../misc/lv_math.h"
-#include "../../../../misc/lv_log.h"
-#include "../../../../stdlib/lv_string.h"
-#include "../../../../drivers/opengles/lv_opengles_private.h"
-#include "../../../../drivers/opengles/lv_opengles_debug.h"
+#include "../../../misc/lv_math.h"
+#include "../../../misc/lv_log.h"
+#include "../../../stdlib/lv_sprintf.h"
+#include "../../../stdlib/lv_string.h"
+#include "../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../drivers/opengles/lv_opengles_debug.h"
 
-#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../lv_gltf_view_internal.h"
-#include "../assets/lv_gltf_view_shader.h"
+#include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
+#include "../gltf_view/assets/lv_gltf_view_shader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../stb_image/stb_image.h"
+#include "../stb_image/stb_image.h"
 
 /*********************
  *      DEFINES
@@ -39,7 +39,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path);
 static void ibl_sampler_filter(lv_gltf_ibl_sampler_t * sampler);
 static void ibl_sampler_destroy(lv_gltf_ibl_sampler_t * sampler);
@@ -76,33 +75,16 @@ static void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gltf_ibl_generate_env_textures(lv_gltf_view_env_textures_t * env, const char * path, float env_rotation)
+lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(uint32_t texture_size)
 {
-    lv_gltf_ibl_sampler_t sampler;
+    if(!texture_size) {
+        LV_LOG_WARN("Can't create a sampler with a texture size of %" LV_PRIu32, texture_size);
+        return NULL;
+    }
 
-    ibl_sampler_init(&sampler);
-    ibl_sampler_load(&sampler, path);
-    ibl_sampler_filter(&sampler);
+    lv_gltf_ibl_sampler_t * sampler = lv_zalloc(sizeof(*sampler));
 
-    env->angle = env_rotation;
-    env->diffuse = sampler.lambertian_texture_id;
-    env->specular = sampler.ggx_texture_id;
-    env->sheen = sampler.sheen_texture_id;
-    env->ggxLut = sampler.ggxlut_texture_id;
-    env->charlie_lut = sampler.charlielut_texture_id;
-    env->mip_count = sampler.mipmap_levels;
-    env->ibl_intensity_scale = sampler.scale_value;
-    ibl_sampler_destroy(&sampler);
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
-{
-    lv_memset(sampler, 0, sizeof(*sampler));
-    sampler->texture_size = 128;
+    sampler->texture_size = texture_size;
     sampler->ggx_sample_count = 128;
     sampler->lambertian_sample_count = 256;
     sampler->sheen_sample_count = 32;
@@ -111,12 +93,67 @@ static void ibl_sampler_init(lv_gltf_ibl_sampler_t * sampler)
     sampler->lut_resolution = 1024;
     sampler->lut_sample_count = 64;
     sampler->scale_value = 1.0;
+
     lv_opengl_shader_portions_t env_shader_portions;
     lv_gltf_view_shader_get_env(&env_shader_portions);
     lv_opengl_shader_manager_init(&sampler->shader_manager, env_shader_portions.all, env_shader_portions.count, NULL,
                                   NULL);
     init_fullscreen_quad(sampler);
+    return sampler;
 }
+
+void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler)
+{
+    if(!sampler) {
+        LV_LOG_WARN("Can't delete a NULL sampler");
+        return;
+    }
+
+    ibl_sampler_destroy(sampler);
+    lv_free(sampler);
+}
+
+void lv_gltf_environment_set_angle(lv_gltf_environment_t * env, float angle)
+{
+    if(!env) {
+        LV_LOG_WARN("Can't set angle on a NULL environment");
+        return;
+    }
+    env->angle = angle;
+}
+
+lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampler, const char * file_path)
+{
+    if(!sampler) {
+        LV_LOG_WARN("Can't create an environment with a NULL sampler");
+        return NULL;
+    }
+
+    lv_gltf_environment_t * env = lv_zalloc(sizeof(*env));
+    ibl_sampler_load(sampler, file_path);
+    ibl_sampler_filter(sampler);
+
+    env->diffuse = sampler->lambertian_texture_id;
+    env->specular = sampler->ggx_texture_id;
+    env->sheen = sampler->sheen_texture_id;
+    env->ggxLut = sampler->ggxlut_texture_id;
+    env->charlie_lut = sampler->charlielut_texture_id;
+    env->mip_count = sampler->mipmap_levels;
+    env->ibl_intensity_scale = sampler->scale_value;
+    return env;
+}
+
+void lv_gltf_environment_delete(lv_gltf_environment_t * env)
+{
+    const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
+    GL_CALL(glDeleteTextures(3, d));
+    lv_free(env);
+}
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
 {

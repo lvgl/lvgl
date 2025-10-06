@@ -19,6 +19,7 @@
 #include "../../../drivers/opengles/lv_opengles_private.h"
 #include "../../../drivers/opengles/lv_opengles_debug.h"
 #include "../math/lv_gltf_math.hpp"
+#include "../gltf_environment/lv_gltf_environment_private.h"
 
 #include <algorithm>
 
@@ -61,12 +62,12 @@ static uint32_t render_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex
                                GLint uv_transform);
 static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
-                           const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass);
+                           const lv_gltf_environment_t * env_tex, bool is_transmission_pass);
 
 static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data,
                             fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
-                            const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass);
+                            const lv_gltf_environment_t * env_tex, bool is_transmission_pass);
 
 static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
                           lv_gltf_primitive_t * _prim_data, size_t materialIndex, bool is_transmission_pass, GLuint program,
@@ -269,7 +270,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             const auto & node_element = node_distance_pair.second;
             const auto & node = node_element.first;
             draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
-                           lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, true);
+                           lv_gltf_data_get_cached_transform(model, node), viewer->environment, true);
         }
 
         GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->opaque_render_state.texture));
@@ -302,7 +303,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         const auto & node_element = node_distance_pair.second;
         const auto & node = node_element.first;
         draw_primitive(node_element.second, viewer, model, *node, node->meshIndex.value(),
-                       lv_gltf_data_get_cached_transform(model, node), &viewer->env_textures, false);
+                       lv_gltf_data_get_cached_transform(model, node), viewer->environment, false);
     }
     if(opt_aa_this_frame) {
         GL_CALL(glBindTexture(GL_TEXTURE_2D, vstate->render_state.texture));
@@ -328,7 +329,7 @@ static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, co
         for(const auto & pair : kv.second) {
             auto node = pair.first;
             draw_primitive(pair.second, viewer, gltf_data, *node, node->meshIndex.value(),
-                           lv_gltf_data_get_cached_transform(gltf_data, node), &viewer->env_textures, true);
+                           lv_gltf_data_get_cached_transform(gltf_data, node), viewer->environment, true);
         }
     }
 }
@@ -378,7 +379,7 @@ static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * model)
 }
 static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, fastgltf::Node & node,
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
-                           const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass)
+                           const lv_gltf_environment_t * env_tex, bool is_transmission_pass)
 {
     lv_gltf_mesh_data_t * mesh = lv_gltf_data_get_mesh(gltf_data, mesh_index);
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
@@ -397,7 +398,7 @@ static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t
 }
 static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * model, fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
-                            const lv_gltf_view_env_textures_t * env_tex, bool is_transmission_pass)
+                            const lv_gltf_environment_t * env_tex, bool is_transmission_pass)
 {
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
     lv_gltf_mesh_data_t * mesh = lv_gltf_data_get_mesh(model, mesh_index);
@@ -437,7 +438,7 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     GL_CALL(glUniform1f(uniforms->exposure, view_desc->exposure));
     GL_CALL(glUniform1f(uniforms->env_intensity, view_desc->env_pow));
     GL_CALL(glUniform1i(uniforms->env_mip_count, (int32_t)env_tex->mip_count));
-    setup_environment_rotation_matrix(viewer->env_textures.angle, program);
+    setup_environment_rotation_matrix(viewer->environment->angle, program);
     GL_CALL(glEnable(GL_CULL_FACE));
     GL_CALL(glDisable(GL_BLEND));
     GL_CALL(glEnable(GL_DEPTH_TEST));
@@ -1137,16 +1138,16 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 
     /* Bind the texture to the specified texture unit*/
     GL_CALL(glActiveTexture(GL_TEXTURE0 + 0));
-    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, viewer->env_textures.specular));
+    GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, viewer->environment->specular));
 
     GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_GGXEnvSampler"), 0));
 
-    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->env_textures.mip_count));
+    GL_CALL(glUniform1i(glGetUniformLocation(manager->bg_program, "u_MipCount"), viewer->environment->mip_count));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvBlurNormalized"), blur));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_EnvIntensity"), 1.0f));
     GL_CALL(glUniform1f(glGetUniformLocation(manager->bg_program, "u_Exposure"), 1.0f));
 
-    setup_environment_rotation_matrix(viewer->env_textures.angle, manager->bg_program);
+    setup_environment_rotation_matrix(viewer->environment->angle, manager->bg_program);
 
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, manager->bg_index_buf));
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, manager->bg_vertex_buf));
