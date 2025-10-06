@@ -10,64 +10,7 @@ The glTF extension in LVGL provides 3D model loading, rendering, and animation c
 
 For a detailed introduction to glTF, see: https://www.khronos.org/gltf/
 
-Features
-********
 
-LVGL's glTF implementation provides comprehensive 3D rendering capabilities:
-
-**File Format Support:**
-
-* Loading glTF (.gltf) and binary GLB (.glb) files from local filesystem
-* Support for hex-encoded bytes in source include files when filesystem is not available
-* JPG, PNG, and WebP compressed texture support
-* External texture files or textures embedded within the glTF source
-
-**Rendering & Lighting:**
-
-* Image-Based Lighting (IBL) for realistic environmental lighting
-* Punctual lighting support with animated light sources
-* Physically Based Rendering (PBR) materials with full texture support:
-  
-  * Diffuse/albedo textures
-  * Roughness and metallic workflow textures  
-  * Normal maps for surface detail
-  * Ambient occlusion textures
-
-**Advanced Materials:**
-
-* Emissive materials for glowing effects and self-illuminated surfaces
-* Refractive materials with realistic distortion effects revealing geometry behind surfaces
-* Clearcoat material support for multi-layer surface effects (like automotive paint finishes)
-* Full transparency support with alpha blending
-
-**Animation System:**
-
-* Keyframe-based animations for object transformations
-* Single-skeleton skinned character animations
-* Animated punctual lights with dynamic lighting effects
-* Parameter binding for real-time monitoring and control of object properties (position, rotation, scale)
-* Dynamic parameter override from host application
-
-**Camera & Viewport:**
-
-* Programmatic viewport control with full camera manipulation
-* Support for cameras defined within 3D editor software
-* Multiple camera switching for different scene perspectives
-* Orthographic and perspective projection modes
-
-**Rendering Quality:**
-
-* Configurable antialiasing with multiple modes:
-  
-  * Always-on for consistent quality
-  * Always-off for maximum performance  
-  * Auto-on that activates when scene movement stops
-
-* Flexible background rendering:
-  
-  * Environment-based backgrounds using IBL
-  * Solid color backgrounds
-  * Transparent backgrounds for overlay effects
 
 What is glTF?
 *************
