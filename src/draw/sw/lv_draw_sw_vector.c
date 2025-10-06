@@ -453,7 +453,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else {
-        tvg_canvas_set_viewport(canvas, (int32_t)rc.x + state->translate_x, rc.y + state->translate_y,
+        tvg_canvas_set_viewport(canvas, (int32_t)rc.x + state->translate_x, (int32_t)rc.y + state->translate_y,
                                 (int32_t)rc.w, (int32_t)rc.h);
 
         lv_matrix_t matrix;
