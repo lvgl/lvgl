@@ -78,6 +78,11 @@ static void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program
 lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void)
 {
     lv_gltf_ibl_sampler_t * sampler = lv_zalloc(sizeof(*sampler));
+    LV_ASSERT_MALLOC(sampler)
+    if(!sampler) {
+        LV_LOG_WARN("Failed to create sampler");
+        return NULL;
+    }
 
     sampler->cube_map_resolution = LV_GLTF_DEFAULT_CUBE_MAP_RESOLUTION;
     sampler->ggx_sample_count = 128;
@@ -138,6 +143,11 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
     }
 
     lv_gltf_environment_t * env = lv_zalloc(sizeof(*env));
+    LV_ASSERT_MALLOC(env);
+    if(!env) {
+        LV_LOG_WARN("Failed to create environment");
+        return NULL;
+    }
     ibl_sampler_load(sampler, file_path);
     ibl_sampler_filter(sampler);
 
