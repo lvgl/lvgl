@@ -16,6 +16,7 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
 
+#include "lv_gltf_environment.h"
 #include "../../../misc/lv_types.h"
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 
@@ -28,11 +29,11 @@ extern "C" {
  **********************/
 
 struct _lv_gltf_ibl_sampler {
-    uint32_t texture_size;
+    uint32_t cube_map_resolution;
     float lod_bias;
     uint32_t lowest_mip_level;
     uint32_t input_texture_id;
-    uint32_t cubemap_texture_id;
+    uint32_t cube_map_texture_id;
     uint32_t framebuffer;
     uint32_t mipmap_count;
 
