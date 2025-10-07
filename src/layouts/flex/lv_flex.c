@@ -159,11 +159,6 @@ static bool calc_min_size(lv_obj_t * cont, int32_t * req_size, bool width, void 
 
     int32_t item_gap =
         f.row ? lv_obj_get_style_pad_column(cont, LV_PART_MAIN) : lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
-    // typedef int32_t (*margin_func_t)(const lv_obj_t*, lv_part_t);
-    // margin_func_t get_margin_main_start = (f.row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
-    // margin_func_t get_margin_main_end = (f.row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
-    // int32_t cont_margin_start = get_margin_main_start(cont, LV_PART_MAIN);
-    // int32_t cont_margin_end = get_margin_main_end(cont, LV_PART_MAIN);
 
     int32_t cont_space_start =
         (f.row ? lv_obj_get_style_space_left(cont, LV_PART_MAIN) : lv_obj_get_style_space_top(cont, LV_PART_MAIN));

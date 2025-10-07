@@ -206,8 +206,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
         int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
         w = LV_CLAMP(minw, w, maxw);
-        obj->w_min = w == minw;
-        obj->w_max = w == maxw;
     }
 
     int32_t h;
@@ -220,8 +218,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
         int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
         h = LV_CLAMP(minh, h, maxh);
-        obj->h_min = h == minh;
-        obj->h_max = h == maxh;
     }
 
     /*Do nothing if the size is not changed*/
@@ -668,13 +664,18 @@ int32_t lv_obj_get_self_height(const lv_obj_t * obj)
     return p.y;
 }
 
-int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj)
+int32_t lv_obj_get_style_clamped_width(lv_obj_t * obj)
 {
-    int32_t w;
-    if(obj->w_min) {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t content_width = -1;
+    int32_t w = calc_dynamic_width(obj, LV_STYLE_WIDTH, &content_width);
+    int32_t minw = calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH, &content_width);
+    int32_t maxw = calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH, &content_width);
+    if(w <= minw) {
         w = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
     }
-    else if(obj->w_max) {
+    else if(w >= maxw) {
         w = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
     }
     else {
@@ -683,13 +684,18 @@ int32_t lv_obj_get_style_clamped_width(const lv_obj_t * obj)
     return w;
 }
 
-int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj)
+int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj)
 {
-    int32_t h;
-    if(obj->h_min) {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t content_height = -1;
+    int32_t h = calc_dynamic_height(obj, LV_STYLE_HEIGHT, &content_height);
+    int32_t minh = calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT, &content_height);
+    int32_t maxh = calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT, &content_height);
+    if(h <= minh) {
         h = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
     }
-    else if(obj->h_max) {
+    else if(h >= maxh) {
         h = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
     }
     else {
@@ -698,24 +704,40 @@ int32_t lv_obj_get_style_clamped_height(const lv_obj_t * obj)
     return h;
 }
 
-bool lv_obj_is_width_min(const lv_obj_t * obj)
+bool lv_obj_is_width_min(lv_obj_t * obj)
 {
-    return obj->w_min;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t minw = lv_obj_calc_dynamic_width(obj, LV_STYLE_MIN_WIDTH);
+    int32_t w = lv_obj_get_width(obj);
+    return w == minw;
 }
 
-bool lv_obj_is_height_min(const lv_obj_t * obj)
+bool lv_obj_is_height_min(lv_obj_t * obj)
 {
-    return obj->h_min;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t minh = lv_obj_calc_dynamic_height(obj, LV_STYLE_MIN_HEIGHT);
+    int32_t h = lv_obj_get_height(obj);
+    return h == minh;
 }
 
-bool lv_obj_is_width_max(const lv_obj_t * obj)
+bool lv_obj_is_width_max(lv_obj_t * obj)
 {
-    return obj->w_max;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t maxw = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH);
+    int32_t w = lv_obj_get_width(obj);
+    return w == maxw;
 }
 
-bool lv_obj_is_height_max(const lv_obj_t * obj)
+bool lv_obj_is_height_max(lv_obj_t * obj)
 {
-    return obj->h_max;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    int32_t maxh = lv_obj_calc_dynamic_height(obj, LV_STYLE_MAX_HEIGHT);
+    int32_t h = lv_obj_get_height(obj);
+    return h == maxh;
 }
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
