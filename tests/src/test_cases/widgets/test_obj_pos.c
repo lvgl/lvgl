@@ -63,10 +63,20 @@ void test_style_min_size(void)
     lv_obj_set_size(child, LV_PCT(100), LV_PCT(100));
     lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_no_min_size.png");
+    TEST_ASSERT_FALSE(lv_obj_is_width_min(child));
+    TEST_ASSERT_FALSE(lv_obj_is_height_min(child));
+    TEST_ASSERT_EQUAL(LV_PCT(100), lv_obj_get_style_clamped_width(child));
+    TEST_ASSERT_EQUAL(LV_PCT(100), lv_obj_get_style_clamped_height(child));
 
     lv_obj_set_style_min_width(child, 200, 0);
     lv_obj_set_style_min_height(child, 300, 0);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_fixed_min_size.png");
+    TEST_ASSERT_EQUAL_INT32(200, lv_obj_get_width(child));
+    TEST_ASSERT_EQUAL_INT32(300, lv_obj_get_height(child));
+    TEST_ASSERT_TRUE(lv_obj_is_width_min(child));
+    TEST_ASSERT_TRUE(lv_obj_is_height_min(child));
+    TEST_ASSERT_EQUAL(200, lv_obj_get_style_clamped_width(child));
+    TEST_ASSERT_EQUAL(300, lv_obj_get_style_clamped_height(child));
 
     lv_obj_set_style_min_width(child, LV_SIZE_CONTENT, 0);
     lv_obj_set_style_min_height(child, LV_SIZE_CONTENT, 0);
