@@ -23,6 +23,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_GLTF_DEFAULT_CUBE_MAP_RESOLUTION 128
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -79,5 +81,3 @@ void lv_gltf_environment_delete(lv_gltf_environment_t * environment);
 #endif
 
 #endif /*LV_GLTF_ENVIRONMENT_H*/
-
-
