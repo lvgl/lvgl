@@ -319,6 +319,15 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     LV_UNUSED(observer);
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    LV_LOG("sysmon: "
+           "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
+           "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
+           "CPU (total %" LV_PRIu32 "%% proc %" LV_PRIu32 "%%)\n",
+           perf->calculated.fps, perf->measured.refr_cnt, perf->measured.render_cnt,
+           perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
+           perf->calculated.cpu, perf->calculated.cpu_proc);
+#else
     LV_LOG("sysmon: "
            "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
            "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
@@ -326,6 +335,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
            perf->calculated.fps, perf->measured.refr_cnt, perf->measured.render_cnt,
            perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
            perf->calculated.cpu);
+#endif
 #else
     lv_obj_t * label = lv_observer_get_target(observer);
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
