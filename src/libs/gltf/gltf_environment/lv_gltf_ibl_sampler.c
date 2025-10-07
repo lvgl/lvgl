@@ -75,13 +75,8 @@ static void draw_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler, GLuint program
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(uint32_t texture_size)
+lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void)
 {
-    if(!texture_size) {
-        LV_LOG_WARN("Can't create a sampler with a texture size of %" LV_PRIu32, texture_size);
-        return NULL;
-    }
-
     lv_gltf_ibl_sampler_t * sampler = lv_zalloc(sizeof(*sampler));
 
     sampler->cube_map_resolution = LV_GLTF_DEFAULT_CUBE_MAP_RESOLUTION;
@@ -100,6 +95,19 @@ lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(uint32_t texture_size)
                                   NULL);
     init_fullscreen_quad(sampler);
     return sampler;
+}
+
+void lv_gltf_ibl_sampler_set_cube_map_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution)
+{
+    if(!sampler) {
+        LV_LOG_WARN("Can't set cube map resolution on a NULL sampler");
+        return;
+    }
+    if(!resolution) {
+        LV_LOG_WARN("Cube map resolution should be > %d", resolution);
+        return;
+    }
+    sampler->cube_map_resolution = resolution;
 }
 
 void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler)
