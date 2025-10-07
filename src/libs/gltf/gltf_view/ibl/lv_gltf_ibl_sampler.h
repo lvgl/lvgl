@@ -17,7 +17,7 @@ extern "C" {
 
 #if LV_USE_GLTF
 #include "../../../../misc/lv_types.h"
-#include "../../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../lv_gltf_view_internal.h"
 
 /*********************
@@ -56,7 +56,11 @@ typedef struct {
     float scale_value;
     uint32_t mipmap_levels;
 
-    lv_opengl_shader_manager_t * shader_manager;
+    lv_opengl_shader_manager_t shader_manager;
+
+    uint32_t fullscreen_vertex_buffer;
+    uint32_t fullscreen_tex_coord_buffer;
+
 } lv_gltf_ibl_sampler_t;
 
 typedef struct {

@@ -79,7 +79,7 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 
 /**
- * Set the time to wait before starting the the animation.
+ * Set the time to wait before starting the animation.
  * Applies only when playing from the very start, or reverse from the very end.
  * @param at        pointer to an animation timeline
  * @param delay     the delay time in milliseconds
@@ -113,17 +113,6 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress);
  * @param user_data pointer to any data. Only the pointer will be saved.
  */
 void lv_anim_timeline_set_user_data(lv_anim_timeline_t * at, void * user_data);
-
-#if LV_USE_OBJ_NAME
-/**
- * Set base object.
- * If set, it's assumed that the  `var` of animations is a widget name (path).
- * The widget pointer will be retrieved by finding them by name on this widget.
- * @param at        pointer to the animation timeline.
- * @param base_obj  pointer to a widget
- */
-void lv_anim_timeline_set_base_obj(lv_anim_timeline_t * at, lv_obj_t * base_obj);
-#endif
 
 /**
  * Get the time used to play the animation timeline.
@@ -171,18 +160,13 @@ uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
  */
 void * lv_anim_timeline_get_user_data(lv_anim_timeline_t * at);
 
-
-#if LV_USE_OBJ_NAME
 /**
- * Get base object.
- * If set, it's assumed that the  `var` of animations is a widget name (path).
- * The widget pointer will be retrieved by finding them by name on this widget.
- * @param at        pointer to the animation timeline.
- * @return          pointer to the base widget
+ * Merge (add) all animations of a timeline to another
+ * @param dest      merge animation into this timeline
+ * @param src       merge the animations of this timeline
+ * @param delay     add the animations with this extra delay
  */
-lv_obj_t * lv_anim_timeline_get_base_obj(lv_anim_timeline_t * at);
-#endif
-
+void lv_anim_timeline_merge(lv_anim_timeline_t * dest, const lv_anim_timeline_t * src, int32_t delay);
 
 /**********************
  *      MACROS

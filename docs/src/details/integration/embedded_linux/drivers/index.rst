@@ -9,7 +9,9 @@ Drivers
 
     fbdev
     drm
+    opengl_driver
     glfw
+    egl
     wayland
     X11
     evdev

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_image_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_IMAGE
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
@@ -61,12 +61,21 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("src", name)) lv_image_set_src(item, lv_xml_get_image(&state->scope, value));
-        if(lv_streq("inner_align", name)) lv_image_set_inner_align(item, image_align_to_enum(value));
-        if(lv_streq("rotation", name)) lv_image_set_rotation(item, lv_xml_atoi(value));
-        if(lv_streq("scale_x", name)) lv_image_set_scale_x(item, lv_xml_atoi(value));
-        if(lv_streq("scale_y", name)) lv_image_set_scale_y(item, lv_xml_atoi(value));
-        if(lv_streq("pivot_x", name)) lv_image_set_pivot_x(item, lv_xml_to_size(value));
-        if(lv_streq("pivot_y", name)) lv_image_set_pivot_y(item, lv_xml_to_size(value));
+        else if(lv_streq("inner_align", name)) lv_image_set_inner_align(item, image_align_to_enum(value));
+        else if(lv_streq("rotation", name)) lv_image_set_rotation(item, lv_xml_atoi(value));
+        else if(lv_streq("scale_x", name)) lv_image_set_scale_x(item, lv_xml_atoi(value));
+        else if(lv_streq("scale_y", name)) lv_image_set_scale_y(item, lv_xml_atoi(value));
+        else if(lv_streq("pivot_x", name)) lv_image_set_pivot_x(item, lv_xml_to_size(value));
+        else if(lv_streq("pivot_y", name)) lv_image_set_pivot_y(item, lv_xml_to_size(value));
+        else if(lv_streq("bind_src", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
+            if(subject) {
+                lv_image_bind_src(item, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in image bind_src", value);
+            }
+        }
     }
 }
 

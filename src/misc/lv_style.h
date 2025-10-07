@@ -118,6 +118,14 @@ typedef enum {
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 } lv_border_side_t;
 
+/** A image colorkey definition.
+ *  The transparency within the color range of [low, high] will be set to LV_OPA_TRANSP If the "enable" flag is set to true.
+ */
+typedef struct {
+    lv_color_t low;
+    lv_color_t high;
+} lv_image_colorkey_t;
+
 /**
  * A common type to handle all the property types in the same way.
  */
@@ -283,8 +291,9 @@ enum _lv_style_id_t {
     LV_STYLE_GRID_CELL_ROW_POS      = 134,
     LV_STYLE_GRID_CELL_ROW_SPAN     = 135,
     LV_STYLE_GRID_CELL_Y_ALIGN      = 136,
+    LV_STYLE_IMAGE_COLORKEY         = 137,
 
-    LV_STYLE_LAST_BUILT_IN_PROP     = 137,
+    LV_STYLE_LAST_BUILT_IN_PROP     = 138,
 
     LV_STYLE_NUM_BUILT_IN_PROPS     = LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
@@ -362,6 +371,19 @@ void lv_style_reset(lv_style_t * style);
  * @param src   the source style to copy from.
  */
 void lv_style_copy(lv_style_t * dst, const lv_style_t * src);
+
+/**
+ * Copy all properties of a style to an other without resetting the dst style.
+ * It has the same effect as calling the same `lv_set_style_...`
+ * functions on both styles.
+ * It means new memory will be allocated to store the properties in
+ * the destination style.
+ * After the copy the destination style is fully independent of the source
+ * and source can removed without affecting the destination style.
+ * @param dst   the destination to copy into (cannot be a constant style)
+ * @param src   the source style to copy from.
+ */
+void lv_style_merge(lv_style_t * dst, const lv_style_t * src);
 
 
 /**

@@ -143,6 +143,8 @@ menu "LVGL configuration"
 				bool "5: WINDOWS"
 			config LV_OS_MQX
 				bool "6: MQX"
+			config LV_OS_SDL2
+				bool "7: SDL2"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -252,6 +254,11 @@ menu "LVGL configuration"
 
 		config LV_DRAW_SW_SUPPORT_ARGB8888
 			bool "Enable support for ARGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+			bool "Enable support for ARGB8888 premultiplied color format"
 			default y
 			depends on LV_USE_DRAW_SW
 
@@ -366,37 +373,6 @@ menu "LVGL configuration"
 			string "Set the custom asm include file"
 			default ""
 			depends on LV_DRAW_SW_ASM_CUSTOM
-
-		config LV_USE_DRAW_VGLITE
-			bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms"
-			default n
-
-		config LV_USE_VGLITE_BLIT_SPLIT
-			bool "Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels"
-			depends on LV_USE_DRAW_VGLITE
-			default n
-
-		config LV_USE_VGLITE_DRAW_THREAD
-			bool "Use additional draw thread for VG-Lite processing"
-			depends on LV_USE_DRAW_VGLITE && !LV_OS_NONE
-			default y
-
-		config LV_USE_VGLITE_DRAW_ASYNC
-			bool "Enable VGLite draw async"
-			depends on LV_USE_VGLITE_DRAW_THREAD
-			default y
-			help
-				Queue multiple tasks and flash them once to the GPU. The task ready state will be send asynchronous to dispatcher.
-
-		config LV_USE_VGLITE_ASSERT
-			bool "Enable VGLite asserts"
-			depends on LV_USE_DRAW_VGLITE
-			default n
-
-		config LV_USE_VGLITE_CHECK_ERROR
-			bool "Enable VGLite error checks"
-			depends on LV_USE_DRAW_VGLITE
-			default n
 
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
@@ -1318,7 +1294,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_STDIO
 			bool "File system on top of stdio API"
 		config LV_FS_STDIO_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_STDIO
 		config LV_FS_STDIO_PATH
@@ -1332,7 +1308,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_POSIX
 			bool "File system on top of posix API"
 		config LV_FS_POSIX_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_POSIX
 		config LV_FS_POSIX_PATH
@@ -1346,7 +1322,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_WIN32
 			bool "File system on top of Win32 API"
 		config LV_FS_WIN32_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_WIN32
 		config LV_FS_WIN32_PATH
@@ -1360,7 +1336,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_FATFS
 			bool "File system on top of FatFS"
 		config LV_FS_FATFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_FATFS
 		config LV_FS_FATFS_PATH
@@ -1374,14 +1350,14 @@ menu "LVGL configuration"
 		config LV_USE_FS_MEMFS
 			bool "File system on top of memory-mapped API"
 		config LV_FS_MEMFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_MEMFS
 
 		config LV_USE_FS_LITTLEFS
 			bool "File system on top of littlefs API"
 		config LV_FS_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 		config LV_FS_LITTLEFS_PATH
@@ -1391,7 +1367,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
 			bool "File system on top of Arduino ESP littlefs API"
 		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
 		config LV_FS_ARDUINO_ESP_LITTLEFS_PATH
@@ -1401,7 +1377,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_ARDUINO_SD
 			bool "File system on top of Arduino SD API"
 		config LV_FS_ARDUINO_SD_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_SD
 		config LV_FS_ARDUINO_SD_PATH
@@ -1411,9 +1387,16 @@ menu "LVGL configuration"
 		config LV_USE_FS_UEFI
 			bool "File system on top of the UEFI EFI_SIMPLE_FILE_SYSTEM_PROTOCOL"
 		config LV_USE_FS_UEFI_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_UEFI
+
+		config LV_USE_FS_FROGFS
+			bool "FrogFS read-only filesystem"
+		config LV_FS_FROGFS_LETTER
+			int "Set an upper-cased driver-identifier letter for this driver (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_FROGFS
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
@@ -1477,12 +1460,12 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
-			bool "Tiny ttf cache entries count"
+			int "Tiny ttf cache entries count"
 			default 128
 			depends on LV_USE_TINY_TTF
 
 		config LV_TINY_TTF_CACHE_KERNING_CNT
-			bool "Tiny ttf kerning cache entries count"
+			int "Tiny ttf kerning cache entries count"
 			default 256
 			depends on LV_USE_TINY_TTF
 
@@ -1617,6 +1600,10 @@ menu "LVGL configuration"
 			bool "Enable built-in profiler by default"
 			depends on LV_USE_PROFILER_BUILTIN
 			default y
+		config LV_USE_PROFILER_BUILTIN_POSIX
+			bool "Enable POSIX profiler port"
+			depends on LV_USE_PROFILER_BUILTIN
+			default n
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			default "lvgl/src/misc/lv_profiler_builtin.h"
@@ -1879,10 +1866,6 @@ menu "LVGL configuration"
 			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
 			depends on LV_USE_WAYLAND
 			default n
-		config LV_WAYLAND_WL_SHELL
-			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
-			depends on LV_USE_WAYLAND
-			default n
 		config LV_WAYLAND_BUF_COUNT
 			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
 			depends on LV_USE_WAYLAND
@@ -2074,6 +2057,14 @@ menu "LVGL configuration"
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
 			default n
+
+		config LV_USE_LOVYAN_GFX
+			bool "Use LovyanGFX driver"
+			default n
+		config LV_LGFX_USER_INCLUDE
+			string "Header for LovyanGFX user configuration"
+			default "lv_lgfx_user.hpp"
+			depends on LV_USE_LOVYAN_GFX
 
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"

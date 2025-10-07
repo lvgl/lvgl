@@ -207,7 +207,7 @@ Setup
 
 3. **Setup OpenGL ES Driver** 
 
-   Follow the OpenGL ES driver setup documentation (:ref:``opengl_es_driver``) to configure GLFW and OpenGL ES support for your platform.
+   Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure GLFW and OpenGL ES support for your platform.
 
 4. **Basic Setup Example**
 
@@ -219,10 +219,10 @@ Setup
         lv_init();
         
         /* GLFW setup */
-        lv_glfw_window_t *window = lv_glfw_window_create(WINDOW_WIDTH, WINDOW_HEIGHT, true);
+        lv_opengles_window_t *window = lv_opengles_glfw_window_create(WINDOW_WIDTH, WINDOW_HEIGHT, true);
         lv_display_t *display = lv_opengles_texture_create(WINDOW_WIDTH, WINDOW_HEIGHT);
         unsigned int texture_id = lv_opengles_texture_get_texture_id(display);
-        lv_glfw_window_add_texture(window, texture_id, WINDOW_WIDTH, WINDOW_HEIGHT);
+        lv_opengles_window_add_texture(window, texture_id, WINDOW_WIDTH, WINDOW_HEIGHT);
         
         /* Load and display glTF demo */
         lv_demo_gltf("A:<path/to/gltf>");

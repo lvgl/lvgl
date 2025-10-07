@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_keyboard_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_KEYBOARD
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
@@ -57,6 +57,7 @@ void lv_xml_keyboard_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
         //        if(lv_streq("textarea", name)) lv_keyboard_set_mode(item, lv_obj_get_child_by_name());
         if(lv_streq("mode", name)) lv_keyboard_set_mode(item, mode_text_to_enum_value(value));
+        if(lv_streq("popovers", name)) lv_keyboard_set_popovers(item, lv_xml_to_bool(value));
     }
 }
 

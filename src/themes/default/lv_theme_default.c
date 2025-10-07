@@ -630,6 +630,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     if(!lv_theme_default_is_inited()) {
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
+        LV_ASSERT_MALLOC(theme_def);
     }
 
     my_theme_t * theme = theme_def;

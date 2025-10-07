@@ -12,7 +12,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
+#include "lv_os_private.h"
 #if LV_USE_OS == LV_OS_FREERTOS
 
 #include "atomic.h"
@@ -417,6 +417,11 @@ uint32_t lv_os_get_idle_percent(void)
     globals->freertos_idle_time_sum = 0;
 
     return pct;
+}
+
+void lv_sleep_ms(uint32_t ms)
+{
+    vTaskDelay(ms / portTICK_PERIOD_MS);
 }
 
 /**********************

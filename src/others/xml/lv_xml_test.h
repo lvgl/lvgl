@@ -26,11 +26,13 @@ typedef enum {
     LV_XML_TEST_STEP_TYPE_PRESS,
     LV_XML_TEST_STEP_TYPE_RELEASE,
     LV_XML_TEST_STEP_TYPE_CLICK_AT,
+    LV_XML_TEST_STEP_TYPE_CLICK_ON,
     LV_XML_TEST_STEP_TYPE_WAIT,
     LV_XML_TEST_STEP_TYPE_FREEZE,
     LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE,
     LV_XML_TEST_STEP_TYPE_SUBJECT_SET,
     LV_XML_TEST_STEP_TYPE_SUBJECT_COMPARE,
+    LV_XML_TEST_STEP_TYPE_SET_LANGUAGE,
 } lv_xml_test_step_type_t;
 
 /**********************
@@ -41,7 +43,7 @@ typedef enum {
  * Load the styles, constants, another data of the test. It needs to be called only once for each test.
  * @param xml_def                   the XML definition of the test as a NULL terminated string
  * @param ref_image_path_prefix     prefix for the path of reference images
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * ref_image_path_prefix);
 
@@ -49,7 +51,7 @@ lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * re
  * Load the styles, constants, another data of the test. It needs to be called only once for each test.
  * @param path                      path to an XML file
  * @param ref_image_path_prefix     prefix for the path of reference images
- * @return                          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * @return                          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_image_path_prefix);
 

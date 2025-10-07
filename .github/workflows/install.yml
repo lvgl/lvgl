@@ -1,0 +1,48 @@
+name: Install LVGL using CMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build-examples:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Generate lv_conf.h
+        run: |
+          python3 ./scripts/generate_lv_conf.py \
+            --template lv_conf_template.h \
+            --config lv_conf.h \
+            --defaults configs/ci/install/lv_conf.defaults
+
+      - name: Build LVGL
+        run: |
+          cmake -B build -DCMAKE_INSTALL_PREFIX=$(pwd)/lvgl-install
+          cmake --build build -j$(nproc)
+      - name: Install LVGL
+        run: cmake --install build
+
+      - name: Build an application with the installed version of LVGL
+        run: |
+          echo "#include <lvgl/lvgl.h> 
+            #include <lvgl/lvgl.h> 
+            #include <lvgl/demos/lv_demos.h> 
+            #include <lvgl/examples/lv_examples.h> 
+            int main(void) { 
+              lv_init();
+              lv_example_label_1();
+              lv_demo_widgets();
+              while(1) { 
+                lv_timer_handler(); 
+              } 
+              return 0; 
+          }" >> main.c
+          # We link with `g++` as thorvg (ThorVG library) contains C++ code that requires C++ runtime symbols
+          g++ main.c -o main -I$(pwd)/lvgl-install/include -L$(pwd)/lvgl-install/lib -llvgl_thorvg -llvgl_examples -llvgl_demos -llvgl -lm

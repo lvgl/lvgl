@@ -1,6 +1,6 @@
 <!--
 Example
-<lv_spangroup mode="fixed">
+<lv_spangroup width="300" height="content">
     <lv_spangroup-span text="hello " style="red"/>
     <lv_spangroup-span text="world" style="blue"/>
 </lv_spangroup>
@@ -8,27 +8,21 @@ Example
 
 <widget>
     <api>
-        <enumdef name="lv_span_overflow">
-            <enum name="clip" help=""/>
-            <enum name="ellipses" help=""/>
+        <enumdef name="lv_span_overflow" help="How to handle overflowing text">
+            <enum name="clip" help="Clip at boundary"/>
+            <enum name="ellipsis" help="Replace overflowing words with ..."/>
         </enumdef>
 
-        <enumdef name="lv_span_mode">
-            <enum name="fixed" help=""/>
-            <enum name="expand" help=""/>
-            <enum name="break" help=""/>
-        </enumdef>
+        <prop name="overflow" type="enum:lv_span_overflow" help="Set overflow mode"/>
+        <prop name="max_lines" type="int" help="Set max lines"/>
+        <prop name="indent" type="int" help="Set first line indent (px)"/>
 
-        <prop name="overflow" type="enum:lv_span_overflow" help=""/>
-        <prop name="max_lines" type="int" help=""/>
-        <prop name="indent" type="int" help=""/>
-
-        <element name="span" type="lv_span" access="add">
-            <prop name="text" type="string" help=""/>
-            <prop name="style" type="style" help=""/>
-            <prop name="bind_text" help="">
-                <param name="bind_text" type="subject"/>
-                <param name="fmt" type="string" default="NULL"/>
+        <element name="span" type="lv_span" access="add" help="Add a styled text span">
+            <prop name="text" type="string" help="Set span text"/>
+            <prop name="style" type="style" help="Set span style"/>
+            <prop name="bind_text" help="Bind text to a subject">
+                <param name="bind_text" type="subject" help="Subject that provides text"/>
+                <param name="fmt" type="string" default="NULL" help="Format string (printf style)"/>
             </prop>
         </element>
     </api>

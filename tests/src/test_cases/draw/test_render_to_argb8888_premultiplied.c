@@ -31,7 +31,7 @@ void test_render_to_argb8888_premultiplied(void)
              * also skip normal_3 and recolor_3 on VGLite
              * because RGB565A8 and I8 are not supported
              */
-            if((LV_BIN_DECODER_RAM_LOAD == 0 || LV_USE_DRAW_VGLITE == 0) &&
+            if((LV_BIN_DECODER_RAM_LOAD == 0 || LV_USE_DRAW_VG_LITE) &&
                (i == LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_3 ||
                 i == LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_3)) continue;
 

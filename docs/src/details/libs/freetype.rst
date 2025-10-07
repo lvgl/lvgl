@@ -1,8 +1,8 @@
 .. _freetype:
 
-================
-FreeType Support
-================
+====================
+FreeType Font Engine
+====================
 
 **FreeType** is a freely available software library to render fonts.
 

@@ -110,6 +110,11 @@ void lv_draw_nema_gfx_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * ds
 void lv_draw_nema_gfx_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                           const lv_area_t * coords);
 
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_NEMA_VG
+void lv_draw_nema_gfx_vector(lv_draw_task_t * t, const lv_draw_vector_dsc_t * dsc,
+                             const lv_area_t * coords);
+#endif
+
 
 /**********************
  *      MACROS

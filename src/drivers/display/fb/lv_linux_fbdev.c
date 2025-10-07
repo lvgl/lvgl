@@ -28,6 +28,7 @@
 
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -241,6 +242,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+    /* TODO: map delete event callback to deallocate buffers */
 }
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
@@ -275,55 +277,75 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 #endif
 
-    int32_t w = lv_area_get_width(area);
-    int32_t h = lv_area_get_height(area);
-    lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t px_size = lv_color_format_get_size(cf);
+    const bool wait_for_last_flush = LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_FULL;
+    const bool is_last_flush = lv_display_flush_is_last(disp);
+    const bool skip_flush = wait_for_last_flush && !is_last_flush;
 
-    lv_area_t rotated_area;
-    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-
-    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
-    if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        /* (Re)allocate temporary buffer if needed */
-        size_t buf_size = w * h * px_size;
-        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
-            dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
-            dsc->rotated_buf_size = buf_size;
-        }
-
-        /* Rotate the pixel buffer */
-        uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
-        uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-
-        switch(rotation) {
-            case LV_DISPLAY_ROTATION_0:
-                break;
-            case LV_DISPLAY_ROTATION_90:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                break;
-            case LV_DISPLAY_ROTATION_180:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-                break;
-            case LV_DISPLAY_ROTATION_270:
-                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                break;
-        }
-        color_p = dsc->rotated_buf;
-
-        /* Rotate the area */
-        rotated_area = *area;
-        lv_display_rotate_area(disp, &rotated_area);
-        area = &rotated_area;
-
-        if(rotation != LV_DISPLAY_ROTATION_180) {
-            w = lv_area_get_width(area);
-            h = lv_area_get_height(area);
-        }
+    if(skip_flush) {
+        lv_display_flush_ready(disp);
+        return;
     }
 
-    /* Ensure that we're within the framebuffer's bounds */
-    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    const lv_color_format_t cf = lv_display_get_color_format(disp);
+    const uint32_t px_size = lv_color_format_get_size(cf);
+
+    lv_area_t rotated_area;
+    const lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+
+    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
+    if(rotation != LV_DISPLAY_ROTATION_0) {
+        int32_t src_w;
+        int32_t src_h;
+        uint32_t src_stride;
+
+        /* Direct render mode rotation only works if we rotate the whole screen at the same time
+         * To do that, we use the display's resolution and as the area
+         *  we also grab the current draw buffer so that we can rotate the whole display */
+        if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+            if(!is_last_flush) {
+                /* We need to wait for the last flush when using direct render mode with rotation*/
+                lv_display_flush_ready(disp);
+                return;
+            }
+            lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
+            src_w = lv_display_get_horizontal_resolution(disp);
+            src_h = lv_display_get_vertical_resolution(disp);
+            src_stride = lv_draw_buf_width_to_stride(src_w, cf);
+            color_p = draw_buf->data;
+            rotated_area.x1 = rotated_area.y1 =  0;
+            lv_area_set_width(&rotated_area, src_w);
+            lv_area_set_height(&rotated_area, src_h);
+        }
+        else {
+            /* For partial and full render modes, we need to rotate the current area
+             * In Full mode we will rotate the whole display just like with direct render mode
+             * but we don't need to do anything special since the area is already the full area of the display
+             * For Partial mode we will rotate just the part we're currently displaying*/
+            src_w = lv_area_get_width(area);
+            src_h = lv_area_get_height(area);
+            src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+            rotated_area = *area;
+        }
+
+        lv_display_rotate_area(disp, &rotated_area);
+        const uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
+        const size_t buf_size = dest_stride * lv_area_get_height(&rotated_area);
+        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+            dsc->rotated_buf = lv_realloc(dsc->rotated_buf, buf_size);
+            LV_ASSERT_MALLOC(dsc->rotated_buf);
+            dsc->rotated_buf_size = buf_size;
+        }
+        lv_draw_sw_rotate(color_p, dsc->rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+        area = &rotated_area;
+        color_p = dsc->rotated_buf;
+    }
+
+    lv_area_t display_area;
+    /* vinfo.xres and vinfo.yres will already be 1 less than the actual resolution. i.e: 1023x767 on a 1024x768 screen */
+    lv_area_set(&display_area, 0, 0, dsc->vinfo.xres, dsc->vinfo.yres);
+
+    /* TODO: Consider rendering the clipped area*/
+    if(!lv_area_is_in(area, &display_area, 0)) {
         lv_display_flush_ready(disp);
         return;
     }
@@ -332,24 +354,25 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (area->x1 + dsc->vinfo.xoffset) * px_size +
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
-    int32_t y;
-    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+
+    const int32_t w = lv_area_get_width(area);
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT && rotation == LV_DISPLAY_ROTATION_0) {
         uint32_t color_pos =
             area->x1 * px_size +
             area->y1 * disp->hor_res * px_size;
 
-        for(y = area->y1; y <= area->y2; y++) {
+        for(int32_t y = area->y1; y <= area->y2; y++) {
             write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_pos += disp->hor_res * px_size;
         }
     }
     else {
-        w = lv_area_get_width(area);
-        for(y = area->y1; y <= area->y2; y++) {
+        const int32_t stride = lv_draw_buf_width_to_stride(w, cf);
+        for(int32_t y = area->y1; y <= area->y2; y++) {
             write_to_fb(dsc, fb_pos, color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_p += w * px_size;
+            color_p += stride;
         }
     }
 

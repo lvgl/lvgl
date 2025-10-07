@@ -266,7 +266,7 @@ static void perf_dump_info(lv_display_t * disp)
     lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
     uint32_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
 
-    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
+    info->calculated.fps = time_since_last_report ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
     info->calculated.fps = LV_MIN(info->calculated.fps,
                                   1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
 
@@ -319,6 +319,15 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     LV_UNUSED(observer);
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+    LV_LOG("sysmon: "
+           "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
+           "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
+           "CPU (total %" LV_PRIu32 "%% proc %" LV_PRIu32 "%%)\n",
+           perf->calculated.fps, perf->measured.refr_cnt, perf->measured.render_cnt,
+           perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
+           perf->calculated.cpu, perf->calculated.cpu_proc);
+#else
     LV_LOG("sysmon: "
            "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
            "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
@@ -326,12 +335,13 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
            perf->calculated.fps, perf->measured.refr_cnt, perf->measured.render_cnt,
            perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
            perf->calculated.cpu);
+#endif
 #else
     lv_obj_t * label = lv_observer_get_target(observer);
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     lv_label_set_text_fmt(
         label,
-        "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU, %" LV_PRIu32 "%% Self\n"
+        "%" LV_PRIu32" FPS | CPU (%" LV_PRIu32 "%% | %" LV_PRIu32 "%%)\n"
         "%" LV_PRIu32" ms (%" LV_PRIu32" | %" LV_PRIu32")",
         perf->calculated.fps, perf->calculated.cpu, perf->calculated.cpu_proc,
         perf->calculated.render_avg_time + perf->calculated.flush_avg_time,

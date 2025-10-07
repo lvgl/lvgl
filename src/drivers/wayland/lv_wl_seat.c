@@ -85,12 +85,10 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
         seat->wl_keyboard = NULL;
     }
 
-#if LV_USE_GESTURE_RECOGNITION
     if((caps & WL_SEAT_CAPABILITY_TOUCH) && !seat->wl_touch) {
         seat->wl_touch = wl_seat_get_touch(wl_seat);
         wl_touch_add_listener(seat->wl_touch, lv_wayland_touch_get_listener(), app);
     }
-#endif
     else if(!(caps & WL_SEAT_CAPABILITY_TOUCH) && seat->wl_touch) {
         wl_touch_destroy(seat->wl_touch);
         seat->wl_touch = NULL;

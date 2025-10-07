@@ -33,19 +33,30 @@ jobs:
       - name: Move artifacts to  current folder
         if: ${{ github.event.workflow_run.event == 'pull_request' }}
         run: |
+          if [ ! -f "artifacts/pr_number/pr_number" ] || [ ! -f "artifacts/comment/comment.md" ]; then
+            echo "Required artifact files not found."
+            echo "This probably means this run was triggered by a label other than 'Run Benchmark on HW'."
+            echo "Exiting workflow."
+            echo "results_exist=false" >> $GITHUB_ENV
+            exit 0
+          fi
           mv artifacts/pr_number/pr_number .
           mv artifacts/comment/comment.md .
+          echo "results_exist=true" >> $GITHUB_ENV
 
       - name: Install Dependencies
+        if: ${{env.results_exist == 'true'}}
         run: |
           sudo apt update -y
           sudo apt install -y libfontconfig-dev
 
       - name: Install EJ dispatcher tool
+        if: ${{env.results_exist == 'true'}}
         run: |
           cargo install ejlv
 
       - name: Comment PR
+        if: ${{env.results_exist == 'true'}}
         run: |
           ejlv comment-pr \
             --comment-path comment.md \
@@ -54,7 +65,8 @@ jobs:
             --signature "hw_performance_tests"
 
       - name: Remove trigger label
-        uses: actions/github-script@v7
+        if: ${{env.results_exist == 'true'}}
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');

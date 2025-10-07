@@ -49,7 +49,7 @@ static void touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 lv_display_t * lv_draw_eve_display_create(const lv_draw_eve_parameters_t * params, lv_draw_eve_operation_cb_t op_cb,
                                           void * user_data)
 {
-    static uint8_t dummy_buf; /* It won't be used as it will send commands instead of draw pixels. */
+    static uint32_t dummy_buf; /* It won't be used as it will send commands instead of draw pixels. */
 
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
     lv_display_set_flush_cb(disp, flush_cb);

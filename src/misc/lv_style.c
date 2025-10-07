@@ -160,6 +160,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
     [LV_STYLE_GRID_CELL_X_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_GRID_CELL_Y_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 #endif
+    [LV_STYLE_IMAGE_COLORKEY]         = 0,
 
 };
 
@@ -210,10 +211,27 @@ void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
 
     lv_style_reset(dst);
 
-    /*Source is empty*/
-    if(src->values_and_props == NULL) return;
-    if(src->prop_cnt == 0) return;
+    lv_style_merge(dst, src);
+}
 
+void lv_style_merge(lv_style_t * dst, const lv_style_t * src)
+{
+    if(lv_style_is_const(dst)) {
+        LV_LOG_WARN("The destination can not be a constant style");
+        return;
+    }
+
+    /*Source is empty*/
+    if(src->values_and_props == NULL) {
+        LV_LOG_TRACE("Source style is empty");
+        return;
+    }
+    if(src->prop_cnt == 0) {
+        LV_LOG_TRACE("Source style has no properties");
+        return;
+    }
+
+    /* Merge the styles */
     int32_t i;
     if(lv_style_is_const(src)) {
         lv_style_const_prop_t * props_and_values = (lv_style_const_prop_t *)src->values_and_props;
@@ -457,6 +475,15 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             return (lv_style_value_t) {
                 .num = 256
             };
+
+#if LV_USE_GRID
+        case LV_STYLE_GRID_CELL_ROW_SPAN:
+        case LV_STYLE_GRID_CELL_COLUMN_SPAN:
+            return (lv_style_value_t) {
+                .num = 1
+            };
+#endif
+
         default:
             return (lv_style_value_t) {
                 .ptr = NULL

@@ -48,7 +48,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char ** attrs)
+lv_result_t lv_xml_register_style(lv_xml_component_scope_t * scope, const char ** attrs)
 {
     const char * style_name =  lv_xml_get_value_of(attrs, "name");
     if(style_name == NULL) {
@@ -163,6 +163,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
         else SET_STYLE_IF(max_height, lv_xml_to_size(value));
         else SET_STYLE_IF(length, lv_xml_to_size(value));
         else SET_STYLE_IF(radius, lv_xml_to_size(value));
+        else SET_STYLE_IF(radial_offset, lv_xml_atoi(value));
+        else SET_STYLE_IF(align, lv_xml_align_to_enum(value));
 
         else SET_STYLE_IF(pad_left, lv_xml_atoi(value));
         else SET_STYLE_IF(pad_right, lv_xml_atoi(value));
@@ -281,8 +283,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
         else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
-        else if(lv_streq(name, "style_grid_column_dsc_array") ||
-                lv_streq(name, "style_grid_row_dsc_array")) {
+        else if(lv_streq(name, "grid_column_dsc_array") ||
+                lv_streq(name, "grid_row_dsc_array")) {
 
             uint32_t item_cnt = 0;
             uint32_t c;
@@ -310,7 +312,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
             }
             dsc_array[item_cnt] = LV_GRID_TEMPLATE_LAST;
 
-            if(lv_streq(name, "style_grid_column_dsc_array")) {
+            if(lv_streq(name, "grid_column_dsc_array")) {
                 lv_style_set_grid_column_dsc_array(style, dsc_array);
             }
             else {

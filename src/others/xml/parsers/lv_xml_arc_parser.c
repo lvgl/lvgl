@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_arc_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_ARC
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
@@ -58,6 +58,7 @@ void lv_xml_arc_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("end_angle", name)) lv_arc_set_end_angle(item, lv_xml_atoi(value));
         else if(lv_streq("bg_start_angle", name)) lv_arc_set_bg_start_angle(item, lv_xml_atoi(value));
         else if(lv_streq("bg_end_angle", name)) lv_arc_set_bg_end_angle(item, lv_xml_atoi(value));
+        else if(lv_streq("rotation", name)) lv_arc_set_rotation(item, lv_xml_atoi(value));
         else if(lv_streq("value", name)) lv_arc_set_value(item, lv_xml_atoi(value));
         else if(lv_streq("min_value", name)) lv_arc_set_min_value(item, lv_xml_atoi(value));
         else if(lv_streq("max_value", name)) lv_arc_set_max_value(item, lv_xml_atoi(value));

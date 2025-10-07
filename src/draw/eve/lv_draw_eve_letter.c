@@ -34,7 +34,7 @@
 static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 static void font_bitmap_to_ramg(uint32_t addr, const uint8_t * src, uint32_t width,
-                                uint32_t height);
+                                uint32_t height, uint8_t src_stride_align);
 
 /**********************
  *  STATIC VARIABLES
@@ -103,7 +103,8 @@ uint32_t lv_draw_eve_label_upload_glyph(bool burst_is_active, const lv_font_fmt_
             EVE_end_cmd_burst();
         }
 
-        font_bitmap_to_ramg(ramg_addr, glyph_bitmap, g_box_w, g_box_h);
+        uint8_t glyph_bitmap_stride_align = font_dsc->stride;
+        font_bitmap_to_ramg(ramg_addr, glyph_bitmap, g_box_w, g_box_h, glyph_bitmap_stride_align);
 
         if(burst_is_active) {
             EVE_start_cmd_burst();
@@ -155,22 +156,32 @@ static void lv_draw_eve_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     lv_eve_color_opa(glyph_draw_dsc->opa);
     lv_eve_color(glyph_draw_dsc->color);
 
-    EVE_cmd_dl_burst(BITMAP_SOURCE(ramg_addr));
+    lv_eve_bitmap_source(ramg_addr);
 
-    EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, g_box_w, g_box_h));
-    EVE_cmd_dl_burst(BITMAP_LAYOUT(bpp_eve, g_aligned_stride, g_box_h));
+    lv_eve_bitmap_size(EVE_NEAREST, EVE_BORDER, EVE_BORDER, g_box_w, g_box_h);
+    lv_eve_bitmap_layout(bpp_eve, g_aligned_stride, g_box_h);
 
     lv_eve_vertex_2f(glyph_draw_dsc->letter_coords->x1, glyph_draw_dsc->letter_coords->y1);
 }
 
 static void font_bitmap_to_ramg(uint32_t addr, const uint8_t * src, uint32_t width,
-                                uint32_t height)
+                                uint32_t height, uint8_t src_stride_align)
 {
     uint32_t stride = (width + 1) / 2;
 
-    if(width % 2 == 0) {
+    if(src_stride_align == 1 || (src_stride_align == 0 && width % 2 == 0)) {
         uint32_t size = stride * height;
         EVE_memWrite_flash_buffer(addr, src, size);
+        return;
+    }
+
+    if(src_stride_align > 0) {
+        uint32_t src_stride = LV_ALIGN_UP(stride, src_stride_align);
+        for(uint32_t y = 0; y < height; y++) {
+            EVE_memWrite_sram_buffer(addr, src, stride);
+            addr += stride;
+            src += src_stride;
+        }
         return;
     }
 

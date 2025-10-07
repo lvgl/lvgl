@@ -13,25 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "../../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 
 #if LV_USE_GLTF
-
-/*********************
- *      DEFINES
- *********************/
-
-#define GLSL_VERSION_PREFIX "#version 300 es\n"
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-	const lv_opengl_shader_t *shader_list;
-	size_t count;
-} lv_gltf_view_shader_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -39,8 +23,8 @@ typedef struct {
 
 char *lv_gltf_view_shader_get_vertex(void);
 char *lv_gltf_view_shader_get_fragment(void);
-void lv_gltf_view_shader_get_src(lv_gltf_view_shader_t *shaders);
-void lv_gltf_view_shader_get_env(lv_gltf_view_shader_t *shaders);
+void lv_gltf_view_shader_get_src(lv_opengl_shader_portions_t *shaders);
+void lv_gltf_view_shader_get_env(lv_opengl_shader_portions_t *shaders);
 
 /**********************
  *      MACROS

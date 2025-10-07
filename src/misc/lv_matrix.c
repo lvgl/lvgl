@@ -198,12 +198,21 @@ lv_point_precise_t lv_matrix_transform_precise_point(const lv_matrix_t * matrix,
 
 lv_area_t lv_matrix_transform_area(const lv_matrix_t * matrix, const lv_area_t * area)
 {
+    if(lv_matrix_is_identity(matrix)) {
+        return *area;
+    }
+
+    /**
+     * Since lv_area_t will subtract 1px when calculating width and height,
+     * this will affect the matrix transformation calculation, so +1px is needed as compensation,
+     * and the compensation value is subtracted after the calculation is completed
+     */
     lv_area_t res;
     lv_point_precise_t p[4] = {
         {area->x1, area->y1},
-        {area->x1, area->y2},
-        {area->x2, area->y1},
-        {area->x2, area->y2},
+        {area->x1, area->y2 + 1},
+        {area->x2 + 1, area->y1},
+        {area->x2 + 1, area->y2 + 1},
     };
     p[0] = lv_matrix_transform_precise_point(matrix, &p[0]);
     p[1] = lv_matrix_transform_precise_point(matrix, &p[1]);
@@ -211,9 +220,9 @@ lv_area_t lv_matrix_transform_area(const lv_matrix_t * matrix, const lv_area_t *
     p[3] = lv_matrix_transform_precise_point(matrix, &p[3]);
 
     res.x1 = (int32_t)(LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x));
-    res.x2 = (int32_t)(LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x));
+    res.x2 = (int32_t)(LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x)) - 1;
     res.y1 = (int32_t)(LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y));
-    res.y2 = (int32_t)(LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y));
+    res.y2 = (int32_t)(LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y)) - 1;
 
     return res;
 }

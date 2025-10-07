@@ -160,7 +160,17 @@ The following functions are used to get a Subject's previous value:
 :Pointer: const void * :cpp:expr:`lv_subject_get_previous_pointer(subject)`
 :Color:   lv_color_t   :cpp:expr:`lv_subject_get_previous_color(subject)`
 
+Setting a Range for a Subject
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The range of the integer and float subjects can be limited by setting minimum and maximum values:
+
+- :cpp:expr:`lv_subject_set_min_value_int(subject, value)`
+- :cpp:expr:`lv_subject_set_max_value_int(subject, value)`
+- :cpp:expr:`lv_subject_set_min_value_float(subject, value)`
+- :cpp:expr:`lv_subject_set_max_value_float(subject, value)`
+
+The default range is the smallest and largest possible values, so there is no limit by default.
 
 .. _observer_observer:
 
@@ -361,13 +371,9 @@ integer value:
 
 - flag (or OR-ed combination of flags) from from the ``LV_OBJ_FLAG_...`` enumeration values;
 - state (or OR-ed combination of states) from the ``LV_STATE_...`` enumeration values;
-- text value for
-
+- text and/or integer values for
     - Label
     - Span;
-
-- integer value for these Widget types:
-
     - Arc
     - Drop-Down
     - Roller
@@ -457,165 +463,60 @@ Subject's value to be set to ``1`` or ``0`` respectively.
 
 - :cpp:expr:`lv_obj_bind_checked(widget, &subject)`
 
+Specific Widget Types
+~~~~~~~~~~~~~~~~~~~~~
 
-Label Widgets
-~~~~~~~~~~~~~
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
-
-This method of subscribing to an integer Subject affects a Label Widget's
-``text``.  The Subject can be an STRING, POINTER or INTEGER type.
-
-When the subscribing occurs, and each time the Subject's value is changed thereafter,
-the Subject's value is used to update the Label's text as follows:
-
-:string Subject:    Subject's string is used to directly update the Label's text.
-
-:pointer Subject:   If NULL is passed as the ``format_string`` argument when
-                    subscribing, the Subject's pointer value is assumed to point to a
-                    NUL-terminated string. and is used to directly update the Label's
-                    text.  See :ref:`observer_format_string` for other options.
-
-:integer Subject:   Subject's integer value is used with the ``format_string`` argument.
-                    See See :ref:`observer_format_string` for details.
-
-Note that this is a one-way binding (Subject ===> Widget).
-
-- :cpp:expr:`lv_label_bind_text(label, &subject, format_string)`
-
-.. _observer_format_string:
-
-The ``format_string`` Argument
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The ``format_string`` argument is optional and if provided, must contain exactly 1
-printf-like format specifier and be one of the following:
-
-:string or pointer Subject:  "%s" to format the new pointer value as a string or "%p"
-                             to format the pointer as a pointer (typically the
-                             pointer's address value is spelled out with 4, 8 or 16
-                             hexadecimal characters depending on the platform).
-
-:integer Subject:            "%d" format specifier (``"%" PRIdxx`` --- a
-                             cross-platform equivalent where ``xx`` can be ``8``,
-                             ``16``, ``32`` or ``64``, depending on the platform).
-
-:float Subject:              "%f" format specifier, or e.g. "%0.2f" to display two digits after the decimal point.
-
-
-If ``NULL`` is passed for the ``format_string`` argument:
-
-:string or pointer Subject:  Updates expect the pointer to point to a NUL-terminated string.
-:integer Subject:            The Label will simply display the number. Equivalent to "%d".
-:float Subject:            The Label will display the value with "%0.1f" format string.
-
-**Example:**  "%d |deg|\C"
-
-
-Spangroup's Span
-~~~~~~~~~~~~~~~~
-
-Very similar to Label-text binding, a Span's text can be bound to a subject as well.
-
-The only difference is that in the bind function both the Spangroup and the Span need to be specified:
-
- :cpp:expr:`lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)`
-
-Note that before calling :cpp:expr:`lv_spangroup_delete_span` :cpp:expr:`lv_observer_remove`
-needs to be called manually as LVGL can't remove the binding automatically.
-
-Arc Widgets
-~~~~~~~~~~~
-
-This method of subscribing to an integer Subject affects an Arc Widget's integer
-value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
-user's direct interaction with the Arc Widget updates the Subject's value and vice
-versa.  (Requires :c:macro:`LV_USE_ARC` to be configured to ``1``.)
-
-It support integer and float subjects.
-
-
-- :cpp:expr:`lv_arc_bind_value(arc, &subject)`
-
-
-Slider Widgets
-~~~~~~~~~~~~~~
-
-This method of subscribing to an integer Subject affects a Slider Widget's integer
-value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
-user's direct interaction with the Slider Widget updates the Subject's value and vice
-versa.  (Requires :c:macro:`LV_USE_SLIDER` to be configured to ``1``.)
-
-It support integer and float subjects.
-
-- :cpp:expr:`lv_slider_bind_value(slider, &subject)`
-
-
-Roller Widgets
-~~~~~~~~~~~~~~
-
-This method of subscribing to an integer Subject affects a Roller Widget's integer
-value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
-user's direct interaction with the Slider Widget updates the Subject's value and vice
-versa.  (Requires :c:macro:`LV_USE_ROLLER` to be configured to ``1``.)
-
-It support only integer subjects.
-
-- :cpp:expr:`lv_roller_bind_value(roller, &subject)`
-
-
-Drop-Down Widgets
-~~~~~~~~~~~~~~~~~
-
-This method of subscribing to an integer Subject affects a Drop-Down Widget's integer
-value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
-user's direct interaction with the Drop-Down Widget updates the Subject's value and
-vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
-
-It support only integer subjects.
-
-- :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
-
-Scale's Section
-~~~~~~~~~~~~~~~
-
-This method of subscribing to an integer Subject affects a Section of a Scale Widget's integer
-minimum or maximum values directly.  Note that this is a one-way binding (Subject ==> Widget)
-as the Scale Section's boundaries are not interactive.
-(Requires :c:macro:`LV_USE_SCALE` to be configured to ``1``.)
-
-It supports only integer subjects.
-
-- :cpp:expr:`lv_scale_bind_section_min_value(scale, section1, &subject)`
-- :cpp:expr:`lv_scale_bind_section_max_value(scale, section1, &subject)`
-
-
-.. _change_subject_on_event:
+To learn how to bind subjects to Arcs, Labels, Sliders, etc. visit the "Data binding"
+section of the given widget's documentation. For example: :ref:`Data binding for lv_label <lv_label_data_binding>`.
 
 
 Change Subject on Event
 -----------------------
 
-It's a common requirement to update a subject based on a user action (trigger).
+It's a common requirement to update a Subject based on a user action (trigger).
 To simplify this, *subject set* and *increment* actions can be attached directly to any widget.
 
 Internally, these are implemented as special event callbacks.
-Note: these callbacks are **not** automatically removed when a subject is deinited.
+Note: these callbacks are **not** automatically removed when a subject is de-initialized.
+
+
+Toggle
+~~~~~~
+
+:cpp:expr:`lv_obj_add_subject_toggle_event(obj, subject)`
+
+Toggle the subjects value when the trigger happens. IF the value was not 0, it will be 0.
+If it was 0 it will be 1.
+
+For example:
+
+:cpp:expr:`lv_obj_add_subject_toggle_event(button1, subject1, LV_EVENT_CLICKED)`
+
+This will toggle `subject1` between 0 and 1 each time `button1` is clicked.
 
 Increment
 ~~~~~~~~~
 
-:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, step, min, max)`
-Increments the subject's value by `step`, clamped between `min` and `max`.
+:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step, rollover)`
+increments an integer subject's value by `step`.
+
+It works on both integer and float subject.
+
+``rollover`` can be ``true`` or ``false``. If ``true`` and the subject's minimum or maximum
+value is exceeded, the other end value is set. That is, going beyond
+the maximum value sets the minimum value, and vice versa.
+
+Using a negative `step` will decrement the value instead.
+
 
 For example:
 
-:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, -10, 80)`
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, false)`
 
-This will increment `subject1` by 5 when `button1` is clicked.
-The resulting value will be constrained to the range -10 to 80.
+This will increment `subject1` by 5 when `button1` is clicked, stopping at the limits set by
+:cpp:expr:`lv_subject_set_min_value_int()` and :cpp:expr:`lv_subject_set_max_value_int()`
+(same for float subjects).
 
-Using a negative `step` will decrement the value instead.
 
 Set to a Value
 ~~~~~~~~~~~~~~

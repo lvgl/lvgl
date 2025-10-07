@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_xml_chart_parser.h"
-#if LV_USE_XML
+#if LV_USE_XML && LV_USE_CHART
 
 #include "../../../lvgl.h"
 #include "../../../lvgl_private.h"
@@ -174,6 +174,7 @@ static lv_chart_type_t chart_type_to_enum(const char * txt)
     if(lv_streq("none", txt)) return LV_CHART_TYPE_NONE;
     if(lv_streq("line", txt)) return LV_CHART_TYPE_LINE;
     if(lv_streq("bar", txt)) return LV_CHART_TYPE_BAR;
+    if(lv_streq("stacked", txt)) return LV_CHART_TYPE_STACKED;
     if(lv_streq("scatter", txt)) return LV_CHART_TYPE_SCATTER;
 
     LV_LOG_WARN("%s is an unknown value for chart's chart_type", txt);

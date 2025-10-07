@@ -22,6 +22,7 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -58,6 +59,11 @@ static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+    static void dropdown_value_changed_event_cb(lv_event_t * e);
+    static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -635,6 +641,27 @@ bool lv_dropdown_is_open(lv_obj_t * obj)
 
     return lv_obj_has_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN) ? false : true;
 }
+
+#if LV_USE_OBSERVER
+
+lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -1256,5 +1283,23 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
 
     return lv_obj_get_child(dropdown->list, 0);
 }
+
+#if LV_USE_OBSERVER
+
+static void dropdown_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * dropdown = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    lv_subject_set_int(subject, lv_dropdown_get_selected(dropdown));
+}
+
+static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_dropdown_set_selected(observer->target, subject->value.num);
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

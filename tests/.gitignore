@@ -3,5 +3,5 @@
 *.bin
 *_err.png
 build_*/
-report/
+report*/
 wayland_protocols/

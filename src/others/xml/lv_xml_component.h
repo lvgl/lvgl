@@ -34,25 +34,25 @@ extern "C" {
 lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * name, const char ** attrs);
 
 /**
- * Load the styles, constants, another data of the component. It needs to be called only once for each component.
- * @param name      the name as the component will be referenced later in other components
- * @param xml_def   the XML definition of the component as a NULL terminated string
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * Load the styles, constants, and other data of the Component. It needs to be called only once for each Component.
+ * @param name      The name as the component will be referenced later in other components
+ * @param xml_def   The XML definition of the component as a NULL terminated string
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
-lv_result_t lv_xml_component_register_from_data(const char * name, const char * xml_def);
+lv_result_t lv_xml_register_component_from_data(const char * name, const char * xml_def);
 
 /**
- * Load the styles, constants, another data of the component. It needs to be called only once for each component.
- * @param path      path to an XML file
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * Load the styles, constants, and other data of the Component. It needs to be called only once for each Component.
+ * @param path      Path to an XML file
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
-lv_result_t lv_xml_component_register_from_file(const char * path);
+lv_result_t lv_xml_register_component_from_file(const char * path);
 
 /**
- * Get the scope of a component which was registered by
- * `lv_xml_component_register_from_data` or `lv_xml_component_register_from_file`
- * @param component_name    name of the component
- * @return                  pointer the scope or NULL if not found
+ * Get the scope of a Component which was registered by
+ * `lv_xml_register_component_from_data()` or `lv_xml_register_component_from_file()`
+ * @param component_name    Name of the Component
+ * @return                  Pointer to the scope or NULL if not found
  */
 lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_name);
 

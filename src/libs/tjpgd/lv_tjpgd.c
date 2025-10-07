@@ -153,13 +153,15 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
+    lv_fs_file_t * f = NULL;
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
 #if LV_USE_FS_MEMFS
         const lv_image_dsc_t * img_dsc = dsc->src;
         if(is_jpg(img_dsc->data, img_dsc->data_size) == true) {
+            f = lv_malloc(sizeof(lv_fs_file_t));
+            if(f == NULL) return LV_RESULT_INVALID;
             lv_fs_path_ex_t path;
-            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size);
+            lv_fs_make_path_from_buffer(&path, LV_FS_MEMFS_LETTER, img_dsc->data, img_dsc->data_size, "bin");
             lv_fs_res_t res;
             res = lv_fs_open(f, (const char *)&path, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -169,12 +171,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
 #else
         LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
-        return LV_RESULT_INVALID;
 #endif
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
         if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+            f = lv_malloc(sizeof(lv_fs_file_t));
+            if(f == NULL) return LV_RESULT_INVALID;
             lv_fs_res_t res;
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -183,23 +186,28 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
         }
     }
+    if(f == NULL) return LV_RESULT_INVALID;
 
     uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
     JDEC * jd = lv_malloc(sizeof(JDEC));
-    dsc->user_data = jd;
-    JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
-    if(rc) return LV_RESULT_INVALID;
+    JRESULT rc = JDR_MEM1;
 
-    dsc->header.cf = LV_COLOR_FORMAT_RGB888;
-    dsc->header.w = jd->width;
-    dsc->header.h = jd->height;
-    dsc->header.stride = jd->width * 3;
+    if(workb_temp != NULL && jd != NULL)
+        rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
 
     if(rc != JDR_OK) {
+        lv_fs_close(f);
+        lv_free(f);
         lv_free(workb_temp);
         lv_free(jd);
         return LV_RESULT_INVALID;
     }
+
+    dsc->user_data = jd;
+    dsc->header.cf = LV_COLOR_FORMAT_RGB888;
+    dsc->header.w = jd->width;
+    dsc->header.h = jd->height;
+    dsc->header.stride = jd->width * 3;
 
     return LV_RESULT_OK;
 }

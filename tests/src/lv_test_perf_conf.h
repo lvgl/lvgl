@@ -1137,7 +1137,6 @@
         #define LV_USE_WAYLAND          0
         #if LV_USE_WAYLAND
             #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
         #endif
 
         /** Driver for /dev/fb */
@@ -1183,7 +1182,7 @@
             * shared across sub-systems and libraries using the Linux DMA-BUF API.
             * The GBM library aims to provide a platform independent memory management system
             * it supports the major GPU vendors - This option requires linking with libgbm */
-            #define LV_LINUX_DRM_GBM_BUFFERS 0
+            #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
         #endif
 
         /** Interface for TFT_eSPI */

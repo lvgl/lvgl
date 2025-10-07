@@ -81,7 +81,6 @@ static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
-static void indev_init_gesture_recognizers(lv_indev_t * indev);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
@@ -143,7 +142,9 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
 
-    indev_init_gesture_recognizers(indev);
+#if LV_USE_GESTURE_RECOGNITION
+    lv_indev_gesture_init(indev);
+#endif
 
     return indev;
 }
@@ -153,6 +154,7 @@ void lv_indev_delete(lv_indev_t * indev)
     LV_ASSERT_NULL(indev);
 
     lv_indev_send_event(indev, LV_EVENT_DELETE, NULL);
+    lv_event_mark_deleted(indev);
     lv_event_remove_all(&(indev->event_list));
 
     /*Clean up the read timer first*/
@@ -191,7 +193,6 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
     else if(indev->type == LV_INDEV_TYPE_ENCODER) {
         data->key = LV_KEY_ENTER;
     }
-
 
     if(indev->read_cb) {
         LV_TRACE_INDEV("calling indev_read_cb");
@@ -670,21 +671,7 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
 
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param)
 {
-
-    lv_event_t e;
-    lv_memzero(&e, sizeof(e));
-    e.code = code;
-    e.current_target = indev;
-    e.original_target = indev;
-    e.param = param;
-    lv_result_t res;
-    res = lv_event_send(&indev->event_list, &e, true);
-    if(res != LV_RESULT_OK) return res;
-
-    res = lv_event_send(&indev->event_list, &e, false);
-    if(res != LV_RESULT_OK) return res;
-
-    return res;
+    return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
 
 /**********************
@@ -1911,22 +1898,4 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
-}
-
-/**
- * Initialize this indev's recognizers. It specify their recognizer function
- * @param indev             pointer to the indev containing the recognizers to initialize
- */
-static void indev_init_gesture_recognizers(lv_indev_t * indev)
-{
-#if LV_USE_GESTURE_RECOGNITION
-    indev->recognizers[LV_INDEV_GESTURE_NONE].recog_fn = NULL;
-    indev->recognizers[LV_INDEV_GESTURE_PINCH].recog_fn = lv_indev_gesture_detect_pinch;
-    indev->recognizers[LV_INDEV_GESTURE_ROTATE].recog_fn = lv_indev_gesture_detect_rotation;
-    indev->recognizers[LV_INDEV_GESTURE_TWO_FINGERS_SWIPE].recog_fn = lv_indev_gesture_detect_two_fingers_swipe;
-    indev->recognizers[LV_INDEV_GESTURE_SCROLL].recog_fn = NULL;
-    indev->recognizers[LV_INDEV_GESTURE_SWIPE].recog_fn = NULL;
-#else
-    LV_UNUSED(indev);
-#endif
 }

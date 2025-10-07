@@ -98,6 +98,7 @@ void lv_example_label_3(void);
 void lv_example_label_4(void);
 void lv_example_label_5(void);
 void lv_example_label_6(void);
+void lv_example_label_7(void);
 
 void lv_example_led_1(void);
 

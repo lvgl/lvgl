@@ -23,6 +23,7 @@ extern "C" {
 #include "../../font/lv_symbol_def.h"
 #include "../../misc/lv_text.h"
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -157,6 +158,19 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
  */
 void lv_label_set_recolor(lv_obj_t * obj, bool en);
 
+#if LV_USE_TRANSLATION
+
+/**
+ * Assign a translation tag for this label. Memory will be allocated to store the tag by the label.
+ * The label text will automatically update when the language is changed via `lv_translation_set_language`.
+ * @param obj           pointer to a label object
+ * @param tag          '\0' terminated character string.
+ */
+void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag);
+
+#endif /*LV_USE_TRANSLATION*/
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -227,6 +241,21 @@ bool lv_label_get_recolor(const lv_obj_t * obj);
  * Other functions
  *====================*/
 
+#if LV_USE_OBSERVER
+/**
+ * Bind an integer, string, or pointer Subject to a Label.
+ * @param obj       pointer to Label
+ * @param subject   pointer to Subject
+ * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
+ *                  or NULL to bind to the value directly.
+ * @return          pointer to newly-created Observer
+ * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
+ *                  as text as they are, integers as %d, floats as %0.1f
+ */
+lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
+#endif
+
+
 /**
  * Insert a text to a label. The label text cannot be static.
  * @param obj       pointer to a label object
@@ -244,6 +273,8 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
  * @param cnt       number of characters to cut
  */
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt);
+
+
 
 /**********************
  *      MACROS

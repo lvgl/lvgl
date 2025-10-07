@@ -548,6 +548,16 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
     return cursor;
 }
 
+void lv_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(cursor);
+
+    lv_chart_t * chart = (lv_chart_t *)obj;
+    lv_ll_remove(&chart->cursor_ll, cursor);
+    lv_free(cursor);
+}
+
 void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
 {
     LV_ASSERT_NULL(cursor);

@@ -2,10 +2,8 @@
 #include "lv_gltf_data_internal.hpp"
 
 #if LV_USE_GLTF
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "../../../drivers/opengles/lv_opengles_private.h"
 
-#include <cstdint>
 #include <lvgl.h>
 
 #include <fastgltf/core.hpp>

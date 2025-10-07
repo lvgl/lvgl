@@ -25,9 +25,11 @@ extern "C" {
  **********************/
 
 /**
- * Load the styles, constants, another data of the component. It needs to be called only once for each component.
- * @param xml_def   the XML definition of the component as a NULL terminated string
- * @return          LV_RES_OK: loaded successfully, LV_RES_INVALID: otherwise
+ * Change the properties of a given widget by processing XML snippets.
+ * For example `<lv_slider name="my_slider_1" min_value="30" "style_bg_color="0xff0000"/>`
+ * Note that the tag should be the underlying widget's name and the component's name.
+ * @param xml_def   the XML to process as a string
+ * @return          LV_RESULT_OK: loaded successfully, LV_RES_INVALID: otherwise
  */
 lv_result_t lv_xml_update_from_data(const char * xml_def);
 

@@ -12,13 +12,12 @@
 #if LV_USE_GLTF
 
 #include "../gltf_data/lv_gltf_data_internal.hpp"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../misc/lv_types.h"
 #include "../../../stdlib/lv_sprintf.h"
-#include "../../../drivers/glfw/lv_opengles_debug.h"
+#include "../../../drivers/opengles/lv_opengles_private.h"
+#include "../../../drivers/opengles/lv_opengles_debug.h"
 #include "../math/lv_gltf_math.hpp"
 
 #include <algorithm>
@@ -107,7 +106,9 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
         return GL_NONE;
     }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
-    GLuint texture_id = lv_gltf_view_render_model(viewer, model, true);
+
+    GLuint texture_id = GL_NONE;
+    texture_id = lv_gltf_view_render_model(viewer, model, true);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
         lv_gltf_view_render_model(viewer, model, false);
@@ -142,7 +143,7 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     GL_CALL(glBlendEquation(state->blend_equation));
     GL_CALL(glDepthMask(GL_TRUE));
     GL_CALL(glClearColor(state->clear_color[0], state->clear_color[1], state->clear_color[2], state->clear_color[3]));
-    GL_CALL(glClearDepth(state->clear_depth));
+    GL_CALL(glClearDepthf(state->clear_depth));
 }
 
 static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg)
@@ -254,7 +255,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         }
 
         if(opt_draw_bg) {
-            setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+            setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
         render_materials(viewer, model, model->opaque_nodes_by_material_index);
@@ -289,7 +290,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         return vstate->render_state.texture;
     }
     if(opt_draw_bg)
-        setup_draw_environment_background(viewer->shader_manager, viewer, view_desc->blur_bg);
+        setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
     render_materials(viewer, model, model->opaque_nodes_by_material_index);
 
     for(const auto & node_distance_pair : distance_sort_nodes) {
@@ -629,6 +630,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         }
     }
 
+#if FASTGLTF_ENABLE_DEPRECATED_EXT
     if(gltfMaterial.specularGlossiness) {
         LV_LOG_WARN(
             "Model uses outdated legacy mode pbr_speculargloss. Please update this model to a new shading model ");
@@ -650,6 +652,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                       uniforms->specular_glossiness_uv_transform);
         }
     }
+#endif
 
     if(gltfMaterial.diffuseTransmission) {
         render_uniform_color(uniforms->diffuse_transmission_color_factor,
@@ -760,7 +763,7 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
 
-        GL_CALL(glClearDepth(1.0f));
+        GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
@@ -854,10 +857,10 @@ static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 #ifdef __EMSCRIPTEN__
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
@@ -899,11 +902,11 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
 #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
     // For WebGL2
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_INT, NULL));
 #else
     // For Desktop OpenGL
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
                          GL_UNSIGNED_SHORT, NULL));
 #endif
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
@@ -1083,7 +1086,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
         GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
-        GL_CALL(glClearDepth(1.0f));
+        GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;

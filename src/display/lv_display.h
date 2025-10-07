@@ -358,6 +358,7 @@ void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt);
 uint32_t lv_display_get_tile_cnt(lv_display_t * disp);
 
 /**
+ * Disabling anti-aliasing is not supported since v9. This function will be removed.
  * Enable anti-aliasing for the render engine
  * @param disp      pointer to a display
  * @param en        true/false
@@ -407,6 +408,13 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp);
  * @return          pointer to the previous screen object or NULL if not used now
  */
 lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
+
+/**
+ * Return the screen that is currently being loaded by the display
+ * @param disp      pointer to a display object (NULL to use the default screen)
+ * @return          pointer to the screen being loaded or NULL if no screen is currently being loaded
+ */
+lv_obj_t * lv_display_get_screen_loading(lv_display_t * disp);
 
 /**
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.

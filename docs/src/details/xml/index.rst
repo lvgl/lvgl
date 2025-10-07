@@ -1,15 +1,19 @@
-.. _xml_main:
+.. _editor_and_xml:
 
-====================
-XML - Declarative UI
-====================
+================
+LVGL Pro and XML
+================
 
 
 .. toctree::
-    :class:    toctree-1-deep
     :maxdepth: 2
 
-    overview/index
-    build_ui/index
-    test
-    license
+    intro
+    learn_by_examples
+    editor/index
+    xml/index
+    integration/index
+    ui_elements/index
+    assets/index
+    features/index
+    tools/index

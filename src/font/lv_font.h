@@ -36,7 +36,7 @@ extern "C" {
 typedef enum {
     LV_FONT_GLYPH_FORMAT_NONE   = 0, /**< Maybe not visible*/
 
-    /**< Legacy simple formats with no byte padding at end of the lines*/
+    /**< Legacy simple formats*/
     LV_FONT_GLYPH_FORMAT_A1     = 0x01, /**< 1 bit per pixel*/
     LV_FONT_GLYPH_FORMAT_A2     = 0x02, /**< 2 bit per pixel*/
     LV_FONT_GLYPH_FORMAT_A3     = 0x03, /**< 3 bit per pixel*/

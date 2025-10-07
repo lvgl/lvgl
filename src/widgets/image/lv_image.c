@@ -13,8 +13,9 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 #if LV_USE_IMAGE != 0
 
@@ -39,6 +40,11 @@ static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
 static void reset_image_attributes(lv_obj_t * obj);
+
+#if LV_USE_OBSERVER
+    static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
     static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
     static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
@@ -289,7 +295,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
         angle = 0;
     }
     else {
@@ -334,7 +340,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
         x = 0;
         y = 0;
     }
@@ -395,7 +401,7 @@ void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_x && zoom == img->scale_y) return;
 
@@ -411,7 +417,7 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_x) return;
 
@@ -427,7 +433,7 @@ void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom)
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
-    if(img->align > LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
+    if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) return;
 
     if(zoom == img->scale_y) return;
 
@@ -653,6 +659,24 @@ const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
     return img->bitmap_mask_src;
 }
 
+
+#if LV_USE_OBSERVER
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(subject->type != LV_SUBJECT_TYPE_POINTER) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, image_src_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -874,7 +898,7 @@ static void draw_image(lv_event_t * e)
             draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
 
             lv_area_t coords;
-            if(img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+            if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
                 coords = draw_dsc.image_area;
             }
@@ -917,7 +941,7 @@ static void draw_image(lv_event_t * e)
             const bool needs_inner_alignment = img->align > LV_IMAGE_ALIGN_TOP_LEFT
                                                && !image_area_is_same_as_coords;
             const bool has_offset = img->offset.x || img->offset.y;
-            const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
+            const bool inner_alignment_is_transforming = img->align >= _LV_IMAGE_ALIGN_AUTO_TRANSFORM;
             if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
                 lv_point_t text_size;
 
@@ -1035,6 +1059,18 @@ static void reset_image_attributes(lv_obj_t * obj)
     lv_obj_refresh_self_size(obj);
 }
 
+
+#if LV_USE_OBSERVER
+
+static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if(subject->type == LV_SUBJECT_TYPE_POINTER) {
+        lv_image_set_src(observer->target, subject->value.pointer);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 #if LV_USE_OBJ_PROPERTY
 static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
 {
@@ -1048,5 +1084,6 @@ static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj)
     return pivot;
 }
 #endif
+
 
 #endif

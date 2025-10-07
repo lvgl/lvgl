@@ -27,6 +27,10 @@ extern "C" {
 #include "fsl_cache.h"
 #include "fsl_pxp.h"
 
+#if ((LV_DRAW_BUF_ALIGN % 32) != 0)
+#error "If PXP is enabled the draw buffers should be aligned to 32-byte boundary, please set LV_DRAW_BUF_ALIGN to a multiple of 32 in lv_conf.h"
+#endif
+
 #include "../../../misc/lv_log.h"
 
 /*********************

@@ -14,10 +14,6 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 - Source: https://github.com/freetype/freetype
 - Note: Only the interfaces are used; FreeType itself is not part of LVGL.
 
-**GifDec (GIF decoder library)**
-- Path: src/libs/gifdec
-- Source: https://github.com/lecram/gifdec
-
 **LodePNG (PNG decoder)**
 - Path: src/libs/lodepng
 - Source: https://github.com/lvandeve/lodepng
@@ -61,3 +57,11 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 **FT800-FT813 (EVE GPU driver)**
 - Path src/libs/FT800-FT813
 - Source: https://github.com/RudolphRiedel/FT800-FT813
+
+**AnimatedGIF (GIF decoder library)**
+- Path: src/libs/gif/AnimatedGIF
+- Source: https://github.com/bitbank2/AnimatedGIF
+
+**FrogFS (read-only filesystem)**
+- Path: src/libs/frogfs
+- Source: https://github.com/jkent/frogfs

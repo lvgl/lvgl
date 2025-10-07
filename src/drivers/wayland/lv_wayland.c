@@ -18,6 +18,10 @@
     #error "Wayland doesn't support more than 1 LV_WAYLAND_BUF_COUNT without DMABUF"
 #endif
 
+#if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_BUF_COUNT != 2
+    #error "Wayland with DMABUF only supports 2 LV_WAYLAND_BUF_COUNT"
+#endif
+
 #if LV_WAYLAND_USE_DMABUF && !LV_USE_DRAW_G2D
     #error "LV_WAYLAND_USE_DMABUF requires LV_USE_DRAW_G2D"
 #endif
@@ -88,13 +92,29 @@ static void handle_output(void);
 
 static uint32_t tick_get_cb(void);
 
+static void output_scale(void * data, struct wl_output * output, int32_t factor);
+static void output_mode(void * data, struct wl_output * output, uint32_t flags, int32_t width, int32_t height,
+                        int32_t refresh);
+static void output_done(void * data, struct wl_output * output);
+static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
+                            int32_t physical_height, int32_t subpixel, const char * make, const char * model, int32_t transform);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static bool is_wayland_initialized                         = false;
-static const struct wl_registry_listener registry_listener = {.global        = handle_global,
-           .global_remove = handle_global_remove
+
+static const struct wl_registry_listener registry_listener = {
+    .global = handle_global,
+    .global_remove = handle_global_remove
+};
+
+static const struct wl_output_listener output_listener = {
+    .geometry = output_geometry,
+    .mode = output_mode,
+    .done = output_done,
+    .scale = output_scale
 };
 
 /**********************
@@ -278,11 +298,7 @@ void lv_wayland_deinit(void)
     lv_wayland_dmabuf_deinit(&lv_wl_ctx.dmabuf_ctx);
 #endif
 
-#if LV_WAYLAND_WL_SHELL
-    lv_wayland_wl_shell_deinit();
-#elif LV_WAYLAND_XDG_SHELL
     lv_wayland_xdg_shell_deinit();
-#endif
 
     if(lv_wl_ctx.wl_seat) {
         wl_seat_destroy(lv_wl_ctx.wl_seat);
@@ -305,7 +321,7 @@ void lv_wayland_deinit(void)
 
 void lv_wayland_wait_flush_cb(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     /* TODO: Figure out why we need this */
     if(window->frame_counter == 0) {
         return;
@@ -320,6 +336,52 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+// --- wl_output listener callbacks ---
+static void output_geometry(void * data, struct wl_output * output, int32_t x, int32_t y, int32_t physical_width,
+                            int32_t physical_height,
+                            int32_t subpixel, const char * make, const char * model, int32_t transform)
+{
+    LV_UNUSED(output);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(physical_width);
+    LV_UNUSED(physical_height);
+    LV_UNUSED(subpixel);
+    LV_UNUSED(make);
+    LV_UNUSED(transform);
+
+    struct output_info * info = data;
+    snprintf(info->name, sizeof(info->name), "%s", model);
+}
+
+static void output_mode(void * data, struct wl_output * wl_output, uint32_t flags, int32_t width, int32_t height,
+                        int32_t refresh)
+{
+    LV_UNUSED(wl_output);
+
+    struct output_info * info = data;
+
+    if(flags & WL_OUTPUT_MODE_CURRENT) {
+        info->height = height;
+        info->width = width;
+        info->refresh = refresh;
+        info->flags = flags;
+    }
+}
+
+static void output_done(void * data, struct wl_output * output)
+{
+    /* Called when all geometry/mode info for this output has been sent */
+    LV_UNUSED(data);
+    LV_UNUSED(output);
+}
+
+static void output_scale(void * data, struct wl_output * output, int32_t factor)
+{
+    LV_UNUSED(output);
+    struct output_info * info = data;
+    info->scale = factor;
+}
 
 static uint32_t tick_get_cb(void)
 {
@@ -351,18 +413,20 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         app->wl_seat = wl_registry_bind(app->registry, name, &wl_seat_interface, 1);
         wl_seat_add_listener(app->wl_seat, lv_wayland_seat_get_listener(), app);
     }
-#if LV_WAYLAND_WL_SHELL
-    else if(strcmp(interface, wl_shell_interface.name) == 0) {
-        app->wl_shell = wl_registry_bind(registry, name, &wl_shell_interface, 1);
-    }
-#endif
-#if LV_WAYLAND_XDG_SHELL
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
         /* supporting version 2 of the XDG protocol - ensures greater compatibility */
         app->xdg_wm = wl_registry_bind(app->registry, name, &xdg_wm_base_interface, 2);
         xdg_wm_base_add_listener(app->xdg_wm, lv_wayland_xdg_shell_get_wm_base_listener(), app);
     }
-#endif
+    else if(strcmp(interface, wl_output_interface.name) == 0) {
+        if(app->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
+            memset(&app->outputs[app->wl_output_count], 0, sizeof(struct output_info));
+            struct wl_output * out = wl_registry_bind(registry, name, &wl_output_interface, 1);
+            app->outputs[app->wl_output_count].wl_output = out;
+            wl_output_add_listener(out, &output_listener, &app->outputs[app->wl_output_count].wl_output);
+            app->wl_output_count++;
+        }
+    }
 #if LV_WAYLAND_USE_DMABUF
     else if(strcmp(interface, zwp_linux_dmabuf_v1_interface.name) == 0) {
         lv_wayland_dmabuf_set_interface(&app->dmabuf_ctx, app->registry, name, interface, version);

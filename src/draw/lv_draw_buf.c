@@ -12,6 +12,7 @@
 #include "../core/lv_global.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_area_private.h"
+#include "convert/lv_draw_buf_convert.h"
 
 /*********************
  *      DEFINES
@@ -378,6 +379,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
 
+    if(x >= buf->header.w || y >= buf->header.h) {
+        LV_LOG_ERROR("coordinates out of range, x: %" LV_PRIu32 ", y: %"LV_PRIu32", w: %"LV_PRIu32", h: %"LV_PRIu32, x, y,
+                     (uint32_t)buf->header.w, (uint32_t)buf->header.h);
+        return NULL;
+    }
+
     uint8_t * data = buf->data;
 
     /*Skip palette*/
@@ -472,67 +479,7 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     }
     LV_PROFILER_DRAW_BEGIN;
 
-    /*Premultiply color with alpha, do case by case by judging color format*/
-    lv_color_format_t cf = draw_buf->header.cf;
-    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        int size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
-        lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
-        for(int i = 0; i < size; i++) {
-            lv_color_premultiply(&palette[i]);
-        }
-    }
-    else if(cf == LV_COLOR_FORMAT_ARGB8888) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        for(uint32_t y = 0; y < h; y++) {
-            lv_color32_t * pixel = (lv_color32_t *)line;
-            for(uint32_t x = 0; x < w; x++) {
-                lv_color_premultiply(pixel);
-                pixel++;
-            }
-            line += stride;
-        }
-    }
-    else if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint32_t alpha_stride = stride / 2;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        lv_opa_t * alpha = (lv_opa_t *)(line + stride * h);
-        for(uint32_t y = 0; y < h; y++) {
-            lv_color16_t * pixel = (lv_color16_t *)line;
-            for(uint32_t x = 0; x < w; x++) {
-                lv_color16_premultiply(pixel, alpha[x]);
-                pixel++;
-            }
-            line += stride;
-            alpha += alpha_stride;
-        }
-    }
-    else if(cf == LV_COLOR_FORMAT_ARGB8565) {
-        uint32_t h = draw_buf->header.h;
-        uint32_t w = draw_buf->header.w;
-        uint32_t stride = draw_buf->header.stride;
-        uint8_t * line = (uint8_t *)draw_buf->data;
-        for(uint32_t y = 0; y < h; y++) {
-            uint8_t * pixel = line;
-            for(uint32_t x = 0; x < w; x++) {
-                uint8_t alpha = pixel[2];
-                lv_color16_premultiply((lv_color16_t *)pixel, alpha);
-                pixel += 3;
-            }
-            line += stride;
-        }
-    }
-    else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-        /*Pass*/
-    }
-    else {
-        LV_LOG_WARN("draw buf has no alpha, cf: %d", cf);
-    }
+    lv_draw_buf_convert_premultiply(draw_buf);
 
     draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
 

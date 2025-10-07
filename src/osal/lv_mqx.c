@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
+#include "lv_os_private.h"
 
 #if LV_USE_OS == LV_OS_MQX
 
@@ -167,6 +167,11 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
 uint32_t lv_os_get_idle_percent(void)
 {
     return lv_timer_get_idle();
+}
+
+void lv_sleep_ms(uint32_t ms)
+{
+    _time_delay(ms);
 }
 
 /**********************

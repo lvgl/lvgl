@@ -16,7 +16,7 @@
 
 #include "lv_gltf.h"
 #include "../../../misc/lv_types.h"
-#include "../opengl_shader/lv_opengl_shader_internal.h"
+#include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../widgets/3dtexture/lv_3dtexture_private.h"
 #include "../gltf_data/lv_gltf_data_internal.h"
 
@@ -105,7 +105,7 @@ struct _lv_gltf_t {
     lv_gltf_view_state_t state;
     lv_gltf_view_desc_t desc;
     lv_gltf_view_desc_t last_desc;
-    lv_opengl_shader_manager_t * shader_manager;
+    lv_opengl_shader_manager_t shader_manager;
     lv_gltf_view_env_textures_t env_textures;
     fastgltf::math::fmat4x4 view_matrix;
     fastgltf::math::fmat4x4 projection_matrix;

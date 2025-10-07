@@ -530,6 +530,14 @@ void lv_style_set_image_recolor_opa(lv_style_t * style, lv_opa_t value)
     lv_style_set_prop(style, LV_STYLE_IMAGE_RECOLOR_OPA, v);
 }
 
+void lv_style_set_image_colorkey(lv_style_t * style, const lv_image_colorkey_t * value)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_style_set_prop(style, LV_STYLE_IMAGE_COLORKEY, v);
+}
+
 void lv_style_set_line_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {

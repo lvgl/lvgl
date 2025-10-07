@@ -22,6 +22,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -51,6 +52,11 @@ static int32_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_completed_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
+
+#if LV_USE_OBSERVER
+    static void roller_value_changed_event_cb(lv_event_t * e);
+    static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif /*LV_USE_OBSERVER*/
 
 /**********************
  *  STATIC VARIABLES
@@ -281,26 +287,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
-    lv_obj_t * label = get_label(obj);
-    uint32_t i;
-    uint32_t line        = 0;
-    const char * opt_txt = lv_label_get_text(label);
-    size_t txt_len     = lv_strlen(opt_txt);
-
-    for(i = 0; i < txt_len && line != roller->sel_opt_id; i++) {
-        if(opt_txt[i] == '\n') line++;
-    }
-
-    uint32_t c;
-    for(c = 0; i < txt_len && opt_txt[i] != '\n'; c++, i++) {
-        if(buf_size && c >= buf_size - 1) {
-            LV_LOG_WARN("the buffer was too small");
-            break;
-        }
-        buf[c] = opt_txt[i];
-    }
-
-    buf[c] = '\0';
+    lv_roller_get_option_str(obj, roller->sel_opt_id, buf, buf_size);
 }
 
 /**
@@ -326,6 +313,56 @@ uint32_t lv_roller_get_option_count(const lv_obj_t * obj)
     else {
         return roller->option_cnt;
     }
+}
+
+#if LV_USE_OBSERVER
+
+lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event_cb(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
+    return observer;
+}
+#endif /*LV_USE_OBSERVER*/
+
+lv_result_t lv_roller_get_option_str(const lv_obj_t * obj, uint32_t option, char * buf, uint32_t buf_size)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_obj_t * label = get_label(obj);
+    uint32_t i;
+    uint32_t line        = 0;
+    const char * opt_txt = lv_label_get_text(label);
+    size_t txt_len     = lv_strlen(opt_txt);
+
+    for(i = 0; i < txt_len && line != option; i++) {
+        if(opt_txt[i] == '\n') line++;
+    }
+
+    if(line != option) {
+        return LV_RESULT_INVALID;
+    }
+
+    uint32_t c;
+    for(c = 0; i < txt_len && opt_txt[i] != '\n'; c++, i++) {
+        if(buf_size && c >= buf_size - 1) {
+            LV_LOG_WARN("the buffer was too small");
+            break;
+        }
+        buf[c] = opt_txt[i];
+    }
+
+    buf[c] = '\0';
+    return LV_RESULT_OK;
 }
 
 /**********************
@@ -914,5 +951,25 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     scale_y = 256 * 256 / scale_y;
     lv_point_transform(vect, -angle, scale_x, scale_y, &pivot, false);
 }
+
+#if LV_USE_OBSERVER
+
+static void roller_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * roller = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    lv_subject_set_int(subject, lv_roller_get_selected(roller));
+}
+
+static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
+        lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
+    }
+}
+
+#endif /*LV_USE_OBSERVER*/
+
 
 #endif

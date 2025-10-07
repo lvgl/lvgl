@@ -108,6 +108,8 @@ to set text alignment.
 Modes
 -----
 
+**DEPRECATED**, set the width to ``LV_SIZE_CONTENT`` or fixed value to control expanding/wrapping.
+
 A Spangroup can be set to one the following modes:
 
 - :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes its size.
@@ -134,8 +136,8 @@ First line indent
 
 Use :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
 first line. All modes support pixel units. In addition, :cpp:enumerator:`LV_SPAN_MODE_FIXED`
-and :cpp:enumerator:`LV_SPAN_MODE_BREAK` modes support :ref:`percentage units <coord_units>`
-as well.
+and :cpp:enumerator:`LV_SPAN_MODE_BREAK` modes support percentage units as well
+(e.g. ``lv_pct(10)``).
 
 
 Lines
@@ -146,6 +148,20 @@ of lines to be displayed in :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode. A negativ
 value indicates no limit.
 
 
+Data binding
+------------
+
+To get familiar with observers, subjects, and data bindings in general, visit the
+:ref:`Observer <observer_how_to_use>` page.
+
+Very similar to Label-text binding, a Span's text can be bound to a subject as well.
+
+The only difference is that in the bind function both the Spangroup and the Span need to be specified:
+
+:cpp:expr:`lv_spangroup_bind_span_text(spangroup, span1, &subject, format_string)`
+
+Note that before calling :cpp:expr:`lv_spangroup_delete_span`, :cpp:expr:`lv_observer_remove`
+needs to be called manually as LVGL can't remove the binding automatically.
 
 .. _lv_spangroup_events:
 

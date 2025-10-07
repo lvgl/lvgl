@@ -5,12 +5,12 @@ Example
 
 <widget>
     <api>
-        <enumdef name="lv_switch_orientation" help="">
-            <enum name="auto" help=""/>
-            <enum name="horizontal" help=""/>
-            <enum name="vertical" help=""/>
+        <enumdef name="lv_switch_orientation" help="Switch orientation">
+            <enum name="auto" help="Choose based on widget size"/>
+            <enum name="horizontal" help="Horizontal switch"/>
+            <enum name="vertical" help="Vertical switch"/>
         </enumdef>
 
-        <prop name="orientation" type="enum:lv_switch_orientation"/>
+        <prop name="orientation" type="enum:lv_switch_orientation" help="Set switch orientation"/>
     </api>
 </widget>

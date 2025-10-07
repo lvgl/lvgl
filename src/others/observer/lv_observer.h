@@ -58,6 +58,8 @@ typedef struct {
     lv_ll_t subs_ll;                     /**< Subscribers */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
+    lv_subject_value_t min_value;        /**< Minimum value for min. int or float*/
+    lv_subject_value_t max_value;        /**< Maximum value for max. int or float*/
     void * user_data;                    /**< Additional parameter, can be used freely by user */
     uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
     uint32_t size                 : 24;  /**< String buffer size or group length */
@@ -104,6 +106,21 @@ int32_t lv_subject_get_int(lv_subject_t * subject);
  */
 int32_t lv_subject_get_previous_int(lv_subject_t * subject);
 
+
+/**
+ * Set a minimum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_int(lv_subject_t * subject, int32_t min_value);
+
+/**
+ * Set a maximum value for an integer subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_int(lv_subject_t * subject, int32_t max_value);
+
 #if LV_USE_FLOAT
 
 /**
@@ -133,6 +150,20 @@ float lv_subject_get_float(lv_subject_t * subject);
  * @return          current value
  */
 float lv_subject_get_previous_float(lv_subject_t * subject);
+
+/**
+ * Set a minimum value for a float subject
+ * @param subject   pointer to Subject
+ * @param min_value the minimum value
+ */
+void lv_subject_set_min_value_float(lv_subject_t * subject, float min_value);
+
+/**
+ * Set a maximum value for a float subject
+ * @param subject   pointer to Subject
+ * @param max_value the maximum value
+ */
+void lv_subject_set_max_value_float(lv_subject_t * subject, float max_value);
 
 #endif /*LV_USE_FLOAT*/
 
@@ -348,11 +379,20 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param subject   pointer to a subject to change
  * @param trigger   the trigger on which the subject should be changed
  * @param step      value to add on trigger
- * @param min       the minimum value
- * @param max       the maximum value
+ * @param rollover  if true and the subject's maximum value is exceeded the minimum value is set,
+ *                  if the minimum value is reached, the maximum value will be set on rollover.
  */
 void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
-                                        int32_t min, int32_t max);
+                                        bool rollover);
+
+/**
+ * Toggle the value of an integer subject on an event. If it was != 0 it will be 0.
+ * If it was 0, it will be 1.
+ * @param obj       pointer to a widget
+ * @param subject   pointer to a subject to toggle
+ * @param trigger   the trigger on which the subject should be changed
+ */
+void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger);
 
 /**
  * Set the value of an integer subject.
@@ -530,100 +570,6 @@ lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, 
  */
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 
-#if LV_USE_LABEL
-/**
- * Bind an integer, string, or pointer Subject to a Label.
- * @param obj       pointer to Label
- * @param subject   pointer to Subject
- * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
- * @return          pointer to newly-created Observer
- * @note            `fmt == NULL` can be used only with string and pointer Subjects.
- * @note            If Subject is a pointer and `fmt == NULL`, pointer must point
- *                  to a `\0` terminated string.
- */
-lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
-#endif
-
-#if LV_USE_SPAN
-
-/**
- * Bind an integer, string, or pointer Subject to a Spangroup's Span.
- * @param obj       pointer to Spangroup
- * @param span      pointer to Span
- * @param subject   pointer to Subject
- * @param fmt       optional printf-like format string with 1 format specifier (e.g. "%d °C")
- *                  or NULL to bind to the value directly.
- * @return          pointer to newly-created Observer
- * @note            `fmt == NULL` can be used only with string and pointer Subjects.
- * @note            If `fmt == NULL` strings and pointers (`\0` terminated string) will be shown
- *                  as text as they are, integers as %d, floats as %0.1f
- */
-lv_observer_t * lv_spangroup_bind_span_text(lv_obj_t * obj, lv_span_t * span, lv_subject_t * subject, const char * fmt);
-
-#endif
-
-#if LV_USE_ARC
-/**
- * Bind an integer subject to an Arc's value.
- * @param obj       pointer to Arc
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_SLIDER
-/**
- * Bind an integer Subject to a Slider's value.
- * @param obj       pointer to Slider
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_ROLLER
-/**
- * Bind an integer Subject to a Roller's value.
- * @param obj       pointer to Roller
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_DROPDOWN
-/**
- * Bind an integer Subject to a Dropdown's value.
- * @param obj       pointer to Dropdown
- * @param subject   pointer to Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
-#if LV_USE_SCALE
-
-/**
- * Bind an integer subject to a scales section minimum value
- * @param obj       pointer to a Scale
- * @param section   pointer to a Scale section
- * @param subject   pointer to a Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_scale_bind_section_min_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
-
-/**
- * Bind an integer subject to a scales section maximum value
- * @param obj       pointer to an Scale
- * @param section   pointer to a Scale section
- * @param subject   pointer to a Subject
- * @return          pointer to newly-created Observer
- */
-lv_observer_t * lv_scale_bind_section_max_value(lv_obj_t * obj, lv_scale_section_t * section, lv_subject_t * subject);
-
-#endif
 
 /**********************
  *      MACROS

@@ -51,13 +51,13 @@ You need to implement two platform-dependent functions:
 .. code-block:: c
 
 	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
-	int32_t my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
+	void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
 	{
 		...
 	}
 
 	/* Send large array of pixel data to the LCD. If necessary, this function has to do the byte-swapping. This function can do the transfer in the background. */
-	int32_t my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
 	}
@@ -84,10 +84,6 @@ implement a separate set of callbacks for each display. Also note that the user 
 
 Example
 -------
-
-.. note::
-	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
-
 
 .. code-block:: c
 

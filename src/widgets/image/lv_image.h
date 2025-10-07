@@ -25,6 +25,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_fs.h"
 #include "../../draw/lv_draw.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES
@@ -50,11 +51,11 @@ typedef enum {
     LV_IMAGE_ALIGN_LEFT_MID,
     LV_IMAGE_ALIGN_RIGHT_MID,
     LV_IMAGE_ALIGN_CENTER,
-    LV_IMAGE_ALIGN_AUTO_TRANSFORM,
-    LV_IMAGE_ALIGN_STRETCH, /* Set X and Y scale to fill the Widget's area. */
-    LV_IMAGE_ALIGN_TILE,    /* Tile image to fill Widget's area. Offset is applied to shift the tiling. */
-    LV_IMAGE_ALIGN_CONTAIN, /* The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area. */
-    LV_IMAGE_ALIGN_COVER,   /* The image keeps its aspect ratio and fills the Widget's area. */
+    _LV_IMAGE_ALIGN_AUTO_TRANSFORM, /**< Marks the start of modes that transform the image*/
+    LV_IMAGE_ALIGN_STRETCH, /**< Set X and Y scale to fill the Widget's area. */
+    LV_IMAGE_ALIGN_TILE,    /**< Tile image to fill Widget's area. Offset is applied to shift the tiling. */
+    LV_IMAGE_ALIGN_CONTAIN, /**< The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area. */
+    LV_IMAGE_ALIGN_COVER,   /**< The image keeps its aspect ratio and fills the Widget's area. */
 } lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
@@ -337,6 +338,17 @@ lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
  * @return          an lv_image_dsc_t bitmap mask source.
  */
 const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
+
+
+#if LV_USE_OBSERVER
+/**
+ * Bind a pointer Subject to an Image's source.
+ * @param obj       pointer to Image
+ * @param subject   pointer to Subject
+ * @return          pointer to newly-created Observer
+ */
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
 /**********************
  *      MACROS

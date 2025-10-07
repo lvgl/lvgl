@@ -28,10 +28,11 @@
 body {
   --font-stack: "Inter", sans-serif;
   --font-stack--monospace: "Geist Mono", monospace;
+  font-variant-ligatures: none;
   --sidebar-item-font-size: 0.875rem;
   --sidebar-item-spacing-horizontal: 0.75rem;
   --sidebar-item-spacing-vertical: 0.5rem;
-  --toc-font-size: 0.75rem;
+  --toc-font-size: 0.8125rem;
   --icon-search: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="4.25" stroke="%230E0E0E" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="%230E0E0E" stroke-width="1.5" stroke-linecap="round"/></svg>');
   --sidebar-search-icon-size: 1.25rem;
   --sidebar-item-spacing-horizontal: 0.5rem;
@@ -45,14 +46,14 @@ body {
   --color-link--visited--hover: var(--color-accent);
   --color-link-underline--hover: var(--color-accent);
   --color-background-border: var(--color-border-primary) !important;
-  --color-sidebar-link-text--top-level: var(--color-text-tertiary);
+  --color-sidebar-link-text--top-level: var(--color-text-primary);
   --color-sidebar-item-background--hover: var(--color-background-primary);
   --color-sidebar-item-expander-background--hover: rgba(var(--color-background-base-rgb), 0.04);
-  --color-toc-item-text: var(--color-text-tertiary);
+  --color-toc-item-text: var(--color-text-primary);
   --color-toc-item-text--active: var(--color-text-base);
   --color-sidebar-background: var(--color-background-primary);
   --color-sidebar-background-border: var(--color-border-primary);
-  --color-content-foreground: var(--color-text-secondary);
+  --color-content-foreground: var(--color-text-base);
   --color-sidebar-item-background--current: transparent;
   --color-sidebar-item-background--hover: rgba(var(--color-accent-rgb), 0.16);
 }
@@ -143,7 +144,7 @@ h3,
 h4 {
   transition: background-color 0.15s ease-in-out;
   color: var(--color-text-base);
-  font-weight: 800;
+  font-weight: 650;
   letter-spacing: -0.02em;
 }
 
@@ -415,7 +416,7 @@ code.literal + sub {
 }
 
 .toc-tree li.scroll-current > .reference {
-  font-weight: 600;
+  font-weight: 550;
 }
 
 .toc-tree li a:hover {
@@ -450,7 +451,7 @@ code.literal + sub {
   display: inline-block;
   overflow: hidden;
   text-indent: -0.85ch;
-  font-weight: 800;
+  font-weight: 550;
   text-decoration: none;
   vertical-align: top;
   padding-right: 0.25ch;
@@ -466,7 +467,7 @@ code.literal + sub {
 }
 
 .admonition-title {
-  font-weight: 600;
+  font-weight: 550;
   color: var(--color-text-base);
 }
 
@@ -515,7 +516,7 @@ code.literal + sub {
 }
 
 #furo-main-content .toctree-l1 > a {
-  font-weight: 800;
+  font-weight: 650;
   font-size: 1.25rem;
   line-height: 1.25;
 }
@@ -546,7 +547,7 @@ code.literal + sub {
 
 #furo-main-content .toctree-landing-page .toctree-l1 > a {
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 550;
 }
 
 #furo-main-content .toctree-landing-page .toctree-l1 + .toctree-l1 {
@@ -619,7 +620,7 @@ code.literal + sub {
 
 #furo-main-content dt {
   color: var(--color-text-base);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 #furo-main-content dl[class]:not(.option-list):not(.field-list):not(.glossary):not(.simple) dd {
@@ -672,7 +673,7 @@ table.docutils {
 }
 
 table.docutils th {
-  font-weight: 600;
+  font-weight: 550;
   color: var(--color-text-base);
   background-color: var(--color-background-secondary);
   font-size: 0.625rem;
@@ -770,7 +771,7 @@ table.docutils th p {
   display: inline-block;
   vertical-align: top;
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 550;
   text-decoration: none;
   color: var(--color-text-on-accent);
   background-color: var(--color-accent);
@@ -961,9 +962,8 @@ table.docutils th p {
 }
 
 /*-------------------------------------------------------------------------
- * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
- *-------------------------------------------------------------------------
- */
+ * API Pages
+ *-------------------------------------------------------------------------*/
 .lv-api-expansion-button {
   padding: 4px;
 }
@@ -1084,7 +1084,7 @@ dl.field-list {
 }
 
 dl.field-list > dt {
-  font-weight: 600;
+  font-weight: 550;
   word-break: break-word;
   margin-top: 0.5em;
   margin-right: 1em;
@@ -1110,8 +1110,15 @@ figure figcaption .caption-text {
   font-size: 0.8rem;
 }
 
-article figure {
+/* Whitespace below figures and images... */
+article figure,
+article img {
   margin-bottom: 2rem;
+}
+
+/* ...except when the image is part of a figure. */
+article figure img {
+  margin-bottom: 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -1125,21 +1132,20 @@ body[data-theme="dark"] .highlight .p {
 /*-------------------------------------------------------------------------
  * Glossary
  *-------------------------------------------------------------------------*/
-
 .glossary {
   display: flex;
   flex-direction: column;
   margin-top: 4rem;
 }
 
-.glossary > .dt {
+.glossary > dt {
   font-weight: 800 !important;
   font-size: 1.25rem;
   line-height: 1.25;
   margin-top: 0;
 }
 
-.glossary > .dt:first-child {
+.glossary > dt:first-child {
   margin-top: 2rem;
 }
 

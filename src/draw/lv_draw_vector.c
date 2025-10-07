@@ -12,8 +12,8 @@
 
 #if LV_USE_VECTOR_GRAPHIC
 
-#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE)
-    #error "LV_USE_VECTOR_GRAPHIC requires either (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE"
+#if !((LV_USE_DRAW_SW && LV_USE_THORVG) || LV_USE_DRAW_VG_LITE || (LV_USE_NEMA_GFX && LV_USE_NEMA_VG))
+    #error "LV_USE_VECTOR_GRAPHIC requires (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or (LV_USE_NEMA_GFX and LV_USE_NEMA_VG)"
 #endif
 
 #include "../misc/lv_ll.h"
@@ -54,16 +54,11 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_vector_path_t * path;
-    lv_vector_draw_dsc_t dsc;
-} lv_vector_draw_task;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_t * src)
+static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_t * src)
 {
     lv_memcpy(&(dst->fill_dsc), &(src->fill_dsc), sizeof(lv_vector_fill_dsc_t));
 
@@ -82,6 +77,8 @@ static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_
     lv_memcpy(&(dst->matrix), &(src->matrix), sizeof(lv_matrix_t));
     lv_area_copy(&(dst->scissor_area), &(src->scissor_area));
 }
+
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -390,12 +387,9 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
     area->y2 = lroundf(y2);
 }
 
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
+void lv_vector_path_append_rectangle(lv_vector_path_t * path, float x, float y, float w, float h, float rx, float ry)
 {
-    float x = rect->x1;
-    float y = rect->y1;
-    float w = (float)lv_area_get_width(rect);
-    float h = (float)lv_area_get_height(rect);
+    if(w <= 0.0f || h <= 0.0f) return;
 
     float hw = w * 0.5f;
     float hh = h * 0.5f;
@@ -403,7 +397,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
     if(rx > hw) rx = hw;
     if(ry > hh) ry = hh;
 
-    if(rx == 0 && ry == 0) {
+    if(rx <= 0.0f && ry <= 0.0f) {
         lv_fpoint_t pt = {x, y};
         lv_vector_path_move_to(path, &pt);
         pt.x += w;
@@ -413,69 +407,72 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
         pt.x -= w;
         lv_vector_path_line_to(path, &pt);
         lv_vector_path_close(path);
+        return;
     }
-    else if(rx == hw && ry == hh) {
-        lv_fpoint_t pt = {x + w * 0.5f, y + h * 0.5f};
+
+    if(rx == hw && ry == hh) {
+        lv_fpoint_t pt = {x + hw, y + hh};
         lv_vector_path_append_circle(path, &pt, rx, ry);
+        return;
     }
-    else {
-        float hrx = rx * 0.5f;
-        float hry = ry * 0.5f;
-        lv_fpoint_t pt, pt2, pt3;
 
-        pt.x = x + rx;
-        pt.y = y;
-        lv_vector_path_move_to(path, &pt);
+    float hrx = rx * 0.5f;
+    float hry = ry * 0.5f;
+    lv_fpoint_t pt, pt2, pt3;
 
-        pt.x = x + w - rx;
-        pt.y = y;
-        lv_vector_path_line_to(path, &pt);
+    pt.x = x + rx;
+    pt.y = y;
+    lv_vector_path_move_to(path, &pt);
 
-        pt.x = x + w - rx + hrx;
-        pt.y = y;
-        pt2.x = x + w;
-        pt2.y = y + ry - hry;
-        pt3.x = x + w;
-        pt3.y = y + ry;
-        lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
+    pt.x = x + w - rx;
+    pt.y = y;
+    lv_vector_path_line_to(path, &pt);
 
-        pt.x = x + w;
-        pt.y = y + h - ry;
-        lv_vector_path_line_to(path, &pt);
+    pt.x = x + w - rx + hrx;
+    pt.y = y;
+    pt2.x = x + w;
+    pt2.y = y + ry - hry;
+    pt3.x = x + w;
+    pt3.y = y + ry;
+    lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
 
-        pt.x = x + w;
-        pt.y = y + h - ry + hry;
-        pt2.x = x + w - rx + hrx;
-        pt2.y = y + h;
-        pt3.x = x + w - rx;
-        pt3.y = y + h;
-        lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
+    pt.x = x + w;
+    pt.y = y + h - ry;
+    lv_vector_path_line_to(path, &pt);
 
-        pt.x = x + rx;
-        pt.y = y + h;
-        lv_vector_path_line_to(path, &pt);
+    pt.x = x + w;
+    pt.y = y + h - ry + hry;
+    pt2.x = x + w - rx + hrx;
+    pt2.y = y + h;
+    pt3.x = x + w - rx;
+    pt3.y = y + h;
+    lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
 
-        pt.x = x + rx - hrx;
-        pt.y = y + h;
-        pt2.x = x;
-        pt2.y = y + h - ry + hry;
-        pt3.x = x;
-        pt3.y = y + h - ry;
-        lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
+    pt.x = x + rx;
+    pt.y = y + h;
+    lv_vector_path_line_to(path, &pt);
 
-        pt.x = x;
-        pt.y = y + ry;
-        lv_vector_path_line_to(path, &pt);
+    pt.x = x + rx - hrx;
+    pt.y = y + h;
+    pt2.x = x;
+    pt2.y = y + h - ry + hry;
+    pt3.x = x;
+    pt3.y = y + h - ry;
+    lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
 
-        pt.x = x;
-        pt.y = y + ry - hry;
-        pt2.x = x + rx - hrx;
-        pt2.y = y;
-        pt3.x = x + rx;
-        pt3.y = y;
-        lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
-        lv_vector_path_close(path);
-    }
+    pt.x = x;
+    pt.y = y + ry;
+    lv_vector_path_line_to(path, &pt);
+
+    pt.x = x;
+    pt.y = y + ry - hry;
+    pt2.x = x + rx - hrx;
+    pt2.y = y;
+    pt3.x = x + rx;
+    pt3.y = y;
+    lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
+
+    lv_vector_path_close(path);
 }
 
 void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry)
@@ -627,22 +624,33 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
 
 /* draw dsc functions */
 
-lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
+lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
 {
-    lv_vector_dsc_t * dsc = lv_malloc(sizeof(lv_vector_dsc_t));
+
+    lv_draw_vector_dsc_t * dsc = lv_zalloc(sizeof(lv_draw_vector_dsc_t));
     LV_ASSERT_MALLOC(dsc);
-    lv_memzero(dsc, sizeof(lv_vector_dsc_t));
+    if(dsc == NULL) {
+        LV_LOG_WARN("Couldn't allocate lv_draw_vector_dsc_t");
+        return NULL;
+    }
 
-    dsc->layer = layer;
+    dsc->base.layer = layer;
 
-    lv_vector_fill_dsc_t * fill_dsc = &(dsc->current_dsc.fill_dsc);
+    dsc->ctx = lv_zalloc(sizeof(lv_vector_path_ctx_t));
+    if(dsc->ctx == NULL) {
+        LV_LOG_WARN("Couldn't allocate vector path context");
+        lv_free(dsc);
+        return NULL;
+    }
+
+    lv_vector_fill_dsc_t * fill_dsc = &(dsc->ctx->fill_dsc);
     fill_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
     fill_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
     fill_dsc->opa = LV_OPA_COVER;
     fill_dsc->fill_rule = LV_VECTOR_FILL_NONZERO;
     lv_matrix_identity(&(fill_dsc->matrix)); /*identity matrix*/
 
-    lv_vector_stroke_dsc_t * stroke_dsc = &(dsc->current_dsc.stroke_dsc);
+    lv_vector_stroke_dsc_t * stroke_dsc = &(dsc->ctx->stroke_dsc);
     stroke_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
     stroke_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
     stroke_dsc->opa = LV_OPA_0; /*default no stroke*/
@@ -652,138 +660,139 @@ lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
     stroke_dsc->miter_limit = 4.0f;
     lv_matrix_identity(&(stroke_dsc->matrix)); /*identity matrix*/
 
-    dsc->current_dsc.blend_mode = LV_VECTOR_BLEND_SRC_OVER;
-    dsc->current_dsc.scissor_area = layer->_clip_area;
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
-    dsc->tasks.task_list = NULL;
+    dsc->ctx->blend_mode = LV_VECTOR_BLEND_SRC_OVER;
+    dsc->ctx->scissor_area = layer->_clip_area;
+    lv_matrix_identity(&(dsc->ctx->matrix)); /*identity matrix*/
+    dsc->task_list = NULL;
     return dsc;
 }
 
-void lv_vector_dsc_delete(lv_vector_dsc_t * dsc)
+void lv_draw_vector_dsc_delete(lv_draw_vector_dsc_t * dsc)
 {
-    if(dsc->tasks.task_list) {
-        lv_ll_t * task_list = dsc->tasks.task_list;
+    if(dsc->task_list) {
+        lv_ll_t * task_list = dsc->task_list;
         lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
-        dsc->tasks.task_list = NULL;
+        dsc->task_list = NULL;
     }
-    lv_array_deinit(&(dsc->current_dsc.stroke_dsc.dash_pattern));
+    lv_array_deinit(&(dsc->ctx->stroke_dsc.dash_pattern));
+    lv_free(dsc->ctx);
     lv_free(dsc);
 }
 
-void lv_vector_dsc_set_blend_mode(lv_vector_dsc_t * dsc, lv_vector_blend_t blend)
+void lv_draw_vector_dsc_set_blend_mode(lv_draw_vector_dsc_t * dsc, lv_vector_blend_t blend)
 {
-    dsc->current_dsc.blend_mode = blend;
+    dsc->ctx->blend_mode = blend;
 }
 
-void lv_vector_dsc_set_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
+void lv_draw_vector_dsc_set_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
-    lv_memcpy(&(dsc->current_dsc.matrix), matrix, sizeof(lv_matrix_t));
+    lv_memcpy(&(dsc->ctx->matrix), matrix, sizeof(lv_matrix_t));
 }
 
-void lv_vector_dsc_set_fill_color(lv_vector_dsc_t * dsc, lv_color_t color)
+void lv_draw_vector_dsc_set_fill_color(lv_draw_vector_dsc_t * dsc, lv_color_t color)
 {
-    dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
-    dsc->current_dsc.fill_dsc.color = lv_color_to_32(color, 0xFF);
+    dsc->ctx->fill_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
+    dsc->ctx->fill_dsc.color = lv_color_to_32(color, 0xFF);
 }
 
-void lv_vector_dsc_set_fill_color32(lv_vector_dsc_t * dsc, lv_color32_t color)
+void lv_draw_vector_dsc_set_fill_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color)
 {
-    dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
-    dsc->current_dsc.fill_dsc.color = color;
+    dsc->ctx->fill_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
+    dsc->ctx->fill_dsc.color = color;
 }
 
-void lv_vector_dsc_set_fill_opa(lv_vector_dsc_t * dsc, lv_opa_t opa)
+void lv_draw_vector_dsc_set_fill_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa)
 {
-    dsc->current_dsc.fill_dsc.opa = opa;
+    dsc->ctx->fill_dsc.opa = opa;
 }
 
-void lv_vector_dsc_set_fill_rule(lv_vector_dsc_t * dsc, lv_vector_fill_t rule)
+void lv_draw_vector_dsc_set_fill_rule(lv_draw_vector_dsc_t * dsc, lv_vector_fill_t rule)
 {
-    dsc->current_dsc.fill_dsc.fill_rule = rule;
+    dsc->ctx->fill_dsc.fill_rule = rule;
 }
 
-void lv_vector_dsc_set_fill_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units)
+void lv_draw_vector_dsc_set_fill_units(lv_draw_vector_dsc_t * dsc, const lv_vector_fill_units_t units)
 {
-    dsc->current_dsc.fill_dsc.fill_units = units;
+    dsc->ctx->fill_dsc.fill_units = units;
 }
 
-void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc)
+void lv_draw_vector_dsc_set_fill_image(lv_draw_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc)
 {
-    dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_PATTERN;
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.img_dsc), img_dsc, sizeof(lv_draw_image_dsc_t));
+    dsc->ctx->fill_dsc.style = LV_VECTOR_DRAW_STYLE_PATTERN;
+    lv_memcpy(&(dsc->ctx->fill_dsc.img_dsc), img_dsc, sizeof(lv_draw_image_dsc_t));
 }
 
-void lv_vector_dsc_set_fill_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
+void lv_draw_vector_dsc_set_fill_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
 {
-    dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
-    dsc->current_dsc.fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
-    dsc->current_dsc.fill_dsc.gradient.x1 = x1;
-    dsc->current_dsc.fill_dsc.gradient.y1 = y1;
-    dsc->current_dsc.fill_dsc.gradient.x2 = x2;
-    dsc->current_dsc.fill_dsc.gradient.y2 = y2;
+    dsc->ctx->fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
+    dsc->ctx->fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
+    dsc->ctx->fill_dsc.gradient.x1 = x1;
+    dsc->ctx->fill_dsc.gradient.y1 = y1;
+    dsc->ctx->fill_dsc.gradient.x2 = x2;
+    dsc->ctx->fill_dsc.gradient.y2 = y2;
 }
 
-void lv_vector_dsc_set_fill_radial_gradient(lv_vector_dsc_t * dsc, float cx, float cy, float radius)
+void lv_draw_vector_dsc_set_fill_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius)
 {
-    dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
-    dsc->current_dsc.fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
-    dsc->current_dsc.fill_dsc.gradient.cx = cx;
-    dsc->current_dsc.fill_dsc.gradient.cy = cy;
-    dsc->current_dsc.fill_dsc.gradient.cr = radius;
+    dsc->ctx->fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
+    dsc->ctx->fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
+    dsc->ctx->fill_dsc.gradient.cx = cx;
+    dsc->ctx->fill_dsc.gradient.cy = cy;
+    dsc->ctx->fill_dsc.gradient.cr = radius;
 }
 
-void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
+void lv_draw_vector_dsc_set_fill_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
 {
-    dsc->current_dsc.fill_dsc.gradient.spread = spread;
+    dsc->ctx->fill_dsc.gradient.spread = spread;
 }
 
-void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
-                                                 uint16_t count)
+void lv_draw_vector_dsc_set_fill_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
+                                                      uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
         LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
         count = LV_GRADIENT_MAX_STOPS;
     }
 
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
-    dsc->current_dsc.fill_dsc.gradient.stops_count = count;
+    lv_memcpy(&(dsc->ctx->fill_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
+    dsc->ctx->fill_dsc.gradient.stops_count = count;
 }
 
-void lv_vector_dsc_set_fill_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
+void lv_draw_vector_dsc_set_fill_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.matrix), matrix, sizeof(lv_matrix_t));
+    lv_memcpy(&(dsc->ctx->fill_dsc.matrix), matrix, sizeof(lv_matrix_t));
 }
 
-void lv_vector_dsc_set_stroke_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
+void lv_draw_vector_dsc_set_stroke_transform(lv_draw_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
-    lv_memcpy(&(dsc->current_dsc.stroke_dsc.matrix), matrix, sizeof(lv_matrix_t));
+    lv_memcpy(&(dsc->ctx->stroke_dsc.matrix), matrix, sizeof(lv_matrix_t));
 }
 
-void lv_vector_dsc_set_stroke_color32(lv_vector_dsc_t * dsc, lv_color32_t color)
+void lv_draw_vector_dsc_set_stroke_color32(lv_draw_vector_dsc_t * dsc, lv_color32_t color)
 {
-    dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
-    dsc->current_dsc.stroke_dsc.color = color;
+    dsc->ctx->stroke_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
+    dsc->ctx->stroke_dsc.color = color;
 }
 
-void lv_vector_dsc_set_stroke_color(lv_vector_dsc_t * dsc, lv_color_t color)
+void lv_draw_vector_dsc_set_stroke_color(lv_draw_vector_dsc_t * dsc, lv_color_t color)
 {
-    dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
-    dsc->current_dsc.stroke_dsc.color = lv_color_to_32(color, 0xFF);
+    dsc->ctx->stroke_dsc.style = LV_VECTOR_DRAW_STYLE_SOLID;
+    dsc->ctx->stroke_dsc.color = lv_color_to_32(color, 0xFF);
 }
 
-void lv_vector_dsc_set_stroke_opa(lv_vector_dsc_t * dsc, lv_opa_t opa)
+void lv_draw_vector_dsc_set_stroke_opa(lv_draw_vector_dsc_t * dsc, lv_opa_t opa)
 {
-    dsc->current_dsc.stroke_dsc.opa = opa;
+    dsc->ctx->stroke_dsc.opa = opa;
 }
 
-void lv_vector_dsc_set_stroke_width(lv_vector_dsc_t * dsc, float width)
+void lv_draw_vector_dsc_set_stroke_width(lv_draw_vector_dsc_t * dsc, float width)
 {
-    dsc->current_dsc.stroke_dsc.width = width;
+    dsc->ctx->stroke_dsc.width = width;
 }
 
-void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count)
+void lv_draw_vector_dsc_set_stroke_dash(lv_draw_vector_dsc_t * dsc, float * dash_pattern, uint16_t dash_count)
 {
-    lv_array_t * dash_array = &(dsc->current_dsc.stroke_dsc.dash_pattern);
+    lv_array_t * dash_array = &(dsc->ctx->stroke_dsc.dash_pattern);
     if(dash_pattern) {
         lv_array_clear(dash_array);
         if(lv_array_capacity(dash_array) == 0) {
@@ -801,90 +810,90 @@ void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, 
     }
 }
 
-void lv_vector_dsc_set_stroke_cap(lv_vector_dsc_t * dsc, lv_vector_stroke_cap_t cap)
+void lv_draw_vector_dsc_set_stroke_cap(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_cap_t cap)
 {
-    dsc->current_dsc.stroke_dsc.cap = cap;
+    dsc->ctx->stroke_dsc.cap = cap;
 }
 
-void lv_vector_dsc_set_stroke_join(lv_vector_dsc_t * dsc, lv_vector_stroke_join_t join)
+void lv_draw_vector_dsc_set_stroke_join(lv_draw_vector_dsc_t * dsc, lv_vector_stroke_join_t join)
 {
-    dsc->current_dsc.stroke_dsc.join = join;
+    dsc->ctx->stroke_dsc.join = join;
 }
 
-void lv_vector_dsc_set_stroke_miter_limit(lv_vector_dsc_t * dsc, uint16_t miter_limit)
+void lv_draw_vector_dsc_set_stroke_miter_limit(lv_draw_vector_dsc_t * dsc, uint16_t miter_limit)
 {
-    dsc->current_dsc.stroke_dsc.miter_limit = miter_limit;
+    dsc->ctx->stroke_dsc.miter_limit = miter_limit;
 }
 
-void lv_vector_dsc_set_stroke_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
+void lv_draw_vector_dsc_set_stroke_linear_gradient(lv_draw_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
 {
-    dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
-    dsc->current_dsc.stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
-    dsc->current_dsc.stroke_dsc.gradient.x1 = x1;
-    dsc->current_dsc.stroke_dsc.gradient.y1 = y1;
-    dsc->current_dsc.stroke_dsc.gradient.x2 = x2;
-    dsc->current_dsc.stroke_dsc.gradient.y2 = y2;
+    dsc->ctx->stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
+    dsc->ctx->stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
+    dsc->ctx->stroke_dsc.gradient.x1 = x1;
+    dsc->ctx->stroke_dsc.gradient.y1 = y1;
+    dsc->ctx->stroke_dsc.gradient.x2 = x2;
+    dsc->ctx->stroke_dsc.gradient.y2 = y2;
 }
 
-void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, float cx, float cy, float radius)
+void lv_draw_vector_dsc_set_stroke_radial_gradient(lv_draw_vector_dsc_t * dsc, float cx, float cy, float radius)
 {
-    dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
-    dsc->current_dsc.stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
-    dsc->current_dsc.stroke_dsc.gradient.cx = cx;
-    dsc->current_dsc.stroke_dsc.gradient.cy = cy;
-    dsc->current_dsc.stroke_dsc.gradient.cr = radius;
+    dsc->ctx->stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
+    dsc->ctx->stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
+    dsc->ctx->stroke_dsc.gradient.cx = cx;
+    dsc->ctx->stroke_dsc.gradient.cy = cy;
+    dsc->ctx->stroke_dsc.gradient.cr = radius;
 }
 
-void lv_vector_dsc_set_stroke_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
+void lv_draw_vector_dsc_set_stroke_gradient_spread(lv_draw_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
 {
-    dsc->current_dsc.stroke_dsc.gradient.spread = spread;
+    dsc->ctx->stroke_dsc.gradient.spread = spread;
 }
 
-void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
-                                                   uint16_t count)
+void lv_draw_vector_dsc_set_stroke_gradient_color_stops(lv_draw_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
+                                                        uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
         LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
         count = LV_GRADIENT_MAX_STOPS;
     }
 
-    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
-    dsc->current_dsc.stroke_dsc.gradient.stops_count = count;
+    lv_memcpy(&(dsc->ctx->stroke_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
+    dsc->ctx->stroke_dsc.gradient.stops_count = count;
 }
 
 /* draw functions */
-void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
+void lv_draw_vector_dsc_add_path(lv_draw_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
     lv_area_t rect;
-    if(!lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!lv_area_intersect(&rect, &(dsc->base.layer->_clip_area), &(dsc->ctx->scissor_area))) {
         return;
     }
 
-    if(dsc->current_dsc.fill_dsc.opa == 0
-       && dsc->current_dsc.stroke_dsc.opa == 0) {
+    if(dsc->ctx->fill_dsc.opa == 0
+       && dsc->ctx->stroke_dsc.opa == 0) {
         return;
     }
 
-    if(!dsc->tasks.task_list) {
-        dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
-        LV_ASSERT_MALLOC(dsc->tasks.task_list);
-        lv_ll_init(dsc->tasks.task_list, sizeof(lv_vector_draw_task));
+    if(!dsc->task_list) {
+        dsc->task_list = lv_malloc(sizeof(lv_ll_t));
+        LV_ASSERT_MALLOC(dsc->task_list);
+        lv_ll_init(dsc->task_list, sizeof(lv_draw_vector_subtask_t));
     }
 
-    lv_vector_draw_task * new_task = (lv_vector_draw_task *)lv_ll_ins_tail(dsc->tasks.task_list);
-    lv_memset(new_task, 0, sizeof(lv_vector_draw_task));
+    lv_draw_vector_subtask_t * new_task = (lv_draw_vector_subtask_t *)lv_ll_ins_tail(dsc->task_list);
+    lv_memset(new_task, 0, sizeof(lv_draw_vector_subtask_t));
 
     new_task->path = lv_vector_path_create(0);
 
-    _copy_draw_dsc(&(new_task->dsc), &(dsc->current_dsc));
+    _copy_draw_dsc(&(new_task->ctx), dsc->ctx);
     lv_vector_path_copy(new_task->path, path);
-    new_task->dsc.scissor_area = rect;
+    new_task->ctx.scissor_area = rect;
 }
 
-void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
+void lv_draw_vector_dsc_clear_area(lv_draw_vector_dsc_t * dsc, const lv_area_t * rect)
 {
     lv_area_t r;
-    if(!lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!lv_area_intersect(&r, &(dsc->base.layer->_clip_area), &(dsc->ctx->scissor_area))) {
         return;
     }
 
@@ -893,83 +902,89 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
         return;
     }
 
-    if(!dsc->tasks.task_list) {
-        dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
-        LV_ASSERT_MALLOC(dsc->tasks.task_list);
-        lv_ll_init(dsc->tasks.task_list, sizeof(lv_vector_draw_task));
+    if(!dsc->task_list) {
+        dsc->task_list = lv_malloc(sizeof(lv_ll_t));
+        LV_ASSERT_MALLOC(dsc->task_list);
+        lv_ll_init(dsc->task_list, sizeof(lv_draw_vector_subtask_t));
     }
 
-    lv_vector_draw_task * new_task = (lv_vector_draw_task *)lv_ll_ins_tail(dsc->tasks.task_list);
-    lv_memset(new_task, 0, sizeof(lv_vector_draw_task));
+    lv_draw_vector_subtask_t * new_task = (lv_draw_vector_subtask_t *)lv_ll_ins_tail(dsc->task_list);
+    lv_memset(new_task, 0, sizeof(lv_draw_vector_subtask_t));
 
-    new_task->dsc.fill_dsc.color = dsc->current_dsc.fill_dsc.color;
-    new_task->dsc.fill_dsc.opa = dsc->current_dsc.fill_dsc.opa;
-    lv_area_copy(&(new_task->dsc.scissor_area), &final_rect);
+    new_task->ctx.fill_dsc.color = dsc->ctx->fill_dsc.color;
+    new_task->ctx.fill_dsc.opa = dsc->ctx->fill_dsc.opa;
+    lv_area_copy(&(new_task->ctx.scissor_area), &final_rect);
 }
 
-void lv_draw_vector(lv_vector_dsc_t * dsc)
+void lv_draw_vector(lv_draw_vector_dsc_t * dsc)
 {
-    if(!dsc->tasks.task_list) {
+    if(!dsc->task_list) {
         return;
     }
 
-    lv_layer_t * layer = dsc->layer;
+    lv_layer_t * layer = dsc->base.layer;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_TASK_TYPE_VECTOR);
-    lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));
+    lv_memcpy(t->draw_dsc, dsc, sizeof(lv_draw_vector_dsc_t));
     lv_draw_finalize_task_creation(layer, t);
-    dsc->tasks.task_list = NULL;
+    dsc->task_list = NULL;
 }
 
 /* draw dsc transform */
-void lv_vector_dsc_identity(lv_vector_dsc_t * dsc)
+void lv_draw_vector_dsc_identity(lv_draw_vector_dsc_t * dsc)
 {
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
+    lv_matrix_identity(&(dsc->ctx->matrix)); /*identity matrix*/
 }
 
-void lv_vector_dsc_scale(lv_vector_dsc_t * dsc, float scale_x, float scale_y)
+void lv_draw_vector_dsc_scale(lv_draw_vector_dsc_t * dsc, float scale_x, float scale_y)
 {
-    lv_matrix_scale(&(dsc->current_dsc.matrix), scale_x, scale_y);
+    lv_matrix_scale(&(dsc->ctx->matrix), scale_x, scale_y);
 }
 
-void lv_vector_dsc_rotate(lv_vector_dsc_t * dsc, float degree)
+void lv_draw_vector_dsc_rotate(lv_draw_vector_dsc_t * dsc, float degree)
 {
-    lv_matrix_rotate(&(dsc->current_dsc.matrix), degree);
+    lv_matrix_rotate(&(dsc->ctx->matrix), degree);
 }
 
-void lv_vector_dsc_translate(lv_vector_dsc_t * dsc, float tx, float ty)
+void lv_draw_vector_dsc_translate(lv_draw_vector_dsc_t * dsc, float tx, float ty)
 {
-    lv_matrix_translate(&(dsc->current_dsc.matrix), tx, ty);
+    lv_matrix_translate(&(dsc->ctx->matrix), tx, ty);
 }
 
-void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y)
+void lv_draw_vector_dsc_skew(lv_draw_vector_dsc_t * dsc, float skew_x, float skew_y)
 {
-    lv_matrix_skew(&(dsc->current_dsc.matrix), skew_x, skew_y);
+    lv_matrix_skew(&(dsc->ctx->matrix), skew_x, skew_y);
 }
 
 void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
 {
     if(task_list == NULL) return;
 
-    lv_vector_draw_task * task = lv_ll_get_head(task_list);
-    lv_vector_draw_task * next_task = NULL;
+    lv_draw_vector_subtask_t * task = lv_ll_get_head(task_list);
+    lv_draw_vector_subtask_t * next_task = NULL;
 
     while(task != NULL) {
         next_task = lv_ll_get_next(task_list, task);
         lv_ll_remove(task_list, task);
 
         if(cb) {
-            cb(data, task->path, &(task->dsc));
+            cb(data, task->path, &task->ctx);
         }
 
         if(task->path) {
             lv_vector_path_delete(task->path);
         }
-        lv_array_deinit(&(task->dsc.stroke_dsc.dash_pattern));
+        lv_array_deinit(&(task->ctx.stroke_dsc.dash_pattern));
 
         lv_free(task);
         task = next_task;
     }
     lv_free(task_list);
 }
+
+lv_draw_vector_dsc_t * lv_draw_task_get_vector_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_VECTOR ? (lv_draw_vector_dsc_t *)task->draw_dsc : NULL;
+}
+
 #endif /* LV_USE_VECTOR_GRAPHIC */

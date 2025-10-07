@@ -44,7 +44,7 @@ Example
     /* Release the DOM tree */
     lv_svg_node_delete(svg_doc);
 
-`lv_image` also supports SVG images, For example:
+`lv_image` also supports SVG images.  For example:
 
 .. code-block:: c
 

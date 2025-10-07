@@ -35,6 +35,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct SDL_Window;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -42,6 +44,8 @@ extern "C" {
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res);
 
 void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value);
+
+void lv_sdl_window_set_size(lv_display_t * disp, int32_t hor_res, int32_t ver_res);
 
 void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom);
 
@@ -54,6 +58,8 @@ void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int
 void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
 void lv_sdl_quit(void);
+
+struct SDL_Window * lv_sdl_window_get_window(lv_display_t * disp);
 
 /**********************
  *      MACROS

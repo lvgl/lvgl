@@ -78,7 +78,7 @@ lv_indev_t * lv_wayland_pointer_create(void)
 
 lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
@@ -100,7 +100,7 @@ const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
 
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
 
     if(!window || window->closed) {
         return;
@@ -129,9 +129,7 @@ static void pointer_handle_enter(void * data, struct wl_pointer * pointer, uint3
     app->pointer_obj->input.pointer.x = pos_x;
     app->pointer_obj->input.pointer.y = pos_y;
 
-#if LV_WAYLAND_XDG_SHELL
     cursor = lv_wayland_xdg_shell_get_cursor_name(app);
-#endif
 
     if(app->cursor_surface) {
         struct wl_cursor_image * cursor_image = wl_cursor_theme_get_cursor(app->cursor_theme, cursor)->images[0];
@@ -187,11 +185,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * wl_pointer, u
     }
     struct window * window = app->pointer_obj->window;
 
-#if LV_WAYLAND_WL_SHELL
-    lv_wayland_wl_shell_handle_pointer_event(app, serial, button, state);
-#elif LV_WAYLAND_XDG_SHELL
     lv_wayland_xdg_shell_handle_pointer_event(app, serial, button, state);
-#endif
 
     switch(app->pointer_obj->type) {
         case OBJECT_WINDOW:

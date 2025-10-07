@@ -16,6 +16,7 @@
 #include "../../misc/lv_fs.h"
 #include "../../libs/expat/expat.h"
 #include "../../display/lv_display_private.h"
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
@@ -33,6 +34,8 @@ typedef struct {
             int32_t x;
             int32_t y;
         } mouse_pos;
+
+        const char * str;
 
         struct {
             int32_t ms;
@@ -73,6 +76,7 @@ static lv_obj_t * create_cursor(lv_obj_t * parent);
 static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown);
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs);
 static void end_metadata_handler(void * user_data, const char * name);
+static void click_at(int32_t x, int32_t y, int32_t slowdown);
 
 /**********************
  *  STATIC VARIABLES
@@ -99,7 +103,7 @@ lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * re
     test.ref_image_path_prefix = ref_image_path_prefix;
 
     /*Register as a component first to allow creating the view of the test later*/
-    lv_result_t res = lv_xml_component_register_from_data(LV_TEST_NAME, xml_def);
+    lv_result_t res = lv_xml_register_component_from_data(LV_TEST_NAME, xml_def);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Couldn't register the test as a component");
         return LV_RESULT_INVALID;
@@ -182,6 +186,12 @@ void lv_xml_test_unregister(void)
     uint32_t i;
     for(i = 0; i < test.step_cnt; i++) {
         lv_xml_test_step_type_t type = test.steps[i].type;
+        if(type == LV_XML_TEST_STEP_TYPE_CLICK_ON) {
+            lv_free((void *)test.steps[i].param.str);
+        }
+        if(type == LV_XML_TEST_STEP_TYPE_SET_LANGUAGE) {
+            lv_free((void *)test.steps[i].param.str);
+        }
         if(type == LV_XML_TEST_STEP_TYPE_SCREENSHOT_COMPARE) {
             lv_free((void *)test.steps[i].param.screenshot_compare.path);
         }
@@ -302,19 +312,25 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
     if(step->type == LV_XML_TEST_STEP_TYPE_CLICK_AT) {
         int32_t x = step->param.mouse_pos.x;
         int32_t y = step->param.mouse_pos.y;
+        click_at(x, y, slowdown);
+    }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_CLICK_ON) {
+        const char * name = step->param.str;
+        lv_obj_t * obj = lv_obj_find_by_name(lv_screen_active(), name);
+        if(obj == NULL) {
+            LV_LOG_WARN("No widget found by `%s` name", name);
+            return LV_RESULT_INVALID;
+        }
 
-        lv_obj_remove_state(cursor, LV_STATE_PRESSED);
-        lv_test_mouse_release();
-        lv_xml_test_wait(50, slowdown);
-        lv_test_mouse_move_to(x, y);
-        lv_test_mouse_press();
-        lv_obj_set_pos(cursor, x, y);
-        lv_obj_add_state(cursor, LV_STATE_PRESSED);
-        lv_xml_test_wait(100, slowdown);
-        lv_test_mouse_release();
-        lv_xml_test_wait(50, slowdown);
-        lv_obj_remove_state(cursor, LV_STATE_PRESSED);
-        lv_refr_now(NULL);
+        if(lv_obj_is_visible(obj) == false) {
+            LV_LOG_WARN("`%s` is not visible, so can't click on it", name);
+            return LV_RESULT_INVALID;
+        }
+
+        int32_t x = obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
+        int32_t y = obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
+
+        click_at(x, y, slowdown);
     }
     else if(step->type == LV_XML_TEST_STEP_TYPE_PRESS) {
         lv_obj_add_state(cursor, LV_STATE_PRESSED);
@@ -395,6 +411,10 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
             LV_LOG_WARN("Not supported subject type %d", type);
         }
     }
+    else if(step->type == LV_XML_TEST_STEP_TYPE_SET_LANGUAGE) {
+        const char * lang = step->param.str;
+        lv_translation_set_language(lang);
+    }
 
     return res;
 }
@@ -443,6 +463,20 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_AT;
         test.steps[idx].param.mouse_pos.x = lv_xml_atoi(x);
         test.steps[idx].param.mouse_pos.y = lv_xml_atoi(y);
+    }
+    else if(lv_streq(name, "click_on")) {
+        const char * obj_name = lv_xml_get_value_of(attrs, "name");
+        if(obj_name == NULL) {
+            LV_LOG_WARN("No name is set in test step");
+            return;
+        }
+
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_CLICK_ON;
+        test.steps[idx].param.str = lv_strdup(obj_name);
+        LV_ASSERT_MALLOC(test.steps[idx].param.str);
     }
     else if(lv_streq(name, "move_to")) {
         test.step_cnt++;
@@ -534,6 +568,20 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         test.steps[idx].param.subject_compare.subject = subject;
         test.steps[idx].param.subject_compare.value = lv_strdup(value_str);
     }
+    else if(lv_streq(name, "set_language")) {
+        const char * obj_name = lv_xml_get_value_of(attrs, "name");
+        if(obj_name == NULL) {
+            LV_LOG_WARN("No name is set in test step");
+            return;
+        }
+
+        test.step_cnt++;
+        test.steps = lv_realloc(test.steps, sizeof(lv_xml_test_step_t) * test.step_cnt);
+        uint32_t idx = test.step_cnt - 1;
+        test.steps[idx].type = LV_XML_TEST_STEP_TYPE_SET_LANGUAGE;
+        test.steps[idx].param.str = lv_strdup(obj_name);
+        LV_ASSERT_MALLOC(test.steps[idx].param.str);
+    }
 }
 
 static void end_metadata_handler(void * user_data, const char * name)
@@ -545,5 +593,21 @@ static void end_metadata_handler(void * user_data, const char * name)
     }
 }
 
+
+static void click_at(int32_t x, int32_t y, int32_t slowdown)
+{
+    lv_obj_remove_state(cursor, LV_STATE_PRESSED);
+    lv_test_mouse_release();
+    lv_xml_test_wait(50, slowdown);
+    lv_test_mouse_move_to(x, y);
+    lv_test_mouse_press();
+    lv_obj_set_pos(cursor, x, y);
+    lv_obj_add_state(cursor, LV_STATE_PRESSED);
+    lv_xml_test_wait(100, slowdown);
+    lv_test_mouse_release();
+    lv_xml_test_wait(50, slowdown);
+    lv_obj_remove_state(cursor, LV_STATE_PRESSED);
+    lv_refr_now(NULL);
+}
 
 #endif /* LV_USE_XML */

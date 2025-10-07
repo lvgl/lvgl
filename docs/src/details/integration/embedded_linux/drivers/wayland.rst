@@ -71,16 +71,10 @@ Some optional settings depend on whether DMA buffer support is enabled (`LV_WAYL
      - `1` or `0`
      - `0`
 
-   * - `LV_WAYLAND_WL_SHELL` (**Deprecated**)
-     - Optional (`1` or `0`)
-     - Optional (`1` or `0`)
-
-
 Additional notes
 
 * DMABUF support (`LV_WAYLAND_USE_DMABUF`) improves performance and enables more render modes but has specific requirements and restrictions.
 * `LV_WAYLAND_WINDOW_DECORATIONS` is only required for some compositors (e.g., GNOME/Mutter or Weston).
-* `LV_WAYLAND_WL_SHELL` Enables support for the deprecated `wl_shell`. Only useful when the BSP on the target has weston ``9.x``. (**Deprecated** and will be removed in a future release)
 
 Example
 -------
@@ -122,9 +116,31 @@ Handles for input devices of each display can be obtained using
 Fullscreen mode
 ^^^^^^^^^^^^^^^
 
-To programmatically fullscreen the window,
-use the ``lv_wayland_window_set_fullscreen()`` function respectively with ``true``
-or ``false`` for the ``fullscreen`` argument.
+To programmatically fullscreen the window, use the ``lv_wayland_window_set_fullscreen()``
+function respectively with ``true`` or ``false`` for the ``fullscreen`` argument.
+
+Physical display assignment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When using multiple physical displays, you can control which display a fullscreen window
+appears on by assigning it to a specific physical display before entering fullscreen mode.
+
+Use ``lv_wayland_assign_physical_display()`` to assign a window to a particular physical
+display, where the ``display`` parameter specifies the physical display number (typically
+0, 1, 2, etc.):
+
+.. code-block:: c
+
+    /* Assign to physical display 0 and full screen on that display */
+    lv_wayland_assign_physical_display(disp, 0);  
+    lv_wayland_window_set_fullscreen(window, true); 
+
+To remove the physical display assignment and return to default behavior, use
+``lv_wayland_unassign_physical_display()``:
+
+.. code-block:: c
+
+    lv_wayland_unassign_physical_display(disp);
 
 Maximized mode
 ^^^^^^^^^^^^^^

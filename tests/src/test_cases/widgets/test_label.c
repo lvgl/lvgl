@@ -615,6 +615,44 @@ void test_label_max_width(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");
 }
 
+void test_label_dots(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_t * label1 = lv_label_create(cont);
+    lv_obj_t * label2 = lv_label_create(cont);
+    lv_obj_t * label3 = lv_label_create(cont);
+    lv_obj_t * label4 = lv_label_create(cont);
+
+    lv_obj_set_size(label1, 150, 30);
+    lv_obj_set_size(label2, 150, 30);
+    lv_obj_set_size(label3, 150, 30);
+    lv_obj_set_size(label4, 150, 30);
+
+    const char * temp_text = "Some other text";
+
+    lv_label_set_text(label1, long_text);
+    lv_label_set_text(label2, temp_text);
+
+    lv_label_set_text_fmt(label3, "%.*s", (int)strlen(long_text), long_text);
+    lv_label_set_text_fmt(label4, "%.*s", (int)strlen(temp_text), temp_text);
+
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label3, LV_LABEL_LONG_MODE_DOTS);
+    lv_label_set_long_mode(label4, LV_LABEL_LONG_MODE_DOTS);
+
+    /* Setting the text with _fmt when long mode was dots would cause the incorrect text to be displayed */
+    lv_label_set_text(label2, long_text);
+    lv_label_set_text_fmt(label4, "%.*s", (int)strlen(long_text), long_text);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_dots.png");
+}
+
 void test_label_with_recolor_cmd(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -624,6 +662,50 @@ void test_label_with_recolor_cmd(void)
     lv_label_set_recolor(label_recolor, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
+}
+
+void test_label_recolor_with_text_wrap(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    /* Create a label with recolor enabled and text wrapping */
+    lv_obj_t * label_recolor_wrap = lv_label_create(lv_screen_active());
+
+    /* Configure the label similar to the bug report */
+    lv_obj_set_style_text_font(label_recolor_wrap, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_text_color(label_recolor_wrap, lv_color_hex(0x8199f7), 0);
+    lv_obj_set_width(label_recolor_wrap, 300); /* Fixed width to force wrapping */
+    lv_obj_set_style_text_align(label_recolor_wrap, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_long_mode(label_recolor_wrap, LV_LABEL_LONG_MODE_WRAP);
+    lv_label_set_recolor(label_recolor_wrap, true);
+
+    /* Test text with recolor commands that should wrap across multiple lines */
+    const char * test_text_with_recolor =
+        "Before color. #ff0000 This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line# After color.";
+
+    lv_label_set_text(label_recolor_wrap, test_text_with_recolor);
+    lv_obj_align(label_recolor_wrap, LV_ALIGN_TOP_MID, 0, 20);
+
+    /* Create a reference label without recolor for comparison */
+    lv_obj_t * label_no_recolor = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_font(label_no_recolor, &lv_font_montserrat_22, 0);
+    lv_obj_set_style_text_color(label_no_recolor, lv_color_hex(0x8199f7), 0);
+    lv_obj_set_width(label_no_recolor, 300);
+    lv_obj_set_style_text_align(label_no_recolor, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_long_mode(label_no_recolor, LV_LABEL_LONG_MODE_WRAP);
+    lv_label_set_recolor(label_no_recolor, false); /* Disabled for comparison */
+
+    /* Same text but without recolor commands */
+    const char * test_text_without_recolor =
+        "Before color. This is a very long red colored text that should maintain its red color even when it wraps across multiple lines due to the label width being too narrow to contain the entire text on a single line After color.";
+
+    lv_label_set_text(label_no_recolor, test_text_without_recolor);
+    lv_obj_align(label_no_recolor, LV_ALIGN_BOTTOM_MID, 0, -20);
+
+    /* The bug would manifest as improper recolor handling when text wraps */
+    /* This test verifies that recolor commands work correctly with text wrapping */
+    /* No assertion needed - the test passes if no crashes occur during rendering */
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor_2.png");
 }
 
 static void scroll_next_step(lv_obj_t * label1, lv_obj_t * label2, const char * text1, const char * text2, uint32_t idx)
@@ -706,6 +788,66 @@ void test_label_wrap_mode_clip(void)
     char buf[128];
     lv_snprintf(buf, sizeof(buf), "widgets/label_wrap_clip.png");
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+}
+void test_label_translation_tag(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El Tigre");
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
+}
+
+void test_label_setting_text_disables_translation(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+    label = lv_label_create(NULL);
+    lv_label_set_translation_tag(label, "tiger");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text should unbind the translation tag*/
+    lv_label_set_text(label, "Hello world");
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    /* Using set text static should unbind the translation tag*/
+    lv_label_set_text_static(label, "Hello world");
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    /* Using set text fmt should unbind the translation tag*/
+    lv_label_set_text_fmt(label, "Hello world %d", 1);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world 1");
+    lv_label_set_translation_tag(label, "tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
 }
 
 #endif

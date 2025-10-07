@@ -22,6 +22,7 @@ extern "C" {
 #include "lv_xml_translation.h"
 #include "lv_xml_component.h"
 #include "lv_xml_widget.h"
+#include "lv_xml_load.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +42,31 @@ void lv_xml_init(void);
 
 void lv_xml_deinit(void);
 
+/**
+ * Create a UI element from XML.
+ * @param parent    Pointer to the parent
+ * @param name      The name of an already-registered Component or Widget
+ * @param attrs     Pointer to a list of attribute/value pairs to pass.
+ *                  The last two items should be `NULL`.
+ * @return          Pointer to the created UI element
+ * @example         If `name` is "lv_slider" and
+ *                  `attrs` is {"width", "100", "value", "30", NULL, NULL};
+ *                  it's equivalent to `<lv_slider width="100" value="30"/>`
+ * @example         not only components can be created this way but e.g
+ *                  - `name`="lv_chart-series", `attrs`={"color", "0xf00", "axis", "primary_y", NULL, NULL}
+ *                  - `name`="style", `attrs`={"name", "style1", "selector", "pressed|knob", NULL, NULL}
+ *                  - `name`="bind_flag_if_eq",
+ *                    `attrs`={"subject", "subject1", "flag", "hidden", "ref_value", "1", NULL, NULL}
+ */
 void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
+
+/**
+ * Create a Screen from XML.
+ * @param name  The name of an already-registered Screen
+ * @return      Pointer to the created Screen
+ * @note        If required, can be loaded with `lv_screen_load()`.
+ */
+lv_obj_t * lv_xml_create_screen(const char * name);
 
 void * lv_xml_create_in_scope(lv_obj_t * parent, lv_xml_component_scope_t * parent_ctx,
                               lv_xml_component_scope_t * scope,

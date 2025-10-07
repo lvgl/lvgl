@@ -9,23 +9,23 @@ jobs:
     if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           repo-token: ${{ secrets.LVGL_BOT_TOKEN }}
           stale-issue-message: |
             We need some feedback on this issue.
 
-            Now we mark this as "Abandoned" because there was no activity here for 14 days.
+            Now we mark this as "Stale" because there was no activity here for 60 days.
 
-            Remove the "Stale" label or comment else this will be closed in 7 days.
+            Remove the "Stale" label or comment else this will be closed in 14 days.
 
             cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           stale-pr-message: |
             We need some feedback on this pull request.
 
-            Now we mark this as "Abandoned" because there was no activity here for 14 days.
+            Now we mark this as "Stale" because there was no activity here for 60 days.
 
-            Remove the "Abandoned" label or comment else this will be closed in 7 days.
+            Remove the "Stale" label or comment else this will be closed in 14 days.
 
             cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
           close-issue-message: |
@@ -34,8 +34,8 @@ jobs:
             Feel free to comment if you have remarks or ideas on this topic.
 
             cc @kisvegabor, @liamHowatt, @uLipe, @AndreCostaaa
-          days-before-stale: 14
-          days-before-close: 7
+          days-before-stale: 60
+          days-before-close: 14
           exempt-issue-labels: '🔥 Important'
           exempt-pr-labels: '🔥 Important'
           stale-issue-label: '💤 Stale'

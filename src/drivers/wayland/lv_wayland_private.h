@@ -21,12 +21,7 @@ extern "C" {
 #include "lv_wayland_smm.h"
 #include <sys/poll.h>
 #include <wayland-client-protocol.h>
-#if !LV_WAYLAND_WL_SHELL
-#include "wayland_xdg_shell.h"
-#define LV_WAYLAND_XDG_SHELL 1
-#else
-#define LV_WAYLAND_XDG_SHELL 0
-#endif
+#include <wayland_xdg_shell.h>
 
 #if LV_WAYLAND_USE_DMABUF
 #include <sys/mman.h>
@@ -38,6 +33,7 @@ extern "C" {
  *********************/
 
 #define LV_WAYLAND_DEFAULT_CURSOR_NAME "left_ptr"
+#define LV_WAYLAND_MAX_OUTPUTS 8
 
 #define LVGL_DRAW_BUFFER_DIV (8)
 #define DMG_CACHE_CAPACITY (32)
@@ -67,10 +63,8 @@ extern "C" {
 enum object_type {
     OBJECT_TITLEBAR = 0,
     OBJECT_BUTTON_CLOSE,
-#if LV_WAYLAND_XDG_SHELL
     OBJECT_BUTTON_MAXIMIZE,
     OBJECT_BUTTON_MINIMIZE,
-#endif
     OBJECT_BORDER_TOP,
     OBJECT_BORDER_BOTTOM,
     OBJECT_BORDER_LEFT,
@@ -106,6 +100,11 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
+#else
+    struct {
+        lv_point_t point;
+        lv_indev_state_t state;
+    } touch;
 #endif
 };
 
@@ -136,13 +135,23 @@ typedef struct {
     struct buffer * buffers;
     struct zwp_linux_dmabuf_v1 * handler;
     uint32_t format;
+    uint8_t last_used;
 } dmabuf_ctx_t;
 
 typedef struct {
-    lv_draw_buf_t * lv_draw_buf;
     struct wl_shm * handler;
     uint32_t format;
 } shm_ctx_t;
+
+struct output_info {
+    struct wl_output * wl_output;
+    char name[64];
+    int width;
+    int height;
+    int refresh;
+    int scale;
+    int flags;
+};
 
 struct lv_wayland_context {
     struct wl_display * display;
@@ -153,18 +162,14 @@ struct lv_wayland_context {
     struct wl_cursor_theme * cursor_theme;
     struct wl_surface * cursor_surface;
     shm_ctx_t shm_ctx;
+    struct output_info outputs[LV_WAYLAND_MAX_OUTPUTS];
+    uint8_t wl_output_count;
 
 #if LV_WAYLAND_USE_DMABUF
     dmabuf_ctx_t dmabuf_ctx;
 #endif
 
-#if LV_WAYLAND_WL_SHELL
-    struct wl_shell * wl_shell;
-#endif
-
-#if LV_WAYLAND_XDG_SHELL
     struct xdg_wm_base * xdg_wm;
-#endif
 
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
@@ -192,19 +197,16 @@ struct window {
     lv_indev_t * lv_indev_touch;
     lv_indev_t * lv_indev_keyboard;
 
-    lv_wayland_display_close_f_t close_cb;
+    lv_draw_buf_t * lv_draw_buf;
 
+    lv_wayland_display_close_f_t close_cb;
     struct lv_wayland_context * wl_ctx;
 
-#if LV_WAYLAND_WL_SHELL
-    struct wl_shell_surface * wl_shell_surface;
-#endif
-
-#if LV_WAYLAND_XDG_SHELL
+    /* The current physical assigned output */
+    struct wl_output * assigned_output;
     struct xdg_surface * xdg_surface;
     struct xdg_toplevel * xdg_toplevel;
     uint32_t wm_capabilities;
-#endif
 
     struct graphic_object * body;
     struct {
@@ -231,6 +233,7 @@ struct window {
     bool maximized;
     bool fullscreen;
     uint32_t frame_counter;
+    bool is_window_configured;
 
 #if LV_WAYLAND_USE_DMABUF
     /* XDG/DMABUF synchronization fields */
@@ -277,6 +280,7 @@ extern struct lv_wayland_context lv_wl_ctx;
 void lv_wayland_init(void);
 void lv_wayland_deinit(void);
 void lv_wayland_wait_flush_cb(lv_display_t * disp);
+
 /**********************
  *      Window
  **********************/
@@ -300,25 +304,12 @@ void lv_wayland_window_decoration_detach(struct window * window, struct graphic_
  *  Window Management
  **********************/
 
-#if LV_WAYLAND_WL_SHELL
-lv_result_t lv_wayland_wl_shell_create_window(struct lv_wayland_context * app, struct window * window,
-                                              const char * title);
-const struct wl_shell_surface_listener * lv_wayland_wl_shell_get_listener(void);
-void lv_wayland_wl_shell_handle_pointer_event(struct lv_wayland_context * app, uint32_t serial, uint32_t button,
-                                              uint32_t state);
-lv_result_t lv_wayland_wl_shell_set_maximized(struct window * window, bool maximized);
-lv_result_t lv_wayland_wl_shell_set_minimized(struct window * window);
-lv_result_t lv_wayland_wl_shell_set_fullscreen(struct window * window, bool fullscreen);
-lv_result_t lv_wayland_wl_shell_destroy_window(struct window * window);
-void lv_wayland_wl_shell_deinit(void);
-#elif LV_WAYLAND_XDG_SHELL
-
 const struct xdg_surface_listener * lv_wayland_xdg_shell_get_surface_listener(void);
 const struct xdg_toplevel_listener * lv_wayland_xdg_shell_get_toplevel_listener(void);
 const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
 lv_result_t lv_wayland_xdg_shell_set_maximized(struct window * window, bool maximized);
 lv_result_t lv_wayland_xdg_shell_set_minimized(struct window * window);
-lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen);
+lv_result_t lv_wayland_xdg_shell_set_fullscreen(struct window * window, bool fullscreen, struct wl_output * output);
 #if LV_WAYLAND_USE_DMABUF
 void lv_wayland_xdg_shell_ack_configure(struct window * window, uint32_t serial);
 #endif
@@ -332,7 +323,6 @@ void lv_wayland_xdg_shell_handle_pointer_event(struct lv_wayland_context * app, 
 
 const char * lv_wayland_xdg_shell_get_cursor_name(const struct lv_wayland_context * app);
 void lv_wayland_xdg_shell_deinit(void);
-#endif
 
 /**********************
  *      SHM
@@ -343,7 +333,7 @@ void lv_wayland_shm_set_interface(shm_ctx_t * context, struct wl_registry * regi
 
 struct graphic_object * lv_wayland_shm_on_graphical_object_creation(shm_ctx_t * context, struct graphic_object * obj);
 void lv_wayland_shm_on_graphical_object_destruction(shm_ctx_t * context, struct graphic_object * obj);
-lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display);
+lv_result_t lv_wayland_shm_set_draw_buffers(shm_ctx_t * context, lv_display_t * display, struct window * window);
 lv_result_t lv_wayland_shm_create_draw_buffers(shm_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_shm_resize_window(shm_ctx_t * context, struct window * window, int32_t width, int32_t height);
 lv_result_t lv_wayland_shm_is_ready(shm_ctx_t * context);
@@ -370,13 +360,15 @@ lv_result_t lv_wayland_dmabuf_set_draw_buffers(dmabuf_ctx_t * context, lv_displa
 lv_result_t lv_wayland_dmabuf_create_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct window * window, int width, int height);
 lv_result_t lv_wayland_dmabuf_is_ready(dmabuf_ctx_t * context);
-struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
 void destroy_decorators_buf(struct window * window, struct graphic_object * decoration);
 void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct window * window);
 void lv_wayland_dmabuf_initalize_context(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_deinit(dmabuf_ctx_t * context);
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p);
 
+#if LV_WAYLAND_WINDOW_DECORATIONS
+struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphic_object * decoration);
+#endif
 /**********************
  *      SME
  **********************/

@@ -140,6 +140,12 @@ struct _lv_vg_lite_pending_t * lv_vg_lite_grad_ctx_get_pending(struct _lv_vg_lit
     return ctx->pending;
 }
 
+struct _lv_cache_t * lv_vg_lite_grad_ctx_get_cache(struct _lv_vg_lite_grad_ctx_t * ctx)
+{
+    LV_ASSERT_NULL(ctx);
+    return ctx->cache;
+}
+
 bool lv_vg_lite_draw_grad(
     struct _lv_vg_lite_grad_ctx_t * ctx,
     vg_lite_buffer_t * buffer,
@@ -160,13 +166,13 @@ bool lv_vg_lite_draw_grad(
     /* check radial gradient is supported */
     if(grad->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
-            LV_LOG_INFO("radial gradient is not supported");
+            LV_LOG_WARN("radial gradient is not supported");
             return false;
         }
 
         /* check if the radius is valid */
         if(grad->cr <= 0) {
-            LV_LOG_INFO("radius: %f is not valid", grad->cr);
+            LV_LOG_WARN("radius: %f is not valid", grad->cr);
             return false;
         }
     }
@@ -174,7 +180,7 @@ bool lv_vg_lite_draw_grad(
     /* check spread mode is supported */
     if(grad->spread == LV_VECTOR_GRADIENT_SPREAD_REPEAT || grad->spread == LV_VECTOR_GRADIENT_SPREAD_REFLECT) {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_REPEAT_REFLECT)) {
-            LV_LOG_INFO("repeat/reflect spread(%d) is not supported", grad->spread);
+            LV_LOG_WARN("repeat/reflect spread(%d) is not supported", grad->spread);
             return false;
         }
     }
@@ -306,7 +312,6 @@ bool lv_vg_lite_draw_grad_helper(
     lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_grad_stop_t) * grad_dsc->stops_count);
 
     /*convert to spread mode*/
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     switch(grad_dsc->extend) {
         case LV_GRAD_EXTEND_PAD:
             grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
@@ -322,9 +327,6 @@ bool lv_vg_lite_draw_grad_helper(
             grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
             break;
     }
-#else
-    grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
-#endif
 
     switch(grad_dsc->dir) {
         case LV_GRAD_DIR_VER:
@@ -341,7 +343,6 @@ bool lv_vg_lite_draw_grad_helper(
             grad.y2 = area->y1;
             break;
 
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
         case LV_GRAD_DIR_LINEAR: {
                 int32_t w = lv_area_get_width(area);
                 int32_t h = lv_area_get_height(area);
@@ -365,7 +366,6 @@ bool lv_vg_lite_draw_grad_helper(
                 grad.cr = LV_MAX(end_extent_x - grad.cx, end_extent_y - grad.cy);
             }
             break;
-#endif
 
         default:
             LV_LOG_WARN("Unsupported gradient direction: %d", grad_dsc->dir);

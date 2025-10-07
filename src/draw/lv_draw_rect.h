@@ -53,6 +53,8 @@ typedef struct {
     lv_color_t bg_color;        /**< First element of a gradient is a color, so it maps well here*/
     lv_grad_dsc_t bg_grad;
 
+    const lv_image_colorkey_t * bg_image_colorkey;
+
     /*Border*/
     lv_color_t border_color;
     int32_t border_width;
@@ -120,7 +122,7 @@ typedef struct {
     /**Radius, LV_RADIUS_CIRCLE for max. radius */
     int32_t radius;
 
-    /**Color of the the shadow */
+    /**Color of shadow */
     lv_color_t color;
 
     /**Width of the shadow. (radius of the blur)*/
