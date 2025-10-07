@@ -22,6 +22,10 @@ extern "C" {
 #include "lv_os.h"
 #include "../misc/lv_types.h"
 
+#ifdef __linux__
+#include "lv_linux.h"
+#endif
+
 #if LV_USE_OS == LV_OS_NONE
 #include "lv_os_none.h"
 #elif LV_USE_OS == LV_OS_PTHREAD
@@ -71,6 +75,12 @@ void lv_os_init(void);
  * @return the idle percentage since the last call
  */
 uint32_t lv_os_get_idle_percent(void);
+
+#if LV_SYSMON_PROC_IDLE_AVAILABLE
+
+uint32_t lv_os_get_proc_idle_percent(void);
+
+#endif
 
 #if LV_USE_OS != LV_OS_NONE
 

@@ -55,7 +55,6 @@ Basic Usage
 
     #include "lvgl/lvgl.h"
     #include "lvgl/demos/lv_demos.h"
-    #include "lvgl/drivers/drm/lv_linux_drm.h"
 
     int main(void)
     {
@@ -95,6 +94,19 @@ Notes
   If ``-1`` is passed, the DRM driver will try to automatically pick the first available connector.
 - DRM requires proper modesetting. By default, LVGL will select a preferred display mode.
 
+
+In order to avoid hard codding the device card path, you can ask LVGL to find a connected one for you using :cpp:func:`lv_linux_drm_find_device_path`.
+It will return the first connected card it can find.
+
+.. code-block:: c
+
+    lv_display_t * disp = lv_linux_drm_create();
+
+    /* Find the first connected card in /sys/class/drm */
+    char * device = lv_linux_drm_find_device_path();
+    lv_linux_drm_set_file(disp, device, -1);
+    /* Free the path pointer */
+    lv_free(device);
 
 
 Using DRM with GBM
@@ -139,3 +151,116 @@ No special setup is required beyond the basic DRM initialization shown in :ref:`
 
 For a detailed overview of EGL usage and configuration, see :ref:`egl_driver`.
 
+
+Selecting Display Mode
+----------------------
+
+.. note::
+    Custom mode selection is currently only supported when using DRM with EGL 
+    (``LV_LINUX_DRM_USE_EGL`` enabled). When using DRM without EGL, the driver 
+    will always use the preferred display mode.
+
+By default, the DRM driver automatically selects the preferred display mode for the connected display. However, you can customize this behavior by providing a mode selection callback.
+
+Custom Mode Selection
+~~~~~~~~~~~~~~~~~~~~~
+
+To implement custom mode selection logic, define a callback function and register it with :cpp:func:`lv_linux_drm_set_mode_cb`:
+
+.. code-block:: c
+
+    #include "lvgl/lvgl.h"
+
+    /* Custom mode selection callback */
+    size_t my_mode_selector(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
+    {
+        /* Example: Select the first 1920x1080@60Hz mode */
+        for(size_t i = 0; i < mode_count; i++) {
+            int32_t width = lv_linux_drm_mode_get_horizontal_resolution(&modes[i]);
+            int32_t height = lv_linux_drm_mode_get_vertical_resolution(&modes[i]);
+            int32_t refresh = lv_linux_drm_mode_get_refresh_rate(&modes[i]);
+            
+            if(width == 1920 && height == 1080 && refresh == 60) {
+                return i;  /* Return the index of the selected mode */
+            }
+        }
+        
+        /* Fallback: return the first mode */
+        return 0;
+    }
+
+    int main(void)
+    {
+        lv_init();
+        
+        lv_display_t * disp = lv_linux_drm_create();
+        
+        /* Set custom mode selection callback */
+        lv_linux_drm_set_mode_cb(disp, my_mode_selector);
+        
+        lv_linux_drm_set_file(disp, "/dev/dri/card0", -1);
+        
+        /* ... rest of your application ... */
+    }
+
+The callback receives an array of available modes and must return the index of the desired mode.
+
+Mode Information API
+~~~~~~~~~~~~~~~~~~~~
+
+The following functions are available to query mode properties:
+
+- :cpp:func:`lv_linux_drm_mode_get_horizontal_resolution` - Get width in pixels
+- :cpp:func:`lv_linux_drm_mode_get_vertical_resolution` - Get height in pixels
+- :cpp:func:`lv_linux_drm_mode_get_refresh_rate` - Get refresh rate in Hz
+- :cpp:func:`lv_linux_drm_mode_is_preferred` - Check if mode is the display's preferred/native mode
+
+Example: Selecting Preferred Mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: c
+
+    size_t select_preferred_mode(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
+    {
+        /* Find and select the preferred mode */
+        for(size_t i = 0; i < mode_count; i++) {
+            if(lv_linux_drm_mode_is_preferred(&modes[i])) {
+                return i;
+            }
+        }
+        
+        /* If no preferred mode found, return the first mode */
+        return 0;
+    }
+
+Example: Selecting Highest Resolution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: c
+
+    size_t select_highest_resolution(lv_display_t * disp, const lv_linux_drm_mode_t * modes, size_t mode_count)
+    {
+        size_t best_index = 0;
+        int32_t max_pixels = 0;
+        
+        for(size_t i = 0; i < mode_count; i++) {
+            int32_t width = lv_linux_drm_mode_get_horizontal_resolution(&modes[i]);
+            int32_t height = lv_linux_drm_mode_get_vertical_resolution(&modes[i]);
+            int32_t pixels = width * height;
+            
+            if(pixels > max_pixels) {
+                max_pixels = pixels;
+                best_index = i;
+            }
+        }
+        
+        return best_index;
+    }
+
+Notes
+~~~~~
+
+- The mode selection callback is called before the display is initialized.
+- If no callback is set, the driver uses the preferred mode by default.
+- Ensure the callback always returns a valid index (0 to ``mode_count - 1``).
+- To restore default behavior, call :cpp:func:`lv_linux_drm_set_mode_cb` with ``NULL`` as the callback.

@@ -992,7 +992,6 @@ extern "C" {
             case gcFEATURE_BIT_VG_RGBA2_FORMAT:
             case gcFEATURE_BIT_VG_IM_FASTCLAER:
             case gcFEATURE_BIT_VG_GLOBAL_ALPHA:
-            case gcFEATURE_BIT_VG_COLOR_KEY:
             case gcFEATURE_BIT_VG_24BIT:
             case gcFEATURE_BIT_VG_DITHER:
             case gcFEATURE_BIT_VG_USE_DST:

@@ -61,3 +61,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 **AnimatedGIF (GIF decoder library)**
 - Path: src/libs/gif/AnimatedGIF
 - Source: https://github.com/bitbank2/AnimatedGIF
+
+**FrogFS (read-only filesystem)**
+- Path: src/libs/frogfs
+- Source: https://github.com/jkent/frogfs

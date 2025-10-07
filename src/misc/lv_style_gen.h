@@ -79,6 +79,7 @@ void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_image_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_image_recolor(lv_style_t * style, lv_color_t value);
 void lv_style_set_image_recolor_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_image_colorkey(lv_style_t * style, const lv_image_colorkey_t * value);
 void lv_style_set_line_width(lv_style_t * style, int32_t value);
 void lv_style_set_line_dash_width(lv_style_t * style, int32_t value);
 void lv_style_set_line_dash_gap(lv_style_t * style, int32_t value);
@@ -462,6 +463,11 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 #define LV_STYLE_CONST_IMAGE_RECOLOR_OPA(val) \
     { \
         .prop = LV_STYLE_IMAGE_RECOLOR_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_IMAGE_COLORKEY(val) \
+    { \
+        .prop = LV_STYLE_IMAGE_COLORKEY, .value = { .ptr = val } \
     }
 
 #define LV_STYLE_CONST_LINE_WIDTH(val) \

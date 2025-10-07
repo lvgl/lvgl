@@ -38,9 +38,9 @@ void lv_example_xml_1(void)
         "</component>";
 
     /*Register all the custom components*/
-    lv_xml_component_register_from_data("red_button", red_button_xml);
-    lv_xml_component_register_from_data("card", card_xml);
-    lv_xml_component_register_from_data("motor_card", motor_card_xml);
+    lv_xml_register_component_from_data("red_button", red_button_xml);
+    lv_xml_register_component_from_data("card", card_xml);
+    lv_xml_register_component_from_data("motor_card", motor_card_xml);
 
     lv_obj_t * card;
     /*Create a card with the default values*/

@@ -8,6 +8,5 @@ Integration
     :class:    toctree-1-deep
     :maxdepth: 2
 
-    overview
     c_code
     xml

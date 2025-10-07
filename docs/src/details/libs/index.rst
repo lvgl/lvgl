@@ -6,8 +6,7 @@
 
 
 .. toctree::
-    :class:    toctree-1-deep
-    :maxdepth: 1
+    :maxdepth: 2
 
     arduino_esp_littlefs
     arduino_sd
@@ -15,6 +14,7 @@
     bmp
     ffmpeg
     freetype
+    frogfs
     fs
     gif
     gstreamer

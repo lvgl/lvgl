@@ -76,6 +76,13 @@ they are stored in ROM memory, which is always accessible.
     realloc() will be forced every time the length of the string changes.  That
     MCU overhead can be avoided by doing the above.
 
+Set translation tag
+-------------------
+
+When using LVGL's translation module, you can bind a translation tag to a label directly with :cpp:expr:`lv_label_set_translation_tag(label, tag)`.
+After this function is called, future changes to the language will automatically update the label's text to display the corresponding translation
+for that tag in the new language.
+
 .. _lv_label_newline:
 
 Newline

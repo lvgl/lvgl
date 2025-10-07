@@ -108,6 +108,8 @@ to set text alignment.
 Modes
 -----
 
+**DEPRECATED**, set the width to ``LV_SIZE_CONTENT`` or fixed value to control expanding/wrapping.
+
 A Spangroup can be set to one the following modes:
 
 - :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes its size.
@@ -134,8 +136,8 @@ First line indent
 
 Use :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
 first line. All modes support pixel units. In addition, :cpp:enumerator:`LV_SPAN_MODE_FIXED`
-and :cpp:enumerator:`LV_SPAN_MODE_BREAK` modes support :ref:`percentage units <coord_units>`
-as well.
+and :cpp:enumerator:`LV_SPAN_MODE_BREAK` modes support percentage units as well
+(e.g. ``lv_pct(10)``).
 
 
 Lines

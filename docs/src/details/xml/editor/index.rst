@@ -1,14 +1,17 @@
+.. include:: substitutions.txt
 .. _editor:
 
-=========
-UI Editor
-=========
+======
+Editor
+======
+
 
 .. toctree::
-    :class:    toctree-1-deep
     :maxdepth: 2
 
     overview
     install
-    vscode
+    user_interface
     hotkeys
+    license
+

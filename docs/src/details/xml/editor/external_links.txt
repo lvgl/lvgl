@@ -1,0 +1,3 @@
+.. _VSCode Simulator:   https://github.com/lvgl/lv_port_pc_vscode
+.. _Figma:              https://www.figma.com/
+.. _see all plans:      https://pro.lvgl.io/pricing

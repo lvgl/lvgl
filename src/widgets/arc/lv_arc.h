@@ -27,10 +27,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/**
+ * In which direction the indicator should grow.
+ */
 typedef enum {
-    LV_ARC_MODE_NORMAL,
-    LV_ARC_MODE_SYMMETRICAL,
-    LV_ARC_MODE_REVERSE
+    LV_ARC_MODE_NORMAL,      /**< Clock-wise */
+    LV_ARC_MODE_SYMMETRICAL, /**< Left/right from the midpoint */
+    LV_ARC_MODE_REVERSE      /**< Counterclock-wise */
 } lv_arc_mode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arc_class;
@@ -106,7 +110,7 @@ void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_pre
 void lv_arc_set_rotation(lv_obj_t * obj, int32_t rotation);
 
 /**
- * Set the type of arc.
+ * Set in which direction the indicator should grow.
  * @param obj       pointer to arc object
  * @param type      arc's mode
  */

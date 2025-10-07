@@ -38,7 +38,7 @@ typedef struct _lv_xml_style_t {
  * @param scope     add styles here. (Constants should be already added as style properties might use them)
  * @param attrs     list of attribute names and values
  */
-lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char ** attrs);
+lv_result_t lv_xml_register_style(lv_xml_component_scope_t * scope, const char ** attrs);
 
 /**
  * Decompose a string like `"style1:pressed:checked:knob"` to style name and selector
@@ -49,7 +49,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_scope_t * scope, const char *
 const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selector);
 
 /**
- * Find a style by name which was added by `lv_xml_style_register`
+ * Find a style by name which was added by `lv_xml_register_style`
  * @param scope     the default context to search in
  * @param name      the name of the style. Can start with a component name prefix (e.g. `my_button.blue`) to overwrite the ctx
  * @return          the style structure
