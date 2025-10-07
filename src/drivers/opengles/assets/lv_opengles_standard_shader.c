@@ -64,16 +64,16 @@ static const lv_opengl_shader_t src_includes[] = {
 static const char * src_vertex_shader = R"(
     precision mediump float;
     
-    in vec4 position;
-    in vec2 texCoord;
+    attribute vec4 position;
+    attribute vec2 texCoord;
     
-    out vec2 v_TexCoord;
+    varying vec2 v_TexCoord;
     
     uniform mat3 u_VertexTransform;
     
     void main()
     {
-        gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);
+        gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1.0)).xy, position.zw);
         v_TexCoord = texCoord;
     }
 )";
@@ -81,9 +81,7 @@ static const char * src_vertex_shader = R"(
 static const char *src_fragment_shader = R"(
     precision lowp float;
     
-    out vec4 color;
-    
-    in vec2 v_TexCoord;
+    varying vec2 v_TexCoord;
     
     uniform sampler2D u_Texture;
     uniform float u_ColorDepth;
@@ -94,25 +92,24 @@ static const char *src_fragment_shader = R"(
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
     #endif
-
+    
     void main()
     {
         vec4 texColor;
         if (u_IsFill) {
             texColor = vec4(u_FillColor, 1.0);
         } else {
-            //texColor = texture(u_Texture, v_TexCoord);
-            texColor = textureLod(u_Texture, v_TexCoord, 0.0);  // If the vertices have been transformed, and mipmaps have not been generated, some rotation angles (notably 90 and 270) require using textureLod() to mitigate derivative calculation errors from increments flipping direction
+            texColor = texture2D(u_Texture, v_TexCoord);
         }
         if (abs(u_ColorDepth - 8.0) < 0.1) {
             float gray = texColor.r;
-            color = vec4(gray, gray, gray, u_Opa);
+            gl_FragColor = vec4(gray, gray, gray, u_Opa);
         } else {
             float combinedAlpha = texColor.a * u_Opa;
-            color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
+            gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
         }
         #ifdef HSV_ADJUST
-        color.rgb = adjustHSV(color.rgb);
+        gl_FragColor.rgb = adjustHSV(gl_FragColor.rgb);
         #endif
     }
 )";
