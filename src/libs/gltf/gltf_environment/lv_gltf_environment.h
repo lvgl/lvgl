@@ -36,11 +36,17 @@ extern "C" {
 
 /**
  * Create an IBL sampler for processing environment images
- * @param texture_size resolution of each cube map face (recommended: 128-512 for embedded)
  * @return pointer to the created sampler, or NULL on failure
  * @note Can be safely deleted after environments are created
  */
-lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(uint32_t texture_size);
+lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void);
+
+/**
+ * Set the resoultion for each cubemap face
+ * @param pointer to a sampler
+ * @param resolution of each cube map face (recommended: 64-512 for embedded)
+ */
+void lv_gltf_ibl_sampler_set_cube_map_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution);
 
 /**
  * Delete an IBL sampler
@@ -81,3 +87,5 @@ void lv_gltf_environment_delete(lv_gltf_environment_t * environment);
 #endif
 
 #endif /*LV_GLTF_ENVIRONMENT_H*/
+
+

@@ -609,7 +609,7 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
 
 static lv_result_t create_default_environment(lv_gltf_t * gltf)
 {
-    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create(128);
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
     gltf->environment = lv_gltf_environment_create(sampler, NULL);
     lv_gltf_ibl_sampler_delete(sampler);
     if(!gltf->environment) {
