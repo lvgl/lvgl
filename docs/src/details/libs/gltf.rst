@@ -334,7 +334,8 @@ For example, using an HDR image of a forest will make your 3D model appear to be
 Default Behavior
 ~~~~~~~~~~~~~~~~
 
-By default, each glTF viewer automatically creates an environment using an embedded default image with a texture size of 128. This provides good visual quality for most use cases without any setup.
+By default, each glTF viewer automatically creates an environment using an embedded default image with a cube map resolution of 128.
+This provides good visual quality for most use cases without any setup.
 
 Custom Environments
 ~~~~~~~~~~~~~~~~~~~
@@ -344,10 +345,13 @@ For more control over lighting quality, to use custom HDR images, or to share en
 .. code-block:: c
 
     /* Create an IBL sampler with custom resolution */
-    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create(256);
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
+
+    /* Set a custom cube map resolution. Higher resoltuion produce sharper results at a cost of longer setup time */
+    lv_gltf_ibl_sampler_set_cube_map_resolution(256);
     
     /* Create environment from custom HDR/JPEG image (or NULL for default) */
-    lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, "A:path/to/environment.hdr");
+    lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, "/path/to/environment.hdr");
     
     /* Sampler can be deleted after environment creation */
     lv_gltf_ibl_sampler_delete(sampler);
@@ -370,7 +374,7 @@ The same environment can be shared across multiple glTF viewers for consistent l
     lv_obj_t * gltf2 = lv_gltf_create(lv_screen_active());
     
     /* Create shared environment */
-    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create(256);
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
     lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, NULL);
     lv_gltf_ibl_sampler_delete(sampler);
     
@@ -385,9 +389,9 @@ Environment Images
 ~~~~~~~~~~~~~~~~~~
 
 - Use equirectangular (360°) panoramic images in HDR or JPEG format
-- Source images are converted to cube map format at the sampler's ``texture_size`` resolution
-- Higher texture sizes (256-512) provide better quality but use more memory
-- Lower texture sizes (64-128) are suitable for embedded systems
+- Source images are converted to cube map format at the sampler's cube map resolution
+- Higher resolution values (256-512) provide better quality but use more memory
+- Lower resoluton values (64-128) are more suitable for embedded systems
 - Free HDR environment maps are widely available online. Choose environments that match the "look" you want (outdoor, studio, warehouse, etc.)
 
 
@@ -402,9 +406,8 @@ The processing cost is paid once during environment creation.
 Performance Notes
 ~~~~~~~~~~~~~~~~~
 
-- Environment creation processes the source image into cube map data, which may take time with larger texture sizes
-- The texture size determines the resolution of the internal cube map (6 faces × size²)
-- Processing time increases with both source image resolution and texture size
+- Environment creation processes the source image into cube map data, which may take time with larger resolution values
+- Processing time increases with both source image resolution and cube map resolution
 
 
 Multi-Model Support
