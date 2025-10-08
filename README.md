@@ -180,7 +180,8 @@ void main(void)
     lv_display_set_flush_cb(display, my_flush_cb);
 
     /*Create an input device for touch handling*/
-    lv_indev_t * indev = lv_indev_create(LV_INDEV_TYPE_POINTER);
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, my_touch_read_cb);
 
     /*The drivers are in place; now we can create the UI*/
