@@ -48,5 +48,10 @@ cd cmbuild
 emcmake cmake .. -DLV_BUILD_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 emmake make -j$(nproc)
 rm -rf CMakeFiles
-cd ../..
-cp -a emscripten_builder/cmbuild docs/src/_static/built_lv_examples
+cd ..
+if [ "$ARG_1" != "--symlink" ]; then
+  cp -a cmbuild ../docs/src/_static/built_lv_examples
+else
+  cp -a cmbuild lvgl/docs/src/_static/built_lv_examples
+fi
+cd ..
