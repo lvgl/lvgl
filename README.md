@@ -205,6 +205,8 @@ The Online Viewer also contains tutorials to easily learn XML: https://viewer.lv
 
 ### Hello World Button with an Event
 
+<img width="311" height="232" alt="image" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
+
 <details>
   <summary>C code</summary>
 
@@ -242,6 +244,8 @@ static void button_clicked_cb(lv_event_t * e)
 </details>
 
 ### Styled Slider with Data-binding
+
+<img width="314" height="233" alt="image" src="https://github.com/user-attachments/assets/268db1a0-946c-42e2-aee4-9550bdf5f4f9" />
 
 <details>
   <summary>C code</summary>
@@ -285,7 +289,7 @@ lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
 <details>
   <summary>In XML with LVGL Pro</summary>
 
-  ```xml
+```xml
 <screen>
 	<styles>
 		<style name="style_base" bg_opa="100%" bg_color="0xff8800" radius="4" />
@@ -307,6 +311,8 @@ lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
 </details>
 
 ### Checkboxes in a Layout
+
+<img width="311" height="231" alt="image" src="https://github.com/user-attachments/assets/ba9af647-2ea1-4bc8-b53d-c7b43ce24b6e" />
 
 <details>
   <summary>C code</summary>
