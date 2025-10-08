@@ -148,37 +148,37 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
 
    - Enabling LVGL's STDIO file system in the configuration
 
-      You can use ``menuconfig``:
+     You can use ``menuconfig``:
 
-         - ``Component config → LVGL configuration → 3rd Party Libraries``: enable ``File system on top of stdio API``
-         - Then select ``Set an upper cased letter on which the drive will accessible`` and set it to ``65`` (ASCII **A**)
-         - You can also set ``Default driver letter`` to 65 to skip the prefix in file paths.
+        - ``Component config → LVGL configuration → 3rd Party Libraries``: enable ``File system on top of stdio API``
+        - Then select ``Set an upper cased letter on which the drive will accessible`` and set it to ``65`` (ASCII **A**)
+        - You can also set ``Default driver letter`` to 65 to skip the prefix in file paths.
 
    - Modifying the partition table
 
-      The exact configuration depends on your flash size and existing partitions,
-      but the new final result should look something like this:
+     The exact configuration depends on your flash size and existing partitions,
+     but the new final result should look something like this:
 
-      .. csv-table:: Partition Table
+     .. csv-table:: Partition Table
 
-         nvs,      data, nvs,     0x9000,  0x6000
-         phy_init, data, phy,     0xf000,  0x1000
-         factory,  app,  factory, 0x10000, 1400k
-         storage,  data, spiffs,         ,  400k
+        nvs,      data, nvs,     0x9000,  0x6000
+        phy_init, data, phy,     0xf000,  0x1000
+        factory,  app,  factory, 0x10000, 1400k
+        storage,  data, spiffs,         ,  400k
 
 
-      .. note::
+     .. note::
 
-         If you are not using a custom ``partition.csv`` yet, it can be added
-         via ``menuconfig`` (``Partition Table → Partition Table → Custom partition table CSV``).
+        If you are not using a custom ``partition.csv`` yet, it can be added
+        via ``menuconfig`` (``Partition Table → Partition Table → Custom partition table CSV``).
 
    - Apply changes to the build system
 
-      Some ESP file systems provide automatic generation from a host folder using CMake. The proper line(s) must be copied to ``main/CMakeLists.txt``
+     Some ESP file systems provide automatic generation from a host folder using CMake. The proper line(s) must be copied to ``main/CMakeLists.txt``
 
-      .. note::
+     .. note::
 
-         ``LittleFS`` has extra dependencies that should be added to ``main/idf_component.yml``
+        ``LittleFS`` has extra dependencies that should be added to ``main/idf_component.yml``
 
 - **Prepare the image files**
 
