@@ -42,7 +42,7 @@ jobs:
             !${{ env.pythonLocation }}/bin/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
             !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-          key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('lvgl/docs/requirements.txt') }}
       - name: Install Doxygen and Latex dependencies
         run: |
           sudo apt-get update
