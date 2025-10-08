@@ -67,7 +67,13 @@ d2_color  lv_draw_dave2d_lv_colour_to_d2_colour(lv_color_t color)
 d2_s32 lv_draw_dave2d_cf_fb_get(void)
 {
     d2_s32 d2_fb_mode = 0;
-    switch(g_display0_cfg.input->format) {
+    display_in_format_t fb_format;
+#if defined(__ZEPHYR__)
+    fb_format = (display_in_format_t)LV_DISPLAY_INPUT_FORMAT;
+#else
+    fb_format = (display_in_format_t)(g_display0_cfg.input->format);
+#endif
+    switch(fb_format) {
         case    DISPLAY_IN_FORMAT_16BITS_RGB565: ///< RGB565,   16 bits
             d2_fb_mode = d2_mode_rgb565;
             break;
