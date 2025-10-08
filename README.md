@@ -372,7 +372,7 @@ LVGL is an open project, and contributions are very welcome. There are many ways
 For a detailed description of contribution opportunities, visit the Contributing
  section of the documentation.
 
-More than 300 people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂
+More than 600 people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂
 
 <a href="https://github.com/lvgl/lvgl/graphs/contributors"> <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" /> </a>
 
