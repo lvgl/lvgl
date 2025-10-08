@@ -12,7 +12,7 @@ export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
 rm -rf emscripten_builder
 git clone https://github.com/lvgl/lv_sim_emscripten.git emscripten_builder
 cd emscripten_builder
-if [ "$ARG_1" != "--symlink" ]
+if [ "$ARG_1" != "--symlink" ]; then
   REPO_URL="$ARG_1"
   COMMIT_REF="$ARG_2"
   git submodule update --init -- lvgl
@@ -28,7 +28,7 @@ else
   SYMLINK_TARGET="$ARG_2"
   echo "Using provided symbolic link to LVGL directory (should be absolute): $SYMLINK_TARGET"
   rmdir lvgl # remove the uninitialized submodule empty dir
-  symlink -s -T "$SYMLINK_TARGET" lvgl
+  ln -s -T "$SYMLINK_TARGET" lvgl
 fi
 
 cd lvgl
