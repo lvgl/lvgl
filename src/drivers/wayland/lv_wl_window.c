@@ -140,6 +140,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_shm_flush_partial_mode);
 #endif
 
+    lv_display_add_event_cb(window->lv_disp, lv_wayland_event_cb, LV_EVENT_RESOLUTION_CHANGED, window);
+
     /* Register input */
     window->lv_indev_pointer = lv_wayland_pointer_create();
 
@@ -322,22 +324,26 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
         height -= (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
 #endif
+    if(window->lv_disp) {
+        lv_display_set_resolution(window->lv_disp, width, height);
+        window->body->input.pointer.x = LV_MIN((int32_t)window->body->input.pointer.x, (width - 1));
+        window->body->input.pointer.y = LV_MIN((int32_t)window->body->input.pointer.y, (height - 1));
+    }
 
+    /* On the first resize call, the resolution of the display is already set, so there won't be a trigger on the resolution changed event.*/
+    if(!window->is_window_configured) {
 #if LV_WAYLAND_USE_DMABUF
-    {
         lv_result_t err = lv_wayland_dmabuf_resize_window(&window->wl_ctx->dmabuf_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
-    }
 #else
-    {
         lv_result_t err = lv_wayland_shm_resize_window(&window->wl_ctx->shm_ctx, window, width, height);
         if(err != LV_RESULT_OK) {
             return err;
         }
-    }
 #endif
+    }
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     if(!window->wl_ctx->opt_disable_decorations && !window->fullscreen) {
@@ -350,11 +356,6 @@ lv_result_t lv_wayland_window_resize(struct window * window, int width, int heig
     }
 #endif
 
-    if(window->lv_disp) {
-        lv_display_set_resolution(window->lv_disp, width, height);
-        window->body->input.pointer.x = LV_MIN((int32_t)window->body->input.pointer.x, (width - 1));
-        window->body->input.pointer.y = LV_MIN((int32_t)window->body->input.pointer.y, (height - 1));
-    }
     window->width  = width;
     window->height = height;
     return LV_RESULT_OK;

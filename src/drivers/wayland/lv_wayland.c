@@ -347,6 +347,37 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp)
     }
 }
 
+void lv_wayland_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    struct window * window = lv_event_get_user_data(e);
+    lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
+
+    switch(code) {
+        case LV_EVENT_RESOLUTION_CHANGED: {
+                uint32_t rotation = lv_display_get_rotation(window->lv_disp);
+                int width, height;
+                if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+                    width = lv_display_get_vertical_resolution(display);
+                    height = lv_display_get_horizontal_resolution(display);
+                }
+                else {
+                    width = lv_display_get_horizontal_resolution(display);
+                    height = lv_display_get_vertical_resolution(display);
+                }
+#if LV_WAYLAND_USE_DMABUF
+                dmabuf_ctx_t * context = &window->wl_ctx->dmabuf_ctx;
+                lv_wayland_dmabuf_resize_window(context, window, width, height);
+#else
+                lv_wayland_shm_resize_window(&window->wl_ctx->shm_ctx, window, width, height);
+#endif
+                break;
+            }
+        default:
+            return;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
