@@ -5,7 +5,7 @@ NV3007 LCD Controller driver
 Overview
 --------
 
-The `NV3007 <https:/* www.buydisplay.com/download/ic/NV3007.pdf>`__ is a single-chip driver for 262,144-color, a-Si TFT liquid crystal display
+The `NV3007 <https://www.buydisplay.com/download/ic/NV3007.pdf>`__ is a single-chip driver for 262,144-color, a-Si TFT liquid crystal display
 with maximum resolution of 168RGBx428 dots. It contains 252-channel source driver,
 a 24-channel GIP driver which used for dual-gate control, 161,784-byte GRAM for
 graphic display data, internal precise power supply circuit which supports full color,
@@ -14,7 +14,7 @@ NV3007 supports 3-/4-line serial peripheral interface (SPI) ， quad serial
 peripheral interface (QSPI). The display area can be specified in internal GRAM by
 window address function.
 
-The NV3007 LCD controller `driver <https:/* github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https:/* github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
+The NV3007 LCD controller `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
 It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
@@ -161,7 +161,7 @@ Here is a simple example of using the NV3007 display with Arduino framework and 
 	    lv_tick_set_cb(my_tick);
 
 	    /*  Create NV3007 display */
-	    lv_display_t *disp = lv_nv3007_create(142, 428, LV_LCD_FLAG_NONE, send_cmd_cb, send_color_cb);
+	    lv_display_t *disp = lv_nv3007_create(142, 428, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
 		lv_nv3007_set_gap(disp, 0, 14);
 		lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
 		lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
@@ -179,4 +179,4 @@ Here is a simple example of using the NV3007 display with Arduino framework and 
 	    delay(5);
 	}
 
-For additional details and a working example see the `generic MIPI driver documentation <https:/* github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
+For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
