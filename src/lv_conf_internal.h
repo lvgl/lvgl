@@ -4301,8 +4301,15 @@
         #define LV_USE_FT81X         0
     #endif
 #endif
+#ifndef LV_USE_NV3007
+    #ifdef CONFIG_LV_USE_NV3007
+        #define LV_USE_NV3007 CONFIG_LV_USE_NV3007
+    #else
+        #define LV_USE_NV3007        0
+    #endif
+#endif
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #ifndef LV_USE_GENERIC_MIPI
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_GENERIC_MIPI
