@@ -11,7 +11,6 @@ ARG_2="${2:-}"
 export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
 rm -rf emscripten_builder
 git clone https://github.com/lvgl/lv_sim_emscripten.git emscripten_builder
-scripts/genexamplelist.sh > emscripten_builder/examplelist.c
 cd emscripten_builder
 if [ "$ARG_1" != "--symlink" ]
   REPO_URL="$ARG_1"
@@ -31,6 +30,10 @@ else
   rmdir lvgl # remove the uninitialized submodule empty dir
   symlink -s -T "$SYMLINK_TARGET" lvgl
 fi
+
+cd lvgl
+scripts/genexamplelist.sh > ../examplelist.c
+cd ..
 
 # Generate lv_conf
 LV_CONF_PATH=`pwd`/lvgl/configs/ci/docs/lv_conf_docs.h
