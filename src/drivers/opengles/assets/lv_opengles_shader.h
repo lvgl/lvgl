@@ -21,9 +21,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-char *lv_opengles_standard_shader_get_vertex(void);
-char *lv_opengles_standard_shader_get_fragment(void);
-void lv_opengles_standard_shader_get_src(lv_opengl_shader_portions_t *portions);
+char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version);
+char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version);
+void lv_opengles_shader_get_source(lv_opengl_shader_portions_t * portions, lv_opengl_glsl_version version);
+
 
 /**********************
  *      MACROS

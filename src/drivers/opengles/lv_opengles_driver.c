@@ -18,7 +18,7 @@
 #include "../../display/lv_display.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
-#include "assets/lv_opengles_standard_shader.h"
+#include "assets/lv_opengles_shader.h"
 
 /*********************
  *      DEFINES
@@ -51,9 +51,8 @@ static void lv_opengles_index_buffer_deinit(void);
 static unsigned int lv_opengles_index_buffer_get_count(void);
 static void lv_opengles_index_buffer_bind(void);
 static void lv_opengles_index_buffer_unbind(void);
-static void lv_opengles_shader_manager_init(void);
-static unsigned int lv_opengles_shader_program_init(void);
-static void lv_opengles_shader_init(void);
+static unsigned int lv_opengles_shader_manager_init(void);
+static lv_result_t lv_opengles_shader_init(void);
 static void lv_opengles_shader_deinit(void);
 static void lv_opengles_shader_bind(void);
 static void lv_opengles_shader_unbind(void);
@@ -117,7 +116,9 @@ void lv_opengles_init(void)
 
     lv_opengles_index_buffer_init(indices, 6);
 
-    lv_opengles_shader_init();
+    lv_result_t res = lv_opengles_shader_init();
+    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to initialize shaders");
+
     lv_opengles_shader_bind();
 
     /* unbind everything */
@@ -370,32 +371,56 @@ static void lv_opengles_index_buffer_unbind(void)
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-static void lv_opengles_shader_manager_init(void)
+static unsigned int lv_opengles_shader_manager_init(void)
 {
-    lv_opengl_shader_portions_t portions;
-    lv_opengles_standard_shader_get_src(&portions);
-    char * vertex_shader = lv_opengles_standard_shader_get_vertex();
-    char * frag_shader = lv_opengles_standard_shader_get_fragment();
-    lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
-    lv_free(vertex_shader);
-    lv_free(frag_shader);
-}
+    lv_opengl_shader_program_t * program  = NULL;
+    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+        LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
+        lv_opengl_shader_portions_t portions;
+        lv_opengles_shader_get_source(&portions, version);
+        char * vertex_shader = lv_opengles_shader_get_vertex(version);
+        char * frag_shader = lv_opengles_shader_get_fragment(version);
+        lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
+        lv_free(vertex_shader);
+        lv_free(frag_shader);
 
-static unsigned int lv_opengles_shader_program_init(void)
-{
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0);
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0);
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash,
-                                                                                vert_shader_hash);
+        uint32_t frag_shader_hash;
+        uint32_t vert_shader_hash;
+
+        lv_result_t res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0, version,
+                                                                 &frag_shader_hash);
+        if(res != LV_RESULT_OK) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0, version, &vert_shader_hash);
+        if(res != LV_RESULT_OK) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash, vert_shader_hash);
+        if(!program) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
+        break;
+    }
+
+    if(!program) {
+        LV_LOG_ERROR("Failed to initialize shaders");
+        return 0;
+    }
     return lv_opengl_shader_program_get_id(program);
 }
 
-static void lv_opengles_shader_init(void)
+static lv_result_t lv_opengles_shader_init(void)
 {
-    if(shader_id == 0) {
-        lv_opengles_shader_manager_init();
-        shader_id = lv_opengles_shader_program_init();
+    if(shader_id != 0) {
+        return LV_RESULT_OK;
     }
+    shader_id = lv_opengles_shader_manager_init();
+    return shader_id != 0 ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 static void lv_opengles_shader_deinit(void)
