@@ -934,8 +934,8 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     offsets[0] = buf->offset = gbm_bo_get_offset(gbm_bo, 0);
     buf->size = h * buf->pitch;
 
-    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
-                buf->size, buf->pitch, buf->offset, drmGetFormatName(format));
+    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u",
+                buf->size, buf->pitch, buf->offset);
 
     prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
 

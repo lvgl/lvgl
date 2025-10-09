@@ -471,7 +471,8 @@ lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_conf
             return LV_COLOR_FORMAT_RGB888;
         }
     }
-    LV_LOG_INFO("Unhandled color format (RGBA) (%d %d %d %d)", r_bits, g_bits, b_bits, a_bits);
+    LV_LOG_INFO("Unhandled color format (RGBA) (%d %d %d %d)", config->r_bits, config->g_bits, config->b_bits,
+                config->a_bits);
     return LV_COLOR_FORMAT_UNKNOWN;
 }
 
