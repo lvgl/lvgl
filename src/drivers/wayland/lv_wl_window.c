@@ -229,7 +229,7 @@ void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display_num
         return;
     }
 
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
 
     if(!window || window->closed) {
         LV_LOG_ERROR("Invalid window");
