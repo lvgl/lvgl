@@ -424,9 +424,8 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
             id = i;
         }
     }
-    if(id == -1) {
-        return -1;
-    }
+
+    LV_ASSERT_FORMAT_MSG(id > -1, "Uniform location doesn't exist for '%s'. Check `shader_location` array", name);
 
     if(shader_location[id] != 0) {
         return shader_location[id];
