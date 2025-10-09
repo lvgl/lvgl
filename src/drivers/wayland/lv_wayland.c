@@ -10,6 +10,13 @@
 
 #if LV_USE_WAYLAND
 
+#ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
+    /* FIXME: Hacky fix else building fails with -Wundef=error*/
+    #define LV_DISPLAY_RENDER_MODE_PARTIAL 0
+    #define LV_DISPLAY_RENDER_MODE_DIRECT 1
+    #define LV_DISPLAY_RENDER_MODE_FULL 2
+#endif
+
 #if LV_USE_G2D
     #if LV_USE_ROTATE_G2D
         #if !LV_WAYLAND_USE_DMABUF
@@ -17,6 +24,9 @@
         #endif
         #if LV_WAYLAND_BUF_COUNT != 3
             #error "LV_WAYLAND_BUF_COUNT must be 3 when LV_USE_ROTATE_G2D is enabled"
+        #endif
+        #if LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT
+            #error "LV_USE_ROTATE_G2D doesn't support direct render mode"
         #endif
         #define LV_WAYLAND_CHECK_BUF_COUNT 0
     #endif
@@ -38,13 +48,6 @@
 
 #if LV_WAYLAND_USE_DMABUF && !LV_USE_G2D
     #error "LV_WAYLAND_USE_DMABUF requires LV_USE_G2D"
-#endif
-
-#ifndef LV_DISPLAY_RENDER_MODE_PARTIAL
-    /* FIXME: Hacky fix else building fails with -Wundef=error*/
-    #define LV_DISPLAY_RENDER_MODE_PARTIAL 0
-    #define LV_DISPLAY_RENDER_MODE_DIRECT 1
-    #define LV_DISPLAY_RENDER_MODE_FULL 2
 #endif
 
 #if LV_WAYLAND_USE_DMABUF && LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL
