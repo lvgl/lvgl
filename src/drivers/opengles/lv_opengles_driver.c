@@ -59,7 +59,7 @@ static void lv_opengles_shader_bind(void);
 static void lv_opengles_shader_unbind(void);
 static int lv_opengles_shader_get_uniform_location(const char * name);
 static void lv_opengles_shader_set_uniform1i(const char * name, int value);
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values);
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values);
 static void lv_opengles_shader_set_uniform1f(const char * name, float value);
 static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2);
 static void lv_opengles_render_draw(void);
@@ -177,16 +177,16 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
 
-    float matrix[9] = {
-        hor_scale, 0.0f,      hor_translate,
-        0.0f,      ver_scale, ver_translate,
-        0.0f,      0.0f,      1.0f
+    const float transposed_matrix[9] = {
+        hor_scale,  0.0f,        0.0f,
+        0.0f,       ver_scale,   0.0f,
+        hor_translate, ver_translate, 1.0f
     };
 
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
@@ -235,11 +235,6 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
-    float matrix[9] = {
-        hor_scale, 0.0f,      hor_translate,
-        0.0f,      ver_scale, ver_translate,
-        0.0f,      0.0f,      1.0f
-    };
 
     if(texture != 0) {
         float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
@@ -260,10 +255,16 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }
 
+    const float transposed_matrix[9] = {
+        hor_scale,  0.0f,        0.0f,
+        0.0f,       ver_scale,   0.0f,
+        hor_translate, ver_translate, 1.0f
+    };
+
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
@@ -447,10 +448,14 @@ static void lv_opengles_shader_set_uniform1i(const char * name, int value)
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values)
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values)
 {
     LV_PROFILER_DRAW_BEGIN;
-    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, transpose, values));
+    /*
+     * GLES2.0 doesn't support transposing the matrix via glUniformMatrix3fv so this is the transposed matrix
+     * https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf page 47
+     */
+    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, GL_FALSE, values));
     LV_PROFILER_DRAW_END;
 }
 
