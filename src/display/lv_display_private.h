@@ -171,6 +171,10 @@ struct _lv_display_t {
     lv_obj_t * mem_label;
 #endif
 
+#if LV_EXTERNAL_DATA_AND_DESTRUCTOR
+    void (* destructor)(void * ext_data);
+    void * ext_data;
+#endif
 };
 
 /**********************
