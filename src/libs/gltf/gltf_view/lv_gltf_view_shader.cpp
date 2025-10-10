@@ -302,15 +302,19 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
 lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
                                                         size_t n)
 {
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.frag",
-                                                                       defines, n);
-
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.vert",
-                                                                       defines, n);
+    uint32_t frag_shader_hash;
+    uint32_t vert_shader_hash;
+    lv_result_t res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.frag",
+                                                             defines, n, LV_OPENGL_GLSL_VERSION_300ES, &frag_shader_hash);
+    LV_ASSERT(res == LV_RESULT_OK);
+    res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.vert",
+                                                 defines, n, LV_OPENGL_GLSL_VERSION_300ES, &vert_shader_hash);
+    LV_ASSERT(res == LV_RESULT_OK);
     lv_opengl_shader_program_t * program =
         lv_opengl_shader_manager_get_program(&view->shader_manager, frag_shader_hash, vert_shader_hash);
 
-    LV_ASSERT_NULL(program);
+    LV_ASSERT_MSG(program != NULL,
+                  "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
 
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 
