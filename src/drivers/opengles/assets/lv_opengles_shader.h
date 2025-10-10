@@ -1,10 +1,10 @@
 /**
- * @file lv_opengles_standard_shader.h
+ * @file lv_opengles_shader.h
  *
  */
 
-#ifndef LV_OPENGLES_STANDARD_SHADER_H
-#define LV_OPENGLES_STANDARD_SHADER_H
+#ifndef LV_OPENGLES_SHADER_H
+#define LV_OPENGLES_SHADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +21,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-char *lv_opengles_standard_shader_get_vertex(void);
-char *lv_opengles_standard_shader_get_fragment(void);
-void lv_opengles_standard_shader_get_src(lv_opengl_shader_portions_t *portions);
+char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version);
+char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version);
+void lv_opengles_shader_get_source(lv_opengl_shader_portions_t * portions, lv_opengl_glsl_version version);
+
 
 /**********************
  *      MACROS
@@ -35,4 +36,4 @@ void lv_opengles_standard_shader_get_src(lv_opengl_shader_portions_t *portions);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OPENGLES_STANDARD_SHADER_H*/
+#endif /*LV_OPENGLES_SHADER_H*/
