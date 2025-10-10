@@ -33,15 +33,8 @@ static void draw_event_cb(lv_event_t * e)
             label_draw_dsc->text = lv_strdup(tmp_buffer);
             label_draw_dsc->text_local = 1;
 
-            lv_text_attributes_t attributes = {0};
             lv_point_t size;
-
-            attributes.text_flags = LV_TEXT_FLAG_NONE;
-            attributes.letter_space = 0;
-            attributes.line_space = 0;
-            attributes.max_width = 1000;
-
-            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
+            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, 0, 0, 1000, LV_TEXT_FLAG_NONE);
             int32_t new_w = size.x;
             int32_t old_w = lv_area_get_width(&draw_task->area);
 
