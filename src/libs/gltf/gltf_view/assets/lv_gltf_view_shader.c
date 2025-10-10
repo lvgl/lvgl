@@ -2528,11 +2528,11 @@ static const lv_opengl_shader_t src_includes[] = {
 
 
         #ifdef MATERIAL_UNLIT
-            //#ifdef HAS_EMISSIVE_MAP
-            //    color = texture(u_EmissiveSampler, getEmissiveUV()).rgb;
-            //#else
+            #ifdef HAS_EMISSIVE_MAP
+                color = texture(u_EmissiveSampler, getEmissiveUV()).rgb;
+            #else
                 color = baseColor.rgb;
-            //#endif
+            #endif
         #elif defined(NOT_TRIANGLE) && !defined(HAS_NORMAL_VEC3)
             //Points or Lines with no NORMAL attribute SHOULD be rendered without lighting and instead use the sum of the base color value and the emissive value.
             color = f_emissive + baseColor.rgb;
