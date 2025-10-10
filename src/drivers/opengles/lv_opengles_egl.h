@@ -44,6 +44,9 @@ void lv_opengles_egl_update(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_clear(lv_opengles_egl_t * ctx);
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx);
 
+lv_result_t lv_opengles_egl_bind_current_context(lv_opengles_egl_t * ctx);
+lv_result_t lv_opengles_egl_unbind_current_context(lv_opengles_egl_t * ctx);
+
 /**********************
  *      MACROS
  **********************/

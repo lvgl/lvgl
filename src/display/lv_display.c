@@ -1238,6 +1238,30 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
+void lv_display_wait_for_flushing(lv_display_t * disp)
+{
+    LV_PROFILER_REFR_BEGIN;
+    LV_LOG_TRACE("begin");
+
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
+
+    if(disp->flush_wait_cb) {
+        if(disp->flushing) {
+            disp->flush_wait_cb(disp);
+            disp->flushing = 0;
+        }
+    }
+    else {
+        while(disp->flushing);
+    }
+    disp->flushing_last = 0;
+
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
+
+    LV_LOG_TRACE("end");
+    LV_PROFILER_REFR_END;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

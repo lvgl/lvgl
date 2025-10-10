@@ -25,11 +25,11 @@
 #include "../../opengles/lv_opengles_debug.h"
 
 #include "../../opengles/lv_opengles_driver.h"
-#include "../../opengles/lv_opengles_texture.h"
 #include "../../opengles/lv_opengles_private.h"
 
 #include "../../../stdlib/lv_string.h"
 #include "../../../display/lv_display.h"
+#include "../../../display/lv_display_private.h"
 
 /**********************
  *      TYPEDEFS
@@ -66,6 +66,10 @@ static void * drm_create_window(void * driver_data, const lv_egl_native_window_p
 static void drm_destroy_window(void * driver_data, void * native_window);
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 static inline void set_viewport(lv_display_t * display);
+
+static void * egl_update_thread_fn(void * arg);
+static void egl_update_thread_init(lv_drm_ctx_t * ctx);
+static void egl_update_thread_deinit(lv_drm_ctx_t * ctx);
 
 /**********************
  *  STATIC VARIABLES
@@ -137,8 +141,10 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
 
+    lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RENDER_START, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
+    egl_update_thread_init(ctx);
 }
 
 void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
@@ -160,6 +166,7 @@ static void event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
+    lv_result_t res;
     switch(code) {
         case LV_EVENT_DELETE:
             if(ctx) {
@@ -167,12 +174,22 @@ static void event_cb(lv_event_t * e)
                 ctx->egl_ctx = NULL;
                 lv_opengles_texture_deinit(&ctx->texture);
                 drm_device_deinit(ctx);
+                egl_update_thread_deinit(ctx);
                 lv_display_set_driver_data(display, NULL);
             }
             break;
         case LV_EVENT_RESOLUTION_CHANGED:
             lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
                                         lv_display_get_vertical_resolution(display));
+            break;
+        case LV_EVENT_RENDER_START:
+            /* We need to wait for the swap thread to finish displaying the previous frame
+            * So that we can bind the context to the current thread.
+            * In case the we need opengl to draw (see opengl draw unit),
+            * it will expect the context to be bound to the current thread*/
+            lv_display_wait_for_flushing(display);
+            res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
+            LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
             break;
         default:
             return;
@@ -207,13 +224,20 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 {
     LV_UNUSED(area);
     LV_UNUSED(px_map);
-    if(lv_display_flush_is_last(disp)) {
-        set_viewport(disp);
-        lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        lv_opengles_render_display_texture(disp, false, true);
-        lv_opengles_egl_update(ctx->egl_ctx);
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
     }
-    lv_display_flush_ready(disp);
+    lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+
+    /* The current context is set in the RENDER_START event so we don't need to do it here*/
+    set_viewport(disp);
+    lv_opengles_render_display_texture(disp, false, true);
+
+    /* Unbind the current context so that it can be bound in the update thread*/
+    lv_result_t res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
+    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
+    sem_post(&ctx->egl_update_thread.update_semaphore);
 }
 
 #else
@@ -222,34 +246,42 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 {
     LV_UNUSED(px_map);
     LV_UNUSED(area);
-    if(lv_display_flush_is_last(disp)) {
-        lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        int32_t disp_width = lv_display_get_horizontal_resolution(disp);
-        int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
-        set_viewport(disp);
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
+    }
 
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, ctx->texture.texture_id));
+    lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+    int32_t disp_width = lv_display_get_horizontal_resolution(disp);
+    int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
-        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-        GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
-        /*Color depth: 16 (RGB565), 32 (ARGB8888)*/
+    /* The current context is set in the RENDER_START event so we don't need to do it here*/
+    set_viewport(disp);
+
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, ctx->texture.texture_id));
+
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
+    /*Color depth: 16 (RGB565), 32 (ARGB8888)*/
 #if LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             ctx->texture.fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+                         ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
-                             ctx->texture.fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+                         ctx->texture.fb1));
 #else
 #error("Unsupported color format")
 #endif
 
-        lv_opengles_render_display_texture(disp, false, false);
-        lv_opengles_egl_update(ctx->egl_ctx);
-    }
-    lv_display_flush_ready(disp);
+    lv_opengles_render_display_texture(disp, false, false);
+
+    /* Unbind the current context so that it can be bound in the update thread*/
+    lv_result_t res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
+    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
+    sem_post(&ctx->egl_update_thread.update_semaphore);
 }
 #endif
 
@@ -742,5 +774,39 @@ static void drm_destroy_window(void * driver_data, void * native_window)
     ctx->gbm_surface = NULL;
 }
 
+static void * egl_update_thread_fn(void * arg)
+{
+    lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)arg;
+    while(!ctx->egl_update_thread.should_exit) {
+        sem_wait(&ctx->egl_update_thread.update_semaphore);
+        if(ctx->egl_update_thread.should_exit) {
+            LV_LOG_INFO("EGL update thread exiting");
+            break;
+        }
+        lv_result_t res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
+        LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
+        lv_opengles_egl_update(ctx->egl_ctx);
+        res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
+        LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
+        lv_display_flush_ready(ctx->display);
+    }
+    return NULL;
+}
+
+static void egl_update_thread_init(lv_drm_ctx_t * ctx)
+{
+    ctx->egl_update_thread.should_exit = false;
+    sem_init(&ctx->egl_update_thread.update_semaphore, 0, 0);
+
+    pthread_create(&ctx->egl_update_thread.thread, NULL, egl_update_thread_fn, ctx);
+}
+
+static void egl_update_thread_deinit(lv_drm_ctx_t * ctx)
+{
+    ctx->egl_update_thread.should_exit = true;
+    sem_post(&ctx->egl_update_thread.update_semaphore);
+    pthread_join(ctx->egl_update_thread.thread, NULL);
+    sem_destroy(&ctx->egl_update_thread.update_semaphore);
+}
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/
