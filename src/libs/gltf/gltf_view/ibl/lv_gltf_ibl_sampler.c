@@ -323,11 +323,20 @@ static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler)
         GL_CALL(glViewport(0, 0, sampler->texture_size, sampler->texture_size));
         GL_CALL(glClearColor(1.0, 0.0, 0.0, 0.0));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-        uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
+        uint32_t frag_shader_hash;
+        uint32_t vert_shader_hash;
+        lv_result_t res = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "panorama_to_cubemap.frag", NULL, 0,
+                                                                 LV_OPENGL_GLSL_VERSION_300ES, &frag_shader_hash);
+        LV_ASSERT(res == LV_RESULT_OK);
+        res = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0,
+                                                     LV_OPENGL_GLSL_VERSION_300ES, &vert_shader_hash);
+        LV_ASSERT(res == LV_RESULT_OK);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader_hash, vert_shader_hash);
+
+        LV_ASSERT_MSG(program != NULL,
+                      "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
+
         GLuint program_id = lv_opengl_shader_program_get_id(program);
 
         GL_CALL(glUseProgram(program_id));
@@ -359,12 +368,21 @@ static void ibl_apply_filter(lv_gltf_ibl_sampler_t * sampler, uint32_t distribut
         GL_CALL(glClearColor(0.0, 1.0, 0.0, 0.0));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        uint32_t frag_shader =
-            lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-        uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
+        uint32_t frag_shader_hash;
+        uint32_t vert_shader_hash;
+        lv_result_t res = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0,
+                                                                 LV_OPENGL_GLSL_VERSION_300ES, &frag_shader_hash);
+        LV_ASSERT(res == LV_RESULT_OK);
+        res = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0,
+                                                     LV_OPENGL_GLSL_VERSION_300ES, &vert_shader_hash);
+        LV_ASSERT(res == LV_RESULT_OK);
         lv_opengl_shader_program_t * program =
-            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader, vert_shader);
+            lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader_hash, vert_shader_hash);
+
+        LV_ASSERT_MSG(program != NULL,
+                      "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
         GLuint program_id = lv_opengl_shader_program_get_id(program);
+
 
         GL_CALL(glUseProgram(program_id));
         GL_CALL(glActiveTexture(GL_TEXTURE0));
@@ -420,11 +438,19 @@ static void ibl_sample_lut(lv_gltf_ibl_sampler_t * sampler, uint32_t distributio
     GL_CALL(glViewport(0, 0, currentTextureSize, currentTextureSize));
     GL_CALL(glClearColor(0.0, 1.0, 1.0, 0.0));
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-    uint32_t frag_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0);
-    uint32_t vert_shader = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0);
+    uint32_t frag_shader;
+    uint32_t vert_shader;
+    lv_result_t res    = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "ibl_filtering.frag", NULL, 0,
+                                                                LV_OPENGL_GLSL_VERSION_300ES, &frag_shader);
+    LV_ASSERT(res == LV_RESULT_OK);
+    res = lv_opengl_shader_manager_select_shader(&sampler->shader_manager, "fullscreen.vert", NULL, 0,
+                                                 LV_OPENGL_GLSL_VERSION_300ES, &vert_shader);
+    LV_ASSERT(res == LV_RESULT_OK);
     lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&sampler->shader_manager, frag_shader,
                                                                                 vert_shader);
+    LV_ASSERT_MSG(program != NULL,
+                  "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
+
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 
     GL_CALL(glUseProgram(program_id));

@@ -2854,7 +2854,6 @@ static const lv_opengl_shader_t env_src_includes[] = {
     {
         "ibl_filtering1.glsl", R"(
 
-        //#version 450
         //#extension GL_ARB_separate_shader_objects : enable
 
         precision highp float;
@@ -3497,11 +3496,11 @@ static const size_t src_includes_count = sizeof src_includes / sizeof src_includ
  **********************/
 
 char* lv_gltf_view_shader_get_vertex(void) {
-    return lv_opengl_shader_manager_process_includes(src_vertex_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count );
+    return lv_opengl_shader_manager_process_includes(src_vertex_shader, src_includes, src_includes_count);
 }
 
 char* lv_gltf_view_shader_get_fragment(void) {
-    return lv_opengl_shader_manager_process_includes(src_fragment_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count);
+    return lv_opengl_shader_manager_process_includes(src_fragment_shader, src_includes, src_includes_count);
 }
 
 void lv_gltf_view_shader_get_src(lv_opengl_shader_portions_t *portions)
