@@ -248,7 +248,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
         attributes.text_flags = LV_TEXT_FLAG_NONE;
 
         lv_point_t size;
-        lv_text_get_size(&size, src, font, &attributes);
+        lv_text_get_size_attrs(&size, src, font, &attributes);
         header.w = size.x;
         header.h = size.y;
     }
@@ -951,7 +951,7 @@ static void draw_image(lv_event_t * e)
                 attributes.max_width = LV_COORD_MAX;
                 attributes.text_flags = LV_TEXT_FLAG_NONE;
 
-                lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, &attributes);
+                lv_text_get_size_attrs(&text_size, label_dsc.text, label_dsc.font, &attributes);
                 lv_area_set(&aligned_coords, 0, 0, text_size.x, text_size.y);
                 lv_area_align(&obj->coords, &aligned_coords, img->align, img->offset.x, img->offset.y);
                 coords = &aligned_coords;

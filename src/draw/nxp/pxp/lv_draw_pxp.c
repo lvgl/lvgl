@@ -429,7 +429,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+        lv_text_get_size_attrs(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
