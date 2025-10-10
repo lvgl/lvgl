@@ -1,10 +1,10 @@
 /**
- * @file lv_opengles_standard_shader.h
+ * @file lv_opengles_shader.h
  *
  */
 
-#ifndef LV_OPENGLES_STANDARD_SHADER_H
-#define LV_OPENGLES_STANDARD_SHADER_H
+#ifndef LV_OPENGLES_SHADER_H
+#define LV_OPENGLES_SHADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ void lv_opengles_shader_get_source(lv_opengl_shader_portions_t * portions, lv_op
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OPENGLES_STANDARD_SHADER_H*/
+#endif /*LV_OPENGLES_SHADER_H*/
