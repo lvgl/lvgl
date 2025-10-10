@@ -24,6 +24,8 @@ extern "C" {
 #include "../../opengles/lv_opengles_egl.h"
 #include "../../opengles/lv_opengles_egl_private.h"
 #include "lv_linux_drm.h"
+#include <pthread.h>
+#include <semaphore.h>
 
 /*********************
  *      DEFINES
@@ -32,6 +34,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    /* TODO: Once we make sure OS_PTHREAD is stable we need to use lvgl's API for this*/
+    pthread_t thread;
+    sem_t update_semaphore;
+    volatile bool should_exit;
+} lv_drm_egl_update_thread_t;
 
 typedef struct {
     lv_opengles_texture_t texture;
@@ -51,6 +60,7 @@ typedef struct {
     struct gbm_bo * gbm_bo_flipped;
     struct gbm_bo * gbm_bo_presented;
 
+    lv_drm_egl_update_thread_t egl_update_thread;
     lv_linux_drm_select_mode_cb_t mode_select_cb;
     int fd;
     bool crtc_isset;
