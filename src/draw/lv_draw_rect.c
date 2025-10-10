@@ -282,7 +282,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 attributes.line_space = 0;
                 attributes.letter_space = 0;
 
-                lv_text_get_size(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, &attributes);
+                lv_text_get_size_attributes(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, &attributes);
 
                 lv_area_t a = {0, 0, s.x - 1, s.y - 1};
                 lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
