@@ -25,6 +25,7 @@
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"
 #include "lv_opengles_driver.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 /*********************
 *      DEFINES
@@ -79,6 +80,9 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
         return NULL;
     }
     lv_opengles_init();
+#if LV_USE_DRAW_NANOVG
+    lv_draw_nanovg_init();
+#endif
     return ctx;
 }
 

@@ -1101,6 +1101,17 @@
     #endif
 #endif
 
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_OPENGLES, LV_USE_MATRIX.
+ */
+#ifndef LV_USE_DRAW_NANOVG
+    #ifdef CONFIG_LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG CONFIG_LV_USE_DRAW_NANOVG
+    #else
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -3182,6 +3193,15 @@
         #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
     #else
         #define LV_USE_THORVG_EXTERNAL 0
+    #endif
+#endif
+
+/** Enable NanoVG (vector graphics library) */
+#ifndef LV_USE_NANOVG
+    #ifdef CONFIG_LV_USE_NANOVG
+        #define LV_USE_NANOVG CONFIG_LV_USE_NANOVG
+    #else
+        #define LV_USE_NANOVG 0
     #endif
 #endif
 
