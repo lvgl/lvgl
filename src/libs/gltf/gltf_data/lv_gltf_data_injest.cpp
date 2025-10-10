@@ -659,7 +659,7 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
             if(material.transmission)
                 load_mesh_texture(data, material.transmission->transmissionTexture,
                                   &primitive.transmissionTexture, (GLint *)&primitive.transmissionTexcoordIndex);
-            if(material.clearcoat) {
+            if(material.clearcoat && material.clearcoat->clearcoatFactor > 0.0f) {
                 load_mesh_texture(data, material.clearcoat->clearcoatTexture,
                                   (GLuint *)&primitive.clearcoatTexture, &primitive.clearcoatTexcoordIndex);
                 load_mesh_texture(data, material.clearcoat->clearcoatRoughnessTexture,
@@ -669,7 +669,7 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
                                   (GLuint *)&primitive.clearcoatNormalTexture,
                                   &primitive.clearcoatNormalTexcoordIndex);
             }
-            if(material.diffuseTransmission) {
+            if(material.diffuseTransmission && material.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
                 load_mesh_texture(data, material.diffuseTransmission->diffuseTransmissionTexture,
                                   &primitive.diffuseTransmissionTexture,
                                   &primitive.diffuseTransmissionTexcoordIndex);
