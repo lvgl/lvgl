@@ -2529,7 +2529,7 @@ static const lv_opengl_shader_t src_includes[] = {
 
         #ifdef MATERIAL_UNLIT
             #ifdef HAS_EMISSIVE_MAP
-                color = texture(u_EmissiveSampler, getEmissiveUV()).rgb;
+                color = f_emissive;
             #else
                 color = baseColor.rgb;
             #endif
