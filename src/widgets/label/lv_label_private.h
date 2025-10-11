@@ -53,6 +53,7 @@ struct _lv_label_t {
     uint8_t recolor : 1;                /**< Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /**< Ignore real width (used by the library with LV_LABEL_LONG_MODE_SCROLL) */
     uint8_t invalid_size_cache : 1;     /**< 1: Recalculate size and update cache */
+    uint8_t need_refr_text : 1;         /**< 1: Refresh text after layout update completion */
 
     lv_point_t text_size;
 };
