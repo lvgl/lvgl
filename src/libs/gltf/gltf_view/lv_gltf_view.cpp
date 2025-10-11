@@ -618,9 +618,16 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager)
 {
     lv_opengl_shader_define_t frag_defs[1] = { { "TONEMAP_KHR_PBR_NEUTRAL", NULL, false} };
+    uint32_t frag_shader_hash ;
+    uint32_t vert_shader_hash;
+    lv_result_t res = lv_opengl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1,
+                                                             LV_OPENGL_GLSL_VERSION_300ES,
+                                                             &frag_shader_hash);
 
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.frag", frag_defs, 1);
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0);
+    LV_ASSERT(res == LV_RESULT_OK);
+    res = lv_opengl_shader_manager_select_shader(manager, "cubemap.vert", nullptr, 0, LV_OPENGL_GLSL_VERSION_300ES,
+                                                 &vert_shader_hash);
+    LV_ASSERT(res == LV_RESULT_OK);
 
     lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(manager, frag_shader_hash,
                                                                                 vert_shader_hash);
