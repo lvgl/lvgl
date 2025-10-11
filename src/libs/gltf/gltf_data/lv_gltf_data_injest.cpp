@@ -467,6 +467,9 @@ bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t *
     LV_LOG_TRACE("Image (%s) [%d] [%u]", image.name.c_str(), texture_id, hash);
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
 
     GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
     bool image_invalidated = false;
