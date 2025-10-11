@@ -36,14 +36,6 @@ typedef struct {
     lv_style_value_t end_value;
 } trans_t;
 
-typedef enum {
-    CACHE_ZERO = 0,
-    CACHE_TRUE = 1,
-    CACHE_UNSET = 2,
-    CACHE_255 = 3,
-    CACHE_NEED_CHECK = 4,
-} cache_t;
-
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
