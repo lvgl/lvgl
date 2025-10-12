@@ -203,8 +203,12 @@ static const char *src_fragment_shader_v300es = R"(
         if (u_IsFill) {
             texColor = vec4(u_FillColor, 1.0);
         } else {
-            //texColor = texture(u_Texture, v_TexCoord);
-            texColor = textureLod(u_Texture, v_TexCoord, 0.0);  // If the vertices have been transformed, and mipmaps have not been generated, some rotation angles (notably 90 and 270) require using textureLod() to mitigate derivative calculation errors from increments flipping direction
+            texColor = texture(u_Texture, v_TexCoord);
+            /* If the vertices have been transformed, and mipmaps have not been generated, 
+             * some rotation angles (notably 90 and 270) require using textureLod() to mitigate 
+             * derivative calculation errors from interpolator increments flipping direction.
+             * texColor = textureLod(u_Texture, v_TexCoord, u_LodLevel);
+             */
         }
         if (abs(u_ColorDepth - 8.0) < 0.1) {
             float gray = texColor.r;
