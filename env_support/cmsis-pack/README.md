@@ -55,7 +55,6 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_FLEX_LAYOUT
    - LV_USE_DEMO_MULTILANG
    - LV_USE_DEMO_TRANSFORM
-   - LV_USE_DEMO_SCROLL
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DEMO_EBIKE
    - LV_USE_DEMO_HIGH_RES
