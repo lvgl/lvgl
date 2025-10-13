@@ -467,7 +467,7 @@ void vg_lite_IRQHandler(void)
 int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t * value)
 {
     if(device->int_queue) {
-        if(xSemaphoreTake(device->int_queue, timeout / portTICK_PERIOD_MS) == pdTRUE) {
+        if(lv_thread_sync_wait(&device->int_queue) == LV_RESULT_OK) {
             if(value != NULL) {
                 *value = device->int_flags & mask;
             }

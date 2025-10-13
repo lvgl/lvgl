@@ -51,7 +51,7 @@ lv_indev_t * lv_wayland_pointer_axis_create(void)
 
 lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * display)
 {
-    struct window * window = lv_display_get_user_data(display);
+    struct window * window = lv_display_get_driver_data(display);
     if(!window) {
         return NULL;
     }
@@ -64,7 +64,7 @@ lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * display)
 
 static void pointeraxis_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
 
     if(!window || window->closed) {
         return;

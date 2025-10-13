@@ -4301,8 +4301,15 @@
         #define LV_USE_FT81X         0
     #endif
 #endif
+#ifndef LV_USE_NV3007
+    #ifdef CONFIG_LV_USE_NV3007
+        #define LV_USE_NV3007 CONFIG_LV_USE_NV3007
+    #else
+        #define LV_USE_NV3007        0
+    #endif
+#endif
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #ifndef LV_USE_GENERIC_MIPI
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_GENERIC_MIPI
@@ -4733,6 +4740,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #if LV_USE_SYSMON == 0
     #define LV_USE_PERF_MONITOR 0
     #define LV_USE_MEM_MONITOR 0
+    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
 #endif /*LV_USE_SYSMON*/
 
 #if LV_USE_PERF_MONITOR == 0

@@ -251,6 +251,12 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
                 hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
+void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
+{
+    LV_UNUSED(disp);
+    LV_UNUSED(callback);
+    LV_LOG_WARN("DRM without EGL support doesn't currently support setting a mode selection callback");
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -928,8 +934,8 @@ static int create_gbm_buffer(drm_dev_t * drm_dev, drm_buffer_t * buf)
     offsets[0] = buf->offset = gbm_bo_get_offset(gbm_bo, 0);
     buf->size = h * buf->pitch;
 
-    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u format: %s",
-                buf->size, buf->pitch, buf->offset, drmGetFormatName(format));
+    LV_LOG_INFO("Created GBM BO of size: %lu pitch: %u offset: %u",
+                buf->size, buf->pitch, buf->offset);
 
     prime_fd = gbm_bo_get_fd_for_plane(gbm_bo, 0);
 

@@ -156,7 +156,7 @@ void lv_wayland_dmabuf_on_graphical_object_destruction(dmabuf_ctx_t * context, s
 
 static void dmabuf_wait_swap_buf(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
 
     if(window->frame_counter == 0) {
         return;
@@ -172,7 +172,7 @@ static void dmabuf_wait_swap_buf(lv_display_t * disp)
 
 void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     struct buffer * buf    = dmabuf_acquire_buffer(&window->wl_ctx->dmabuf_ctx, color_p);
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");

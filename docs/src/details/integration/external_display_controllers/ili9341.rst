@@ -11,7 +11,7 @@ display data of 240RGBx320 dots, and power supply circuit.
 ILI9341 supports parallel 8-/9-/16-/18-bit data bus MCU interface, 6-/16-/18-bit data bus RGB interface and
 3-/4-line serial peripheral interface (SPI).
 
-The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/drivers/display/ili9341>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
+The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/ili9341>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
 It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
@@ -65,4 +65,4 @@ To create an ILI9341-based display use the function
 									lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_color_cb_t send_color_cb);
 
 
-For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
+For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
