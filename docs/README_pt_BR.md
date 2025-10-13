@@ -6,7 +6,7 @@
   <a href="./README_zh.md">中文</a> |
   <b>Português do Brasil</b> |
   <a href="./README_jp.md">日本語</a> |
-  <a href="./docs/README_he.md">עברית</a>
+  <a href="./README_he.md">עברית</a>
 </p>
 <p align="center">
   <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>

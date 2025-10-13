@@ -1,7 +1,7 @@
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
 
 <p align="right">
-  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a> | <a href="./docs/README_he.md">עברית</a>
+  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a> | <a href="./README_he.md">עברית</a>
 </p>
 <br>
 
