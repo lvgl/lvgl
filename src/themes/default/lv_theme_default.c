@@ -676,8 +676,8 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
     /*Re-initialize the styles if the resolution changes as a different display size might
      *result in different paddings */
-    lv_display_remove_event_cb_with_user_data(disp, resolution_change_event_cb, theme);
-    lv_display_add_event_cb(disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
+    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
+    lv_display_add_event_cb(new_disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
 }
