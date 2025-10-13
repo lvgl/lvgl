@@ -42,8 +42,7 @@ void lv_example_scroll_9(void)
     switch_create(panel, "Add scroll momentum", LV_OBJ_FLAG_SCROLL_MOMENTUM, true);
 
     /*Show the switches first*/
-    lv_obj_move_foreground(list);
-
+    lv_obj_move_to_index(list, -1);
 }
 
 static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_flag_t flag, bool en)
