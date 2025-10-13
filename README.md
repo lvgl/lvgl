@@ -1,6 +1,3 @@
-
-<a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
-
 <p align="right">
   <b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a> | <a href="./docs/README_he.md">עברית</a>
 </p>
@@ -11,38 +8,44 @@
   <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
 </p>
 
-  <h1 align="center">Light and Versatile Graphics Library</h1>
-  <br>
+<h1 align="center">Light and Versatile Graphics Library</h1>
+
+<br/>
+
 <div align="center">
   <img src="https://lvgl.io/github-assets/smartwatch-demo.gif">
   &nbsp;
   <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
+
 <br/>
+
 <p align="center">
-<a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
-<a href="https://pro.lvgl.io" title="LVGL Pro XML based UI Editor">LVGL Pro Editor </a> |
-<a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
-<a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
-<a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
+  <a href="https://lvgl.io" title="Homepage of LVGL">Website</a> |
+  <a href="https://pro.lvgl.io" title="LVGL Pro XML based UI Editor">LVGL Pro Editor</a> |
+  <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
+  <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
+  <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
 <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a>
 </p>
+
 <br/>
 
 ### Table of Content
 <p>
-<a href="#ledger-overview">Overview </a> <br/>
-<a href="#-features">Features </a> <br/>
-<a href="#%EF%B8%8F-platform-support">Platform Support</a> <br/>
-<a href="#-lvgl-pro-editor">LVGL Pro Editor</a> <br/>
-<a href="#-commercial-services">Commercial Services</a> <br/>
-<a href="#%E2%80%8D-integrating-lvgl">Integrating LVGL </a> <br/>
-<a href="#-examples">Examples </a> <br/>
-<a href="#-contributing">Contributing</a>
+  <a href="#ledger-overview">Overview</a> <br/>
+  <a href="#-features">Features</a> <br/>
+  <a href="#%EF%B8%8F-platform-support">Platform Support</a> <br/>
+  <a href="#-lvgl-pro-editor">LVGL Pro Editor</a> <br/>
+  <a href="#-commercial-services">Commercial Services</a> <br/>
+  <a href="#%E2%80%8D-integrating-lvgl">Integrating LVGL</a> <br/>
+  <a href="#-examples">Examples</a> <br/>
+  <a href="#-contributing">Contributing</a>
 </p>
-<br>
 
-## :ledger: Overview
+<br/>
+
+## 📒 Overview
 
 **LVGL** is a free and open-source UI library that enables you to create graphical user interfaces
 for any MCUs and MPUs from any vendor on any platform.
@@ -370,7 +373,7 @@ lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
 
 LVGL is an open project, and contributions are very welcome. There are many ways to contribute, from simply speaking about your project, writing examples, improving the documentation, fixing bugs, or even hosting your own project under the LVGL organization.
 
-For a detailed description of contribution opportunities, visit the [Contributing](https://docs.lvgl.io/master/contributing/index.html) 
+For a detailed description of contribution opportunities, visit the [Contributing](https://docs.lvgl.io/master/contributing/index.html)
 section of the documentation.
 
 More than 600 people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂

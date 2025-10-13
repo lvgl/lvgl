@@ -17,438 +17,346 @@
   &nbsp;
   <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
-<br>
+
+<br/>
+
+
 <p align="center">
-<a href="https://lvgl.io" title="עמוד הבית של LVGL">אתר הבית </a> |
-<a href="https://docs.lvgl.io/" title="תיעוד מפורט עם 100+ דוגמאות">תיעוד</a> |
-<a href="https://forum.lvgl.io" title="קבל עזרה ועזור לאחרים">פורום</a> |
-<a href="https://lvgl.io/demos" title="דמוים שרצים בדפדפן שלך">דמוים</a> |
-<a href="https://lvgl.io/services" title="עיצוב גרפי, מימוש ממשק וייעוץ">שירותים</a>
+  <a href="https://lvgl.io" title="עמוד הבית של LVGL">אתר</a> |
+  <a href="https://pro.lvgl.io" title="עורך UI מבוסס XML של LVGL Pro">עורך LVGL Pro</a> |
+  <a href="https://docs.lvgl.io/" title="תיעוד מפורט עם יותר מ־100 דוגמאות">תיעוד</a> |
+  <a href="https://forum.lvgl.io" title="קבל עזרה ועזור לאחרים">פורום</a> |
+  <a href="https://lvgl.io/demos" title="הדגמות שרצות בדפדפן">דוגמאות</a> |
+  <a href="https://lvgl.io/services" title="עיצוב גרפי, יישום UI וייעוץ">שירותים</a>
 </p>
-<br>
 
-## :ledger: סקירה כללית
+<br/>
 
-**בוגרת ומוכרת**  
-LVGL היא ספריית הגרפיקה החינמית והפתוחה הפופולרית ביותר ליצירת ממשקי משתמש יפים לכל MCU, MPU וסוג תצוגה. הספרייה נתמכת על ידי יצרני תעשייה מובילים ופרויקטים כגון Arm, STM32, NXP, Espressif, Nuvoton, Arduino, RT-Thread, Zephyr, NuttX, Adafruit ועוד רבים.
+## 📒 סקירה
 
-**עשירה בתכונות**  
-הספרייה כוללת את כל מה שצריך ליצירת GUI מודרני ויפה: מעל 30 ווידג'טים מובנים, מערכת עיצוב עוצמתית, מנגנוני פריסה בהשראת האינטרנט, ומערכת טיפוגרפיה התומכת בשפות רבות. כדי לשלב את LVGL בפלטפורמה שלך, נדרשים לפחות 32kB RAM ו־128kB Flash, קומפיילר C, buffer גרפי ו־1/10 מגודל המסך כ־buffer נוסף לעיבוד.
+**LVGL** היא ספריית UI חינמית וקוד פתוח שמאפשרת ליצור ממשקי משתמש גרפיים לכל MCU או MPU מכל ספק ועל כל פלטפורמה.
 
-**שירותים**  
-הצוות שלנו מוכן לעזור בעיצוב גרפי, מימוש ממשקים ושירותי ייעוץ. פנו אלינו אם אתם זקוקים לתמיכה בפרויקט ה־GUI הבא שלכם.
+**דרישות**: ל־LVGL אין תלות חיצונית, מה שמקל על הידור לכל יעד מודרני, החל מ־MCU קטנים ועד MPU מבוססי Linux מרובי ליבות עם תמיכת 3D. עבור UI פשוט דרושים רק ~100kB RAM, כ~200–300kB Flash ומאגר רינדור בגודל 1/10 מגודל המסך.
 
-## :rocket: תכונות
+**להתחלה מהירה**: בחרו פרויקט מוכן ל־VSCode,‏ Eclipse או כל סביבת פיתוח אחרת ונסו את LVGL על המחשב. קוד ה־UI של LVGL בלתי תלוי בפלטפורמה, ולכן ניתן להשתמש באותו קוד גם ביעדים משובצים.
+
+**LVGL Pro** הוא מארז כלים מלא לבנייה, בדיקה, שיתוף והפצה מהירה יותר של UI. הוא כולל עורך XML ליצירה ולבדיקה מהירה של רכיבים לשימוש חוזר, ייצוא קוד C או טעינת קובצי XML בזמן ריצה. מידע נוסף באתר.
+
+## 💡 יכולות
 
 **חינמית וניידת**
--ספריית C מלאה (תואמת ++C) ללא תלות בספריות חיצוניות.
--ניתנת לקימפול על כל MCU או MPU, עם או בלי (RT)OS.
--תומכת בתצוגות מונוכרום, ePaper, OLED, TFT ואפילו במסכים גדולים. [מידע על תצוגות](https://docs.lvgl.io/master/details/main-modules/display/index.html)
--תחת רישיון MIT – מותר לשימוש חופשי, כולל בפרויקטים מסחריים.
--דורשת רק 32kB RAM ו־128kB Flash, buffer גרפי, ו־1/10 מגודל המסך ל־rendering.
--תמיכה ב־OS, זיכרון חיצוני ו־GPU – אך לא נדרש.
+  - ספריית C מלאה (תואמת ++C) ללא תלות חיצונית.
+  - ניתנת לקימפול לכל MCU או MPU, עם כל (RT)OS. תומכת ב־Make,‏ CMake וב־globbing פשוט.
+  - תמיכה במסכי מונוכרום, ePaper,‏ OLED או TFT, ואף במסכים של מחשבים. ראו [תצוגות](https://docs.lvgl.io/master/details/main-modules/display/index.html)
+  - רישיון MIT המקל על שימוש מסחרי.
+  - נדרשים רק 32kB RAM ו־128kB Flash, מאגר מסגרת, ולפחות מאגר רינדור בגודל 1/10 מגודל המסך.
+  - מערכת הפעלה, זיכרון חיצוני ו־GPU נתמכים אך אינם נדרשים.
 
-**ווידג'טים, עיצובים, פריסות ועוד**
--מעל 30 [ווידג'טים](https://docs.lvgl.io/master/details/widgets/index.html) מובנים: כפתור, תווית, סליידר, טבלה, מקלדת, מד, קשת, לוח ועוד.
--מערכת [עיצובים גמישה](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) עם ~100 מאפייני עיצוב להתאמה אישית.
--מנועים לפריסה בסגנון [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) ו-[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html) להתאמה רספונסיבית.
--תומכת בטקסטים ב־UTF-8 כולל עברית, סינית, תאית, הינדית, ערבית, פרסית ועוד.
--תמיכה ב־word wrapping, kerning, גלילה, תצוגת תווים בעברית, סמיילים ועוד.
--מנוע גרפי עם אנימציות, anti-aliasing, שקיפויות, גלילה חלקה, צללים, שינוי תמונות ועוד.
--תמיכה בעכבר, מסך מגע, מקשים חיצוניים, מקודדים ועוד. [התקני קלט](https://docs.lvgl.io/master/details/main-modules/indev.html).
--תמיכה בריבוי מסכים. [מידע נוסף](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use)
+**וידג'טים, סגנונות, פריסות ועוד**
+  - יותר מ־30 [וידג'טים](https://docs.lvgl.io/master/details/widgets/index.html) מובנים: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table ועוד רבים.
+  - [מערכת סגנונות](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) גמישה עם כ~100 מאפייני עיצוב להתאמה של כל חלקי הווידג'טים בכל מצב.
+  - מנועי פריסה בסגנון [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) ו־[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html) למיקום וגודל רספונסיביים.
+  - טקסט מעובד בקידוד UTF-8 עם תמיכה במערכות כתיבה סינית/יפנית/קוריאנית, תאית, הינדי, ערבית ופרסית.
+  - [קישורי נתונים](https://docs.lvgl.io/master/details/auxiliary-modules/observer/index.html) לחיבור קל בין ה־UI ליישום.
+  - מנוע רינדור עם תמיכה באנימציות, החלקת קצוות, שקיפות, גלילה חלקה, צללים, טרנספורמציות תמונה ועוד.
+  - [מנוע רינדור 3D חזק](https://docs.lvgl.io/master/details/libs/gltf.html) להצגת [מודלי glTF](https://sketchfab.com/) עם OpenGL.
+  - תמיכה בעכבר, משטח מגע, לוח מקשים, מקלדת, כפתורים חיצוניים ואנקודר [התקני קלט](https://docs.lvgl.io/master/details/main-modules/indev.html).
+  - תמיכה ב[מסכים מרובים](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use).
 
-**קישוריות ותמיכה בבנייה**
--[קישור ל־MicroPython](https://blog.lvgl.io/2019-02-20/micropython-bindings) – כל ה־API של LVGL בפייתון.
--[קישור ל־PikaScript](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) – פייתון למיקרו-בקרים.
--אין צורך במערכת בנייה ייחודית – פשוט לקמפל כמו כל קובץ C אחר.
--תמיכה מלאה ב־Make וב־[CMake](https://docs.lvgl.io/master/details/integration/building/cmake.html).
--פיתוח ב־PC באמצעות [סימולטור](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) – אותו קוד רץ גם בחומרה משובצת.
--המרת קוד C ל־HTML באמצעות [פורטים ל־Emscripten](https://github.com/lvgl/lv_web_emscripten).
+## 📦️ תמיכת פלטפורמות
 
-**תיעוד, כלים ושירותים**
--[תיעוד מלא](https://docs.lvgl.io/) כולל [מעל 100 דוגמאות](https://docs.lvgl.io/master/examples.html)
--[שירותים](https://lvgl.io/services): עיצוב UI, מימוש וייעוץ – להאיץ פיתוח.
+ל־LVGL אין תלות חיצונית, ולכן ניתן לקמפל אותה בקלות לכל התקן. היא זמינה גם במנהלי חבילות רבים ובמערכות RTOS:
 
-## :heart: נותני חסות
-
-אם LVGL חסכה לך זמן וכסף, או אם נהנית להשתמש בה – שקול [לתמוך בפרויקט](https://github.com/sponsors/lvgl).
-
-**מה עושים עם התרומות?**  
-המטרה היא לתגמל כל מי שתורם בצורה משמעותית לספרייה – לא רק את המתחזקים, אלא כל מי שמוסיף פיצ'ר משמעותי או מתקן באגים. התרומות מכסות גם עלויות תפעול (שרתים, שירותים וכו').
-
-**איך תורמים?**  
-באמצעות [GitHub Sponsors](https://github.com/sponsors/lvgl) – אפשר חד־פעמי או חודשי, הכל גלוי.
-
-**איך מקבלים תשלום על תרומה?**  
-אם תיקנת או פיתחת נושא שמסומן ב־[Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored), לאחר המיזוג ניתן להגיש חשבונית ולקבל תשלום דרך [opencollective.com](https://opencollective.com/lvgl).
-
-**חברות שתומכות ב־LVGL**  
-[![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
-
-**תורמים פרטיים**  
-[![Backers of LVGL](https://contrib.rocks/image?repo=lvgl/lvgl&max=48)](https://opencollective.com/lvgl)
-
-## :package: חבילות
-LVGL זמינה כ:
 - [ספריית Arduino](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
 - [חבילת PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [ספריית Zephyr](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
-- [רכיב ESP-IDF(ESP32)](https://components.espressif.com/components/lvgl/lvgl)
+- [רכיב ESP-IDF ‏(ESP32)](https://components.espressif.com/components/lvgl/lvgl)
 - [רכיב NXP MCUXpresso](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [ספריית NuttX](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
 - [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [חבילת RIOT OS](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
-## :robot: דוגמאות
+## 🚀 עורך LVGL Pro
 
-ראה כמה דוגמאות של יצירת ווידג'טים, שימוש בפריסות והחלת סגנונות. תמצא כאן קוד ב-C ו-MicroPython, וקישורים לניסיון או עריכת הדוגמאות בעורך MicroPython מקוון.
+LVGL Pro הוא מארז כלים מלא לבנייה, בדיקה, שיתוף והפצה יעילים של UI משובץ.
 
-לדוגמאות נוספות, בדוק את [תיקיית הדוגמאות](https://github.com/lvgl/lvgl/tree/master/examples).
+הוא מורכב מארבעה כלים המשולבים זה בזה:
 
+1. **עורך XML**: הלב של LVGL Pro. יישום שולחני לבניית רכיבים ומסכים ב־XML, ניהול קישורי נתונים, תרגומים, אנימציות, בדיקות ועוד. קראו עוד על [פורמט ה־XML](https://docs.lvgl.io/master/details/xml/xml/index.html) ועל [העורך](https://docs.lvgl.io/master/details/xml/editor/index.html).
+2. **מציג מקוון**: הריצו את העורך בדפדפן, פתחו פרויקטים מ־GitHub ושיתפו בקלות בלי להקים סביבת פיתוח. בקרו ב־[https://viewer.lvgl.io](https://viewer.lvgl.io).
+3. **כלי CLI**: הפקת קוד C והרצת בדיקות ב־CI/CD. פרטים [כאן](https://docs.lvgl.io/master/details/xml/tools/cli.html).
+4. **תוסף Figma**: סנכרון וחילוץ סגנונות ישירות מ־Figma. מידע נוסף [כאן](https://docs.lvgl.io/master/details/xml/tools/figma.html).
 
-### תווית Hello world
+ביחד, הכלים מאפשרים לבנות UI ביעילות, לבדוק באמינות ולשתף פעולה עם צוותים ולקוחות.
 
-![דוגמה פשוטה של תווית Hello world ב-LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_1.png)
+מידע נוסף: https://pro.lvgl.io
 
-<details>
-  <summary>קוד C</summary>
+## 🤝 שירותים מסחריים
 
-```c
-/*שינוי צבע הרקע של המסך הפעיל*/
-lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
+חברת LVGL LLC מספקת מגוון שירותים מסחריים לסיוע בפיתוח UI. עם יותר מ־15 שנות ניסיון בתחום הממשקים והגרפיקה, נוכל לקדם את ה־UI של המוצר שלכם לרמה הבאה.
 
-/*יצירת תווית לבנה, הגדרת הטקסט שלה ויישור למרכז*/
-lv_obj_t * label = lv_label_create(lv_screen_active());
-lv_label_set_text(label, "Hello world");
-lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-```
-</details>
+- **עיצוב גרפי**: המעצבים הפנימיים שלנו מומחים בעיצוב מודרני ויפה שמתאים למוצר וליכולות החומרה.
+- **מימוש UI**: ניישם את ה־UI על בסיס העיצוב שלכם או שלנו, ונמצה את יכולות החומרה ו־LVGL. אם חסר רכיב או יכולת ב־LVGL, נפתח זאת עבורכם.
+- **ייעוץ ותמיכה**: ייעוץ מקצועי למניעת טעויות יקרות וגוזלות זמן במהלך פיתוח ה־UI.
+- **אישור לוחות**: לחברות שמציעות לוחות פיתוח או ערכות מוכנות לייצור אנו מספקים הסמכה שמדגימה כיצד הלוח מריץ LVGL.
 
-<details>
-  <summary>קוד MicroPython | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_direct=4ab7c40c35b0dc349aa2f0c3b00938d7d8e8ac9f" target="_blank">סימולטור מקוון</a></summary>
+עיינו ב[דוגמאות](https://lvgl.io/demos) שלנו לע参考. למידע נוסף ראו את [עמוד השירותים](https://lvgl.io/services).
 
-```python
-# שינוי צבע הרקע של המסך הפעיל
-scr = lv.screen_active()
-scr.set_style_bg_color(lv.color_hex(0x003a57), lv.PART.MAIN)
+[צרו קשר](https://lvgl.io/#contact) וספרו לנו כיצד נוכל לעזור.
 
-# יצירת תווית לבנה, הגדרת הטקסט שלה ויישור למרכז
-label = lv.label(lv.screen_active())
-label.set_text("Hello world")
-label.set_style_text_color(lv.color_hex(0xffffff), lv.PART.MAIN)
-label.align(lv.ALIGN.CENTER, 0, 0)
-```
-</details>
-<br>
+## 🧑‍💻 שילוב LVGL
 
-### כפתור עם אירוע לחיצה
+שילוב LVGL פשוט מאוד. הוסיפו אותו לפרויקט וקומפלו כמו קבצים אחרים.
+כדי להגדיר, העתיקו את `lv_conf_template.h` ל־`lv_conf.h`, הפעילו את ה־`#if 0` הראשון והתאימו את ההגדרות לפי הצורך.
+(בדרך כלל ברירת המחדל מספקת.) ניתן גם להשתמש ב־LVGL עם Kconfig כשזמין.
 
-![דוגמת כפתור LVGL עם תווית](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
-
-<details>
-  <summary>קוד C</summary>
+לאחר מכן אפשר לאתחל את LVGL וליצור התקני תצוגה וקלט כך:
 
 ```c
-lv_obj_t * button = lv_button_create(lv_screen_active());                   /*הוספת כפתור למסך הנוכחי*/
-lv_obj_center(button);                                             /*הגדרת המיקום שלו*/
-lv_obj_set_size(button, 100, 50);                                  /*הגדרת הגודל שלו*/
-lv_obj_add_event_cb(button, button_event_cb, LV_EVENT_CLICKED, NULL); /*הקצאת callback לכפתור*/
+#include "lvgl/lvgl.h" /*הגדירו LV_LVGL_H_INCLUDE_SIMPLE כדי לכלול כ-"lvgl.h"*/
 
-lv_obj_t * label = lv_label_create(button);                        /*הוספת תווית לכפתור*/
-lv_label_set_text(label, "כפתור");                             /*הגדרת טקסט התווית*/
-lv_obj_center(label);                                           /*יישור התווית למרכז*/
-...
+#define TFT_HOR_RES 320
+#define TFT_VER_RES 240
 
-void button_event_cb(lv_event_t * e)
+static uint32_t my_tick_cb(void)
 {
-  printf("נלחץ\n");
+    return my_get_millisec();
+}
+
+static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+{
+    /*כתבו את px_map לאזור המתאים במאגר המסגרת או בבקר התצוגה החיצוני*/
+}
+
+static void my_touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
+{
+   if(my_touch_is_pressed()) {
+       data->point.x = touchpad_x;
+       data->point.y = touchpad_y;
+       data->state = LV_INDEV_STATE_PRESSED;
+   } else {
+       data->state = LV_INDEV_STATE_RELEASED;
+   }
+}
+
+void main(void)
+{
+    my_hardware_init();
+
+    /*אתחול LVGL*/
+    lv_init();
+
+    /*הגדרת מקור טיק במילישניות כדי של־LVGL תהיה ספירת זמן*/
+    lv_tick_set_cb(my_tick_cb);
+
+    /*יצירת תצוגה להוספת מסכים ווידג'טים*/
+    lv_display_t * display = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
+
+    /*הוספת מאגרי רינדור
+     *כאן מוסיפים מאגר חלקי קטן בהנחה של 16 סיביות (RGB565)*/
+    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2]; /* x2 בגלל עומק צבע 16 ביט */
+    lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+    /*קולבק לרענון התוכן מן המאגר אל התצוגה*/
+    lv_display_set_flush_cb(display, my_flush_cb);
+
+    /*יצירת התקן קלט למגע*/
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, my_touch_read_cb);
+
+    /*הדרייברים מוכנים, יוצרים UI*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello world");
+    lv_obj_center(label);
+
+    /*לולאת משימות של LVGL*/
+    while(1) {
+        lv_timer_handler();
+        my_sleep_ms(5);         /*השהיה קצרה להורדת עומס המערכת*/
+    }
 }
 ```
+
+## 🤖 דוגמאות
+
+מעל 100 דוגמאות זמינות ב־https://docs.lvgl.io/master/examples.html
+
+המציג המקוון כולל גם מדריכים ללימוד XML: ‏https://viewer.lvgl.io/
+
+
+### כפתור Hello World עם אירוע
+
+<img width="311" height="232" alt="image" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
+
+<details>
+  <summary>קוד C</summary>
+
+  ```c
+static void button_clicked_cb(lv_event_t * e)
+{
+	printf("Clicked\n");
+}
+
+[...]
+
+  lv_obj_t * button = lv_button_create(lv_screen_active());
+  lv_obj_center(button);
+  lv_obj_add_event_cb(button, button_clicked_cb, LV_EVENT_CLICKED, NULL);
+
+  lv_obj_t * label = lv_label_create(button);
+  lv_label_set_text(label, "Hello from LVGL!");
+```
 </details>
 
 <details>
-  <summary>קוד MicroPython | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">סימולטור מקוון</a></summary>
+  <summary>ב־XML עם LVGL Pro</summary>
 
-```python
-def button_event_cb(e):
-  print("נלחץ")
-
-# יצירת כפתור ותווית
-button = lv.button(lv.screen_active())
-button.center()
-button.set_size(100, 50)
-button.add_event_cb(button_event_cb, lv.EVENT.CLICKED, None)
-
-label = lv.label(button)
-label.set_text("כפתור")
-label.center()
+```xml
+<screen>
+	<view>
+		<lv_button align="center">
+			<event_cb callback="button_clicked_cb" />
+			<lv_label text="Hello from LVGL!" />
+		</lv_button>
+	</view>
+</screen>
 ```
-</details>
-<br>
 
-### תיבות סימון עם פריסה
-![תיבות סימון עם פריסה ב-LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
+</details>
+
+### מחוון מעוצב עם קישור נתונים
+
+<img width="314" height="233" alt="image" src="https://github.com/user-attachments/assets/268db1a0-946c-42e2-aee4-9550bdf5f4f9" />
 
 <details>
   <summary>קוד C</summary>
 
 ```c
-lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+static void my_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+	printf("Slider value: %d\n", lv_subject_get_int(subject));
+}
 
-lv_obj_t * cb;
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "תפוח");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+[...]
 
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "בננה");
-lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+static lv_subject_t subject_value;
+lv_subject_init_int(&subject_value, 35);
+lv_subject_add_observer(&subject_value, my_observer_cb, NULL);
 
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "לימון");
-lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_style_t style_base;
+lv_style_init(&style_base);
+lv_style_set_bg_color(&style_base, lv_color_hex(0xff8800));
+lv_style_set_bg_opa(&style_base, 255);
+lv_style_set_radius(&style_base, 4);
 
-cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_checkbox_set_text(cb, "מלון\nושורה חדשה");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
-```
-</details>
-
-<details>
-  <summary>קוד MicroPython | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=311d37e5f70daf1cb0d2cad24c7f72751b5f1792" target="_blank">סימולטור מקוון</a></summary>
-
-```python
-def event_handler(e):
-    code = e.get_code()
-    obj = e.get_target_obj()
-    if code == lv.EVENT.VALUE_CHANGED:
-        txt = obj.get_text()
-        if obj.get_state() & lv.STATE.CHECKED:
-            state = "מסומן"
-        else:
-            state = "לא מסומן"
-        print(txt + ":" + state)
-
-
-lv.screen_active().set_flex_flow(lv.FLEX_FLOW.COLUMN)
-lv.screen_active().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("תפוח")
-cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("בננה")
-cb.add_state(lv.STATE.CHECKED)
-cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("לימון")
-cb.add_state(lv.STATE.DISABLED)
-cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
-cb.set_text("מלון")
-cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
-```
-</details>
-<br>
-
-### עיצוב מחוון (Slider)
-![עיצוב מחוון עם LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.gif)
-
-<details>
-  <summary>קוד C</summary>
-
-```c
 lv_obj_t * slider = lv_slider_create(lv_screen_active());
-lv_slider_set_value(slider, 70, LV_ANIM_OFF);
-lv_obj_set_size(slider, 300, 20);
 lv_obj_center(slider);
+lv_obj_set_size(slider, lv_pct(80), 16);
+lv_obj_add_style(slider, &style_base, LV_PART_INDICATOR);
+lv_obj_add_style(slider, &style_base, LV_PART_KNOB);
+lv_obj_add_style(slider, &style_base, 0);
+lv_obj_set_style_bg_opa(slider, LV_OPA_50, 0);
+lv_obj_set_style_border_width(slider, 3, LV_PART_KNOB);
+lv_obj_set_style_border_color(slider, lv_color_hex3(0xfff), LV_PART_KNOB);
+lv_slider_bind_value(slider, &subject_value);
 
-/*הוספת סגנונות מקומיים לחלק הראשי (מלבן הרקע)*/
-lv_obj_set_style_bg_color(slider, lv_color_hex(0x0F1215), LV_PART_MAIN);
-lv_obj_set_style_bg_opa(slider, 255, LV_PART_MAIN);
-lv_obj_set_style_border_color(slider, lv_color_hex(0x333943), LV_PART_MAIN);
-lv_obj_set_style_border_width(slider, 5, LV_PART_MAIN);
-lv_obj_set_style_pad_all(slider, 5, LV_PART_MAIN);
-
-/*יצירת גיליון סגנונות לשימוש חוזר עבור חלק המחוון*/
-static lv_style_t style_indicator;
-lv_style_init(&style_indicator);
-lv_style_set_bg_color(&style_indicator, lv_color_hex(0x37B9F5));
-lv_style_set_bg_grad_color(&style_indicator, lv_color_hex(0x1464F0));
-lv_style_set_bg_grad_dir(&style_indicator, LV_GRAD_DIR_HOR);
-lv_style_set_shadow_color(&style_indicator, lv_color_hex(0x37B9F5));
-lv_style_set_shadow_width(&style_indicator, 15);
-lv_style_set_shadow_spread(&style_indicator, 5);
-
-/*הוספת גיליון הסגנונות לחלק המחוון של הסליידר*/
-lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
-
-/*הוספת אותו סגנון גם לחלק הכפתור ושינוי מקומי של כמה מאפיינים*/
-lv_obj_add_style(slider, &style_indicator, LV_PART_KNOB);
-
-lv_obj_set_style_outline_color(slider, lv_color_hex(0x0096FF), LV_PART_KNOB);
-lv_obj_set_style_outline_width(slider, 3, LV_PART_KNOB);
-lv_obj_set_style_outline_pad(slider, -5, LV_PART_KNOB);
-lv_obj_set_style_shadow_spread(slider, 2, LV_PART_KNOB);
+lv_obj_t * label = lv_label_create(lv_screen_active());
+lv_obj_align(label, LV_ALIGN_CENTER, 0, -30);
+lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
 ```
+
 </details>
 
 <details>
-  <summary>קוד MicroPython | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=c431c7b4dfd2cc0dd9c392b74365d5af6ea986f0" target="_blank">סימולטור מקוון</a></summary>
+  <summary>ב־XML עם LVGL Pro</summary>
 
-```python
-# יצירת מחוון והוספת הסגנון
-slider = lv.slider(lv.screen_active())
-slider.set_value(70, lv.ANIM.OFF)
-slider.set_size(300, 20)
-slider.center()
+```xml
+<screen>
+	<styles>
+		<style name="style_base" bg_opa="100%" bg_color="0xff8800" radius="4" />
+		<style name="style_border" border_color="0xfff" border_width="3" />
+	</styles>
 
-# הוספת סגנונות מקומיים לחלק הראשי (מלבן הרקע)
-slider.set_style_bg_color(lv.color_hex(0x0F1215), lv.PART.MAIN)
-slider.set_style_bg_opa(255, lv.PART.MAIN)
-slider.set_style_border_color(lv.color_hex(0x333943), lv.PART.MAIN)
-slider.set_style_border_width(5, lv.PART.MAIN)
-slider.set_style_pad_all(5, lv.PART.MAIN)
-
-# יצירת גיליון סגנונות לשימוש חוזר עבור חלק המחוון
-style_indicator = lv.style_t()
-style_indicator.init()
-style_indicator.set_bg_color(lv.color_hex(0x37B9F5))
-style_indicator.set_bg_grad_color(lv.color_hex(0x1464F0))
-style_indicator.set_bg_grad_dir(lv.GRAD_DIR.HOR)
-style_indicator.set_shadow_color(lv.color_hex(0x37B9F5))
-style_indicator.set_shadow_width(15)
-style_indicator.set_shadow_spread(5)
-
-# הוספת גיליון הסגנונות לחלק המחוון של הסליידר
-slider.add_style(style_indicator, lv.PART.INDICATOR)
-slider.add_style(style_indicator, lv.PART.KNOB)
-
-# הוספת אותו סגנון לחלק הכפתור ושינוי מקומי של כמה מאפיינים
-slider.set_style_outline_color(lv.color_hex(0x0096FF), lv.PART.KNOB)
-slider.set_style_outline_width(3, lv.PART.KNOB)
-slider.set_style_outline_pad(-5, lv.PART.KNOB)
-slider.set_style_shadow_spread(2, lv.PART.KNOB)
+	<view>
+		<lv_label bind_text="value" bind_text-fmt="Temperature: %d °C" align="center" y="-30" />
+		<lv_slider align="center" bind_value="value" style_bg_opa="30%">
+			<style name="style_base" />
+			<style name="style_base" selector="knob" />
+			<style name="style_base" selector="indicator" />
+			<style name="style_border" selector="knob" />
+		</lv_slider>
+	</view>
+</screen>
 ```
+
 </details>
-<br>
 
-### טקסטים באנגלית, עברית (מעורב LTR-RTL) וסינית
+### תיבות סימון בפריסה
 
-![טקסטים באנגלית, עברית וסינית עם LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_5.png)
+<img width="311" height="231" alt="image" src="https://github.com/user-attachments/assets/ba9af647-2ea1-4bc8-b53d-c7b43ce24b6e" />
 
 <details>
   <summary>קוד C</summary>
 
-```c
-lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
-lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
-lv_obj_set_style_text_font(ltr_label, &lv_font_montserrat_16, 0);
-lv_obj_set_width(ltr_label, 310);
-lv_obj_align(ltr_label, LV_ALIGN_TOP_LEFT, 5, 5);
+  ```c
+/* יצירת מסך חדש וטעינתו */
+lv_obj_t * scr = lv_obj_create(NULL);
+lv_screen_load(scr);
 
-lv_obj_t * rtl_label = lv_label_create(lv_screen_active());
-lv_label_set_text(rtl_label,"מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).");
-lv_obj_set_style_base_dir(rtl_label, LV_BASE_DIR_RTL, 0);
-lv_obj_set_style_text_font(rtl_label, &lv_font_dejavu_16_persian_hebrew, 0);
-lv_obj_set_width(rtl_label, 310);
-lv_obj_align(rtl_label, LV_ALIGN_LEFT_MID, 5, 0);
+/* הגדרת פריסת עמודה */
+lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, /*יישור אנכי*/
+						   LV_FLEX_ALIGN_START,	       /*יישור אופקי במסילה*/
+						   LV_FLEX_ALIGN_CENTER);      /*יישור המסילה*/
 
-lv_obj_t * cz_label = lv_label_create(lv_screen_active());
-lv_label_set_text(cz_label,
-                  "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
-lv_obj_set_style_text_font(cz_label, &lv_font_source_han_sans_sc_16_cjk, 0);
-lv_obj_set_width(cz_label, 310);
-lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
+/* יצירת 5 תיבות סימון */
+const char * texts[5] = {"Input 1", "Input 2", "Input 3", "Output 1", "Output 2"};
+for(int i = 0; i < 5; i++) {
+	lv_obj_t * cb = lv_checkbox_create(scr);
+	lv_checkbox_set_text(cb, texts[i]);
+}
+
+/* שינוי מצבים */
+lv_obj_add_state(lv_obj_get_child(scr, 1), LV_STATE_CHECKED);
+lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
 ```
+
 </details>
 
 <details>
-  <summary>קוד MicroPython | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">סימולטור מקוון</a></summary>
+  <summary>ב־XML עם LVGL Pro</summary>
 
-```python
-ltr_label = lv.label(lv.screen_active())
-ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
-ltr_label.set_style_text_font(lv.font_montserrat_16, 0)
-ltr_label.set_width(310)
-ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)
-
-rtl_label = lv.label(lv.screen_active())
-rtl_label.set_text("מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).")
-rtl_label.set_style_base_dir(lv.BASE_DIR.RTL, 0)
-rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
-rtl_label.set_width(310)
-rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
-
-cz_label = lv.label(lv.screen_active())
-cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")
-cz_label.set_style_text_font(lv.font_source_han_sans_sc_16_cjk, 0)
-cz_label.set_width(310)
-cz_label.align(lv.ALIGN.BOTTOM_LEFT, 5, -5)
+```xml
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="space_evenly"
+		style_flex_cross_place="start"
+		style_flex_track_place="center"
+	>
+		<lv_checkbox text="Input 1"/>
+		<lv_checkbox text="Input 2"/>
+		<lv_checkbox text="Input 3" checked="true"/>
+		<lv_checkbox text="Output 1"/>
+		<lv_checkbox text="Output 2" disabled="true"/>
+   </view>
+</screen>
 ```
+
 </details>
 
-## :arrow_forward: התחלה מהירה
-הרשימה הבאה תדריך אותך כיצד להתחיל עם LVGL שלב אחר שלב.
 
-**הכרת LVGL**
+## 🌟 תרומה
 
-1.בדוק את [הדמו המקוון](https://lvgl.io/demos) כדי לראות את LVGL בפעולה (3 דקות).
-2.קרא את עמוד [המבוא](https://docs.lvgl.io/master/intro/introduction/index.html) בתיעוד (5 דקות).
-3.הכר את הבסיס בעמוד [סקירה מהירה](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html) (15 דקות).
+LVGL הוא פרויקט פתוח ותרומות מתקבלות בברכה. אפשר לתרום בדרכים רבות: לשתף על הפרויקט שלכם, לכתוב דוגמאות, לשפר את התיעוד, לתקן תקלות ואפילו לארח פרויקט משלכם תחת ארגון LVGL.
 
-**התחל להשתמש ב-LVGL**
+לתיאור מפורט של אפשרויות התרומה, בקרו בפרק [Contributing](https://docs.lvgl.io/master/contributing/index.html) בתיעוד.
 
-4.הגדר [סימולטור](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html#simulator) (10 דקות).
-5.נסה כמה [דוגמאות](https://github.com/lvgl/lvgl/tree/master/examples).
-6.העבר את LVGL ללוח. ראה את מדריך [הפורטינג](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html) או בדוק את [הפרויקטים](https://github.com/lvgl?q=lv_port_) המוכנים לשימוש.
+יותר מ־600 אנשים כבר הותירו חותם על LVGL. הצטרפו אלינו. נתראה שם 🙂
 
-**הפוך למקצוען**
+<a href="https://github.com/lvgl/lvgl/graphs/contributors"> <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" /> </a>
 
-7.קרא את עמוד [המודולים הראשיים](https://docs.lvgl.io/master/details/main-modules/index.html) כדי להבין טוב יותר את הספרייה (2-3 שעות)
-8.בדוק את התיעוד של [הווידג'טים](https://docs.lvgl.io/master/details/widgets/index.html) כדי לראות את התכונות והשימוש שלהם
+...ועוד רבים.
 
-**קבל עזרה ועזור לאחרים**
-
-9.אם יש לך שאלות, גש ל[פורום](http://forum.lvgl.io/)
-10.קרא את מדריך [התרומה לפרויקט](https://docs.lvgl.io/master/contributing/index.html) כדי לראות כיצד תוכל לעזור לשפר את LVGL (15 דקות)
-
-
-## :handshake: שירותים
-LVGL LLC הוקמה כדי לספק רקע מוצק לספריית LVGL ולהציע מספר סוגים של שירותים כדי לעזור לך בפיתוח ממשק המשתמש. עם 15+ שנות ניסיון בתעשיית ממשק המשתמש והגרפיקה, אנחנו יכולים לעזור לך להביא את ממשק המשתמש שלך לרמה הבאה.
-
-- **עיצוב גרפי** המעצבים הגרפיים שלנו הם מומחים ביצירת עיצובים מודרניים יפים המתאימים למוצר שלך ולמשאבי החומרה שלך.
-- **מימוש ממשק משתמש** אנחנו יכולים גם לממש את ממשק המשתמש שלך בהתבסס על העיצוב שאתה או אנחנו יצרנו. אתה יכול להיות בטוח שנפיק את המרב מהחומרה שלך ומ-LVGL. אם חסרה תכונה או ווידג'ט ב-LVGL, אל דאגה, נממש אותם עבורך.
-- **ייעוץ ותמיכה** אנחנו יכולים לתמוך בך גם בייעוץ כדי למנוע טעויות יקרות וזוללות זמן במהלך פיתוח ממשק המשתמש.
-- **הסמכת לוחות** לחברות המציעות לוחות פיתוח או ערכות מוכנות לייצור, אנו מבצעים הסמכת לוחות המראה כיצד הלוח יכול להריץ LVGL.
-
-
-בדוק את [הדמואים](https://lvgl.io/demos) שלנו כדוגמה. למידע נוסף, עיין ב[עמוד השירותים](https://lvgl.io/services).
-
-[צור קשר](https://lvgl.io/#contact) וספר לנו כיצד נוכל לעזור.
-
-
-## :star2: תרומה לפרויקט
-LVGL הוא פרויקט פתוח ותרומה מתקבלת בברכה. ישנן דרכים רבות לתרום, החל מלדבר על הפרויקט שלך, דרך כתיבת דוגמאות, שיפור התיעוד, תיקון באגים ואפילו אירוח הפרויקט שלך תחת ארגון LVGL.
-
-לתיאור מפורט של הזדמנויות תרומה, בקר בסעיף [תרומה לפרויקט](https://docs.lvgl.io/master/contributing/index.html) בתיעוד.
-
-יותר מ-300 אנשים כבר השאירו את חותמם ב-LVGL. היה אחד מהם! נתראה כאן! :slightly_smiling_face:
-
-<a href="https://github.com/lvgl/lvgl/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" />
-</a>
-
-... ורבים אחרים.
