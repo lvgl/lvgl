@@ -62,6 +62,7 @@ remove the misleading guide above this code segment.
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
+   - LV_USE_FS_FROGFS
    - LV_USE_GLTF
    - LV_USE_GSTREAMER
    - LV_USE_VG_LITE_DRIVER
@@ -74,6 +75,7 @@ remove the misleading guide above this code segment.
    - LV_USE_DRAW_DMA2D
    - LV_USE_DRAW_EVE
    - LV_USE_PPA
+   - LV_USE_NV3007
    - LV_USE_NXP_ELCDIF
    - LV_USE_TRANSLATION
    - LV_USE_SNAPSHOT

@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-09-27" version="9.4.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
+    <release date="2025-10-13" version="9.4.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
       - LVGL 9.4.0
       - See Change Log
     </release>
@@ -496,6 +496,11 @@
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_texture.c" />
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_egl.c" />
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_glfw.c" />
+                <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_manager.c" />
+                <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_program.c" />
+                <file category="sourceC"            name="src/drivers/opengles/assets/lv_opengles_standard_shader.c" />
+                <file category="sourceC"            name="src/drivers/opengles/glad/src/egl.c" />
+                <file category="sourceC"            name="src/drivers/opengles/glad/src/gles2.c" />
                 
                 <file category="sourceC"            name="src/drivers/qnx/lv_qnx.c" />
                 
@@ -568,6 +573,7 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565_swapped.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb565.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/neon/lv_draw_sw_blend_neon_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
                 
                 <!-- src/draw/sw/convert -->
@@ -630,7 +636,6 @@
                 <file category="sourceC"            name="src/misc/lv_area.c" />
                 <file category="sourceC"            name="src/misc/lv_array.c" />
                 <file category="sourceC"            name="src/misc/lv_async.c" />
-                <file category="sourceC"            name="src/misc/lv_assert.c" />
                 <file category="sourceC"            name="src/misc/lv_bidi.c" />
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_color_op.c" />
@@ -811,6 +816,8 @@
               <description>Add the display driver for Linux /dev/dri/card*/  </description>
               <files>
                 <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm.c" />
+                <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm_common.c" />
+                <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm_egl.c" />
               </files>
 
               <RTE_Components_h>
@@ -834,6 +841,19 @@
               </RTE_Components_h>
             </component>
 
+            <component Cgroup="Display" Cvariant="NV3007" condition="LVGL-Essential">
+              <description>This driver is just a wrapper around the generic MIPI compatible LCD controller driver</description>
+              <files>
+                <file category="sourceC"          name="src/drivers/display/nv3007/lv_nv3007.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/* use display driver for the generic MIPI compatible LCD controller */
+#define LV_USE_NV3007    1
+              </RTE_Components_h>
+            </component>
+
             <component Cgroup="Display" Cvariant="TFT_eSPI" condition="LVGL-Essential">
               <description>Add the display driver for TFT_eSPI </description>
               <files>
@@ -846,7 +866,6 @@
 #define LV_USE_TFT_ESPI    1
               </RTE_Components_h>
             </component>
-
 
             <component Cgroup="Display" Cvariant="Lovyan GFX" condition="LVGL-Essential">
               <description>Add the display driver for Lovyan GFX </description>
@@ -1220,6 +1239,7 @@
 
             </component>
 
+        <!--
             <component Cgroup="Acceleration" Csub="GPU NXP-VGLite"  condition="LVGL-GPU-NXP-VGLite">
               <description>An hardware acceleration from NXP-VGLite</description>
               <files>
@@ -1246,6 +1266,7 @@
               </RTE_Components_h>
 
             </component>
+        -->
 
             <component Cgroup="Acceleration" Csub="GPU VG-Lite">
               <description>An hardware acceleration from VG-Lite GPU</description>
@@ -1328,6 +1349,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-float-abi-hard-wc16.a"     condition="Armv8-M Mainline Library" />
@@ -1359,6 +1381,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-float-abi-hard.a"          condition="Armv8-M Mainline Library" />
@@ -1389,6 +1412,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-wc16.a"                    condition="Armv8-M Mainline Library" />
@@ -1418,6 +1442,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx.a"                         condition="Armv8-M Mainline Library" />
@@ -1447,6 +1472,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_NemaPVG/gcc/libnemagfx.a"                     condition="Armv8-M Mainline Library" />
@@ -1475,6 +1501,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_NemaPVG/gcc/libnemagfx-wc16.a"                condition="Armv8-M Mainline Library" />
@@ -1503,6 +1530,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_NemaPVG/gcc/libnemagfx-float-abi-hard.a"      condition="Armv8-M Mainline Library" />
@@ -1532,6 +1560,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_vector.c" />
 
                 <!-- libs/nema_gfx/ -->
                 <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_NemaPVG/gcc/libnemagfx-float-abi-hard-wc16.a" condition="Armv8-M Mainline Library" />
@@ -1786,6 +1815,9 @@
               </RTE_Components_h>
 
             </component>
+            
+            
+            
 
             <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Arduino LittleFs" condition="LVGL-Essential">
               <description>Add API for file access via Arduino LittleFs</description>
@@ -1802,6 +1834,22 @@
 #define LV_USE_FS_ARDUINO_SD                1
               </RTE_Components_h>
 
+            </component>
+
+
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="FrogFS" condition="LVGL-Essential">
+              <description>Add API for file access via FrogFS</description>
+              <files>
+                <file category="sourceC"    name="src/libs/frogfs/src/decomp_raw.c" />
+                <file category="sourceC"    name="src/libs/frogfs/src/frogfs.c" />
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_frogfs.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable file access via FrogFS*/
+#define LV_USE_FS_FROGFS    1
+              </RTE_Components_h>
             </component>
 
             <!--
@@ -2056,7 +2104,7 @@
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_tabview_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_textarea_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_qrcode_parser.c" />
-                
+                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_spinbox_parser.c" />
               </files>
 
               <RTE_Components_h>
@@ -2249,8 +2297,6 @@
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view_render.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view_shader.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/math/lv_gltf_math.cpp" />
-                <file category="sourceC"              name="src/drivers/opengles/opengl_shader/lv_opengl_shader_manager.c" />
-                <file category="sourceC"              name="src/drivers/opengles/opengl_shader/lv_opengl_shader_program.c" />
               </files>
 
               <RTE_Components_h>

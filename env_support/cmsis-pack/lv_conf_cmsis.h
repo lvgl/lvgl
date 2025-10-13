@@ -909,6 +909,10 @@
     #define LV_FS_UEFI_LETTER '\0'      /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
 #endif
 
+#if LV_USE_FS_FROGFS
+    #define LV_FS_FROGFS_LETTER '\0'
+#endif
+
 /** GIF decoder library */
 #if LV_USE_GIF
     /** GIF decoder accelerate */
@@ -1242,7 +1246,7 @@
 #endif
 
 /* Drivers for LCD devices connected via SPI/parallel port */
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #define LV_USE_GENERIC_MIPI 1
 #else
     #define LV_USE_GENERIC_MIPI 0
