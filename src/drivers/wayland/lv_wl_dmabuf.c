@@ -189,10 +189,10 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
     struct buffer * buf;
     int32_t src_width = lv_area_get_width(area);
     int32_t src_height = lv_area_get_height(area);
+    uint32_t rotation = lv_display_get_rotation(window->lv_disp);
 #if LV_USE_ROTATE_G2D
     LV_UNUSED(color_p);
     buf    = get_next_buffer(&window->wl_ctx->dmabuf_ctx);
-    uint32_t rotation = lv_display_get_rotation(window->lv_disp);
     if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
         src_width  = lv_area_get_height(area);
         src_height = lv_area_get_width(area);
@@ -210,10 +210,18 @@ void lv_wayland_dmabuf_flush_full_mode(lv_display_t * disp, const lv_area_t * ar
     lv_draw_buf_invalidate_cache(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, NULL);
 #endif
 
+    const bool force_full_flush = LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT &&
+                                  rotation != LV_DISPLAY_ROTATION_0;
     /* Mark surface damage */
-    wl_surface_damage(window->body->surface, area->x1, area->y1, src_width, src_height);
+    if(!force_full_flush) {
+        wl_surface_damage(window->body->surface, area->x1, area->y1, src_width, src_height);
+    }
 
     if(lv_display_flush_is_last(disp)) {
+        if(force_full_flush) {
+            wl_surface_damage(window->body->surface, 0, 0, lv_display_get_original_horizontal_resolution(disp),
+                              lv_display_get_original_vertical_resolution(disp));
+        }
 #if LV_USE_ROTATE_G2D
         g2d_rotate(window->wl_ctx->dmabuf_ctx.buffers[2].lv_draw_buf, buf->lv_draw_buf, window->width, window->height,
                    lv_display_get_rotation(window->lv_disp), lv_display_get_color_format(window->lv_disp));
