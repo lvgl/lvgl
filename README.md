@@ -35,7 +35,7 @@
 <a href="#-features">Features </a> <br/>
 <a href="#%EF%B8%8F-platform-support">Platform Support</a> <br/>
 <a href="#-lvgl-pro-editor">LVGL Pro Editor</a> <br/>
-<a href="#-commercial-services">Commertial Services</a> <br/>
+<a href="#-commercial-services">Commercial Services</a> <br/>
 <a href="#%E2%80%8D-integrating-lvgl">Integrating LVGL </a> <br/>
 <a href="#-examples">Examples </a> <br/>
 <a href="#-contributing">Contributing</a>
