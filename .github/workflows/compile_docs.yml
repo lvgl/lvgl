@@ -82,7 +82,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: docs
+          repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html  # The folder the action should deploy.
           target-folder: ${{ steps.version.outputs.VERSION_NAME }}
@@ -94,7 +94,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
-          repository-name: docs
+          repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html  # The folder the action should deploy.
           target-folder: master
