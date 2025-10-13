@@ -44,12 +44,12 @@
 
 ## :ledger: Overview
 
-**LVGL** is a free and open-source UI library to create graphical user interfaces
+**LVGL** is a free and open-source UI library that enables you to create graphical user interfaces
 for any MCUs and MPUs from any vendor on any platform.
 
 **Requirements**: LVGL has no external dependencies, which makes it easy to compile for any modern target,
 from small MCUs to multi-core Linux-based MPUs with 3D support. For a simple UI, you need only ~100kB RAM,
-~200–300kB flash, and a buffer sized at 1/10 of the screen for rendering.
+~200–300kB flash, and a buffer size of 1/10 of the screen for rendering.
 
 **To get started**, pick a ready-to-use VSCode, Eclipse, or any other project and try out LVGL
 on your PC. The LVGL UI code is fully platform-independent, so you can use the same UI code
@@ -370,8 +370,8 @@ lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
 
 LVGL is an open project, and contributions are very welcome. There are many ways to contribute, from simply speaking about your project, writing examples, improving the documentation, fixing bugs, or even hosting your own project under the LVGL organization.
 
-For a detailed description of contribution opportunities, visit the Contributing
- section of the documentation.
+For a detailed description of contribution opportunities, visit the [Contributing](https://docs.lvgl.io/master/contributing/index.html) 
+section of the documentation.
 
 More than 600 people have already left their fingerprint on LVGL. Be one of them! See you here! 🙂
 
