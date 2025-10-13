@@ -187,7 +187,7 @@ static void event_cb(lv_event_t * e)
             * So that we can bind the context to the current thread.
             * In case the we need opengl to draw (see opengl draw unit),
             * it will expect the context to be bound to the current thread*/
-            lv_display_wait_for_flushing(display);
+            sem_wait(&ctx->egl_update_thread.update_complete_semaphore);
             res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
             LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
             break;
@@ -788,6 +788,7 @@ static void * egl_update_thread_fn(void * arg)
         lv_opengles_egl_update(ctx->egl_ctx);
         res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
         LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
+        sem_post(&ctx->egl_update_thread.update_complete_semaphore);
         lv_display_flush_ready(ctx->display);
     }
     return NULL;
@@ -797,6 +798,7 @@ static void egl_update_thread_init(lv_drm_ctx_t * ctx)
 {
     ctx->egl_update_thread.should_exit = false;
     sem_init(&ctx->egl_update_thread.update_semaphore, 0, 0);
+    sem_init(&ctx->egl_update_thread.update_complete_semaphore, 0, 1);
 
     pthread_create(&ctx->egl_update_thread.thread, NULL, egl_update_thread_fn, ctx);
 }
@@ -807,6 +809,7 @@ static void egl_update_thread_deinit(lv_drm_ctx_t * ctx)
     sem_post(&ctx->egl_update_thread.update_semaphore);
     pthread_join(ctx->egl_update_thread.thread, NULL);
     sem_destroy(&ctx->egl_update_thread.update_semaphore);
+    sem_destroy(&ctx->egl_update_thread.update_complete_semaphore);
 }
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/

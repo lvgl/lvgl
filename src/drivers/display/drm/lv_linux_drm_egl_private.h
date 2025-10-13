@@ -39,6 +39,7 @@ typedef struct {
     /* TODO: Once we make sure OS_PTHREAD is stable we need to use lvgl's API for this*/
     pthread_t thread;
     sem_t update_semaphore;
+    sem_t update_complete_semaphore;
     volatile bool should_exit;
 } lv_drm_egl_update_thread_t;
 
