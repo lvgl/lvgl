@@ -181,6 +181,7 @@ struct _my_theme_t {
  **********************/
 static void style_init_reset(lv_style_t * style);
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
+static void resolution_change_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -672,6 +673,11 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     }
 
     theme->inited = true;
+
+    /*Re-initialize the styles if the resolution changes as a different display size might
+     *result in different paddings */
+    lv_display_remove_event_cb_with_user_data(disp, resolution_change_event_cb, theme);
+    lv_display_add_event_cb(disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
 }
@@ -1210,6 +1216,17 @@ static void style_init_reset(lv_style_t * style)
     else {
         lv_style_init(style);
     }
+}
+
+
+static void resolution_change_event_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    my_theme_t * theme = lv_event_get_user_data(e);
+
+    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary, theme->base.flags,
+                          theme->base.font_normal);
+
 }
 
 #endif
