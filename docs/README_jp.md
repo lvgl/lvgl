@@ -2,7 +2,8 @@
 
 
 
-<p align="right"><a href="../README.md">English</a> | <a href="./README_zh.md">中文</a> | <a href="./README_pt_BR.md">Português do Brasil</a> | <b>日本語</b></p>
+<p align="right"><a href="../README.md">English</a> | <a href="./README_zh.md">中文</a> | <a href="./README_pt_BR.md">Português do Brasil</a> | <b>日本語</b> | <a href="./docs/README_he.md">עברית</a>
+</p>
 
 <p align="center">
   <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
