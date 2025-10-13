@@ -822,10 +822,6 @@ Content of ``0001-change-config-file-to-run-fbdev-with-2-threads.patch``
     -#define LV_USE_DEMO_MULTILANG       1
     +#define LV_USE_DEMO_MULTILANG       0
 
-    /* Widget transformation demo */
-    -#define LV_USE_DEMO_TRANSFORM       1
-    +#define LV_USE_DEMO_TRANSFORM       0
-
     /* Vector graphic demo */
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     --

@@ -1449,9 +1449,6 @@
     /** Smart-phone like multi-language demo */
     #define LV_USE_DEMO_MULTILANG       0
 
-    /** Widget transformation demo */
-    #define LV_USE_DEMO_TRANSFORM       0
-
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #define LV_USE_DEMO_EBIKE           0
     #if LV_USE_DEMO_EBIKE
