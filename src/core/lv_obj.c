@@ -1143,15 +1143,30 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
     timeline_play_dsc_t * dsc = lv_event_get_user_data(e);
     LV_ASSERT_NULL(dsc);
 
+    /*Reset the progress only if the animation was finished*/
+    uint16_t progress = lv_anim_timeline_get_progress(dsc->at);
     if(dsc->reverse) {
-        lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        if(progress == 0) {
+            lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        }
+
+        if(lv_anim_timeline_get_progress(dsc->at) == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(dsc->at, true);
     }
     else {
-        lv_anim_timeline_set_progress(dsc->at, 0);
+        if(progress == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_progress(dsc->at, 0);
+        }
+
+        if(lv_anim_timeline_get_progress(dsc->at) == 0) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(dsc->at, false);
     }
-    lv_anim_timeline_set_delay(dsc->at, dsc->delay);
     lv_anim_timeline_start(dsc->at);
 }
 

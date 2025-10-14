@@ -593,7 +593,7 @@ static void draw_main(lv_event_t * e)
 
             /*Get the size of the "selected text"*/
             lv_point_t label_sel_size;
-            lv_text_get_size(&label_sel_size, lv_label_get_text(label), label_dsc.font, &attributes);
+            lv_text_get_size_attributes(&label_sel_size, lv_label_get_text(label), label_dsc.font, &attributes);
 
             /*Move the selected label proportionally with the background label*/
             int32_t roller_h = lv_obj_get_height(obj);
@@ -908,7 +908,7 @@ static int32_t get_selected_label_width(const lv_obj_t * obj)
 
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    lv_text_get_size(&size, txt, font, &attributes);
+    lv_text_get_size_attributes(&size, txt, font, &attributes);
     return size.x;
 }
 

@@ -843,7 +843,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             attributes.text_flags = flag;
             attributes.max_width = w;
 
-            lv_text_get_size(&label->size_cache, label->text, font, &attributes);
+            lv_text_get_size_attributes(&label->size_cache, label->text, font, &attributes);
             lv_label_set_dots(obj, dot_begin);
 
             label->size_cache.y = LV_MIN(label->size_cache.y, lv_obj_get_style_max_height(obj, LV_PART_MAIN));
@@ -1088,7 +1088,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     lv_point_t size;
 
     lv_label_revert_dots(obj);
-    lv_text_get_size(&size, label->text, font, &attributes);
+    lv_text_get_size_attributes(&size, label->text, font, &attributes);
     label->text_size = size;
 
     lv_obj_refresh_self_size(obj);
