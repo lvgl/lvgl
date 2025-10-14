@@ -467,6 +467,9 @@ bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t *
     LV_LOG_TRACE("Image (%s) [%d] [%u]", image.name.c_str(), texture_id, hash);
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
 
     GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
     bool image_invalidated = false;
@@ -659,7 +662,7 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
             if(material.transmission)
                 load_mesh_texture(data, material.transmission->transmissionTexture,
                                   &primitive.transmissionTexture, (GLint *)&primitive.transmissionTexcoordIndex);
-            if(material.clearcoat) {
+            if(material.clearcoat && material.clearcoat->clearcoatFactor > 0.0f) {
                 load_mesh_texture(data, material.clearcoat->clearcoatTexture,
                                   (GLuint *)&primitive.clearcoatTexture, &primitive.clearcoatTexcoordIndex);
                 load_mesh_texture(data, material.clearcoat->clearcoatRoughnessTexture,
@@ -669,7 +672,7 @@ static bool injest_mesh(lv_gltf_model_t * data, fastgltf::Mesh & mesh)
                                   (GLuint *)&primitive.clearcoatNormalTexture,
                                   &primitive.clearcoatNormalTexcoordIndex);
             }
-            if(material.diffuseTransmission) {
+            if(material.diffuseTransmission && material.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
                 load_mesh_texture(data, material.diffuseTransmission->diffuseTransmissionTexture,
                                   &primitive.diffuseTransmissionTexture,
                                   &primitive.diffuseTransmissionTexcoordIndex);
