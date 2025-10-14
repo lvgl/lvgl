@@ -76,10 +76,6 @@ struct _lv_obj_t {
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t is_deleting : 1;
-    uint16_t h_min : 1; // Minimum height is set
-    uint16_t w_min : 1; // Minimum width is set
-    uint16_t h_max : 1; // Maximum height is set
-    uint16_t w_max : 1; // Maximum width is set
 };
 
 /**********************
