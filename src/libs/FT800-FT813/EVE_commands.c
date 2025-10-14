@@ -285,12 +285,7 @@ void EVE_memWrite_flash_buffer(uint32_t const ft_address, const uint8_t *p_data,
         spi_transmit((uint8_t) (ft_address >> 8U));
         spi_transmit((uint8_t) (ft_address & 0x000000ffUL));
 
-    //    uint32_t length = (len + 3U) & (~3U);
-
-        for (uint32_t count = 0U; count < len; count++)
-        {
-            spi_transmit(fetch_flash_byte(&p_data[count]));
-        }
+        lv_eve_target_spi_transmit_buf(p_data, len);
 
         EVE_cs_clear();
     }    
@@ -308,12 +303,7 @@ void EVE_memWrite_sram_buffer(uint32_t const ft_address, const uint8_t *p_data, 
         spi_transmit((uint8_t) (ft_address >> 8U));
         spi_transmit((uint8_t) (ft_address & 0x000000ffUL));
 
-    //    uint32_t length = (len + 3U) & (~3U);
-
-        for (uint32_t count = 0U; count < len; count++)
-        {
-            spi_transmit(p_data[count]);
-        }
+        lv_eve_target_spi_transmit_buf(p_data, len);
 
         EVE_cs_clear();
     }
@@ -454,9 +444,9 @@ static void eve_begin_cmd(uint32_t command)
     spi_transmit_32(command);
 }
 
-void private_block_write(const uint8_t *p_data, uint16_t len); /* prototype to comply with MISRA */
+static void private_block_write(const uint8_t *p_data, uint16_t len); /* prototype to comply with MISRA */
 
-void private_block_write(const uint8_t *p_data, uint16_t len)
+static void private_block_write(const uint8_t *p_data, uint16_t len)
 {
     uint8_t padding;
 
@@ -476,9 +466,9 @@ void private_block_write(const uint8_t *p_data, uint16_t len)
     }
 }
 
-void block_transfer(const uint8_t *p_data, uint32_t len); /* prototype to comply with MISRA */
+static void block_transfer(const uint8_t *p_data, uint32_t len); /* prototype to comply with MISRA */
 
-void block_transfer(const uint8_t *p_data, uint32_t len)
+static void block_transfer(const uint8_t *p_data, uint32_t len)
 {
     uint32_t bytes_left;
     uint32_t offset = 0U;
@@ -1391,9 +1381,9 @@ uint8_t EVE_init_flash(void)
 #endif
 #endif
 
-void use_gt911(void);
+static void use_gt911(void);
 
-void use_gt911(void)
+static void use_gt911(void)
 {
 #if EVE_GEN > 2
     EVE_memWrite16(REG_TOUCH_CONFIG, 0x05d0U); /* switch to Goodix touch controller */

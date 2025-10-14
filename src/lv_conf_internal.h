@@ -1121,6 +1121,15 @@
             #define LV_DRAW_EVE_EVE_GENERATION 4
         #endif
     #endif
+
+    /* the maximum number of bytes to buffer before a single SPI transmission */
+    #ifndef LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #ifdef CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #else
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+        #endif
+    #endif
 #endif
 
 /*=======================

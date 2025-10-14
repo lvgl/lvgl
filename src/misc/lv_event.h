@@ -106,7 +106,7 @@ typedef enum {
     LV_EVENT_REFR_START,          /**< Sent before a refreshing cycle starts. Sent even if there is nothing to redraw. */
     LV_EVENT_REFR_READY,          /**< Sent when refreshing has been completed (after rendering and calling flush callback). Sent even if no redraw happened. */
     LV_EVENT_RENDER_START,        /**< Sent just before rendering begins. */
-    LV_EVENT_RENDER_READY,        /**< Sent after rendering has been completed (before calling flush callback) */
+    LV_EVENT_RENDER_READY,        /**< Sent after rendering has been completed. */
     LV_EVENT_FLUSH_START,         /**< Sent before flush callback is called. */
     LV_EVENT_FLUSH_FINISH,        /**< Sent after flush callback call has returned. */
     LV_EVENT_FLUSH_WAIT_START,    /**< Sent before flush wait callback is called. */
