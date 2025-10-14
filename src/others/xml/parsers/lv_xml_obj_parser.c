@@ -1049,16 +1049,31 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
         return;
     }
 
+    /*Reset the progress only if the animation was finished*/
+    uint16_t progress = lv_anim_timeline_get_progress(timeline);
     if(dsc->reverse) {
+        if(progress == 0) {
+            lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        }
+
+        if(lv_anim_timeline_get_progress(timeline) == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_delay(timeline, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(timeline, true);
-        lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
     }
     else {
+        if(progress == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_progress(timeline, 0);
+        }
+
+        if(lv_anim_timeline_get_progress(timeline) == 0) {
+            lv_anim_timeline_set_delay(timeline, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(timeline, false);
-        lv_anim_timeline_set_progress(timeline, 0);
     }
 
-    lv_anim_timeline_set_delay(timeline, dsc->delay);
     lv_anim_timeline_start(timeline);
 
 }
