@@ -511,11 +511,11 @@ event further:
   Set what to do when the min/max value is crossed. ``false``: stop at the min/max
   value; ``true``: jump to the other end. Default ``false``
 
-It works on both integer and float subject, but the min/max value is integer in both cases.
+It works on both integer and float subjects, but the min/max value is an integer in both cases.
 
-If the subject also set a min/max value the smaller range will be used.
+If the subject also sets a min/max value the narrower range will be used.
 
-Using a negative `step` will decrement the value instead.
+Using a negative ``step`` will decrement the value instead.
 
 For example:
 
