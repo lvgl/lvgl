@@ -126,19 +126,28 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         window_style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME);
     }
 
+    DWORD ext_window_style = WS_EX_CLIENTEDGE;
+
+    /* Have Windows compute window size so, regardless of window style,
+     * the CLIENT AREA has dimensions [data->hor_res, data->ver_res].
+     * This is the area needed for LVGL to render to. */
+    RECT rect = { 0, 0, data->hor_res, data->ver_res };
+    AdjustWindowRectEx(&rect, window_style, false, ext_window_style);
+
     HWND window_handle = CreateWindowExW(
-                             WS_EX_CLIENTEDGE,
+                             ext_window_style,
                              L"LVGL.Window",
                              data->title,
                              window_style,
                              CW_USEDEFAULT,
                              0,
-                             data->hor_res,
-                             data->ver_res,
+                             rect.right - rect.left,
+                             rect.bottom - rect.top,
                              NULL,
                              NULL,
                              NULL,
                              data);
+
     if(!window_handle) {
         return 0;
     }
