@@ -935,8 +935,8 @@ static void subject_increment_cb(lv_event_t * e)
 #if LV_USE_FLOAT
     else if(user_data->subject->type == LV_SUBJECT_TYPE_FLOAT) {
         /*Use the smaller range*/
-        float max_value = LV_MIN((float)user_data->max_value, user_data->subject->max_value.num);
-        float min_value = LV_MAX((float)user_data->min_value, user_data->subject->min_value.num);
+        float max_value = LV_MIN((float)user_data->max_value, user_data->subject->max_value.float_v);
+        float min_value = LV_MAX((float)user_data->min_value, user_data->subject->min_value.float_v);
 
 
         float value = lv_subject_get_float(user_data->subject);
