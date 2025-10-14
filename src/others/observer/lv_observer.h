@@ -398,7 +398,7 @@ void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_inc
  * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
  * @param max_value     the maximum value to set
  */
-void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t min_value);
+void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t max_value);
 
 /**
  * Set what to do when the min/max value is crossed.

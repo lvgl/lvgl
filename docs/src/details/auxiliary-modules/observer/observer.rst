@@ -500,8 +500,8 @@ Increment
 :cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step)`
 increments an integer subject's value by `step`.
 
-It returns value :cpp:type:`lv_subject_increment_dsc_t` to configure the
-the event further:
+It returns a :cpp:type:`lv_subject_increment_dsc_t` pointer to configure the
+event further:
 
 - :cpp:expr:`lv_obj_set_subject_increment_event_min_value(obj, dsc, min_value)`:
   Set a minimum value for the event. Default ``INT32_MIN``
@@ -511,7 +511,7 @@ the event further:
   Set what to do when the min/max value is crossed. ``false``: stop at the min/max
   value; ``true``: jump to the other end. Default ``false``
 
-It works on both integer and float subject, but the in/max value is integer in both cases.
+It works on both integer and float subject, but the min/max value is integer in both cases.
 
 If the subject also set a min/max value the smaller range will be used.
 
