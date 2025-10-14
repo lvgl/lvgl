@@ -282,8 +282,6 @@ typedef struct _lv_global_t {
 
 #if LV_USE_DRAW_EVE
     lv_draw_eve_unit_t * draw_eve_unit;
-    uint32_t lv_eve_write_buf_len;
-    uint8_t lv_eve_write_buf[2048];
 #endif
 } lv_global_t;
 

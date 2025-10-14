@@ -6,8 +6,8 @@
 #include "../../misc/lv_utils.h"
 #include "../../core/lv_global.h"
 
-#define lv_eve_write_buf (LV_GLOBAL_DEFAULT()->lv_eve_write_buf)
-#define lv_eve_write_buf_len (LV_GLOBAL_DEFAULT()->lv_eve_write_buf_len)
+#define lv_eve_write_buf (LV_GLOBAL_DEFAULT()->draw_eve_unit->lv_eve_write_buf)
+#define lv_eve_write_buf_len (LV_GLOBAL_DEFAULT()->draw_eve_unit->lv_eve_write_buf_len)
 
 static inline void lv_eve_target_flush_write_buf(void);
 
