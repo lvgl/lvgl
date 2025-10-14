@@ -218,7 +218,7 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto egl_make_current_context_err;
     }
 
-    if(!eglSwapInterval || !eglSwapInterval(ctx->egl_display, 0)) {
+    if(!eglSwapInterval(ctx->egl_display, 0)) {
         LV_LOG_WARN("Can't set egl swap interval");
     }
 
