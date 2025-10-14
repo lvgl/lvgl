@@ -67,7 +67,7 @@ remove the misleading guide above this code segment.
    - LV_USE_GSTREAMER
    - LV_USE_VG_LITE_DRIVER
    - LV_USE_LOVYAN_GFX
-   - LV_USE_DRAW_G2D
+   - LV_USE_G2D
    - LV_USE_DRAW_SDL
    - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_DRAW_ARM2D_ASYNC

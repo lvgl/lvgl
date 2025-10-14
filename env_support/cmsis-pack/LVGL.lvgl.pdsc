@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-10-13" version="9.4.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
+    <release date="2025-10-14" version="9.4.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.4.0.pack">
       - LVGL 9.4.0
       - See Change Log
     </release>
@@ -1196,7 +1196,7 @@
               <RTE_Components_h>
 
 /*! \brief Use NXP's G2D on MPU platforms. */
-#define LV_USE_DRAW_G2D     1
+#define LV_USE_G2D     1
               </RTE_Components_h>
             </component>
             
@@ -2291,7 +2291,7 @@
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_data_texture.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_data/lv_gltf_uniform_locations.cpp" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/lv_gltf_view_shader.c" />
-                <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/pisa.c" />
+                <file category="sourceC"              name="src/libs/gltf/gltf_view/assets/chromatic.c" />
                 <file category="sourceC"              name="src/libs/gltf/gltf_view/ibl/lv_gltf_ibl_sampler.c" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view.cpp" />
                 <file category="sourceCpp"            name="src/libs/gltf/gltf_view/lv_gltf_view_render.cpp" />
