@@ -611,11 +611,13 @@ void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_inc
             lv_subject_set_int(dsc->subject, min_value);
         }
     }
+#if LV_USE_FLOAT
     else if(dsc->subject->type == LV_SUBJECT_TYPE_FLOAT) {
         if(dsc->subject->value.float_v < (float)min_value) {
             lv_subject_set_float(dsc->subject, (float)min_value);
         }
     }
+#endif
 }
 
 void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t max_value)
@@ -634,11 +636,13 @@ void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_inc
             lv_subject_set_int(dsc->subject, max_value);
         }
     }
+#if LV_USE_FLOAT
     else if(dsc->subject->type == LV_SUBJECT_TYPE_FLOAT) {
         if(dsc->subject->value.float_v > (float)max_value) {
             lv_subject_set_float(dsc->subject, (float)max_value);
         }
     }
+#endif
 }
 
 void lv_obj_set_subject_increment_event_rollover(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, bool rollover)
