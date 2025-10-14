@@ -31,7 +31,7 @@
 
 <br/>
 
-### Table of Content
+### Table of Contents
 <p>
   <a href="#ledger-overview">Overview</a> <br/>
   <a href="#-features">Features</a> <br/>
