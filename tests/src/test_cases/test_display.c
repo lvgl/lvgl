@@ -268,7 +268,7 @@ static void never_called(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     TEST_FAIL();
 }
 
-void test_displa_deleted_during_event(void)
+void test_display_deleted_during_event(void)
 {
     lv_display_t * disp = lv_display_create(480, 320);
     lv_display_set_flush_cb(disp, never_called);
