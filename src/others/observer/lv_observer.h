@@ -379,19 +379,43 @@ void lv_subject_notify(lv_subject_t * subject);
  * @param subject   pointer to a subject to change
  * @param trigger   the trigger on which the subject should be changed
  * @param step      value to add on trigger
- * @param rollover  if true and the subject's maximum value is exceeded the minimum value is set,
  *                  if the minimum value is reached, the maximum value will be set on rollover.
  */
-void lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger, int32_t step,
-                                        bool rollover);
+lv_subject_increment_dsc_t * lv_obj_add_subject_increment_event(lv_obj_t * obj, lv_subject_t * subject,
+                                                                lv_event_code_t trigger, int32_t step);
 
 /**
- * Toggle the value of an integer subject on an event. If it was != 0 it will be 0.
- * If it was 0, it will be 1.
- * @param obj       pointer to a widget
- * @param subject   pointer to a subject to toggle
- * @param trigger   the trigger on which the subject should be changed
+ * Set the minimum subject value to set by the event
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param min_value     the minimum value to set
  */
+void lv_obj_set_subject_increment_event_min_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t min_value);
+
+/**
+ * Set the maximum subject value to set by the event
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param max_value     the maximum value to set
+ */
+void lv_obj_set_subject_increment_event_max_value(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, int32_t max_value);
+
+/**
+ * Set what to do when the min/max value is crossed.
+ * @param obj           pointer to the Widget to which the event is attached
+ * @param dsc           pointer to the descriptor returned by `lv_obj_add_subject_increment_event()`
+ * @param rollover      false: stop at the min/max value; true: jump to the other end
+ * @note                the subject also can have min/max values and always the smaller range will be considered
+ */
+void lv_obj_set_subject_increment_event_rollover(lv_obj_t * obj, lv_subject_increment_dsc_t * dsc, bool rollover);
+
+/**
+* Toggle the value of an integer subject on an event. If it was != 0 it will be 0.
+* If it was 0, it will be 1.
+* @param obj       pointer to a widget
+* @param subject   pointer to a subject to toggle
+* @param trigger   the trigger on which the subject should be changed
+*/
 void lv_obj_add_subject_toggle_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger);
 
 /**

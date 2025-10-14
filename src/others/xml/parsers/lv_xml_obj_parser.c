@@ -404,6 +404,8 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
     const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
     const char * step_str =  lv_xml_get_value_of(attrs, "step");
+    const char * min_value_str =  lv_xml_get_value_of(attrs, "min_value");
+    const char * max_value_str =  lv_xml_get_value_of(attrs, "max_value");
     const char * rollover_str =  lv_xml_get_value_of(attrs, "rollover");
 
     if(subject_str == NULL) {
@@ -435,8 +437,11 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     void * item = lv_xml_state_get_item(state);
 
     int32_t step = lv_xml_atoi(step_str);
-    bool rollover = lv_xml_to_bool(rollover_str);
-    lv_obj_add_subject_increment_event(item, subject, trigger, step, rollover);
+    lv_subject_increment_dsc_t * dsc = lv_obj_add_subject_increment_event(item, subject, trigger, step);
+
+    if(min_value_str) lv_obj_set_subject_increment_event_min_value(item, dsc, lv_xml_atoi(min_value_str));
+    if(max_value_str) lv_obj_set_subject_increment_event_max_value(item, dsc, lv_xml_atoi(max_value_str));
+    if(rollover_str) lv_obj_set_subject_increment_event_rollover(item, dsc, lv_xml_to_bool(rollover_str));
 }
 
 void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs)
