@@ -31,8 +31,10 @@ else
   ln -s -T "$SYMLINK_TARGET" lvgl
 fi
 
+# Grab the path to emscripten's port examplelist.c before changing to LVGL's directory
+EXAMPLE_LIST_C=$(pwd)/examplelist.c
 cd lvgl
-scripts/genexamplelist.sh > ../examplelist.c
+scripts/genexamplelist.sh > $EXAMPLE_LIST_C
 cd ..
 
 # Generate lv_conf
