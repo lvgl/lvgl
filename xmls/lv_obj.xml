@@ -141,7 +141,7 @@ Example
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_ge" access="custom" type="void" help="Enable flag if subject's value is greater or equal to a reference value">
+        <element name="bind_flag_if_ge" access="custom" type="void" help="Enable flag if subject's value is greater than or equal to a reference value">
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>
@@ -153,7 +153,7 @@ Example
             <arg name="ref_value" type="int"/>
         </element>
 
-        <element name="bind_flag_if_le" access="custom" type="void" help="Enable flag if subject's value is less or equalt to a reference value">
+        <element name="bind_flag_if_le" access="custom" type="void" help="Enable flag if subject's value is less than or equal to a reference value">
             <arg name="subject" type="subject"/>
             <arg name="flag" type="enum:lv_obj_flag"/>
             <arg name="ref_value" type="int"/>

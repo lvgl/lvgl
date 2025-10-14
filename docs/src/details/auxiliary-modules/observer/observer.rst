@@ -498,7 +498,7 @@ Increment
 ~~~~~~~~~
 
 :cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step)`
-increments an integer subject's value by `step`.
+increments an integer subject's value by ``step``.
 
 It returns a :cpp:type:`lv_subject_increment_dsc_t` pointer to configure the
 event further:
@@ -521,7 +521,7 @@ For example:
 
 :cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5)`
 
-This will increment `subject1` by 5 when `button1` is clicked, stopping at the limits
+This will increment ``subject1`` by 5 when ``button1`` is clicked, stopping at the limits
 set by the min/max values of the event or :cpp:expr:`lv_subject_set_min_value_int()`
 and :cpp:expr:`lv_subject_set_max_value_int()` (same for float subjects).
 
