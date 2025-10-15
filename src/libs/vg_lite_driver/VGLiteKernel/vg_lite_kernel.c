@@ -55,7 +55,7 @@
 #include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
-#include "vg_lite_platform.h"
+#include "../lv_vg_lite_hal/vg_lite_platform.h"
 #include "vg_lite_kernel.h"
 #include "vg_lite_hal.h"
 #include "vg_lite_hw.h"

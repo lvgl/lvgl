@@ -18,6 +18,7 @@
 
 static void sleep(uint32_t msec)
 {
+    lv_sleep_ms(msec);
 }
 
 static uint32_t registerMemBase = LV_VG_LITE_HAL_GPU_BASE_ADDRESS;
@@ -466,20 +467,19 @@ void vg_lite_IRQHandler(void)
 
 int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t * value)
 {
-    if(device->int_queue) {
-        if(lv_thread_sync_wait(&device->int_queue) == LV_RESULT_OK) {
-            if(value != NULL) {
-                *value = device->int_flags & mask;
-            }
-            device->int_flags = 0;
-
-            if(IS_AXI_BUS_ERR(*value)) {
-                vg_lite_bus_error_handler();
-            }
-
-            return 1;
+    if(lv_thread_sync_wait(&device->int_queue) == LV_RESULT_OK) {
+        if(value != NULL) {
+            *value = device->int_flags & mask;
         }
+        device->int_flags = 0;
+
+        if(IS_AXI_BUS_ERR(*value)) {
+            vg_lite_bus_error_handler();
+        }
+
+        return 1;
     }
+
     return 0;
 }
 
