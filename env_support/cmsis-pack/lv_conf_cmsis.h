@@ -1,5 +1,5 @@
 /**
- * @file lv_conf.h
+ * @file lv_conf_cmsis.h
  * Configuration file for v9.4.0
  */
 
