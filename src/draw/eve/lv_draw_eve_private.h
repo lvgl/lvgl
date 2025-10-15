@@ -60,6 +60,8 @@ struct _lv_draw_eve_unit_t {
     lv_draw_eve_ramg_t ramg;
     lv_draw_eve_parameters_t params;
     lv_draw_eve_operation_cb_t op_cb;
+    uint32_t lv_eve_write_buf_len;
+    uint8_t lv_eve_write_buf[LV_DRAW_EVE_WRITE_BUFFER_SIZE];
 };
 
 /**********************

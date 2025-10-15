@@ -497,26 +497,33 @@ This will toggle `subject1` between 0 and 1 each time `button1` is clicked.
 Increment
 ~~~~~~~~~
 
-:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step, rollover)`
-increments an integer subject's value by `step`.
+:cpp:expr:`lv_obj_add_subject_increment_event(obj, subject, trigger, step)`
+increments an integer subject's value by ``step``.
 
-It works on both integer and float subject.
+It returns a :cpp:type:`lv_subject_increment_dsc_t` pointer to configure the
+event further:
 
-``rollover`` can be ``true`` or ``false``. If ``true`` and the subject's minimum or maximum
-value is exceeded, the other end value is set. That is, going beyond
-the maximum value sets the minimum value, and vice versa.
+- :cpp:expr:`lv_obj_set_subject_increment_event_min_value(obj, dsc, min_value)`:
+  Set a minimum value for the event. Default ``INT32_MIN``
+- :cpp:expr:`lv_obj_set_subject_increment_event_max_value(obj, dsc, max_value)`:
+  Set a maximum value for the event. Default ``INT32_MAX``
+- :cpp:expr:`lv_obj_set_subject_increment_event_rollover(obj, dsc, rollover)`:
+  Set what to do when the min/max value is crossed. ``false``: stop at the min/max
+  value; ``true``: jump to the other end. Default ``false``
 
-Using a negative `step` will decrement the value instead.
+It works on both integer and float subjects, but the min/max value is an integer in both cases.
 
+If the subject also sets a min/max value the narrower range will be used.
+
+Using a negative ``step`` will decrement the value instead.
 
 For example:
 
-:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5, false)`
+:cpp:expr:`lv_obj_add_subject_increment_event(button1, subject1, LV_EVENT_CLICKED, 5)`
 
-This will increment `subject1` by 5 when `button1` is clicked, stopping at the limits set by
-:cpp:expr:`lv_subject_set_min_value_int()` and :cpp:expr:`lv_subject_set_max_value_int()`
-(same for float subjects).
-
+This will increment ``subject1`` by 5 when ``button1`` is clicked, stopping at the limits
+set by the min/max values of the event or :cpp:expr:`lv_subject_set_min_value_int()`
+and :cpp:expr:`lv_subject_set_max_value_int()` (same for float subjects).
 
 Set to a Value
 ~~~~~~~~~~~~~~

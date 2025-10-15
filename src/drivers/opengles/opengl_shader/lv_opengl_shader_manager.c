@@ -62,10 +62,12 @@ static bool string_ends_with(const char * value, const char * suffix);
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len);
+                               size_t permutations_len, lv_opengl_glsl_version glsl_version);
 
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader);
 static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
+static bool is_shader_compiled(GLint shader_id);
+static bool is_program_linked(GLint program_id);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -157,10 +159,9 @@ GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager
     return ((lv_opengl_shader_texture_t *)node->data)->id;
 }
 
-uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader,
-                                                const char * shader_identifier,
-                                                const lv_opengl_shader_define_t * permutations,
-                                                size_t permutations_len)
+lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader, const char * shader_identifier,
+                                                   const lv_opengl_shader_define_t * permutations, size_t permutations_len,
+                                                   lv_opengl_glsl_version glsl_version, uint32_t * out_hash)
 {
     /* First check that the shader identifier exists */
     lv_opengl_shader_t key = { shader_identifier, NULL };
@@ -169,7 +170,7 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
 
     if(!source_node) {
         LV_LOG_WARN("Couldn't find shader %s", shader_identifier);
-        return 0;
+        return LV_RESULT_INVALID;
     }
 
     /* Then hash the name with the permutations and see if we already compiled it */
@@ -193,24 +194,36 @@ uint32_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * sha
     if(shader_map_node != NULL) {
         LV_LOG_INFO("Shader '%s' with hash %u found. Id: %d", shader_identifier, hash,
                     ((lv_opengl_compiled_shader_t *)shader_map_node->data)->id);
-        return hash;
+        *out_hash = hash;
+        return LV_RESULT_OK;
     }
 
     /* New shader requested, construct and compile it */
     bool is_vertex = string_ends_with(shader_identifier, ".vert");
     const char * original_shader_source = ((lv_opengl_shader_source_t *)source_node->data)->data.source;
+
     char * shader_source = construct_shader(original_shader_source,
-                                            permutations, permutations_len);
+                                            permutations, permutations_len, glsl_version);
+
     shader_map_key.id = compile_shader(shader_source, is_vertex);
     lv_free(shader_source);
+
+    if(!is_shader_compiled(shader_map_key.id)) {
+        GLchar info_log[512];
+        GL_CALL(glGetShaderInfoLog(shader_map_key.id, sizeof(info_log), NULL, info_log));
+        LV_LOG_WARN("Failed to compile shader for glsl version '%s': %s", lv_opengles_glsl_version_to_string(glsl_version),
+                    info_log);
+        return LV_RESULT_INVALID;
+    }
 
     LV_LOG_TRACE("Compiled %s shader %s to %d Hash %u", is_vertex ? "V" : "F", shader_identifier, shader_map_key.id, hash);
     lv_rb_node_t * node = lv_rb_insert(&shader->compiled_shaders_map, &shader_map_key);
     LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
     lv_memcpy(node->data, &shader_map_key, sizeof(shader_map_key));
 
+    *out_hash = hash;
 
-    return hash;
+    return LV_RESULT_OK;
 }
 
 lv_opengl_shader_program_t *
@@ -250,6 +263,14 @@ lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
         ((lv_opengl_compiled_shader_t *)fragment_node->data)->id;
 
     GLuint program_id = link_program(vertex_shader_id, fragment_shader_id);
+    bool is_linked = is_program_linked(program_id);
+    if(!is_linked) {
+        GLchar info_log[512];
+        GL_CALL(glGetProgramInfoLog(program_id, sizeof(info_log), NULL,
+                                    info_log));
+        LV_LOG_WARN("Failed to link program: %s", info_log);
+        return NULL;
+    }
     LV_LOG_TRACE("Linking program with shaders V: %d F:%d P: %d", vertex_shader_id, fragment_shader_id, program_id);
 
     lv_opengl_shader_program_t * program =
@@ -301,19 +322,32 @@ void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
 
 }
 
-char * lv_opengl_shader_manager_process_includes(const char * c_src, const char * defines,
-                                                 const lv_opengl_shader_t * src_includes, size_t num_items)
+const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version)
 {
 
-    if(!c_src || !defines || !src_includes) {
+    switch(version) {
+        case LV_OPENGL_GLSL_VERSION_100:
+            return "#version 100\n";
+        case LV_OPENGL_GLSL_VERSION_300ES:
+            return "#version 300 es\n";
+        case LV_OPENGL_GLSL_VERSION_LAST:
+            LV_LOG_ERROR("LV_OPENGL_GLSL_VERSION_LAST is not a valid version");
+            return NULL;
+    }
+    LV_UNREACHABLE();
+}
+
+char * lv_opengl_shader_manager_process_includes(const char * c_src, const lv_opengl_shader_t * src_includes,
+                                                 size_t num_items)
+{
+    if(!c_src || !src_includes) {
         return NULL;
     }
 
-    char * rep = replace_word(c_src, GLSL_VERSION_PREFIX, defines);
+    char * rep = lv_strdup(c_src);
     if(!rep) {
         return NULL;
     }
-
     char search_str[255];
 
     for(size_t i = 0; i < num_items; i++) {
@@ -399,6 +433,19 @@ compiled_shader_compare_cb(const lv_opengl_compiled_shader_t * lhs,
 {
     return lhs->hash - rhs->hash;
 }
+static bool is_shader_compiled(GLint shader_id)
+{
+    int shader_compiled;
+    GL_CALL(glGetShaderiv(shader_id, GL_COMPILE_STATUS, &shader_compiled));
+    return shader_compiled;
+}
+
+static bool is_program_linked(GLint program_id)
+{
+    int link_status;
+    GL_CALL(glGetProgramiv(program_id, GL_LINK_STATUS, &link_status));
+    return link_status;
+}
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader)
 {
     GLuint shader_id;
@@ -413,15 +460,6 @@ static GLuint compile_shader(const char * shader_source, bool is_vertex_shader)
                            NULL));
     GL_CALL(glCompileShader(shader_id));
 
-    int shader_compiled;
-    GL_CALL(glGetShaderiv(shader_id, GL_COMPILE_STATUS, &shader_compiled));
-    if(!shader_compiled) {
-        GLchar info_log[512];
-        GL_CALL(glGetShaderInfoLog(shader_id, sizeof(info_log), NULL,
-                                   info_log));
-        LV_LOG_ERROR("Failed to compile shader: %s", info_log);
-        LV_ASSERT_MSG(shader_compiled, "Couldn't compile shader");
-    }
     return shader_id;
 }
 
@@ -433,15 +471,6 @@ static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id)
     GL_CALL(glAttachShader(program_id, vertex_shader_id));
     GL_CALL(glLinkProgram(program_id));
 
-    int link_status;
-    GL_CALL(glGetProgramiv(program_id, GL_LINK_STATUS, &link_status));
-    if(!link_status) {
-        GLchar info_log[512];
-        GL_CALL(glGetProgramInfoLog(program_id, sizeof(info_log), NULL,
-                                    info_log));
-        LV_LOG_ERROR("GLSL LINK ERROR: %s", info_log);
-        LV_ASSERT_MSG(link_status, "Couldn't link program");
-    }
     return program_id;
 }
 
@@ -454,10 +483,11 @@ static char * append_to_shader(char * dst, const char * src, size_t * curr_index
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len)
+                               size_t permutations_len, lv_opengl_glsl_version glsl_version)
 {
-    const char * defines = "#version 300 es\n";
+    const char * defines = lv_opengles_glsl_version_to_string(glsl_version);
     const char * prefix = "#define ";
+
     const size_t prefix_len = lv_strlen(prefix);
     size_t shader_source_size = lv_strlen(defines) + lv_strlen(source);
 

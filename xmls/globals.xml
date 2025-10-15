@@ -217,6 +217,13 @@
         <enum name="center" help="Align to center of the parent"/>
     </enumdef>
 
+    <enumdef name="lv_scrollbar_mode" help="How to display scrollbars">
+        <enum name="off" help="Never show the scrollbars"/>
+        <enum name="on" help="Always show the scrollbars"/>
+        <enum name="active" help="Show scrollbars while the widget is being scrolled"/>
+        <enum name="auto" help="Show scrollbars when the content is large enough to be scrolled"/>
+    </enumdef>
+
     <enumdef name="lv_screen_load_anim" help="Screen load animations">
         <enum name="none" help="No animation"/>
         <enum name="over_left" help="Slide in from left"/>
