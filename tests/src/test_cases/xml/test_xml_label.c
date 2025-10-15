@@ -83,11 +83,29 @@ void test_xml_label_translation_tag(void)
         NULL, NULL,
     };
 
+    /* Translation tag takes precedence over the text*/
+    const char * label3_attrs[] = {
+        "text", "This is text",
+        "translation_tag", "tiger",
+        NULL, NULL,
+    };
+
+    /* ... even if the text is set later */
+    const char * label4_attrs[] = {
+        "translation_tag", "tiger",
+        "text", "This is text",
+        NULL, NULL,
+    };
+
     lv_obj_t * label = lv_xml_create(scr, "lv_label", label1_attrs);
     lv_obj_t * label2 = lv_xml_create(scr, "lv_label", label2_attrs);
+    lv_obj_t * label3 = lv_xml_create(scr, "lv_label", label3_attrs);
+    lv_obj_t * label4 = lv_xml_create(scr, "lv_label", label4_attrs);
     lv_translation_set_language("de");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label2), "This is text");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label3), "Der Tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label4), "Der Tiger");
 }
 
 void test_xml_label_both_text_and_translation_tag(void)

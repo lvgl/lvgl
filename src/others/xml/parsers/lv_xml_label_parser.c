@@ -51,17 +51,26 @@ void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
     lv_xml_obj_apply(state, attrs); /*Apply the common properties, e.g. width, height, styles flags etc*/
 
+    bool has_tag = false;
     for(int i = 0; attrs[i]; i += 2) {
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
+        const bool is_value_empty = !value || lv_strlen(value) == 0;
 
-        /* Allow defining both translation_tag and text attributes
-         * Ignore the empty one*/
-        if(lv_streq("text", name) && value && lv_strlen(value) > 0) lv_label_set_text(item, value);
-        else if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
+        /* Allow defining both translation_tag and text attributes. Ignore the empty one*/
+        /* Translation tag has precendence over text*/
+        if(lv_streq("text", name) && !has_tag) {
+            lv_label_set_text(item, value);
+        }
 #if LV_USE_TRANSLATION
-        else if(lv_streq("translation_tag", name) && value && lv_strlen(value) > 0) lv_label_set_translation_tag(item, value);
+        /* We only set the translation tag if the value is non empty
+         * but if we set it, then we must ignore the text attribute*/
+        else if(lv_streq("translation_tag", name) && !is_value_empty) {
+            has_tag = true;
+            lv_label_set_translation_tag(item, value);
+        }
 #endif
+        else if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
         else if(lv_streq("bind_text", name)) {
             lv_subject_t * subject = lv_xml_get_subject(&state->scope, value);
             if(subject == NULL) {
