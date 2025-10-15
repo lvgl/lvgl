@@ -97,15 +97,24 @@ void test_xml_label_translation_tag(void)
         NULL, NULL,
     };
 
+    /* If both are empty, we should set label to be an empty string */
+    const char * label5_attrs[] = {
+        "translation_tag", "",
+        "text", "",
+        NULL, NULL,
+    };
+
     lv_obj_t * label = lv_xml_create(scr, "lv_label", label1_attrs);
     lv_obj_t * label2 = lv_xml_create(scr, "lv_label", label2_attrs);
     lv_obj_t * label3 = lv_xml_create(scr, "lv_label", label3_attrs);
     lv_obj_t * label4 = lv_xml_create(scr, "lv_label", label4_attrs);
+    lv_obj_t * label5 = lv_xml_create(scr, "lv_label", label5_attrs);
     lv_translation_set_language("de");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label2), "This is text");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label3), "Der Tiger");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label4), "Der Tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label5), "");
 }
 
 void test_xml_label_both_text_and_translation_tag(void)
