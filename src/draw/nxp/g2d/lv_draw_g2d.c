@@ -23,6 +23,15 @@
 
 #define DRAW_UNIT_ID_G2D 8
 
+/**
+ * Enum name differs depending on g2d version (breaking API change, not handled in g2d.h)
+ * Note: enum value is the same in either case
+ * See https://github.com/nxp-imx/imx-g2d-pxp/commit/d7af84b5c8ad161b6898ffabe23918cb59fe2fe9
+ */
+#if (G2D_VERSION_MAJOR >= 2) && (G2D_VERSION_MINOR < 3)
+    #define G2D_HARDWARE_PXP_V1 G2D_HARDWARE_PXP
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
