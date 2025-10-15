@@ -205,7 +205,7 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
-    if(!tag) {
+    if(!tag || tag[0] == '\0') {
         return;
     }
     char * new_tag = lv_strdup(tag);
