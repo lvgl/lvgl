@@ -498,7 +498,7 @@
                 <file category="sourceC"            name="src/drivers/opengles/lv_opengles_glfw.c" />
                 <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_manager.c" />
                 <file category="sourceC"            name="src/drivers/opengles/opengl_shader/lv_opengl_shader_program.c" />
-                <file category="sourceC"            name="src/drivers/opengles/assets/lv_opengles_standard_shader.c" />
+                <file category="sourceC"            name="src/drivers/opengles/assets/lv_opengles_shader.c" />
                 <file category="sourceC"            name="src/drivers/opengles/glad/src/egl.c" />
                 <file category="sourceC"            name="src/drivers/opengles/glad/src/gles2.c" />
                 
