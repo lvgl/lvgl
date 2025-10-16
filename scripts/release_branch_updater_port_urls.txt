@@ -9,8 +9,8 @@ https://github.com/lvgl/lv_port_actions_technology
 https://github.com/lvgl/lv_port_icop_qec_ppc_m_090t
 https://github.com/lvgl/lv_port_nxp_frdm_mcxn947
 https://github.com/lvgl/lv_port_nxp_imx_rt500_evk
-https://github.com/lvgl/lv_port_nxp_imx_rt1064-evk
-https://github.com/lvgl/lv_port_nxp_imx_rt1170-evkb
+https://github.com/lvgl/lv_port_nxp_mimxrt1064-evk
+https://github.com/lvgl/lv_port_nxp_imxrt1170-evkb
 https://github.com/lvgl/lv_port_raspberry_pi_pico_mdk
 https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
 https://github.com/lvgl/lv_port_renesas_ek-ra6m3g
