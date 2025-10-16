@@ -70,6 +70,58 @@ void test_xml_label_translation_tag(void)
     lv_translation_add_static(languages, tags, translations);
 
     lv_obj_t * scr = lv_screen_active();
+
+    const char * label1_attrs[] = {
+        "text", "",
+        "translation_tag", "tiger",
+        NULL, NULL,
+    };
+
+    const char * label2_attrs[] = {
+        "text", "This is text",
+        "translation_tag", "",
+        NULL, NULL,
+    };
+
+    const char * label3_attrs[] = {
+        "text", "This is text",
+        "translation_tag", "tiger",
+        NULL, NULL,
+    };
+
+    const char * label4_attrs[] = {
+        "translation_tag", "tiger",
+        "text", "This is text",
+        NULL, NULL,
+    };
+
+    const char * label5_attrs[] = {
+        "translation_tag", "",
+        "text", "",
+        NULL, NULL,
+    };
+
+    lv_obj_t * label = lv_xml_create(scr, "lv_label", label1_attrs);
+    lv_obj_t * label2 = lv_xml_create(scr, "lv_label", label2_attrs);
+    lv_obj_t * label3 = lv_xml_create(scr, "lv_label", label3_attrs);
+    lv_obj_t * label4 = lv_xml_create(scr, "lv_label", label4_attrs);
+    lv_obj_t * label5 = lv_xml_create(scr, "lv_label", label5_attrs);
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label2), "This is text");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label3), "Der Tiger");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label4), "This is text");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label5), "");
+}
+
+void test_xml_label_both_text_and_translation_tag(void)
+{
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    lv_translation_add_static(languages, tags, translations);
+
+    lv_obj_t * scr = lv_screen_active();
     const char * label1_attrs[] = {
         "translation_tag", "tiger",
         NULL, NULL,
