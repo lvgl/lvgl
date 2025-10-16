@@ -98,11 +98,25 @@ int32_t lv_gif_get_loop_count(lv_obj_t * obj);
 void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count);
 
 /**
+ * Get frame count of the GIF.
+ * @param obj pointer to a gif obj
+ * @return frame count of the GIF
+ */
+int32_t lv_gif_get_frame_count(lv_obj_t * obj);
+
+/**
+ * Get the current frame index of the GIF.
+ * @param obj pointer to a gif obj
+ * @return current frame index of the GIF
+ */
+int32_t lv_gif_get_current_frame_index(lv_obj_t * obj);
+
+/**
  * Set whether to decode invisible obj.
  * @param obj             pointer to a gif object
  * @param decode_invisible true: decode invisible obj, false: don't decode them
  */
-void lv_gif_set_decode_invisible(lv_obj_t * obj, bool decode_invisible);
+void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool decode_invisible);
 
 /**********************
  *      MACROS
