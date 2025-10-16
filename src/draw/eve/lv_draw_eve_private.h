@@ -34,10 +34,10 @@ extern "C" {
 #include "../lv_draw_arc.h"
 
 #if LV_DRAW_EVE_WRITE_BUFFER_SIZE != 0 && LV_DRAW_EVE_WRITE_BUFFER_SIZE < 4
-    #warning LV_DRAW_EVE_WRITE_BUFFER_SIZE cannot be less than 4. Using 0 (buffering disabled).
-    #define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL 0
+#warning LV_DRAW_EVE_WRITE_BUFFER_SIZE cannot be less than 4. Using 0 (buffering disabled).
+#define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL 0
 #else
-    #define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL LV_DRAW_EVE_WRITE_BUFFER_SIZE
+#define LV_DRAW_EVE_WRITE_BUFFER_SIZE_INTERNAL LV_DRAW_EVE_WRITE_BUFFER_SIZE
 #endif
 
 /*********************
