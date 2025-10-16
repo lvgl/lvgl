@@ -72,6 +72,8 @@ static void * egl_update_thread_fn(void * arg);
 static void egl_update_thread_init(lv_drm_ctx_t * ctx);
 static void egl_update_thread_deinit(lv_drm_ctx_t * ctx);
 
+static void flush_wait_cb(lv_display_t * display);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -142,9 +144,9 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
 
-    lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RENDER_START, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
+    lv_display_set_flush_wait_cb(ctx->display, flush_wait_cb);
     egl_update_thread_init(ctx);
 }
 
@@ -167,7 +169,6 @@ static void event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
-    lv_result_t res;
     switch(code) {
         case LV_EVENT_DELETE:
             if(ctx) {
@@ -183,18 +184,23 @@ static void event_cb(lv_event_t * e)
             lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
                                         lv_display_get_vertical_resolution(display));
             break;
-        case LV_EVENT_RENDER_START:
-            /* We need to wait for the swap thread to finish displaying the previous frame
-            * So that we can bind the context to the current thread.
-            * In case the we need opengl to draw (see opengl draw unit),
-            * it will expect the context to be bound to the current thread*/
-            sem_wait(&ctx->egl_update_thread.update_complete_semaphore);
-            res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
-            LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
-            break;
         default:
             return;
     }
+}
+
+static void flush_wait_cb(lv_display_t * display)
+{
+    /* We need to wait for the swap thread to finish displaying the previous frame
+    * So that we can bind the context to the current thread.
+    * In case the we need opengl to draw (see opengl draw unit),
+    * it will expect the context to be bound to the current thread*/
+    lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
+
+    sem_wait(&ctx->egl_update_thread.update_complete_semaphore);
+
+    int res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
+    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
 }
 
 static uint32_t tick_cb(void)
@@ -226,12 +232,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     LV_UNUSED(px_map);
     if(!lv_display_flush_is_last(disp)) {
+        /* Call flush ready to prevent calling wait_flush_cb on the non-last area
+        * else it will block forever*/
         lv_display_flush_ready(disp);
         return;
     }
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
 
-    /* The current context is set in the RENDER_START event so we don't need to do it here*/
     set_viewport(disp);
     lv_opengles_render_display_texture(disp, false, true);
 
@@ -250,6 +257,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
 
     if(!lv_display_flush_is_last(disp)) {
+        /* Call flush ready to prevent calling wait_flush_cb on the non-last area
+        * else it will block forever*/
         lv_display_flush_ready(disp);
         return;
     }
@@ -258,7 +267,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     int32_t disp_width = lv_display_get_horizontal_resolution(disp);
     int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
-    /* The current context is set in the RENDER_START event so we don't need to do it here*/
     set_viewport(disp);
 
     lv_color_format_t cf = lv_display_get_color_format(disp);
@@ -790,13 +798,17 @@ static void * egl_update_thread_fn(void * arg)
             LV_LOG_INFO("EGL update thread exiting");
             break;
         }
+
+
         lv_result_t res = lv_opengles_egl_bind_current_context(ctx->egl_ctx);
         LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to bind current EGL context");
+
         lv_opengles_egl_update(ctx->egl_ctx);
+
         res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
         LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
+
         ret = sem_post(&ctx->egl_update_thread.update_complete_semaphore);
-        lv_display_flush_ready(ctx->display);
         LV_ASSERT_FORMAT_MSG(!ret, "Failed to sync with main thread: %s", strerror(errno));
     }
     return NULL;
@@ -807,7 +819,7 @@ static void egl_update_thread_init(lv_drm_ctx_t * ctx)
     ctx->egl_update_thread.should_exit = false;
     int ret = sem_init(&ctx->egl_update_thread.update_semaphore, 0, 0);
     LV_ASSERT_FORMAT_MSG(!ret, "Failed to create thread syncing semaphore: %s", strerror(errno));
-    ret = sem_init(&ctx->egl_update_thread.update_complete_semaphore, 0, 1);
+    ret = sem_init(&ctx->egl_update_thread.update_complete_semaphore, 0, 0);
     LV_ASSERT_FORMAT_MSG(!ret, "Failed to create thread syncing semaphore: %s", strerror(errno));
     ret = pthread_create(&ctx->egl_update_thread.thread, NULL, egl_update_thread_fn, ctx);
     LV_ASSERT_FORMAT_MSG(!ret, "Failed to initialize flush thread: %s", strerror(errno));
