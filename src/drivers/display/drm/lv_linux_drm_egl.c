@@ -10,6 +10,7 @@
 
 #if LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL
 
+#include <errno.h>
 #include <fcntl.h>
 #include <string.h>
 #include <xf86drmMode.h>
@@ -237,7 +238,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     /* Unbind the current context so that it can be bound in the update thread*/
     lv_result_t res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
     LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
-    sem_post(&ctx->egl_update_thread.update_semaphore);
+    int ret = sem_post(&ctx->egl_update_thread.update_semaphore);
+    LV_ASSERT_FORMAT_MSG(!ret, "Failed to dispatch flush thread: %s", strerror(errno));
 }
 
 #else
@@ -281,7 +283,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     /* Unbind the current context so that it can be bound in the update thread*/
     lv_result_t res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
     LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
-    sem_post(&ctx->egl_update_thread.update_semaphore);
+    int ret = sem_post(&ctx->egl_update_thread.update_semaphore);
+    LV_ASSERT_FORMAT_MSG(!ret, "Failed to dispatch flush thread: %s", strerror(errno));
 }
 #endif
 
@@ -778,7 +781,11 @@ static void * egl_update_thread_fn(void * arg)
 {
     lv_drm_ctx_t * ctx = (lv_drm_ctx_t *)arg;
     while(!ctx->egl_update_thread.should_exit) {
-        sem_wait(&ctx->egl_update_thread.update_semaphore);
+        int ret = sem_wait(&ctx->egl_update_thread.update_semaphore);
+        if(ret) {
+            LV_LOG_ERROR("Failed to wait on semaphore: %s", strerror(errno));
+            break;
+        }
         if(ctx->egl_update_thread.should_exit) {
             LV_LOG_INFO("EGL update thread exiting");
             break;
@@ -788,8 +795,9 @@ static void * egl_update_thread_fn(void * arg)
         lv_opengles_egl_update(ctx->egl_ctx);
         res = lv_opengles_egl_unbind_current_context(ctx->egl_ctx);
         LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to unbind current EGL context");
-        sem_post(&ctx->egl_update_thread.update_complete_semaphore);
+        ret = sem_post(&ctx->egl_update_thread.update_complete_semaphore);
         lv_display_flush_ready(ctx->display);
+        LV_ASSERT_FORMAT_MSG(!ret, "Failed to sync with main thread: %s", strerror(errno));
     }
     return NULL;
 }
@@ -797,19 +805,34 @@ static void * egl_update_thread_fn(void * arg)
 static void egl_update_thread_init(lv_drm_ctx_t * ctx)
 {
     ctx->egl_update_thread.should_exit = false;
-    sem_init(&ctx->egl_update_thread.update_semaphore, 0, 0);
-    sem_init(&ctx->egl_update_thread.update_complete_semaphore, 0, 1);
-
-    pthread_create(&ctx->egl_update_thread.thread, NULL, egl_update_thread_fn, ctx);
+    int ret = sem_init(&ctx->egl_update_thread.update_semaphore, 0, 0);
+    LV_ASSERT_FORMAT_MSG(!ret, "Failed to create thread syncing semaphore: %s", strerror(errno));
+    ret = sem_init(&ctx->egl_update_thread.update_complete_semaphore, 0, 1);
+    LV_ASSERT_FORMAT_MSG(!ret, "Failed to create thread syncing semaphore: %s", strerror(errno));
+    ret = pthread_create(&ctx->egl_update_thread.thread, NULL, egl_update_thread_fn, ctx);
+    LV_ASSERT_FORMAT_MSG(!ret, "Failed to initialize flush thread: %s", strerror(errno));
 }
 
 static void egl_update_thread_deinit(lv_drm_ctx_t * ctx)
 {
     ctx->egl_update_thread.should_exit = true;
-    sem_post(&ctx->egl_update_thread.update_semaphore);
-    pthread_join(ctx->egl_update_thread.thread, NULL);
-    sem_destroy(&ctx->egl_update_thread.update_semaphore);
-    sem_destroy(&ctx->egl_update_thread.update_complete_semaphore);
+    int ret = sem_post(&ctx->egl_update_thread.update_semaphore);
+    if(ret) {
+        LV_LOG_ERROR("Failed to sync with thread: %s", strerror(errno));
+        return;
+    }
+    ret = pthread_join(ctx->egl_update_thread.thread, NULL);
+    if(ret) {
+        LV_LOG_ERROR("Failed to join flush thread: %s", strerror(errno));
+    }
+    ret = sem_destroy(&ctx->egl_update_thread.update_semaphore);
+    if(ret) {
+        LV_LOG_ERROR("Failed to destroy flush thread syncing semaphore: %s", strerror(errno));
+    }
+    ret = sem_destroy(&ctx->egl_update_thread.update_complete_semaphore);
+    if(ret) {
+        LV_LOG_ERROR("Failed to destroy flush thread syncing semaphore: %s", strerror(errno));
+    }
 }
 
 #endif /*LV_USE_LINUX_DRM && LV_LINUX_DRM_USE_EGL*/
