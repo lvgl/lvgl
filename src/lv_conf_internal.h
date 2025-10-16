@@ -1122,7 +1122,9 @@
         #endif
     #endif
 
-    /* the maximum number of bytes to buffer before a single SPI transmission */
+    /* The maximum number of bytes to buffer before a single SPI transmission.
+     * Set it to 0 to disable write buffering.
+     */
     #ifndef LV_DRAW_EVE_WRITE_BUFFER_SIZE
         #ifdef CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
