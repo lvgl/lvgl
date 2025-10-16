@@ -1,6 +1,6 @@
 /**
  * @file lv_conf_cmsis.h
- * Configuration file for v9.3.0
+ * Configuration file for v9.4.0
  */
 
 /* clang-format off */
@@ -106,6 +106,16 @@
 /*=================
  * OPERATING SYSTEM
  *=================*/
+/** Select operating system to use. Possible options:
+ * - LV_OS_NONE
+ * - LV_OS_PTHREAD
+ * - LV_OS_FREERTOS
+ * - LV_OS_CMSIS_RTOS2
+ * - LV_OS_RTTHREAD
+ * - LV_OS_WINDOWS
+ * - LV_OS_MQX
+ * - LV_OS_SDL2
+ * - LV_OS_CUSTOM */
 
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
@@ -216,8 +226,8 @@
     #if !defined(LV_USE_DRAW_SW_ASM) && defined(RTE_Acceleration_Arm_2D)
         /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
         #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
-            #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
-            #define LV_USE_DRAW_ARM2D_SYNC   1
+            #define LV_USE_DRAW_SW_ASM      LV_DRAW_SW_ASM_HELIUM
+            #define LV_USE_DRAW_ARM2D_SYNC  1
         #endif
     #endif
 
@@ -272,12 +282,18 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+    /** Use G2D for drawing. **/
+    #define LV_USE_DRAW_G2D 1
+
+    /** Use G2D to rotate display. **/
+    #define LV_USE_ROTATE_G2D 0
+
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #define LV_G2D_HASH_TABLE_SIZE 50
 
-    #if LV_USE_OS
+    #if LV_USE_DRAW_G2D && LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #define LV_USE_G2D_DRAW_THREAD 1
     #endif
@@ -308,6 +324,12 @@
 
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
+
+    /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
+    #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
+
+    /** Disable linear gradient extension for some older versions of drivers. */
+    #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
@@ -320,8 +342,26 @@
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
 
-/** Draw using cached OpenGLES textures */
+/** Draw using cached OpenGLES textures. Requires LV_USE_OPENGLES */
 #define LV_USE_DRAW_OPENGLES 0
+
+#if LV_USE_DRAW_OPENGLES
+    #define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 64
+#endif
+
+/** Draw using espressif PPA accelerator */
+#if LV_USE_PPA
+    #define LV_USE_PPA_IMG 0
+#endif
+
+/* Use EVE FT81X GPU. */
+#if LV_USE_DRAW_EVE
+    /* EVE_GEN value: 2, 3, or 4 */
+    #define LV_DRAW_EVE_EVE_GENERATION 4
+
+    /* the maximum number of bytes to buffer before a single SPI transmission */
+    #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+#endif
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -487,6 +527,20 @@
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 #endif
 
+/* Enable usage of the LVGL's vg_lite spec driver */
+#if LV_USE_VG_LITE_DRIVER
+
+    /* Used to pick the correct GPU series folder valid options are gc255, gc355 and gc555*/
+    #define LV_VG_LITE_HAL_GPU_SERIES gc255
+
+    /* Used to pick the correct GPU revision header it depends on the vendor */
+    #define LV_VG_LITE_HAL_GPU_REVISION 0x40
+
+    /* Base memory address of the GPU IP it depends on SoC, default value is for NXP based devices */
+    #define LV_VG_LITE_HAL_GPU_BASE_ADDRESS 0x40240000
+
+#endif
+
 /* Enable the multi-touch gesture recognition feature */
 /* Gesture recognition requires the use of floats */
 #define LV_USE_GESTURE_RECOGNITION 0
@@ -513,7 +567,7 @@
 
 /** Will be added where memory needs to be aligned (with -Os data might not be aligned to boundary by default).
  *  E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
 
 /** Attribute to mark large constant arrays, for example for font bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -663,12 +717,15 @@
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
  *  - lv_roller_t      :  Options set to "Option 1", "Option 2", "Option 3", "Option 4", "Option 5", else no values are set.
  *  - lv_label_t       :  Text set to "Text", else empty string.
+ *  - lv_arclabel_t   :  Text set to "Arced Text", else empty string.
  * */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
 
 #define LV_USE_ANIMIMG    1
 
 #define LV_USE_ARC        1
+
+#define LV_USE_ARCLABEL  1
 
 #define LV_USE_BAR        1
 
@@ -760,7 +817,7 @@
 /*==================
  * THEMES
  *==================*/
-/* Documentation for themes can be found here: https://docs.lvgl.io/master/details/common-widget-features/styles/style.html#themes . */
+/* Documentation for themes can be found here: https://docs.lvgl.io/master/details/common-widget-features/styles/styles.html#themes . */
 
 /** A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT 1
@@ -861,6 +918,10 @@
     #define LV_FS_UEFI_LETTER '\0'      /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
 #endif
 
+#if LV_USE_FS_FROGFS
+    #define LV_FS_FROGFS_LETTER '\0'
+#endif
+
 /** GIF decoder library */
 #if LV_USE_GIF
     /** GIF decoder accelerate */
@@ -884,11 +945,13 @@
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
-    #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+    #define LV_TINY_TTF_CACHE_GLYPH_CNT 128
+    #define LV_TINY_TTF_CACHE_KERNING_CNT 256
 #endif
 
 /** Enable Vector Graphic APIs
  *  - Requires `LV_USE_MATRIX = 1` */
+/*Enable Vector Graphic APIs*/
 #ifndef LV_USE_VECTOR_GRAPHIC
 #   define LV_USE_VECTOR_GRAPHIC  0
 
@@ -899,16 +962,11 @@
 #   define LV_USE_THORVG_EXTERNAL 0
 #endif
 
-/*Enable LZ4 compress/decompress lib*/
-#ifndef LV_USE_LZ4
-#   define LV_USE_LZ4  0
+/** Use lvgl built-in LZ4 lib */
+#define LV_USE_LZ4_INTERNAL  0
 
-/*Use lvgl built-in LZ4 lib*/
-#   define LV_USE_LZ4_INTERNAL  0
-
-/*Use external LZ4 library*/
-#   define LV_USE_LZ4_EXTERNAL  0
-#endif
+/** Use external LZ4 library */
+#define LV_USE_LZ4_EXTERNAL  0
 
 /*SVG library
  *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
@@ -936,6 +994,13 @@
 #if LV_USE_SYSMON
     /** Get the idle percentage. E.g. uint32_t my_get_idle(void); */
     #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
+    /** 1: Enable usage of lv_os_get_proc_idle_percent.*/
+    #define LV_SYSMON_PROC_IDLE_AVAILABLE 0
+    #if LV_SYSMON_PROC_IDLE_AVAILABLE
+        /** Get the applications idle percentage.
+         * - Requires `LV_USE_OS == LV_OS_PTHREAD` */
+        #define LV_SYSMON_GET_PROC_IDLE lv_os_get_proc_idle_percent
+    #endif 
 
     /** 1: Show CPU usage and FPS count.
      *  - Requires `LV_USE_SYSMON = 1` */
@@ -965,6 +1030,7 @@
         /** Default profiler trace buffer size */
         #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /**< [bytes] */
         #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
+        #define LV_USE_PROFILER_BUILTIN_POSIX 0 /**< Enable POSIX profiler port */
     #endif
 
     /** Header to include for profiler */
@@ -1065,6 +1131,7 @@
 
 /*1: Enable color filter style*/
 #define LV_USE_COLOR_FILTER     0
+
 /*==================
  * DEVICES
  *==================*/
@@ -1095,7 +1162,11 @@
 /** Use Wayland to open a window and handle input on Linux or BSD desktops */
 #define LV_USE_WAYLAND          0
 #if LV_USE_WAYLAND
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
+    #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
+    #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_USE_DRAW_G2D */
+    #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
+                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
+    #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
 #endif
 
 /** Driver for /dev/fb */
@@ -1131,8 +1202,21 @@
     /** Driver for /dev/input */
     #define LV_USE_NUTTX_TOUCHSCREEN    0
 
-    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    /** Touchscreen cursor size in pixels(<=0: disable cursor) */
     #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
+
+    /** Driver for /dev/mouse */
+    #define LV_USE_NUTTX_MOUSE    0
+
+    /** Mouse movement step (pixels) */
+    #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
+
+    /*NuttX trace file and its path*/
+    #define LV_USE_NUTTX_TRACE_FILE 0
+    #if LV_USE_NUTTX_TRACE_FILE
+        #define LV_NUTTX_TRACE_FILE_PATH "/data/lvgl-trace.log"
+    #endif
+
 #endif
 
 /** Driver for /dev/dri/card */
@@ -1143,8 +1227,15 @@
      * The GBM library aims to provide a platform independent memory management system
      * it supports the major GPU vendors - This option requires linking with libgbm */
     #define LV_USE_LINUX_DRM_GBM_BUFFERS 0
+
+    #define LV_LINUX_DRM_USE_EGL     0
 #endif
 
+/** Interface for Lovyan_GFX */
+#if LV_USE_LOVYAN_GFX
+    #define LV_LGFX_USER_INCLUDE "lv_lgfx_user.hpp"
+
+#endif /*LV_USE_LOVYAN_GFX*/
 
 /** Driver for evdev input devices */
 #define LV_USE_EVDEV    0
@@ -1163,7 +1254,8 @@
     #endif
 #endif
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+/* Drivers for LCD devices connected via SPI/parallel port */
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #define LV_USE_GENERIC_MIPI 1
 #else
     #define LV_USE_GENERIC_MIPI 0
@@ -1182,11 +1274,15 @@
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 
-/** Use OpenGL to open window on PC and handle mouse and keyboard */
+/** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL */
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
 #endif
+
+/** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
+#define LV_USE_GLFW   0
+
 
 /** QNX Screen display and input drivers */
 #define LV_USE_QNX              0
@@ -1204,12 +1300,16 @@
 /** Build the demos */
 #define LV_BUILD_DEMOS 1
 
-
 /*===================
  * DEMO USAGE
  ====================*/
 
 #if LV_BUILD_DEMOS
+
+    #if LV_USE_DEMO_BENCHMARK
+        /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
+        #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
+    #endif
 
     /** Music player demo */
     #if LV_USE_DEMO_MUSIC
@@ -1220,18 +1320,9 @@
         #define LV_DEMO_MUSIC_AUTO_PLAY 0
     #endif
 
-    #if LV_USE_DEMO_BENCHMARK
-        /** Use fonts where bitmaps are aligned 16 byte and has Nx16 byte stride */
-        #define LV_DEMO_BENCHMARK_ALIGNED_FONTS 0
-    #endif
+#endif /* LV_BUILD_DEMOS */
 
-#endif
-/*---------------------------
- * Demos from lvgl/lv_demos
-  ---------------------------*/
-
-
-/*--END OF LV_CONF_H--*/
+/*--END OF LV_CONF_CMSIS_H--*/
 
 #endif /*LV_CONF_CMSIS_H*/
 
