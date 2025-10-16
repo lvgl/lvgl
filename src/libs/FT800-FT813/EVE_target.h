@@ -9,8 +9,6 @@
 #define lv_eve_write_buf (LV_GLOBAL_DEFAULT()->draw_eve_unit->lv_eve_write_buf)
 #define lv_eve_write_buf_len (LV_GLOBAL_DEFAULT()->draw_eve_unit->lv_eve_write_buf_len)
 
-#define LV_EVE_TARGET_SPI_SEND(data, size) lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, (data), (size))
-
 static inline void lv_eve_target_flush_write_buf(void);
 
 static inline void DELAY_MS(uint16_t ms)
@@ -47,7 +45,7 @@ static inline void spi_transmit(uint8_t data)
     }
     lv_eve_write_buf[lv_eve_write_buf_len++] = data;
 #else
-    LV_EVE_TARGET_SPI_SEND(&data, sizeof(data));
+    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, &data, sizeof(data));
 #endif
 }
 
@@ -66,14 +64,14 @@ static inline void spi_transmit_32(uint32_t data)
     lv_eve_write_buf[lv_eve_write_buf_len++] = buf4[2];
     lv_eve_write_buf[lv_eve_write_buf_len++] = buf4[3];
 #else
-    LV_EVE_TARGET_SPI_SEND(&data, sizeof(data));
+    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, &data, sizeof(data));
 #endif
 }
 
 static inline void lv_eve_target_spi_transmit_buf(const void * data, uint32_t size)
 {
     lv_eve_target_flush_write_buf();
-    LV_EVE_TARGET_SPI_SEND((void *) data, size);
+    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, (void *) data, size);
 }
 
 static inline void lv_eve_target_flush_write_buf(void)
@@ -82,7 +80,7 @@ static inline void lv_eve_target_flush_write_buf(void)
     if(lv_eve_write_buf_len == 0) {
         return;
     }
-    LV_EVE_TARGET_SPI_SEND(lv_eve_write_buf, lv_eve_write_buf_len);
+    lv_draw_eve_unit_g->op_cb(lv_draw_eve_unit_g->disp, LV_DRAW_EVE_OPERATION_SPI_SEND, lv_eve_write_buf, lv_eve_write_buf_len);
     lv_eve_write_buf_len = 0;
 #endif
 }
