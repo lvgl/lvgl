@@ -20,7 +20,7 @@ Initialization
 The main entry point is a ``<project_name>_init("asset_path")`` function located
 in ``<project_name>.c``.
 
-``<project_name>`` is the name of the parent folder by default, which can overwritten
+``<project_name>`` is the name of the parent folder by default, which can be overwritten
 in ``project.xml`` as ``<project name="my_project">``.
 
 
