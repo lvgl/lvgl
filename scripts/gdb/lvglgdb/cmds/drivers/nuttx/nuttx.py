@@ -4,9 +4,6 @@ import argparse
 import sys
 
 import gdb
-from nxgdb import utils
-
-# Add current script folder so we can import module lvgl
 
 
 class Lvglobal(gdb.Command):
@@ -28,27 +25,31 @@ class Lvglobal(gdb.Command):
             args = parser.parse_args(gdb.string_to_argv(arg))
         except SystemExit:
             return
+        try:
+            from nxgdb import utils
+        except ImportError:
+            print("nxgdb is not installed, can't find lvgl global pointer.")
+            return
 
         lv_global = utils.gdb_eval_or_none("lv_global")
         if lv_global:
-            gdb.write(f"Found single instance lv_global@{hex(lv_global.address)}\n")
+            print(f"Found single instance lv_global@{hex(lv_global.address)}")
             self.set_lvgl_instance(lv_global)
             return
 
         # find the lvgl global pointer in tls
         if not args.pid:
-            gdb.write("Lvgl is in multi-process mode, need pid argument.\n")
+            print("LVGL is in multi-process mode; please provide --pid.")
             return
         lv_key = utils.gdb_eval_or_none("lv_nuttx_tlskey")
         if lv_key is None:
             lv_key = utils.gdb_eval_or_none("lv_global_default::index")
         if lv_key is None:
-            gdb.write("Can't find lvgl tls key in multi-process mode.\n")
+            print("Can't find lvgl tls key in multi-process mode.")
             return
         lv_global = utils.get_task_tls(args.pid, lv_key)
         if lv_global:
-            gdb.write(f"Found lv_global@{hex(lv_global)}\n")
+            print(f"Found lv_global@{hex(lv_global)}")
             self.set_lvgl_instance(lv_global)
         else:
-            gdb.write(f"\nCan't find lv_global with tlskey@{hex(lv_key)}.\n")
-        gdb.write("\n")
+            print(f"\nCan't find lv_global with tlskey@{hex(lv_key)}.")
