@@ -36,6 +36,7 @@ typedef struct {
     int32_t loop_count;
     uint32_t is_open : 1;
     uint32_t is_visible_dec : 1;
+    uint32_t cur_frame_index;
 } lv_gif_t;
 
 /**********************
@@ -123,6 +124,8 @@ void lv_gif_restart(lv_obj_t * obj)
     gifobj->loop_count = -1; /* match the behavior of the old library */
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
+
+    gifobj->cur_frame_index = 0;
 }
 
 void lv_gif_pause(lv_obj_t * obj)
@@ -173,6 +176,33 @@ void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
     gifobj->loop_count = count;
 }
 
+int32_t lv_gif_get_frame_count(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    if(!gifobj->is_open) {
+        return -1;
+    }
+
+    GIFINFO info;
+    int res = GIF_getInfo(&gifobj->gif, &info);
+    if(res != 1) {
+        LV_LOG_WARN("Get the frame count failed");
+        return -1;
+    }
+
+    return info.iFrameCount;
+}
+
+int32_t lv_gif_get_current_frame_index(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    if(!gifobj->is_open) {
+        return 0;
+    }
+
+    return (int32_t)gifobj->cur_frame_index;
+}
+
 void lv_gif_set_decode_invisible(lv_obj_t * obj, bool decode_invisible)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
@@ -193,6 +223,7 @@ static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     gifobj->color_format = LV_COLOR_FORMAT_ARGB8888;
     gifobj->is_open = 0;
     gifobj->is_visible_dec = 1;
+    gifobj->cur_frame_index = 0;
     gifobj->timer = lv_timer_create(next_frame_task_cb, 10, obj);
     lv_timer_pause(gifobj->timer);
 }
@@ -308,6 +339,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     int ms_delay_next;
     int has_next = GIF_playFrame(&gifobj->gif, &ms_delay_next, gifobj);
     if(has_next <= 0) {
+        gifobj->cur_frame_index = 0;
         /*It was the last repeat*/
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
         if(gifobj->loop_count > 0) {
@@ -321,6 +353,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         if(res != LV_RESULT_OK) return;
     }
     else {
+        gifobj->cur_frame_index++;
         lv_timer_set_period(gifobj->timer, ms_delay_next);
     }
 
