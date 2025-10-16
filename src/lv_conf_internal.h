@@ -3207,15 +3207,6 @@
     #endif
 #endif
 
-/** Enable ThorVG by assuming that its installed and linked to the project */
-#ifndef LV_USE_THORVG_EXTERNAL
-    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
-        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
-    #else
-        #define LV_USE_THORVG_EXTERNAL 0
-    #endif
-#endif
-
 /** Use lvgl built-in LZ4 lib */
 #ifndef LV_USE_LZ4_INTERNAL
     #ifdef CONFIG_LV_USE_LZ4_INTERNAL
