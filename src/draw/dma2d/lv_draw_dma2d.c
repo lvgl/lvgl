@@ -361,6 +361,7 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
+#if LV_DRAW_DMA2D_ASYNC
 static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
@@ -372,6 +373,7 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
     post_transfer_tasks(u);
     return 0;
 }
+#endif /*LV_DRAW_DMA2D_ASYNC*/
 
 #if !LV_DRAW_DMA2D_ASYNC
 static bool check_transfer_completion(void)
