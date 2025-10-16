@@ -2,7 +2,6 @@
 
 import argparse
 import sys
-from os import path
 
 import gdb
 from nxgdb import utils
