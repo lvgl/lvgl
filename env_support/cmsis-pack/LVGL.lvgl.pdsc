@@ -1697,6 +1697,7 @@
                 <file category="sourceC"    name="src/libs/vg_lite_driver/VGLite/vg_lite_stroke.c" />
                 <file category="sourceC"    name="src/libs/vg_lite_driver/VGLiteKernel/vg_lite_kernel.c" />
                 <file category="sourceC"    name="src/libs/vg_lite_driver/lv_vg_lite_hal/lv_vg_lite_hal.c" />
+                <file category="sourceC"    name="src/libs/vg_lite_driver/lv_vg_lite_hal/vg_lite_os.c" />
               </files>
 
               <RTE_Components_h>
