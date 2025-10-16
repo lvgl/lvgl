@@ -85,14 +85,18 @@ void g2d_insert_buf_map(void * key, struct g2d_buf * value)
     lv_map_item_t * item = _map_create_item(key, value);
     int index = _map_hash_function(key);
 
+    if(table->count == table->size) {
+        /* Table is full. */
+        _map_free_item(item);
+        G2D_ASSERT_MSG(false, "Hash table is full. Increase LV_G2D_HASH_TABLE_SIZE.");
+        return;
+    }
+
     if(table->items[index] == NULL) {
-        /* Key not found. */
-        if(table->count == table->size) {
-            /* Table is full. */
-            _map_free_item(item);
-            G2D_ASSERT_MSG(false, "Hash table is full.");
-            return;
-        }
+        /* Key not found. Insert item. */
+        table->items[index] = item;
+        table->count++;
+        return;
     }
     else {
         if(table->items[index]->key == key) {
@@ -107,9 +111,6 @@ void g2d_insert_buf_map(void * key, struct g2d_buf * value)
         }
     }
 
-    /* Insert item. */
-    table->items[index] = item;
-    table->count++;
 }
 
 struct g2d_buf * g2d_search_buf_map(void * key)
@@ -176,6 +177,7 @@ void g2d_free_item(void * key)
             if(item->key == key) {
                 g2d_free(item->value);
                 lv_array_remove(list, i);
+                table->count--;
                 if(lv_array_size(list) == 0) {
                     _map_free_list(index, list);
                 }
@@ -230,6 +232,7 @@ static void _handle_collision(unsigned long index, lv_map_item_t * item)
         lv_array_init(list, LV_ARRAY_DEFAULT_CAPACITY, sizeof(lv_map_item_t));
         lv_array_push_back(list, item);
         table->overflow_list[index] = list;
+        table->count++;
         return;
     }
     else {
@@ -244,6 +247,7 @@ static void _handle_collision(unsigned long index, lv_map_item_t * item)
         }
         /* Insert to the list. */
         lv_array_push_back(table->overflow_list[index], item);
+        table->count++;
         return;
     }
 }
