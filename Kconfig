@@ -544,7 +544,7 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_EVE
 
 		config LV_DRAW_EVE_WRITE_BUFFER_SIZE
-			int "Max bytes to buffer for each SPI transmission"
+			int "Max bytes to buffer for each SPI transmission or 0 to disable buffering"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
