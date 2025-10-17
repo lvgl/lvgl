@@ -275,7 +275,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     if(needle_line_points == NULL) {
         uint32_t i;
         uint32_t line_event_cnt = lv_obj_get_event_count(needle_line);
-        for(i = 0; i < line_event_cnt; i--) {
+        for(i = 0; i < line_event_cnt; i++) {
             lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, i);
             if(lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
                 needle_line_points = lv_event_dsc_get_user_data(dsc);
