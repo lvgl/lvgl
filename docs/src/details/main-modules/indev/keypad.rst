@@ -87,3 +87,41 @@ The most important special keys in your :cpp:func:`read_cb` function are:
 
 You should translate some of the read keys to these special keys to support navigation
 in a group and interact with selected widgets.
+
+Key remapping
+*************
+
+Some applications require assigning physical buttons to multiple key events depending
+on the context: arrow keys may be used in a screen to navigate across widgets, and
+used to interact with one widget in another screen. Key remapping functionality of
+indev can be used to implement this behavior.
+
+You must first define a remapping callback, then invoke
+:cpp:func:`lv_indev_set_key_remap_cb` to enable it.
+
+.. code-block:: c
+
+    lv_key_t remap_left_right_into_prev_next(lv_indev_t * indev, lv_key_t key)
+    {
+        LV_UNUSED(indev);
+
+        switch (key) {
+        case LV_KEY_LEFT:
+            return LV_KEY_PREV;
+        case LV_KEY_RIGHT:
+            return LV_KEY_NEXT;
+        default:
+            return key;
+        }
+    }
+
+.. code-block:: c
+
+    /* in your setup code */
+    lv_indev_set_key_remap_cb(indev, remap_left_right_into_prev_next);
+
+    /* later, to disable remapping */
+    lv_indev_set_key_remap_cb(indev, NULL);
+
+.. note::
+   The remap callback is invoked only for keypad input devices. It will not remap keys from other input device types.
