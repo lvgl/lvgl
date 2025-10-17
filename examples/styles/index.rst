@@ -112,3 +112,10 @@ Test between recolor style or full background modal
 
 .. lv_example:: styles/lv_example_style_19
   :language: c
+
+
+Transform style
+---------------
+
+.. lv_example:: styles/lv_example_style_20
+  :language: c
