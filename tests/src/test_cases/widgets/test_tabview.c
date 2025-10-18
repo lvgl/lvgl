@@ -22,6 +22,7 @@ void test_tabview_get_tab_bar(void);
 void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
 void test_tabview_update_on_external_scroll(void);
+void test_tabview_translation_tag(void);
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * tabview = NULL;
@@ -283,6 +284,51 @@ void test_tabview_update_on_external_scroll(void)
     TEST_ASSERT_TRUE(lv_obj_is_visible(label1));
     TEST_ASSERT_FALSE(lv_obj_is_visible(label2));
     TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_active(tabview));
+}
+
+void test_tabview_translation_tag(void)
+{
+    static const char * tags[] = {"tiger", "lion", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = {
+        "The Tiger", "Der Tiger", "El Tigre",
+        "The Lion", "Der Löwe", "El León"
+    };
+
+    lv_translation_add_static(languages, tags, translations);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_add_translation_tag_tab(tabview, "tiger");
+
+    lv_obj_t * label = lv_obj_get_child_by_type(lv_tabview_get_tab_button(tabview, 0), 0, &lv_label_class);
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Tiger");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El Tigre");
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
+
+    lv_tabview_rename_translation_tag_tab(tabview, 0, "lion");
+
+    lv_translation_set_language("en");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Lion");
+
+    lv_translation_set_language("de");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Löwe");
+
+    lv_translation_set_language("es");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El León");
+
+    /* Unknown language translates to the tag */
+    lv_translation_set_language("fr");
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "lion");
+
 }
 
 #endif
