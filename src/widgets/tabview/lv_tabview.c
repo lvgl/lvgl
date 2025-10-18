@@ -107,6 +107,50 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name)
     lv_label_set_text(label, new_name);
 }
 
+#if LV_USE_TRANSLATION
+
+lv_obj_t * lv_tabview_add_translation_tag_tab(lv_obj_t * obj, const char * tag)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_obj_t * cont = lv_tabview_get_content(obj);
+
+    lv_obj_t * page = lv_obj_create(cont);
+    lv_obj_set_size(page, lv_pct(100), lv_pct(100));
+
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
+
+    lv_obj_t * button = lv_button_create(tab_bar);
+    lv_obj_set_flex_grow(button, 1);
+    lv_obj_set_size(button, lv_pct(100), lv_pct(100));
+    lv_obj_add_event_cb(button, button_clicked_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_group_t * g = lv_group_get_default();
+    if(g) lv_group_add_obj(g, button);
+
+    lv_obj_t * label = lv_label_create(button);
+    lv_label_set_translation_tag(label, tag);
+    lv_obj_center(label);
+
+    uint32_t tab_idx = lv_obj_get_child_count(cont) - 1;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+    if(tab_idx == tabview->tab_cur) {
+        lv_tabview_set_active(obj, tab_idx, LV_ANIM_OFF);
+    }
+
+    return page;
+}
+
+void lv_tabview_rename_translation_tag_tab(lv_obj_t * obj, uint32_t idx, const char * new_tag)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
+    lv_obj_t * button = lv_obj_get_child_by_type(tab_bar, idx, &lv_button_class);
+    lv_obj_t * label = lv_obj_get_child_by_type(button, 0, &lv_label_class);
+    lv_label_set_translation_tag(label, new_tag);
+}
+
+#endif
+
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
