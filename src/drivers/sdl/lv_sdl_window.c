@@ -95,11 +95,6 @@ static void sdl_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
 static void res_chg_event_cb(lv_event_t * e);
 
-#if LV_SDL_USE_EGL
-    static bool init_egl(lv_sdl_window_t * dsc);
-    static void deinit_egl(lv_sdl_window_t * dsc);
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -142,6 +137,9 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_flush_cb(disp, flush_cb);
 
 #if LV_USE_DRAW_NANOVG
+#if !LV_SDL_USE_EGL
+#error "NANOVG requires LV_SDL_USE_EGL"
+#endif
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_FULL) {
         lv_draw_nanovg_init();
     }
@@ -285,13 +283,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t * argb_px_map = NULL;
 
-    if(LV_SDL_USE_EGL) {
-        /* EGL rendering path */
-        if(lv_display_flush_is_last(disp)) {
-            eglSwapBuffers(dsc->egl.display, dsc->egl.surface);
-        }
+#if LV_SDL_USE_EGL
+    /* EGL rendering path */
+    if(lv_display_flush_is_last(disp)) {
+        eglSwapBuffers(dsc->egl.display, dsc->egl.surface);
     }
-    else if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    lv_display_flush_ready(disp);
+    return;
+#endif
+
+    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
 
         if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
             uint32_t width = lv_area_get_width(area);
@@ -420,6 +421,7 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
+#if LV_SDL_USE_EGL
 static bool init_egl(lv_sdl_window_t * dsc)
 {
     dsc->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
@@ -506,13 +508,14 @@ static void deinit_egl(lv_sdl_window_t * dsc)
     dsc->egl.context = EGL_NO_CONTEXT;
     dsc->egl.surface = EGL_NO_SURFACE;
 }
+#endif
 
 static void window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    int flag = SDL_WINDOW_OPENGL;
+    const int flag = LV_SDL_USE_EGL ? SDL_WINDOW_OPENGL : 0;
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
@@ -521,18 +524,17 @@ static void window_create(lv_display_t * disp)
     int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   hor_res, ver_res, flag);
+                                   hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
-    if(LV_SDL_USE_EGL) {
-        if(!init_egl(dsc)) {
-            LV_LOG_ERROR("Failed to initialize EGL, falling back to SDL renderer");
-        }
+#if LV_SDL_USE_EGL
+    if(!init_egl(dsc)) {
+        LV_LOG_ERROR("Failed to initialize EGL, falling back to SDL renderer");
     }
+#else
+    dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
+                                       LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
+#endif /*LV_SDL_USE_EGL*/
 
-    if(!LV_SDL_USE_EGL) {
-        dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
-                                           LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
-    }
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 
@@ -551,26 +553,21 @@ static void window_create(lv_display_t * disp)
 static void window_update(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    if(LV_SDL_USE_EGL) {
-        eglSwapBuffers(dsc->egl.display, dsc->egl.surface);
-    }
-    else {
 #if LV_USE_DRAW_SDL == 0
-        int32_t hor_res = disp->hor_res;
-        lv_color_format_t cf = lv_display_get_color_format(disp);
-        if(cf == LV_COLOR_FORMAT_I1) {
-            cf = LV_COLOR_FORMAT_ARGB8888;
-        }
-        uint32_t stride = lv_draw_buf_width_to_stride(hor_res, cf);
-        SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
-
-        SDL_RenderClear(dsc->renderer);
-
-        /*Update the renderer with the texture containing the rendered image*/
-        SDL_RenderCopy(dsc->renderer, dsc->texture, NULL, NULL);
-#endif
-        SDL_RenderPresent(dsc->renderer);
+    int32_t hor_res = disp->hor_res;
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    if(cf == LV_COLOR_FORMAT_I1) {
+        cf = LV_COLOR_FORMAT_ARGB8888;
     }
+    uint32_t stride = lv_draw_buf_width_to_stride(hor_res, cf);
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
+
+    SDL_RenderClear(dsc->renderer);
+
+    /*Update the renderer with the texture containing the rendered image*/
+    SDL_RenderCopy(dsc->renderer, dsc->texture, NULL, NULL);
+#endif /*LV_USE_DRAW_SDL == 0*/
+    SDL_RenderPresent(dsc->renderer);
 }
 
 #if LV_USE_DRAW_SDL == 0
@@ -673,10 +670,11 @@ static void release_disp_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     SDL_DestroyTexture(dsc->texture);
 #endif
-    if(LV_SDL_USE_EGL) {
-        deinit_egl(dsc);
-    }
-    else {
+
+#if LV_SDL_USE_EGL
+    deinit_egl(dsc);
+#endif
+    if(dsc->renderer) {
         SDL_DestroyRenderer(dsc->renderer);
     }
     SDL_DestroyWindow(dsc->window);
