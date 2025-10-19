@@ -3962,6 +3962,13 @@
             #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
         #endif
     #endif
+    #ifndef LV_SDL_USE_EGL
+        #ifdef CONFIG_LV_SDL_USE_EGL
+            #define LV_SDL_USE_EGL CONFIG_LV_SDL_USE_EGL
+        #else
+            #define LV_SDL_USE_EGL          0    /**< 1: Use EGL backend for rendering */
+        #endif
+    #endif
 #endif
 
 /** Use X11 to open window on Linux desktop and handle mouse and keyboard */

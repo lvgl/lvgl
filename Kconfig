@@ -1874,6 +1874,11 @@ menu "LVGL configuration"
 			default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
 			default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
 
+		config LV_SDL_USE_SDL
+			bool "Use EGL backend for rendering"
+			depends on LV_USE_SDL
+			default n
+
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
 			default n
