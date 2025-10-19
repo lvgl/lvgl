@@ -32,10 +32,6 @@ extern "C" {
 #error "Require LV_USE_NANOVG = 1"
 #endif
 
-#if !LV_USE_OPENGLES
-#error "Require LV_USE_OPENGLES = 1"
-#endif
-
 #if !LV_USE_MATRIX
 #error "Require LV_USE_MATRIX = 1"
 #endif

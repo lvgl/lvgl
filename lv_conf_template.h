@@ -408,7 +408,7 @@
 #endif
 
 /** Use NanoVG Renderer
- * - Requires LV_USE_NANOVG, LV_USE_OPENGLES, LV_USE_MATRIX.
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
 #define LV_USE_DRAW_NANOVG 0
 

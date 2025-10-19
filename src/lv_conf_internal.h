@@ -1153,7 +1153,7 @@
 #endif
 
 /** Use NanoVG Renderer
- * - Requires LV_USE_NANOVG, LV_USE_OPENGLES, LV_USE_MATRIX.
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
 #ifndef LV_USE_DRAW_NANOVG
     #ifdef CONFIG_LV_USE_DRAW_NANOVG
