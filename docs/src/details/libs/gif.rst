@@ -46,7 +46,7 @@ converter since LVGL v9.0.  However, there is still a way to do it through the
 
 .. code-block:: bash
 
-   python  LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
+   python  ./scripts/LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
 
 will produce all the bytes from the ``input.gif`` in unaltered form in a C array,
 ready to use in this code:
