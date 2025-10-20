@@ -931,9 +931,9 @@ typedef unsigned int        vg_lite_color_t;
         vg_lite_uint8_t low_g;                  /*! The G channel of low_rgb. */
         vg_lite_uint8_t low_b;                  /*! The B channel of low_rgb. */
         vg_lite_uint8_t alpha;                  /*! The alpha channel to replace destination pixel alpha channel.*/
-        vg_lite_uint8_t hign_r;                 /*! The R channel of hign_rgb. */
-        vg_lite_uint8_t hign_g;                 /*! The G channel of hign_rgb. */
-        vg_lite_uint8_t hign_b;                 /*! The B channel of hign_rgb. */
+        vg_lite_uint8_t high_r;                 /*! The R channel of high_rgb. */
+        vg_lite_uint8_t high_g;                 /*! The G channel of high_rgb. */
+        vg_lite_uint8_t high_b;                 /*! The B channel of high_rgb. */
     } vg_lite_color_key_t;
 
     /* Four colorkey definition.

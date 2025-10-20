@@ -1418,9 +1418,9 @@ void lv_vg_lite_set_color_key(const lv_image_colorkey_t * colorkey)
             .low_g = colorkey->low.green,
             .low_b = colorkey->low.blue,
             .alpha = 0,
-            .hign_r = colorkey->high.red,
-            .hign_g = colorkey->high.green,
-            .hign_b = colorkey->high.blue,
+            .high_r = colorkey->high.red,
+            .high_g = colorkey->high.green,
+            .high_b = colorkey->high.blue,
         };
         vg_colorkey[0] = key0;
     }
