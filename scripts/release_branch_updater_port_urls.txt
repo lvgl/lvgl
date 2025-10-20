@@ -14,7 +14,6 @@ https://github.com/lvgl/lv_port_nxp_imxrt1170-evkb
 https://github.com/lvgl/lv_port_raspberry_pi_pico_mdk
 https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit
 https://github.com/lvgl/lv_port_renesas_ek-ra6m3g
-https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit
 https://github.com/lvgl/lv_port_renesas-ek-rz_a3m
 https://github.com/lvgl/lv_port_renesas_ek_ra8p1
 https://github.com/lvgl/lv_port_riverdi_stm32u5
