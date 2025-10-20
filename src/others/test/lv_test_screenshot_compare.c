@@ -118,11 +118,14 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
         LV_LOG_WARN("%s%s", fn_ref_full, " was not found, creating it now from the rendered screen");
         write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full);
         lv_free(screen_buf_xrgb8888);
+        lv_draw_buf_destroy(ref_draw_buf);
         return true;
     }
 
     if(ref_img_width != draw_buf->header.w || ref_img_height != draw_buf->header.h) {
         LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
+        lv_free(screen_buf_xrgb8888);
+        lv_draw_buf_destroy(ref_draw_buf);
         return false;
     }
 
