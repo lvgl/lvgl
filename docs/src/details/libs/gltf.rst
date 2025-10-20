@@ -347,7 +347,7 @@ For more control over lighting quality, to use custom HDR images, or to share en
     /* Create an IBL sampler with custom resolution */
     lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
 
-    /* Set a custom cube map resolution. Higher resoltuion produce sharper results at a cost of longer setup time */
+    /* Set a custom cube map resolution. Higher resolution produces sharper results at a cost of longer setup time */
     lv_gltf_ibl_sampler_set_cube_map_resolution(256);
     
     /* Create environment from custom HDR/JPEG image (or NULL for default) */
@@ -391,7 +391,7 @@ Environment Images
 - Use equirectangular (360°) panoramic images in HDR or JPEG format
 - Source images are converted to cube map format at the sampler's cube map resolution
 - Higher resolution values (256-512) provide better quality but use more memory
-- Lower resoluton values (64-128) are more suitable for embedded systems
+- Lower resolution values (64-128) are more suitable for embedded systems
 - Free HDR environment maps are widely available online. Choose environments that match the "look" you want (outdoor, studio, warehouse, etc.)
 
 
