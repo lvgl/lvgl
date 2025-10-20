@@ -375,6 +375,11 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
     const EGLint config_attribs[] = {
         EGL_RENDERABLE_TYPE,
         EGL_OPENGL_ES2_BIT,
+        EGL_BLUE_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_RED_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_STENCIL_SIZE, 8,
         EGL_NONE
     };
 
