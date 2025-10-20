@@ -74,7 +74,7 @@ For complete implementation details, see :ref:`OpenGL driver <opengl_driver>`.
 ===============
 
 The glTF module provides support for loading and rendering 3D models using the glTF 2.0 specification within LVGL applications.
-This support requires OpenGL ES 2.0 with some extra extension and provides comprehensive 3D rendering capabilities including PBR materials,
+This support requires OpenGL ES 2.0 with some extra extensions and provides comprehensive 3D rendering capabilities including PBR materials,
 animations, and interactive camera controls for embedded 3D visualization.
 
 For complete implementation details, see :ref:`glTF <gltf>`.

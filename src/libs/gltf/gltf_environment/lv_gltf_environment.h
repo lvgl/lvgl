@@ -42,7 +42,7 @@ extern "C" {
 lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void);
 
 /**
- * Set the resoultion for each cubemap face
+ * Set the resolution for each cubemap face
  * @param pointer to a sampler
  * @param resolution of each cube map face (recommended: 64-512 for embedded)
  */
