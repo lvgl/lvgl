@@ -516,7 +516,12 @@ static void window_create(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    const int flag = LV_SDL_USE_EGL ? SDL_WINDOW_OPENGL : 0;
+    int flag = 0;
+
+#if LV_SDL_USE_EGL
+    flag |= SDL_WINDOW_OPENGL;
+#endif
+
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
