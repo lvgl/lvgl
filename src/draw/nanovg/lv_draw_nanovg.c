@@ -70,6 +70,10 @@ static void draw_event_cb(lv_event_t * e);
 
 void lv_draw_nanovg_init(void)
 {
+    static bool initialized = false;
+    if(initialized) return;
+    initialized = true;
+
     lv_draw_nanovg_unit_t * unit = lv_draw_create_unit(sizeof(lv_draw_nanovg_unit_t));
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.evaluate_cb = draw_evaluate;
