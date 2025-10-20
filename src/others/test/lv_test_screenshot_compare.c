@@ -110,7 +110,7 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
     buf_to_xrgb8888(draw_buf, screen_buf_xrgb8888);
 
-    lv_draw_buf_t * ref_draw_buf;
+    lv_draw_buf_t * ref_draw_buf = NULL;
     unsigned ref_img_width = 0;
     unsigned  ref_img_height = 0;
     unsigned  res = read_png_file(&ref_draw_buf, &ref_img_width, &ref_img_height, fn_ref_full);
@@ -118,14 +118,14 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
         LV_LOG_WARN("%s%s", fn_ref_full, " was not found, creating it now from the rendered screen");
         write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full);
         lv_free(screen_buf_xrgb8888);
-        lv_draw_buf_destroy(ref_draw_buf);
+        if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
         return true;
     }
 
     if(ref_img_width != draw_buf->header.w || ref_img_height != draw_buf->header.h) {
         LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
         lv_free(screen_buf_xrgb8888);
-        lv_draw_buf_destroy(ref_draw_buf);
+        if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
         return false;
     }
 
@@ -172,7 +172,7 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
 
     fflush(stdout);
     lv_free(screen_buf_xrgb8888);
-    lv_draw_buf_destroy(ref_draw_buf);
+    if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
     return !err;
 
 }
