@@ -137,6 +137,7 @@ void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
     lv_gltf_t * gltf = (lv_gltf_t *)obj;
     if(env == NULL) {
         LV_LOG_WARN("Refusing to assign a NULL environment to the glTF object");
+        return;
     }
 
     if(gltf->environment && gltf->owns_environment) {
