@@ -226,6 +226,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     if(lv_display_flush_is_last(disp)) {
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+
+#if !LV_USE_DRAW_NANOVG
         int32_t disp_width = lv_display_get_horizontal_resolution(disp);
         int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
@@ -249,6 +251,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #endif
 
         lv_opengles_render_display_texture(disp, false, false);
+#endif /* LV_USE_DRAW_NANOVG */
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
