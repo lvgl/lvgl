@@ -56,7 +56,7 @@ void lv_xml_spinner_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("anim_duration", name)) lv_spinner_set_anim_duration(item, lv_xml_atoi(value));
-        else if(lv_streq("anim_angle", name)) lv_spinner_set_anim_angle(item, lv_xml_atoi(value));
+        else if(lv_streq("arc_sweep", name)) lv_spinner_set_arc_sweep(item, lv_xml_atoi(value));
     }
 }
 

@@ -20,7 +20,7 @@ void test_xml_spinner_with_attrs(void)
 
     const char * spinner_attrs[] = {
         "anim_duration", "1500",
-        "anim_angle", "270",
+        "arc_sweep", "270",
         NULL, NULL,
     };
 

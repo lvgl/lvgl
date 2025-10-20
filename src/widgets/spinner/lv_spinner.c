@@ -93,7 +93,7 @@ void lv_spinner_set_anim_duration(lv_obj_t * obj, uint32_t t)
     lv_spinner_set_anim_params(obj, t, spinner->angle);
 }
 
-void lv_spinner_set_anim_angle(lv_obj_t * obj, uint32_t angle)
+void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle)
 {
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
 

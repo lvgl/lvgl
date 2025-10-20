@@ -62,11 +62,11 @@ void lv_spinner_set_anim_duration(lv_obj_t * obj, uint32_t t);
 
 /**
  * Set the animation arc length of the spinner.
- * The animation is suited for values between 180 and 360.
+ * The animation is suited to values between 180 and 360.
  * @param obj       pointer to a spinner
  * @param angle     the angle of the arc in degrees
  */
-void lv_spinner_set_anim_angle(lv_obj_t * obj, uint32_t angle);
+void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle);
 
 /**********************
  *      MACROS
