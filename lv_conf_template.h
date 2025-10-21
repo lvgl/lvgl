@@ -1466,6 +1466,9 @@
 
     /* Smart watch demo */
     #define LV_USE_DEMO_SMARTWATCH      0
+
+    /* Vector Dodger Game */
+    #define LV_USE_DEMO_VECTOR_DODGER   0
 #endif /* LV_BUILD_DEMOS */
 
 /*--END OF LV_CONF_H--*/
