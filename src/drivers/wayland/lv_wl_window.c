@@ -34,6 +34,7 @@
 
 static void refr_start_event(lv_event_t * e);
 static void refr_end_event(lv_event_t * e);
+static void res_changed_event(lv_event_t * e);
 
 static struct graphic_object * create_graphic_obj(struct window * window, enum object_type type,
                                                   struct graphic_object * parent);
@@ -143,7 +144,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_flush_cb(window->lv_disp, lv_wayland_shm_flush_partial_mode);
 #endif
 
-    lv_display_add_event_cb(window->lv_disp, lv_wayland_event_cb, LV_EVENT_RESOLUTION_CHANGED, window);
+    lv_display_add_event_cb(window->lv_disp, res_changed_event, LV_EVENT_RESOLUTION_CHANGED, window);
     lv_display_add_event_cb(window->lv_disp, refr_start_event, LV_EVENT_REFR_START, window);
     lv_display_add_event_cb(window->lv_disp, refr_end_event, LV_EVENT_REFR_READY, window);
 
@@ -447,6 +448,28 @@ static void refr_end_event(lv_event_t * e)
 {
     struct window * window = lv_event_get_user_data(e);
     lv_wayland_update_window(window);
+}
+
+static void res_changed_event(lv_event_t * e)
+{
+    lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
+    struct window * window = lv_event_get_user_data(e);
+    uint32_t rotation = lv_display_get_rotation(window->lv_disp);
+    int width, height;
+    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+        width = lv_display_get_vertical_resolution(display);
+        height = lv_display_get_horizontal_resolution(display);
+    }
+    else {
+        width = lv_display_get_horizontal_resolution(display);
+        height = lv_display_get_vertical_resolution(display);
+    }
+#if LV_WAYLAND_USE_DMABUF
+    dmabuf_ctx_t * context = &window->wl_ctx->dmabuf_ctx;
+    lv_wayland_dmabuf_resize_window(context, window, width, height);
+#else
+    lv_wayland_shm_resize_window(&window->wl_ctx->shm_ctx, window, width, height);
+#endif
 }
 
 static struct window * create_window(struct lv_wayland_context * app, int width, int height, const char * title)

@@ -280,7 +280,6 @@ extern struct lv_wayland_context lv_wl_ctx;
 void lv_wayland_init(void);
 void lv_wayland_deinit(void);
 void lv_wayland_wait_flush_cb(lv_display_t * disp);
-void lv_wayland_event_cb(lv_event_t * e);
 void lv_wayland_read_input_events(void);
 void lv_wayland_update_window(struct window * window);
 
