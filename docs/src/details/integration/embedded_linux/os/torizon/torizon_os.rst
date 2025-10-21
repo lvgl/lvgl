@@ -156,14 +156,19 @@ This creates a smaller image that does not include the tool chain and the build 
 
 The images are built with the following command:
 
-``docker build . -t lvgl_app``
+.. code-block:: sh
+
+    docker build . -t lvgl_app
 
 Docker will interpret the ``Dockerfile`` present in the current working directory.
 The ``-t`` argument gives a name to the resulting image.
 
 Upon completion, ensure that the image is listed by Docker:
 
-``docker image list | grep lvgl_app``
+.. code-block:: sh
+
+    docker image list | grep lvgl_app
+    lvgl_app                  latest    2967a34a9e74   2 minutes ago    118MB
 
 It should display the image along with its ID that will be used later.
 
@@ -181,16 +186,21 @@ will be able to pull the image from the registry.
 
 The registry is created like so:
 
-``docker run -d -p 5000:5000 --name registry registry:2.7``
+.. code-block:: sh
+
+    docker run -d -p 5000:5000 --name registry registry:2.7
+
 
 The ``-d`` flag runs the container in detached mode. The ``-p`` argument specifies the port mapping.
 The registry container will listen on port ``TCP/5000`` and will map to the same port externally.
 
 Push the image created in the previous step to the newly created registry:
 
-``docker tag <IMAGE_ID> 127.0.0.1:5000/lvgl-app``
+.. code-block:: sh
 
-``docker push 127.0.0.1:5000/lvgl-app``
+    docker tag lvgl_app 127.0.0.1:5000/lvgl-app
+    docker push 127.0.0.1:5000/lvgl-app
+
 
 By default a local container registry uses clear text HTTP so the Docker instance
 running on the device has to be configured to allow fetching images from an 'insecure' repository.
@@ -227,7 +237,9 @@ By using the ``--device`` argument it is possible to map a device to a container
 
 Start the container like so:
 
-``docker run --device /dev/fb0:/dev/fb0 <IMAGE_ID>``
+.. code-block:: sh
+
+    docker run --device /dev/fb0:/dev/fb0 <IMAGE_ID>
 
 Conclusion
 ----------
