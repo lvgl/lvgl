@@ -92,56 +92,48 @@ These commands create the project directory and the ``Dockerfile``.
 
 Now edit the Dockerfile. Copy-paste the block below into the file:
 
-.. code-block::
+.. code-block:: docker
 
-   ARG CROSS_SDK_BASE_TAG=3.2.1-bookworm
-   ARG BASE_VERSION=3.2.1-bookworm
-   ##
-   # Board architecture
-   # arm or arm64
-   ##
-   ARG IMAGE_ARCH=arm64
 
-   ##
-   # Directory of the application inside container
-   ##
-   ARG APP_ROOT=/usr/lvgl_application
-
-   # BUILD ------------------------------------------------------------------------
-   FROM torizon/debian-cross-toolchain-${IMAGE_ARCH}:${CROSS_SDK_BASE_TAG} AS build
-
-   ARG APP_ROOT
-   ARG IMAGE_ARCH
-
-   RUN apt-get -q -y update && \
-       apt-get -q -y install && \
-       apt-get clean && apt-get autoremove && \
-       apt-get install -q -y curl git cmake file && \
-       rm -rf /var/lib/apt/lists/*
-
-   COPY . ${APP_ROOT}
-   WORKDIR ${APP_ROOT}
-
-   # Compile lv_port_linux
-   RUN CC=aarch64-linux-gnu-gcc cmake -S ./lv_port_linux -B build
-   RUN make -j 4 -C ${APP_ROOT}/build
-
-   # DEPLOY -----------------------------------------------------------------------
-   FROM --platform=linux/${IMAGE_ARCH} torizon/debian:${BASE_VERSION} AS deploy
-
-   ARG IMAGE_ARCH
-   ARG APP_ROOT
-
-   RUN apt-get -y update && apt-get install -y --no-install-recommends \
-   && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
-
-   # Copy the lvglsim executable compiled in the build step to the $APP_ROOT directory
-   # path inside the container
-   COPY --from=build ${APP_ROOT}/lv_port_linux/bin/lvglsim ${APP_ROOT}
-
-   # Command executed during runtime when the container starts
-   ENTRYPOINT [ "./lvglsim" ]
-
+    ARG CROSS_SDK_BASE_TAG=3.2.1-bookworm
+    ARG BASE_VERSION=3.2.1-bookworm
+    ##
+    # Board architecture
+    # arm or arm64
+    ##
+    ARG IMAGE_ARCH=arm64
+    
+    
+    # BUILD ------------------------------------------------------------------------
+    FROM torizon/debian-cross-toolchain-${IMAGE_ARCH}:${CROSS_SDK_BASE_TAG} AS build
+    
+    ARG IMAGE_ARCH
+    
+    RUN apt-get -q -y update && \
+        apt-get clean && apt-get autoremove && \
+        apt-get install -q -y curl git cmake file python3 python3-venv pkg-config libevdev-dev:arm64 && \
+        rm -rf /var/lib/apt/lists/*
+    
+    WORKDIR /app
+    COPY . .
+    
+    # Compile lv_port_linux
+    RUN CC=aarch64-linux-gnu-gcc cmake -S ./lv_port_linux -B build
+    RUN cmake --build build -j$(nproc)
+    
+    # DEPLOY -----------------------------------------------------------------------
+    FROM --platform=linux/${IMAGE_ARCH} torizon/debian:${BASE_VERSION} AS deploy
+    
+    ARG IMAGE_ARCH
+    
+    RUN apt-get -y update && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
+    
+    # Copy the lvglsim executable compiled in the build step to the $APP_ROOT directory
+    # path inside the container
+    COPY --from=build /app/build/bin/lvglsim /usr/lvgl_widgets
+    
+    # Command executed during runtime when the container starts
+    ENTRYPOINT [ "/usr/lvgl_widgets" ]
 
 The ``Dockerfile`` acts like a recipe to build two images:  ``build`` and ``deploy``.
 
