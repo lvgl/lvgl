@@ -310,6 +310,8 @@ static void path_data_print_cb(void * user_data, uint8_t op_code, const float * 
     LV_UNUSED(user_data);
     const char * op_str = lv_vg_lite_vlc_op_string(op_code);
 
+    LV_UNUSED(op_str);
+
     switch(len) {
         case 0:
             LV_LOG("%s,\n", op_str);
