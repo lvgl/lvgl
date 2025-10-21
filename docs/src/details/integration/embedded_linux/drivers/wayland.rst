@@ -150,19 +150,6 @@ use the ``lv_wayland_window_set_maximized()`` function respectively with ``true`
 or ``false`` for the ``maximized`` argument.
 
 
-Custom timer handler
-^^^^^^^^^^^^^^^^^^^^
-
-Always call ``lv_wayland_timer_handler()`` in your timer loop instead of the regular ``lv_timer_handler()``.
-
-**Note:** ``lv_wayland_timer_handler()`` internally calls ``lv_timer_handler()``
-
-This allows the wayland client to work well on weston, resizing shared memory buffers during
-a commit does not work well on weston.
-
-Wrapping the call to ``lv_timer_handler()`` is a necessity to have more control over
-when the LVGL flush callback is called.
-
 Building the wayland driver
 ---------------------------
 
