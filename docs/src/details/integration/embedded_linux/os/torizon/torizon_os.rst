@@ -53,8 +53,8 @@ This guide explains how to perform those operations manually.
 Creating the Docker image
 -------------------------
 
-To build a Torizon container Docker ARM emulation needs to be enabled
-by typing the following commands:
+To build a Torizon container for ARM on your development machine, you need to enable Docker emulation.
+Run the following commands to enable it:
 
 .. code-block:: sh
 
@@ -170,7 +170,8 @@ Upon completion, ensure that the image is listed by Docker:
     docker image list | grep lvgl_app
     lvgl_app                  latest    2967a34a9e74   2 minutes ago    118MB
 
-It should display the image along with its ID that will be used later.
+
+Alongside the image name, you'll also find its ID. This will be useful for later.
 
 Deploying the container image to the device
 -------------------------------------------
@@ -184,7 +185,7 @@ For this guide, we are going to setup a Docker registry container on the develop
 which will be accessible from any device on your LAN. The Toradex board being on the same network
 will be able to pull the image from the registry.
 
-The registry is created like so:
+The registry can be installed and started with a single command:
 
 .. code-block:: sh
 
@@ -235,7 +236,7 @@ The container running the LVGL application needs access to the framebuffer devic
 
 By using the ``--device`` argument it is possible to map a device to a container.
 
-Start the container like so:
+Start the container like so, using the image ID:
 
 .. code-block:: sh
 
