@@ -140,8 +140,7 @@ lv_obj_t * lv_list_add_translation_tag_text(lv_obj_t * list, const char * tag)
 {
     LV_LOG_INFO("begin");
 
-    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_TEXT, list);
-    lv_obj_class_init_obj(obj);
+    lv_obj_t * obj = lv_list_add_text(list, NULL);
     lv_label_set_translation_tag(obj, tag);
     return obj;
 }
@@ -149,23 +148,9 @@ lv_obj_t * lv_list_add_translation_tag_text(lv_obj_t * list, const char * tag)
 lv_obj_t * lv_list_add_translation_tag_button(lv_obj_t * list, const void * icon, const char * tag)
 {
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS_BUTTON, list);
-    lv_obj_class_init_obj(obj);
-    lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
-#if LV_USE_IMAGE == 1
-    if(icon) {
-        lv_obj_t * img = lv_image_create(obj);
-        lv_image_set_src(img, icon);
-    }
-#endif
-
-    if(tag) {
-        lv_obj_t * label = lv_label_create(obj);
-        lv_label_set_translation_tag(label, tag);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
-        lv_obj_set_flex_grow(label, 1);
-    }
+    lv_obj_t * obj = lv_list_add_button(list, icon, "");
+    lv_list_set_translation_tag_button_text(list, obj, tag);
 
     return obj;
 }
