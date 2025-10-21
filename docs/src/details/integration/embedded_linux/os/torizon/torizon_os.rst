@@ -43,15 +43,13 @@ Once the setup is complete, the device will boot into TorizonOS.
 Creating the Docker image
 -------------------------
 
-Toradex provides a `VSCode extension <https://developer.toradex.com/torizon/application-development/ide-extension/>`_ that offers a collection of templates used to configure
-and automate the tasks needed to cross-compile applications and build Docker images.
+Toradex provides a `VS Code extension <https://developer.toradex.com/torizon/application-development/ide-extension/>`_ that offers a collection of templates used 
+to configure and automate the tasks needed to cross-compile applications and build Docker images.
 
+These templates now include support for LVGL applications, available as one of the `partner templates <https://github.com/torizon/vscode-torizon-templates?tab=readme-ov-file#partner-templates>`_.
 
-However, this guide explains how to perform those operations manually.
+This guide explains how to perform those operations manually.
 
-.. note::
-
-   The template for a LVGL application is currently being added to the VSCode extension and will be available soon.
 
 To build a Torizon container Docker ARM emulation needs to be enabled
 by typing the following commands:
