@@ -248,7 +248,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
     #define LV_USE_DEMO_TRANSFORM       0
-    #define LV_USE_DEMO_SCROLL          0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
