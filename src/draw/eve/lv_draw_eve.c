@@ -127,13 +127,6 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
-    uint8_t coprocessor_status;
-    do {
-        coprocessor_status = EVE_busy();
-    } while(coprocessor_status != E_OK && coprocessor_status != EVE_FIFO_HALF_EMPTY);
-
-    EVE_start_cmd_burst();
-
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_eve_line(t, t->draw_dsc);
@@ -159,8 +152,6 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
         default:
             break;
     }
-
-    EVE_end_cmd_burst();
 }
 
 static void disp_delete_cb(lv_event_t * e)

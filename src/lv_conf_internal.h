@@ -759,15 +759,37 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#ifndef LV_USE_DRAW_G2D
-    #ifdef CONFIG_LV_USE_DRAW_G2D
-        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+#ifndef LV_USE_G2D
+    #ifdef CONFIG_LV_USE_G2D
+        #define LV_USE_G2D CONFIG_LV_USE_G2D
     #else
-        #define LV_USE_DRAW_G2D 0
+        #define LV_USE_G2D 0
     #endif
 #endif
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+    /** Use G2D for drawing. **/
+    #ifndef LV_USE_DRAW_G2D
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_G2D
+                #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+            #else
+                #define LV_USE_DRAW_G2D 0
+            #endif
+        #else
+            #define LV_USE_DRAW_G2D 1
+        #endif
+    #endif
+
+    /** Use G2D to rotate display. **/
+    #ifndef LV_USE_ROTATE_G2D
+        #ifdef CONFIG_LV_USE_ROTATE_G2D
+            #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
+        #else
+            #define LV_USE_ROTATE_G2D 0
+        #endif
+    #endif
+
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #ifndef LV_G2D_HASH_TABLE_SIZE
@@ -778,7 +800,7 @@
         #endif
     #endif
 
-    #if LV_USE_OS
+    #if LV_USE_DRAW_G2D && LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #ifndef LV_USE_G2D_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
@@ -1097,6 +1119,17 @@
             #define LV_DRAW_EVE_EVE_GENERATION CONFIG_LV_DRAW_EVE_EVE_GENERATION
         #else
             #define LV_DRAW_EVE_EVE_GENERATION 4
+        #endif
+    #endif
+
+    /* The maximum number of bytes to buffer before a single SPI transmission.
+     * Set it to 0 to disable write buffering.
+     */
+    #ifndef LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #ifdef CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #else
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
         #endif
     #endif
 #endif
@@ -3176,15 +3209,6 @@
     #endif
 #endif
 
-/** Enable ThorVG by assuming that its installed and linked to the project */
-#ifndef LV_USE_THORVG_EXTERNAL
-    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
-        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
-    #else
-        #define LV_USE_THORVG_EXTERNAL 0
-    #endif
-#endif
-
 /** Use lvgl built-in LZ4 lib */
 #ifndef LV_USE_LZ4_INTERNAL
     #ifdef CONFIG_LV_USE_LZ4_INTERNAL
@@ -4301,8 +4325,15 @@
         #define LV_USE_FT81X         0
     #endif
 #endif
+#ifndef LV_USE_NV3007
+    #ifdef CONFIG_LV_USE_NV3007
+        #define LV_USE_NV3007 CONFIG_LV_USE_NV3007
+    #else
+        #define LV_USE_NV3007        0
+    #endif
+#endif
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #ifndef LV_USE_GENERIC_MIPI
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_GENERIC_MIPI

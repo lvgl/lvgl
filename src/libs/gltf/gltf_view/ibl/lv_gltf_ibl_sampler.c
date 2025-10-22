@@ -136,9 +136,9 @@ static void ibl_sampler_load(lv_gltf_ibl_sampler_t * sampler, const char * path)
         data = stbi_loadf(path, &src_width, &src_height, &src_nrChannels, 3);
     }
     else {
-        extern unsigned char pisa_jpg[];
-        extern unsigned int pisa_jpg_len;
-        data = stbi_loadf_from_memory(pisa_jpg, pisa_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
+        extern unsigned char chromatic_jpg[];
+        extern unsigned int chromatic_jpg_len;
+        data = stbi_loadf_from_memory(chromatic_jpg, chromatic_jpg_len, &src_width, &src_height, &src_nrChannels, 3);
     }
 
     {

@@ -95,7 +95,7 @@ To learn more about how to register the name-data pairs visit :ref:`editor_integ
 Arrays
 ------
 
-An array of any type can be defined in four ways:
+An array of any type can be defined in three ways:
 
 :int[count]:        An integer array. The number of elements will be passed as a separate parameter.
 :string[NULL]:      An array terminated with a ``NULL`` element.

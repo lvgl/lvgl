@@ -1,7 +1,7 @@
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
 
 <p align="right">
-  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a>
+  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a> | <a href="./README_he.md">עברית</a>
 </p>
 <br>
 
@@ -27,439 +27,340 @@
 <br>
 
 <p align="center">
-<a href="https://lvgl.io" title="Homepage of LVGL">官网 </a> |
-<a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">文档</a> |
-<a href="https://forum.lvgl.io" title="Get help and help others">论坛</a> |
-<a href="https://lvgl.io/demos" title="Demos running in your browser">示例</a> |
-<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">服务</a>
+  <a href="https://lvgl.io" title="LVGL 官方网站">网站</a> |
+  <a href="https://pro.lvgl.io" title="LVGL Pro 基于 XML 的 UI 编辑器">LVGL Pro 编辑器</a> |
+  <a href="https://docs.lvgl.io/" title="包含 100+ 示例的详细文档">文档</a> |
+  <a href="https://forum.lvgl.io" title="寻求帮助或帮助他人">论坛</a> |
+  <a href="https://lvgl.io/demos" title="在浏览器中运行的演示">演示</a> |
+  <a href="https://lvgl.io/services" title="图形设计、UI 实现和咨询服务">服务</a>
 </p>
 
+<br/>
 
-[中文宣传单](./flyers/LVGL-Chinese-Flyer.pdf)
+## 📒 概述
 
-## :ledger: 目录
+**LVGL** 是一个免费、开源的 UI 库，可用于为来自任何厂商、任何平台的 MCU 或 MPU 创建图形用户界面。
 
-- [:ledger: 目录](#ledger-目录)
-- [:rocket: 概况与总览](#rocket-概况与总览)
-  - [硬件要求](#硬件要求)
-  - [:package: 已经支持的平台](#package-已经支持的平台)
-- [如何入门](#如何入门)
-- [:robot: 例程](#robot-例程)
-  - [Button with Click Event 按钮与点击事件](#button-with-click-event-按钮与点击事件)
-  - [Micropython](#micropython)
-  - [Checkboxes with Layout 带布局的复选框](#checkboxes-with-layout-带布局的复选框)
-  - [Styling a Slider 设置滑块的样式](#styling-a-slider-设置滑块的样式)
-  - [English, Hebrew (mixed LRT-RTL) and Chinese texts 英语、希伯来语（ 双向文本排版 ）和中文](#english-hebrew-mixed-lrt-rtl-and-chinese-texts-英语希伯来语-双向文本排版-和中文)
-- [:handshake: 服务](#handshake-服务)
-- [:star: 如何向社区贡献](#star-如何向社区贡献)
+**要求**：LVGL 无需外部依赖，因此可以轻松编译到任何现代平台上，从小型 MCU 到支持 3D 的多核 Linux MPU。简单 UI 仅需约 100kB RAM、200–300kB Flash，以及 1/10 屏幕大小的渲染缓冲区。
 
-## :rocket: 概况与总览
+**开始使用**：选择一个可直接使用的 VSCode、Eclipse 或其他项目，在 PC 上尝试 LVGL。LVGL 的 UI 代码完全平台无关，因此也可直接用于嵌入式设备。
 
-**特性**
+**LVGL Pro** 是一套完整的工具包，可让你更快地构建、测试、共享和发布 UI。它附带一个 XML 编辑器，你可以在其中快速创建和测试可重用组件，导出 C 代码，或在运行时加载 XML。了解更多信息请点击这里。
 
--  丰富且强大的模块化[图形组件](https://docs.lvgl.io/master/details/widgets/index.html)：按钮
-   (buttons)、图表 (charts)、列表 (lists)、滑动条 (sliders)、图片
-   (images) 等
--  高级的图形引擎：动画、抗锯齿、透明度、平滑滚动、图层混合等效果
--  支持多种[输入设备](https://docs.lvgl.io/master/details/main-modules/indev.html)：触摸屏、键盘、编码器、按键等
--  支持[多显示设备](https://docs.lvgl.io/master/details/main-modules/display/index.html)
--  不依赖特定的硬件平台，可以在任何显示屏上运行
--  配置可裁剪（最低资源占用：64 kB Flash，16 kB RAM）
--  基于UTF-8的多语种支持，例如中文、日文、韩文、阿拉伯文等
--  可以通过[类CSS](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html)的方式来设计、布局图形界面（例如：[Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)）
--  支持操作系统、外置内存、以及硬件加速（LVGL已内建支持STM32 DMA2D、SWM341 DMA2D、NXP PXP和VGLite）
--  即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/details/main-modules/display/index.html)的情况下，也可保证渲染如丝般顺滑
--  全部由C编写完成，并支持C++调用
--  支持Micropython编程，参见：[LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
--  支持[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) 仿真，可以无硬件依托进行开发
--  丰富详实的[例程](https://github.com/lvgl/lvgl/tree/master/examples)
--  详尽的[文档](http://docs.lvgl.io/) 以及API参考手册，可线上查阅或可下载为PDF格式
+## 💡 特性
 
-### 硬件要求
+**免费与可移植性**
+  - 纯 C（兼容 C++）库，无外部依赖。
+  - 可为任意 MCU 或 MPU 编译，支持任何 (RT)OS。支持 Make、CMake 和简单文件匹配。
+  - 支持单色、电子墨水、OLED、TFT 显示器，甚至是 PC 显示器。详见 [显示模块](https://docs.lvgl.io/master/details/main-modules/display/index.html)
+  - 采用 MIT 许可证，可自由用于商业项目。
+  - 仅需 32kB RAM、128kB Flash、一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲。
+  - 支持但不强制要求使用操作系统、外部存储或 GPU。
 
-<table>
-   <tr>
-      <td><strong>要求</strong></td>
-      <td><strong>最低要求</strong></td>
-      <td><strong>建议要求</strong></td>
-   </tr>
-   <tr>
-      <td><strong>架构</strong></td>
-      <td colspan="2">16、32、64位微控制器或微处理器</td>
-   </tr>
-   <tr>
-      <td><strong>时钟</strong></td>
-      <td> &gt; 16 MHz</td>
-      <td> &gt; 48 MHz</td>
-   </tr>
-   <tr>
-      <td><strong>Flash/ROM</strong></td>
-      <td> &gt; 64 kB</td>
-      <td> &gt; 180 kB</td>
-   </tr>
-   <tr>
-      <td><strong>Static RAM</strong></td>
-      <td> &gt; 16 kB</td>
-      <td> &gt; 48 kB</td>
-   </tr>
-   <tr>
-      <td><strong>Draw buffer</strong></td>
-      <td> &gt; 1 × <em>hor. res.</em> pixels</td>
-      <td> &gt; 1/10屏幕大小 </td>
-   </tr>
-   <tr>
-      <td><strong>编译器</strong></td>
-      <td colspan="2">C99或更新 </td>
-   </tr>
-</table>
+**控件、样式、布局等**
+  - 超过 30 个内置 [控件](https://docs.lvgl.io/master/details/widgets/index.html)：按钮、标签、滑块、图表、键盘、仪表、弧形、表格等。
+  - 灵活的 [样式系统](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html)，提供约 100 种属性，可自定义控件任意部分与状态。
+  - [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) 和 [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html) 布局引擎可实现自适应布局。
+  - 文本支持 UTF-8 编码，兼容中日韩、泰语、印地语、阿拉伯语、波斯语等。
+  - [数据绑定](https://docs.lvgl.io/master/details/auxiliary-modules/observer/index.html) 模块轻松连接 UI 与应用逻辑。
+  - 渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图像变换等。
+  - [强大的 3D 渲染引擎](https://docs.lvgl.io/master/details/libs/gltf.html)，可使用 OpenGL 显示 [glTF 模型](https://sketchfab.com/)。
+  - 支持鼠标、触摸板、按键、键盘、外部按钮、编码器等 [输入设备](https://docs.lvgl.io/master/details/main-modules/indev.html)。
+  - 支持 [多显示屏](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use)。
 
-*注意：资源占用情况与具体硬件平台、编译器等因素有关，上表中仅给出参考值*
+## 📦️ 平台支持
 
-### :package: 已经支持的平台
+LVGL 无外部依赖，因此可轻松编译到任何设备，并已被多个包管理器与 RTOS 集成：
 
-LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求的微控制器均可运行LVGL。
-如下仅列举其中一部分:
+- [Arduino 库](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
+- [PlatformIO 包](https://registry.platformio.org/libraries/lvgl/lvgl)
+- [Zephyr 库](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
+- [ESP-IDF (ESP32) 组件](https://components.espressif.com/components/lvgl/lvgl)
+- [NXP MCUXpresso 组件](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
+- [NuttX 库](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
+- CMSIS-Pack
+- [RIOT OS 包](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
--  NXP: Kinetis, LPC, iMX, iMX RT
--  STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
--  Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
--  [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
--  [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
--  [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
--  Nordic NRF52 Bluetooth modules
--  Quectel modems
--  [SYNWIT SWM341](https://www.synwit.cn/)
+## 🚀 LVGL Pro 编辑器
 
-LVGL也支持：
-- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
-- [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
-- [ESP32 component](https://docs.lvgl.io/master/details/integration/chip/espressif.html)
-- [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/packages-manual/lvgl-docs/introduction)
+LVGL Pro 是一套完整的工具，用于高效构建、测试、共享和交付嵌入式 UI。
 
+它包含四个紧密集成的工具：
 
+1. **XML 编辑器**：LVGL Pro 的核心。桌面应用，用于通过 XML 构建组件与界面，管理数据绑定、翻译、动画、测试等。了解更多 [XML 格式](https://docs.lvgl.io/master/details/xml/xml/index.html) 和 [编辑器](https://docs.lvgl.io/master/details/xml/editor/index.html)。
+2. **在线预览器**：在浏览器中运行编辑器，打开 GitHub 项目，无需搭建开发环境即可共享。访问 [https://viewer.lvgl.io](https://viewer.lvgl.io)。
+3. **CLI 工具**：在 CI/CD 中生成 C 代码并运行测试。详见 [此处](https://docs.lvgl.io/master/details/xml/tools/cli.html)。
+4. **Figma 插件**：直接从 Figma 同步和提取样式。了解更多 [这里](https://docs.lvgl.io/master/details/xml/tools/figma.html)。
 
-## 如何入门
+这些工具结合在一起，帮助开发者高效构建 UI、可靠测试，并便于团队协作。
 
-请按照如下顺序来学习LVGL：
-1. 使用[网页在线例程](https://lvgl.io/demos) 来体验LVGL（3分钟）
-2. 阅读文档[简介](https://docs.lvgl.io/master/intro/introduction/index.html)章节来初步了解LVGL（5分钟）
-3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/intro/getting_started/learn_the_basics.html)章节来了解LVGL的基本知识（15分钟）
-4. 学习如何使用[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html)来在电脑上仿真LVGL（10分钟）
-5. 试着动手实践一些[例程](https://github.com/lvgl/lvgl/tree/master/examples)
-6. 参考[移植指南](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html)尝试将LVGL移植到一块开发板上，LVGL也已经提供了一些移植好的[工程](https://github.com/lvgl?q=lv_port_)
-7. 仔细阅读文档[总览](https://docs.lvgl.io/master/details/main-modules/index.html)章节来更加深入的了解和熟悉LVGL（2-3小时）
-8. 浏览文档[组件(Widgets)](https://docs.lvgl.io/master/details/widgets/index.html)章节来了解如何使用它们
-9. 如果你有问题可以到LVGL[论坛](http://forum.lvgl.io/)提问
-10. 阅读文档[如何向社区贡献](https://docs.lvgl.io/master/contributing/index.html)章节来看看你能帮LVGL社区做些什么，以促进LVGL软件质量的不断提高（15分钟）
+了解更多：https://pro.lvgl.io
 
+## 🤝 商业服务
 
-## :robot: 例程
+LVGL LLC 提供多种商业服务，助力 UI 开发。凭借超过 15 年的用户界面与图形经验，我们能将你的产品 UI 提升到更高水平。
 
-更多例程请参见 [examples](https://github.com/lvgl/lvgl/tree/master/examples) 文件夹。
+- **图形设计**：我们的内部设计师擅长打造美观现代的设计，兼顾产品特性与硬件能力。
+- **UI 实现**：我们可以基于你提供或我们设计的 UI 进行实现，充分发挥硬件与 LVGL 的潜力。如缺少特定功能或控件，我们也可为你开发。
+- **咨询与支持**：提供 UI 开发咨询，帮助你避免代价高昂、耗时的错误。
+- **开发板认证**：为提供开发板或量产套件的企业提供认证服务，展示该板卡的 LVGL 运行能力。
 
-### Button with Click Event 按钮与点击事件
+查看我们的 [演示](https://lvgl.io/demos) 以了解示例。更多信息请访问 [服务页面](https://lvgl.io/services)。
 
-![Button with Click Event](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_2.gif)
+[联系我们](https://lvgl.io/#contact)，告诉我们如何帮助你。
 
-<details>
-  <summary>C code</summary>
+## 🧑‍💻 集成 LVGL
+
+集成 LVGL 非常简单。将其添加到项目中并像其他源文件一样编译即可。
+配置时复制 `lv_conf_template.h` 为 `lv_conf.h`，启用第一个 `#if 0` 并按需修改配置。
+（默认配置通常已足够。）LVGL 也支持通过 Kconfig 配置。
+
+项目中可按以下方式初始化 LVGL 并创建显示和输入设备：
 
 ```c
-lv_obj_t * btn = lv_button_create(lv_screen_active());       /*Add a button to the current screen*/
-lv_obj_center(btn);                                          /*Set its position*/
-lv_obj_set_size(btn, 100, 50);                               /*Set its size*/
-lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+#include "lvgl/lvgl.h" /*定义 LV_LVGL_H_INCLUDE_SIMPLE 可直接使用 "lvgl.h"*/
 
-lv_obj_t * label = lv_label_create(btn);                     /*Add a label to the button*/
-lv_label_set_text(label, "Button");                          /*Set the labels text*/
-lv_obj_center(label);                                        /*Align the label to the center*/
-...
+#define TFT_HOR_RES 320
+#define TFT_VER_RES 240
 
-void btn_event_cb(lv_event_t * e)
+static uint32_t my_tick_cb(void)
 {
-  printf("Clicked\n");
+    return my_get_millisec();
+}
+
+static void my_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+{
+    /*将 px_map 写入帧缓冲或显示控制器对应区域*/
+}
+
+static void my_touch_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
+{
+   if(my_touch_is_pressed()) {
+       data->point.x = touchpad_x;
+       data->point.y = touchpad_y;
+       data->state = LV_INDEV_STATE_PRESSED;
+   } else {
+       data->state = LV_INDEV_STATE_RELEASED;
+   }
+}
+
+void main(void)
+{
+    my_hardware_init();
+
+    /*初始化 LVGL*/
+    lv_init();
+
+    /*设置毫秒级时钟回调，用于 LVGL 计时*/
+    lv_tick_set_cb(my_tick_cb);
+
+    /*创建显示对象，用于添加屏幕和控件*/
+    lv_display_t * display = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
+
+    /*添加渲染缓冲，这里假设使用 16 位 RGB565 格式*/
+    static uint8_t buf[TFT_HOR_RES * TFT_VER_RES / 10 * 2];
+    lv_display_set_buffers(display, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+    /*设置刷新回调，将缓冲内容写入显示设备*/
+    lv_display_set_flush_cb(display, my_flush_cb);
+
+    /*创建输入设备用于触摸处理*/
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, my_touch_read_cb);
+
+    /*驱动已就绪，创建 UI*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Hello world");
+    lv_obj_center(label);
+
+    /*循环执行 LVGL 任务*/
+    while(1) {
+        lv_timer_handler();
+        my_sleep_ms(5);
+    }
 }
 ```
 
-</details>
+## 🤖 示例
+
+可在 https://docs.lvgl.io/master/examples.html 查看 100+ 示例。
+
+在线预览器 https://viewer.lvgl.io/ 也提供了易学的 XML 教程。
 
 
-### Micropython
+### Hello World 按钮事件示例
 
-更多信息请到 [Micropython官网](https://docs.lvgl.io/master/get-started/bindings/micropython.html) 查询.
+<img width="311" height="232" alt="image" src="https://github.com/user-attachments/assets/5948b485-e3f7-4a63-bb21-984381417c4a" />
 
 <details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">Online Simulator</a> :gb:</summary>
+  <summary>C 代码</summary>
 
-```python
-def btn_event_cb(e):
-  print("Clicked")
+  ```c
+static void button_clicked_cb(lv_event_t * e)
+{
+	printf("Clicked\n");
+}
 
-# Create a Button and a Label
-btn = lv.btn(lv.screen_active())
-btn.center()
-btn.set_size(100, 50)
-btn.add_event(btn_event_cb, lv.EVENT.CLICKED, None)
+[...]
 
-label = lv.label(btn)
-label.set_text("Button")
-label.center()
+  lv_obj_t * button = lv_button_create(lv_screen_active());
+  lv_obj_center(button);
+  lv_obj_add_event_cb(button, button_clicked_cb, LV_EVENT_CLICKED, NULL);
+
+  lv_obj_t * label = lv_label_create(button);
+  lv_label_set_text(label, "Hello from LVGL!");
+```
+</details>
+
+<details>
+  <summary>使用 LVGL Pro 的 XML</summary>
+
+```xml
+<screen>
+	<view>
+		<lv_button align="center">
+			<event_cb callback="button_clicked_cb" />
+			<lv_label text="Hello from LVGL!" />
+		</lv_button>
+	</view>
+</screen>
 ```
 
 </details>
-<br>
 
+### 带数据绑定的滑块
 
-### Checkboxes with Layout 带布局的复选框
-![Checkboxes with layout in LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_3.gif)
+<img width="314" height="233" alt="image" src="https://github.com/user-attachments/assets/268db1a0-946c-42e2-aee4-9550bdf5f4f9" />
 
 <details>
-  <summary>C code</summary>
+  <summary>C 代码</summary>
 
 ```c
+static void my_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+	printf("Slider value: %d\n", lv_subject_get_int(subject));
+}
 
-lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+[...]
 
-lv_obj_t * cb;
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "Apple");
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+static lv_subject_t subject_value;
+lv_subject_init_int(&subject_value, 35);
+lv_subject_add_observer(&subject_value, my_observer_cb, NULL);
 
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "Banana");
-lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_style_t style_base;
+lv_style_init(&style_base);
+lv_style_set_bg_color(&style_base, lv_color_hex(0xff8800));
+lv_style_set_bg_opa(&style_base, 255);
+lv_style_set_radius(&style_base, 4);
 
-cb = lv_checkbox_create(lv_screen_active());
-lv_checkbox_set_text(cb, "Lemon");
-lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
-
-cb = lv_checkbox_create(lv_screen_active());
-lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_checkbox_set_text(cb, "Melon\nand a new line");
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
-```
-
-</details>
-
-
-<details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=311d37e5f70daf1cb0d2cad24c7f72751b5f1792" target="_blank">Online Simulator</a> :gb:</summary>
-
-```python
-def event_handler(e):
-    code = e.get_code()
-    obj = e.get_target_obj()
-    if code == lv.EVENT.VALUE_CHANGED:
-        txt = obj.get_text()
-        if obj.get_state() & lv.STATE.CHECKED:
-            state = "Checked"
-        else:
-            state = "Unchecked"
-        print(txt + ":" + state)
-
-
-lv.scr_act().set_flex_flow(lv.FLEX_FLOW.COLUMN)
-lv.scr_act().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("Apple")
-cb.add_event(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("Banana")
-cb.add_state(lv.STATE.CHECKED)
-cb.add_event(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.set_text("Lemon")
-cb.add_state(lv.STATE.DISABLED)
-cb.add_event(event_handler, lv.EVENT.ALL, None)
-
-cb = lv.checkbox(lv.screen_active())
-cb.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
-cb.set_text("Melon")
-cb.add_event(event_handler, lv.EVENT.ALL, None)
-```
-
-</details>
-
-
-### Styling a Slider 设置滑块的样式
-![Styling a slider with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_4.gif)
-
-
-<details>
-  <summary>C code</summary>
-
-```c
 lv_obj_t * slider = lv_slider_create(lv_screen_active());
-lv_slider_set_value(slider, 70, LV_ANIM_OFF);
-lv_obj_set_size(slider, 300, 20);
 lv_obj_center(slider);
+lv_obj_set_size(slider, lv_pct(80), 16);
+lv_obj_add_style(slider, &style_base, LV_PART_INDICATOR);
+lv_obj_add_style(slider, &style_base, LV_PART_KNOB);
+lv_obj_add_style(slider, &style_base, 0);
+lv_obj_set_style_bg_opa(slider, LV_OPA_50, 0);
+lv_obj_set_style_border_width(slider, 3, LV_PART_KNOB);
+lv_obj_set_style_border_color(slider, lv_color_hex3(0xfff), LV_PART_KNOB);
+lv_slider_bind_value(slider, &subject_value);
 
-/*Add local styles to MAIN part (background rectangle)*/
-lv_obj_set_style_bg_color(slider, lv_color_hex(0x0F1215), LV_PART_MAIN);
-lv_obj_set_style_bg_opa(slider, 255, LV_PART_MAIN);
-lv_obj_set_style_border_color(slider, lv_color_hex(0x333943), LV_PART_MAIN);
-lv_obj_set_style_border_width(slider, 5, LV_PART_MAIN);
-lv_obj_set_style_pad_all(slider, 5, LV_PART_MAIN);
-
-/*Create a reusable style sheet for the INDICATOR part*/
-static lv_style_t style_indicator;
-lv_style_init(&style_indicator);
-lv_style_set_bg_color(&style_indicator, lv_color_hex(0x37B9F5));
-lv_style_set_bg_grad_color(&style_indicator, lv_color_hex(0x1464F0));
-lv_style_set_bg_grad_dir(&style_indicator, LV_GRAD_DIR_HOR);
-lv_style_set_shadow_color(&style_indicator, lv_color_hex(0x37B9F5));
-lv_style_set_shadow_width(&style_indicator, 15);
-lv_style_set_shadow_spread(&style_indicator, 5);
-
-/*Add the style sheet to the slider's INDICATOR part*/
-lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
-
-/*Add the same style to the KNOB part too and locally overwrite some properties*/
-lv_obj_add_style(slider, &style_indicator, LV_PART_KNOB);
-
-lv_obj_set_style_outline_color(slider, lv_color_hex(0x0096FF), LV_PART_KNOB);
-lv_obj_set_style_outline_width(slider, 3, LV_PART_KNOB);
-lv_obj_set_style_outline_pad(slider, -5, LV_PART_KNOB);
-lv_obj_set_style_shadow_spread(slider, 2, LV_PART_KNOB);
+lv_obj_t * label = lv_label_create(lv_screen_active());
+lv_obj_align(label, LV_ALIGN_CENTER, 0, -30);
+lv_label_bind_text(label, &subject_value, "Temperature: %d °C");
 ```
 
 </details>
 
 <details>
-  <summary>MicroPython code |
-<a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=c431c7b4dfd2cc0dd9c392b74365d5af6ea986f0" target="_blank">Online Simulator</a> :gb:
-</summary>
+  <summary>使用 LVGL Pro 的 XML</summary>
 
+```xml
+<screen>
+	<styles>
+		<style name="style_base" bg_opa="100%" bg_color="0xff8800" radius="4" />
+		<style name="style_border" border_color="0xfff" border_width="3" />
+	</styles>
 
-```python
-# Create a slider and add the style
-slider = lv.slider(lv.screen_active())
-slider.set_value(70, lv.ANIM.OFF)
-slider.set_size(300, 20)
-slider.center()
-
-# Add local styles to MAIN part (background rectangle)
-slider.set_style_bg_color(lv.color_hex(0x0F1215), lv.PART.MAIN)
-slider.set_style_bg_opa(255, lv.PART.MAIN)
-slider.set_style_border_color(lv.color_hex(0x333943), lv.PART.MAIN)
-slider.set_style_border_width(5, lv.PART.MAIN)
-slider.set_style_pad_all(5, lv.PART.MAIN)
-
-# Create a reusable style sheet for the INDICATOR part
-style_indicator = lv.style_t()
-style_indicator.init()
-style_indicator.set_bg_color(lv.color_hex(0x37B9F5))
-style_indicator.set_bg_grad_color(lv.color_hex(0x1464F0))
-style_indicator.set_bg_grad_dir(lv.GRAD_DIR.HOR)
-style_indicator.set_shadow_color(lv.color_hex(0x37B9F5))
-style_indicator.set_shadow_width(15)
-style_indicator.set_shadow_spread(5)
-
-# Add the style sheet to the slider's INDICATOR part
-slider.add_style(style_indicator, lv.PART.INDICATOR)
-slider.add_style(style_indicator, lv.PART.KNOB)
-
-# Add the same style to the KNOB part too and locally overwrite some properties
-slider.set_style_outline_color(lv.color_hex(0x0096FF), lv.PART.KNOB)
-slider.set_style_outline_width(3, lv.PART.KNOB)
-slider.set_style_outline_pad(-5, lv.PART.KNOB)
-slider.set_style_shadow_spread(2, lv.PART.KNOB)
+	<view>
+		<lv_label bind_text="value" bind_text-fmt="Temperature: %d °C" align="center" y="-30" />
+		<lv_slider align="center" bind_value="value" style_bg_opa="30%">
+			<style name="style_base" />
+			<style name="style_base" selector="knob" />
+			<style name="style_base" selector="indicator" />
+			<style name="style_border" selector="knob" />
+		</lv_slider>
+	</view>
+</screen>
 ```
+
 </details>
-<br>
 
+### 布局中的复选框
 
-### English, Hebrew (mixed LRT-RTL) and Chinese texts 英语、希伯来语（ 双向文本排版 ）和中文
-
-![English, Hebrew and Chinese texts with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_5.png)
+<img width="311" height="231" alt="image" src="https://github.com/user-attachments/assets/ba9af647-2ea1-4bc8-b53d-c7b43ce24b6e" />
 
 <details>
-  <summary>C code</summary>
+  <summary>C 代码</summary>
 
-```c
-lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
-lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
-lv_obj_set_style_text_font(ltr_label, &lv_font_montserrat_16, 0);
-lv_obj_set_width(ltr_label, 310);
-lv_obj_align(ltr_label, LV_ALIGN_TOP_LEFT, 5, 5);
+  ```c
+/*创建新屏幕并加载*/
+lv_obj_t * scr = lv_obj_create(NULL);
+lv_screen_load(scr);
 
-lv_obj_t * rtl_label = lv_label_create(lv_screen_active());
-lv_label_set_text(rtl_label,"מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).");
-lv_obj_set_style_base_dir(rtl_label, LV_BASE_DIR_RTL, 0);
-lv_obj_set_style_text_font(rtl_label, &lv_font_dejavu_16_persian_hebrew, 0);
-lv_obj_set_width(rtl_label, 310);
-lv_obj_align(rtl_label, LV_ALIGN_LEFT_MID, 5, 0);
+/*设置列布局*/
+lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, /*垂直对齐*/
+						   LV_FLEX_ALIGN_START,	       /*主轴方向对齐*/
+						   LV_FLEX_ALIGN_CENTER);      /*交叉轴方向对齐*/
 
-lv_obj_t * cz_label = lv_label_create(lv_screen_active());
-lv_label_set_text(cz_label,
-                  "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
-lv_obj_set_style_text_font(cz_label, &lv_font_source_han_sans_sc_16_cjk, 0);
-lv_obj_set_width(cz_label, 310);
-lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
+/*创建 5 个复选框*/
+const char * texts[5] = {"Input 1", "Input 2", "Input 3", "Output 1", "Output 2"};
+for(int i = 0; i < 5; i++) {
+	lv_obj_t * cb = lv_checkbox_create(scr);
+	lv_checkbox_set_text(cb, texts[i]);
+}
+
+/*更改状态*/
+lv_obj_add_state(lv_obj_get_child(scr, 1), LV_STATE_CHECKED);
+lv_obj_add_state(lv_obj_get_child(scr, 3), LV_STATE_DISABLED);
 ```
 
 </details>
 
 <details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">Online Simulator</a> :gb:</summary>
+  <summary>使用 LVGL Pro 的 XML</summary>
 
-```python
-ltr_label = lv.label(lv.screen_active())
-ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
-ltr_label.set_style_text_font(lv.font_montserrat_16, 0);
-
-ltr_label.set_width(310)
-ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)
-
-rtl_label = lv.label(lv.screen_active())
-rtl_label.set_text("מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).")
-rtl_label.set_style_base_dir(lv.BASE_DIR.RTL, 0)
-rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
-rtl_label.set_width(310)
-rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
-
-font_han_sans_16_cjk = lv.font_load("S:../../assets/font/lv_font_source_han_sans_sc_16_cjk.fnt")
-
-cz_label = lv.label(lv.screen_active())
-cz_label.set_style_text_font(font_han_sans_16_cjk, 0)
-cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")
-cz_label.set_width(310)
-cz_label.align(lv.ALIGN.BOTTOM_LEFT, 5, -5)
-
+```xml
+<screen>
+	<view
+		flex_flow="column"
+		style_flex_main_place="space_evenly"
+		style_flex_cross_place="start"
+		style_flex_track_place="center"
+	>
+		<lv_checkbox text="Input 1"/>
+		<lv_checkbox text="Input 2"/>
+		<lv_checkbox text="Input 3" checked="true"/>
+		<lv_checkbox text="Output 1"/>
+		<lv_checkbox text="Output 2" disabled="true"/>
+   </view>
+</screen>
 ```
+
 </details>
 
 
+## 🌟 贡献
 
-## :handshake: 服务
+LVGL 是一个开放项目，欢迎任何形式的贡献。无论是分享你的项目、编写示例、改进文档、修复错误，还是将项目托管到 LVGL 组织下，都非常欢迎。
 
-LVGL
-责任有限公司成立的目的是为了给用户使用LVGL图形库提供额外的技术支持，我们致力于提供以下服务：
+更多贡献方式详见 [贡献文档](https://docs.lvgl.io/master/contributing/index.html)。
 
--  图形设计
--  UI设计
--  技术咨询以及技术支持
+已有超过 600 位开发者为 LVGL 留下足迹。加入我们吧！🙂
 
-更多信息请参见 https://lvgl.io/services ，如果有任何问题请随时联系我们。
+<a href="https://github.com/lvgl/lvgl/graphs/contributors"> <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" /> </a>
 
+……还有更多人。
 
-## :star: 如何向社区贡献
-
-LVGL是一个开源项目，非常欢迎您参与到社区贡献当中。您有很多种方式来为提高LVGL贡献您的一份力量，包括但不限于：
-
--  介绍你基于LVGL设计的作品或项目
--  写一些例程
--  修改以及完善文档
--  修复bug
-
-请参见文档[如何向社区贡献](https://docs.lvgl.io/master/contributing/index.html)章节来获取更多信息。

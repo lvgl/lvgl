@@ -17,7 +17,12 @@ application.
 Initialization
 **************
 
-The main entry point is ``ui_init("asset_path")`` located in ``ui.c``.
+The main entry point is a ``<project_name>_init("asset_path")`` function located
+in ``<project_name>.c``.
+
+``<project_name>`` is the name of the parent folder by default, which can be overwritten
+in ``project.xml`` as ``<project name="my_project">``.
+
 
 Its only parameter is a path where the file-based assets (fonts and images) are
 located. For example, if a PNG and TTF file are located at
@@ -25,7 +30,7 @@ located. For example, if a PNG and TTF file are located at
 paths can be prefixed. That is, if ``images/logo.png`` was used in the UI Editor,
 then the full path will be ``"A:my_ui/v2.3/assets/images/logo.png"``.
 
-Note that ``ui_init()`` creates only the :ref:`permanent screens <xml_screen_permanent>` but
+Note that "init" function creates only the :ref:`permanent screens <xml_screen_permanent>` but
 doesn't load any screens. However, this can be done easily by calling ``lv_screen_load(screen1)``.
 
 Screens can also be created easily by calling their generated create function,
@@ -52,7 +57,7 @@ the name of the file. For example:
 For Components, no setters are created, but all the parameters are passed to the
 create function.
 
-From each ``globals.xml``, four files are created:
+From ``globals.xml``, four files are created:
 
 - Generated C and H files containing all subject, font, image, style, and other
   initializations.

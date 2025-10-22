@@ -652,7 +652,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
          * then respect the current position instead of going straight back to 0.
          */
         const int32_t scroll_ended = diff > 0 ? scroll_start : scroll_end;
-        if(scroll_ended < 0) diff = 0;
+        if(scroll_ended <= 0) diff = 0;
         else if(scroll_ended - diff < 0) diff = scroll_ended;
     }
     /*Handle elastic scrolling*/

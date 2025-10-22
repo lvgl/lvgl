@@ -39,8 +39,10 @@ extern "C" {
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(dsc, dest_px_size) lv_draw_sw_blend_neon_color_to_rgb888_with_opa_mask(dsc, dest_px_size)
 #endif
 
+#ifdef __aarch64__ /* This function uses a special intrinsic only available for arm64 */
 #ifndef LV_DRAW_SW_L8_BLEND_NORMAL_TO_RGB888
 #define LV_DRAW_SW_L8_BLEND_NORMAL_TO_RGB888(dsc, dest_px_size) lv_draw_sw_blend_neon_l8_to_rgb888(dsc, dest_px_size)
+#endif
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888
@@ -111,7 +113,9 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_mask(lv_draw_sw_blend_fil
 lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_opa_mask(lv_draw_sw_blend_fill_dsc_t * dsc,
                                                                 uint32_t dest_px_size);
 
+#ifdef __aarch64__
 lv_result_t lv_draw_sw_blend_neon_l8_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+#endif /*__aarch64__*/
 
 lv_result_t lv_draw_sw_blend_neon_al88_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 lv_result_t lv_draw_sw_blend_neon_al88_to_rgb888_with_opa(lv_draw_sw_blend_image_dsc_t * dsc);

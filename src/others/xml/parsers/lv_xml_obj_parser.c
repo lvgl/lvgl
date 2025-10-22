@@ -99,6 +99,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("ext_click_area", name)) lv_obj_set_ext_click_area(item, lv_xml_atoi(value));
         else if(lv_streq("scroll_snap_x", name)) lv_obj_set_scroll_snap_x(item, lv_xml_scroll_snap_to_enum(value));
         else if(lv_streq("scroll_snap_y", name)) lv_obj_set_scroll_snap_y(item, lv_xml_scroll_snap_to_enum(value));
+        else if(lv_streq("scrollbar_mode", name)) lv_obj_set_scrollbar_mode(item, lv_xml_scrollbar_mode_to_enum(value));
 
         else if(lv_streq("hidden", name))               lv_obj_set_flag(item, LV_OBJ_FLAG_HIDDEN, lv_xml_to_bool(value));
         else if(lv_streq("clickable", name))            lv_obj_set_flag(item, LV_OBJ_FLAG_CLICKABLE, lv_xml_to_bool(value));
@@ -403,6 +404,8 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     const char * subject_str =  lv_xml_get_value_of(attrs, "subject");
     const char * trigger_str =  lv_xml_get_value_of(attrs, "trigger");
     const char * step_str =  lv_xml_get_value_of(attrs, "step");
+    const char * min_value_str =  lv_xml_get_value_of(attrs, "min_value");
+    const char * max_value_str =  lv_xml_get_value_of(attrs, "max_value");
     const char * rollover_str =  lv_xml_get_value_of(attrs, "rollover");
 
     if(subject_str == NULL) {
@@ -434,8 +437,11 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
     void * item = lv_xml_state_get_item(state);
 
     int32_t step = lv_xml_atoi(step_str);
-    bool rollover = lv_xml_to_bool(rollover_str);
-    lv_obj_add_subject_increment_event(item, subject, trigger, step, rollover);
+    lv_subject_increment_dsc_t * dsc = lv_obj_add_subject_increment_event(item, subject, trigger, step);
+
+    if(min_value_str) lv_obj_set_subject_increment_event_min_value(item, dsc, lv_xml_atoi(min_value_str));
+    if(max_value_str) lv_obj_set_subject_increment_event_max_value(item, dsc, lv_xml_atoi(max_value_str));
+    if(rollover_str) lv_obj_set_subject_increment_event_rollover(item, dsc, lv_xml_to_bool(rollover_str));
 }
 
 void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs)
@@ -1049,16 +1055,31 @@ static void play_anim_on_trigger_event_cb(lv_event_t * e)
         return;
     }
 
+    /*Reset the progress only if the animation was finished*/
+    uint16_t progress = lv_anim_timeline_get_progress(timeline);
     if(dsc->reverse) {
+        if(progress == 0) {
+            lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        }
+
+        if(lv_anim_timeline_get_progress(timeline) == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_delay(timeline, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(timeline, true);
-        lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
     }
     else {
+        if(progress == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_progress(timeline, 0);
+        }
+
+        if(lv_anim_timeline_get_progress(timeline) == 0) {
+            lv_anim_timeline_set_delay(timeline, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(timeline, false);
-        lv_anim_timeline_set_progress(timeline, 0);
     }
 
-    lv_anim_timeline_set_delay(timeline, dsc->delay);
     lv_anim_timeline_start(timeline);
 
 }

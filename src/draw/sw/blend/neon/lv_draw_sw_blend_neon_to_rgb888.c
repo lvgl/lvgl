@@ -366,6 +366,7 @@ lv_result_t lv_draw_sw_blend_neon_color_to_rgb888_with_opa_mask(lv_draw_sw_blend
     return LV_RESULT_OK;
 }
 
+#ifdef __aarch64__ /* vqtbl1q_u8 is only available on arm64 */
 lv_result_t lv_draw_sw_blend_neon_l8_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
     LV_ASSERT(dest_px_size == 3 || dest_px_size == 4);
@@ -425,6 +426,7 @@ lv_result_t lv_draw_sw_blend_neon_l8_to_rgb888(lv_draw_sw_blend_image_dsc_t * ds
     }
     return LV_RESULT_OK;
 }
+#endif
 
 lv_result_t lv_draw_sw_blend_neon_rgb565_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {

@@ -11,16 +11,26 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
 #include "../../../misc/lv_area_private.h"
 #include "g2d.h"
 #include "lv_g2d_buf_map.h"
+#include "lv_g2d_utils.h"
 
 /*********************
  *      DEFINES
  *********************/
 
 #define DRAW_UNIT_ID_G2D 8
+
+/**
+ * Enum name differs depending on g2d version (breaking API change, not handled in g2d.h)
+ * Note: enum value is the same in either case
+ * See https://github.com/nxp-imx/imx-g2d-pxp/commit/d7af84b5c8ad161b6898ffabe23918cb59fe2fe9
+ */
+#if (G2D_VERSION_MAJOR >= 2) && (G2D_VERSION_MINOR < 3)
+    #define G2D_HARDWARE_PXP_V1 G2D_HARDWARE_PXP
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -57,6 +67,8 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
  *  STATIC VARIABLES
  **********************/
 
+static int32_t is_hw_pxp = 0;
+
 /**********************
  *      MACROS
  **********************/
@@ -68,16 +80,13 @@ static void _g2d_execute_drawing(lv_draw_task_t * t);
 void lv_draw_g2d_init(void)
 {
     lv_draw_buf_g2d_init_handlers();
-
+#if LV_USE_DRAW_G2D
     lv_draw_g2d_unit_t * draw_g2d_unit = lv_draw_create_unit(sizeof(lv_draw_g2d_unit_t));
     draw_g2d_unit->base_unit.evaluate_cb = _g2d_evaluate;
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     draw_g2d_unit->base_unit.name = "G2D";
-    g2d_create_buf_map();
-    if(g2d_open(&draw_g2d_unit->g2d_handle)) {
-        LV_LOG_ERROR("g2d_open fail.\n");
-    }
+
 #if LV_USE_G2D_DRAW_THREAD
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
     thread_dsc->idx = 0;
@@ -85,6 +94,12 @@ void lv_draw_g2d_init(void)
     lv_thread_init(&thread_dsc->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, LV_DRAW_THREAD_STACK_SIZE,
                    thread_dsc);
 #endif
+#endif
+    g2d_create_buf_map();
+    void * handle;
+    LV_ASSERT_MSG(!g2d_open(&handle), "Cannot open G2D handle\r\n");
+    g2d_query_hardware(handle, G2D_HARDWARE_PXP_V1, &is_hw_pxp);
+    g2d_set_handle(handle);
 }
 
 void lv_draw_g2d_deinit(void)
@@ -95,7 +110,7 @@ void lv_draw_g2d_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#if LV_USE_DRAW_G2D
 static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -105,6 +120,12 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
+        case LV_COLOR_FORMAT_RGB565: {
+                if(!is_hw_pxp) {
+                    is_cf_supported = true;
+                }
+            }
+            break;
         default:
             break;
     }
@@ -112,7 +133,7 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
-static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_format_t cf)
+static inline bool _g2d_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
 
@@ -122,10 +143,7 @@ static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_for
             is_cf_supported = true;
             break;
         case LV_COLOR_FORMAT_RGB565: {
-                int32_t hw_pxp = 0;
-                lv_draw_g2d_unit_t * u = (lv_draw_g2d_unit_t *)drawunit;
-                g2d_query_hardware(u->g2d_handle, G2D_HARDWARE_PXP, &hw_pxp);
-                if(!hw_pxp) {
+                if(!is_hw_pxp) {
                     is_cf_supported = true;
                 }
             }
@@ -139,16 +157,13 @@ static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_for
 
 static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 {
-    bool is_tiled = draw_dsc->tile;
-    /* Tiled image (repeat image) is currently not supported. */
-    if(is_tiled)
+    bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
+    /* Recolor is not supported. */
+    if(has_recolor)
         return false;
 
-    bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
-    bool has_rotation = (draw_dsc->rotation != 0);
-
-    /* Recolor or rotation are not supported. */
-    if(has_recolor || has_rotation)
+    /* G2D can only rotate at 90x angles. */
+    if(draw_dsc->rotation % 900)
         return false;
 
     return true;
@@ -184,7 +199,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
 
-                if(!_g2d_src_cf_supported(u, draw_dsc->header.cf))
+                if(!_g2d_src_cf_supported(draw_dsc->header.cf))
                     return 0;
 
                 if(!_g2d_draw_img_supported(draw_dsc))
@@ -255,10 +270,12 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 {
-    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
     lv_result_t res = LV_RESULT_OK;
 
-#if LV_USE_G2D_DRAW_THREAD
+#if !LV_USE_G2D_DRAW_THREAD
+    LV_UNUSED(draw_unit);
+#else
+    lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
     lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
     LV_LOG_INFO("Cancel G2D draw thread.");
     thread_dsc->exit_status = true;
@@ -268,7 +285,7 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 
     res = lv_thread_delete(&thread_dsc->thread);
 #endif
-    g2d_close(draw_g2d_unit->g2d_handle);
+    g2d_close(g2d_get_handle());
 
     return res;
 }
@@ -333,4 +350,5 @@ static void _g2d_render_thread_cb(void * ptr)
 }
 #endif
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/

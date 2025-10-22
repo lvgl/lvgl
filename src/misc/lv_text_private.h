@@ -20,14 +20,53 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#ifndef LV_TXT_COLOR_CMD
+#define LV_TXT_COLOR_CMD "#"
+#endif
+
+#define LV_TXT_ENC_UTF8 1
+#define LV_TXT_ENC_ASCII 2
+
+#define LV_TEXT_LEN_MAX UINT32_MAX
+
 /**********************
  *      TYPEDEFS
  **********************/
+
+/** State machine for text renderer. */
+typedef enum {
+    LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
+    LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
+    LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
+} lv_text_cmd_state_t;
+
+typedef struct {
+    int32_t letter_space;   /**< Letter space between letters*/
+    int32_t line_space;     /**< Space between lines of text*/
+    int32_t max_width;      /**< Max width of the text (break the lines to fit this size). Set COORD_MAX to avoid*/
+    lv_text_flag_t text_flags;
+} lv_text_attributes_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize the text attributes descriptor
+ * @param attributes the text attributes descriptor to initialize
+ */
+void lv_text_attributes_init(lv_text_attributes_t * attributes);
+
+/**
+ * Get size of a text
+ * @param size_res pointer to a 'point_t' variable to store the result
+ * @param text pointer to a text
+ * @param font pointer to font of the text
+ * @param attributes the text attributes, flags for line break behaviour, spacing etc
+ */
+void lv_text_get_size_attributes(lv_point_t * size_res, const char * text, const lv_font_t * font,
+                                 lv_text_attributes_t * attributes);
 /**
  * Give the length of a text with a given font with text flags
  * @param txt a '\0' terminate string
