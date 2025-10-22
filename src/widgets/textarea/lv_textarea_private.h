@@ -32,6 +32,7 @@ struct _lv_textarea_t {
     lv_obj_t obj;
     lv_obj_t * label;            /**< Label of the text area */
     char * placeholder_txt;      /**< Place holder label. only visible if text is an empty string */
+    lv_point_t placeholder_txt_size; /*Size of the placeholder text*/
     char * pwd_tmp;              /**< Used to store the original text in password mode */
     char * pwd_bullet;           /**< Replacement characters displayed in password mode */
     char * accepted_chars;       /**< Only these characters will be accepted. NULL: accept all */
