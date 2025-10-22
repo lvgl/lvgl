@@ -288,16 +288,15 @@ void test_tabview_update_on_external_scroll(void)
 
 void test_tabview_translation_tag(void)
 {
-    static const char * tags[] = {"tiger", "lion", NULL};
+    static const char * tags[] = {"tiger", NULL};
     static const char * languages[]    = {"en", "de", "es", NULL};
     static const char * translations[] = {
-        "The Tiger", "Der Tiger", "El Tigre",
-        "The Lion", "Der Löwe", "El León"
+        "The Tiger", "Der Tiger", "El Tigre"
     };
 
     lv_translation_add_static(languages, tags, translations);
     tabview = lv_tabview_create(active_screen);
-    lv_tabview_add_translation_tag_tab(tabview, "tiger");
+    lv_tabview_set_tab_translation_tag(tabview, "tiger");
 
     lv_obj_t * label = lv_obj_get_child_by_type(lv_tabview_get_tab_button(tabview, 0), 0, &lv_label_class);
 
@@ -313,22 +312,6 @@ void test_tabview_translation_tag(void)
     /* Unknown language translates to the tag */
     lv_translation_set_language("fr");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
-
-    lv_tabview_rename_translation_tag_tab(tabview, 0, "lion");
-
-    lv_translation_set_language("en");
-    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "The Lion");
-
-    lv_translation_set_language("de");
-    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Löwe");
-
-    lv_translation_set_language("es");
-    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "El León");
-
-    /* Unknown language translates to the tag */
-    lv_translation_set_language("fr");
-    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "lion");
-
 }
 
 #endif

@@ -73,7 +73,7 @@ void test_list_translation_tag(void)
     };
     lv_translation_add_static(languages, tags, translations);
 
-    lv_obj_t * list_text = lv_list_add_translation_tag_text(list, "tiger");
+    lv_obj_t * list_text = lv_list_add_text_translation_tag(list, "tiger");
 
     lv_translation_set_language("en");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(list_text), "The Tiger");
@@ -88,7 +88,7 @@ void test_list_translation_tag(void)
     lv_translation_set_language("fr");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(list_text), "tiger");
 
-    lv_obj_t * list_button = lv_list_add_translation_tag_button(list, NULL, "lion");
+    lv_obj_t * list_button = lv_list_add_button_translation_tag(list, NULL, "lion");
 
     lv_translation_set_language("en");
     TEST_ASSERT_EQUAL_STRING(lv_list_get_button_text(list, list_button), "The Lion");
@@ -103,7 +103,7 @@ void test_list_translation_tag(void)
     lv_translation_set_language("fr");
     TEST_ASSERT_EQUAL_STRING(lv_list_get_button_text(list, list_button), "lion");
 
-    lv_list_set_translation_tag_button_text(list, list_button, "rabbit");
+    lv_list_set_button_text_translation_tag(list, list_button, "rabbit");
 
     lv_translation_set_language("en");
     TEST_ASSERT_EQUAL_STRING(lv_list_get_button_text(list, list_button), "The Rabbit");

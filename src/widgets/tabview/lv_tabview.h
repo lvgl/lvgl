@@ -59,15 +59,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name);
  * @param tag       translation key used for the tab label; will be displayed on the tab bar
  * @return          the widget where the content of the tab can be created
  */
-lv_obj_t * lv_tabview_add_translation_tag_tab(lv_obj_t * obj, const char * tag);
-
-/**
- * Change the translation tag of the tab
- * @param obj       pointer to a tabview widget
- * @param idx       the index of the tab to rename
- * @param new_tag   the new translation tag as a string
- */
-void lv_tabview_rename_translation_tag_tab(lv_obj_t * obj, uint32_t idx, const char * new_tag);
+lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag);
 
 #endif
 
