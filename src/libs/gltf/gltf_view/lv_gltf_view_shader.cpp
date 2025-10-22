@@ -108,7 +108,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                && material.pbrData.roughnessFactor == 1.0f
                && material.emissiveStrength > 0.0f) {
                 /* Special case where settings preclude IBL's ability to have visible effect, so disable it entirely */
-                LV_LOG("Special case identified, disabling IBL and enabling UNLIT\n");
+                LV_LOG_TRACE("Special case identified, disabling IBL and enabling UNLIT\n");
                 if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
                     return LV_RESULT_INVALID;
                 }
