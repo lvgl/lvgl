@@ -1393,6 +1393,8 @@ static void draw_placeholder(lv_event_t * e)
         ph_coords.y1 += top + border_width;
         ph_coords.y2 -= bottom + border_width;
         ph_dsc.text = ta->placeholder_txt;
+        lv_text_get_size(&ph_dsc.text_size, ph_dsc.text, ph_dsc.font, ph_dsc.letter_space, ph_dsc.line_space, LV_COORD_MAX,
+                         ph_dsc.flag);
         lv_draw_label(layer, &ph_dsc, &ph_coords);
     }
 }
