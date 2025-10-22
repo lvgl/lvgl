@@ -108,6 +108,7 @@ before any other LVGL function is started.
 
 Ensuring Time Updates are Atomic
 --------------------------------
+
 For LVGL's time-related tasks to be reliable, the time updates via the Tick Interface
 must be reliable and the Tick Value must appear :ref:`atomic <atomic>` to LVGL.  See
 :ref:`tick_interface` for details.
@@ -118,6 +119,7 @@ must be reliable and the Tick Value must appear :ref:`atomic <atomic>` to LVGL. 
 
 Tasks
 *****
+
 Under an OS, it is common to have many threads of execution ("tasks" in some OSes)
 performing services for the application.  In some cases, such threads can acquire
 data that should be shown (or otherwise reflected) in the user interface, and doing
@@ -133,6 +135,7 @@ How do you do this?
 
 Method 1:  Use a Gateway Thread
 -------------------------------
+
 A "Gateway Thread" (or "Gateway Task" in some OSes) is a thread (task) that the
 system designer designates to *exclusively* manage a system resource.  An example is
 management of a remote chip, such as an EEPROM or other device that always needs to
@@ -160,21 +163,49 @@ If `atomic data`_ relevant to the user interface is updated in another thread (i
 by another task or in an interrupt), the thread calling LVGL functions can read that
 data directly without worry that it is in an inconsistent state.  (To avoid
 unnecessary CPU overhead, a mechanism can be provided [such as a flag raised by the
-updating thread] so that the user interface is only updated when it will result in a
-change visible to the end user.)
+updating thread, or a comparison of current data vs previous data] so that the user
+interface is only updated when it will result in a change visible to the end user.)
 
 If `non-atomic data`_ relevant to the user interface is updated in another thread
 (i.e. by another task or in an interrupt), an alternate (and safe) way of convey that
 data to the thread calling LVGL functions is to pass a private copy of that data to
-that thread via a QUEUE or other OS mechanism that protects that data from being seen
-in an inconsistent state.
+that thread via a QUEUE (e.g. a request queue) or other OS mechanism that protects
+that data from being seen in an inconsistent state.
 
 Use of a `Gateway Thread`_ avoids the CPU-overhead (and coding overhead) of using a
 MUTEX to protect LVGL data structures.
 
 
-Method 2:  Use a MUTEX
+Method 2:  Use a Work Queue
+---------------------------
+
+A Work Queue architecture (from the Linux world) is a slight variation of the `Gateway
+Thread`_ architecture in that it dedicates a single thread to make LVGL calls, but
+instead places that duty inside a "generic" worker thread.  Specifically, it involves
+a dedicated thread that typically waits on and accepts a generic
+``struct work_struct * work`` pointer, which itself contains a generic function
+pointer (which function accepts the same pointer argument) plus generic "data" that
+can be passed to the function and interpreted however needed by that function.  On
+Linux, this is a system-wide utility and can involve many threads, and can become
+heavily used, since other parts of the system also use it.  In a firmware environment,
+its use can be determined by the system architect, who can decide whether its use
+would be restricted to handling the UI by making LVGL calls.
+
+**Cost:**
+
+This architecture somewhat less efficient than a `Gateway Thread`_ because it implies
+a (worst-case scenario) task switch every time an LVGL call must be made (when the
+queue is empty when the submission is made).  A task switch can be a significant
+cost, depending on the platform and CPU involved.
+
+For this reason, it can never be as efficient as a `Gateway Thread`_, but for UIs that
+do not change rapidly, this may be a desirable alternative threading architecture,
+especially if your firmware is already running on an embedded Linux platform.
+
+
+Method 3:  Use a MUTEX
 ----------------------
+
 A MUTEX stands for "MUTually EXclusive" and is a synchronization primitive that
 protects the state of a system resource from being modified or accessed by multiple
 threads of execution at the same time.  In other words, it makes data thus protected "appear"
