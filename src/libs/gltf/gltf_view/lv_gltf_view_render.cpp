@@ -1208,11 +1208,12 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                         current_override->data[2] = local_scale[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3){
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3) {
                             local_scale[0] = current_override->data[3];
                             local_scale[1] = current_override->data[3];
                             local_scale[2] = current_override->data[3];
-                        } else {
+                        }
+                        else {
                             if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
                                 local_scale[0] = current_override->data[0];
                             if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
