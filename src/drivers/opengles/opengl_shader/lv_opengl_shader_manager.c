@@ -213,7 +213,6 @@ lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * 
         GL_CALL(glGetShaderInfoLog(shader_map_key.id, sizeof(info_log), NULL, info_log));
         LV_LOG_WARN("Failed to compile shader for glsl version '%s': %s", lv_opengles_glsl_version_to_string(glsl_version),
                     info_log);
-        GL_CALL(glDeleteShader(shader_map_key.id));
         return LV_RESULT_INVALID;
     }
 
