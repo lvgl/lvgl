@@ -178,7 +178,7 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto load_egl_functions_err;
     }
 
-    if(!eglMakeCurrent || !eglSwapInterval || !eglMakeCurrent || !eglDestroyContext) {
+    if(!eglMakeCurrent || !eglSwapInterval || !eglBindAPI || !eglDestroyContext) {
         LV_LOG_ERROR("Failed to load required EGL function pointers");
         goto load_egl_functions_err;
     }

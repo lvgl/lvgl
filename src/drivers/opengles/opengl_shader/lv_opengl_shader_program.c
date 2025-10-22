@@ -86,7 +86,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
      * To-do: Consider setting a flag at this point and if that flag is true
      * when the app finally shuts down, then perform the glDeleteProgram calls
      * if necessary.  That is not really necessary, OpenGL will do that anyways
-     * when it shut's down. */
+     * when it shuts down. */
 
     /* GL_CALL(glDeleteProgram(program->id)); */
 
