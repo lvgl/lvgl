@@ -174,15 +174,17 @@ That’s why placing your exported project under ``src/`` ensures everything is 
 Example structure
 -----------------
 
-YourSketch/
- ├── YourSketch.ino
- └── src/
-      └── editor_project/
-           ├── editor_project.h
-           ├── editor_project.c
-           ├── screens/
-           ├── widgets/
-           └── components/
+.. code-block:: text
+
+    YourSketch/
+    ├── YourSketch.ino
+    └── src/
+          └── editor_project/
+              ├── editor_project.h
+              ├── editor_project.c
+              ├── screens/
+              ├── widgets/
+              └── components/
 
 Include paths
 -------------
@@ -230,6 +232,7 @@ Change:
 .. code-block:: c
 
     #include "editor_project.h"
+    
 to:
 
 .. code-block:: c
@@ -246,9 +249,11 @@ Step-by-Step Setup
 
 1. Create the ``src`` Folder inside your sketch folder
 
-YourSketch/
- ├── YourSketch.ino
- └── src/
+.. code-block:: text
+
+    YourSketch/
+    ├── YourSketch.ino
+    └── src/
 
 2. Copy or create the LVGL Editor Project inside ``src`` folder
 
@@ -275,7 +280,7 @@ Example Arduino sketch
 ----------------------
 
 .. code-block:: cpp
-    
+
     #include <lvgl.h>
     #include "src/editor_project/editor_project.h"  // Adjust to match your project name
 
