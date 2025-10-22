@@ -3439,7 +3439,7 @@ static const char *src_fragment_shader = R"(
     // [5] "KHR_materials_clearcoat"
     //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
 
-    precision mediump float;
+    precision highp float;
 
 #include <tonemapping.glsl>
 #include <textures1.glsl>
