@@ -5,6 +5,7 @@ from .display import DumpDisplayBuf
 from .draw import InfoDrawUnit
 from .misc import InfoStyle
 from .debugger import Debugger
+from .drivers import Lvglobal
 
 __all__ = []
 
@@ -25,3 +26,6 @@ DumpDisplayBuf()
 # Infos
 InfoStyle()
 InfoDrawUnit()
+
+# Drivers
+Lvglobal()

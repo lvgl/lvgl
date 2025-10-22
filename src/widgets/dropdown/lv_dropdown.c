@@ -926,7 +926,7 @@ static void draw_main(lv_event_t * e)
             attributes.max_width = LV_COORD_MAX;
             attributes.text_flags = symbol_dsc.flag;
 
-            lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, &attributes);
+            lv_text_get_size_attributes(&size, dropdown->symbol, symbol_dsc.font, &attributes);
             symbol_w = size.x;
             symbol_h = size.y;
         }
@@ -983,7 +983,7 @@ static void draw_main(lv_event_t * e)
     attributes.text_flags = label_dsc.flag;
 
     lv_point_t size;
-    lv_text_get_size(&size, opt_txt, label_dsc.font, &attributes);
+    lv_text_get_size_attributes(&size, opt_txt, label_dsc.font, &attributes);
 
     lv_area_t txt_area;
     txt_area.x1 = obj->coords.x1 + left;

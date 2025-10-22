@@ -468,9 +468,9 @@ vg_lite_error_t vg_lite_set_color_key(vg_lite_color_key4_t colorkey)
         VG_LITE_RETURN_ERROR(push_state(&s_context, 0x0A90 + i, value_low));
 
         /* Set gcregVGPEColorKeyHigh. Layout "A/R/G/B". */
-        r = colorkey[i].hign_r;
-        g = colorkey[i].hign_g;
-        b = colorkey[i].hign_b;
+        r = colorkey[i].high_r;
+        g = colorkey[i].high_g;
+        b = colorkey[i].high_b;
         a = colorkey[i].alpha;
         value_high = (a << 24) | (r << 16) | (g << 8) | b;
         VG_LITE_RETURN_ERROR(push_state(&s_context, 0x0A94 + i, value_high));

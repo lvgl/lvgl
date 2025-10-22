@@ -5,27 +5,36 @@ set -e
 # These variables allow us to specify an alternate repository URL and commit reference
 # This is particularly useful when running in CI environments for pull requests
 # where we need to build from the contributor's forked repository
-REPO_URL="${1:-}"
-COMMIT_REF="${2:-}"
+ARG_1="${1:-}"
+ARG_2="${2:-}"
 
 export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
 rm -rf emscripten_builder
 git clone https://github.com/lvgl/lv_sim_emscripten.git emscripten_builder
-scripts/genexamplelist.sh > emscripten_builder/examplelist.c
 cd emscripten_builder
-git submodule update --init -- lvgl
-cd lvgl
-if [ -n "$REPO_URL" ] && [ -n "$COMMIT_REF" ]; then
-  echo "Using provided repo URL: $REPO_URL and commit ref: $COMMIT_REF for lvgl submodule"
-  git remote set-url origin "$REPO_URL"
-  git fetch origin
-  git fetch origin '+refs/pull/*:refs/remotes/origin/pull/*'
-  git checkout "$COMMIT_REF"
+if [ "$ARG_1" != "--symlink" ]; then
+  REPO_URL="$ARG_1"
+  COMMIT_REF="$ARG_2"
+  git submodule update --init -- lvgl
+  if [ -n "$REPO_URL" ] && [ -n "$COMMIT_REF" ]; then
+    cd lvgl
+    echo "Using provided repo URL: $REPO_URL and commit ref: $COMMIT_REF for lvgl submodule"
+    git remote set-url origin "$REPO_URL"
+    git fetch origin
+    git checkout "$COMMIT_REF"
+    cd ..
+  fi
 else
-  CURRENT_REF="$(git rev-parse HEAD)"
-  echo "Using current commit ref: $CURRENT_REF for lvgl"
-  git checkout "$CURRENT_REF"
+  SYMLINK_TARGET="$ARG_2"
+  echo "Using provided symbolic link to LVGL directory (should be absolute): $SYMLINK_TARGET"
+  rmdir lvgl # remove the uninitialized submodule empty dir
+  ln -s -T "$SYMLINK_TARGET" lvgl
 fi
+
+# Grab the path to emscripten's port examplelist.c before changing to LVGL's directory
+EXAMPLE_LIST_C=$(pwd)/examplelist.c
+cd lvgl
+scripts/genexamplelist.sh > $EXAMPLE_LIST_C
 cd ..
 
 # Generate lv_conf
@@ -41,5 +50,10 @@ cd cmbuild
 emcmake cmake .. -DLV_BUILD_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 emmake make -j$(nproc)
 rm -rf CMakeFiles
-cd ../..
-cp -a emscripten_builder/cmbuild docs/src/_static/built_lv_examples
+cd ..
+if [ "$ARG_1" != "--symlink" ]; then
+  cp -a cmbuild ../docs/src/_static/built_lv_examples
+else
+  cp -a cmbuild lvgl/docs/src/_static/built_lv_examples
+fi
+cd ..

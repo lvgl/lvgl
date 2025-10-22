@@ -31,12 +31,9 @@
 #include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
-    #if defined(LV_VG_LITE_HAL_GPU_SERIES)
-        #define VG_LITE_OPTIONS  <Series/LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION/vg_lite_options.h>
-        #include VG_LITE_OPTIONS
-    #else
-        #error "LV_VG_LITE_HAL_GPU_SERIES and / LV_VG_LITE_HAL_GPU_REVISION or are/is not defined, check your lv_conf.h"
-    #endif
+    #define VG_LITE_OPTIONS VG_LITE_OPTIONS_2
+    #define VG_LITE_OPTIONS_2  <../VGLite/Series/LV_VG_LITE_HAL_GPU_SERIES/LV_VG_LITE_HAL_GPU_REVISION/vg_lite_options.h>
+    #include VG_LITE_OPTIONS
 
 #endif /* LV_USE_VG_LITE_DRIVER */
 

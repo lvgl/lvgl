@@ -164,6 +164,15 @@ lv_scroll_snap_t lv_xml_scroll_snap_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
+lv_scrollbar_mode_t lv_xml_scrollbar_mode_to_enum(const char * txt)
+{
+    if(lv_streq("off", txt)) return LV_SCROLLBAR_MODE_OFF;
+    else if(lv_streq("on", txt)) return LV_SCROLLBAR_MODE_ON;
+    else if(lv_streq("active", txt)) return LV_SCROLLBAR_MODE_ACTIVE;
+    else if(lv_streq("auto", txt)) return LV_SCROLLBAR_MODE_AUTO;
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 lv_flex_flow_t lv_xml_flex_flow_to_enum(const char * txt)
 {
     if(lv_streq("column", txt)) return LV_FLEX_FLOW_COLUMN;

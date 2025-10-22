@@ -80,3 +80,12 @@ Explanation of complex bindings:
 - ``<lv_obj-bind_state_if_le>`` — Set a state if the subject's value is **less than or equal to** the reference value.
 
 Note: The ``lv_obj-`` prefix can be omitted. For example, you can simply write ``<bind_state_if_gt>`` instead.
+
+Subject Related Events
+**********************
+
+Besides binding properties to subjects, it's also possible to add events the change the value
+of a subject on pressed, release, etc.
+
+Learn more about these in :ref:`xml_events_set_subject_value` and
+:ref:`xml_events_increment_subject_value`.

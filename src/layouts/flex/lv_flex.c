@@ -116,7 +116,8 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
 {
     lv_obj_set_style_flex_grow(obj, grow, 0);
-    lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent) lv_obj_mark_layout_as_dirty(parent);
 }
 
 /**********************

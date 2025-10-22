@@ -10,6 +10,7 @@ The implementation uses the `AnimatedGIF <https://github.com/bitbank2/AnimatedGI
 library.
 
 
+
 Usage
 *****
 
@@ -35,12 +36,30 @@ The supported color formats are:
 :cpp:expr:`lv_gif_set_src(widget, src)` works very similarly to :cpp:func:`lv_image_set_src`.
 As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or files.
 
+
 Converting GIF Files to C Arrays
 --------------------------------
 
-To convert a GIF file to an array of bytes, use `LVGL's online
-converter <https://lvgl.io/tools/imageconverter>`__. Select "Raw" color
-format and "C array" Output format.
+Converting GIF files to an array of bytes is not supported in the online image
+converter since LVGL v9.0.  However, there is still a way to do it through the
+``./scripts/LVGLImage.py`` Python script.  This command line:
+
+.. code-block:: bash
+
+   python  ./scripts/LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
+
+will produce all the bytes from the ``input.gif`` in unaltered form in a C array,
+ready to use in this code:
+
+.. code-block:: c
+
+    LV_IMAGE_DECLARE(my_gif_image_array);
+    lv_obj_t * img;
+
+    img = lv_gif_create(lv_screen_active());
+    lv_gif_set_color_format(img, LV_COLOR_FORMAT_ARGB8888);
+    lv_gif_set_src(img, &my_gif_image_array);
+
 
 Using GIF Images from Files
 ---------------------------

@@ -41,8 +41,6 @@ remove the misleading guide above this code segment.
 ```
 4. Remove macro definitions for
 
-   - LV_USE_DEMO_WIDGETS
-   - LV_USE_DEMO_BENCHMARK
    - LV_USE_IME_PINYIN
    - LV_USE_OS
    - LV_USE_FILE_EXPLORER
@@ -60,15 +58,26 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_EBIKE
    - LV_USE_DEMO_HIGH_RES
    - LV_USE_DEMO_SMARTWATCH
+   - LV_USE_DEMO_GLTF
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
-   - LV_USE_DRAW_G2D
+   - LV_USE_FS_FROGFS
+   - LV_USE_GLTF
+   - LV_USE_GSTREAMER
+   - LV_USE_VG_LITE_DRIVER
+   - LV_USE_LOVYAN_GFX
+   - LV_USE_G2D
    - LV_USE_DRAW_SDL
    - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_DRAW_ARM2D_ASYNC
    - LV_USE_DRAW_DAVE2D
    - LV_USE_DRAW_DMA2D
+   - LV_USE_DRAW_EVE
+   - LV_USE_PPA
+   - LV_USE_NV3007
+   - LV_USE_NXP_ELCDIF
+   - LV_USE_TRANSLATION
    - LV_USE_SNAPSHOT
    - LV_USE_MONKEY
    - LV_USE_GRIDNAV

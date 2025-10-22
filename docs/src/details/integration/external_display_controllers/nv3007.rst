@@ -1,0 +1,182 @@
+=============================
+NV3007 LCD Controller driver
+=============================
+
+Overview
+--------
+
+The `NV3007 <https://www.buydisplay.com/download/ic/NV3007.pdf>`__ is a single-chip driver for 262,144-color, a-Si TFT liquid crystal display
+with maximum resolution of 168RGBx428 dots. It contains 252-channel source driver,
+a 24-channel GIP driver which used for dual-gate control, 161,784-byte GRAM for
+graphic display data, internal precise power supply circuit which supports full color,
+8-color display mode and sleep mode
+NV3007 supports 3-/4-line serial peripheral interface (SPI) ， quad serial
+peripheral interface (QSPI). The display area can be specified in internal GRAM by
+window address function.
+
+The NV3007 LCD controller `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
+It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
+a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
+
+Prerequisites
+-------------
+
+There are no prerequisites.
+
+Configuring the driver
+----------------------
+
+Enable the NV3007 driver support in lv_conf.h, by cmake compiler define or by KConfig
+
+.. code-block:: c
+
+	#define LV_USE_NV3007  1
+
+Usage
+-----
+
+You need to implement two platform-dependent functions:
+
+.. code-block:: c
+
+	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
+	void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
+	{
+		...
+	}
+
+	/* Send large array of pixel data to the LCD. If necessary, this function has to do the byte-swapping. This function can do the transfer in the background. */
+	void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	{
+		...
+	}
+
+To create an NV3007-based display use the function
+
+.. code-block:: c
+
+	/**
+	 * Create an LCD display with NV3007 driver
+	 * @param hor_res       horizontal resolution
+	 * @param ver_res       vertical resolution
+	 * @param flags         default configuration settings (mirror, RGB ordering, etc.)
+	 * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+	 * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
+	 * @return              pointer to the created display
+	 */
+	lv_display_t * lv_nv3007_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
+									lv_nv3007_send_cmd_cb_t send_cmd_cb, lv_nv3007_send_color_cb_t send_color_cb);
+
+
+Arduino Example
+---------------
+
+Here is a simple example of using the NV3007 display with Arduino framework and SPI interface:
+
+.. code-block:: cpp
+
+	#include <lvgl.h>
+
+	/* Platform-specific includes */
+	#include <SPI.h>
+
+	#define LCD_DC 21
+	#define LCD_CS 5
+	#define LCD_RST 4
+	#define LCD_SCK 18
+	#define LCD_MOSI 23
+	#define LCD_MISO -1
+	#define LCD_BL 15
+	#define SPI_CLK 40000000
+
+	#define BUFFER_SIZE 142 * 50
+	uint8_t buf[BUFFER_SIZE];
+
+	/*  Define your platform-specific functions to send commands and data */
+	void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size) 
+	{
+		SPI.beginTransaction(SPISettings(SPI_CLK, MSBFIRST, SPI_MODE0));
+		/* Send command */
+		digitalWrite(LCD_DC, LOW); /* command mode */
+		digitalWrite(LCD_CS, LOW); /* CS low */
+		SPI.transferBytes(cmd, NULL, cmd_size);
+
+		/* Send parameters (if any) */
+		if (param != NULL && param_size > 0)
+		{
+			digitalWrite(LCD_DC, HIGH); /* data mode */
+			SPI.transferBytes(param, NULL, param_size);
+		}
+		digitalWrite(LCD_CS, HIGH); /* CS high */
+		SPI.endTransaction();
+	}
+
+	void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size) 
+	{
+	    SPI.beginTransaction(SPISettings(SPI_CLK, MSBFIRST, SPI_MODE0));
+		digitalWrite(LCD_CS, LOW);
+
+		/* Send the command first */
+		digitalWrite(LCD_DC, LOW);
+		SPI.transferBytes(cmd, NULL, cmd_size);
+
+		/* Then send the pixel data */
+		if (param && param_size > 0)
+		{
+			digitalWrite(LCD_DC, HIGH);
+			SPI.transferBytes(param, NULL, param_size);
+		}
+
+		digitalWrite(LCD_CS, HIGH);
+		SPI.endTransaction();
+
+		/* Important: signal LVGL that we're done */
+		lv_display_flush_ready(disp);
+	}
+
+	void setup() 
+	{
+
+		pinMode(LCD_BL, OUTPUT);
+		digitalWrite(LCD_BL, HIGH); /*  turn on backlight */
+
+		pinMode(LCD_DC, OUTPUT);
+		pinMode(LCD_CS, OUTPUT);
+		pinMode(LCD_RST, OUTPUT);
+		/*  reset sequence */
+		digitalWrite(LCD_RST, HIGH);
+		delay(100);
+		digitalWrite(LCD_RST, LOW);
+		delay(120);
+		digitalWrite(LCD_RST, HIGH);
+		delay(120);
+
+		SPI.begin(LCD_SCK, LCD_MISO, LCD_MOSI, LCD_CS); /*  SCK, MISO, MOSI, SS */
+
+		digitalWrite(LCD_CS, HIGH); /*  disable device */
+		delay(100);             /*  wait for device to stabilize */
+
+	    lv_init();
+
+	    lv_tick_set_cb(my_tick);
+
+	    /*  Create NV3007 display */
+	    lv_display_t *disp = lv_nv3007_create(142, 428, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
+		lv_nv3007_set_gap(disp, 0, 14);
+		lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+		lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565_SWAPPED);
+		lv_display_set_buffers(disp, buf, NULL, BUFFER_SIZE, LV_DISP_RENDER_MODE_PARTIAL);
+
+	    /*  Create a simple label on the display */
+	    lv_obj_t *label = lv_label_create(lv_screen_active());
+	    lv_label_set_text(label, "Hello NV3007!");
+	    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+	}
+
+	void loop() 
+	{
+	    lv_task_handler();
+	    delay(5);
+	}
+
+For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.

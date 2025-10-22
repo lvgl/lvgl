@@ -914,7 +914,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
 
     int32_t scroll_left = lv_obj_get_scroll_left(obj);
     int32_t scroll_top = lv_obj_get_scroll_top(obj);
-    if(chart->hdiv_cnt != 0) {
+    if(chart->hdiv_cnt > 1) {
         int32_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
         line_dsc.p1.x = obj->coords.x1;
         line_dsc.p2.x = obj->coords.x2;
@@ -936,7 +936,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
         }
     }
 
-    if(chart->vdiv_cnt != 0) {
+    if(chart->vdiv_cnt > 1) {
         int32_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
         line_dsc.p1.y = obj->coords.y1;
         line_dsc.p2.y = obj->coords.y2;

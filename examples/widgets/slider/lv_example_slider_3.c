@@ -46,14 +46,8 @@ static void slider_event_cb(lv_event_t * e)
         char buf[16];
         lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
 
-        lv_text_attributes_t attributes = {0};
-        attributes.text_flags = LV_TEXT_FLAG_NONE;
-        attributes.max_width = LV_COORD_MAX;
-        attributes.letter_space = 0;
-        attributes.line_space = 0;
-
         lv_point_t label_size;
-        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, &attributes);
+        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_area_t label_area;
         label_area.x1 = 0;
         label_area.x2 = label_size.x - 1;

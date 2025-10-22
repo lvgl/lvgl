@@ -233,7 +233,7 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
             attributes.text_flags = dsc->flag;
 
             lv_point_t p;
-            lv_text_get_size(&p, dsc->text, dsc->font, &attributes);
+            lv_text_get_size_attributes(&p, dsc->text, dsc->font, &attributes);
             w = p.x;
         }
     }

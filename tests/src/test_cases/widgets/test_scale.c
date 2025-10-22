@@ -284,7 +284,7 @@ static void draw_event_cb(lv_event_t * e)
             attributes.max_width = 1000;
             attributes.text_flags = LV_TEXT_FLAG_NONE;
 
-            lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
+            lv_text_get_size_attributes(&size, label_draw_dsc->text, label_draw_dsc->font, &attributes);
             int32_t new_w = size.x;
             int32_t old_w = lv_area_get_width(&draw_task->area);
 

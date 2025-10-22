@@ -181,6 +181,7 @@ struct _my_theme_t {
  **********************/
 static void style_init_reset(lv_style_t * style);
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
+static void resolution_change_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -638,10 +639,12 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
     int32_t new_dpi = lv_display_get_dpi(new_disp);
     int32_t hor_res = lv_display_get_horizontal_resolution(new_disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(new_disp);
+    int32_t greater_res = LV_MAX(hor_res, ver_res);
     disp_size_t new_size;
 
-    if(hor_res <= 320) new_size = DISP_SMALL;
-    else if(hor_res < 720) new_size = DISP_MEDIUM;
+    if(greater_res <= 320) new_size = DISP_SMALL;
+    else if(greater_res < 720) new_size = DISP_MEDIUM;
     else new_size = DISP_LARGE;
 
     /* check theme information whether will change or not*/
@@ -672,6 +675,11 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     }
 
     theme->inited = true;
+
+    /*Re-initialize the styles if the resolution changes as a different display size might
+     *result in different paddings */
+    lv_display_remove_event_cb_with_user_data(new_disp, resolution_change_event_cb, theme);
+    lv_display_add_event_cb(new_disp, resolution_change_event_cb, LV_EVENT_RESOLUTION_CHANGED, theme);
 
     return (lv_theme_t *) theme;
 }
@@ -1210,6 +1218,17 @@ static void style_init_reset(lv_style_t * style)
     else {
         lv_style_init(style);
     }
+}
+
+
+static void resolution_change_event_cb(lv_event_t * e)
+{
+    lv_display_t * disp = lv_event_get_target(e);
+    my_theme_t * theme = lv_event_get_user_data(e);
+
+    lv_theme_default_init(disp, theme->base.color_primary, theme->base.color_secondary, theme->base.flags,
+                          theme->base.font_normal);
+
 }
 
 #endif

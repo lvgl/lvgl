@@ -228,11 +228,7 @@ static void multiple_labels_cb(void)
 #endif
 
     lv_point_t s;
-    lv_text_attributes_t attributes;
-    lv_text_attributes_init(&attributes);
-    attributes.max_width = LV_COORD_MAX;
-
-    lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(scr, 0), &attributes);
+    lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(scr, 0), 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
     int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / (s.x * 3 / 2);
     int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (s.y  * 3);

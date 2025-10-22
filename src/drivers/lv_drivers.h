@@ -31,6 +31,7 @@ extern "C" {
 #include "display/st7735/lv_st7735.h"
 #include "display/st7789/lv_st7789.h"
 #include "display/st7796/lv_st7796.h"
+#include "display/nv3007/lv_nv3007.h"
 
 #include "display/renesas_glcdc/lv_renesas_glcdc.h"
 #include "display/st_ltdc/lv_st_ltdc.h"

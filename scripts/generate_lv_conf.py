@@ -101,7 +101,7 @@ def generate_config(path_destination: str, path_source: str, defaults: dict):
 
     if len(keys_used) != len(defaults):
         unused_keys = [k for k in defaults.keys() if k not in keys_used]
-        fatal('The following keys are deprecated:\n  ' + '\n  '.join(unused_keys))
+        print('WARNING: The following keys are deprecated:\n  ' + '\n  '.join(unused_keys))
 
     with open(path_destination, 'w', encoding='utf-8') as f_dst:
         for dst_line in dst_lines:
