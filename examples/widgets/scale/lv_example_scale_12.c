@@ -26,7 +26,7 @@ static void set_heading_value(void * obj, int32_t v)
 {
     LV_UNUSED(obj);
     lv_scale_set_rotation(scale, 270 - v);
-    lv_label_set_text_fmt(label, "%d°\n%s", v, heading_to_cardinal(v));
+    lv_label_set_text_fmt(label, "%d°\n%s", (int)v, heading_to_cardinal(v));
 }
 
 static void draw_event_cb(lv_event_t * e)

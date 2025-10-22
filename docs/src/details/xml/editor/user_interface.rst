@@ -29,20 +29,14 @@ won’t need to do anything manually, it stays up-to-date in the background.
 Login
 *****
 
-.. TODO
-
-hints:
-- enter your email address
-- you will receive an email with an OTP (On Time Password)
-- it will create a user for you
-- no password is needed
+1. enter your email address
+2. you will receive an email with an OTP (One-Time Password)
+3. it will create a user for you (no password is needed)
 
 
 
 Licence Selection
 *****************
-
-.. TODO
 
 After logging in you need select a licence for the list.
 

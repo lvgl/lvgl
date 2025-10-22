@@ -983,9 +983,9 @@ typedef struct vg_lite_color_key {
     vg_lite_uint8_t low_g;                  /*! The G chanel of low_rgb. */
     vg_lite_uint8_t low_b;                  /*! The B chanel of low_rgb. */
     vg_lite_uint8_t alpha;                  /*! The alpha channel to replace destination pixel alpha channel.*/
-    vg_lite_uint8_t hign_r;                 /*! The R chanel of hign_rgb. */
-    vg_lite_uint8_t hign_g;                 /*! The G chanel of hign_rgb. */
-    vg_lite_uint8_t hign_b;                 /*! The B chanel of hign_rgb. */
+    vg_lite_uint8_t high_r;                 /*! The R chanel of high_rgb. */
+    vg_lite_uint8_t high_g;                 /*! The G chanel of high_rgb. */
+    vg_lite_uint8_t high_b;                 /*! The B chanel of high_rgb. */
 } vg_lite_color_key_t;
 
 /* Four colorkey definition.

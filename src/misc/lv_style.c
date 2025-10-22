@@ -255,11 +255,6 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         last_custom_prop_id = (uint16_t)LV_STYLE_LAST_BUILT_IN_PROP;
     }
 
-    //    if((last_custom_prop_id + 1) != 0) {
-    //        LV_LOG_ERROR("No more custom property IDs available");
-    //        return LV_STYLE_PROP_INV;
-    //    }
-
     /*
      * Allocate the lookup table if it's not yet available.
      */

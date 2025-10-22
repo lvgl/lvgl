@@ -828,7 +828,7 @@ static void draw_main(lv_event_t * e)
                     label_dsc_act.flag |= LV_TEXT_FLAG_EXPAND;
                 }
 
-                lv_text_get_size(&txt_size, table->cell_data[cell]->txt, label_dsc_def.font, &attributes);
+                lv_text_get_size_attributes(&txt_size, table->cell_data[cell]->txt, label_dsc_def.font, &attributes);
 
                 /*Align the content to the middle if not cropped*/
                 if(!crop) {
@@ -973,7 +973,7 @@ static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t *
             lv_point_t txt_size;
             attributes.max_width -= cell_left + cell_right;
 
-            lv_text_get_size(&txt_size, table->cell_data[cell]->txt, font, &attributes);
+            lv_text_get_size_attributes(&txt_size, table->cell_data[cell]->txt, font, &attributes);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
             /*Skip until one element after the last merged column*/

@@ -76,7 +76,7 @@ class _LVGLSingleton:
                 print(f"Failed to get lv_global: {e}")
                 return False
         elif not isinstance(lv_global, Value):
-            lv_global = Value(lv_global)
+            lv_global = Value(lv_global).cast("lv_global_t", ptr=True)
 
         if not lv_global.inited:
             print(

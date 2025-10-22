@@ -282,6 +282,8 @@ typedef struct _lv_gltf_model_t lv_gltf_model_t;
 
 typedef struct _lv_observer_t lv_observer_t;
 
+typedef struct _lv_subject_increment_dsc_t lv_subject_increment_dsc_t;
+
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
 
 typedef struct _lv_ime_pinyin_t lv_ime_pinyin_t;

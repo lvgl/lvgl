@@ -734,7 +734,7 @@ static void draw_main(lv_event_t * e)
         attributes.max_width = lv_area_get_width(&area_obj);
 
         lv_point_t txt_size;
-        lv_text_get_size(&txt_size, txt, font, &attributes);
+        lv_text_get_size_attributes(&txt_size, txt, font, &attributes);
 
         btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
         btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
