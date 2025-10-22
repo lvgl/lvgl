@@ -190,11 +190,12 @@ Include paths
 LVGL source files typically use this include pattern:
 
 .. code-block:: c
-  #ifdef LV_LVGL_H_INCLUDE_SIMPLE
-      #include "lvgl.h"
-  #else
-      #include "lvgl/lvgl.h"
-  #endif
+
+    #ifdef LV_LVGL_H_INCLUDE_SIMPLE
+        #include "lvgl.h"
+    #else
+        #include "lvgl/lvgl.h"
+    #endif
 
 
 The ``LV_LVGL_H_INCLUDE_SIMPLE`` define allows flexibility in how LVGL is included.
@@ -202,19 +203,22 @@ However, Arduino’s build system doesn’t provide a way to set this define glo
 As a result, the compiler falls back to:
 
 .. code-block:: c
-  #include "lvgl/lvgl.h"
+
+    #include "lvgl/lvgl.h"
 
 which fails, because Arduino installs the LVGL library headers directly (e.g. ``libraries/lvgl/src/lvgl.h``), not in a nested ``lvgl/`` folder.
 
 To fix this, replace all occurrences of:
 
 .. code-block:: c
-  #include "lvgl/lvgl.h"
+
+    #include "lvgl/lvgl.h"
 
 with:
 
 .. code-block:: c
-  #include "lvgl.h"
+
+    #include "lvgl.h"
 
 Relative paths
 --------------
@@ -224,11 +228,13 @@ Since the LVGL Editor exports files in multiple nested directories, files like `
 Change:
 
 .. code-block:: c
-  #include "editor_project.h"
+
+    #include "editor_project.h"
 to:
 
 .. code-block:: c
-  #include "../editor_project.h"
+
+    #include "../editor_project.h"
 
 
 (or adjust accordingly depending on how deep the file is nested).
@@ -251,13 +257,15 @@ YourSketch/
 Edit files to use:
 
 .. code-block:: c
-  #include "lvgl.h"
+
+    #include "lvgl.h"
 
 
 and ensure the main header file ie. ``editor_project.h`` is included relatively:
 
 .. code-block:: c
-  #include "../editor_project.h"
+
+    #include "../editor_project.h"
 
 4. Reapply Changes After Regeneration
 
@@ -267,23 +275,24 @@ Example Arduino sketch
 ----------------------
 
 .. code-block:: cpp
-  #include <lvgl.h>
-  #include "src/editor_project/editor_project.h"  // Adjust to match your project name
+    
+    #include <lvgl.h>
+    #include "src/editor_project/editor_project.h"  // Adjust to match your project name
 
-  void my_disp_init();
-  void my_touch_init();
+    void my_disp_init();
+    void my_touch_init();
 
-  void setup() {
-    Serial.begin(115200);
-    lv_init();          // Initialize LVGL
-    my_disp_init();     // Setup display driver
-    my_touch_init();    // Setup input driver
-    editor_project_init("");          // Load LVGL Editor UI
-    lv_screen_load(main_create()); // load the main screen
-  }
+    void setup() {
+      Serial.begin(115200);
+      lv_init();          // Initialize LVGL
+      my_disp_init();     // Setup display driver
+      my_touch_init();    // Setup input driver
+      editor_project_init("");          // Load LVGL Editor UI
+      lv_screen_load(main_create()); // load the main screen
+    }
 
-  void loop() {
-    lv_timer_handler(); // Handle LVGL tasks
-    delay(5);
-  }
+    void loop() {
+      lv_timer_handler(); // Handle LVGL tasks
+      delay(5);
+    }
   
