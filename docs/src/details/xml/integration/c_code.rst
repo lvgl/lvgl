@@ -265,7 +265,6 @@ Edit files to use:
 
     #include "lvgl.h"
 
-
 and ensure the main header file ie. ``editor_project.h`` is included relatively:
 
 .. code-block:: c
