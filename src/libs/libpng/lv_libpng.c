@@ -205,61 +205,6 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
        !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
-static uint8_t * alloc_file(const char * filename, uint32_t * size)
-{
-    uint8_t * data = NULL;
-    lv_fs_file_t f;
-    uint32_t data_size;
-    uint32_t rn;
-    lv_fs_res_t res;
-
-    *size = 0;
-
-    res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
-    if(res != LV_FS_RES_OK) {
-        LV_LOG_WARN("can't open %s", filename);
-        return NULL;
-    }
-
-    res = lv_fs_seek(&f, 0, LV_FS_SEEK_END);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    res = lv_fs_tell(&f, &data_size);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    res = lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    /*Read file to buffer*/
-    data = lv_malloc(data_size);
-    if(data == NULL) {
-        LV_LOG_WARN("malloc failed for data");
-        goto failed;
-    }
-
-    res = lv_fs_read(&f, data, data_size, &rn);
-
-    if(res == LV_FS_RES_OK && rn == data_size) {
-        *size = rn;
-    }
-    else {
-        LV_LOG_WARN("read file failed");
-        lv_free(data);
-        data = NULL;
-    }
-
-failed:
-    lv_fs_close(&f);
-
-    return data;
-}
-
 static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
 {
     int ret;
@@ -271,7 +216,7 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
     image.version = PNG_IMAGE_VERSION;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        png_data = alloc_file(dsc->src, &png_data_size);
+        png_data = lv_fs_load_with_alloc((const char *)dsc->src, &png_data_size);
         if(png_data == NULL) {
             LV_LOG_WARN("can't load file: %s", (const char *)dsc->src);
             return NULL;
