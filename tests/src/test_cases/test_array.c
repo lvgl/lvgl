@@ -184,6 +184,24 @@ void test_array_remove(void)
 
 void test_array_erase(void)
 {
+    /* Test overlapping memory regions */
+    for(int32_t i = 0; i < 5; i++) {
+        lv_array_push_back(&array, &i);
+    }
+
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_erase(&array, 0, 1));
+    TEST_ASSERT_EQUAL_UINT32(4, lv_array_size(&array));
+    for(int32_t i = 0; i < 4; i++) {
+        int32_t * v = lv_array_at(&array, i);
+        TEST_ASSERT_EQUAL_INT32(i + 1, *v);
+    }
+
+    for(int32_t i = 0; i < 10; i++) {
+        lv_array_push_back(&array, &i);
+    }
+
+    /* Test erase from the middle */
+    lv_array_clear(&array);
     for(int32_t i = 0; i < 10; i++) {
         lv_array_push_back(&array, &i);
     }
@@ -191,7 +209,6 @@ void test_array_erase(void)
     TEST_ASSERT_EQUAL_UINT32(10, lv_array_size(&array));
     lv_array_erase(&array, 3, 7);
     TEST_ASSERT_EQUAL_UINT32(6, lv_array_size(&array));
-
     for(int32_t i = 0; i < 6; i++) {
         int32_t * v = lv_array_at(&array, i);
         if(i < 3) {
@@ -211,6 +228,10 @@ void test_array_erase(void)
     /* end > array->size */
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_erase(&array, 3, 15));
     TEST_ASSERT_EQUAL_UINT32(3, lv_array_size(&array));
+    for(int32_t i = 0; i < 3; i++) {
+        int32_t * v = lv_array_at(&array, i);
+        TEST_ASSERT_EQUAL_INT32(i, *v);
+    }
 
     /* Reset array */
     lv_array_clear(&array);
@@ -225,6 +246,10 @@ void test_array_erase(void)
     /* end == array->size */
     TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_array_erase(&array, 5, 10));
     TEST_ASSERT_EQUAL_UINT32(5, lv_array_size(&array));
+    for(int32_t i = 0; i < 5; i++) {
+        int32_t * v = lv_array_at(&array, i);
+        TEST_ASSERT_EQUAL_INT32(i, *v);
+    }
 }
 
 void test_array_assign(void)
