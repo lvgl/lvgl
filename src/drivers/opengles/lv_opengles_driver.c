@@ -35,8 +35,9 @@
  **********************/
 static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                                        bool h_flip, bool v_flip, lv_color_t fill_color);
-static void lv_opengles_enable_blending(void);
+                                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
+static void lv_opengles_enable_blending(bool blend_opt);
+static void lv_opengles_disable_blending(void);
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size);
 static void lv_opengles_vertex_buffer_deinit(void);
 static void lv_opengles_vertex_buffer_bind(void);
@@ -102,7 +103,7 @@ void lv_opengles_init(void)
 {
     if(is_init) return;
 
-    lv_opengles_enable_blending();
+    lv_opengles_enable_blending(false);
 
     unsigned int indices[] = {
         0, 1, 2,
@@ -147,14 +148,23 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                                lv_color_black());
+                                lv_color_black(), false);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_texture_alt(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                    int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
+                                lv_color_black(), true);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color);
+    lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color, false);
     LV_PROFILER_DRAW_END;
 }
 
@@ -215,7 +225,8 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
  **********************/
 
 static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color)
+                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color,
+                                        bool blend_opt)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -263,6 +274,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     };
 
     lv_opengles_shader_bind();
+    lv_opengles_enable_blending(blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
@@ -271,13 +283,19 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
     lv_opengles_render_draw();
+    lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_enable_blending(void)
+static void lv_opengles_enable_blending(bool blend_opt)
 {
     GL_CALL(glEnable(GL_BLEND));
-    GL_CALL(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
+    GL_CALL(glBlendFunc(blend_opt ? GL_SRC_ALPHA : GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
+}
+
+static void lv_opengles_disable_blending(void)
+{
+    GL_CALL(glDisable(GL_BLEND));
 }
 
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)

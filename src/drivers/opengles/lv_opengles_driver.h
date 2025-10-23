@@ -58,6 +58,19 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 
 /**
+ * Render a texture using alternate blending mode for smoother translucent materials and correct anti-aliasing of glTF elements when using transparent background
+ * @param texture        OpenGL texture ID
+ * @param texture_area   the area in the window to render the texture in
+ * @param opa            opacity to blend the texture with existing contents
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
+ * @param h_flip         horizontal flip
+ * @param v_flip         vertical flip
+ */
+void lv_opengles_render_texture_alt(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                    int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
+
+/**
  * Render a display texture - Supports rotation
  * @param display           LVGL Texture display. Created with the `lv_opengles_texture` module
  * @param h_flip            horizontal flip
