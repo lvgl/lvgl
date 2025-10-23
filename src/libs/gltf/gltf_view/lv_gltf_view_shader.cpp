@@ -104,7 +104,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             if(material.pbrData.baseColorFactor.x() == 0.0f
                && material.pbrData.baseColorFactor.y() == 0.0f
                && material.pbrData.baseColorFactor.z() == 0.0f
-               && material.pbrData.metallicFactor == 0.0f
+               && material.pbrData.metallicFactor == 1.0f
                && material.pbrData.roughnessFactor == 1.0f
                && material.emissiveStrength > 0.0f) {
                 /* Special case where settings preclude IBL's ability to have visible effect, so disable it entirely */
