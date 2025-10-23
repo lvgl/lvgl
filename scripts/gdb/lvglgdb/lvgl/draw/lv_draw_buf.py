@@ -109,13 +109,19 @@ class LVDrawBuf(Value):
             if data_size <= 0:
                 raise ValueError(f"Invalid data size: {data_size}")
             if data_size < expected_data_size:
-                raise ValueError(f"Data size mismatch: expected {expected_data_size}, got {data_size}")
+                raise ValueError(
+                    f"Data size mismatch: expected {expected_data_size}, got {data_size}"
+                )
             elif data_size > expected_data_size:
-                gdb.write(f"\033[93mData size mismatch: expected {expected_data_size}, got {data_size}\033[0m\n")
+                gdb.write(
+                    f"\033[93mData size mismatch: expected {expected_data_size}, got {data_size}\033[0m\n"
+                )
 
             # Read pixel data
             pixel_data = (
-                gdb.selected_inferior().read_memory(int(data_ptr), expected_data_size).tobytes()
+                gdb.selected_inferior()
+                .read_memory(int(data_ptr), expected_data_size)
+                .tobytes()
             )
             if not pixel_data:
                 raise ValueError("Failed to read pixel data")
