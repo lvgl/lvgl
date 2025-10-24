@@ -62,7 +62,7 @@ Example
 API
 ***
 
-:ref:`libs/fsdrv/lv_fsdrv.h`
+.. API equals:  lv_fs_frogfs_register_blob
 
 See also:  `lvgl/src/libs/fsdrv/lv_fs_littlefs.c <https://github.com/lvgl/lvgl/blob/master/src/libs/fsdrv/lv_fs_littlefs.c>`__
 
