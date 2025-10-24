@@ -990,7 +990,7 @@ void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
         lv_theme_apply(disp->screens[0]);
 
         if(!th) {
-            /* When th is NULL, dereference all styles */
+            /* When th is NULL, clear all styles */
             for(uint32_t i = 1; i < disp->screen_cnt; i++) {
                 lv_theme_apply(disp->screens[i]);
             }
