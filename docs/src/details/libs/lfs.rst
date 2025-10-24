@@ -62,7 +62,7 @@ Example
 API
 ***
 
-.. API equals:  lv_fs_frogfs_register_blob
+.. API equals:  lv_fs_littlefs_init
 
 See also:  `lvgl/src/libs/fsdrv/lv_fs_littlefs.c <https://github.com/lvgl/lvgl/blob/master/src/libs/fsdrv/lv_fs_littlefs.c>`__
 
