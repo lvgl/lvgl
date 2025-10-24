@@ -18,7 +18,7 @@
 #include "../../display/lv_display.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
-#include "assets/lv_opengles_standard_shader.h"
+#include "assets/lv_opengles_shader.h"
 
 /*********************
  *      DEFINES
@@ -51,15 +51,14 @@ static void lv_opengles_index_buffer_deinit(void);
 static unsigned int lv_opengles_index_buffer_get_count(void);
 static void lv_opengles_index_buffer_bind(void);
 static void lv_opengles_index_buffer_unbind(void);
-static void lv_opengles_shader_manager_init(void);
-static unsigned int lv_opengles_shader_program_init(void);
-static void lv_opengles_shader_init(void);
+static unsigned int lv_opengles_shader_manager_init(void);
+static lv_result_t lv_opengles_shader_init(void);
 static void lv_opengles_shader_deinit(void);
 static void lv_opengles_shader_bind(void);
 static void lv_opengles_shader_unbind(void);
 static int lv_opengles_shader_get_uniform_location(const char * name);
 static void lv_opengles_shader_set_uniform1i(const char * name, int value);
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values);
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values);
 static void lv_opengles_shader_set_uniform1f(const char * name, float value);
 static void lv_opengles_shader_set_uniform3f(const char * name, float value_0, float value_1, float value_2);
 static void lv_opengles_render_draw(void);
@@ -117,7 +116,9 @@ void lv_opengles_init(void)
 
     lv_opengles_index_buffer_init(indices, 6);
 
-    lv_opengles_shader_init();
+    lv_result_t res = lv_opengles_shader_init();
+    LV_ASSERT_MSG(res == LV_RESULT_OK, "Failed to initialize shaders");
+
     lv_opengles_shader_bind();
 
     /* unbind everything */
@@ -177,16 +178,16 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
 
-    float matrix[9] = {
-        hor_scale, 0.0f,      hor_translate,
-        0.0f,      ver_scale, ver_translate,
-        0.0f,      0.0f,      1.0f
+    const float transposed_matrix[9] = {
+        hor_scale,  0.0f,        0.0f,
+        0.0f,       ver_scale,   0.0f,
+        hor_translate, ver_translate, 1.0f
     };
 
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
@@ -235,11 +236,6 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     hor_scale = h_flip ? -hor_scale : hor_scale;
     ver_scale = v_flip ? ver_scale : -ver_scale;
-    float matrix[9] = {
-        hor_scale, 0.0f,      hor_translate,
-        0.0f,      ver_scale, ver_translate,
-        0.0f,      0.0f,      1.0f
-    };
 
     if(texture != 0) {
         float clip_x1 = h_flip ? lv_opengles_map_float(texture_clip_area->x2, texture_area->x2, texture_area->x1, 0.f, 1.f)
@@ -260,10 +256,16 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
         lv_opengles_vertex_buffer_init(positions, sizeof(positions));
     }
 
+    const float transposed_matrix[9] = {
+        hor_scale,  0.0f,        0.0f,
+        0.0f,       ver_scale,   0.0f,
+        hor_translate, ver_translate, 1.0f
+    };
+
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
@@ -369,32 +371,56 @@ static void lv_opengles_index_buffer_unbind(void)
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-static void lv_opengles_shader_manager_init(void)
+static unsigned int lv_opengles_shader_manager_init(void)
 {
-    lv_opengl_shader_portions_t portions;
-    lv_opengles_standard_shader_get_src(&portions);
-    char * vertex_shader = lv_opengles_standard_shader_get_vertex();
-    char * frag_shader = lv_opengles_standard_shader_get_fragment();
-    lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
-    lv_free(vertex_shader);
-    lv_free(frag_shader);
-}
+    lv_opengl_shader_program_t * program  = NULL;
+    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+        LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
+        lv_opengl_shader_portions_t portions;
+        lv_opengles_shader_get_source(&portions, version);
+        char * vertex_shader = lv_opengles_shader_get_vertex(version);
+        char * frag_shader = lv_opengles_shader_get_fragment(version);
+        lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
+        lv_free(vertex_shader);
+        lv_free(frag_shader);
 
-static unsigned int lv_opengles_shader_program_init(void)
-{
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0);
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0);
-    lv_opengl_shader_program_t * program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash,
-                                                                                vert_shader_hash);
+        uint32_t frag_shader_hash;
+        uint32_t vert_shader_hash;
+
+        lv_result_t res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0, version,
+                                                                 &frag_shader_hash);
+        if(res != LV_RESULT_OK) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0, version, &vert_shader_hash);
+        if(res != LV_RESULT_OK) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash, vert_shader_hash);
+        if(!program) {
+            lv_opengl_shader_manager_deinit(&shader_manager);
+            continue;
+        }
+        LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
+        break;
+    }
+
+    if(!program) {
+        LV_LOG_ERROR("Failed to initialize shaders");
+        return 0;
+    }
     return lv_opengl_shader_program_get_id(program);
 }
 
-static void lv_opengles_shader_init(void)
+static lv_result_t lv_opengles_shader_init(void)
 {
-    if(shader_id == 0) {
-        lv_opengles_shader_manager_init();
-        shader_id = lv_opengles_shader_program_init();
+    if(shader_id != 0) {
+        return LV_RESULT_OK;
     }
+    shader_id = lv_opengles_shader_manager_init();
+    return shader_id != 0 ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 static void lv_opengles_shader_deinit(void)
@@ -423,9 +449,8 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
             id = i;
         }
     }
-    if(id == -1) {
-        return -1;
-    }
+
+    LV_ASSERT_FORMAT_MSG(id > -1, "Uniform location doesn't exist for '%s'. Check `shader_location` array", name);
 
     if(shader_location[id] != 0) {
         return shader_location[id];
@@ -447,10 +472,14 @@ static void lv_opengles_shader_set_uniform1i(const char * name, int value)
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values)
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, const float * values)
 {
     LV_PROFILER_DRAW_BEGIN;
-    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, transpose, values));
+    /*
+     * GLES2.0 doesn't support transposing the matrix via glUniformMatrix3fv so this is the transposed matrix
+     * https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf page 47
+     */
+    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, GL_FALSE, values));
     LV_PROFILER_DRAW_END;
 }
 

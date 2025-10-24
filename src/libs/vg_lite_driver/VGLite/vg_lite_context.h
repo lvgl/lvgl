@@ -25,7 +25,7 @@
 *
 *****************************************************************************/
 
-#include "../../lv_conf_internal.h"
+#include "../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
 #include <stdio.h>
@@ -34,9 +34,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <math.h>
-#include "vg_lite.h"
-#include "vg_lite_kernel.h"
-#include "vg_lite_options.h"
+#include "../inc/vg_lite.h"
+#include "../VGLiteKernel/vg_lite_kernel.h"
+#include "../VGLiteKernel/vg_lite_option.h"
 
 #define DUMP_CAPTURE                            0
 #define DUMP_COMMAND_CAPTURE                    0

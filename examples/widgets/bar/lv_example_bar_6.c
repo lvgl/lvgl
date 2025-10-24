@@ -20,14 +20,9 @@ static void event_cb(lv_event_t * e)
     char buf[8];
     lv_snprintf(buf, sizeof(buf), "%d", (int)lv_bar_get_value(obj));
 
-    lv_text_attributes_t attributes = {0};
-    attributes.letter_space = label_dsc.letter_space;
-    attributes.line_space = label_dsc.line_space;
-    attributes.max_width = LV_COORD_MAX;
-    attributes.text_flags = label_dsc.flag;
-
     lv_point_t txt_size;
-    lv_text_get_size(&txt_size, buf, label_dsc.font, &attributes);
+    lv_text_get_size(&txt_size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                     label_dsc.flag);
 
     lv_area_t txt_area;
     txt_area.x1 = 0;

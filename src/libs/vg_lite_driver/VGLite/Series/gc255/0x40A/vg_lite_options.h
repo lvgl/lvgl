@@ -28,7 +28,7 @@
 #ifndef VG_LITE_OPTIONS_H
 #define VG_LITE_OPTIONS_H
 
-#include "../../../../../lv_conf_internal.h"
+#include "../../../../../../lv_conf_internal.h"
 #if LV_USE_VG_LITE_DRIVER
 
     #define CHIPID          0x255
