@@ -85,6 +85,14 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  * Setter functions
  *====================*/
 
+ /**
+ * Set center pos. See lv_scale_mode_t.
+ * @param obj    pointer to Scale Widget
+ * @param x      x position of the center of the needle
+ * @param y      y position of the center of the needle
+ */
+void lv_scale_set_center_pos(lv_obj_t * obj, int32_t x, int32_t y);
+
 /**
  * Set scale mode. See lv_scale_mode_t.
  * @param obj       pointer to Scale Widget
@@ -209,6 +217,15 @@ void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
  * @param en        true: enable draw ticks on top of all parts
  */
 void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
+
+/**
+ * DEPRECATED, use lv_scale_set_section_rangeinstead.
+ * Set range for specified Scale Section
+ * @param obj           pointer to scale
+ * @param section       pointer to section
+ * @param offset        offset
+ */
+void lv_scale_set_section_offset(lv_obj_t * obj, lv_scale_section_t * section, int32_t offset);
 
 /**
  * Add a Section to specified Scale.  Section will not be drawn until

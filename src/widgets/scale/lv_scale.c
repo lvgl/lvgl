@@ -118,6 +118,17 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
+ void lv_scale_set_center_pos(lv_obj_t * obj, int32_t x, int32_t y)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	lv_scale_t * scale = (lv_scale_t *)obj;
+
+	scale->arc_center_pos_x = x;
+	scale->arc_center_pos_y = y;
+
+	lv_obj_invalidate(obj);
+}
+
 void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -189,6 +200,14 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_section_offset(lv_obj_t * obj, lv_scale_section_t * section, int32_t offset)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	LV_ASSERT_NULL(section);
+
+	section->offset = offset;
+}
+
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -222,7 +241,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 {
     int32_t angle;
     int32_t scale_width, scale_height;
-    int32_t actual_needle_length;
+	int32_t actual_needle_length = needle_length;
     int32_t needle_length_x, needle_length_y;
     lv_point_precise_t * needle_line_points = NULL;
 
@@ -235,25 +254,13 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 
     lv_obj_align(needle_line, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    int32_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+	int32_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+	int32_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+	int32_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-    if(scale_width != scale_height) {
-        return;
-    }
-
-    if(needle_length >= scale_width / 2) {
-        actual_needle_length = scale_width / 2;
-    }
-    else if(needle_length >= 0) {
-        actual_needle_length = needle_length;
-    }
-    else if(needle_length + scale_width / 2 < 0) {
-        actual_needle_length = 0;
-    }
-    else {
-        actual_needle_length = scale_width / 2 + needle_length;
-    }
+	scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN) - left_bg - right_bg;
+	scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN) - top_bg - bottom_bg;
 
     if(value < scale->range_min) {
         angle = 0;
@@ -275,7 +282,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     if(needle_line_points == NULL) {
         uint32_t i;
         uint32_t line_event_cnt = lv_obj_get_event_count(needle_line);
-        for(i = 0; i < line_event_cnt; i++) {
+        for(i = 0; i < line_event_cnt; i--) {
             lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, i);
             if(lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
                 needle_line_points = lv_event_dsc_get_user_data(dsc);
@@ -291,12 +298,11 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
         lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, needle_line_points);
     }
 
-    needle_line_points[0].x = scale_width / 2;
-    needle_line_points[0].y = scale_height / 2;
-    needle_line_points[1].x = scale_width / 2 + needle_length_x;
-    needle_line_points[1].y = scale_height / 2 + needle_length_y;
-
-    lv_line_set_points_mutable(needle_line, needle_line_points, 2);
+	needle_line_points[0].x = (scale_width / 2) + scale->arc_center_pos_x;
+	needle_line_points[0].y = (scale_height / 2) + scale->arc_center_pos_y;
+	needle_line_points[1].x = (scale_width / 2) + scale->arc_center_pos_x + needle_length_x;
+	needle_line_points[1].y = (scale_height / 2) + scale->arc_center_pos_y + needle_length_y;    
+	lv_line_set_points_mutable(needle_line, needle_line_points, 2);
 }
 
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
@@ -379,14 +385,13 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     return section;
 }
 
-
-void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max)
+void lv_scale_set_section_range(lv_obj_t * obj, lv_scale_section_t * section, int32_t min, int32_t max)
 {
-    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(section);
 
-    lv_scale_set_section_min_value(scale, section, min);
-    lv_scale_set_section_max_value(scale, section, max);
+    lv_scale_set_section_min_value(obj, section, min);
+    lv_scale_set_section_max_value(obj, section, max);
 }
 
 void lv_scale_set_section_min_value(lv_obj_t * scale, lv_scale_section_t * section, int32_t min)
@@ -416,7 +421,6 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
     section->range_min = min;
     section->range_max = max;
 }
-
 
 void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
 {
@@ -519,6 +523,13 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
     return scale->range_max;
 }
 
+int32_t lv_scale_get_section_offset(lv_obj_t * obj, lv_scale_section_t * section, int32_t offset)
+{
+	LV_ASSERT_OBJ(obj, MY_CLASS);
+	LV_ASSERT_NULL(section);
+
+	return section->offset;
+}
 /*=====================
  * Other functions
  *====================*/
@@ -586,6 +597,8 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->draw_ticks_on_top = false;
     scale->custom_label_cnt = 0;
     scale->txt_src = NULL;
+	scale->arc_center_pos_x = 0;
+	scale->arc_center_pos_y = 0;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -801,12 +814,11 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
-        /* Find the center of the scale */
         lv_point_t center_point;
-        int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2, lv_area_get_height(&scale_area) / 2);
-        center_point.x = scale_area.x1 + radius_edge;
-        center_point.y = scale_area.y1 + radius_edge;
+        int32_t radius_edge;
+        scale_get_center(obj, &center_point, &radius_edge);
 
+        /* Find the center of the scale */
         const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
 
         /* Also take into consideration the letter space of the style */
@@ -1102,7 +1114,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             scale_set_arc_properties(obj, &main_arc_section_dsc, section->main_style);
 
             main_arc_section_dsc.center = section_arc_center;
-            main_arc_section_dsc.radius = section_arc_radius;
+            main_arc_section_dsc.radius = section_arc_radius + section->offset;
             main_arc_section_dsc.start_angle = section_start_angle;
             main_arc_section_dsc.end_angle = section_end_angle;
 
@@ -1120,17 +1132,25 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
  */
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r)
 {
-    int32_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    int32_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    int32_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    int32_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+	lv_scale_t *scale = (lv_scale_t *)obj;
 
-    int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2;
+	int32_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+	int32_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+	int32_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+	int32_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-    center->x = obj->coords.x1 + r + left_bg;
-    center->y = obj->coords.y1 + r + top_bg;
+	int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2;
 
-    if(arc_r) *arc_r = r;
+	center->x = obj->coords.x1 + r + left_bg;
+	center->y = obj->coords.y1 + r + top_bg;
+
+	if (arc_r)
+	{
+		r = (lv_obj_get_height(obj) - top_bg - bottom_bg) / 2;
+		center->x = obj->coords.x1 + ((lv_obj_get_width(obj) - left_bg - right_bg) / 2) + left_bg + scale->arc_center_pos_x;
+		center->y = obj->coords.y1 + r + top_bg + scale->arc_center_pos_y;
+		*arc_r = r + scale->arc_center_pos_y;
+	}
 }
 
 /**
@@ -1265,15 +1285,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        lv_area_t scale_area;
-        lv_obj_get_content_coords(obj, &scale_area);
-
         /* Find the center of the scale */
         lv_point_t center_point;
-        const int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2, lv_area_get_height(&scale_area) / 2);
-        center_point.x = scale_area.x1 + radius_edge;
-        center_point.y = scale_area.y1 + radius_edge;
-
+        int32_t radius_edge;
+		
+        scale_get_center(obj, &center_point, &radius_edge);
         int32_t angle_upscale = (int32_t)((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
         angle_upscale += scale->rotation * 10;
 
