@@ -66,6 +66,12 @@ void test_mem_test(void)
     *zero_mem = ZERO_MEM_SENTINEL;
     lv_free(zero_mem);
 
+    /* Re-verify zero memory */
+    uint32_t * new_zero_mem = lv_malloc_zeroed(0);
+    TEST_ASSERT_EQUAL_UINT32(ZERO_MEM_SENTINEL, *new_zero_mem);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, lv_mem_test());
+    lv_free(new_zero_mem);
+
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
 #endif
 }
