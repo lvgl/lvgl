@@ -139,6 +139,8 @@ static void test_widgets(const char * img_name)
     lv_obj_t * menu = lv_menu_create(scr_act);
     lv_obj_set_size(menu, 100, 100);
 
+    lv_spinner_create(scr_act);
+
     TEST_ASSERT_EQUAL_SCREENSHOT(img_name);
 
     lv_obj_clean(scr_act);
