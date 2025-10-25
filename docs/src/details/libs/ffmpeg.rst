@@ -70,6 +70,8 @@ This library can load videos and images. The LVGL file system
 will always be used when an image is loaded with :cpp:func:`lv_image_set_src`
 regardless of the value of :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS`.
 
+The ffmpeg player uses software decoding by default. If you require a hardware decoder, you must manually specify it using ``lv_ffmpeg_player_set_decoder``, such as ``h264_v4l2m2m``.
+
 See the examples below for how to correctly use this library.
 
 
