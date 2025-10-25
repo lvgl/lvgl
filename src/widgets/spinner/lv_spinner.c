@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
+#include "lv_spinner_private.h"
+#if LV_USE_SPINNER
+
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../lvgl.h"
-#if LV_USE_SPINNER
 
 /*********************
  *      DEFINES
@@ -35,6 +37,7 @@ const lv_obj_class_t lv_spinner_class = {
     .base_class = &lv_arc_class,
     .constructor_cb = lv_spinner_constructor,
     .name = "lv_spinner",
+    .instance_size = sizeof(lv_spinner_t),
 };
 
 /**********************
@@ -55,6 +58,11 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent)
 
 void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 {
+    lv_spinner_t * spinner = (lv_spinner_t *)obj;
+
+    spinner->duration = t;
+    spinner->angle = angle;
+
     /*Delete the current animation*/
     lv_anim_delete(obj, NULL);
 
@@ -76,6 +84,20 @@ void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 
     lv_arc_set_bg_angles(obj, 0, 360);
     lv_arc_set_rotation(obj, 270);
+}
+
+void lv_spinner_set_anim_duration(lv_obj_t * obj, uint32_t t)
+{
+    lv_spinner_t * spinner = (lv_spinner_t *)obj;
+
+    lv_spinner_set_anim_params(obj, t, spinner->angle);
+}
+
+void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle)
+{
+    lv_spinner_t * spinner = (lv_spinner_t *)obj;
+
+    lv_spinner_set_anim_params(obj, spinner->duration, angle);
 }
 
 /**********************

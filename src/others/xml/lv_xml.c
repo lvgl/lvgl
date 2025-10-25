@@ -51,6 +51,7 @@
 #include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
+#include "parsers/lv_xml_spinner_parser.h"
 #include "parsers/lv_xml_qrcode_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
@@ -202,6 +203,10 @@ void lv_xml_init(void)
     lv_xml_register_widget("lv_calendar-header_dropdown", lv_xml_calendar_header_dropdown_create,
                            lv_xml_calendar_header_dropdown_apply);
 #endif
+#endif
+
+#if LV_USE_SPINNER
+    lv_xml_register_widget("lv_spinner", lv_xml_spinner_create, lv_xml_spinner_apply);
 #endif
 
 #if LV_USE_QRCODE
