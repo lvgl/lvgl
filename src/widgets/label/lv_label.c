@@ -62,7 +62,7 @@ static void copy_text_to_label(lv_label_t * label, const char * text);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
 static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, const char * txt,
                                    uint32_t length, const lv_font_t * font, lv_area_t * txt_coords, lv_text_attributes_t * attributes);
-
+static void lv_label_mark_need_refr_text(lv_obj_t * obj);
 #if LV_USE_OBSERVER
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
@@ -166,7 +166,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
 
     /*If text is NULL then refresh*/
     if(fmt == NULL) {
-        lv_label_refr_text(obj);
+        lv_label_mark_need_refr_text(obj);
         return;
     }
 
@@ -178,7 +178,7 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
     label->text = lv_text_set_text_vfmt(fmt, args);
     label->static_txt = 0; /*Now the text is dynamically allocated*/
 
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 void lv_label_set_text_static(lv_obj_t * obj, const char * text)
@@ -197,7 +197,7 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
         label->text       = (char *)text;
     }
 
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 #if LV_USE_TRANSLATION
@@ -240,7 +240,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
         label->expand = 0;
 
     label->long_mode = long_mode;
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
@@ -281,7 +281,7 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en)
     label->recolor = en == false ? 0 : 1;
 
     /*Refresh the text because the potential color codes in text needs to be hidden or revealed*/
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 /*=====================
@@ -740,7 +740,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     lv_text_cut(label_txt, pos, cnt);
 
     /*Refresh the label*/
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 
@@ -806,7 +806,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_current_target(e);
 
     if((code == LV_EVENT_STYLE_CHANGED) || (code == LV_EVENT_SIZE_CHANGED)) {
-        lv_label_refr_text(obj);
+        lv_label_mark_need_refr_text(obj);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* Italic or other non-typical letters can be drawn of out of the object.
@@ -858,6 +858,9 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
 
+    }
+    else if(code == LV_EVENT_UPDATE_LAYOUT_COMPLETED) {
+        lv_label_refr_text(obj);
     }
 #if LV_USE_TRANSLATION
     else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
@@ -1022,7 +1025,7 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
         label->static_txt = 0;
     }
 
-    lv_label_refr_text(obj);
+    lv_label_mark_need_refr_text(obj);
 }
 
 static void remove_translation_tag(lv_obj_t * obj)
@@ -1062,6 +1065,18 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
     }
 }
 
+static void lv_label_mark_need_refr_text(lv_obj_t * obj)
+{
+    lv_label_t * label = (lv_label_t *)obj;
+    if(label->text == NULL) return;
+    label->invalid_size_cache = true;
+    label->need_refr_text = true;
+
+    lv_obj_refresh_self_size(obj);
+
+    lv_obj_request_layout_complete_event(obj);
+}
+
 /**
  * Refresh the label with its text stored in its extended data
  * @param label pointer to a label object
@@ -1070,10 +1085,11 @@ static void lv_label_refr_text(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
+    if(!label->need_refr_text) return;
+    label->need_refr_text = false;
 #if LV_LABEL_LONG_TXT_HINT
     label->hint.line_start = -1; /*The hint is invalid if the text changes*/
 #endif
-    label->invalid_size_cache = true;
 
     lv_area_t txt_coords;
     lv_text_attributes_t attributes = {0};
@@ -1090,8 +1106,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
     lv_label_revert_dots(obj);
     lv_text_get_size_attributes(&size, label->text, font, &attributes);
     label->text_size = size;
-
-    lv_obj_refresh_self_size(obj);
 
     /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL) {
