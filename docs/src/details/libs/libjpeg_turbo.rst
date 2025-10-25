@@ -76,5 +76,5 @@ Example
 API
 ***
 
-:ref:`libs/libjpeg_turbo/lv_libjpeg_turbo.h`
+.. API equals:  lv_libjpeg_turbo_init
 

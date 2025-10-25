@@ -26,4 +26,4 @@ Display (lv_display)
 API
 ***
 
-:ref:`display/lv_display.h`
+.. API equals:  lv_display_create
