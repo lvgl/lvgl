@@ -302,6 +302,13 @@ void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t *
  */
 void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
 
+/**
+ * Set the style of the minor ticks on a section.
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ */
+int32_t lv_scale_get_section_offset(lv_obj_t * obj, lv_scale_section_t * section);
+
 /*=====================
  * Getter functions
  *====================*/
