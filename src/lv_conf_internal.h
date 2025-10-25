@@ -1134,6 +1134,17 @@
     #endif
 #endif
 
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ */
+#ifndef LV_USE_DRAW_NANOVG
+    #ifdef CONFIG_LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG CONFIG_LV_USE_DRAW_NANOVG
+    #else
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -3209,6 +3220,15 @@
     #endif
 #endif
 
+/** Enable NanoVG (vector graphics library) */
+#ifndef LV_USE_NANOVG
+    #ifdef CONFIG_LV_USE_NANOVG
+        #define LV_USE_NANOVG CONFIG_LV_USE_NANOVG
+    #else
+        #define LV_USE_NANOVG 0
+    #endif
+#endif
+
 /** Use lvgl built-in LZ4 lib */
 #ifndef LV_USE_LZ4_INTERNAL
     #ifdef CONFIG_LV_USE_LZ4_INTERNAL
@@ -3895,6 +3915,13 @@
             #define LV_SDL_MOUSEWHEEL_MODE CONFIG_LV_SDL_MOUSEWHEEL_MODE
         #else
             #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
+        #endif
+    #endif
+    #ifndef LV_SDL_USE_EGL
+        #ifdef CONFIG_LV_SDL_USE_EGL
+            #define LV_SDL_USE_EGL CONFIG_LV_SDL_USE_EGL
+        #else
+            #define LV_SDL_USE_EGL          0    /**< 1: Use EGL backend for rendering */
         #endif
     #endif
 #endif
