@@ -79,8 +79,8 @@ struct _lv_scale_t {
     int32_t last_tick_width;           /**< Width of last tick in pixels */
     int32_t first_tick_width;          /**< Width of first tick in pixels */
 
-    int32_t arc_center_pos_x;		   /**< x value to offcenter the arc */
-    int32_t arc_center_pos_y;		   /**< y value to offcenter the arc */
+    int32_t arc_center_pos_x;		       /**< x value to offcenter the arc */
+    int32_t arc_center_pos_y;		       /**< y value to offcenter the arc */
 };
 
 

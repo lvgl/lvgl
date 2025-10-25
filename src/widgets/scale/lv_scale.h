@@ -85,12 +85,12 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  * Setter functions
  *====================*/
 
- /**
- * Set center pos. See lv_scale_mode_t.
- * @param obj    pointer to Scale Widget
- * @param x      x position of the center of the needle
- * @param y      y position of the center of the needle
- */
++/**
++* Set center pos. See lv_scale_mode_t.
++* @param obj    pointer to Scale Widget
++* @param x      x position of the center of the needle
++* @param y      y position of the center of the needle
++*/
 void lv_scale_set_center_pos(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**

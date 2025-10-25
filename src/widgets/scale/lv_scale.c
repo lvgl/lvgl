@@ -1132,7 +1132,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
  */
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r)
 {
-    lv_scale_t *scale = (lv_scale_t *)obj;
+    lv_scale_t * scale = (lv_scale_t *)obj;
 
     int32_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     int32_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
@@ -1144,8 +1144,7 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t 
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
 
-    if (arc_r)
-    {
+    if (arc_r) {
         r = (lv_obj_get_height(obj) - top_bg - bottom_bg) / 2;
         center->x = obj->coords.x1 + ((lv_obj_get_width(obj) - left_bg - right_bg) / 2) + left_bg + scale->arc_center_pos_x;
         center->y = obj->coords.y1 + r + top_bg + scale->arc_center_pos_y;
@@ -1288,6 +1287,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         /* Find the center of the scale */
         lv_point_t center_point;
         int32_t radius_edge;
+        
         
         scale_get_center(obj, &center_point, &radius_edge);
         int32_t angle_upscale = (int32_t)((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
