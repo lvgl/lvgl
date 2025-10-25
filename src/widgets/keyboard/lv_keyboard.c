@@ -245,14 +245,14 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
     if(keyboard->ta) {
-        lv_obj_remove_state(obj, LV_STATE_FOCUSED);
+        lv_obj_remove_state(keyboard->ta, LV_STATE_FOCUSED);
     }
 
     keyboard->ta = ta;
 
     /*Show the cursor of the new Text area if cursor management is enabled*/
     if(keyboard->ta) {
-        lv_obj_add_state(obj, LV_STATE_FOCUSED);
+        lv_obj_add_state(keyboard->ta, LV_STATE_FOCUSED);
     }
 }
 
