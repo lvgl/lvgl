@@ -100,7 +100,7 @@ static const char *src_fragment_shader_v100 = R"(
         }
         if (abs(u_ColorDepth - 8.0) < 0.1) {
             float gray = texColor.r;
-            gl_FragColor = vec4(gray, gray, gray, u_Opa);
+            gl_FragColor = vec4(vec3(gray * u_Opa), u_Opa);
         } else {
             float combinedAlpha = texColor.a * u_Opa;
             gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
@@ -203,12 +203,16 @@ static const char *src_fragment_shader_v300es = R"(
         if (u_IsFill) {
             texColor = vec4(u_FillColor, 1.0);
         } else {
-            //texColor = texture(u_Texture, v_TexCoord);
-            texColor = textureLod(u_Texture, v_TexCoord, 0.0);  // If the vertices have been transformed, and mipmaps have not been generated, some rotation angles (notably 90 and 270) require using textureLod() to mitigate derivative calculation errors from increments flipping direction
+            texColor = texture(u_Texture, v_TexCoord);
+            /* If the vertices have been transformed, and mipmaps have not been generated, 
+             * some rotation angles (notably 90 and 270) require using textureLod() to mitigate 
+             * derivative calculation errors from interpolator increments flipping direction.
+             * texColor = textureLod(u_Texture, v_TexCoord, u_LodLevel);
+             */
         }
         if (abs(u_ColorDepth - 8.0) < 0.1) {
             float gray = texColor.r;
-            color = vec4(gray, gray, gray, u_Opa);
+            color = vec4(vec3(gray * u_Opa), u_Opa);
         } else {
             float combinedAlpha = texColor.a * u_Opa;
             color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);

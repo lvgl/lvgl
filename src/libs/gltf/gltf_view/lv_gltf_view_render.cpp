@@ -562,7 +562,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                   uniforms->normal_uv_set, uniforms->normal_uv_transform);
     }
 
-    if(gltfMaterial.clearcoat) {
+    if(gltfMaterial.clearcoat && gltfMaterial.clearcoat->clearcoatFactor > 0.0f) {
         GL_CALL(glUniform1f(uniforms->clearcoat_factor, static_cast<float>(gltfMaterial.clearcoat->clearcoatFactor)));
         GL_CALL(glUniform1f(uniforms->clearcoat_roughness_factor,
                             static_cast<float>(gltfMaterial.clearcoat->clearcoatRoughnessFactor)));
@@ -654,7 +654,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
     }
 #endif
 
-    if(gltfMaterial.diffuseTransmission) {
+    if(gltfMaterial.diffuseTransmission && gltfMaterial.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
         render_uniform_color(uniforms->diffuse_transmission_color_factor,
                              gltfMaterial.diffuseTransmission->diffuseTransmissionColorFactor);
         GL_CALL(glUniform1f(uniforms->diffuse_transmission_factor,
@@ -1156,34 +1156,34 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
             // Traverse through all linked overrides
             while(current_override != nullptr) {
                 if(current_override->prop == LV_GLTF_BIND_PROP_ROTATION) {
-                    if(current_override->dir) {
+                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
                         current_override->data[0] = local_rot[0];
                         current_override->data[1] = local_rot[1];
                         current_override->data[2] = local_rot[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
                             local_rot[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
                             local_rot[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
                             local_rot[2] = current_override->data[2];
                         made_changes = true;
                         made_rotation_changes = true;
                     }
                 }
                 else if(current_override->prop == LV_GLTF_BIND_PROP_POSITION) {
-                    if(current_override->dir) {
+                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
                         current_override->data[0] = local_pos[0];
                         current_override->data[1] = local_pos[1];
                         current_override->data[2] = local_pos[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
                             local_pos[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
                             local_pos[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
                             local_pos[2] = current_override->data[2];
                         made_changes = true;
                     }
@@ -1195,25 +1195,32 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                     fastgltf::math::decomposeTransformMatrix(parentworldmatrix * localmatrix,
                                                              world_scale, world_quat, world_pos);
 
-                    if(current_override->dir) {
+                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
                         current_override->data[0] = world_pos[0];
                         current_override->data[1] = world_pos[1];
                         current_override->data[2] = world_pos[2];
                     }
                 }
                 else if(current_override->prop == LV_GLTF_BIND_PROP_SCALE) {
-                    if(current_override->dir) {
+                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
                         current_override->data[0] = local_scale[0];
                         current_override->data[1] = local_scale[1];
                         current_override->data[2] = local_scale[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_scale[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_scale[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3)
-                            local_scale[2] = current_override->data[2];
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3) {
+                            local_scale[0] = current_override->data[3];
+                            local_scale[1] = current_override->data[3];
+                            local_scale[2] = current_override->data[3];
+                        }
+                        else {
+                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
+                                local_scale[0] = current_override->data[0];
+                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                                local_scale[1] = current_override->data[1];
+                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                                local_scale[2] = current_override->data[2];
+                        }
                         made_changes = true;
                     }
                 }
