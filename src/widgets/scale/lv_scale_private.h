@@ -51,9 +51,9 @@ struct _lv_scale_section_t {
     lv_point_t first_tick_in_section;      /**< Internal (set during drawing) */
     lv_point_t last_tick_in_section;       /**< Internal (set during drawing) */
     uint32_t first_tick_idx_is_major : 1;  /**< Internal (set during drawing): true if
-                                            * `first_tick_idx_in_section` represents a major tick. */
-    uint32_t last_tick_idx_is_major  : 1;  /**< Internal (set during drawing): true if
-                                            * `last_tick_idx_in_section` represents a major tick. */
+                                            *   first_tick_idx_in_section` represents a major tick. */
+    uint32_t last_tick_idx_is_major  : 1;  /** Internal (set during drawing): true if
+                                            * last_tick_idx_in_section` represents a major tick. */
     int32_t offset;
 };
 
@@ -79,8 +79,8 @@ struct _lv_scale_t {
     int32_t last_tick_width;           /**< Width of last tick in pixels */
     int32_t first_tick_width;          /**< Width of first tick in pixels */
 
-	  int32_t arc_center_pos_x;		       /** x value to offcenter the arc */
-	  int32_t arc_center_pos_y;		       /** y value to offcenter the arc */
+    int32_t arc_center_pos_x;		   /**< x value to offcenter the arc */
+    int32_t arc_center_pos_y;		   /**< y value to offcenter the arc */
 };
 
 
