@@ -58,6 +58,14 @@ void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t si
 lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char * path);
 
 /**
+ * Read a file to a buffer
+ * @param filename  path of the file to read
+ * @param size      pointer to a variable to store the size of the file
+ * @return          pointer to the buffer or NULL on error
+ */
+void * lv_load_file_to_mem(const char * filename, uint32_t * size);
+
+/**
  * Reverse the order of the bytes in a 32-bit value.
  * @param x     a 32-bit value.
  * @return      the value `x` with reversed byte-order.
