@@ -12,8 +12,10 @@ XML animations are built on top of :ref:`Timeline animations <animations_timelin
 Timelines are composed of simple animations. For example: *"change the ``bg_opa``
 of ``my_button_2`` from 0 to 255 in 500 ms."*
 
-Each component can define its own timeline animations, which can then be played by the
-component itself or by any parent component.
+Each Component can define its own timeline animations, which can then be played by the
+Component itself or by any parent Component.
+
+
 
 Defining Timelines
 ******************
@@ -29,7 +31,7 @@ Example:
     <component>
        <animations>
 
-           <!-- Show the component and its children -->
+           <!-- Show Component and its children -->
            <timeline name="load">
                <animation prop="translate_x" target="self" start="-30" end="0" duration="500"/>
                <animation prop="opa" target="text" start="0" end="255" duration="500" delay="200"/>
@@ -61,7 +63,7 @@ Supported properties of ``<animation>`` are:
 
 - ``prop``: Style property to animate. All integer style properties are supported (colors are not).
 - ``selector``: Style selector, e.g. ``knob|pressed``. Default: ``main|default``.
-- ``target``: Name of the UI element to animate. ``self`` refers to the root element of the component (the ``<view>``).
+- ``target``: Name of the UI element to animate. ``self`` refers to the root element of the Component (the ``<view>``).
 - ``start``: Start value (integer only).
 - ``end``: End value (integer only).
 - ``duration``: Duration of the animation in milliseconds.
@@ -70,14 +72,16 @@ Supported properties of ``<animation>`` are:
 
 ``<include_timeline>`` also can be used in ``<timeline>``\ s to "merge" the animations
 of another timeline. Imagine that in the example above ``my_icon`` defines a ``"show_up"`` timeline
-which fades in and scales up the icon. All these are described in the ``my_icon.xml`` in an
+which fades in and enlarges the icon. All these are described in the ``my_icon.xml`` in an
 encapsulated way but can be referenced in other timelines.
 
-To include a timeline, the following properties shall be used:
+To include a timeline, use the following properties:
 
-- ``target``: name of the target UI element whose timeline should be included. ``self`` refers to the root element of the component (the ``<view>``).
-- ``timeline``: name of the timeline to include. Shall be defined in the ``target``'s XML file.
+- ``target``: name of the target UI element whose timeline should be included. ``self`` refers to the root element of the Component (the ``<view>``).
+- ``timeline``: name of the timeline to include. Must be defined in the ``target``'s XML file.
 - ``delay``: Delay before starting in milliseconds. Default is 0.
+
+
 
 Playing Timelines
 *****************
@@ -98,10 +102,13 @@ Example:
    </view>
 
 You set a ``target`` UI element and select one of its ``timeline``\ s to play.
-If ``target="self"``, the timeline is looked up in the current component/widget/screen
+If ``target="self"``, the timeline is looked up in the current Component/widget/Screen
 (i.e. in the current XML file).
 
 You can also set a ``delay`` and ``reverse="true"`` when playing a timeline.
+
+
+
 Under the Hood
 **************
 
@@ -111,16 +118,16 @@ When an XML file is registered, the contents of the ``<animations>`` section are
 and the ``<timeline>``'s data is stored as a "blueprint". The descriptors store the targets'
 names as strings.
 
-When an instance of a component or screen is created, as the last step ``lv_anim_timeline``\ s are
+When an instance of a Component or Screen is created, as the last step ``lv_anim_timeline``\ s are
 created and initialized from the saved "blueprints". If ``<include_timeline>``\ s are also used,
-the requested timeline is included in the component's timeline at this point too.
+the requested timeline is included in the Component's timeline at this point too.
 As all the children are also created at this point, the saved animation target names are resolved
 to pointers by using :cpp:expr:`lv_obj_find_by_name`.
 
 
-The created timeline instances and their names are saved in the component's instance.
+The created timeline instances and their names are saved in the Component's instance.
 
-Since each instance has its own timeline, you can have multiple components (e.g. 10 ``<list_item>``\ s)
+Since each instance has its own timeline, you can have multiple Components (e.g. 10 ``<list_item>``\ s)
 and play their ``load`` timelines independently with different delays.
 
 When a ``<play_timeline_event>`` is added to a UI element, the target and timeline
