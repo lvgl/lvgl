@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _lodepng_rst:
 
 ===============
@@ -18,8 +19,6 @@ image source.
 
     A file system driver needs to be registered to open images from files.  To do so,
     follow the instructions in :ref:`file_system`.
-
-.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
 
 The whole PNG image is decoded, so
 
