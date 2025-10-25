@@ -203,6 +203,7 @@ void lv_scale_set_max_value(lv_obj_t * obj, int32_t max)
 void lv_scale_set_section_offset(lv_obj_t * obj, lv_scale_section_t * section, int32_t offset)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_UNUSED(obj);
     LV_ASSERT_NULL(section);
 
     section->offset = offset;
@@ -526,6 +527,7 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
 int32_t lv_scale_get_section_offset(lv_obj_t * obj, lv_scale_section_t * section)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_UNUSED(obj);
     LV_ASSERT_NULL(section);
 
     return section->offset;

@@ -304,6 +304,7 @@ void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * sec
 
 /**
  * Set the style of the minor ticks on a section.
+ * @param obj           pointer to object
  * @param scale         pointer to scale
  * @param section       pointer to section
  */
