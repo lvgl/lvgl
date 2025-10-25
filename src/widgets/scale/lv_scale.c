@@ -1287,7 +1287,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         /* Find the center of the scale */
         lv_point_t center_point;
         int32_t radius_edge;
-        
+
 
         scale_get_center(obj, &center_point, &radius_edge);
         int32_t angle_upscale = (int32_t)((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
