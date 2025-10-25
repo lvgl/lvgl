@@ -281,7 +281,7 @@ void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * name)
     if(player->decoder_name) {
         lv_free((void *)player->decoder_name);
     }
-    player->decoder_name = lv_strdup(name);
+    player->decoder_name = name ? lv_strdup(name) : NULL;
 }
 
 /**********************
