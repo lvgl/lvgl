@@ -146,19 +146,21 @@ Performance Measurement
 
 Event-based collection:
 
-+----------------------+--------------------------------+
-| Event                | Measurement                    |
-+======================+================================+
-| LV_EVENT_REFR_START  | Refresh interval start         |
-+----------------------+--------------------------------+
-| LV_EVENT_REFR_READY  | Record refresh duration        |
-+----------------------+--------------------------------+
-| LV_EVENT_RENDER_START| Render time start              |
-+----------------------+--------------------------------+
-| LV_EVENT_RENDER_READY| Record render duration         |
-+----------------------+--------------------------------+
-| LV_EVENT_FLUSH_*     | Measure flush operations       |
-+----------------------+--------------------------------+
+.. container:: tighter-table-3
+
+    +----------------------+--------------------------------+
+    | Event                | Measurement                    |
+    +======================+================================+
+    | LV_EVENT_REFR_START  | Refresh interval start         |
+    +----------------------+--------------------------------+
+    | LV_EVENT_REFR_READY  | Record refresh duration        |
+    +----------------------+--------------------------------+
+    | LV_EVENT_RENDER_START| Render time start              |
+    +----------------------+--------------------------------+
+    | LV_EVENT_RENDER_READY| Record render duration         |
+    +----------------------+--------------------------------+
+    | LV_EVENT_FLUSH_*     | Measure flush operations       |
+    +----------------------+--------------------------------+
 
 
 Timers
