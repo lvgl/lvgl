@@ -301,7 +301,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     needle_line_points[0].x = (scale_width / 2) + scale->arc_center_pos_x;
     needle_line_points[0].y = (scale_height / 2) + scale->arc_center_pos_y;
     needle_line_points[1].x = (scale_width / 2) + scale->arc_center_pos_x + needle_length_x;
-    needle_line_points[1].y = (scale_height / 2) + scale->arc_center_pos_y + needle_length_y;    
+    needle_line_points[1].y = (scale_height / 2) + scale->arc_center_pos_y + needle_length_y;
     lv_line_set_points_mutable(needle_line, needle_line_points, 2);
 }
 
@@ -1144,7 +1144,7 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t 
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
 
-    if (arc_r) {
+    if(arc_r) {
         r = (lv_obj_get_height(obj) - top_bg - bottom_bg) / 2;
         center->x = obj->coords.x1 + ((lv_obj_get_width(obj) - left_bg - right_bg) / 2) + left_bg + scale->arc_center_pos_x;
         center->y = obj->coords.y1 + r + top_bg + scale->arc_center_pos_y;
@@ -1288,7 +1288,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         lv_point_t center_point;
         int32_t radius_edge;
         
-        
+
         scale_get_center(obj, &center_point, &radius_edge);
         int32_t angle_upscale = (int32_t)((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
         angle_upscale += scale->rotation * 10;
