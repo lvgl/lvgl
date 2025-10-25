@@ -93,12 +93,12 @@ const lv_obj_class_t lv_keyboard_class = {
 #endif
 };
 
-static const char * const default_kb_map_lc[] = {"1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
-                                                 "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
+static const char * const default_kb_map_lc[] = {LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL, "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
+                                                 LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_UPPER, "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
                                                  "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
                                                  LV_SYMBOL_KEYBOARD,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-                                                 "أب",
+                                                 LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC,
 #endif
                                                  LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
                                                 };
@@ -114,12 +114,12 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_lc_map[] = {
     LV_BUTTONMATRIX_CTRL_CHECKED | 2, 6, LV_BUTTONMATRIX_CTRL_CHECKED | 2, LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2
 };
 
-static const char * const default_kb_map_uc[] = {"1#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", LV_SYMBOL_BACKSPACE, "\n",
-                                                 "abc", "A", "S", "D", "F", "G", "H", "J", "K", "L", LV_SYMBOL_NEW_LINE, "\n",
+static const char * const default_kb_map_uc[] = {LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL, "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", LV_SYMBOL_BACKSPACE, "\n",
+                                                 LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER, "A", "S", "D", "F", "G", "H", "J", "K", "L", LV_SYMBOL_NEW_LINE, "\n",
                                                  "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
                                                  LV_SYMBOL_CLOSE,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-                                                 "أب",
+                                                 LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC,
 #endif
                                                  LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
                                                 };
@@ -137,10 +137,10 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_uc_map[] = {
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static const char * const default_kb_map_ar[] = {
-    "1#", "ض", "ص", "ث", "ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "\n",
+    LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL, "ض", "ص", "ث", "ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "\n",
     "ش", "س", "ي", "ب", "ل", "ا", "ت", "ن", "م", "ك", "ط", LV_SYMBOL_BACKSPACE, "\n",
     "ذ", "ء", "ؤ", "ر", "ى", "ة", "و", "ز", "ظ", "د", "ز", "ظ", "د", "\n",
-    LV_SYMBOL_CLOSE, "abc", LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_NEW_LINE, LV_SYMBOL_OK, ""
+    LV_SYMBOL_CLOSE, LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_NEW_LINE, LV_SYMBOL_OK, ""
 };
 
 static const lv_buttonmatrix_ctrl_t default_kb_ctrl_ar_map[] = {
@@ -152,11 +152,11 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_ar_map[] = {
 #endif
 
 static const char * const default_kb_map_spec[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", LV_SYMBOL_BACKSPACE, "\n",
-                                                   "abc", "+", "&", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+                                                   LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER, "+", "&", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
                                                    "\\",  "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
                                                    LV_SYMBOL_KEYBOARD,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-                                                   "أب",
+                                                   LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC,
 #endif
                                                    LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
                                                   };
@@ -327,27 +327,27 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     const char * txt = lv_buttonmatrix_get_button_text(obj, btn_id);
     if(txt == NULL) return;
 
-    if(lv_strcmp(txt, "abc") == 0) {
+    if(lv_strcmp(txt, LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER) == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_LOWER;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_LOWER]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-    else if(lv_strcmp(txt, "أب") == 0) {
+    else if(lv_strcmp(txt, LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC) == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_ARABIC;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_ARABIC]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
 #endif
-    else if(lv_strcmp(txt, "ABC") == 0) {
+    else if(lv_strcmp(txt, LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_UPPER) == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_UPPER;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_UPPER]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
-    else if(lv_strcmp(txt, "1#") == 0) {
+    else if(lv_strcmp(txt, LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL) == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_SPECIAL;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_SPECIAL]);
         lv_keyboard_update_ctrl_map(obj);
