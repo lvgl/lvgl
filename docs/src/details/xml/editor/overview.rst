@@ -1,5 +1,5 @@
 .. include:: /include/external_links.txt
-.. include:: /include/substitutions.txt
+.. include:: substitutions.txt
 .. _editor_overview:
 
 ========
