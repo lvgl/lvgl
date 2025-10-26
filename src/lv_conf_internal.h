@@ -4658,15 +4658,6 @@
         #endif
     #endif
 
-    /** Widget transformation demo */
-    #ifndef LV_USE_DEMO_TRANSFORM
-        #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
-            #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
-        #else
-            #define LV_USE_DEMO_TRANSFORM       0
-        #endif
-    #endif
-
     /** Demonstrate scroll settings */
     #ifndef LV_USE_DEMO_SCROLL
         #ifdef CONFIG_LV_USE_DEMO_SCROLL
@@ -4781,7 +4772,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_TRANSFORM       0
     #define LV_USE_DEMO_SCROLL          0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0

@@ -120,7 +120,6 @@
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER     1
 #define LV_USE_DEMO_FLEX_LAYOUT            1
 #define LV_USE_DEMO_STRESS      1
-#define LV_USE_DEMO_TRANSFORM   1
 #define LV_USE_DEMO_MULTILANG   1
 #define LV_USE_DEMO_RENDER      1
 #define LV_USE_DEMO_MUSIC       1
