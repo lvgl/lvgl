@@ -154,7 +154,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_dave2d_fill_single(t, fill_draw_dsc, fill_area);
+        lv_draw_dave2d_fill(t, fill_draw_dsc, fill_area);
     }
 }
 
