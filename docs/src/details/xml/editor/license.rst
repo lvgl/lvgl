@@ -1,4 +1,4 @@
-.. include:: external_links.txt
+.. include:: /include/external_links.txt
 .. _editor_license:
 
 =======
