@@ -200,7 +200,8 @@ cost, depending on the platform and CPU involved.
 
 For this reason, it can never be as efficient as a `Gateway Thread`_, but for UIs that
 do not change rapidly, this may be a desirable alternative threading architecture,
-especially if your firmware is already running on an embedded Linux platform.
+especially if your firmware is already running under an embedded OS that exposes the
+Work Queue API, e.g. Zephyr.
 
 
 Method 3:  Use a MUTEX
