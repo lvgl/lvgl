@@ -33,9 +33,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
+
 static void lv_opengles_enable_blending(bool blend_opt);
 static void lv_opengles_disable_blending(void);
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size);
@@ -147,8 +145,8 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                                lv_color_black(), false);
+    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
+                       lv_color_black(), false);
     LV_PROFILER_DRAW_END;
 }
 
@@ -156,15 +154,15 @@ void lv_opengles_render_texture_alt(unsigned int texture, const lv_area_t * text
                                     int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_internal(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                                lv_color_black(), true);
+    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
+                       lv_color_black(), true);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render_internal(0, area, opa, disp_w, disp_h, area, false, false, color, false);
+    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false);
     LV_PROFILER_DRAW_END;
 }
 
@@ -220,13 +218,9 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
     LV_PROFILER_DRAW_END;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
-                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip, lv_color_t fill_color,
-                                        bool blend_opt)
+void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -286,6 +280,10 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void lv_opengles_enable_blending(bool blend_opt)
 {
