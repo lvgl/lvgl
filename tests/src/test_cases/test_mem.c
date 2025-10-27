@@ -14,8 +14,71 @@ void tearDown(void)
     /* Function run after every test */
 }
 
+void test_malloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_malloc(32);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+static void check_zero_mem(const void * data, size_t size)
+{
+    const uint8_t * p = data;
+    for(size_t i = 0; i < size; i++) {
+        TEST_ASSERT_EQUAL_UINT8(0, p[i]);
+    }
+}
+
+void test_calloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_calloc(4, 8);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    check_zero_mem(buf, 32);
+
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+void test_zalloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_zalloc(32);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    check_zero_mem(buf, 32);
+
+    lv_free(buf);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
+void test_realloc(void)
+{
+    uint32_t mem = lv_test_get_free_mem();
+    void * buf = lv_malloc(16);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    buf = lv_realloc(buf, 32);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    buf = lv_realloc(buf, 8);
+    TEST_ASSERT_NOT_NULL(buf);
+
+    lv_free(buf);
+
+    /* Should behave like malloc */
+    buf = lv_realloc(NULL, 16);
+    TEST_ASSERT_NOT_NULL(buf);
+    lv_free(buf);
+
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem, 0);
+}
+
 /* #3324 */
-void test_mem_realloc(void)
+void test_realloc_failed(void)
 {
 #ifdef LVGL_CI_USING_DEF_HEAP
     uint32_t mem = lv_test_get_free_mem();
@@ -37,7 +100,7 @@ void test_mem_realloc(void)
 #endif
 }
 
-void test_mem_alloc_failed(void)
+void test_malloc_failed(void)
 {
 #ifdef LVGL_CI_USING_DEF_HEAP
     uint32_t mem = lv_test_get_free_mem();
