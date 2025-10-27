@@ -801,7 +801,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             /*Simulate a press on the object if ENTER was pressed*/
             if(data->key == LV_KEY_ENTER) {
                 /*Send the ENTER as a normal KEY*/
-                lv_group_send_data(g, LV_KEY_ENTER);
+                if(lv_group_send_data(g, LV_KEY_ENTER) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
 
                 if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
@@ -809,14 +809,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
             else if(data->key == LV_KEY_ESC) {
                 /*Send the ESC as a normal KEY*/
-                lv_group_send_data(g, LV_KEY_ESC);
+                if(lv_group_send_data(g, LV_KEY_ESC) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
 
                 if(send_event(LV_EVENT_CANCEL, indev_act) == LV_RESULT_INVALID) return;
             }
             /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
             else {
-                lv_group_send_data(g, data->key);
+                if(lv_group_send_data(g, data->key) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
             }
         }
