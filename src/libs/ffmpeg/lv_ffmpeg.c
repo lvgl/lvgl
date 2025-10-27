@@ -548,6 +548,40 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
     return 0;
 }
 
+static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec* dec,
+                                     enum AVMediaType type, AVStream* st)
+{
+    int ret = 0;
+
+    /* Allocate a codec context for the decoder */
+    *dec_ctx = avcodec_alloc_context3(dec);
+    if(*dec_ctx == NULL) {
+        return AVERROR(ENOMEM);
+    }
+
+    /* Copy codec parameters from input stream to output codec context */
+    if((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
+        LV_LOG_ERROR("Failed to allocate the %s codec context",
+                     av_get_media_type_string(type));
+        goto free_dec_ctx;
+    }
+
+    /* Init the decoders */
+    if((ret = avcodec_open2(*dec_ctx, dec, NULL)) < 0) {
+        LV_LOG_ERROR(
+            "Failed to copy %s codec parameters to decoder context",
+            av_get_media_type_string(type));
+        goto free_dec_ctx;
+    }
+
+    return 0;
+
+free_dec_ctx:
+    avcodec_free_context(dec_ctx);
+    *dec_ctx = NULL;
+    return ret;
+}
+
 static int ffmpeg_open_codec_context(int * stream_idx,
                                      AVCodecContext ** dec_ctx, AVFormatContext * fmt_ctx,
                                      enum AVMediaType type, const char * decoder_name)
@@ -556,7 +590,6 @@ static int ffmpeg_open_codec_context(int * stream_idx,
     int stream_index;
     AVStream * st;
     const AVCodec * dec = NULL;
-    AVDictionary * opts = NULL;
 
     ret = av_find_best_stream(fmt_ctx, type, -1, -1, NULL, 0);
     if(ret < 0) {
@@ -571,37 +604,27 @@ static int ffmpeg_open_codec_context(int * stream_idx,
         /* find decoder for the stream */
         if(decoder_name) {
             dec = avcodec_find_decoder_by_name(decoder_name);
+            if(dec) {
+                ret = ffmpeg_init_codec_context(dec_ctx, dec, type, st);
+                if(ret < 0) {
+                    dec = NULL;
+                }
+            }
         }
         if(dec == NULL) {
             dec = avcodec_find_decoder(st->codecpar->codec_id);
-        }
-        if(dec == NULL) {
-            LV_LOG_ERROR("Failed to find %s codec",
-                         av_get_media_type_string(type));
-            return AVERROR(EINVAL);
-        }
+            if(dec == NULL) {
+                LV_LOG_ERROR("Failed to find %s codec",
+                             av_get_media_type_string(type));
+                return AVERROR(EINVAL);
+            }
 
-        /* Allocate a codec context for the decoder */
-        *dec_ctx = avcodec_alloc_context3(dec);
-        if(*dec_ctx == NULL) {
-            LV_LOG_ERROR("Failed to allocate the %s codec context",
-                         av_get_media_type_string(type));
-            return AVERROR(ENOMEM);
-        }
-
-        /* Copy codec parameters from input stream to output codec context */
-        if((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
-            LV_LOG_ERROR(
-                "Failed to copy %s codec parameters to decoder context",
-                av_get_media_type_string(type));
-            return ret;
-        }
-
-        /* Init the decoders */
-        if((ret = avcodec_open2(*dec_ctx, dec, &opts)) < 0) {
-            LV_LOG_ERROR("Failed to open %s codec",
-                         av_get_media_type_string(type));
-            return ret;
+            ret = ffmpeg_init_codec_context(dec_ctx, dec, type, st);
+            if(ret < 0) {
+                LV_LOG_ERROR("Failed to initialize %s codec context",
+                             av_get_media_type_string(type));
+                return ret;
+            }
         }
 
         *stream_idx = stream_index;
