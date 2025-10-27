@@ -49,7 +49,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name);
  * @param idx       the index of the tab to rename
  * @param new_name  the new name as a string
  */
-void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name);
+void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name);
 
 #if LV_USE_TRANSLATION
 

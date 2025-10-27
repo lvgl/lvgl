@@ -181,7 +181,7 @@ void test_tabview_rename_tab(void)
     LV_UNUSED(tab3);
 
     /*rename 2nd tab (0-based index)*/
-    lv_tabview_rename_tab(tabview, 1, "2nd Tab");
+    lv_tabview_set_tab_text(tabview, 1, "2nd Tab");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_08.png");
 }
