@@ -32,6 +32,7 @@
  **********************/
 
 static void update_animation_cb(lv_timer_t * timer);
+static lv_rb_compare_res_t compare_bind_nodes(const void * a, const void * b);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,7 +66,7 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
 
-    new(&data->node_binds) NodeOverrideMap();
+    lv_rb_init(&data->node_binds, compare_bind_nodes, sizeof(lv_gltf_node_binds_t));
     new(&data->node_transform_cache) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
@@ -77,7 +78,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
 
-    lv_array_init(&data->binds, 0, sizeof(lv_gltf_bind_t));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
@@ -224,6 +224,10 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
 }
 
 
+lv_rb_t * lv_gltf_model_get_binds(lv_gltf_model_t * model)
+{
+    return &model->node_binds;
+}
 
 
 void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
@@ -245,7 +249,24 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
     }
     to->bound_radius = from->bound_radius;
 }
+lv_gltf_node_binds_t * lv_gltf_model_node_get_binds_internal(lv_gltf_model_t * model, fastgltf::Node * internal_node)
+{
+    lv_gltf_node_binds_t key;
+    lv_gltf_model_node_t node;
+    key.node = &node;
+    node.node = internal_node;
 
+    lv_rb_node_t * rb_node = lv_rb_find(&model->node_binds, &key);
+    if(!rb_node) {
+        return NULL;
+    }
+    return (lv_gltf_node_binds_t *) rb_node->data;
+}
+
+lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, lv_gltf_model_node_t * node)
+{
+    return lv_gltf_model_node_get_binds_internal(model, node->node);
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -267,5 +288,11 @@ static void update_animation_cb(lv_timer_t * timer)
     lv_obj_invalidate((lv_obj_t *)model->viewer);
 }
 
-#endif /*LV_USE_GLTF*/
+static lv_rb_compare_res_t compare_bind_nodes(const void * a, const void * b)
+{
+    lv_gltf_node_binds_t * entry_a = (lv_gltf_node_binds_t *) a;
+    lv_gltf_node_binds_t * entry_b = (lv_gltf_node_binds_t *) b;
+    return (size_t)entry_a->node - (size_t)entry_b->node;
+}
 
+#endif /*LV_USE_GLTF*/
