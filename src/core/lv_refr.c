@@ -777,40 +777,32 @@ static void refr_invalid_areas(void)
 
         lv_area_t inv_a = disp_refr->inv_areas[i];
         if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-            /*Calculate the max row num*/
             int32_t w = lv_area_get_width(&inv_a);
             int32_t h = lv_area_get_height(&inv_a);
 
-            int32_t max_row = get_max_row(disp_refr, w, h);
-
             int32_t row;
-            int32_t row_last = 0;
             lv_area_t sub_area;
-            sub_area.x1 = inv_a.x1;
-            sub_area.x2 = inv_a.x2;
             int32_t y_off = 0;
-            for(row = inv_a.y1; row + max_row - 1 <= inv_a.y2; row += max_row) {
-                /*Calc. the next y coordinates of draw_buf*/
+
+            row = inv_a.y1;
+            do {
+                int32_t max_row = get_max_row(disp_refr, w, h);
+
+                /* Create sub area */
+                sub_area.x1 = inv_a.x1;
+                sub_area.x2 = inv_a.x2;
                 sub_area.y1 = row;
                 sub_area.y2 = row + max_row - 1;
-                if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
-                row_last = sub_area.y2;
-                if(inv_a.y2 == row_last) disp_refr->last_part = 1;
-                refr_area(&sub_area, y_off);
-                y_off += lv_area_get_height(&sub_area);
-                draw_buf_flush(disp_refr);
-            }
 
-            /*If the last y coordinates are not handled yet ...*/
-            if(inv_a.y2 != row_last) {
-                /*Calc. the next y coordinates of draw_buf*/
-                sub_area.y1 = row;
-                sub_area.y2 = inv_a.y2;
-                disp_refr->last_part = 1;
+                if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
+                if(sub_area.y2 == inv_a.y2) disp_refr->last_part = 1;
+
                 refr_area(&sub_area, y_off);
                 y_off += lv_area_get_height(&sub_area);
                 draw_buf_flush(disp_refr);
-            }
+                row += max_row;
+
+            } while(disp_refr->last_part == false);
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL ||
                 disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
@@ -1311,6 +1303,8 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
+    LV_UNUSED(area_h);
+
     lv_color_format_t cf = disp->color_format;
     uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
     uint32_t overhead = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
@@ -1321,35 +1315,6 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
     }
 
     int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
-
-    if(max_row > area_h) max_row = area_h;
-
-    /*Round down the lines of draw_buf if rounding is added*/
-    lv_area_t tmp;
-    tmp.x1 = 0;
-    tmp.x2 = 0;
-    tmp.y1 = 0;
-
-    int32_t h_tmp = max_row;
-    do {
-        tmp.y2 = h_tmp - 1;
-        lv_display_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);
-
-        /*If this height fits into `max_row` then fine*/
-        if(lv_area_get_height(&tmp) <= max_row) break;
-
-        /*Decrement the height of the area until it fits into `max_row` after rounding*/
-        h_tmp--;
-    } while(h_tmp > 0);
-
-    if(h_tmp <= 0) {
-        LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or too "
-                    "small draw_buf)");
-        return 0;
-    }
-    else {
-        max_row = tmp.y2 + 1;
-    }
 
     return max_row;
 }
