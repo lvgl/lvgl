@@ -572,9 +572,10 @@ static int ffmpeg_open_codec_context(int * stream_idx,
         if(decoder_name) {
             dec = avcodec_find_decoder_by_name(decoder_name);
         }
-        else {
+	if (dec == NULL)
+	{
             dec = avcodec_find_decoder(st->codecpar->codec_id);
-        }
+	}
         if(dec == NULL) {
             LV_LOG_ERROR("Failed to find %s codec",
                          av_get_media_type_string(type));
