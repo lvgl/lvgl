@@ -1167,6 +1167,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
 
     lv_gltf_data_clear_transform_cache(gltf_data);
 
+
     auto tmat = fastgltf::math::fmat4x4{};
     fastgltf::custom_iterate_scene_nodes(
         *asset, scene_index, &tmat,
@@ -1178,88 +1179,86 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                                                 localmatrix);
             made_changes = true;
         }
-        if(gltf_data->node_binds.find(&node) != gltf_data->node_binds.end()) {
-            lv_gltf_bind_t * current_override = gltf_data->node_binds[&node];
+        lv_gltf_node_binds_t * bind_entry = lv_gltf_model_node_get_binds_internal(gltf_data, &node);
+        if(bind_entry) {
             fastgltf::math::fvec3 local_pos;
             fastgltf::math::fquat local_quat;
             fastgltf::math::fvec3 local_scale;
             fastgltf::math::decomposeTransformMatrix(localmatrix, local_scale, local_quat, local_pos);
             fastgltf::math::fvec3 local_rot = lv_gltf_math_quaternion_to_euler(local_quat);
 
-            // Traverse through all linked overrides
-            while(current_override != nullptr) {
-                if(current_override->prop == LV_GLTF_BIND_PROP_ROTATION) {
-                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
-                        current_override->data[0] = local_rot[0];
-                        current_override->data[1] = local_rot[1];
-                        current_override->data[2] = local_rot[2];
+            const uint32_t bind_count = lv_array_size(&bind_entry->binds);
+            for(uint32_t i = 0; i < bind_count; ++i) {
+                lv_gltf_bind_t * bind = (lv_gltf_bind_t *) lv_array_at(&bind_entry->binds, i);
+                if(bind->prop == LV_GLTF_BIND_PROP_ROTATION) {
+                    if(bind->dir == LV_GLTF_BIND_DIR_READ) {
+                        bind->data[0] = local_rot[0];
+                        bind->data[1] = local_rot[1];
+                        bind->data[2] = local_rot[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
-                            local_rot[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_rot[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_rot[2] = current_override->data[2];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_0)
+                            local_rot[0] = bind->data[0];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                            local_rot[1] = bind->data[1];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                            local_rot[2] = bind->data[2];
                         made_changes = true;
                         made_rotation_changes = true;
                     }
                 }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_POSITION) {
-                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
-                        current_override->data[0] = local_pos[0];
-                        current_override->data[1] = local_pos[1];
-                        current_override->data[2] = local_pos[2];
+                else if(bind->prop == LV_GLTF_BIND_PROP_POSITION) {
+                    if(bind->dir == LV_GLTF_BIND_DIR_READ) {
+                        bind->data[0] = local_pos[0];
+                        bind->data[1] = local_pos[1];
+                        bind->data[2] = local_pos[2];
                     }
                     else {
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
-                            local_pos[0] = current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_pos[1] = current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_pos[2] = current_override->data[2];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_0)
+                            local_pos[0] = bind->data[0];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                            local_pos[1] = bind->data[1];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                            local_pos[2] = bind->data[2];
                         made_changes = true;
                     }
                 }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_WORLD_POSITION) {
+                else if(bind->prop == LV_GLTF_BIND_PROP_WORLD_POSITION) {
                     fastgltf::math::fvec3 world_pos;
                     fastgltf::math::fquat world_quat;
                     fastgltf::math::fvec3 world_scale;
                     fastgltf::math::decomposeTransformMatrix(parentworldmatrix * localmatrix,
                                                              world_scale, world_quat, world_pos);
 
-                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
-                        current_override->data[0] = world_pos[0];
-                        current_override->data[1] = world_pos[1];
-                        current_override->data[2] = world_pos[2];
+                    if(bind->dir == LV_GLTF_BIND_DIR_READ) {
+                        bind->data[0] = world_pos[0];
+                        bind->data[1] = world_pos[1];
+                        bind->data[2] = world_pos[2];
                     }
                 }
-                else if(current_override->prop == LV_GLTF_BIND_PROP_SCALE) {
-                    if(current_override->dir == LV_GLTF_BIND_DIR_READ) {
-                        current_override->data[0] = local_scale[0];
-                        current_override->data[1] = local_scale[1];
-                        current_override->data[2] = local_scale[2];
+                else if(bind->prop == LV_GLTF_BIND_PROP_SCALE) {
+                    if(bind->dir == LV_GLTF_BIND_DIR_READ) {
+                        bind->data[0] = local_scale[0];
+                        bind->data[1] = local_scale[1];
+                        bind->data[2] = local_scale[2];
                     }
                     else {
                         float base_scale = 1.0f;
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3) {
-                            base_scale = current_override->data[3];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_3) {
+                            base_scale = bind->data[3];
                             local_scale[0] = base_scale;
                             local_scale[1] = base_scale;
                             local_scale[2] = base_scale;
                         }
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
-                            local_scale[0] = base_scale * current_override->data[0];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                            local_scale[1] = base_scale * current_override->data[1];
-                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                            local_scale[2] = base_scale * current_override->data[2];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_0)
+                            local_scale[0] = base_scale * bind->data[0];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                            local_scale[1] = base_scale * bind->data[1];
+                        if(bind->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                            local_scale[2] = base_scale * bind->data[2];
                         made_changes = true;
                     }
                 }
-
-                // Move to the next override in the linked list
-                current_override = current_override->next_bind;
             }
 
             // Rebuild the local matrix after applying all overrides

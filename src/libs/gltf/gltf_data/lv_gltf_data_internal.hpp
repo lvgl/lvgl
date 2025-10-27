@@ -59,12 +59,11 @@ typedef struct {
 	std::vector<lv_gltf_primitive_t> primitives;
 } lv_gltf_mesh_data_t;
 
-typedef struct {
-	const char *ip;
-	const char *path;
+struct _lv_gltf_model_node_t {
+	const char * ip;
+	const char * path;
 	fastgltf::Node *node;
-} lv_gltf_data_node_t;
-
+};
 
 struct _lv_gltf_model_t {
 	const char *filename;
@@ -74,8 +73,7 @@ struct _lv_gltf_model_t {
 	NodeTransformMap node_transform_cache;
 	MaterialIndexMap opaque_nodes_by_material_index;
 	MaterialIndexMap blended_nodes_by_material_index;
-	NodeOverrideMap node_binds;
-	lv_array_t binds;
+	lv_rb_t node_binds;
 	std::vector<size_t> validated_skins;
 	std::vector<GLuint> skin_tex;
 	NodePrimCenterMap local_mesh_to_center_points_by_primitive;
@@ -339,10 +337,10 @@ fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_model_t *data, size_t index
 
 void lv_gltf_data_destroy_textures(lv_gltf_model_t *data);
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t *data);
-void lv_gltf_data_nodes_init(lv_gltf_model_t *data, size_t size);
-void lv_gltf_data_node_init(lv_gltf_data_node_t * node, fastgltf::Node * fastgltf_node, const char * path, const char * ip);
-void lv_gltf_data_node_add(lv_gltf_model_t *data, const lv_gltf_data_node_t *data_node);
-void lv_gltf_data_node_delete(lv_gltf_data_node_t *node);
+void lv_gltf_model_nodes_init(lv_gltf_model_t *data, size_t size);
+void lv_gltf_model_node_init(lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node, const char * path, const char * ip);
+void lv_gltf_model_node_add(lv_gltf_model_t *data, const lv_gltf_model_node_t *data_node);
+void lv_gltf_model_node_delete(lv_gltf_model_node_t *node);
 
 /**
  * @brief Retrieve the pixel data for a specific texture in a GLTF model.
@@ -359,13 +357,12 @@ void lv_gltf_data_node_delete(lv_gltf_data_node_t *node);
 bool lv_gltf_data_get_texture_pixels(void *pixels, lv_gltf_model_t *data_obj, uint32_t model_texture_index, uint32_t mipmapnum,
 				     uint32_t width, uint32_t height, bool has_alpha);
 
-lv_gltf_data_node_t *lv_gltf_data_node_get_by_index(lv_gltf_model_t *data, size_t index);
-lv_gltf_data_node_t *lv_gltf_data_node_get_by_ip(lv_gltf_model_t *data, const char *ip);
-lv_gltf_data_node_t *lv_gltf_data_node_get_by_path(lv_gltf_model_t *data, const char *path);
 uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t *data, uint32_t index);
 std::vector<uint32_t> *lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t *data, fastgltf::Node &node);
 void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_model_t *gltf_data, fastgltf::Node &node,
 					 fastgltf::math::fmat4x4 &matrix);
+
+lv_gltf_node_binds_t * lv_gltf_model_node_get_binds_internal(lv_gltf_model_t * model, fastgltf::Node * node);
 
 #endif
 

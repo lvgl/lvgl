@@ -165,16 +165,16 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
         }
         first_visible_mesh = false;
     });
-    lv_gltf_data_nodes_init(data, data->asset.nodes.size());
+    lv_gltf_model_nodes_init(data, data->asset.nodes.size());
 
     fastgltf::namegen_iterate_scene_nodes(data->asset, scene_index,
                                           [&](fastgltf::Node & node, const std::string & node_path, const std::string & node_ip,
     size_t node_index, std::size_t child_index) {
         LV_UNUSED(node_index);
         LV_UNUSED(child_index);
-        lv_gltf_data_node_t data_node;
-        lv_gltf_data_node_init(&data_node, &node, node_path.c_str(), node_ip.c_str());
-        lv_gltf_data_node_add(data, &data_node);
+        lv_gltf_model_node_t model_node;
+        lv_gltf_model_node_init(&model_node, &node, node_path.c_str(), node_ip.c_str());
+        lv_gltf_model_node_add(data, &model_node);
     });
 
     {
