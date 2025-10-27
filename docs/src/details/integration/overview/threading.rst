@@ -196,7 +196,7 @@ would be restricted to handling the UI by making LVGL calls.
 This architecture is somewhat less efficient than a `Gateway Thread`_ because it implies
 a (worst-case scenario) task switch every time an LVGL call must be made (when the
 queue is empty when the submission is made).  A task switch can be a significant
-cost, depending on the platform and CPU involved.
+cost, depending on the platform, CPU and configuration involved.
 
 For this reason, it can never be as efficient as a `Gateway Thread`_, but for UIs that
 do not change rapidly, this may be a desirable alternative threading architecture,
