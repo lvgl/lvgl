@@ -203,6 +203,16 @@ do not change rapidly, this may be a desirable alternative threading architectur
 especially if your firmware is already running under an embedded OS that exposes the
 Work Queue API, e.g. Zephyr.
 
+**Caution:**
+
+In an RTOS environment with preemptive scheduling, if your Work Queue has higher
+priority than other tasks, you will *guarantee* that you will encounter the
+worst-case scenario mentioned above:  it will incur a task switch for each LVGL call
+submitted.  Consider, instead, lowering the Work Queue priority below those of
+time-critical tasks (e.g. fast input data handling), which will allow the Work Queue
+to handle multiple LVGL calls with one task switch, emptying the entire queue in the
+best-case scenario.
+
 
 Method 3:  Use a MUTEX
 ----------------------
