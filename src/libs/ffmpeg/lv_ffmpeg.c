@@ -824,13 +824,6 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     int ret;
 
-    if(ret < 0) {
-        LV_LOG_ERROR("Could not allocate src raw video buffer");
-        return ret;
-    }
-
-    LV_LOG_INFO("alloc video_src_bufsize = %d", ret);
-
     ret = av_image_alloc(
               ffmpeg_ctx->video_dst_data,
               ffmpeg_ctx->video_dst_linesize,
