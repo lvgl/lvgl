@@ -30,6 +30,19 @@
 #define MY_CLASS (&lv_keyboard_class)
 #define LV_KB_BTN(width) LV_BUTTONMATRIX_CTRL_POPOVER | width
 
+#ifndef LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER
+    #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER     "abc"
+#endif
+#ifndef LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_UPPER
+    #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_UPPER     "ABC"
+#endif
+#ifndef LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL
+    #define LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL        "1#"
+#endif
+#ifndef LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC
+    #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC    "أب"
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

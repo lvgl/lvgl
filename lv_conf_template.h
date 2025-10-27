@@ -761,14 +761,6 @@
 #define LV_USE_IMAGEBUTTON     1
 
 #define LV_USE_KEYBOARD   1
-#if LV_USE_KEYBOARD
-    #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_LOWER     "abc"
-    #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_UPPER     "ABC"
-    #define LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL        "1#"
-    #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-        #define LV_KEYBOARD_CTRL_BUTTON_MODE_TEXT_ARABIC    "أب"
-    #endif
-#endif
 
 #define LV_USE_LABEL      1
 #if LV_USE_LABEL
