@@ -46,9 +46,9 @@ lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
 void lv_theme_apply(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
-    if(th == NULL) return;
-
     lv_obj_remove_style_all(obj);
+
+    if(th == NULL) return;
 
     apply_theme_recursion(th, obj);    /*Apply the theme including the base theme(s)*/
 }
