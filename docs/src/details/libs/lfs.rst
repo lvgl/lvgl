@@ -62,7 +62,7 @@ Example
 API
 ***
 
-:ref:`libs/fsdrv/lv_fsdrv.h`
+.. API equals:  lv_fs_littlefs_init
 
 See also:  `lvgl/src/libs/fsdrv/lv_fs_littlefs.c <https://github.com/lvgl/lvgl/blob/master/src/libs/fsdrv/lv_fs_littlefs.c>`__
 

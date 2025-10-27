@@ -101,4 +101,4 @@ the output to ``./output/cogwheel.bin``.
 API
 ***
 
-:ref:`libs/rle/lv_rle.h`
+.. API equals:  lv_rle_decompress

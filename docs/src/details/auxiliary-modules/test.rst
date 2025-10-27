@@ -22,6 +22,8 @@ assertions can be performed to check if, for example:
 Note that it is assumed the tests are performed on a desktop or server environment,
 where there are no memory constraints.
 
+
+
 Usage
 *****
 
@@ -32,6 +34,7 @@ and it consists of the following components:
 - Display emulation
 - Input device emulation
 - Screenshot comparison
+
 
 Helpers
 -------
@@ -70,6 +73,7 @@ a tolerance of 32 bytes is recommended.
 
     if(LV_ABS((int64_t)mem2 - (int64_t)mem1) > 32) fail();
 
+
 Display Emulation
 -----------------
 
@@ -82,6 +86,7 @@ a framebuffer will be allocated for this size, and ``XRGB8888`` color format wil
 
 The resolution and color format can be changed at any time by calling :cpp:func:`lv_display_set_resolution` and
 :cpp:func:`lv_display_set_color_format`.
+
 
 Input Device Emulation
 ----------------------
@@ -117,8 +122,9 @@ by getting the Y coordinate of a child.
     int32_t y_end = lv_obj_get_y(child);
     if(y_start + 100 != y_end) fail();
 
-Please refer to :ref:`others/test/lv_test_indev.h` for the list of supported input
-device emulation functions.
+Please refer to the ``lv_test_indev.h`` link below (in the :ref:`test_api` section)
+for the list of supported input device emulation functions.
+
 
 Screenshot Comparison
 ---------------------
@@ -160,5 +166,11 @@ The screenshot comparison uses ``lodepng`` which is built-in to LVGL and just ne
 To avoid making the entire Test module dependent on ``lodepng``, screenshot comparison can be individually enabled by
 ``LV_USE_TEST_SCREENSHOT_COMPARE``.
 
+
+
+.. _test_api:
+
 API
 ***
+
+.. API startswith:  lv_test_
