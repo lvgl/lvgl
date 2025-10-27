@@ -548,8 +548,8 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
     return 0;
 }
 
-static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec* dec,
-                                     enum AVMediaType type, AVStream* st)
+static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec * dec,
+                                     enum AVMediaType type, AVStream * st)
 {
     int ret = 0;
 
