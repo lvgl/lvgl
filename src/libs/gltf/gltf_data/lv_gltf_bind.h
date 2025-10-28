@@ -43,6 +43,14 @@ typedef struct _lv_gltf_bind lv_gltf_bind_t;
 void lv_gltf_bind_set(lv_gltf_bind_t * bind, uint8_t channel, float data);
 float lv_gltf_bind_get(lv_gltf_bind_t * bind, uint8_t channel);
 
+
+/**
+ * @brief Allocate a number of required binds.  Important to do this before adding any new binds.
+ *
+ * @param new_size The new minimum number of binds, if it already has more allocated this call will be ignored.
+ */
+void lv_gltf_bind_reserve(lv_gltf_model_t * gltf_data, size_t new_size);
+
 /**
  * @brief Reset the dirty flag for a given bind.
  *

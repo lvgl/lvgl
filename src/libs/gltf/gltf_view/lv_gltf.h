@@ -43,6 +43,19 @@ typedef enum {
     LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environnement background*/
 } lv_gltf_bg_mode_t;
 
+typedef struct {
+    float x;
+    float y;
+    float z;
+} lv_3dpoint_t;
+
+typedef struct {
+    lv_3dpoint_t origin;
+    lv_3dpoint_t direction;
+} lv_3dplane_t;
+
+typedef lv_3dplane_t lv_3dray_t;
+
 #define LV_GLTF_ANIM_SPEED_TENTH 100
 #define LV_GLTF_ANIM_SPEED_QUARTER 250
 #define LV_GLTF_ANIM_SPEED_HALF 500
@@ -130,11 +143,18 @@ float lv_gltf_get_pitch(const lv_obj_t * obj);
 void lv_gltf_set_distance(lv_obj_t * obj, float value);
 
 /**
- * Get the camera distance from the focal point
+ * Get the camera distance scale factor from the focal point
  * @param obj pointer to a GLTF viewer object
- * @return distance value
+ * @return distance scaling factor value
  */
 float lv_gltf_get_distance(const lv_obj_t * obj);
+
+/**
+ * Get the camera distance from the focal point in world units
+ * @param obj pointer to a GLTF viewer object
+ * @return world unit distance value
+ */
+float lv_gltf_get_distance_units(lv_obj_t * obj);
 
 /**********************
  * Viewport Functions
@@ -339,6 +359,70 @@ void lv_gltf_set_antialiasing_mode(lv_obj_t * obj, lv_gltf_aa_mode_t value);
  * @return anti-aliasing mode
  */
 lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
+
+/***********************
+ * Raycasting Functions
+ ***********************/
+
+/**
+ * Get a plane that faces the current view camera, centered some units in front of it
+ * @param obj pointer to a GLTF viewer object
+ * @param value distance in front of the camera to set the plane, in world units. see lv_gltf_get_distance_units to get the auto-distance
+ * @return camera facing plane
+ */
+lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);
+
+/**
+ * Get a plane that faces upward, centered at a given height
+ * @param obj pointer to a GLTF viewer object
+ * @param value elevation of the ground plane, in world units. this is usually zero
+ * @return ground plane
+ */
+lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
+
+/**
+ * Calculates a ray originating from the camera and passing through the specified mouse position on the screen. It can be used for picking or collision detection with the ground.
+ * @param obj pointer to a GLTF viewer object
+ * @param value normalized mouse x co-ordinate, valid range 0-1
+ * @param value normalized mouse y co-ordinate, valid range 0-1
+ * @return mouse point ray
+ */
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouseX, float norm_mouseY);
+
+/**
+ * Get the 3d point a mouse co-ordinate would intersect with on a ground plane if projected into the screen
+ * @param obj pointer to a GLTF viewer object
+ * @param value normalized mouse x co-ordinate, valid range 0-1
+ * @param value normalized mouse y co-ordinate, valid range 0-1
+ * @param value base elevation of the ground plane, this is usually zero
+ * @param obj output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @return true if intersection, false if no intersection
+ */
+bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t _mouseX, int32_t _mouseY, float base_elevation,
+                                     lv_3dpoint_t * outPos);
+
+/**
+ * Get the 3d point a mouse co-ordinate would intersect with on a camera-facing plane at a given distance if projected into the screen
+ * @param obj pointer to a GLTF viewer object
+ * @param value normalized mouse x co-ordinate, valid range 0-1
+ * @param value normalized mouse y co-ordinate, valid range 0-1
+ * @param value distance from the view position to set the camera-facing plane at, intersection points will be on this plane
+ * @param obj output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @return true if intersection, false if no intersection
+ */
+bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t _mouseX, int32_t _mouseY, float offset_distance,
+                                  lv_3dpoint_t * outPos);
+
+/**
+ * Get the screen position of a 3d point
+ * @param obj pointer to a GLTF viewer object
+ * @param obj world position to convert
+ * @param value the resulting point x coordinate, in pixels. only valid if return value is true
+ * @param value the resulting point y coordinate, in pixels. only valid if return value is true
+ * @return true if conversion valid, false if no valid conversion
+ */
+bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32_t * screen_x, int32_t * screen_y);
+
 
 /**********************
  *      MACROS
