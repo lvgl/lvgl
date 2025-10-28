@@ -215,6 +215,9 @@ float lv_gltf_get_distance_units(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
+    if(viewer->models.size == 0) {
+        return 0.0f;
+    }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
     return (lv_gltf_data_get_radius(model) * LV_GLTF_AUTOMATIC_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
@@ -517,7 +520,7 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
     return outplane;
 }
 
-bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t _mouseX, int32_t _mouseY, float base_elevation,
+bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
                                      lv_3dpoint_t * outPos)
 {
     LV_ASSERT_NULL(obj);
@@ -525,14 +528,14 @@ bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t _mouseX, int32_t _m
 
     int32_t _winWidth = lv_obj_get_width(obj);
     int32_t _winHeight = lv_obj_get_height(obj);
-    float norm_mouseX = (float)_mouseX / (float)(_winWidth);
-    float norm_mouseY = (float)_mouseY / (float)(_winHeight);
+    float norm_mouseX = (float)screen_x / (float)(_winWidth);
+    float norm_mouseY = (float)screen_y / (float)(_winHeight);
 
     return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouseX, norm_mouseY),
                                                       lv_gltf_get_ground_plane(base_elevation), outPos));
 }
 
-bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t _mouseX, int32_t _mouseY, float offset_distance,
+bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
                                   lv_3dpoint_t * outPos)
 {
     LV_ASSERT_NULL(obj);
@@ -540,8 +543,8 @@ bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t _mouseX, int32_t _mous
 
     int32_t _winWidth = lv_obj_get_width(obj);
     int32_t _winHeight = lv_obj_get_height(obj);
-    float norm_mouseX = (float)_mouseX / (float)(_winWidth);
-    float norm_mouseY = (float)_mouseY / (float)(_winHeight);
+    float norm_mouseX = (float)screen_x / (float)(_winWidth);
+    float norm_mouseY = (float)screen_y / (float)(_winHeight);
 
     return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouseX, norm_mouseY),
                                                       lv_gltf_get_current_view_plane(obj, offset_distance), outPos));
@@ -558,8 +561,8 @@ bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32
 
     // Check for perspective division (w must not be zero)
     if(clipSpacePos[3] == 0.0f) {
-        *screen_x = -1.0;
-        *screen_y = -1.0;
+        *screen_x = -1;
+        *screen_y = -1;
         return false; // Position is not valid for screen mapping
     }
 

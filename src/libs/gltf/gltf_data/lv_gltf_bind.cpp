@@ -67,7 +67,7 @@ void lv_gltf_bind_bind_clean(lv_gltf_bind_t * bind)
 
 void lv_gltf_bind_reserve(lv_gltf_model_t * gltf_data, size_t new_size)
 {
-    if(lv_array_size(&gltf_data->binds) <= new_size) {
+    if(lv_array_size(&gltf_data->binds) < new_size) {
         lv_array_resize(&gltf_data->binds, new_size);
     }
 }
