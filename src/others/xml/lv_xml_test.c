@@ -153,7 +153,7 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
     /* Create the buffer */
     char * xml_buf = lv_zalloc(file_size + 1);
     if(xml_buf == NULL) {
-        LV_LOG_WARN("Memory allocation failed for file %s (%d bytes)", path, file_size + 1);
+        LV_LOG_WARN("Memory allocation failed for file %s (%" LV_PRIu32 "bytes)", path, file_size + 1);
         lv_fs_close(&f);
         return LV_RESULT_INVALID;
     }
@@ -242,7 +242,7 @@ bool lv_xml_test_run_next(uint32_t slowdown)
     bool passed = execute_step(&test.steps[test.step_act], slowdown);
     test.steps[test.step_act].passed = passed;
     if(!test.steps[test.step_act].passed) {
-        LV_LOG_WARN("Step %d failed", test.step_act);
+        LV_LOG_WARN("Step %" LV_PRIu32 "failed", test.step_act);
     }
 
     test.step_act++;
@@ -396,7 +396,7 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         if(type == LV_SUBJECT_TYPE_INT) {
             int32_t v =  lv_subject_get_int(step->param.subject_compare.subject);
             if(v != lv_xml_atoi(step->param.subject_compare.value)) {
-                LV_LOG_WARN("Subject compare failed. Expected: %s, Actual: %d", step->param.subject_compare.value, v);
+                LV_LOG_WARN("Subject compare failed. Expected: %s, Actual: %" LV_PRId32, step->param.subject_compare.value, v);
                 res = false;
             }
         }

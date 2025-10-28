@@ -61,7 +61,7 @@ lv_result_t lv_xml_register_translation_from_file(const char * path)
     char * xml_buf = lv_malloc(file_size + 1);
     LV_ASSERT_MALLOC(xml_buf);
     if(xml_buf == NULL) {
-        LV_LOG_WARN("Memory allocation failed for file %s (%d bytes)", path, file_size + 1);
+        LV_LOG_WARN("Memory allocation failed for file %s (%" LV_PRIu32 " bytes)", path, file_size + 1);
         lv_fs_close(&f);
         return LV_RESULT_INVALID;
     }
