@@ -26,7 +26,7 @@ Screens are created on the :ref:`Default display <default_display>`. As typicall
 there is only one displays the screen are created on them automatically.
 
 The resolution of the screen always matches the resolution of the display. Functions
-such as :cpp:func:`lv_obj_set_pos()` and :cpp:func:`lv_obj_set_size()` cannot be used
+such as :cpp:func:`lv_obj_set_pos` and :cpp:func:`lv_obj_set_size` cannot be used
 on screens.
 
 The created Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but be sure
