@@ -155,7 +155,7 @@ float lv_gltf_get_distance(const lv_obj_t * obj);
  * @param obj pointer to a GLTF viewer object
  * @return world unit distance value
  */
-float lv_gltf_get_distance_units(const lv_obj_t * obj);
+float lv_gltf_get_world_distance(const lv_obj_t * obj);
 
 /**********************
  * Viewport Functions
@@ -368,7 +368,7 @@ lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
 /**
  * Get a plane that faces the current view camera, centered some units in front of it
  * @param obj pointer to a GLTF viewer object
- * @param distance distance in front of the camera to set the plane, in world units. see lv_gltf_get_distance_units to get the auto-distance
+ * @param distance distance in front of the camera to set the plane, in world units. see lv_gltf_get_world_distance to get the auto-distance
  * @return camera facing plane
  */
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);

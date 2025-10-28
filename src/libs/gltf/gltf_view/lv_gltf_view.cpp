@@ -209,7 +209,7 @@ float lv_gltf_get_distance(const lv_obj_t * obj)
     return viewer->desc.distance;
 }
 
-float lv_gltf_get_distance_units(const lv_obj_t * obj)
+float lv_gltf_get_world_distance(const lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
