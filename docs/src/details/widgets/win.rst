@@ -64,7 +64,7 @@ will be placed in the Header in left-to-right order as they are added.  These
 functions can be called in any order, any number of times.
 
 - :cpp:expr:`lv_win_add_title(win, "The title")` adds a Label to the header, with
-  long mode :c:enumerator:`LV_LABEL_LONG_DOT` so that if its text contents are wider
+  long mode :cpp:enumerator:`LV_LABEL_LONG_MODE_DOTS` so that if its text contents are wider
   than the area it has, the text will be truncated with an ellipsis ("...") placed
   at the end of the text.  It is set to be FLEX GROW 1, so if it is the only Label
   in the header, it will occupy all available space after any Buttons are added.
