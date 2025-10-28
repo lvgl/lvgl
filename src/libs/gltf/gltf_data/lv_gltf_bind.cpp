@@ -12,35 +12,7 @@
 
 #include "lv_gltf_bind.h"
 
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node, lv_gltf_bind_prop_t which_prop,
-                             uint32_t data_mask,
-                             lv_gltf_bind_dir_t dir);
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
 static uint32_t bind_count = 0;
-
-/**********************
- *      MACROS
- **********************/
-
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
 
 void lv_gltf_bind_set(lv_gltf_bind_t * bind, uint8_t channel, float data)
 {
@@ -65,11 +37,43 @@ void lv_gltf_bind_bind_clean(lv_gltf_bind_t * bind)
     bind->dirty = false;
 }
 
-void lv_gltf_bind_reserve(lv_gltf_model_t * gltf_data, size_t new_size)
+lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node, lv_gltf_bind_prop_t which_prop,
+                             uint32_t data_mask,
+                             lv_gltf_bind_dir_t dir)
 {
-    if(lv_array_capacity(&gltf_data->binds) < new_size) {
-        lv_array_resize(&gltf_data->binds, new_size);
+    if(node == nullptr) {
+        return nullptr;
     }
+
+    lv_gltf_bind_t new_bind;
+    new_bind.id = bind_count++;
+    new_bind.prop = which_prop;
+    new_bind.data_mask = data_mask;
+    new_bind.data[0] = new_bind.data[1] = new_bind.data[2] = which_prop == LV_GLTF_BIND_PROP_SCALE ? 1.f : 0.f;
+    new_bind.dir = dir;
+    new_bind.dirty = true;
+    new_bind.next_bind = nullptr;
+
+    // Check if an bind already exists for this node
+    if(gltf_data->node_binds.find(node) != gltf_data->node_binds.end()) {
+        // Get the existing bind
+        lv_gltf_bind_t * existingbind = gltf_data->node_binds[node];
+
+        // Traverse to the end of the linked list of binds
+        while(existingbind->next_bind != nullptr)
+            existingbind = existingbind->next_bind;
+
+        lv_array_push_back(&gltf_data->binds, &new_bind);
+        existingbind->next_bind  = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
+        return existingbind->next_bind;
+    }
+    else {
+        // No existing bind, insert the new one
+        lv_array_push_back(&gltf_data->binds, &new_bind);
+        gltf_data->node_binds[node] = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
+        return gltf_data->node_binds[node];
+    }
+    return nullptr;
 }
 
 lv_gltf_bind_t * lv_gltf_bind_add_by_index(lv_gltf_model_t * data, size_t index, lv_gltf_bind_prop_t which_prop,
@@ -144,49 +148,6 @@ lv_result_t lv_gltf_bind_remove(lv_gltf_model_t * gltf_data, lv_gltf_bind_t * bi
         }
     }
     return LV_RESULT_INVALID;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-lv_gltf_bind_t * add_by_node(lv_gltf_model_t * gltf_data, fastgltf::Node * node, lv_gltf_bind_prop_t which_prop,
-                             uint32_t data_mask,
-                             lv_gltf_bind_dir_t dir)
-{
-    if(node == nullptr) {
-        return nullptr;
-    }
-
-    lv_gltf_bind_t new_bind;
-    new_bind.id = bind_count++;
-    new_bind.prop = which_prop;
-    new_bind.data_mask = data_mask;
-    new_bind.data[0] = new_bind.data[1] = new_bind.data[2] = which_prop == LV_GLTF_BIND_PROP_SCALE ? 1.f : 0.f;
-    new_bind.dir = dir;
-    new_bind.dirty = true;
-    new_bind.next_bind = nullptr;
-
-    // Check if an bind already exists for this node
-    if(gltf_data->node_binds.find(node) != gltf_data->node_binds.end()) {
-        // Get the existing bind
-        lv_gltf_bind_t * existingbind = gltf_data->node_binds[node];
-
-        // Traverse to the end of the linked list of binds
-        while(existingbind->next_bind != nullptr)
-            existingbind = existingbind->next_bind;
-
-        lv_array_push_back(&gltf_data->binds, &new_bind);
-        existingbind->next_bind  = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
-        return existingbind->next_bind;
-    }
-    else {
-        // No existing bind, insert the new one
-        lv_array_push_back(&gltf_data->binds, &new_bind);
-        gltf_data->node_binds[node] = (lv_gltf_bind_t *)lv_array_at(&gltf_data->binds, lv_array_size(&gltf_data->binds) - 1);
-        return gltf_data->node_binds[node];
-    }
-    return nullptr;
 }
 
 #endif /*LV_USE_GLTF*/
