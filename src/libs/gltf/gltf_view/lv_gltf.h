@@ -15,6 +15,7 @@
 #if LV_USE_GLTF
 
 #include "../../../misc/lv_types.h"
+#include "../../../misc/lv_area.h"
 #include "../../../misc/lv_color.h"
 #include "../gltf_data/lv_gltf_model.h"
 
@@ -396,10 +397,10 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x
  * @param screen_y screen x co-ordinate, in pixels
  * @param value base elevation of the ground plane, this is usually zero
  * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
- * @return true if intersection, false if no intersection
+ * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
  */
-bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                     lv_3dpoint_t * collision_point);
+lv_result_t lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
+                                            lv_3dpoint_t * collision_point);
 
 /**
  * Get the 3d point a screen co-ordinate would intersect with on a camera-facing plane at a given distance if projected into the screen
@@ -408,20 +409,19 @@ bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t s
  * @param screen_y screen x co-ordinate, in pixels
  * @param offset_distance distance from the view position to set the camera-facing plane at, intersection points will be on this plane
  * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
- * @return true if intersection, false if no intersection
+ * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
  */
-bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                  lv_3dpoint_t * collision_point);
+lv_result_t lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
+                                         lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point
  * @param obj pointer to a GLTF viewer object
  * @param world_pos world position to convert
- * @param screen_x the resulting point x coordinate, in pixels. only valid if return value is true
- * @param screen_y the resulting point y coordinate, in pixels. only valid if return value is true
- * @return true if conversion valid, false if no valid conversion
+ * @param lv_point_t the resulting point, in pixels. only valid if return value is true
+ * @return LV_RESULT_OK if conversion valid, LV_RESULT_INVALID if no valid conversion
  */
-bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32_t * screen_x, int32_t * screen_y);
+lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos);
 
 
 /**********************

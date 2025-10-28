@@ -473,8 +473,8 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x
     return outray;
 }
 
-bool lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3dplane_t plane,
-                                               lv_3dpoint_t * collision_point)
+lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3dplane_t plane,
+                                                      lv_3dpoint_t * collision_point)
 {
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane.origin.x, plane.origin.y, plane.origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane.direction.x, plane.direction.y, plane.direction.z);
@@ -491,10 +491,10 @@ bool lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3d
             (*collision_point).x = ray_start[0] + t * ray_direction[0];
             (*collision_point).y = ray_start[1] + t * ray_direction[1];
             (*collision_point).z = ray_start[2] + t * ray_direction[2];
-            return true; /* Collision point found */
+            return LV_RESULT_OK; /* Collision point found */
         }
     }
-    return false; /* No intersection */
+    return LV_RESULT_INVALID; /* No intersection */
 }
 
 lv_3dplane_t lv_gltf_get_ground_plane(float elevation)
@@ -524,8 +524,8 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
     return outplane;
 }
 
-bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                     lv_3dpoint_t * collision_point)
+lv_result_t lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
+                                            lv_3dpoint_t * collision_point)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -533,8 +533,8 @@ bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t s
                                                       lv_gltf_get_ground_plane(base_elevation), collision_point));
 }
 
-bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                  lv_3dpoint_t * collision_point)
+lv_result_t lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
+                                         lv_3dpoint_t * collision_point)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -542,7 +542,7 @@ bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t scre
                                                       lv_gltf_get_current_view_plane(obj, offset_distance), collision_point));
 }
 
-bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32_t * screen_x, int32_t * screen_y)
+lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -553,9 +553,9 @@ bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32
 
     /* Check for perspective division (w must not be zero) */
     if(clip_space_pos[3] == 0.0f) {
-        *screen_x = -1;
-        *screen_y = -1;
-        return false; /* Position is not valid for screen mapping */
+        screen_pos->x = -1;
+        screen_pos->y = -1;
+        return LV_RESULT_INVALID; /* Position is not valid for screen mapping */
     }
 
     clip_space_pos /= clip_space_pos[3];
@@ -563,9 +563,9 @@ bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32
     float norm_screen_y = 0.5f - (clip_space_pos[1] * 0.5f);
     int32_t win_width = lv_obj_get_width(obj);
     int32_t win_height = lv_obj_get_height(obj);
-    *screen_x = norm_screen_x * win_width;
-    *screen_y = norm_screen_y * win_height;
-    return true;
+    screen_pos->x = norm_screen_x * win_width;
+    screen_pos->y = norm_screen_y * win_height;
+    return LV_RESULT_OK;
 }
 
 /**********************

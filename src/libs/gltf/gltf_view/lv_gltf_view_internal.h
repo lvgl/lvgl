@@ -25,7 +25,7 @@
  *      DEFINES
  *********************/
 
-#define LV_GLTF_AUTOMATIC_DISTANCE_SCALE_FACTOR 2.5
+#define LV_GLTF_AUTOMATIC_DISTANCE_SCALE_FACTOR 2.5f
 
 /**********************
  *      TYPEDEFS
