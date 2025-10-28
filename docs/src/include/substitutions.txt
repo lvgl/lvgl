@@ -1,8 +1,8 @@
 .. -----------------------------------------------------
 .. Each substitution is sorted by its Unicode value
 .. within each group, so you know where to put new ones.
-.. For special symbols in the Latin character sets,
-.. include xhtml1-lat1.txt.
+.. The Latin1 Symbols group is the exception, which is
+.. sorted alphabetically without regard for case.
 .. -------- Custom Substitutions -----------------------
 .. |lvglpro|         replace:: LVGL |nbsp| Pro
 .. -------- Common Typographical Entities --------
@@ -25,10 +25,8 @@
 .. |yen|             unicode:: U+000A5 .. YEN SIGN
 .. |brvbar|          unicode:: U+000A6 .. BROKEN BAR
 .. |sect|            unicode:: U+000A7 .. SECTION SIGN
-.. |uml|             unicode:: U+000A8 .. DIAERESIS
 .. |copy|            unicode:: U+000A9 .. COPYRIGHT
 .. |ordf|            unicode:: U+000AA .. FEMININE ORDINAL INDICATOR
-.. |laquo|           unicode:: U+000AB .. LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
 .. |not|             unicode:: U+000AC .. NOT SIGN
 .. |reg|             unicode:: U+000AE .. REGISTERED TRADEMARK
 .. |macr|            unicode:: U+000AF .. MACRON
@@ -41,7 +39,6 @@
 .. |middot|          unicode:: U+000B7 .. MIDDLE DOT
 .. |sup1|            unicode:: U+000B9 .. SUPERSCRIPT ONE
 .. |ordm|            unicode:: U+000BA .. MASCULINE ORDINAL INDICATOR
-.. |raquo|           unicode:: U+000BB .. RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
 .. |frac14|          unicode:: U+000BC .. VULGAR FRACTION ONE QUARTER (1/4)
 .. |frac12|          unicode:: U+000BD .. VULGAR FRACTION ONE HALF (1/2)
 .. |half|            unicode:: U+000BD .. 1/2
@@ -92,6 +89,7 @@
 .. |iquest|          unicode:: U+000BF .. INVERTED QUESTION MARK
 .. |Iuml|            unicode:: U+000CF .. LATIN CAPITAL LETTER I WITH DIAERESIS
 .. |iuml|            unicode:: U+000EF .. LATIN SMALL LETTER I WITH DIAERESIS
+.. |laquo|           unicode:: U+000AB .. LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
 .. |Ntilde|          unicode:: U+000D1 .. LATIN CAPITAL LETTER N WITH TILDE
 .. |ntilde|          unicode:: U+000F1 .. LATIN SMALL LETTER N WITH TILDE
 .. |Oacute|          unicode:: U+000D3 .. LATIN CAPITAL LETTER O WITH ACUTE
@@ -106,6 +104,7 @@
 .. |otilde|          unicode:: U+000F5 .. LATIN SMALL LETTER O WITH TILDE
 .. |Ouml|            unicode:: U+000D6 .. LATIN CAPITAL LETTER O WITH DIAERESIS
 .. |ouml|            unicode:: U+000F6 .. LATIN SMALL LETTER O WITH DIAERESIS
+.. |raquo|           unicode:: U+000BB .. RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
 .. |szlig|           unicode:: U+000DF .. LATIN SMALL LETTER SHARP S
 .. |THORN|           unicode:: U+000DE .. LATIN CAPITAL LETTER THORN
 .. |thorn|           unicode:: U+000FE .. LATIN SMALL LETTER THORN
@@ -115,6 +114,7 @@
 .. |ucirc|           unicode:: U+000FB .. LATIN SMALL LETTER U WITH CIRCUMFLEX
 .. |Ugrave|          unicode:: U+000D9 .. LATIN CAPITAL LETTER U WITH GRAVE
 .. |ugrave|          unicode:: U+000F9 .. LATIN SMALL LETTER U WITH GRAVE
+.. |uml|             unicode:: U+000A8 .. DIAERESIS
 .. |Uuml|            unicode:: U+000DC .. LATIN CAPITAL LETTER U WITH DIAERESIS
 .. |uuml|            unicode:: U+000FC .. LATIN SMALL LETTER U WITH DIAERESIS
 .. |Yacute|          unicode:: U+000DD .. LATIN CAPITAL LETTER Y WITH ACUTE
