@@ -387,7 +387,7 @@ lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
  * @param screen_pos screen co-ordinate, in pixels
  * @return mouse point ray
  */
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t * screen_pos);
+lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos);
 
 /**
  * Get the point that a given ray intersects with a specified plane at, if any

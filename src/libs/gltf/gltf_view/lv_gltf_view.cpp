@@ -440,7 +440,7 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     viewer->desc.focal_z = center_position[2];
 }
 
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t * screen_pos)
+lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
