@@ -60,6 +60,7 @@ as a function parameter or made global. However, this approach has some drawback
 - It's not scalable. Passing references to 20 widgets as function parameters is not ideal.
 - Tracking whether a widget still exists or has been deleted requires extra logic and can be tricky.
 
+
 Setting Names
 -------------
 
@@ -97,6 +98,7 @@ Below is an example showing how manually and automatically assigned names are re
     - ``lv_button`` named ``mybtn_#``: "mybtn_2"
     - ``lv_button`` named ``mybtn_#``: "mybtn_3"
 
+
 Finding Widgets
 ---------------
 
@@ -104,4 +106,32 @@ Widgets can be found by name in two ways:
 
 1. **Get a direct child by name** using :cpp:expr:`lv_obj_get_child_by_name(parent, "child_name")`.
    Example:
-   :cpp:expr:`lv_obj_get_child_by_name(header, "title")`
+   :cpp:expr:`lv_obj_get_child_by_name(header, "title")`.
+   You can also use a path to find nested children:
+   :cpp:expr:`lv_obj_get_child_by_name(cont, "buttons/mybtn_2")`.
+
+2. **Find a descendant at any level** using :cpp:expr:`lv_obj_find_by_name(parent, "child_name")`.
+   Example:
+   :cpp:expr:`lv_obj_find_by_name(cont, "mybtn_1")`
+   Note that ``"mybtn_1"`` is a child of ``cont`` at any level, not necessarily a
+   direct child.  This is useful when you want to ignore the hierarchy and search by
+   name alone.
+
+Since both functions start searching from a specific parent, it's possible to have
+multiple widget subtrees with identical names under different parents.
+
+For example, if ``my_listitem_create(parent)`` creates a widget named ``"list_item_#"``
+with direct children ``"icon"``, ``"title"``, ``"ok_button"``, and ``"lv_label_0"``,
+and it is called 10 times, a specific ``"ok_button"`` can be found like this:
+
+.. code-block:: c
+
+    lv_obj_t * item = lv_obj_find_by_name(lv_screen_active(), "list_item_5");
+    lv_obj_t * ok_btn = lv_obj_find_by_name(item, "ok_button");
+
+    // Or
+    lv_obj_t * ok_btn = lv_obj_get_child_by_name(some_list_container, "list_item_5/ok_button");
+
+Names are resolved **when they are retrieved**, not when they are set.  This means
+indices always reflect the current state of the widget tree at the time the name is
+used.
