@@ -473,8 +473,8 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t
     return outray;
 }
 
-lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                                      lv_3dpoint_t * collision_point)
+lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                             lv_3dpoint_t * collision_point)
 {
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);

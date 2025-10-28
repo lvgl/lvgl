@@ -396,8 +396,8 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t
  * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
  * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
  */
-lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                                      lv_3dpoint_t * collision_point);
+lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                             lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point
