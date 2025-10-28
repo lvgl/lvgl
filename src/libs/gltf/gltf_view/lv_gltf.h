@@ -383,11 +383,11 @@ lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
 /**
  * Calculates a ray originating from the camera and passing through the specified mouse position on the screen. It can be used for picking or collision detection with the ground.
  * @param obj pointer to a GLTF viewer object
- * @param norm_mouseX normalized mouse x co-ordinate, valid range 0-1
- * @param norm_mouseY normalized mouse y co-ordinate, valid range 0-1
+ * @param norm_mouse_x normalized mouse x co-ordinate, valid range 0-1
+ * @param norm_mouse_y normalized mouse y co-ordinate, valid range 0-1
  * @return mouse point ray
  */
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouseX, float norm_mouseY);
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouse_x, float norm_mouse_y);
 
 /**
  * Get the 3d point a mouse co-ordinate would intersect with on a ground plane if projected into the screen
@@ -395,11 +395,11 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouse
  * @param screen_x screen x co-ordinate, in pixels
  * @param screen_y screen x co-ordinate, in pixels
  * @param value base elevation of the ground plane, this is usually zero
- * @param obj output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
  * @return true if intersection, false if no intersection
  */
 bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                     lv_3dpoint_t * outPos);
+                                     lv_3dpoint_t * collision_point);
 
 /**
  * Get the 3d point a screen co-ordinate would intersect with on a camera-facing plane at a given distance if projected into the screen
@@ -407,11 +407,11 @@ bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t s
  * @param screen_x screen x co-ordinate, in pixels
  * @param screen_y screen x co-ordinate, in pixels
  * @param offset_distance distance from the view position to set the camera-facing plane at, intersection points will be on this plane
- * @param outPos output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
  * @return true if intersection, false if no intersection
  */
 bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                  lv_3dpoint_t * outPos);
+                                  lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point

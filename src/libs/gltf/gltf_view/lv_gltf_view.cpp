@@ -440,37 +440,37 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     viewer->desc.focal_z = center_position[2];
 }
 
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouseX, float norm_mouseY)
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouse_x, float norm_mouse_y)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     lv_3dray_t outray = {0};
 
-    fastgltf::math::fmat4x4 __projmat = fastgltf::math::invert(fastgltf::math::fmat4x4(viewer->projection_matrix));
+    fastgltf::math::fmat4x4 proj_mat = fastgltf::math::invert(fastgltf::math::fmat4x4(viewer->projection_matrix));
 
     // Convert mouse coordinates to NDC
-    float _x = norm_mouseX * 2.0f - 1.0f;
-    float _y = 1.0f - (norm_mouseY * 2.0f);
-    float _z = -1.0f; // Clip space z
+    float x = norm_mouse_x * 2.0f - 1.0f;
+    float y = 1.0f - (norm_mouse_y * 2.0f);
+    float z = -1.0f; // Clip space z
 
-    fastgltf::math::fvec4 clipSpacePos = fastgltf::math::fvec4(_x, _y, _z, 1.f);
-    auto rayEye = (__projmat) * clipSpacePos;
-    rayEye[2] = -1.0f;
-    rayEye[3] = 0.0f;
+    fastgltf::math::fvec4 clip_space_pos = fastgltf::math::fvec4(x, y, z, 1.f);
+    auto ray_eye = (proj_mat) * clip_space_pos;
+    ray_eye[2] = -1.0f;
+    ray_eye[3] = 0.0f;
 
     // Calculate ray world direction
-    fastgltf::math::fvec4 t_rayWorld = fastgltf::math::invert(viewer->view_matrix) * rayEye;
-    auto rayDirection = fastgltf::math::normalize(fastgltf::math::fvec3(t_rayWorld[0], t_rayWorld[1], t_rayWorld[2]));
+    fastgltf::math::fvec4 ray_world = fastgltf::math::invert(viewer->view_matrix) * ray_eye;
+    auto ray_direction = fastgltf::math::normalize(fastgltf::math::fvec3(ray_world[0], ray_world[1], ray_world[2]));
 
-    outray.direction = {rayDirection[0], rayDirection[1], rayDirection[2]};
+    outray.direction = {ray_direction[0], ray_direction[1], ray_direction[2]};
     outray.origin = {viewer->camera_pos[0], viewer->camera_pos[1], viewer->camera_pos[2]};
 
     return outray;
 }
 
 bool lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3dplane_t plane,
-                                               lv_3dpoint_t * collisionPoint)
+                                               lv_3dpoint_t * collision_point)
 {
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane.origin.x, plane.origin.y, plane.origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane.direction.x, plane.direction.y, plane.direction.z);
@@ -484,9 +484,9 @@ bool lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3d
 
         if(t >= 0) {  // Intersection occurs ahead of the ray origin
             // Calculate the collision point
-            (*collisionPoint).x = ray_start[0] + t * ray_direction[0];
-            (*collisionPoint).y = ray_start[1] + t * ray_direction[1];
-            (*collisionPoint).z = ray_start[2] + t * ray_direction[2];
+            (*collision_point).x = ray_start[0] + t * ray_direction[0];
+            (*collision_point).y = ray_start[1] + t * ray_direction[1];
+            (*collision_point).z = ray_start[2] + t * ray_direction[2];
             return true; // Collision point found
         }
     }
@@ -513,41 +513,41 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
     forward = fastgltf::math::normalize(forward); // Normalize the forward vector
 
     // Calculate the plane center
-    const auto & cameraPos = viewer->camera_pos;
-    auto planepos = fastgltf::math::fvec3(cameraPos[0], cameraPos[1], cameraPos[2]) - forward * distance;
-    outplane.origin = {planepos[0], planepos[1], planepos[2]};
+    const auto & camera_pos = viewer->camera_pos;
+    auto plane_pos = fastgltf::math::fvec3(camera_pos[0], camera_pos[1], camera_pos[2]) - forward * distance;
+    outplane.origin = {plane_pos[0], plane_pos[1], plane_pos[2]};
     outplane.direction = {-forward[0], -forward[1], -forward[2]};
     return outplane;
 }
 
 bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                     lv_3dpoint_t * outPos)
+                                     lv_3dpoint_t * collision_point)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    int32_t _winWidth = lv_obj_get_width(obj);
-    int32_t _winHeight = lv_obj_get_height(obj);
-    float norm_mouseX = (float)screen_x / (float)(_winWidth);
-    float norm_mouseY = (float)screen_y / (float)(_winHeight);
+    int32_t win_width = lv_obj_get_width(obj);
+    int32_t win_height = lv_obj_get_height(obj);
+    float norm_mouse_x = (float)screen_x / (float)(win_width);
+    float norm_mouse_y = (float)screen_y / (float)(win_height);
 
-    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouseX, norm_mouseY),
-                                                      lv_gltf_get_ground_plane(base_elevation), outPos));
+    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouse_x, norm_mouse_y),
+                                                      lv_gltf_get_ground_plane(base_elevation), collision_point));
 }
 
 bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                  lv_3dpoint_t * outPos)
+                                  lv_3dpoint_t * collision_point)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    int32_t _winWidth = lv_obj_get_width(obj);
-    int32_t _winHeight = lv_obj_get_height(obj);
-    float norm_mouseX = (float)screen_x / (float)(_winWidth);
-    float norm_mouseY = (float)screen_y / (float)(_winHeight);
+    int32_t win_width = lv_obj_get_width(obj);
+    int32_t win_height = lv_obj_get_height(obj);
+    float norm_mouseX = (float)screen_x / (float)(win_width);
+    float norm_mouseY = (float)screen_y / (float)(win_height);
 
     return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouseX, norm_mouseY),
-                                                      lv_gltf_get_current_view_plane(obj, offset_distance), outPos));
+                                                      lv_gltf_get_current_view_plane(obj, offset_distance), collision_point));
 }
 
 bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32_t * screen_x, int32_t * screen_y)
@@ -556,23 +556,23 @@ bool lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, int32
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
-    fastgltf::math::fvec4 worldPositionH = fastgltf::math::fvec4(world_pos.x, world_pos.y, world_pos.z, 1.0f);
-    fastgltf::math::fvec4 clipSpacePos = viewer->projection_matrix * viewer->view_matrix * worldPositionH;
+    fastgltf::math::fvec4 world_position_h = fastgltf::math::fvec4(world_pos.x, world_pos.y, world_pos.z, 1.0f);
+    fastgltf::math::fvec4 clip_space_pos = viewer->projection_matrix * viewer->view_matrix * world_position_h;
 
     // Check for perspective division (w must not be zero)
-    if(clipSpacePos[3] == 0.0f) {
+    if(clip_space_pos[3] == 0.0f) {
         *screen_x = -1;
         *screen_y = -1;
         return false; // Position is not valid for screen mapping
     }
 
-    clipSpacePos /= clipSpacePos[3];
-    float norm_screen_x = clipSpacePos[0] * 0.5f + 0.5f;
-    float norm_screen_y = 0.5f - (clipSpacePos[1] * 0.5f);
-    int32_t _winWidth = lv_obj_get_width(obj);
-    int32_t _winHeight = lv_obj_get_height(obj);
-    *screen_x = norm_screen_x * _winWidth;
-    *screen_y = norm_screen_y * _winHeight;
+    clip_space_pos /= clip_space_pos[3];
+    float norm_screen_x = clip_space_pos[0] * 0.5f + 0.5f;
+    float norm_screen_y = 0.5f - (clip_space_pos[1] * 0.5f);
+    int32_t win_width = lv_obj_get_width(obj);
+    int32_t win_height = lv_obj_get_height(obj);
+    *screen_x = norm_screen_x * win_width;
+    *screen_y = norm_screen_y * win_height;
     return true;
 }
 
