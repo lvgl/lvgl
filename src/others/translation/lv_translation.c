@@ -84,8 +84,8 @@ void lv_translation_deinit(void)
     lv_free((void *)selected_lang);
 }
 
-lv_translation_pack_t * lv_translation_add_static(const char * languages[], const char * tags[],
-                                                  const char * translations[])
+lv_translation_pack_t * lv_translation_add_static(const char * const languages[], const char * const tags[],
+                                                  const char * const translations[])
 {
     LV_ASSERT_NULL(languages);
     LV_ASSERT_NULL(tags);
@@ -102,9 +102,9 @@ lv_translation_pack_t * lv_translation_add_static(const char * languages[], cons
         pack->language_cnt++;
     }
 
-    pack->languages = languages;
-    pack->tag_p = tags;
-    pack->translation_p = translations;
+    pack->languages = (const char **)languages;
+    pack->tag_p = (const char **)tags;
+    pack->translation_p = (const char **)translations;
     return pack;
 }
 
