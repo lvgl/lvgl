@@ -384,35 +384,20 @@ lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
 /**
  * Calculates a ray originating from the camera and passing through the specified mouse position on the screen.
  * @param obj pointer to a GLTF viewer object
- * @param screen_x screen x co-ordinate, in pixels
- * @param screen_y screen y co-ordinate, in pixels
+ * @param screen_pos screen co-ordinate, in pixels
  * @return mouse point ray
  */
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x, int32_t screen_y);
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t * screen_pos);
 
 /**
- * Get the 3d point a mouse co-ordinate would intersect with on a ground plane if projected into the screen
- * @param obj pointer to a GLTF viewer object
- * @param screen_x screen x co-ordinate, in pixels
- * @param screen_y screen x co-ordinate, in pixels
- * @param value base elevation of the ground plane, this is usually zero
+ * Get the point that a given ray intersects with a specified plane at, if any
+ * @param ray the intersection test ray
+ * @param screen_y the plane to test ray intersection with
  * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
  * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
  */
-lv_result_t lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                            lv_3dpoint_t * collision_point);
-
-/**
- * Get the 3d point a screen co-ordinate would intersect with on a camera-facing plane at a given distance if projected into the screen
- * @param obj pointer to a GLTF viewer object
- * @param screen_x screen x co-ordinate, in pixels
- * @param screen_y screen x co-ordinate, in pixels
- * @param offset_distance distance from the view position to set the camera-facing plane at, intersection points will be on this plane
- * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
- * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
- */
-lv_result_t lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                         lv_3dpoint_t * collision_point);
+lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                                      lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point

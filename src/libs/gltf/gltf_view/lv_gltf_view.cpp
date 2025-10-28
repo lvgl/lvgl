@@ -219,7 +219,7 @@ float lv_gltf_get_distance_units(const lv_obj_t * obj)
         return 0.0f;
     }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
-    return (lv_gltf_data_get_radius(model) * LV_GLTF_AUTOMATIC_DISTANCE_SCALE_FACTOR) * view_desc->distance;
+    return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
 void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
@@ -440,14 +440,14 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     viewer->desc.focal_z = center_position[2];
 }
 
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x, int32_t screen_y)
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, const lv_point_t * screen_pos)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
-    float norm_mouse_x = (float)screen_x / (float)(lv_obj_get_width(obj));
-    float norm_mouse_y = (float)screen_y / (float)(lv_obj_get_height(obj));
+    float norm_mouse_x = (float)screen_pos->x / (float)(lv_obj_get_width(obj));
+    float norm_mouse_y = (float)screen_pos->y / (float)(lv_obj_get_height(obj));
 
     lv_3dray_t outray = {0};
 
@@ -473,13 +473,13 @@ lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x
     return outray;
 }
 
-lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t ray, const lv_3dplane_t plane,
+lv_result_t lv_gltf_check_ray_intersection_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
                                                       lv_3dpoint_t * collision_point)
 {
-    fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane.origin.x, plane.origin.y, plane.origin.z);
-    fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane.direction.x, plane.direction.y, plane.direction.z);
-    fastgltf::math::fvec3 ray_start = fastgltf::math::fvec3(ray.origin.x, ray.origin.y, ray.origin.z);
-    fastgltf::math::fvec3 ray_direction = fastgltf::math::fvec3(ray.direction.x, ray.direction.y, ray.direction.z);
+    fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
+    fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);
+    fastgltf::math::fvec3 ray_start = fastgltf::math::fvec3(ray->origin.x, ray->origin.y, ray->origin.z);
+    fastgltf::math::fvec3 ray_direction = fastgltf::math::fvec3(ray->direction.x, ray->direction.y, ray->direction.z);
 
     float denom = fastgltf::math::dot(plane_normal, ray_direction);
     if(fabs(denom) > 1e-6) {  /* Check if the ray is not parallel to the plane */
@@ -522,24 +522,6 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
     outplane.origin = {plane_pos[0], plane_pos[1], plane_pos[2]};
     outplane.direction = {-forward[0], -forward[1], -forward[2]};
     return outplane;
-}
-
-lv_result_t lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float base_elevation,
-                                            lv_3dpoint_t * collision_point)
-{
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, screen_x, screen_y),
-                                                      lv_gltf_get_ground_plane(base_elevation), collision_point));
-}
-
-lv_result_t lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t screen_y, float offset_distance,
-                                         lv_3dpoint_t * collision_point)
-{
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, screen_x, screen_y),
-                                                      lv_gltf_get_current_view_plane(obj, offset_distance), collision_point));
 }
 
 lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos)
