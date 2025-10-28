@@ -381,13 +381,13 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);
 lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
 
 /**
- * Calculates a ray originating from the camera and passing through the specified mouse position on the screen. It can be used for picking or collision detection with the ground.
+ * Calculates a ray originating from the camera and passing through the specified mouse position on the screen.
  * @param obj pointer to a GLTF viewer object
- * @param norm_mouse_x normalized mouse x co-ordinate, valid range 0-1
- * @param norm_mouse_y normalized mouse y co-ordinate, valid range 0-1
+ * @param screen_x screen x co-ordinate, in pixels
+ * @param screen_y screen y co-ordinate, in pixels
  * @return mouse point ray
  */
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouse_x, float norm_mouse_y);
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x, int32_t screen_y);
 
 /**
  * Get the 3d point a mouse co-ordinate would intersect with on a ground plane if projected into the screen

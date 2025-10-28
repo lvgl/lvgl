@@ -440,11 +440,15 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     viewer->desc.focal_z = center_position[2];
 }
 
-lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, float norm_mouse_x, float norm_mouse_y)
+lv_3dray_t lv_gltf_create_ray_from_screen_point(lv_obj_t * obj, int32_t screen_x, int32_t screen_y)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    float norm_mouse_x = (float)screen_x / (float)(lv_obj_get_width(obj));
+    float norm_mouse_y = (float)screen_y / (float)(lv_obj_get_height(obj));
+
     lv_3dray_t outray = {0};
 
     fastgltf::math::fmat4x4 proj_mat = fastgltf::math::invert(fastgltf::math::fmat4x4(viewer->projection_matrix));
@@ -525,13 +529,7 @@ bool lv_gltf_raycast_ground_position(lv_obj_t * obj, int32_t screen_x, int32_t s
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    int32_t win_width = lv_obj_get_width(obj);
-    int32_t win_height = lv_obj_get_height(obj);
-    float norm_mouse_x = (float)screen_x / (float)(win_width);
-    float norm_mouse_y = (float)screen_y / (float)(win_height);
-
-    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouse_x, norm_mouse_y),
+    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, screen_x, screen_y),
                                                       lv_gltf_get_ground_plane(base_elevation), collision_point));
 }
 
@@ -540,13 +538,7 @@ bool lv_gltf_raycast_camera_plane(lv_obj_t * obj, int32_t screen_x, int32_t scre
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    int32_t win_width = lv_obj_get_width(obj);
-    int32_t win_height = lv_obj_get_height(obj);
-    float norm_mouseX = (float)screen_x / (float)(win_width);
-    float norm_mouseY = (float)screen_y / (float)(win_height);
-
-    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, norm_mouseX, norm_mouseY),
+    return (lv_gltf_check_ray_intersection_with_plane(lv_gltf_create_ray_from_screen_point(obj, screen_x, screen_y),
                                                       lv_gltf_get_current_view_plane(obj, offset_distance), collision_point));
 }
 
