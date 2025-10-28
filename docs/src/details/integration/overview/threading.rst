@@ -206,17 +206,17 @@ including calls to :cpp:func:`lv_timer_handler`.
 
 .. note::
     If your OS is integrated with LVGL (the macro :c:macro:`LV_USE_OS` has a value
-    other than ``LV_OS_NONE`` in ``lv_conf.h``) you can use :cpp:func:`lv_lock()` and
-    :cpp:func:`lv_unlock()` to perform #1 and #2.
+    other than ``LV_OS_NONE`` in ``lv_conf.h``) you can use :cpp:func:`lv_lock` and
+    :cpp:func:`lv_unlock` to perform #1 and #2.
 
-    When this is the case, :cpp:func:`lv_timer_handler` calls :cpp:func:`lv_lock()`
-    and :cpp:func:`lv_unlock()` internally, so you do not have to bracket your
+    When this is the case, :cpp:func:`lv_timer_handler` calls :cpp:func:`lv_lock`
+    and :cpp:func:`lv_unlock` internally, so you do not have to bracket your
     calls to :cpp:func:`lv_timer_handler` with them.
 
     If your OS is NOT integrated with LVGL, then these calls either return
     immediately with no effect, or are optimized away by the linker.
 
-    To enable :cpp:func:`lv_lock()` and :cpp:func:`lv_unlock()`, set ``LV_USE_OS``
+    To enable :cpp:func:`lv_lock` and :cpp:func:`lv_unlock`, set ``LV_USE_OS``
     to a value other than ``LV_OS_NONE``.
 
 This pseudocode illustrates the concept of using a MUTEX:

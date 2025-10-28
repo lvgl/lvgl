@@ -30,7 +30,7 @@ Limitations
 ***********
 
 -  Only BMP files are supported.  BMP images as C arrays
-   (:c:struct:`lv_image_dsc_t`) are not.  This is because there is no practical
+   (:cpp:struct:`lv_image_dsc_t`) are not.  This is because there is no practical
    differences between how the BMP files and LVGL's image format stores
    the image data.
 -  BMP files can be loaded only from .BMP files. If you want to store them in
