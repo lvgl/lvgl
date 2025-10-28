@@ -822,8 +822,4 @@ static void destroy_environment(lv_gltf_view_env_textures_t * env)
     GL_CALL(glDeleteTextures(3, d));
 }
 
-
-
-
-
 #endif /*LV_USE_GLTF*/
