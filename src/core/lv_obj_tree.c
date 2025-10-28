@@ -839,7 +839,8 @@ static lv_obj_t * find_by_name_direct(const lv_obj_t * parent, const char * name
 
         if(len == UINT16_MAX) {
             if(lv_strcmp(child_name_resolved, name) == 0) return child;
-        } else {
+        }
+        else {
             if(lv_strncmp(child_name_resolved, name, len) == 0 &&
                child_name_resolved[len] == '\0') {
                 return child;
