@@ -824,6 +824,11 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     int ret;
 
+    /* Allocate video_dst_data as a separate buffer for the destination image.
+     * This is necessary because the destination may require a different pixel format
+     * or layout than the source (decoded) frame, so we cannot always use the source
+     * frame's data directly. Unlike video_src_data, which is no longer allocated,
+     * video_dst_data is still needed for format conversion or copying. */
     ret = av_image_alloc(
               ffmpeg_ctx->video_dst_data,
               ffmpeg_ctx->video_dst_linesize,
