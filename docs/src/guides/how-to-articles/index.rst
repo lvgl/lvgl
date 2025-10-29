@@ -7,3 +7,4 @@ How-To Articles
 .. toctree::
     :maxdepth: 2
 
+    add-cache-class
