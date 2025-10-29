@@ -132,6 +132,9 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
     // Or
     lv_obj_t * ok_btn = lv_obj_get_child_by_name(some_list_container, "list_item_5/ok_button");
 
-Names are resolved **when they are retrieved**, not when they are set.  This means
-indices always reflect the current state of the widget tree at the time the name is
-used.
+.. caution::
+
+    When a Widget is named with a trailing "#", the index used for name comparisons in
+    #1 and #2 above are computed when those calls are made, thus always reflecting the
+    current state of the Widget tree.  Deletion of a sibling Widget otherwise having
+    the same name, with a smaller "apparent" index, will cause this index to change.
