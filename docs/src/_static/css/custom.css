@@ -1195,58 +1195,18 @@ span.bi {
   font-weight: bold;
   font-style: italic;
 }
-span.ib {
-  font-weight: bold;
-  font-style: italic;
-}
-span.u {
-  text-decoration: underline;
-}
 span.ul {
   text-decoration: underline;
-}
-span.ub {
-  text-decoration: underline;
-  font-weight: bold;
 }
 span.bu {
   text-decoration: underline;
   font-weight: bold;
-}
-span.ui {
-  text-decoration: underline;
-  font-style: italic;
 }
 span.iu {
   text-decoration: underline;
   font-style: italic;
 }
 span.ubi {
-  text-decoration: underline;
-  font-weight: bold;
-  font-style: italic;
-}
-span.uib {
-  text-decoration: underline;
-  font-weight: bold;
-  font-style: italic;
-}
-span.bui {
-  text-decoration: underline;
-  font-weight: bold;
-  font-style: italic;
-}
-span.iub {
-  text-decoration: underline;
-  font-weight: bold;
-  font-style: italic;
-}
-span.biu {
-  text-decoration: underline;
-  font-weight: bold;
-  font-style: italic;
-}
-span.ibu {
   text-decoration: underline;
   font-weight: bold;
   font-style: italic;

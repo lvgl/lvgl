@@ -1,32 +1,32 @@
 .. role:: bolditalic
-    :class: bolditalic
+    :class: bi
 .. role:: bi
     :class: bi
 .. role:: ib
-    :class: ib
+    :class: bi
 .. role:: underlined
-    :class: underlined
+    :class: ul
 .. role:: u
-    :class: u
+    :class: ul
 .. role:: ul
     :class: ul
 .. role:: ub
-    :class: ub
+    :class: bu
 .. role:: bu
     :class: bu
 .. role:: ui
-    :class: ui
+    :class: iu
 .. role:: iu
     :class: iu
 .. role:: ubi
     :class: ubi
 .. role:: uib
-    :class: uib
+    :class: ubi
 .. role:: bui
-    :class: bui
+    :class: ubi
 .. role:: iub
-    :class: iub
+    :class: ubi
 .. role:: biu
-    :class: biu
+    :class: ubi
 .. role:: ibu
-    :class: ibu
+    :class: ubi
