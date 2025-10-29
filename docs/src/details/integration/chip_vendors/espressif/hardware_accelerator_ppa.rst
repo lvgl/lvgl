@@ -24,14 +24,73 @@ Using the LVGL PPA draw unit on your ESP-IDF project
 
 LVGL supports, in experimental level, the filling and the image blending
 acceleration through the PPA, the user can enable it in their ``sdkconfig.defaults`` by
-adding the following option to enable the PPA draw unit in conjunction with the software renderer:
+adding the following option to enable the PPA draw unit in conjunction with the software renderer, also:
+don't forget to make the draw buffers aligned with the cache line size, typically 64bytes:
 
    .. code:: c
 
       CONFIG_LV_USE_PPA=y
+      CONFIG_LV_DRAW_BUF_ALIGN=64
 
 Save the file and then rebuild the project, this will be sufficient to add the PPA code and it will start to run automatically, so
 no further steps are required from the user code perspective.
+
+Is it suggested to use PPA with the double buffer support of the ESP LVGL Port since it will not offer performance increase when using it in partial mode due
+to DMA2D memory bandwith. To have te best performance and experience you can use the following snippet code to start the LVGL subsystem
+for ESP-IDF:
+
+   .. code:: c
+
+      #include "lvgl.h"
+      #include "bsp/esp-bsp.h"
+
+      void app_main(void)
+      {
+            bsp_display_cfg_t cfg = {
+            .lvgl_port_cfg = ESP_LVGL_PORT_INIT_CONFIG(),
+            
+            /* Use buffers with the same size of the screen in pixels */
+            .buffer_size = BSP_LCD_H_RES * BSP_LCD_V_RES,
+            /* Use double buffer (possible with SPIRAM) */
+            .double_buffer = 1,
+            .hw_cfg = {
+         #if CONFIG_BSP_LCD_TYPE_HDMI
+         #if CONFIG_BSP_LCD_HDMI_800x600_60HZ
+                  .hdmi_resolution = BSP_HDMI_RES_800x600,
+         #elif CONFIG_BSP_LCD_HDMI_1280x720_60HZ
+                  .hdmi_resolution = BSP_HDMI_RES_1280x720,
+         #elif CONFIG_BSP_LCD_HDMI_1280x800_60HZ
+                  .hdmi_resolution = BSP_HDMI_RES_1280x800,
+         #elif CONFIG_BSP_LCD_HDMI_1920x1080_30HZ
+                  .hdmi_resolution = BSP_HDMI_RES_1920x1080,
+         #endif
+         #else
+                  .hdmi_resolution = BSP_HDMI_RES_NONE,
+         #endif
+                  .dsi_bus = {
+                     .phy_clk_src = MIPI_DSI_PHY_CLK_SRC_DEFAULT,
+                     .lane_bit_rate_mbps = BSP_LCD_MIPI_DSI_LANE_BITRATE_MBPS,
+                  }
+            },
+            .flags = {
+         #if CONFIG_BSP_LCD_COLOR_FORMAT_RGB888
+                  .buff_dma = false,
+         #else
+                  .buff_dma = true,
+         #endif
+                  /* Use SPIRAM when available */
+                  .buff_spiram = true,
+                  .sw_rotate = true,
+            }
+         };
+
+         bsp_display_start_with_config(&cfg);
+         bsp_display_backlight_on();
+         bsp_display_lock(0);
+         lv_demo_widgets();
+         bsp_display_unlock();
+      }
+
 
 Benchmarking
 ------------

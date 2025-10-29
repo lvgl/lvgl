@@ -56,7 +56,7 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
 
         .out = {
             .buffer          = draw_buf->data,
-            .buffer_size     = PPA_ALIGN_UP(draw_buf->data_size, CONFIG_CACHE_L1_CACHE_LINE_SIZE),
+            .buffer_size     = draw_buf->data_size,
             .pic_w           = draw_buf->header.w,
             .pic_h           = draw_buf->header.h,
             .block_offset_x  = 0,
@@ -64,7 +64,7 @@ void lv_draw_ppa_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             .blend_cm        = lv_color_format_to_ppa_blend(draw_buf->header.cf),
         },
 
-        .mode            = PPA_TRANS_MODE_NON_BLOCKING,
+        .mode            = PPA_TRANS_MODE_BLOCKING,
         .user_data       = u,
     };
 
