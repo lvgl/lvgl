@@ -44,6 +44,7 @@ static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void draw_raw_cb(GIFDRAW * pDraw);
 static void initialize(lv_gif_t * gifobj);
+static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf);
 static void next_frame_task_cb(lv_timer_t * t);
 
 /**********************
@@ -420,13 +421,72 @@ static void initialize(lv_gif_t * gifobj)
 
 }
 
+static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
+{
+    int x = gif->iX;
+    int y = gif->iY;
+    int w = gif->iWidth;
+    int h = gif->iHeight;
+    int disposal_method = (gif->ucGIFBits & 0x1c) >> 2;
+    int i, j;
+
+    if(disposal_method == 2) {
+        /* Restore to background color */
+        unsigned char bg = gif->ucBackground;
+        unsigned char * palette = (unsigned char *)(gif->bUseLocalPalette ? gif->pLocalPalette : gif->pPalette);
+        switch(gif->ucPaletteType) {
+            case GIF_PALETTE_RGB565_LE:
+            case GIF_PALETTE_RGB565_BE: {
+                    unsigned short * palette16 = (unsigned short *)palette;
+                    for(i = y; i < y + h; i++) {
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        for(j = x; j < x + w; j++) {
+                            *(uint16_t *)(dst + 2 * j) = palette16[bg];
+                        }
+                    }
+                }
+                break;
+            case GIF_PALETTE_RGB888:
+                for(i = y; i < y + h; i++) {
+                    uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                    for(j = x; j < x + w; j++) {
+                        dst[3 * j] = palette[(bg * 3) + 2];
+                        dst[3 * j + 1] = palette[(bg * 3) + 1];
+                        dst[3 * j + 2] = palette[(bg * 3) + 0];
+                    }
+                }
+                break;
+            case GIF_PALETTE_RGB8888: {
+                    lv_color32_t bg_color = lv_color32_make(palette[(bg * 3) + 2], palette[(bg * 3) + 1], palette[(bg * 3)], 0xff);
+                    /* has transparent */
+                    if(gif->ucGIFBits & 1) {
+                        bg_color = lv_color32_make(0, 0, 0, 0);
+                    }
+
+                    for(i = y; i < y + h; i++) {
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        for(j = x; j < x + w; j++) {
+                            *(lv_color32_t *)(dst + 4 * j) = bg_color;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_gif_t * gifobj = (lv_gif_t *) obj;
-
+    GIFIMAGE * gif = &gifobj->gif;
     int ms_delay_next;
-    int has_next = GIF_playFrame(&gifobj->gif, &ms_delay_next, gifobj);
+
+    disposal_last_frame(gif, gifobj->draw_buf);
+
+    int has_next = GIF_playFrame(gif, &ms_delay_next, gifobj);
     if(has_next <= 0) {
         /*It was the last repeat*/
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
