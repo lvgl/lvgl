@@ -134,7 +134,8 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
 
 .. caution::
 
-    When a Widget is named with a trailing "#", the index used for name comparisons in
-    #1 and #2 above are computed when those calls are made, thus always reflecting the
-    current state of the Widget tree.  Deletion of a sibling Widget otherwise having
-    the same name, with a smaller "apparent" index, will cause this index to change.
+    When a Widget is named with a trailing "#", the index used for name comparison is
+    computed in #1 and #2 above *when those calls are made*, thus always reflecting
+    the current state of the Widget tree.  Deletion of a sibling Widget otherwise
+    having the same name, with a smaller "apparent" index, will cause this index to
+    change.
