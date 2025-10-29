@@ -441,6 +441,7 @@ void * lv_fs_load_with_alloc(const char * path, uint32_t * size)
     if(ret != LV_FS_RES_OK || bytes_read != *size) {
         LV_LOG_WARN("read %s failed, rn %" LV_PRIu32 ", res %d", path, bytes_read, ret);
         lv_free(data);
+        data = NULL;
     }
 
 fail:
