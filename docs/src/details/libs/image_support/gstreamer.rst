@@ -66,7 +66,7 @@ Requirements
 The GStreamer extension requires **GStreamer 1.0** or later with the following components:
 
 :gstreamer-1.0:        Core GStreamer framework
-:gstreamer-video-1.0:  Video handling and processing utilities  
+:gstreamer-video-1.0:  Video handling and processing utilities
 :gstreamer-app-1.0:    Application integration utilities
 
 Dependencies
@@ -92,18 +92,18 @@ Setup
 .. code-block:: cmake
 
     find_package(PkgConfig REQUIRED)
-    
+
     # Find GStreamer packages
     pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
     pkg_check_modules(GSTREAMER_VIDEO REQUIRED gstreamer-video-1.0)
     pkg_check_modules(GSTREAMER_APP REQUIRED gstreamer-app-1.0)
-    
+
     # Link with LVGL
-    target_include_directories(lvgl PUBLIC 
+    target_include_directories(lvgl PUBLIC
         ${GSTREAMER_INCLUDE_DIRS}
-        ${GSTREAMER_VIDEO_INCLUDE_DIRS} 
+        ${GSTREAMER_VIDEO_INCLUDE_DIRS}
         ${GSTREAMER_APP_INCLUDE_DIRS})
-    target_link_libraries(lvgl PUBLIC 
+    target_link_libraries(lvgl PUBLIC
         ${GSTREAMER_LIBRARIES}
         ${GSTREAMER_VIDEO_LIBRARIES}
         ${GSTREAMER_APP_LIBRARIES})
@@ -126,18 +126,18 @@ Setup
     {
         /* Initialize LVGL */
         lv_init();
-        
+
         /* Setup display driver */
         lv_display_t *display = lv_display_create(800, 480);
         /* ... configure display driver ... */
-        
+
         /* Create and run your GStreamer application */
         lv_example_gstreamer_1();
-        
+
         while (1) {
             lv_timer_handler();
         }
-        
+
         return 0;
     }
 
@@ -153,18 +153,18 @@ Here's how to create a basic GStreamer player and load media:
 
     /* Create a GStreamer object */
     lv_obj_t * streamer = lv_gstreamer_create(lv_screen_active());
-    
+
     /* Set the media source using URI factory */
-    lv_result_t result = lv_gstreamer_set_src(streamer, 
+    lv_result_t result = lv_gstreamer_set_src(streamer,
         LV_GSTREAMER_FACTORY_URI_DECODE,
         LV_GSTREAMER_PROPERTY_URI_DECODE,
         "https://example.com/video.webm");
-    
+
     if (result != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to set GStreamer source");
         return;
     }
-    
+
     /* Start playback */
     lv_gstreamer_play(streamer);
 
@@ -178,15 +178,15 @@ The GStreamer widget supports various media sources through different factories:
 .. code-block:: c
 
     /* Load from web URL */
-    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_URI_DECODE, 
+    lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_URI_DECODE,
                          LV_GSTREAMER_PROPERTY_URI_DECODE,
                          "https://example.com/stream.webm");
-    
+
     /* Load from local file */
     lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_URI_DECODE,
-                         LV_GSTREAMER_PROPERTY_URI_DECODE, 
+                         LV_GSTREAMER_PROPERTY_URI_DECODE,
                          "file:///path/to/video.mp4");
-    
+
     /* RTSP stream */
     lv_gstreamer_set_src(streamer, LV_GSTREAMER_FACTORY_URI_DECODE,
                          LV_GSTREAMER_PROPERTY_URI_DECODE,
@@ -213,17 +213,17 @@ Control media playback with these functions:
     lv_gstreamer_play(streamer);
     lv_gstreamer_pause(streamer);
     lv_gstreamer_stop(streamer);
-    
+
     /* Get current state */
     lv_gstreamer_state_t state = lv_gstreamer_get_state(streamer);
-    
+
     /* Seek to position (in milliseconds) */
     lv_gstreamer_set_position(streamer, 30000);  /* Seek to 30 seconds */
-    
+
     /* Get current position and duration */
     uint32_t position = lv_gstreamer_get_position(streamer);
     uint32_t duration = lv_gstreamer_get_duration(streamer);
-    
+
     /* Set playback rate - values relative to 256 (1x speed) */
     lv_gstreamer_set_rate(streamer, 128);   /* 0.5x speed */
     lv_gstreamer_set_rate(streamer, 256);   /* 1.0x speed (normal) */
@@ -238,7 +238,7 @@ Manage audio volume with built-in controls:
 
     /* Set volume (0-100%) */
     lv_gstreamer_set_volume(streamer, 75);
-    
+
     /* Get current volume */
     uint8_t volume = lv_gstreamer_get_volume(streamer);
 
@@ -253,16 +253,16 @@ Handle GStreamer events using LVGL's event system:
     {
         lv_event_code_t code = lv_event_get_code(e);
         lv_obj_t * streamer = lv_event_get_target_obj(e);
-        
+
         if(code == LV_EVENT_READY) {
-                LV_LOG_USER("Stream ready - Duration: %" LV_PRIu32 " ms", 
+                LV_LOG_USER("Stream ready - Duration: %" LV_PRIu32 " ms",
                            lv_gstreamer_get_duration(streamer));
                 LV_LOG_USER("Resolution: %" LV_PRId32 "x%" LV_PRId32,
                            lv_image_get_src_width(streamer),
                            lv_image_get_src_height(streamer));
         }
     }
-    
+
     /* Add event callback */
     lv_obj_add_event_cb(streamer, gstreamer_event_cb, LV_EVENT_ALL, NULL);
 
@@ -291,7 +291,7 @@ Media Information Access
 Once media is loaded (LV_EVENT_READY), you can access:
 
 - Video resolution via ``lv_image_get_src_width()`` and ``lv_image_get_src_height()``
-- Media duration via ``lv_gstreamer_get_duration()``  
+- Media duration via ``lv_gstreamer_get_duration()``
 - Current playback position via ``lv_gstreamer_get_position()``
 - Current volume level via ``lv_gstreamer_get_volume()``
 - Current playback state via ``lv_gstreamer_get_state()``
