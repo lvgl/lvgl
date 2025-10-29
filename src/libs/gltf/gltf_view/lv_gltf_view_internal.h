@@ -25,6 +25,7 @@
  *      DEFINES
  *********************/
 
+#define LV_GLTF_CONVERT_BASE_COLOR_TO_SRGB 1
 
 /**********************
  *      TYPEDEFS

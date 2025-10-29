@@ -49,6 +49,7 @@ static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwi
 
 static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data);
 static fastgltf::math::fmat3x3 create_texture_transform_matrix(std::unique_ptr<fastgltf::TextureTransform> & transform);
+static fastgltf::math::nvec4 color_convert_to_srgb(fastgltf::math::nvec4 color);
 static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color);
 static void render_uniform_color(GLint uniform_loc, fastgltf::math::nvec3 color);
 static uint32_t render_texture(uint32_t tex_unit, uint32_t tex_name, int32_t tex_coord_index,
@@ -526,7 +527,11 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
     }
 
     draw_lights(model, program);
+#if LV_GLTF_CONVERT_BASE_COLOR_TO_SRGB
+    render_uniform_color_alpha(uniforms->base_color_factor, color_convert_to_srgb(gltfMaterial.pbrData.baseColorFactor));
+#else
     render_uniform_color_alpha(uniforms->base_color_factor, gltfMaterial.pbrData.baseColorFactor);
+#endif
     render_uniform_color(uniforms->emissive_factor, gltfMaterial.emissiveFactor);
 
     GL_CALL(glUniform1f(uniforms->emissive_strength, gltfMaterial.emissiveStrength));
@@ -768,6 +773,29 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
+static fastgltf::math::nvec4 color_convert_to_srgb(fastgltf::math::nvec4 color)
+{
+    const float SRGB_GAMMA = 2.4f;
+    const float INV_SRGB_GAMMA = 1.0f / SRGB_GAMMA;
+    // Apply the sRGB conversion formula:
+    // sRGB = 12.92 * C, if C <= 0.0031308
+    // sRGB = 1.055 * C^(1/2.4) - 0.055, if C > 0.0031308
+
+    fastgltf::math::nvec4 srgbColor;
+    for(int i = 0; i < 3; i++) {   // Loop through R, G, B channels
+        float c = color[i];
+        if(c <= 0.0031308f) {
+            srgbColor[i] = 12.92f * c;
+        }
+        else {
+            srgbColor[i] = 1.055f * pow(c, INV_SRGB_GAMMA) - 0.055f;
+        }
+    }
+
+    srgbColor[3] = color[3];
+    return srgbColor;
 }
 
 static void render_uniform_color_alpha(GLint uniform_loc, fastgltf::math::nvec4 color)
