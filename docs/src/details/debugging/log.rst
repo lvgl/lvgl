@@ -26,7 +26,7 @@ set :c:macro:`LV_LOG_LEVEL` to one of the following values:
 - :c:macro:`LV_LOG_LEVEL_USER`: Log only custom log messages added by the user.
 - :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything.
 
-The events which have a level higher than the set log level will be also be logged.
+The events that have a level higher than the set log level will also be logged.
 Example:  you set :c:macro:`LV_LOG_LEVEL` to :c:macro:`LV_LOG_LEVEL_WARN` and
 :c:macro:`LV_LOG_LEVEL_USER` messages will also be logged.
 
