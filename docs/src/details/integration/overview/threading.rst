@@ -167,7 +167,7 @@ updating thread, or a comparison of current data vs previous data] so that the u
 interface is only updated when it will result in a change visible to the end user.)
 
 If `non-atomic data`_ relevant to the user interface is updated in another thread
-(i.e. by another task or in an interrupt), an alternate (and safe) way of convey that
+(i.e. by another task or in an interrupt), an alternate (and safe) way to convey that
 data to the thread calling LVGL functions is to pass a private copy of that data to
 that thread via a QUEUE (e.g. a request queue) or other OS mechanism that protects
 that data from being seen in an inconsistent state.
