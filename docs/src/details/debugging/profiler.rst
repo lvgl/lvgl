@@ -138,7 +138,7 @@ Use the mouse to move the focus and click on functions on the timeline to observ
 Adding Measurement Points
 *************************
 
-Users can add your own measured functions:
+Users can add their own measured functions:
 
 .. code-block:: c
 
