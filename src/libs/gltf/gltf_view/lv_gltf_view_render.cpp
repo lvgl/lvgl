@@ -1208,19 +1208,19 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                         current_override->data[2] = local_scale[2];
                     }
                     else {
+                        float base_scale = 1.0f;
                         if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_3) {
-                            local_scale[0] = current_override->data[3];
-                            local_scale[1] = current_override->data[3];
-                            local_scale[2] = current_override->data[3];
+                            base_scale = current_override->data[3];
+                            local_scale[0] = base_scale;
+                            local_scale[1] = base_scale;
+                            local_scale[2] = base_scale;
                         }
-                        else {
-                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
-                                local_scale[0] = current_override->data[0];
-                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
-                                local_scale[1] = current_override->data[1];
-                            if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
-                                local_scale[2] = current_override->data[2];
-                        }
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_0)
+                            local_scale[0] = base_scale * current_override->data[0];
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_1)
+                            local_scale[1] = base_scale * current_override->data[1];
+                        if(current_override->data_mask & LV_GLTF_BIND_CHANNEL_2)
+                            local_scale[2] = base_scale * current_override->data[2];
                         made_changes = true;
                     }
                 }
