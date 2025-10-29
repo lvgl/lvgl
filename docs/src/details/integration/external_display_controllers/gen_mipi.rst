@@ -92,7 +92,7 @@ You need to implement two platform-dependent functions:
 
 The only difference between the :cpp:func:`my_lcd_send_cmd`
 and :cpp:func:`my_lcd_send_color` functions is that :cpp:func:`my_lcd_send_cmd` is
-used to send short commands and it is expected complete the transaction when it
+used to send short commands and it is expected to complete the transaction when it
 returns (in other words, it should be blocking), while :cpp:func:`my_lcd_send_color`
 is only used to send pixel data, and it is recommended to use DMA to transmit data in
 the background.  More sophisticated methods can be also implemented, like queuing
