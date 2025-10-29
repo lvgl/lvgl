@@ -182,7 +182,7 @@
 .. |rbunchecked|     unicode:: U+025CB .. RADIO BUTTON UNCHECKED / WHITE CIRCLE
 .. |cbunchecked|     unicode:: U+02610 .. CHECKBOX UNCHECKED / BALLOT BOX EMPTY
 .. |cbchecked|       unicode:: U+02611 .. CHECKBOX CHECKED / BALLOT BOX WITH CHECK
-.. |cbexxed|         unicode:: U+02612 .. CHECKBOX WITH X / BALLOT BOX WITH X
+.. |cbexed|          unicode:: U+02612 .. CHECKBOX WITH X / BALLOT BOX WITH X
 .. -------- Trigraphs --------
 .. |triheaven|       unicode:: U+02630 .. HEAVEN   (SOLID, SOLID, SOLID)  (looks like menu icon)
 .. -------- Raw HTML --------
