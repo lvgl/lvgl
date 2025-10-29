@@ -16,7 +16,7 @@ Introduction
 ************
 
 LVGL has a built-in trace system to track and record the timestamps of important events that occur during runtime,
-such as rendering events and user input events. These event timestamps serve in metrics for performance analysis.
+such as rendering events and user input events. These event timestamps serve in measurements taken in performance analysis.
 
 The trace system has a configurable record buffer that stores the names of event functions and their timestamps.
 When the buffer is full, the trace system prints the log information through the provided user interface.
