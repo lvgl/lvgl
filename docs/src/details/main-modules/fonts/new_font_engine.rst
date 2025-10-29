@@ -1,19 +1,19 @@
 
+.. _new_font_engine:
 
-
+========================
 Adding a New Font Engine
-************************
+========================
 
-Generic proepties
-*****************
+Overview
+********
 
 Fonts have a **format** property. It describes how the glyph data is stored.
-At the time of writing, there are 12 possible values that this field can take, and those
+At the time of writing, there are several possible values that this field can take, and those
 values fall into 2 categories:
 
-:Legacy simple: 1, 2, 4 or 8-bpp (aligned or unaligned) and image format, and
-:Advanced:      vector, SVG, and custom formats; for the latter, the user provides
-                the rendering logic.
+1. **Bitmap based**: 1, 2, 4 or 8-bpp and image format, and
+2. **Vector based** vector, SVG; for the latter, the user provides the rendering logic.
 
 For simple formats:
 
@@ -27,7 +27,8 @@ The **format** property also affects the amount of memory needed to store a
 font. For example, ``format = LV_FONT_GLYPH_FORMAT_A4`` makes a font nearly four
 times larger compared to ``format = LV_FONT_GLYPH_FORMAT_A1``.
 
-
+Example
+*******
 
 LVGL's font interface is designed to be very flexible but, even so, you
 can add your own font engine in place of LVGL's internal one. For

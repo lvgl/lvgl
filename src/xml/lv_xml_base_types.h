@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_types.h"
-#include "../../misc/lv_style.h"
+#include "../misc/lv_types.h"
+#include "../misc/lv_style.h"
 #if LV_USE_XML
 
 /**********************

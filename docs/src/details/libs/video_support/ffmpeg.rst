@@ -90,7 +90,7 @@ Learn more about :ref:`events`.
 Examples
 ********
 
-.. include:: ../../examples/libs/ffmpeg/index.rst
+.. include:: ../../../examples/libs/ffmpeg/index.rst
 
 
 

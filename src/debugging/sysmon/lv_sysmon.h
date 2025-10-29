@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../misc/lv_timer.h"
-#include "../../others/observer/lv_observer.h"
+#include "../../core/lv_observer.h"
 
 #if LV_USE_SYSMON
 

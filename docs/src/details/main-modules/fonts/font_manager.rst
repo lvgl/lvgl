@@ -127,7 +127,7 @@ being referenced, the font manager will fail to be destroyed and the function wi
 Example
 *******
 
-.. include:: ../../examples/others/font_manager/index.rst
+.. include:: ../../../examples/others/font_manager/index.rst
 
 
 

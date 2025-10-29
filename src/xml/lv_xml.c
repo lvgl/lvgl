@@ -53,10 +53,10 @@
 #include "parsers/lv_xml_calendar_parser.h"
 #include "parsers/lv_xml_spinner_parser.h"
 #include "parsers/lv_xml_qrcode_parser.h"
-#include "../../libs/expat/expat.h"
-#include "../../draw/lv_draw_image.h"
-#include "../../core/lv_global.h"
-#include "../../misc/lv_anim_timeline_private.h"
+#include "../libs/expat/expat.h"
+#include "../draw/lv_draw_image.h"
+#include "../core/lv_global.h"
+#include "../misc/lv_anim_timeline_private.h"
 
 /*********************
  *      DEFINES

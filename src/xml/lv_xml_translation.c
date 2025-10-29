@@ -9,11 +9,11 @@
 #include "../../lvgl.h"
 #if LV_USE_XML && LV_USE_TRANSLATION
 
-#include "../translation/lv_translation_private.h"
+#include "../others/translation/lv_translation_private.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_parser.h"
-#include "../../others/translation/lv_translation.h"
-#include "../../libs/expat/expat.h"
+#include "../others/translation/lv_translation.h"
+#include "../libs/expat/expat.h"
 
 /*********************
  *      DEFINES

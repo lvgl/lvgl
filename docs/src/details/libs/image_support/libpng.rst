@@ -59,7 +59,7 @@ stored in RGBA pixel format.
 Example
 *******
 
-.. include:: ../../examples/libs/libpng/index.rst
+.. include:: ../../../examples/libs/libpng/index.rst
 
 
 

@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_font.h"
-#include "../misc/lv_types.h"
+#include "../lv_font.h"
+#include "../../misc/lv_types.h"
 
 /*********************
  *      DEFINES

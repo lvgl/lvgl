@@ -298,7 +298,7 @@ IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call --- for SPIRAM usage this 
 Example
 *******
 
-.. include:: ../../examples/libs/rlottie/index.rst
+.. include:: ../../../examples/libs/rlottie/index.rst
 
 
 

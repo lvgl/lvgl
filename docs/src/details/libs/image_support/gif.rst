@@ -90,7 +90,7 @@ ARGB8888 has a pixel size of 4.
 Example
 *******
 
-.. include:: ../../examples/libs/gif/index.rst
+.. include:: ../../../examples/libs/gif/index.rst
 
 
 

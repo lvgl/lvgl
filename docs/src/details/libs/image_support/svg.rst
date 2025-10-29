@@ -1,7 +1,7 @@
 .. _svg:
 
 ===========
-SVG Support
+SVG Decoder
 ===========
 
 The lv_svg extension provides makes it possible to use SVG images in your LVGL UI using the
@@ -22,11 +22,20 @@ If you need support for SVG animation attribute parsing,
 you can set :c:macro:`LV_USE_SVG_ANIMATION` in ``lv_conf.h`` to ``1``.
 
 
+As Image Source
+***************
 
-.. _svg_example:
+`lv_image` directly supports SVG images.  For example:
 
-Example
-*******
+.. code-block:: c
+
+    lv_image_set_src(widget, "S:path/to/example.svg");
+
+
+Direct Rendering
+****************
+
+It also possible draw SVG vector graphics in draw events:
 
 .. code:: c
 
@@ -44,12 +53,12 @@ Example
     /* Release the DOM tree */
     lv_svg_node_delete(svg_doc);
 
-`lv_image` also supports SVG images.  For example:
+.. _svg_example:
 
-.. code-block:: c
+Example
+*******
 
-    lv_image_set_src(widget, "S:path/to/example.svg");
-
+.. include:: ../../../examples/libs/svg/index.rst
 
 
 .. _svg_api:

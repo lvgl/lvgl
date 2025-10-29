@@ -1,12 +1,18 @@
 
-Using a BDF Font
-****************
+.. _bdf_font:
+
+========
+BDF Font
+========
+
+Overview
+********
 
 Small displays with low resolution don't look pretty with automatically rendered fonts. A bitmap font provides
 the solution, but it's necessary to convert the bitmap font (BDF) to a TTF.
 
 Convert BDF to TTF
-------------------
+******************
 
 BDF are bitmap fonts where fonts are not described in outlines but in pixels. BDF files can be used but
 they must be converted into the TTF format using ``mkttf``, which can be found
@@ -55,8 +61,8 @@ line 1
 
     #!/usr/bin/env python3
 
-Example for a 12px font
------------------------
+Example
+*******
 
 .. code-block:: console
 

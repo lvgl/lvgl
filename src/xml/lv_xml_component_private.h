@@ -17,9 +17,9 @@ extern "C" {
 #if LV_USE_XML
 
 #include "lv_xml_utils.h"
-#include "../../misc/lv_ll.h"
-#include "../../misc/lv_style.h"
-#include "../../others/observer/lv_observer.h"
+#include "../misc/lv_ll.h"
+#include "../misc/lv_style.h"
+#include "../core/lv_observer.h"
 
 /**********************
  *      TYPEDEFS

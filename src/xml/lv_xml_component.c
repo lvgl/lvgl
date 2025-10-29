@@ -9,7 +9,7 @@
 #include "lv_xml_component.h"
 #if LV_USE_XML
 
-#include "../../lvgl.h"
+#include "../lvgl.h"
 #include "lv_xml_component_private.h"
 #include "lv_xml_private.h"
 #include "lv_xml_parser.h"
@@ -17,9 +17,9 @@
 #include "lv_xml_base_types.h"
 #include "lv_xml_widget.h"
 #include "parsers/lv_xml_obj_parser.h"
-#include "../../libs/expat/expat.h"
-#include "../../misc/lv_fs.h"
-#include "../../core/lv_global.h"
+#include "../libs/expat/expat.h"
+#include "../misc/lv_fs.h"
+#include "../core/lv_global.h"
 #include <string.h>
 
 /*********************

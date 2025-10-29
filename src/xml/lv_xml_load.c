@@ -11,11 +11,11 @@
 #if LV_USE_XML
 
 #include "lv_xml_private.h"
-#include "../../core/lv_global.h"
-#include "../../misc/lv_fs.h"
-#include "../../libs/fsdrv/lv_fsdrv.h"
-#include "../../misc/lv_ll.h"
-#include "../../libs/expat/expat.h"
+#include "../core/lv_global.h"
+#include "../misc/lv_fs.h"
+#include "../libs/fsdrv/lv_fsdrv.h"
+#include "../misc/lv_ll.h"
+#include "../libs/expat/expat.h"
 
 /*********************
  *      DEFINES

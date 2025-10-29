@@ -22,7 +22,7 @@ compressed to save more than 70% space.  The below statistics are from a watch
 project.  It shows the file count of every compress level. For rare conditions, RLE
 compress may increase the file size if there's no large repetition in data.
 
-.. image:: rle-compress-statistics.png
+.. image:: /_static/images/rle-compress-statistics.png
    :alt: RLE compress statistics from a watch project
    :align: center
 

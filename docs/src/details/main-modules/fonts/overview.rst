@@ -8,11 +8,11 @@
 
 .. _font:
 
-==============
-Font (lv_font)
-==============
+========
+Overview
+========
 
-What is a font?
+What is a Font?
 ***************
 
 In LVGL fonts are collections of bitmaps and other information required
@@ -24,16 +24,32 @@ For example:
 
     lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /* Set a larger font */
 
-
 Font Engines
 ************
 
-Built in engine, usually good enough.
+A font engine is a some C code that allows LVGL to extract valrious information
+from the fonts, such as character (glyph) information or bitmap.
 
-Easy to add a font, go to online converter, LV_FONT_DECLARE, and use. Set size, bpp, etc list, compbine multiple fonts.
+LVGL's built-in font engine is suitable for most of the typical case.
+It can handle various bit-per-pixel settings (1, 2, 3, 4, 8) in bitmaps,
+kerning, having only selected character ranages from multiple fonts,
+compressing bitmaps, and several others.
 
+The built-in font engine is also the easiest to use:
 
-List of available fonr engines + links
+1. Go to https://lvgl.io/tools/fontconverter
+2. Upload font(s) and set the ranges and/or specify a list of characters to include and other parameters
+3. Click the "Submit" button and copy the generated file to your project
+4. In a C file add :cpp:expr:`LV_FONT_DECLARE(font_name)` to declare the font
+5. Use the font like ``lv_style_set_text_font(&my_style, &font_name);``
+   or ``lv_obj_set_style_text_font(label1, &font_name, 0);``
+
+LVGL also support several other font engines:
+
+- ``fmt_txt``: This the built-in font engine that stores the fonts as a C array
+- ``binfont``: Similar to the built-in format, but the font is stored as a file, so it can be loaded at runtime too
+- ``tiny_ttf``: Small vector graphics engine to load TTF files at runtime at any size
+- ``freetype``: Well known font rendering library load and render TTF fonts at runtime. Also supports letter strokes.
 
 Unicode Support
 ***************
@@ -81,11 +97,11 @@ and where the resulting glyph has no individual Unicode representation
 Kerning
 *******
 
-Fonts may provide kerning information to adjust the spacing between specific
+Fonts usually provide kerning information to adjust the spacing between specific
 characters.
 
-- The online converter generates kerning tables.
-- The offline converter generates kerning tables unless ``--no-kerning`` is
+- The `Online converter <https://lvgl.io/tools/fontconverter>`__ generates kerning tables.
+- The `Offline converter <https://github.com/lvgl/lv_font_conv/>`__ generates kerning tables unless ``--no-kerning`` is
   specified.
 - FreeType integration does not currently support kerning.
 - The Tiny TTF font engine supports GPOS (Glyph Positioning) and Kern tables.
@@ -111,11 +127,30 @@ specify a ``fallback`` font to be used in :cpp:type:`lv_font_t`.
    roboto->fallback = droid_sans_fallback;
 
 
+.. _font_symbols:
 
 Symbols
 *******
 
-The built-in symbols are created from the `FontAwesome <https://fontawesome.com/>`__ font.
+LVGL support some predefines "symbols". A symbol is a specific unicode character
+in a font with an icon-like image. The symbols have names like ``LV_SYMBOL_OK``,
+``LV_SYMBOL_HOME``, etc. See the full list of predefines symbols below:
+
+.. image:: /_static/images/symbols.png
+
+The symbols in the :ref:`built-in fonts <built_in_fonts>` are created from
+the `FontAwesome <https://fontawesome.com/>`__ font.
+
+Using these symbols is very simple:
+
+
+.. code-block:: c
+
+    lv_label_set_text(label, LV_SYMBOL_OK); /*Just a symbol*/
+    lv_label_set_text(label, LV_SYMBOL_OK "Apply"); /*Concatenate with a string*/
+
+
+To add a new symbol in a custom font:
 
 1. Search for a symbol on https://fontawesome.com. For example the
    `USB symbol <https://fontawesome.com/icons/usb?style=brands>`__. Copy its
@@ -128,8 +163,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
    for the USB symbol. More symbols can be enumerated with ``,``.
 5. Convert the font and copy the generated source code to your project.
    Make sure to compile the ``.c`` file of your font.
-6. Declare the font using ``extern lv_font_t my_font_name;`` or simply
-   use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
+6. Declare the font using :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
 **Using the symbol**
 
@@ -145,8 +179,8 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
        :cpp:expr:`lv_style_set_text_font(&my_style, &my_font_name)` or
        :cpp:expr:`lv_obj_set_style_text_font(label, &my_font_name, 0)`.
 
-
-
+Of course any other fonts can be used, just make sure that they define the
+symbols you need.
 
 .. _fonts_api:
 

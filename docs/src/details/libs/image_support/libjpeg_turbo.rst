@@ -66,7 +66,7 @@ feature to ensure that the memory usage is within a reasonable range.
 Example
 *******
 
-.. include:: ../../examples/libs/libjpeg_turbo/index.rst
+.. include:: ../../../examples/libs/libjpeg_turbo/index.rst
 
 
 

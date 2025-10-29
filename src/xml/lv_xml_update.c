@@ -9,10 +9,10 @@
 #include "lv_xml_update.h"
 #if LV_USE_XML &&  LV_USE_OBJ_NAME
 
-#include "../../lvgl.h"
+#include "../lvgl.h"
 #include "lv_xml_widget.h"
 #include "lv_xml_parser.h"
-#include "../../libs/expat/expat.h"
+#include "../libs/expat/expat.h"
 
 /*********************
  *      DEFINES

@@ -1,8 +1,8 @@
 .. _tjpgd:
 
-================================
-Tiny JPEG Decompressor (TJpgDec)
-================================
+=================
+Tiny JPEG Decoder
+=================
 
 **Tiny JPEG Decompressor** is an LVGL interface to the TJpgDec library --- a generic
 JPEG image decompressor module that highly optimized for small embedded systems.  It
@@ -65,7 +65,7 @@ Converting JPEG to C array
 Example
 *******
 
-.. include:: ../../examples/libs/tjpgd/index.rst
+.. include:: ../../../examples/libs/tjpgd/index.rst
 
 
 

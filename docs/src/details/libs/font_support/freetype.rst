@@ -122,8 +122,7 @@ please refer to the example code below.
 
 .. admonition::  Further Reading
 
-    - `FreeType tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
-    - LVGL's :ref:`add_font`
+    `FreeType tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
 
 Rendering vector fonts is supported with VGLite or ThorVG,
 when using vector fonts with ThorVG, it is possible to set a letter outline of a different color.
@@ -148,7 +147,7 @@ See the :cpp:func:`lv_example_freetype_2_vector_font` function for a usage examp
 Examples
 ********
 
-.. include:: ../../examples/libs/freetype/index.rst
+.. include:: ../../../examples/libs/freetype/index.rst
 
 
 

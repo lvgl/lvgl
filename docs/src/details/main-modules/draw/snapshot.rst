@@ -84,7 +84,7 @@ is large enough, and if it fails, destroy the existing draw buffer and call
 Example
 *******
 
-.. include:: ../../examples/others/snapshot/index.rst
+.. include:: ../../../examples/others/snapshot/index.rst
 
 
 

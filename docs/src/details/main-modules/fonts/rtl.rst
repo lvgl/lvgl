@@ -2,8 +2,14 @@
 
 .. _bidi:
 
-Bidirectional support
----------------------
+
+=====================
+Bidirectional Support
+=====================
+
+
+Overview
+********
 
 Most languages use a Left-to-Right (LTR for short) writing direction,
 however some languages (such as Hebrew, Persian or Arabic) use
@@ -46,7 +52,7 @@ This list summarizes the effect of RTL base direction on Widgets:
   ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
---------------------------
+**************************
 
 There are some special rules to display Arabic and Persian characters:
 the *form* of a character depends on its position in the text. A

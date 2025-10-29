@@ -1,11 +1,20 @@
 
-Loading a Font at Run-Time
-**************************
+.. _binfont_laoder:
+
+==============
+BinFont Loader
+==============
+
+Overview
+********
 
 :cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
+
+Loading from File
+*****************
 
 :note: To load a font :ref:`LVGL's filesystem <file_system>`
        needs to be enabled and a driver must be added.
@@ -24,8 +33,8 @@ Example
 
 
 
-Loading a Font from a Memory Buffer at Run-Time
-***********************************************
+Loading from Memory
+*******************
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not

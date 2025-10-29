@@ -13,11 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "../lv_conf_internal.h"
 #if LV_USE_XML
 
 #include LV_STDINT_INCLUDE
-#include "../../misc/lv_color.h"
+#include "../misc/lv_color.h"
 
 /**********************
  * GLOBAL PROTOTYPES
