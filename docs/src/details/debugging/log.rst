@@ -4,41 +4,47 @@
 Logging
 =======
 
-LVGL has a built-in *Log* module to inform the user about what is
+LVGL has a built-in *Logging* module to inform the user about what is
 happening in the library.
 
 
-Log Level
-*********
 
-To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` and set
-:c:macro:`LV_LOG_LEVEL` to one of the following values:
+Configuring Logging
+*******************
+
+
+Log Level
+---------
+
+To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` to a non-zero value and
+set :c:macro:`LV_LOG_LEVEL` to one of the following values:
 
 - :c:macro:`LV_LOG_LEVEL_TRACE`: A lot of logs to give detailed information
-- :c:macro:`LV_LOG_LEVEL_INFO`: Log important events
-- :c:macro:`LV_LOG_LEVEL_WARN`: Log if something unwanted happened but didn't cause a problem
-- :c:macro:`LV_LOG_LEVEL_ERROR`: Only critical issues, where the system may fail
-- :c:macro:`LV_LOG_LEVEL_USER`: Only user messages
-- :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything
+- :c:macro:`LV_LOG_LEVEL_INFO`: Log important events.
+- :c:macro:`LV_LOG_LEVEL_WARN`: Log if something unwanted happened but didn't cause a problem.
+- :c:macro:`LV_LOG_LEVEL_ERROR`: Log only critical issues, where the system may fail.
+- :c:macro:`LV_LOG_LEVEL_USER`: Log only custom log messages added by the user.
+- :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything.
 
-The events which have a higher level than the set log level will be logged
-as well. E.g., if you set :c:macro:`LV_LOG_LEVEL_WARN`, errors will also be logged.
+The events which have a level higher than the set log level will be also be logged.
+Example:  you set :c:macro:`LV_LOG_LEVEL` to :c:macro:`LV_LOG_LEVEL_WARN` and
+:c:macro:`LV_LOG_LEVEL_USER` messages will also be logged.
 
 
-Printing Logs
-*************
+Log Output
+----------
 
-Logging with printf
--------------------
+Logging with ``printf``
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If your system supports ``printf``, you just need to enable
-:c:macro:`LV_LOG_PRINTF` in ``lv_conf.h`` to send the logs with ``printf``.
+:c:macro:`LV_LOG_PRINTF` in ``lv_conf.h`` to output log messages with ``printf``.
 
-Custom log function
--------------------
+Using a custom log function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you can't use ``printf`` or want to use a custom function to log, you
-can register a "logger" callback with :cpp:func:`lv_log_register_print_cb`.
+can register a "logging" function with :cpp:func:`lv_log_register_print_cb`.
 
 For example:
 
@@ -55,19 +61,31 @@ For example:
    lv_log_register_print_cb(my_log_cb);
 
 
-Add Logs
-********
 
-You can also use the log module via the
-``LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)`` or ``LV_LOG(text)``
-functions. Here:
+Using Logging
+*************
 
--  ``LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)`` append the following information to your ``text``
--  Log Level
+You use the log module via the following macros:
+
+- ``LV_LOG_TRACE(text)``
+- ``LV_LOG_INFO(text)``
+- ``LV_LOG_WARN(text)``
+- ``LV_LOG_ERROR(text)``
+- ``LV_LOG_USER(text)``
+- ``LV_LOG(text)``
+
+The first 5 macros append the following information to your ``text``:
+
+-  Log Level name ("Trace", "Info", "Warn", "Error", "User")
 -  \__FILE\_\_
 -  \__LINE\_\_
 -  \__func\_\_
--  ``LV_LOG(text)`` is similar to ``LV_LOG_USER`` but has no extra information attached.
+
+``LV_LOG(text)`` is similar to ``LV_LOG_USER`` but has no extra information added.
+
+
 
 API
 ***
+
+.. API equals:  lv_log_register_print_cb
