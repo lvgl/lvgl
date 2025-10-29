@@ -141,6 +141,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         parentDlNode.classList.remove(unExClass);
         parentDlNode.classList.add(exClass);
       }
+
+      /* Have browser scroll `cppListing` into view if it is not already. */
+      cppListing.scrollIntoView();
     } else {
       cppListing.classList.add(unExClass);
     }
