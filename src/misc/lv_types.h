@@ -282,6 +282,8 @@ typedef struct _lv_gltf_t lv_gltf_t;
 
 typedef struct _lv_gltf_model_t lv_gltf_model_t;
 
+typedef struct _lv_gltf_model_node_t lv_gltf_model_node_t;
+
 typedef struct _lv_observer_t lv_observer_t;
 
 typedef struct _lv_subject_increment_dsc_t lv_subject_increment_dsc_t;

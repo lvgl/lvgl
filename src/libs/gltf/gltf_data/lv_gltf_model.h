@@ -127,6 +127,13 @@ bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
  */
 size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
 
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * data, size_t index);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_ip(lv_gltf_model_t * data, const char * ip);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * data, const char * path);
+
+const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node);
+const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
