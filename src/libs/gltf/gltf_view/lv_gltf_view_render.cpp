@@ -562,7 +562,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                   uniforms->normal_uv_set, uniforms->normal_uv_transform);
     }
 
-    if(gltfMaterial.clearcoat) {
+    if(gltfMaterial.clearcoat && gltfMaterial.clearcoat->clearcoatFactor > 0.0f) {
         GL_CALL(glUniform1f(uniforms->clearcoat_factor, static_cast<float>(gltfMaterial.clearcoat->clearcoatFactor)));
         GL_CALL(glUniform1f(uniforms->clearcoat_roughness_factor,
                             static_cast<float>(gltfMaterial.clearcoat->clearcoatRoughnessFactor)));
@@ -654,7 +654,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
     }
 #endif
 
-    if(gltfMaterial.diffuseTransmission) {
+    if(gltfMaterial.diffuseTransmission && gltfMaterial.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
         render_uniform_color(uniforms->diffuse_transmission_color_factor,
                              gltfMaterial.diffuseTransmission->diffuseTransmissionColorFactor);
         GL_CALL(glUniform1f(uniforms->diffuse_transmission_factor,
