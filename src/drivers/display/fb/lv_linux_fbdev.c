@@ -68,12 +68,15 @@ typedef struct {
     long int screensize;
     int fbfd;
     bool force_refresh;
+    uint8_t * draw_buf_1;
+    uint8_t * draw_buf_2;
 } lv_linux_fb_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
+static void del_event_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static uint32_t tick_get_cb(void);
 
@@ -113,6 +116,7 @@ lv_display_t * lv_linux_fbdev_create(void)
     dsc->fbfd = -1;
     lv_display_set_driver_data(disp, dsc);
     lv_display_set_flush_cb(disp, flush_cb);
+    lv_display_add_event_cb(disp, del_event_cb, LV_EVENT_DELETE, NULL);
 
     return disp;
 }
@@ -227,11 +231,14 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     uint8_t * draw_buf = NULL;
     uint8_t * draw_buf_2 = NULL;
-    draw_buf = malloc(draw_buf_size);
+    draw_buf = lv_malloc(draw_buf_size);
 
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
-        draw_buf_2 = malloc(draw_buf_size);
+        draw_buf_2 = lv_malloc(draw_buf_size);
     }
+
+    dsc->draw_buf_1 = draw_buf;
+    dsc->draw_buf_2 = draw_buf_2;
 
     lv_display_set_resolution(disp, hor_res, ver_res);
     lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
@@ -242,7 +249,6 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
-    /* TODO: map delete event callback to deallocate buffers */
 }
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
@@ -264,6 +270,34 @@ static void write_to_fb(lv_linux_fb_t * dsc, uint32_t fb_pos, const void * data,
     if(pwrite(dsc->fbfd, data, sz, fb_pos) < 0)
         LV_LOG_ERROR("write failed: %d", errno);
 #endif
+}
+
+static void del_event_cb(lv_event_t * e)
+{
+    if(LV_EVENT_DELETE != lv_event_get_code(e))
+        return;
+
+    lv_display_t * disp = lv_event_get_target(e);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    if(!dsc) return;
+
+#if LV_LINUX_FBDEV_MMAP
+    if (dsc->fbp) {
+        munmap(dsc->fbp, dsc->screensize);
+        dsc->fbp = NULL;
+    }
+#endif
+    if(dsc->fbfd >= 0) {
+        close(dsc->fbfd);
+        dsc->fbfd = -1;
+    }
+    if(dsc->rotated_buf) lv_free(dsc->rotated_buf);
+    if(dsc->draw_buf_1) lv_free(dsc->draw_buf_1);
+    if(dsc->draw_buf_2) lv_free(dsc->draw_buf_2);
+    if(dsc->devname) lv_free((void *)dsc->devname);
+
+    lv_free(dsc);
+    lv_display_set_driver_data(disp, NULL);
 }
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
