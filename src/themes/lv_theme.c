@@ -43,6 +43,26 @@ lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
     return lv_display_get_theme(disp);
 }
 
+lv_theme_t * lv_theme_create(void)
+{
+    lv_theme_t * theme = lv_zalloc(sizeof(*theme));
+    LV_ASSERT_MALLOC(theme);
+    return theme;
+}
+void lv_theme_destroy(lv_theme_t * theme)
+{
+    lv_free(theme);
+}
+
+void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src)
+{
+    if(!dst || !src) {
+        LV_LOG_WARN("Refusing to copy null themes");
+        return;
+    }
+    lv_memcpy(dst, src, sizeof(*src));
+}
+
 void lv_theme_apply(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);

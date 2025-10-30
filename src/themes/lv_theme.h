@@ -30,6 +30,19 @@ typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
  **********************/
 
 /**
+ * Creates a new theme
+ * @return  the new theme or NULL if allocated failed
+ */
+lv_theme_t * lv_theme_create(void);
+
+/**
+ * Copy 'src' theme into 'dst'
+ * @param dst   pointer to the destination theme
+ * @param src   pointer to the source theme
+ */
+void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src);
+
+/**
  * Get the theme assigned to the display of the object
  * @param obj       pointer to a theme object
  * @return          the theme of the object's display (can be NULL)
@@ -92,6 +105,13 @@ lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
  * @return the color
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
+
+
+/**
+ * Destroy a theme
+ * @param   theme the theme to destroy
+ */
+void lv_theme_destroy(lv_theme_t * theme);
 
 /**********************
  *    MACROS
