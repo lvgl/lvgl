@@ -664,7 +664,6 @@ code.literal + sub {
 }
 
 table.docutils {
-  width: 100%;
   border-radius: 0.25rem;
   box-shadow: 0 0 0 1px var(--color-border-primary), 0px 2px 6px rgba(0, 0, 0, 0.08);
   font-size: 0.8125rem;
@@ -683,7 +682,7 @@ table.docutils th {
 
 table.docutils td p,
 table.docutils th p {
-  margin: 0.5rem;
+  margin: 0.5rem 1.0rem;
 }
 
 .mobile-header.scrolled {
@@ -1163,4 +1162,135 @@ body[data-theme="dark"] .highlight .p {
 
 .glossary dl dd > :first-child {
   margin-top: 0 !important;
+}
+
+/*-------------------------------------------------------------------------
+ * Combining Bold / Italic / Underlining
+ * -------------------------------------
+ * These are things that reStructuredText cannot do by itself.
+ * It uses custom_roles.txt to set up roles using these classes.
+ *
+ * To use them in `.rst` files:
+ * ----------------------------
+ * 1.  .. include::  /include/custom_roles.txt
+ * 2.  Use with custom roles like this:
+ *         :bi:`text`
+ *         :ib:`text`
+ *         :u:`text`
+ *         :ub:`text`
+ *         :bu:`text`
+ *         :ui:`text`
+ *         :iu:`text`
+ *         :ubi:`text`
+ *         :uib:`text`
+ *         :bui:`text`
+ *         :iub:`text`
+ *         :biu:`text`
+ *         :ibu:`text`
+ *
+ * The above combinations were done so you don't have to remember
+ * whether 'i', 'b' or 'u' comes first when they are combined.
+ *-------------------------------------------------------------------------*/
+span.bi {
+  font-weight: bold;
+  font-style: italic;
+}
+span.ul {
+  text-decoration: underline;
+}
+span.bu {
+  text-decoration: underline;
+  font-weight: bold;
+}
+span.iu {
+  text-decoration: underline;
+  font-style: italic;
+}
+span.ubi {
+  text-decoration: underline;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/*-------------------------------------------------------------------------
+ * Tigher Tables
+ * -------------
+ * Here, we introduce 7 levels of table "tightening" with increasingly reduced space
+ * and size.  The large number of options here are merely for flexibility, giving the
+ * author the possibility of getting his table "just right" for its context to make
+ * the table maximally readable and usable.
+ *
+ * Furo normal table styling is for <p> elements inside <th> and <td> elements:
+ *
+ * table.docutils td p,
+ * table.docutils th p {
+ *     margin:.25rem
+ * }
+ *
+ * Then custom.css overrides this with:
+ *
+ * table.docutils {
+ *   ...
+ *   font-size: 0.8125rem;
+ *   ...
+ * }
+ * table.docutils td p,
+ * table.docutils th p {
+ *   margin: 0.5rem 1.0rem;
+ * }
+ *
+ * We make more compact tables by reducing the margin for the first 6, and finally
+ * reducing the font size for the 7th.  Note that these are used by putting the table
+ * within a ``container`` directive like this:
+ *
+ *     .. container:: tighter-table-N
+ *
+ *         table definition here
+ *
+ * where `N` is a digit 1-7, so that the table is wrapped in a
+ * <div class="tighter-table-N"> element.  Note that the table has to be
+ * indented past the leading `..` of the directive in order to accomplish
+ * this, so that the table itself is "contained" by the directive.
+ *-------------------------------------------------------------------------*/
+/* Level 1 */
+#furo-main-content .tighter-table-1 table.docutils th p,
+#furo-main-content .tighter-table-1 table.docutils td p {
+  margin: 0.4375rem 0.875rem;
+}
+/* Level 2 */
+#furo-main-content .tighter-table-2 table.docutils th p,
+#furo-main-content .tighter-table-2 table.docutils td p {
+  margin: 0.375rem 0.75rem;
+}
+/* Level 3 */
+#furo-main-content .tighter-table-3 table.docutils th p,
+#furo-main-content .tighter-table-3 table.docutils td p {
+  margin: 0.3125rem 0.625rem;
+}
+/* Level 4 */
+#furo-main-content .tighter-table-4 table.docutils th p,
+#furo-main-content .tighter-table-4 table.docutils td p {
+  margin: 0.25rem 0.5rem;
+}
+/* Level 5 */
+#furo-main-content .tighter-table-5 table.docutils th p,
+#furo-main-content .tighter-table-5 table.docutils td p {
+  margin: 0.1875rem 0.375rem;
+}
+/* Level 6 */
+#furo-main-content .tighter-table-6 table.docutils th p {
+  margin: 0.125rem 0.25rem;
+}
+#furo-main-content .tighter-table-6 table.docutils td p {
+  margin: 0.125rem 0.375rem;
+  /* left/right 0.375rem is intentional, larger than `th p` above. */
+}
+/* Level 7 */
+#furo-main-content .tighter-table-7 table.docutils th p {
+  font-size: 0.7rem;
+  margin: 0.0625rem 0.125rem;
+}
+#furo-main-content .tighter-table-7 table.docutils td p {
+  font-size: 0.7rem;
+  margin: 0.0625rem 0.125rem;
 }
