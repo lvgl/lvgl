@@ -13,6 +13,7 @@ Image Support
     libjpeg_turbo
     libpng
     lodepng
+    libwebp
     rle
     rlottie
     svg
