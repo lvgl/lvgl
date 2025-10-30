@@ -282,9 +282,9 @@ static void del_event_cb(lv_event_t * e)
     if(!dsc) return;
 
 #if LV_LINUX_FBDEV_MMAP
-    if (dsc->fbp) {
+    if(MAP_FAILED != dsc->fbp) {
         munmap(dsc->fbp, dsc->screensize);
-        dsc->fbp = NULL;
+        dsc->fbp = MAP_FAILED;
     }
 #endif
     if(dsc->fbfd >= 0) {
