@@ -48,7 +48,6 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h);
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
-static void wait_for_flushing(lv_display_t * disp);
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out);
 static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area);
@@ -658,7 +657,7 @@ static void refr_sync_areas(void)
     LV_PROFILER_REFR_BEGIN;
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
+    lv_display_wait_for_flushing(disp_refr);
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
@@ -1017,7 +1016,7 @@ static void refr_configured_layer(lv_layer_t * layer)
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
     if(!lv_display_is_double_buffered(disp_refr)) {
-        wait_for_flushing(disp_refr);
+        lv_display_wait_for_flushing(disp_refr);
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
@@ -1372,7 +1371,7 @@ static void draw_buf_flush(lv_display_t * disp)
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image. */
     if(lv_display_is_double_buffered(disp)) {
-        wait_for_flushing(disp_refr);
+        lv_display_wait_for_flushing(disp_refr);
     }
 
     disp->flushing = 1;
@@ -1425,26 +1424,3 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     LV_PROFILER_REFR_END;
 }
 
-static void wait_for_flushing(lv_display_t * disp)
-{
-    LV_PROFILER_REFR_BEGIN;
-    LV_LOG_TRACE("begin");
-
-    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
-
-    if(disp->flush_wait_cb) {
-        if(disp->flushing) {
-            disp->flush_wait_cb(disp);
-            disp->flushing = 0;
-        }
-    }
-    else {
-        while(disp->flushing);
-    }
-    disp->flushing_last = 0;
-
-    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
-
-    LV_LOG_TRACE("end");
-    LV_PROFILER_REFR_END;
-}
