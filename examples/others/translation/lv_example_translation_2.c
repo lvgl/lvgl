@@ -2,12 +2,13 @@
 
 #if LV_USE_TRANSLATION && LV_USE_DROPDOWN && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
-static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-static const char * languages[] = {"English", "Deutsch", "Español", NULL};
+/* Arrays are defined `const` to place them in program space instead of RAM. */
+static const char * const tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+static const char * const languages[] = {"English", "Deutsch", "Español", NULL};
 
 static void add_static_translations(void)
 {
-    static const char * translations[] = {
+    static const char * const translations[] = {
         "The Tiger",    "Der Tiger",     "El Tigre",
         "The Lion",     "Der Löwe",      "El León",
         "The Rabbit",   "Das Kaninchen", "El Conejo",
