@@ -840,7 +840,7 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
               ffmpeg_ctx->video_dec_ctx->width,
               ffmpeg_ctx->video_dec_ctx->height,
               ffmpeg_ctx->video_dec_ctx->pix_fmt,
-              4);
+              32);
 
     if(ret < 0) {
         LV_LOG_ERROR("Could not allocate src raw video buffer");
@@ -855,7 +855,7 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
               ffmpeg_ctx->video_dec_ctx->width,
               ffmpeg_ctx->video_dec_ctx->height,
               ffmpeg_ctx->video_dst_pix_fmt,
-              4);
+              32);
 
     if(ret < 0) {
         LV_LOG_ERROR("Could not allocate dst raw video buffer");
