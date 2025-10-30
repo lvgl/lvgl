@@ -49,7 +49,7 @@ lv_theme_t * lv_theme_create(void)
     LV_ASSERT_MALLOC(theme);
     return theme;
 }
-void lv_theme_destroy(lv_theme_t * theme)
+void lv_theme_delete(lv_theme_t * theme)
 {
     lv_free(theme);
 }

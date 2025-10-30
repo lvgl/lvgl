@@ -108,10 +108,10 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
 
 
 /**
- * Destroy a theme
+ * Delete a theme
  * @param   theme the theme to destroy
  */
-void lv_theme_destroy(lv_theme_t * theme);
+void lv_theme_delete(lv_theme_t * theme);
 
 /**********************
  *    MACROS

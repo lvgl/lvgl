@@ -20,7 +20,7 @@ static void on_display_delete(lv_event_t * e)
 {
     lv_display_t * display = (lv_display_t *) lv_event_get_target(e);
     lv_theme_t * display_theme = lv_display_get_theme(display);
-    lv_theme_destroy(display_theme);
+    lv_theme_delete(display_theme);
 }
 
 static void new_theme_init_and_set(void)
