@@ -73,9 +73,9 @@ void lv_theme_apply(lv_obj_t * obj)
     apply_theme_recursion(th, obj);    /*Apply the theme including the base theme(s)*/
 }
 
-void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * base)
+void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent)
 {
-    new_theme->parent = base;
+    theme->parent = parent;
 }
 
 void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)

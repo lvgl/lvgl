@@ -59,10 +59,10 @@ void lv_theme_apply(lv_obj_t * obj);
  * Set a base theme for a theme.
  * The styles from the base them will be added before the styles of the current theme.
  * Arbitrary long chain of themes can be created by setting base themes.
- * @param new_theme pointer to theme which base should be set
+ * @param theme pointer to theme which base should be set
  * @param parent pointer to the base theme
  */
-void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * parent);
+void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent);
 
 /**
  * Set an apply callback for a theme.
