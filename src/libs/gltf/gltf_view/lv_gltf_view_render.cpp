@@ -1035,7 +1035,7 @@ static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * vie
                                    bool transmission_pass)
 {
     auto b_radius = lv_gltf_data_get_radius(gltf_data);
-    float radius = b_radius * 2.5;
+    float radius = b_radius * LV_GLTF_DISTANCE_SCALE_FACTOR;
     radius *= view_desc->distance;
 
     fastgltf::math::fvec3 rcam_dir = fastgltf::math::fvec3(0.0f, 0.0f, 1.0f);
