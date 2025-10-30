@@ -1,8 +1,7 @@
+.. include:: /include/substitutions.txt
 ===========
 RZ/A Family
 ===========
-
-.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
 
 Supported boards in the RZ/A Family:
 

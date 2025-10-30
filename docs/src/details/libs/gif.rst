@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _gif:
 
 ===========
@@ -77,8 +78,6 @@ from files.  To do so, follow the instructions in :ref:`file_system`.
 
 Memory Requirements
 *******************
-
-.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
 
 To decode and display a GIF animation ~25 kB of RAM is needed plus
 (color format pixel size + 1) |times| image width |times| image height.

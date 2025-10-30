@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _stm32 ltdc driver:
 
 =========================
@@ -99,9 +100,6 @@ a single buffer if :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` is enabled.
 
 Linker Script
 *************
-
-.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
-.. |divide| unicode:: U+000F7 .. DIVISION SIGN
 
 You should ensure the LTDC framebuffer memory is actually reserved in the linker script.
 This is a file that normally has the extension ``.ld``.
