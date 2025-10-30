@@ -160,8 +160,8 @@ Arduino Build system
 --------------------
 
 Arduino uses a special build system that automatically compiles:
-The main sketch file (.ino), and
-All ``.c``, ``.cpp``, and ``.h`` files located in the same directory as the sketch or inside the ``src`` subfolder.
+- The main sketch file (``.ino``)
+- All ``.c``, ``.cpp``, and ``.h`` files located in the same directory as the sketch or inside the ``src`` subfolder.
 Any files placed outside these locations will not be compiled or linked automatically.
 
 Because LVGL Editor exports projects with nested folders like:
@@ -232,13 +232,12 @@ Change:
 .. code-block:: c
 
     #include "editor_project.h"
-    
+
 to:
 
 .. code-block:: c
 
     #include "../editor_project.h"
-
 
 (or adjust accordingly depending on how deep the file is nested).
 
@@ -265,7 +264,7 @@ Edit files to use:
 
     #include "lvgl.h"
 
-and ensure the main header file ie. ``editor_project.h`` is included relatively:
+and ensure the main header file i.e., ``editor_project.h`` is included relatively:
 
 .. code-block:: c
 
