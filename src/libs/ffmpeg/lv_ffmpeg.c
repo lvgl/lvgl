@@ -84,7 +84,7 @@ static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc
 static int ffmpeg_lvfs_read(void * ptr, uint8_t * buf, int buf_size);
 static int64_t ffmpeg_lvfs_seek(void * ptr, int64_t pos, int whence);
 static AVIOContext * ffmpeg_open_io_context(lv_fs_file_t * file);
-static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_fs_path);
+static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_fs_path, const char * decoder_name);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -148,7 +148,7 @@ void lv_ffmpeg_deinit(void)
 int lv_ffmpeg_get_frame_num(const char * path)
 {
     int ret = -1;
-    struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS);
+    struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS, NULL);
 
     if(ffmpeg_ctx) {
         ret = ffmpeg_ctx->video_stream->nb_frames;
@@ -179,7 +179,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 
     lv_timer_pause(player->timer);
 
-    player->ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS);
+    player->ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS, player->decoder_name);
 
     if(!player->ffmpeg_ctx) {
         goto failed;
@@ -274,6 +274,16 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
     player->auto_restart = en;
 }
 
+void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * name)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
+    if(player->decoder_name) {
+        lv_free((void *)player->decoder_name);
+    }
+    player->decoder_name = name ? lv_strdup(name) : NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -311,7 +321,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
 
-        struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, true);
+        struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, true, NULL);
 
         if(ffmpeg_ctx == NULL) {
             return LV_RESULT_INVALID;
@@ -538,15 +548,48 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
     return 0;
 }
 
+static int ffmpeg_init_codec_context(AVCodecContext ** dec_ctx, const AVCodec * dec,
+                                     enum AVMediaType type, AVStream * st)
+{
+    int ret = 0;
+
+    /* Allocate a codec context for the decoder */
+    *dec_ctx = avcodec_alloc_context3(dec);
+    if(*dec_ctx == NULL) {
+        return AVERROR(ENOMEM);
+    }
+
+    /* Copy codec parameters from input stream to output codec context */
+    if((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
+        LV_LOG_ERROR("Failed to allocate the %s codec context",
+                     av_get_media_type_string(type));
+        goto free_dec_ctx;
+    }
+
+    /* Init the decoders */
+    if((ret = avcodec_open2(*dec_ctx, dec, NULL)) < 0) {
+        LV_LOG_ERROR(
+            "Failed to copy %s codec parameters to decoder context",
+            av_get_media_type_string(type));
+        goto free_dec_ctx;
+    }
+
+    return 0;
+
+free_dec_ctx:
+    avcodec_free_context(dec_ctx);
+    *dec_ctx = NULL;
+    return ret;
+}
+
 static int ffmpeg_open_codec_context(int * stream_idx,
                                      AVCodecContext ** dec_ctx, AVFormatContext * fmt_ctx,
-                                     enum AVMediaType type)
+                                     enum AVMediaType type, const char * decoder_name)
 {
     int ret;
     int stream_index;
     AVStream * st;
     const AVCodec * dec = NULL;
-    AVDictionary * opts = NULL;
 
     ret = av_find_best_stream(fmt_ctx, type, -1, -1, NULL, 0);
     if(ret < 0) {
@@ -559,34 +602,29 @@ static int ffmpeg_open_codec_context(int * stream_idx,
         st = fmt_ctx->streams[stream_index];
 
         /* find decoder for the stream */
-        dec = avcodec_find_decoder(st->codecpar->codec_id);
+        if(decoder_name) {
+            dec = avcodec_find_decoder_by_name(decoder_name);
+            if(dec) {
+                ret = ffmpeg_init_codec_context(dec_ctx, dec, type, st);
+                if(ret < 0) {
+                    dec = NULL;
+                }
+            }
+        }
         if(dec == NULL) {
-            LV_LOG_ERROR("Failed to find %s codec",
-                         av_get_media_type_string(type));
-            return AVERROR(EINVAL);
-        }
+            dec = avcodec_find_decoder(st->codecpar->codec_id);
+            if(dec == NULL) {
+                LV_LOG_ERROR("Failed to find %s codec",
+                             av_get_media_type_string(type));
+                return AVERROR(EINVAL);
+            }
 
-        /* Allocate a codec context for the decoder */
-        *dec_ctx = avcodec_alloc_context3(dec);
-        if(*dec_ctx == NULL) {
-            LV_LOG_ERROR("Failed to allocate the %s codec context",
-                         av_get_media_type_string(type));
-            return AVERROR(ENOMEM);
-        }
-
-        /* Copy codec parameters from input stream to output codec context */
-        if((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
-            LV_LOG_ERROR(
-                "Failed to copy %s codec parameters to decoder context",
-                av_get_media_type_string(type));
-            return ret;
-        }
-
-        /* Init the decoders */
-        if((ret = avcodec_open2(*dec_ctx, dec, &opts)) < 0) {
-            LV_LOG_ERROR("Failed to open %s codec",
-                         av_get_media_type_string(type));
-            return ret;
+            ret = ffmpeg_init_codec_context(dec_ctx, dec, type, st);
+            if(ret < 0) {
+                LV_LOG_ERROR("Failed to initialize %s codec context",
+                             av_get_media_type_string(type));
+                return ret;
+            }
         }
 
         *stream_idx = stream_index;
@@ -632,7 +670,7 @@ static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc,
     }
 
     if(ffmpeg_open_codec_context(&video_stream_idx, &video_dec_ctx,
-                                 fmt_ctx, AVMEDIA_TYPE_VIDEO)
+                                 fmt_ctx, AVMEDIA_TYPE_VIDEO, NULL)
        >= 0) {
         bool has_alpha = ffmpeg_pix_fmt_has_alpha(video_dec_ctx->pix_fmt);
 
@@ -748,7 +786,7 @@ static AVIOContext * ffmpeg_open_io_context(lv_fs_file_t * file)
     return pIOCtx;
 }
 
-static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_fs_path)
+static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_fs_path, const char * decoder_name)
 {
     if(path == NULL || lv_strlen(path) == 0) {
         LV_LOG_ERROR("file path is empty");
@@ -803,7 +841,7 @@ static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_
     if(ffmpeg_open_codec_context(
            &(ffmpeg_ctx->video_stream_idx),
            &(ffmpeg_ctx->video_dec_ctx),
-           ffmpeg_ctx->fmt_ctx, AVMEDIA_TYPE_VIDEO)
+           ffmpeg_ctx->fmt_ctx, AVMEDIA_TYPE_VIDEO, decoder_name)
        >= 0) {
         ffmpeg_ctx->video_stream = ffmpeg_ctx->fmt_ctx->streams[ffmpeg_ctx->video_stream_idx];
 
@@ -963,6 +1001,8 @@ static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
                                     FRAME_DEF_REFR_PERIOD, obj);
     lv_timer_pause(player->timer);
 
+    player->decoder_name = NULL;
+
     LV_TRACE_OBJ_CREATE("finished");
 }
 
@@ -984,6 +1024,11 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;
+
+    if(player->decoder_name) {
+        lv_free((void *)player->decoder_name);
+        player->decoder_name = NULL;
+    }
 
     LV_TRACE_OBJ_CREATE("finished");
 }
