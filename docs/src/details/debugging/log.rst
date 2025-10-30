@@ -34,14 +34,8 @@ Example:  you set :c:macro:`LV_LOG_LEVEL` to :c:macro:`LV_LOG_LEVEL_WARN` and
 Log Output
 ----------
 
-Logging with ``printf``
-~~~~~~~~~~~~~~~~~~~~~~~
-
 If your system supports ``printf``, you just need to enable
 :c:macro:`LV_LOG_PRINTF` in ``lv_conf.h`` to output log messages with ``printf``.
-
-Using a custom log function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you can't use ``printf`` or want to use a custom function to log, you
 can register a "logging" function with :cpp:func:`lv_log_register_print_cb`.
