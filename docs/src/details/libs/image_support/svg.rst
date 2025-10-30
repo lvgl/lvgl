@@ -35,7 +35,7 @@ As Image Source
 Direct Rendering
 ****************
 
-It also possible draw SVG vector graphics in draw events:
+It is also possible to draw SVG vector graphics in draw events:
 
 .. code:: c
 

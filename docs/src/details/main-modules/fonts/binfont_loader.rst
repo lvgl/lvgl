@@ -1,5 +1,5 @@
 
-.. _binfont_laoder:
+.. _binfont_loader:
 
 ==============
 BinFont Loader

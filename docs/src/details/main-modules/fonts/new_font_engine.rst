@@ -65,7 +65,7 @@ To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be cr
        dsc_out->adv_w = 12;        /* Horizontal space required by the glyph in [px] */
        dsc_out->box_h = 8;         /* Height of the bitmap in [px] */
        dsc_out->box_w = 6;         /* Width of the bitmap in [px] */
-       dsc_out->ofs_x = 0;         /* X offset of the bitmap in [pf] */
+       dsc_out->ofs_x = 0;         /* X offset of the bitmap in [px] */
        dsc_out->ofs_y = 3;         /* Y offset of the bitmap measured from the as line */
        dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 

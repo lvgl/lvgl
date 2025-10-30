@@ -27,7 +27,7 @@ For example:
 Font Engines
 ************
 
-A font engine is a some C code that allows LVGL to extract valrious information
+A font engine is some C code that allows LVGL to extract various information
 from the fonts, such as character (glyph) information or bitmap.
 
 LVGL's built-in font engine is suitable for most of the typical case.
