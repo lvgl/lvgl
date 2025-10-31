@@ -36,7 +36,7 @@ Styles can be referenced like this in the ``<view>``:
 
 As shown in the example, parts and states can be set using ``selector``.
 
-Style binding
+Style Binding
 *************
 
 Instead of directly adding styles to the UI elements it's also possible to add them conditionally
@@ -77,6 +77,23 @@ Local styles can be used directly, for example:
     <lv_label style_bg_opa="200" style_bg_color="0x123456"/>
 
 Selectors are not supported for local style properties yet.
+
+
+Local Style Binding
+*******************
+
+Instead of setting local style properties directly, it's also possible to bind style properties
+to :ref:`Subject <observer_how_to_use>` values:
+
+.. code-block:: xml
+
+    <component>
+       <view extends="lv_slider">
+            <bind_style_prop prop="bg_opa" selector="knob|pressed" subject="slider_knob_opa" />
+       </view>
+    </component>
+
+
 
 Gradients
 *********
