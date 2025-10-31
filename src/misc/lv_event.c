@@ -338,6 +338,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_REFRESH);
             ENUM_CASE(EVENT_READY);
             ENUM_CASE(EVENT_CANCEL);
+            ENUM_CASE(EVENT_STATE_CHANGED);
 
             /** Other events*/
             ENUM_CASE(EVENT_CREATE);

@@ -163,9 +163,14 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
         *s = LV_MAX(*s, knob_size);
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
-    else if(code == LV_EVENT_VALUE_CHANGED) {
-        lv_switch_trigger_anim(obj);
-        lv_obj_invalidate(obj);
+    else if(code == LV_EVENT_STATE_CHANGED) {
+        lv_state_t prev_state = lv_event_get_prev_state(e);
+        lv_state_t diff = prev_state ^ lv_obj_get_state(obj);
+
+        if(diff & LV_STATE_CHECKED) {
+            lv_switch_trigger_anim(obj);
+            lv_obj_invalidate(obj);
+        }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
@@ -296,6 +301,8 @@ static void lv_switch_anim_completed(lv_anim_t * a)
 static void lv_switch_trigger_anim(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->no_anim) return;
+
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
