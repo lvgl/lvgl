@@ -46,7 +46,7 @@ The built-in font engine is also the easiest to use:
 
 LVGL also supports several other font engines:
 
-- ``fmt_txt``: This the built-in font engine that stores the fonts as a C array
+- ``fmt_txt``: This is the built-in font engine that stores the fonts as a C array
 - ``binfont``: Similar to the built-in format, but the font is stored as a file, so it can be loaded at runtime too
 - ``tiny_ttf``: Small vector graphics engine to load TTF files at runtime at any size
 - ``freetype``: Well known font rendering library load and render TTF fonts at runtime. Also supports letter strokes.
