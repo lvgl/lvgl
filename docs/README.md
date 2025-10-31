@@ -295,16 +295,25 @@ All lists (including nested lists) **must** be preceded and followed with at lea
 
 ### Tightening Tables
 
-The default cell formatting (specifically margins around cell text) for tables is designed to be maximally readable for short tables with relatively few columns.  However, as the number of columns or rows grows large, this default formatting becomes less and less readable.  For this purpose, LVGL documentation provides an easy-to-use tool to "tighten" larger tables until they are maximally readable.  How to do this:
+Very long or very wide tables can be difficult to read and use.  You, as the writer, are responsible for making your tables as readable as they can be.  Here's how to "squeeze" them down to a smaller size when needed to make them more readable and usable:
+
+1.  move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7), and
+
+2.  indent your table to be the container's "content", like this:
 
 ```rst
-.. container:: tighter-table-N
+.. container:: tighter-table-3
 
-    normal table syntax here
-    (indented to be the content of the `container` directive)
+    +-----------+--------------+--------------+--------+
+    | Heading 1 | Heading 2    | Heading 3    | Hdg 4  |
+    +===========+==============+==============+========+
+    | row 1 c 1 | row 1 col 3  | row 1 col 3  | r1 c4  |
+    +-----------+--------------+--------------+--------+
+    | row 2 c 1 | row 2 col 3  | row 2 col 3  | r2 c4  |
+    +-----------+--------------+--------------+--------+
+    | row 3 c 1 | row 3 col 3  | row 3 col 3  | r3 c4  |
+    +-----------+--------------+--------------+--------+
 ```
-
-where `N` is a digit from 1 to 7 representing an increasing level of "tightening".  This places the generated table inside a `<div>` HTML element having a class `tighter-table-1` through `tighter-table-7`.  Custom LVGL .CSS takes over from there, progressively (1-7) reducing the margins around cell text.  It is the responsibility of the writer to generate the documentation locally to test various "tightening levels" and produce tables that are maximally readable in documents you create or modify.  (You don't need to worry about this for small tables:  the default table formatting will work just fine.)
 
 
 
@@ -326,7 +335,11 @@ Example:
 The temperature outside is 20\ |deg|\ C.
 ```
 
-Note that the spaces surrounding **reStructuredText** substitutions *are required* for the parser to parse them correctly.  Any time you need to remove those spaces in the final output, you can do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` modifier, and thus do not need this escaping:
+results in
+
+The temperature outside is 20°C.
+
+Note that the spaces surrounding **reStructuredText** substitutions *are required* for the parser to parse them correctly.  Any time you need to remove those spaces in the final output, do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` modifier. These do not need this escaping:
 
 - `|nbsp|` (non-breaking space),
 - `|shy|` (soft hyphen), and
