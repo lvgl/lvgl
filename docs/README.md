@@ -374,7 +374,7 @@ If you instead want the API-link-generation logic to simply include links to cod
 
 #### In-Line Code Expressions
 
-If you want to reference documentation of of specific LVGL code elements, there are special Text Roles to do this:
+If you want to reference documentation of specific LVGL code elements, there are special Text Roles to do this:
 
     :cpp:func:`lv_init`   (note there are no parentheses after the function name)
     :c:macro:`LV_USE_FLEX`
