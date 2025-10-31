@@ -3,6 +3,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.cpp)
 
 idf_build_get_property(LV_MICROPYTHON LV_MICROPYTHON)
+idf_build_get_property(target IDF_TARGET)
 
 if(LV_MICROPYTHON)
   idf_component_register(
@@ -54,11 +55,11 @@ else()
     set_source_files_properties(${DEMO_MUSIC_SOURCES} COMPILE_FLAGS "-Wno-format")
   endif()
 
-  if(CONFIG_LV_USE_PPA)
-    set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer log)
-  else()
-    set(IDF_COMPONENTS esp_timer log)
-  endif()
+if(${target} STREQUAL "esp32p4")
+  set(IDF_COMPONENTS esp_driver_ppa esp_mm esp_timer log)
+else()
+  set(IDF_COMPONENTS esp_timer log)
+endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
       INCLUDE_DIRS ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../
