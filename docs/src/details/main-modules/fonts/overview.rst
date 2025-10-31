@@ -134,7 +134,7 @@ Symbols
 
 LVGL supports some predefined "symbols". A symbol is a specific Unicode character
 in a font with an icon-like image. The symbols have names like ``LV_SYMBOL_OK``,
-``LV_SYMBOL_HOME``, etc. See the full list of predefines symbols below:
+``LV_SYMBOL_HOME``, etc. See the full list of predefined symbols below:
 
 .. image:: /_static/images/symbols.png
 
