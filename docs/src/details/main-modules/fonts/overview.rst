@@ -32,7 +32,7 @@ from the fonts, such as character (glyph) information or bitmap.
 
 LVGL's built-in font engine is suitable for most typical cases.
 It can handle various bit-per-pixel settings (1, 2, 3, 4, 8) in bitmaps,
-kerning, having only selected character ranages from multiple fonts,
+kerning, having only selected character ranges from multiple fonts,
 compressing bitmaps, and several others.
 
 The built-in font engine is also the easiest to use:
