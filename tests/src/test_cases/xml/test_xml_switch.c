@@ -33,6 +33,7 @@ void test_xml_switch_widget(void)
 
     lv_xml_create(scr, "lv_switch", attrs_1);
 
+    lv_test_wait(1000); /*Wait for the transitions*/
 
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/lv_switch.png");
 }

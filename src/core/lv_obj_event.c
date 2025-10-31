@@ -346,7 +346,18 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
         LV_LOG_WARN("Not interpreted with this event code");
         return NULL;
     }
+}
 
+lv_state_t lv_event_get_prev_state(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_STATE_CHANGED) {
+        lv_state_t * state = lv_event_get_param(e);
+        return state ? *state : 0;
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
 }
 
 /**********************

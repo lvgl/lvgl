@@ -77,6 +77,7 @@ struct _lv_obj_t {
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t is_deleting : 1;
+    uint16_t no_anim : 1;  /**< Temporarily skip any animations */
 };
 
 /**********************

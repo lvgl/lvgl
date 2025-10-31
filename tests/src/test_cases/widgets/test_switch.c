@@ -156,6 +156,8 @@ void test_screeshots(void)
     lv_obj_add_state(sw, LV_STATE_CHECKED);
     lv_obj_set_size(sw, 50, 100);
 
+    lv_test_wait(1000); /*Wait for the transitions*/
+
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/switch_1.png");
 }
 
