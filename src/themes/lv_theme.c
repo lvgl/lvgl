@@ -43,6 +43,26 @@ lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
     return lv_display_get_theme(disp);
 }
 
+lv_theme_t * lv_theme_create(void)
+{
+    lv_theme_t * theme = lv_zalloc(sizeof(*theme));
+    LV_ASSERT_MALLOC(theme);
+    return theme;
+}
+void lv_theme_delete(lv_theme_t * theme)
+{
+    lv_free(theme);
+}
+
+void lv_theme_copy(lv_theme_t * dst, const lv_theme_t * src)
+{
+    if(!dst || !src) {
+        LV_LOG_WARN("Refusing to copy null themes");
+        return;
+    }
+    lv_memcpy(dst, src, sizeof(*src));
+}
+
 void lv_theme_apply(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
@@ -53,9 +73,9 @@ void lv_theme_apply(lv_obj_t * obj)
     apply_theme_recursion(th, obj);    /*Apply the theme including the base theme(s)*/
 }
 
-void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * base)
+void lv_theme_set_parent(lv_theme_t * theme, lv_theme_t * parent)
 {
-    new_theme->parent = base;
+    theme->parent = parent;
 }
 
 void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
