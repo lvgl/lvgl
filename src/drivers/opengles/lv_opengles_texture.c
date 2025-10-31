@@ -96,6 +96,8 @@ void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t hei
         return;
     }
     dsc->fb1 = buffer;
+
+    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, lv_display_get_render_mode(disp));
 #endif /*!LV_USE_DRAW_OPENGLES*/
 
     if(dsc->is_texture_owner && dsc->texture_id != 0) {
