@@ -55,7 +55,7 @@ Unicode Support
 ***************
 
 LVGL supports **UTF-8** encoded Unicode characters. Your editor needs to
-be configured to save your code/text as UTF-8 (usually this the default)
+be configured to save your code/text as UTF-8 (usually this is the default)
 and be sure that :c:macro:`LV_TXT_ENC` is set to :c:macro:`LV_TXT_ENC_UTF8` in
 ``lv_conf.h``. (This is the default value.)
 
