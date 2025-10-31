@@ -61,7 +61,7 @@ typedef enum {
  * - If the reference image is not found it will be created automatically from the rendered screen.
  * - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
  *
- * It requires libPNG.
+ * It requires lodepng.
  *
  * @param fn_ref    path to the reference image. Will be appended toREF_IMGS_PATH if set.
  * @return          An element of `lv_test_screenshot_result_t`
