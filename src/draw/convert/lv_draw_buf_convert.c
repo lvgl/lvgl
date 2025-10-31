@@ -119,11 +119,9 @@ lv_result_t lv_draw_buf_convert_premultiply(lv_draw_buf_t * draw_buf)
             }
         }
     }
-    else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-        /*Pass*/
-    }
     else {
-        LV_LOG_WARN("draw buf has no alpha, cf: %d", cf);
+        LV_LOG_WARN("color format: %d not supported for premultiply", cf);
+        return LV_RESULT_INVALID;
     }
 
     return LV_RESULT_OK;

@@ -472,19 +472,32 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) return LV_RESULT_INVALID;
-    if((draw_buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) == 0) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) return LV_RESULT_INVALID;
+
+    if(!lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_MODIFIABLE)) {
         LV_LOG_WARN("draw buf is not modifiable: 0x%04x", draw_buf->header.flags);
         return LV_RESULT_INVALID;
     }
+
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_buf_convert_premultiply(draw_buf);
+    lv_result_t res = lv_draw_buf_convert_premultiply(draw_buf);
+    if(res == LV_RESULT_OK) {
+        lv_area_t area = {0, 0, draw_buf->header.w - 1, draw_buf->header.h - 1};
+        if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+            /**
+             * We only need to flush the palette table, so we set y2 equal to y1 to improve performance
+             * and reduce cache flush overhead.
+             */
+            area.y2 = 0;
+        }
 
-    draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
+        lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+        lv_draw_buf_flush_cache(draw_buf, &area);
+    }
 
     LV_PROFILER_DRAW_END;
-    return LV_RESULT_OK;
+    return res;
 }
 
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
