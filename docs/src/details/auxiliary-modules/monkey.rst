@@ -19,7 +19,7 @@ Usage
 
 First, enable :c:macro:`LV_USE_MONKEY` in ``lv_conf.h``.
 
-Next, declare a variable (it can be local) of type :c:type:`lv_monkey_config_t` to
+Next, declare a variable (it can be local) of type :cpp:type:`lv_monkey_config_t` to
 define the configuration structure, initialize it using
 :cpp:expr:`lv_monkey_config_init(cfg)` then set its ``type`` member to the desired
 type of :ref:`input device <indev>`, and set the ``min`` and ``max`` values for its
@@ -60,3 +60,4 @@ Example
 API
 ***
 
+.. API equals: lv_monkey_create
