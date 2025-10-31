@@ -1,19 +1,26 @@
 .. _vg_lite_tvg:
 
-=================
-VG-Lite Simulator
-=================
+=====================
+VG-Lite GPU Simulator
+=====================
 
-LVGL integrates a VG-Lite simulator based on ThorVG.
-Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the time spent debugging and locating problems on hardware devices.
+LVGL integrates a VG-Lite GPU simulator based on ThorVG.  Its purpose is to simplify
+the debugging of VG-Lite GPU adaptation and reduce the time spent debugging and
+locating problems on hardware devices.
 
-It has been integrated into the CI automated compilation and testing process to ensure that the VG-Lite rendering backend can be fully tested after each PR modification.
+It has been integrated into the CI automated compilation and testing process to ensure
+that the VG-Lite rendering backend can be fully tested after each Pull Request (PR) is
+merged into the repository.
+
+
 
 How It Works
 ************
 
-Sort out the APIs in the ``vg_lite.h`` header file provided by the vendor, re-implement the APIs using `ThorVG <https://github.com/thorvg/thorvg>`_,
-and simulate the same rendering images as the real hardware on the simulator.
+Using the ``vg_lite.h`` header file, ThorVG re-implements the VG-Lite API, generating
+the same rendered images as the real VG-Lite GPU hardware.
+
+
 
 Configuration
 *************

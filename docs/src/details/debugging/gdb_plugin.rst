@@ -5,7 +5,7 @@ GDB Plug-In
 ===========
 
 Debugging LVGL with GDB
------------------------
+***********************
 
 To facilitate debugging LVGL with GDB, a GDB plugin is provided. This plugin
 can be found in the ``lvgl/scripts/gdb`` directory. The GDB plugin can be used
@@ -42,9 +42,16 @@ The plugin provides the following commands.
 - ``info style``: Show the object's style.
 - ``info draw_unit``: Display all current drawing unit information.
 
+.. note::
 
-Dump obj tree
--------------
+    Some versions of ``gdb`` on Windows (e.g. those delivered with various versions
+    of Perl) are compiled without Python support, so the ``source`` command will not
+    be supported.
+
+
+
+Dump Obj Tree
+*************
 
 ``dump obj``: Dump the object tree.
 
@@ -53,10 +60,12 @@ Dump obj tree
 ``dump obj -a 0x60700000dd10``: Dump the object tree starting from the specified address.
 
 
-Show obj's style
-----------------
 
-This command can dump the object's local style, since style value is a union, it's displayed in all possible formats.
+Show Obj's Style
+****************
+
+This command can dump the object's local style, since style value is a union, it's
+displayed in all possible formats.
 
 ``info style address_of_obj``: Show the object's style.
 
@@ -75,8 +84,10 @@ Example:
       158 = {num = 32767, ptr = 0x7fff, color = {blue = 255 '\377', green = 127 '\177', red = 0 '\000'}}
     (gdb)
 
-Connect to Debugger
--------------------
+
+
+Connecting to a Debugger
+************************
 
 This command provides the ability to connect and debug GDB Python Script using IDE.
 
@@ -88,4 +99,5 @@ Connect to ``PyCharm`` / ``VSCode`` / ``Eclipse (not supported yet)``
 
 ``debugger -t eclipse``
 
-How to use it specifically, search ``pydevd_pycharm`` / ``debugpy`` for details.
+Perform a web search for ``pydevd_pycharm`` or ``debugpy`` for details about how to
+use the debugger.
