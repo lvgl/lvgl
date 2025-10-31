@@ -237,6 +237,7 @@ void lv_xml_init(void)
                            lv_obj_xml_play_timeline_event_apply);
 
     lv_xml_register_widget("lv_obj-bind_style", lv_obj_xml_bind_style_create, lv_obj_xml_bind_style_apply);
+    lv_xml_register_widget("lv_obj-bind_style_prop", lv_obj_xml_bind_style_prop_create, lv_obj_xml_bind_style_prop_apply);
     lv_xml_register_widget("lv_obj-bind_flag_if_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_register_widget("lv_obj-bind_flag_if_not_eq", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
     lv_xml_register_widget("lv_obj-bind_flag_if_gt", lv_obj_xml_bind_flag_create, lv_obj_xml_bind_flag_apply);
