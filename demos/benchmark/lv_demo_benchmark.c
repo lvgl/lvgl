@@ -537,20 +537,6 @@ void lv_demo_benchmark_set_end_cb(lv_demo_benchmark_on_end_cb_t cb)
     on_demo_end_cb = cb;
 }
 
-lv_obj_t * add_warning_label(const char * text)
-{
-    LV_LOG("%s\n", text);
-
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_recolor(label, true);
-    lv_label_set_text_fmt(label, "#ffc000 " LV_SYMBOL_WARNING "# %s", text);
-    lv_obj_set_style_pad_left(label, 12, 0);
-    lv_obj_set_width(label, lv_pct(100));
-
-    return label;
-}
-
-
 void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summary)
 {
     LV_ASSERT_NULL(summary)
@@ -1033,6 +1019,18 @@ static bool is_optimization_enabled(void)
     return t_optimized * 5 < t_unoptimized;
 }
 
+static lv_obj_t * add_warning_label(const char * text)
+{
+    LV_LOG("%s\n", text);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_recolor(label, true);
+    lv_label_set_text_fmt(label, "#ffc000 " LV_SYMBOL_WARNING "# %s", text);
+    lv_obj_set_style_pad_left(label, 12, 0);
+    lv_obj_set_width(label, lv_pct(100));
+
+    return label;
+}
 
 static void add_warnings(void)
 {
