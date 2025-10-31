@@ -232,7 +232,7 @@ Normally underlining is not possible in **reStructuredText**.  Also, at this wri
 | underline and boldface | `ub` or `bu`                             | :ub:\`text\`  |
 | underline and italics  | `iu` or `ui`                             | :iu:\`text\`  |
 | italics and boldface   | `ib` or `bi`                             | :ib:\`text\`  |
-| all three              | `ubi`, `uib`, `bui`, iub`, biu` or `ibu` | :ubi:\`text\` |
+| all three              | `ubi`, `uib`, `bui`, `iub`, `biu` or `ibu` | :ubi:\`text\` |
 
 
 
