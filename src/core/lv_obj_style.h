@@ -394,6 +394,32 @@ lv_color32_t lv_obj_style_apply_recolor(const lv_obj_t * obj, lv_part_t part, lv
  */
 lv_color32_t lv_obj_get_style_recolor_recursive(const lv_obj_t * obj, lv_part_t part);
 
+#if LV_USE_OBSERVER
+/**
+ * Disable a style if a subject's value is not equal to a reference value
+ * @param obj           pointer to Widget
+ * @param style         pointer to a style
+ * @param selector      pointer to a selector
+ * @param subject       pointer to Subject
+ * @param ref_value     reference value to compare Subject's value with
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
+                                  lv_subject_t * subject, int32_t ref_value);
+
+/**
+ * Connect a subject's value to a style property of a widget.
+ * @param obj       pointer to a Widget
+ * @param prop      a style property
+ * @param selector  a selector for which the property should be added, e.g. `LV_PART_KNOB | LV_STATE_PRESSED`
+ * @param subject   pointer a Subject to which value the property should be bound
+ * @return              pointer to newly-created Observer
+ */
+lv_observer_t * lv_obj_bind_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector,
+                                       lv_subject_t * subject);
+
+#endif
+
 /**********************
  *      MACROS
  **********************/
