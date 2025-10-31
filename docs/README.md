@@ -71,7 +71,7 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ### reStructuredText
 
-LVGL documentation uses **reStructuredText**.  The definitive reStructuredText reference is https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html.  Supplemented by [the Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any any all reStructuredText tools you will ever need while creating or modifying LVGL documentation.
+LVGL documentation uses **reStructuredText**.  The definitive reStructuredText reference is https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html.  Supplemented by [the Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any and all reStructuredText tools you will ever need while creating or modifying LVGL documentation.
 
 
 
