@@ -79,7 +79,7 @@ LVGL documentation uses **reStructuredText**.  The definitive reStructuredText r
 
 Because LVGL Documentation is currently using the `Furo` theme, this link to the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) takes you to a set of HTML pages whose source files can be very instructive about how to do different things using **reStructuredText**.  Just find an example of what you are trying to do (e.g. tables), and then click the "eye" icon at the top-right of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.  Note that the sub-pages of the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) contain a wide variety of **reStructuredText** constructs:  lists, tables, structural elements, admonitions, images, figures, typography, etc..
 
-Note:  the section headings in these pages use a different convention than the one presented above.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
+Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
 
 
