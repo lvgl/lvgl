@@ -17,7 +17,7 @@
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
-#include "../others/sysmon/lv_sysmon.h"
+#include "../debugging/sysmon/lv_sysmon.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"

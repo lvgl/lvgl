@@ -22,7 +22,7 @@
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_math.h"
 #include "../image/lv_image.h"
-#include "../../others/observer/lv_observer_private.h"
+#include "../../core/lv_observer_private.h"
 
 /*********************
  *      DEFINES

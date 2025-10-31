@@ -14,3 +14,4 @@ Input devices (lv_indev)
     button
     groups
     gestures
+    gridnav

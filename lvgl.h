@@ -43,14 +43,18 @@ extern "C" {
 
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
+#include "src/core/lv_refr.h"
+#include "src/core/lv_observer.h"
 #include "src/indev/lv_indev.h"
 #include "src/indev/lv_indev_gesture.h"
-#include "src/core/lv_refr.h"
+#include "src/indev/lv_gridnav.h"
 #include "src/display/lv_display.h"
 
 #include "src/font/lv_font.h"
-#include "src/font/lv_binfont_loader.h"
-#include "src/font/lv_font_fmt_txt.h"
+#include "src/font/binfont_loader/lv_binfont_loader.h"
+#include "src/font/fmt_txt/lv_font_fmt_txt.h"
+#include "src/font/imgfont/lv_imgfont.h"
+#include "src/font/font_manager/lv_font_manager.h"
 
 #include "src/widgets/animimage/lv_animimage.h"
 #include "src/widgets/arc/lv_arc.h"
@@ -86,20 +90,17 @@ extern "C" {
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
 #include "src/widgets/3dtexture/lv_3dtexture.h"
+#include "src/widgets/ime/lv_ime_pinyin.h"
 
-#include "src/others/snapshot/lv_snapshot.h"
-#include "src/others/sysmon/lv_sysmon.h"
-#include "src/others/monkey/lv_monkey.h"
-#include "src/others/gridnav/lv_gridnav.h"
+#include "src/xml/lv_xml.h"
+
+#include "src/debugging/sysmon/lv_sysmon.h"
+#include "src/debugging/monkey/lv_monkey.h"
+#include "src/debugging/test/lv_test.h"
+
 #include "src/others/fragment/lv_fragment.h"
-#include "src/others/imgfont/lv_imgfont.h"
-#include "src/others/observer/lv_observer.h"
-#include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
-#include "src/others/font_manager/lv_font_manager.h"
 #include "src/others/translation/lv_translation.h"
-#include "src/others/xml/lv_xml.h"
-#include "src/others/test/lv_test.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"
@@ -128,12 +129,13 @@ extern "C" {
 #include "src/draw/lv_draw_vector.h"
 #include "src/draw/sw/lv_draw_sw_utils.h"
 #include "src/draw/eve/lv_draw_eve_target.h"
+#include "src/draw/snapshot/lv_snapshot.h"
 
 #include "src/themes/lv_theme.h"
 
 #include "src/drivers/lv_drivers.h"
 
-/* Define LV_DISABLE_API_MAPPING using a compiler option 
+/* Define LV_DISABLE_API_MAPPING using a compiler option
  * to make sure your application is not using deprecated names */
 #ifndef LV_DISABLE_API_MAPPING
     #include "src/lv_api_map_v8.h"

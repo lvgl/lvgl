@@ -24,12 +24,7 @@ extern "C" {
 #include "src/layouts/lv_layout_private.h"
 #include "src/stdlib/lv_mem_private.h"
 #include "src/others/file_explorer/lv_file_explorer_private.h"
-#include "src/others/sysmon/lv_sysmon_private.h"
-#include "src/others/monkey/lv_monkey_private.h"
-#include "src/others/ime/lv_ime_pinyin_private.h"
 #include "src/others/fragment/lv_fragment_private.h"
-#include "src/others/observer/lv_observer_private.h"
-#include "src/others/xml/lv_xml_private.h"
 #include "src/libs/qrcode/lv_qrcode_private.h"
 #include "src/libs/barcode/lv_barcode_private.h"
 #include "src/draw/lv_draw_triangle_private.h"
@@ -47,7 +42,6 @@ extern "C" {
 #include "src/drivers/libinput/lv_xkb_private.h"
 #include "src/drivers/libinput/lv_libinput_private.h"
 #include "src/drivers/evdev/lv_evdev_private.h"
-#include "src/font/lv_font_fmt_txt_private.h"
 #include "src/themes/lv_theme_private.h"
 #include "src/core/lv_refr_private.h"
 #include "src/core/lv_obj_style_private.h"
@@ -57,6 +51,14 @@ extern "C" {
 #include "src/core/lv_obj_class_private.h"
 #include "src/core/lv_group_private.h"
 #include "src/core/lv_obj_event_private.h"
+#include "src/core/lv_observer_private.h"
+
+#include "src/xml/lv_xml_private.h"
+#include "src/debugging/sysmon/lv_sysmon_private.h"
+#include "src/debugging/monkey/lv_monkey_private.h"
+
+#include "src/font/fmt_txt/lv_font_fmt_txt_private.h"
+
 #include "src/misc/lv_timer_private.h"
 #include "src/misc/lv_area_private.h"
 #include "src/misc/lv_fs_private.h"
@@ -67,6 +69,7 @@ extern "C" {
 #include "src/misc/lv_style_private.h"
 #include "src/misc/lv_color_op_private.h"
 #include "src/misc/lv_anim_private.h"
+
 #include "src/widgets/msgbox/lv_msgbox_private.h"
 #include "src/widgets/buttonmatrix/lv_buttonmatrix_private.h"
 #include "src/widgets/slider/lv_slider_private.h"
@@ -97,6 +100,8 @@ extern "C" {
 #include "src/widgets/canvas/lv_canvas_private.h"
 #include "src/widgets/tabview/lv_tabview_private.h"
 #include "src/widgets/3dtexture/lv_3dtexture_private.h"
+#include "src/widgets/ime/lv_ime_pinyin_private.h"
+
 #include "src/tick/lv_tick_private.h"
 #include "src/stdlib/builtin/lv_tlsf_private.h"
 #include "src/libs/rlottie/lv_rlottie_private.h"

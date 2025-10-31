@@ -8,24 +8,11 @@
 .. toctree::
     :maxdepth: 2
 
-    arduino_esp_littlefs
-    arduino_sd
+    font_support/index
+    fs_support/index
+    image_support/index
+    video_support/index
     barcode
-    bmp
-    ffmpeg
-    freetype
-    frogfs
-    fs
-    gif
-    gstreamer
     gltf
-    lfs
-    libjpeg_turbo
-    libpng
-    lodepng
     qrcode
-    rle
-    rlottie
-    svg
-    tiny_ttf
-    tjpgd
+
