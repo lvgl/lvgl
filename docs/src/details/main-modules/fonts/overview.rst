@@ -44,7 +44,7 @@ The built-in font engine is also the easiest to use:
 5. Use the font like ``lv_style_set_text_font(&my_style, &font_name);``
    or ``lv_obj_set_style_text_font(label1, &font_name, 0);``
 
-LVGL also support several other font engines:
+LVGL also supports several other font engines:
 
 - ``fmt_txt``: This the built-in font engine that stores the fonts as a C array
 - ``binfont``: Similar to the built-in format, but the font is stored as a file, so it can be loaded at runtime too
