@@ -98,7 +98,7 @@ static lv_tick_get_cb_t tick_cb_original;
 lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * ref_image_path_prefix)
 {
     /*Cleanup the previous test*/
-    lv_xml_test_unregister();
+    lv_xml_unregister_test();
 
     test.ref_image_path_prefix = ref_image_path_prefix;
 
@@ -181,7 +181,7 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
     return res;
 }
 
-void lv_xml_test_unregister(void)
+void lv_xml_unregister_test(void)
 {
     uint32_t i;
     for(i = 0; i < test.step_cnt; i++) {
@@ -206,7 +206,7 @@ void lv_xml_test_unregister(void)
     test.steps = NULL;
     test.step_cnt = 0;
 
-    lv_xml_component_unregister(LV_TEST_NAME);
+    lv_xml_unregister_component(LV_TEST_NAME);
 }
 
 void lv_xml_test_run_init(void)
@@ -251,12 +251,18 @@ bool lv_xml_test_run_next(uint32_t slowdown)
 
 void lv_xml_test_run_stop(void)
 {
-    lv_obj_delete(cursor);
-    lv_tick_set_cb(tick_cb_original);
-    lv_display_delete(test_display);
+    if(cursor) {
+        lv_obj_delete(cursor);
+        cursor = NULL;
+    }
+    if(test_display) {
+        lv_tick_set_cb(tick_cb_original);
+        lv_display_delete(test_display);
+        test_display = NULL;
+    }
+
     lv_test_indev_delete_all();
 }
-
 
 uint32_t lv_xml_test_run_all(uint32_t slowdown)
 {
