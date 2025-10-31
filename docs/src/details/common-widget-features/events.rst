@@ -181,6 +181,9 @@ Special Events
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify Widget to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
 -  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
+-  :cpp:enumerator:`LV_EVENT_STATE_CHANGED`: The state of a widget has been changed.
+   E.g. :cpp:enumerator:`LV_STATE_PRESSED` was added. In the event :cpp:expr:`lv_event_get_prev_state(e)`
+   returns the previous state and :cpp:expr:`lv_obj_get_state(obj)` returns the current state.
 
 
 Other Events
@@ -265,11 +268,11 @@ contains all data about the event. The following values can be retrieved from it
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_obj_send_event_cb`
 
 .. tip::
-   When using C++, prefer :cpp:expr:`lv_event_get_target_obj(e)` over :cpp:expr:`lv_event_get_target(e)` 
+   When using C++, prefer :cpp:expr:`lv_event_get_target_obj(e)` over :cpp:expr:`lv_event_get_target(e)`
    when you know the target is a Widget, as it returns the correct type without requiring a cast.
 
 .. warning::
-   Only call :cpp:expr:`lv_event_get_target_obj(e)` when the event target is known to be a Widget. 
+   Only call :cpp:expr:`lv_event_get_target_obj(e)` when the event target is known to be a Widget.
    Calling it for Display or Indev targets is considered Undefined Behavior.
 
 
