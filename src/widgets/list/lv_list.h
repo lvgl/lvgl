@@ -84,7 +84,7 @@ void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt);
  * @param tag       translation tag of the new label
  * @return          pointer to the created label
  */
-lv_obj_t * lv_list_add_text_translation_tag(lv_obj_t * list, const char * tag);
+lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag);
 
 /**
  * Add translation tag button to a list
@@ -101,7 +101,7 @@ lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon
  * @param btn       pointer to the button
  * @param tag       pointer to the translation tag
  */
-void lv_list_set_button_text_translation_tag(lv_obj_t * list, lv_obj_t * btn, const char * tag);
+void lv_list_set_button_translation_tag(lv_obj_t * list, lv_obj_t * btn, const char * tag);
 
 #endif
 
