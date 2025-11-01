@@ -93,7 +93,6 @@ typedef enum {
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed */
     LV_EVENT_LAYOUT_CHANGED,      /**< A child's position position has changed due to a layout recalculation */
     LV_EVENT_GET_SELF_SIZE,       /**< Get internal size of a widget */
-    LV_EVENT_UPDATE_LAYOUT_COMPLETED,    /**< Sent after layout update completes*/
 
     /** Events of optional LVGL components */
     LV_EVENT_INVALIDATE_AREA,     /**< An area is invalidated (marked for redraw). `lv_event_get_param(e)`
@@ -112,6 +111,7 @@ typedef enum {
     LV_EVENT_FLUSH_FINISH,        /**< Sent after flush callback call has returned. */
     LV_EVENT_FLUSH_WAIT_START,    /**< Sent before flush wait callback is called. */
     LV_EVENT_FLUSH_WAIT_FINISH,   /**< Sent after flush wait callback call has returned. */
+    LV_EVENT_UPDATE_LAYOUT_COMPLETED,    /**< Sent after layout update completes*/
 
     LV_EVENT_VSYNC,
     LV_EVENT_VSYNC_REQUEST,
