@@ -159,7 +159,6 @@ void lv_label_set_text_vfmt(lv_obj_t * obj, const char * fmt, va_list args)
     LV_ASSERT_NULL(fmt);
 
     remove_translation_tag(obj);
-    lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
 
     lv_label_revert_dots(obj);
@@ -707,8 +706,6 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     /*Cannot append to static text*/
     if(label->static_txt != 0) return;
 
-    lv_obj_invalidate(obj);
-
     /*Allocate space for the new text*/
     size_t old_len = lv_strlen(label->text);
     size_t ins_len = lv_strlen(txt);
@@ -732,8 +729,6 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
 
     /*Cannot append to static text*/
     if(label->static_txt) return;
-
-    lv_obj_invalidate(obj);
 
     char * label_txt = lv_label_get_text(obj);
     /*Delete the characters*/
@@ -1072,6 +1067,7 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     label->invalid_size_cache = true;
     label->need_refr_text = true;
 
+    lv_obj_invalidate(obj);
     lv_obj_refresh_self_size(obj);
 
     lv_obj_request_layout_complete_event(obj);
