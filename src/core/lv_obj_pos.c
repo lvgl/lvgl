@@ -35,7 +35,6 @@ static int32_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
 static bool is_transformed(const lv_obj_t * obj);
-static lv_obj_tree_walk_res_t update_layout_completed_cb(lv_obj_t * obj, void * user_data);
 static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp);
 
 /**********************
@@ -324,12 +323,6 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
 }
 
-void lv_obj_request_layout_complete_event(lv_obj_t * obj)
-{
-    lv_obj_t * scr = lv_obj_get_screen(obj);
-    scr->scr_layout_complete_pending = 1;
-}
-
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
     if(update_layout_mutex) {
@@ -348,11 +341,8 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Layout update end");
     }
 
-    if(scr->scr_layout_complete_pending) {
-        scr->scr_layout_complete_pending = 0;
-        lv_obj_tree_walk(scr, update_layout_completed_cb, NULL);
-    }
-
+    lv_display_t * disp = lv_obj_get_display(scr);
+    lv_display_send_event(disp, LV_EVENT_UPDATE_LAYOUT_COMPLETED, NULL);
     update_layout_mutex = false;
     LV_PROFILER_LAYOUT_END;
 }
@@ -1407,13 +1397,6 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
     }
 
     lv_point_array_transform(p, p_count, angle, scale_x, scale_y, &pivot, !inv);
-}
-
-static lv_obj_tree_walk_res_t update_layout_completed_cb(lv_obj_t * obj, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lv_obj_send_event(obj, LV_EVENT_UPDATE_LAYOUT_COMPLETED, NULL);
-    return LV_OBJ_TREE_WALK_NEXT;
 }
 
 static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp)
