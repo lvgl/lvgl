@@ -80,6 +80,7 @@
 #define LV_USE_TJPGD        1
 #ifndef _WIN32
     #define LV_USE_LIBJPEG_TURBO       1
+    #define LV_USE_LIBWEBP             1
 #endif
 #ifndef LV_USE_FFMPEG
     #define LV_USE_FFMPEG              1

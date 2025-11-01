@@ -23,6 +23,7 @@
     libjpeg_turbo
     libpng
     lodepng
+    libwebp
     qrcode
     rle
     rlottie

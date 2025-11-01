@@ -125,6 +125,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLE 0
     - \#define LV_USE_TJPGD 0
     - \#define LV_USE_LIBJPEG_TURBO 0
+    - \#define LV_USE_LIBWEBP 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
     - \#define LV_USE_QRCODE 0

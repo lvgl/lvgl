@@ -3035,6 +3035,15 @@
     #endif
 #endif
 
+/** WebP decoder library */
+#ifndef LV_USE_LIBWEBP
+    #ifdef CONFIG_LV_USE_LIBWEBP
+        #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP
+    #else
+        #define LV_USE_LIBWEBP 0
+    #endif
+#endif
+
 /** GIF decoder library */
 #ifndef LV_USE_GIF
     #ifdef CONFIG_LV_USE_GIF

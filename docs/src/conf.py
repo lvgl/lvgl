@@ -549,6 +549,7 @@ redirects = {
     "libs/libjpeg_turbo":                         "../details/libs/libjpeg_turbo.html"                              ,
     "libs/libpng":                                "../details/libs/libpng.html"                                     ,
     "libs/lodepng":                               "../details/libs/lodepng.html"                                    ,
+    "libs/libwebp":                               "../details/libs/libwebp.html"                                    ,
     "libs/qrcode":                                "../details/libs/qrcode.html"                                     ,
     "libs/rle":                                   "../details/libs/rle.html"                                        ,
     "libs/rlottie":                               "../details/libs/rlottie.html"                                    ,
