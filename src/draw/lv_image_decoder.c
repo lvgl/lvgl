@@ -10,6 +10,7 @@
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw_image.h"
 #include "../misc/lv_ll.h"
+#include "../misc/lv_profiler.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 
@@ -92,6 +93,7 @@ void lv_image_decoder_deinit(void)
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_image_decoder_dsc_t dsc;
     lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
     dsc.src = src;
@@ -100,16 +102,20 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     lv_mutex_lock(img_decoder_info_lock_p);
     lv_image_decoder_t * decoder = image_decoder_get_info(&dsc, header);
     lv_mutex_unlock(img_decoder_info_lock_p);
-    if(decoder == NULL) return LV_RESULT_INVALID;
 
-    return LV_RESULT_OK;
+    LV_PROFILER_DECODER_END;
+    return decoder ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_memzero(dsc, sizeof(lv_image_decoder_dsc_t));
 
-    if(src == NULL) return LV_RESULT_INVALID;
+    if(src == NULL) {
+        LV_PROFILER_DECODER_END;
+        return LV_RESULT_INVALID;
+    }
     dsc->src = src;
     dsc->src_type = lv_image_src_get_type(src);
 
@@ -124,6 +130,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
             * If the image is found in the cache, just return it.*/
             if(try_cache(dsc) == LV_RESULT_OK) {
                 lv_mutex_unlock(img_decoder_open_lock_p);
+                LV_PROFILER_DECODER_END;
                 return LV_RESULT_OK;
             }
         }
@@ -133,6 +140,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->decoder = image_decoder_get_info(dsc, &dsc->header);
     if(dsc->decoder == NULL) {
         lv_mutex_unlock(img_decoder_open_lock_p);
+        LV_PROFILER_DECODER_END;
         return LV_RESULT_INVALID;
     }
 
@@ -150,7 +158,9 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * If decoder open failed, free the source and return error.
      * If decoder open succeed, add the image to cache if enabled.
      * */
+    LV_PROFILER_DECODER_BEGIN_TAG(dsc->decoder->name);
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
+    LV_PROFILER_DECODER_END_TAG(dsc->decoder->name);
 
     if(res == LV_RESULT_OK && dsc->decoded != NULL) {
         LV_ASSERT_MSG(dsc->decoded->unaligned_data && dsc->decoded->handlers, "Invalid draw buffer");
@@ -169,27 +179,40 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     }
 
     lv_mutex_unlock(img_decoder_open_lock_p);
+    LV_PROFILER_DECODER_END;
     return res;
 }
 
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_result_t res = LV_RESULT_INVALID;
-    if(dsc->decoder->get_area_cb) res = dsc->decoder->get_area_cb(dsc->decoder, dsc, full_area, decoded_area);
+    if(dsc->decoder->get_area_cb) {
+        LV_PROFILER_DECODER_BEGIN_TAG(dsc->decoder->name);
+        res = dsc->decoder->get_area_cb(dsc->decoder, dsc, full_area, decoded_area);
+        LV_PROFILER_DECODER_END_TAG(dsc->decoder->name);
+    }
 
+    LV_PROFILER_DECODER_END;
     return res;
 }
 
 void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
+    LV_PROFILER_DECODER_BEGIN;
     if(!dsc->decoder) {
+        LV_PROFILER_DECODER_END;
         return;
     }
 
     lv_mutex_lock(img_decoder_open_lock_p);
 
-    if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+    if(dsc->decoder->close_cb) {
+        LV_PROFILER_DECODER_BEGIN_TAG(dsc->decoder->name);
+        dsc->decoder->close_cb(dsc->decoder, dsc);
+        LV_PROFILER_DECODER_END_TAG(dsc->decoder->name);
+    }
 
     if(lv_image_cache_is_enabled() && dsc->cache && dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
@@ -197,6 +220,7 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
     }
 
     lv_mutex_unlock(img_decoder_open_lock_p);
+    LV_PROFILER_DECODER_END;
 }
 
 /**
@@ -253,8 +277,10 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_cache_entry_t * cache_entry = lv_cache_add(img_cache_p, search_key, NULL);
     if(cache_entry == NULL) {
+        LV_PROFILER_DECODER_END;
         return NULL;
     }
 
@@ -269,12 +295,17 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
     cached_data->user_data = user_data; /*Need to free data on cache invalidate instead of decoder_close*/
     cached_data->decoder = decoder;
 
+    LV_PROFILER_DECODER_END;
     return cache_entry;
 }
 
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
 {
-    if(decoded == NULL) return NULL; /*No need to adjust*/
+    LV_PROFILER_DECODER_BEGIN;
+    if(decoded == NULL) {
+        LV_PROFILER_DECODER_END;
+        return NULL; /*No need to adjust*/
+    }
 
     lv_image_decoder_args_t * args = &dsc->args;
     if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
@@ -287,6 +318,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
                                                                 decoded->header.cf, stride_expect);
                 if(aligned == NULL) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
+                    LV_PROFILER_DECODER_END;
                     return NULL;
                 }
 
@@ -312,6 +344,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             decoded = lv_draw_buf_dup_ex(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
                 LV_LOG_ERROR("No memory for premultiplying.");
+                LV_PROFILER_DECODER_END;
                 return NULL;
             }
 
@@ -319,6 +352,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
         }
     }
 
+    LV_PROFILER_DECODER_END;
     return decoded;
 }
 
@@ -328,6 +362,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
 
 static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_memzero(header, sizeof(lv_image_header_t));
 
     const void * src = dsc->src;
@@ -335,7 +370,10 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return NULL;
+        if(img_dsc->data == NULL) {
+            LV_PROFILER_DECODER_END;
+            return NULL;
+        }
     }
 
     if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_TRACE("Try to find decoder for %s", (const char *)src);
@@ -358,6 +396,7 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
             lv_cache_release(img_header_cache_p, entry, NULL);
 
             LV_LOG_TRACE("Found decoder %s in header cache", decoder->name);
+            LV_PROFILER_DECODER_END;
             return decoder;
         }
     }
@@ -366,6 +405,7 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
         lv_fs_res_t fs_res = lv_fs_open(&dsc->file, src, LV_FS_MODE_RD);
         if(fs_res != LV_FS_RES_OK) {
             LV_LOG_ERROR("File open failed: %" LV_PRIu32, (uint32_t)fs_res);
+            LV_PROFILER_DECODER_END;
             return NULL;
         }
     }
@@ -375,7 +415,9 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
             lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET);
+            LV_PROFILER_DECODER_BEGIN_TAG(decoder->name);
             lv_result_t res = decoder->info_cb(decoder, dsc, header);
+            LV_PROFILER_DECODER_END_TAG(decoder->name);
 
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) {
@@ -408,12 +450,14 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
 
         if(entry == NULL) {
             if(src_type == LV_IMAGE_SRC_FILE) lv_free((void *)search_key.src);
+            LV_PROFILER_DECODER_END;
             return NULL;
         }
 
         lv_cache_release(img_header_cache_p, entry, NULL);
     }
 
+    LV_PROFILER_DECODER_END;
     return decoder;
 }
 
@@ -429,6 +473,7 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
 
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
+    LV_PROFILER_DECODER_BEGIN;
     lv_cache_t * cache = dsc->cache;
 
     lv_image_cache_data_t search_key;
@@ -442,8 +487,10 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
         dsc->decoded = cached_data->decoded;
         dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
+        LV_PROFILER_DECODER_END;
         return LV_RESULT_OK;
     }
 
+    LV_PROFILER_DECODER_END;
     return LV_RESULT_INVALID;
 }
