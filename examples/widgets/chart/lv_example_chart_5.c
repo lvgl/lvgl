@@ -78,7 +78,6 @@ static void add_faded_area(lv_event_t * e)
     int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
     tri_dsc.grad.stops[0].color = ser_color;
     tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_uppter);
-    tri_dsc.grad.stops[0].opa = 255 - fract_uppter;
     tri_dsc.grad.stops[0].frac = 0;
     tri_dsc.grad.stops[1].color = ser_color;
     tri_dsc.grad.stops[1].opa = (lv_opa_t)(255 - fract_lower);
@@ -100,7 +99,7 @@ static void add_faded_area(lv_event_t * e)
     lv_area_t rect_area;
     rect_area.x1 = (int32_t)draw_line_dsc->p1.x;
     rect_area.x2 = (int32_t)draw_line_dsc->p2.x - 1;
-    rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - 1;
+    rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
     rect_area.y2 = (int32_t)coords.y2;
     lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
 }
