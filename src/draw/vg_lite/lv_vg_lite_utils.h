@@ -41,13 +41,17 @@ extern "C" {
 #define LV_VG_LITE_ASSERT(expr)
 #endif
 
-#define LV_VG_LITE_CHECK_ERROR(expr, error_handler)           \
+#define LV_VG_LITE_CHECK_ERROR(expr, dump_param)              \
     do {                                                      \
+        if(lv_vg_lite_is_dump_param_enabled()) {              \
+            LV_LOG_USER("Call '" #expr "', Parameter:");      \
+            dump_param;                                       \
+        }                                                     \
         vg_lite_error_t error = expr;                         \
         if (error != VG_LITE_SUCCESS) {                       \
             LV_LOG_ERROR("Execute '" #expr "' error: %d", (int)error);  \
             lv_vg_lite_error_dump_info(error);                \
-            error_handler;                                    \
+            dump_param;                                       \
             LV_VG_LITE_ASSERT(false);                         \
         }                                                     \
     } while (0)
@@ -179,6 +183,10 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u);
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u);
 
+void lv_vg_lite_set_dump_param_enable(bool enable);
+
+bool lv_vg_lite_is_dump_param_enabled(void);
+
 static inline void lv_vg_lite_draw(vg_lite_buffer_t * target,
                                    vg_lite_path_t * path,
                                    vg_lite_fill_t fill_rule,
@@ -198,13 +206,13 @@ static inline void lv_vg_lite_draw(vg_lite_buffer_t * target,
                                matrix,
                                blend,
                                color),
-                           /*Error handler*/
+                           /* Dump parameters */
     {
         lv_vg_lite_buffer_dump_info(target);
         lv_vg_lite_path_dump_info(path);
-        LV_LOG_ERROR("fill_rule: 0x%X,", (int)fill_rule);
+        LV_LOG_USER("fill_rule: 0x%X,", (int)fill_rule);
         lv_vg_lite_matrix_dump_info(matrix);
-        LV_LOG_ERROR("blend: 0x%X,", (int)blend);
+        LV_LOG_USER("blend: 0x%X,", (int)blend);
         lv_vg_lite_color_dump_info(color);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
@@ -241,19 +249,19 @@ static inline void lv_vg_lite_draw_pattern(vg_lite_buffer_t * target,
                                pattern_color,
                                color,
                                filter),
-                           /*Error handler*/
+                           /* Dump parameters */
     {
         lv_vg_lite_buffer_dump_info(target);
         lv_vg_lite_path_dump_info(path);
-        LV_LOG_ERROR("fill_rule: 0x%X,", (int)fill_rule);
+        LV_LOG_USER("fill_rule: 0x%X,", (int)fill_rule);
         lv_vg_lite_matrix_dump_info(path_matrix);
         lv_vg_lite_buffer_dump_info(pattern_image);
         lv_vg_lite_matrix_dump_info(pattern_matrix);
-        LV_LOG_ERROR("blend: 0x%X,", (int)blend);
-        LV_LOG_ERROR("pattern_mode: 0x%X,", (int)pattern_mode);
+        LV_LOG_USER("blend: 0x%X,", (int)blend);
+        LV_LOG_USER("pattern_mode: 0x%X,", (int)pattern_mode);
         lv_vg_lite_color_dump_info(pattern_color);
         lv_vg_lite_color_dump_info(color);
-        LV_LOG_ERROR("filter: 0x%X,", (int)filter);
+        LV_LOG_USER("filter: 0x%X,", (int)filter);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
 }
@@ -279,16 +287,16 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
                                blend,
                                color,
                                filter),
-                           /*Error handler*/
+                           /* Dump parameters */
     {
         lv_vg_lite_buffer_dump_info(target);
         lv_vg_lite_buffer_dump_info(source);
-        LV_LOG_ERROR("rect: X%d Y%d W%d H%d",
-                     (int)rect->x, (int)rect->y, (int)rect->width, (int)rect->height);
+        LV_LOG_USER("rect: X%d Y%d W%d H%d",
+                    (int)rect->x, (int)rect->y, (int)rect->width, (int)rect->height);
         lv_vg_lite_matrix_dump_info(matrix);
-        LV_LOG_ERROR("blend: 0x%X", (int)blend);
+        LV_LOG_USER("blend: 0x%X", (int)blend);
         lv_vg_lite_color_dump_info(color);
-        LV_LOG_ERROR("filter: 0x%X", (int)filter);
+        LV_LOG_USER("filter: 0x%X", (int)filter);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
 }
@@ -301,7 +309,7 @@ static inline void lv_vg_lite_clear(vg_lite_buffer_t * target, const lv_area_t *
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
     LV_VG_LITE_CHECK_ERROR(vg_lite_clear(target, &rect, color), {
         lv_vg_lite_buffer_dump_info(target);
-        LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
+        LV_LOG_USER("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
         lv_vg_lite_color_dump_info(color);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
