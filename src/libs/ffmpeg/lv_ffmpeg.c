@@ -88,7 +88,7 @@ static struct ffmpeg_context_s * ffmpeg_open_file(const char * path, bool is_lv_
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
-static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx);
+static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx, int align);
 static int ffmpeg_get_image_header(lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx);
 static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -185,7 +185,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
         goto failed;
     }
 
-    if(ffmpeg_image_allocate(player->ffmpeg_ctx) < 0) {
+    if(ffmpeg_image_allocate(player->ffmpeg_ctx, 32) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
         ffmpeg_close(player->ffmpeg_ctx);
         player->ffmpeg_ctx = NULL;
@@ -327,7 +327,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        if(ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
+        if(ffmpeg_image_allocate(ffmpeg_ctx, 4) < 0) {
             LV_LOG_ERROR("ffmpeg image allocate failed");
             ffmpeg_close(ffmpeg_ctx);
             return LV_RESULT_INVALID;
@@ -867,7 +867,7 @@ failed:
     return NULL;
 }
 
-static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
+static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx, int align)
 {
     int ret;
 
@@ -878,7 +878,7 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
               ffmpeg_ctx->video_dec_ctx->width,
               ffmpeg_ctx->video_dec_ctx->height,
               ffmpeg_ctx->video_dec_ctx->pix_fmt,
-              4);
+              align);
 
     if(ret < 0) {
         LV_LOG_ERROR("Could not allocate src raw video buffer");
@@ -893,7 +893,7 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
               ffmpeg_ctx->video_dec_ctx->width,
               ffmpeg_ctx->video_dec_ctx->height,
               ffmpeg_ctx->video_dst_pix_fmt,
-              4);
+              align);
 
     if(ret < 0) {
         LV_LOG_ERROR("Could not allocate dst raw video buffer");
