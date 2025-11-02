@@ -29,6 +29,9 @@ void tearDown(void)
     /* Test all cleanup */
     lv_draw_unit_send_event(NULL, LV_EVENT_CANCEL, NULL);
 
+    /* Test draw unit dump info */
+    lv_draw_unit_send_event(NULL, LV_EVENT_HIT_TEST, NULL);
+
     lv_obj_clean(lv_screen_active());
 }
 
