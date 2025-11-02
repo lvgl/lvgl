@@ -251,8 +251,8 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
         /* Dump parameters */
     {
         lv_vg_lite_path_dump_info(vg_path);
-        LV_LOG_USER("Cap: %d", lv_stroke_cap_to_vg(item->lv.cap));
-        LV_LOG_USER("Join: %d", lv_stroke_join_to_vg(item->lv.join));
+        LV_LOG_USER("Cap: 0x%X", (int)lv_stroke_cap_to_vg(item->lv.cap));
+        LV_LOG_USER("Join: 0x%X", (int)lv_stroke_join_to_vg(item->lv.join));
         LV_LOG_USER("Width: %f", item->lv.width);
         LV_LOG_USER("Miter limit: %d", item->lv.miter_limit);
         if(vg_dash_pattern)
