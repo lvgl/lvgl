@@ -60,6 +60,11 @@ struct _lv_display_t {
     /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
     uint32_t dpi;
 
+    uint32_t screen_left_offset;
+    uint32_t screen_right_offset;
+    uint32_t screen_top_offset;
+    uint32_t screen_bottom_offset;
+
     /*---------------------
      * Buffering
      *--------------------*/
@@ -176,6 +181,16 @@ struct _lv_display_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+uint32_t lv_display_get_screen_left_offset(lv_display_t * disp);
+uint32_t lv_display_get_screen_right_offset(lv_display_t * disp);
+uint32_t lv_display_get_screen_top_offset(lv_display_t * disp);
+uint32_t lv_display_get_screen_bottom_offset(lv_display_t * disp);
+
+void lv_display_set_screen_left_offset(lv_display_t * disp, uint32_t offset);
+void lv_display_set_screen_right_offset(lv_display_t * disp, uint32_t offset);
+void lv_display_set_screen_top_offset(lv_display_t * disp, uint32_t offset);
+void lv_display_set_screen_bottom_offset(lv_display_t * disp, uint32_t offset);
 
 /**********************
  *      MACROS

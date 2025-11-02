@@ -1253,6 +1253,73 @@ int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
     return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
+uint32_t lv_display_get_screen_left_offset(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return 0;
+    }
+    return disp->screen_left_offset;
+}
+uint32_t lv_display_get_screen_right_offset(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return 0;
+    }
+    return disp->screen_right_offset;
+}
+uint32_t lv_display_get_screen_top_offset(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return 0;
+    }
+    return disp->screen_top_offset;
+}
+uint32_t lv_display_get_screen_bottom_offset(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return 0;
+    }
+
+    return disp->screen_bottom_offset;
+}
+
+void lv_display_set_screen_left_offset(lv_display_t * disp, uint32_t offset)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return;
+    }
+    disp->screen_left_offset = offset;
+}
+void lv_display_set_screen_right_offset(lv_display_t * disp, uint32_t offset)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return;
+    }
+    disp->screen_right_offset = offset;
+}
+void lv_display_set_screen_top_offset(lv_display_t * disp, uint32_t offset)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return;
+    }
+    disp->screen_top_offset = offset;
+}
+void lv_display_set_screen_bottom_offset(lv_display_t * disp, uint32_t offset)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) {
+        return;
+    }
+    disp->screen_bottom_offset = offset;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
