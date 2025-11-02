@@ -17,7 +17,8 @@ Log Level
 ---------
 
 To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` to a non-zero value and
-set :c:macro:`LV_LOG_LEVEL` to one of the following values:
+set :c:macro:`LV_LOG_LEVEL` to one of the following values.  They are prioritized as
+follows (from most to least verbose):
 
 - :c:macro:`LV_LOG_LEVEL_TRACE`: A lot of logs to give detailed information
 - :c:macro:`LV_LOG_LEVEL_INFO`: Log important events.
@@ -26,9 +27,12 @@ set :c:macro:`LV_LOG_LEVEL` to one of the following values:
 - :c:macro:`LV_LOG_LEVEL_USER`: Log only custom log messages added by the user.
 - :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything.
 
-The events that have a level higher than the set log level will also be logged.
-Example:  you set :c:macro:`LV_LOG_LEVEL` to :c:macro:`LV_LOG_LEVEL_WARN` and
-:c:macro:`LV_LOG_LEVEL_USER` messages will also be logged.
+When you set :c:macro:`LV_LOG_LEVEL` to a certain level, only messages with that level
+or higher priority (less verbose) will be logged.
+
+Example:  you set :c:macro:`LV_LOG_LEVEL` to :c:macro:`LV_LOG_LEVEL_WARN`, then
+:c:macro:`LV_LOG_LEVEL_WARN`, :c:macro:`LV_LOG_LEVEL_ERROR` and
+:c:macro:`LV_LOG_LEVEL_USER` messages will be logged.
 
 
 Log Output
