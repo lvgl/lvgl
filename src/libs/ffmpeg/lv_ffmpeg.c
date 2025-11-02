@@ -50,13 +50,11 @@ struct ffmpeg_context_s {
     AVFormatContext * fmt_ctx;
     AVCodecContext * video_dec_ctx;
     AVStream * video_stream;
-    uint8_t * video_src_data[4];
     uint8_t * video_dst_data[4];
     struct SwsContext * sws_ctx;
     AVFrame * frame;
     AVPacket * pkt;
     int video_stream_idx;
-    int video_src_linesize[4];
     int video_dst_linesize[4];
     enum AVPixelFormat video_dst_pix_fmt;
     bool has_alpha;
@@ -444,13 +442,6 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
         goto failed;
     }
 
-    /* copy decoded frame to destination buffer:
-     * this is required since rawvideo expects non aligned data
-     */
-    av_image_copy(ffmpeg_ctx->video_src_data, ffmpeg_ctx->video_src_linesize,
-                  (const uint8_t **)(frame->data), frame->linesize,
-                  ffmpeg_ctx->video_dec_ctx->pix_fmt, width, height);
-
     if(ffmpeg_ctx->sws_ctx == NULL) {
         int swsFlags = SWS_BILINEAR;
 
@@ -492,8 +483,8 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 
     ret = sws_scale(
               ffmpeg_ctx->sws_ctx,
-              (const uint8_t * const *)(ffmpeg_ctx->video_src_data),
-              ffmpeg_ctx->video_src_linesize,
+              (const uint8_t * const *)(frame->data),
+              frame->linesize,
               0,
               height,
               ffmpeg_ctx->video_dst_data,
@@ -871,22 +862,11 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     int ret;
 
-    /* allocate image where the decoded image will be put */
-    ret = av_image_alloc(
-              ffmpeg_ctx->video_src_data,
-              ffmpeg_ctx->video_src_linesize,
-              ffmpeg_ctx->video_dec_ctx->width,
-              ffmpeg_ctx->video_dec_ctx->height,
-              ffmpeg_ctx->video_dec_ctx->pix_fmt,
-              4);
-
-    if(ret < 0) {
-        LV_LOG_ERROR("Could not allocate src raw video buffer");
-        return ret;
-    }
-
-    LV_LOG_INFO("alloc video_src_bufsize = %d", ret);
-
+    /* Allocate video_dst_data as a separate buffer for the destination image.
+     * This is necessary because the destination may require a different pixel format
+     * or layout than the source (decoded) frame, so we cannot always use the source
+     * frame's data directly. Unlike video_src_data, which is no longer allocated,
+     * video_dst_data is still needed for format conversion or copying. */
     ret = av_image_alloc(
               ffmpeg_ctx->video_dst_data,
               ffmpeg_ctx->video_dst_linesize,
@@ -928,10 +908,6 @@ static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
     avformat_close_input(&(ffmpeg_ctx->fmt_ctx));
     av_packet_free(&ffmpeg_ctx->pkt);
     av_frame_free(&(ffmpeg_ctx->frame));
-    if(ffmpeg_ctx->video_src_data[0] != NULL) {
-        av_free(ffmpeg_ctx->video_src_data[0]);
-        ffmpeg_ctx->video_src_data[0] = NULL;
-    }
 }
 
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
