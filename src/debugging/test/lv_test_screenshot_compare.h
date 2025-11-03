@@ -64,7 +64,7 @@ typedef enum {
  * It requires libPNG.
  *
  * @param fn_ref    path to the reference image. Will be appended toREF_IMGS_PATH if set.
- * @return          An element of `lv_test_screenshot_compare_result_t`
+ * @return          An element of `lv_test_screenshot_result_t`
  * true: the reference image and the display are the same; false: they are different (`<image_name>_err.png` is created).
  * @note            This function assumes that the default display is the test display that was created by
  *                  `lv_test_display_create()`
