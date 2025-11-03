@@ -56,7 +56,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool screenshot_compare(const char * fn_ref, uint8_t tolerance);
+static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance);
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name);
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
@@ -75,14 +75,14 @@ static void create_folders_if_needed(const char * path) ;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_test_screenshot_compare_result_t lv_test_screenshot_compare(const char * fn_ref)
+lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 {
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
     lv_refr_now(NULL);
 
-    lv_test_screenshot_compare_result_t res;
+    lv_test_screenshot_result_t res;
     res = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
     return res;
 }
