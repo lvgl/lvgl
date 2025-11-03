@@ -41,6 +41,9 @@
 
 #define DECODER_BUFFER_SIZE (8 * 1024)
 
+#define PLAYER_ALIGMENT 32
+#define DECODER_ALIGNMENT 4
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -185,7 +188,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
         goto failed;
     }
 
-    if(ffmpeg_image_allocate(player->ffmpeg_ctx, 32) < 0) {
+    if(ffmpeg_image_allocate(player->ffmpeg_ctx, PLAYER_ALIGMENT) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
         ffmpeg_close(player->ffmpeg_ctx);
         player->ffmpeg_ctx = NULL;
@@ -317,7 +320,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        if(ffmpeg_image_allocate(ffmpeg_ctx, 4) < 0) {
+        if(ffmpeg_image_allocate(ffmpeg_ctx, DECODER_ALIGNMENT) < 0) {
             LV_LOG_ERROR("ffmpeg image allocate failed");
             ffmpeg_close(ffmpeg_ctx);
             return LV_RESULT_INVALID;
