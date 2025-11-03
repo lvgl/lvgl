@@ -18,7 +18,7 @@ Naming Conventions
 - Lowercase letters with ``_`` separation are used for attribute names.
 - Tag names follow the usual variable-name rules: they must start with a letter or
   ``'_'`` and the rest of the name may be comprised of letters, ``'_'`` and digits.
-- ``-`` is used create compaund names, e.g. ``lv_chart-series``
+- ``-`` is used to create compaund names, e.g. ``lv_chart-series``
 - The LVGL API is followed as much as possible, e.g., ``align="center"``, ``bg_color="0xff0000"``.
 - For colors, all these syntaxes are supported (similar to CSS colors): ``0x112233``,
   ``#112233``, ``112233``, ``0x123``, ``#123``, ``123``.  Note that like CSS,
