@@ -134,7 +134,7 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
     // Or
     lv_obj_t * ok_btn = lv_obj_get_child_by_name(some_list_container, "list_item_5/ok_button");
 
-.. caution::
+.. important::
 
     When a Widget has the default name or otherwise has an index because it was named
     with a trailing '#', the index used for name comparison is computed in #1 and #2
