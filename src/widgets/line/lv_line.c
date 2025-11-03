@@ -160,6 +160,24 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
     return line->y_inv == 1U;
 }
 
+bool lv_line_get_round_start(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+
+    return line->round_start;
+}
+
+bool lv_line_get_round_end(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+
+    return line->round_end;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
