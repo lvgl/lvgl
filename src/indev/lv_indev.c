@@ -141,6 +141,7 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+    indev->key_remap_cb         = NULL;
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -674,6 +675,16 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
     return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
 
+void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb)
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't remap key on a NULL indev");
+        return;
+    }
+
+    indev->key_remap_cb = remap_cb;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -760,6 +771,11 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->pr_timestamp            = 0;
         i->long_pr_sent            = 0;
         i->keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
+    }
+
+    /* Remap key using callback */
+    if(i->key_remap_cb) {
+        data->key = i->key_remap_cb(i, data->key);
     }
 
     /*Save the last key. *It must be done here else `lv_indev_get_key` will return the last key in events*/

@@ -1,6 +1,5 @@
+.. include:: /include/substitutions.txt
 .. _toradex:
-
-.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
 
 =======
 Toradex

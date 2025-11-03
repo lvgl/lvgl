@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _lv_image:
 
 ================
@@ -6,8 +7,6 @@ Image (lv_image)
 
 Overview
 ********
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Images are Widgets that display images from flash (as arrays) or
 from files. Images can also display symbols (``LV_SYMBOL_...``).

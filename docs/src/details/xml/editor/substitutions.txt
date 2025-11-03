@@ -1,4 +1,0 @@
-.. -------- Custom Substitutions --------
-.. |nbsp|     unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
-.. |lvglpro|  replace:: LVGL |nbsp| Pro

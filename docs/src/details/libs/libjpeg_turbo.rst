@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _libjpeg:
 
 =====================
@@ -50,8 +51,6 @@ Usage
 Set :c:macro:`LV_USE_LIBJPEG_TURBO` in ``lv_conf.h`` to ``1``.
 
 See the examples below.
-
-.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
 
 It should be noted that each image decoded needs to consume:
 

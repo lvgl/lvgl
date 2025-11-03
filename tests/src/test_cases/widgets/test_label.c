@@ -791,9 +791,10 @@ void test_label_wrap_mode_clip(void)
 }
 void test_label_translation_tag(void)
 {
-    static const char * tags[] = {"tiger", NULL};
-    static const char * languages[]    = {"en", "de", "es", NULL};
-    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
     label = lv_label_create(NULL);
     lv_label_set_translation_tag(label, "tiger");
@@ -814,9 +815,10 @@ void test_label_translation_tag(void)
 
 void test_label_setting_text_disables_translation(void)
 {
-    static const char * tags[] = {"tiger", NULL};
-    static const char * languages[]    = {"en", "de", "es", NULL};
-    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
     label = lv_label_create(NULL);
     lv_label_set_translation_tag(label, "tiger");

@@ -1,4 +1,4 @@
-.. include:: ../editor/substitutions.txt
+.. include:: /include/substitutions.txt
 .. _editor_figma:
 
 =================

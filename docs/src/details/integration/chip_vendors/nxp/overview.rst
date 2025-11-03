@@ -1,8 +1,7 @@
+.. include:: /include/substitutions.txt
 ========
 Overview
 ========
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of our
 microcontrollers as an optional software component, allowing easy evaluation and

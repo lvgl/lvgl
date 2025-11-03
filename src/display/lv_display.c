@@ -609,6 +609,14 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
     return disp->antialiasing;
 }
 
+lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    LV_ASSERT_MSG(disp != NULL, "No display to get render mode");
+
+    return disp->render_mode;
+}
+
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
     disp->flushing = 0;
