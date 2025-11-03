@@ -136,19 +136,16 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
 
 .. caution::
 
-    When a Widget is named with a trailing '#', the index used for name comparison is
-    computed in #1 and #2 above *when those calls are made*, thus always reflecting
-    the current state of the Widget tree.  Deletion of sibling Widgets can impact
-    the indices.  Example:  Given these sibling buttons all named with '#' :
+    When a Widget has the default name or otherwise has an index because it was named
+    with a trailing '#', the index used for name comparison is computed in #1 and #2
+    above *when those calls are made*, thus always reflecting the current state of
+    the Widget tree.  Deletion of sibling Widgets can impact the indices.  Example:
 
-    - red button: my_button_0
-    - green button: my_button_1
-    - blue button: my_button_2
+    - red button: button_0
+    - green button: button_1
+    - blue button: button_2
 
     If the green button is deleted, what's left will be:
 
-    - red button: my_button_0
-    - blue button: my_button_1
-
-    This only applies to sibling Widgets named with a trailing '#'
-    :ref:`described above <tree_setting_names>`.
+    - red button: button_0
+    - blue button: button_1
