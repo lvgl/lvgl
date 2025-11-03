@@ -125,6 +125,7 @@ If the framebuffer is not reserved in the linker script or the framebuffer is no
 board initialization, you may absolutely set it at runtime before creating the LVGL display.
 
 .. code-block:: c
+
     /* like this */
     HAL_LTDC_SetAddress(&hltdc, my_ltdc_framebuffer_address, my_ltdc_layer_index);
 
