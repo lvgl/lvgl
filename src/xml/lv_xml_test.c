@@ -252,8 +252,14 @@ bool lv_xml_test_run_next(uint32_t slowdown)
 bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step)
 {
 
-    bool passed = true;
+    if(step >= test.step_cnt) {
+        LV_LOG_WARN("%d step index was greater than the total step count."
+                    "Limited to %d",
+                    step, test.step_cnt);
+        step = test.step_cnt - 1;
+    }
 
+    bool passed = true;
     while(passed && test.step_act <= step) {
         passed = lv_xml_test_run_next(slowdown);
     }
@@ -386,9 +392,14 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         lv_obj_invalidate(lv_display_get_layer_sys(test_display));
 
         /*Do the actual screenshot compare*/
-        res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
-        if(!res) {
+        lv_test_screenshot_result_t screen_cmp_res;
+        screen_cmp_res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
+        if(screen_cmp_res != LV_TEST_SCREENSHOT_RESULT_PASSED) {
             LV_LOG_WARN("screenshot compare of `%s` failed", step->param.screenshot_compare.path);
+            res = true;
+        }
+        else {
+            res = false;
         }
 
         /*Restore*/
