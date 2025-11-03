@@ -139,7 +139,7 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
     When a Widget has the default name or otherwise has an index because it was named
     with a trailing '#', the index used for name comparison is computed in #1 and #2
     above *when those calls are made*, thus always reflecting the current state of
-    the Widget tree.  Deletion of sibling Widgets can impact the indices.  Example:
+    the Widget tree.  Deletion of sibling Widgets can impact these indices.  Example:
 
     - red button: button_0
     - green button: button_1
