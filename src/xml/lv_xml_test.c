@@ -249,6 +249,18 @@ bool lv_xml_test_run_next(uint32_t slowdown)
     return passed;
 }
 
+bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step)
+{
+
+    bool passed = true;
+
+    while(passed && test.step_act <= step) {
+        passed = lv_xml_test_run_next(slowdown);
+    }
+
+    return passed;
+}
+
 void lv_xml_test_run_stop(void)
 {
     if(cursor) {
@@ -284,6 +296,11 @@ uint32_t lv_xml_test_run_all(uint32_t slowdown)
 uint32_t lv_xml_test_get_step_count(void)
 {
     return test.step_cnt;
+}
+
+uint32_t lv_xml_test_get_step_next(void)
+{
+    return test.step_act;
 }
 
 lv_xml_test_step_type_t lv_xml_test_get_step_type(uint32_t idx)
