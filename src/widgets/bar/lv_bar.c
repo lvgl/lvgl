@@ -738,7 +738,8 @@ static void lv_bar_init_anim(lv_obj_t * obj, lv_bar_anim_t * bar_anim)
 static void bar_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * obj = lv_observer_get_target_obj(observer);
-    lv_anim_enable_t anim_on = obj->no_anim ? LV_ANIM_OFF : LV_ANIM_ON;
+    /*If the bar is not rendered yet show the new state immediately*/
+    lv_anim_enable_t anim_on = obj->rendered ? LV_ANIM_ON : LV_ANIM_OFF;
     if(subject->type == LV_SUBJECT_TYPE_INT) {
         lv_bar_set_value(observer->target, subject->value.num, anim_on);
     }

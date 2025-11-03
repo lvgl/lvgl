@@ -1004,8 +1004,8 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     obj->state = new_state;
     lv_obj_update_layer_type(obj);
 
-    /*Skip transitions if requested*/
-    if(obj->no_anim) {
+    /*Skip transitions if the widget is not rendered yet. */
+    if(!obj->rendered) {
         lv_obj_invalidate(obj);
         if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
             lv_obj_refresh_ext_draw_size(obj);

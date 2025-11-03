@@ -301,7 +301,8 @@ static void lv_switch_anim_completed(lv_anim_t * a)
 static void lv_switch_trigger_anim(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->no_anim) return;
+    /*If the widget is not rendered yet show state changes immediately*/
+    if(!obj->rendered) return;
 
     lv_switch_t * sw = (lv_switch_t *)obj;
 

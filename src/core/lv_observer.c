@@ -996,10 +996,8 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     p->inv = inv;
     p->cond = cond;
 
-    obj->no_anim = 1; /*Apply the new state flag or state immediately when notified*/
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
-    obj->no_anim = 0;
 
     return observable;
 }
