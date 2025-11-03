@@ -61,7 +61,7 @@ Example
         </element>
 
         <element name="bind_style_prop" access="custom" type="void" help="Bind a style to a subject value">
-            <arg name="prop" type="style_prop" help="Name of a style proeperty"/>
+            <arg name="prop" type="style_prop" help="Name of a style property"/>
             <arg name="selector" type="selector+" default="0" help="Selector (part and/or state)"/>
             <arg name="subject" type="subject" help="Subject to bind"/>
         </element>

@@ -164,7 +164,7 @@ Binding Styles
 **************
 
 By using :cpp:expr:`lv_obj_bind_style`, it's possible to add a style to a Widget
-but enable it only if a :ref:`observer_overview <Subject>`'\ s value is equal to
+but enable it only if a :ref:`Subject <observer_overview>`'s value is equal to
 a reference value.
 
 It's a great way to implement a light/dark theme switch by normally adding the styles

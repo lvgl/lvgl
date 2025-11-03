@@ -34,7 +34,7 @@ Binding Local Styles
 ********************
 
 By using :cpp:expr:`lv_obj_bind_style_prop`, it's possible to bind a style property
-to a :ref:`observer_overview <Subject>`\ 's value.
+to a :ref:`Subject <observer_overview>`\ 's value.
 
 It's a great way to map every slider's color or opacity to a subject and control it
 externally.

@@ -504,7 +504,7 @@ void lv_obj_xml_bind_style_prop_apply(lv_xml_parser_state_t * state, const char 
 {
     const char * prop_str = lv_xml_get_value_of(attrs, "prop");
     if(prop_str == NULL) {
-        LV_LOG_WARN("`prop` is missing in lv_obj bind_prop_style");
+        LV_LOG_WARN("`prop` is missing in lv_obj bind_style_prop");
         return;
     }
     lv_style_prop_t prop = lv_xml_style_prop_to_enum(prop_str);
