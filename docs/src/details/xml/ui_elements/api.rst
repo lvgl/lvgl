@@ -68,17 +68,17 @@ Slots
 -----
 
 With help of "slot" any UI element in the component can be easily exposed as a parent
-that can be referenced later ans children can be created there.
+that can be referenced later and children can be created there.
 
 
 Just add ``<slot name="my_slot"/>`` to the ``<api>`` to tell the Editor
-which childred to expose.
+which children to expose.
 
 To target a slot on an instance of a component create a child like
 ``<component_name-slot_name>`` add the children as needed.
 
 Slots are available only for components. In case of widget the more powerful
-:ref:`elements with get access type <xml_api_element_get>` can eb used.
+:ref:`elements with get access type <xml_api_element_get>` can be used.
 
 Slots are very useful to create components like screen templates where the user is
 allowed to create children on certain internal UI elements.
@@ -101,7 +101,7 @@ allowed to create children on certain internal UI elements.
     <!-- main_screen.xml -->
     <component>
         <view extends="simple_screen" width="100%">
-            <simple_screen-icon_area">
+            <simple_screen-icon_area>
                 <lv_image src="img1"/>
                 <lv_image src="img2"/>
             </simple_screen-icon_area">
