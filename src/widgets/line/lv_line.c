@@ -87,6 +87,22 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
     lv_obj_invalidate(obj);
 }
 
+void lv_line_set_round_start(lv_obj_t * obj, bool round)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    line->round_start = round;
+}
+
+void lv_line_set_round_end(lv_obj_t * obj, bool round)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    line->round_end = round;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -181,6 +197,24 @@ static inline lv_value_precise_t resolve_point_coord(lv_value_precise_t coord, i
     }
 }
 
+static inline void draw_line(lv_layer_t * layer, lv_draw_line_dsc_t * line_dsc, const lv_point_precise_t * p1,
+                             const lv_point_precise_t * p2, int w, int h, int x_ofs, int y_ofs, bool y_inv)
+{
+    line_dsc->p1.x = resolve_point_coord(p1->x, w) + x_ofs;
+    line_dsc->p1.y = resolve_point_coord(p1->y, h);
+    line_dsc->p2.x = resolve_point_coord(p2->x, w) + x_ofs;
+    line_dsc->p2.y = resolve_point_coord(p2->y, h);
+    if(y_inv) {
+        line_dsc->p1.y = h - line_dsc->p1.y + y_ofs;
+        line_dsc->p2.y = h - line_dsc->p2.y + y_ofs;
+    }
+    else {
+        line_dsc->p1.y = line_dsc->p1.y + y_ofs;
+        line_dsc->p2.y = line_dsc->p2.y + y_ofs;
+    }
+    lv_draw_line(layer, line_dsc);
+}
+
 static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
@@ -240,28 +274,44 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/
-        uint32_t i;
-        for(i = 0; i < line->point_num - 1; i++) {
-            int32_t w = lv_obj_get_width(obj);
-            int32_t h = lv_obj_get_height(obj);
-
-            line_dsc.p1.x = resolve_point_coord(line->point_array.constant[i].x, w) + x_ofs;
-            line_dsc.p1.y = resolve_point_coord(line->point_array.constant[i].y, h);
-
-            line_dsc.p2.x = resolve_point_coord(line->point_array.constant[i + 1].x, w) + x_ofs;
-            line_dsc.p2.y = resolve_point_coord(line->point_array.constant[i + 1].y, h);
-
-            if(line->y_inv == 0) {
-                line_dsc.p1.y = line_dsc.p1.y + y_ofs;
-                line_dsc.p2.y = line_dsc.p2.y + y_ofs;
-            }
-            else {
-                line_dsc.p1.y = h - line_dsc.p1.y + y_ofs;
-                line_dsc.p2.y = h - line_dsc.p2.y + y_ofs;
-            }
-
-            lv_draw_line(layer, &line_dsc);
-            line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
+        int32_t w = lv_obj_get_width(obj);
+        int32_t h = lv_obj_get_height(obj);
+        line_dsc.round_start = line->round_start;
+        if(line->point_num == 2) {
+            line_dsc.round_end = line->round_end;
+        }
+        draw_line(layer,
+                  &line_dsc,
+                  &line->point_array.constant[0],
+                  &line->point_array.constant[1],
+                  w,
+                  h, 
+		  x_ofs,
+                  y_ofs,
+                  line->y_inv);
+        line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
+        for(int i = 1; i < line->point_num - 2; i++) {
+            draw_line(layer,
+                      &line_dsc,
+                      &line->point_array.constant[i],
+                      &line->point_array.constant[i + 1],
+                      w,
+                      h, 
+		      x_ofs,
+                      y_ofs,
+                      line->y_inv);
+        }
+        if(line->point_num > 2) {
+            line_dsc.round_end = line->round_end;
+            draw_line(layer,
+                      &line_dsc,
+                      &line->point_array.constant[line->point_num - 2],
+                      &line->point_array.constant[line->point_num - 1],
+                      w,
+                      h, 
+		      x_ofs,
+                      y_ofs,
+                      line->y_inv);
         }
     }
 }

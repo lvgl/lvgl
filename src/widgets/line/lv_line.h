@@ -66,6 +66,20 @@ void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uin
  */
 void lv_line_set_y_invert(lv_obj_t * obj, bool en);
 
+/**
+ * Enable (or disable) the start point rounding.
+ * @param obj       pointer to a line object
+ * @param round     true: round the start point, false: no rounding
+ */
+void lv_line_set_round_start(lv_obj_t * obj, bool round);
+
+/**
+ * Enable (or disable) the end point rounding.
+ * @param obj       pointer to a line object
+ * @param round     true: round the end point, false: no rounding
+ */
+void lv_line_set_round_end(lv_obj_t * obj, bool round);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -104,6 +118,20 @@ lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj);
  * @return          true: y inversion is enabled, false: disabled
  */
 bool lv_line_get_y_invert(const lv_obj_t * obj);
+
+/**
+ * Get the rounding attribute
+ * @param obj       pointer to a line object
+ * @return          true: rounding is enabled, false: disabled
+ */
+bool lv_line_get_round_start(const lv_obj_t * obj);
+
+/**
+ * Get the rounding attribute
+ * @param obj       pointer to a line object
+ * @return          true: rounding is enabled, false: disabled
+ */
+bool lv_line_get_round_end(const lv_obj_t * obj);
 
 /**********************
  *      MACROS
