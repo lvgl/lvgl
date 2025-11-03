@@ -260,6 +260,7 @@ bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step)
     }
 
     bool passed = true;
+
     while(passed && test.step_act <= step) {
         passed = lv_xml_test_run_next(slowdown);
     }
