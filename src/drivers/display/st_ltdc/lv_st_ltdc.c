@@ -13,6 +13,7 @@
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../osal/lv_os_private.h"
 #include "main.h"
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
