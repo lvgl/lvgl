@@ -92,7 +92,11 @@ void lv_line_set_round_start(lv_obj_t * obj, bool round)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *)obj;
+    if(line->round_start == round) return;
+
     line->round_start = round;
+
+    lv_obj_invalidate(obj);
 }
 
 void lv_line_set_round_end(lv_obj_t * obj, bool round)
@@ -100,7 +104,11 @@ void lv_line_set_round_end(lv_obj_t * obj, bool round)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *)obj;
+    if(line->round_end == round) return;
+
     line->round_end = round;
+
+    lv_obj_invalidate(obj);
 }
 
 /*=====================
@@ -167,6 +175,8 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     line->point_array.constant = NULL;
     line->y_inv       = 0;
     line->point_array_is_mutable = 0;
+    line->round_start = 0;
+    line->round_end   = 0;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
