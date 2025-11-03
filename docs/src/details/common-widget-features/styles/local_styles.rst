@@ -43,8 +43,8 @@ For example:
 
 .. code-block:: c
 
-   lv_obj_bind_style_prop(slider1, LV_PROP_BG_OPA, LV_PART_MAIN, &subject_bg_opa);
-   lv_obj_bind_style_prop(slider1, LV_PROP_BG_COLOR, LV_PART_INDICATOR, &subject_bg_color);
+   lv_obj_bind_style_prop(slider1, LV_STYLE_BG_OPA, LV_PART_MAIN, &subject_bg_opa);
+   lv_obj_bind_style_prop(slider1, LV_STYLE_BG_COLOR, LV_PART_INDICATOR, &subject_bg_color);
 
 
 ..  Hyperlinks
