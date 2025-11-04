@@ -30,6 +30,7 @@ All Widgets
     dropdown
     image
     imagebutton
+    ime_pinyin
     keyboard
     label
     led
