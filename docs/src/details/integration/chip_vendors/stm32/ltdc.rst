@@ -127,7 +127,7 @@ board initialization, you may absolutely set it at runtime before creating the L
 .. code-block:: c
 
     /* like this */
-    HAL_LTDC_SetAddress(&hltdc, my_ltdc_framebuffer_address, my_ltdc_layer_index);
+    HAL_LTDC_SetAddress(&hltdc, (uint32_t)my_ltdc_framebuffer_address, my_ltdc_layer_index);
 
     /* and then... */
 
