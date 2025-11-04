@@ -221,8 +221,10 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
         png_data = (uint8_t *)img_dsc->data;
         png_data_size = img_dsc->data_size;
     }
-    else
+    else {
+        LV_PROFILER_DECODER_END;
         return NULL;
+    }
 
     /*Ready to read file*/
     LV_PROFILER_DECODER_BEGIN_TAG("png_image_begin_read_from_memory");
