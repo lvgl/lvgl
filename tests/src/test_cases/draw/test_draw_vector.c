@@ -29,6 +29,9 @@ void tearDown(void)
     /* Test all cleanup */
     lv_draw_unit_send_event(NULL, LV_EVENT_CANCEL, NULL);
 
+    /* Test draw unit dump info */
+    lv_draw_unit_send_event(NULL, LV_EVENT_HIT_TEST, NULL);
+
     lv_obj_clean(lv_screen_active());
 }
 
@@ -390,8 +393,15 @@ static void draw_during_rendering(const char * name, draw_cb_t draw_cb, lv_opa_t
 
 void test_draw_during_rendering(void)
 {
+    /* Enable the Draw Unit dump parameters */
+    lv_draw_unit_send_event(NULL, LV_EVENT_FOCUSED, NULL);
+
     draw_during_rendering("shapes", draw_shapes, LV_OPA_COVER);
     draw_during_rendering("lines", draw_lines, LV_OPA_COVER);
+
+    /* Disable the Draw Unit dump parameters */
+    lv_draw_unit_send_event(NULL, LV_EVENT_DEFOCUSED, NULL);
+
     draw_during_rendering("shapes_opa_50", draw_shapes, LV_OPA_50);
     draw_during_rendering("lines_opa_50", draw_lines, LV_OPA_50);
 }
