@@ -141,6 +141,7 @@ extern "C" {
     #include "src/lv_api_map_v9_1.h"
     #include "src/lv_api_map_v9_2.h"
     #include "src/lv_api_map_v9_3.h"
+    #include "src/lv_api_map_v9_4.h"
 #endif /*LV_DISABLE_API_MAPPING*/
 
 #if LV_USE_PRIVATE_API

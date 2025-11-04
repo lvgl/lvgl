@@ -134,6 +134,42 @@ void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
     }
 }
 
+#if LV_USE_TRANSLATION
+
+lv_obj_t * lv_list_add_translation_tag(lv_obj_t * list, const char * tag)
+{
+    LV_LOG_INFO("begin");
+
+    lv_obj_t * obj = lv_list_add_text(list, NULL);
+    lv_label_set_translation_tag(obj, tag);
+    return obj;
+}
+
+lv_obj_t * lv_list_add_button_translation_tag(lv_obj_t * list, const void * icon, const char * tag)
+{
+    LV_LOG_INFO("begin");
+
+    lv_obj_t * obj = lv_list_add_button(list, icon, "");
+    lv_list_set_button_translation_tag(list, obj, tag);
+
+    return obj;
+}
+
+void lv_list_set_button_translation_tag(lv_obj_t * list, lv_obj_t * btn, const char * tag)
+{
+    LV_UNUSED(list);
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_count(btn); i++) {
+        lv_obj_t * child = lv_obj_get_child(btn, i);
+        if(lv_obj_check_type(child, &lv_label_class)) {
+            lv_label_set_translation_tag(child, tag);
+            return;
+        }
+    }
+}
+
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
