@@ -10,7 +10,7 @@ Main Modules
     display/index
     indev/index
     fonts/index
-    image
+    images/index
     color
     timer
     animation

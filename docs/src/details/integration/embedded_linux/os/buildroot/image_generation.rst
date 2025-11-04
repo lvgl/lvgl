@@ -145,7 +145,7 @@ are needed to build packages or to run the build system itself. It may contain
 compilers, build tools, and libraries that are required to support the build
 process for the target.
 
-.. _images:
+.. _rpi4_images:
 
 images
 ======
@@ -181,7 +181,7 @@ If it is mounted on /dev/sda, run the following command
 
     sudo dd if=images/sdcard.img of=/dev/sda
 
-As mentioned in :ref:`images`, the output image is in ``images`` and named
+As mentioned in :ref:`rpi4_images`, the output image is in ``images`` and named
 ``sdcard.img``.
 
 Connect an Ethernet cable to the RPi4 and ensure the laptop and the RPi4 are on
