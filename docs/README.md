@@ -46,7 +46,7 @@ or if you are on a Unix-like OS:
 
 Intermediate files are normally prepared in `./docs/intermediate/` and the final documentation will normally appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` header comment for details.)
 
-If the list of document source files has changed (names or paths):
+If the list of document source (including the `.h` files in the `./src/` directory) files has changed (names or paths):
 
     python build.py clean html
 
@@ -56,7 +56,7 @@ To see a list of options available:
 
     python build.py
 
-Read the header comment in `build.py` for detailed documentation of each option.
+Read the header comment in `build.py` for detailed documentation on each option.
 
 
 
@@ -73,29 +73,16 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 LVGL documentation uses **reStructuredText**.  The definitive reStructuredText reference is https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html.  Supplemented by [the Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any and all reStructuredText tools you will ever need while creating or modifying LVGL documentation.
 
-
-
-### Example-Based reStructuredText Quick-Reference
-
-Because LVGL Documentation is currently using the `Furo` theme, this link to the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) takes you to a set of HTML pages whose source files can be very instructive about how to do different things using **reStructuredText**.  Just find an example of what you are trying to do (e.g. tables), and then click the "eye" icon at the top-right of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.  Note that the sub-pages of the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) contain a wide variety of **reStructuredText** constructs:  lists, tables, structural elements, admonitions, images, figures, typography, etc..
+If you prefer to learn by observing examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) are an excellent resource.  Find the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/), find an example of what you want to create (e.g. tables), then click the "eye" icon at the top of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.
 
 Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
 
 
 
-### What to Name Your `.rst` File
-
-The directory structure under the `./docs/src/` directory, and the filenames of the `.rst` files govern the eventual URLs that are generated in the HTML output.  These directories are organized so as to reflect the nature of the content.  Example:  the `.rst` files under `./docs/src/intro` contain introductory material—detailed reference material would not go there, but instead in an appropriate subdirectory of `./docs/src/details/`.  It is expected that the content and location of any new documents added would be in alignment with this directory structure, and placed and named according to their content.  Additionally, to be linked into the eventual generated documentation, the stem of the new filename needs to appear in at least one (normally *only one*) `.. toctree::` directive, normally in an `index.rst` file in the directory where it will appear in that page's table of contents (TOC).
-
-Other than that, there are no restrictions on filenames.  Previous linking of filenames to generated API links has been removed and replaced by a better scheme.
-
-
-
-
 ### Text Format
 
-With `.md` files, it is important to allow paragraphs to flow off to the right with one long line so that when they are formatted as `.html` files, the paragraphs will word-wrap with the width of the browser.  Thankfully, this liability is not present with reStructuredText (`.rst` files).  [Sphinx](https://www.sphinx-doc.org/en/master/) and its underlying [docutils parsing engine](https://docutils.sourceforge.io/docs/) conveniently combine grouped text into a proper paragraph with that word-wrapping behavior.  This allows the source text documents to be nicely word-wrapped so that they are more readable in text- and code-editors that do not have wide editing windows.  Please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
+Please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
 
 
 
@@ -106,7 +93,7 @@ If you create a new directory you will need an `index.rst` file in that director
 
 Let's take a look at the `index.rst` file that is located in the `docs/src/details/common-widget-features/layouts` directory.
 
-```
+```rst
 .. _layouts:
 
 =======
@@ -117,6 +104,7 @@ Layouts
 .. toctree::
     :maxdepth: 2
 
+    overview
     flex
     grid
 ```
@@ -124,7 +112,7 @@ Layouts
 
 The below explains the parts of this file.
 
-```
+```rst
 .. _layouts:      <=== Creates an explicit link target
                   <=== Empty line -- important!
 =======
@@ -136,13 +124,15 @@ Layouts           <=== Document title, seen in documentation
 .. toctree::      <=== Table of contents directive
     :maxdepth: 2  <=== Internal use and needs to always be set this way
 
-    flex          <=== relative path to .rst files located in the same directory
+    overview      <=== relative path to .rst files located in the same directory
+    flex
     grid
 ```
 
 The first line is for the purposes of providing a uniquely-named **link target** that can be referenced elsewhere in the documentation.
 
     .. _{LINK NAME}:
+                      <=== mandatory blank line
 
 Note that `{LINK NAME}`:
 
@@ -150,7 +140,7 @@ Note that `{LINK NAME}`:
 - **must** be followed by a single colon, and
 - **must** be followed by at least one blank line for the doc-generation logic to process it correctly.
 
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/src/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/src/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  Single spaces, hyphens or underscores can be used to separate multiple words.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
 
 That unique name is then used to provide a link reference elsewhere in the documentation using one of two formats.
 
@@ -168,9 +158,7 @@ This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` ro
 :ref:`other link text <{LINK NAME}>`
 ```
 
-This latter syntax enables you to put a **link target** anywhere in an .RST file (not just above a heading) and link to it using this syntax.
-
-Note:  This latter syntax was either added or fixed in Sphinx recently.  It did not work in Sphinx 7.3.7.
+This enables you to put a **link target** anywhere in an `.rst` file (not just above a heading) and link to it using this syntax.
 
 
 
@@ -209,9 +197,9 @@ Sub Sub Sub Section
 
 Being consistent about this helps the Sphinx/docutils parser to format the tables of contents correctly.
 
-Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
+Note that the "underlining" can be longer than the heading title, but not shorter.
 
-For improved readability in the .RST file:
+For improved readability in the `.rst` file:
 
 - place 3 blank lines above the 2nd and subsequent chapter titles (see above), and
 - place 2 blank lines above section headings below chapters.
@@ -224,7 +212,7 @@ Emphasis using italics is done by surrounding a word or phrase with single aster
 
 Emphasis using boldface is done by surrounding a word or phrase with double asterisks (`**`).
 
-Normally underlining is not possible in **reStructuredText**.  Also, at this writing, the core **reStructuredText** parser (docutils) is unable to combine boldface, italics, and/or underlining.  However, LVGL documentation provides a work-around for these shortcomings using Text Roles.  All you have to remember is that the Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  Note that all possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
+Normally underlining is not possible in **reStructuredText**.  Also, at this writing, the core **reStructuredText** parser (docutils) is unable to combine boldface, italics, and/or underlining.  However, LVGL documentation provides a work-around for this using Text Roles.  All you have to remember is that the Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
 
 | To Combine             | Text Role Name                           | Example       |
 | ---------------------- | ---------------------------------------- | ------------- |
@@ -270,24 +258,26 @@ The full set of supported lexers are listed in the [Pygments Library documentati
 
 To create a bulleted list, do the following:
 
-    - First item description
-    - If you want to span multiple lines, indent subsequent
-      lines to align with item text like this.
-    - If you want to include a code block under a list item,
-      it must be intended to align with the list item like this:
-    
-      .. code-block: python
-                                 <=== blank line here is important
-          # this is some code
-                                 <=== blank line here is important
-    - If you want to have nested bulleted lists, indent each
-      new level to align with its parent list item like this:
-                                 <=== blank line here is important
-      - level 2 item 1: text
-      - level 2 item 2: text
-                                 <=== blank line here is important
-    - Last list item.  Note that the nested list above is preceded
-      and followed by 1 blank line.
+```rst
+- First item description
+- If you want to span multiple lines, indent subsequent
+  lines to align with item text like this.
+- If you want to include a code block under a list item,
+  it must be intended to align with the list item like this:
+
+  .. code-block: python
+                             <=== blank line here is important
+      # Python code here
+                             <=== blank line here is important
+- If you want to have nested bulleted lists, indent each
+  new level to align with its parent list item like this:
+                             <=== blank line here is important
+  - level 2 item 1: text
+  - level 2 item 2: text
+                             <=== blank line here is important
+- Last list item.  Note that the nested list above is preceded
+  and followed by 1 blank line.
+```
 
 All lists (including nested lists) **must** be preceded and followed with at least 1 blank line.  This is mandatory for the documentation-generation logic to process it correctly.
 
@@ -295,11 +285,11 @@ All lists (including nested lists) **must** be preceded and followed with at lea
 
 ### Tightening Tables
 
-Very long or very wide tables can be difficult to read and use.  You, as the writer, are responsible for making your tables as readable as they can be.  Here's how to "squeeze" them down to a smaller size when needed to make them more readable and usable:
+Very long or very wide tables can be difficult to read and use.  As the writer, you are responsible for making your tables as readable as they can be.  Here's how to "squeeze" them down to a smaller size when needed to make them more readable and usable:
 
-1.  move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7), and
+1.  move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and
 
-2.  indent your table to be the container's "content", like this:
+2.  indent your table to be the container directive's content, like this:
 
 ```rst
 .. container:: tighter-table-3
@@ -319,7 +309,7 @@ Very long or very wide tables can be difficult to read and use.  You, as the wri
 
 ### Special Symbols
 
-Because not all editors support special Unicode symbols well, it is encouraged to use **reStructuredText** substitutions to represent special symbols in `.rst` you create or modify.  A list of the most common of these can be found in `./docs/src/include/substitutions.txt`.  To use one of these substitutions, simply include this line at the top of the `.rst` file if it is not already there:
+Because not all editors support special Unicode symbols well, it is encouraged to use **reStructuredText** substitutions to represent special symbols in `.rst` you create or modify.  A list of the most common of these can be found in `./docs/src/include/substitutions.txt`.  To use one of these substitutions, add this line at the top of the `.rst` file if it is not already there:
 
 ```rst
 .. include:: /include/substitutions.txt
@@ -337,9 +327,11 @@ The temperature outside is 20\ |deg|\ C.
 
 results in
 
+```
 The temperature outside is 20°C.
+```
 
-Note that the spaces surrounding **reStructuredText** substitutions *are required* for the parser to parse them correctly.  Any time you need to remove those spaces in the final output, do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` modifier. These do not need this escaping:
+The spaces surrounding substitutions *are required*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` modifier since their use *always* removes these spaces in the output.  These do not need this escaping:
 
 - `|nbsp|` (non-breaking space),
 - `|shy|` (soft hyphen), and
@@ -358,18 +350,20 @@ API
 ***
 ```
 
-and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with a reStructuredText comment using this syntax:
+and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with this pseudo-directive (it's really a comment) using this syntax:
 
 ```rst
 .. API equals: lv_scale_t, lv_scale_create
+                             <=== blank line here ends the list
 ```
 
-What follows the colon is a comma- or space-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.  If the list is long, it can be wrapped to subsequent lines, though continuation lines must be all indented at the same level.  The list ends with the first blank line after this pseudo-directive.  This list is used to locate the `.h` files containing documentation for those symbols, and provide exactly one link to each applicable `.h` file API page.
+What follows the colon is a comma- or space-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.  If the list is long, it can be wrapped to subsequent lines, though continuation lines must be all indented at the same level.  This list is used to locate the `.h` files containing documentation for those symbols, and provide exactly one link to each applicable `.h` file API page.
 
-If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead.  The format of the list is the same as for `.. API equals:`:
+If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead.  The format of the list is the same as for `.. API equals:`
 
 ```rst
 .. API startswith: lv_scale, lv_obj_set_style
+                             <=== blank line here ends the list
 ```
 
 #### In-Line Code Expressions
