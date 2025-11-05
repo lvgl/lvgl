@@ -59,6 +59,8 @@ must be reliable and the Tick Value must appear atomic to LVGL.  See
 :ref:`tick_interface` for details.
 
 
+.. _gateway thread:
+
 Common Thread Management Approaches
 -----------------------------------
 
