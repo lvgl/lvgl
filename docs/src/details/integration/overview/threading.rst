@@ -84,7 +84,7 @@ Notes on Using MUTEXES
 
 Use of MUTEXes requires:
 
-1.  acquiring the MUTEX (locking it) before each LVGL call, and
+1.  acquiring the MUTEX (locking it) before each LVGL call (or group of calls), and
 
 2.  releasing the MUTEX (unlocking it) afterwards.
 
