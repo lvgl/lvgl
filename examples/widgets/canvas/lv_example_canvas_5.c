@@ -25,7 +25,6 @@ void lv_example_canvas_5(void)
     lv_draw_arc_dsc_t dsc;
     lv_draw_arc_dsc_init(&dsc);
     dsc.color = lv_palette_main(LV_PALETTE_RED);
-    dsc.width = 5;
     dsc.center.x = 25;
     dsc.center.y = 25;
     dsc.width = 10;
