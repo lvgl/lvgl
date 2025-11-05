@@ -146,6 +146,15 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
     file_explorer_sort(obj);
 }
 
+void lv_file_explorer_show_back_button(lv_obj_t * obj, bool show)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
+
+    explorer-> show_back = show;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -263,6 +272,8 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
 #endif
 
     explorer->sort = LV_EXPLORER_SORT_NONE;
+
+    explorer->show_back = true;
 
     lv_memzero(explorer->current_path, sizeof(explorer->current_path));
 
@@ -614,7 +625,9 @@ static void show_dir(lv_obj_t * obj, const char * path)
     }
 
     clear_table_cells_user_data(explorer);
-    lv_table_set_cell_value(explorer->file_table, index++, 0, LV_SYMBOL_LEFT "  " LV_FILE_NAVIGATION_PARENT_DIR);
+    if(explorer->show_back) {
+        lv_table_set_cell_value(explorer->file_table, index++, 0, LV_SYMBOL_LEFT "  " LV_FILE_NAVIGATION_PARENT_DIR);
+    }
     file_entry_user_data = lv_malloc(sizeof(lv_file_explorer_file_table_entry_data_t));
     LV_ASSERT_MALLOC(file_entry_user_data);
     file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_DIR;
