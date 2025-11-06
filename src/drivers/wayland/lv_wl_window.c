@@ -293,13 +293,14 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     /* Make sure buffer is correctly released*/
     wl_display_roundtrip(lv_wl_ctx.wl_display);
 
+    wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
+    window->backend_display_data = NULL;
+
     /* Set the driver data to NULL before calling display delete
      * so that the delete event doesn't do anything*/
     lv_display_set_driver_data(window->lv_disp, NULL);
     lv_display_delete(window->lv_disp);
 
-    wl_backend_ops.deinit_display(window->backend_display_data, window->lv_disp);
-    window->backend_display_data = NULL;
 
     lv_ll_remove(&lv_wl_ctx.window_ll, window);
 
