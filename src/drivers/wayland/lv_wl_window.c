@@ -323,15 +323,22 @@ static void delete_event(lv_event_t * e)
 
 static void refr_start_event(lv_event_t * e)
 {
-    LV_LOG_USER("Refr start event");
-    LV_UNUSED(e);
+    lv_display_t * display = lv_event_get_target(e);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+
     while(wl_display_prepare_read(lv_wl_ctx.wl_display) != 0) {
         wl_display_dispatch_pending(lv_wl_ctx.wl_display);
     }
+
     wl_display_read_events(lv_wl_ctx.wl_display);
     wl_display_dispatch_pending(lv_wl_ctx.wl_display);
 
-    LV_LOG_USER("Refr start done");
+
+    if(window->resize_event.pending) {
+        lv_wayland_window_resize(window, window->resize_event.width, window->resize_event.height);
+        xdg_surface_ack_configure(window->resize_event.xdg_surface, window->resize_event.serial);
+        window->resize_event.pending = false;
+    }
 
 #if 0
     if(window->resize_pending) {
@@ -365,7 +372,6 @@ static void refr_start_event(lv_event_t * e)
 static void refr_end_event(lv_event_t * e)
 {
     LV_UNUSED(e);
-    LV_LOG_USER("Refr end");
     int ret;
     while((ret = wl_display_flush(lv_wl_ctx.wl_display)) == -1 && errno == EAGAIN) {
         struct pollfd pfd = {
@@ -379,8 +385,6 @@ static void refr_end_event(lv_event_t * e)
         }
         /* Socket is writable now, loop back and try flush again */
     }
-
-    LV_LOG_USER("Flush done");
 }
 static void res_changed_event(lv_event_t * e)
 {
