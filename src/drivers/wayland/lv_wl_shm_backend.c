@@ -10,6 +10,8 @@
 #include "lv_wayland_private.h"
 
 #if LV_WAYLAND_USE_SHM
+
+#include "../../display/lv_display_private.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -43,7 +45,6 @@ typedef struct {
     size_t curr_wl_buffer_idx;
     uint32_t shm_cf;
     int fd;
-    bool flushing;
     bool delete_on_release;
 } lv_wl_shm_display_data_t;
 
@@ -125,10 +126,8 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
 {
     LV_UNUSED(time);
     lv_display_t * display = data;
-    lv_wl_shm_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
     wl_callback_destroy(callback);
     lv_display_flush_ready(display);
-    ddata->flushing = false;
 }
 
 static uint32_t lv_cf_to_shm_cf(lv_color_format_t cf)
@@ -258,11 +257,9 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
 
 static void flush_wait_cb(lv_display_t * disp)
 {
-    lv_wl_shm_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
-    while(ddata->flushing) {
+    while(disp->flushing) {
         wl_display_dispatch(lv_wl_ctx.wl_display);
     }
-    lv_display_flush_ready(disp);
 }
 
 static void * shm_init_display(void * backend_data, lv_display_t * display, int32_t width, int32_t height)
@@ -425,7 +422,6 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     wl_surface_commit(surface);
 
     buffer->busy = true;
-    ddata->flushing = true;
     ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WAYLAND_BUF_COUNT;
 }
 
