@@ -216,12 +216,14 @@ void lv_timer_set_period(lv_timer_t * timer, uint32_t period)
 {
     LV_ASSERT_NULL(timer);
     timer->period = period;
+    lv_timer_handler_resume();
 }
 
 void lv_timer_ready(lv_timer_t * timer)
 {
     LV_ASSERT_NULL(timer);
     timer->last_run = lv_tick_get() - timer->period - 1;
+    lv_timer_handler_resume();
 }
 
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
