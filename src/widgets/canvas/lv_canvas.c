@@ -18,7 +18,6 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display.h"
-#include "../../draw/sw/lv_draw_sw.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/cache/lv_cache.h"
 /*********************
