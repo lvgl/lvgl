@@ -13,14 +13,6 @@
 
 #if LV_WAYLAND_USE_G2D
 
-#if LV_USE_ROTATE_G2D && LV_WAYLAND_BUF_COUNT != 3
-    #error "LV_WAYLAND_BUF_COUNT must be 3 when LV_USE_ROTATE_G2D is enabled"
-#endif
-
-// #if LV_WAYLAND_RENDER_MODE == 0
-//     #error "LV_WAYLAND with G2D doesn't support LV_DISPLAY_RENDER_MODE_PARTIAL"
-// #endif
-
 #include "../../display/lv_display_private.h"
 #include <wayland_linux_dmabuf.h>
 #include <drm/drm_fourcc.h>
@@ -38,13 +30,18 @@
  *      DEFINES
  *********************/
 
+/* v9.4 got released with this combination of settings. Allow this until v9.5 is released*/
+#if LV_WAYLAND_BUF_COUNT == 3
+    #undef LV_WAYLAND_BUF_COUNT
+    #define LV_WAYLAND_BUF_COUNT 2
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef struct {
     struct wl_buffer * wl_buffer;
-    void * buf_base;
     lv_draw_buf_t * lv_draw_buf;
     int dmabuf_fd;
     uint32_t stride;
@@ -54,6 +51,9 @@ typedef struct {
 
 typedef struct {
     lv_wl_buffer_t buffers[LV_WAYLAND_BUF_COUNT];
+#if LV_USE_ROTATE_G2D
+    lv_wl_buffer_t rotate_buffer;
+#endif
     uint32_t drm_cf;
     uint8_t last_used;
     bool flushing;
@@ -113,6 +113,10 @@ static uint32_t lv_cf_to_drm_cf(lv_color_format_t cf);
 
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time);
 
+static void init_buffer(lv_wl_g2d_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t width, uint32_t height,
+                        lv_color_format_t cf);
+
+static void delete_buffer(lv_wl_buffer_t * buffer);
 static void flush_wait_cb(lv_display_t * disp);
 
 static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata);
@@ -218,6 +222,43 @@ static void wl_g2d_global_handler(void * backend_data, struct wl_registry * regi
         wl_display_roundtrip(lv_wl_ctx.wl_display);
     }
 }
+static void init_buffer(lv_wl_g2d_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t width, uint32_t height,
+                        lv_color_format_t cf)
+{
+    uint32_t drm_cf = lv_cf_to_drm_cf(cf);
+    uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
+    buffer->lv_draw_buf = lv_draw_buf_create(width, height, cf, stride);
+    buffer->dmabuf_fd = g2d_get_buf_fd(buffer->lv_draw_buf);
+    buffer->stride = stride;
+
+    /* Will be set on the dmabuf callback if the creation is successful*/
+    buffer->wl_buffer = NULL;
+
+    struct zwp_linux_buffer_params_v1 * params = zwp_linux_dmabuf_v1_create_params(ctx->handler);
+
+    zwp_linux_buffer_params_v1_add(params,
+                                   buffer->dmabuf_fd,
+                                   0,
+                                   buffer->offset,
+                                   buffer->stride,
+                                   0,
+                                   0);
+
+    zwp_linux_buffer_params_v1_add_listener(params, &params_listener, buffer);
+    zwp_linux_buffer_params_v1_create(params, width, height, drm_cf, 0);
+}
+
+static void delete_buffer(lv_wl_buffer_t * buffer)
+{
+    if(buffer->wl_buffer) {
+        wl_buffer_destroy(buffer->wl_buffer);
+        buffer->wl_buffer = NULL;
+    }
+    if(buffer->lv_draw_buf) {
+        lv_draw_buf_destroy(buffer->lv_draw_buf);
+        buffer->lv_draw_buf = NULL;
+    }
+}
 
 static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * ctx, lv_display_t * display,
                                                              int32_t width, int32_t height)
@@ -228,58 +269,60 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         return NULL;
     }
 
+    lv_display_rotation_t rotation = lv_display_get_rotation(display);
     lv_color_format_t cf = lv_display_get_color_format(display);
     if(cf == LV_COLOR_FORMAT_RGB565 && !ctx->supports_rgb565) {
         LV_LOG_WARN("RGB565 is not supported by the wayland compositor. Falling back to XRGB8888");
         cf = LV_COLOR_FORMAT_XRGB8888;
         lv_display_set_color_format(display, cf);
     }
+
     ddata->drm_cf = lv_cf_to_drm_cf(cf);
-
-    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
-        uint32_t w = width;
-        uint32_t h = height;
-        uint32_t rotation = lv_display_get_rotation(display);
-        if(LV_USE_ROTATE_G2D && i == 2 && (rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270)) {
-            w = height;
-            h = width;
-        }
-
-        uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
-
-        ddata->buffers[i].lv_draw_buf = lv_draw_buf_create(w, h, cf, stride);
-        ddata->buffers[i].stride = stride;
-        ddata->buffers[i].dmabuf_fd = g2d_get_buf_fd(ddata->buffers[i].lv_draw_buf);
-        ddata->buffers[i].buf_base = ddata->buffers[i].lv_draw_buf->data;
-
-        struct zwp_linux_buffer_params_v1 * params = zwp_linux_dmabuf_v1_create_params(ctx->handler);
-
-        zwp_linux_buffer_params_v1_add(params,
-                                       ddata->buffers[i].dmabuf_fd,
-                                       0,
-                                       ddata->buffers[i].offset,
-                                       ddata->buffers[i].stride,
-                                       0,
-                                       0);
-
-        zwp_linux_buffer_params_v1_add_listener(params, &params_listener, &ddata->buffers[i]);
-        zwp_linux_buffer_params_v1_create(params, w, h, ddata->drm_cf, 0);
+    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        init_buffer(ctx, &ddata->buffers[i], width, height, cf);
     }
+
+#if LV_USE_ROTATE_G2D
+    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+        LV_LOG_USER("Rotation is 90/270");
+        init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
+    }
+    else {
+
+        LV_LOG_USER("Rotation is 0 / 180");
+        init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
+    }
+#endif
+
+    wl_display_flush(lv_wl_ctx.wl_display);
+    wl_display_roundtrip(lv_wl_ctx.wl_display);
+    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; ++i) {
+        if(!ddata->buffers[i].wl_buffer) {
+            LV_LOG_ERROR("DMABUF creation failed");
+            return NULL;
+        }
+    }
+
+#if LV_USE_ROTATE_G2D
+    if(!ddata->rotate_buffer.wl_buffer) {
+        LV_LOG_ERROR("DMABUF creation failed");
+        return NULL;
+    }
+#endif
+
     return ddata;
 }
 
 static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata)
 {
     for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
-        lv_wl_buffer_t * buf = ddata->buffers + i;
-        if(buf->wl_buffer) {
-            wl_buffer_destroy(buf->wl_buffer);
-        }
-
-        if(buf->lv_draw_buf) {
-            lv_draw_buf_destroy(buf->lv_draw_buf);
-        }
+        delete_buffer(ddata->buffers + i);
     }
+
+#if LV_USE_ROTATE_G2D
+    delete_buffer(&ddata->rotate_buffer);
+#endif
+
     lv_free(ddata);
 }
 
@@ -296,7 +339,12 @@ static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, i
     set_display_buffers(display, ddata);
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
-    lv_display_set_render_mode(display, LV_WAYLAND_RENDER_MODE);
+    lv_display_render_mode_t render_mode = LV_WAYLAND_RENDER_MODE;
+    if(LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        LV_LOG_WARN("Partial render mode is not supported by G2D. Using DIRECT instead");
+        render_mode = LV_DISPLAY_RENDER_MODE_DIRECT;
+    }
+    lv_display_set_render_mode(display, render_mode);
     return ddata;
 }
 
@@ -324,6 +372,7 @@ static uint32_t lv_cf_to_drm_cf(lv_color_format_t cf)
 
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time)
 {
+    LV_LOG_USER("Frame done");
     LV_UNUSED(time);
     lv_display_t * display = data;
     wl_callback_destroy(callback);
@@ -333,6 +382,7 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
 
 static void buffer_release(void * data, struct wl_buffer * buffer)
 {
+    LV_LOG_USER("Buffer release");
     LV_UNUSED(buffer);
     lv_wl_buffer_t * buf = data;
     buf->busy = false;
@@ -341,6 +391,7 @@ static void buffer_release(void * data, struct wl_buffer * buffer)
 
 static void create_succeeded(void * data, struct zwp_linux_buffer_params_v1 * params, struct wl_buffer * new_buffer)
 {
+    LV_LOG_USER("Create succeeded");
     lv_wl_buffer_t * buffer = data;
     buffer->wl_buffer = new_buffer;
 
@@ -354,6 +405,7 @@ static void create_succeeded(void * data, struct zwp_linux_buffer_params_v1 * pa
 
 static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * params)
 {
+    LV_LOG_USER("Create failed");
     lv_wl_buffer_t * buffer = data;
     buffer->wl_buffer = NULL;
     zwp_linux_buffer_params_v1_destroy(params);
@@ -362,6 +414,7 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
 
 static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
 {
+    LV_LOG_USER("Resize display");
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
     int32_t width = lv_display_get_horizontal_resolution(disp);
     int32_t height = lv_display_get_vertical_resolution(disp);
@@ -376,6 +429,7 @@ static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
     lv_wl_g2d_display_data_t * old_ddata = lv_wayland_get_backend_display_data(disp);
     wl_g2d_delete_display_data(old_ddata);
 
+    LV_LOG_USER("Resize done");
     return ddata;
 }
 
@@ -540,9 +594,10 @@ static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata)
 
 static void set_display_buffers(lv_display_t * display, lv_wl_g2d_display_data_t * ddata)
 {
-    if(LV_USE_ROTATE_G2D == 1) {
-        lv_display_set_draw_buffers(display, ddata->buffers[2].lv_draw_buf, NULL);
-    }
+#if LV_USE_ROTATE_G2D
+    lv_display_set_draw_buffers(display, ddata->rotate_buffer.lv_draw_buf, NULL);
+    return;
+#endif
     if(LV_WAYLAND_BUF_COUNT == 2) {
         lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
     }
@@ -560,6 +615,8 @@ static void flush_wait_cb(lv_display_t * disp)
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
+
+    LV_LOG_USER("Flush");
     LV_UNUSED(color_p);
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     int32_t src_width = lv_area_get_width(area);
@@ -581,7 +638,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
 
     lv_draw_buf_invalidate_cache(buf->lv_draw_buf, NULL);
 #if LV_USE_ROTATE_G2D
-    lv_draw_buf_invalidate_cache(ddata->buffers[2].lv_draw_buf, NULL);
+    lv_draw_buf_invalidate_cache(ddata->rotate_buffer.lv_draw_buf, NULL);
 #endif
 
     const bool force_full_flush = LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT &&
@@ -593,16 +650,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     }
 
     if(lv_display_flush_is_last(disp)) {
-
-        if(buf->busy) {
-            LV_LOG_ERROR("buffer is busy");
-        }
         if(force_full_flush) {
             wl_surface_damage(surface, 0, 0, lv_display_get_original_horizontal_resolution(disp),
                               lv_display_get_original_vertical_resolution(disp));
         }
 #if LV_USE_ROTATE_G2D
-        g2d_rotate(ddata->buffers[2].lv_draw_buf, buf->lv_draw_buf,
+        g2d_rotate(ddata->rotate_buffer.lv_draw_buf, buf->lv_draw_buf,
                    lv_display_get_original_horizontal_resolution(disp),
                    lv_display_get_original_vertical_resolution(disp),
                    lv_display_get_rotation(disp),
@@ -620,10 +673,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     else {
         /* Not the last frame yet, so tell lvgl to keep going
          * For the last frame, we wait for the compositor instead */
-        // buf->busy = false;
         lv_display_flush_ready(disp);
     }
 
+    LV_LOG_USER("Flush done");
     return;
 }
 
