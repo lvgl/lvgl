@@ -4,6 +4,9 @@
 Debugging
 =========
 
+LVGL comes packaged with various tools that can help you debug problems you may
+encounter during development and testing.
+
 .. toctree::
     :maxdepth: 2
 
