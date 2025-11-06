@@ -157,7 +157,7 @@ void lv_wayland_deinit(void)
         lv_wayland_window_delete(window);
     }
 
-    lv_wayland_xdg_shell_deinit();
+    lv_wayland_xdg_deinit();
 
     wl_backend_ops.deinit(lv_wl_ctx.backend_data);
 
@@ -258,7 +258,7 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
         /* supporting version 2 of the XDG protocol - ensures greater compatibility */
         ctx->xdg_wm = wl_registry_bind(ctx->wl_registry, name, &xdg_wm_base_interface, 2);
-        xdg_wm_base_add_listener(ctx->xdg_wm, lv_wayland_xdg_shell_get_wm_base_listener(), ctx);
+        xdg_wm_base_add_listener(ctx->xdg_wm, lv_wayland_xdg_get_wm_base_listener(), ctx);
     }
     else if(strcmp(interface, wl_output_interface.name) == 0) {
         if(ctx->wl_output_count < LV_WAYLAND_MAX_OUTPUTS) {
