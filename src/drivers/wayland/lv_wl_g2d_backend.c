@@ -461,6 +461,7 @@ static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, i
     set_display_buffers(display, ddata);
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
+    lv_display_set_render_mode(display, LV_WAYLAND_RENDER_MODE);
     return ddata;
 }
 
