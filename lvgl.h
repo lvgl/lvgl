@@ -109,6 +109,7 @@ extern "C" {
 #include "src/libs/fsdrv/lv_fsdrv.h"
 #include "src/libs/lodepng/lv_lodepng.h"
 #include "src/libs/libpng/lv_libpng.h"
+#include "src/libs/libwebp/lv_libwebp.h"
 #include "src/libs/gltf/gltf_data/lv_gltf_model.h"
 #include "src/libs/gltf/gltf_view/lv_gltf.h"
 #include "src/libs/gif/lv_gif.h"

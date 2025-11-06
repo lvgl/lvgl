@@ -30,6 +30,7 @@
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/libwebp/lv_libwebp.h"
 #include "libs/tiny_ttf/lv_tiny_ttf.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
@@ -396,6 +397,10 @@ void lv_init(void)
 
 #if LV_USE_LIBJPEG_TURBO
     lv_libjpeg_turbo_init();
+#endif
+
+#if LV_USE_LIBWEBP
+    lv_libwebp_init();
 #endif
 
 #if LV_USE_BMP
