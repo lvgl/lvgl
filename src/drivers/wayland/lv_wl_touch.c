@@ -129,16 +129,16 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
     }
 #if LV_USE_GESTURE_RECOGNITION
     /* Collect touches if there are any - send them to the gesture recognizer */
-    lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->touch_event_cnt);
+    lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
 
-    LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
+    LV_LOG_TRACE("collected touch events: %d", tdata->touch_event_cnt);
 
-    tdata->touch_event_cnt = 0;
+    tdata->event_cnt = 0;
 
     /* Set the gesture information, before returning to LVGL */
     lv_indev_gesture_recognizers_set_data(indev, data);
 
-    if(tdata->touch_event_cnt > 0) {
+    if(tdata->event_cnt > 0) {
         data->point = tdata->touches[0].point;
     }
     else {
@@ -167,11 +167,11 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch, uint32_t 
 #if LV_USE_GESTURE_RECOGNITION
     uint8_t i = tdata->event_cnt;
 
-    tdata->s[i].point.x   = wl_fixed_to_int(x_w);
-    tdata->s[i].point.y   = wl_fixed_to_int(y_w);
-    tdata->s[i].id        = id;
-    tdata->s[i].timestamp = time;
-    tdata->s[i].state     = LV_INDEV_STATE_PRESSED;
+    tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+    tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+    tdata->touches[i].id        = id;
+    tdata->touches[i].timestamp = time;
+    tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
     tdata->event_cnt++;
 #else
     tdata->point.x = wl_fixed_to_int(x_w);
@@ -192,11 +192,11 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch, uint32_t se
 #if LV_USE_GESTURE_RECOGNITION
     uint8_t i = tdata->event_cnt;
 
-    tdata->s[i].point.x   = 0;
-    tdata->s[i].point.y   = 0;
-    tdata->s[i].id        = id;
-    tdata->s[i].timestamp = time;
-    tdata->s[i].state     = LV_INDEV_STATE_RELEASED;
+    tdata->touches[i].point.x   = 0;
+    tdata->touches[i].point.y   = 0;
+    tdata->touches[i].id        = id;
+    tdata->touches[i].timestamp = time;
+    tdata->touches[i].state     = LV_INDEV_STATE_RELEASED;
 
     tdata->event_cnt++;
 #else
@@ -215,7 +215,7 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
 
 #if LV_USE_GESTURE_RECOGNITION
     /* Update the contact point of the corresponding id with the latest coordinate */
-    lv_indev_touch_data_t * touch = &tdata->s[0];
+    lv_indev_touch_data_t * touch = &tdata->touches[0];
     lv_indev_touch_data_t * cur = NULL;
 
     for(uint8_t i = 0; i < tdata->event_cnt; i++) {
@@ -227,11 +227,11 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch, uint32_
 
     if(cur == NULL) {
         uint8_t i = tdata->event_cnt;
-        tdata->s[i].point.x   = wl_fixed_to_int(x_w);
-        tdata->s[i].point.y   = wl_fixed_to_int(y_w);
-        tdata->s[i].id        = id;
-        tdata->s[i].timestamp = time;
-        tdata->s[i].state     = LV_INDEV_STATE_PRESSED;
+        tdata->touches[i].point.x   = wl_fixed_to_int(x_w);
+        tdata->touches[i].point.y   = wl_fixed_to_int(y_w);
+        tdata->touches[i].id        = id;
+        tdata->touches[i].timestamp = time;
+        tdata->touches[i].state     = LV_INDEV_STATE_PRESSED;
         tdata->event_cnt++;
     }
     else {
