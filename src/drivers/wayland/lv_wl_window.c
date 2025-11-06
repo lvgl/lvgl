@@ -141,19 +141,24 @@ alloc_window_err:
 
 void * lv_wayland_get_backend_display_data(lv_display_t * display)
 {
+    LV_ASSERT_NULL(display);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT_NULL(window);
     return window->backend_display_data;
 }
 
 struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display)
 {
+    LV_ASSERT_NULL(display);
     lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT_NULL(window);
     return window->body;
 }
 
-void lv_wayland_window_close(lv_display_t * disp)
+void lv_wayland_window_close(lv_display_t * display)
 {
-    lv_wl_window_t * window = lv_display_get_driver_data(disp);
+    LV_ASSERT_NULL(display);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
     if(!window) {
         return;
     }
