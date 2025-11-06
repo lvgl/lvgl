@@ -38,6 +38,7 @@ typedef struct {
     void * mmap_ptr;
     size_t mmap_size;
     struct wl_shm_pool * pool;
+    uint8_t * partial_buffer;
     lv_wl_buffer_t buffers[LV_WAYLAND_BUF_COUNT];
     size_t curr_wl_buffer_idx;
     uint32_t shm_cf;
@@ -236,6 +237,11 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
         ddata->pool = NULL;
     }
 
+    if(ddata->partial_buffer) {
+        lv_free(ddata->partial_buffer);
+        ddata->partial_buffer = NULL;
+    }
+
     if(ddata->mmap_ptr != MAP_FAILED) {
         munmap(ddata->mmap_ptr, ddata->mmap_size);
         ddata->mmap_ptr = MAP_FAILED;
@@ -306,8 +312,8 @@ static void * shm_resize_display(void * backend_data, lv_display_t * display)
 static void set_display_buffers(lv_display_t * display, lv_wl_shm_display_data_t * ddata)
 {
     if(LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        uint8_t * partial_buffer = lv_malloc(ddata->mmap_size / 10);
-        lv_display_set_buffers(display, partial_buffer, NULL, ddata->mmap_size / 10,
+        ddata->partial_buffer = lv_malloc(ddata->mmap_size / 10);
+        lv_display_set_buffers(display, ddata->partial_buffer, NULL, ddata->mmap_size / 10,
                                LV_WAYLAND_RENDER_MODE);
         return;
     }
