@@ -26,8 +26,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void flush_end_event(lv_event_t * e);
-
 static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_surface, uint32_t serial);
 static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg_toplevel, int32_t width,
                                           int32_t height, struct wl_array * states);
@@ -138,10 +136,6 @@ lv_result_t lv_wayland_xdg_shell_create_window(struct xdg_wm_base * xdg_wm, lv_w
     xdg_toplevel_add_listener(window->xdg.xdg_toplevel, &xdg_toplevel_listener, window);
     xdg_toplevel_set_title(window->xdg.xdg_toplevel, title);
     xdg_toplevel_set_app_id(window->xdg.xdg_toplevel, title);
-
-    /* Add an event to the flush end event so that we can ack a resize after the flush is done*/
-    lv_display_add_event_cb(window->lv_disp, flush_end_event, LV_EVENT_FLUSH_FINISH, window);
-
     return LV_RESULT_OK;
 }
 
@@ -152,6 +146,7 @@ void lv_wayland_xdg_shell_configure_surface(lv_wl_window_t * window)
      * configure event */
     wl_surface_commit(window->body);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
+    LV_LOG_USER("lv_wayland_xdg_shell_configure_surface");
     LV_ASSERT_MSG(window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
 }
 
@@ -180,14 +175,6 @@ void lv_wayland_xdg_shell_destroy_window_toplevel(lv_wl_window_xdg_t * xdg)
  *   STATIC FUNCTIONS
  **********************/
 
-static void flush_end_event(lv_event_t * e)
-{
-    lv_wl_window_t * window = lv_event_get_user_data(e);
-    if(window->resize_event.pending) {
-        xdg_surface_ack_configure(window->resize_event.xdg_surface, window->resize_event. serial);
-    }
-    window->resize_event.pending = false;
-}
 
 static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_surface, uint32_t serial)
 {
@@ -199,7 +186,6 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
         return;
     }
 
-    lv_wayland_window_resize(window, window->resize_event.width, window->resize_event.height);
     window->resize_event.pending = true;
     window->resize_event.requested = false;
     window->resize_event.xdg_surface = xdg_surface;
