@@ -26,7 +26,7 @@
 #include <drm/drm_fourcc.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <src/misc/lv_types.h>
+#include "../../misc/lv_types.h"
 #include <string.h>
 #include "../../draw/nxp/g2d/lv_g2d_utils.h"
 #include <stdio.h>

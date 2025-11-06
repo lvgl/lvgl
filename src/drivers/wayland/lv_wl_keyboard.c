@@ -4,9 +4,6 @@
  */
 
 #include "lv_wl_keyboard.h"
-#include <src/core/lv_obj_event.h>
-#include <src/indev/lv_indev.h>
-#include <src/misc/lv_event.h>
 
 #if LV_USE_WAYLAND
 

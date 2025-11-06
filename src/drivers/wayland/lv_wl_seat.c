@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_wayland.h"
-#include "wayland_xdg_shell.h"
 
 #if LV_USE_WAYLAND
 
