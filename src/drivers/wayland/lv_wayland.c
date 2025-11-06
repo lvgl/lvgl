@@ -148,6 +148,9 @@ lv_result_t lv_wayland_init(void)
 
 void lv_wayland_deinit(void)
 {
+    if(!is_wayland_initialized) {
+        return;
+    }
     lv_wl_window_t * window = NULL;
 
     LV_LL_READ(&lv_wl_ctx.window_ll, window) {
@@ -174,6 +177,7 @@ void lv_wayland_deinit(void)
     }
 
     lv_ll_clear(&lv_wl_ctx.window_ll);
+    is_wayland_initialized = false;
 }
 
 /**********************
