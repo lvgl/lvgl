@@ -624,7 +624,7 @@ static void process_animation_element(lv_xml_parser_state_t * state, const char 
     child->is_anim = true;
     lv_anim_t * a = &child->data.anim;
 
-    anim_data_t * anim_data = lv_malloc(sizeof(anim_data));
+    anim_data_t * anim_data = lv_malloc(sizeof(anim_data_t));
     anim_data->selector = selector;
     anim_data->prop = prop;
     anim_data->prop_type = prop_type;
