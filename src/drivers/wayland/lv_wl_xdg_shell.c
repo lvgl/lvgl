@@ -146,8 +146,26 @@ void lv_wayland_xdg_configure_surface(lv_wl_window_t * window)
      * configure event */
     wl_surface_commit(window->body);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
-    LV_LOG_USER("lv_wayland_xdg_shell_configure_surface");
     LV_ASSERT_MSG(window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
+}
+bool lv_wayland_xdg_is_resize_pending(lv_wl_window_t * window)
+{
+    return window->resize_event.pending;
+}
+
+void lv_wayland_xdg_resize(lv_wl_window_t * window)
+{
+    if(!window->resize_event.pending) {
+        return;
+    }
+
+
+    lv_display_set_resolution(window->lv_disp,
+                              window->resize_event.width,
+                              window->resize_event.height);
+    xdg_surface_ack_configure(window->resize_event.xdg_surface, window->resize_event.serial);
+    window->resize_event.pending = false;
+    window->xdg.configured = true;
 }
 
 void lv_wayland_xdg_delete_window(lv_wl_window_xdg_t * xdg)
@@ -182,10 +200,12 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
 
     if(!window->resize_event.requested) {
         LV_LOG_USER("resize event not requested. ignoring it");
+        window->xdg.configured = true;
         xdg_surface_ack_configure(xdg_surface, serial);
         return;
     }
 
+    LV_LOG_USER("Requested is false");
     window->resize_event.pending = true;
     window->resize_event.requested = false;
     window->resize_event.xdg_surface = xdg_surface;
@@ -199,7 +219,6 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
 
     LV_UNUSED(xdg_toplevel);
     LV_UNUSED(states);
-
     LV_LOG_USER("XDG toplevel configure: w=%d h=%d (current: %dx%d)",
                 width, height, lv_wayland_window_get_width(window), lv_wayland_window_get_height(window));
 
@@ -207,15 +226,17 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
         LV_LOG_USER("will not resize to w:%d h:%d", width, height);
         return;
     }
+
+    window->xdg.configured = false;
     /* Width and height are already ok, don't resize*/
-    if(width == lv_wayland_window_get_width(window) && height == lv_wayland_window_get_height(window)) {
+    if(width == lv_wayland_window_get_width(window) &&
+       height == lv_wayland_window_get_height(window)) {
         LV_LOG_USER("Window's size is already correct. Ignore resize request");
         return;
     }
-
     window->resize_event.requested = true;
-    window->resize_event.width = width ? width : lv_wayland_window_get_width(window);
-    window->resize_event.height = height ? height : lv_wayland_window_get_height(window);
+    window->resize_event.width = width ? width : lv_display_get_horizontal_resolution(window->lv_disp);
+    window->resize_event.height = height ? height : lv_display_get_vertical_resolution(window->lv_disp);
 }
 
 static void xdg_toplevel_handle_close(void * data, struct xdg_toplevel * xdg_toplevel)

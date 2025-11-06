@@ -259,24 +259,6 @@ int32_t lv_wayland_window_get_height(lv_wl_window_t * window)
     return lv_display_get_vertical_resolution(window->lv_disp);
 }
 
-void lv_wayland_window_resize(lv_wl_window_t * window, int32_t width, int32_t height)
-{
-    LV_ASSERT_NULL(window->lv_disp);
-
-    /* If the width and height is the same, we won't get a resolution changed event
-     * so call resize display directly
-     * In every other case, use the resolution changed event to actually do the resizing*/
-    if(lv_display_get_horizontal_resolution(window->lv_disp) == width &&
-       lv_display_get_vertical_resolution(window->lv_disp) == height) {
-        window->backend_display_data = wl_backend_ops.resize_display(lv_wl_ctx.backend_data, window->lv_disp);
-    }
-    else {
-        lv_display_set_resolution(window->lv_disp, width, height);
-    }
-
-    return LV_RESULT_OK;
-}
-
 void lv_wayland_window_delete(lv_wl_window_t * window)
 {
     if(!window) {

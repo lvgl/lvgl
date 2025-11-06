@@ -174,7 +174,6 @@ int32_t lv_wayland_window_get_width(lv_wl_window_t * window);
 int32_t lv_wayland_window_get_height(lv_wl_window_t * window);
 
 void lv_wayland_window_draw(lv_wl_window_t * window, uint32_t width, uint32_t height);
-void lv_wayland_window_resize(lv_wl_window_t * window, int width, int height);
 void lv_wayland_window_delete(lv_wl_window_t * window);
 
 /**********************
