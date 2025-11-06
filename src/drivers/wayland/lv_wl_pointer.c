@@ -31,7 +31,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void update_indevs(lv_wl_seat_pointer_t * driver_data);
 
 static void pointer_read(lv_indev_t * indev, lv_indev_data_t * data);
 static void pointeraxis_read(lv_indev_t * indev, lv_indev_data_t * data);
@@ -142,9 +141,11 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
 
     return wl_seat_pointer;
 }
+
 void lv_wayland_seat_pointer_delete(lv_wl_seat_pointer_t * seat_pointer)
 {
-    update_indevs(NULL);
+    lv_wayland_update_indevs(pointer_read, NULL);
+    lv_wayland_update_indevs(pointeraxis_read, NULL);
     wl_pointer_destroy(seat_pointer->wl_pointer);
     lv_free(seat_pointer);
 }
@@ -161,17 +162,6 @@ const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void update_indevs(lv_wl_seat_pointer_t * driver_data)
-{
-    lv_indev_t * indev = NULL;
-    while((indev = lv_indev_get_next(indev))) {
-        if(lv_indev_get_read_cb(indev) != pointer_read) {
-            continue;
-        }
-        lv_indev_set_driver_data(indev, driver_data);
-    }
-}
 
 static void pointeraxis_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
