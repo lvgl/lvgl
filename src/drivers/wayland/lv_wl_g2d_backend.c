@@ -230,6 +230,8 @@ static void init_buffer(lv_wl_g2d_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t
     buffer->lv_draw_buf = lv_draw_buf_create(width, height, cf, stride);
     buffer->dmabuf_fd = g2d_get_buf_fd(buffer->lv_draw_buf);
     buffer->stride = stride;
+    buffer->offset = 0;
+    buffer->busy = false;
 
     /* Will be set on the dmabuf callback if the creation is successful*/
     buffer->wl_buffer = NULL;
@@ -285,7 +287,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
 #if LV_USE_ROTATE_G2D
     if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
         LV_LOG_USER("Rotation is 90/270");
-        init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
+        init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
     else {
 
@@ -416,8 +418,8 @@ static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
 {
     LV_LOG_USER("Resize display");
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
-    int32_t width = lv_display_get_horizontal_resolution(disp);
-    int32_t height = lv_display_get_vertical_resolution(disp);
+    int32_t width = lv_display_get_original_horizontal_resolution(disp);
+    int32_t height = lv_display_get_original_vertical_resolution(disp);
 
     lv_wl_g2d_display_data_t * ddata = wl_g2d_create_display_data(ctx, disp, width, height);
     if(!ddata) {
@@ -624,13 +626,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     uint32_t rotation = lv_display_get_rotation(disp);
     lv_wl_buffer_t * buf = get_next_buffer(ddata);
 
-#if LV_USE_ROTATE_G2D
-    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
-        src_width  = lv_area_get_height(area);
-        src_height = lv_area_get_width(area);
-    }
-#endif
-
     if(!buf) {
         LV_LOG_ERROR("Failed to acquire a wayland window body buffer");
         return;
@@ -651,7 +646,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
 
     if(lv_display_flush_is_last(disp)) {
         if(force_full_flush) {
-            wl_surface_damage(surface, 0, 0, lv_display_get_original_horizontal_resolution(disp),
+            wl_surface_damage(surface, 0, 0,
+                              lv_display_get_original_horizontal_resolution(disp),
                               lv_display_get_original_vertical_resolution(disp));
         }
 #if LV_USE_ROTATE_G2D
