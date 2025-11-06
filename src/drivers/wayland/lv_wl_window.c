@@ -78,7 +78,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         goto create_surface_err;
     }
 
-    if(lv_wayland_xdg_shell_create_window(lv_wl_ctx.xdg_wm, window, title) != LV_RESULT_OK) {
+    if(lv_wl_xdg_create_window(lv_wl_ctx.xdg_wm, window, title) != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create window");
         goto create_window_err;
     }
@@ -89,7 +89,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_driver_data(window->lv_disp, window);
 
     LV_LOG_USER("Configure surface");
-    lv_wayland_xdg_shell_configure_surface(window);
+
+    lv_wayland_xdg_configure_surface(window);
 
     LV_LOG_USER("surface configured");
     lv_display_add_event_cb(window->lv_disp, res_changed_event, LV_EVENT_RESOLUTION_CHANGED, NULL);
@@ -180,7 +181,7 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
         return;
     }
     if(window->maximized != maximized) {
-        lv_wayland_xdg_shell_set_maximized(&window->xdg, maximized);
+        lv_wayland_xdg_set_maximized(&window->xdg, maximized);
     }
 
     window->maximized = maximized;
@@ -191,7 +192,7 @@ void lv_wayland_window_set_minimized(lv_display_t * disp)
     if(!window) {
         return;
     }
-    lv_wayland_xdg_shell_set_minimized(&window->xdg);
+    lv_wayland_xdg_set_minimized(&window->xdg);
 }
 
 void lv_wayland_assign_physical_display(lv_display_t * disp, uint8_t display_number)
@@ -241,7 +242,7 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
     if(window->fullscreen == fullscreen) {
         return;
     }
-    lv_wayland_xdg_shell_set_fullscreen(&window->xdg, fullscreen, window->physical_output);
+    lv_wayland_xdg_set_fullscreen(&window->xdg, fullscreen, window->physical_output);
     window->fullscreen = fullscreen;
 }
 
@@ -258,7 +259,7 @@ int32_t lv_wayland_window_get_height(lv_wl_window_t * window)
     return lv_display_get_vertical_resolution(window->lv_disp);
 }
 
-lv_result_t lv_wayland_window_resize(lv_wl_window_t * window, int32_t width, int32_t height)
+void lv_wayland_window_resize(lv_wl_window_t * window, int32_t width, int32_t height)
 {
     LV_ASSERT_NULL(window->lv_disp);
 
@@ -285,7 +286,7 @@ void lv_wayland_window_delete(lv_wl_window_t * window)
     if(window->close_cb) {
         window->close_cb(window->lv_disp);
     }
-    lv_wayland_xdg_shell_delete_window(&window->xdg);
+    lv_wayland_xdg_delete_window(&window->xdg);
 
     /* Commit a NULL buffer to the body surface so that we release buffers*/
     wl_surface_attach(window->body, NULL, 0, 0);
@@ -340,10 +341,8 @@ static void refr_start_event(lv_event_t * e)
     wl_display_dispatch_pending(lv_wl_ctx.wl_display);
 
 
-    if(window->resize_event.pending) {
-        lv_wayland_window_resize(window, window->resize_event.width, window->resize_event.height);
-        xdg_surface_ack_configure(window->resize_event.xdg_surface, window->resize_event.serial);
-        window->resize_event.pending = false;
+    if(lv_wayland_xdg_is_resize_pending(window)) {
+        lv_wayland_xdg_resize(window);
     }
 
 #if 0

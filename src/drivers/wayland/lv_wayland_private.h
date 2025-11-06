@@ -121,6 +121,7 @@ typedef struct {
 typedef struct {
     struct xdg_surface * xdg_surface;
     struct xdg_toplevel * xdg_toplevel;
+    bool configured;
 } lv_wl_window_xdg_t;
 
 
@@ -173,24 +174,26 @@ int32_t lv_wayland_window_get_width(lv_wl_window_t * window);
 int32_t lv_wayland_window_get_height(lv_wl_window_t * window);
 
 void lv_wayland_window_draw(lv_wl_window_t * window, uint32_t width, uint32_t height);
-lv_result_t lv_wayland_window_resize(lv_wl_window_t * window, int width, int height);
+void lv_wayland_window_resize(lv_wl_window_t * window, int width, int height);
 void lv_wayland_window_delete(lv_wl_window_t * window);
 
 /**********************
  *  Window Management
  **********************/
 
-const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void);
+const struct xdg_wm_base_listener * lv_wayland_xdg_get_wm_base_listener(void);
 
-void lv_wayland_xdg_shell_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized);
-void lv_wayland_xdg_shell_set_minimized(lv_wl_window_xdg_t * xdg);
-void lv_wayland_xdg_shell_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
-                                         struct wl_output * output);
-lv_result_t lv_wayland_xdg_shell_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window,
-                                               const char * title);
-void lv_wayland_xdg_shell_configure_surface(lv_wl_window_t * window);
-void lv_wayland_xdg_shell_delete_window(lv_wl_window_xdg_t * xdg);
-void lv_wayland_xdg_shell_deinit(void);
+void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized);
+void lv_wayland_xdg_set_minimized(lv_wl_window_xdg_t * xdg);
+void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
+                                   struct wl_output * output);
+lv_result_t lv_wl_xdg_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window,
+                                    const char * title);
+bool lv_wayland_xdg_is_resize_pending(lv_wl_window_t * window);
+void lv_wayland_xdg_configure_surface(lv_wl_window_t * window);
+void lv_wayland_xdg_resize(lv_wl_window_t * window);
+void lv_wayland_xdg_delete_window(lv_wl_window_xdg_t * xdg);
+void lv_wayland_xdg_deinit(void);
 
 /**********************
  *      Input

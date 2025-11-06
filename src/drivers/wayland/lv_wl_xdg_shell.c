@@ -63,7 +63,7 @@ static const struct xdg_wm_base_listener xdg_wm_base_listener = {.ping = xdg_wm_
  *   Shell
  **********************/
 
-void lv_wayland_xdg_shell_deinit(void)
+void lv_wayland_xdg_deinit(void)
 {
     if(lv_wl_ctx.xdg_wm) {
         xdg_wm_base_destroy(lv_wl_ctx.xdg_wm);
@@ -74,7 +74,7 @@ void lv_wayland_xdg_shell_deinit(void)
  *   Listeners
  **********************/
 
-const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(void)
+const struct xdg_wm_base_listener * lv_wayland_xdg_get_wm_base_listener(void)
 {
     return &xdg_wm_base_listener;
 }
@@ -83,8 +83,8 @@ const struct xdg_wm_base_listener * lv_wayland_xdg_shell_get_wm_base_listener(vo
  *   Shell Window
  **********************/
 
-void lv_wayland_xdg_shell_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
-                                         struct wl_output * output)
+void lv_wayland_xdg_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscreen,
+                                   struct wl_output * output)
 {
     LV_ASSERT_NULL(xdg);
     LV_ASSERT_NULL(xdg->xdg_toplevel);
@@ -96,7 +96,7 @@ void lv_wayland_xdg_shell_set_fullscreen(lv_wl_window_xdg_t * xdg, bool fullscre
     }
 }
 
-void lv_wayland_xdg_shell_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
+void lv_wayland_xdg_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized)
 {
     LV_ASSERT_NULL(xdg);
     LV_ASSERT_NULL(xdg->xdg_toplevel);
@@ -108,14 +108,14 @@ void lv_wayland_xdg_shell_set_maximized(lv_wl_window_xdg_t * xdg, bool maximized
     }
 }
 
-void lv_wayland_xdg_shell_set_minimized(lv_wl_window_xdg_t * xdg)
+void lv_wayland_xdg_set_minimized(lv_wl_window_xdg_t * xdg)
 {
     LV_ASSERT_NULL(xdg);
     LV_ASSERT_NULL(xdg->xdg_toplevel);
     xdg_toplevel_set_minimized(xdg->xdg_toplevel);
 }
 
-lv_result_t lv_wayland_xdg_shell_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window, const char * title)
+lv_result_t lv_wl_xdg_create_window(struct xdg_wm_base * xdg_wm, lv_wl_window_t * window, const char * title)
 {
     LV_ASSERT_NULL(xdg_wm);
 
@@ -139,7 +139,7 @@ lv_result_t lv_wayland_xdg_shell_create_window(struct xdg_wm_base * xdg_wm, lv_w
     return LV_RESULT_OK;
 }
 
-void lv_wayland_xdg_shell_configure_surface(lv_wl_window_t * window)
+void lv_wayland_xdg_configure_surface(lv_wl_window_t * window)
 {
     /* XDG surfaces need to be configured before a buffer can be attached.
      * An (XDG) surface commit (without an attached buffer) triggers this
@@ -150,7 +150,7 @@ void lv_wayland_xdg_shell_configure_surface(lv_wl_window_t * window)
     LV_ASSERT_MSG(window->resize_event.pending, "Failed to receive the xdg_surface configuration event");
 }
 
-void lv_wayland_xdg_shell_delete_window(lv_wl_window_xdg_t * xdg)
+void lv_wayland_xdg_delete_window(lv_wl_window_xdg_t * xdg)
 {
     if(xdg->xdg_toplevel) {
         xdg_toplevel_destroy(xdg->xdg_toplevel);
