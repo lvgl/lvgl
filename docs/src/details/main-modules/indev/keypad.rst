@@ -106,6 +106,10 @@ an indev event like this:
         }
     }
 
+    ...
+
+    lv_indev_add_event_cb(keyboard, key_event_cb, LV_EVENT_KEY, NULL);
+
 
 
 Key Remapping
