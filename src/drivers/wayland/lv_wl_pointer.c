@@ -247,7 +247,7 @@ static void pointer_handle_button(void * data, struct wl_pointer * pointer, uint
     else if(button == BTN_RIGHT) {
         seat_pointer->right_btn_state = lv_state;
     }
-    else if(button == BTN_MOUSE) {
+    else if(button == BTN_MIDDLE) {
         seat_pointer->wheel_btn_state = lv_state;
     }
 
