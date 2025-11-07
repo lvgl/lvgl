@@ -462,6 +462,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->color_format = color_format;
 
     if(disp->layer_init) disp->layer_init(disp, layer);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 
     if(disp->layer_head) {
         lv_layer_t * tail = disp->layer_head;
@@ -669,6 +670,7 @@ static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
                 l2 = l2->next;
             }
 
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer_drawn);
             if(disp->layer_deinit) {
                 LV_PROFILER_DRAW_BEGIN_TAG("layer_deinit");
                 disp->layer_deinit(disp, layer_drawn);

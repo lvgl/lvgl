@@ -88,8 +88,6 @@ static void window_display_flush_cb(lv_display_t * disp, const lv_area_t * area,
 #if !LV_USE_DRAW_OPENGLES
     static void ensure_init_window_display_texture(void);
 #endif
-static void window_display_layer_init_cb(lv_display_t * disp, lv_layer_t * layer);
-static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * layer);
 
 /**********************
  *  STATIC VARIABLES
@@ -331,9 +329,6 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
     lv_display_set_flush_cb(disp, window_display_flush_cb);
     lv_display_add_event_cb(disp, window_display_delete_cb, LV_EVENT_DELETE, disp);
     lv_display_add_event_cb(disp, window_display_refr_request_cb, LV_EVENT_REFR_REQUEST, disp);
-
-    disp->layer_init = window_display_layer_init_cb;
-    disp->layer_deinit = window_display_layer_deinit_cb;
 
 #if LV_USE_DRAW_OPENGLES
     window->direct_render_invalidated = 1;
@@ -738,17 +733,5 @@ static void ensure_init_window_display_texture(void)
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 #endif
-
-static void window_display_layer_init_cb(lv_display_t * disp, lv_layer_t * layer)
-{
-    LV_UNUSED(disp);
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
-}
-
-static void window_display_layer_deinit_cb(lv_display_t * disp, lv_layer_t * layer)
-{
-    LV_UNUSED(disp);
-    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
-}
 
 #endif /*LV_USE_GLFW*/
