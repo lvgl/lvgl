@@ -140,12 +140,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #if !LV_SDL_USE_EGL
 #error "NANOVG requires LV_SDL_USE_EGL"
 #endif
-    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_FULL) {
-        lv_draw_nanovg_init();
-    }
-    else {
-        LV_LOG_ERROR("NANOVG requires LV_DISPLAY_RENDER_MODE_FULL");
-    }
+    lv_draw_nanovg_init();
 #endif
 
 #if LV_USE_DRAW_SDL == 0

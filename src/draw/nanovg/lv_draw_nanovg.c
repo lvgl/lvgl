@@ -11,6 +11,7 @@
 
 #if LV_USE_DRAW_NANOVG
 
+#include "../../display/lv_display.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 
@@ -70,6 +71,11 @@ static void draw_event_cb(lv_event_t * e);
 
 void lv_draw_nanovg_init(void)
 {
+    lv_display_render_mode_t mode = lv_display_get_render_mode(NULL);
+    if(mode != LV_DISPLAY_RENDER_MODE_FULL) {
+        LV_LOG_ERROR("Detect render mode(%d) is not FULL. The rendering result may be incorrect.", mode);
+    }
+
     static bool initialized = false;
     if(initialized) return;
     initialized = true;
@@ -211,10 +217,10 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         u->current_layer = layer;
     }
 
-    const int32_t buf_w = lv_area_get_width(&layer->buf_area);
-    const int32_t buf_h = lv_area_get_height(&layer->buf_area);
-
     if(!u->is_started) {
+        const int32_t buf_w = lv_area_get_width(&layer->buf_area);
+        const int32_t buf_h = lv_area_get_height(&layer->buf_area);
+
         glViewport(0, 0, buf_w, buf_h);
         LV_PROFILER_DRAW_BEGIN_TAG("nvgBeginFrame");
         nvgBeginFrame(u->vg, buf_w, buf_h, 1.0f);
