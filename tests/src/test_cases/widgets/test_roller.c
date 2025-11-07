@@ -241,7 +241,6 @@ void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void
 
 void test_roller_rendering_test(void)
 {
-#if LV_FONT_MONTSERRAT_24
     static lv_style_t style_sel;
     lv_style_init(&style_sel);
     lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
@@ -256,9 +255,6 @@ void test_roller_rendering_test(void)
     lv_obj_center(roller);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_1.png");
-#else
-    TEST_PASS();
-#endif
 }
 
 void test_roller_select_option_with_click(void)
@@ -286,6 +282,31 @@ void test_roller_release_handler_pointer_indev(void)
     lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 100);
     /* Check which is the selected option */
     TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
+}
+
+void test_roller_transformed_click(void)
+{
+    lv_obj_t * rotated = lv_obj_create(active_screen);
+    lv_obj_center(rotated);
+    lv_obj_set_size(rotated, 200, 200);
+    lv_obj_set_style_transform_pivot_x(rotated, 100, 0);
+    lv_obj_set_style_transform_pivot_y(rotated, 100, 0);
+    lv_obj_set_style_transform_rotation(rotated, 900, 0);
+
+    lv_obj_set_parent(roller_mouse, rotated);
+
+    lv_obj_t * click_dot = lv_obj_create(active_screen);
+    lv_obj_add_flag(click_dot, LV_OBJ_FLAG_FLOATING);
+    lv_obj_set_size(click_dot, 10, 10);
+    lv_obj_set_style_border_width(click_dot, 0, 0);
+    lv_obj_set_style_radius(click_dot, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(click_dot, lv_color_hex3(0xf00), 0);
+    lv_obj_set_pos(click_dot, 380 - 5, 205 - 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_4.png");
+
+    lv_test_mouse_click_at(380, 205);
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(roller_mouse));
 }
 
 void test_roller_appearance(void)
