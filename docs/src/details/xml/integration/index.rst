@@ -10,3 +10,4 @@ Integration
 
     c_code
     xml
+    renesas-dev-tools
