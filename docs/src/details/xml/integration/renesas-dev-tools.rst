@@ -38,6 +38,8 @@ The LVGL Editor plugin will attempt to determine the currently active project in
 
 Upon first launching the LVGL Editor for a project, it will create a `ui` sub-folder for the LVGL project. Some of the LVGL configuration (such as target screen resolution) will be automatically derived from the Renesas `configuration.xml`. Subsequently launching the LVGL Editor, after the `ui` project has been creating, will trigger it to re-scan the Renesas `configuration.xml`. If any of the LVGL-related config has changed, the LVGL Editor will ask if the user wishes to update the `ui` project configuration accordingly.
 
+Once the LVGL Editor is open, you can create and edit LVGL XML files as usual. Use the Editor's export code functionality to generate C code, which E2Studio will automatically detect and include in the build.
+
 VS Code
 *******
 
