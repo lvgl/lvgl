@@ -107,7 +107,11 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
 
 /**
  * Initialize a blur draw descriptor from an object's styles in its current state.
+<<<<<<< HEAD
  * draw_dsc->radius will only be calculated if it's 0 initially. Radius can be set before calling this function
+=======
+ * draw_dsc->radius will be get only if it's 0 initially. Radius can set it before calling this function
+>>>>>>> d145e5a97 (basic blur support)
  * to avoid getting it twice.
  * @param obj       pointer to an object
  * @param part      part of the object, e.g. `LV_PART_MAIN`, `LV_PART_SCROLLBAR`, `LV_PART_KNOB`, etc

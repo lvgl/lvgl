@@ -1439,7 +1439,7 @@ If `true` the background of the widget will be blurred. The part should have < 1
 blur_quality
 ~~~~~~~~~~~~
 
-Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
+Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically. 
 
 .. raw:: html
 
