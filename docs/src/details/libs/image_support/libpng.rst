@@ -48,7 +48,7 @@ It should be noted that each image of this decoder needs to consume
 
     width |times| height |times| 4
 
-bytes of RAM, and it needs to be combined with the :ref:`overview_image_caching` feature to
+bytes of RAM, and it needs to be combined with the :ref:`image caching` feature to
 ensure that the memory usage is within a reasonable range. The decoded image is
 stored in RGBA pixel format.
 

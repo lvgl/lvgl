@@ -1,3 +1,4 @@
+.. include:: /include/external_links.txt
 .. _bmp:
 
 ===========
@@ -34,7 +35,7 @@ Limitations
    differences between how the BMP files and LVGL's image format stores
    the image data.
 -  BMP files can be loaded only from .BMP files. If you want to store them in
-   flash it's better to convert them to a C array with `LVGL's image converter <https://lvgl.io/tools/imageconverter>`__.
+   flash it's better to convert them to a C array with `LVGL Online Image Converter`_.
 -  The BMP file's color format needs to match the configured :c:macro:`LV_COLOR_DEPTH`
    of the display on which it will be rendered.  You can use GIMP to save the image
    in the required format.  Both RGB888 and ARGB888 works with

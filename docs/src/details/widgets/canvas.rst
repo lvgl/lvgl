@@ -42,7 +42,7 @@ Or you can use
 
 Canvas supports all the color formats like
 :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` or :cpp:enumerator:`LV_COLOR_FORMAT_I2`. See the full
-list in the :ref:`Color formats <overview_image_color_formats>` section.
+list in the :ref:`Color formats <images_color_formats>` section.
 
 Indexed colors
 --------------
