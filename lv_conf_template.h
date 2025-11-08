@@ -1387,6 +1387,9 @@
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
 
+/** EVE5 display output */
+#define LV_USE_EVE5 0
+
 /*=====================
 * BUILD OPTIONS
 *======================*/
