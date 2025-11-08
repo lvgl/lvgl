@@ -693,9 +693,18 @@ static void lv_obj_draw(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);
+
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.base.layer = layer;
+
+        lv_draw_blur_dsc_t blur_dsc;
+        lv_draw_blur_dsc_init(&blur_dsc);
+        blur_dsc.radius = draw_dsc.radius;
+
+        lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc, true);
+        blur_dsc.base.layer = layer;
+        lv_draw_blur(layer, &blur_dsc, &obj->coords);
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -710,6 +719,9 @@ static void lv_obj_draw(lv_event_t * e)
         lv_area_increase(&coords, w, h);
 
         lv_draw_rect(layer, &draw_dsc, &coords);
+
+        blur_dsc.intensity = lv_obj_get_style_blur_intensity(obj, LV_PART_MAIN);
+        lv_draw_blur(layer, &blur_dsc, &coords);
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -747,17 +759,37 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
 
     if(lv_area_get_size(&hor_area) <= 0 && lv_area_get_size(&ver_area) <= 0) return;
 
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &rect_dsc);
     if(sb_res != LV_RESULT_OK) return;
 
     if(lv_area_get_size(&hor_area) > 0) {
-        draw_dsc.base.id1 = 0;
-        lv_draw_rect(layer, &draw_dsc, &hor_area);
+        lv_draw_blur_dsc_t blur_dsc;
+        lv_draw_blur_dsc_init(&blur_dsc);
+        blur_dsc.radius = rect_dsc.radius;
+        lv_obj_init_draw_blur_dsc(obj, LV_PART_SCROLLBAR, &blur_dsc, true);
+        blur_dsc.base.id1 = 0;
+        lv_draw_blur(layer, &blur_dsc, &hor_area);
+
+        rect_dsc.base.id1 = 0;
+        lv_draw_rect(layer, &rect_dsc, &hor_area);
+
+        blur_dsc.intensity = lv_obj_get_style_blur_intensity(obj, LV_PART_SCROLLBAR);
+        lv_draw_blur(layer, &blur_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        draw_dsc.base.id1 = 1;
-        lv_draw_rect(layer, &draw_dsc, &ver_area);
+        lv_draw_blur_dsc_t blur_dsc;
+        lv_draw_blur_dsc_init(&blur_dsc);
+        blur_dsc.radius = rect_dsc.radius;
+        lv_obj_init_draw_blur_dsc(obj, LV_PART_SCROLLBAR, &blur_dsc, true);
+        blur_dsc.base.id1 = 1;
+        lv_draw_blur(layer, &blur_dsc, &hor_area);
+
+        rect_dsc.base.id1 = 1;
+        lv_draw_rect(layer, &rect_dsc, &ver_area);
+
+        blur_dsc.intensity = lv_obj_get_style_blur_intensity(obj, LV_PART_SCROLLBAR);
+        lv_draw_blur(layer, &blur_dsc, &hor_area);
     }
 }
 

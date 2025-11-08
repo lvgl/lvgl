@@ -1408,6 +1408,34 @@ Sets the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+blur_intensity
+~~~~~~~~~~~~~~
+
+Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+backdrop_blur_intensity
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the intensity of blurring of the widget's background. Applied before the given part is rendered. The part should have < 100% opacity to make it visible.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 anim
 ~~~~
 
