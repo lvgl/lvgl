@@ -110,6 +110,8 @@ void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_recolor(lv_style_t * style, lv_color_t value);
 void lv_style_set_recolor_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_blur_intensity(lv_style_t * style, int32_t value);
+void lv_style_set_backdrop_blur_intensity(lv_style_t * style, int32_t value);
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 void lv_style_set_anim_duration(lv_style_t * style, uint32_t value);
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
@@ -618,6 +620,16 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 #define LV_STYLE_CONST_RECOLOR_OPA(val) \
     { \
         .prop = LV_STYLE_RECOLOR_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_BLUR_INTENSITY(val) \
+    { \
+        .prop = LV_STYLE_BLUR_INTENSITY, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_BACKDROP_BLUR_INTENSITY(val) \
+    { \
+        .prop = LV_STYLE_BACKDROP_BLUR_INTENSITY, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_ANIM(val) \
