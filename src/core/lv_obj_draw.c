@@ -12,7 +12,6 @@
 #include "../display/lv_display.h"
 #include "../indev/lv_indev.h"
 #include "../stdlib/lv_string.h"
-#include "../draw/lv_draw_arc.h"
 
 /*********************
  *      DEFINES
@@ -318,6 +317,24 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
     LV_PROFILER_DRAW_END;
 }
+
+void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc, bool backdrop)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
+    draw_dsc->intensity = backdrop ? lv_obj_get_style_backdrop_blur_intensity(obj, part) :
+                          lv_obj_get_style_blur_intensity(obj, part);
+
+    /*Radius might be set earlier as it's already known*/
+    if(draw_dsc->radius == 0) {
+        draw_dsc->radius = lv_obj_get_style_radius(obj, part);
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
 
 int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
