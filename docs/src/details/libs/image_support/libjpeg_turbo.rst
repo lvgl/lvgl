@@ -56,7 +56,7 @@ It should be noted that each image decoded needs to consume:
 
     image width |times| image height |times| 3
 
-bytes of RAM, and it needs to be combined with the :ref:`overview_image_caching`
+bytes of RAM, and it needs to be combined with the :ref:`image caching`
 feature to ensure that the memory usage is within a reasonable range.
 
 

@@ -1,0 +1,22 @@
+The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the
+following order:
+
+- 32-bit color depth:
+
+  - **Byte 0**: Blue
+  - **Byte 1**: Green
+  - **Byte 2**: Red
+  - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+- 16-bit color depth:
+
+  - **Byte 0**: Green 3 lower bits, Blue 5 bit
+  - **Byte 1**: Red 5 bit, Green 3 higher bits
+  - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+- 8-bit color depth:
+
+  - **Byte 0**: Red 3 bits, Green 3 bits, Blue 2 bits
+  - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
+
+
