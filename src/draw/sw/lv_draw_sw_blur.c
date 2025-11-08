@@ -276,6 +276,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf16_line -= skip_cnt;
             }
         }
+        //        return;
     }
 
     LV_PROFILER_DRAW_END;
