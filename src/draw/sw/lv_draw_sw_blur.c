@@ -22,6 +22,8 @@
  *      DEFINES
  *********************/
 #define BLUR_SAMPLE_SIZE 8
+#define BLUR_MULTIPLIER_BITS 12
+#define BLUR_MULTIPLIER_MAX (1 << 12)
 
 /**********************
  *      TYPEDEFS
@@ -48,17 +50,18 @@ static inline void blur_init(uint32_t * sum, uint8_t * buf, uint32_t px_cnt, uin
 
     uint32_t sample_cnt = LV_MIN(BLUR_SAMPLE_SIZE, len);
     uint32_t i = 0;
+    uint8_t * buf_ori = buf;
 
     for(i = 0; i < px_cnt; i++) {
         sum[i] = 0;
-
+        buf = buf_ori;
         uint32_t s;
         for(s = 0; s < sample_cnt; s++) {
             sum[i] += buf[i];
             buf += stride;
         }
 
-        sum[i] = (sum[i] << 8) / sample_cnt;
+        sum[i] = (sum[i] << BLUR_MULTIPLIER_BITS) / sample_cnt;
     }
 
 }
@@ -67,8 +70,8 @@ static inline void blur_px(uint32_t * sum, uint8_t * buf, uint32_t intensity, ui
 {
     uint32_t i = 0;
     for(i = 0; i < px_cnt; i++) {
-        sum[i] = ((sum[i] * intensity) >> 8) + ((buf[i] * (256 - intensity)));
-        buf[i] = sum[i] >> 8;
+        sum[i] = ((sum[i] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[i] * (BLUR_MULTIPLIER_MAX - intensity)));
+        buf[i] = sum[i] >> BLUR_MULTIPLIER_BITS;
     }
 }
 
@@ -89,8 +92,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
     lv_area_t clipped_coords;
     if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) return;
+    lv_area_move(&clipped_coords, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
-    uint32_t intensity = dsc->intensity;
+    uint32_t intensity = (BLUR_MULTIPLIER_MAX * dsc->intensity) / (dsc->intensity + 4);
 
     int32_t radius = dsc->radius;
     int32_t w = lv_area_get_width(coords);
@@ -121,8 +125,11 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         for(x = x_start; x <= x_end; x++) {
             blur_px(sum_start, buf_start, intensity, px_size);
-            blur_px(sum_end, buf_end, intensity, px_size);
             buf_start += px_size;
+        }
+
+        for(x = x_start; x <= x_end; x++) {
+            blur_px(sum_end, buf_end, intensity, px_size);
             buf_end -= px_size;
         }
     }
@@ -147,11 +154,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         for(y = y_start; y <= y_end; y++) {
             blur_px(sum_start, buf_start, intensity, px_size);
-            blur_px(sum_end, buf_end, intensity, px_size);
             buf_start += stride;
+        }
+
+        for(y = y_start; y <= y_end; y++) {
+            blur_px(sum_end, buf_end, intensity, px_size);
             buf_end -= stride;
         }
-        //        return;
     }
 
     LV_PROFILER_DRAW_END;
