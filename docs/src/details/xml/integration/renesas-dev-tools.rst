@@ -43,3 +43,19 @@ Once the LVGL Editor is open, you can create and edit LVGL XML files as usual. U
 VS Code
 *******
 
+Setup
+-----
+
+1. Install the LVGL Editor VS Code extension from within VS Code.
+2. Install the Renesas VS Code extensions that you need.
+
+Usage
+-----
+
+The VS Code Renesas integration behaves very similarly to the e2 Studio plugin described above. To use it, add a Renesas project folder (with a `configuration.xml` file) to your workspace. Then, use the command palette to run "LVGL: Create from Renesas Project". The LVGL Editor VS Code extension will create a `ui` sub-folder for the LVGL project and derive configuration from the Renesas `configuration.xml` file.
+
+You may then open the LVGL Editor in VS Code by using the command palette to run "LVGL: Open Editor".
+
+As with the e2 Studio plugin, opening the LVGL Editor extension will trigger it to re-scan the Renesas `configuration.xml` file and prompt to update the LVGL project configuration if any relevant settings have changed.
+
+Lastly, use the LVGL Editor's export code functionality to generate C code, which the Renesas extension will automatically detect and include in its build.
