@@ -860,6 +860,47 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
     area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
 }
 
+typedef struct {
+    const lv_obj_t * reqester_obj;
+    const lv_area_t * inv_area;
+} blur_walk_data_t;
+
+static int walk_cnt;
+static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
+{
+    blur_walk_data_t * blur_data = user_data;
+    if(obj == blur_data->reqester_obj) return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+
+    walk_cnt++;
+    /*Truncate the area to the object*/
+    lv_area_t obj_coords;
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    lv_area_increase(&obj_coords, ext_size, ext_size);
+
+    if(is_transformed(obj)) {
+        lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+    }
+
+    if(lv_area_is_on(blur_data->inv_area, &obj_coords)) {
+        if(lv_obj_get_style_backdrop_blur_intensity(obj, 0) ||
+           lv_obj_get_style_backdrop_blur_intensity(obj, LV_PART_INDICATOR)) {
+            lv_obj_invalidate(obj);
+            return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+        }
+        else {
+            return LV_OBJ_TREE_WALK_NEXT;
+
+        }
+    }
+    else {
+        return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+    }
+
+}
+
+static int total_inv_cnt = 0;
+
 void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -886,6 +927,19 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 #endif
 
     lv_inv_area(lv_obj_get_display(obj),  &area_tmp);
+
+    total_inv_cnt++;
+    walk_cnt = 0;
+    /*If this area is on a blurred widget, invalidate that widget too*/
+    blur_walk_data_t blur_walk_data;
+    blur_walk_data.reqester_obj = obj;
+    blur_walk_data.inv_area = &area_tmp;
+    lv_obj_tree_walk(disp->act_scr, blur_walk_cb, &blur_walk_data);
+    if(disp->prev_scr) lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->sys_layer, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->top_layer, blur_walk_cb, &blur_walk_data);
+    lv_obj_tree_walk(disp->bottom_layer, blur_walk_cb, &blur_walk_data);
+    printf("%d, %d\n", total_inv_cnt, walk_cnt);
 }
 
 void lv_obj_invalidate(const lv_obj_t * obj)
