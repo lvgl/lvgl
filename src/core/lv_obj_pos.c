@@ -1448,4 +1448,3 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
     lv_result_t res = lv_inv_area(lv_obj_get_display(obj), area_tmp);
     return res;
 }
-
