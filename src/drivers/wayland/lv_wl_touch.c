@@ -131,7 +131,7 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
     /* Collect touches if there are any - send them to the gesture recognizer */
     lv_indev_gesture_recognizers_update(indev, tdata->touches, tdata->event_cnt);
 
-    LV_LOG_TRACE("collected touch events: %d", tdata->touch_event_cnt);
+    LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
 
     tdata->event_cnt = 0;
 
