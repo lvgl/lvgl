@@ -129,11 +129,6 @@ void lv_wayland_seat_keyboard_delete(lv_wl_seat_keyboard_t * seat_keyboard)
     lv_free(seat_keyboard);
 }
 
-const struct wl_keyboard_listener * lv_wayland_keyboard_get_listener(void)
-{
-    return &keyboard_listener;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

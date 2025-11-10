@@ -154,15 +154,6 @@ void lv_wayland_seat_pointer_delete(lv_wl_seat_pointer_t * seat_pointer)
 }
 
 /**********************
- *   PRIVATE FUNCTIONS
- **********************/
-
-const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void)
-{
-    return &pointer_listener;
-}
-
-/**********************
  *   STATIC FUNCTIONS
  **********************/
 

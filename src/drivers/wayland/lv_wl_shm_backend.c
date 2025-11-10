@@ -42,7 +42,6 @@ typedef struct {
     void * mmap_ptr;
     size_t mmap_size;
     struct wl_shm_pool * pool;
-    uint8_t * partial_buffer;
     lv_wl_buffer_t buffers[LV_WL_SHM_BUF_COUNT];
     size_t curr_wl_buffer_idx;
     uint32_t shm_cf;
@@ -245,10 +244,6 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
         ddata->pool = NULL;
     }
 
-    if(ddata->partial_buffer) {
-        lv_free(ddata->partial_buffer);
-        ddata->partial_buffer = NULL;
-    }
 
     if(ddata->mmap_ptr != MAP_FAILED) {
         munmap(ddata->mmap_ptr, ddata->mmap_size);
@@ -279,7 +274,6 @@ static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32
         return NULL;
     }
 
-    /* Force a single buffer if render mode is partial*/
     lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, width, height, LV_WL_SHM_BUF_COUNT);
     if(!ddata) {
         LV_LOG_ERROR("Failed to allocate data for display");

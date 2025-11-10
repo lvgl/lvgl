@@ -180,15 +180,6 @@ void lv_wayland_xdg_delete_window(lv_wl_window_xdg_t * xdg)
     xdg->xdg_toplevel = NULL;
 }
 
-void lv_wayland_xdg_shell_destroy_window_toplevel(lv_wl_window_xdg_t * xdg)
-{
-    if(!xdg->xdg_toplevel) {
-        return;
-    }
-    xdg_toplevel_destroy(xdg->xdg_toplevel);
-    xdg->xdg_toplevel = NULL;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
