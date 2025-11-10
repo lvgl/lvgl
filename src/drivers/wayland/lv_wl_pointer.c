@@ -124,7 +124,7 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
 
     struct wl_pointer * pointer = wl_seat_get_pointer(seat);
     if(!pointer) {
-        LV_LOG_WARN("Faield to get seat pointer");
+        LV_LOG_WARN("Failed to get seat pointer");
         return NULL;
     }
 
