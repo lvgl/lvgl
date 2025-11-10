@@ -83,7 +83,6 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
                                                              int32_t width, int32_t height);
 
 static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata);
-static void set_display_buffers(lv_display_t * display, lv_wl_g2d_display_data_t * ddata);
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 
@@ -310,6 +309,9 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         LV_LOG_ERROR("DMABUF creation failed");
         return NULL;
     }
+    lv_display_set_draw_buffers(display, ddata->rotate_buffer.lv_draw_buf, NULL);
+#else
+    lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
 #endif
 
     return ddata;
@@ -338,7 +340,6 @@ static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, i
         return NULL;
     }
 
-    set_display_buffers(display, ddata);
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
     lv_display_render_mode_t render_mode = LV_WAYLAND_RENDER_MODE;
@@ -426,7 +427,6 @@ static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
         LV_LOG_ERROR("Failed to create DMABUF buffers for %dx%d", width, height);
         return NULL;
     }
-    set_display_buffers(disp, ddata);
 
     lv_wl_g2d_display_data_t * old_ddata = lv_wayland_get_backend_display_data(disp);
     wl_g2d_delete_display_data(old_ddata);
