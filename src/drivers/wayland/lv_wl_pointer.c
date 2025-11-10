@@ -96,6 +96,9 @@ lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
 lv_indev_t * lv_wayland_pointer_axis_create(void)
 {
     lv_indev_t * indev = lv_indev_create();
+    if(!indev) {
+        return NULL;
+    }
     lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
     lv_indev_set_read_cb(indev, pointeraxis_read);
     lv_indev_set_driver_data(indev, lv_wl_ctx.seat.pointer);
