@@ -54,6 +54,10 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
                                         lv_wayland_display_close_cb_t close_cb)
 {
     lv_wayland_init();
+    if(close_cb) {
+        LV_LOG_WARN("'lv_wayland_display_close_cb_t' is deprecated and will be removed in the next release. Instead bind an LV_EVENT_DELETE to the display\
+		      Bind an LV_EVENT_DELETE to the display returned by `lv_wayland_window_create` instead.");
+    }
 
     lv_wl_window_t * window = lv_ll_ins_tail(&lv_wl_ctx.window_ll);
     LV_ASSERT_MALLOC(window);
