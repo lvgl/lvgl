@@ -67,8 +67,6 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
                                                           int32_t height, size_t buf_count);
 static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata);
 
-static void set_display_buffers(lv_display_t * display, lv_wl_shm_display_data_t * ddata);
-
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time);
 static void buffer_release(void * data, struct wl_buffer * wl_buffer);
 
@@ -201,6 +199,10 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         wl_buffer_add_listener(ddata->buffers[i].wl_buffer, &buffer_listener, ddata);
         ddata->buffers[i].busy = false;
     }
+
+    lv_display_set_buffers(display, ddata->mmap_ptr, (uint8_t *)ddata->mmap_ptr + buf_size,
+                           buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+
     return ddata;
 
 pool_buffer_err:
@@ -276,7 +278,6 @@ static void * shm_init_display(void * backend_data, lv_display_t * display, int3
         LV_LOG_ERROR("Failed to allocate data for display");
         return NULL;
     }
-    set_display_buffers(display, ddata);
 
     lv_display_set_flush_cb(display, shm_flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
@@ -298,33 +299,12 @@ static void * shm_resize_display(void * backend_data, lv_display_t * display)
         return NULL;
     }
 
-    set_display_buffers(display, ddata);
-
     LV_LOG_USER("Resize");
     lv_wl_shm_display_data_t * curr_ddata = lv_wayland_get_backend_display_data(display);
     shm_destroy_display_data(curr_ddata);
     return ddata;
 }
 
-static void set_display_buffers(lv_display_t * display, lv_wl_shm_display_data_t * ddata)
-{
-    if(LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        ddata->partial_buffer = lv_malloc(ddata->mmap_size / 10);
-        lv_display_set_buffers(display, ddata->partial_buffer, NULL, ddata->mmap_size / 10,
-                               LV_WAYLAND_RENDER_MODE);
-        return;
-    }
-
-    if(LV_WAYLAND_BUF_COUNT == 1) {
-        lv_display_set_buffers(display, ddata->mmap_ptr, NULL, ddata->mmap_size,
-                               LV_DISPLAY_RENDER_MODE_DIRECT);
-    }
-    else {
-        const size_t buf_size = ddata->mmap_size / 2;
-        lv_display_set_buffers(display, ddata->mmap_ptr, (uint8_t *)ddata->mmap_ptr + buf_size,
-                               buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
-    }
-}
 
 static void shm_deinit_display(void * backend_data, lv_display_t * display)
 {
