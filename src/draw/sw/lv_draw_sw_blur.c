@@ -60,6 +60,19 @@ static int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p,
  *   GLOBAL FUNCTIONS
  **********************/
 
+static inline void repeate_2x2(uint8_t * buf, uint32_t px_size, uint32_t stride)
+{
+    buf[px_size + 0] = buf[0];
+    buf[px_size + 1] = buf[1];
+    buf[px_size + 2] = buf[2];
+    buf[stride + 0] = buf[0];
+    buf[stride + 1] = buf[1];
+    buf[stride + 2] = buf[2];
+    buf[stride + px_size + 0] = buf[0];
+    buf[stride + px_size + 1] = buf[1];
+    buf[stride + px_size + 2] = buf[2];
+}
+
 void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->blur_radius == 0) return;
@@ -107,13 +120,15 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
     uint32_t blur_radius = dsc->blur_radius;
     uint32_t skip_cnt = 1;
-    if(blur_radius >= 48) {
-        skip_cnt = 5;
-        blur_radius = blur_radius / 4;
-    }
-    else if(blur_radius >= 8) {
-        skip_cnt = 2;
-        blur_radius = blur_radius / 2;
+    if(dsc->corner_radius == 0) {
+        if(blur_radius >= 32) {
+            skip_cnt = 4;
+            blur_radius = blur_radius / 4;
+        }
+        else if(blur_radius >= 8) {
+            skip_cnt = 2;
+            blur_radius = blur_radius / 2;
+        }
     }
 
     uint32_t intensity = (BLUR_MULTIPLIER_MAX * blur_radius) / (blur_radius + 4);
@@ -389,20 +404,45 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf_end -= stride * skip_cnt;
             }
 
-            if(skip_cnt > 1) {
+            if(skip_cnt == 2) {
                 buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
                 for(y = y_start; y <= y_end; y += skip_cnt) {
-                    buf_start[px_size + 0] = buf_start[0];
-                    buf_start[px_size + 1] = buf_start[1];
-                    buf_start[px_size + 2] = buf_start[2];
-                    buf_start[stride + 0] = buf_start[0];
-                    buf_start[stride + 1] = buf_start[1];
-                    buf_start[stride + 2] = buf_start[2];
-                    buf_start[stride + px_size + 0] = buf_start[0];
-                    buf_start[stride + px_size + 1] = buf_start[1];
-                    buf_start[stride + px_size + 2] = buf_start[2];
+                    repeate_2x2(buf_start, px_size, stride);
                     buf_start += stride * skip_cnt;
                 }
+            }
+            else if(skip_cnt == 4 && x > 4) {
+                buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start + 4);
+                for(y = y_start + 4 ; y < y_end; y += skip_cnt) {
+
+                    repeate_2x2(buf_start, px_size, stride);
+
+                    uint8_t * buf_prev;
+
+                    buf_prev = buf_start - 4 * px_size;
+                    uint8_t * buf_interp1 = buf_start - 2 * px_size;
+                    buf_interp1[0] = (buf_start[0] + buf_prev[0]) / 2;
+                    buf_interp1[1] = (buf_start[1] + buf_prev[1]) / 2;
+                    buf_interp1[2] = (buf_start[2] + buf_prev[2]) / 2;
+                    repeate_2x2(buf_interp1, px_size, stride);
+
+                    buf_prev = buf_start - 4 * stride;
+                    uint8_t * buf_interp2 = buf_start - 2 * stride;
+                    buf_interp2[0] = (buf_start[0] + buf_prev[0]) / 2;
+                    buf_interp2[1] = (buf_start[1] + buf_prev[1]) / 2;
+                    buf_interp2[2] = (buf_start[2] + buf_prev[2]) / 2;
+                    repeate_2x2(buf_interp2, px_size, stride);
+
+                    uint8_t * buf_interp3 = buf_start - 4 * stride - 2 * px_size;
+                    uint8_t * buf_interp4 = buf_start - 2 * stride - 4 * px_size;
+                    uint8_t * buf_interp_mid = buf_start - 2 * stride - 2 * px_size;
+                    buf_interp_mid[0] = (buf_interp1[0] + buf_interp2[0] + buf_interp3[0] + buf_interp4[0]) / 4;
+                    buf_interp_mid[1] = (buf_interp1[1] + buf_interp2[1] + buf_interp3[1] + buf_interp4[1]) / 4;
+                    buf_interp_mid[2] = (buf_interp1[2] + buf_interp2[2] + buf_interp3[2] + buf_interp4[2]) / 4;
+                    repeate_2x2(buf_interp_mid, px_size, stride);
+                    buf_start += stride * skip_cnt;
+                }
+
             }
         }
         else if(px_size == 2) {
