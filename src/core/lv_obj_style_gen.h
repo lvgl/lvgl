@@ -668,15 +668,15 @@ static inline lv_opa_t lv_obj_get_style_recolor_opa(const lv_obj_t * obj, lv_par
     return (lv_opa_t)v.num;
 }
 
-static inline int32_t lv_obj_get_style_blur_intensity(const lv_obj_t * obj, lv_part_t part)
+static inline int32_t lv_obj_get_style_blur_radius(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BLUR_INTENSITY);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BLUR_RADIUS);
     return (int32_t)v.num;
 }
 
-static inline int32_t lv_obj_get_style_backdrop_blur_intensity(const lv_obj_t * obj, lv_part_t part)
+static inline int32_t lv_obj_get_style_backdrop_blur_radius(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BACKDROP_BLUR_INTENSITY);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BACKDROP_BLUR_RADIUS);
     return (int32_t)v.num;
 }
 
@@ -921,8 +921,8 @@ void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc
 void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
-void lv_obj_set_style_blur_intensity(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_backdrop_blur_intensity(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_backdrop_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);

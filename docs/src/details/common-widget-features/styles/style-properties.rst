@@ -1408,8 +1408,8 @@ Sets the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
-blur_intensity
-~~~~~~~~~~~~~~
+blur_radius
+~~~~~~~~~~~
 
 Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered.
 
@@ -1422,8 +1422,8 @@ Sets the intensity of blurring. Applied on each lv_part separately before the ch
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
-backdrop_blur_intensity
-~~~~~~~~~~~~~~~~~~~~~~~
+backdrop_blur_radius
+~~~~~~~~~~~~~~~~~~~~
 
 Sets the intensity of blurring of the widget's background. Applied before the given part is rendered. The part should have < 100% opacity to make it visible.
 

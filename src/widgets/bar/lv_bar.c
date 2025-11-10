@@ -516,7 +516,7 @@ static void draw_indic(lv_event_t * e)
 
     lv_draw_blur_dsc_t draw_blur_dsc;
     lv_draw_blur_dsc_init(&draw_blur_dsc);
-    draw_blur_dsc.radius = draw_rect_dsc.radius;
+    draw_blur_dsc.corner_radius = draw_rect_dsc.radius;
     lv_obj_init_draw_blur_dsc(obj, LV_PART_INDICATOR, &draw_blur_dsc, true);
     lv_draw_blur(layer, &draw_blur_dsc, &indic_area);
 
