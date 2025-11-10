@@ -34,7 +34,7 @@ static void new_theme_init_and_set(void)
     lv_style_set_border_width(&style_btn, 3);
 
     /* Initialize the new theme with the current theme as its parent
-     * The user is reponsible for freeing the theme when it's no longer needed */
+     * The user is responsible for freeing the theme when it's no longer needed */
     lv_theme_t * th_act = lv_display_get_theme(NULL);
     lv_theme_t * th_new = lv_theme_create();
     lv_theme_copy(th_new, th_act);
@@ -46,7 +46,7 @@ static void new_theme_init_and_set(void)
     /*Assign the new theme to the current display*/
     lv_display_set_theme(display, th_new);
 
-    /* Assing a delete event callback so that we can delete the theme when the display is deleted*/
+    /* Assign a delete event callback so that we can delete the theme when the display is deleted*/
     lv_display_add_event_cb(display, on_display_delete, LV_EVENT_DELETE, NULL);
 }
 

@@ -31,7 +31,7 @@ typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
 
 /**
  * Creates a new theme
- * @return  the new theme or NULL if allocated failed
+ * @return  the new theme or NULL if allocation failed
  */
 lv_theme_t * lv_theme_create(void);
 
