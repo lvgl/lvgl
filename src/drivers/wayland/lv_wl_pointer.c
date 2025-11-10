@@ -118,8 +118,9 @@ lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, str
 {
     LV_ASSERT_NULL(seat);
     LV_ASSERT_NULL(surface);
-    if(!cursor_theme) {
-        cursor_theme = wl_cursor_theme_load(NULL, 32, lv_wl_ctx.wl_shm);
+    if(!cursor_theme && !(cursor_theme = wl_cursor_theme_load(NULL, 32, lv_wl_ctx.wl_shm))) {
+        LV_LOG_WARN("Failed to load cursor theme for pointer");
+        return NULL;
     }
 
     struct wl_pointer * pointer = wl_seat_get_pointer(seat);
