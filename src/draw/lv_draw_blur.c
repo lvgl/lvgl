@@ -38,8 +38,8 @@
 void LV_ATTRIBUTE_FAST_MEM lv_draw_blur_dsc_init(lv_draw_blur_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_blur_dsc_t));
-    dsc->intensity = 0;
-    dsc->radius = 0;
+    dsc->blur_radius = 0;
+    dsc->corner_radius = 0;
     dsc->base.dsc_size = sizeof(lv_draw_blur_dsc_t);
 }
 
@@ -50,7 +50,7 @@ lv_draw_blur_dsc_t * lv_draw_task_get_blur_dsc(lv_draw_task_t * task)
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_blur(lv_layer_t * layer, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(dsc->intensity <= 0) return;
+    if(dsc->blur_radius <= 0) return;
 
     LV_PROFILER_DRAW_BEGIN;
 

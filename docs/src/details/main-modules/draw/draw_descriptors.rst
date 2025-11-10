@@ -617,6 +617,24 @@ Functions for triangle drawing:
 
 
 
+Blur Draw Descriptor
+********************
+
+Blur is defined by :cpp:type:`lv_draw_blur_dsc_t`, which includes:
+
+:blur_radius:      The radius of the blur.
+:corner_radius:    The radius of the corners.
+
+Functions for blur drawing:
+
+- :cpp:expr:`lv_draw_blur_dsc_init(&dsc)` initializes a blur descriptor.
+- :cpp:expr:`lv_draw_blur(layer, &dsc, area)` creates a task to blur an area.
+- :cpp:expr:`lv_draw_task_get_blur_dsc(draw_task)` retrieves blur descriptor.
+
+.. lv_example:: widgets/canvas/lv_example_canvas_9
+  :language: c
+
+
 Vector Draw Descriptor
 **********************
 
