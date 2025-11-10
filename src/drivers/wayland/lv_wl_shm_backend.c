@@ -141,7 +141,7 @@ static uint32_t lv_cf_to_shm_cf(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return WL_SHM_FORMAT_RGB565;
         default:
-            LV_ASSERT_FORMAT_MSG(0, "Unsupported color format %d", cf);
+            return 0;
     }
 }
 
@@ -190,6 +190,11 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
     }
 
     ddata->shm_cf = lv_cf_to_shm_cf(cf);
+    if(!ddata->shm_cf) {
+        LV_LOG_WARN("Unsupported color format %d. Falling back to XRGB8888", cf);
+        lv_display_set_color_format(display, LV_COLOR_FORMAT_XRGB8888);
+        ddata->shm_cf = WL_SHM_FORMAT_XRGB8888;
+    }
 
     for(size_t i = 0; i < buf_count; ++i) {
         size_t offset = i * buf_size;
