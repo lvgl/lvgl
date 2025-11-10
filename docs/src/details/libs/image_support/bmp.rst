@@ -30,9 +30,9 @@ files.  Follow the instructions in :ref:`file_system`.
 Limitations
 ***********
 
--  Only BMP files are supported.  BMP images as C arrays
-   (:cpp:struct:`lv_image_dsc_t`) are not.  This is because there is no practical
-   differences between how the BMP files and LVGL's image format stores
+-  Only uncompressed BMP files are supported.  BMP images as C arrays
+   (:cpp:type:`lv_image_dsc_t`) are not.  This is because there is no practical
+   differences between how the uncompressed BMP files and LVGL's image format stores
    the image data.
 -  BMP files can be loaded only from .BMP files. If you want to store them in
    flash it's better to convert them to a C array with `LVGL Online Image Converter`_.

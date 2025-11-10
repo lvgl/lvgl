@@ -4,15 +4,27 @@
 Image Decoders
 ==============
 
-.. _supported image decoders:
+What is an Image Decoder?
+*************************
 
-LVGL comes with a number of image decoders to support generic image formats
-from files.
+Images that are encoded (i.e. outside of the list of built-in supported
+:ref:`images_color_formats`) are dealt with through an "Image Decoder".  A Decoder
+is very simply a body of logic that can convert a coded image into one of the
+recognized formats.
+
+
+
+.. _built-in image decoders:
+
+Built-In Image Decoders
+***********************
+
+LVGL comes with a number of image decoders to support generic image formats:
 
 .. container:: tighter-table-3
 
     +--------+----------------------+--------------------+
-    | Format | lv_conf.h            | Reference          |
+    | Format | ``lv_conf.h``        | Reference          |
     |        | Symbol to Set        |                    |
     +========+======================+====================+
     | BMP    | LV_USE_BMP           | :ref:`bmp`         |
@@ -30,8 +42,19 @@ from files.
     | SVG    | LV_USE_SVG           | :ref:`svg`         |
     +--------+----------------------+--------------------+
 
-To handle a non-built-in image format, you need to use an external image-decoding
-library and attach it to LVGL via the *Image decoder* interface.
+Once you have the appropriate symbol set to ``1`` in ``lv_conf.h``, you simply pass
+the file-system path to the file containing your image as the ``src`` argument to
+:cpp:expr:`lv_image_set_src(icon, "S:my_icon.png")`, and LVGL takes care of the rest.
+
+
+
+Using Custom Image Formats
+**************************
+
+If you have a file-based image type that is not in this list, you can set up LVGL to
+successfully handle it by implementing a custom image decoder.  You can use an
+external decoding library or write your own.  To "connect" it to LVGL, you simply
+use LVGL's *Image Decoder* interface.
 
 An image decoder consists of 4 callbacks:
 
