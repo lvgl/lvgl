@@ -165,7 +165,7 @@ extern lv_wl_ctx_t lv_wl_ctx;
 
 lv_result_t lv_wayland_init(void);
 void lv_wayland_deinit(void);
-void lv_wayland_wait_flush_cb(lv_display_t * disp);
+
 /**********************
  *      Window
  **********************/
@@ -173,12 +173,7 @@ void lv_wayland_wait_flush_cb(lv_display_t * disp);
 int32_t lv_wayland_window_get_width(lv_wl_window_t * window);
 int32_t lv_wayland_window_get_height(lv_wl_window_t * window);
 
-void lv_wayland_window_draw(lv_wl_window_t * window, uint32_t width, uint32_t height);
 void lv_wayland_window_delete(lv_wl_window_t * window);
-
-/**********************
- *  Window Management
- **********************/
 
 const struct xdg_wm_base_listener * lv_wayland_xdg_get_wm_base_listener(void);
 
@@ -200,10 +195,6 @@ void lv_wayland_xdg_deinit(void);
 
 void lv_wayland_seat_init(lv_wl_seat_t * seat, struct wl_registry * registry, uint32_t name, uint32_t version);
 void lv_wayland_seat_deinit(lv_wl_seat_t * seat);
-
-const struct wl_keyboard_listener * lv_wayland_keyboard_get_listener(void);
-const struct wl_pointer_listener * lv_wayland_pointer_get_listener(void);
-const struct wl_touch_listener * lv_wayland_touch_get_listener(void);
 
 lv_wl_seat_pointer_t * lv_wayland_seat_pointer_create(struct wl_seat * seat, struct wl_surface * surface);
 void lv_wayland_seat_pointer_delete(lv_wl_seat_pointer_t * seat_pointer);
