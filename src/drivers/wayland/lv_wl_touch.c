@@ -133,17 +133,18 @@ static void touch_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     LV_LOG_TRACE("collected touch events: %d", tdata->event_cnt);
 
-    tdata->event_cnt = 0;
-
-    /* Set the gesture information, before returning to LVGL */
-    lv_indev_gesture_recognizers_set_data(indev, data);
-
     if(tdata->event_cnt > 0) {
         data->point = tdata->touches[0].point;
     }
     else {
         data->point.x = data->point.y = 0;
     }
+
+    tdata->event_cnt = 0;
+
+    /* Set the gesture information, before returning to LVGL */
+    lv_indev_gesture_recognizers_set_data(indev, data);
+
 #else
     data->point = tdata->point;
     data->state = tdata->state;
