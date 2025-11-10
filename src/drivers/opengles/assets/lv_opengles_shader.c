@@ -170,13 +170,35 @@ static const char * src_vertex_shader_v300es = R"(
     in vec2 texCoord;
     
     out vec2 v_TexCoord;
-    
+    flat out lowp vec4 fill_color_alpha;
+    flat out lowp int is_gray;
+
+    uniform lowp float u_Opa;
+    uniform bool u_IsFill;
+    uniform vec3 u_FillColor;
     uniform mat3 u_VertexTransform;
+    uniform float u_ColorDepth;
     
     void main()
     {
         gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);
         v_TexCoord = texCoord;
+
+        if (u_IsFill) {
+            if (abs(u_ColorDepth - 8.0) < 0.1) {
+                /* is_gray = 1; // not necessary */
+                fill_color_alpha = vec4(u_FillColor.rrr, 1.0) * u_Opa;
+            } else {
+                fill_color_alpha = vec4((u_FillColor.rgb * u_Opa), u_Opa);
+            }
+        } else {
+            fill_color_alpha = vec4(0.0);
+            if (abs(u_ColorDepth - 8.0) < 0.1) {
+                is_gray = 1;
+            } else {
+                is_gray = 0;
+            }
+        }
     }
 )";
 
@@ -186,12 +208,11 @@ static const char *src_fragment_shader_v300es = R"(
     out vec4 color;
     
     in vec2 v_TexCoord;
+    flat in lowp vec4 fill_color_alpha;
+    flat in lowp int is_gray;
     
     uniform sampler2D u_Texture;
-    uniform float u_ColorDepth;
-    uniform float u_Opa;
-    uniform bool u_IsFill;
-    uniform vec3 u_FillColor;
+    uniform lowp float u_Opa;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -199,23 +220,23 @@ static const char *src_fragment_shader_v300es = R"(
 
     void main()
     {
-        vec4 texColor;
-        if (u_IsFill) {
-            texColor = vec4(u_FillColor, 1.0);
+        if (0.0 != fill_color_alpha.a) {
+            color = fill_color_alpha;
+            return;
         } else {
-            texColor = texture(u_Texture, v_TexCoord);
+            color = texture(u_Texture, v_TexCoord);
             /* If the vertices have been transformed, and mipmaps have not been generated, 
              * some rotation angles (notably 90 and 270) require using textureLod() to mitigate 
              * derivative calculation errors from interpolator increments flipping direction.
-             * texColor = textureLod(u_Texture, v_TexCoord, u_LodLevel);
+             * color = textureLod(u_Texture, v_TexCoord, u_LodLevel);
              */
-        }
-        if (abs(u_ColorDepth - 8.0) < 0.1) {
-            float gray = texColor.r;
-            color = vec4(vec3(gray * u_Opa), u_Opa);
-        } else {
-            float combinedAlpha = texColor.a * u_Opa;
-            color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
+            if (0 != is_gray) {
+                color.r *= u_Opa;
+                color.gba = vec3(color.rr, u_Opa);
+            } else {
+                color.a *= u_Opa;
+                color.rgb *= color.a;
+            }
         }
         #ifdef HSV_ADJUST
         color.rgb = adjustHSV(color.rgb);
