@@ -47,7 +47,7 @@ SHM Backend (Default)
 ---------------------
 
 The **SHM (Shared Memory)** backend is the default rendering backend used by the Wayland driver.
-It uses Wayland's shared memory protocol (``wl_shm``) for rendering, which supported across all Wayland compositors.
+It uses Wayland's shared memory protocol (``wl_shm``) for rendering, which is supported across all Wayland compositors.
 
 **Features:**
 
