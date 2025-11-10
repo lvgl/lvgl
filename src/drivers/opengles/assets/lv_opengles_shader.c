@@ -186,13 +186,14 @@ static const char * src_vertex_shader_v300es = R"(
 
         if (u_IsFill) {
             if (abs(u_ColorDepth - 8.0) < 0.1) {
-                /* is_gray = 1; // not necessary */
+                is_gray = 1;
                 fill_color_alpha = vec4(u_FillColor.rrr, 1.0) * u_Opa;
             } else {
+                is_gray = 0;
                 fill_color_alpha = vec4((u_FillColor.rgb * u_Opa), u_Opa);
             }
         } else {
-            fill_color_alpha = vec4(0.0);
+            fill_color_alpha = vec4(0.0, 0.0, 0.0, -1.0);
             if (abs(u_ColorDepth - 8.0) < 0.1) {
                 is_gray = 1;
             } else {
@@ -220,9 +221,8 @@ static const char *src_fragment_shader_v300es = R"(
 
     void main()
     {
-        if (0.0 != fill_color_alpha.a) {
+        if (-1.0 != fill_color_alpha.a) {
             color = fill_color_alpha;
-            return;
         } else {
             color = texture(u_Texture, v_TexCoord);
             /* If the vertices have been transformed, and mipmaps have not been generated, 

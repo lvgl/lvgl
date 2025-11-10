@@ -33,6 +33,13 @@
     #define LV_GLTF_CONVERT_BASE_COLOR_TO_SRGB 1
 #endif
 
+/* This attempts a potential optimization that only clears the alpha channel if the output
+ * background is 0% opaque.  Additional testing showed this actually created a slight slowdown
+ * so it's optional and off by default.  Needs further testing. */
+#ifndef LV_GLTF_USE_COLORMASKED_CLEAR_FILL
+    #define LV_GLTF_USE_COLORMASKED_CLEAR_FILL 0
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -1151,18 +1158,18 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 }
 static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
 {
+    GL_CALL(glClearDepthf(1.0f));
+    GL_CALL(glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
+                         (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f));
+#if LV_GLTF_USE_COLORMASKED_CLEAR_FILL
     if(bg_opa == LV_OPA_0) {
-        glColorMask(false, false, false, true);
-        glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
-                     (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f);
-        glColorMask(true, true, true, true);
+        GL_CALL(glColorMask(false, false, false, true));
+#endif
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+#if LV_GLTF_USE_COLORMASKED_CLEAR_FILL
+        GL_CALL(glColorMask(true, true, true, true));
     }
-    else {
-        glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
-                     (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f);
-    }
-    glClearDepthf(1.0f);
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+#endif
 }
 static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
 {
