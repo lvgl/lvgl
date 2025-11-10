@@ -28,6 +28,7 @@ void lv_example_image_1(void)
     lv_label_set_text(label,
                       "asdasdasdas a sad sad sasdas\n sadsad jsahd kajhd asd asdsad ss a\n sal kjd a sljdsla kdj\nsad jasd sss tegfd adssa e\nadssa dsad ff  wedsada asdsa\nlasjkuhe  ajkhads askhad\nassldjasjas kjsahds \n asd data khe asww fkha sdas d kcj");
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
     lv_obj_t * obj = lv_calendar_create(parent);
     lv_obj_center(obj);
     lv_obj_set_style_backdrop_blur_intensity(obj, 20, 0);
