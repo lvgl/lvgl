@@ -39,6 +39,61 @@ On Fedora
 
 
 
+Rendering Backends
+******************
+
+The Wayland driver supports multiple rendering backends, allowing you to choose the most appropriate rendering method for your hardware and use case.
+
+
+SHM Backend (Default)
+---------------------
+
+The **SHM (Shared Memory)** backend is the default rendering backend used by the Wayland driver.
+It uses Wayland's shared memory protocol (``wl_shm``) for rendering, which supported across all Wayland compositors.
+
+**Features:**
+
+* Double-buffered direct rendering
+* Universal compatibility with all Wayland compositors
+* No special hardware requirements
+
+**Limitations:**
+
+* Rotation is not currently supported
+
+**Usage:**
+
+The SHM backend is enabled by default and requires no additional configuration.
+
+
+G2D Backend
+-----------
+
+The G2D backend leverages NXP's hardware-accelerated 2D graphics engine available on i.MX processors. This backend provides improved performance on NXP platforms.
+
+**Features:**
+
+* Hardware-accelerated rendering
+* Double-buffered direct rendering
+* Rotation support (0°, 90°, 180°, 270°)
+
+**Requirements:**
+
+* Hardware with G2D support (e.g., NXP i.MX6/i.MX8 series)
+* G2D library and drivers installed on the system
+
+**Usage:**
+
+Enable the G2D backend in ``lv_conf.h``:
+
+.. code:: c
+
+   #define LV_USE_DRAW_G2D  1
+
+When ``LV_USE_DRAW_G2D`` is enabled, the Wayland driver will automatically use the G2D backend instead of the default SHM backend.
+
+
+
 Configuring the wayland driver
 ******************************
 
@@ -48,40 +103,13 @@ Configuring the wayland driver
 
    #define LV_USE_WAYLAND  1
 
-2. Optional configuration options:
-
-Some optional settings depend on whether DMA buffer support is enabled (`LV_WAYLAND_USE_DMABUF`). The table below summarizes valid combinations and limitations:
-
-.. list-table:: Configuration possibilities
-   :widths: 50 25 25
-   :header-rows: 1
-
-   * - Configuration Option
-     - Without DMABUF
-     - With DMABUF
-
-   * - `LV_DRAW_USE_G2D`
-     - Not required
-     - **Required**
-
-   * - `LV_WAYLAND_BUF_COUNT`
-     - `1`
-     - `1` or `2`
-
-   * - `LV_WAYLAND_RENDER_MODE`
-     - `LV_DISPLAY_RENDER_MODE_PARTIAL`
-     - `LV_DISPLAY_RENDER_MODE_DIRECT` or `LV_DISPLAY_RENDER_MODE_FULL`
-
-Additional notes
-
-* DMABUF support (`LV_WAYLAND_USE_DMABUF`) improves performance and enables more render modes but has specific requirements and restrictions.
-
 
 
 Reference Project
 *****************
 
-You can always reference this `project <https://github.com/lvgl/lv_port_linux/>`__ as a reference project for setting up wayland.
+`LVGL Linux port <https://github.com/lvgl/lv_port_linux/>`__ serves as a reference project for setting up wayland. It uses CMake to generate
+the required protocols at build time.
 
 
 
@@ -131,6 +159,11 @@ Maximized mode
 To programmatically maximize the window,
 use the ``lv_wayland_window_set_maximized()`` function respectively with ``true``
 or ``false`` for the ``maximized`` argument.
+
+Minimize window
+---------------
+
+To programmatically minimize the window, use the ``lv_wayland_window_set_minimized()`` function.
 
 
 Physical display assignment
@@ -230,9 +263,9 @@ For applications that don't need decorations (fullscreen, kiosk mode, etc.), sim
 Current state and objectives
 ****************************
 
-* Mesa Support
 * EGL Support
 * Server-side window decorations
+* Rotation support for the SHM backend
 
 
 
