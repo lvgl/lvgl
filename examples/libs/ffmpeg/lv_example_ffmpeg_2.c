@@ -20,7 +20,7 @@ void lv_example_ffmpeg_2(void)
     lv_obj_t * player = lv_ffmpeg_player_create(lv_screen_active());
     /*If the system and the file being played support it, v4l2 hardware decoding will 
      *be used; otherwise, it will fall back to software decoding. */
-    lv_ffmpeg_player_set_decoder(player,"h264_v4l2m2m");
+    lv_ffmpeg_player_set_decoder(player, "h264_v4l2m2m");
     lv_ffmpeg_player_set_src(player, PATH_PREFIX "lvgl/examples/libs/ffmpeg/birds.mp4");
     lv_ffmpeg_player_set_auto_restart(player, true);
     lv_ffmpeg_player_set_cmd(player, LV_FFMPEG_PLAYER_CMD_START);
