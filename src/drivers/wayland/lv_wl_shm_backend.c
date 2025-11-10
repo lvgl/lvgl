@@ -23,6 +23,8 @@
  *      DEFINES
  *********************/
 
+#define LV_WL_SHM_BUF_COUNT 2
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -41,7 +43,7 @@ typedef struct {
     size_t mmap_size;
     struct wl_shm_pool * pool;
     uint8_t * partial_buffer;
-    lv_wl_buffer_t buffers[LV_WAYLAND_BUF_COUNT];
+    lv_wl_buffer_t buffers[LV_WL_SHM_BUF_COUNT];
     size_t curr_wl_buffer_idx;
     uint32_t shm_cf;
     int fd;
@@ -109,7 +111,7 @@ const lv_wayland_backend_ops_t wl_backend_ops = {
 static void buffer_release(void * data, struct wl_buffer * wl_buffer)
 {
     lv_wl_shm_display_data_t * ddata = data;
-    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; ++i) {
+    for(size_t i = 0; i < LV_WL_SHM_BUF_COUNT; ++i) {
         if(wl_buffer == ddata->buffers[i].wl_buffer) {
             ddata->buffers[i].busy = false;
         }
@@ -218,7 +220,7 @@ shm_file_err:
 
 static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
 {
-    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; ++i) {
+    for(size_t i = 0; i < LV_WL_SHM_BUF_COUNT; ++i) {
         lv_wl_buffer_t * buffer = &ddata->buffers[i];
         if(!buffer->wl_buffer) {
             continue;
@@ -273,7 +275,7 @@ static void * shm_init_display(void * backend_data, lv_display_t * display, int3
     }
 
     /* Force a single buffer if render mode is partial*/
-    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, width, height, LV_WAYLAND_BUF_COUNT);
+    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, width, height, LV_WL_SHM_BUF_COUNT);
     if(!ddata) {
         LV_LOG_ERROR("Failed to allocate data for display");
         return NULL;
@@ -292,14 +294,13 @@ static void * shm_resize_display(void * backend_data, lv_display_t * display)
     const int32_t new_width = lv_display_get_horizontal_resolution(display);
     const int32_t new_height = lv_display_get_vertical_resolution(display);
 
-    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, new_width, new_height, LV_WAYLAND_BUF_COUNT);
+    lv_wl_shm_display_data_t * ddata = shm_create_display_data(ctx, display, new_width, new_height, LV_WL_SHM_BUF_COUNT);
 
     if(!ddata) {
         LV_LOG_ERROR("Failed to allocate data for new display resolution");
         return NULL;
     }
 
-    LV_LOG_USER("Resize");
     lv_wl_shm_display_data_t * curr_ddata = lv_wayland_get_backend_display_data(display);
     shm_destroy_display_data(curr_ddata);
     return ddata;
@@ -372,22 +373,6 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         }
     }
 
-    if(LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        int32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp),
-                                                     lv_display_get_color_format(disp));
-        uint8_t px_size = lv_color_format_get_size(cf);
-        size_t display_size = ddata->mmap_size / LV_WAYLAND_BUF_COUNT;
-        size_t mmap_offset = ddata->curr_wl_buffer_idx * display_size;
-        uint8_t * buffer_base = ((uint8_t *)ddata->mmap_ptr) + mmap_offset;
-        for(int32_t y = area->y1; y <= area->y2; ++y) {
-            for(int32_t x = area->x1; x <= area->x2; ++x) {
-                size_t index = (y * stride) + (x * px_size);
-                lv_memcpy(&buffer_base[index], px_map, px_size);
-                px_map += px_size;
-            }
-        }
-    }
-
     wl_surface_damage(surface, area->x1, area->y1, w, h);
     if(!lv_display_flush_is_last(disp)) {
         lv_display_flush_ready(disp);
@@ -398,11 +383,14 @@ static void shm_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     wl_callback_add_listener(callback, &frame_listener, disp);
 
     lv_wl_buffer_t * buffer = &ddata->buffers[ddata->curr_wl_buffer_idx];
+    if(buffer->busy) {
+        LV_LOG_WARN("Failed to acquire a non-busy buffer");
+    }
     wl_surface_attach(surface, buffer->wl_buffer, 0, 0);
     wl_surface_commit(surface);
 
     buffer->busy = true;
-    ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WAYLAND_BUF_COUNT;
+    ddata->curr_wl_buffer_idx = (ddata->curr_wl_buffer_idx + 1) % LV_WL_SHM_BUF_COUNT;
 }
 
 #endif /*LV_WAYLAND_USE_SHM*/
