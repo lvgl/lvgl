@@ -56,10 +56,10 @@ typedef struct {
 
 static void * shm_init(void);
 static void shm_deinit(void *);
-static void * shm_init_display(void * backend_data, lv_display_t * display, int32_t width, int32_t height);
-static void * shm_resize_display(void * backend_data, lv_display_t * display);
-static void shm_deinit_display(void * backend_data, lv_display_t * display);
-static void shm_global_handler(void * backend_data, struct wl_registry * registry, uint32_t name,
+static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
+static void * shm_resize_display(void * backend_ctx, lv_display_t * display);
+static void shm_deinit_display(void * backend_ctx, lv_display_t * display);
+static void shm_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
                                const char * interface, uint32_t version);
 
 static int create_shm_file(size_t size);
@@ -151,9 +151,9 @@ static void * shm_init(void)
     return &shm_ctx;
 }
 
-static void shm_deinit(void * backend_data)
+static void shm_deinit(void * backend_ctx)
 {
-    lv_wl_shm_ctx_t * ctx = backend_data;
+    lv_wl_shm_ctx_t * ctx = backend_ctx;
     if(ctx->shm) {
         wl_shm_destroy(ctx->shm);
     }
@@ -266,9 +266,9 @@ static void flush_wait_cb(lv_display_t * disp)
     }
 }
 
-static void * shm_init_display(void * backend_data, lv_display_t * display, int32_t width, int32_t height)
+static void * shm_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
-    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_data;
+    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_ctx;
     if(!ctx->shm) {
         LV_LOG_ERROR("wl_shm not available");
         return NULL;
@@ -287,9 +287,9 @@ static void * shm_init_display(void * backend_data, lv_display_t * display, int3
     return ddata;
 }
 
-static void * shm_resize_display(void * backend_data, lv_display_t * display)
+static void * shm_resize_display(void * backend_ctx, lv_display_t * display)
 {
-    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_data;
+    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_ctx;
 
     const int32_t new_width = lv_display_get_horizontal_resolution(display);
     const int32_t new_height = lv_display_get_vertical_resolution(display);
@@ -307,9 +307,9 @@ static void * shm_resize_display(void * backend_data, lv_display_t * display)
 }
 
 
-static void shm_deinit_display(void * backend_data, lv_display_t * display)
+static void shm_deinit_display(void * backend_ctx, lv_display_t * display)
 {
-    LV_UNUSED(backend_data);
+    LV_UNUSED(backend_ctx);
     lv_wl_shm_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
     if(!ddata) {
         return;
@@ -339,11 +339,11 @@ static int create_shm_file(size_t size)
     return fd;
 }
 
-static void shm_global_handler(void * backend_data, struct wl_registry * registry, uint32_t name,
+static void shm_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
                                const char * interface, uint32_t version)
 {
     LV_UNUSED(version);
-    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_data;
+    lv_wl_shm_ctx_t * ctx = (lv_wl_shm_ctx_t *)backend_ctx;
 
     if(lv_streq(interface, wl_shm_interface.name)) {
         ctx->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
