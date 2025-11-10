@@ -169,7 +169,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         int32_t x_end = coords->x2 - cir_x;
 
         x_start = LV_CLAMP(clipped_coords.x1, x_start, clipped_coords.x2);
-        x_end = LV_CLAMP(clipped_coords.x1, x_end, clipped_coords.x2 - skip_cnt);
+        x_end = LV_CLAMP(clipped_coords.x1, x_end, (clipped_coords.x2 / skip_cnt) * skip_cnt);
         if(x_start > x_end) continue;
 >>>>>>> d60c42a74 (add tests)
 
@@ -278,7 +278,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         int32_t y_end = coords->y2 - cir_y;
 
         y_start = LV_CLAMP(clipped_coords.y1, y_start, clipped_coords.y2);
-        y_end = LV_CLAMP(clipped_coords.y1, y_end, clipped_coords.y2 - skip_cnt);
+        y_end = LV_CLAMP(clipped_coords.y1, y_end, (clipped_coords.y2 / skip_cnt) * skip_cnt);
         if(y_start > y_end) continue;
 >>>>>>> d60c42a74 (add tests)
 
