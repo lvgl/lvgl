@@ -147,9 +147,6 @@ lv_result_t lv_wayland_init(void)
 
 void lv_wayland_deinit(void)
 {
-    if(!is_wayland_initialized) {
-        return;
-    }
     lv_wl_window_t * window = NULL;
 
     LV_LL_READ(&lv_wl_ctx.window_ll, window) {
@@ -158,21 +155,27 @@ void lv_wayland_deinit(void)
 
     lv_wayland_xdg_deinit();
 
-    wl_backend_ops.deinit(lv_wl_ctx.backend_data);
+    if(is_wayland_initialized) {
+        wl_backend_ops.deinit(lv_wl_ctx.backend_data);
+    }
 
     if(lv_wl_ctx.seat.wl_seat) {
         lv_wayland_seat_deinit(&lv_wl_ctx.seat);
+        lv_wl_ctx.seat.wl_seat = NULL;
     }
 
     if(lv_wl_ctx.wl_registry) {
         wl_registry_destroy(lv_wl_ctx.wl_registry);
+        lv_wl_ctx.wl_registry = NULL;
     }
 
     if(lv_wl_ctx.wl_compositor) {
         wl_compositor_destroy(lv_wl_ctx.wl_compositor);
+        lv_wl_ctx.wl_compositor = NULL;
     }
     if(lv_wl_ctx.wl_display) {
         wl_display_disconnect(lv_wl_ctx.wl_display);
+        lv_wl_ctx.wl_display = NULL;
     }
 
     lv_ll_clear(&lv_wl_ctx.window_ll);
