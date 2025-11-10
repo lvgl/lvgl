@@ -167,9 +167,19 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
         return NULL;
     }
 
-    const lv_color_format_t cf = lv_display_get_color_format(display);
+    lv_color_format_t cf = lv_display_get_color_format(display);
+    ddata->shm_cf = lv_cf_to_shm_cf(cf);
+
+    if(!ddata->shm_cf) {
+        LV_LOG_WARN("Unsupported color format %d. Falling back to XRGB8888", cf);
+        cf = LV_COLOR_FORMAT_XRGB8888;
+        lv_display_set_color_format(display, cf);
+        ddata->shm_cf = WL_SHM_FORMAT_XRGB8888;
+    }
+
     const uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     const size_t buf_size = stride * height;
+
     ddata->mmap_size = buf_size * buf_count;
 
     ddata->fd = create_shm_file(ddata->mmap_size);
@@ -186,13 +196,6 @@ static lv_wl_shm_display_data_t * shm_create_display_data(lv_wl_shm_ctx_t * ctx,
     if(!ddata->pool) {
         LV_LOG_ERROR("Failed to create wl_shm_pool");
         goto shm_pool_err;
-    }
-
-    ddata->shm_cf = lv_cf_to_shm_cf(cf);
-    if(!ddata->shm_cf) {
-        LV_LOG_WARN("Unsupported color format %d. Falling back to XRGB8888", cf);
-        lv_display_set_color_format(display, LV_COLOR_FORMAT_XRGB8888);
-        ddata->shm_cf = WL_SHM_FORMAT_XRGB8888;
     }
 
     for(size_t i = 0; i < buf_count; ++i) {
