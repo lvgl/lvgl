@@ -99,10 +99,16 @@ static lv_wl_seat_pointer_t * create_pointer(struct wl_seat * wl_seat)
 {
     struct wl_surface * surface = wl_compositor_create_surface(lv_wl_ctx.wl_compositor);
     if(!surface) {
-        LV_LOG_WARN("Faield to get surface for pointer");
+        LV_LOG_WARN("Failed to get surface for pointer");
         return NULL;
     }
-    return lv_wayland_seat_pointer_create(wl_seat, surface);
+    lv_wl_seat_pointer_t * seat_pointer = lv_wayland_seat_pointer_create(wl_seat, surface);
+    if(!seat_pointer) {
+        LV_LOG_WARN("Failed to create seat pointer");
+        wl_surface_destroy(surface);
+        return NULL;
+    }
+    return seat_pointer;
 }
 
 static void delete_pointer(lv_wl_seat_pointer_t * seat_pointer)
