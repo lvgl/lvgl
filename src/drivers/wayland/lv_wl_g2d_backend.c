@@ -285,7 +285,6 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
         init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
     else {
-
         LV_LOG_USER("Rotation is 0 / 180");
         init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
     }
@@ -295,6 +294,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
     wl_display_roundtrip(lv_wl_ctx.wl_display);
     for(size_t i = 0; i < LV_WL_G2D_BUF_COUNT; ++i) {
         if(!ddata->buffers[i].wl_buffer) {
+            wl_g2d_delete_display_data(ddata);
             LV_LOG_ERROR("DMABUF creation failed");
             return NULL;
         }
@@ -302,6 +302,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
 
 #if LV_USE_ROTATE_G2D
     if(!ddata->rotate_buffer.wl_buffer) {
+        wl_g2d_delete_display_data(ddata);
         LV_LOG_ERROR("DMABUF creation failed");
         return NULL;
     }
