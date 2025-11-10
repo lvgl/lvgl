@@ -9,14 +9,12 @@ Wayland Display/Inputs driver
 Overview
 ********
 
-The **Wayland** `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/wayland>`__
-offers support for simulating the LVGL display and keyboard/mouse inputs in a desktop
-window.
+The Wayland `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/wayland>`__ provides integration between LVGL and Wayland-based systems,
+allowing LVGL applications to render directly into a Wayland surface and handle keyboard, mouse and touch input. This makes it suitable 
+for production deployments, such as kiosk interfaces, control panels, or other embedded GUIs where Wayland is the display server.
 
-It is an alternative to **X11** or **SDL2**
-
-The main purpose for this driver is for testing/debugging the LVGL application. It can
-also be used to run applications in "kiosk mode".
+In addition to production use, the driver is also useful for development on linux desktop environments, offering a convenient way to simulate and validate 
+your LVGL applications without dedicated hardware. It serves as an alternative to the X11 and SDL2 drivers.
 
 
 
