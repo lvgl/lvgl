@@ -244,7 +244,6 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
 {
     lv_wl_ctx_t * ctx = data;
 
-    LV_UNUSED(version);
     LV_UNUSED(data);
 
     if(strcmp(interface, wl_compositor_interface.name) == 0) {
@@ -258,8 +257,7 @@ static void handle_global(void * data, struct wl_registry * registry, uint32_t n
         lv_wayland_seat_init(&ctx->seat, registry, name, version);
     }
     else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
-        /* supporting version 2 of the XDG protocol - ensures greater compatibility */
-        ctx->xdg_wm = wl_registry_bind(ctx->wl_registry, name, &xdg_wm_base_interface, 2);
+        ctx->xdg_wm = wl_registry_bind(ctx->wl_registry, name, &xdg_wm_base_interface, LV_MIN(version, 2));
         xdg_wm_base_add_listener(ctx->xdg_wm, lv_wayland_xdg_get_wm_base_listener(), ctx);
     }
     else if(strcmp(interface, wl_output_interface.name) == 0) {
