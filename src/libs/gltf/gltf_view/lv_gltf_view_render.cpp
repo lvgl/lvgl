@@ -1224,6 +1224,9 @@ static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color,
 #if LV_GLTF_USE_COLORMASKED_CLEAR_FILL
         GL_CALL(glColorMask(true, true, true, true));
     }
+    else {
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    }
 #endif
 }
 
