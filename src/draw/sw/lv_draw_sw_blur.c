@@ -32,6 +32,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static inline int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r);
+
 
 static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
 static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity);
@@ -126,6 +128,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         uint32_t sample_len_limited = LV_MIN((y_end - y_start) / skip_cnt + 1, sample_len);
 
+        uint32_t sample_len_limited = LV_MIN(x_end - x_start + 1, sample_len);
+
         if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
@@ -185,6 +189,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(x_start > x_end) continue;
         uint32_t line_len_byte = (x_end - x_start + skip_cnt) * px_size;
         uint32_t sample_len_limited = LV_MIN((x_end - x_start) / skip_cnt + 1, sample_len);
+
+        uint32_t sample_len_limited = LV_MIN(y_end - y_start + 1, sample_len);
 
         if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
