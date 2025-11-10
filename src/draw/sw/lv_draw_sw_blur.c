@@ -31,8 +31,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static inline int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r);
 
+static void blur_3_bytes_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride);
+static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
+
+static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity);
+static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity);
+static int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r);
 
 /**********************
  *  STATIC VARIABLES
@@ -45,77 +50,6 @@ static inline int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-static inline void blur_3px_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride)
-{
-    uint32_t s;
-
-    sum[0] = 0;
-    sum[1] = 0;
-    sum[2] = 0;
-
-    for(s = 0; s < sample_len; s++) {
-        sum[0] += buf[0];
-        sum[1] += buf[1];
-        sum[2] += buf[2];
-        buf += stride;
-    }
-    sum[0] = (sum[0] << BLUR_MULTIPLIER_BITS) / sample_len;
-    sum[1] = (sum[1] << BLUR_MULTIPLIER_BITS) / sample_len;
-    sum[2] = (sum[2] << BLUR_MULTIPLIER_BITS) / sample_len;
-}
-
-static inline void blur_2px_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride)
-{
-    uint32_t s;
-
-    sum[0] = 0;
-    sum[1] = 0;
-    sum[2] = 0;
-    for(s = 0; s < sample_len; s++) {
-        sum[0] += buf->red;
-        sum[1] += buf->green;
-        sum[2] += buf->blue;
-        buf += stride;
-    }
-
-    sum[0] = (sum[0] << BLUR_MULTIPLIER_BITS) / sample_len;
-    sum[1] = (sum[1] << BLUR_MULTIPLIER_BITS) / sample_len;
-    sum[2] = (sum[2] << BLUR_MULTIPLIER_BITS) / sample_len;
-}
-
-static inline void blur_3px(uint32_t * sum, uint8_t * buf, uint32_t intensity)
-{
-    uint32_t intensity_inv = BLUR_MULTIPLIER_MAX - intensity;
-
-    if(buf[0] != sum[0] >> BLUR_MULTIPLIER_BITS) {
-        sum[0] = ((sum[0] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[0] * intensity_inv));
-        buf[0] = sum[0] >> BLUR_MULTIPLIER_BITS;
-    }
-
-    if(buf[1] != sum[1] >> BLUR_MULTIPLIER_BITS) {
-        sum[1] = ((sum[1] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[1] * intensity_inv));
-        buf[1] = sum[1] >> BLUR_MULTIPLIER_BITS;
-    }
-
-    if(buf[2] != sum[2] >> BLUR_MULTIPLIER_BITS) {
-        sum[2] = ((sum[2] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[2] * intensity_inv));
-        buf[2] = sum[2] >> BLUR_MULTIPLIER_BITS;
-    }
-}
-
-static inline void blur_2px(uint32_t * sum, lv_color16_t * buf, uint32_t intensity)
-{
-    uint32_t intensity_inv = BLUR_MULTIPLIER_MAX - intensity;
-    sum[0] = ((sum[0] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->red * intensity_inv));
-    buf->red = (sum[0] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
-
-    sum[1] = ((sum[1] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->green * intensity_inv));
-    buf->green = (sum[1] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
-
-    sum[2] = ((sum[2] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->blue * intensity_inv));
-    buf->blue = (sum[2] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
-}
 
 void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
@@ -163,16 +97,16 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             uint8_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
             uint8_t * buf_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
 
-            blur_3px_init(sum_start, buf_start, sample_len_limited, px_size);
-            blur_3px_init(sum_end, buf_end, sample_len_limited, -px_size);
+            blur_3_bytes_init(sum_start, buf_start, sample_len_limited, px_size);
+            blur_3_bytes_init(sum_end, buf_end, sample_len_limited, -px_size);
 
             for(x = x_start; x <= x_end; x++) {
-                blur_3px(sum_start, buf_start, intensity);
+                blur_3_bytes(sum_start, buf_start, intensity);
                 buf_start += px_size;
             }
 
             for(x = x_start; x <= x_end; x++) {
-                blur_3px(sum_end, buf_end, intensity);
+                blur_3_bytes(sum_end, buf_end, intensity);
                 buf_end -= px_size;
             }
         }
@@ -180,16 +114,16 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             lv_color16_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
             lv_color16_t * buf_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
 
-            blur_2px_init(sum_start, buf_start, sample_len, 1);
-            blur_2px_init(sum_end, buf_end, sample_len, -1);
+            blur_2_bytes_init(sum_start, buf_start, sample_len, 1);
+            blur_2_bytes_init(sum_end, buf_end, sample_len, -1);
 
             for(x = x_start; x <= x_end; x++) {
-                blur_2px(sum_start, buf_start, intensity);
+                blur_2_bytes(sum_start, buf_start, intensity);
                 buf_start ++;
             }
 
             for(x = x_start; x <= x_end; x++) {
-                blur_2px(sum_end, buf_end, intensity);
+                blur_2_bytes(sum_end, buf_end, intensity);
                 buf_end --;
             }
         }
@@ -210,16 +144,16 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(px_size >= 3) {
             uint8_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
             uint8_t * buf_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_3px_init(sum_start, buf_start, sample_len_limited, stride);
-            blur_3px_init(sum_end, buf_end, sample_len_limited, -stride);
+            blur_3_bytes_init(sum_start, buf_start, sample_len_limited, stride);
+            blur_3_bytes_init(sum_end, buf_end, sample_len_limited, -stride);
 
             for(y = y_start; y <= y_end; y++) {
-                blur_3px(sum_start, buf_start, intensity);
+                blur_3_bytes(sum_start, buf_start, intensity);
                 buf_start += stride;
             }
 
             for(y = y_start; y <= y_end; y++) {
-                blur_3px(sum_end, buf_end, intensity);
+                blur_3_bytes(sum_end, buf_end, intensity);
                 buf_end -= stride;
             }
         }
@@ -227,16 +161,16 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             lv_color16_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
             lv_color16_t * buf_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
 
-            blur_2px_init(sum_start, buf_start, sample_len_limited, stride);
-            blur_2px_init(sum_end, buf_end, sample_len_limited, -stride);
+            blur_2_bytes_init(sum_start, buf_start, sample_len_limited, stride);
+            blur_2_bytes_init(sum_end, buf_end, sample_len_limited, -stride);
 
             for(y = y_start; y <= y_end; y++) {
-                blur_2px(sum_start, buf_start, intensity);
+                blur_2_bytes(sum_start, buf_start, intensity);
                 buf_start += stride;
             }
 
             for(y = y_start; y <= y_end; y++) {
-                blur_2px(sum_end, buf_end, intensity);
+                blur_2_bytes(sum_end, buf_end, intensity);
                 buf_end -= stride;
             }
         }
@@ -249,6 +183,78 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
  *   STATIC FUNCTIONS
  **********************/
 
+static void blur_3_bytes_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride)
+{
+    uint32_t s;
+
+    sum[0] = 0;
+    sum[1] = 0;
+    sum[2] = 0;
+
+    for(s = 0; s < sample_len; s++) {
+        sum[0] += buf[0];
+        sum[1] += buf[1];
+        sum[2] += buf[2];
+        buf += stride;
+    }
+    sum[0] = (sum[0] << BLUR_MULTIPLIER_BITS) / sample_len;
+    sum[1] = (sum[1] << BLUR_MULTIPLIER_BITS) / sample_len;
+    sum[2] = (sum[2] << BLUR_MULTIPLIER_BITS) / sample_len;
+}
+
+static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride)
+{
+    uint32_t s;
+
+    sum[0] = 0;
+    sum[1] = 0;
+    sum[2] = 0;
+    for(s = 0; s < sample_len; s++) {
+        sum[0] += buf->red;
+        sum[1] += buf->green;
+        sum[2] += buf->blue;
+        buf += stride;
+    }
+
+    sum[0] = (sum[0] << BLUR_MULTIPLIER_BITS) / sample_len;
+    sum[1] = (sum[1] << BLUR_MULTIPLIER_BITS) / sample_len;
+    sum[2] = (sum[2] << BLUR_MULTIPLIER_BITS) / sample_len;
+}
+
+static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity)
+{
+
+    uint32_t intensity_inv = BLUR_MULTIPLIER_MAX - intensity;
+    sum[0] = ((sum[0] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->red * intensity_inv));
+    buf->red = (sum[0] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
+
+    sum[1] = ((sum[1] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->green * intensity_inv));
+    buf->green = (sum[1] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
+
+    sum[2] = ((sum[2] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf->blue * intensity_inv));
+    buf->blue = (sum[2] + BLUR_MULTIPLIER_MAX / 2) >> BLUR_MULTIPLIER_BITS;
+}
+
+static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity)
+{
+    uint32_t intensity_inv = BLUR_MULTIPLIER_MAX - intensity;
+
+    if(buf[0] != sum[0] >> BLUR_MULTIPLIER_BITS) {
+        sum[0] = ((sum[0] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[0] * intensity_inv));
+        buf[0] = sum[0] >> BLUR_MULTIPLIER_BITS;
+    }
+
+    if(buf[1] != sum[1] >> BLUR_MULTIPLIER_BITS) {
+        sum[1] = ((sum[1] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[1] * intensity_inv));
+        buf[1] = sum[1] >> BLUR_MULTIPLIER_BITS;
+    }
+
+    if(buf[2] != sum[2] >> BLUR_MULTIPLIER_BITS) {
+        sum[2] = ((sum[2] * intensity) >> BLUR_MULTIPLIER_BITS) + ((buf[2] * intensity_inv));
+        buf[2] = sum[2] >> BLUR_MULTIPLIER_BITS;
+    }
+}
+
 /**
  * Get the X or Y point for a rounded edge.
  * If the X coordinates are used Y will be returned and vice versa
@@ -259,7 +265,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
  * @param r         the radius of the corner
  * @return          the X or Y coordinate corresponding to the provided coordinates
  */
-static inline int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r)
+static int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r)
 {
     if(p < p_start + r) p = r - (p - p_start);
     else if(p > p_end - r) p = r - (p_end - p);

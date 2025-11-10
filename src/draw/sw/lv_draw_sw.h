@@ -122,6 +122,15 @@ void lv_draw_sw_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, 
  */
 void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc);
 
+
+/**
+ * Blue an area with SW render
+ * @param t             pointer to a draw task
+ * @param dsc           the draw descriptor
+ * @param coords        the area to blur
+ */
+void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords);
+
 /**
  * Mask out a rectangle with radius from a current layer
  * @param t             pointer to a draw task
