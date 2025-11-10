@@ -1,8 +1,8 @@
 .. _editor_integration_renesas:
 
-===================================
-Integrations with Renesas Dev Tools
-===================================
+=======
+Renesas
+=======
 
 e2 Studio
 *********
@@ -63,6 +63,10 @@ Lastly, use the LVGL Editor's export code functionality to generate C code, whic
 Loading the UI
 **************
 
+Both the e2 studio and VSCode plugins help create a new UI project integrated with the Renesas project; however, it's the user's responsibility to initialize the UI and create the screens.
+
+In practice you need to call these functions:
+
 .. code-block:: c
 
     /* Standard LVGL initialization */
@@ -72,6 +76,8 @@ Loading the UI
 
     /* Initialize the UI generated from the LVGL Editor */
     ui_init();
+    
     /* (replace "my_screen" with the actual name of your main screen) */
     lv_obj_t * my_screen = my_screen_create();
     lv_screen_load(my_screen);
+
