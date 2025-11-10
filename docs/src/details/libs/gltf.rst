@@ -110,7 +110,7 @@ The glTF extension relies on **OpenGL ES 2.0** with some extension support for 3
 
 The renderer uses OpenGL ES 3.0 shaders (GLSL version 300 es) to provide modern PBR (Physically Based Rendering) capabilities.
 
-The full list of extensions required can be found `here <https://gen.glad.sh/#generator=c&api=egl%3D1.5%2Cgles2%3D2.0&profile=gl%3Dcompatibility%2Cgles1%3Dcommon&extensions=EGL_EXT_image_dma_buf_import%2CEGL_EXT_image_dma_buf_import_modifiers%2CEGL_EXT_platform_base%2CEGL_EXT_platform_wayland%2CEGL_KHR_fence_sync%2CEGL_KHR_image_base%2CEGL_KHR_platform_gbm%2CEGL_KHR_platform_wayland%2CGL_APPLE_texture_max_level%2CGL_ARM_rgba8%2CGL_EXT_color_buffer_float%2CGL_EXT_color_buffer_half_float%2CGL_EXT_texture_format_BGRA8888%2CGL_EXT_texture_storage%2CGL_EXT_unpack_subimage%2CGL_OES_depth24%2CGL_OES_mapbuffer%2CGL_OES_rgb8_rgba8%2CGL_OES_texture_float%2CGL_OES_texture_half_float%2CGL_OES_texture_storage_multisample_2d_array%2CGL_OES_vertex_array_object&options=ALIAS>`_.
+The full list of extensions required can be found `here <https://gen.glad.sh/#generator=c&api=egl%3D1.5%2Cgles2%3D2.0&profile=gl%3Dcompatibility%2Cgles1%3Dcommon&extensions=EGL_EXT_image_dma_buf_import%2CEGL_EXT_image_dma_buf_import_modifiers%2CEGL_EXT_platform_base%2CEGL_EXT_platform_wayland%2CEGL_KHR_fence_sync%2CEGL_KHR_image_base%2CEGL_KHR_platform_gbm%2CEGL_KHR_platform_wayland%2CGL_APPLE_texture_max_level%2CGL_ARM_rgba8%2CGL_EXT_color_buffer_float%2CGL_EXT_color_buffer_half_float%2CGL_EXT_texture_format_BGRA8888%2CGL_EXT_texture_storage%2CGL_EXT_unpack_subimage%2CGL_OES_depth24%2CGL_OES_mapbuffer%2CGL_OES_rgb8_rgba8%2CGL_OES_texture_float%2CGL_OES_texture_half_float%2CGL_OES_texture_storage_multisample_2d_array%2CGL_OES_vertex_array_object&options=ALIAS>`__.
 
 
 Dependencies
@@ -329,7 +329,7 @@ IBL captures the entire lighting environment in an image, producing natural-look
 - **Subtle lighting effects** like under-lighting and color variation based on viewing angle
 - **Visual cohesiveness** that makes models appear naturally placed in their environment
 
-For example, using an HDR image of a forest will make your 3D model appear to be sitting in a forest.
+For example, using an High-Dynamic-Range (HDR) image of a forest will make your 3D model appear to be sitting in a forest.
 
 Default Behavior
 ~~~~~~~~~~~~~~~~
@@ -406,7 +406,7 @@ The processing cost is paid once during environment creation.
 Performance Notes
 ~~~~~~~~~~~~~~~~~
 
-- Environment creation processes the source image into cube map data, which may take time with larger resolution values
+- Environment creation processes the source image into cube map data, which takes more time with larger resolution values
 - Processing time increases with both source image resolution and cube map resolution
 
 
