@@ -617,42 +617,37 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     lv_draw_buf_invalidate_cache(ddata->rotate_buffer.lv_draw_buf, NULL);
 #endif
 
-    const bool force_full_flush = LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT &&
-                                  rotation != LV_DISPLAY_ROTATION_0;
     struct wl_surface * surface = lv_wayland_get_window_surface(disp);
     /* Mark surface damage */
-    if(!force_full_flush) {
-        wl_surface_damage(surface, area->x1, area->y1, src_width, src_height);
-    }
+    wl_surface_damage(surface, area->x1, area->y1, src_width, src_height);
 
-    if(lv_display_flush_is_last(disp)) {
-        if(force_full_flush) {
-            wl_surface_damage(surface, 0, 0,
-                              lv_display_get_original_horizontal_resolution(disp),
-                              lv_display_get_original_vertical_resolution(disp));
-        }
-#if LV_USE_ROTATE_G2D
-        g2d_rotate(ddata->rotate_buffer.lv_draw_buf, buf->lv_draw_buf,
-                   lv_display_get_original_horizontal_resolution(disp),
-                   lv_display_get_original_vertical_resolution(disp),
-                   lv_display_get_rotation(disp),
-                   lv_display_get_color_format(disp));
-#endif
-        /* Finally, attach buffer and commit to surface */
-        struct wl_callback * cb = wl_surface_frame(surface);
-        wl_callback_add_listener(cb, &frame_listener, disp);
-
-        wl_surface_attach(surface, buf->wl_buffer, 0, 0);
-        wl_surface_commit(surface);
-
-        buf->busy = true;
-    }
-    else {
-        /* Not the last frame yet, so tell lvgl to keep going
-         * For the last frame, we wait for the compositor instead */
+    if(!lv_display_flush_is_last(disp)) {
         lv_display_flush_ready(disp);
+        return;
     }
 
+    /*Rerender the whole surface if we're using rotation*/
+    if(rotation != LV_DISPLAY_ROTATION_0) {
+        wl_surface_damage(surface, 0, 0,
+                          lv_display_get_original_horizontal_resolution(disp),
+                          lv_display_get_original_vertical_resolution(disp));
+    }
+
+#if LV_USE_ROTATE_G2D
+    g2d_rotate(ddata->rotate_buffer.lv_draw_buf, buf->lv_draw_buf,
+               lv_display_get_original_horizontal_resolution(disp),
+               lv_display_get_original_vertical_resolution(disp),
+               lv_display_get_rotation(disp),
+               lv_display_get_color_format(disp));
+#endif
+    /* Finally, attach buffer and commit to surface */
+    struct wl_callback * cb = wl_surface_frame(surface);
+    wl_callback_add_listener(cb, &frame_listener, disp);
+
+    wl_surface_attach(surface, buf->wl_buffer, 0, 0);
+    wl_surface_commit(surface);
+
+    buf->busy = true;
     LV_LOG_USER("Flush done");
     return;
 }
