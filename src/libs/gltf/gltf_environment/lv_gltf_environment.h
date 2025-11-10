@@ -36,29 +36,30 @@ extern "C" {
 
 /**
  * Create an IBL sampler for processing environment images
- * @return pointer to the created sampler, or NULL on failure
- * @note Can be safely deleted after environments are created
+ * @return  pointer to the created sampler, or NULL on failure
+ * @note    Can be safely deleted after environments are created
  */
 lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void);
 
 /**
  * Set the resolution for each cubemap face
- * @param pointer to a sampler
- * @param resolution of each cube map face (recommended: 64-512 for embedded)
+ * @param   pointer to a sampler
+ * @param   resolution of each cube map face (recommended: 64-512 for embedded)
  */
 void lv_gltf_ibl_sampler_set_cube_map_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution);
 
 /**
  * Delete an IBL sampler
- * @param sampler pointer to the sampler to delete
+ * @param   sampler pointer to the sampler to delete
  */
 void lv_gltf_ibl_sampler_delete(lv_gltf_ibl_sampler_t * sampler);
 
 /**
  * Create an environment from an HDR or JPEG panoramic image for IBL rendering
- * @param sampler IBL sampler defining output resolution (can be deleted after this call)
- * @param file_path path to equirectangular environment image, or NULL to use default embedded image
- * @return pointer to the created environment, or NULL on failure
+ * @param   sampler IBL sampler defining output resolution (can be deleted after this call)
+ * @param   file_path path to equirectangular environment image, or NULL to use default embedded image
+ * @return  pointer to the created environment, or NULL on failure
+ *
  * @note The source image will be downsampled to the sampler's texture_size
  * @note The environment can be shared across multiple glTF objects
  */
@@ -66,8 +67,8 @@ lv_gltf_environment_t * lv_gltf_environment_create(lv_gltf_ibl_sampler_t * sampl
 
 /**
  * Set the rotation angle of the environment map
- * @param env pointer to the environment
- * @param angle rotation angle in degrees
+ * @param   env pointer to the environment
+ * @param   angle rotation angle in degrees
  */
 void lv_gltf_environment_set_angle(lv_gltf_environment_t * env, float angle);
 
