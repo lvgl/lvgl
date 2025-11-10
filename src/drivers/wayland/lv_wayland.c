@@ -14,17 +14,6 @@
     #error[wayland] Unsupported LV_COLOR_DEPTH
 #endif
 
-/* v9.4 got released with this combination of settings. Allow this until v9.5 is released*/
-#if LV_WAYLAND_BUF_COUNT == 3
-    #if LV_USE_ROTATE_G2D
-        #warning LV_WAYLAND_BUF_COUNT == 3 is deprecated. Use LV_WAYLAND_BUF_COUNT 2.
-    #else
-        #error Invalid LV_WAYLAND_BUF_COUNT. Max is 2
-    #endif
-#elif LV_WAYLAND_BUF_COUNT > 2 || LV_WAYLAND_BUF_COUNT < 0
-    #error Invalid LV_WAYLAND_BUF_COUNT. Value should be between 1 and 2.
-#endif
-
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     #if LV_WAYLAND_WINDOW_DECORATIONS == 1
         #warning LV_WAYLAND_WINDOW_DECORATIONS has been removed for v9.5. \

@@ -3987,24 +3987,6 @@
     #endif
 #endif
 #if LV_USE_WAYLAND
-    #ifndef LV_WAYLAND_BUF_COUNT
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_WAYLAND_BUF_COUNT
-                #define LV_WAYLAND_BUF_COUNT CONFIG_LV_WAYLAND_BUF_COUNT
-            #else
-                #define LV_WAYLAND_BUF_COUNT 0
-            #endif
-        #else
-            #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
-        #endif
-    #endif
-    #ifndef LV_WAYLAND_RENDER_MODE
-        #ifdef CONFIG_LV_WAYLAND_RENDER_MODE
-            #define LV_WAYLAND_RENDER_MODE CONFIG_LV_WAYLAND_RENDER_MODE
-        #else
-            #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_DIRECT
-        #endif
-    #endif
     #ifndef LV_WAYLAND_DIRECT_EXIT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_WAYLAND_DIRECT_EXIT

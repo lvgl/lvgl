@@ -30,11 +30,7 @@
  *      DEFINES
  *********************/
 
-/* v9.4 got released with this combination of settings. Allow this until v9.5 is released*/
-#if LV_WAYLAND_BUF_COUNT == 3
-    #undef LV_WAYLAND_BUF_COUNT
-    #define LV_WAYLAND_BUF_COUNT 2
-#endif
+#define LV_WL_G2D_BUF_COUNT 2
 
 /**********************
  *      TYPEDEFS
@@ -50,7 +46,7 @@ typedef struct {
 } lv_wl_buffer_t;
 
 typedef struct {
-    lv_wl_buffer_t buffers[LV_WAYLAND_BUF_COUNT];
+    lv_wl_buffer_t buffers[LV_WL_G2D_BUF_COUNT];
 #if LV_USE_ROTATE_G2D
     lv_wl_buffer_t rotate_buffer;
 #endif
@@ -279,7 +275,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
     }
 
     ddata->drm_cf = lv_cf_to_drm_cf(cf);
-    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+    for(size_t i = 0; i < LV_WL_G2D_BUF_COUNT; i++) {
         init_buffer(ctx, &ddata->buffers[i], width, height, cf);
     }
 
@@ -297,7 +293,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
 
     wl_display_flush(lv_wl_ctx.wl_display);
     wl_display_roundtrip(lv_wl_ctx.wl_display);
-    for(size_t i = 0; i < LV_WAYLAND_BUF_COUNT; ++i) {
+    for(size_t i = 0; i < LV_WL_G2D_BUF_COUNT; ++i) {
         if(!ddata->buffers[i].wl_buffer) {
             LV_LOG_ERROR("DMABUF creation failed");
             return NULL;
@@ -319,7 +315,7 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
 
 static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata)
 {
-    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+    for(int i = 0; i < LV_WL_G2D_BUF_COUNT; i++) {
         delete_buffer(ddata->buffers + i);
     }
 
@@ -342,12 +338,7 @@ static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, i
 
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
-    lv_display_render_mode_t render_mode = LV_WAYLAND_RENDER_MODE;
-    if(LV_WAYLAND_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_LOG_WARN("Partial render mode is not supported by G2D. Using DIRECT instead");
-        render_mode = LV_DISPLAY_RENDER_MODE_DIRECT;
-    }
-    lv_display_set_render_mode(display, render_mode);
+    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
     return ddata;
 }
 
@@ -590,22 +581,12 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
 static lv_wl_buffer_t * get_next_buffer(lv_wl_g2d_display_data_t * ddata)
 {
     lv_wl_buffer_t * ret =  &ddata->buffers[ddata->last_used];
-    ddata->last_used = (ddata->last_used + 1) % (LV_WAYLAND_BUF_COUNT);
+    if(ret->busy) {
+        /* In theory this should never happen, log a warning in case it does */
+        LV_LOG_WARN("Failed to acquire a non-busy buffer");
+    }
+    ddata->last_used = (ddata->last_used + 1) % (LV_WL_G2D_BUF_COUNT);
     return ret;
-}
-
-static void set_display_buffers(lv_display_t * display, lv_wl_g2d_display_data_t * ddata)
-{
-#if LV_USE_ROTATE_G2D
-    lv_display_set_draw_buffers(display, ddata->rotate_buffer.lv_draw_buf, NULL);
-    return;
-#endif
-    if(LV_WAYLAND_BUF_COUNT == 2) {
-        lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, ddata->buffers[1].lv_draw_buf);
-    }
-    else if(LV_WAYLAND_BUF_COUNT == 1) {
-        lv_display_set_draw_buffers(display, ddata->buffers[0].lv_draw_buf, NULL);
-    }
 }
 
 static void flush_wait_cb(lv_display_t * disp)
