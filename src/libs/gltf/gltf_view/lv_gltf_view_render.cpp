@@ -1216,18 +1216,16 @@ static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color,
     GL_CALL(glClearDepthf(1.0f));
     GL_CALL(glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
                          (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f));
-#if LV_GLTF_USE_COLORMASKED_CLEAR_FILL
-    if(bg_opa == LV_OPA_0) {
+
+    if(LV_GLTF_USE_COLORMASKED_CLEAR_FILL && (bg_opa == LV_OPA_0)) {
         GL_CALL(glColorMask(false, false, false, true));
-#endif
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-#if LV_GLTF_USE_COLORMASKED_CLEAR_FILL
         GL_CALL(glColorMask(true, true, true, true));
     }
     else {
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
-#endif
+
 }
 
 static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)

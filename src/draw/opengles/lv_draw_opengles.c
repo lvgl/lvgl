@@ -570,7 +570,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
             }
 
-            if(fill_dsc->opa == LV_OPA_100) {
+            if(fill_dsc->opa >= LV_OPA_MAX) {
                 float tex_w = (float)lv_area_get_width(&fill_area);
                 float tex_h = (float)lv_area_get_height(&fill_area);
                 glEnable(GL_SCISSOR_TEST);
