@@ -324,12 +324,12 @@ void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
 
-    draw_dsc->intensity = backdrop ? lv_obj_get_style_backdrop_blur_intensity(obj, part) :
-                          lv_obj_get_style_blur_intensity(obj, part);
+    draw_dsc->blur_radius = backdrop ? lv_obj_get_style_backdrop_blur_radius(obj, part) :
+                            lv_obj_get_style_blur_radius(obj, part);
 
     /*Radius might be set earlier as it's already known*/
-    if(draw_dsc->radius == 0) {
-        draw_dsc->radius = lv_obj_get_style_radius(obj, part);
+    if(draw_dsc->corner_radius == 0) {
+        draw_dsc->corner_radius = lv_obj_get_style_radius(obj, part);
     }
 
     LV_PROFILER_DRAW_END;

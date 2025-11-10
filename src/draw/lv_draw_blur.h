@@ -30,14 +30,14 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     /**
-     * The intensity of blur. Typically means the blur radius.
+     * The intensity of blur.
      */
-    int32_t intensity;
+    int32_t blur_radius;
 
     /**
      * The corner radius of the blurred area
      */
-    int32_t radius;
+    int32_t corner_radius;
 
 } lv_draw_blur_dsc_t;
 
