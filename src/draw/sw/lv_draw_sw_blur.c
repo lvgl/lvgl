@@ -60,8 +60,20 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
     if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) return;
     lv_area_move(&clipped_coords, -t->target_layer->buf_area.x1, -t->target_layer->buf_area.y1);
 
-    uint32_t intensity = (BLUR_MULTIPLIER_MAX * dsc->blur_radius) / (dsc->blur_radius + 4);
-    int32_t sample_len = LV_MAX(dsc->blur_radius / 2, 1);
+    uint32_t blur_radius = dsc->blur_radius;
+    uint32_t skip_cnt = 1;
+    if(blur_radius >= 48) {
+        skip_cnt = 5;
+        blur_radius = blur_radius / 4;
+    }
+    else if(blur_radius >= 8) {
+        skip_cnt = 2;
+        blur_radius = blur_radius / 2;
+    }
+
+    uint32_t intensity = (BLUR_MULTIPLIER_MAX * blur_radius) / (blur_radius + 4);
+
+    int32_t sample_len = LV_MAX(blur_radius / 2, 1);
     int32_t radius = dsc->corner_radius;
     int32_t w = lv_area_get_width(coords);
     int32_t h = lv_area_get_height(coords);
@@ -82,13 +94,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
     int32_t y;
     int32_t x;
 
-    for(y = clipped_coords.y1; y <= clipped_coords.y2; y++) {
+    for(y = clipped_coords.y1; y <= clipped_coords.y2 - skip_cnt; y += skip_cnt) {
         int32_t cir_x = get_rounded_edge_point(coords->y1, coords->y2, y, radius);
         int32_t x_start = coords->x1 + cir_x;
         int32_t x_end = coords->x2 - cir_x;
 
         x_start = LV_CLAMP(clipped_coords.x1, x_start, clipped_coords.x2);
-        x_end = LV_CLAMP(clipped_coords.x1, x_end, clipped_coords.x2);
+        x_end = LV_CLAMP(clipped_coords.x1, x_end, clipped_coords.x2 - skip_cnt);
         if(x_start > x_end) continue;
 
         uint32_t sample_len_limited = LV_MIN(x_end - x_start + 1, sample_len);
@@ -99,16 +111,17 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
             blur_3_bytes_init(sum_start, buf_start, sample_len_limited, px_size);
             blur_3_bytes_init(sum_end, buf_end, sample_len_limited, -px_size);
-
-            for(x = x_start; x <= x_end; x++) {
+            buf_start += px_size * skip_cnt;
+            for(x = x_start + skip_cnt; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum_start, buf_start, intensity);
-                buf_start += px_size;
+                buf_start += px_size * skip_cnt;
             }
 
-            for(x = x_start; x <= x_end; x++) {
+            for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum_end, buf_end, intensity);
-                buf_end -= px_size;
+                buf_end -= px_size * skip_cnt;
             }
+
         }
         else if(px_size == 2) {
             lv_color16_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
@@ -130,13 +143,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
     }
 
 
-    for(x = clipped_coords.x1; x <= clipped_coords.x2; x++) {
+    for(x = clipped_coords.x1; x <= clipped_coords.x2 - skip_cnt; x += skip_cnt) {
         int32_t cir_y = get_rounded_edge_point(coords->x1, coords->x2, x, radius);
         int32_t y_start = coords->y1 + cir_y;
         int32_t y_end = coords->y2 - cir_y;
 
         y_start = LV_CLAMP(clipped_coords.y1, y_start, clipped_coords.y2);
-        y_end = LV_CLAMP(clipped_coords.y1, y_end, clipped_coords.y2);
+        y_end = LV_CLAMP(clipped_coords.y1, y_end, clipped_coords.y2 - skip_cnt);
         if(y_start > y_end) continue;
 
         uint32_t sample_len_limited = LV_MIN(y_end - y_start + 1, sample_len);
@@ -147,14 +160,30 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             blur_3_bytes_init(sum_start, buf_start, sample_len_limited, stride);
             blur_3_bytes_init(sum_end, buf_end, sample_len_limited, -stride);
 
-            for(y = y_start; y <= y_end; y++) {
+            for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum_start, buf_start, intensity);
-                buf_start += stride;
+                buf_start += stride * skip_cnt;
             }
 
-            for(y = y_start; y <= y_end; y++) {
+            for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum_end, buf_end, intensity);
-                buf_end -= stride;
+                buf_end -= stride * skip_cnt;
+            }
+
+            if(skip_cnt > 1) {
+                buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+                for(y = y_start; y <= y_end; y += skip_cnt) {
+                    buf_start[px_size + 0] = buf_start[0];
+                    buf_start[px_size + 1] = buf_start[1];
+                    buf_start[px_size + 2] = buf_start[2];
+                    buf_start[stride + 0] = buf_start[0];
+                    buf_start[stride + 1] = buf_start[1];
+                    buf_start[stride + 2] = buf_start[2];
+                    buf_start[stride + px_size + 0] = buf_start[0];
+                    buf_start[stride + px_size + 1] = buf_start[1];
+                    buf_start[stride + px_size + 2] = buf_start[2];
+                    buf_start += stride * skip_cnt;
+                }
             }
         }
         else if(px_size == 2) {
@@ -175,6 +204,43 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
         }
     }
+
+    //    for(y = clipped_coords.y1; y < clipped_coords.y2; y+=2) {
+    //
+    //      int32_t cir_x = get_rounded_edge_point(coords->y1, coords->y2, y, radius);
+    //      int32_t x_start = coords->x1 + cir_x;
+    //      int32_t x_end = coords->x2 - cir_x;
+    //      x_start = LV_CLAMP(clipped_coords.x1, x_start, clipped_coords.x2);
+    //      x_end = LV_CLAMP(clipped_coords.x1, x_end, clipped_coords.x2 & ~0x1);
+    //      if(x_start > x_end) continue;
+    //
+    //      uint8_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y);
+    //      for(x = clipped_coords.x1; x < clipped_coords.x2; x+=2) {
+    //            buf_start[px_size + 0] = buf_start[0];
+    //            buf_start[stride + 0] = buf_start[2 * stride * 2];
+    //            buf_start[stride + 2 * px_size + 0] = buf_start[0];
+    //
+
+
+    //              for(y = y_start + 1; y < y_end; y+=2) {
+    //                  uint8_t * prev_px = buf_start - stride;
+    //                  buf_start[0] = (prev_px[0] + buf_start[0 + stride]) / 2;
+    //                  buf_start[1] = (prev_px[1] + buf_start[1 + stride]) / 2;
+    //                  buf_start[2] = (prev_px[2] + buf_start[2 + stride]) / 2;
+    //                  buf_start[px_size + 0] = buf_start[0];
+    //                  buf_start[px_size + 1] = buf_start[1];
+    //                  buf_start[px_size + 2] = buf_start[2];
+    //                  buf_start += stride*2;
+    //              }
+    //
+    //              buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start + 1, y);
+    //              for(x = x_start + 1; x < x_end; x+=2) {
+    //                  uint8_t * prev_px = buf_start - px_size;
+    //                  buf_start[0] = (prev_px[0] + buf_start[0 + px_size]) / 2;
+    //                  buf_start[1] = (prev_px[1] + buf_start[1 + px_size]) / 2;
+    //                  buf_start[2] = (prev_px[2] + buf_start[2 + px_size]) / 2;
+    //                  buf_start += px_size*2;
+    //              }
 
     LV_PROFILER_DRAW_END;
 }
