@@ -89,6 +89,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
                                                uint32_t texture_w,
                                                uint32_t texture_h, bool prepare_bg);
 static void setup_draw_environment_background(lv_opengl_shader_manager_t * manager, lv_gltf_t * viewer, float blur);
+static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa);
 static void setup_environment_rotation_matrix(float env_rotation_angle, uint32_t shader_program);
 
 /**********************
@@ -768,12 +769,8 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
-        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
-        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
-
-        GL_CALL(glClearDepthf(1.0f));
-        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN),
+                                    lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN));
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
@@ -1115,11 +1112,8 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
-        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
-        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
-        GL_CALL(glClearDepthf(1.0f));
-        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN),
+                                    lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN));
     }
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
@@ -1154,6 +1148,21 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 
     GL_CALL(glBindVertexArray(0));
     return;
+}
+static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
+{
+    if(bg_opa == LV_OPA_0) {
+        glColorMask(false, false, false, true);
+        glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
+                     (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f);
+        glColorMask(true, true, true, true);
+    }
+    else {
+        glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
+                     (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f);
+    }
+    glClearDepthf(1.0f);
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
 {
