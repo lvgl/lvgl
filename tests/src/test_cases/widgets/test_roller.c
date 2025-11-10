@@ -297,6 +297,7 @@ void test_roller_transformed_click(void)
 
     lv_obj_t * click_dot = lv_obj_create(active_screen);
     lv_obj_add_flag(click_dot, LV_OBJ_FLAG_FLOATING);
+    lv_obj_remove_flag(click_dot, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_size(click_dot, 10, 10);
     lv_obj_set_style_border_width(click_dot, 0, 0);
     lv_obj_set_style_radius(click_dot, LV_RADIUS_CIRCLE, 0);
