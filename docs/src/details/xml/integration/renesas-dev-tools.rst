@@ -31,12 +31,12 @@ NOTE: the path to the Editor executable is stored in the workspace folder in a f
 Usage
 -----
 
-The LVGL Editor plugin will attempt to determine the currently active project in the IDE.  It pick the first project that:
+The LVGL Editor plugin will attempt to determine the currently active project in the IDE.  It picks the first project that:
 
 1. Contains a Renesas `configuration.xml` file in its root folder. Or
 2. Pick the project to which the currently active file (in the code editor) belongs.
 
-Upon first launching the LVGL Editor for a project, it will create a `ui` sub-folder for the LVGL project. Some of the LVGL configuration (such as target screen resolution) will be automatically derived from the Renesas `configuration.xml`. Subsequently launching the LVGL Editor, after the `ui` project has been creating, will trigger it to re-scan the Renesas `configuration.xml`. If any of the LVGL-related config has changed, the LVGL Editor will ask if the user wishes to update the `ui` project configuration accordingly.
+Upon first launching the LVGL Editor for a project, it will create a `ui` sub-folder for the LVGL project. Some of the LVGL configuration (such as target screen resolution) will be automatically derived from the Renesas `configuration.xml`. Subsequently launching the LVGL Editor, after the `ui` project has been created, will trigger it to re-scan the Renesas `configuration.xml`. If any of the LVGL-related config has changed, the LVGL Editor will ask if the user wishes to update the `ui` project configuration accordingly.
 
 Once the LVGL Editor is open, you can create and edit LVGL XML files as usual. Use the Editor's export code functionality to generate C code, which E2Studio will automatically detect and include in its build.
 
@@ -54,8 +54,24 @@ Usage
 
 The VS Code Renesas integration behaves very similarly to the e2 Studio plugin described above. To use it, add a Renesas project folder (with a `configuration.xml` file) to your workspace. Then, use the command palette to run "LVGL: Create from Renesas Project". The LVGL Editor VS Code extension will create a `ui` sub-folder for the LVGL project and derive configuration from the Renesas `configuration.xml` file.
 
-You may then open the LVGL Editor in VS Code by using the command palette to run "LVGL: Open Editor".
+You may then open the LVGL project by using the command palette to run "LVGL: Open Editor".
 
 As with the e2 Studio plugin, opening the LVGL Editor extension will trigger it to re-scan the Renesas `configuration.xml` file and prompt to update the LVGL project configuration if any relevant settings have changed.
 
 Lastly, use the LVGL Editor's export code functionality to generate C code, which the Renesas extension will automatically detect and include in its build.
+
+Loading the UI
+**************
+
+.. code-block:: c
+
+    /* Standard LVGL initialization */
+    lv_init();
+    lv_port_disp_init();
+    lv_port_indev_init();
+
+    /* Initialize the UI generated from the LVGL Editor */
+    ui_init();
+    /* (replace "my_screen" with the actual name of your main screen) */
+    lv_obj_t * my_screen = my_screen_create();
+    lv_screen_load(my_screen);
