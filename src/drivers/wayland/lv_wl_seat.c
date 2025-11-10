@@ -74,11 +74,6 @@ void lv_wayland_seat_deinit(lv_wl_seat_t * seat)
     wl_seat_destroy(seat->wl_seat);
 }
 
-const struct wl_seat_listener * lv_wayland_seat_get_listener(void)
-{
-    return &seat_listener;
-}
-
 void lv_wayland_update_indevs(lv_indev_read_cb_t read_cb, void * new_driver_data)
 {
     lv_indev_t * indev = NULL;
