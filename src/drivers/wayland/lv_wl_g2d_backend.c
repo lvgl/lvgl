@@ -66,14 +66,14 @@ typedef struct {
  **********************/
 
 static void * wl_g2d_init(void);
-static void wl_g2d_deinit(void * backend_data);
-static void wl_g2d_global_handler(void * backend_data, struct wl_registry * registry, uint32_t name,
+static void wl_g2d_deinit(void * backend_ctx);
+static void wl_g2d_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
                                   const char * interface, uint32_t version);
 
 
-static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, int32_t width, int32_t height);
-static void * wl_g2d_resize_display(void * backend_data, lv_display_t * display);
-static void wl_g2d_deinit_display(void * backend_data, lv_display_t * display);
+static void * wl_g2d_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height);
+static void * wl_g2d_resize_display(void * backend_ctx, lv_display_t * display);
+static void wl_g2d_deinit_display(void * backend_ctx, lv_display_t * display);
 
 static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * ctx, lv_display_t * display,
                                                              int32_t width, int32_t height);
@@ -182,9 +182,9 @@ static void * wl_g2d_init(void)
     return &ctx;
 }
 
-static void wl_g2d_deinit(void * backend_data)
+static void wl_g2d_deinit(void * backend_ctx)
 {
-    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
+    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
     if(!ctx) {
         return;
     }
@@ -194,12 +194,12 @@ static void wl_g2d_deinit(void * backend_data)
 }
 
 
-static void wl_g2d_global_handler(void * backend_data, struct wl_registry * registry, uint32_t name,
+static void wl_g2d_global_handler(void * backend_ctx, struct wl_registry * registry, uint32_t name,
                                   const char * interface, uint32_t version)
 {
 
     LV_UNUSED(version);
-    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
+    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
 
     if(lv_streq(interface, zwp_linux_dmabuf_v1_interface.name)) {
         ctx->handler = wl_registry_bind(registry, name, &zwp_linux_dmabuf_v1_interface, version);
@@ -327,10 +327,10 @@ static void wl_g2d_delete_display_data(lv_wl_g2d_display_data_t * ddata)
     lv_free(ddata);
 }
 
-static void * wl_g2d_init_display(void * backend_data, lv_display_t * display, int32_t width, int32_t height)
+static void * wl_g2d_init_display(void * backend_ctx, lv_display_t * display, int32_t width, int32_t height)
 {
 
-    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
+    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
     lv_wl_g2d_display_data_t * ddata = wl_g2d_create_display_data(ctx, display, width, height);
     if(!ddata) {
         LV_LOG_ERROR("Failed to create display data");
@@ -407,10 +407,10 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
     LV_LOG_ERROR("Failed to create dmabuf buffer\n");
 }
 
-static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
+static void * wl_g2d_resize_display(void * backend_ctx, lv_display_t * disp)
 {
     LV_LOG_USER("Resize display");
-    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_data;
+    lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
     int32_t width = lv_display_get_original_horizontal_resolution(disp);
     int32_t height = lv_display_get_original_vertical_resolution(disp);
 
@@ -427,9 +427,9 @@ static void * wl_g2d_resize_display(void * backend_data, lv_display_t * disp)
     return ddata;
 }
 
-static void wl_g2d_deinit_display(void * backend_data, lv_display_t * display)
+static void wl_g2d_deinit_display(void * backend_ctx, lv_display_t * display)
 {
-    LV_UNUSED(backend_data);
+    LV_UNUSED(backend_ctx);
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
     if(!ddata) {
         return;
