@@ -128,7 +128,7 @@ Now edit the Dockerfile. Copy-paste the block below into the file:
     
     RUN apt-get -y update && apt-get clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*
     
-    # Copy the lvglsim executable compiled in the build step to the $APP_ROOT directory
+    # Copy the lvglsim executable compiled in the build step to the /usr/lvgl_widgets directory
     # path inside the container
     COPY --from=build /app/build/bin/lvglsim /usr/lvgl_widgets
     
@@ -163,7 +163,7 @@ Upon completion, ensure that the image is listed by Docker:
     lvgl_app                  latest    2967a34a9e74   2 minutes ago    118MB
 
 
-Alongside the image name, you'll also find its ID. This will be useful for later.
+Alongside the image name, you'll also find its ID (``2967a34a9e74`` in this example). This will be useful for later.
 
 Deploying the container image to the device
 -------------------------------------------
