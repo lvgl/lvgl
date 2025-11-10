@@ -85,6 +85,12 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
  */
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
 
+/**
+ * Minizes the window
+ * @param disp Reference to the LVGL display associated to the window
+ */
+void lv_wayland_window_set_minimized(lv_display_t * disp);
+
 /**********************
  *      MACROS
  **********************/
