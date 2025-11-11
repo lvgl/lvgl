@@ -195,7 +195,6 @@ def main() -> int:
         print(f"Current working directory: {root}")
 
         covered, total, uncovered = check_commit_coverage(args.commit, root)
-        title = f" Coverage analysis results for {args.commit} "
 
         # Print results with better formatting
         title = f" Coverage analysis results for commit {args.commit} "
@@ -220,10 +219,12 @@ def main() -> int:
             for filename, lineno in sorted(uncovered):
                 print(f"  {filename}:{lineno}")
 
+            # `fail-under=0` means ignoring uncovered code and always returning success.
             if args.fail_under is not None and args.fail_under == 0:
                 print("Ignore uncovered lines due to --fail-under=0 setting, skipped.")
                 return 0
 
+            # Return failure if uncovered lines are found
             return 1
         else:
             print("\n✓ All new code is covered!")
@@ -238,7 +239,7 @@ def main() -> int:
         return e.returncode if e.returncode is not None else 64
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
-        return 1
+        return 2
 
 
 if __name__ == "__main__":
