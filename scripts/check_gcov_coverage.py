@@ -77,7 +77,7 @@ def get_coverage_data(root: str) -> Tuple[Dict[str, Dict[int, int]], str]:
     Returns: ({file_path: {line_number: execution_count}}, filter_pattern)
     Raises: subprocess.CalledProcessError if gcovr fails
     """
-    filter_pattern = os.path.join(root, "src/.*/lv_.*\\.c")
+    filter_pattern = os.path.join(root, r"src/(?:.*/)?lv_.*\.c")
     cmd = [
         "gcovr",
         "--gcov-ignore-parse-errors",
