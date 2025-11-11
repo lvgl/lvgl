@@ -18,11 +18,11 @@ The plugin adds an LVGL Editor button to the toolbar, which launches the LVGL Ed
 
 .. figure:: /_static/images/renesas/e2studio_toolbar_with_editor_plugin.png
     :align: center
-    :alt: |lvglpro| e2 Studio Toolbar with LVGL Editor Plugin
+    :alt: e2 Studio Toolbar with LVGL Editor Plugin
 
     ..
 
-    |lvglpro| e2 Studio Toolbar with LVGL Editor Plugin
+    e2 Studio Toolbar with LVGL Editor Plugin
 
 This will automatically open the Editor (if installed to the `/Applications` folder) <u>on MacOS</u>. On Linux and Windows, it will ask the user to browse for the install location of the Editor. Pick the Editor executable when prompted.
 
@@ -76,7 +76,7 @@ In practice you need to call these functions:
 
     /* Initialize the UI generated from the LVGL Editor */
     ui_init();
-    
+
     /* (replace "my_screen" with the actual name of your main screen) */
     lv_obj_t * my_screen = my_screen_create();
     lv_screen_load(my_screen);
