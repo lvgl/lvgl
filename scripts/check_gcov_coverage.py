@@ -14,13 +14,13 @@ from typing import Dict, Set, Tuple, List
 def create_argument_parser() -> argparse.ArgumentParser:
     """Create argument parser"""
     parser = argparse.ArgumentParser(
-        description="Check gcov coverage for new code in a git commit",
+        description="Check gcov coverage for new code in a git commit or PR",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
         "--commit",
-        help="Git commit hash or reference (e.g. HEAD, HEAD~1)",
+        help="Git commit hash, reference (e.g. HEAD, HEAD~1) or PR range (base...head)",
         default="HEAD",
     )
 
@@ -126,19 +126,37 @@ def check_commit_coverage(
     commit: str, root: str
 ) -> Tuple[int, int, List[Tuple[str, int]]]:
     """
-    Check coverage for a commit
+    Check coverage for a commit or PR range
     Returns: (covered_lines, total_new_lines, uncovered_lines)
     """
-    print(f"Analyzing commit '{commit}'...")
-
-    changed_lines = get_changed_lines(commit, root)
-    print(f"Found changes in {len(changed_lines)} files (before filtering)")
+    if "..." in commit:
+        # Handle PR range format (base...head)
+        base, head = commit.split("...")
+        print(f"Analyzing PR commits '{base}...{head}'...")
+        changed_lines = {}
+        # Get changes for each commit in the PR range
+        commits = run_git_command(["rev-list", f"{base}...{head}"], cwd=root).split()
+        print(f"Found {len(commits)} commits in PR range:")
+        for c in commits:
+            print(f"  {c}")
+            cl = get_changed_lines(c, root)
+            for f, lines in cl.items():
+                if f not in changed_lines:
+                    changed_lines[f] = set()
+                changed_lines[f].update(lines)
+    else:
+        # Handle single commit
+        print(f"Analyzing commit '{commit}'...")
+        changed_lines = get_changed_lines(commit, root)
+    print(f"Found changes in {len(changed_lines)} files (before filtering):")
+    for filename, lines in sorted(changed_lines.items()):
+        print(f"  {filename}: {len(lines)} lines changed")
 
     print("Getting coverage data...")
     coverage_data, filter_pattern = get_coverage_data(root)
 
     # Extract the regex pattern from the filter (remove root path)
-    pattern_str = filter_pattern.replace(root + os.path.sep, "")
+    pattern_str = filter_pattern.replace(root, "").lstrip(os.path.sep)
     pattern = re.compile(pattern_str)
 
     filtered_lines = {
@@ -175,7 +193,9 @@ def main() -> int:
         root = os.path.dirname(script_dir)
         os.chdir(root)
         print(f"Current working directory: {root}")
+
         covered, total, uncovered = check_commit_coverage(args.commit, root)
+        title = f" Coverage analysis results for {args.commit} "
 
         # Print results with better formatting
         title = f" Coverage analysis results for commit {args.commit} "
@@ -194,7 +214,6 @@ def main() -> int:
                 print(
                     f"\n✗ Coverage {coverage_percent:.2f}% is below required {args.fail_under}%"
                 )
-                return 2
 
         if uncovered:
             print("\nUncovered lines:")
@@ -202,7 +221,7 @@ def main() -> int:
                 print(f"  {filename}:{lineno}")
 
             if args.fail_under is not None and args.fail_under == 0:
-                print("Ignore uncovered lines due to --fail-under=0 setting.")
+                print("Ignore uncovered lines due to --fail-under=0 setting, skipped.")
                 return 0
 
             return 1
