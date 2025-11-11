@@ -130,25 +130,26 @@ def check_commit_coverage(
     Check coverage for a commit or range
     Returns: (covered_lines, total_new_lines, uncovered_lines)
     """
+
     if "..." in commit:
         # Handle range format (base...head)
         base, head = commit.split("...")
-        print(f"Analyzing commits '{base}...{head}'...")
-        changed_lines = {}
         # Get changes for each commit in the range
         commits = run_git_command(["rev-list", f"{base}...{head}"], cwd=root).split()
-        print(f"Found {len(commits)} commits in range:")
-        for c in commits:
-            print(f"  {c}")
-            cl = get_changed_lines(c, root)
-            for f, lines in cl.items():
-                if f not in changed_lines:
-                    changed_lines[f] = set()
-                changed_lines[f].update(lines)
     else:
         # Handle single commit
-        print(f"Analyzing commit '{commit}'...")
-        changed_lines = get_changed_lines(commit, root)
+        commits = [commit]
+
+    print(f"Found {len(commits)} commits in range:")
+    changed_lines = {}
+    for c in commits:
+        print(f"  {c}")
+        cl = get_changed_lines(c, root)
+        for f, lines in cl.items():
+            if f not in changed_lines:
+                changed_lines[f] = set()
+            changed_lines[f].update(lines)
+
     print(f"Found changes in {len(changed_lines)} files (before filtering):")
     for filename, lines in sorted(changed_lines.items()):
         print(f"  {filename}: {len(lines)} lines changed")
