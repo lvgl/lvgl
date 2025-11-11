@@ -28,6 +28,7 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "--fail-under",
         type=float,
         metavar="PERCENT",
+        default=75,
         help="Fail if coverage is below this percentage (0-100)",
     )
 
@@ -203,29 +204,28 @@ def main() -> int:
         print(f"New lines of code: {total}")
         print(f"Covered lines: {covered}")
         print(f"Uncovered lines: {len(uncovered)}")
+        retval = 0
 
         if total > 0:
             coverage_percent = (covered / total) * 100
             print(f"Coverage: {coverage_percent:.2f}%")
 
             # Check if coverage meets minimum requirement
-            if args.fail_under is not None and coverage_percent < args.fail_under:
+            if args.fail_under == 0:
+                print("Skipping uncovered failure due to --fail-under=0 setting.")
+                retval = 0
+            elif coverage_percent < args.fail_under:
                 print(
                     f"\n✗ Coverage {coverage_percent:.2f}% is below required {args.fail_under}%"
                 )
+                retval = 1
 
         if uncovered:
             print("\nUncovered lines:")
             for filename, lineno in sorted(uncovered):
                 print(f"  {filename}:{lineno}")
 
-            # `fail-under=0` means ignoring uncovered code and always returning success.
-            if args.fail_under is not None and args.fail_under == 0:
-                print("Ignore uncovered lines due to --fail-under=0 setting, skipped.")
-                return 0
-
-            # Return failure if uncovered lines are found
-            return 1
+            return retval
         else:
             print("\n✓ All new code is covered!")
             return 0
