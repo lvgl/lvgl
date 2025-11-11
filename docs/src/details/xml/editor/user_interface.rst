@@ -1,4 +1,4 @@
-.. include:: substitutions.txt
+.. include:: /include/substitutions.txt
 .. _user interface:
 
 ==============

@@ -2528,11 +2528,11 @@ static const lv_opengl_shader_t src_includes[] = {
 
 
         #ifdef MATERIAL_UNLIT
-            //#ifdef HAS_EMISSIVE_MAP
-            //    color = texture(u_EmissiveSampler, getEmissiveUV()).rgb;
-            //#else
+            #ifdef HAS_EMISSIVE_MAP
+                color = f_emissive;
+            #else
                 color = baseColor.rgb;
-            //#endif
+            #endif
         #elif defined(NOT_TRIANGLE) && !defined(HAS_NORMAL_VEC3)
             //Points or Lines with no NORMAL attribute SHOULD be rendered without lighting and instead use the sum of the base color value and the emissive value.
             color = f_emissive + baseColor.rgb;
@@ -2767,7 +2767,9 @@ static const lv_opengl_shader_t src_includes[] = {
 static const lv_opengl_shader_t env_src_includes[] = {
     {
         "fullscreen.vert", R"(
-        precision highp float;
+        precision lowp float;  
+        // The vertex positions being supplied to this shader are
+        // always exactly 0 or 1, so low precision is fine here.
 
         in vec2 aPosition;
         in vec2 aTexCoord;
@@ -3437,7 +3439,7 @@ static const char *src_fragment_shader = R"(
     // [5] "KHR_materials_clearcoat"
     //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
 
-    precision highp float;
+    precision mediump float;
 
 #include <tonemapping.glsl>
 #include <textures1.glsl>

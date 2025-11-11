@@ -791,9 +791,10 @@ void test_label_wrap_mode_clip(void)
 }
 void test_label_translation_tag(void)
 {
-    static const char * tags[] = {"tiger", NULL};
-    static const char * languages[]    = {"en", "de", "es", NULL};
-    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
     label = lv_label_create(NULL);
     lv_label_set_translation_tag(label, "tiger");
@@ -814,9 +815,10 @@ void test_label_translation_tag(void)
 
 void test_label_setting_text_disables_translation(void)
 {
-    static const char * tags[] = {"tiger", NULL};
-    static const char * languages[]    = {"en", "de", "es", NULL};
-    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
     label = lv_label_create(NULL);
     lv_label_set_translation_tag(label, "tiger");
@@ -848,6 +850,62 @@ void test_label_setting_text_disables_translation(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Hello world 1");
     lv_label_set_translation_tag(label, "tiger");
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "Der Tiger");
+}
+
+static void display_invalidate_area_cb(lv_event_t * e)
+{
+    int * i = lv_event_get_user_data(e);
+    *i += 1;
+}
+
+void test_label_invalidate_area(void)
+{
+    int i = 0;
+    label = lv_label_create(lv_screen_active());
+    lv_display_add_event_cb(lv_display_get_default(), display_invalidate_area_cb, LV_EVENT_INVALIDATE_AREA, &i);
+    i = 0;
+    lv_label_set_text_static(label, "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text(label, "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text_fmt(label, "%s", "Hello world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL);
+    TEST_ASSERT(i > 0);
+
+#if LV_LABEL_TEXT_SELECTION
+    i = 0;
+    lv_label_set_text_selection_start(label, 1);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_set_text_selection_end(label, 1);
+    TEST_ASSERT(i > 0);
+#endif
+
+    i = 0;
+    lv_label_set_recolor(label, true);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_ins_text(label, 5, " world");
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_label_cut_text(label, 5, 5);
+    TEST_ASSERT(i > 0);
+
+    i = 0;
+    lv_obj_set_style_align(label, LV_ALIGN_CENTER, 0);
+    TEST_ASSERT(i > 0);
+
+    lv_display_remove_event_cb_with_user_data(lv_display_get_default(), display_invalidate_area_cb, &i);
 }
 
 #endif

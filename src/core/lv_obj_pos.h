@@ -154,6 +154,12 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj);
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj);
 
 /**
+ * Mark screen to send layout completed event after update.
+ * @param obj   Any object on the target screen
+ */
+void lv_obj_request_layout_complete_event(lv_obj_t * obj);
+
+/**
  * Update the layout of an object.
  * @param obj      pointer to an object whose position and size needs to be updated
  */

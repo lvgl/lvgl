@@ -1265,6 +1265,12 @@ menu "LVGL configuration"
 		config LV_USE_WIN
 			bool "Win"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_3DTEXTURE
+			bool "3D Texture"
+			depends on LV_USE_DRAW_OPENGLES
+		config LV_USE_GLTF
+			bool "glTF support"
+			depends on LV_USE_3DTEXTURE
 	endmenu
 
 	menu "Themes"
@@ -2210,10 +2216,6 @@ menu "LVGL configuration"
 				bool "Render test for each primitives. Requires at least 480x272 display"
 				default n
 
-			config LV_USE_DEMO_SCROLL
-				bool "Scroll settings test for LVGL"
-				default n
-
 			config LV_USE_DEMO_STRESS
 				bool "Stress test for LVGL"
 				default n
@@ -2257,6 +2259,10 @@ menu "LVGL configuration"
 				bool "vector graphic demo"
 				default n
 				depends on LV_USE_VECTOR_GRAPHIC
+			config LV_USE_DEMO_GLTF
+				bool "glTF demo"
+				default n
+				depends on LV_USE_GLTF
 			config LV_USE_DEMO_SMARTWATCH
 				bool "Smartwatch demo"
 			config LV_USE_DEMO_EBIKE

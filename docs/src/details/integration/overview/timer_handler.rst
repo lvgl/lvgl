@@ -68,13 +68,13 @@ When No Timers Are Ready
 
 :c:func:`lv_timer_handler` will return :c:macro:`LV_NO_TIMER_READY` (``UINT32_MAX``)
 if there are no running timers. This can happen if there are no indevs or they are disabled with `lv_indev_enable()`, running
-animations, or running user-created timers. :c:func:`lv_timer_handler` will continue
+animations, or running user-created timers. :cpp:func:`lv_timer_handler` will continue
 to return :c:macro:`LV_NO_TIMER_READY` until there is a running timer. Display
 timers will stay paused when there is no reason to refresh.
-:c:func:`lv_timer_handler` should be called after something is created, deleted, or
+:cpp:func:`lv_timer_handler` should be called after something is created, deleted, or
 modified so that a refresh will be performed if necessary. In practice this means
 waiting without a timeout for some external event. After the
-external events are received and handled, :c:func:`lv_timer_handler` should be
+external events are received and handled, :cpp:func:`lv_timer_handler` should be
 called again.
 
 .. code-block:: c

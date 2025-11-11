@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _xml_preview:
 
 =======
@@ -6,9 +7,6 @@ Preview
 
 Overview
 ********
-
-.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
 
 In ``<component>`` and ``<widget>``, it is possible to define ``<preview>`` tags.
 These are **not** exported to code and are **not** loaded from XML.

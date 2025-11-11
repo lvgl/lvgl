@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _lv_image:
 
 ================
@@ -6,8 +7,6 @@ Image (lv_image)
 
 Overview
 ********
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Images are Widgets that display images from flash (as arrays) or
 from files. Images can also display symbols (``LV_SYMBOL_...``).
@@ -36,7 +35,7 @@ To provide maximum flexibility, the source of the image can be:
 
 - a variable in code (a C array containing the pixels).
 - a file stored externally (e.g. on an SD card).
-- a :ref:`Symbol <fonts_symbols>` as text.
+- a :ref:`Symbol <font_symbols>` as text.
 
 To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 

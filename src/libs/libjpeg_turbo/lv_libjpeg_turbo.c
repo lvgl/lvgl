@@ -44,7 +44,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_jpeg_file(const char * filename);
-static uint8_t * read_file(const char * filename, uint32_t * size);
 static bool get_jpeg_head_info(const char * filename, uint32_t * width, uint32_t * height, uint32_t * orientation);
 static bool get_jpeg_size(uint8_t * data, uint32_t data_size, uint32_t * width, uint32_t * height);
 static bool get_jpeg_direction(uint8_t * data, uint32_t data_size, uint32_t * orientation);
@@ -208,61 +207,6 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
        !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
-static uint8_t * read_file(const char * filename, uint32_t * size)
-{
-    uint8_t * data = NULL;
-    lv_fs_file_t f;
-    uint32_t data_size;
-    uint32_t rn;
-    lv_fs_res_t res;
-
-    *size = 0;
-
-    res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
-    if(res != LV_FS_RES_OK) {
-        LV_LOG_WARN("can't open %s", filename);
-        return NULL;
-    }
-
-    res = lv_fs_seek(&f, 0, LV_FS_SEEK_END);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    res = lv_fs_tell(&f, &data_size);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    res = lv_fs_seek(&f, 0, LV_FS_SEEK_SET);
-    if(res != LV_FS_RES_OK) {
-        goto failed;
-    }
-
-    /*Read file to buffer*/
-    data = lv_malloc(data_size);
-    if(data == NULL) {
-        LV_LOG_WARN("malloc failed for data");
-        goto failed;
-    }
-
-    res = lv_fs_read(&f, data, data_size, &rn);
-
-    if(res == LV_FS_RES_OK && rn == data_size) {
-        *size = rn;
-    }
-    else {
-        LV_LOG_WARN("read file failed");
-        lv_free(data);
-        data = NULL;
-    }
-
-failed:
-    lv_fs_close(&f);
-
-    return data;
-}
-
 static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 {
     /* This struct contains the JPEG decompression parameters and pointers to
@@ -290,7 +234,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
      */
 
     uint32_t data_size;
-    uint8_t * data = read_file(filename, &data_size);
+    uint8_t * data = lv_fs_load_with_alloc(filename, &data_size);
     if(data == NULL) {
         LV_LOG_WARN("can't load file %s", filename);
         return NULL;
@@ -425,7 +369,7 @@ static bool get_jpeg_head_info(const char * filename, uint32_t * width, uint32_t
 {
     uint8_t * data = NULL;
     uint32_t data_size;
-    data = read_file(filename, &data_size);
+    data = lv_fs_load_with_alloc(filename, &data_size);
     if(data == NULL) {
         return false;
     }

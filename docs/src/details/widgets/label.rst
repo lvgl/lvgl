@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _lv_label:
 
 ================
@@ -197,8 +198,6 @@ the :ref:`font` section to learn more about symbols.
 
 Data binding
 ------------
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 To get familiar with observers, subjects, and data bindings in general visit the
 :ref:`Observer <observer_how_to_use>` page.

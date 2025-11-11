@@ -1,8 +1,7 @@
+.. include:: /include/substitutions.txt
 =========
 RX Family
 =========
-
-.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
 
 .. |img_debug_btn| image:: /_static/images/renesas/debug_btn.png
    :alt: Debug button

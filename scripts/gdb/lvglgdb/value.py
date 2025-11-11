@@ -34,3 +34,30 @@ class Value(gdb.Value):
 
     def super_value(self, attr: str) -> "Value":
         return self[attr]
+
+    def as_string(self):
+        """Convert to string if possible"""
+        try:
+            return self.string()
+        except gdb.error:
+            return str(self)
+
+    def __str__(self):
+        """Provide better string representation for debugging"""
+        try:
+            ptr_val = int(self)
+            return f"({self.type})0x{ptr_val:x}"
+        except gdb.error:
+            pass
+
+        return super().__str__()
+
+    def __repr__(self):
+        """Provide detailed representation"""
+        try:
+            content = self.dereference()
+            return f"Value({self.__str__()}: {content})"
+        except gdb.error:
+            pass
+
+        return f"Value({self.__str__()})"

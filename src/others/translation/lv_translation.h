@@ -50,8 +50,8 @@ void lv_translation_deinit(void);
  * @param translations  List of translations. E.g. `{"Dog", "Cat", "Hund", "Katze"}`
  * @return              The created pack
  */
-lv_translation_pack_t * lv_translation_add_static(const char * languages[], const char * tags[],
-                                                  const char * translations[]);
+lv_translation_pack_t * lv_translation_add_static(const char * const languages[], const char * const tags[],
+                                                  const char * const translations[]);
 
 /**
  * Add a pack to which translations can be added dynamically.

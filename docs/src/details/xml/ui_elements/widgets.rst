@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _xml_widgets:
 
 =======
@@ -6,9 +7,6 @@ Widgets
 
 Overview
 ********
-
-.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
 
 Besides Components and Screens, Widgets are the other main building blocks of UIs.
 
