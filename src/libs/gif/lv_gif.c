@@ -444,6 +444,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         lv_timer_set_period(gifobj->timer, ms_delay_next);
     }
 
+    lv_draw_buf_flush_cache(gifobj->draw_buf, NULL);
     lv_image_cache_drop(lv_image_get_src(obj));
     lv_obj_invalidate(obj);
 }
