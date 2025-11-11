@@ -14,13 +14,13 @@ from typing import Dict, Set, Tuple, List
 def create_argument_parser() -> argparse.ArgumentParser:
     """Create argument parser"""
     parser = argparse.ArgumentParser(
-        description="Check gcov coverage for new code in a git commit or PR",
+        description="Check gcov coverage for new code in a git commit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
         "--commit",
-        help="Git commit hash, reference (e.g. HEAD, HEAD~1) or PR range (base...head)",
+        help="Git commit hash, reference (e.g. HEAD, HEAD~1) or range (base...head)",
         default="HEAD",
     )
 
@@ -127,17 +127,17 @@ def check_commit_coverage(
     commit: str, root: str
 ) -> Tuple[int, int, List[Tuple[str, int]]]:
     """
-    Check coverage for a commit or PR range
+    Check coverage for a commit or range
     Returns: (covered_lines, total_new_lines, uncovered_lines)
     """
     if "..." in commit:
-        # Handle PR range format (base...head)
+        # Handle range format (base...head)
         base, head = commit.split("...")
-        print(f"Analyzing PR commits '{base}...{head}'...")
+        print(f"Analyzing commits '{base}...{head}'...")
         changed_lines = {}
-        # Get changes for each commit in the PR range
+        # Get changes for each commit in the range
         commits = run_git_command(["rev-list", f"{base}...{head}"], cwd=root).split()
-        print(f"Found {len(commits)} commits in PR range:")
+        print(f"Found {len(commits)} commits in range:")
         for c in commits:
             print(f"  {c}")
             cl = get_changed_lines(c, root)
@@ -236,7 +236,7 @@ def main() -> int:
             print(f"Error details:\n{e.stderr}", file=sys.stderr)
         if e.stdout:
             print(f"Command output:\n{e.stdout}", file=sys.stderr)
-        return e.returncode if e.returncode is not None else 64
+        return e.returncode
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         return 2
