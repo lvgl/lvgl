@@ -138,8 +138,8 @@ jobs:
     - name: Fetch PR commits
       if: github.event_name == 'pull_request'
       run: |
-        git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
-        git fetch --no-tags --prune --depth=1 origin +refs/pull/${{ github.event.pull_request.number }}/head:refs/remotes/origin/pr/${{ github.event.pull_request.number }}
+        git fetch --no-tags --prune origin +refs/heads/${{ github.event.pull_request.base.ref }}:refs/remotes/origin/${{ github.event.pull_request.base.ref }}
+        git fetch --no-tags --prune origin +refs/pull/${{ github.event.pull_request.number }}/head:refs/remotes/origin/pr/${{ github.event.pull_request.number }}
     - name: Code coverage analysis
       # The threshold is temporarily set to 0 to prevent CI from being blocked.
       run: |
