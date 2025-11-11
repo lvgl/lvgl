@@ -7,6 +7,7 @@ import subprocess
 import json
 import re
 import sys
+import os
 from typing import Dict, Set, Tuple, List
 
 
@@ -15,34 +16,12 @@ def create_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Check gcov coverage for new code in a git commit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""  
-Examples:  
-  %(prog)s HEAD                    # Check latest commit  
-  %(prog)s abc123def               # Check specific commit  
-  %(prog)s HEAD --root /path/to/project  
-  %(prog)s HEAD --gcovr-args "--filter src/"  
-        """,
     )
 
     parser.add_argument(
-        "commit", help="Git commit hash or reference (e.g. HEAD, HEAD~1)"
-    )
-
-    parser.add_argument(
-        "--root",
-        "-r",
-        default=".",
-        help="Project root directory (default: current directory)",
-    )
-
-    parser.add_argument(
-        "--gcovr-args",
-        default="",
-        help="Additional arguments to pass to gcovr (e.g. '--filter src/ --exclude test/')",
-    )
-
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Show verbose output"
+        "--commit",
+        help="Git commit hash or reference (e.g. HEAD, HEAD~1)",
+        default="HEAD",
     )
 
     parser.add_argument(
@@ -92,15 +71,23 @@ def get_changed_lines(commit: str, root: str) -> Dict[str, Set[int]]:
     return changed_lines
 
 
-def get_coverage_data(root: str, extra_args: str) -> Dict[str, Dict[int, int]]:
+def get_coverage_data(root: str) -> Tuple[Dict[str, Dict[int, int]], str]:
     """
     Get coverage data using gcovr
-    Returns: {file_path: {line_number: execution_count}}
+    Returns: ({file_path: {line_number: execution_count}}, filter_pattern)
     Raises: subprocess.CalledProcessError if gcovr fails
     """
-    cmd = ["gcovr", "--gcov-ignore-parse-errors", "--json", "-", "--root", root]
-    if extra_args:
-        cmd.extend(extra_args.split())
+    filter_pattern = os.path.join(root, "src/.*/lv_.*\\.c")
+    cmd = [
+        "gcovr",
+        "--gcov-ignore-parse-errors",
+        "--json",
+        "-",
+        "--root",
+        root,
+        "--filter",
+        filter_pattern,
+    ]
 
     result = subprocess.run(
         cmd,
@@ -132,32 +119,39 @@ def get_coverage_data(root: str, extra_args: str) -> Dict[str, Dict[int, int]]:
             count = line_info["count"]
             coverage_data[filename][line_number] = count
 
-    return coverage_data
+    return coverage_data, filter_pattern
 
 
 def check_commit_coverage(
-    commit: str, root: str, gcovr_args: str, verbose: bool
+    commit: str, root: str
 ) -> Tuple[int, int, List[Tuple[str, int]]]:
     """
     Check coverage for a commit
     Returns: (covered_lines, total_new_lines, uncovered_lines)
     """
-    if verbose:
-        print(f"Analyzing commit {commit}...")
+    print(f"Analyzing commit '{commit}'...")
 
     changed_lines = get_changed_lines(commit, root)
-    if verbose:
-        print(f"Found changes in {len(changed_lines)} files")
+    print(f"Found changes in {len(changed_lines)} files (before filtering)")
 
-    if verbose:
-        print("Getting coverage data...")
-    coverage_data = get_coverage_data(root, gcovr_args)
+    print("Getting coverage data...")
+    coverage_data, filter_pattern = get_coverage_data(root)
+
+    # Extract the regex pattern from the filter (remove root path)
+    pattern_str = filter_pattern.replace(root + os.path.sep, "")
+    pattern = re.compile(pattern_str)
+
+    filtered_lines = {
+        f: lines for f, lines in changed_lines.items() if pattern.search(f)
+    }
+
+    print(f"After filtering, {len(filtered_lines)} files match pattern '{pattern_str}'")
 
     total_new_lines = 0
     covered_lines = 0
     uncovered_lines: List[Tuple[str, int]] = []
 
-    for filename, line_numbers in changed_lines.items():
+    for filename, line_numbers in filtered_lines.items():
         file_coverage = coverage_data.get(filename, {})
 
         for lineno in line_numbers:
@@ -177,14 +171,16 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        covered, total, uncovered = check_commit_coverage(
-            args.commit, args.root, args.gcovr_args, args.verbose
-        )
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        root = os.path.dirname(script_dir)
+        os.chdir(root)
+        print(f"Current working directory: {root}")
+        covered, total, uncovered = check_commit_coverage(args.commit, root)
 
-        # Print results
-        print("\n" + "=" * 60)
-        print(f"Coverage analysis results for commit {args.commit}:")
-        print("=" * 60)
+        # Print results with better formatting
+        title = f" Coverage analysis results for commit {args.commit} "
+        separator = "=" * len(title)
+        print(f"\n{separator}\n{title}\n{separator}")
         print(f"New lines of code: {total}")
         print(f"Covered lines: {covered}")
         print(f"Uncovered lines: {len(uncovered)}")
@@ -204,6 +200,11 @@ def main() -> int:
             print("\nUncovered lines:")
             for filename, lineno in sorted(uncovered):
                 print(f"  {filename}:{lineno}")
+
+            if args.fail_under is not None and args.fail_under == 0:
+                print("Ignore uncovered lines due to --fail-under=0 setting.")
+                return 0
+
             return 1
         else:
             print("\n✓ All new code is covered!")

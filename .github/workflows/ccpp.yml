@@ -135,6 +135,9 @@ jobs:
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
       run: python tests/main.py --report --update-image test --auto-clean
+    - name: Code coverage analysis
+      # The threshold is temporarily set to 0 to prevent CI from being blocked.
+      run: python scripts/check_gcov_coverage.py --fail-under=0
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v5
