@@ -38,7 +38,7 @@ You make use of images module by using any of these Widgets:
 +-----------------------+---------------------------------+
 | :ref:`lv_imagebutton` | setting image source            |
 +-----------------------+---------------------------------+
-| :ref:`lv_canvas`      | Direct access to drawing buffer |
+| :ref:`lv_canvas`      | direct access to drawing buffer |
 +-----------------------+---------------------------------+
 
 There are also a number of Widgets that use Image Widgets internally for optional icons:

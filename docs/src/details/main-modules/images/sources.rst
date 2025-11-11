@@ -8,11 +8,11 @@ Image Sources
 
 The images module supports images in any of 3 forms:
 
-- variables (i.e. image data in ROM or RAM):  a :cpp:type:`lv_image_dsc_t` object plus
-  its data)
-- files (strings beginning with a printable ASCII character are interpreted as a
+- **variables** (i.e. image data in ROM or RAM):  a :cpp:type:`lv_image_dsc_t` object
+  plus its data
+- **files** (strings beginning with a printable ASCII character are interpreted as a
   file-system path to an image file)
-- strings containing Unicode characters
+- **strings** containing Unicode characters
 
 .. container:: tighter-table-3
 
