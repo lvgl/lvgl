@@ -30,7 +30,7 @@ no image is cached.
 
 The size of cache can be changed at run-time with
 :cpp:expr:`lv_cache_set_max_size(size_t size)`,
-and get with :cpp:expr:`lv_cache_get_max_size()`.
+and retrieved with :cpp:expr:`lv_cache_get_max_size()`.
 
 
 
@@ -81,10 +81,11 @@ Let's say you have loaded a PNG image into a :cpp:struct:`lv_image_dsc_t` ``my_p
 variable and use it in an ``lv_image`` Widget. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
-detecting that the underlying file changed and LVGL will still draw the
+detecting that the underlying file has changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
+To do this, use
+:cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
 
 
 
@@ -96,56 +97,57 @@ following code to replace the LVGL built-in cache manager:
 
 .. code-block:: c
 
-   static lv_cache_entry_t * my_cache_add_cb(size_t size)
-   {
-     ...
-   }
+    static lv_cache_entry_t * my_cache_add_cb(size_t size)
+    {
+        ...
+    }
 
-   static lv_cache_entry_t * my_cache_find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
-   {
-     ...
-   }
+    static lv_cache_entry_t * my_cache_find_cb(const void * src, lv_cache_src_type_t src_type,
+                                               uint32_t param1, uint32_t param2)
+    {
+        ...
+    }
 
-   static void my_cache_invalidate_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static void my_cache_invalidate_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static const void * my_cache_get_data_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static const void * my_cache_get_data_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static void my_cache_release_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static void my_cache_release_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static void my_cache_set_max_size_cb(size_t new_size)
-   {
-     ...
-   }
+    static void my_cache_set_max_size_cb(size_t new_size)
+    {
+        ...
+    }
 
-   static void my_cache_empty_cb(void)
-   {
-     ...
-   }
+    static void my_cache_empty_cb(void)
+    {
+        ...
+    }
 
-   void my_cache_init(void)
-   {
-    /* Initialize new cache manager. */
-    lv_cache_manager_t my_manager;
-    my_manager.add_cb = my_cache_add_cb;
-    my_manager.find_cb = my_cache_find_cb;
-    my_manager.invalidate_cb = my_cache_invalidate_cb;
-    my_manager.get_data_cb = my_cache_get_data_cb;
-    my_manager.release_cb = my_cache_release_cb;
-    my_manager.set_max_size_cb = my_cache_set_max_size_cb;
-    my_manager.empty_cb = my_cache_empty_cb;
+    void my_cache_init(void)
+    {
+        /* Initialize new cache manager. */
+        lv_cache_manager_t my_manager;
+        my_manager.add_cb = my_cache_add_cb;
+        my_manager.find_cb = my_cache_find_cb;
+        my_manager.invalidate_cb = my_cache_invalidate_cb;
+        my_manager.get_data_cb = my_cache_get_data_cb;
+        my_manager.release_cb = my_cache_release_cb;
+        my_manager.set_max_size_cb = my_cache_set_max_size_cb;
+        my_manager.empty_cb = my_cache_empty_cb;
 
-    /* Replace existing cache manager with the new one. */
-    lv_cache_lock();
-    lv_cache_set_manager(&my_manager);
-    lv_cache_unlock();
-   }
+        /* Replace existing cache manager with the new one. */
+        lv_cache_lock();
+        lv_cache_set_manager(&my_manager);
+        lv_cache_unlock();
+    }
 

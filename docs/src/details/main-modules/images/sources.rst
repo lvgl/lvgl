@@ -14,27 +14,27 @@ The images module supports images in any of 3 forms:
   file-system path to an image file)
 - strings containing Unicode characters
 
-.. container:: tighter-table-5
+.. container:: tighter-table-3
 
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | Form                  | Compressed?  | Location   | RAM Cost                                             |
-    +=======================+==============+============+======================================================+
-    | variable (C struct)   | No           | ROM        | decoder cache + draw buffer                          |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | variable (C struct)   | No           | RAM        | full image size + decoder cache + draw buffer        |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | file                  | No           | .bmp file  | size of file buffer, decoder cache + draw buffer     |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | file                  | Yes          | .png file  | size of file buffer, decoder cache + draw buffer     |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | file                  | Yes          | .jpg file  | size of file buffer, decoder cache + draw buffer     |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | file                  | Yes          | .gif file  | size of file buffer, decoder cache + draw buffer     |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | buffer read from file | File content | RAM        | file size + size of file buffer, cache + draw buffer |
-    +-----------------------+--------------+------------+------------------------------------------------------+
-    | Unicode string        | No           | ROM or RAM | length of C string                                   |
-    +-----------------------+--------------+------------+------------------------------------------------------+
+    +-----------------------+--------------+------------+
+    | Form                  | Compressed?  | Location   |
+    +=======================+==============+============+
+    | variable (C struct)   | No           | ROM        |
+    +-----------------------+--------------+------------+
+    | variable (C struct)   | No           | RAM        |
+    +-----------------------+--------------+------------+
+    | file                  | No           | .bmp file  |
+    +-----------------------+--------------+------------+
+    | file                  | Yes          | .png file  |
+    +-----------------------+--------------+------------+
+    | file                  | Yes          | .jpg file  |
+    +-----------------------+--------------+------------+
+    | file                  | Yes          | .gif file  |
+    +-----------------------+--------------+------------+
+    | buffer read from file | File content | RAM        |
+    +-----------------------+--------------+------------+
+    | Unicode string        | No           | ROM or RAM |
+    +-----------------------+--------------+------------+
 
 
 .. _image_sources_variables:
@@ -99,6 +99,11 @@ into RAM before being drawn.  As a result, they are not as resource-friendly as
 images linked at compile time.  However, they are easier to replace without needing
 to rebuild the main program.
 
+The exception to this is BMP files which use a very low RAM footprint because the
+drawn image is taken directly from the BMP file as it is needed.  The RAM cost is
+only the size of the file buffer and the size of the area being drawn at any given
+moment.
+
 For the images module to deal with files you need to add a *Driver* for the target
 storage system to LVGL.  See the :ref:`file_system` section to learn more.
 
@@ -113,7 +118,7 @@ value >= 0x80.  Most often, such strings are passed as the image source like thi
 
 .. code-block:: c
 
-  lv_image_set_src(icon, LV_SYMBOL_BATTERY_FULL);
+    lv_image_set_src(icon, LV_SYMBOL_BATTERY_FULL);
 
 The file ``./src/font/lv_symbol_def.h`` contains a wide variety of Unicode symbols you
 can use directly, or you can make your own.  See :ref:`font_adding_a_custom_symbol`

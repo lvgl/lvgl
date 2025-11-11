@@ -21,7 +21,7 @@ Online Converter
 
 Adding an image to LVGL via the `LVGL Online Image Converter`_ is easy:
 
-1. Click [Select image file(s)] and select a BMP, PNG, JPG, WEBP or SVG image.
+1. Click [Select image file(s)] and select a PNG, JPG, WEBP or SVG image.
    Also supported:  GIF, SVGZ, TIF, TIFF, AI, DRW, PCT, PSP, XCF, PSD, RAW and HEIC.
 2. Select the :ref:`Color format <images_color_formats>`.  Currently supported:
 
@@ -33,6 +33,9 @@ Adding an image to LVGL via the `LVGL Online Image Converter`_ is easy:
 
    If you need another color format, use the :ref:`offline converter
    <images_offline_converter>`.
+
+   .. note::  BMP images are currently supported in file form only.
+              See :ref:`images_bmp_files` below.
 
 3. Click the [Convert] button.  This will convert the file and open a "Save As..."
    dialog box.  The default filename will be the filename of the selected image file
@@ -54,6 +57,17 @@ Offline Converter
 
 The offline converter is contained in ``./scripts/LVGLImage.py``.  Run it with no
 arguments to see its command-line options.
+
+
+
+.. _images_bmp_files:
+
+BMP Files
+*********
+
+BMP files don't need a converter.  Simply save your BMP file in using the color format
+that matches the Display it will be displayed on.  Thereafter, you can use the BMP
+file from firmware as a file on an external storage device (e.g. an SD card).
 
 
 

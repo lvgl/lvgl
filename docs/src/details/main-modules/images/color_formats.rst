@@ -112,8 +112,13 @@ Built-In Input and Output Formats
 GPU Input Formats
 *****************
 
-The following color formats are supported by certain GPUs and are contained an
-optional format that can be used when a GPU is going to be doing the drawing:
+The following color formats are supported by certain GPUs and are retained as
+color-format enumeration values that can be used when a GPU is going to be doing the
+drawing.
+
+
+Alpha-Only and Special ARGB Formats
+-----------------------------------
 
 +----------+-----+------------+---------------------------------------+
 | Format   | BPP | Supported  | Description                           |
@@ -146,7 +151,7 @@ Reference: https://wiki.videolan.org/YUV/
     |        |     | by offline |                                                   |
     |        |     | converter  |                                                   |
     +========+=====+============+===================================================+
-    | I420   |     | No         | YUV420 planar(3 plane)                            |
+    | I420   |     | No         | YUV420 planar (3 plane)                           |
     +--------+-----+------------+---------------------------------------------------+
     | I422   |     | No         | YUV422 planar (3 plane)                           |
     +--------+-----+------------+---------------------------------------------------+
