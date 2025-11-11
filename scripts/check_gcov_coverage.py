@@ -28,8 +28,8 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "--fail-under",
         type=float,
         metavar="PERCENT",
-        default=75,
-        help="Fail if coverage is below this percentage (0-100)",
+        default=0,
+        help="Fail if coverage is below this percentage (0-100), default: 0 (no failure)",
     )
 
     return parser
@@ -212,10 +212,7 @@ def main() -> int:
             print(f"Coverage: {coverage_percent:.2f}%")
 
             # Check if coverage meets minimum requirement
-            if args.fail_under == 0:
-                print("Skipping uncovered failure due to --fail-under=0 setting.")
-                retval = 0
-            elif coverage_percent < args.fail_under:
+            if coverage_percent < args.fail_under:
                 print(
                     f"\n✗ Coverage {coverage_percent:.2f}% is below required {args.fail_under}%"
                 )
@@ -227,9 +224,9 @@ def main() -> int:
                 print(f"  {filename}:{lineno}")
 
             return retval
-        else:
-            print("\n✓ All new code is covered!")
-            return 0
+
+        print("\n✓ All new code is covered!")
+        return retval
 
     except subprocess.CalledProcessError as e:
         print(f"Error: Command failed - {e}", file=sys.stderr)

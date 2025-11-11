@@ -136,15 +136,14 @@ jobs:
     - name: Run tests
       run: python tests/main.py --report --update-image test --auto-clean
     - name: Code coverage analysis
-      # The threshold is temporarily set to 0 to prevent CI from being blocked.
       run: |
         if [ "${{ github.event_name }}" = "pull_request" ]; then
           git fetch --no-tags --prune origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           MB=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
           echo "Merge-base: $MB"
-          python scripts/check_gcov_coverage.py --fail-under=0 --commit="${MB}...${{ github.event.pull_request.head.sha }}"
+          python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
         else
-          python scripts/check_gcov_coverage.py --fail-under=0 --commit=HEAD
+          python scripts/check_gcov_coverage.py --commit=HEAD
         fi
     - name: Archive screenshot errors
       if: failure()
