@@ -86,7 +86,7 @@ An image decoder consists of 4 callbacks:
 :open:     Open an image:
 
            - optionally store entire decoded image;
-           - set it to ``NULL`` to indicate the image can be read line-by-line;
+           - set ``dsc->decoded`` to ``NULL`` to indicate the image can be decoded incrementally;
            - return :cpp:enumerator:`LV_RESULT_OK` if decoder can decode the given
              image, :cpp:enumerator:`LV_RESULT_INVALID` otherwise.  (This is normally
              done by reading the image header from the file and determining
