@@ -123,6 +123,13 @@ else
     exit 1
 fi
 
+echo "Checking gcov coverage..."
+./scripts/check_gcov_coverage.py
+if [ $? -ne 0 ]; then
+    echo "Gcov coverage check failed!"
+    exit 1
+fi
+
 new_png_files=$(git status --porcelain | grep "\?\? .*\.png")
 if [ -n "$new_png_files" ]; then
     echo "New untracked PNG files detected:"
