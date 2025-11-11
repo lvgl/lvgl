@@ -8,8 +8,8 @@ What is an Image Decoder?
 *************************
 
 Images that are encoded (i.e. outside of the list of built-in supported
-:ref:`images_color_formats`) are dealt with through an "Image Decoder".  A Decoder
-is very simply a body of logic that can convert a coded image into one of the
+:ref:`images_color_formats`) are dealt with through an Image Decoder.  An Image
+Decoder is a body of logic that can convert a coded image into one of the
 recognized formats.
 
 
@@ -21,68 +21,87 @@ Built-In Image Decoders
 
 LVGL comes with a number of image decoders to support generic image formats:
 
-.. container:: tighter-table-3
+.. container:: tighter-table-5
 
-    +--------+----------------------+--------------------+
-    | Format | ``lv_conf.h``        | Reference          |
-    |        | Symbol to Set        |                    |
-    +========+======================+====================+
-    | BMP    | LV_USE_BMP           | :ref:`bmp`         |
-    +--------+----------------------+--------------------+
-    | PNG    | LV_USE_LODEPNG       | :ref:`lodepng_rst` |
-    +--------+----------------------+--------------------+
-    | PNG    | LV_USE_LIBPNG        | :ref:`libpng`      |
-    +--------+----------------------+--------------------+
-    | JPG    | LV_USE_LIBJPEG_TURBO | :ref:`libjpeg`     |
-    +--------+----------------------+--------------------+
-    | JPG    | LV_USE_TJPGD         | :ref:`tjpgd`       |
-    +--------+----------------------+--------------------+
-    | WEBP   | LV_USE_LIBWEBP       | :ref:`libwebp`     |
-    +--------+----------------------+--------------------+
-    | SVG    | LV_USE_SVG           | :ref:`svg`         |
-    +--------+----------------------+--------------------+
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | Format  | ``lv_conf.h``        | Reference          | External  | Form                  | RAM Cost            |
+    |         | Symbol to Set        |                    | Library   |                       |                     |
+    |         |                      |                    | Required? |                       |                     |
+    +=========+======================+====================+===========+=======================+=====================+
+    | BMP     | LV_USE_BMP           | :ref:`bmp`         | No        | File only             | Low (1 draw buffer) |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | PNG     | LV_USE_LODEPNG       | :ref:`lodepng_rst` | No        | File or variable      | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | PNG     | LV_USE_LIBPNG        | :ref:`libpng`      | Yes       | File or variable      | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | JPG     | LV_USE_LIBJPEG_TURBO | :ref:`libjpeg`     | Yes       | File only             | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | JPG     | LV_USE_TJPGD         | :ref:`tjpgd`       | Yes       | File or variable      | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | WEBP    | LV_USE_LIBWEBP       | :ref:`libwebp`     | Yes       | File only             | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | SVG     | LV_USE_SVG           | :ref:`svg`         | No        | File or variable      | Full image          |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | GIF     | LV_USE_GIF           | :ref:`gif`         | No        | Use GIF Widget (File) | Widget + 1 frame    |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
+    | Lottie  | See reference        | :ref:`lv_lottie`   | No        | Use Lottie Widget     | Widget + 1 frame    |
+    +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
 
-Once you have the appropriate symbol set to ``1`` in ``lv_conf.h``, you simply pass
-the file-system path to the file containing your image as the ``src`` argument to
-:cpp:expr:`lv_image_set_src(icon, "S:my_icon.png")`, and LVGL takes care of the rest.
+Once you have the appropriate symbol set to ``1`` in ``lv_conf.h``, to use a file,
+simply make the file accessible on an external storage device.  You will need to then
+pass the :ref:`file-system <file_system>` path to the file containing your image as
+the ``src`` argument to :cpp:expr:`lv_image_set_src(icon, "S:my_icon.png")`, and LVGL
+takes care of the rest.
+
+To use the encoded file as a variable, choose one of these approaches:
+
+- Use the online- or offline converter to convert the file to an
+  :cpp:type:`lv_image_dsc_t` object + data into a ``.c`` file and compile and link it
+  into your project.  The color format is stored in the ``header.cf`` field of the
+  :cpp:type:`lv_image_dsc_t` struct.
+
+- Load the whole file into RAM using :cpp:func:`what_function_does_this`, manually
+  create a :cpp:type:`lv_image_dsc_t` and point the ``data`` field to the byte array
+  loaded, and set the ``header.cf`` field to :c:macro:`LV_COLOR_FORMAT_RAW` or
+  :c:macro:`LV_COLOR_FORMAT_RAW_ALPHA`, and set the image source to this
+  :cpp:type:`lv_image_dsc_t` object using :cpp:expr:`lv_image_set_src(icon, &my_img_dsc)`,
+  and when it is time to decode, the registered decoder that recognizes the image
+  format will be used to decode it.
+
+  TODO: verify/confirm this
 
 
 
 Using Custom Image Formats
 **************************
 
-If you have a file-based image type that is not in this list, you can set up LVGL to
-successfully handle it by implementing a custom image decoder.  You can use an
-external decoding library or write your own.  To "connect" it to LVGL, you simply
-use LVGL's *Image Decoder* interface.
+If you have a file-based image type that is not in the above list, you can set up LVGL
+to successfully handle it by implementing a custom image decoder.  You can use an
+external decoding library or write your own.  To "connect" it to LVGL, use
+LVGL's *Image Decoder* interface.
 
 An image decoder consists of 4 callbacks:
 
-:info:     get some basic info about the image (width, height and color format).
-:open:     open an image:
+:info:     Get some basic info about the image (width, height and color format).
+:open:     Open an image:
 
-           - store a decoded image
-           - set it to ``NULL`` to indicate the image can be read line-by-line.
+           - optionally store entire decoded image;
+           - set it to ``NULL`` to indicate the image can be read line-by-line;
+           - return :cpp:enumerator:`LV_RESULT_OK` if decoder can decode the given
+             image, :cpp:enumerator:`LV_RESULT_INVALID` otherwise.  (This is normally
+             done by reading the image header from the file and determining
+             compatibility by reading the header content.)
 
-:get_area: if *open* didn't fully open an image this function should give back part
-           of image as decoded data.
-:close:    close an opened image, and free the allocated resources.
+:get_area: If *open* didn't fully open an image this function should decode the
+           indicated area of the image into the draw buffer.
+:close:    Close an opened image, and free the allocated resources.
 
-You can add any number of image decoders. When an image needs to be
-drawn, the library will try all the registered image decoders until it
-finds one which can open the image, i.e. one which knows that format.
+You can add any number of image decoders.  When an image needs to be drawn, the
+library will try all the registered image decoders until it finds one which can open
+the image, i.e. one which knows that format.
 
-The following formats are understood by the built-in decoder:
-
-- :cpp:enumerator:`LV_COLOR_FORMAT_I1`
-- :cpp:enumerator:`LV_COLOR_FORMAT_I2`
-- :cpp:enumerator:`LV_COLOR_FORMAT_I4`
-- :cpp:enumerator:`LV_COLOR_FORMAT_I8`
-- :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
-- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
-- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
-- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565A8`
+The built-in decoder understands all the formats in :ref:`images_color_formats` minus
+the ``RAW`` formats.
 
 
 .. _custom_image_formats:
@@ -97,8 +116,8 @@ an image decoder that will parse that bitmap and generate the real, render-able
 bitmap.
 
 ``header.cf`` will be :cpp:enumerator:`LV_COLOR_FORMAT_RAW`,
-:cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA` accordingly.  You should choose the
-correct format according to your needs:  a fully opaque image, using an alpha channel.
+:cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA` accordingly.  Use the format according
+to your needs:  a fully opaque image, or one using an alpha channel.
 
 The decoded format of a RAW image depends on the decoder.  Example:  JPG images are
 decoded to RGB888 and PNG images are decoded to ARGB8888.  See
@@ -108,161 +127,50 @@ decoded to RGB888 and PNG images are decoded to ARGB8888.  See
 Registering an Image Decoder
 ----------------------------
 
-Here's an example of getting LVGL to work with PNG images.
+Here's an example of getting LVGL to work with a custom format using the PNG decoder
+as an example.  In ``lv_libpng.c``, see the following functions as examples to follow.
 
-First, you need to create a new image decoder and set some functions to
-open/close the PNG files. It should look like this:
+.. container:: tighter-table-1
 
-.. code-block:: c
+    +----------------------------------------------+-------------------------+
+    | Action                                       | Function                |
+    +==============================================+=========================+
+    | Create and register image decoder            | lv_libpng_init()        |
+    +----------------------------------------------+-------------------------+
+    | De-initialize image decoder                  | lv_libpng_deinit()      |
+    +----------------------------------------------+-------------------------+
+    | Gather basic information about the image     | decoder_info()          |
+    | and store it in ``header``.                  |                         |
+    +----------------------------------------------+-------------------------+
+    | Open a image and generate decoded image [1]_ | decoder_open()          |
+    +----------------------------------------------+-------------------------+
+    | Free any allocated resources                 | decoder_close()         |
+    +----------------------------------------------+-------------------------+
+    | Partially decode based on specified area     | decoder_get_area() [2]_ |
+    | (Optional: use if ``decoder_open()`` does    |                         |
+    | not decode whole image.)                     |                         |
+    +----------------------------------------------+-------------------------+
 
-   /* Create a new decoder and register functions */
-   lv_image_decoder_t * dec = lv_image_decoder_create();
-   lv_image_decoder_set_info_cb(dec, decoder_info);
-   lv_image_decoder_set_open_cb(dec, decoder_open);
-   lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
-   lv_image_decoder_set_close_cb(dec, decoder_close);
+.. [1]
 
+    In ``decoder_open()``, you should try to open the image source pointed by
+    ``dsc->src``.  Its type is already in ``dsc->src_type == LV_IMG_SRC_FILE/VARIABLE``.
+    If this format/type is not supported by the decoder, return :cpp:enumerator:`LV_RESULT_INVALID`.
+    However, if you can open the image, a pointer to the decoded image should be
+    set in ``dsc->decoded``.  If the format is known, but you don't want to
+    decode the entire image (e.g. no memory for it), set ``dsc->decoded = NULL`` and
+    use ``decoder_get_area()`` to get the image area pixels.
 
-   /**
-    * Get info about a PNG image
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param src       can be file name or pointer to a C array
-    * @param header    image information is set in header parameter
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
-    */
-   static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
-   {
-     /* Check whether the type `src` is known by the decoder */
-     if(is_png(src) == false) return LV_RESULT_INVALID;
+.. [2]
 
-     /* Read the PNG header and find `width` and `height` */
-     ...
-
-     header->cf = LV_COLOR_FORMAT_ARGB8888;
-     header->w = width;
-     header->h = height;
-   }
-
-   /**
-    * Open a PNG image and decode it into dsc.decoded
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param dsc       image descriptor
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
-    */
-   static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-   {
-     (void) decoder; /* Unused */
-
-     /* Check whether the type `src` is known by the decoder */
-     if(is_png(dsc->src) == false) return LV_RESULT_INVALID;
-
-     /* Decode and store the image. If `dsc->decoded` is `NULL`, the `decoder_get_area` function will be called to get the image data line-by-line */
-     dsc->decoded = my_png_decoder(dsc->src);
-
-     /* Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format */
-     dsc->decoded.header.cf = LV_COLOR_FORMAT_...
-
-     /* Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in ARGB8888 format. */
-     lv_result_t res = lv_bin_decoder_open(decoder, dsc);
-
-     return res;
-   }
-
-   /**
-    * Decode an area of image
-    * @param decoder      pointer to the decoder where this function belongs
-    * @param dsc          image decoder descriptor
-    * @param full_area    input parameter. the full area to decode after enough subsequent calls
-    * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
-    *                     the decoded area is stored here after each call.
-    * @return             LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
-    */
-   static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                    const lv_area_t * full_area, lv_area_t * decoded_area)
-   {
-     /**
-     * If `dsc->decoded` is always set in `decoder_open` then `decoder_get_area` does not need to be implemented.
-     * If `dsc->decoded` is only sometimes set or never set in `decoder_open` then `decoder_get_area` is used to
-     * incrementally decode the image by calling it repeatedly until it returns `LV_RESULT_INVALID`.
-     * In the example below the image is decoded line-by-line but the decoded area can have any shape and size
-     * depending on the requirements and capabilities of the image decoder.
-     */
-
-     my_decoder_data_t * my_decoder_data = dsc->user_data;
-
-     /* if `decoded_area` has a field set to `LV_COORD_MIN` then reset decoding */
-     if(decoded_area->y1 == LV_COORD_MIN) {
-       decoded_area->x1 = full_area->x1;
-       decoded_area->x2 = full_area->x2;
-       decoded_area->y1 = full_area->y1;
-       decoded_area->y2 = decoded_area->y1; /* decode line-by-line, starting with the first line */
-
-       /* create a draw buf the size of one line */
-       bool reshape_success = NULL != lv_draw_buf_reshape(my_decoder_data->partial,
-                                                          dsc->decoded.header.cf,
-                                                          lv_area_get_width(full_area),
-                                                          1,
-                                                          LV_STRIDE_AUTO);
-       if(!reshape_success) {
-         lv_draw_buf_destroy(my_decoder_data->partial);
-         my_decoder_data->partial = lv_draw_buf_create(lv_area_get_width(full_area),
-                                                       1,
-                                                       dsc->decoded.header.cf,
-                                                       LV_STRIDE_AUTO);
-
-         my_png_decode_line_reset(full_area);
-       }
-     }
-     /* otherwise decoding is already in progress. decode the next line */
-     else {
-       /* all lines have already been decoded. indicate completion by returning `LV_RESULT_INVALID` */
-       if (decoded_area->y1 >= full_area->y2) return LV_RESULT_INVALID;
-       decoded_area->y1++;
-       decoded_area->y2++;
-     }
-
-     my_png_decode_line(my_decoder_data->partial);
-
-     return LV_RESULT_OK;
-   }
-
-   /**
-    * Close PNG image and free data
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param dsc       image decoder descriptor
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
-    */
-   static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-   {
-     /* Free all allocated data */
-     my_png_cleanup();
-
-     my_decoder_data_t * my_decoder_data = dsc->user_data;
-     lv_draw_buf_destroy(my_decoder_data->partial);
-
-     /* Call the built-in close function if the built-in open/get_area was used */
-     lv_bin_decoder_close(decoder, dsc);
-
-   }
-
-In summary:
-
-- In ``decoder_info``, you should collect some basic information about the image and store it in ``header``.
-- In ``decoder_open``, you should try to open the image source pointed by
-  ``dsc->src``. Its type is already in ``dsc->src_type == LV_IMG_SRC_FILE/VARIABLE``.
-  If this format/type is not supported by the decoder, return :cpp:enumerator:`LV_RESULT_INVALID`.
-  However, if you can open the image, a pointer to the decoded image should be
-  set in ``dsc->decoded``. If the format is known, but you don't want to
-  decode the entire image (e.g. no memory for it), set ``dsc->decoded = NULL`` and
-  use ``decoder_get_area`` to get the image area pixels.
-- In ``decoder_close`` you should free all allocated resources.
-- ``decoder_get_area`` is optional. In this case you should decode the whole image In
-  ``decoder_open`` function and store image data in ``dsc->decoded``.
-  Decoding the whole image requires extra memory and some computational overhead.
+    ``lv_bmp.c`` has an example of ``decoder_get_area()``.
 
 
 Manually Using an Image Decoder
 -------------------------------
+
+TODO: verify/confirm this section is obsolete, no longer supported
+      (lv_image_decoder_dsc_t is private).
 
 LVGL will use registered image decoders automatically if you try and
 draw a raw image (i.e. using the ``lv_image`` Widget) but you can use them

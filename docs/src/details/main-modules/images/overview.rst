@@ -34,9 +34,9 @@ You make use of images module by using any of these Widgets:
 +-----------------------+---------------------------------+
 | Widget                | Via                             |
 +=======================+=================================+
-| :ref:`lv_image`       | :cpp:type:`lv_image_dsc_t`      |
+| :ref:`lv_image`       | setting image source            |
 +-----------------------+---------------------------------+
-| :ref:`lv_imagebutton` | :cpp:type:`lv_image_dsc_t`      |
+| :ref:`lv_imagebutton` | setting image source            |
 +-----------------------+---------------------------------+
 | :ref:`lv_canvas`      | Direct access to drawing buffer |
 +-----------------------+---------------------------------+
