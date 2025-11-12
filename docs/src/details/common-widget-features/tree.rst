@@ -100,6 +100,11 @@ Below is an example showing how manually and automatically assigned names are re
     - ``lv_button`` named ``mybtn_#``: "mybtn_2"
     - ``lv_button`` named ``mybtn_#``: "mybtn_3"
 
+Note that these indices are "fluid", meaning if "mybtn_2" above is deleted, the button
+previously known as "mybtn_3" will thereafter be known as "mybtn_2", since the indices
+are resolved *when names are being searched*, not when they are set.  Keep this in
+mind when Finding Widgets as described below.
+
 
 Finding Widgets
 ---------------
@@ -133,19 +138,3 @@ and it is called 10 times, a specific ``"ok_button"`` can be found like this:
 
     // Or
     lv_obj_t * ok_btn = lv_obj_get_child_by_name(some_list_container, "list_item_5/ok_button");
-
-.. important::
-
-    When a Widget has the default name or otherwise has an index because it was named
-    with a trailing '#', the index used for name comparison is computed in #1 and #2
-    above *when those calls are made*, thus always reflecting the current state of
-    the Widget tree.  Deletion of sibling Widgets can impact these indices.  Example:
-
-    - red button: button_0
-    - green button: button_1
-    - blue button: button_2
-
-    If the green button is deleted, what's left will be:
-
-    - red button: button_0
-    - blue button: button_1
