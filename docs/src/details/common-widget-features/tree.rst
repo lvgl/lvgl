@@ -101,9 +101,9 @@ Below is an example showing how manually and automatically assigned names are re
     - ``lv_button`` named ``mybtn_#``: "mybtn_3"
 
 Note that these indices are "fluid", meaning if "mybtn_2" above is deleted, the button
-previously known as "mybtn_3" will thereafter be known as "mybtn_2", since the indices
-are resolved *when names are being searched*, not when they are set.  Keep this in
-mind when Finding Widgets as described below.
+previously known as "mybtn_3" will thereafter be known as "mybtn_2", since the
+indices are resolved *when names are being found by name*, not when they are set.
+Keep this in mind when Finding Widgets as described below.
 
 
 Finding Widgets
