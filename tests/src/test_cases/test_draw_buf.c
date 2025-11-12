@@ -127,4 +127,90 @@ void test_draw_buf_xy_access(void)
     TEST_ASSERT_NULL(ret);
 }
 
+static void test_draw_buf_with_args(lv_obj_t * img, uint16_t radius, uint8_t aprec, uint8_t zprec,
+                                    lv_draw_buf_t * blur_buf,
+                                    const lv_draw_buf_t * src_buf)
+{
+    lv_draw_buf_blur_args_t args;
+    lv_draw_buf_blur_args_init(&args);
+    args.radius = radius;
+    args.aprec = aprec;
+    args.zprec = zprec;
+
+    lv_result_t res = lv_draw_buf_blur(blur_buf, src_buf, &args);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+
+    lv_image_cache_drop(blur_buf);
+    lv_image_set_src(img, blur_buf);
+
+    char path[64];
+    lv_snprintf(path, sizeof(path), "draw/draw_buf_blur_radius_%d_aprec_%d_zprec_%d.png", radius, aprec, zprec);
+    TEST_ASSERT_EQUAL_SCREENSHOT(path);
+}
+
+static void test_draw_buf_with_size_and_color_format(uint32_t w, uint32_t h, lv_color_format_t cf,
+                                                     const lv_draw_buf_t * src_buf)
+{
+    lv_draw_buf_t * blur_buf = lv_draw_buf_create(w, h, cf, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(blur_buf);
+
+    lv_draw_buf_blur_args_t args;
+    lv_draw_buf_blur_args_init(&args);
+    args.radius = 50;
+
+    lv_result_t res = lv_draw_buf_blur(blur_buf, src_buf, &args);
+    TEST_ASSERT_NOT_EQUAL(LV_RESULT_OK, res);
+
+    lv_draw_buf_destroy(blur_buf);
+}
+
+void test_draw_buf_blur(void)
+{
+
+    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+
+    lv_draw_buf_t src_buf;
+    lv_result_t res = lv_draw_buf_from_image(&src_buf, &test_image_cogwheel_argb8888);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+
+    lv_draw_buf_t * blur_buf = lv_draw_buf_dup(&src_buf);
+    TEST_ASSERT_NOT_NULL(blur_buf);
+
+    /* Test for invalid blur type */
+    lv_draw_buf_blur_args_t args;
+    lv_draw_buf_blur_args_init(&args);
+    args.type = _LV_DRAW_BUF_BLUR_TYPE_LAST;
+    TEST_ASSERT_EQUAL(LV_RESULT_INVALID, lv_draw_buf_blur(blur_buf, &src_buf, &args));
+
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_obj_center(img);
+
+    for(uint16_t radius = 0; radius <= 100; radius += 20) {
+        test_draw_buf_with_args(img, radius, 16, 7, blur_buf, &src_buf);
+        test_draw_buf_with_args(img, radius, 8, 0, blur_buf, &src_buf);
+    }
+
+    /* Testing in-place blur */
+    for(uint16_t radius = 0; radius <= 100; radius += 20) {
+        lv_draw_buf_copy(blur_buf, NULL, &src_buf, NULL);
+        test_draw_buf_with_args(img, 50, 16, 7, blur_buf, blur_buf);
+        lv_draw_buf_copy(blur_buf, NULL, &src_buf, NULL);
+        test_draw_buf_with_args(img, 50, 8, 0, blur_buf, blur_buf);
+    }
+
+    lv_obj_delete(img);
+    lv_image_cache_drop(blur_buf);
+    lv_draw_buf_destroy(blur_buf);
+
+    /* Test for size and color format mismatch */
+    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
+    lv_draw_buf_t src_buf_rgb565;
+    res = lv_draw_buf_from_image(&src_buf_rgb565, &test_image_cogwheel_rgb565);
+    TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+
+    test_draw_buf_with_size_and_color_format(10, 10, LV_COLOR_FORMAT_ARGB8888, &src_buf);
+    test_draw_buf_with_size_and_color_format(src_buf.header.w, src_buf.header.h, LV_COLOR_FORMAT_RGB565, &src_buf);
+    test_draw_buf_with_size_and_color_format(src_buf.header.w, src_buf.header.h, LV_COLOR_FORMAT_ARGB8888, &src_buf_rgb565);
+}
+
 #endif
