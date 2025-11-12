@@ -27,7 +27,7 @@ Images can be:
   Such files can contain color formats other than the supported formats (e.g. JPEG,
   BMP, PNG, SVG, WEBP, GIF or other formats).
 
-When the color format of the image is not in the same format as the :ref:`Display` it
+When the color format of the image is not in the same format as the :ref:`Display <display>` it
 will be sent to, the drawing logic converts those pixels to the target Display's
 format (into a buffer) when it is drawn.
 
