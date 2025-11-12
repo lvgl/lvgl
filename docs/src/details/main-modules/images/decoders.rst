@@ -212,71 +212,84 @@ See the detailed code below:
 
 .. code-block:: c
 
-   /* Define post-processing state */
-   typedef enum {
-     IMAGE_PROCESS_STATE_NONE = 0,
-     IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
-     IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
-   } image_process_state_t;
+    /* Define post-processing state */
+    typedef enum {
+        IMAGE_PROCESS_STATE_NONE = 0,
+        IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
+        IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
+    } image_process_state_t;
 
-   lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
-   {
-     lv_color_format_t color_format = dsc->header.cf;
-     lv_result_t res = LV_RESULT_OK;
+    lv_draw_buf_t * my_image_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
+    {
+        if(decoded == NULL) {
+            return NULL; /* No need to adjust */
+        }
 
-     if(color_format == LV_COLOR_FORMAT_ARGB8888) {
-       lv_cache_lock();
-       lv_cache_entry_t * entry = dsc->cache_entry;
+        lv_image_decoder_args_t * args = &dsc->args;
+        if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
+            uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
+            if(decoded->header.stride != stride_expect) {
+                LV_LOG_TRACE("Stride mismatch");
+                lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
+                if(res != LV_RESULT_OK) {
+                    lv_draw_buf_t * aligned = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
+                                                                    decoded->header.cf, stride_expect);
+                    if(aligned == NULL) {
+                        LV_LOG_ERROR("No memory for Stride adjust.");
+                        return NULL;
+                    }
 
-       if(!(entry->process_state & IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
-         lv_draw_buf_premultiply(dsc->decoded);
-         LV_LOG_USER("premultiplied alpha OK");
+                    lv_draw_buf_copy(aligned, NULL, decoded, NULL);
+                    decoded = aligned;
+                }
+            }
+        }
 
-         entry->process_state |= IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA;
-       }
+        /* Premultiply alpha channel */
+        if(args->premultiply
+           && !LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoded->header.cf)
+           && lv_color_format_has_alpha(decoded->header.cf)
+           && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
+           && decoded->header.cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED /* Not done yet */
+          ) {
+            LV_LOG_TRACE("Alpha premultiply.");
+            if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {
+                /*Do it directly*/
+                lv_draw_buf_premultiply(decoded);
+            }
+            else {
+                decoded = lv_draw_buf_dup_ex(image_cache_draw_buf_handlers, decoded);
+                if(decoded == NULL) {
+                    LV_LOG_ERROR("No memory for premultiplying.");
+                    return NULL;
+                }
 
-       if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
-          uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-          if(decoded->header.stride != stride_expect) {
-              LV_LOG_WARN("Stride mismatch");
-              lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
-              if(aligned == NULL) {
-                  LV_LOG_ERROR("No memory for Stride adjust.");
-                  res = LV_RESULT_INVALID;
-                  goto alloc_failed;
-              }
+                lv_draw_buf_premultiply(decoded);
+            }
+        }
 
-              decoded = aligned;
-          }
+        return decoded;
+    }
 
-          entry->process_state |= IMAGE_PROCESS_STATE_STRIDE_ALIGNED;
-       }
-
-   alloc_failed:
-       lv_cache_unlock();
-     }
-
-     return res;
-   }
 
 - GPU draw unit example:
 
 .. code-block:: c
 
-  void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
-  {
-    ...
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
-    if(res != LV_RESULT_OK) {
-      LV_LOG_ERROR("Failed to open image");
-      return;
-    }
+    void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
+    {
+        ...
+        lv_image_decoder_dsc_t decoder_dsc;
+        lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to open image");
+            return;
+      }
 
-    res = my_image_post_process(&decoder_dsc);
-    if(res != LV_RESULT_OK) {
-      LV_LOG_ERROR("Failed to post-process image");
-      return;
+      res = my_image_post_process(&decoder_dsc);
+      if(res != LV_RESULT_OK) {
+          LV_LOG_ERROR("Failed to post-process image");
+          return;
+      }
+      ...
     }
-    ...
-  }
