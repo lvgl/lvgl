@@ -7,7 +7,7 @@
 LZ4 Decompression
 =================
 
-LVGL provides a custom LZ4 (Limpel-Ziv v4 Encoding) decompression method.  It can be
+LVGL provides a custom LZ4 (Lempel-Ziv v4 Encoding) decompression method.  It can be
 used to reduce binary image size.  The LZ4 compression is a lossless compression
 method.
 
