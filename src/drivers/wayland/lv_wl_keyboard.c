@@ -230,7 +230,6 @@ static void keyboard_handle_key(void * data, struct wl_keyboard * keyboard, uint
         (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if(lv_key != 0) {
-        LV_LOG_USER("Key %d %d", lv_key, lv_state);
         kbdata->key = lv_key;
         kbdata->state = lv_state;
     }

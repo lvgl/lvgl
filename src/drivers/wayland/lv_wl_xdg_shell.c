@@ -190,13 +190,13 @@ static void xdg_surface_handle_configure(void * data, struct xdg_surface * xdg_s
     lv_wl_window_t * window = (lv_wl_window_t *)data;
 
     if(!window->resize_event.requested) {
-        LV_LOG_USER("resize event not requested. ignoring it");
+        LV_LOG_TRACE("resize event not requested. ignoring it");
         window->xdg.configured = true;
         xdg_surface_ack_configure(xdg_surface, serial);
         return;
     }
 
-    LV_LOG_USER("Requested is false");
+    LV_LOG_TRACE("resize event requested and now pending");
     window->resize_event.pending = true;
     window->resize_event.requested = false;
     window->resize_event.xdg_surface = xdg_surface;
@@ -210,11 +210,11 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
 
     LV_UNUSED(xdg_toplevel);
     LV_UNUSED(states);
-    LV_LOG_USER("XDG toplevel configure: w=%d h=%d (current: %dx%d)",
-                width, height, lv_wayland_window_get_width(window), lv_wayland_window_get_height(window));
+    LV_LOG_TRACE("XDG toplevel configure: w=%d h=%d (current: %dx%d)",
+                 width, height, lv_wayland_window_get_width(window), lv_wayland_window_get_height(window));
 
     if((width < 0) || (height < 0)) {
-        LV_LOG_USER("will not resize to w:%d h:%d", width, height);
+        LV_LOG_TRACE("will not resize to w:%d h:%d", width, height);
         return;
     }
 
@@ -222,7 +222,7 @@ static void xdg_toplevel_handle_configure(void * data, struct xdg_toplevel * xdg
     /* Width and height are already ok, don't resize*/
     if(width == lv_wayland_window_get_width(window) &&
        height == lv_wayland_window_get_height(window)) {
-        LV_LOG_USER("Window's size is already correct. Ignore resize request");
+        LV_LOG_TRACE("Window's size is already correct. Ignore resize request");
         return;
     }
     window->resize_event.requested = true;
