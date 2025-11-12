@@ -223,16 +223,15 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_obj_set_width(pitch_slider, LV_PCT(100));
     lv_slider_set_min_value(pitch_slider, -90);
     lv_slider_set_max_value(pitch_slider, 90);
-
     style_slider(pitch_slider, SLIDER_COLOR);
 
     lv_obj_t * distance_title = add_title_to_row(camera_row, "");
     lv_label_bind_text(distance_title, &distance_subject, "Distance %.2f");
 
     lv_obj_t * distance_slider = lv_slider_create(camera_row);
-    lv_obj_set_width(distance_slider, LV_PCT(100));
     lv_slider_bind_value(distance_slider, &distance_subject);
-    lv_slider_set_min_value(distance_slider, 1);
+    lv_obj_set_width(distance_slider, LV_PCT(100));
+    lv_slider_set_min_value(distance_slider, -10);
     lv_slider_set_max_value(distance_slider, 25);
     style_slider(distance_slider, SLIDER_COLOR);
 

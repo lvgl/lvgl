@@ -633,11 +633,20 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u, uint32_t color_
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, width, height, 0, GL_DEPTH_COMPONENT,
                              GL_UNSIGNED_SHORT, NULL));
 #endif
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
         GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, u->depth_texture, 0));
 #endif
     }
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
+    else {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
+        uint32_t current_texture_id;
+        glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME,
+                                              (uint32_t *)&current_texture_id);
+        if(current_texture_id != color_texture) {
+            LV_LOG("framebuffer texture_id from %u to %u\n", current_texture_id, color_texture);
+            GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture, 0));
+        }
+    }
     return u->framebuffer;
 }
 
