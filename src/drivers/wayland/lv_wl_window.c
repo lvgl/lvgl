@@ -92,11 +92,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
     lv_display_set_driver_data(window->lv_disp, window);
 
-    LV_LOG_USER("Configure surface");
-
     lv_wayland_xdg_configure_surface(window);
 
-    LV_LOG_USER("surface configured");
     lv_display_add_event_cb(window->lv_disp, res_changed_event, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(window->lv_disp, refr_start_event, LV_EVENT_REFR_START, NULL);
     lv_display_add_event_cb(window->lv_disp, refr_end_event, LV_EVENT_REFR_READY, NULL);
@@ -130,7 +127,6 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     if(!window->lv_indev_keyboard) {
         LV_LOG_ERROR("failed to register keyboard indev");
     }
-    LV_LOG_USER("Window created");
     return window->lv_disp;
 
 create_window_err:

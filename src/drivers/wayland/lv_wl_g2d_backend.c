@@ -281,11 +281,9 @@ static lv_wl_g2d_display_data_t * wl_g2d_create_display_data(lv_wl_g2d_ctx_t * c
 
 #if LV_USE_ROTATE_G2D
     if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
-        LV_LOG_USER("Rotation is 90/270");
         init_buffer(ctx, &ddata->rotate_buffer, height, width, cf);
     }
     else {
-        LV_LOG_USER("Rotation is 0 / 180");
         init_buffer(ctx, &ddata->rotate_buffer, width, height, cf);
     }
 #endif
@@ -367,7 +365,7 @@ static uint32_t lv_cf_to_drm_cf(lv_color_format_t cf)
 
 static void frame_done(void * data, struct wl_callback * callback, uint32_t time)
 {
-    LV_LOG_USER("Frame done");
+    LV_LOG_TRACE("Frame done");
     LV_UNUSED(time);
     lv_display_t * display = data;
     wl_callback_destroy(callback);
@@ -377,7 +375,7 @@ static void frame_done(void * data, struct wl_callback * callback, uint32_t time
 
 static void buffer_release(void * data, struct wl_buffer * buffer)
 {
-    LV_LOG_USER("Buffer release");
+    LV_LOG_TRACE("Buffer released");
     LV_UNUSED(buffer);
     lv_wl_buffer_t * buf = data;
     buf->busy = false;
@@ -386,7 +384,7 @@ static void buffer_release(void * data, struct wl_buffer * buffer)
 
 static void create_succeeded(void * data, struct zwp_linux_buffer_params_v1 * params, struct wl_buffer * new_buffer)
 {
-    LV_LOG_USER("Create succeeded");
+    LV_LOG_TRACE("Buffer created successfuly");
     lv_wl_buffer_t * buffer = data;
     buffer->wl_buffer = new_buffer;
 
@@ -400,7 +398,6 @@ static void create_succeeded(void * data, struct zwp_linux_buffer_params_v1 * pa
 
 static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * params)
 {
-    LV_LOG_USER("Create failed");
     lv_wl_buffer_t * buffer = data;
     buffer->wl_buffer = NULL;
     zwp_linux_buffer_params_v1_destroy(params);
@@ -409,7 +406,6 @@ static void create_failed(void * data, struct zwp_linux_buffer_params_v1 * param
 
 static void * wl_g2d_resize_display(void * backend_ctx, lv_display_t * disp)
 {
-    LV_LOG_USER("Resize display");
     lv_wl_g2d_ctx_t * ctx = (lv_wl_g2d_ctx_t *)backend_ctx;
     int32_t width = lv_display_get_original_horizontal_resolution(disp);
     int32_t height = lv_display_get_original_vertical_resolution(disp);
@@ -422,8 +418,6 @@ static void * wl_g2d_resize_display(void * backend_ctx, lv_display_t * disp)
 
     lv_wl_g2d_display_data_t * old_ddata = lv_wayland_get_backend_display_data(disp);
     wl_g2d_delete_display_data(old_ddata);
-
-    LV_LOG_USER("Resize done");
     return ddata;
 }
 
@@ -600,7 +594,6 @@ static void flush_wait_cb(lv_display_t * disp)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
 
-    LV_LOG_USER("Flush");
     LV_UNUSED(color_p);
     lv_wl_g2d_display_data_t * ddata = lv_wayland_get_backend_display_data(disp);
     int32_t src_width = lv_area_get_width(area);
@@ -649,7 +642,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, unsigned char 
     wl_surface_commit(surface);
 
     buf->busy = true;
-    LV_LOG_USER("Flush done");
     return;
 }
 

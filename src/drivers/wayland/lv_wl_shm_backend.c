@@ -234,7 +234,7 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
         }
         if(buffer->busy) {
             /* Defer the deletion of this display data until the buffers are released */
-            LV_LOG_USER("Deferring deletion");
+            LV_LOG_INFO("Buffer is still busy, deferring deletion to when its released");
             ddata->delete_on_release = true;
             return;
         }
@@ -258,7 +258,7 @@ static void shm_destroy_display_data(lv_wl_shm_display_data_t * ddata)
         ddata->fd = -1;
     }
 
-    LV_LOG_USER("deleting now");
+    LV_LOG_INFO("Deleted buffers and display data");
     lv_free(ddata);
 }
 
