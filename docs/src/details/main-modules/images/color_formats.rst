@@ -9,7 +9,7 @@ Color Formats
 Built-in Input Color Formats
 ****************************
 
-The following image pixel color formats have built-in rendering support:
+The following image pixel color formats have built-in decoding support:
 
 .. note::
 
