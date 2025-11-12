@@ -763,24 +763,24 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
-    #if !LV_GLTF_DIRECT_BUFFER_WRITES
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-    #endif
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
+#endif
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
-        #if !LV_GLTF_DIRECT_BUFFER_WRITES
-            /* cast is safe because viewer is a lv_obj_t*/
-            lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
-            uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
-            GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
+        /* cast is safe because viewer is a lv_obj_t*/
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
+        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
 
-            GL_CALL(glClearDepthf(1.0f));
-            GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-        #else
-            GL_CALL(glClearDepthf(1.0f));
-            GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));                                    
-        #endif
+        GL_CALL(glClearDepthf(1.0f));
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+#else
+        GL_CALL(glClearDepthf(1.0f));
+        GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
+#endif
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
@@ -916,49 +916,49 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
 {
     lv_gltf_renwin_state_t result;
 
-    #if !LV_GLTF_DIRECT_BUFFER_WRITES
-        GLuint rtex;
-        GL_CALL(glGenTextures(1, &rtex));
-        result.texture = rtex;
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                mipmaps_enabled ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
+    GLuint rtex;
+    GL_CALL(glGenTextures(1, &rtex));
+    result.texture = rtex;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.texture));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            mipmaps_enabled ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_width, texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
-        GLuint rdepth;
-        GL_CALL(glGenTextures(1, &rdepth));
-        result.renderbuffer = rdepth;
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
-    #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
-        // For WebGL2
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                            GL_UNSIGNED_INT, NULL));
-    #else
-        // For Desktop OpenGL
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
-                            GL_UNSIGNED_SHORT, NULL));
-    #endif
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
+    GLuint rdepth;
+    GL_CALL(glGenTextures(1, &rdepth));
+    result.renderbuffer = rdepth;
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, result.renderbuffer));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1));
+#ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
+    // For WebGL2
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_INT, NULL));
+#else
+    // For Desktop OpenGL
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, texture_width, texture_height, 0, GL_DEPTH_COMPONENT,
+                         GL_UNSIGNED_SHORT, NULL));
+#endif
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
 
-        GL_CALL(glGenFramebuffers(1, &result.framebuffer));
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
-    #else
-        result.framebuffer = 2;
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
-    #endif
+    GL_CALL(glGenFramebuffers(1, &result.framebuffer));
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
+#else
+    result.framebuffer = 2;
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+#endif
     return result;
 }
 
