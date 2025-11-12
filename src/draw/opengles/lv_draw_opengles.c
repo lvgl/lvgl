@@ -79,7 +79,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data);
 
 static unsigned int layer_get_texture(lv_layer_t * layer);
-static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
+static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u, uint32_t color_texture, int32_t width, int32_t height);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 
 #if LV_USE_3DTEXTURE
@@ -426,9 +426,7 @@ static void blend_texture_layer(lv_draw_task_t * t)
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
     if(target_texture) {
-        unsigned int framebuffer = get_framebuffer(u);
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+        unsigned int framebuffer = get_framebuffer(u, target_texture, targ_tex_w, targ_tex_h);
     }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
@@ -531,9 +529,7 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
     if(target_texture) {
-        unsigned int framebuffer = get_framebuffer(u);
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+        unsigned int framebuffer = get_framebuffer(u, target_texture, targ_tex_w, targ_tex_h);
     }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
@@ -578,9 +574,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             int32_t targ_tex_h = lv_area_get_height(&layer->buf_area);
 
             if(target_texture) {
-                unsigned int framebuffer = get_framebuffer(u);
-                GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-                GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+                unsigned int framebuffer = get_framebuffer(u, target_texture, targ_tex_w, targ_tex_h);
             }
 
             lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
@@ -616,16 +610,13 @@ static unsigned int layer_get_texture(lv_layer_t * layer)
     return (unsigned int)(uintptr_t)layer->user_data;
 }
 
-static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
+static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u, uint32_t color_texture, int32_t width, int32_t height)
 {
     if(u->framebuffer == 0) {
         GL_CALL(glGenFramebuffers(1, &u->framebuffer));
-#if LV_USE_GLTF && LV_GLTF_DIRECT_BUFFER_WRITES
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
-        lv_draw_task_t * task = u->task_act;
-        int32_t display_w = lv_area_get_width(&task->_real_area);
-        int32_t display_h = lv_area_get_height(&task->_real_area);
-
+        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture, 0));
+#if LV_USE_GLTF && LV_GLTF_DIRECT_BUFFER_WRITES
         GL_CALL(glGenTextures(1, &u->depth_texture));
         GL_CALL(glBindTexture(GL_TEXTURE_2D, u->depth_texture));
         GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -635,17 +626,18 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
         GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
         // For WebGL2
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, display_w, display_h, 0, GL_DEPTH_COMPONENT,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, width, height, 0, GL_DEPTH_COMPONENT,
                              GL_UNSIGNED_INT, NULL));
 #else
         // For Desktop OpenGL
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, display_w, display_h, 0, GL_DEPTH_COMPONENT,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, width, height, 0, GL_DEPTH_COMPONENT,
                              GL_UNSIGNED_SHORT, NULL));
 #endif
         GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, u->depth_texture, 0));
 #endif
     }
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
     return u->framebuffer;
 }
 
@@ -694,9 +686,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
 
     if(target_texture) {
-        unsigned int framebuffer = get_framebuffer(u);
-        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
-        GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+        unsigned int framebuffer = get_framebuffer(u, target_texture, targ_tex_w, targ_tex_h);
     }
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
