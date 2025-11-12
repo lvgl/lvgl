@@ -242,7 +242,8 @@ See the detailed code below:
               lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
               if(aligned == NULL) {
                   LV_LOG_ERROR("No memory for Stride adjust.");
-                  return NULL;
+                  res = LV_RESULT_INVALID;
+                  goto alloc_failed;
               }
 
               decoded = aligned;
