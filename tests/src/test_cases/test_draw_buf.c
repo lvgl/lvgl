@@ -140,6 +140,7 @@ static void test_draw_buf_with_args(lv_obj_t * img, uint16_t radius, uint8_t apr
     lv_result_t res = lv_draw_buf_blur(blur_buf, src_buf, &args);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
+    lv_draw_buf_clear_flag(blur_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
     lv_image_cache_drop(blur_buf);
     lv_image_set_src(img, blur_buf);
 
@@ -166,7 +167,6 @@ static void test_draw_buf_with_size_and_color_format(uint32_t w, uint32_t h, lv_
 
 void test_draw_buf_blur(void)
 {
-
     LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
 
     lv_draw_buf_t src_buf;
@@ -193,9 +193,9 @@ void test_draw_buf_blur(void)
     /* Testing in-place blur */
     for(uint16_t radius = 0; radius <= 100; radius += 20) {
         lv_draw_buf_copy(blur_buf, NULL, &src_buf, NULL);
-        test_draw_buf_with_args(img, 50, 16, 7, blur_buf, blur_buf);
+        test_draw_buf_with_args(img, radius, 16, 7, blur_buf, blur_buf);
         lv_draw_buf_copy(blur_buf, NULL, &src_buf, NULL);
-        test_draw_buf_with_args(img, 50, 8, 0, blur_buf, blur_buf);
+        test_draw_buf_with_args(img, radius, 8, 0, blur_buf, blur_buf);
     }
 
     lv_obj_delete(img);
