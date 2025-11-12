@@ -11,7 +11,7 @@ Instead of loading the whole image at once, BMP pixels are read on demand,
 so using BMP images requires very little RAM.
 
 If enabled in ``lv_conf.h`` by setting :c:macro:`LV_USE_BMP` to ``1``, LVGL will
-register a the BMP image decoder automatically so BMP files can be directly used as
+register the BMP image decoder automatically so BMP files can be directly used as
 image sources.  Example:
 
 .. code-block:: c
