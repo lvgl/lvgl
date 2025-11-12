@@ -38,7 +38,7 @@
 
 #include "lv_draw_nema_gfx.h"
 #include "../../font/lv_font.h"
-#include "../../font/lv_font_fmt_txt.h"
+#include "../../font/fmt_txt/lv_font_fmt_txt.h"
 
 /*********************
  *      DEFINES
