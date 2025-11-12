@@ -143,7 +143,7 @@ jobs:
           echo "Merge-base: $MB"
           python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
         else
-          python scripts/check_gcov_coverage.py --commit=HEAD
+          echo "Not a pull request, skipping code coverage analysis."
         fi
     - name: Archive screenshot errors
       if: failure()
