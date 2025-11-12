@@ -13,44 +13,23 @@ Once Python is installed
 
     pip install -r requirements.txt
 
-will install all the prerequisite packages:
+will install all the prerequisite packages.
 
-* Sphinx
-* breathe
-* imagesize
-* importlib-metadata
-* sphinx-rtd-theme
-* sphinx-sitemap
-* sphinxcontrib-applehelp
-* sphinxcontrib-devhelp
-* sphinxcontrib-htmlhelp
-* sphinxcontrib-jsmath
-* sphinxcontrib-qthelp
-* sphinxcontrib-serializinghtml
-* sphinxcontrib-mermaid==0.9.2
-* sphinx-copybutton
-* sphinx-design
-* typing-extensions
-* sphinx-reredirects
-* dirsync
-* furo
-* accessible-pygments
-
-Now you are ready to build the documentation:
+To build the documentation on Windows:
 
     python build.py html
 
-or if you are on a Unix-like OS:
+On Linux:
 
     python3 build.py html
 
-Intermediate files are normally prepared in `./docs/intermediate/` and the final documentation will normally appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` header comment for details.)
+Intermediate files are normally prepared in `./docs/intermediate/` and the final documentation will normally appear in `./docs/build/html/`.  Both of these directories can be overridden using environment variables.  See documentation in `build.py` header comment for details.
 
-If the list of document source (including the `.h` files in the `./src/` directory) files has changed (names or paths):
+If the list of document source files (including the `.h` files in the `./src/` directory) has changed (names or paths):
 
-    python build.py clean html
+    python build.py clean
 
-Will remove the old intermediate and build files and regenerate new ones matching the new structure, eliminating the orphan files that would otherwise result.
+Will remove the old intermediate and build files, eliminating the orphan files that would otherwise result.
 
 To see a list of options available:
 
@@ -71,9 +50,9 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ### reStructuredText
 
-LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any areStructuredText tools you will need while creating or modifying LVGL documentation.
+LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any areStructuredText references you will need while creating or modifying LVGL documentation.
 
-If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) are an excellent resource, especially the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page.  Find an example of what you want to create (e.g. tables), then click the "eye" icon at the top of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.
+If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page are excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
 
 Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
@@ -84,6 +63,7 @@ Note:  the section headings in these pages use a different convention than the o
 
 Please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
 
+Indent using 4 spaces (not tab characters).
 
 
 
@@ -140,7 +120,7 @@ This Is a Heading
 *****************
 ```
 
-reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  However, the LVGL docs policy is to use the below heading convention:
+Use these conventions for section headings in LVGL documentation:
 
 ```
 =====
@@ -163,26 +143,27 @@ Sub Sub Sub Section
 '''''''''''''''''''
 ```
 
-Being consistent about this helps the Sphinx/docutils parser to format the tables of contents correctly.
+Being consistent about this helps the reST parser to format the tables of contents correctly.
 
 For improved readability in the `.rst` file:
 
-- place 3 blank lines above the 2nd and subsequent chapter titles (see above), and
-- place 2 blank lines above section headings below chapters.
+- place 3 blank lines above the 2nd and subsequent chapter titles (see above),
+- 2 blank lines above "Section" headings, and
+- 1 blank line above all lower-level section headings.
 
 
 
 ### Italics, Boldface and Underlining
 
-Emphasis using italics is done by surrounding a word or phrase with single asterisks (`*`).
+Emphasis using `*italics*`.
 
-Emphasis using boldface is done by surrounding a word or phrase with double asterisks (`**`).
+Emphasis using `**boldface**`.
 
-Normally underlining is not possible in reStructuredText.  Also, at this writing, the core reStructuredText parser (docutils) is unable to combine boldface, italics, and/or underlining.  However, LVGL documentation provides a work-around for this using Text Roles.  All you have to remember is that the Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
+Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST Interpreted Text Roles.  Just remember is that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
 
-| To Combine             | Text Role Name                             | Example       |
+| To Combine             | Interpreted Text Role Name                 | Example       |
 | ---------------------- | ------------------------------------------ | ------------- |
-| underline              | `u` or `ul`                                | :ul:\`text\`  |
+| underline              | `u` or `ul`                                | :u:\`text\`   |
 | underline and boldface | `ub` or `bu`                               | :ub:\`text\`  |
 | underline and italics  | `iu` or `ui`                               | :iu:\`text\`  |
 | italics and boldface   | `ib` or `bi`                               | :ib:\`text\`  |
@@ -192,13 +173,11 @@ Normally underlining is not possible in reStructuredText.  Also, at this writing
 
 ### Code Blocks
 
-* Do not use tab characters in code blocks.
-* Each indentation level use 4 spaces.
+* Indent using 4 spaces (not tab characters).
 * Include at least 1 empty line after a code block.
 * There must be one empty line between the code block directive and the code.
-* `.. code-block::` is the only directive that should be used.  Note that unlike the **link target** above, reST directives (like this one) have 2 colons.  (The only reST and Sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code::` should not be used.
-* If you want to separate code into easier-to-understand sections you can do so with a single empty line.
-* For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Examples:
+* `.. code-block::` is the only directive that should be used.  Do not use lone `::`, `:code:` or `.. code::`.
+* Specify the language after the directive for appropriate syntax highlighting.  Examples:
 
   - `.. code-block:: c`,
   - `.. code-block:: cpp`,
@@ -208,28 +187,26 @@ Normally underlining is not possible in reStructuredText.  Also, at this writing
   - `.. code-block:: kconfig`,
   - `.. code-block:: json`,
   - `.. code-block:: yaml`,
-  - `.. code-block:: csharp` (or "cs"),
-  - `.. code-block:: vb.net`,
   - `.. code-block:: dot` (graphviz),
   - `.. code-block:: html`,
   - `.. code-block:: css`,
   - `.. code-block:: xml`,
   - `.. code-block:: make`.
 
-The full set of supported code lexers are listed in the [Pygments Library documentation](https://pygments.org/docs/lexers/).
+See [the full set of supported code lexers](https://pygments.org/docs/lexers/) for more details.
 
 
 
 ### Bulleted Lists
 
-To create a bulleted list, do the following:
-
 ```rst
 - First item description
 - If you want to span multiple lines, indent subsequent
   lines to align with item text like this.
-- If you want to include a code block under a list item,
-  it must be intended to align with the list item like this:
+- If you want to include multiple paragraphs and/or code blocks under a
+  list item, it must be intended to align with the list item like this:
+
+  Second paragraph.
 
   .. code-block: python
                              <=== blank line here is important
@@ -245,7 +222,7 @@ To create a bulleted list, do the following:
   and followed by 1 blank line.
 ```
 
-All lists (including nested lists) **must** be preceded and followed with at least 1 blank line.  This is mandatory for the documentation-generation logic to process it correctly.
+All lists (including nested lists) **must** be preceded and followed with at least 1 blank line for the reST parser to process it correctly.
 
 
 
@@ -253,7 +230,7 @@ All lists (including nested lists) **must** be preceded and followed with at lea
 
 URLs are converted to links automatically. E.g. `Visit https://lvgl.io`.
 
-To add links with custom text use
+To add links with custom link text use
 
 ```rst
 Visit `My Website <https://pro.lvgl.io>`__.
@@ -261,7 +238,7 @@ Visit `My Website <https://pro.lvgl.io>`__.
 
 If an external link will be used on many pages:
 
-- Put it in `./docs/src/include/external_links.txt` if it is not already there.  Example:
+- Add it to `./docs/src/include/external_links.txt` if not already there.  Example:
 
   ```rst
   .. _LVGL Pro:  https://pro.lvgl.io
@@ -275,13 +252,13 @@ If an external link will be used on many pages:
   For further details see `LVGL Pro`_.
   ```
 
-Back-quotes are not needed if there are no spaces in the name.
+  Back-quotes are not needed if there are no spaces in the name.
 
 
 
 ### Internal Links
 
-##### Linking to a Section on the Same Page
+#### To a Section on the Same Page:
 
 Given:
 
@@ -296,10 +273,10 @@ link to section headings on the same page like this:
 See `My Heading`_ for details.
 ```
 
-Backquotes are not needed if there are no spaces in the title.
+Back-quotes are not needed if there are no spaces in the title.
 
 
-##### Linking to a Section on a Different Page
+#### To a Section on a Different Page:
 
 Add an anchor before headings that will be linked to:
 
@@ -310,7 +287,7 @@ My Heading
 **********
 ```
 
-`unique_anchor_name` must be unique throughout the entire set of documentation files.
+`unique_anchor_name` must be unique throughout all `.rst` files under `./docs/src/`.
 
 Link to the anchor by:
 
@@ -332,11 +309,7 @@ Results in "Learn more at <span style="color:blue;"><u>My Heading</u></span>.".
 
 ### Tightening Tables
 
-Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  Here is how:
-
-1.  move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and
-
-2.  indent your table to be the container directive's content, like this:
+Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  To do so, move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest).  Indent your table to make it the "content" of the directive.  Example:
 
 ```rst
 .. container:: tighter-table-3
@@ -358,7 +331,7 @@ This works for all types of tables.
 
 ### Special Symbols
 
-Because not all editors support special Unicode symbols well, it is encouraged to use reStructuredText substitutions to represent special symbols in `.rst` you create or modify.  A list of the most common of these can be found in `./docs/src/include/substitutions.txt`.  To use one of these substitutions, add this line at the top of the `.rst` file if it is not already there.  Technically this line can be anywhere in the `.rst` file, but we include it at the top so it is visible to anyone subsequently viewing or editing the file.
+Because not everyone has editors that deal with Unicode characters well, we use reST substitutions to insert special characters into documentation.  A list of the most commonly-used special symbols can be found in `./docs/src/include/substitutions.txt`.  To use one of these, add this line at the top of the `.rst` file if it is not already there:
 
 ```rst
 .. include:: /include/substitutions.txt
@@ -372,12 +345,13 @@ The temperature outside is 20\ |deg|\ C.
 
 Result:  "The temperature outside is 20°C."
 
-
 The spaces surrounding substitutions *are required*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` option since their use *always* removes these spaces in the output.  These do not need this escaping:
 
 - `|nbsp|` (non-breaking space),
 - `|shy|` (soft hyphen), and
 - `|nbhyph|` (non-breaking hyphen used in titles and official names)
+
+If you need a substitution that is not already in `substitutions.txt`, please add it.
 
 
 
@@ -385,32 +359,35 @@ The spaces surrounding substitutions *are required*, but when you need to remove
 
 #### Providing Links to API Pages
 
-Let us say you are creating (or enhancing) documentation related to the `lv_scale_t` data type (one of the LVGL Widgets):  if you want the doc-build logic to generate appropriate links to LVGL API pages, place an API section at the end of your document (it must be at the end) like this:
+1.  Include this section heading at the bottom of your `.rst` file:
 
-```rst
-API
-***
-```
+    ```rst
+    API
+    ***
+    ```
 
-and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with this pseudo-directive (it's really a reST comment) using this syntax:
+2.  Below the API section heading, match to exact C symbols:
 
-```rst
-.. API equals: lv_scale_t, lv_scale_create
-                             <=== blank line here ends the list
-```
+    ```rst
+    .. API equals: lv_scale_t, lv_scale_create
+                                 <=== blank line here ends the list
+    ```
 
-What follows the colon is a comma- or space-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.  If the list is long, it can be wrapped to subsequent lines, though continuation lines must be all indented at the same level.  This list is used to locate the `.h` files containing documentation for those symbols, and provide exactly one link to each applicable `.h` file API page.
+3.  Below the API section heading, match to C symbols that start with a certain string:
 
-If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead.  The format of the list is the same as for `.. API equals:`
+    ```rst
+    .. API startswith: lv_scale, lv_obj_set_style
+                                 <=== blank line here ends the list
+    ```
 
-```rst
-.. API startswith: lv_scale, lv_obj_set_style
-                             <=== blank line here ends the list
-```
+The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.
+
+The list of symbols (or prefixes) can be separated by commas or spaces.
+
 
 #### In-Line Code Expressions
 
-If you want to reference documentation of specific LVGL code elements, there are special Text Roles to do this:
+Use the following Interpreted Text Roles in text to include in-line C code that links to documentation on that symbol when available:
 
     :cpp:func:`lv_init`   (note there are no parentheses after the function name)
     :c:macro:`LV_USE_FLEX`
@@ -422,7 +399,7 @@ If you want to reference documentation of specific LVGL code elements, there are
 
 #### More Complex Expressions
 
-There is a special text role to reference parts of more complex expressions.  For example when showing the arguments passed to a function.
+Use the `:cpp:expr:` Interpreted Text Role for more complex expressions, for example when showing the arguments passed to a function.
 
     :cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_FLEX)`
     :cpp:expr:`lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
@@ -434,16 +411,17 @@ Arguments that contain more than one word or non-alphanumeric characters will ca
 | :cpp:expr:\`lv_obj_set_layout(widget, LV_LAYOUT_FLEX/GRID)\` | argument with > 1 word |
 | :cpp:expr:\`lv_obj_set_layout(widget, LV_LAYOUT_*)\`         | asterisk               |
 | :cpp:expr:\`lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)\`     | asterisk               |
-| :cpp:expr:\`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)\` | cast                   |
+| :cpp:expr:\`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)\` | cast            |
 | :cpp:expr:\`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);\`    | ampersand & semicolon  |
 | :cpp:expr:\`lv_obj_set_layout(widget, ...)\`                 | lone ellipsis          |
 
 For such examples, simply use reStructuredText literal markup like this:
 
-    ``lv_obj_set_layout(widget, LV_LAYOUT_FLEX/GRID)``
-    ``lv_obj_set_layout(widget, LV_LAYOUT_*)``
-    ``lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)``
-    ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
-    ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
-    ``lv_obj_set_layout(widget, ...)``
-
+```rst
+``lv_obj_set_layout(widget, LV_LAYOUT_FLEX/GRID)``
+``lv_obj_set_layout(widget, LV_LAYOUT_*)``
+``lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)``
+``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
+``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
+``lv_obj_set_layout(widget, ...)``
+```
