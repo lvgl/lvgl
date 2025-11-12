@@ -71,9 +71,9 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ### reStructuredText
 
-LVGL documentation uses **reStructuredText**.  The definitive reStructuredText reference is https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html.  Supplemented by [the Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any and all reStructuredText tools you will ever need while creating or modifying LVGL documentation.
+LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any areStructuredText tools you will need while creating or modifying LVGL documentation.
 
-If you prefer to learn by observing examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) are an excellent resource.  Find the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/), find an example of what you want to create (e.g. tables), then click the "eye" icon at the top of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.
+If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) are an excellent resource, especially the ["Kitchen Sink" page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page.  Find an example of what you want to create (e.g. tables), then click the "eye" icon at the top of that page, and it will take you to the `.rst` source file that was used to generate that HTML page.
 
 Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
@@ -110,7 +110,7 @@ Layouts
 ```
 
 
-The below explains the parts of this file.
+Explanation:
 
 ```rst
 .. _layouts:      <=== Creates an explicit link target
@@ -128,38 +128,6 @@ Layouts           <=== Document title, seen in documentation
     flex
     grid
 ```
-
-The first line is for the purposes of providing a uniquely-named **link target** that can be referenced elsewhere in the documentation.
-
-    .. _{LINK NAME}:
-                      <=== mandatory blank line
-
-Note that `{LINK NAME}`:
-
-- **must** be preceded by a single underscore,
-- **must** be followed by a single colon, and
-- **must** be followed by at least one blank line for the doc-generation logic to process it correctly.
-
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/src/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  Single spaces, hyphens or underscores can be used to separate multiple words.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
-
-That unique name is then used to provide a link reference elsewhere in the documentation using one of two formats.
-
-##### When the "link text" should be a title or section heading from the target document:
-
-```reStructuredText
-:ref:`{LINK NAME}`
-```
-
-This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` role) is then replaced with a hyperlink whose "link text" is the name of the section heading or document title just below the **link target**.  For this reason, when using this syntax, `{LINK NAME}` must reference **link target**s that are just above a title or section heading.
-
-##### When "link text" should be something else:
-
-```reStructuredText
-:ref:`other link text <{LINK NAME}>`
-```
-
-This enables you to put a **link target** anywhere in an `.rst` file (not just above a heading) and link to it using this syntax.
-
 
 
 
@@ -197,8 +165,6 @@ Sub Sub Sub Section
 
 Being consistent about this helps the Sphinx/docutils parser to format the tables of contents correctly.
 
-Note that the "underlining" can be longer than the heading title, but not shorter.
-
 For improved readability in the `.rst` file:
 
 - place 3 blank lines above the 2nd and subsequent chapter titles (see above), and
@@ -212,14 +178,14 @@ Emphasis using italics is done by surrounding a word or phrase with single aster
 
 Emphasis using boldface is done by surrounding a word or phrase with double asterisks (`**`).
 
-Normally underlining is not possible in **reStructuredText**.  Also, at this writing, the core **reStructuredText** parser (docutils) is unable to combine boldface, italics, and/or underlining.  However, LVGL documentation provides a work-around for this using Text Roles.  All you have to remember is that the Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
+Normally underlining is not possible in reStructuredText.  Also, at this writing, the core reStructuredText parser (docutils) is unable to combine boldface, italics, and/or underlining.  However, LVGL documentation provides a work-around for this using Text Roles.  All you have to remember is that the Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
 
-| To Combine             | Text Role Name                           | Example       |
-| ---------------------- | ---------------------------------------- | ------------- |
-| underline              | `u` or `ul`                              | :ul:\`text\`  |
-| underline and boldface | `ub` or `bu`                             | :ub:\`text\`  |
-| underline and italics  | `iu` or `ui`                             | :iu:\`text\`  |
-| italics and boldface   | `ib` or `bi`                             | :ib:\`text\`  |
+| To Combine             | Text Role Name                             | Example       |
+| ---------------------- | ------------------------------------------ | ------------- |
+| underline              | `u` or `ul`                                | :ul:\`text\`  |
+| underline and boldface | `ub` or `bu`                               | :ub:\`text\`  |
+| underline and italics  | `iu` or `ui`                               | :iu:\`text\`  |
+| italics and boldface   | `ib` or `bi`                               | :ib:\`text\`  |
 | all three              | `ubi`, `uib`, `bui`, `iub`, `biu` or `ibu` | :ubi:\`text\` |
 
 
@@ -230,9 +196,9 @@ Normally underlining is not possible in **reStructuredText**.  Also, at this wri
 * Each indentation level use 4 spaces.
 * Include at least 1 empty line after a code block.
 * There must be one empty line between the code block directive and the code.
-* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only reST and Sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
+* `.. code-block::` is the only directive that should be used.  Note that unlike the **link target** above, reST directives (like this one) have 2 colons.  (The only reST and Sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code::` should not be used.
 * If you want to separate code into easier-to-understand sections you can do so with a single empty line.
-* For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
+* For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Examples:
 
   - `.. code-block:: c`,
   - `.. code-block:: cpp`,
@@ -250,7 +216,7 @@ Normally underlining is not possible in **reStructuredText**.  Also, at this wri
   - `.. code-block:: xml`,
   - `.. code-block:: make`.
 
-The full set of supported lexers are listed in the [Pygments Library documentation](https://pygments.org/docs/lexers/).
+The full set of supported code lexers are listed in the [Pygments Library documentation](https://pygments.org/docs/lexers/).
 
 
 
@@ -283,9 +249,90 @@ All lists (including nested lists) **must** be preceded and followed with at lea
 
 
 
+### External Links
+
+URLs are converted to links automatically. E.g. `Visit https://lvgl.io`.
+
+To add links with custom text use
+
+```rst
+Visit `My Website <https://pro.lvgl.io>`__.
+```
+
+If an external link will be used on many pages:
+
+- Put it in `./docs/src/include/external_links.txt` if it is not already there.  Example:
+
+  ```rst
+  .. _LVGL Pro:  https://pro.lvgl.io
+  ```
+
+- `.. include:  /include/external_links.txt` once at the top of each `.rst` file that uses it.
+
+- Use it by name in text:
+
+  ```rst
+  For further details see `LVGL Pro`_.
+  ```
+
+Back-quotes are not needed if there are no spaces in the name.
+
+
+
+### Internal Links
+
+##### Linking to a Section on the Same Page
+
+Given:
+
+```rst
+My Heading
+**********
+```
+
+link to section headings on the same page like this:
+
+```rst
+See `My Heading`_ for details.
+```
+
+Backquotes are not needed if there are no spaces in the title.
+
+
+##### Linking to a Section on a Different Page
+
+Add an anchor before headings that will be linked to:
+
+```rst
+.. _unique_anchor_name:
+
+My Heading
+**********
+```
+
+`unique_anchor_name` must be unique throughout the entire set of documentation files.
+
+Link to the anchor by:
+
+```rst
+Click :ref:`here <unique_anchor_name>` for more details.
+```
+
+Or use the heading's text as the link's text:
+
+```rst
+Learn more at :ref:`unique_anchor_name`.
+```
+
+Results in "Learn more at <span style="color:blue;"><u>My Heading</u></span>.".
+
+`unique_anchor_name` may appear in places other than before a heading, but if so, custom link text (like "here" the first example above) must be provided.
+
+
+
 ### Tightening Tables
 
-Very long or very wide tables can be difficult to read and use.  As the writer, you are responsible for making your tables as readable as they can be.  Here's how to "squeeze" them down to a smaller size when needed to make them more readable and usable:
+Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  Here is how:
 
 1.  move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and
 
@@ -305,33 +352,28 @@ Very long or very wide tables can be difficult to read and use.  As the writer, 
     +-----------+--------------+--------------+--------+
 ```
 
+This works for all types of tables.
+
 
 
 ### Special Symbols
 
-Because not all editors support special Unicode symbols well, it is encouraged to use **reStructuredText** substitutions to represent special symbols in `.rst` you create or modify.  A list of the most common of these can be found in `./docs/src/include/substitutions.txt`.  To use one of these substitutions, add this line at the top of the `.rst` file if it is not already there:
+Because not all editors support special Unicode symbols well, it is encouraged to use reStructuredText substitutions to represent special symbols in `.rst` you create or modify.  A list of the most common of these can be found in `./docs/src/include/substitutions.txt`.  To use one of these substitutions, add this line at the top of the `.rst` file if it is not already there.  Technically this line can be anywhere in the `.rst` file, but we include it at the top so it is visible to anyone subsequently viewing or editing the file.
 
 ```rst
 .. include:: /include/substitutions.txt
 ```
 
-Then, any of those substitutions can be used in that `.rst` file.
-
-(Technically this line can be anywhere in the `.rst` file, but we normally include it at the top so it is visible to anyone subsequently viewing or editing the file.)
-
-Example:
+Then, any of those substitutions can be used in that `.rst` file.  Example:
 
 ```rst
 The temperature outside is 20\ |deg|\ C.
 ```
 
-results in
+Result:  "The temperature outside is 20°C."
 
-```
-The temperature outside is 20°C.
-```
 
-The spaces surrounding substitutions *are required*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` modifier since their use *always* removes these spaces in the output.  These do not need this escaping:
+The spaces surrounding substitutions *are required*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` option since their use *always* removes these spaces in the output.  These do not need this escaping:
 
 - `|nbsp|` (non-breaking space),
 - `|shy|` (soft hyphen), and
@@ -350,7 +392,7 @@ API
 ***
 ```
 
-and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with this pseudo-directive (it's really a comment) using this syntax:
+and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with this pseudo-directive (it's really a reST comment) using this syntax:
 
 ```rst
 .. API equals: lv_scale_t, lv_scale_create
