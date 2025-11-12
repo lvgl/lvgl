@@ -71,6 +71,27 @@ file from firmware as a file on an external storage device (e.g. an SD card).
 
 
 
+.. _images_bin_files:
+
+BIN Files
+*********
+
+Another way you can add an image to your project is by using the
+:ref:`images_offline_converter` to create a ``.bin`` file.  Typically, you would do
+this with a target color format matching the Display the image is going to be sent
+to. Optionally, you can use a command-line argument to cause the image contents to
+be compressed using RLE or LZ4 compression as well.  Of course, the decompression
+logic must be part of your project by enabling appropriate ``LV_USE_RLE``,
+``LV_USE_LZ4_INTERNAL``, and/or ``LV_USE_LZ4_EXTERNAL`` macros in your ``lv_conf.h``
+file.
+
+This enables the drawing logic to have a very low RAM footprint because the pixels
+are extracted directly from the file similar to how they are extracted from BMP files.
+
+See :ref:`rle` and :ref:`lz4`
+
+
+
 .. _images_manually_creating:
 
 Manually Creating an Image

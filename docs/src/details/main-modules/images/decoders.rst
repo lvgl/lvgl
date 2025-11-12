@@ -34,9 +34,9 @@ LVGL comes with a number of image decoders to support generic image formats:
     +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
     | PNG     | LV_USE_LIBPNG        | :ref:`libpng`      | Yes       | File or variable      | Full image          |
     +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
-    | JPG     | LV_USE_LIBJPEG_TURBO | :ref:`libjpeg`     | Yes       | File only             | Full image          |
+    | JPG     | LV_USE_LIBJPEG_TURBO | :ref:`libjpeg`     | Yes       | File only             | 8x8 Pixel Tiles     |
     +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
-    | JPG     | LV_USE_TJPGD         | :ref:`tjpgd`       | Yes       | File or variable      | Full image          |
+    | JPG     | LV_USE_TJPGD         | :ref:`tjpgd`       | Yes       | File or variable      | 8x8 Pixel Tiles     |
     +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
     | WEBP    | LV_USE_LIBWEBP       | :ref:`libwebp`     | Yes       | File only             | Full image          |
     +---------+----------------------+--------------------+-----------+-----------------------+---------------------+
