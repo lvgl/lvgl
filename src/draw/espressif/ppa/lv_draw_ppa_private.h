@@ -124,7 +124,7 @@ static inline ppa_fill_color_mode_t lv_color_format_to_ppa_fill(lv_color_format_
         case LV_COLOR_FORMAT_RGB565:
             return PPA_FILL_COLOR_MODE_RGB565;
         case LV_COLOR_FORMAT_RGB888:
-            return PPA_FILL_COLOR_MODE_ARGB8888;
+            return PPA_FILL_COLOR_MODE_RGB888;
         case LV_COLOR_FORMAT_ARGB8888:
             return PPA_FILL_COLOR_MODE_ARGB8888;
         default:

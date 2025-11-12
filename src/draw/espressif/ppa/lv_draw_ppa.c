@@ -61,7 +61,7 @@ void lv_draw_ppa_init(void)
 
     /* Register Blend client */
     cfg.oper_type = PPA_OPERATION_BLEND;
-    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_32;
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
 
     res = ppa_register_client(&cfg, &draw_ppa_unit->blend_client);
     LV_ASSERT(res == ESP_OK);
