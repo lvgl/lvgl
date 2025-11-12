@@ -126,4 +126,10 @@ static void read_dir(void)
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
 }
+
+void test_file_explorer_show_back_button(void)
+{
+    lv_file_explorer_show_back_button(file_explorer_obj, false);
+}
+
 #endif
