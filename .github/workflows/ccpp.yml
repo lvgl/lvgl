@@ -143,9 +143,6 @@ jobs:
           echo "Merge-base: $MB"
           python scripts/check_gcov_coverage.py --commit="${MB}...${{ github.event.pull_request.head.sha }}"
         else
-          # For push events, fetch enough history to resolve HEAD^
-          git fetch --no-tags --prune --depth=2 origin
-          echo "Using HEAD commit for push event"
           python scripts/check_gcov_coverage.py --commit=HEAD
         fi
     - name: Archive screenshot errors
