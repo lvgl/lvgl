@@ -9,7 +9,7 @@ The simplest way to use an image in LVGL is to display it with an
 
 .. code-block:: c
 
-    lv_obj_t * icon = lv_image_create(lv_screen_active(), NULL);
+    lv_obj_t * icon = lv_image_create(lv_screen_active());
 
     /* From variable */
     lv_image_set_src(icon, &my_img_dsc);
