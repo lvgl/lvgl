@@ -47,7 +47,9 @@ typedef struct {
     lv_draw_task_t * task_act;
     lv_cache_t * texture_cache;
     unsigned int framebuffer;
+#if LV_USE_GLTF && LV_GLTF_DIRECT_BUFFER_WRITES
     unsigned int depth_texture;
+#endif
     lv_draw_buf_t render_draw_buf;
 } lv_draw_opengles_unit_t;
 
@@ -125,6 +127,12 @@ void lv_draw_opengles_deinit(void)
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         GL_CALL(glDeleteFramebuffers(1, &g_unit->framebuffer));
     }
+#if LV_USE_GLTF && LV_GLTF_DIRECT_BUFFER_WRITES
+    if(g_unit->depth_texture != 0) {
+        const unsigned int d[1] = { g_unit->depth_texture };
+        GL_CALL(glDeleteTextures(1, d));
+    }
+#endif
     g_unit = NULL;
 }
 
@@ -593,7 +601,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
 
 #if LV_USE_3DTEXTURE
     if(t->type == LV_DRAW_TASK_TYPE_3D) {
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
+#if LV_USE_GLTF && !LV_GLTF_DIRECT_BUFFER_WRITES
         lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
 #endif
         return;
@@ -612,7 +620,7 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
 {
     if(u->framebuffer == 0) {
         GL_CALL(glGenFramebuffers(1, &u->framebuffer));
-#if LV_GLTF_DIRECT_BUFFER_WRITES
+#if LV_USE_GLTF && LV_GLTF_DIRECT_BUFFER_WRITES
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
         lv_draw_task_t * task = u->task_act;
         int32_t display_w = lv_area_get_width(&task->_real_area);
