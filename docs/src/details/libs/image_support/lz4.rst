@@ -7,9 +7,9 @@
 LZ4 Decompression
 =================
 
-LVGL provides a custom LZ4 (Lempel-Ziv v4 Encoding) decompression method.  It can be
-used to reduce binary image size.  The LZ4 compression is a lossless compression
-method.
+LVGL provides a the extremely fast LZ4 decompression method found in the `LZ4
+repository <https://github.com/lz4/lz4>`__ on GitHub.  It can be used to reduce
+binary image size.  The LZ4 compression is a lossless compression method.
 
 The LVGL's built-in binary image decoder supports LZ4-compressed images.
 The decoder supports both variable and file as image sources.  The original
@@ -20,11 +20,12 @@ binary data is directly decoded to RAM.
 Which Library
 *************
 
-If ``LV_USE_LZ4_INTERNAL`` is enabled in ``lv_conf.h``, LVGL's internal LZ4
-decompresser is used (``./src/libs/lz4/lz4.c``).
+If ``LV_USE_LZ4_INTERNAL`` is enabled in ``lv_conf.h``, LVGL's internal copy of the
+LZ4 decompression algorithm is used (``./src/libs/lz4/lz4.c``).
 
 If ``LV_USE_LZ4_EXTERNAL`` is enabled, LVGL's is assumed to be compiled and linked
-with an external LZ4 library.
+with an external LZ4 library that provides the :cpp:func:`LZ4_decompress_safe`
+function.
 
 One of them must be enabled to use LZ4 decompression.
 

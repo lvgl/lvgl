@@ -21,7 +21,7 @@ Online Converter
 
 Adding an image to LVGL via the `LVGL Online Image Converter`_ is easy:
 
-1. Click [Select image file(s)] and select a PNG, JPG, WEBP or SVG image.
+1. Click [Select image file(s)] and select a BMP, PNG, JPG, WEBP or SVG image.
    Also supported:  GIF, SVGZ, TIF, TIFF, AI, DRW, PCT, PSP, XCF, PSD, RAW and HEIC.
 2. Select the :ref:`Color format <images_color_formats>`.  Currently supported:
 
@@ -62,12 +62,12 @@ arguments to see its command-line options.
 
 .. _images_bmp_files:
 
-BMP Files
-*********
+BMP and WEBP Files
+******************
 
-BMP files don't need a converter.  Simply save your BMP file in using the color format
-that matches the Display it will be displayed on.  Thereafter, you can use the BMP
-file from firmware as a file on an external storage device (e.g. an SD card).
+Currently, support for BMP and WEBP images is limited to using them as files on an
+external file system.  For a BMP file, follow the instructions in :ref:`bmp`.  For
+WEBP files, follow the instructions in :ref:`libwebp`.
 
 
 
