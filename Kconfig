@@ -492,6 +492,11 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_PATH_DUMP_MAX_LEN
+			int "Maximum path dump print length (in points)"
+			default 1000
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
