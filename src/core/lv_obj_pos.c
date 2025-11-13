@@ -881,8 +881,9 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
     }
 
     if(lv_area_is_on(blur_data->inv_area, &obj_coords)) {
-        if(lv_obj_get_style_backdrop_blur_radius(obj, 0) ||
-           lv_obj_get_style_backdrop_blur_radius(obj, LV_PART_INDICATOR)) {
+        if(lv_obj_get_style_blur_radius(obj, 0) ||
+           lv_obj_get_style_blur_radius(obj, LV_PART_INDICATOR) ||
+           lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR)) {
             lv_obj_invalidate(obj);
             return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
         }

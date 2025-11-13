@@ -786,12 +786,20 @@ void lv_style_set_blur_radius(lv_style_t * style, int32_t value)
     lv_style_set_prop(style, LV_STYLE_BLUR_RADIUS, v);
 }
 
-void lv_style_set_backdrop_blur_radius(lv_style_t * style, int32_t value)
+void lv_style_set_blur_backdrop(lv_style_t * style, bool value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_BACKDROP_BLUR_RADIUS, v);
+    lv_style_set_prop(style, LV_STYLE_BLUR_BACKDROP, v);
+}
+
+void lv_style_set_blur_quality(lv_style_t * style, lv_blur_quality_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BLUR_QUALITY, v);
 }
 
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value)

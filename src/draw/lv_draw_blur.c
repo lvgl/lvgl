@@ -38,8 +38,6 @@
 void LV_ATTRIBUTE_FAST_MEM lv_draw_blur_dsc_init(lv_draw_blur_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_blur_dsc_t));
-    dsc->blur_radius = 0;
-    dsc->corner_radius = 0;
     dsc->base.dsc_size = sizeof(lv_draw_blur_dsc_t);
 }
 

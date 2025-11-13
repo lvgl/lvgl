@@ -674,10 +674,16 @@ static inline int32_t lv_obj_get_style_blur_radius(const lv_obj_t * obj, lv_part
     return (int32_t)v.num;
 }
 
-static inline int32_t lv_obj_get_style_backdrop_blur_radius(const lv_obj_t * obj, lv_part_t part)
+static inline bool lv_obj_get_style_blur_backdrop(const lv_obj_t * obj, lv_part_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BACKDROP_BLUR_RADIUS);
-    return (int32_t)v.num;
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BLUR_BACKDROP);
+    return (bool)v.num;
+}
+
+static inline lv_blur_quality_t lv_obj_get_style_blur_quality(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BLUR_QUALITY);
+    return (lv_blur_quality_t)v.num;
 }
 
 static inline const lv_anim_t * lv_obj_get_style_anim(const lv_obj_t * obj, lv_part_t part)
@@ -922,7 +928,8 @@ void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_
 void lv_obj_set_style_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_backdrop_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_blur_backdrop(lv_obj_t * obj, bool value, lv_style_selector_t selector);
+void lv_obj_set_style_blur_quality(lv_obj_t * obj, lv_blur_quality_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);

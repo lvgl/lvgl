@@ -39,6 +39,11 @@ typedef struct {
      */
     int32_t corner_radius;
 
+    /**
+     * Sets whether to prefer speed or precision
+     */
+    lv_blur_quality_t quality;
+
 } lv_draw_blur_dsc_t;
 
 /**********************

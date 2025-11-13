@@ -405,9 +405,13 @@ props = [
  'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
 
-{'name': 'BACKDROP_BLUR_RADIUS',
- 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Sets the intensity of blurring of the widget's background. Applied before the given part is rendered. The part should have < 100% opacity to make it visible."},
+{'name': 'BLUR_BACKDROP',
+ 'style_type': 'num',   'var_type': 'bool',  'default':'`false`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "If `true` the background of the widget will be blurred. The part should have < 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children."},
+
+{'name': 'BLUR_QUALITY',
+ 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_AUTO`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically. "},
 
  {'name': 'ANIM',
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,

@@ -114,7 +114,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
  * @param draw_dsc  the descriptor to initialize.
  *                  Should be initialized with `lv_draw_blur_dsc_init(draw_dsc)`.
  */
-void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc, bool backdrop);
+void lv_obj_init_draw_blur_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_blur_dsc_t * draw_dsc);
 
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
