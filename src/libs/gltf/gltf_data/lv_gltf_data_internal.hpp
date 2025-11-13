@@ -5,7 +5,6 @@
 
 #if LV_USE_GLTF
 
-#include <fastgltf/math.hpp>
 #include "lv_gltf_data_internal.h"
 #include "lv_gltf_bind.h"
 
@@ -14,6 +13,7 @@
 
 #ifdef __cplusplus
 
+#include <fastgltf/math.hpp>
 #include <string>
 #include <vector>
 #include <map>
