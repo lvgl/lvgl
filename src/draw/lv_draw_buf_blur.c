@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_types.h"
+#include "../stdlib/lv_sprintf.h"
 #include "lv_draw_buf.h"
 #include "lv_draw_buf_blur.h"
-#include <math.h>
 
 /*********************
  *      DEFINES
@@ -204,6 +204,54 @@ static inline void exp_blur_col(
     }
 }
 
+static int32_t exp_get_alpha(int32_t radius, int32_t aprec)
+{
+    /* alpha = (int32_t)((1 << aprec) * (1.0f - expf(-2.3f / (radius + 1.f)))) */
+
+    static const float alpha_table[] = {
+        0.899741f, 0.683363f, 0.535441f, 0.437295f,
+        0.368716f, 0.318414f, 0.280048f, 0.249863f,
+        0.225514f, 0.205466f, 0.188679f, 0.174418f,
+        0.162156f, 0.151500f, 0.142156f, 0.133896f,
+        0.126541f, 0.119951f, 0.114013f, 0.108634f,
+        0.103739f, 0.099266f, 0.095163f, 0.091385f,
+        0.087895f, 0.084662f, 0.081658f, 0.078860f,
+        0.076247f, 0.073801f, 0.071508f, 0.069353f,
+        0.067324f, 0.065410f, 0.063602f, 0.061891f,
+        0.060270f, 0.058731f, 0.057269f, 0.055878f,
+        0.054553f, 0.053289f, 0.052083f, 0.050930f,
+        0.049827f, 0.048771f, 0.047758f, 0.046787f,
+        0.045854f, 0.044958f, 0.044096f, 0.043267f,
+        0.042468f, 0.041698f, 0.040956f, 0.040239f,
+        0.039548f, 0.038879f, 0.038233f, 0.037608f,
+        0.037003f, 0.036417f, 0.035850f, 0.035299f,
+        0.034766f, 0.034248f, 0.033746f, 0.033258f,
+        0.032784f, 0.032323f, 0.031875f, 0.031440f,
+        0.031016f, 0.030603f, 0.030201f, 0.029810f,
+        0.029428f, 0.029057f, 0.028694f, 0.028341f,
+        0.027996f, 0.027659f, 0.027330f, 0.027009f,
+        0.026696f, 0.026390f, 0.026090f, 0.025798f,
+        0.025512f, 0.025232f, 0.024958f, 0.024690f,
+        0.024428f, 0.024171f, 0.023920f, 0.023674f,
+        0.023432f, 0.023196f, 0.022965f, 0.022738f,
+        0.022515f, 0.022297f, 0.022083f, 0.021873f,
+        0.021667f, 0.021464f, 0.021266f, 0.021071f,
+        0.020880f, 0.020692f, 0.020508f, 0.020326f,
+        0.020148f, 0.019973f, 0.019801f, 0.019632f,
+        0.019466f, 0.019303f, 0.019142f, 0.018984f,
+        0.018829f, 0.018676f, 0.018525f, 0.018377f,
+        0.018232f, 0.018088f, 0.017947f, 0.017808f,
+    };
+    static const int32_t alpha_table_size = sizeof(alpha_table) / sizeof(alpha_table[0]);
+
+    if(radius >= alpha_table_size) {
+        LV_LOG_WARN("Radius: %" LV_PRIu32 " is too large, clamping to %" LV_PRIu32, radius, alpha_table_size - 1);
+        radius = alpha_table_size - 1;
+    }
+
+    return (int32_t)((1 << aprec) * alpha_table[radius]);
+}
+
 static void exp_blur(uint8_t * dst,
                      const uint8_t * src,
                      int32_t width,
@@ -218,7 +266,7 @@ static void exp_blur(uint8_t * dst,
      * the kernel is within the radius.
      * (Kernel extends to infinity)
      */
-    const int32_t alpha = (int32_t)((1 << aprec) * (1.0f - expf(-2.3f / (radius + 1.f))));
+    const int32_t alpha = exp_get_alpha(radius, aprec);
 
     for(int32_t row = 0; row < height; row++) {
         exp_blur_row(dst, src, width, height, stride, row, alpha, aprec, zprec);
