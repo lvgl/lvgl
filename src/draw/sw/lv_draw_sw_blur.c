@@ -80,6 +80,66 @@ static inline void repeate_2x2_2byte(lv_color16_t * buf, uint32_t stride)
     buf[stride + 1] = buf[0];
 }
 
+static inline void repeate_4x4_2byte(lv_color16_t * buf, uint32_t stride)
+{
+    lv_color16_t v = buf[0];
+    buf[1] = v;
+    buf[2] = v;
+    buf[3] = v;
+
+    buf += stride;
+    buf[0] = v;
+    buf[1] = v;
+    buf[2] = v;
+    buf[3] = v;
+
+    buf += stride;
+    buf[0] = v;
+    buf[1] = v;
+    buf[2] = v;
+    buf[3] = v;
+
+    buf += stride;
+    buf[0] = v;
+    buf[1] = v;
+    buf[2] = v;
+    buf[3] = v;
+}
+
+static inline void repeate_3x3_2byte(lv_color16_t * buf, uint32_t stride)
+{
+    lv_color16_t v = buf[0];
+    buf[1] = v;
+    buf[2] = v;
+
+    //    buf += stride;
+    //    buf[0] = v;
+    //    buf[1] = v;
+    //    buf[2] = v;
+    //
+    //    buf += stride;
+    //    buf[0] = v;
+    //    buf[1] = v;
+    //    buf[2] = v;
+}
+
+uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix_blur(uint16_t c1, uint16_t c2)
+{
+    //    if(c1 == c2) return c1;
+
+    uint16_t ret;
+
+    /* Source: https://stackoverflow.com/a/50012418/1999969*/
+
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1 | ((uint32_t)c1 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * 16) >> 5) + bg) & 0x7E0F81F;
+    ret = (uint16_t)(result >> 16) | result;
+
+    return ret;
+}
+
 void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->blur_radius == 0) return;
@@ -127,17 +187,19 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
     uint32_t blur_radius = dsc->blur_radius;
     uint32_t skip_cnt = 1;
-    //    if(dsc->corner_radius == 0)
+    //        if(dsc->corner_radius == 0)
     {
         if(blur_radius >= 32) {
-            skip_cnt = 4;
-            blur_radius = blur_radius / 4;
+            skip_cnt = 3;
+        }
+        else if(blur_radius >= 24) {
+            skip_cnt = 3;
         }
         else if(blur_radius >= 8) {
             skip_cnt = 2;
-            blur_radius = blur_radius / 2;
         }
     }
+    blur_radius = blur_radius / skip_cnt;
 
     uint32_t intensity = (BLUR_MULTIPLIER_MAX * blur_radius) / (blur_radius + 4);
 
@@ -527,9 +589,18 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                     buf_start += stride * skip_cnt;
                 }
             }
-            else if(skip_cnt == 4 && x > 4) {
-                buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start + 4);
-                for(y = y_start + 4; y < y_end; y += skip_cnt) {
+            else if(skip_cnt == 3 && x > skip_cnt) {
+                buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start + skip_cnt);
+                for(y = y_start + skip_cnt; y < y_end; y += skip_cnt) {
+                    //                  printf("%d %d\n", x, y);
+                    uint16_t * buf_start_u16 = buf_start;
+                    repeate_3x3_2byte(buf_start_u16, stride);
+                    buf_start += stride * skip_cnt;
+                }
+            }
+            else if(skip_cnt == 4 && x > skip_cnt) {
+                buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start + skip_cnt);
+                for(y = y_start + skip_cnt; y < y_end; y += skip_cnt) {
                     //                  printf("%d %d\n", x, y);
                     uint16_t * buf_start_u16 = buf_start;
                     repeate_2x2_2byte(buf_start_u16, stride);
@@ -538,19 +609,20 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                     //
                     buf_prev = buf_start_u16 - 4;
                     uint16_t * buf_interp1 = buf_start_u16 - 2;
-                    buf_interp1[0] = lv_color_16_16_mix(buf_start_u16[0], buf_prev[0], LV_OPA_50);
+                    buf_interp1[0] = lv_color_16_16_mix_blur(buf_start_u16[0], buf_prev[0]);
                     repeate_2x2_2byte(buf_interp1, stride);
                     //
                     buf_prev = buf_start_u16 - 4 * stride;
                     uint16_t * buf_interp2 = buf_start - 2 * stride;
-                    buf_interp2[0] = lv_color_16_16_mix(buf_start_u16[0], buf_prev[0], LV_OPA_50);
+                    buf_interp2[0] = lv_color_16_16_mix_blur(buf_start_u16[0], buf_prev[0]);
                     repeate_2x2_2byte(buf_interp2, stride);
 
                     uint16_t * buf_interp3 = buf_start_u16 - 4 * stride - 2;
                     uint16_t * buf_interp4 = buf_start_u16 - 2 * stride - 4;
                     uint16_t * buf_interp_mid = buf_start_u16 - 2 * stride - 2;
-                    //              buf_interp_mid[0] = lv_color_16_16_mix(buf_interp1[0] + buf_interp2[0] + buf_interp3[0] + buf_interp4[0]) / 4;
-                    buf_interp_mid[0] = lv_color_16_16_mix(buf_interp1[0], buf_interp2[0], LV_OPA_50) ;
+                    uint16_t midv12 =  lv_color_16_16_mix_blur(buf_interp1[0], buf_interp2[0]) ;
+                    uint16_t midv34 =  lv_color_16_16_mix_blur(buf_interp3[0], buf_interp4[0]) ;
+                    buf_interp_mid[0] = lv_color_16_16_mix_blur(midv12, midv34);
                     repeate_2x2_2byte(buf_interp_mid, stride);
                     buf_start += stride * skip_cnt;
                 }
@@ -558,7 +630,25 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
         }
     }
-    //    printf("skip_cnt: %d\n", cnt);
+
+
+    for(y = (clipped_coords.y1 / skip_cnt) * skip_cnt; y <= (clipped_coords.y2 / skip_cnt) * skip_cnt - 3; y += skip_cnt) {
+        int32_t cir_x = get_rounded_edge_point(coords->y1, coords->y2, y, radius);
+        int32_t x_start = ((coords->x1 + cir_x) / skip_cnt) * skip_cnt;
+        int32_t x_end = ((coords->x2 - cir_x) / skip_cnt) * skip_cnt;
+
+        x_start = LV_CLAMP((clipped_coords.x1 / skip_cnt) * skip_cnt, x_start, clipped_coords.x2);
+        x_end = LV_CLAMP(clipped_coords.x1, x_end, (clipped_coords.x2 / skip_cnt) * skip_cnt);
+        if(x_start > x_end) continue;
+
+        uint16_t * buf_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+        if(px_size >= 2 && skip_cnt == 3) {
+            lv_memcpy(buf_start + stride, buf_start, stride * 2);
+            lv_memcpy(buf_start + stride * 2, buf_start, stride * 2);
+        }
+    }
+
+    //        printf("skip_cnt: %d\n", cnt);
 
     //    for(y = clipped_coords.y1; y < clipped_coords.y2; y+=2) {
     //
