@@ -258,7 +258,7 @@ void lv_xml_init(void)
 void lv_xml_deinit(void)
 {
 #if LV_USE_TEST
-    lv_xml_test_unregister();
+    lv_xml_unregister_test();
 #endif
 
     lv_xml_load_deinit();
