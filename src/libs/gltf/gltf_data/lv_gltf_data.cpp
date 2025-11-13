@@ -247,7 +247,7 @@ lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, fas
     lv_gltf_node_binds_t key;
     lv_gltf_model_node_t node;
     key.node = &node;
-    node.node = internal_node;
+    node.fastgltf_node = internal_node;
 
     lv_rb_node_t * rb_node = lv_rb_find(&model->node_binds, &key);
     if(!rb_node) {
@@ -280,7 +280,7 @@ static lv_rb_compare_res_t compare_bind_nodes(const void * a, const void * b)
 {
     lv_gltf_node_binds_t * entry_a = (lv_gltf_node_binds_t *) a;
     lv_gltf_node_binds_t * entry_b = (lv_gltf_node_binds_t *) b;
-    return (size_t)entry_a->node - (size_t)entry_b->node;
+    return (size_t)entry_a->node->fastgltf_node - (size_t)entry_b->node->fastgltf_node;
 }
 
 #endif /*LV_USE_GLTF*/
