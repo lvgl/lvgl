@@ -18,6 +18,7 @@
 #include "../../../misc/lv_area.h"
 #include "../../../misc/lv_color.h"
 #include "../gltf_data/lv_gltf_model.h"
+#include "../gltf_data/lv_gltf_bind.h"
 
 #ifdef __cplusplus
 extern "C" {
