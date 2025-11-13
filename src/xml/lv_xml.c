@@ -869,7 +869,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     /* If not a component either, check if it is a slot, e.g. my_button-icon */
     if(state->item == NULL) {
         char buf[128];
-        lv_strncpy(buf, name, sizeof(buf));
+        lv_strlcpy(buf, name, sizeof(buf));
         char * bufp = buf;
         const char * comp_name = lv_xml_split_str(&bufp, '-');
         const char * slot_name = bufp;
