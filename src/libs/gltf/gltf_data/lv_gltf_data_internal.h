@@ -254,9 +254,5 @@ void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              size_t byte_total_count,
                              bool has_alpha);
 
-lv_rb_t * lv_gltf_model_get_binds(lv_gltf_model_t * model);
-
-lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, lv_gltf_model_node_t * node);
-
 #endif /*LV_USE_GLTF*/
 #endif /* LV_GLTFDATA_PRIVATE_H */

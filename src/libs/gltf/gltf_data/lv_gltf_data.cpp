@@ -249,7 +249,7 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
     }
     to->bound_radius = from->bound_radius;
 }
-lv_gltf_node_binds_t * lv_gltf_model_node_get_binds_internal(lv_gltf_model_t * model, fastgltf::Node * internal_node)
+lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, fastgltf::Node * internal_node)
 {
     lv_gltf_node_binds_t key;
     lv_gltf_model_node_t node;
@@ -261,11 +261,6 @@ lv_gltf_node_binds_t * lv_gltf_model_node_get_binds_internal(lv_gltf_model_t * m
         return NULL;
     }
     return (lv_gltf_node_binds_t *) rb_node->data;
-}
-
-lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, lv_gltf_model_node_t * node)
-{
-    return lv_gltf_model_node_get_binds_internal(model, node->node);
 }
 
 /**********************
