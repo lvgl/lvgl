@@ -27,7 +27,17 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+#if LV_USE_EXT_DATA
+typedef struct {
+    void * data;
+    void (* free_cb)(void * data);
+} lv_indev_ext_data_t;
+#endif
+
 struct _lv_indev_t {
+#if LV_USE_EXT_DATA
+    lv_indev_ext_data_t ext_data;
+#endif
     /** Input device type*/
     lv_indev_type_t type;
 

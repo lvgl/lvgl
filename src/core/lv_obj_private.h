@@ -24,6 +24,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+#if LV_USE_EXT_DATA
+typedef struct {
+    void * data[LV_EXT_DATA_MAX_NUM];
+    void (* free_cb)(void * data);
+} lv_obj_ext_data_t;
+#endif
+
 /**
  * Special, rarely used attributes.
  * They are allocated automatically if any elements is set.
@@ -53,6 +60,9 @@ struct _lv_obj_spec_attr_t {
 };
 
 struct _lv_obj_t {
+#if LV_USE_EXT_DATA
+    lv_obj_ext_data_t ext_data;
+#endif
     const lv_obj_class_t * class_p;
     lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;
