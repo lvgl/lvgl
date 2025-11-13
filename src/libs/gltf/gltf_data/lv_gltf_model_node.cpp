@@ -120,6 +120,14 @@ const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node)
     return node->ip;
 }
 
+size_t lv_gltf_model_node_get_count(lv_gltf_model_t * model)
+{
+    if(!model) {
+        return 0;
+    }
+    return lv_array_size(&model->nodes);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

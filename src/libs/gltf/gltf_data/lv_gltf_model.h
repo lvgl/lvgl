@@ -133,6 +133,7 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * data, co
 
 const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node);
 const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node);
+size_t lv_gltf_model_node_get_count(lv_gltf_model_t * model);
 
 #ifdef __cplusplus
 } /*extern "C"*/
