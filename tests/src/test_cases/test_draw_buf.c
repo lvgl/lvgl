@@ -190,6 +190,12 @@ void test_draw_buf_blur(void)
         test_draw_buf_with_args(img, radius, 8, 0, blur_buf, &src_buf);
     }
 
+    /* Testing max radius limit */
+    test_draw_buf_with_args(img, 127, 16, 7, blur_buf, &src_buf);
+    test_draw_buf_with_args(img, 128, 16, 7, blur_buf, &src_buf);
+    /* Should be the same as 127 */
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_buf_blur_radius_127_aprec_16_zprec_7.png");
+
     /* Testing in-place blur */
     for(uint16_t radius = 0; radius <= 100; radius += 20) {
         lv_draw_buf_copy(blur_buf, NULL, &src_buf, NULL);
