@@ -223,13 +223,6 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
     return data->vertex_max;
 }
 
-
-lv_rb_t * lv_gltf_model_get_binds(lv_gltf_model_t * model)
-{
-    return &model->node_binds;
-}
-
-
 void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 {
     {
