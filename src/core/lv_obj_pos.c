@@ -1128,6 +1128,9 @@ static int32_t calc_content_width(lv_obj_t * obj)
             lv_obj_t * child = obj->spec_attr->children[i];
             if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
+            if(child->w_ignore_size)
+                continue;
+
             if(!lv_obj_is_layout_positioned(child)) {
                 lv_align_t align = lv_obj_get_style_align(child, LV_PART_MAIN);
                 switch(align) {
