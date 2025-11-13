@@ -218,7 +218,7 @@ static int32_t exp_get_alpha(int32_t radius, int32_t aprec)
      * }
      */
 
-    static const int32_t alpha_table[] = {
+    static const int32_t exp_table[] = {
         89974120, 68336320, 53544100, 43729512,
         36871636, 31841434, 28004848, 24986344,
         22551388, 20546638, 18867850, 17441798,
@@ -252,14 +252,14 @@ static int32_t exp_get_alpha(int32_t radius, int32_t aprec)
         1882875, 1867586, 1852542, 1837742,
         1823175, 1808840, 1794725, 1780825,
     };
-    static const int32_t alpha_table_size = sizeof(alpha_table) / sizeof(alpha_table[0]);
+    static const int32_t exp_table_size = sizeof(exp_table) / sizeof(exp_table[0]);
 
-    if(radius >= alpha_table_size) {
-        LV_LOG_WARN("Radius: %" LV_PRIu32 " is too large, clamping to %" LV_PRIu32, radius, alpha_table_size - 1);
-        radius = alpha_table_size - 1;
+    if(radius >= exp_table_size) {
+        LV_LOG_WARN("Radius: %" LV_PRIu32 " is too large, clamping to %" LV_PRIu32, radius, exp_table_size - 1);
+        radius = exp_table_size - 1;
     }
 
-    return (int32_t)(((int64_t)(1 << aprec) * alpha_table[radius]) / 100000000);
+    return (int32_t)(((int64_t)(1 << aprec) * exp_table[radius]) / 100000000);
 }
 
 static void exp_blur(uint8_t * dst,
