@@ -7,6 +7,7 @@
 #include <lvgl.h>
 
 #include "lv_gltf_bind.h"
+#include "lv_gltf_data_internal.hpp"
 
 static uint32_t bind_count = 0;
 
@@ -58,7 +59,7 @@ lv_gltf_bind_t * lv_gltf_bind_node(lv_gltf_model_t * model, lv_gltf_model_node_t
     new_bind.dirty = true;
     new_bind.node = node;
 
-    lv_rb_t * model_binds = lv_gltf_model_get_binds(model);
+    lv_rb_t * model_binds = &model->node_binds;
     lv_gltf_node_binds_t * rb_entry = NULL;
 
     {
@@ -67,6 +68,7 @@ lv_gltf_bind_t * lv_gltf_bind_node(lv_gltf_model_t * model, lv_gltf_model_node_t
         lv_rb_node_t * rb_node = lv_rb_find(model_binds, &key);
 
         if(!rb_node) {
+            LV_LOG_USER("No rb node ");
             rb_node = lv_rb_insert(model_binds, &key);
             if(!rb_node) {
                 LV_LOG_ERROR("Failed to allocate new bind tree");
@@ -76,7 +78,12 @@ lv_gltf_bind_t * lv_gltf_bind_node(lv_gltf_model_t * model, lv_gltf_model_node_t
             rb_entry = (lv_gltf_node_binds_t *)rb_node->data;
             lv_array_init(&rb_entry->binds, 1, sizeof(lv_gltf_bind_t));
         }
+        else {
+            rb_entry = (lv_gltf_node_binds_t *)rb_node->data;
+        }
+
     }
+    LV_LOG_USER("Binding %p", node->fastgltf_node);
 
     lv_result_t res = lv_array_push_back(&rb_entry->binds, &new_bind);
     if(res == LV_RESULT_INVALID) {
@@ -90,7 +97,7 @@ lv_gltf_bind_t * lv_gltf_bind_node(lv_gltf_model_t * model, lv_gltf_model_node_t
 void lv_gltf_bind_remove(lv_gltf_model_t * model, lv_gltf_bind_t * bind)
 {
 
-    lv_rb_t * model_binds = lv_gltf_model_get_binds(model);
+    lv_rb_t * model_binds = &model->node_binds;
 
     lv_gltf_node_binds_t key = {.node = bind->node};
     lv_rb_node_t * rb_node = lv_rb_find(model_binds, &key);
