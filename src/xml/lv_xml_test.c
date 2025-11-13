@@ -396,10 +396,10 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         screen_cmp_res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
         if(screen_cmp_res != LV_TEST_SCREENSHOT_RESULT_PASSED) {
             LV_LOG_WARN("screenshot compare of `%s` failed", step->param.screenshot_compare.path);
-            res = true;
+            res = false;
         }
         else {
-            res = false;
+            res = true;
         }
 
         /*Restore*/

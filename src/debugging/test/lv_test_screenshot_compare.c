@@ -101,7 +101,9 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 
+#if LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
     create_folders_if_needed(fn_ref_full);
+#endif
 
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
 
