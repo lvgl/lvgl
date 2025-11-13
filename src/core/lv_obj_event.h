@@ -196,7 +196,7 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e);
 
 /**
  * Get the previous state before the state change.
- * Can be used in `LV_EVENT_STATE_CHANGED event`
+ * Can be used in `LV_EVENT_STATE_CHANGED` event
  * @param e     pointer to an event
  * @return      the previous state
  */
