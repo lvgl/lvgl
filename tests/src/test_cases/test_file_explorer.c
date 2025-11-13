@@ -130,6 +130,7 @@ static void read_dir(void)
 void test_file_explorer_show_back_button(void)
 {
     lv_file_explorer_show_back_button(file_explorer_obj, false);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/file_explorer_01.png");
 }
 
 #endif
