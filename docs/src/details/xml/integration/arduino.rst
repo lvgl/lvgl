@@ -54,28 +54,25 @@ LVGL source files typically use this include pattern:
         #include "lvgl/lvgl.h"
     #endif
 
+The ``LV_LVGL_H_INCLUDE_SIMPLE`` define controls how LVGL headers are included.
+However, the Arduino IDE does not provide a way to add custom compiler symbols through its interface.
+Instead, you must modify the ``platform.txt`` file for the specific board core you are using.
 
-The ``LV_LVGL_H_INCLUDE_SIMPLE`` define allows flexibility in how LVGL is included.
-However, Arduino’s build system doesn’t provide a way to set this define globally across all source files.
-As a result, the compiler falls back to:
+To ensure correct compilation, you need to instruct the Arduino build system to define ``LV_LVGL_H_INCLUDE_SIMPLE`` during compilation.
 
-.. code-block:: c
+1. Locate the ``platform.txt`` file for your Arduino core.
+    Example paths:
+    - ESP32: ``hardware/esp32/esp32/``
+    - AVR (Uno, Mega): ``hardware/arduino/avr/``
+2. Open the file in a text editor.
+3. Find the line starting with: ``build.extra_flags=``
+4. Add the following flag to it: ``-DLV_LVGL_H_INCLUDE_SIMPLE``
 
-    #include "lvgl/lvgl.h"
+The modified line should look similar to this:
 
-which fails, because Arduino installs the LVGL library headers directly (e.g. ``libraries/lvgl/src/lvgl.h``), not in a nested ``lvgl/`` folder.
+.. code-block:: text
 
-To fix this, replace all occurrences of:
-
-.. code-block:: c
-
-    #include "lvgl/lvgl.h"
-
-with:
-
-.. code-block:: c
-
-    #include "lvgl.h"
+    build.extra_flags=-DARDUINO_HOST_OS="{runtime.os}" -DARDUINO_FQBN="{build.fqbn}" -DESP32=ESP32 -DCORE_DEBUG_LEVEL={build.code_debug} {build.loop_core} {build.event_core} {build.defines} {build.extra_flags.{build.mcu}} {build.zigbee_mode} -DLV_LVGL_H_INCLUDE_SIMPLE
 
 Relative paths
 --------------
