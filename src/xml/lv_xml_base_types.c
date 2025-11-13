@@ -285,6 +285,7 @@ lv_event_code_t lv_xml_trigger_text_to_enum_value(const char * txt)
     if(lv_streq("child_changed", txt)) return LV_EVENT_CHILD_CHANGED;
     if(lv_streq("child_created", txt)) return LV_EVENT_CHILD_CREATED;
     if(lv_streq("child_deleted", txt)) return LV_EVENT_CHILD_DELETED;
+    if(lv_streq("state_changed", txt)) return LV_EVENT_STATE_CHANGED;
     if(lv_streq("screen_unload_start", txt)) return LV_EVENT_SCREEN_UNLOAD_START;
     if(lv_streq("screen_load_start", txt)) return LV_EVENT_SCREEN_LOAD_START;
     if(lv_streq("screen_loaded", txt)) return LV_EVENT_SCREEN_LOADED;
