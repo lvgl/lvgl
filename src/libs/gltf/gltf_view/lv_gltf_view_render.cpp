@@ -1179,7 +1179,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                                                 localmatrix);
             made_changes = true;
         }
-        lv_gltf_node_binds_t * bind_entry = lv_gltf_model_node_get_binds_internal(gltf_data, &node);
+        lv_gltf_node_binds_t * bind_entry = lv_gltf_model_node_get_binds(gltf_data, &node);
         if(bind_entry) {
             fastgltf::math::fvec3 local_pos;
             fastgltf::math::fquat local_quat;
