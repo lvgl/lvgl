@@ -1422,15 +1422,29 @@ Sets the intensity of blurring. Applied on each lv_part separately before the ch
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
-backdrop_blur_radius
-~~~~~~~~~~~~~~~~~~~~
+blur_backdrop
+~~~~~~~~~~~~~
 
-Sets the intensity of blurring of the widget's background. Applied before the given part is rendered. The part should have < 100% opacity to make it visible.
+If `true` the background of the widget will be blurred. The part should have < 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children.
 
 .. raw:: html
 
   <ul>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `false`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+blur_quality
+~~~~~~~~~~~~
+
+Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BLUR_QUALITY_AUTO`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
