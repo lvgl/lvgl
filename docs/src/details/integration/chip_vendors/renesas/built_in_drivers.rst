@@ -46,3 +46,9 @@ fbdev
 -----
 
 The LVGL ``fbdev`` (frame buffer) display driver can almost always be used.
+
+OpenGL
+------
+
+The constantly evolving OpenGL driver in LVGL has proven to be the most performant driver
+in at least one case and can be used wherever the prerequisites are satisfied.
