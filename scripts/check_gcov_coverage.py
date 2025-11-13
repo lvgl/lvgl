@@ -72,10 +72,10 @@ def get_changed_lines(commit: str, root: str) -> Dict[str, Set[int]]:
     return changed_lines
 
 
-def get_coverage_data(root: str) -> Tuple[Dict[str, Dict[int, int]], str]:
+def get_coverage_data(root: str) -> Dict[str, Dict[int, int]]:
     """
     Get coverage data using gcovr
-    Returns: ({rel_file_path: {line_number: execution_count}}, filter_pattern)
+    Returns: {rel_file_path: {line_number: execution_count}}
     Notes:
     - Only lines explicitly present in gcovr JSON are considered "coverable".
         Lines that are missing from the JSON (e.g. preprocessor directives like
@@ -175,7 +175,7 @@ def check_commit_coverage(
 
     # Normalize changed file paths to POSIX separators for matching.
     normalized_changed: Dict[str, Set[int]] = {
-        (f.replace(os.path.sep, "/")): lines for f, lines in changed_lines.items()
+        f.replace(os.path.sep, "/"): lines for f, lines in changed_lines.items()
     }
 
     # If desired, we could additionally filter by the gcovr filter pattern.
@@ -197,7 +197,7 @@ def check_commit_coverage(
             skipped_noncoverable += len(line_numbers)
             continue
 
-        file_coverage = coverage_data.get(filename, {})
+        file_coverage = coverage_data[filename]
         for lineno in line_numbers:
             if lineno not in file_coverage:
                 skipped_noncoverable += 1
