@@ -15,7 +15,7 @@
 #include "../misc/lv_color.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
-#include "../others/observer/lv_observer_private.h"
+#include "lv_observer_private.h"
 
 /*********************
  *      DEFINES
