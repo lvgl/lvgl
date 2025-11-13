@@ -404,7 +404,7 @@ static void birthday_event_cb(lv_event_t * e)
         if(lv_indev_get_type(lv_indev_active()) == LV_INDEV_TYPE_POINTER) {
             if(calendar == NULL) {
                 lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
-                lv_obj_set_style_backdrop_blur_radius(lv_layer_top(), 32, 0);
+                lv_obj_set_style_blur_radius(lv_layer_top(), 32, 0);
                 calendar = lv_calendar_create(lv_layer_top());
                 lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_30, 0);
                 lv_obj_set_style_bg_color(lv_layer_top(), lv_palette_main(LV_PALETTE_GREY), 0);
@@ -437,7 +437,7 @@ static void calendar_event_cb(lv_event_t * e)
         calendar = NULL;
         lv_obj_remove_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
-        lv_obj_set_style_backdrop_blur_radius(lv_layer_top(), 0, 0);
+        lv_obj_set_style_blur_radius(lv_layer_top(), 0, 0);
     }
 }
 

@@ -1439,7 +1439,11 @@ If `true` the background of the widget will be blurred. The part should have < 1
 blur_quality
 ~~~~~~~~~~~~
 
+<<<<<<< HEAD:docs/src/common-widget-features/styles/style-properties.rst
 Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically. 
+=======
+Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
+>>>>>>> 9d262f236 (works well, these are missing: XML support, more tests):docs/src/details/common-widget-features/styles/style-properties.rst
 
 .. raw:: html
 
