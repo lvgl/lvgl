@@ -107,6 +107,10 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
 
+    /*The widget will be rendered.
+     *So setters from now should use animations. */
+    obj->rendered = 1;
+
     /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
@@ -258,6 +262,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
 
     layer->_clip_area = clip_area_ori;
+
     LV_PROFILER_REFR_END;
 }
 

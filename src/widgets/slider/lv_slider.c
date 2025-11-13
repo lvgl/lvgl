@@ -234,7 +234,6 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     }
 
     lv_obj_add_event_cb(obj, slider_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
-
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, slider_value_observer_cb, obj, NULL);
     return observer;
 }
@@ -682,12 +681,15 @@ static void slider_value_changed_event_cb(lv_event_t * e)
 
 static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    /*If the slider is not rendered yet show the new state immediately*/
+    lv_anim_enable_t anim_on = obj->rendered ? LV_ANIM_ON : LV_ANIM_OFF;
     if(subject->type == LV_SUBJECT_TYPE_INT) {
-        lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
+        lv_slider_set_value(observer->target, subject->value.num, anim_on);
     }
 #if LV_USE_FLOAT
     else {
-        lv_slider_set_value(observer->target, (int32_t)subject->value.float_v, LV_ANIM_OFF);
+        lv_slider_set_value(observer->target, (int32_t)subject->value.float_v, anim_on);
     }
 #endif
 }

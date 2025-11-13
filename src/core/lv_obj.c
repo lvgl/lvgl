@@ -994,6 +994,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == LV_STYLE_STATE_CMP_SAME) {
         obj->state = new_state;
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
         return;
     }
 
@@ -1002,6 +1003,18 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     obj->state = new_state;
     lv_obj_update_layer_type(obj);
+
+    /*Skip transitions if the widget is not rendered yet. */
+    if(!obj->rendered) {
+        lv_obj_invalidate(obj);
+        if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+            lv_obj_refresh_ext_draw_size(obj);
+        }
+
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
+        return;
+    }
+
     lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
@@ -1058,6 +1071,8 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
         lv_obj_invalidate(obj);
         lv_obj_refresh_ext_draw_size(obj);
     }
+
+    lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
 }
 
 /**

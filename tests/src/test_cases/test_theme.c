@@ -141,6 +141,8 @@ static void test_widgets(const char * img_name)
 
     lv_spinner_create(scr_act);
 
+    lv_test_wait(1000); /*Wait for the transitions*/
+
     TEST_ASSERT_EQUAL_SCREENSHOT(img_name);
 
     lv_obj_clean(scr_act);

@@ -964,8 +964,11 @@ static void roller_value_changed_event_cb(lv_event_t * e)
 
 static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    /*If the roller is not rendered yet show the new state immediately*/
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_anim_enable_t anim_on = obj->rendered ? LV_ANIM_ON : LV_ANIM_OFF;
     if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
-        lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
+        lv_roller_set_selected(observer->target, subject->value.num, anim_on);
     }
 }
 

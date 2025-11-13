@@ -78,6 +78,7 @@ typedef enum {
     LV_EVENT_REFRESH,             /**< Notify Widget to refresh something on it (for user)*/
     LV_EVENT_READY,               /**< A process has finished */
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
+    LV_EVENT_STATE_CHANGED,       /**< The state of the widget changed*/
 
     /** Other events */
     LV_EVENT_CREATE,              /**< Object is being created */
