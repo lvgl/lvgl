@@ -1054,7 +1054,7 @@ static void add_warnings(void)
         char buf[128];
         lv_snprintf(buf, sizeof(buf),
                     "LV_DRAW_LAYER_SIMPLE_BUF_SIZE is small making opa_layered slow. Consider 1/20 screen size for it (> %"LV_PRIu32"kB)",
-                    (ideal_layer_size / 1024) + 1);
+                    LV_ALIGN_UP(ideal_layer_size, 1024) / 1024;
         add_warning_label(buf);
     }
 
