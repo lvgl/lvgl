@@ -70,6 +70,8 @@ The following simple built-in types are supported:
 
 :scale_1/256:   Scale/Zoom, where 256 means 100%, 128 means 50%, 512 means 200% etc.
 
+:style_prop:    A style property, for example ``"bg_opa"`` meaning :cpp:enumerator:`LV_STYLE_BG_OPA`.
+
 Name-based types
 ----------------
 

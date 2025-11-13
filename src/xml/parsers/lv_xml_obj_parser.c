@@ -492,6 +492,43 @@ void lv_obj_xml_bind_style_apply(lv_xml_parser_state_t * state, const char ** at
     lv_obj_bind_style(item, &xml_style->style, selector, subject, ref_value);
 }
 
+
+void * lv_obj_xml_bind_style_prop_create(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    LV_UNUSED(attrs);
+    void * item = lv_xml_state_get_parent(state);
+    return item;
+}
+
+void lv_obj_xml_bind_style_prop_apply(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    const char * prop_str = lv_xml_get_value_of(attrs, "prop");
+    if(prop_str == NULL) {
+        LV_LOG_WARN("`prop` is missing in lv_obj bind_style_prop");
+        return;
+    }
+    lv_style_prop_t prop = lv_xml_style_prop_to_enum(prop_str);
+
+    const char * subject_str = lv_xml_get_value_of(attrs, "subject");
+
+    if(subject_str == NULL) {
+        LV_LOG_WARN("`subject` is missing in lv_obj bind_style_prop");
+        return;
+    }
+
+    lv_subject_t * subject = lv_xml_get_subject(&state->scope, subject_str);
+    if(subject == NULL) {
+        LV_LOG_WARN("Subject `%s` doesn't exist in lv_obj bind_style_prop", subject_str);
+        return;
+    }
+
+    const char * selector_str = lv_xml_get_value_of(attrs, "selector");
+    lv_style_selector_t selector = lv_xml_style_selector_text_to_enum(selector_str);
+
+    void * item = lv_xml_state_get_parent(state);
+    lv_obj_bind_style_prop(item, prop, selector, subject);
+}
+
 void * lv_obj_xml_bind_flag_create(lv_xml_parser_state_t * state, const char ** attrs)
 {
     LV_UNUSED(attrs);

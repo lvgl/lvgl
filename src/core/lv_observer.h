@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_obj.h"
+
 #if LV_USE_OBSERVER
 
 /*********************
@@ -54,7 +55,7 @@ typedef union {
 /**
  * The Subject (an observable value)
  */
-typedef struct {
+struct _lv_subject_t {
     lv_ll_t subs_ll;                     /**< Subscribers */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
@@ -65,7 +66,7 @@ typedef struct {
     uint32_t size                 : 24;  /**< String buffer size or group length */
     uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notification,
                                           * start notifying from the beginning. */
-} lv_subject_t;
+};
 
 /**
   * Callback called to notify Observer that Subject's value has changed
@@ -448,18 +449,6 @@ void lv_obj_add_subject_set_float_event(lv_obj_t * obj, lv_subject_t * subject, 
  */
 void lv_obj_add_subject_set_string_event(lv_obj_t * obj, lv_subject_t * subject, lv_event_code_t trigger,
                                          const char * value);
-
-/**
- * Disable a style if a subject's value is not equal to a reference value
- * @param obj           pointer to Widget
- * @param style         pointer to a style
- * @param selector      pointer to a selector
- * @param subject       pointer to Subject
- * @param ref_value     reference value to compare Subject's value with
- * @return              pointer to newly-created Observer
- */
-lv_observer_t * lv_obj_bind_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector,
-                                  lv_subject_t * subject, int32_t ref_value);
 
 /**
  * Set Widget's flag(s) if an integer Subject's value is equal to a reference value, clear flag otherwise.

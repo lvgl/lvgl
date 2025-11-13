@@ -51,6 +51,9 @@ void lv_obj_xml_subject_increment_apply(lv_xml_parser_state_t * state, const cha
 void * lv_obj_xml_bind_style_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_bind_style_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
+void * lv_obj_xml_bind_style_prop_create(lv_xml_parser_state_t * state, const char ** attrs);
+void lv_obj_xml_bind_style_prop_apply(lv_xml_parser_state_t * state, const char ** attrs);
+
 void * lv_obj_xml_bind_flag_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_obj_xml_bind_flag_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
