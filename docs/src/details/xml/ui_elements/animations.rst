@@ -61,7 +61,7 @@ that you can reference later.
 Inside a ``<timeline>``, you add ``<animation>``\ s to describe each step.
 Supported properties of ``<animation>`` are:
 
-- ``prop``: Style property to animate. All integer style properties are supported (colors are not).
+- ``prop``: Style property to animate. All integer, percentage and color style properties are supported.
 - ``selector``: Style selector, e.g. ``knob|pressed``. Default: ``main|default``.
 - ``target``: Name of the UI element to animate. ``self`` refers to the root element of the Component (the ``<view>``).
 - ``start``: Start value (integer only).
