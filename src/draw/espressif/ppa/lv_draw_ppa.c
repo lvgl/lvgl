@@ -27,13 +27,6 @@ static int32_t ppa_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t ppa_delete(lv_draw_unit_t * draw_unit);
 static void  ppa_execute_drawing(lv_draw_ppa_unit_t * u);
-static bool ppa_isr(ppa_client_handle_t ppa_client, ppa_event_data_t * event_data, void * user_data);
-
-#if LV_PPA_NONBLOCKING_OPS
-    static void ppa_thread(void * arg);
-#endif
-
-static bool g_ppa_complete = true;
 
 /**********************
 *   GLOBAL FUNCTIONS
@@ -43,10 +36,6 @@ void lv_draw_ppa_init(void)
 {
     esp_err_t res;
     ppa_client_config_t cfg = {0};
-    ppa_event_callbacks_t ppa_cbs = {
-        .on_trans_done = ppa_isr,
-
-    };
 
     /* Create draw unit */
     lv_draw_buf_ppa_init_handlers();
@@ -58,7 +47,7 @@ void lv_draw_ppa_init(void)
 
     /* Register SRM client */
     cfg.oper_type = PPA_OPERATION_SRM;
-    cfg.max_pending_trans_num = 8;
+    cfg.max_pending_trans_num = 1;
     cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
 
     res = ppa_register_client(&cfg, &draw_ppa_unit->srm_client);
@@ -72,21 +61,10 @@ void lv_draw_ppa_init(void)
 
     /* Register Blend client */
     cfg.oper_type = PPA_OPERATION_BLEND;
-    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_32;
+    cfg.data_burst_length = PPA_DATA_BURST_LENGTH_128;
 
     res = ppa_register_client(&cfg, &draw_ppa_unit->blend_client);
     LV_ASSERT(res == ESP_OK);
-
-    ppa_client_register_event_callbacks(draw_ppa_unit->srm_client, &ppa_cbs);
-    ppa_client_register_event_callbacks(draw_ppa_unit->fill_client, &ppa_cbs);
-    ppa_client_register_event_callbacks(draw_ppa_unit->blend_client, &ppa_cbs);
-
-#if LV_PPA_NONBLOCKING_OPS
-    lv_result_t lv_res = lv_thread_init(&draw_ppa_unit->thread, "ppa_thread", LV_DRAW_THREAD_PRIO, ppa_thread, 8192,
-                                        draw_ppa_unit);
-    LV_ASSERT(lv_res == LV_RESULT_OK);
-#endif
-
 }
 
 void lv_draw_ppa_deinit(void)
@@ -97,19 +75,6 @@ void lv_draw_ppa_deinit(void)
 /**********************
 *   STATIC FUNCTIONS
 **********************/
-
-static bool ppa_isr(ppa_client_handle_t ppa_client, ppa_event_data_t * event_data, void * user_data)
-{
-    g_ppa_complete = true;
-
-#if LV_PPA_NONBLOCKING_OPS
-    lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)user_data;
-    lv_thread_sync_signal_isr(&u->interrupt_signal);
-#endif
-
-    return false;
-}
-
 static int32_t ppa_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
@@ -170,18 +135,12 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_ppa_unit_t * u = (lv_draw_ppa_unit_t *)draw_unit;
     if(u->task_act) {
-        if(!g_ppa_complete) {
-            return LV_DRAW_UNIT_IDLE;
-        }
-        else {
-            u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-            u->task_act = NULL;
-        }
+        return LV_DRAW_UNIT_IDLE;
     }
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PPA);
     if(!t || t->preferred_draw_unit_id != DRAW_UNIT_ID_PPA) return LV_DRAW_UNIT_IDLE;
-    if(!lv_draw_layer_alloc_buf(layer)) return LV_DRAW_UNIT_IDLE;
+    if(lv_draw_layer_alloc_buf(layer) == NULL) return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     u->task_act = t;
@@ -189,11 +148,9 @@ static int32_t ppa_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     ppa_execute_drawing(u);
 
-#if !LV_PPA_NONBLOCKING_OPS
     u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
     lv_draw_dispatch_request();
-#endif
 
     return 1;
 }
@@ -213,43 +170,22 @@ static void ppa_execute_drawing(lv_draw_ppa_unit_t * u)
     lv_layer_t * layer         = t->target_layer;
     lv_draw_buf_t * buf        = layer->draw_buf;
     lv_area_t area;
-    lv_area_t draw_area;
 
     if(!lv_area_intersect(&area, &t->area, &t->clip_area)) return;
-
-    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
-    lv_draw_buf_invalidate_cache(buf, &draw_area);
+    lv_draw_buf_invalidate_cache(buf, &area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            g_ppa_complete = false;
             lv_draw_ppa_fill(t, (lv_draw_fill_dsc_t *)t->draw_dsc, &area);
+            lv_draw_buf_invalidate_cache(buf, &area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            g_ppa_complete = false;
             lv_draw_ppa_img(t, (lv_draw_image_dsc_t *)t->draw_dsc, &area);
+            lv_draw_buf_invalidate_cache(buf, &area);
             break;
         default:
             break;
     }
 }
-
-#if LV_PPA_NONBLOCKING_OPS
-static void ppa_thread(void * arg)
-{
-    lv_draw_ppa_unit_t * u = arg;
-    lv_thread_sync_init(&u->interrupt_signal);
-
-    while(1) {
-        do {
-            lv_thread_sync_wait(&u->interrupt_signal);
-        } while(u->task_act != NULL);
-
-        u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
-        u->task_act = NULL;
-        lv_draw_dispatch_request();
-    }
-}
-#endif
 
 #endif /*LV_USE_PPA*/
