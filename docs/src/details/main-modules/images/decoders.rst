@@ -60,15 +60,18 @@ To use the encoded file as a variable, choose one of these approaches:
   into your project.  The color format is stored in the ``header.cf`` field of the
   :cpp:type:`lv_image_dsc_t` struct.
 
-- Load the whole file into RAM using :cpp:func:`what_function_does_this`, manually
-  create a :cpp:type:`lv_image_dsc_t` and point the ``data`` field to the byte array
-  loaded, and set the ``header.cf`` field to :c:macro:`LV_COLOR_FORMAT_RAW` or
-  :c:macro:`LV_COLOR_FORMAT_RAW_ALPHA`, and set the image source to this
+- There could be case where it was needed to load an image file into
+  dynamically-allocated RAM at run-time and free it later, thus avoiding storing the
+  images as part of the application.  In this case, you could manually create a
+  :cpp:type:`lv_image_dsc_t` and point the ``data`` field to the byte array containing
+  the file content and set the ``header.cf`` field to :c:macro:`LV_COLOR_FORMAT_RAW`
+  or :c:macro:`LV_COLOR_FORMAT_RAW_ALPHA`, and set the image source to this
   :cpp:type:`lv_image_dsc_t` object using :cpp:expr:`lv_image_set_src(icon, &my_img_dsc)`,
   and when it is time to decode, the registered decoder that recognizes the image
   format will be used to decode it.
 
-  TODO: verify/confirm this
+  The types having the word "variable" in the "Form" column in the table above would
+  support this approach if it was needed.
 
 
 
@@ -169,29 +172,28 @@ as an example.  In ``lv_libpng.c``, see the following functions as examples to f
 Manually Using an Image Decoder
 -------------------------------
 
-TODO: verify/confirm this section is obsolete, no longer supported
-      (lv_image_decoder_dsc_t is private).
-
 LVGL will use registered image decoders automatically if you try and
 draw a raw image (i.e. using the ``lv_image`` Widget) but you can use them
 manually as well. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
 the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
-The ``color`` parameter is used only with ``LV_COLOR_FORMAT_A1/2/4/8``
-images to tell color of the image.
-
 .. code-block:: c
 
+    lv_result_t res;
+    lv_image_decoder_dsc_t dsc;
+    lv_image_decoder_args_t args = { 0 }; /* Custom decoder behavior via args */
+    res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
 
-   lv_result_t res;
-   lv_image_decoder_dsc_t dsc;
-   lv_image_decoder_args_t args = { 0 }; /* Custom decoder behavior via args */
-   res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
-
-   if(res == LV_RESULT_OK) {
-     /* Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
-     lv_image_decoder_close(&dsc);
+    if(res == LV_RESULT_OK) {
+        /* Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
+        lv_image_decoder_close(&dsc);
    }
+
+.. note::
+
+    You would need to set :c:macro:`LV_USE_PRIVATE_API` to ``1`` in ``lv_conf.h``
+    in order to do this since the definition of the :cpp:type:`lv_image_decoder_dsc_t`
+    and :cpp:type:`_lv_image_decoder_args_t` structs are both in a private header file.
 
 
 Image Post-Processing
@@ -201,95 +203,89 @@ Considering that some hardware has special requirements for image formats, such 
 alpha premultiplication and stride alignment, most image decoders (such as PNG
 decoders) may not directly output image data that meets hardware requirements.
 
-For this reason, LVGL provides a solution for image post-processing.  First, call a
-custom post-processing function after ``lv_image_decoder_open`` to adjust the data in
-the image cache, and then mark the processing status in
-``cache_entry->process_state`` (to avoid repeated post-processing).
+For this reason, LVGL provides a method for implementing custom image post-processing
+to address unpredicted future GPU requirements (over and above the premultiplication
+and stride alignment provided by :cpp:func:`lv_image_decoder_post_process`):
 
-See the detailed code below:
+- In your custom GPU :ref:`draw unit <draw units>`, call a custom post-processing
+  function after ``lv_image_decoder_open`` to adjust the data in the image cache, and
+- then mark the processing status in ``cache_entry->process_state`` (to avoid repeated
+  post-processing).
 
-- Stride alignment and premultiply post-processing example:
+The below code example assumes the image was opened using the decoder interface
+(e.g. using :ref:`libpng` and thus has already called
+:cpp:func:`lv_image_decoder_post_process` to perform stride alignment and/or
+premultiplication via the decoder descriptor's ``args`` field).
+
+Example (requires :c:macro:`LV_USE_PRIVATE_API` to ``1`` in ``lv_conf.h``):
 
 .. code-block:: c
 
     /* Define post-processing state */
     typedef enum {
-        IMAGE_PROCESS_STATE_NONE = 0,
-        IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
-        IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
+        MY_IMAGE_PROCESS_STATE_NONE = 0,
+        MY_IMAGE_PROCESS_STATE_BIT_SHIFTED = 1 << 4,
     } image_process_state_t;
 
-    lv_draw_buf_t * my_image_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
+    #include "..\..\..\src\draw\lv_image_decoder_private.h"
+    #include "..\..\..\src\misc\cache\lv_cache_entry_private.h"
+    lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
     {
-        if(decoded == NULL) {
-            return NULL; /* No need to adjust */
-        }
+        lv_color_format_t color_format = dsc->header.cf;
+        lv_result_t res = LV_RESULT_OK;
 
-        lv_image_decoder_args_t * args = &dsc->args;
-        if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
-            uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-            if(decoded->header.stride != stride_expect) {
-                LV_LOG_TRACE("Stride mismatch");
-                lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
-                if(res != LV_RESULT_OK) {
-                    lv_draw_buf_t * aligned = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
-                                                                    decoded->header.cf, stride_expect);
-                    if(aligned == NULL) {
-                        LV_LOG_ERROR("No memory for Stride adjust.");
-                        return NULL;
-                    }
+        if (color_format == LV_COLOR_FORMAT_ARGB8888) {
+            lv_cache_t * cache_p = dsc->cache;
+            lv_cache_entry_t * entry = dsc->cache_entry;
+            lv_mutex_lock(&cache_p->lock);
 
-                    lv_draw_buf_copy(aligned, NULL, decoded, NULL);
-                    decoded = aligned;
-                }
-            }
-        }
-
-        /* Premultiply alpha channel */
-        if(args->premultiply
-           && !LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoded->header.cf)
-           && lv_color_format_has_alpha(decoded->header.cf)
-           && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED)
-           && decoded->header.cf != LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED /* Not done yet */
-          ) {
-            LV_LOG_TRACE("Alpha premultiply.");
-            if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {
-                /*Do it directly*/
-                lv_draw_buf_premultiply(decoded);
-            }
-            else {
-                decoded = lv_draw_buf_dup_ex(image_cache_draw_buf_handlers, decoded);
-                if(decoded == NULL) {
-                    LV_LOG_ERROR("No memory for premultiplying.");
-                    return NULL;
+            if (!(entry->flags & MY_IMAGE_PROCESS_STATE_BIT_SHIFTED)) {
+                lv_draw_buf_t * shifted_buf = NULL; /* Insert allocation call here. */
+                if (shifted_buf == NULL) {
+                    LV_LOG_ERROR("No memory for bit-shifting adjustment.");
+                    res = LV_RESULT_INVALID;
+                    goto alloc_failed;
                 }
 
-                lv_draw_buf_premultiply(decoded);
+                /* Handle additional GPU requirement here. */
+
+                lv_free(dsc->decoded);
+                dsc->decoded = shifted_buf;
+                entry->flags |= MY_IMAGE_PROCESS_STATE_BIT_SHIFTED;
+                LV_LOG_USER("Bit shifting completed.");
             }
+
+        alloc_failed:
+            lv_mutex_unlock(&cache_p->lock);
         }
 
-        return decoded;
+        return res;
     }
 
-
-- GPU draw unit example:
-
-.. code-block:: c
+    /* GPU draw unit */
 
     void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
     {
-        ...
+        /* ... */
         lv_image_decoder_dsc_t decoder_dsc;
-        lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
-        if(res != LV_RESULT_OK) {
+        lv_image_decoder_args_t args;
+        lv_memzero(&args, sizeof(args));
+        args.premultiply = true;
+        args.stride_align = true;
+        lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, &args);
+
+        if (res != LV_RESULT_OK) {
             LV_LOG_ERROR("Failed to open image");
             return;
-      }
+        }
 
-      res = my_image_post_process(&decoder_dsc);
-      if(res != LV_RESULT_OK) {
-          LV_LOG_ERROR("Failed to post-process image");
-          return;
-      }
-      ...
+        /* Pre-multiplication and stride alignment are now done from the call to
+         * lv_image_decoder_open() above.  But our additional GPU requirement (which we
+         * are calling bit-shifting above) isn't handled yet, so we do it below. */
+        res = my_image_post_process(&decoder_dsc);
+        if (res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to post-process image");
+            return;
+        }
+        /* ... */
     }
