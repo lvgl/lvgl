@@ -170,7 +170,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == LV_GLTF_BG_MODE_ENVIRONMENT);
     bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_MODE_ON) ||
                              (view_desc->aa_mode == LV_GLTF_AA_MODE_DYNAMIC && model->last_frame_no_motion == true);
-    if(prepare_bg == false) {
+    if(!prepare_bg) {
         /* If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn*/
         opt_aa_this_frame = view_desc->frame_was_antialiased;
     }
@@ -1175,8 +1175,6 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
     size_t current_camera_count = 0;
 
     lv_gltf_data_clear_transform_cache(model);
-    LV_LOG_USER("Recache all transforms");
-
 
     auto tmat = fastgltf::math::fmat4x4{};
     fastgltf::custom_iterate_scene_nodes(
@@ -1214,13 +1212,10 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                         break;
                 }
             }
-            lv_array_clear(&model_node->write_ops);
 
             if(model_node->read_attrs) {
-                LV_LOG_USER("Storing node data");
                 bool value_changed = false;
                 if(model_node->read_attrs->read_world_position) {
-                    LV_LOG_USER("With world position");
                     fastgltf::math::fvec3 world_pos;
                     fastgltf::math::fquat world_quat;
                     fastgltf::math::fvec3 world_scale;

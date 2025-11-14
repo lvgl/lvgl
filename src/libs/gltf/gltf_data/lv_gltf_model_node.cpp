@@ -9,6 +9,8 @@
 
 #include "lv_gltf_data_internal.hpp"
 #if LV_USE_GLTF
+
+#include <float.h>
 #include "fastgltf/types.hpp"
 #include "lv_gltf_model.h"
 #include "../../../misc/lv_array.h"
@@ -17,6 +19,7 @@
 #include "../../../misc/lv_event_private.h"
 #include "../../../stdlib/lv_string.h"
 #include "../../../stdlib/lv_sprintf.h"
+#include "../../../core/lv_obj_pos.h"
 
 /*********************
  *      DEFINES
@@ -27,6 +30,7 @@
  **********************/
 
 static lv_result_t add_write_op(lv_gltf_model_node_t * node, lv_gltf_node_prop_t prop, uint8_t channel, float value);
+static void invalidate_model(lv_gltf_model_t * model);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -218,11 +222,6 @@ lv_result_t lv_gltf_model_node_set_rotation_z(lv_gltf_model_node_t * node, float
     return add_write_op(node, LV_GLTF_NODE_PROP_ROTATION, LV_GLTF_NODE_CHANNEL_Z, z);
 }
 
-lv_result_t lv_gltf_model_node_set_rotation_w(lv_gltf_model_node_t * node, float w)
-{
-    return add_write_op(node, LV_GLTF_NODE_PROP_ROTATION, LV_GLTF_NODE_CHANNEL_W, w);
-}
-
 lv_result_t lv_gltf_model_node_set_scale_x(lv_gltf_model_node_t * node, float x)
 {
     return add_write_op(node, LV_GLTF_NODE_PROP_SCALE, LV_GLTF_NODE_CHANNEL_X, x);
@@ -242,19 +241,40 @@ lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z)
  *   STATIC FUNCTIONS
  **********************/
 
+static void invalidate_model(lv_gltf_model_t * model)
+{
+    lv_obj_invalidate((lv_obj_t *)model->viewer);
+    model->write_ops_pending = true;
+}
+
 static lv_result_t add_write_op(lv_gltf_model_node_t * node, lv_gltf_node_prop_t prop, uint8_t channel, float value)
 {
     if(!node) {
         LV_LOG_WARN("Can't queue queue write operation for NULL node");
         return LV_RESULT_INVALID;
     }
+
+    /* Try to find if a write operation for this property + channel combination exists*/
+    const uint32_t write_ops_count = lv_array_size(&node->write_ops);
+    for(uint32_t i = 0; i < write_ops_count; ++i) {
+        lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *)lv_array_at(&node->write_ops, i);
+        if(write_op->prop != prop || write_op->channel != channel) {
+            continue;
+        }
+        if(LV_ABS(write_op->value - value) > FLT_EPSILON) {
+            write_op->value = value;
+            invalidate_model(node->model);
+        }
+        return LV_RESULT_OK;
+    }
+    /* Else create a new one */
     lv_gltf_write_op_t write_op = {.prop = prop, .channel = channel, .value = value};
-    lv_result_t res =  lv_array_push_back(&node->write_ops, &write_op);
+    lv_result_t res = lv_array_push_back(&node->write_ops, &write_op);
     if(res != LV_RESULT_OK) {
         return res;
     }
-    node->model->write_ops_pending = true;
-    lv_obj_invalidate((lv_obj_t *)node->model->viewer);
+    invalidate_model(node->model);
+
     return LV_RESULT_OK;
 }
 

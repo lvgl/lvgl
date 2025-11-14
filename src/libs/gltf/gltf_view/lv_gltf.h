@@ -75,7 +75,7 @@ typedef struct {
     lv_3dpoint_t local_position;
     lv_3dpoint_t world_position;
     lv_3dpoint_t scale;
-    lv_quaternion_t rotation;
+    lv_3dpoint_t rotation;
 } lv_gltf_model_node_data_t;
 
 /**********************
