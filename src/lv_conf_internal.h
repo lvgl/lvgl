@@ -3189,7 +3189,14 @@
 #endif
 
 /** Enable Vector Graphic APIs
- *  Requires `LV_USE_MATRIX = 1` */
+ *  Requires `LV_USE_MATRIX = 1`
+ *  and {
+ *    (LV_USE_DRAW_SW and LV_USE_THORVG)
+ *    or
+ *    LV_USE_DRAW_VG_LITE
+ *    or
+ *    (LV_USE_NEMA_GFX and LV_USE_NEMA_VG)
+ *  } */
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
