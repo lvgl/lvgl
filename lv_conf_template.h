@@ -1000,7 +1000,14 @@
 #define LV_USE_GLTF  0
 
 /** Enable Vector Graphic APIs
- *  Requires `LV_USE_MATRIX = 1` */
+ *  Requires `LV_USE_MATRIX = 1`
+ *  and {
+ *    (LV_USE_DRAW_SW and LV_USE_THORVG)
+ *    or
+ *    LV_USE_DRAW_VG_LITE
+ *    or
+ *    (LV_USE_NEMA_GFX and LV_USE_NEMA_VG)
+ *  } */
 #define LV_USE_VECTOR_GRAPHIC  0
 
 /** Enable ThorVG (vector graphics library) from the src/libs folder.
