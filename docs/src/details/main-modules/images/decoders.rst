@@ -227,8 +227,6 @@ Example (requires :c:macro:`LV_USE_PRIVATE_API` to ``1`` in ``lv_conf.h``):
         MY_IMAGE_PROCESS_STATE_BIT_SHIFTED = 1 << 4,
     } image_process_state_t;
 
-    #include "..\..\..\src\draw\lv_image_decoder_private.h"
-    #include "..\..\..\src\misc\cache\lv_cache_entry_private.h"
     lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
     {
         lv_color_format_t color_format = dsc->header.cf;
