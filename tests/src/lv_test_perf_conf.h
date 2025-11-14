@@ -1287,9 +1287,6 @@
         /** Smart-phone like multi-language demo */
         #define LV_USE_DEMO_MULTILANG       0
 
-        /** Widget transformation demo */
-        #define LV_USE_DEMO_TRANSFORM       0
-
         /** Vector graphic demo */
         #define LV_USE_DEMO_VECTOR_GRAPHIC  0
 

@@ -4667,15 +4667,6 @@
         #endif
     #endif
 
-    /** Widget transformation demo */
-    #ifndef LV_USE_DEMO_TRANSFORM
-        #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
-            #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
-        #else
-            #define LV_USE_DEMO_TRANSFORM       0
-        #endif
-    #endif
-
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #ifndef LV_USE_DEMO_EBIKE
         #ifdef CONFIG_LV_USE_DEMO_EBIKE
@@ -4781,7 +4772,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_TRANSFORM       0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
