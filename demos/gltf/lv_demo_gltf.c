@@ -232,7 +232,8 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_obj_t * distance_slider = lv_slider_create(camera_row);
     lv_obj_set_width(distance_slider, LV_PCT(100));
     lv_slider_bind_value(distance_slider, &distance_subject);
-    lv_slider_set_min_value(distance_slider, 1);
+    lv_slider_set_min_value(distance_slider,
+                            -10); /* Temporary work-around for Issue: 9249 (excessive framebuffer texture attachment switching) - raises framerate approx 15-20% */
     lv_slider_set_max_value(distance_slider, 25);
     style_slider(distance_slider, SLIDER_COLOR);
 
