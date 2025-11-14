@@ -17,10 +17,7 @@
 #include "lv_opengles_debug.h"
 
 #include "../../core/lv_refr.h"
-#include "../../stdlib/lv_sprintf.h"
 #include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
-#include "../../display/lv_display_private.h"
 #include "../../indev/lv_indev.h"
 #include "../../lv_init.h"
 #include "../../misc/lv_area_private.h"
@@ -438,10 +435,10 @@ static void lv_glfw_window_quit(void)
     lv_timer_delete(update_handler_timer);
     update_handler_timer = NULL;
 
+    lv_deinit();
+
     glfwTerminate();
     glfw_inited = false;
-
-    lv_deinit();
 
     exit(0);
 }
