@@ -177,6 +177,8 @@ struct _lv_display_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_display_wait_for_flushing(lv_display_t * disp);
+
 /**********************
  *      MACROS
  **********************/
