@@ -53,6 +53,7 @@ static void destroy_environment(lv_gltf_view_env_textures_t * env);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 
+static void display_refr_end_event_cb(lv_event_t * e);
 
 const lv_obj_class_t lv_gltf_class = {
     &lv_3dtexture_class,
@@ -93,6 +94,9 @@ lv_obj_t * lv_gltf_create(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
+    LV_ASSERT_NULL(disp);
+    lv_display_add_event_cb(disp, display_refr_end_event_cb, LV_EVENT_REFR_READY, obj);
     return obj;
 }
 
@@ -610,10 +614,10 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
     lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(code == LV_EVENT_DRAW_MAIN) {
-        lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
-        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         GLuint texture_id = lv_gltf_view_render(viewer);
         lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
     }
@@ -796,4 +800,13 @@ static void destroy_environment(lv_gltf_view_env_textures_t * env)
     GL_CALL(glDeleteTextures(3, d));
 }
 
+static void display_refr_end_event_cb(lv_event_t * e)
+{
+    lv_gltf_t * viewer = (lv_gltf_t *) lv_event_get_user_data(e);
+    uint32_t model_count = lv_array_size(&viewer->models);
+    for(uint32_t i = 0; i < model_count; ++i) {
+        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_model_send_new_values(model);
+    }
+}
 #endif /*LV_USE_GLTF*/
