@@ -42,7 +42,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg);
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg, bool dirty);
 static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state);
 static void setup_finish_frame(void);
@@ -113,12 +113,22 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
     }
     lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
 
+    bool dirty = lv_memcmp(&viewer->last_desc, &viewer->desc, sizeof(viewer->desc)) != 0;
+
+    for(size_t i = 0; i < n; ++i) {
+        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
+        dirty |= model->is_animation_enabled;
+    }
+
     GLuint texture_id = GL_NONE;
-    texture_id = lv_gltf_view_render_model(viewer, model, true);
+    texture_id = lv_gltf_view_render_model(viewer, model, true, dirty);
     for(size_t i = 1; i < n; ++i) {
         lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
-        lv_gltf_view_render_model(viewer, model, false);
+        lv_gltf_view_render_model(viewer, model, false, dirty);
     }
+
+    lv_memcpy(&(viewer->last_desc), &viewer->desc, sizeof(viewer->desc));
+
     return texture_id;
 }
 
@@ -152,7 +162,7 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     GL_CALL(glClearDepthf(state->clear_depth));
 }
 
-static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg)
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg, bool dirty)
 {
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
@@ -200,10 +210,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             setup_opaque_output(vstate->opaque_frame_buffer_width, vstate->opaque_frame_buffer_height);
         setup_finish_frame();
     }
-
-    bool dirty = lv_memcmp(&viewer->last_desc, view_desc, sizeof(*view_desc)) != 0 || model->is_animation_enabled;
-
-    lv_memcpy(&(viewer->last_desc), view_desc, sizeof(*view_desc));
 
     bool last_frame_no_motion = model->_last_frame_no_motion;
     model->_last_frame_no_motion = model->last_frame_no_motion;
