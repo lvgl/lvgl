@@ -11,7 +11,7 @@ This guide explains how to properly integrate your LVGL Editor exported project 
 an Arduino sketch, why it must go inside the src folder, and how to fix include paths 
 for successful compilation.
 
-Arduino Build system
+Arduino Build System
 --------------------
 
 Arduino uses a special build system that automatically compiles:
@@ -142,8 +142,23 @@ Example Arduino sketch
       lv_init();          // Initialize LVGL
       my_disp_init();     // Setup display driver
       my_touch_init();    // Setup input driver
-      editor_project_init("");          // Load LVGL Editor UI
-      lv_screen_load(main_create()); // load the main screen
+
+      // Parameter to editor_project_init() is the asset path.
+      // Provide the base directory where LVGL should look for asset files (fonts & images).
+      // If you are not loading assets from a filesystem, pass an empty string "".
+      //
+      // Example folder structure:
+      //   /editor_project/fonts/font.ttf
+      //   /editor_project/images/image.bin
+      //
+      // LVGL uses a drive letter prefix based on what you configure (e.g. "C", "D", etc.).
+      // If you configure the drive letter as "C", the path would be:
+      //   C:/editor_project/
+      //
+      // Example:
+      // editor_project_init("C:/editor_project/");
+      editor_project_init("");       // Load LVGL Editor UI
+      lv_screen_load(main_create()); // Load the main screen
     }
 
     void loop() {
