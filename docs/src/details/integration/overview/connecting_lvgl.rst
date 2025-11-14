@@ -78,7 +78,7 @@ There are two ways to provide this information to LVGL:
         called from an interrupt if writing to a ``uint32_t`` value is atomic on your
         platform.  See below and the :ref:`threading` section to learn more.
 
-Either way, the writing of the ``uint32_t`` Tick value must be :ref:`atomic <atomic>`,
+Either way, the writing of the ``uint32_t`` Tick value must be atomic,
 which is usually the case with a 32- or 64-bit platform.  If you are using a 16-bit
 system (causing the update of the Tick value to not be atomic) and your platform uses
 the Harvard instruction set, you can set a function like this as the callback passed
