@@ -305,8 +305,7 @@ lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, cons
         return NULL;
     }
 
-    new_buf->header.flags = draw_buf->header.flags;
-    new_buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+    lv_draw_buf_set_flag(new_buf, draw_buf->header.flags | LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED);
 
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
@@ -349,8 +348,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return;
     LV_PROFILER_DRAW_BEGIN;
-
-    if(draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+    if(lv_draw_buf_has_flag(draw_buf, LV_IMAGE_FLAGS_ALLOCATED)) {
         LV_ASSERT_NULL(draw_buf->handlers);
 
         const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
@@ -512,21 +510,6 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 
     lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
     palette[index] = color;
-}
-
-bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    return draw_buf->header.flags & flag;
-}
-
-void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags |= flag;
-}
-
-void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags &= ~flag;
 }
 
 lv_result_t lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)

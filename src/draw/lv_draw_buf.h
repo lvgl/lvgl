@@ -314,11 +314,37 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
-bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
-void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
+/**
+ * Check if a draw buffer has a given flag.
+ * @param draw_buf  pointer to a draw buffer
+ * @param flag      the flag to check
+ * @return true: the flag is set, false: the flag is not set
+ */
+static inline bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    return draw_buf->header.flags & flag;
+}
 
-void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
+/**
+ * Set a flag to a draw buffer.
+ * @param draw_buf  pointer to a draw buffer
+ * @param flag      the flag to set
+ */
+static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags |= flag;
+}
+
+/**
+ * Clear a flag from a draw buffer.
+ * @param draw_buf  pointer to a draw buffer
+ * @param flag      the flag to clear
+ */
+static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags &= ~flag;
+}
 
 /**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.
