@@ -23,8 +23,8 @@ Which Library
 If ``LV_USE_LZ4_INTERNAL`` is enabled in ``lv_conf.h``, LVGL's internal copy of the
 LZ4 decompression algorithm is used (``./src/libs/lz4/lz4.c``).
 
-If ``LV_USE_LZ4_EXTERNAL`` is enabled, LVGL's is assumed to be compiled and linked
-with an external LZ4 library that provides the :cpp:func:`LZ4_decompress_safe`
+If ``LV_USE_LZ4_EXTERNAL`` is enabled, the LVGL project is assumed to be compiled and
+linked with an external LZ4 library that provides the :cpp:func:`LZ4_decompress_safe`
 function.
 
 One of them must be enabled to use LZ4 decompression.
