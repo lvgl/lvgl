@@ -19,7 +19,7 @@ Usage
 When enabled in ``lv_conf.h`` by setting :c:macro:`LV_USE_TINY_TTF` to ``1``,
 :cpp:expr:`lv_tiny_ttf_create_data(data, data_size, font_size)` can be used to
 create a TTF font instance with the specified line height.  You can then
-use that font anywhere :c:struct:`lv_font_t` is accepted.
+use that font anywhere :cpp:struct:`lv_font_t` is accepted.
 
 By default, the TTF or OTF file must be embedded as an array, either in
 a header, or loaded into RAM in order to function.
