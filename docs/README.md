@@ -372,27 +372,18 @@ For such examples, simply use reStructuredText literal markup like this:
 
 #### Providing Links to API Pages
 
-1.  Include this section heading at the bottom of your `.rst` file:
+To create a link to 1 or more API pages, set up a section at the end of your `.rst` file that looks like this, and use one or both types of the ``.. API `` pseudo-directives below:
 
-    ```rst
-    API
-    ***
-    ```
+```rst
+API
+***
 
-2.  Below the API section heading, match to exact C symbols:
+.. API equals: lv_scale_t, lv_scale_create
 
-    ```rst
-    .. API equals: lv_scale_t, lv_scale_create
-                                 <=== blank line here ends the list
-    ```
+.. API startswith: lv_scale, lv_obj_set_style
 
-3.  Below the API section heading, match to C symbols that start with a certain string:
+```
 
-    ```rst
-    .. API startswith: lv_scale, lv_obj_set_style
-                                 <=== blank line here ends the list
-    ```
-
-The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.
+The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  A blank line after each list ends that list.
 
 The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.
