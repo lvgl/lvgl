@@ -430,6 +430,11 @@ static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
     int disposal_method = (gif->ucGIFBits & 0x1c) >> 2;
     int i, j;
 
+    /* Bounds validation to prevent out-of-bounds access */
+    if(x < 0 || y < 0 || w <= 0 || h <= 0 ||
+       x + w > drawbuf->header.w || y + h > drawbuf->header.h) {
+        return;
+    }
     if(disposal_method == 2) {
         /* Restore to background color */
         unsigned char bg = gif->ucBackground;
