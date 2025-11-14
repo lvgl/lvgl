@@ -1135,9 +1135,6 @@
 
         /** Use Wayland to open a window and handle input on Linux or BSD desktops */
         #define LV_USE_WAYLAND          0
-        #if LV_USE_WAYLAND
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
-        #endif
 
         /** Driver for /dev/fb */
         #define LV_USE_LINUX_FBDEV      0
