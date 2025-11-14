@@ -7,7 +7,7 @@
 LZ4 Decompression
 =================
 
-LVGL provides a the extremely fast LZ4 decompression method found in the `LZ4
+LVGL provides the extremely fast LZ4 decompression method found in the `LZ4
 repository <https://github.com/lz4/lz4>`__ on GitHub.  It can be used to reduce
 binary image size.  The LZ4 compression is a lossless compression method.
 
