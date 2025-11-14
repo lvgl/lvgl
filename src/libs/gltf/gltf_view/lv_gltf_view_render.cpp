@@ -1197,7 +1197,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
             fastgltf::math::fvec3 local_rot = lv_gltf_math_quaternion_to_euler(local_quat);
 
             for(uint32_t i = 0; i < write_ops_count; ++i) {
-                lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *) lv_array_at(&model_node->write_ops, i);
+                lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *)lv_array_at(&model_node->write_ops, i);
                 made_changes = true;
                 switch(write_op->prop) {
                     case LV_GLTF_NODE_PROP_POSITION:
@@ -1215,27 +1215,32 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
 
             if(model_node->read_attrs) {
                 bool value_changed = false;
+                lv_3dpoint_t * target_local_position = &model_node->read_attrs->node_data.local_position;
+                lv_3dpoint_t * target_world_position = &model_node->read_attrs->node_data.world_position;
+                lv_3dpoint_t * target_scale = &model_node->read_attrs->node_data.scale;
+                lv_3dpoint_t * target_rotation = &model_node->read_attrs->node_data.rotation;
+
                 if(model_node->read_attrs->read_world_position) {
                     fastgltf::math::fvec3 world_pos;
                     fastgltf::math::fquat world_quat;
                     fastgltf::math::fvec3 world_scale;
                     fastgltf::math::decomposeTransformMatrix(parentworldmatrix * localmatrix,
                                                              world_scale, world_quat, world_pos);
-                    if(lv_memcmp(&model_node->read_attrs->node_data.world_position, world_pos.data(), sizeof(lv_3dpoint_t))) {
-                        lv_memcpy(&model_node->read_attrs->node_data.world_position, world_pos.data(), sizeof(lv_3dpoint_t));
+                    if(lv_memcmp(target_world_position, world_pos.data(), sizeof(*target_world_position))) {
+                        lv_memcpy(target_world_position, world_pos.data(), sizeof(*target_world_position));
                         value_changed = true;
                     }
                 }
-                if(lv_memcmp(&model_node->read_attrs->node_data.local_position, local_pos.data(), sizeof(lv_3dpoint_t))) {
-                    lv_memcpy(&model_node->read_attrs->node_data.local_position, local_pos.data(), sizeof(lv_3dpoint_t));
+                if(lv_memcmp(target_local_position, local_pos.data(), sizeof(*target_local_position))) {
+                    lv_memcpy(target_local_position, local_pos.data(), sizeof(*target_local_position));
                     value_changed = true;
                 }
-                if(lv_memcmp(&model_node->read_attrs->node_data.rotation, local_rot.data(), sizeof(lv_quaternion_t))) {
-                    lv_memcpy(&model_node->read_attrs->node_data.rotation, local_rot.data(), sizeof(lv_quaternion_t));
+                if(lv_memcmp(target_rotation, local_rot.data(), sizeof(*target_rotation))) {
+                    lv_memcpy(target_rotation, local_rot.data(), sizeof(*target_rotation));
                     value_changed = true;
                 }
-                if(lv_memcmp(&model_node->read_attrs->node_data.scale, local_scale.data(), sizeof(lv_quaternion_t))) {
-                    lv_memcpy(&model_node->read_attrs->node_data.scale, local_scale.data(), sizeof(lv_quaternion_t));
+                if(lv_memcmp(target_scale, local_scale.data(), sizeof(*target_scale))) {
+                    lv_memcpy(target_scale, local_scale.data(), sizeof(*target_scale));
                     value_changed = true;
                 }
                 model_node->read_attrs->value_changed = value_changed;
