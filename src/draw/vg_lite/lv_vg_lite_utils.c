@@ -362,7 +362,12 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
     LV_LOG_USER("type: %d", (int)path->path_type);
     LV_LOG_USER("add_end: %d", (int)path->add_end);
 
-    lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    if(len <= LV_VG_LITE_PATH_DUMP_MAX_LEN) {
+        lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+    }
+    else {
+        LV_LOG_WARN("path length over %d, skip print", LV_VG_LITE_PATH_DUMP_MAX_LEN);
+    }
 
     if(path->stroke) {
         LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
