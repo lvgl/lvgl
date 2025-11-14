@@ -53,7 +53,7 @@ Memory requirements for WebP images:
 - Lossy WebP: width × height × 4 bytes (ARGB8888 format)
 - Lossless WebP: width × height × 4 bytes (ARGB8888 format)
 
-For optimal memory usage, combine with LVGL's :ref:`overview_image_caching` feature.
+For optimal memory usage, combine with LVGL's :ref:`image caching` feature.
 
 .. _libwebp_example:
 

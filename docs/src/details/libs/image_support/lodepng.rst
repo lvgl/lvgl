@@ -28,7 +28,7 @@ bytes of RAM is required from the LVGL heap.  The decoded image is stored in RGB
 pixel format.
 
 Since it might take significant time to decode PNG images LVGL's
-:ref:`overview_image_caching` feature can be useful.
+:ref:`image caching` feature can be useful.
 
 
 
