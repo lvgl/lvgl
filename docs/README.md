@@ -39,7 +39,6 @@ Read the header comment in `build.py` for detailed documentation on each option.
 
 
 
-
 ## For Developers
 
 One of our firm policies is ***EVERYTHING MUST BE DOCUMENTED***.
@@ -48,9 +47,9 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 
 
-### reStructuredText
+## reStructuredText Content
 
-LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any areStructuredText references you will need while creating or modifying LVGL documentation.
+LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any reStructuredText references you will need while creating or modifying LVGL documentation.
 
 If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page are excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
 
@@ -58,12 +57,11 @@ Note:  the section headings in these pages use a different convention than the o
 
 
 
-
 ### Text Format
 
 Please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
 
-Indent using 4 spaces (not tab characters).
+Indent using 4 spaces (not tab characters).  This applies to code blocks as well.
 
 
 
@@ -159,15 +157,7 @@ Emphasis using `*italics*`.
 
 Emphasis using `**boldface**`.
 
-Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST Interpreted Text Roles.  Just remember is that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:
-
-| To Combine             | Interpreted Text Role Name                 | Example       |
-| ---------------------- | ------------------------------------------ | ------------- |
-| underline              | `u` or `ul`                                | :u:\`text\`   |
-| underline and boldface | `ub` or `bu`                               | :ub:\`text\`  |
-| underline and italics  | `iu` or `ui`                               | :iu:\`text\`  |
-| italics and boldface   | `ib` or `bi`                               | :ib:\`text\`  |
-| all three              | `ubi`, `uib`, `bui`, `iub`, `biu` or `ibu` | :ubi:\`text\` |
+Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST Interpreted Text Roles.  Just remember is that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:  ``:u:`underline` ``, ``:ub:`underline and bold` ``, `` `:bi:bold italic` ``.
 
 
 
@@ -258,27 +248,7 @@ If an external link will be used on many pages:
 
 ### Internal Links
 
-#### To a Section on the Same Page:
-
-Given:
-
-```rst
-My Heading
-**********
-```
-
-link to section headings on the same page like this:
-
-```rst
-See `My Heading`_ for details.
-```
-
-Back-quotes are not needed if there are no spaces in the title.
-
-
-#### To a Section on a Different Page:
-
-Add an anchor before headings that will be linked to:
+Add a link target (anchor) before heading or paragraph that will be linked to:
 
 ```rst
 .. _unique_anchor_name:
@@ -289,7 +259,7 @@ My Heading
 
 `unique_anchor_name` must be unique throughout all `.rst` files under `./docs/src/`.
 
-Link to the anchor by:
+Reference the link (anchor) by:
 
 ```rst
 Click :ref:`here <unique_anchor_name>` for more details.
@@ -309,7 +279,9 @@ Results in "Learn more at <span style="color:blue;"><u>My Heading</u></span>.".
 
 ### Tightening Tables
 
-Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  To do so, move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest).  Indent your table to make it the "content" of the directive.  Example:
+reStructuredText syntax for creating tables can be found in the [reST examples](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/tables/) referred to above.  (Click on the "eye" icon to see the source file.)
+
+Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  To do so, move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and indent your table to make it the "content" of the directive.  Example:
 
 ```rst
 .. container:: tighter-table-3
@@ -357,34 +329,6 @@ If you need a substitution that is not already in `substitutions.txt`, please ad
 
 ### Referencing API Documentation
 
-#### Providing Links to API Pages
-
-1.  Include this section heading at the bottom of your `.rst` file:
-
-    ```rst
-    API
-    ***
-    ```
-
-2.  Below the API section heading, match to exact C symbols:
-
-    ```rst
-    .. API equals: lv_scale_t, lv_scale_create
-                                 <=== blank line here ends the list
-    ```
-
-3.  Below the API section heading, match to C symbols that start with a certain string:
-
-    ```rst
-    .. API startswith: lv_scale, lv_obj_set_style
-                                 <=== blank line here ends the list
-    ```
-
-The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.
-
-The list of symbols (or prefixes) can be separated by commas or spaces.
-
-
 #### In-Line Code Expressions
 
 Use the following Interpreted Text Roles in text to include in-line C code that links to documentation on that symbol when available:
@@ -425,3 +369,30 @@ For such examples, simply use reStructuredText literal markup like this:
 ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
 ``lv_obj_set_layout(widget, ...)``
 ```
+
+#### Providing Links to API Pages
+
+1.  Include this section heading at the bottom of your `.rst` file:
+
+    ```rst
+    API
+    ***
+    ```
+
+2.  Below the API section heading, match to exact C symbols:
+
+    ```rst
+    .. API equals: lv_scale_t, lv_scale_create
+                                 <=== blank line here ends the list
+    ```
+
+3.  Below the API section heading, match to C symbols that start with a certain string:
+
+    ```rst
+    .. API startswith: lv_scale, lv_obj_set_style
+                                 <=== blank line here ends the list
+    ```
+
+The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.
+
+The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.
