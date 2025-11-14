@@ -25,6 +25,7 @@
 #include "lv_opengles_private.h"
 #include "lv_opengles_egl_private.h"
 #include "lv_opengles_driver.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 /*********************
 *      DEFINES
@@ -79,6 +80,9 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
         return NULL;
     }
     lv_opengles_init();
+#if LV_USE_DRAW_NANOVG
+    lv_draw_nanovg_init();
+#endif
     return ctx;
 }
 
@@ -371,6 +375,11 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
     const EGLint config_attribs[] = {
         EGL_RENDERABLE_TYPE,
         EGL_OPENGL_ES2_BIT,
+        EGL_BLUE_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_RED_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_STENCIL_SIZE, 8,
         EGL_NONE
     };
 
