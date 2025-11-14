@@ -1,67 +1,69 @@
 #include "../../lv_examples.h"
-#if LV_USE_CANVAS && LV_BUILD_EXAMPLES
+#if LV_USE_CANVAS && LV_FONT_MONTSERRAT_18 && LV_BUILD_EXAMPLES
 
-#define CANVAS_WIDTH  300
-#define CANVAS_HEIGHT  200
+#define CANVAS_WIDTH    100
+#define CANVAS_HEIGHT   100
 
-static void timer_cb(lv_timer_t * timer)
-{
-    static int16_t counter = 0;
-    const char * string = "lol~ I'm wavvvvvvving~>>>";
-    const int16_t string_len = lv_strlen(string);
-
-    lv_obj_t * canvas = (lv_obj_t *)lv_timer_get_user_data(timer);
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
-    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
-
-    lv_draw_letter_dsc_t letter_dsc;
-    lv_draw_letter_dsc_init(&letter_dsc);
-    letter_dsc.color = lv_color_hex(0xff0000);
-    letter_dsc.font = lv_font_get_default();
-
-    {
-#define CURVE2_X(t) (t * 2 + 10)
-#define CURVE2_Y(t) (lv_trigo_sin((t) * 5) * 40 / 32767 + CANVAS_HEIGHT / 2)
-
-        int32_t pre_x = CURVE2_X(-1);
-        int32_t pre_y = CURVE2_Y(-1);
-        for(int16_t i = 0; i < string_len; i++) {
-            const int16_t angle = (int16_t)(i * 5);
-            const int32_t x = CURVE2_X(angle);
-            const int32_t y = CURVE2_Y(angle + counter / 2);
-            const lv_point_t point = { .x = x, .y = y };
-
-            letter_dsc.unicode = (uint32_t)string[i % string_len];
-            letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
-            letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-            lv_draw_letter(&layer, &letter_dsc, &point);
-
-            pre_x = x;
-            pre_y = y;
-        }
-    }
-
-    lv_canvas_finish_layer(canvas, &layer);
-
-    counter++;
-}
-
+/**
+ *Blur an area on the canvas
+ */
 void lv_example_canvas_10(void)
 {
     /*Create a buffer for the canvas*/
-    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
     LV_DRAW_BUF_INIT_STATIC(draw_buf);
 
+    /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_obj_set_size(canvas, CANVAS_WIDTH, CANVAS_HEIGHT);
-
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
 
-    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
 
-    lv_timer_create(timer_cb, 16, canvas);
+    /*A label in the background*/
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = lv_palette_main(LV_PALETTE_RED);
+    label_dsc.font = &lv_font_montserrat_14;
+    label_dsc.decor = LV_TEXT_DECOR_UNDERLINE;
+    label_dsc.align = LV_TEXT_ALIGN_CENTER;
+    label_dsc.text = "Some parts of\nthis canvas is blurred";
+
+    lv_area_t label1_coords = {10, 10, 90, 90};
+
+    lv_draw_label(&layer, &label_dsc, &label1_coords);
+
+    /*Blur the middle of the canvas*/
+    lv_draw_blur_dsc_t blur_dsc;
+    lv_draw_blur_dsc_init(&blur_dsc);
+    blur_dsc.corner_radius = 10;
+    blur_dsc.blur_radius = 8;
+
+    lv_area_t fill_coords = {20, 30, 80, 70};
+    lv_draw_blur(&layer, &blur_dsc, &fill_coords);
+
+    /*Draw a semi-transparent rectangle on the blurred area*/
+    lv_draw_fill_dsc_t fill_dsc;
+    lv_draw_fill_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_palette_lighten(LV_PALETTE_BLUE, 1);
+    fill_dsc.radius = 10;
+    fill_dsc.opa = LV_OPA_30;
+
+    lv_draw_fill(&layer, &fill_dsc, &fill_coords);
+
+    /*Add label on the blurred area*/
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = lv_color_black();
+    label_dsc.font = &lv_font_montserrat_14;
+    label_dsc.align = LV_TEXT_ALIGN_CENTER;
+    label_dsc.text = "Hello world";
+
+    lv_area_t label2_coords = {20, 35, 80, 60};
+    lv_draw_label(&layer, &label_dsc, &label2_coords);
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
 
 #endif

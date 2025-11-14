@@ -409,6 +409,9 @@ static void execute_drawing(lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_sw_line(t, t->draw_dsc);
             break;
+        case LV_DRAW_TASK_TYPE_BLUR:
+            lv_draw_sw_blur(t, t->draw_dsc, &t->area);
+            break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
             lv_draw_sw_triangle(t, t->draw_dsc);
             break;

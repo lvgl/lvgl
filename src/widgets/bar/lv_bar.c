@@ -509,9 +509,17 @@ static void draw_indic(lv_event_t * e)
     draw_rect_dsc.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
+
     int32_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     int32_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
+
+    bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_INDICATOR);
+    lv_draw_blur_dsc_t draw_blur_dsc;
+    lv_draw_blur_dsc_init(&draw_blur_dsc);
+    draw_blur_dsc.corner_radius = draw_rect_dsc.radius;
+    lv_obj_init_draw_blur_dsc(obj, LV_PART_INDICATOR, &draw_blur_dsc);
+    if(backdrop_blur) lv_draw_blur(layer, &draw_blur_dsc, &indic_area);
 
     int32_t indic_radius = draw_rect_dsc.radius;
     short_side = LV_MIN(lv_area_get_width(&bar->indic_area), lv_area_get_height(&bar->indic_area));
@@ -556,12 +564,12 @@ static void draw_indic(lv_event_t * e)
     if(radius_issue || mask_needed) {
         if(!radius_issue) {
             /*Draw only the shadow*/
-            lv_draw_rect_dsc_t draw_tmp_dsc = draw_rect_dsc;
-            draw_tmp_dsc.border_opa = 0;
-            draw_tmp_dsc.outline_opa = 0;
-            draw_tmp_dsc.bg_opa = 0;
-            draw_tmp_dsc.bg_image_opa = 0;
-            lv_draw_rect(layer, &draw_tmp_dsc, &indic_area);
+            lv_draw_rect_dsc_t draw_rect_tmp_dsc = draw_rect_dsc;
+            draw_rect_tmp_dsc.border_opa = 0;
+            draw_rect_tmp_dsc.outline_opa = 0;
+            draw_rect_tmp_dsc.bg_opa = 0;
+            draw_rect_tmp_dsc.bg_image_opa = 0;
+            lv_draw_rect(layer, &draw_rect_tmp_dsc, &indic_area);
         }
         else {
             draw_rect_dsc.border_opa = 0;
@@ -617,10 +625,13 @@ static void draw_indic(lv_event_t * e)
         draw_tmp_dsc.bg_opa = 0;
         draw_tmp_dsc.bg_image_opa = 0;
         lv_draw_rect(layer, &draw_tmp_dsc, &indic_area);
+
     }
     else {
         lv_draw_rect(layer, &draw_rect_dsc, &indic_area);
     }
+
+    if(!backdrop_blur) lv_draw_blur(layer, &draw_blur_dsc, &indic_area);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
