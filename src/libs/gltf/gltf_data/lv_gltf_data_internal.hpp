@@ -5,11 +5,14 @@
 
 #if LV_USE_GLTF
 
+#include "../gltf_view/lv_gltf.h"
 #include "lv_gltf_data_internal.h"
-#include "lv_gltf_bind.h"
 
 #include "../../../misc/lv_array.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
+
+#include "../../../misc/lv_ll.h"
+#include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
 
@@ -49,20 +52,49 @@ using NodeIntMap = std::map<NodePtr, uint32_t>;
 using NodeVector = std::vector<NodePtr>;
 // Map of Node Index to Map of Prim Index to CenterXYZ+RadiusW Vec4
 using NodePrimCenterMap = std::map<uint32_t, std::map<uint32_t, fastgltf::math::fvec4> >;
-// Map of Overrides by Node
-using NodeOverrideMap = std::map<fastgltf::Node *, lv_gltf_bind_t *>;
-// Map of Overrides by Node
-using OverrideVector = std::vector<lv_gltf_bind_t>;
+
+typedef enum {
+    LV_GLTF_NODE_PROP_POSITION,
+    LV_GLTF_NODE_PROP_ROTATION,
+    LV_GLTF_NODE_PROP_SCALE,
+} lv_gltf_node_prop_t;
 
 typedef struct {
     GLuint drawsBuffer;
     std::vector<lv_gltf_primitive_t> primitives;
 } lv_gltf_mesh_data_t;
 
+typedef struct  {
+    lv_event_list_t event_list;
+    lv_gltf_model_node_data_t node_data;
+    bool read_world_position;
+    bool value_changed;
+} lv_gltf_model_node_attr_t;
+
+#define LV_GLTF_NODE_CHANNEL_0 0
+#define LV_GLTF_NODE_CHANNEL_1 1
+#define LV_GLTF_NODE_CHANNEL_2 2
+#define LV_GLTF_NODE_CHANNEL_3 3
+
+#define LV_GLTF_NODE_CHANNEL_X 0
+#define LV_GLTF_NODE_CHANNEL_Y 1
+#define LV_GLTF_NODE_CHANNEL_Z 2
+#define LV_GLTF_NODE_CHANNEL_W 4
+
+
+typedef struct {
+    lv_gltf_node_prop_t prop;
+    uint8_t channel;
+    float value;
+} lv_gltf_write_op_t;
+
 struct _lv_gltf_model_node_t {
+    lv_gltf_model_t * model;
     const char * ip;
     const char * path;
     fastgltf::Node * fastgltf_node;
+    lv_gltf_model_node_attr_t * read_attrs;
+    lv_array_t write_ops;
 };
 
 struct _lv_gltf_model_t {
@@ -73,7 +105,6 @@ struct _lv_gltf_model_t {
     NodeTransformMap node_transform_cache;
     MaterialIndexMap opaque_nodes_by_material_index;
     MaterialIndexMap blended_nodes_by_material_index;
-    lv_rb_t node_binds;
     std::vector<size_t> validated_skins;
     std::vector<GLuint> skin_tex;
     NodePrimCenterMap local_mesh_to_center_points_by_primitive;
@@ -109,6 +140,8 @@ struct _lv_gltf_model_t {
     bool last_frame_was_antialiased;
     bool last_frame_no_motion;
     bool _last_frame_no_motion;
+    bool write_ops_pending;
+    bool write_ops_flushed;
     struct _lv_gltf_model_t * linked_view_source;
 };
 
@@ -335,8 +368,8 @@ fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_model_t * data, size_t inde
 
 void lv_gltf_data_destroy_textures(lv_gltf_model_t * data);
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t * data);
-void lv_gltf_model_nodes_init(lv_gltf_model_t * data, size_t size);
-void lv_gltf_model_node_init(lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node, const char * path,
+void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node,
+                             const char * path,
                              const char * ip);
 void lv_gltf_model_node_add(lv_gltf_model_t * data, const lv_gltf_model_node_t * data_node);
 void lv_gltf_model_node_delete(lv_gltf_model_node_t * node);
@@ -364,7 +397,10 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
                                          fastgltf::Node & node,
                                          fastgltf::math::fmat4x4 & matrix);
 
-lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, fastgltf::Node * node);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_internal_node(lv_gltf_model_t * model,
+                                                               const fastgltf::Node * fastgltf_node);
+
+void lv_gltf_model_send_new_values(lv_gltf_model_t * model);
 
 #endif
 

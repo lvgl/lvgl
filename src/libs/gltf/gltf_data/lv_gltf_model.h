@@ -4,7 +4,9 @@
 #include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
 
+#include "lv_gltf_model_node.h"
 #include "../../../misc/lv_types.h"
+#include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,16 +55,6 @@ size_t lv_gltf_model_get_material_count(const lv_gltf_model_t * model);
  */
 size_t lv_gltf_model_get_camera_count(const lv_gltf_model_t * model);
 
-/**
- * @brief Get the number of nodes in the glTF model
- *
- * Nodes form the scene graph hierarchy and can contain transformations, meshes, cameras,
- * or other nodes as children. They define the spatial relationships between objects in the scene.
- *
- * @param model Pointer to the glTF model data structure
- * @return Number of nodes in the model
- */
-size_t lv_gltf_model_get_node_count(const lv_gltf_model_t * model);
 
 /**
  * @brief Get the number of meshes in the glTF model
@@ -126,14 +118,6 @@ bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
  * @param model Pointer to the glTF model structure
  */
 size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
-
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * data, size_t index);
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_ip(lv_gltf_model_t * data, const char * ip);
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_path(lv_gltf_model_t * data, const char * path);
-
-const char * lv_gltf_model_node_get_path(lv_gltf_model_node_t * node);
-const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node);
-size_t lv_gltf_model_node_get_count(lv_gltf_model_t * model);
 
 #ifdef __cplusplus
 } /*extern "C"*/

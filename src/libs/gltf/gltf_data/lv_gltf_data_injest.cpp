@@ -133,16 +133,16 @@ static void load_mesh_texture(lv_gltf_model_t * data,
 lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t data_size,
                                              lv_opengl_shader_manager_t * shaders)
 {
-    lv_gltf_model_t * data = NULL;
+    lv_gltf_model_t * model = NULL;
     if(data_size > 0) {
-        data = create_data_from_bytes((const uint8_t *)data_source, data_size);
+        model = create_data_from_bytes((const uint8_t *)data_source, data_size);
     }
     else {
-        data = create_data_from_file((const char *)data_source);
+        model = create_data_from_file((const char *)data_source);
     }
 
-    LV_ASSERT_MSG(data, "Failed to create gltf data");
-    if(!data) {
+    LV_ASSERT_MSG(model, "Failed to create gltf data");
+    if(!model) {
         return NULL;
     }
 
@@ -153,51 +153,53 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     int32_t scene_index = 0;
     bool first_visible_mesh = true;
     fastgltf::iterateSceneNodes(
-    data->asset, scene_index, fastgltf::math::fmat4x4(), [&](fastgltf::Node & node, fastgltf::math::fmat4x4 matrix) {
+    model->asset, scene_index, fastgltf::math::fmat4x4(), [&](fastgltf::Node & node, fastgltf::math::fmat4x4 matrix) {
         if(!node.meshIndex.has_value()) {
             return;
         }
         if(first_visible_mesh) {
-            injest_set_initial_bounds(data, matrix, data->asset.meshes[node.meshIndex.value()]);
+            injest_set_initial_bounds(model, matrix, model->asset.meshes[node.meshIndex.value()]);
         }
         else {
-            injest_grow_bounds_to_include(data, matrix, data->asset.meshes[node.meshIndex.value()]);
+            injest_grow_bounds_to_include(model, matrix, model->asset.meshes[node.meshIndex.value()]);
         }
         first_visible_mesh = false;
     });
-    lv_gltf_model_nodes_init(data, data->asset.nodes.size());
 
-    fastgltf::namegen_iterate_scene_nodes(data->asset, scene_index,
+    /* Reserve enough space for model nodes */
+    lv_array_init(&model->nodes, model->asset.nodes.size(), sizeof(lv_gltf_model_node_t));
+
+    fastgltf::namegen_iterate_scene_nodes(model->asset, scene_index,
                                           [&](fastgltf::Node & node, const std::string & node_path, const std::string & node_ip,
     size_t node_index, std::size_t child_index) {
         LV_UNUSED(node_index);
         LV_UNUSED(child_index);
         lv_gltf_model_node_t model_node;
-        lv_gltf_model_node_init(&model_node, &node, node_path.c_str(), node_ip.c_str());
-        lv_gltf_model_node_add(data, &model_node);
+        lv_gltf_model_node_init(model, &model_node, &node, node_path.c_str(), node_ip.c_str());
+        lv_gltf_model_node_add(model, &model_node);
     });
 
     {
         uint32_t i = 0;
-        for(auto & image : data->asset.images) {
-            injest_image(shaders, data, image, i);
+        for(auto & image : model->asset.images) {
+            injest_image(shaders, model, image, i);
             i++;
         }
     }
     uint16_t lightnum = 0;
-    for(auto & light : data->asset.lights) {
-        injest_light(data, lightnum, light, 0);
+    for(auto & light : model->asset.lights) {
+        injest_light(model, lightnum, light, 0);
         lightnum += 1;
     }
-    for(auto & mesh : data->asset.meshes) {
-        injest_mesh(data, mesh);
+    for(auto & mesh : model->asset.meshes) {
+        injest_mesh(model, mesh);
     }
 
-    if(data->asset.defaultScene.has_value()) {
+    if(model->asset.defaultScene.has_value()) {
         LV_LOG_INFO("Default scene = #%d", data->asset.defaultScene.value());
     }
 
-    return data;
+    return model;
 }
 
 /**********************
