@@ -66,7 +66,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
 
-    lv_rb_init(&data->node_binds, compare_bind_nodes, sizeof(lv_gltf_node_binds_t));
     new(&data->node_transform_cache) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
@@ -241,19 +240,6 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
         to->vertex_cen[2] = from->vertex_cen[2];
     }
     to->bound_radius = from->bound_radius;
-}
-lv_gltf_node_binds_t * lv_gltf_model_node_get_binds(lv_gltf_model_t * model, fastgltf::Node * internal_node)
-{
-    lv_gltf_node_binds_t key;
-    lv_gltf_model_node_t node;
-    key.node = &node;
-    node.fastgltf_node = internal_node;
-
-    lv_rb_node_t * rb_node = lv_rb_find(&model->node_binds, &key);
-    if(!rb_node) {
-        return NULL;
-    }
-    return (lv_gltf_node_binds_t *) rb_node->data;
 }
 
 /**********************

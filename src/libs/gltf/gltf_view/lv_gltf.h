@@ -18,7 +18,6 @@
 #include "../../../misc/lv_area.h"
 #include "../../../misc/lv_color.h"
 #include "../gltf_data/lv_gltf_model.h"
-#include "../gltf_data/lv_gltf_bind.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +27,13 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_GLTF_ANIM_SPEED_TENTH 100
+#define LV_GLTF_ANIM_SPEED_QUARTER 250
+#define LV_GLTF_ANIM_SPEED_HALF 500
+#define LV_GLTF_ANIM_SPEED_NORMAL 1000
+#define LV_GLTF_ANIM_SPEED_2X 2000
+#define LV_GLTF_ANIM_SPEED_3X 3000
+#define LV_GLTF_ANIM_SPEED_4X 4000
 #define LV_GLTF_DEFAULT_CAMERA 0
 
 /**********************
@@ -52,19 +58,25 @@ typedef struct {
 } lv_3dpoint_t;
 
 typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} lv_quaternion_t;
+
+typedef struct {
     lv_3dpoint_t origin;
     lv_3dpoint_t direction;
 } lv_3dplane_t;
 
 typedef lv_3dplane_t lv_3dray_t;
 
-#define LV_GLTF_ANIM_SPEED_TENTH 100
-#define LV_GLTF_ANIM_SPEED_QUARTER 250
-#define LV_GLTF_ANIM_SPEED_HALF 500
-#define LV_GLTF_ANIM_SPEED_NORMAL 1000
-#define LV_GLTF_ANIM_SPEED_2X 2000
-#define LV_GLTF_ANIM_SPEED_3X 3000
-#define LV_GLTF_ANIM_SPEED_4X 4000
+typedef struct {
+    lv_3dpoint_t local_position;
+    lv_3dpoint_t world_position;
+    lv_3dpoint_t scale;
+    lv_quaternion_t rotation;
+} lv_gltf_model_node_data_t;
 
 /**********************
  * GLOBAL PROTOTYPES
