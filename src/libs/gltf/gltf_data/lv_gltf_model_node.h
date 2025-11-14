@@ -167,15 +167,6 @@ lv_result_t lv_gltf_model_node_set_rotation_y(lv_gltf_model_node_t * node, float
 lv_result_t lv_gltf_model_node_set_rotation_z(lv_gltf_model_node_t * node, float z);
 
 /**
- * @brief Set the W component of a glTF model node's rotation quaternion. The operation is queued and applied on the next rendering phase.
- *
- * @param node Pointer to the glTF model node structure
- * @param w The W rotation component value
- * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
- */
-lv_result_t lv_gltf_model_node_set_rotation_w(lv_gltf_model_node_t * node, float w);
-
-/**
  * @brief Set the X scale of a glTF model node. The operation is queued and applied on the next rendering phase.
  *
  * @param node Pointer to the glTF model node structure
