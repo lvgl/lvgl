@@ -80,9 +80,7 @@ static lv_gltf_renwin_state_t setup_opaque_output(uint32_t texture_width, uint32
 static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state);
 static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_t texture_height, bool mipmaps_enabled);
 
-static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t camera,
-                                               lv_gltf_view_desc_t * view_desc,
-                                               fastgltf::math::fmat4x4 view_mat, fastgltf::math::fvec3 view_pos,
+static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t camera, lv_gltf_view_desc_t * view_desc,
                                                lv_gltf_model_t * gltf_data, bool transmission_pass);
 
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
@@ -252,8 +250,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     model->last_material_index = 99999;
     if(vstate->render_opaque_buffer) {
         if(model->camera > 0) {
-            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model->view_mat,
-                                               model->view_pos, model, true);
+            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, true);
         }
         else {
             setup_view_proj_matrix(viewer, view_desc, model, true);
@@ -284,14 +281,6 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
         GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         setup_finish_frame();
-    }
-
-    if(model->camera > 0) {
-        setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model->view_mat,
-                                           model->view_pos, model, false);
-    }
-    else {
-        setup_view_proj_matrix(viewer, view_desc, model, false);
     }
 
     lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width,
@@ -978,9 +967,7 @@ static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state)
         state->renderbuffer = 0;
     }
 }
-static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t camera,
-                                               lv_gltf_view_desc_t * view_desc,
-                                               fastgltf::math::fmat4x4 view_mat, fastgltf::math::fvec3 view_pos,
+static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t camera, lv_gltf_view_desc_t * view_desc,
                                                lv_gltf_model_t * gltf_data, bool transmission_pass)
 {
     /* The following matrix math is for the projection matrices as defined by the glTF spec:*/
@@ -1033,10 +1020,8 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
     },
     asset->cameras[camera].camera);
 
-    viewer->view_matrix = view_mat;
     viewer->projection_matrix = projection;
-    viewer->view_projection_matrix = projection * view_mat;
-    viewer->camera_pos = view_pos;
+    viewer->view_projection_matrix = projection * viewer->view_matrix;
 }
 
 static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
