@@ -52,26 +52,6 @@ typedef enum {
 } lv_gltf_bg_mode_t;
 
 typedef struct {
-    float x;
-    float y;
-    float z;
-} lv_3dpoint_t;
-
-typedef struct {
-    float x;
-    float y;
-    float z;
-    float w;
-} lv_quaternion_t;
-
-typedef struct {
-    lv_3dpoint_t origin;
-    lv_3dpoint_t direction;
-} lv_3dplane_t;
-
-typedef lv_3dplane_t lv_3dray_t;
-
-typedef struct {
     lv_3dpoint_t local_position;
     lv_3dpoint_t world_position;
     lv_3dpoint_t scale;
@@ -389,20 +369,22 @@ lv_gltf_aa_mode_t lv_gltf_get_antialiasing_mode(const lv_obj_t * obj);
  ***********************/
 
 /**
+ * Get the point that a given ray intersects with a specified plane at, if any
+ * @param ray the intersection test ray
+ * @param screen_y the plane to test ray intersection with
+ * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
+ * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
+ */
+lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                        lv_3dpoint_t * collision_point);
+
+/**
  * Get a plane that faces the current view camera, centered some units in front of it
  * @param obj pointer to a GLTF viewer object
  * @param distance distance in front of the camera to set the plane, in world units. see lv_gltf_get_world_distance to get the auto-distance
  * @return camera facing plane
  */
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);
-
-/**
- * Get a plane that faces upward, centered at a given height
- * @param obj pointer to a GLTF viewer object
- * @param elevation elevation of the ground plane, in world units. this is usually zero
- * @return ground plane
- */
-lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
 
 /**
  * Calculates a ray originating from the camera and passing through the specified mouse position on the screen.
@@ -412,15 +394,6 @@ lv_3dplane_t lv_gltf_get_ground_plane(float elevation);
  */
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos);
 
-/**
- * Get the point that a given ray intersects with a specified plane at, if any
- * @param ray the intersection test ray
- * @param screen_y the plane to test ray intersection with
- * @param collision_point output lv_3dpoint_t holder, values are only valid if true is the return value
- * @return LV_RESULT_OK if intersection, LV_RESULT_INVALID if no intersection
- */
-lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                             lv_3dpoint_t * collision_point);
 
 /**
  * Get the screen position of a 3d point

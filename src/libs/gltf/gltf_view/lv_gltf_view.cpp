@@ -511,8 +511,8 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
     return outray;
 }
 
-lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                             lv_3dpoint_t * collision_point)
+lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                        lv_3dpoint_t * collision_point)
 {
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);
@@ -533,14 +533,6 @@ lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3d
         }
     }
     return LV_RESULT_INVALID; /* No intersection */
-}
-
-lv_3dplane_t lv_gltf_get_ground_plane(float elevation)
-{
-    lv_3dplane_t outplane = {0};
-    outplane.origin = {0.0f, elevation, 0.0f};
-    outplane.direction = {0.0f, 1.0f, 0.0f};
-    return outplane;
 }
 
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
