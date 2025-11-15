@@ -201,7 +201,7 @@ fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_model_t * data)
     LV_ASSERT_NULL(data);
     return &data->asset;
 }
-double lv_gltf_data_get_radius(lv_gltf_model_t * data)
+double lv_gltf_data_get_radius(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->bound_radius;
