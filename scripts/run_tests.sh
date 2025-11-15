@@ -50,8 +50,6 @@ done
 
 if [ $missing_packages_count -gt 0 ]; then
     echo "Missing $missing_packages_count packages detected. Please run 'scripts/install-prerequisites.sh' to install them."
-    echo "Current packages installed:"
-    apt list --installed
     exit 1
 else
     echo "All required packages are installed."
