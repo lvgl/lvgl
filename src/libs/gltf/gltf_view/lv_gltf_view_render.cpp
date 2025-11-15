@@ -1011,13 +1011,13 @@ static void setup_cleanup_opengl_output(lv_gltf_renwin_state_t * state)
     }
 }
 static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t camera, lv_gltf_view_desc_t * view_desc,
-                                               lv_gltf_model_t * gltf_data, bool transmission_pass)
+                                               lv_gltf_model_t * model, bool transmission_pass)
 {
     /* The following matrix math is for the projection matrices as defined by the glTF spec:*/
     /* https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#projection-matrices*/
 
     fastgltf::math::fmat4x4 projection;
-    const auto & asset = lv_gltf_data_get_asset(gltf_data);
+    const auto & asset = lv_gltf_data_get_asset(model);
 
     auto width = view_desc->render_width;
     auto height = view_desc->render_height;
@@ -1063,6 +1063,8 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
     },
     asset->cameras[camera].camera);
 
+    viewer->view_matrix = model->view_mat;
+    viewer->camera_pos = model->view_pos;
     viewer->projection_matrix = projection;
     viewer->view_projection_matrix = projection * viewer->view_matrix;
 }
