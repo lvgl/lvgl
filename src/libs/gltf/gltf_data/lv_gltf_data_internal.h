@@ -225,7 +225,7 @@ lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
  * @param D Pointer to the lv_gltf_data_t object from which to get the radius.
  * @return The radius of the GLTF data object.
  */
-double lv_gltf_data_get_radius(lv_gltf_model_t * D);
+double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 
 
 /**
