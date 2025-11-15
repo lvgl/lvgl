@@ -161,14 +161,14 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     GL_CALL(glClearDepthf(state->clear_depth));
 }
 
-static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool prepare_bg, bool dirty)
+static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool is_first_model, bool dirty)
 {
     lv_gltf_view_state_t * vstate = &viewer->state;
     lv_gltf_view_desc_t * view_desc = &viewer->desc;
-    bool opt_draw_bg = prepare_bg && (view_desc->bg_mode == LV_GLTF_BG_MODE_ENVIRONMENT);
+    bool opt_draw_bg = is_first_model && (view_desc->bg_mode == LV_GLTF_BG_MODE_ENVIRONMENT);
     bool opt_aa_this_frame = (view_desc->aa_mode == LV_GLTF_AA_MODE_ON) ||
                              (view_desc->aa_mode == LV_GLTF_AA_MODE_DYNAMIC && model->last_frame_no_motion == true);
-    if(!prepare_bg) {
+    if(!is_first_model) {
         /* If this data object is a secondary render pass, inherit the anti-alias setting for this frame from the first gltf_data drawn*/
         opt_aa_this_frame = view_desc->frame_was_antialiased;
     }
@@ -185,7 +185,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
 
     if(opt_aa_this_frame != model->last_frame_was_antialiased) {
         /* Antialiasing state has changed since the last render */
-        if(prepare_bg == true) {
+        if(is_first_model) {
             if(vstate->render_state_ready) {
                 setup_cleanup_opengl_output(&vstate->render_state);
                 vstate->render_state = setup_primary_output((uint32_t)view_desc->render_width,
@@ -257,7 +257,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         }
         lv_result_t result = setup_restore_opaque_output(viewer, &vstate->opaque_render_state,
                                                          vstate->opaque_frame_buffer_width,
-                                                         vstate->opaque_frame_buffer_height, prepare_bg);
+                                                         vstate->opaque_frame_buffer_height, is_first_model);
         LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to setup opaque output which should never happen");
         if(result != LV_RESULT_OK) {
             lv_gltf_view_pop_opengl_state(&opengl_state);
@@ -284,7 +284,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
 
     lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width,
-                                               view_desc->render_height, prepare_bg);
+                                               view_desc->render_height, is_first_model);
 
     LV_ASSERT_MSG(result == LV_RESULT_OK, "Failed to restore primary output which should never happen");
     if(result != LV_RESULT_OK) {
