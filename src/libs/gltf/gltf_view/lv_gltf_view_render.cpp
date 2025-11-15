@@ -39,6 +39,32 @@
  *      TYPEDEFS
  **********************/
 
+/* This is used to push and pop the viewer matrix during the rendering phase*/
+struct lv_gltf_matrices_saver_t {
+    lv_gltf_t * viewer;
+    fastgltf::math::fmat4x4 saved_view_matrix;
+    fastgltf::math::fmat4x4 saved_projection_matrix;
+    fastgltf::math::fvec3 saved_camera_pos;
+
+    lv_gltf_matrices_saver_t(lv_gltf_t * viewer)
+        : viewer(viewer)
+        , saved_view_matrix(viewer->view_matrix)
+        , saved_projection_matrix(viewer->projection_matrix)
+        , saved_camera_pos(viewer->camera_pos)
+    {
+    }
+
+    ~lv_gltf_matrices_saver_t()
+    {
+        viewer->view_matrix = saved_view_matrix;
+        viewer->projection_matrix = saved_projection_matrix;
+        viewer->camera_pos = saved_camera_pos;
+    }
+
+    lv_gltf_matrices_saver_t(const lv_gltf_matrices_saver_t &) = delete;
+    lv_gltf_matrices_saver_t & operator=(const lv_gltf_matrices_saver_t &) = delete;
+};
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -246,9 +272,17 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
         return a.first < b.first;
     });
+
     /* Reset the last material index to an unused value once per frame at the start*/
     model->last_material_index = 99999;
+
     if(vstate->render_opaque_buffer) {
+        std::optional<lv_gltf_matrices_saver_t> saver;
+        if(!is_first_model) {
+            /* Cache the current matrices */
+            saver.emplace(viewer);
+        }
+
         if(model->camera > 0) {
             setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, true);
         }
@@ -281,6 +315,15 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
         GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
         setup_finish_frame();
+    }
+
+    if(is_first_model) {
+        if(model->camera > 0) {
+            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, true);
+        }
+        else {
+            setup_view_proj_matrix(viewer, view_desc, model, true);
+        }
     }
 
     lv_result_t result = render_primary_output(viewer, &vstate->render_state, view_desc->render_width,
@@ -1024,10 +1067,12 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
     viewer->view_projection_matrix = projection * viewer->view_matrix;
 }
 
-static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * gltf_data,
+static void setup_view_proj_matrix(lv_gltf_t * viewer, lv_gltf_view_desc_t * view_desc, lv_gltf_model_t * model,
                                    bool transmission_pass)
 {
-    auto b_radius = lv_gltf_data_get_radius(gltf_data);
+    const lv_gltf_model_t * main_model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
+    auto b_radius = lv_gltf_data_get_radius(main_model);
+
     float radius = b_radius * LV_GLTF_DISTANCE_SCALE_FACTOR;
     radius *= view_desc->distance;
 
