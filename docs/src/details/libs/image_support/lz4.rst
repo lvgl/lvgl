@@ -63,7 +63,7 @@ Generating LZ4 Compressed Binary Images
 ***************************************
 
 An LZ4 image binary can be directly generated from another image using script
-``lvgl/script/LVGLImage.py``.
+``lvgl/scripts/LVGLImage.py``.
 
 .. code-block:: bash
 

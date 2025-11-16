@@ -105,7 +105,7 @@ variable to display it using LVGL. For example:
     uint8_t my_img_data[] = {0x00, 0x01, 0x02, ...};
 
     static lv_image_dsc_t my_img_dsc = {
-       .header.magic = LV_IMAGE_HEADER_MAGIC;
+       .header.magic = LV_IMAGE_HEADER_MAGIC,
        .header.cf = LV_COLOR_FORMAT_RGB565,          /* Set color format */
        .header.flags = 0,
        .header.w = 80,
