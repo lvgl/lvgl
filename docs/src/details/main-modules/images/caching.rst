@@ -59,16 +59,15 @@ to cache even the largest images at the same time.
 
 
 
-Cleaning the Cache
-******************
+Invalidating Cache Entries
+**************************
 
 Let's say you have loaded a PNG image into a :cpp:struct:`lv_image_dsc_t` ``my_png``
 variable and use it in an ``lv_image`` Widget. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file has changed and LVGL will still draw the
-old image from cache.
+old image from cache.  To do this, use :cpp:expr:`lv_image_cache_drop(&my_png)`.
 
-To do this, use
-:cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
+To invalidate all cached images:  :cpp:expr:`lv_image_cache_drop(NULL)`.
 
