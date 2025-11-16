@@ -29,9 +29,9 @@ Limitations
 ***********
 
 -  Only uncompressed BMP files are supported.  BMP images as C arrays
-   (:cpp:type:`lv_image_dsc_t`) are not.  This is because there is no practical
-   differences between how the uncompressed BMP files and LVGL's image format stores
-   the image data.
+   (:cpp:type:`lv_image_dsc_t`) are not supported.  This is because there is no
+   practical difference between how uncompressed BMP files and LVGL's image format
+   store the image data.
 -  The BMP file's color format needs to match the configured :c:macro:`LV_COLOR_DEPTH`
    of the display on which it will be rendered.  You can use GIMP to save the image
    in the required format.  Both RGB888 and ARGB888 work with
