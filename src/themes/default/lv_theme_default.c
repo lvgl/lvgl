@@ -1133,18 +1133,18 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_header_class)) {
-        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_small, 0);
         lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_footer_class)) {
-        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_small, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_content_class)) {
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
-        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_small, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_header_button_class) ||

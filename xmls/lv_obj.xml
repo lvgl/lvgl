@@ -342,6 +342,9 @@ Example
         <prop name="style_rotary_sensitivity-selector" type="int" help="Set rotary sensitivity for Crown input devices"/>
         <prop name="style_recolor-selector" type="color" help="Mix this color to the widget and all its children"/>
         <prop name="style_recolor_opa-selector" type="opa" help="The intensity of recoloring"/>
+        <prop name="style_blur_radius-selector" type="int" help="The radius of the blurring"/>
+        <prop name="style_blur_quality-selector" type="enum:lv_blur_quality" help="Set whether to prefer speed or precision"/>
+        <prop name="style_blur_backdrop-selector" type="bool" help="true: blur the background first, false: blur the widget"/>
 
         <prop name="flex_grow" type="int" help="Set flex grow to fill the available space in the track"/>
         <prop name="flex_flow" type="enum:lv_flex_flow" help="Set flex flow direction (row, column, etc.)"/>
