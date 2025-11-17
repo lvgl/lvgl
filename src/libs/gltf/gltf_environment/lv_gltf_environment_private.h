@@ -1,10 +1,10 @@
 /**
- * @file lv_gltf_ibl_sampler.h
+ * @file lv_gltf_environment_private.h
  *
  */
 
-#ifndef LV_GLTF_IBL_SAMPLER_H
-#define LV_GLTF_IBL_SAMPLER_H
+#ifndef LV_GLTF_ENVIRONMENT_PRIVATE_H
+#define LV_GLTF_ENVIRONMENT_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,12 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../../lv_conf_internal.h"
-
+#include "../../../lv_conf_internal.h"
 #if LV_USE_GLTF
-#include "../../../../misc/lv_types.h"
-#include "../../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../lv_gltf_view_internal.h"
+
+#include "lv_gltf_environment.h"
+#include "../../../misc/lv_types.h"
+#include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 
 /*********************
  *      DEFINES
@@ -28,12 +28,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    uint32_t texture_size;
+struct _lv_gltf_ibl_sampler {
+    uint32_t cube_map_resolution;
     float lod_bias;
     uint32_t lowest_mip_level;
     uint32_t input_texture_id;
-    uint32_t cubemap_texture_id;
+    uint32_t cube_map_texture_id;
     uint32_t framebuffer;
     uint32_t mipmap_count;
 
@@ -61,7 +61,7 @@ typedef struct {
     uint32_t fullscreen_vertex_buffer;
     uint32_t fullscreen_tex_coord_buffer;
 
-} lv_gltf_ibl_sampler_t;
+};
 
 typedef struct {
     uint8_t * data;
@@ -77,20 +77,30 @@ typedef struct {
     uint32_t height;
 } lv_gltf_ibl_image_t;
 
+struct _lv_gltf_environment {
+    uint32_t diffuse;
+    uint32_t specular;
+    uint32_t sheen;
+    uint32_t ggxLut;
+    uint32_t charlie_lut;
+    uint32_t mip_count;
+    float ibl_intensity_scale;
+    float angle;
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-void lv_gltf_ibl_generate_env_textures(lv_gltf_view_env_textures_t * env, const char * env_file_path,
-                                       float env_rotation);
 
 /**********************
  *      MACROS
  **********************/
 
 #endif /*LV_USE_GLTF*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GLTF_IBL_SAMPLER_H*/
+#endif /*LV_GLTF_ENVIRONMENT_PRIVATE_H*/
+

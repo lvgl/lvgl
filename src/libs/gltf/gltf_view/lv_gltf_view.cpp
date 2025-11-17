@@ -18,7 +18,7 @@
 #include "../../../core/lv_obj_class_private.h"
 #include "../../../misc/lv_types.h"
 #include "../../../widgets/3dtexture/lv_3dtexture.h"
-#include "ibl/lv_gltf_ibl_sampler.h"
+#include "../gltf_environment/lv_gltf_environment.h"
 #include "assets/lv_gltf_view_shader.h"
 #include <fastgltf/math.hpp>
 #include <fastgltf/tools.hpp>
@@ -49,9 +49,11 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
-static void destroy_environment(lv_gltf_view_env_textures_t * env);
+static void destroy_environment(lv_gltf_environment_t * env);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
+
+static lv_result_t create_default_environment(lv_gltf_t * gltf);
 
 
 const lv_obj_class_t lv_gltf_class = {
@@ -101,6 +103,14 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(!viewer->environment) {
+        lv_result_t res = create_default_environment(viewer);
+        if(res != LV_RESULT_OK) {
+            return NULL;
+        }
+    }
+
     lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
 }
@@ -110,8 +120,32 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(!viewer->environment) {
+        lv_result_t res = create_default_environment(viewer);
+        if(res != LV_RESULT_OK) {
+            return NULL;
+        }
+    }
+
     lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
+}
+void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * gltf = (lv_gltf_t *)obj;
+    if(env == NULL) {
+        LV_LOG_WARN("Refusing to assign a NULL environment to the glTF object");
+        return;
+    }
+
+    if(gltf->environment && gltf->owns_environment) {
+        lv_gltf_environment_delete(gltf->environment);
+        gltf->environment = NULL;
+    }
+    gltf->environment = env;
+    gltf->owns_environment = false;
 }
 
 size_t lv_gltf_get_model_count(lv_obj_t * obj)
@@ -556,7 +590,6 @@ lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos
 
 static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {
-
     if(!model) {
         return NULL;
     }
@@ -575,6 +608,18 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
     return model;
 }
 
+static lv_result_t create_default_environment(lv_gltf_t * gltf)
+{
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
+    gltf->environment = lv_gltf_environment_create(sampler, NULL);
+    lv_gltf_ibl_sampler_delete(sampler);
+    if(!gltf->environment) {
+        LV_LOG_WARN("Failed to create default gltf environment");
+        return LV_RESULT_INVALID;
+    }
+    gltf->owns_environment = true;
+    return LV_RESULT_OK;
+}
 
 static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -598,8 +643,6 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_opengl_shader_manager_init(&view->shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
-
-    lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
     lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_t *));
 
@@ -638,7 +681,9 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
-    destroy_environment(&view->env_textures);
+    if(view->environment && view->owns_environment) {
+        lv_gltf_environment_delete(view->environment);
+    }
 }
 
 static void lv_gltf_view_state_init(lv_gltf_t * view)
@@ -790,10 +835,5 @@ static void setup_background_environment(GLuint program, GLuint * vao, GLuint * 
     GL_CALL(glUseProgram(0));
 }
 
-static void destroy_environment(lv_gltf_view_env_textures_t * env)
-{
-    const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
-    GL_CALL(glDeleteTextures(3, d));
-}
 
 #endif /*LV_USE_GLTF*/
