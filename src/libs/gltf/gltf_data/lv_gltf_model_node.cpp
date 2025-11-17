@@ -237,6 +237,89 @@ lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z)
     return add_write_op(node, LV_GLTF_NODE_PROP_SCALE, LV_GLTF_NODE_CHANNEL_Z, z);
 }
 
+lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t * result)
+{
+    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return LV_RESULT_INVALID;
+    }
+    lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
+
+    if(!node) {
+        LV_LOG_WARN("Cannot get property from a NULL node");
+        return LV_RESULT_INVALID;
+    }
+    if(!node->read_attrs) {
+        LV_LOG_WARN("No read event set for this node");
+        return LV_RESULT_INVALID;
+    }
+    *result = node->read_attrs->node_data.local_position;
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t * result)
+{
+    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return LV_RESULT_INVALID;
+    }
+
+    lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
+
+    if(!node) {
+        LV_LOG_WARN("Cannot get property from a NULL node");
+        return LV_RESULT_INVALID;
+    }
+    if(!node->read_attrs) {
+        LV_LOG_WARN("No read event set for this node");
+        return LV_RESULT_INVALID;
+    }
+    if(!node->read_attrs->read_world_position) {
+        LV_LOG_WARN("World position is not read by this node");
+        return LV_RESULT_INVALID;
+    }
+    *result = node->read_attrs->node_data.world_position;
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result)
+{
+    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return LV_RESULT_INVALID;
+    }
+    lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
+    if(!node) {
+        LV_LOG_WARN("Cannot get property from a NULL node");
+        return LV_RESULT_INVALID;
+    }
+    if(!node->read_attrs) {
+        LV_LOG_WARN("No read event set for this node");
+        return LV_RESULT_INVALID;
+    }
+    *result = node->read_attrs->node_data.scale;
+    return LV_RESULT_OK;
+}
+
+lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t * result)
+{
+    if(!e || e->code != LV_EVENT_VALUE_CHANGED) {
+        LV_LOG_WARN("Invalid event");
+        return LV_RESULT_INVALID;
+    }
+    lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
+    if(!node) {
+        LV_LOG_WARN("Cannot get property from a NULL node");
+        return LV_RESULT_INVALID;
+    }
+    if(!node->read_attrs) {
+        LV_LOG_WARN("No read event set for this node");
+        return LV_RESULT_INVALID;
+    }
+    *result = node->read_attrs->node_data.rotation;
+    return LV_RESULT_OK;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

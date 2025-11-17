@@ -94,11 +94,11 @@ static plant_t * get_plant(const lv_3dpoint_t * point, lv_3dpoint_t * d)
 static void plant_position_cb(lv_event_t * e)
 {
     lv_gltf_model_node_t * node = (lv_gltf_model_node_t *)lv_event_get_target(e);
-    lv_gltf_model_node_data_t * node_data = (lv_gltf_model_node_data_t *) lv_event_get_param(e);
     for(size_t i = 0; i < PLANT_COUNT; ++i) {
         if(node == plant_positions[i].root) {
-            plant_positions[i].position = node_data->local_position;
-            plant_positions[i].rotation = node_data->rotation;
+            /* Since we're using the root node of the plant, the local position will be the same as the world position*/
+            lv_gltf_model_node_get_local_position(e, &plant_positions[i].position);
+            lv_gltf_model_node_get_euler_rotation(e, &plant_positions[i].rotation);
         }
     }
 }
@@ -149,7 +149,12 @@ void lv_example_gltf_3(void)
                                                                      "A:lvgl/examples/libs/gltf/webp_diffuse_transmission_plant.glb");
         plant_positions[i].root = lv_gltf_model_node_get_by_index(plant_model, 0);
 
+
         /* Register an event so that we can get the plant position when it's updated*/
+        /* For the plant we are interested in its world position and its rotation
+         * but since we're using the root node of the plant, its local position
+         * will be the same as the world position so we can use it instead of the world position
+         * to avoid computation overhead*/
         lv_gltf_model_node_add_event_cb(plant_positions[i].root, plant_position_cb,
                                         LV_EVENT_VALUE_CHANGED, NULL);
 

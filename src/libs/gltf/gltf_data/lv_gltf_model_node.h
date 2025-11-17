@@ -19,6 +19,7 @@ extern "C" {
 #if LV_USE_GLTF
 
 #include "../../../misc/lv_types.h"
+#include "../../../misc/lv_3dmath.h"
 #include "../../../misc/lv_event.h"
 
 /*********************
@@ -192,6 +193,63 @@ lv_result_t lv_gltf_model_node_set_scale_y(lv_gltf_model_node_t * node, float y)
  * @return LV_RESULT_OK if the operation is queued successfully, LV_RESULT_INVALID if node is null or no more memory to queue the operation
  */
 lv_result_t lv_gltf_model_node_set_scale_z(lv_gltf_model_node_t * node, float z);
+
+/**
+ * @brief Get the local position of a glTF model node. Must be called from within an LV_EVENT_VALUE_CHANGED callback.
+ *
+ * Local position is relative to the node's parent.
+ *
+ * This function is only valid when called from an event callback registered.
+ * See `lv_gltf_model_node_add_event_cb()` and `lv_gltf_model_node_add_event_cb_with_world_position()`
+ *
+ * @param e Pointer to the event structure from the callback
+ * @param result Pointer to lv_3dpoint_t structure to store the position (x, y, z)
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ */
+lv_result_t lv_gltf_model_node_get_local_position(lv_event_t * e, lv_3dpoint_t * result);
+
+/**
+ * @brief Get the world position of a glTF model node. Must be called from within an LV_EVENT_VALUE_CHANGED callback
+ * registered with world position enabled.
+ *
+ * World position is the absolute position in global scene coordinates.
+ *
+ * This function requires the event callback to be registered with lv_gltf_model_node_add_event_cb_with_world_position()
+ * as it involves complex matrix calculations that are computed on-demand.
+ *
+ * @param e Pointer to the event structure from the callback
+ * @param result Pointer to lv_3dpoint_t structure to store the position (x, y, z)
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback, world position not enabled, or if parameters are null
+ */
+lv_result_t lv_gltf_model_node_get_world_position(lv_event_t * e, lv_3dpoint_t * result);
+
+/**
+ * @brief Get the scale of a glTF model node. Must be called from within an LV_EVENT_VALUE_CHANGED callback.
+ *
+ * Returns the scale factors for each axis.
+ *
+ * This function is only valid when called from an event callback registered.
+ * See `lv_gltf_model_node_add_event_cb()` and `lv_gltf_model_node_add_event_cb_with_world_position()`
+ *
+ * @param e Pointer to the event structure from the callback
+ * @param result Pointer to lv_3dpoint_t structure to store the scale (x, y, z)
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ */
+lv_result_t lv_gltf_model_node_get_scale(lv_event_t * e, lv_3dpoint_t * result);
+
+/**
+ * @brief Get the Euler rotation of a glTF model node. Must be called from within an LV_EVENT_VALUE_CHANGED callback.
+ *
+ * Returns rotation as Euler angles in radians (x, y, z).
+ *
+ * This function is only valid when called from an event callback registered.
+ * See `lv_gltf_model_node_add_event_cb()` and `lv_gltf_model_node_add_event_cb_with_world_position()`
+ *
+ * @param e Pointer to the event structure from the callback
+ * @param result Pointer to lv_3dpoint_t structure to store the rotation in radians (x, y, z)
+ * @return LV_RESULT_OK if successful, LV_RESULT_INVALID if called outside event callback or if parameters are null
+ */
+lv_result_t lv_gltf_model_node_get_euler_rotation(lv_event_t * e, lv_3dpoint_t * result);
 
 /**********************
  *      MACROS

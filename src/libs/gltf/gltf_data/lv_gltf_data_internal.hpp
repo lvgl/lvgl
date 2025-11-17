@@ -11,6 +11,7 @@
 #include "../../../misc/lv_array.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 
+#include "../../../misc/lv_types.h"
 #include "../../../misc/lv_ll.h"
 #include "../../../misc/lv_event.h"
 
@@ -53,11 +54,29 @@ using NodeVector = std::vector<NodePtr>;
 // Map of Node Index to Map of Prim Index to CenterXYZ+RadiusW Vec4
 using NodePrimCenterMap = std::map<uint32_t, std::map<uint32_t, fastgltf::math::fvec4> >;
 
+#define LV_GLTF_NODE_CHANNEL_X 0
+#define LV_GLTF_NODE_CHANNEL_Y 1
+#define LV_GLTF_NODE_CHANNEL_Z 2
+#define LV_GLTF_NODE_CHANNEL_W 4
+
 typedef enum {
     LV_GLTF_NODE_PROP_POSITION,
     LV_GLTF_NODE_PROP_ROTATION,
     LV_GLTF_NODE_PROP_SCALE,
 } lv_gltf_node_prop_t;
+
+typedef struct {
+    lv_3dpoint_t local_position;
+    lv_3dpoint_t world_position;
+    lv_3dpoint_t scale;
+    lv_3dpoint_t rotation;
+} lv_gltf_model_node_data_t;
+
+typedef struct {
+    lv_gltf_node_prop_t prop;
+    uint8_t channel;
+    float value;
+} lv_gltf_write_op_t;
 
 typedef struct {
     GLuint drawsBuffer;
@@ -71,22 +90,6 @@ typedef struct  {
     bool value_changed;
 } lv_gltf_model_node_attr_t;
 
-#define LV_GLTF_NODE_CHANNEL_0 0
-#define LV_GLTF_NODE_CHANNEL_1 1
-#define LV_GLTF_NODE_CHANNEL_2 2
-#define LV_GLTF_NODE_CHANNEL_3 3
-
-#define LV_GLTF_NODE_CHANNEL_X 0
-#define LV_GLTF_NODE_CHANNEL_Y 1
-#define LV_GLTF_NODE_CHANNEL_Z 2
-#define LV_GLTF_NODE_CHANNEL_W 4
-
-
-typedef struct {
-    lv_gltf_node_prop_t prop;
-    uint8_t channel;
-    float value;
-} lv_gltf_write_op_t;
 
 struct _lv_gltf_model_node_t {
     lv_gltf_model_t * model;
