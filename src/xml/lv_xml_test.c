@@ -251,10 +251,15 @@ bool lv_xml_test_run_next(uint32_t slowdown)
 
 bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step)
 {
+    if(test.step_cnt == 0) {
+        LV_LOG_WARN("There are no test steps");
+        return false;
+    }
 
     if(step >= test.step_cnt) {
-        LV_LOG_WARN("%d step index was greater than the total step count."
-                    "Limited to %d",
+
+        LV_LOG_WARN("%" LV_PRIu32 " step index was greater than the total step count."
+                    "Limited to %" LV_PRIu32,
                     step, test.step_cnt);
         step = test.step_cnt - 1;
     }

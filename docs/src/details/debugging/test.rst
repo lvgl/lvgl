@@ -137,7 +137,7 @@ This function works in a practical way:
 
 - If the folder(s) referenced in ``fn_ref`` do not exist, they will be created automatically.
 - If the reference image is not found, it will be created automatically from the rendered screen
-  (unless :cpp:enumerator:`LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE` is ``0``)
+  (unless :cpp:macro:`LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE` is ``0``)
 - If the comparison fails, an ``<image_name>_err.png`` file will be created with the rendered content next to the reference image.
 - If the comparison fails, the X and Y coordinates of the first divergent pixel, along with the actual and expected colors, will also be printed.
 
