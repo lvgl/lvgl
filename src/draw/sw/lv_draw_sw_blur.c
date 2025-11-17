@@ -80,6 +80,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
      *and and it's very fast.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     int32_t skip_cnt = 1;
     if(dsc->quality == LV_BLUR_QUALITY_AUTO) {
         if(blur_radius >= 32 && dsc->corner_radius == 0) skip_cnt = 3;
@@ -113,6 +114,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
 >>>>>>> 9d262f236 (works well, these are missing: XML support, more tests)
     uint32_t skip_cnt = 1;
+=======
+    int32_t skip_cnt = 1;
+>>>>>>> f58f81bf8 (minor fixes and XML support)
     if(dsc->quality == LV_BLUR_QUALITY_AUTO) {
         if(blur_radius >= 32 && blur_radius == 0) skip_cnt = 3;
         else if(blur_radius >= 8) skip_cnt = 2;
@@ -451,11 +455,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             uint16_t * buf16_prev = &not_equal_data;
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 if(*buf16_prev != *buf16_column) {
-                    blur_2_bytes(sum, buf16_column, intensity);
+                    blur_2_bytes(sum, (lv_color16_t *)buf16_column, intensity);
                     buf16_prev = buf16_column;
-                }
-                else {
-                    cnt++;
                 }
                 buf16_column += stride_px * skip_cnt;
             }
@@ -469,13 +470,18 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
 =======
             buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
+<<<<<<< HEAD
             blur_2_bytes_init(sum, buf16_column, sample_len_limited, -stride_byte);
 >>>>>>> 9d262f236 (works well, these are missing: XML support, more tests)
+=======
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, -stride_byte);
+>>>>>>> f58f81bf8 (minor fixes and XML support)
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 if(*buf16_prev != *buf16_column) {
-                    blur_2_bytes(sum, buf16_column, intensity);
+                    blur_2_bytes(sum, (lv_color16_t *)buf16_column, intensity);
                     buf16_prev = buf16_column;
                 }
+<<<<<<< HEAD
                 else {
                     cnt++;
                 }
@@ -529,6 +535,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 }
 >>>>>>> 08eb74a2f (downsampling at rgb565, 6 times faster)
 =======
+=======
+>>>>>>> f58f81bf8 (minor fixes and XML support)
                 buf16_column -= stride_px * skip_cnt;
 >>>>>>> 9d262f236 (works well, these are missing: XML support, more tests)
             }
@@ -584,10 +592,10 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
                 /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
                 if(skip_cnt > 1 && x + skip_cnt > x_end) {
-                    uint8_t * buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-                    lv_memcpy(buf_line + stride_byte, buf_line, line_len_byte);
+                    uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+                    lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
                     if(skip_cnt == 3) {
-                        lv_memcpy(buf_line + stride_byte * 2, buf_line, line_len_byte);
+                        lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
                     }
                 }
 
@@ -597,13 +605,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         }
         else if(px_size == 2) {
             uint16_t * buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            blur_2_bytes_init(sum, buf16_line, sample_len, 1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, 1);
 
             uint16_t not_equal_data = buf16_line[0] + 1;
             uint16_t * buf16_prev = &not_equal_data;
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(*buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, buf16_line, intensity);
+                    blur_2_bytes(sum, (lv_color16_t *)buf16_line, intensity);
                     buf16_prev = buf16_line;
                 }
                 else {
@@ -613,13 +621,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_2_bytes_init(sum, buf16_line, sample_len, -1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, -1);
 
             not_equal_data = buf16_line[0] + 1;
             buf16_prev = &not_equal_data;
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(*buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, buf16_line, intensity);
+                    blur_2_bytes(sum, (lv_color16_t *)buf16_line, intensity);
                     buf16_prev = buf16_line;
                 }
                 else {
@@ -639,10 +647,10 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
                 /*Fill the empty lines by duplicating a the finished filled lines to the gaps*/
                 if(skip_cnt > 1 && x + skip_cnt > x_end) {
-                    uint8_t * buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-                    lv_memcpy(buf_line + stride_byte, buf_line, line_len_byte);
+                    uint8_t * buf_copy_from = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+                    lv_memcpy(buf_copy_from + stride_byte, buf_copy_from, line_len_byte);
                     if(skip_cnt == 3) {
-                        lv_memcpy(buf_line + stride_byte * 2, buf_line, line_len_byte);
+                        lv_memcpy(buf_copy_from + stride_byte * 2, buf_copy_from, line_len_byte);
                     }
                 }
 
