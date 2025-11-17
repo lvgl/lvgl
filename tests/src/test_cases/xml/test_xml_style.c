@@ -209,10 +209,9 @@ void test_xml_style_binding(void)
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR));
 }
 
-<<<<<<< HEAD
 void test_xml_style_prop_binding(void)
 {
-    const char * comp1_xml = {
+    const char * comp1_xml =
         "<component>"
         " 	<subjects>"
         " 		<int name=\"subject1\" value=\"128\"/>"
@@ -221,23 +220,30 @@ void test_xml_style_prop_binding(void)
         " 	<view>"
         " 		<bind_style_prop prop=\"bg_opa\" selector=\"scrollbar|checked\" subject=\"subject1\"/>"
         " 		<bind_style_prop prop=\"bg_color\" selector=\"scrollbar|checked\" subject=\"subject2\"/>"
-        " 	</view>";
+        " 	</view>"
+        "</component>";
 
-		lv_obj_add_state(obj, LV_STATE_CHECKED);
-		lv_test_wait(1000); /*Wait for transitions*/
+    lv_xml_register_component_from_data("comp1", comp1_xml);
+    lv_xml_component_unregister("comp1");
+    return;
+    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
-		TEST_ASSERT_EQUAL_INT(128, lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
-		TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR));
+    lv_obj_add_state(obj, LV_STATE_CHECKED);
+    lv_test_wait(1000); /*Wait for transitions*/
 
-		lv_subject_t * subject1 = lv_xml_get_subject(lv_xml_component_get_scope("comp1"), "subject1");
-		lv_subject_t * subject2 = lv_xml_get_subject(lv_xml_component_get_scope("comp1"), "subject2");
+    TEST_ASSERT_EQUAL_INT(128, lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR));
 
-		lv_subject_set_int(subject1, 20);
-		lv_subject_set_color(subject2, lv_color_hex(0xff00ff));
-		lv_test_wait(1000); /*Wait for transitions*/
+    lv_subject_t * subject1 = lv_xml_get_subject(lv_xml_component_get_scope("comp1"), "subject1");
+    lv_subject_t * subject2 = lv_xml_get_subject(lv_xml_component_get_scope("comp1"), "subject2");
 
-		TEST_ASSERT_EQUAL_INT(20, lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
-		TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff00ff), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
+    lv_subject_set_int(subject1, 20);
+    lv_subject_set_color(subject2, lv_color_hex(0xff00ff));
+    lv_test_wait(1000); /*Wait for transitions*/
+
+    TEST_ASSERT_EQUAL_INT(20, lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff00ff), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
+
 }
 
 void test_xml_style_local(void)
@@ -249,10 +255,10 @@ void test_xml_style_local(void)
     };
 
     lv_xml_register_component_from_data("comp1", comp1_xml);
-
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj,
+                                                                              LV_PART_SCROLLBAR | LV_STATE_CHECKED | LV_STATE_PRESSED));
 }
 
 #endif

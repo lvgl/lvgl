@@ -282,7 +282,6 @@ lv_result_t lv_xml_component_unregister(const char * name)
     }
     lv_ll_clear(&scope->param_ll);
 
-
     lv_xml_font_t * font;
     LV_LL_READ(&scope->font_ll, font) {
         lv_free((char *)font->name);
@@ -313,6 +312,7 @@ lv_result_t lv_xml_component_unregister(const char * name)
 
     lv_xml_subject_t * subject;
     LV_LL_READ(&scope->subjects_ll, subject) {
+        LV_LOG_USER("######################## ");
         lv_free((char *)subject->name);
         if(subject->subject->type == LV_SUBJECT_TYPE_STRING) {
             lv_free((char *)subject->subject->prev_value.pointer);
