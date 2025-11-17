@@ -255,6 +255,8 @@ static lv_result_t add_write_op(lv_gltf_model_node_t * node, lv_gltf_node_prop_t
     }
 
     /* Try to find if a write operation for this property + channel combination exists*/
+    /* Doing this is ok for now because the array will be of max size 9 (3 properties x 3 channels)
+     * In case we start adding more properties we need to look into other approaches*/
     const uint32_t write_ops_count = lv_array_size(&node->write_ops);
     for(uint32_t i = 0; i < write_ops_count; ++i) {
         lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *)lv_array_at(&node->write_ops, i);
