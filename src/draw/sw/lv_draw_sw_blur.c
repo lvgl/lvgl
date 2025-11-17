@@ -183,6 +183,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(y_start > y_end) continue;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         uint32_t sample_len_limited = LV_MIN((y_end - y_start) / skip_cnt + 1, sample_len);
 =======
 =======
@@ -204,6 +205,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 >>>>>>> d60c42a74 (add tests)
 
         uint32_t sample_len_limited = LV_MIN(x_end - x_start + 1, sample_len);
+=======
+        uint32_t sample_len_limited = LV_MIN((y_end - y_start) / skip_cnt + 1, sample_len);
+>>>>>>> 628612633 (last changes)
 
         if(px_size >= 3) {
 <<<<<<< HEAD
@@ -586,7 +590,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         if(x_start > x_end) continue;
         uint32_t line_len_byte = (x_end - x_start + skip_cnt) * px_size;
-        uint32_t sample_len_limited = LV_MIN((x_end - x_start + 1) / skip_cnt, sample_len);
+        uint32_t sample_len_limited = LV_MIN((x_end - x_start) / skip_cnt + 1, sample_len);
 
         if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
