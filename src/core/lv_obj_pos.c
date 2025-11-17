@@ -36,6 +36,8 @@ static void layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
 static bool is_transformed(const lv_obj_t * obj);
 static lv_obj_tree_walk_res_t update_layout_completed_cb(lv_obj_t * obj, void * user_data);
+static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -880,50 +882,59 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
         lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
     }
 
+    /*If the widget has blur set, invalidate it*/
     if(lv_area_is_on(blur_data->inv_area, &obj_coords)) {
-        if(lv_obj_get_style_blur_radius(obj, 0) ||
-           lv_obj_get_style_blur_radius(obj, LV_PART_INDICATOR) ||
-           lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR)) {
-            lv_obj_invalidate(obj);
-            return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
-        }
-        else {
-            return LV_OBJ_TREE_WALK_NEXT;
+        const uint32_t group = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_BLUR_RADIUS);
+        const lv_state_t state = lv_obj_style_get_selector_state(lv_obj_get_state(obj));
+        const lv_state_t state_inv = ~state;
+        lv_style_value_t v;
+        uint32_t i;
+        for(i = 0; i < obj->style_cnt; i++) {
+            lv_obj_style_t * obj_style = &obj->styles[i];
+            if(obj_style->is_disabled) continue;
+            if((obj_style->style->has_group & group) == 0) continue;
+            lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
+            if((state_style & state_inv)) continue;
+            if(lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
+                /*Truncate the area to the object*/
+                lv_area_t obj_coords;
+                int32_t ext_size = lv_obj_get_ext_draw_size(obj);
+                lv_area_copy(&obj_coords, &obj->coords);
+                obj_coords.x1 -= ext_size;
+                obj_coords.y1 -= ext_size;
+                obj_coords.x2 += ext_size;
+                obj_coords.y2 += ext_size;
 
+                invalidate_area_core(obj, &obj_coords);
+
+                /*No need to check the children as the widget is already invalidated
+                 *which will redraw the children too*/
+                return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+            }
         }
+
+        /*Check the next child, maybe it's blurred*/
+        return LV_OBJ_TREE_WALK_NEXT;
     }
     else {
+        /*Not on the area of interest, skip it*/
         return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
     }
 
 }
 
-void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
+lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_display_t * disp   = lv_obj_get_display(obj);
-    if(!lv_display_is_invalidation_enabled(disp)) return;
+    if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
 
-    if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    /**
-     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
-     * which can be solved by expanding the redrawing area.
-     */
-    lv_area_increase(&area_tmp, 5, 5);
-#else
-    if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
-        /*Make the area slightly larger to avoid rounding errors.
-         *5 is an empirical value*/
-        lv_area_increase(&area_tmp, 5, 5);
-    }
-#endif
-
-    lv_inv_area(lv_obj_get_display(obj),  &area_tmp);
+    lv_result_t res = invalidate_area_core(obj, &area_tmp);
+    if(res == LV_RESULT_INVALID) return res;
 
     /*If this area is on a blurred widget, invalidate that widget too*/
     blur_walk_data_t blur_walk_data;
@@ -934,9 +945,12 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_obj_tree_walk(disp->sys_layer, blur_walk_cb, &blur_walk_data);
     lv_obj_tree_walk(disp->top_layer, blur_walk_cb, &blur_walk_data);
     lv_obj_tree_walk(disp->bottom_layer, blur_walk_cb, &blur_walk_data);
+
+    return res;
 }
 
-void lv_obj_invalidate(const lv_obj_t * obj)
+
+lv_result_t lv_obj_invalidate(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -949,7 +963,9 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     obj_coords.x2 += ext_size;
     obj_coords.y2 += ext_size;
 
-    lv_obj_invalidate_area(obj, &obj_coords);
+    lv_result_t res = lv_obj_invalidate_area(obj, &obj_coords);
+
+    return res;
 }
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
@@ -1400,3 +1416,25 @@ static lv_obj_tree_walk_res_t update_layout_completed_cb(lv_obj_t * obj, void * 
     lv_obj_send_event(obj, LV_EVENT_UPDATE_LAYOUT_COMPLETED, NULL);
     return LV_OBJ_TREE_WALK_NEXT;
 }
+
+static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_tmp)
+{
+    if(!lv_obj_area_is_visible(obj, area_tmp)) return LV_RESULT_INVALID;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /**
+     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
+     * which can be solved by expanding the redrawing area.
+     */
+    lv_area_increase(&area_tmp, 5, 5);
+#else
+    if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
+        /*Make the area slightly larger to avoid rounding errors.
+         *5 is an empirical value*/
+        lv_area_increase(area_tmp, 5, 5);
+    }
+#endif
+
+    lv_result_t res = lv_inv_area(lv_obj_get_display(obj),  area_tmp);
+    return res;
+}
+

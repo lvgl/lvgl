@@ -401,14 +401,18 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
  * The area will be truncated to the object's area and marked for redraw.
  * @param obj       pointer to an object
  * @param           area the area to redraw
+ * @return LV_RESULT_OK: the are is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
+ *         (maybe it was off-screen or fully clipped)
  */
-void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
+lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
 
 /**
  * Mark the object as invalid to redrawn its area
  * @param obj       pointer to an object
+ * @return LV_RESULT_OK: the are is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
+ *         (maybe it was off-screen or fully clipped)
  */
-void lv_obj_invalidate(const lv_obj_t * obj);
+lv_result_t lv_obj_invalidate(const lv_obj_t * obj);
 
 /**
  * Tell whether an area of an object is visible (even partially) now or not

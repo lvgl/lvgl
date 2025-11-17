@@ -978,7 +978,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
     else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         lv_obj_add_style(obj, &theme->styles.line_space_large, 0);
         lv_obj_add_style(obj, &theme->styles.dropdown_list, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
