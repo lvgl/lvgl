@@ -11,6 +11,7 @@ Supported boards in the RA Family:
 - **EK-RA8D1**
 - **EK-RA8P1**
 - **EK-RA6M3G**
+- **EK-RA8D2**
 
 
 Run the Project
@@ -18,7 +19,7 @@ Run the Project
 
 - The official IDE of Renesas is called e\ |sup2| studio. Because it's Eclipse-based,
   it runs on Windows, Linux, and Mac as well. Members of the RA family require
-  certain minimum versions of the Flexible Software Package (FSP). See the individual
+  certain versions of the Flexible Software Package (FSP). See the individual
   README.md files in the applicable repositories for info. FSPs can be downloaded
   `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
   Please notice from FSP version 6.0 and above, LVGL is now part of the middleware section
@@ -30,17 +31,17 @@ Run the Project
 
 - Clone the ready-to-use repository for your selected board, for FSP version prior to 6.0:
 
-    .. code-block:: shell
+  .. code-block:: shell
 
-        git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
+      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
 
   Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
 - Clone the ready-to-use repository for your selected board, for FSP version from 6.0 and above:
 
-    .. code-block:: shell
+  .. code-block:: shell
 
-        git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git
+      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git
 
 - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select
   ``General`` / ``Existing projects into workspace``.
