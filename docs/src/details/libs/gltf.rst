@@ -176,7 +176,7 @@ Also enable other required dependencies by setting the following defines to ``1`
 Setup OpenGL ES Driver
 -----------------------
 
-Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure GLFW and OpenGL ES support for your platform.
+Follow the OpenGL ES driver setup documentation (:ref:`opengl_driver`) to configure a driver that supports OpenGL for your platform.
 
 
 Basic Setup Example
@@ -315,6 +315,119 @@ Customize the visual appearance of your 3D scene:
     
     /* Anti-aliasing */
     lv_gltf_set_antialiasing_mode(gltf, LV_GLTF_AA_DYNAMIC);
+
+
+Runtime Node Manipulation
+-------------------------
+
+You can dynamically modify node properties (position, rotation, scale) at runtime and receive notifications when these values change.
+
+Reading Node Properties
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Change individual node properties using setter functions. Changes are queued and applied during the next render cycle:
+
+￼
+.. code-block:: c
+
+    /* Get a node from the model */
+    lv_gltf_model_node_t * node = lv_gltf_model_node_get_by_index(model, 0);
+    
+    /* Set position */
+    lv_gltf_model_node_set_position_x(node, 1.5f);
+    lv_gltf_model_node_set_position_y(node, 0.0f);
+    lv_gltf_model_node_set_position_z(node, -2.0f);
+    
+    /* Set rotation (Euler angles in radians) */
+    lv_gltf_model_node_set_rotation_x(node, 0.0f);
+    lv_gltf_model_node_set_rotation_y(node, 1.57f);  /* 90 degrees */
+    lv_gltf_model_node_set_rotation_z(node, 0.0f);
+    
+    /* Set scale */
+    lv_gltf_model_node_set_scale_x(node, 2.0f);
+    lv_gltf_model_node_set_scale_y(node, 2.0f);
+    lv_gltf_model_node_set_scale_z(node, 2.0f);
+
+Reading Node Properties
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To read current node properties, register an event callback.
+
+Property values can only be read from within the ``LV_EVENT_VALUE_CHANGED``
+callback to ensure data validity.
+
+.. code-block:: c
+    static void node_value_cb(lv_event_t * e)
+    {
+        lv_3dpoint_t position, rotation, scale;
+        
+        /* Read current values - only valid inside this callback */
+        lv_gltf_model_node_get_local_position(e, &position);
+        lv_gltf_model_node_get_euler_rotation(e, &rotation);
+        lv_gltf_model_node_get_scale(e, &scale);
+        
+        LV_LOG_USER("Local Position: %.2f, %.2f, %.2f\n", 
+                    position.x, position.y, position.z);
+    }
+    
+    /* Register the callback */
+    lv_gltf_model_node_add_event_cb(node, node_value_cb, 
+                                    LV_EVENT_VALUE_CHANGED, NULL);
+
+If you need world-space coordinates (position in global scene coordinates rather than relative to parent),
+use the world position variant. This involves complex matrix calculations during the rendering phase which 
+will impact performance:
+￼
+.. code-block:: c
+    static void node_world_value_cb(lv_event_t * e)
+    {
+        lv_3dpoint_t local_pos, world_pos;
+        
+        /* Both local and world positions are available */
+        lv_gltf_model_node_get_local_position(e, &local_pos);
+        lv_gltf_model_node_get_world_position(e, &world_pos);
+        
+        LV_LOG_USER("Local: %.2f, %.2f, %.2f\n", 
+                    local_pos.x, local_pos.y, local_pos.z);
+        LV_LOG_USER("World: %.2f, %.2f, %.2f\n",
+                    world_pos.x, world_pos.y, world_pos.z);
+    }
+    
+    /* Register with world position calculation enabled */
+    lv_gltf_model_node_add_event_cb_with_world_position(node, node_world_value_cb,
+                                                        LV_EVENT_VALUE_CHANGED, NULL);
+
+Note: World position registration incurs additional computational cost due to matrix transformations. Only use it when you specifically need global coordinates.
+
+.. important::
+
+    - The ``LV_EVENT_VALUE_CHANGED`` event fires only when node properties are modified, not every frame 
+    - Getter functions return ``LV_RESULT_INVALID`` if called outside the event callback, ensuring you never read stale data
+    - Calling :cpp:func:`lv_gltf_model_node_get_world_position` without world position registration will return ``LV_RESULT_INVALID``
+
+.. tip::
+   When using the root node, the local position will equal the world position, meaning you can subscribe to 
+   :cpp:func:`lv_gltf_model_node_add_event_cb` instead of :cpp:func:`lv_gltf_model_node_add_event_cb_with_world_position`
+   and use :cpp:func:`lv_gltf_model_node_get_local_position` to get the world position without the computational 
+   overhead of matrix calculations.
+
+Finding Nodes
+-------------
+
+Access nodes by index, IP (index path) or path:
+
+.. code-block::c
+
+    /* Get by index */
+    lv_gltf_model_node_t * root = lv_gltf_model_node_get_by_index(model, 0);
+    lv_gltf_model_node_t * last_node = lv_gltf_model_node_get_by_index(model, lv_gltf_model_get_node_count(model) - 1); 
+    
+    /* Get by path (hierarchical node names from your 3D editor) */
+    lv_gltf_model_node_t * cursor = lv_gltf_model_node_get_by_path(model, "/cursor");
+    lv_gltf_model_node_t * arm = lv_gltf_model_node_get_by_path(model, "/body/arm");
+
+    /* Get by index path (useful for unnamed nodes) */
+    lv_gltf_model_node_t * node = lv_gltf_model_node_get_by_ip(model, ".0.1");
 
 
 Image-Based Lighting (IBL)
