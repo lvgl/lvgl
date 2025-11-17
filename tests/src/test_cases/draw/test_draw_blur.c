@@ -65,7 +65,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
 
     /*Add label on the blurred area*/
     char buf[128];
-    lv_snprintf(buf, sizeof(buf), "%s/blur:%d", name_sub, blur_radius);
+    lv_snprintf(buf, sizeof(buf), "%s\nblur:%d", name_sub, blur_radius);
 
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = lv_color_black();
