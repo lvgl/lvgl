@@ -632,7 +632,7 @@ Functions for blur drawing:
 - :cpp:expr:`lv_draw_blur(layer, &dsc, area)` creates a task to blur an area.
 - :cpp:expr:`lv_draw_task_get_blur_dsc(draw_task)` retrieves blur descriptor.
 
-.. lv_example:: widgets/canvas/lv_example_canvas_9
+.. lv_example:: widgets/canvas/lv_example_canvas_10
   :language: c
 
 
