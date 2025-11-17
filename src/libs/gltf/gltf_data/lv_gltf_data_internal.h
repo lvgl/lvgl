@@ -10,11 +10,6 @@
 
 
 typedef struct {
-    lv_gltf_model_node_t * node;
-    lv_array_t binds;
-} lv_gltf_node_binds_t;
-
-typedef struct {
     GLuint count;
     GLuint instanceCount;
     GLuint firstIndex;

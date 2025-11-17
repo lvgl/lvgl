@@ -32,7 +32,6 @@
  **********************/
 
 static void update_animation_cb(lv_timer_t * timer);
-static lv_rb_compare_res_t compare_bind_nodes(const void * a, const void * b);
 
 /**********************
  *  STATIC VARIABLES
@@ -260,13 +259,6 @@ static void update_animation_cb(lv_timer_t * timer)
         model->local_timestamp = 50;
     }
     lv_obj_invalidate((lv_obj_t *)model->viewer);
-}
-
-static lv_rb_compare_res_t compare_bind_nodes(const void * a, const void * b)
-{
-    lv_gltf_node_binds_t * entry_a = (lv_gltf_node_binds_t *) a;
-    lv_gltf_node_binds_t * entry_b = (lv_gltf_node_binds_t *) b;
-    return (size_t)entry_a->node->fastgltf_node - (size_t)entry_b->node->fastgltf_node;
 }
 
 #endif /*LV_USE_GLTF*/
