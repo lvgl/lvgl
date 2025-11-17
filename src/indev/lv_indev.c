@@ -782,7 +782,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
 
-    lv_indev_send_event(indev_act, LV_EVENT_KEY, indev_obj_act);
+    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
 
     lv_group_t * g = i->group;
     if(g == NULL) return;
