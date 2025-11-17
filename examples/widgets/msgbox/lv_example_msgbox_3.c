@@ -3,13 +3,8 @@
 
 static void dropdown_value_changed_event_cb(lv_event_t * e)
 {
-<<<<<<< HEAD
     lv_obj_t * dropdown = lv_event_get_target_obj(e);
     lv_obj_t * msgbox = (lv_obj_t *)lv_event_get_user_data(e);
-=======
-    lv_obj_t * dropdown = lv_event_get_target(e);
-    lv_obj_t * msgbox = lv_event_get_user_data(e);
->>>>>>> f8c8383bf (fix invalidation)
     lv_obj_t * top_layer = lv_layer_top();
     uint32_t opt = lv_dropdown_get_selected(dropdown);
 
