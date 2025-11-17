@@ -288,7 +288,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
         disp->inv_p = 0;
-        return;
+        return LV_RESULT_INVALID;
     }
 
     lv_area_t scr_area;
@@ -315,7 +315,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
-        return;
+        return LV_RESULT_OK;
     }
 
     lv_result_t res = lv_display_send_event(disp, LV_EVENT_INVALIDATE_AREA, &com_area);
