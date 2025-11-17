@@ -453,15 +453,6 @@ int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3)
     return lv_cubic_bezier(t, 341, u1, 683, u2);
 }
 
-lv_3dplane_t lv_get_ground_plane(float elevation)
-{
-    return (lv_3dplane_t) {
-        .origin = {0.f, elevation, 0.f},
-        .direction = {0.f, 1.f, 0.f}
-    };
-}
-
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
