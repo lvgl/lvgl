@@ -897,8 +897,7 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
             if((state_style & state_inv)) continue;
             if(lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
                 /*Truncate the area to the object*/
-                lv_area_t obj_coords;
-                int32_t ext_size = lv_obj_get_ext_draw_size(obj);
+                ext_size = lv_obj_get_ext_draw_size(obj);
                 lv_area_copy(&obj_coords, &obj->coords);
                 obj_coords.x1 -= ext_size;
                 obj_coords.y1 -= ext_size;
@@ -1425,7 +1424,7 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
      * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
      * which can be solved by expanding the redrawing area.
      */
-    lv_area_increase(&area_tmp, 5, 5);
+    lv_area_increase(area_tmp, 5, 5);
 #else
     if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Make the area slightly larger to avoid rounding errors.
@@ -1434,7 +1433,7 @@ static lv_result_t invalidate_area_core(const lv_obj_t * obj, lv_area_t * area_t
     }
 #endif
 
-    lv_result_t res = lv_inv_area(lv_obj_get_display(obj),  area_tmp);
+    lv_result_t res = lv_inv_area(lv_obj_get_display(obj), area_tmp);
     return res;
 }
 
