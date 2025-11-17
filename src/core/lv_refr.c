@@ -324,7 +324,7 @@ lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
     for(i = 0; i < disp->inv_p; i++) {
-        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return LV_RESULT_INVALID;
+        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return LV_RESULT_OK;
     }
 
     /*Save the area*/

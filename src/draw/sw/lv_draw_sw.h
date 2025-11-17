@@ -124,7 +124,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 
 
 /**
- * Blue an area with SW render
+ * Blur an area with SW render
  * @param t             pointer to a draw task
  * @param dsc           the draw descriptor
  * @param coords        the area to blur

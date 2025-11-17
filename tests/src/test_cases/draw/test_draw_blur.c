@@ -112,7 +112,7 @@ void test_blur(void)
         small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, canvas_buf[15], 60, radius_current);
 
         char buf[128];
-        lv_snprintf(buf, sizeof(buf), "draw/draw_blur_corner_%d.png", radius_current);
+        lv_snprintf(buf, sizeof(buf), "draw/draw_blur_corner_%u.png", radius_current);
         TEST_ASSERT_EQUAL_SCREENSHOT(buf);
     }
 }
