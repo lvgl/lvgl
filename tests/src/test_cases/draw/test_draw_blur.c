@@ -83,7 +83,6 @@ void test_blur(void)
 {
     static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[16][LV_TEST_WIDTH_TO_STRIDE(CANVAS_WIDTH,
                                                                                  4) * CANVAS_HEIGHT + LV_DRAW_BUF_ALIGN];
-
     uint32_t corner_radius_options[4] = {0, 4, 16, 32};
     uint32_t r;
 
