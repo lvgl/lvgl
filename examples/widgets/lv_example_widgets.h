@@ -119,6 +119,7 @@ void lv_example_menu_5(void);
 
 void lv_example_msgbox_1(void);
 void lv_example_msgbox_2(void);
+void lv_example_msgbox_3(void);
 
 void lv_example_obj_1(void);
 void lv_example_obj_2(void);
