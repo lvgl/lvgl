@@ -234,7 +234,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         }
         else if(px_size == 2) {
             uint16_t * buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, 1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, 1);
             uint16_t buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -246,7 +246,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, -1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, -1);
             buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
