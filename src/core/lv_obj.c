@@ -768,6 +768,7 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     lv_draw_blur_dsc_t blur_dsc;
     lv_draw_blur_dsc_init(&blur_dsc);
     blur_dsc.corner_radius = rect_dsc.radius;
+    blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR);
 
     if(lv_area_get_size(&hor_area) > 0) {
         if(backdrop_blur) lv_obj_init_draw_blur_dsc(obj, LV_PART_SCROLLBAR, &blur_dsc);
@@ -777,18 +778,16 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
         rect_dsc.base.id1 = 0;
         lv_draw_rect(layer, &rect_dsc, &hor_area);
 
-        blur_dsc.corner_radius = lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR);
         if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
         blur_dsc.base.id1 = 1;
-        if(backdrop_blur) lv_draw_blur(layer, &blur_dsc, &hor_area);
+        if(backdrop_blur) lv_draw_blur(layer, &blur_dsc, &ver_area);
 
         rect_dsc.base.id1 = 1;
         lv_draw_rect(layer, &rect_dsc, &ver_area);
 
-        blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR);
-        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &hor_area);
+        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &ver_area);
     }
 }
 

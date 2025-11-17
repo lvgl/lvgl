@@ -863,14 +863,14 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
 }
 
 typedef struct {
-    const lv_obj_t * reqester_obj;
+    const lv_obj_t * requester_obj;
     const lv_area_t * inv_area;
 } blur_walk_data_t;
 
 static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
 {
     blur_walk_data_t * blur_data = user_data;
-    if(obj == blur_data->reqester_obj) return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+    if(obj == blur_data->requester_obj) return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
@@ -937,7 +937,7 @@ lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     /*If this area is on a blurred widget, invalidate that widget too*/
     blur_walk_data_t blur_walk_data;
-    blur_walk_data.reqester_obj = obj;
+    blur_walk_data.requester_obj = obj;
     blur_walk_data.inv_area = &area_tmp;
     lv_obj_tree_walk(disp->act_scr, blur_walk_cb, &blur_walk_data);
     if(disp->prev_scr) lv_obj_tree_walk(disp->prev_scr, blur_walk_cb, &blur_walk_data);
