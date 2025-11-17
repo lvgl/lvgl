@@ -348,7 +348,7 @@ For more control over lighting quality, to use custom HDR images, or to share en
     lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
 
     /* Set a custom cube map resolution. Higher resolution produces sharper results at a cost of longer setup time */
-    lv_gltf_ibl_sampler_set_cube_map_resolution(256);
+    lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(256);
     
     /* Create environment from custom HDR/JPEG image (or NULL for default) */
     lv_gltf_environment_t * env = lv_gltf_environment_create(sampler, "/path/to/environment.hdr");

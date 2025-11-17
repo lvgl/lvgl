@@ -44,9 +44,9 @@ lv_gltf_ibl_sampler_t * lv_gltf_ibl_sampler_create(void);
 /**
  * Set the resolution for each cubemap face
  * @param   pointer to a sampler
- * @param   resolution of each cube map face (recommended: 64-512 for embedded)
+ * @param   resolution of each cube map face in pixels (recommended: 64-512 for embedded)
  */
-void lv_gltf_ibl_sampler_set_cube_map_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution);
+void lv_gltf_ibl_sampler_set_cube_map_pixel_resolution(lv_gltf_ibl_sampler_t * sampler, uint32_t resolution);
 
 /**
  * Delete an IBL sampler
