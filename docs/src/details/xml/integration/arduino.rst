@@ -15,14 +15,18 @@ Arduino Build System
 --------------------
 
 Arduino uses a special build system that automatically compiles:
+
 - The main sketch file (``.ino``)
 - All ``.c``, ``.cpp``, and ``.h`` files located in the same directory as the sketch or inside the ``src`` subfolder.
+
 Any files placed outside these locations will not be compiled or linked automatically.
 
 Because LVGL Editor exports projects with nested folders like:
+
 - ``screens/``
 - ``widgets/``
 - ``components/``
+
 Arduino would ignore those files unless they’re inside ``src/``.
 That’s why placing your exported project under ``src/`` ensures everything is detected and compiled.
 
@@ -62,8 +66,10 @@ To ensure correct compilation, you need to instruct the Arduino build system to 
 
 1. Locate the ``platform.txt`` file for your Arduino core.
     Example paths:
+
     - ESP32: ``hardware/esp32/esp32/``
     - AVR (Uno, Mega): ``hardware/arduino/avr/``
+
 2. Open the file in a text editor.
 3. Find the line starting with: ``build.extra_flags=``
 4. Add the following flag to it: ``-DLV_LVGL_H_INCLUDE_SIMPLE``
