@@ -40,12 +40,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void blur_3_bytes_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride);
 static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
-
-//static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity);
 static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity);
-static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity);
+
+static void blur_3_bytes_init(uint32_t * sum, volatile uint8_t * buf, uint32_t sample_len, int32_t stride);
+static inline void blur_3_bytes(uint32_t * sum, volatile uint8_t * buf, uint32_t intensity);
+
 static int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r);
 
 static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
@@ -594,7 +594,6 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line, intensity);
 
-
                 /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
                 if(skip_cnt == 2) {
                     buf_line[px_size + 0] = buf_line[0];
@@ -642,7 +641,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, buf16_line, intensity);
+                    blur_2_bytes(sum, *buf16_line, intensity);
                     buf16_prev = *buf16_line;
                 }
 
@@ -679,10 +678,14 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
  **********************/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static void blur_3_bytes_init(uint32_t * sum, volatile uint8_t * buf, uint32_t sample_len, int32_t stride)
 =======
 static void blur_3_bytes_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride)
 >>>>>>> d60c42a74 (add tests)
+=======
+static void blur_3_bytes_init(uint32_t * sum, volatile uint8_t * buf, uint32_t sample_len, int32_t stride)
+>>>>>>> b1201a74f (fixes)
 {
     uint32_t s;
 
@@ -828,7 +831,7 @@ static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t int
 
 
 
-static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity)
+static inline void blur_3_bytes(uint32_t * sum, volatile uint8_t * buf, uint32_t intensity)
 {
     uint32_t intensity_inv = BLUR_INTENSITY_MAX - intensity;
 
