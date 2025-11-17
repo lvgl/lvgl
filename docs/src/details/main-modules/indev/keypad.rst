@@ -102,7 +102,7 @@ an indev event like this:
     {
         lv_indev_t * indev = lv_event_get_target(e); /*Same as lv_indev_active()*/
         if(lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED) {
-            LV_LOG_USER("%c\n", lv_indev_get_key(indev));
+            LV_LOG_USER("%c", (char) lv_indev_get_key(indev));
         }
     }
 
