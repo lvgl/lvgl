@@ -236,6 +236,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 if(buf16_prev != *buf16_column) {
                     *buf16_column = blur_2_bytes(sum, *buf16_column, intensity);
                     buf16_prev = *buf16_column;
+                if(*buf16_prev != *buf16_column) {
+                    blur_2_bytes(sum, (lv_color16_t *)buf16_column, intensity);
+                    buf16_prev = buf16_column;
                 }
                 buf16_column += stride_px * skip_cnt;
             }
