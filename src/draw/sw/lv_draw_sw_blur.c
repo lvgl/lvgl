@@ -641,7 +641,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, *buf16_line, intensity);
+                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity);
                     buf16_prev = *buf16_line;
                 }
 
