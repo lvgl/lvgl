@@ -17,6 +17,7 @@
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_area.h"
 #include "../../../misc/lv_color.h"
+#include "../../../misc/lv_3dmath.h"
 #include "../gltf_data/lv_gltf_model.h"
 
 #ifdef __cplusplus
@@ -51,12 +52,6 @@ typedef enum {
     LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environnement background*/
 } lv_gltf_bg_mode_t;
 
-typedef struct {
-    lv_3dpoint_t local_position;
-    lv_3dpoint_t world_position;
-    lv_3dpoint_t scale;
-    lv_3dpoint_t rotation;
-} lv_gltf_model_node_data_t;
 
 /**********************
  * GLOBAL PROTOTYPES
