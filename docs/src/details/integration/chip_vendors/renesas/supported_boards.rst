@@ -141,7 +141,7 @@ Supported Boards
          | Parallel RGB888
      - .. raw:: html
 
-           <iframe width="160" height="90" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/a8eLdqC7rZk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek-ra8d2>`__
    * - **RZ/G3E-EVKIT**
@@ -155,6 +155,6 @@ Supported Boards
          | Micro-HDMI
      - .. raw:: html
 
-           <iframe width="160" height="90" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/0vzvV9nKW4Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit>`__
