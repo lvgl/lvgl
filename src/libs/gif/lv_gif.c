@@ -421,8 +421,25 @@ static void initialize(lv_gif_t * gifobj)
 
 }
 
+/**
+ * Dispose the previous frame area before rendering the next frame, according to the GIF disposal method.
+ *
+ * This function handles the disposal of the previous frame's area in the GIF image, as specified by the disposal method.
+ * Disposal method values:
+ *   0: No disposal specified (do nothing)
+ *   1: Do not dispose (leave as is)
+ *   2: Restore to background color (the affected area is filled with the background color)
+ *   3: Restore to previous (not implemented here)
+ * Only disposal method 2 ("restore to background") is handled in this function.
+ *
+ * @param gif      Pointer to the GIFIMAGE structure representing the current GIF frame.
+ * @param drawbuf  Pointer to the draw buffer where the frame is rendered.
+ *
+ * Assumptions:
+ *   - The coordinates and dimensions (iX, iY, iWidth, iHeight) are within the bounds of the draw buffer.
+ *   - The palette type and background color are valid for the current GIF frame.
+ */
 static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
-{
     int x = gif->iX;
     int y = gif->iY;
     int w = gif->iWidth;
