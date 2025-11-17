@@ -323,6 +323,7 @@ Example
         <prop name="style_grid_cell_row_span-selector" type="int" help="How many rows the cell should span"/>
         <prop name="style_grid_cell_y_align-selector" type="enum:lv_grid_align" help="How to align the cell vertically"/>
 
+<<<<<<< HEAD
         <prop name="style_opa-selector" type="opa" help="Scale down the opacity of the widget and all its children"/>
         <prop name="style_opa_layered-selector" type="opa" help="Create a snapshot from the widget and blend it with opacity"/>
         <prop name="style_anim_duration-selector" type="int" help="Set animation duration in ms (e.g. for label scroll)"/>
@@ -346,6 +347,31 @@ Example
         <prop name="style_blur_radius-selector" type="int" help="The radius of the blurring"/>
         <prop name="style_blur_quality-selector" type="enum:lv_blur_quality" help="Set whether to prefer speed or precision"/>
         <prop name="style_blur_backdrop-selector" type="bool" help="true: blur the background first, false: blur the widget"/>
+=======
+        <prop name="style_opa" type="opa" help="Scale down the opacity of the widget and all its children"/>
+        <prop name="style_opa_layered" type="opa" help="Create a snapshot from the widget and blend it with opacity"/>
+        <prop name="style_anim_duration" type="int" help="Set animation duration in ms (e.g. for label scroll)"/>
+        <prop name="style_blend_mode" type="enum:lv_blend_mode" help="Set how to blend colors"/>
+        <prop name="style_transform_width" type="int" help="Change the width without affecting the layouts"/>
+        <prop name="style_transform_height" type="int" help="Change the height without affecting the layouts"/>
+        <prop name="style_translate_x" type="int" help="Offset in X after the layouts are calculated"/>
+        <prop name="style_translate_y" type="int" help="Offset in Y after the layouts are calculated"/>
+        <prop name="style_translate_radial" type="int" help="Translate radial"/>
+        <prop name="style_transform_scale_x" type="int" help="Scale X (256=100%)"/>
+        <prop name="style_transform_scale_y" type="int" help="Scale Y (256=100%)"/>
+        <prop name="style_transform_rotation" type="int" help="Rotate (0.1° units)"/>
+        <prop name="style_transform_pivot_x" type="int" help="Set pivot X"/>
+        <prop name="style_transform_pivot_y" type="int" help="Set pivot Y"/>
+        <prop name="style_transform_skew_x" type="int" help="Skew X (no SW render)"/>
+        <prop name="style_transform_skew_y" type="int" help="Skew Y (no SW render)"/>
+        <prop name="style_bitmap_mask_src" type="image" help="Set bitmap mask (A8 or L8)"/>
+        <prop name="style_rotary_sensitivity" type="int" help="Set rotary sensitivity for Crown input devices"/>
+        <prop name="style_recolor" type="color" help="Mix this color to the widget and all its children"/>
+        <prop name="style_recolor_opa" type="opa" help="The intensity of recoloring"/>
+        <prop name="style_blur_radius" type="int" help="The radius of the blurring"/>
+        <prop name="style_blur_quality" type="enum:lv_blur_quality" help="Set whether to prefer speed or precision"/>
+        <prop name="style_blur_backdrop" type="bool" help="true: blur the background first, false: blur the widget"/>
+>>>>>>> 05548bb1e (minor fixes and XML support)
 
         <prop name="flex_grow" type="int" help="Set flex grow to fill the available space in the track"/>
         <prop name="flex_flow" type="enum:lv_flex_flow" help="Set flex flow direction (row, column, etc.)"/>
