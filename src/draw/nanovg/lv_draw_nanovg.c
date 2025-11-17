@@ -26,7 +26,12 @@
     #define NVG_CTX_CREATE nvgCreateGL3
     #define NVG_CTX_DELETE nvgDeleteGL3
 #elif defined(NANOVG_GLES2_IMPLEMENTATION)
-    #include <GLES2/gl2.h>
+    #if LV_USE_OPENGLES
+        #include "../../drivers/opengles/lv_opengles_private.h"
+    #else
+        /* Fallback to default GLES2 headers */
+        #include <GLES2/gl2.h>
+    #endif
     #define NVG_CTX_CREATE nvgCreateGLES2
     #define NVG_CTX_DELETE nvgDeleteGLES2
 #elif defined(NANOVG_GLES3_IMPLEMENTATION)
