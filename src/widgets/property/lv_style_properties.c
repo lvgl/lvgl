@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[121] = {
+const lv_property_name_t lv_style_property_names[123] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -40,6 +40,9 @@ const lv_property_name_t lv_style_property_names[121] = {
     {"bg_opa",                 LV_PROPERTY_STYLE_BG_OPA,},
     {"bitmap_mask_src",        LV_PROPERTY_STYLE_BITMAP_MASK_SRC,},
     {"blend_mode",             LV_PROPERTY_STYLE_BLEND_MODE,},
+    {"blur_backdrop",          LV_PROPERTY_STYLE_BLUR_BACKDROP,},
+    {"blur_quality",           LV_PROPERTY_STYLE_BLUR_QUALITY,},
+    {"blur_radius",            LV_PROPERTY_STYLE_BLUR_RADIUS,},
     {"border_color",           LV_PROPERTY_STYLE_BORDER_COLOR,},
     {"border_opa",             LV_PROPERTY_STYLE_BORDER_OPA,},
     {"border_post",            LV_PROPERTY_STYLE_BORDER_POST,},
@@ -68,7 +71,6 @@ const lv_property_name_t lv_style_property_names[121] = {
     {"image_opa",              LV_PROPERTY_STYLE_IMAGE_OPA,},
     {"image_recolor",          LV_PROPERTY_STYLE_IMAGE_RECOLOR,},
     {"image_recolor_opa",      LV_PROPERTY_STYLE_IMAGE_RECOLOR_OPA,},
-    {"last_built_in_prop",     LV_PROPERTY_STYLE_LAST_BUILT_IN_PROP,},
     {"layout",                 LV_PROPERTY_STYLE_LAYOUT,},
     {"length",                 LV_PROPERTY_STYLE_LENGTH,},
     {"line_color",             LV_PROPERTY_STYLE_LINE_COLOR,},
