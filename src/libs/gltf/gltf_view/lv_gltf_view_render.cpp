@@ -73,7 +73,8 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
 static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state);
 static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state);
 static void setup_finish_frame(void);
-static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map);
+static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map,
+                             bool is_transmission_pass);
 static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data);
 static lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state,
                                          int32_t texture_w,
@@ -91,12 +92,12 @@ static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t
                            std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                            const lv_gltf_environment_t * env_tex, bool is_transmission_pass);
 
-static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data,
+static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * gltf_data,
                             fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                             const lv_gltf_environment_t * env_tex, bool is_transmission_pass);
 
-static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
+static bool draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
                           lv_gltf_primitive_t * _prim_data, size_t materialIndex, bool is_transmission_pass, GLuint program,
                           uint32_t * tex_num);
 
@@ -230,7 +231,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             setup_primary_output(view_desc->render_width, view_desc->render_height, opt_aa_this_frame);
         setup_finish_frame();
     }
-    if(vstate->render_opaque_buffer) {
+    if(vstate->render_opaque_buffer && vstate->opaque_render_state.framebuffer == 0) {
         vstate->opaque_render_state =
             setup_opaque_output(vstate->opaque_frame_buffer_width, vstate->opaque_frame_buffer_height);
         setup_finish_frame();
@@ -302,7 +303,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
             setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
         }
 
-        render_materials(viewer, model, model->opaque_nodes_by_material_index);
+        render_materials(viewer, model, model->opaque_nodes_by_material_index, true);
 
         for(const auto & node_distance_pair : distance_sort_nodes) {
             const auto & node_element = node_distance_pair.second;
@@ -319,10 +320,10 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
 
     if(is_first_model) {
         if(model->camera > 0) {
-            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, true);
+            setup_view_proj_matrix_from_camera(viewer, model->camera - 1, view_desc, model, false);
         }
         else {
-            setup_view_proj_matrix(viewer, view_desc, model, true);
+            setup_view_proj_matrix(viewer, view_desc, model, false);
         }
     }
 
@@ -334,9 +335,11 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
         lv_gltf_view_pop_opengl_state(&opengl_state);
         return vstate->render_state.texture;
     }
-    if(opt_draw_bg)
+    if(opt_draw_bg) {
         setup_draw_environment_background(&viewer->shader_manager, viewer, view_desc->blur_bg);
-    render_materials(viewer, model, model->opaque_nodes_by_material_index);
+    }
+
+    render_materials(viewer, model, model->opaque_nodes_by_material_index, false);
 
     for(const auto & node_distance_pair : distance_sort_nodes) {
         const auto & node_element = node_distance_pair.second;
@@ -362,13 +365,15 @@ static void setup_finish_frame(void)
     GL_CALL(glUseProgram(0));
 }
 
-static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map)
+static void render_materials(lv_gltf_t * viewer, lv_gltf_model_t * gltf_data, const MaterialIndexMap & map,
+                             bool is_transmission_pass)
 {
     for(const auto & kv : map) {
         for(const auto & pair : kv.second) {
             auto node = pair.first;
             draw_primitive(pair.second, viewer, gltf_data, *node, node->meshIndex.value(),
-                           lv_gltf_data_get_cached_transform(gltf_data, node), viewer->environment, true);
+                           lv_gltf_data_get_cached_transform(gltf_data, node),
+                           viewer->environment, is_transmission_pass);
         }
     }
 }
@@ -426,7 +431,9 @@ static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t
 
     std::size_t index_count = 0;
     auto & indexAccessor = asset->accessors[asset->meshes[mesh_index].primitives[prim_num].indicesAccessor.value()];
-    setup_primitive(prim_num, viewer, gltf_data, node, mesh_index, matrix, env_tex, is_transmission_pass);
+    if(!setup_primitive(prim_num, viewer, gltf_data, node, mesh_index, matrix, env_tex, is_transmission_pass)) {
+        return;
+    }
 
     if(indexAccessor.bufferViewIndex.has_value()) {
         index_count = (uint32_t)indexAccessor.count;
@@ -435,7 +442,7 @@ static void draw_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t
         GL_CALL(glDrawElements(_prim_data->primitiveType, index_count, _prim_data->indexType, 0));
     }
 }
-static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * model, fastgltf::Node & node,
+static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_t * model, fastgltf::Node & node,
                             std::size_t mesh_index, const fastgltf::math::fmat4x4 & matrix,
                             const lv_gltf_environment_t * env_tex, bool is_transmission_pass)
 {
@@ -457,7 +464,7 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     /* Fast path, primitive setup in the primitive draw render */
     if((model->last_material_index == materialIndex) && (model->last_pass_was_transmission == is_transmission_pass)) {
         GL_CALL(glUniformMatrix4fv(uniforms->model_matrix, 1, GL_FALSE, &matrix[0][0]));
-        return;
+        return true;
     }
 
     model->last_material_index = materialIndex;
@@ -485,7 +492,9 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     GL_CALL(glCullFace(GL_BACK));
     uint32_t tex_num = 0;
 
-    draw_material(viewer, uniforms, model, _prim_data, materialIndex, is_transmission_pass, program, &tex_num);
+    if(!draw_material(viewer, uniforms, model, _prim_data, materialIndex, is_transmission_pass, program, &tex_num)) {
+        return false;
+    }
 
     const lv_gltf_view_state_t * vstate = &viewer->state;
     if(!is_transmission_pass && vstate->render_opaque_buffer) {
@@ -528,9 +537,10 @@ static void setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
         GL_CALL(glBindTexture(GL_TEXTURE_2D, env_tex->charlie_lut));
         GL_CALL(glUniform1i(uniforms->env_charlie_lut_sampler, tex_num++));
     }
+    return true;
 }
 
-static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
+static bool draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t * uniforms, lv_gltf_model_t * model,
                           lv_gltf_primitive_t * _prim_data, size_t materialIndex, bool is_transmission_pass, GLuint program,
                           uint32_t * tex_num)
 {
@@ -545,13 +555,13 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         GL_CALL(glUniform1f(uniforms->ior, 1.5f));
         GL_CALL(glUniform1f(uniforms->dispersion, 0.0f));
         GL_CALL(glUniform1f(uniforms->thickness, 0.01847f));
-        return;
+        return true;
     }
 
     auto & gltfMaterial = asset->materials[materialIndex - 1];
 
     if(is_transmission_pass && (gltfMaterial.transmission != NULL)) {
-        return;
+        return false;
     }
 
     if(gltfMaterial.doubleSided)
@@ -724,6 +734,7 @@ static void draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
                                       uniforms->diffuse_transmission_color_uv_transform);
         }
     }
+    return true;
 }
 static void draw_lights(lv_gltf_model_t * model, GLuint program)
 {
