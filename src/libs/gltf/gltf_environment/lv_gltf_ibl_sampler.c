@@ -108,8 +108,8 @@ void lv_gltf_ibl_sampler_set_cube_map_resolution(lv_gltf_ibl_sampler_t * sampler
         LV_LOG_WARN("Can't set cube map resolution on a NULL sampler");
         return;
     }
-    if(!resolution) {
-        LV_LOG_WARN("Cube map resolution should be > %d", resolution);
+    if(resolution == 0) {
+        LV_LOG_WARN("Cube map resolution should be > 0");
         return;
     }
     sampler->cube_map_resolution = resolution;
