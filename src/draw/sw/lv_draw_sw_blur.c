@@ -182,6 +182,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         y_end = (y_end / skip_cnt) * skip_cnt;
         if(y_start > y_end) continue;
 
+<<<<<<< HEAD
         uint32_t sample_len_limited = LV_MIN((y_end - y_start) / skip_cnt + 1, sample_len);
 =======
 =======
@@ -342,6 +343,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 >>>>>>> d60c42a74 (add tests)
 
         uint32_t sample_len_limited = LV_MIN(y_end - y_start + 1, sample_len);
+=======
+        uint32_t sample_len_limited = LV_MIN((y_end - y_start + 1) / skip_cnt, sample_len);
+>>>>>>> 195ed8c1d (better sampling)
 
         if(px_size >= 3) {
 <<<<<<< HEAD
@@ -444,9 +448,13 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+<<<<<<< HEAD
 >>>>>>> b5bf873fb (fix optimization issue)
             blur_3_bytes_init(sum, buf_column, sample_len_limited, stride_byte);
 >>>>>>> 9d262f236 (works well, these are missing: XML support, more tests)
+=======
+            blur_3_bytes_init(sum, buf_column, sample_len_limited, stride_byte * skip_cnt);
+>>>>>>> 195ed8c1d (better sampling)
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum, buf_column, intensity);
@@ -454,7 +462,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_3_bytes_init(sum, buf_column, sample_len_limited, -stride_byte);
+            blur_3_bytes_init(sum, buf_column, sample_len_limited, -stride_byte * skip_cnt);
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum, buf_column, intensity);
                 buf_column -= stride_byte * skip_cnt;
@@ -462,9 +470,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         }
         else if(px_size == 2) {
             uint16_t * buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, stride_byte);
-
-            /*Compiler optimization might mishandle it, so add volatile*/
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, stride_px * skip_cnt);
             uint16_t buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -485,6 +491,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 =======
             buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
 <<<<<<< HEAD
+<<<<<<< HEAD
             blur_2_bytes_init(sum, buf16_column, sample_len_limited, -stride_byte);
 >>>>>>> 9d262f236 (works well, these are missing: XML support, more tests)
 =======
@@ -492,6 +499,9 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 <<<<<<< HEAD
 >>>>>>> f58f81bf8 (minor fixes and XML support)
 =======
+=======
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, -stride_px * skip_cnt);
+>>>>>>> 195ed8c1d (better sampling)
             buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
 
 >>>>>>> b5bf873fb (fix optimization issue)
@@ -575,14 +585,14 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         x_end = (x_end / skip_cnt) * skip_cnt;
 
         if(x_start > x_end) continue;
-        uint32_t line_len_byte = (x_end - x_start + 1) * px_size;
-        uint32_t sample_len_limited = LV_MIN(x_end - x_start + 1, sample_len);
+        uint32_t line_len_byte = (x_end - x_start + skip_cnt) * px_size;
+        uint32_t sample_len_limited = LV_MIN((x_end - x_start + 1) / skip_cnt, sample_len);
 
         if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
 
-            blur_3_bytes_init(sum, buf_line, sample_len_limited, px_size);
+            blur_3_bytes_init(sum, buf_line, sample_len_limited, px_size * skip_cnt);
             buf_line += px_size * skip_cnt;
             for(x = x_start + skip_cnt; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line, intensity);
@@ -590,7 +600,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_3_bytes_init(sum, buf_line, sample_len_limited, -px_size);
+            blur_3_bytes_init(sum, buf_line, sample_len_limited, - px_size * skip_cnt);
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line, intensity);
 
@@ -624,7 +634,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         }
         else if(px_size == 2) {
             uint16_t * buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, 1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited,  skip_cnt);
             uint16_t buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -636,7 +646,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, -1);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, - skip_cnt);
             buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
