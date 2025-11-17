@@ -23,6 +23,7 @@
  *********************/
 #define BLUR_INTENSITY_BITS 12
 #define BLUR_INTENSITY_MAX (1 << 12)
+#define BLUR_INTENSITY_HALF ((1 << 12) / 2)
 
 /**********************
  *      TYPEDEFS
@@ -35,7 +36,8 @@
 static void blur_3_bytes_init(uint32_t * sum, uint8_t * buf, uint32_t sample_len, int32_t stride);
 static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
 
-static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity);
+//static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity);
+static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity);
 static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity);
 static int32_t get_rounded_edge_point(int32_t p_start, int32_t p_end, int32_t p, int32_t r);
 
@@ -69,7 +71,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
      */
     int32_t skip_cnt = 1;
     if(dsc->quality == LV_BLUR_QUALITY_AUTO) {
-        if(blur_radius >= 32 && blur_radius == 0) skip_cnt = 3;
+        if(blur_radius >= 32 && dsc->corner_radius == 0) skip_cnt = 3;
         else if(blur_radius >= 8) skip_cnt = 2;
     }
     else if(dsc->quality == LV_BLUR_QUALITY_SPEED) {
@@ -110,8 +112,6 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
     int32_t y;
     int32_t x;
 
-    uint32_t cnt = 0;
-
     /*Blur each column top to bottom and bottom to top.*/
     for(x = clipped_coords.x1; x <= clipped_coords.x2; x += skip_cnt) {
         int32_t cir_y = get_rounded_edge_point(coords->x1, coords->x2, x, radius);
@@ -127,7 +127,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         uint32_t sample_len_limited = LV_MIN(y_end - y_start + 1, sample_len);
 
         if(px_size >= 3) {
-            uint8_t * buf_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
+            /*Compiler optimization might mishandle it, so add volatile*/
+            volatile uint8_t * buf_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
             blur_3_bytes_init(sum, buf_column, sample_len_limited, stride_byte);
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -146,22 +147,25 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             uint16_t * buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, stride_byte);
 
-            uint16_t not_equal_data = buf16_column[0] + 1;
-            uint16_t * buf16_prev = &not_equal_data;
+            /*Compiler optimization might mishandle it, so add volatile*/
+            uint16_t buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
+
             for(y = y_start; y <= y_end; y += skip_cnt) {
-                if(*buf16_prev != *buf16_column) {
-                    blur_2_bytes(sum, (lv_color16_t *)buf16_column, intensity);
-                    buf16_prev = buf16_column;
+                if(buf16_prev != *buf16_column) {
+                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity);
+                    buf16_prev = *buf16_column;
                 }
                 buf16_column += stride_px * skip_cnt;
             }
 
             buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, -stride_byte);
+            buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
+
             for(y = y_start; y <= y_end; y += skip_cnt) {
-                if(*buf16_prev != *buf16_column) {
-                    blur_2_bytes(sum, (lv_color16_t *)buf16_column, intensity);
-                    buf16_prev = buf16_column;
+                if(buf16_prev != *buf16_column) {
+                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity);
+                    buf16_prev = *buf16_column;
                 }
                 buf16_column -= stride_px * skip_cnt;
             }
@@ -185,7 +189,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         uint32_t sample_len_limited = LV_MIN(x_end - x_start + 1, sample_len);
 
         if(px_size >= 3) {
-            uint8_t * buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
+            /*Compiler optimization might mishandle it, so add volatile*/
+            volatile uint8_t * buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
 
             blur_3_bytes_init(sum, buf_line, sample_len_limited, px_size);
             buf_line += px_size * skip_cnt;
@@ -231,32 +236,24 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         else if(px_size == 2) {
             uint16_t * buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, 1);
+            uint16_t buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
-            uint16_t not_equal_data = buf16_line[0] + 1;
-            uint16_t * buf16_prev = &not_equal_data;
             for(x = x_start; x <= x_end; x += skip_cnt) {
-                if(*buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, (lv_color16_t *)buf16_line, intensity);
-                    buf16_prev = buf16_line;
-                }
-                else {
-                    cnt++;
+                if(buf16_prev != *buf16_line) {
+                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity);
+                    buf16_prev = *buf16_line;
                 }
                 buf16_line += skip_cnt;
             }
 
             buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len, -1);
+            buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
-            not_equal_data = buf16_line[0] + 1;
-            buf16_prev = &not_equal_data;
             for(x = x_start; x <= x_end; x += skip_cnt) {
-                if(*buf16_prev != *buf16_line) {
-                    blur_2_bytes(sum, (lv_color16_t *)buf16_line, intensity);
-                    buf16_prev = buf16_line;
-                }
-                else {
-                    cnt++;
+                if(buf16_prev != *buf16_line) {
+                    blur_2_bytes(sum, buf16_line, intensity);
+                    buf16_prev = *buf16_line;
                 }
 
                 /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
@@ -283,9 +280,6 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
         }
     }
-
-
-
 
     LV_PROFILER_DRAW_END;
 }
@@ -332,19 +326,39 @@ static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sampl
     sum[2] = (sum[2] << BLUR_INTENSITY_BITS) / sample_len;
 }
 
-static inline void blur_2_bytes(uint32_t * sum, lv_color16_t * buf, uint32_t intensity)
+static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity)
 {
+    const uint32_t inv = BLUR_INTENSITY_MAX - intensity;
+    const uint32_t half = BLUR_INTENSITY_MAX >> 1;
+    const uint32_t shift = BLUR_INTENSITY_BITS;
 
-    uint32_t intensity_inv = BLUR_INTENSITY_MAX - intensity;
-    sum[0] = ((sum[0] * intensity) >> BLUR_INTENSITY_BITS) + ((buf->red * intensity_inv));
-    buf->red = (sum[0] + BLUR_INTENSITY_MAX / 2) >> BLUR_INTENSITY_BITS;
+    /* unpack */
+    uint32_t r =  px >> 11;
+    uint32_t g = (px >> 5) & 0x3F;
+    uint32_t b =  px        & 0x1F;
 
-    sum[1] = ((sum[1] * intensity) >> BLUR_INTENSITY_BITS) + ((buf->green * intensity_inv));
-    buf->green = (sum[1] + BLUR_INTENSITY_MAX / 2) >> BLUR_INTENSITY_BITS;
+    uint32_t s0 = sum[0];
+    uint32_t s1 = sum[1];
+    uint32_t s2 = sum[2];
 
-    sum[2] = ((sum[2] * intensity) >> BLUR_INTENSITY_BITS) + ((buf->blue * intensity_inv));
-    buf->blue = (sum[2] + BLUR_INTENSITY_MAX / 2) >> BLUR_INTENSITY_BITS;
+    /* fused multiply-accumulate pattern */
+    s0 = (s0 * intensity >> shift) + (r * inv);
+    s1 = (s1 * intensity >> shift) + (g * inv);
+    s2 = (s2 * intensity >> shift) + (b * inv);
+
+    sum[0] = s0;
+    sum[1] = s1;
+    sum[2] = s2;
+
+    /* final */
+    r = (s0 + half) >> shift;
+    g = (s1 + half) >> shift;
+    b = (s2 + half) >> shift;
+
+    return (uint16_t)((r << 11) | (g << 5) | b);
 }
+
+
 
 static inline void blur_3_bytes(uint32_t * sum, uint8_t * buf, uint32_t intensity)
 {
