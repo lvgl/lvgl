@@ -427,7 +427,7 @@ static void window_update(lv_display_t * disp)
     }
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, cf);
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
-    SDL_SetRenderDrawColor(dsc->renderer, 0x00, 0xff, 0x00, 0xff);
+
     SDL_RenderClear(dsc->renderer);
 
     /*Update the renderer with the texture containing the rendered image*/
