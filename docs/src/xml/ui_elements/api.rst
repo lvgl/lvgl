@@ -104,11 +104,11 @@ allowed to create children on certain internal UI elements.
             <simple_screen-icon_area>
                 <lv_image src="img1"/>
                 <lv_image src="img2"/>
-            </simple_screen-icon_area">
+            </simple_screen-icon_area>
 
-            <simple_screen-content_area">
+            <simple_screen-content_area>
                 <lv_label text="Some content"/>
-            </simple_screen-content_area">
+            </simple_screen-content_area>
         </view>
     </component>
 
