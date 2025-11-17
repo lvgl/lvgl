@@ -624,6 +624,7 @@ Blur is defined by :cpp:type:`lv_draw_blur_dsc_t`, which includes:
 
 :blur_radius:      The radius of the blur.
 :corner_radius:    The radius of the corners.
+:quality:          Tells whether to prefer speed or quality.
 
 Functions for blur drawing:
 

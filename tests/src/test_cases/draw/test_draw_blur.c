@@ -18,13 +18,15 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
+#define CAVAS_WIDTH 180
+#define CAVAS_HEIGHT 100
 
-static void small_canvas_render(const char * name_sub, lv_color_format_t cf, uint32_t idx)
+
+static void small_canvas_render(const char * name_sub, lv_color_format_t cf, void * canvas_buf, int32_t blur_radius)
 {
-    static LV_ATTRIBUTE_MEM_ALIGN uint8_t small_canvas_buf[4][LV_TEST_WIDTH_TO_STRIDE(180, 4) * 180 + LV_DRAW_BUF_ALIGN];
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, small_canvas_buf[idx], 180, 180, cf);
+    lv_canvas_set_buffer(canvas, small_canvas_buf, CAVAS_WIDTH, CAVAS_HEIGHT, cf);
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
 
     lv_layer_t layer;
@@ -49,7 +51,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, uin
     blur_dsc.corner_radius = 10;
     blur_dsc.blur_radius = 8;
 
-    lv_area_t fill_coords = {40, 40, 140, 140};
+    lv_area_t fill_coords = {40, 40, CAVAS_WIDTH - 40, CAVAS_HEIGHT - 40};
     lv_draw_blur(&layer, &blur_dsc, &fill_coords);
 
     /*Draw a semi-transparent rectangle on the blurred area*/
@@ -68,7 +70,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, uin
     label_dsc.align = LV_TEXT_ALIGN_CENTER;
     label_dsc.text = name_sub;
 
-    lv_area_t label2_coords = {50, 50, 130, 130};
+    lv_area_t label2_coords = {50, 30, CAVAS_WIDTH - 50, CAVAS_HEIGHT - 50};
     lv_draw_label(&layer, &label_dsc, &label2_coords);
 
     lv_canvas_finish_layer(canvas, &layer);
@@ -76,10 +78,27 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, uin
 
 void test_blur(void)
 {
-    small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, 0);
-    small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, 1);
-    small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, 2);
-    small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, 3);
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[16][LV_TEST_WIDTH_TO_STRIDE(CAVAS_WIDTH,
+                                                                                 4) * CAVAS_HEIGHT + LV_DRAW_BUF_ALIGN];
+    small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, canvas_buf[0], 6);
+    small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, canvas_buf[1], 6);
+    small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, canvas_buf[2], 6);
+    small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, canvas_buf[3], 6);
+
+    small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, canvas_buf[4], 12);
+    small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, canvas_buf[5], 12);
+    small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, canvas_buf[6], 12);
+    small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, canvas_buf[7], 12);
+
+    small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, canvas_buf[8], 24);
+    small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, canvas_buf[9], 24);
+    small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, canvas_buf[10], 24);
+    small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, canvas_buf[11], 24);
+
+    small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, canvas_buf[12], 60);
+    small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, canvas_buf[13], 60);
+    small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, canvas_buf[14], 60);
+    small_canvas_render("argb8888", LV_COLOR_FORMAT_ARGB8888, canvas_buf[15], 60);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_blur.png");
 
