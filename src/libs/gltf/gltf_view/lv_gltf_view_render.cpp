@@ -1262,13 +1262,13 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
             }
 
             // Rebuild the local matrix after applying all overrides
-            localmatrix = fastgltf::math::scale(
-                              fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
+            localmatrix = fastgltf::math::translate(
+                              fastgltf::math::rotate(fastgltf::math::scale(fastgltf::math::fmat4x4(), local_scale),
                                                      made_rotation_changes ?
                                                      lv_gltf_math_euler_to_quaternion(
                                                          local_rot[0], local_rot[1], local_rot[2]) :
                                                      local_quat),
-                              local_scale);
+                              local_pos);
         }
 
         if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
