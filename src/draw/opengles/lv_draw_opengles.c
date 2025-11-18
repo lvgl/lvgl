@@ -28,10 +28,6 @@
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_area_private.h"
 
-#if LV_USE_GLTF
-#include "../../libs/gltf/gltf_view/lv_gltf_view_internal.h"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -47,7 +43,6 @@ typedef struct {
     lv_draw_task_t * task_act;
     lv_cache_t * texture_cache;
     unsigned int framebuffer;
-    unsigned int depth_texture;
     lv_draw_buf_t render_draw_buf;
 } lv_draw_opengles_unit_t;
 
@@ -606,9 +601,7 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
 
 #if LV_USE_3DTEXTURE
     if(t->type == LV_DRAW_TASK_TYPE_3D) {
-        #if !LV_GLTF_DIRECT_BUFFER_WRITES
-            lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
-        #endif
+        lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
         return;
     }
 #endif
@@ -625,31 +618,6 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
 {
     if(u->framebuffer == 0) {
         GL_CALL(glGenFramebuffers(1, &u->framebuffer));
-        #if LV_GLTF_DIRECT_BUFFER_WRITES
-            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, u->framebuffer));
-            lv_draw_task_t * task = u->task_act;
-            int32_t display_w = lv_area_get_width(&task->_real_area);
-            int32_t display_h = lv_area_get_height(&task->_real_area);
-
-            GL_CALL(glGenTextures(1, &u->depth_texture));
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, u->depth_texture));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
-            #ifdef __EMSCRIPTEN__ // Check if compiling for Emscripten (WebGL)
-                // For WebGL2
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, display_w, display_h, 0, GL_DEPTH_COMPONENT,
-                                    GL_UNSIGNED_INT, NULL));
-            #else
-                // For Desktop OpenGL
-                GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, LV_GL_PREFERRED_DEPTH, display_w, display_h, 0, GL_DEPTH_COMPONENT,
-                                    GL_UNSIGNED_SHORT, NULL));
-            #endif
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
-            GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, u->depth_texture, 0));
-        #endif
     }
     return u->framebuffer;
 }
