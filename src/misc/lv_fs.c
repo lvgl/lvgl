@@ -524,7 +524,7 @@ void lv_fs_remove_drive(char letter)
             if((*drv)->remove_cb) {
                 (*drv)->remove_cb(*drv); /* call the remove callback if available */
             }
-            lv_free(*drv); /* free the drive structure */
+            lv_free(drv); /* free the list node*/
         }
     }
 }
