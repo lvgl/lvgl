@@ -413,10 +413,10 @@ NVGcolor nvgRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned cha
 {
 	NVGcolor color;
 	// Use longer initialization to suppress warning.
-	color.r = r / 255.0f;
-	color.g = g / 255.0f;
-	color.b = b / 255.0f;
-	color.a = a / 255.0f;
+	color.ch.r = r / 255.0f;
+	color.ch.g = g / 255.0f;
+	color.ch.b = b / 255.0f;
+	color.ch.a = a / 255.0f;
 	return color;
 }
 
@@ -424,22 +424,22 @@ NVGcolor nvgRGBAf(float r, float g, float b, float a)
 {
 	NVGcolor color;
 	// Use longer initialization to suppress warning.
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
+	color.ch.r = r;
+	color.ch.g = g;
+	color.ch.b = b;
+	color.ch.a = a;
 	return color;
 }
 
 NVGcolor nvgTransRGBA(NVGcolor c, unsigned char a)
 {
-	c.a = a / 255.0f;
+	c.ch.a = a / 255.0f;
 	return c;
 }
 
 NVGcolor nvgTransRGBAf(NVGcolor c, float a)
 {
-	c.a = a;
+	c.ch.a = a;
 	return c;
 }
 
@@ -447,7 +447,7 @@ NVGcolor nvgLerpRGBA(NVGcolor c0, NVGcolor c1, float u)
 {
 	int i;
 	float oneminu;
-	NVGcolor cint = {{{0}}};
+	NVGcolor cint = { 0 };
 
 	u = nvg__clampf(u, 0.0f, 1.0f);
 	oneminu = 1.0f - u;
@@ -487,10 +487,10 @@ NVGcolor nvgHSLA(float h, float s, float l, unsigned char a)
 	l = nvg__clampf(l, 0.0f, 1.0f);
 	m2 = l <= 0.5f ? (l * (1 + s)) : (l + s - l * s);
 	m1 = 2 * l - m2;
-	col.r = nvg__clampf(nvg__hue(h + 1.0f/3.0f, m1, m2), 0.0f, 1.0f);
-	col.g = nvg__clampf(nvg__hue(h, m1, m2), 0.0f, 1.0f);
-	col.b = nvg__clampf(nvg__hue(h - 1.0f/3.0f, m1, m2), 0.0f, 1.0f);
-	col.a = a/255.0f;
+	col.ch.r = nvg__clampf(nvg__hue(h + 1.0f/3.0f, m1, m2), 0.0f, 1.0f);
+	col.ch.g = nvg__clampf(nvg__hue(h, m1, m2), 0.0f, 1.0f);
+	col.ch.b = nvg__clampf(nvg__hue(h - 1.0f/3.0f, m1, m2), 0.0f, 1.0f);
+	col.ch.a = a/255.0f;
 	return col;
 }
 
@@ -2182,8 +2182,8 @@ void nvgFill(NVGcontext* ctx)
 		nvg__expandFill(ctx, 0.0f, NVG_MITER, 2.4f);
 
 	// Apply global alpha
-	fillPaint.innerColor.a *= state->alpha;
-	fillPaint.outerColor.a *= state->alpha;
+	fillPaint.innerColor.ch.a *= state->alpha;
+	fillPaint.outerColor.ch.a *= state->alpha;
 
 	ctx->params.renderFill(ctx->params.userPtr, &fillPaint, state->compositeOperation, &state->scissor, ctx->fringeWidth,
 						   ctx->cache->bounds, ctx->cache->paths, ctx->cache->npaths);
@@ -2211,14 +2211,14 @@ void nvgStroke(NVGcontext* ctx)
 		// If the stroke width is less than pixel size, use alpha to emulate coverage.
 		// Since coverage is area, scale by alpha*alpha.
 		float alpha = nvg__clampf(strokeWidth / ctx->fringeWidth, 0.0f, 1.0f);
-		strokePaint.innerColor.a *= alpha*alpha;
-		strokePaint.outerColor.a *= alpha*alpha;
+		strokePaint.innerColor.ch.a *= alpha*alpha;
+		strokePaint.outerColor.ch.a *= alpha*alpha;
 		strokeWidth = ctx->fringeWidth;
 	}
 
 	// Apply global alpha
-	strokePaint.innerColor.a *= state->alpha;
-	strokePaint.outerColor.a *= state->alpha;
+	strokePaint.innerColor.ch.a *= state->alpha;
+	strokePaint.outerColor.ch.a *= state->alpha;
 
 	nvg__flattenPaths(ctx);
 

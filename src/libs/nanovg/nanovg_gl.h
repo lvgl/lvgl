@@ -194,12 +194,13 @@ struct GLNVGpath {
 };
 typedef struct GLNVGpath GLNVGpath;
 
+#if NANOVG_GL_USE_UNIFORMBUFFER
 struct GLNVGfragUniforms {
-	#if NANOVG_GL_USE_UNIFORMBUFFER
+	struct {
 		float scissorMat[12]; // matrices are actually 3 vec4s
 		float paintMat[12];
-		struct NVGcolor innerCol;
-		struct NVGcolor outerCol;
+		union NVGcolor innerCol;
+		union NVGcolor outerCol;
 		float scissorExt[2];
 		float scissorScale[2];
 		float extent[2];
@@ -209,31 +210,33 @@ struct GLNVGfragUniforms {
 		float strokeThr;
 		int texType;
 		int type;
-	#else
-		// note: after modifying layout or size of uniform array,
-		// don't forget to also update the fragment shader source!
-		#define NANOVG_GL_UNIFORMARRAY_SIZE 11
-		union {
-			struct {
-				float scissorMat[12]; // matrices are actually 3 vec4s
-				float paintMat[12];
-				struct NVGcolor innerCol;
-				struct NVGcolor outerCol;
-				float scissorExt[2];
-				float scissorScale[2];
-				float extent[2];
-				float radius;
-				float feather;
-				float strokeMult;
-				float strokeThr;
-				float texType;
-				float type;
-			};
-			float uniformArray[NANOVG_GL_UNIFORMARRAY_SIZE][4];
-		};
-	#endif
+	} s;
 };
 typedef struct GLNVGfragUniforms GLNVGfragUniforms;
+#else
+// note: after modifying layout or size of uniform array,
+// don't forget to also update the fragment shader source!
+#define NANOVG_GL_UNIFORMARRAY_SIZE 11
+union GLNVGfragUniforms {
+	struct {
+		float scissorMat[12]; // matrices are actually 3 vec4s
+		float paintMat[12];
+		union NVGcolor innerCol;
+		union NVGcolor outerCol;
+		float scissorExt[2];
+		float scissorScale[2];
+		float extent[2];
+		float radius;
+		float feather;
+		float strokeMult;
+		float strokeThr;
+		float texType;
+		float type;
+	} s;
+	float uniformArray[NANOVG_GL_UNIFORMARRAY_SIZE][4];
+};
+typedef union GLNVGfragUniforms GLNVGfragUniforms;
+#endif
 
 struct GLNVGcontext {
 	GLNVGshader shader;
@@ -907,9 +910,9 @@ static void glnvg__xformToMat3x4(float* m3, float* t)
 
 static NVGcolor glnvg__premulColor(NVGcolor c)
 {
-	c.r *= c.a;
-	c.g *= c.a;
-	c.b *= c.a;
+	c.ch.r *= c.ch.a;
+	c.ch.g *= c.ch.a;
+	c.ch.b *= c.ch.a;
 	return c;
 }
 
@@ -921,65 +924,65 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 
 	memset(frag, 0, sizeof(*frag));
 
-	frag->innerCol = glnvg__premulColor(paint->innerColor);
-	frag->outerCol = glnvg__premulColor(paint->outerColor);
+	frag->s.innerCol = glnvg__premulColor(paint->innerColor);
+	frag->s.outerCol = glnvg__premulColor(paint->outerColor);
 
 	if (scissor->extent[0] < -0.5f || scissor->extent[1] < -0.5f) {
-		memset(frag->scissorMat, 0, sizeof(frag->scissorMat));
-		frag->scissorExt[0] = 1.0f;
-		frag->scissorExt[1] = 1.0f;
-		frag->scissorScale[0] = 1.0f;
-		frag->scissorScale[1] = 1.0f;
+		memset(frag->s.scissorMat, 0, sizeof(frag->s.scissorMat));
+		frag->s.scissorExt[0] = 1.0f;
+		frag->s.scissorExt[1] = 1.0f;
+		frag->s.scissorScale[0] = 1.0f;
+		frag->s.scissorScale[1] = 1.0f;
 	} else {
 		nvgTransformInverse(invxform, scissor->xform);
-		glnvg__xformToMat3x4(frag->scissorMat, invxform);
-		frag->scissorExt[0] = scissor->extent[0];
-		frag->scissorExt[1] = scissor->extent[1];
-		frag->scissorScale[0] = sqrtf(scissor->xform[0]*scissor->xform[0] + scissor->xform[2]*scissor->xform[2]) / fringe;
-		frag->scissorScale[1] = sqrtf(scissor->xform[1]*scissor->xform[1] + scissor->xform[3]*scissor->xform[3]) / fringe;
+		glnvg__xformToMat3x4(frag->s.scissorMat, invxform);
+		frag->s.scissorExt[0] = scissor->extent[0];
+		frag->s.scissorExt[1] = scissor->extent[1];
+		frag->s.scissorScale[0] = sqrtf(scissor->xform[0]*scissor->xform[0] + scissor->xform[2]*scissor->xform[2]) / fringe;
+		frag->s.scissorScale[1] = sqrtf(scissor->xform[1]*scissor->xform[1] + scissor->xform[3]*scissor->xform[3]) / fringe;
 	}
 
-	memcpy(frag->extent, paint->extent, sizeof(frag->extent));
-	frag->strokeMult = (width*0.5f + fringe*0.5f) / fringe;
-	frag->strokeThr = strokeThr;
+	memcpy(frag->s.extent, paint->extent, sizeof(frag->s.extent));
+	frag->s.strokeMult = (width*0.5f + fringe*0.5f) / fringe;
+	frag->s.strokeThr = strokeThr;
 
 	if (paint->image != 0) {
 		tex = glnvg__findTexture(gl, paint->image);
 		if (tex == NULL) return 0;
 		if ((tex->flags & NVG_IMAGE_FLIPY) != 0) {
 			float m1[6], m2[6];
-			nvgTransformTranslate(m1, 0.0f, frag->extent[1] * 0.5f);
+			nvgTransformTranslate(m1, 0.0f, frag->s.extent[1] * 0.5f);
 			nvgTransformMultiply(m1, paint->xform);
 			nvgTransformScale(m2, 1.0f, -1.0f);
 			nvgTransformMultiply(m2, m1);
-			nvgTransformTranslate(m1, 0.0f, -frag->extent[1] * 0.5f);
+			nvgTransformTranslate(m1, 0.0f, -frag->s.extent[1] * 0.5f);
 			nvgTransformMultiply(m1, m2);
 			nvgTransformInverse(invxform, m1);
 		} else {
 			nvgTransformInverse(invxform, paint->xform);
 		}
-		frag->type = NSVG_SHADER_FILLIMG;
+		frag->s.type = NSVG_SHADER_FILLIMG;
 
 		#if NANOVG_GL_USE_UNIFORMBUFFER
 		if (tex->type == NVG_TEXTURE_RGBA)
-			frag->texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
+			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
 		else
-			frag->texType = 2;
+			frag->s.texType = 2;
 		#else
 		if (tex->type == NVG_TEXTURE_RGBA)
-			frag->texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
+			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
 		else
-			frag->texType = 2.0f;
+			frag->s.texType = 2.0f;
 		#endif
 //		printf("frag->texType = %d\n", frag->texType);
 	} else {
-		frag->type = NSVG_SHADER_FILLGRAD;
-		frag->radius = paint->radius;
-		frag->feather = paint->feather;
+		frag->s.type = NSVG_SHADER_FILLGRAD;
+		frag->s.radius = paint->radius;
+		frag->s.feather = paint->feather;
 		nvgTransformInverse(invxform, paint->xform);
 	}
 
-	glnvg__xformToMat3x4(frag->paintMat, invxform);
+	glnvg__xformToMat3x4(frag->s.paintMat, invxform);
 
 	return 1;
 }
@@ -1423,8 +1426,8 @@ static void glnvg__renderFill(void* uptr, NVGpaint* paint, NVGcompositeOperation
 		// Simple shader for stencil
 		frag = nvg__fragUniformPtr(gl, call->uniformOffset);
 		memset(frag, 0, sizeof(*frag));
-		frag->strokeThr = -1.0f;
-		frag->type = NSVG_SHADER_SIMPLE;
+		frag->s.strokeThr = -1.0f;
+		frag->s.type = NSVG_SHADER_SIMPLE;
 		// Fill shader
 		glnvg__convertPaint(gl, nvg__fragUniformPtr(gl, call->uniformOffset + gl->fragSize), paint, scissor, fringe, fringe, -1.0f);
 	} else {
@@ -1523,7 +1526,7 @@ static void glnvg__renderTriangles(void* uptr, NVGpaint* paint, NVGcompositeOper
 	if (call->uniformOffset == -1) goto error;
 	frag = nvg__fragUniformPtr(gl, call->uniformOffset);
 	glnvg__convertPaint(gl, frag, paint, scissor, 1.0f, fringe, -1.0f);
-	frag->type = NSVG_SHADER_IMG;
+	frag->s.type = NSVG_SHADER_IMG;
 
 	return;
 
