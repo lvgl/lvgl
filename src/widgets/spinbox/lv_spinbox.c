@@ -175,7 +175,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
     }
 
     spinbox->range_max = max_value;
-    spinbox->range_min = min_value;
+    spinbox->range_min = min_value > INT32_MIN ? min_value : INT32_MIN + 1;
 
     if(spinbox->value > max_value) spinbox->value = max_value;
     if(spinbox->value < min_value) spinbox->value = min_value;
@@ -199,7 +199,7 @@ void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
         if(min_value > max) min_value = max;
     }
 
-    spinbox->range_min = min_value;
+    spinbox->range_min = min_value > INT32_MIN ? min_value : INT32_MIN + 1;
 
     if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
 
