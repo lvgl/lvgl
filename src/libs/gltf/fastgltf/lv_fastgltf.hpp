@@ -18,6 +18,28 @@
 
 namespace fastgltf
 {
+/**
+ * Computes the transform matrix for a given node
+ */
+FASTGLTF_EXPORT inline auto getLocalTransformMatrix(const Node& node) {
+	return visit_exhaustive(visitor {
+		[&](const math::fmat4x4& matrix) {
+				return matrix;
+		},
+		[&](const TRS& trs) {
+			/* Note: There is some debate as to if it is more standard conformant to apply this line 
+			* as translate(rotate(scale())), or scale(rotate(translate())).  For now, it's still
+			* scale(rotate(translate())) to align with fastgltf's internals, but that may change - MK
+			*/
+			/* This way appears to be more correct when interpretting the glTF standard */ 
+			/* return translate(rotate(scale(math::fmat4x4(), trs.scale), trs.rotation), trs.translation); */
+
+			/* This is the way fastgltf currently does it so we have to match that here */
+			return scale(rotate(translate(math::fmat4x4(), trs.translation), trs.rotation), trs.scale);
+		}
+	}, node.transform);
+}
+
 FASTGLTF_EXPORT template <typename AssetType, typename Callback>
 #if FASTGLTF_HAS_CONCEPTS
 requires std::same_as<std::remove_cvref_t<AssetType>, Asset> &&
@@ -74,7 +96,7 @@ requires std::same_as<std::remove_cvref_t<AssetType>, Asset> &&
 			    auto &self) -> void {
 		assert(asset.nodes.size() > nodeIndex);
 		auto &node = asset.nodes[nodeIndex];
-		auto _localMat = getTransformMatrix(node, math::fmat4x4());
+		auto _localMat = getLocalTransformMatrix(node);
 		std::invoke(callback, node, parentWorldMatrix, _localMat);
 		for (auto &child : node.children) {
 			math::fmat4x4 _parentWorldTemp =
@@ -100,7 +122,7 @@ inline void custom_iterate_scene_nodes(AssetType&& asset, std::size_t sceneIndex
     auto function = [&](std::size_t nodeIndex, math::fmat4x4 & parentWorldMatrix, auto & self) -> void {
         //assert(asset.nodes.size() > nodeIndex);
         auto & node = nodes[nodeIndex];
-        auto _localMat = getTransformMatrix(node, math::fmat4x4());
+		auto _localMat = getLocalTransformMatrix(node);
         std::invoke(callback, node, parentWorldMatrix, _localMat);
         uint32_t num_children = node.children.size();
         if(num_children > 0) {
