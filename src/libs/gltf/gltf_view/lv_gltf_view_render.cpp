@@ -776,8 +776,12 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
         /* cast is safe because viewer is a lv_obj_t*/
-        setup_draw_solid_background(viewer, lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN),
-                                    lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN));
+        lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
+        uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
+        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
+
+        GL_CALL(glClearDepthf(1.0f));
+        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
