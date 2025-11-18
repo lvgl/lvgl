@@ -440,6 +440,7 @@ static void initialize(lv_gif_t * gifobj)
  *   - The palette type and background color are valid for the current GIF frame.
  */
 static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
+{
     int x = gif->iX;
     int y = gif->iY;
     int w = gif->iWidth;
