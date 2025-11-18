@@ -51,6 +51,24 @@ void lv_fs_memfs_init(void);
 
 #if LV_USE_FS_LITTLEFS
 #include "lfs.h"
+struct lfs;
+/**
+ * Set the default LittleFS handler to be used by LVGL
+ * @param  lfs     pointer to an initialized LittleFS filesystem structure
+ */
+void lv_littlefs_set_handler(struct lfs * lfs);
+
+/**
+ * Initialize LittleFS file system driver
+ */
+void lv_fs_littlefs_init(void);
+
+/**
+ * Register a LittleFS drive with LVGL
+ * @param  lfs     pointer to an initialized LittleFS filesystem structure
+ * @param  letter  driver letter to register (e.g. 'A')
+ * @return         LV_RESULT_OK: success; LV_RESULT_INVALID: failure
+ */
 lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter);
 #endif
 

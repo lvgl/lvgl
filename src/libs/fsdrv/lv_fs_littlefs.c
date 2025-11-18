@@ -4,6 +4,10 @@
 #include "lfs.h"
 #include "../../core/lv_global.h"
 
+#if !LV_FS_IS_VALID_LETTER(LV_FS_LITTLEFS_LETTER)
+    #error "Invalid drive letter"
+#endif
+
 typedef struct LittleFile {
     lfs_file_t file;
 } LittleFile;
@@ -27,9 +31,34 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
 
 
-/**
- * Register a drive for the LittleFS File System interface
- */
+
+
+void lv_littlefs_set_handler(lfs_t * lfs)
+{
+    lv_fs_drv_t * drv = lv_fs_get_drv(LV_FS_LITTLEFS_LETTER);
+    drv->user_data = lfs;
+}
+
+void lv_fs_littlefs_init(void)
+{
+    lv_fs_drv_t * fs_drv = &(LV_GLOBAL_DEFAULT()->littlefs_fs_drv);
+    lv_fs_drv_init(fs_drv);
+
+    fs_drv->letter = LV_FS_LITTLEFS_LETTER;
+    fs_drv->open_cb = fs_open;
+    fs_drv->close_cb = fs_close;
+    fs_drv->read_cb = fs_read;
+    fs_drv->write_cb = fs_write;
+    fs_drv->seek_cb = fs_seek;
+    fs_drv->tell_cb = fs_tell;
+
+    fs_drv->dir_open_cb = fs_dir_open;
+    fs_drv->dir_close_cb = fs_dir_close;
+    fs_drv->dir_read_cb = fs_dir_read;
+
+    lv_fs_drv_register(fs_drv);
+}
+
 lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
@@ -65,6 +94,7 @@ lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
     fs_drv->user_data = lfs;
 
     lv_fs_drv_register(fs_drv);
+    return LV_RESULT_OK;
 }
 
 /**********************
