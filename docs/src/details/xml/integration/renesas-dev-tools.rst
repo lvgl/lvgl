@@ -12,7 +12,17 @@ Setup
 
 First, download and install the LVGL Editor from `pro.lvgl.io <https://pro.lvgl.io/download>`_.
 
-LVGL provides an e2 Studio plugin to facilitate working with LVGL projects. You can download it from `here <https://github.com/lvgl/lvgl_editor/releases>`_.
+LVGL provides an e2 Studio plugin to facilitate working with LVGL projects. You can download it from `this link <https://github.com/lvgl/lvgl_editor/releases/download/v1.0.0/LVGL_Pro_e2.studio_plugin.v1.0.0.zip>`_.
+
+To install the plugin in e2 Studio:
+
+1. Extract the downloaded zip file to a folder on your computer.
+2. Open e2 Studio.
+3. Go to the menu: Help -> Install New Software...
+4. Click on the "Add..." button.
+5. In the dialog that appears, click on "Local..." and browse to the folder where you extracted the plugin.
+6. Select the plugin folder, give the source a name (e.g. "LVGL Editor Launcher") and follow the prompts to complete the installation (approve any security warnings, accept the license agreement, and finish the installation).
+7. Restart e2 Studio if prompted.
 
 The plugin adds an LVGL Editor button to the toolbar, which launches the LVGL Editor as a separate application, outside of e2 Studio:
 
@@ -24,7 +34,7 @@ The plugin adds an LVGL Editor button to the toolbar, which launches the LVGL Ed
 
     e2 Studio Toolbar with LVGL Editor Plugin
 
-This will automatically open the Editor (if installed to the `/Applications` folder) <u>on MacOS</u>. On Linux and Windows, it will ask the user to browse for the install location of the Editor. Pick the Editor executable when prompted.
+This will automatically open the Editor (if installed to the `/Applications` folder) on MacOS. On Linux and Windows, it will ask the user to browse for the install location of the Editor. Pick the Editor executable when prompted.
 
 NOTE: the path to the Editor executable is stored in the workspace folder in a file named `"lvgl_pro_editor_path.txt"`. If there is an issue with the path configured or you need to change it, simply delete this file and click the LVGL Editor button again to reconfigure it.
 
