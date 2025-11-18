@@ -20,7 +20,7 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #include "../line/lv_line.h"
 #include "../image/lv_image.h"
-#include "../../core/lv_observer.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES

@@ -227,7 +227,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                                     "HAS_THICKNESS_UV_TRANSFORM");
             }
         }
-        if(material.clearcoat && material.clearcoat->clearcoatFactor > 0.0f) {
+        if(material.clearcoat) {
             if(add_define(result, "MATERIAL_CLEARCOAT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
@@ -245,7 +245,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 return LV_RESULT_INVALID;
             }
         }
-        if(material.diffuseTransmission && material.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
+        if(material.diffuseTransmission) {
             if(add_define(result, "MATERIAL_DIFFUSE_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }

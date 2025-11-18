@@ -9,7 +9,6 @@ void test_demo_widgets(void)
 {
 #if LV_USE_DEMO_WIDGETS
     lv_demo_widgets();
-    TEST_ASSERT_EQUAL_SCREENSHOT("demo_widgets.png");
 #endif
 }
 

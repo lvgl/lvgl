@@ -35,14 +35,9 @@ Infinite scrolling
 .. lv_example:: scroll/lv_example_scroll_7
   :language: c
   
-Circular scrolling
+circular scrolling
 ------------------
 .. lv_example:: scroll/lv_example_scroll_8
-  :language: c
-
-Scrolling Properties
---------------------
-.. lv_example:: scroll/lv_example_scroll_9
   :language: c
 
 

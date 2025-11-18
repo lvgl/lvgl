@@ -323,15 +323,6 @@ static void draw_event_cb(lv_event_t * e)
 #endif
             }
             break;
-        case LV_EVENT_FOCUSED:
-            lv_vg_lite_set_dump_param_enable(true);
-            break;
-        case LV_EVENT_DEFOCUSED:
-            lv_vg_lite_set_dump_param_enable(false);
-            break;
-        case LV_EVENT_HIT_TEST:
-            lv_vg_lite_dump_info();
-            break;
         default:
             break;
     }

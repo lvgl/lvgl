@@ -570,21 +570,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
             }
 
-            if(fill_dsc->opa >= LV_OPA_MAX) {
-                float tex_w = (float)lv_area_get_width(&fill_area);
-                float tex_h = (float)lv_area_get_height(&fill_area);
-                glEnable(GL_SCISSOR_TEST);
-                glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h);
-                glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,
-                             (float)fill_dsc->color.blue / 255.0f, 1.0f);
-                glClearDepthf(1.0f);
-                GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-                glDisable(GL_SCISSOR_TEST);
-            }
-            else {
-                lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
-                lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
-            }
+            lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
+            lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
 
             if(target_texture) {
                 GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -639,12 +626,7 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
 #if 0
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-    /* GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
-     * Alternatively, the above form can be used in some cases for slightly faster performance, but
-     * visual quality when using image scales that are not exactly 1:1 (or 2:1 or some other increment)
-     * will be not as good.
-     */
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
 #endif
 
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -676,8 +658,8 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     lv_area_t clip_area = t->clip_area;
     lv_area_move(&clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
 
-    lv_opengles_render(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, dsc->h_flip, !dsc->v_flip,
-                       lv_color_black(), true);
+    lv_opengles_render_texture(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, dsc->h_flip,
+                               !dsc->v_flip);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));

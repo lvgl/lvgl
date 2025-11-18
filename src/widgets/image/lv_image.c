@@ -15,7 +15,7 @@
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "../../core/lv_observer_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 #if LV_USE_IMAGE != 0
 

@@ -11,4 +11,3 @@ Drawing
     draw_api
     draw_layers
     draw_descriptors
-    snapshot

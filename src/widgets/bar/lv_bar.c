@@ -14,7 +14,7 @@
 #if LV_USE_BAR != 0
 
 #include "../../draw/lv_draw.h"
-#include "../../core/lv_observer_private.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_math.h"

@@ -123,9 +123,6 @@ struct _lv_indev_t {
     lv_event_list_t event_list;
     lv_anim_t * scroll_throw_anim;
 
-    /**< Key remapping callback */
-    lv_indev_key_remap_cb_t key_remap_cb;
-
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_recognizer_t recognizers[LV_INDEV_GESTURE_CNT];
     lv_indev_gesture_type_t cur_gesture;

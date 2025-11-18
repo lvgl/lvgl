@@ -4,11 +4,11 @@ Create and provide links to API pages in LVGL doc build.
 
 Uses doxygen_xml.py module to:
 
-- Prep and run Doxygen,
+- Prep and run Doxygen
 - make Doxygen XML output available, and
 - make Doxygen-documented symbols from the C code available.
 
-Because these 5 files are acceptable in a C project:
+Because these 3 files are acceptable in a C project:
 
 1.  ./path/to/one/aaa.c
 2.  ./path/to/one/aaa.h
@@ -21,19 +21,19 @@ we see that:
 - duplicate filename stems ('aaa' above) are acceptable, and
 - they must not only be differentiated by their extensions, but also by their path.
 
-On the other hand, Sphinx link target names for :ref:`link_ref_name` link
-target names must be unique throughout a document project.  Since API pages are
+On the other hand, Sphinx link reference names for :ref:`link_ref_name` link
+references must be unique throughout a document project.  Since API pages are
 generated from C source files, to make this effective, they must include:
 
 A.  at least part of the path,
 B.  filename stem, and
 C.  extension
 
-in the link target names.  Prior to 11-Aug-2025, link target names were formed
+in the link reference names.  Prior to 11-Aug-2025, link reference names were formed
 using ONLY the filename stem.  This created a conflict when an example of #4 above
 appeared in the LVGL code, and caused a doc-build failure because the API-page link
-target names to #2 and #4 were identical, and Sphinx (correctly) does not allow
-that.  So after 11-Aug-2025, these link target names are now differentiated via all 3
+reference names to #2 and #4 were identical, and Sphinx (correctly) does not allow
+that.  So after 11-Aug-2025, these link reference names are now differentiated all 3
 of A, B and C above.
 
 .. note::
@@ -565,7 +565,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
 
                 if html_includes:
                     # Convert `html_includes` set to a list of strings containing the
-                    # Sphinx hyperlink syntax "link target names".  Example from above:
+                    # Sphinx hyperlink syntax "link references".  Example from above:
                     # [':ref:`lv_draw_line_h`\n',
                     #  ':ref:`lv_draw_sdl_h`\n',
                     #  ':ref:`lv_draw_sw_blend_to_i1_h`\n',
@@ -576,7 +576,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
                     )
 
                     # Convert that list to a single string of Sphinx hyperlink
-                    # target names with blank lines between them.
+                    # references with blank lines between them.
                     # :ref:`lv_draw_line_h`
                     #
                     # :ref:`lv_draw_sdl_h`

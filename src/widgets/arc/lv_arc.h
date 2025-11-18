@@ -18,7 +18,7 @@ extern "C" {
 #if LV_USE_ARC != 0
 
 #include "../../core/lv_obj.h"
-#include "../../core/lv_observer.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES

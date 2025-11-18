@@ -180,7 +180,7 @@ def generate_code_coverage_report():
     cmd = ['gcovr', '--gcov-ignore-parse-errors', 
            '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
-           '-j', str(os.cpu_count()), '--print-summary', '--merge-mode-functions=merge-use-line-min',
+           '-j', str(os.cpu_count()), '--print-summary',
            '--html-title', 'LVGL Test Coverage', '--filter', os.path.join(root_dir, 'src/.*/lv_.*\\.c')]
 
     subprocess.check_call(cmd)

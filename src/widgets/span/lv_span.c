@@ -16,7 +16,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_bidi_private.h"
-#include "../../core/lv_observer_private.h"
+#include "../../others/observer/lv_observer_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_global.h"
 

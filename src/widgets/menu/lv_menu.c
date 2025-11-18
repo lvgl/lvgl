@@ -81,22 +81,18 @@ const lv_obj_class_t lv_menu_separator_class = {
 
 const lv_obj_class_t lv_menu_sidebar_cont_class = {
     .base_class = &lv_obj_class,
-    .name = "lv_menu_sidebar",
 };
 
 const lv_obj_class_t lv_menu_main_cont_class = {
     .base_class = &lv_obj_class,
-    .name = "lv_menu_main_container",
 };
 
 const lv_obj_class_t lv_menu_main_header_cont_class = {
     .base_class = &lv_obj_class,
-    .name = "lv_menu_main_header",
 };
 
 const lv_obj_class_t lv_menu_sidebar_header_cont_class = {
     .base_class = &lv_obj_class,
-    .name = "lv_menu_sidebar_header",
 };
 
 static void lv_menu_refr(lv_obj_t * obj);

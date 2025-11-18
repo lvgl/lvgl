@@ -1,4 +1,3 @@
-.. include:: /include/substitutions.txt
 .. _xml_images:
 
 ======
@@ -7,6 +6,9 @@ Images
 
 Overview
 ********
+
+.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
 
 In XML, images are considered external resources that need to be named in order to be referenced in
 XML files. Below is how to map images with names.

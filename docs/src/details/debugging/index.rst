@@ -9,9 +9,5 @@ Debugging
 
     gdb_plugin
     log
-    monkey
-    obj_id
     profiler
-    sysmon
-    test
     vg_lite_tvg

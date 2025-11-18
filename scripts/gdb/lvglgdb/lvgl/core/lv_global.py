@@ -57,16 +57,6 @@ class LVGL:
             yield unit
             unit = unit.next
 
-    def image_cache(self):
-        from ..misc.lv_image_cache import LVImageCache
-
-        return LVImageCache(self.lv_global.img_cache)
-
-    def image_header_cache(self):
-        from ..misc.lv_image_header_cache import LVImageHeaderCache
-
-        return LVImageHeaderCache(self.lv_global.img_header_cache)
-
 
 class _LVGLSingleton:
     __slots__ = ("_lvgl", "_ready")

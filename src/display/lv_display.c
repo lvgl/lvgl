@@ -17,7 +17,7 @@
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
-#include "../debugging/sysmon/lv_sysmon.h"
+#include "../others/sysmon/lv_sysmon.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"
@@ -609,14 +609,6 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
     return disp->antialiasing;
 }
 
-lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp)
-{
-    if(disp == NULL) disp = lv_display_get_default();
-    LV_ASSERT_MSG(disp != NULL, "No display to get render mode");
-
-    return disp->render_mode;
-}
-
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
     disp->flushing = 0;
@@ -996,13 +988,6 @@ void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
        lv_obj_get_child_count(disp->screens[1]) == 0 &&
        lv_obj_get_child_count(disp->screens[2]) == 0) {
         lv_theme_apply(disp->screens[0]);
-
-        if(!th) {
-            /* When th is NULL, clear all styles */
-            for(uint32_t i = 1; i < disp->screen_cnt; i++) {
-                lv_theme_apply(disp->screens[i]);
-            }
-        }
     }
 }
 

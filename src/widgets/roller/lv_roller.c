@@ -22,7 +22,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
-#include "../../core/lv_observer_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES

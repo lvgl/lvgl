@@ -389,13 +389,6 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
 bool lv_display_is_double_buffered(lv_display_t * disp);
 
-/**
- * Get display render mode
- * @param disp      pointer to a display
- * @return          display's render mode (LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL)
- */
-lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp);
-
 /*---------------------
  * SCREENS
  *--------------------*/

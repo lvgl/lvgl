@@ -1,4 +1,3 @@
-.. include:: /include/substitutions.txt
 .. _xml_syntax:
 
 ======
@@ -9,6 +8,9 @@ Syntax
 
 Naming conventions
 ******************
+
+.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
 
 - A standard XML syntax is used.
 - Lowercase letters with ``_`` separation are used for attribute names.

@@ -13,10 +13,9 @@ interesting to the user, e.g. when a Widget:
 - has its value changed
 - is redrawn, etc.
 
-Besides Widgets, events can be registered for displays and input devices as well.
+Besides Widgets, events can be registered on displays and input devices as well.
 It is not detailed below, but you can do this by changing the prefix of the functions
 from ``lv_obj_`` to ``lv_display_`` or ``lv_indev_``.
-
 
 
 .. _adding_events_to_a_widget:
@@ -82,7 +81,6 @@ In the very same way, events can be attached to input devices and displays like 
    lv_indev_add_event_cb(indev, event_cb, LV_EVENT_CLICKED, NULL);
 
 
-
 Removing Event(s) from Widgets
 ******************************
 
@@ -97,7 +95,6 @@ Removing Event(s) from Widgets
            break;
        }
    }
-
 
 
 .. _events_codes:
@@ -118,7 +115,6 @@ are sent,
 *Custom events* are added by the user and are never sent by LVGL.
 
 The following event codes exist:
-
 
 .. _indev_events:
 
@@ -150,7 +146,6 @@ Input Device Events
 -  :cpp:enumerator:`LV_EVENT_HOVER_OVER`: Indev hover over Widget
 -  :cpp:enumerator:`LV_EVENT_HOVER_LEAVE`: Indev hover leave Widget
 
-
 Drawing Events
 --------------
 
@@ -172,7 +167,6 @@ Drawing Events
     LVGL will generate an assertion failure with a message
     indicating that invalidating an area is not allowed during rendering.
 
-
 Special Events
 --------------
 
@@ -181,7 +175,6 @@ Special Events
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify Widget to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
 -  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
-
 
 Other Events
 ------------
@@ -199,7 +192,6 @@ Other Events
 -  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`: Widget's style has changed
 -  :cpp:enumerator:`LV_EVENT_LAYOUT_CHANGED`: The children position has changed due to a layout recalculation
 -  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`: Get the internal size of a widget
-
 
 Display Events
 --------------
@@ -229,7 +221,6 @@ user notify a Widget to refresh itself. Some examples:
 - add/remove styles to/from a Widget if a limit is exceeded, etc
 
 
-
 Sending Events Manually
 ***********************
 
@@ -248,7 +239,6 @@ simulating a button press (although there are simpler ways to do this):
 The same works for display and input devices with
 ``lv_display_send_event(widget, <EVENT_CODE>, &some_data)`` and
 ``lv_indev_send_event(widget, <EVENT_CODE>, &some_data)``.
-
 
 
 Fields of lv_event_t
@@ -272,9 +262,8 @@ contains all data about the event. The following values can be retrieved from it
    Only call :cpp:expr:`lv_event_get_target_obj(e)` when the event target is known to be a Widget. 
    Calling it for Display or Indev targets is considered Undefined Behavior.
 
-
-
 .. _event_bubbling:
+
 
 Event Bubbling
 **************
@@ -287,8 +276,6 @@ parent, and so on.
 The *target* parameter of the event is always the current target Widget,
 not the original Widget. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
-
-
 
 .. _event_trickle:
 
@@ -308,14 +295,13 @@ not the original Widget. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
 
 
-
 .. _events_examples:
+
 
 Examples
 ********
 
 .. include:: ../../examples/event/index.rst
-
 
 
 .. _events_api:

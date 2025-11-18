@@ -128,7 +128,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     uint8_t * start_p = lv_array_at(array, start);
     uint8_t * remaining = start_p + (end - start) * array->element_size;
     uint32_t remaining_size = (array->size - end) * array->element_size;
-    lv_memmove(start_p, remaining, remaining_size);
+    lv_memcpy(start_p, remaining, remaining_size);
     array->size -= (end - start);
     lv_array_shrink(array);
     return LV_RESULT_OK;

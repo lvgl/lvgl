@@ -452,8 +452,6 @@ todo_include_todos = True
 # -------------------------------------------------------------------------
 # See https://sphinx-sitemap.readthedocs.io/en/latest/index.html
 sitemap_url_scheme = "{link}"
-# Prettyfy output using 4 spaces to indent.
-sitemap_prettify = 4
 
 # -------------------------------------------------------------------------
 # Options for breathe extension

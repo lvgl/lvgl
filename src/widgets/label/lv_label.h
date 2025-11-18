@@ -23,7 +23,7 @@ extern "C" {
 #include "../../font/lv_symbol_def.h"
 #include "../../misc/lv_text.h"
 #include "../../draw/lv_draw.h"
-#include "../../core/lv_observer.h"
+#include "../../others/observer/lv_observer.h"
 
 /*********************
  *      DEFINES

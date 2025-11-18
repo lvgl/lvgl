@@ -1,4 +1,3 @@
-.. include:: /include/substitutions.txt
 .. _draw_descriptors:
 
 ================
@@ -413,6 +412,7 @@ The following functions are used for box shadow drawing:
   :language: c
 
 
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Image Draw Descriptor
 *********************

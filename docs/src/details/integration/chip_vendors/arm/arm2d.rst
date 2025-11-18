@@ -65,7 +65,6 @@ Examples
 API
 ***
 
-.. API equals:  lv_draw_sw_image_recolor_rgb888
+:ref:`draw/sw/arm2d/lv_draw_sw_arm2d.h`
 
-.. API equals:  lv_rgb888_blend_normal_to_rgb565_arm2d
-
+:ref:`draw/sw/blend/arm2d/lv_blend_arm2d.h`

@@ -64,10 +64,9 @@ void test_xml_label_with_attrs(void)
 }
 void test_xml_label_translation_tag(void)
 {
-    /* Arrays are defined `const` to place them in program space instead of RAM. */
-    static const char * const tags[] = {"tiger", NULL};
-    static const char * const languages[]    = {"en", "de", "es", NULL};
-    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
 
     lv_obj_t * scr = lv_screen_active();
@@ -117,10 +116,9 @@ void test_xml_label_translation_tag(void)
 
 void test_xml_label_both_text_and_translation_tag(void)
 {
-    /* Arrays are defined `const` to place them in program space instead of RAM. */
-    static const char * const tags[] = {"tiger", NULL};
-    static const char * const languages[]    = {"en", "de", "es", NULL};
-    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    static const char * tags[] = {"tiger", NULL};
+    static const char * languages[]    = {"en", "de", "es", NULL};
+    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
 
     lv_obj_t * scr = lv_screen_active();

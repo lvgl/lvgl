@@ -208,14 +208,14 @@ bool lv_vg_lite_draw_grad(
                                            (vg_lite_matrix_t *)matrix,
                                            linear_grad,
                                            blend),
-                                       /* Dump parameters */
+                                       /*Error handler*/
                 {
                     lv_vg_lite_buffer_dump_info(buffer);
                     lv_vg_lite_path_dump_info(path);
-                    LV_LOG_USER("fill_rule: 0x%X", (int)fill);
+                    LV_LOG_ERROR("fill_rule: 0x%X", (int)fill);
                     lv_vg_lite_matrix_dump_info(matrix);
                     lv_vg_lite_linear_gradient_dump_info(linear_grad);
-                    LV_LOG_USER("blend_mode: 0x%X", (int)blend);
+                    LV_LOG_ERROR("blend_mode: 0x%X", (int)blend);
                 });
                 LV_PROFILER_DRAW_END_TAG("vg_lite_draw_grad");
             }
@@ -236,14 +236,14 @@ bool lv_vg_lite_draw_grad(
                                            0,
                                            blend,
                                            VG_LITE_FILTER_LINEAR),
-                                       /* Dump parameters */
+                                       /*Error handler*/
                 {
                     lv_vg_lite_buffer_dump_info(buffer);
                     lv_vg_lite_path_dump_info(path);
-                    LV_LOG_USER("fill_rule: 0x%X", (int)fill);
+                    LV_LOG_ERROR("fill_rule: 0x%X", (int)fill);
                     lv_vg_lite_matrix_dump_info(matrix);
                     lv_vg_lite_ext_linear_gradient_dump_info(linear_grad);
-                    LV_LOG_USER("blend_mode: 0x%X", (int)blend);
+                    LV_LOG_ERROR("blend_mode: 0x%X", (int)blend);
                 });
                 LV_PROFILER_DRAW_END_TAG("vg_lite_draw_linear_grad");
             }
@@ -266,14 +266,14 @@ bool lv_vg_lite_draw_grad(
                         0,
                         blend,
                         VG_LITE_FILTER_LINEAR),
-                    /* Dump parameters */
+                    /*Error handler*/
                 {
                     lv_vg_lite_buffer_dump_info(buffer);
                     lv_vg_lite_path_dump_info(path);
-                    LV_LOG_USER("fill_rule: 0x%X", (int)fill);
+                    LV_LOG_ERROR("fill_rule: 0x%X", (int)fill);
                     lv_vg_lite_matrix_dump_info(matrix);
                     lv_vg_lite_radial_gradient_dump_info(radial_gradient);
-                    LV_LOG_USER("blend_mode: 0x%X", (int)blend);
+                    LV_LOG_ERROR("blend_mode: 0x%X", (int)blend);
                 });
                 LV_PROFILER_DRAW_END_TAG("vg_lite_draw_radial_grad");
             }
@@ -484,17 +484,14 @@ static bool linear_grad_create(grad_item_t * item)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    /* Capture error code from LV_VG_LITE_CHECK_ERROR */
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     LV_VG_LITE_CHECK_ERROR(
-    err = vg_lite_init_grad(&item->vg.linear), {
+        vg_lite_init_grad(&item->vg.linear),
+        /* Error handler */
+    {
         lv_vg_lite_linear_gradient_dump_info(&item->vg.linear);
-    });
-
-    if(err != VG_LITE_SUCCESS) {
         LV_PROFILER_DRAW_END;
         return false;
-    }
+    });
 
     vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
     vg_lite_uint32_t stops[VLC_MAX_GRADIENT_STOPS];
@@ -516,13 +513,17 @@ static bool linear_grad_create(grad_item_t * item)
     }
 
     LV_VG_LITE_CHECK_ERROR(
-    vg_lite_set_grad(&item->vg.linear, item->lv.stops_count, colors, stops), {
+        vg_lite_set_grad(&item->vg.linear, item->lv.stops_count, colors, stops),
+        /* Error handler */
+    {
         lv_vg_lite_linear_gradient_dump_info(&item->vg.linear);
     });
 
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_grad");
     LV_VG_LITE_CHECK_ERROR(
-    vg_lite_update_grad(&item->vg.linear), {
+        vg_lite_update_grad(&item->vg.linear),
+        /* Error handler */
+    {
         lv_vg_lite_linear_gradient_dump_info(&item->vg.linear);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_update_grad");
@@ -558,18 +559,20 @@ static bool linear_ext_grad_create(grad_item_t * item, vg_lite_color_ramp_t * co
             grad_param,
             lv_spread_to_vg(item->lv.spread),
             1),
-        /* Dump parameters */
+        /* Error handler */
     {
         lv_vg_lite_ext_linear_gradient_dump_info(&item->vg.linear_ext);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_set_linear_grad");
 
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_linear_grad");
-    vg_lite_error_t err = VG_LITE_SUCCESS;
-    LV_VG_LITE_CHECK_ERROR(err = vg_lite_update_linear_grad(&item->vg.linear_ext), {
-        lv_vg_lite_ext_linear_gradient_dump_info(&item->vg.linear_ext);
-    });
+    vg_lite_error_t err = vg_lite_update_linear_grad(&item->vg.linear_ext);
     LV_PROFILER_DRAW_END_TAG("vg_lite_update_linear_grad");
+    if(err != VG_LITE_SUCCESS)  {
+        LV_LOG_ERROR("vg_lite_update_linear_grad error: %d", (int)err);
+        lv_vg_lite_error_dump_info(err);
+        lv_vg_lite_ext_linear_gradient_dump_info(&item->vg.linear_ext);
+    }
 
     LV_PROFILER_DRAW_END;
     return err == VG_LITE_SUCCESS;
@@ -603,18 +606,20 @@ static bool radial_grad_create(grad_item_t * item, vg_lite_color_ramp_t * color_
             grad_param,
             lv_spread_to_vg(item->lv.spread),
             1),
-        /* Dump parameters */
+        /* Error handler */
     {
         lv_vg_lite_radial_gradient_dump_info(&item->vg.radial);
     });
     LV_PROFILER_DRAW_END_TAG("vg_lite_set_radial_grad");
 
     LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_radial_grad");
-    vg_lite_error_t err = VG_LITE_SUCCESS;
-    LV_VG_LITE_CHECK_ERROR(err = vg_lite_update_radial_grad(&item->vg.radial), {
-        lv_vg_lite_radial_gradient_dump_info(&item->vg.radial);
-    });
+    vg_lite_error_t err = vg_lite_update_radial_grad(&item->vg.radial);
     LV_PROFILER_DRAW_END_TAG("vg_lite_update_radial_grad");
+    if(err != VG_LITE_SUCCESS) {
+        LV_LOG_ERROR("vg_lite_update_radial_grad error: %d", (int)err);
+        lv_vg_lite_error_dump_info(err);
+        lv_vg_lite_radial_gradient_dump_info(&item->vg.radial);
+    }
 
     LV_PROFILER_DRAW_END;
     return err == VG_LITE_SUCCESS;

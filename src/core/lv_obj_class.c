@@ -176,7 +176,6 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
 
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(class_p->name);
     if(obj->class_p->base_class) {
         const lv_obj_class_t * original_class_p = obj->class_p;
 

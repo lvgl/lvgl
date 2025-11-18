@@ -1,4 +1,4 @@
-.. include:: /include/substitutions.txt
+.. include:: substitutions.txt
 .. _editor_install:
 
 ============

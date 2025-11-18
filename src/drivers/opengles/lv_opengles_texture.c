@@ -96,8 +96,6 @@ void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t hei
         return;
     }
     dsc->fb1 = buffer;
-
-    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, lv_display_get_render_mode(disp));
 #endif /*!LV_USE_DRAW_OPENGLES*/
 
     if(dsc->is_texture_owner && dsc->texture_id != 0) {
@@ -217,10 +215,9 @@ static unsigned int create_texture(int32_t w, int32_t h)
     GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 20));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
-#else
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 #endif
 
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, GL_NONE));
     return texture;

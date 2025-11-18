@@ -1,4 +1,3 @@
-.. include:: /include/substitutions.txt
 .. _xml_screens:
 
 =======
@@ -7,6 +6,9 @@ Screens
 
 Overview
 ********
+
+.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
+    :trim:
 
 Screens work very similarly to Components. Both can be:
 

@@ -77,9 +77,6 @@ typedef struct {
 
 typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
 
-/** Indev key remapping callback */
-typedef lv_key_t (*lv_indev_key_remap_cb_t)(lv_indev_t * indev, lv_key_t key);
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -444,13 +441,6 @@ uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb
  * @return              LV_RESULT_OK: indev wasn't deleted in the event.
  */
 lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param);
-
-/**
- * Set key remapping callback (LV_INDEV_TYPE_KEYPAD)
- * @param indev         pointer to an indev
- * @param remap_cb      remapping function callback. Use NULL to disable callback.
- */
-void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
 
 /**********************
  *      MACROS

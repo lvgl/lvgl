@@ -1,4 +1,3 @@
-.. include:: /include/substitutions.txt
 .. _widgets:
 
 ===========
@@ -10,7 +9,7 @@ All Widgets
 
     base_widget
 
-|hr|
+|hr_left_250|
 
 .. toctree::
     :class:    toctree-1-deep
@@ -30,7 +29,6 @@ All Widgets
     dropdown
     image
     imagebutton
-    ime_pinyin
     keyboard
     label
     led
@@ -52,3 +50,7 @@ All Widgets
     tileview
     win
     new_widget
+
+.. |hr_left_250|  raw:: html
+
+    <hr />

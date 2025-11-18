@@ -76,20 +76,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
     }
 #endif
 
-    /* We should be able to call the function below without issue at this point
-     * but because of subtle issues regarding lazy updates of shader resources
-     * this induces significant pause on some platforms.  Since the shaders
-     * have already been detached, we can safely skip this function and leave
-     * the empty programs in OpenGL's cache until the app shuts down, it's a
-     * very small amount of memory.
-     *
-     * To-do: Consider setting a flag at this point and if that flag is true
-     * when the app finally shuts down, then perform the glDeleteProgram calls
-     * if necessary.  That is not really necessary, OpenGL will do that anyways
-     * when it shuts down. */
-
-    /* GL_CALL(glDeleteProgram(program->id)); */
-
+    GL_CALL(glDeleteProgram(program->id));
 }
 
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)

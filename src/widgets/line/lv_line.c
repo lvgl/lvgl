@@ -227,7 +227,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_line_t * line = (lv_line_t *)obj;
         lv_layer_t * layer = lv_event_get_layer(e);
 
-        if(line->point_num < 2 || line->point_array.constant == NULL) return;
+        if(line->point_num == 0 || line->point_array.constant == NULL) return;
 
         lv_area_t area;
         lv_obj_get_coords(obj, &area);

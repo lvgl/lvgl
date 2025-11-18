@@ -13,7 +13,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../indev/lv_indev.h"
 #include "../../stdlib/lv_string.h"
-#include "../../core/lv_observer_private.h"
+#include "../../others/observer/lv_observer_private.h"
 
 /*********************
  *      DEFINES

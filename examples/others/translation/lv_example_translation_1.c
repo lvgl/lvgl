@@ -3,10 +3,9 @@
 
 static void add_static(void)
 {
-    /* Arrays are defined `const` to place them in program space instead of RAM. */
-    static const char * const languages[] = {"en", "de", "es", NULL};
-    static const char * const tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-    static const char * const translations[] = {
+    static const char * languages[] = {"en", "de", "es", NULL};
+    static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+    static const char * translations[] = {
         "The Tiger", "Der Tiger", "El Tigre",
         "The Lion", "Der Löwe", "El León",
         "The Rabbit", "Das Kaninchen", "El Conejo",

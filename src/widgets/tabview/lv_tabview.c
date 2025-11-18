@@ -97,7 +97,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     return page;
 }
 
-void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name)
+void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t idx, const char * new_name)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -106,22 +106,6 @@ void lv_tabview_set_tab_text(lv_obj_t * obj, uint32_t idx, const char * new_name
     lv_obj_t * label = lv_obj_get_child_by_type(button, 0, &lv_label_class);
     lv_label_set_text(label, new_name);
 }
-
-#if LV_USE_TRANSLATION
-
-lv_obj_t * lv_tabview_set_tab_translation_tag(lv_obj_t * obj, const char * tag)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * page = lv_tabview_add_tab(obj, NULL);
-    lv_obj_t * button = lv_tabview_get_tab_button(obj, -1);
-    lv_obj_t * label = lv_obj_get_child_by_type(button, 0, &lv_label_class);
-    lv_label_set_translation_tag(label, tag);
-
-    return page;
-}
-
-#endif
 
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_en)
 {

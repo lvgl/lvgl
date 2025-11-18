@@ -229,9 +229,9 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
             break;
         case LV_COLOR_FORMAT_RGB565: {
                 lv_color16_t * c16 = (lv_color16_t *) px;
-                ret.red = (c16[0].red * 2106) >> 8;  /*To make it rounded*/
-                ret.green = (c16[0].green * 1037) >> 8;
-                ret.blue = (c16[0].blue * 2106) >> 8;
+                ret.red = (c16[x].red * 2106) >> 8;  /*To make it rounded*/
+                ret.green = (c16[x].green * 1037) >> 8;
+                ret.blue = (c16[x].blue * 2106) >> 8;
                 ret.alpha = 0xFF;
                 break;
             }
