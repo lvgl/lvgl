@@ -27,15 +27,10 @@ FASTGLTF_EXPORT inline auto getLocalTransformMatrix(const Node& node) {
 				return matrix;
 		},
 		[&](const TRS& trs) {
-			/* Note: There is some debate as to if it is more standard conformant to apply this line 
-			* as translate(rotate(scale())), or scale(rotate(translate())).  For now, it's still
-			* scale(rotate(translate())) to align with fastgltf's internals, but that may change - MK
-			*/
-			/* This way appears to be more correct when interpretting the glTF standard */ 
-			/* return translate(rotate(scale(math::fmat4x4(), trs.scale), trs.rotation), trs.translation); */
-
-			/* This is the way fastgltf currently does it so we have to match that here */
-			return scale(rotate(translate(math::fmat4x4(), trs.translation), trs.rotation), trs.scale);
+			return translate(rotate(scale(math::fmat4x4(), trs.scale), trs.rotation), trs.translation);
+			/* The order of operations above was recently changed from below.  Saving a copy of the previous
+			 * form until we can test it both ways more thoroughly.  Changed 11.18.25 */
+			// return scale(rotate(translate(math::fmat4x4(), trs.translation), trs.rotation), trs.scale);
 		}
 	}, node.transform);
 }
