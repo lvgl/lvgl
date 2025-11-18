@@ -192,6 +192,8 @@
 #ifndef LV_USE_OPENGLES
     #if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
         #define LV_USE_OPENGLES 1
+        #define LV_USE_NANOVG   1
+        #define LV_USE_DRAW_NANOVG 1
     #endif
 #endif
 

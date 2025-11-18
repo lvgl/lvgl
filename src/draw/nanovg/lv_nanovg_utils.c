@@ -322,6 +322,7 @@ static void convert_a8_cb(nvg_color32_t * dest, const void * src, uint32_t px_cn
 
 static void convert_argb8888_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
 {
+    LV_UNUSED(color);
     const lv_color32_t * src_data = src;
     while(px_cnt--) {
         dest->a = src_data->alpha;
@@ -335,6 +336,7 @@ static void convert_argb8888_cb(nvg_color32_t * dest, const void * src, uint32_t
 
 static void convert_rgb888_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
 {
+    LV_UNUSED(color);
     const lv_color_t * src_data = src;
     while(px_cnt--) {
         dest->a = 0xFF;

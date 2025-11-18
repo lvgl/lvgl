@@ -185,7 +185,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     }
 }
 
-static void on_layer_changed(lv_draw_nanovg_unit_t * u, lv_layer_t * new_layer)
+static void on_layer_changed(lv_layer_t * new_layer)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -216,7 +216,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     if(u->current_layer != layer) {
-        on_layer_changed(u, layer);
+        on_layer_changed(layer);
         u->current_layer = layer;
     }
 

@@ -56,11 +56,11 @@ static GLint defaultFBO = -1;
 NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags)
 {
 #ifdef NANOVG_FBO_VALID
-	GLint defaultFBO;
+	GLint defFBO;
 	GLint defaultRBO;
 	NVGLUframebuffer* fb = NULL;
 
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defFBO);
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &defaultRBO);
 
 	fb = (NVGLUframebuffer*)malloc(sizeof(NVGLUframebuffer));
@@ -107,11 +107,11 @@ NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imag
 			goto error;
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, defFBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, defaultRBO);
 	return fb;
 error:
-	glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, defFBO);
 	glBindRenderbuffer(GL_RENDERBUFFER, defaultRBO);
 	nvgluDeleteFramebuffer(fb);
 	return NULL;
@@ -128,7 +128,7 @@ void nvgluBindFramebuffer(NVGLUframebuffer* fb)
 {
 #ifdef NANOVG_FBO_VALID
 	if (defaultFBO == -1) glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, fb != NULL ? fb->fbo : defaultFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb != NULL ? fb->fbo : (GLuint)defaultFBO);
 #else
 	NVG_NOTUSED(fb);
 #endif

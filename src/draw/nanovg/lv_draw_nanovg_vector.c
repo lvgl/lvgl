@@ -136,8 +136,7 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
     LV_PROFILER_DRAW_END;
 }
 
-static void draw_stroke(lv_draw_nanovg_unit_t * u, const lv_vector_stroke_dsc_t * stroke_dsc,
-                        enum NVGcompositeOperation comp_op)
+static void draw_stroke(lv_draw_nanovg_unit_t * u, const lv_vector_stroke_dsc_t * stroke_dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -150,13 +149,14 @@ static void draw_stroke(lv_draw_nanovg_unit_t * u, const lv_vector_stroke_dsc_t 
         case LV_VECTOR_DRAW_STYLE_SOLID:
             break;
 
-        case LV_VECTOR_DRAW_STYLE_GRADIENT:
-            NVGpaint paint;
-            if(!lv_nanovg_grad_to_paint(u->vg, &stroke_dsc->gradient, &paint)) {
-                LV_PROFILER_DRAW_END;
-                return;
+        case LV_VECTOR_DRAW_STYLE_GRADIENT: {
+                NVGpaint paint;
+                if(!lv_nanovg_grad_to_paint(u->vg, &stroke_dsc->gradient, &paint)) {
+                    LV_PROFILER_DRAW_END;
+                    return;
+                }
+                nvgStrokePaint(u->vg, paint);
             }
-            nvgStrokePaint(u->vg, paint);
             break;
 
         default:
@@ -206,7 +206,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     }
 
     if(dsc->stroke_dsc.opa) {
-        draw_stroke(u, &dsc->stroke_dsc, comp_op);
+        draw_stroke(u, &dsc->stroke_dsc);
     }
 
     nvgRestore(u->vg);

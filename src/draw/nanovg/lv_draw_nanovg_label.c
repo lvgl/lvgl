@@ -301,6 +301,7 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
 
 static void letter_free_cb(letter_item_t * item, void * user_data)
 {
+    LV_UNUSED(user_data);
     LV_PROFILER_DRAW_BEGIN;
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     nvgDeleteImage(item->u->vg, item->image_handle);
