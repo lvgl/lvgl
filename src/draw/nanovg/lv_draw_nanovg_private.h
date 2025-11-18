@@ -42,6 +42,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define NANOVG_GLES2_IMPLEMENTATION
+
 /**********************
  *      TYPEDEFS
  **********************/

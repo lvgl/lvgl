@@ -15,8 +15,6 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 
-#define NANOVG_GLES2_IMPLEMENTATION
-
 #if defined(NANOVG_GL2_IMPLEMENTATION)
     #include <GL/glew.h>
     #define NVG_CTX_CREATE nvgCreateGL2

@@ -96,7 +96,7 @@ const lv_draw_buf_t * lv_nanovg_open_image_buffer(struct _lv_draw_nanovg_unit_t 
                                                   bool no_cache, bool premultiply);
 
 int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color,
-                         int imageFlags);
+                         int image_flags);
 
 /**********************
  *      MACROS
