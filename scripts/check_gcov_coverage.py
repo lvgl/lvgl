@@ -72,10 +72,15 @@ def get_changed_lines(commit: str, root: str) -> Dict[str, Set[int]]:
     return changed_lines
 
 
-def get_coverage_data(root: str) -> Tuple[Dict[str, Dict[int, int]], str]:
+def get_coverage_data(root: str) -> Dict[str, Dict[int, int]]:
     """
     Get coverage data using gcovr
-    Returns: ({file_path: {line_number: execution_count}}, filter_pattern)
+    Returns: {rel_file_path: {line_number: execution_count}}
+    Notes:
+    - Only lines explicitly present in gcovr JSON are considered "coverable".
+        Lines that are missing from the JSON (e.g. preprocessor directives like
+        #include, comments, whitespace, or excluded lines) are treated as
+        non-coverable and will be ignored by the uncovered check.
     Raises: subprocess.CalledProcessError if gcovr fails
     """
     filter_pattern = os.path.join(root, r"src/(?:.*/)?lv_.*\.c")
@@ -112,23 +117,34 @@ def get_coverage_data(root: str) -> Tuple[Dict[str, Dict[int, int]], str]:
     coverage_data: Dict[str, Dict[int, int]] = {}
 
     for file_info in coverage_json.get("files", []):
+        # Normalize path to be relative to repo root with POSIX separators.
         filename = file_info["file"]
-        coverage_data[filename] = {}
+        rel = os.path.relpath(filename, root)
+        rel = rel.replace(os.path.sep, "/")
+        coverage_data[rel] = {}
 
         for line_info in file_info.get("lines", []):
-            line_number = line_info["line_number"]
-            count = line_info["count"]
-            coverage_data[filename][line_number] = count
+            line_number = line_info.get("line_number")
+            # Only consider lines explicitly listed by gcovr as coverable.
+            # Some gcovr versions may include additional flags like
+            # "gcovr/noncode" or "excluded"; we simply ignore such lines
+            # by relying on their absence from the JSON or by requiring
+            # a numeric execution count.
+            if line_number is None:
+                continue
+            count = line_info.get("count")
+            if isinstance(count, int):
+                coverage_data[rel][line_number] = count
 
-    return coverage_data, filter_pattern
+    return coverage_data
 
 
 def check_commit_coverage(
     commit: str, root: str
-) -> Tuple[int, int, List[Tuple[str, int]]]:
+) -> Tuple[int, int, List[Tuple[str, int]], int]:
     """
     Check coverage for a commit or range
-    Returns: (covered_lines, total_new_lines, uncovered_lines)
+    Returns: (covered_lines, total_new_lines, uncovered_lines, skipped_noncoverable)
     """
 
     if "..." in commit:
@@ -155,34 +171,45 @@ def check_commit_coverage(
         print(f"  {filename}: {len(lines)} lines changed")
 
     print("Getting coverage data...")
-    coverage_data, filter_pattern = get_coverage_data(root)
+    coverage_data = get_coverage_data(root)
 
-    # Extract the regex pattern from the filter (remove root path)
-    pattern_str = filter_pattern.replace(root, "").lstrip(os.path.sep)
-    pattern = re.compile(pattern_str)
-
-    filtered_lines = {
-        f: lines for f, lines in changed_lines.items() if pattern.search(f)
+    # Normalize changed file paths to POSIX separators for matching.
+    normalized_changed: Dict[str, Set[int]] = {
+        f.replace(os.path.sep, "/"): lines for f, lines in changed_lines.items()
     }
 
-    print(f"After filtering, {len(filtered_lines)} files match pattern '{pattern_str}'")
+    # If desired, we could additionally filter by the gcovr filter pattern.
+    # However, by intersecting with coverage_data keys, we inherently ignore
+    # files that are not part of coverage anyway.
 
-    total_new_lines = 0
+    total_new_lines = 0  # total coverable new lines (per gcovr)
     covered_lines = 0
     uncovered_lines: List[Tuple[str, int]] = []
+    skipped_noncoverable = 0  # changed lines that gcovr doesn't consider coverable
 
-    for filename, line_numbers in filtered_lines.items():
-        file_coverage = coverage_data.get(filename, {})
+    # Build quick lookup for filenames present in coverage.
+    coverage_files: Set[str] = set(coverage_data.keys())
 
+    # Iterate changed files and intersect with gcovr-provided coverable lines.
+    for filename, line_numbers in normalized_changed.items():
+        if filename not in coverage_files:
+            # Entire file has no coverable lines in gcovr output; skip all.
+            skipped_noncoverable += len(line_numbers)
+            continue
+
+        file_coverage = coverage_data[filename]
         for lineno in line_numbers:
-            total_new_lines += 1
+            if lineno not in file_coverage:
+                skipped_noncoverable += 1
+                continue
 
-            if lineno in file_coverage and file_coverage[lineno] > 0:
+            total_new_lines += 1
+            if file_coverage[lineno] > 0:
                 covered_lines += 1
             else:
                 uncovered_lines.append((filename, lineno))
 
-    return covered_lines, total_new_lines, uncovered_lines
+    return covered_lines, total_new_lines, uncovered_lines, skipped_noncoverable
 
 
 def main() -> int:
@@ -196,15 +223,18 @@ def main() -> int:
         os.chdir(root)
         print(f"Current working directory: {root}")
 
-        covered, total, uncovered = check_commit_coverage(args.commit, root)
+        covered, total, uncovered, skipped_noncoverable = check_commit_coverage(
+            args.commit, root
+        )
 
         # Print results with better formatting
         title = f" Coverage analysis results for commit {args.commit} "
         separator = "=" * len(title)
         print(f"\n{separator}\n{title}\n{separator}")
-        print(f"New lines of code: {total}")
+        print(f"New coverable lines (per gcovr): {total}")
         print(f"Covered lines: {covered}")
         print(f"Uncovered lines: {len(uncovered)}")
+        print(f"Skipped non-coverable changed lines: {skipped_noncoverable}")
         retval = 0
 
         if total > 0:
@@ -219,13 +249,15 @@ def main() -> int:
                 retval = 1
 
         if uncovered:
-            print("\nUncovered lines:")
+            print(
+                "\nUncovered lines (explicitly reported by gcovr as coverable with 0 hits):"
+            )
             for filename, lineno in sorted(uncovered):
                 print(f"  {filename}:{lineno}")
 
             return retval
 
-        print("\n✓ All new code is covered!")
+        print("\n✓ All new coverable code is covered!")
         return retval
 
     except subprocess.CalledProcessError as e:
