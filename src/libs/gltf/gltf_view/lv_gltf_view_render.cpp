@@ -763,13 +763,10 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-#endif
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
     if(prepare_bg) {
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
         /* cast is safe because viewer is a lv_obj_t*/
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
@@ -777,10 +774,6 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
 
         GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-#else
-        GL_CALL(glClearDepthf(1.0f));
-        GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
-#endif
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
@@ -916,7 +909,6 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
 {
     lv_gltf_renwin_state_t result;
 
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
     GLuint rtex;
     GL_CALL(glGenTextures(1, &rtex));
     result.texture = rtex;
@@ -955,10 +947,6 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
-#else
-    result.framebuffer = 2;
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
-#endif
     return result;
 }
 
