@@ -931,6 +931,15 @@
         #endif
     #endif
 
+    /** Maximum path dump print length (in points) */
+    #ifndef LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #ifdef CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #else
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
+        #endif
+    #endif
+
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #ifndef LV_USE_VG_LITE_DRIVER
         #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
