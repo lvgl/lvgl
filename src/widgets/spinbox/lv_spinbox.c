@@ -33,8 +33,10 @@
 static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
+static void clamp_value_to_range(lv_spinbox_t* spinbox);
 static void clamp_range_to_digit_count(lv_spinbox_t * spinbox);
 static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox);
+static uint32_t  digit_count(int32_t num);
 
 #if LV_USE_OBSERVER
     static void spinbox_value_changed_event_cb(lv_event_t * e);
@@ -174,12 +176,15 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
         max_value = temp;
     }
 
+    /* Prevent overflow with LV_ABS(spinbox->range_min) used elsewhere. */
+    if (min_value == INT32_MIN) {
+        min_value = INT32_MIN + 1;
+    }
+
     spinbox->range_max = max_value;
-    spinbox->range_min = min_value > INT32_MIN ? min_value : INT32_MIN + 1;
+    spinbox->range_min = min_value;
 
-    if(spinbox->value > max_value) spinbox->value = max_value;
-    if(spinbox->value < min_value) spinbox->value = min_value;
-
+    clamp_value_to_range(spinbox);
     extend_digit_count_when_insufficient(spinbox);
     lv_spinbox_updatevalue(obj);
 }
@@ -199,10 +204,14 @@ void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
         if(min_value > max) min_value = max;
     }
 
-    spinbox->range_min = min_value > INT32_MIN ? min_value : INT32_MIN + 1;
+    /* Prevent overflow with LV_ABS(spinbox->range_min) used elsewhere. */
+    if (min_value == INT32_MIN) {
+        min_value = INT32_MIN + 1;
+    }
 
-    if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+    spinbox->range_min = min_value;
 
+    clamp_value_to_range(spinbox);
     extend_digit_count_when_insufficient(spinbox);
     lv_spinbox_updatevalue(obj);
 }
@@ -224,8 +233,7 @@ void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
 
     spinbox->range_max = max_value;
 
-    if(spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
-
+    clamp_value_to_range(spinbox);
     extend_digit_count_when_insufficient(spinbox);
     lv_spinbox_updatevalue(obj);
 }
@@ -590,16 +598,19 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     lv_textarea_set_cursor_pos(obj, cur_pos);
 }
 
+static void clamp_value_to_range(lv_spinbox_t* spinbox)
+{
+    if (spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
+    if (spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+}
+
 static void clamp_range_to_digit_count(lv_spinbox_t * spinbox)
 {
     int32_t max = (int32_t)lv_pow(10, spinbox->digit_count) - 1;
     int32_t min = -max;
-    bool need_clamping = false;
-    if(spinbox->range_max > max || spinbox->range_max < min) need_clamping = true;
-    if(spinbox->range_min > max || spinbox->range_min < min) need_clamping = true;
-    /* If either range boundary is beyond digit range, then this invalidates
-     * both of them.  Replace with default boundaries for digit count. */
-    if(need_clamping) lv_spinbox_set_range((lv_obj_t *)spinbox, min, max);
+    if(spinbox->range_max > max || spinbox->range_max < min) spinbox->range_max = max;
+    if(spinbox->range_min > max || spinbox->range_min < min) spinbox->range_min = min;
+    clamp_value_to_range(spinbox);
 }
 
 static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox)
@@ -609,11 +620,18 @@ static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox)
     const int32_t largest_magnitude = LV_MAX(min_magnitude, max_magnitude);
     const int32_t max_range_per_digit_cnt = (int32_t)lv_pow(10, spinbox->digit_count) - 1;
     if(largest_magnitude > max_range_per_digit_cnt) {
-        char digits[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES];
-        lv_snprintf(digits, LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES, "%" LV_PRId32, LV_ABS(largest_magnitude));
-        const uint32_t new_digit_count = (uint32_t)lv_strlen(digits);
-        spinbox->digit_count = new_digit_count;
+        spinbox->digit_count = digit_count(largest_magnitude);
     }
+}
+
+static uint32_t digit_count(int32_t num)
+{
+    uint32_t  digit_count = 0;
+    while (num) {
+        num /= 10;
+        digit_count++;
+    }
+    return digit_count;
 }
 
 #if LV_USE_OBSERVER

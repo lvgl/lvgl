@@ -87,7 +87,7 @@ void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos);
 /**
  * Set spinbox step
  * @param obj   pointer to spinbox
- * @param step  steps on increment/decrement. Can be 1, 10, 100, 1000, etc the digit that will change.
+ * @param step  steps on increment/decrement. Can be 1, 10, 100, 1000, etc.; the digit that will change.
  */
 void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step);
 
