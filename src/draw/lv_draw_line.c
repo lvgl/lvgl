@@ -83,10 +83,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
                 continue;
             }
 
-            a.x1 = (int32_t)LV_MIN(a.x1, dsc->points[i].x);
-            a.x2 = (int32_t)LV_MAX(a.x2, dsc->points[i].x);
-            a.y1 = (int32_t)LV_MIN(a.y1, dsc->points[i].y);
-            a.y2 = (int32_t)LV_MAX(a.y2, dsc->points[i].y);
+            a.x1 = (int32_t)LV_MIN(a.x1, dsc->points[i].x) - dsc->width;
+            a.x2 = (int32_t)LV_MAX(a.x2, dsc->points[i].x) + dsc->width;
+            a.y1 = (int32_t)LV_MIN(a.y1, dsc->points[i].y) - dsc->width;
+            a.y2 = (int32_t)LV_MAX(a.y2, dsc->points[i].y) + dsc->width;
         }
 
         if(a.x1 == LV_COORD_MAX) {

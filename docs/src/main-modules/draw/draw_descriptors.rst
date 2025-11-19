@@ -582,7 +582,7 @@ these fields:
 :round_end:    Rounds the line end.
 :raw_end:      Set to 1 to skip end calculations if they are unnecessary.
 
-+If a large amount of points needs to be rendered it's recommended to use ``points``
+If a large amount of points needs to be rendered it's recommended to use ``points``
 instead of ``p1`` and ``p2`` as it avoids creating many draw tasks.
 
 Functions for line drawing:
