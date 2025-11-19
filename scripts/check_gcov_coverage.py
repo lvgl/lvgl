@@ -232,6 +232,10 @@ def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str,
     """
     # Normalize input path
     abs_path = os.path.abspath(path)
+    if not os.path.exists(abs_path):
+        print(f"Error: The specified path does not exist: {abs_path}", file=sys.stderr)
+        sys.exit(1)
+
     # Ensure we operate from repo root to construct relative POSIX paths
     root = os.path.abspath(root)
 
@@ -248,10 +252,14 @@ def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str,
 
     if os.path.isdir(abs_path):
         # Directory scope: include all files under this directory
-        prefix = rel_posix.rstrip("/") + "/"
-        scoped_files = {
-            f: lines for f, lines in coverage_data.items() if f.startswith(prefix)
-        }
+        scoped_files = {}
+        for f, lines in coverage_data.items():
+            # Convert both to absolute paths for comparison
+            f_abs = os.path.abspath(os.path.join(root, f.replace("/", os.path.sep)))
+            # If the common path of abs_path and f_abs is abs_path, f is under abs_path
+            if os.path.commonpath([abs_path, f_abs]) == abs_path:
+                scoped_files[f] = lines
+
         print(f"Found {len(scoped_files)} coverable file(s) under: {rel_posix}")
         for filename, line_map in sorted(scoped_files.items()):
             for lineno, count in line_map.items():
@@ -325,7 +333,10 @@ def report_coverage(
         for filename, lineno in sorted(uncovered):
             print(f"  {filename}:{lineno}")
     else:
-        print(f"\n✓ Code coverage check passed!")
+        if total == 0:
+            print("\nNo coverable lines found.")
+        else:
+            print(f"\n✓ Code coverage check passed!")
 
     return retval
 
