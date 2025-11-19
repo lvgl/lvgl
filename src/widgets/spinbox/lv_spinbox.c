@@ -649,11 +649,13 @@ static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox)
 
 static uint32_t digit_count(int32_t num)
 {
-    uint32_t  digit_count = 0;
+    uint32_t  digit_count = num == 0 ? 1 : 0;
+
     while(num) {
         num /= 10;
         digit_count++;
     }
+
     return digit_count;
 }
 
