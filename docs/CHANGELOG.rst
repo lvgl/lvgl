@@ -139,6 +139,8 @@ Others
    used instead
 - ``lv_msgbox`` is update to be more flexible. It uses normal button instead of button matrix
 - ``lv_tabview`` was updated to user real button instead of a button matrix
+- ``lv_meter`` is removed and replaced by
+  `lv_scale <https://docs.lvgl.io/master/widgets/scale.html>`__
 
 
 v8.3
