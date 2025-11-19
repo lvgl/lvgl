@@ -616,12 +616,23 @@ static void clamp_value_to_range(lv_spinbox_t * spinbox)
 
 static void clamp_range_to_digit_count(lv_spinbox_t * spinbox)
 {
-    int32_t max = (int32_t)lv_pow(10, spinbox->digit_count) - 1;
-    int32_t min = -max;
+    int32_t max;
+    int32_t min;
+
+    if(spinbox->digit_count < 10) {
+        max = (int32_t)lv_pow(10, spinbox->digit_count) - 1;
+        min = -max;
+    }
+    else {
+        max = INT32_MAX;
+        min = INT32_MIN + 1;
+        /* INT32_MIN is illegal for `range_min` because it is used with LV_ABS(). */
+    }
     if(spinbox->range_max > max) spinbox->range_max = max;
     else if(spinbox->range_max < min) spinbox->range_max = min;
     if(spinbox->range_min > max) spinbox->range_min = max;
     else if(spinbox->range_min < min) spinbox->range_min = min;
+
     clamp_value_to_range(spinbox);
 }
 
