@@ -895,7 +895,8 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
             if((obj_style->style->has_group & group) == 0) continue;
             lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
             if((state_style & state_inv)) continue;
-            if(lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
+            if(lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v) ||
+               lv_style_get_prop(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
                 /*Truncate the area to the object*/
                 ext_size = lv_obj_get_ext_draw_size(obj);
                 lv_area_copy(&obj_coords, &obj->coords);
