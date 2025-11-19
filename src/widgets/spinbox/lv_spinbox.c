@@ -559,6 +559,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     int32_t i;
     const size_t digits_len = lv_strlen(digits);
 
+    LV_ASSERT(spinbox->digit_count >= (uint32_t)digits_len);
+
     const int leading_zeros_cnt = (int)(spinbox->digit_count - (uint32_t)digits_len);
     if(leading_zeros_cnt) {
         for(i = (int32_t) digits_len; i >= 0; i--) {
