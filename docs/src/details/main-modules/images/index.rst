@@ -15,11 +15,3 @@ Images
     decoders
     caching
 
-
-
-API
-***
-
-.. API equals:  lv_image_set_src
-
-.. API equals:  lv_image_decoder_open

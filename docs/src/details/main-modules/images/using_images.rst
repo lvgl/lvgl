@@ -24,3 +24,17 @@ If the image was converted to a variable with the :ref:`online <images_online_co
 or :ref:`offline converter <images_offline_converter>`, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_img_dsc)` to declare the image in the file where
 you want to use it.
+
+
+
+.. _using_images_examples:
+
+Examples
+********
+
+.. include:: /examples/widgets/image/index.rst
+
+.. include:: /examples/libs/bmp/index.rst
+
+.. include:: /examples/libs/libpng/index.rst
+

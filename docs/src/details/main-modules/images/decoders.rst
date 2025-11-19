@@ -19,7 +19,7 @@ recognized formats.
 Built-In Image Decoders
 ***********************
 
-LVGL comes with a number of image decoders to support generic image formats:
+LVGL comes with a number of image decoders to support a number of popular image formats:
 
 .. container:: tighter-table-5
 
@@ -287,3 +287,12 @@ Example (requires :c:macro:`LV_USE_PRIVATE_API` to ``1`` in ``lv_conf.h``):
         }
         /* ... */
     }
+
+
+
+API
+***
+
+.. API equals:  lv_image_decoder_open
+
+
