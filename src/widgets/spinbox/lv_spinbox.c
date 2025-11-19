@@ -102,6 +102,7 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
+    if(digit_count == 0) digit_count = 1;
     if(dec_point_pos >= digit_count) dec_point_pos = 0;
 
     spinbox->digit_count = digit_count;
