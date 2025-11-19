@@ -28,8 +28,8 @@ Value, range and step
 
 - :cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value for the Spinbox.
 - :cpp:expr:`lv_spinbox_increment(spinbox)` and :cpp:expr:`lv_spinbox_decrement(spinbox)`
-  increments/decrements the currently-selected digit by the `step` value, changing the
-  value of the Spinbox accordingly.
+  increments/decrements the Spinbox's value by the `step` value, effectively incrementing
+  or decrementing the value of the selected digit.
 - :cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets its range. If the
   value is changed by :cpp:expr:`lv_spinbox_set_value(spinbox)`, by *Keys*,
   by :cpp:expr:`lv_spinbox_increment(spinbox)` or :cpp:expr:`lv_spinbox_decrement(spinbox)`
