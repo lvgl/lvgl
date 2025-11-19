@@ -107,9 +107,7 @@ lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
  */
 static void fs_remove(lv_fs_drv_t * drv)
 {
-    if(drv != NULL) {
-        lv_free(drv);
-    }
+    lv_free(drv);
 }
 
 /**
