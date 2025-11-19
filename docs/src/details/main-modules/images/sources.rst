@@ -20,6 +20,9 @@ The images module supports images in any of 3 forms:
     | Symbols_   | C strings starting with Unicode characters (e.g. icons) in UTF-8 |
     +------------+------------------------------------------------------------------+
 
+Image sources are set by calling one of the ``..._set_src()`` functions.  See code
+examples below.
+
 
 
 .. _image_sources_variables:
@@ -72,6 +75,14 @@ The generated C files are compiled and linked into the resulting executable like
 other ``const`` data.
 
 See :ref:`adding images to your project` for more details.
+
+Example:
+
+.. code-block:: c
+
+    LV_IMAGE_DECLARE(img_cogwheel_argb);
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &img_cogwheel_argb);
 
 
 
@@ -127,3 +138,19 @@ for details.
 .. note::
 
     Symbols are only implemented for :ref:`lv_image` Widgets.
+
+
+
+Examples
+********
+
+See :ref:`Using Images Examples <using_images_examples>` for a number of examples of
+using image sources in these 3 forms.
+
+
+
+API
+***
+
+.. API equals:  lv_image_set_src
+

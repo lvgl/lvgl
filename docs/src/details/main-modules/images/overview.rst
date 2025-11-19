@@ -20,7 +20,7 @@ What is an Image?
 An image can be thought of as set of pixels used to create an image on a Display.
 Images can be:
 
-- a :cpp:type:`lv_image_dsc_t` object plus its pixel data in RAM or ROM in any of the
+- an :cpp:type:`lv_image_dsc_t` object plus its pixel data in RAM or ROM in any of the
   :ref:`supported pixel formats <images_color_formats>`, or
 
 - a stored image in a file on an external file system, or loaded into RAM or ROM.
@@ -36,7 +36,7 @@ format (into a buffer) when it is drawn.
 Using Images
 ************
 
-You make use of images module by using any of these Widgets:
+You make use of images by using any of these Widgets:
 
 +-----------------------+---------------------------------+
 | Widget                | Via                             |
