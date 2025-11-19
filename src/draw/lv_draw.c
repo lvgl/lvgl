@@ -537,6 +537,40 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
     *area = t->area;
 }
 
+lv_layer_t * lv_draw_layer_create_drop_shadow(const lv_draw_dsc_base_t * base, lv_layer_t * parent_layer,
+                                              const lv_area_t * area)
+{
+    lv_area_t ds_a = *area; /*ds_a: drop shadow area*/
+    int32_t blur_radius = base->drop_shadow_blur_radius;
+    lv_area_increase(&ds_a, blur_radius * 2, blur_radius * 2);
+
+    lv_layer_t * ds_layer = lv_draw_layer_create(parent_layer, LV_COLOR_FORMAT_A8, &ds_a);
+    if(ds_layer == NULL) {
+        LV_LOG_WARN("Failed to create a layer for the drop shadow");
+    }
+    return ds_layer;
+}
+
+void lv_draw_layer_finish_drop_shadow(const lv_draw_dsc_base_t * base, lv_layer_t * parent_layer,
+                                      lv_layer_t * drop_shadow_layer)
+{
+    lv_area_t ds_a = drop_shadow_layer->buf_area; /*ds_a: drop shadow area*/
+    lv_draw_blur_dsc_t blur_dsc;
+    lv_draw_blur_dsc_init(&blur_dsc);
+    blur_dsc.blur_radius = base->drop_shadow_blur_radius;
+    blur_dsc.quality = base->drop_shadow_quality;
+    lv_draw_blur(drop_shadow_layer, &blur_dsc, &drop_shadow_layer->buf_area);
+
+    lv_area_move(&ds_a, base->drop_shadow_ofs_x, base->drop_shadow_ofs_y);
+
+    lv_draw_image_dsc_t layer_draw_dsc;
+    lv_draw_image_dsc_init(&layer_draw_dsc);
+    layer_draw_dsc.src = drop_shadow_layer;
+    layer_draw_dsc.recolor = base->drop_shadow_color;
+    layer_draw_dsc.opa = base->drop_shadow_opa;
+    lv_draw_layer(parent_layer, &layer_draw_dsc, &ds_a);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

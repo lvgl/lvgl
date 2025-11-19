@@ -894,7 +894,8 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
 
     /*If the widget has blur set, invalidate it*/
     if(lv_area_is_on(blur_data->inv_area, &obj_coords)) {
-        const uint32_t group = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_BLUR_RADIUS);
+        const uint32_t group_blur = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_BLUR_RADIUS);
+        const uint32_t group_dropshadow = (uint32_t)1 << lv_style_get_prop_group(LV_STYLE_DROP_SHADOW_OPA);
         const lv_state_t state = lv_obj_style_get_selector_state(lv_obj_get_state(obj));
         const lv_state_t state_inv = ~state;
         lv_style_value_t v;
@@ -902,24 +903,35 @@ static lv_obj_tree_walk_res_t blur_walk_cb(lv_obj_t * obj, void * user_data)
         for(i = 0; i < obj->style_cnt; i++) {
             lv_obj_style_t * obj_style = &obj->styles[i];
             if(obj_style->is_disabled) continue;
-            if((obj_style->style->has_group & group) == 0) continue;
+
             lv_state_t state_style = lv_obj_style_get_selector_state(obj->styles[i].selector);
             if((state_style & state_inv)) continue;
-            if(lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
-                /*Truncate the area to the object*/
-                ext_size = lv_obj_get_ext_draw_size(obj);
-                lv_area_copy(&obj_coords, &obj->coords);
-                obj_coords.x1 -= ext_size;
-                obj_coords.y1 -= ext_size;
-                obj_coords.x2 += ext_size;
-                obj_coords.y2 += ext_size;
 
-                invalidate_area_core(obj, &obj_coords);
-
-                /*No need to check the children as the widget is already invalidated
-                 *which will redraw the children too*/
-                return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
+            bool invalidation_needed = false;
+            if((obj_style->style->has_group & group_blur) &&
+               lv_style_get_prop(obj_style->style, LV_STYLE_BLUR_RADIUS, &v)) {
+                invalidation_needed = true;
             }
+            if((obj_style->style->has_group & group_dropshadow) &&
+               lv_style_get_prop(obj_style->style, LV_STYLE_DROP_SHADOW_OPA, &v)) {
+                invalidation_needed = true;
+            }
+
+            if(invalidation_needed == false) continue;
+
+            /*Truncate the area to the object*/
+            ext_size = lv_obj_get_ext_draw_size(obj);
+            lv_area_copy(&obj_coords, &obj->coords);
+            obj_coords.x1 -= ext_size;
+            obj_coords.y1 -= ext_size;
+            obj_coords.x2 += ext_size;
+            obj_coords.y2 += ext_size;
+
+            invalidate_area_core(obj, &obj_coords);
+
+            /*No need to check the children as the widget is already invalidated
+             *which will redraw the children too*/
+            return LV_OBJ_TREE_WALK_SKIP_CHILDREN;
         }
 
         /*Check the next child, maybe it's blurred*/

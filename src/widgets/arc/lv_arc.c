@@ -736,6 +736,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, knob_extra_size);
+        *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
+
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_arc_draw(e);
