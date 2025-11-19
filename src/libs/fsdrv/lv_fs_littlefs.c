@@ -59,19 +59,19 @@ void lv_fs_littlefs_init(void)
     lv_fs_drv_register(fs_drv);
 }
 
-lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
+lv_fs_res_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
 {
 
     if(lfs == NULL) {
-        return LV_RESULT_INVALID; /*Invalid LittleFS handle*/
+        return LV_FS_RES_INV_PARAM; /*Invalid LittleFS handle*/
     }
 
     if(LV_FS_IS_VALID_LETTER(letter) == false) {
-        return LV_RESULT_INVALID; /*Invalid letter*/
+        return LV_FS_RES_INV_PARAM; /*Invalid letter*/
     }
 
     if(lv_fs_get_drv(letter) != NULL) {
-        return LV_RESULT_INVALID; /*Already registered*/
+        return LV_FS_RES_DRIVE_LETTER_ALREADY_USED; /*Already registered*/
     }
 
     lv_fs_drv_t * fs_drv = lv_malloc(sizeof(lv_fs_drv_t));
@@ -94,7 +94,7 @@ lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter)
     fs_drv->user_data = lfs;
 
     lv_fs_drv_register(fs_drv);
-    return LV_RESULT_OK;
+    return LV_FS_RES_OK;
 }
 
 /**********************

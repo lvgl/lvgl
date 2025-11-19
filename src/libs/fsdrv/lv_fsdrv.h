@@ -67,9 +67,10 @@ void lv_fs_littlefs_init(void);
  * Register a LittleFS drive with LVGL
  * @param  lfs     pointer to an initialized LittleFS filesystem structure
  * @param  letter  driver letter to register (e.g. 'A')
- * @return         LV_RESULT_OK: success; LV_RESULT_INVALID: failure
+ * @return         LV_FS_RESULT_OK: success, LV_FS_RES_INV_PARAM: lfs is NULL or letetr not in range A-Z,
+ *                 LV_FS_RES_DRIVE_LETTER_ALREADY_USED: A drive with this letter is already registered
  */
-lv_result_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter);
+lv_fs_res_t lv_fs_littlefs_register_drive(lfs_t * lfs, char letter);
 #endif
 
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
