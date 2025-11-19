@@ -35,8 +35,8 @@ Value, range and step
   by :cpp:expr:`lv_spinbox_increment(spinbox)` or :cpp:expr:`lv_spinbox_decrement(spinbox)`
   this range will be respected.
 - :cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets `step` value to
-  increment/decrement.  It is designed to be either 1 (its default) or a multiple of
-  10 so that setting it simultaneously determines which digit is selected.
+  increment/decrement.  It is designed to be a power of 10 (1, 10, 100, etc.) so that
+  setting it simultaneously determines which digit is selected.
 - :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
   digit to change on increment/decrement. Position '0' sets the cursor to
   the least significant digit.
