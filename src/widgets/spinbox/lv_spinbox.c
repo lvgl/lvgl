@@ -176,9 +176,12 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
         max_value = temp;
     }
 
-    /* Prevent overflow with LV_ABS(spinbox->range_min) used elsewhere. */
+    /* Prevent overflow with LV_ABS(spinbox->range_min) (or range_max) used elsewhere. */
     if(min_value == INT32_MIN) {
         min_value = INT32_MIN + 1;
+    }
+    if(max_value == INT32_MIN) {
+        max_value = INT32_MIN + 1;
     }
 
     spinbox->range_max = max_value;
@@ -229,6 +232,11 @@ void lv_spinbox_set_max_value(lv_obj_t * obj, int32_t max_value)
         const int32_t max = (int32_t)max64;
         if(max_value < -max) max_value = -max;
         if(max_value > max) max_value = max;
+    }
+
+    /* Prevent overflow with LV_ABS(spinbox->range_max) used elsewhere. */
+    if(max_value == INT32_MIN) {
+        max_value = INT32_MIN + 1;
     }
 
     spinbox->range_max = max_value;
@@ -608,8 +616,10 @@ static void clamp_range_to_digit_count(lv_spinbox_t * spinbox)
 {
     int32_t max = (int32_t)lv_pow(10, spinbox->digit_count) - 1;
     int32_t min = -max;
-    if(spinbox->range_max > max || spinbox->range_max < min) spinbox->range_max = max;
-    if(spinbox->range_min > max || spinbox->range_min < min) spinbox->range_min = min;
+    if(spinbox->range_max > max) spinbox->range_max = max;
+    else if(spinbox->range_max < min) spinbox->range_max = min;
+    if(spinbox->range_min > max) spinbox->range_min = max;
+    else if(spinbox->range_min < min) spinbox->range_min = min;
     clamp_value_to_range(spinbox);
 }
 
