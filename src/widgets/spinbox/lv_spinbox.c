@@ -33,7 +33,7 @@
 static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_spinbox_updatevalue(lv_obj_t * obj);
-static void clamp_value_to_range(lv_spinbox_t* spinbox);
+static void clamp_value_to_range(lv_spinbox_t * spinbox);
 static void clamp_range_to_digit_count(lv_spinbox_t * spinbox);
 static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox);
 static uint32_t  digit_count(int32_t num);
@@ -177,7 +177,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t min_value, int32_t max_value)
     }
 
     /* Prevent overflow with LV_ABS(spinbox->range_min) used elsewhere. */
-    if (min_value == INT32_MIN) {
+    if(min_value == INT32_MIN) {
         min_value = INT32_MIN + 1;
     }
 
@@ -205,7 +205,7 @@ void lv_spinbox_set_min_value(lv_obj_t * obj, int32_t min_value)
     }
 
     /* Prevent overflow with LV_ABS(spinbox->range_min) used elsewhere. */
-    if (min_value == INT32_MIN) {
+    if(min_value == INT32_MIN) {
         min_value = INT32_MIN + 1;
     }
 
@@ -598,10 +598,10 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     lv_textarea_set_cursor_pos(obj, cur_pos);
 }
 
-static void clamp_value_to_range(lv_spinbox_t* spinbox)
+static void clamp_value_to_range(lv_spinbox_t * spinbox)
 {
-    if (spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
-    if (spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
+    if(spinbox->value > spinbox->range_max) spinbox->value = spinbox->range_max;
+    if(spinbox->value < spinbox->range_min) spinbox->value = spinbox->range_min;
 }
 
 static void clamp_range_to_digit_count(lv_spinbox_t * spinbox)
@@ -627,7 +627,7 @@ static void extend_digit_count_when_insufficient(lv_spinbox_t * spinbox)
 static uint32_t digit_count(int32_t num)
 {
     uint32_t  digit_count = 0;
-    while (num) {
+    while(num) {
         num /= 10;
         digit_count++;
     }
