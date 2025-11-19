@@ -1006,6 +1006,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             continue;
         }
         line_dsc.color = ser->color;
+        line_dsc.base.drop_shadow_color = ser->color;
         point_dsc_default.bg_color = ser->color;
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
