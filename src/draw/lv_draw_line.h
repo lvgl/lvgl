@@ -21,18 +21,35 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FLOAT
+#include <float.h>
+#define LV_DRAW_LINE_POINT_NONE     FLT_MAX
+#else
+#define LV_DRAW_LINE_POINT_NONE     INT32_MAX
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used.
+     *Ignored if `points` are set*/
     lv_point_precise_t p1;
 
-    /**The second point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    /**The second point of the line. If `LV_USE_FLOAT` is enabled float number can be also used
+     * Ignored if `points` are set*/
     lv_point_precise_t p2;
+
+    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    lv_point_precise_t * points;
+
+    /**
+     * Number of point in the `points`
+     */
+    int32_t point_cnt;
 
     /**The color of the line*/
     lv_color_t color;

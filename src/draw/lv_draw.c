@@ -673,8 +673,15 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
 static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
 {
     LV_PROFILER_DRAW_BEGIN;
+    if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * draw_line_dsc = t->draw_dsc;
+        if(draw_line_dsc->points) {
+            lv_free(draw_line_dsc->points);
+            draw_line_dsc->points = NULL;
+        }
+    }
     /*If it was layer drawing free the layer too*/
-    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+    else if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
         lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
 
