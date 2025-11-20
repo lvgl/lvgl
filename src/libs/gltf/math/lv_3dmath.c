@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_3dmath.h"
+#if LV_USE_GLTF
 
 /*********************
  *      DEFINES
@@ -45,3 +46,5 @@ lv_3dplane_t lv_get_ground_plane(float elevation)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_GLTF*/
