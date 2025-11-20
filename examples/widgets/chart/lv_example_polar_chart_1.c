@@ -14,8 +14,10 @@ void lv_example_polar_chart_1(void)
     lv_polar_chart_set_type(chart, LV_POLAR_CHART_TYPE_LINE);   /*Show lines and points too*/
 
     /*Add two data series*/
-    lv_polar_chart_series_t * ser1 = lv_polar_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_POLAR_CHART_AXIS_RADIAL);
-    lv_polar_chart_series_t * ser2 = lv_polar_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_POLAR_CHART_AXIS_RADIAL);
+    lv_polar_chart_series_t * ser1 = lv_polar_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN),
+                                                               LV_POLAR_CHART_AXIS_RADIAL);
+    lv_polar_chart_series_t * ser2 = lv_polar_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED),
+                                                               LV_POLAR_CHART_AXIS_RADIAL);
     int32_t * ser2_y_points = lv_polar_chart_get_series_radial_array(chart, ser2);
 
     uint32_t i;
