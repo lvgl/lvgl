@@ -134,7 +134,7 @@ void lv_polar_chart_set_axis_range(lv_obj_t * obj, lv_polar_chart_axis_t axis, i
     lv_polar_chart_set_axis_max_value(obj, axis, max);
 }
 
-void lv_polar_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode)
+void lv_polar_chart_set_update_mode(lv_obj_t * obj, lv_polar_chart_update_mode_t update_mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
