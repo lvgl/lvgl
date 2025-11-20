@@ -58,6 +58,9 @@ typedef struct {
 #if LV_USE_CHART
     lv_style_t chart_indic;
 #endif
+#if LV_USE_POLAR_CHART
+    lv_style_t polar_chart_indic;
+#endif
 } my_theme_styles_t;
 
 struct _my_theme_t {
@@ -174,6 +177,14 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_size(&theme->styles.chart_indic, lv_display_dpx(theme->base.disp, 8), lv_display_dpx(theme->base.disp, 8));
     lv_style_set_bg_color(&theme->styles.chart_indic, COLOR_FG);
     lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
+#endif
+
+#if LV_USE_POLAR_CHART
+    style_init_reset(&theme->styles.polar_chart_indic);
+    lv_style_set_radius(&theme->styles.polar_chart_indic, LV_RADIUS_CIRCLE);
+    lv_style_set_size(&theme->styles.polar_chart_indic, lv_display_dpx(theme->base.disp, 8), lv_display_dpx(theme->base.disp, 8));
+    lv_style_set_bg_color(&theme->styles.polar_chart_indic, COLOR_FG);
+    lv_style_set_bg_opa(&theme->styles.polar_chart_indic, LV_OPA_COVER);
 #endif
 }
 

@@ -96,6 +96,10 @@ typedef struct {
     lv_style_t chart_series, chart_indic, chart_bg;
 #endif
 
+#if LV_USE_POLAR_CHART
+    lv_style_t polar_chart_series, polar_chart_indic, polar_chart_bg;
+#endif
+
 #if LV_USE_DROPDOWN
     lv_style_t dropdown_list;
 #endif
@@ -448,6 +452,27 @@ static void style_init(my_theme_t * theme)
     int32_t chart_size = LV_DPX_CALC(theme->disp_dpi, 8);
     lv_style_set_size(&theme->styles.chart_series, chart_size, chart_size);
     lv_style_set_pad_column(&theme->styles.chart_series, LV_DPX_CALC(theme->disp_dpi, 2));
+
+    style_init_reset(&theme->styles.chart_indic);
+    lv_style_set_radius(&theme->styles.chart_indic, LV_RADIUS_CIRCLE);
+    lv_style_set_size(&theme->styles.chart_indic, chart_size, chart_size);
+    lv_style_set_bg_color(&theme->styles.chart_indic, theme->base.color_primary);
+    lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
+#endif
+
+#if LV_USE_POLAR_CHART
+    style_init_reset(&theme->styles.polar_chart_bg);
+    lv_style_set_border_post(&theme->styles.polar_chart_bg, false);
+    lv_style_set_pad_column(&theme->styles.polar_chart_bg, LV_DPX_CALC(theme->disp_dpi, 10));
+    lv_style_set_line_color(&theme->styles.polar_chart_bg, theme->color_grey);
+
+    style_init_reset(&theme->styles.polar_chart_series);
+    lv_style_set_line_width(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
+    lv_style_set_radius(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
+
+    int32_t chart_size = LV_DPX_CALC(theme->disp_dpi, 8);
+    lv_style_set_size(&theme->styles.polar_chart_series, chart_size, chart_size);
+    lv_style_set_pad_column(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 2));
 
     style_init_reset(&theme->styles.chart_indic);
     lv_style_set_radius(&theme->styles.chart_indic, LV_RADIUS_CIRCLE);
