@@ -140,6 +140,13 @@ void lv_xml_init(void)
     lv_xml_register_widget("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
 #endif
 
+#if LV_USE_POLAR_CHART
+    lv_xml_register_widget("lv_polar_chart", lv_xml_polar_chart_create, lv_xml_polar_chart_apply);
+    lv_xml_register_widget("lv_polar_chart-cursor", lv_xml_polar_chart_cursor_create, lv_xml_polar_chart_cursor_apply);
+    lv_xml_register_widget("lv_polar_chart-series", lv_xml_polar_chart_series_create, lv_xml_polar_chart_series_apply);
+    lv_xml_register_widget("lv_polar_chart-axis", lv_xml_polar_chart_axis_create, lv_xml_polar_chart_axis_apply);
+#endif
+
 #if LV_USE_TABLE
     lv_xml_register_widget("lv_table", lv_xml_table_create, lv_xml_table_apply);
     lv_xml_register_widget("lv_table-column", lv_xml_table_column_create, lv_xml_table_column_apply);
