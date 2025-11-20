@@ -51,19 +51,19 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  You will find the following is a fairly-complete list of references about how to do things using reStructuredText:
 
-| Docutils References (Fundamentals)                           | Sphinx References (What Sphinx Adds to Docutils)             |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Introduction](https://docutils.sourceforge.io/docs/ref/rst/introduction.html) | [Configuration](https://www.sphinx-doc.org/en/master/usage/configuration.html) |
+| Docutils References (Fundamentals)                                                | Sphinx References (What Sphinx Adds to Docutils)                               |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Introduction](https://docutils.sourceforge.io/docs/ref/rst/introduction.html)    | [Configuration](https://www.sphinx-doc.org/en/master/usage/configuration.html) |
 | [Markup Specification](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) | [Directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html) |
 | [Markup Specification ∙ Tables](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#tables) | [Directives ∙ Admonitions](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#admonitions-messages-and-warnings) |
 | [Markup Specification ∙ Substitution References](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-references) | [Referencing](https://www.sphinx-doc.org/en/master/usage/referencing.html) |
-| [Directives](https://docutils.sourceforge.io/docs/ref/rst/directives.html) | [Interpreted Text Roles](https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html) |
-| [Interpreted Text Roles](https://docutils.sourceforge.io/docs/ref/rst/roles.html) | [Glossary](https://www.sphinx-doc.org/en/master/glossary.html) |
-| [Quickstart](https://docutils.sourceforge.io/docs/user/rst/quickstart.html) |                                                              |
-| [Examples](https://docutils.sourceforge.io/docs/user/rst/demo.html) |                                                              |
-| [Quick Reference](https://docutils.sourceforge.io/docs/user/rst/quickref.html) |                                                              |
+| [Directives](https://docutils.sourceforge.io/docs/ref/rst/directives.html)        | [Interpreted Text Roles](https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html) |
+| [Interpreted Text Roles](https://docutils.sourceforge.io/docs/ref/rst/roles.html) | [Glossary](https://www.sphinx-doc.org/en/master/glossary.html)                 |
+| [Quickstart](https://docutils.sourceforge.io/docs/user/rst/quickstart.html)       | [Furo-theme Examples](https://sphinx-themes.org/sample-sites/furo/)            |
+| [Examples](https://docutils.sourceforge.io/docs/user/rst/demo.html)               | [Kitchen Sink Page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) |
+| [Quick Reference](https://docutils.sourceforge.io/docs/user/rst/quickref.html)    | [Sphinx Themes Gallery](https://sphinx-themes.org/)                            |
 
-If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page are also excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
+If you prefer to learn by examples, the [Furo-theme Examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink Page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) are excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
 
 Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
@@ -372,7 +372,7 @@ Arguments that contain more than one word or non-alphanumeric characters will ca
 | :cpp:expr:\`lv_obj_set_layout(widget, LV_LAYOUT_*)\`         | asterisk               |
 | :cpp:expr:\`lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)\`     | asterisk               |
 | :cpp:expr:\`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)\` | cast            |
-| :cpp:expr:\`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);\`    | semicolon  |
+| :cpp:expr:\`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);\`    | semicolon              |
 | :cpp:expr:\`lv_obj_set_layout(widget, ...)\`                 | lone ellipsis          |
 
 For such examples, simply use reStructuredText literal markup like this:
