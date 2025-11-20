@@ -44,12 +44,14 @@ struct lv_gltf_matrices_saver_t {
     lv_gltf_t * viewer;
     fastgltf::math::fmat4x4 saved_view_matrix;
     fastgltf::math::fmat4x4 saved_projection_matrix;
+    fastgltf::math::fmat4x4 saved_view_projection_matrix;
     fastgltf::math::fvec3 saved_camera_pos;
 
     lv_gltf_matrices_saver_t(lv_gltf_t * viewer)
         : viewer(viewer)
         , saved_view_matrix(viewer->view_matrix)
         , saved_projection_matrix(viewer->projection_matrix)
+        , saved_view_projection_matrix(viewer->view_projection_matrix)
         , saved_camera_pos(viewer->camera_pos)
     {
     }
@@ -58,6 +60,7 @@ struct lv_gltf_matrices_saver_t {
     {
         viewer->view_matrix = saved_view_matrix;
         viewer->projection_matrix = saved_projection_matrix;
+        viewer->view_projection_matrix = saved_view_projection_matrix;
         viewer->camera_pos = saved_camera_pos;
     }
 
