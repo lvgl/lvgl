@@ -277,7 +277,7 @@ Reference the link (anchor) by:
 Click :ref:`here <unique_anchor_name>` for more details.
 ```
 
-Results in "Click <span style="color:blue;"><u>here</u></span> for more details."
+Result:  "Click **_here_** for more details."
 
 Or use the heading's text as the link's text:
 
@@ -285,7 +285,7 @@ Or use the heading's text as the link's text:
 Click :ref:`unique_anchor_name` for more details.
 ```
 
-Results in "Click <span style="color:blue;"><u>My Heading</u></span> for more details."
+Result:  "Click **_My Heading_** for more details."
 
 `unique_anchor_name` may appear in places other than before a heading, but if so, custom link text (like "here" the first example above) must be provided.
 
