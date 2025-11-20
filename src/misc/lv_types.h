@@ -214,6 +214,8 @@ typedef struct _lv_canvas_t lv_canvas_t;
 
 typedef struct _lv_chart_series_t lv_chart_series_t;
 
+typedef struct _lv_polar_chart_series_t lv_polar_chart_series_t;
+
 typedef struct _lv_chart_cursor_t lv_chart_cursor_t;
 
 typedef struct _lv_chart_t lv_chart_t;
