@@ -218,6 +218,8 @@ typedef struct _lv_chart_cursor_t lv_chart_cursor_t;
 
 typedef struct _lv_chart_t lv_chart_t;
 
+typedef struct _lv_polar_chart_t lv_polar_chart_t;
+
 typedef struct _lv_checkbox_t lv_checkbox_t;
 
 typedef struct _lv_dropdown_t lv_dropdown_t;

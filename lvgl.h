@@ -65,6 +65,7 @@ extern "C" {
 #include "src/widgets/calendar/lv_calendar.h"
 #include "src/widgets/canvas/lv_canvas.h"
 #include "src/widgets/chart/lv_chart.h"
+#include "src/widgets/chart/lv_polar_chart.h"
 #include "src/widgets/checkbox/lv_checkbox.h"
 #include "src/widgets/dropdown/lv_dropdown.h"
 #include "src/widgets/image/lv_image.h"
