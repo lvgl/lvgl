@@ -590,7 +590,7 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
         return NULL;
     }
     if(lv_array_push_back(&viewer->models, &model) == LV_RESULT_INVALID) {
-        lv_gltf_data_destroy(model);
+        lv_gltf_data_delete(model);
         return NULL;
     }
     model->viewer = viewer;
@@ -675,11 +675,14 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
-        lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
+        lv_gltf_data_delete(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
     if(view->environment && view->owns_environment) {
         lv_gltf_environment_delete(view->environment);
     }
+    lv_display_t * disp = lv_obj_get_display(obj);
+    LV_ASSERT_NULL(disp);
+    lv_display_remove_event_cb_with_user_data(disp, display_refr_end_event_cb, obj);
 }
 
 static void lv_gltf_view_state_init(lv_gltf_t * view)

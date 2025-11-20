@@ -80,9 +80,14 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     return data;
 }
 
-void lv_gltf_data_destroy(lv_gltf_model_t * data)
+void lv_gltf_data_delete(lv_gltf_model_t * data)
 {
-    lv_gltf_data_destroy_textures(data);
+    lv_gltf_data_delete_textures(data);
+    uint32_t node_count = lv_array_size(&data->nodes);
+    for(uint32_t i = 0; i < node_count; ++i) {
+        lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&data->nodes, i);
+        lv_gltf_model_node_deinit(node);
+    }
     lv_free(data);
 }
 
