@@ -42,7 +42,6 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer);
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
-static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t cnt, int32_t ** a);
 static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t v, int32_t h);
 
 /**********************
@@ -1041,52 +1040,6 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     }
 }
 
-static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t cnt, int32_t ** a)
-{
-    if((*a) == NULL) return;
-
-    lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
-    uint32_t point_cnt_old = chart->point_cnt;
-    uint32_t i;
-
-    if(ser->start_point != 0) {
-        int32_t * new_points = lv_malloc(sizeof(int32_t) * cnt);
-        LV_ASSERT_MALLOC(new_points);
-        if(new_points == NULL) return;
-
-        if(cnt >= point_cnt_old) {
-            for(i = 0; i < point_cnt_old; i++) {
-                new_points[i] =
-                    (*a)[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
-            }
-            for(i = point_cnt_old; i < cnt; i++) {
-                new_points[i] = LV_CHART_POINT_NONE; /*Fill up the rest with default value*/
-            }
-        }
-        else {
-            for(i = 0; i < cnt; i++) {
-                new_points[i] =
-                    (*a)[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
-            }
-        }
-
-        /*Switch over pointer from old to new*/
-        lv_free((*a));
-        (*a) = new_points;
-    }
-    else {
-        (*a) = lv_realloc((*a), sizeof(int32_t) * cnt);
-        LV_ASSERT_MALLOC((*a));
-        if((*a) == NULL) return;
-        /*Initialize the new points*/
-        if(cnt > point_cnt_old) {
-            for(i = point_cnt_old - 1; i < cnt; i++) {
-                (*a)[i] = LV_CHART_POINT_NONE;
-            }
-        }
-    }
-}
-
 /**
  * Map a value to a height
  * @param obj   pointer to a chart
@@ -1097,6 +1050,8 @@ static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint
  */
 static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t v, int32_t h)
 {
+    LV_UNUSED(ser);
+
     lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
 
     return lv_map(v, chart->radial_min, chart->radial_max, 0, h);
