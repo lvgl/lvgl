@@ -47,3 +47,9 @@ Circular line chart with gap
 
 .. lv_example:: widgets/chart/lv_example_chart_8
   :language: c
+
+Line Polar Chart
+----------
+
+.. lv_example:: widgets/chart/lv_example_polar_chart_1
+  :language: c
