@@ -44,7 +44,7 @@ typedef enum {
     LV_FS_RES_NOT_IMP,    /*Requested function is not implemented*/
     LV_FS_RES_OUT_OF_MEM, /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
-    LV_FS_RES_DRIVE_LETTER_ALREADY_USED, /*A drive with this letter is already registed*/
+    LV_FS_RES_DRIVE_LETTER_ALREADY_USED, /*A drive with this letter is already registered*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
 } lv_fs_res_t;
 
