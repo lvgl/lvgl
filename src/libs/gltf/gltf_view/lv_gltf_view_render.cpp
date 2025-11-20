@@ -1272,18 +1272,18 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                               local_scale);
         }
 
-        if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
-            lv_gltf_data_set_cached_transform(gltf_data, &node, parentworldmatrix * localmatrix);
-        }
+        if(node.cameraIndex.has_value()) current_camera_count++;
 
-        if(node.cameraIndex.has_value()) {
-            current_camera_count++;
-            if(current_camera_count == gltf_data->camera) {
-                fastgltf::math::fmat4x4 cammat = (parentworldmatrix * localmatrix);
-                gltf_data->view_pos[0] = cammat[3][0];
-                gltf_data->view_pos[1] = cammat[3][1];
-                gltf_data->view_pos[2] = cammat[3][2];
-                gltf_data->view_mat = fastgltf::math::invert(cammat);
+        if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
+            auto world_matrix = parentworldmatrix * localmatrix;
+            lv_gltf_data_set_cached_transform(gltf_data, &node, world_matrix);
+
+            if(node.cameraIndex.has_value()) {
+                if(current_camera_count == gltf_data->camera) {
+                    fastgltf::removeScale(world_matrix);
+                    gltf_data->view_pos = world_matrix.col(3);
+                    gltf_data->view_mat = fastgltf::math::invert(world_matrix);
+                }
             }
         }
     });
