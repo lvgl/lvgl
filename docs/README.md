@@ -402,4 +402,4 @@ API
 
 The list of symbols (or prefixes) can be separated by commas or spaces, and they can wrap onto subsequent lines of text so long as they are indented.  A blank line after each list ends that list.
 
-The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.
+The API-page generation logic will add at most 1 link to each API documentation page containing matched symbols.  The links are to the whole API page, not to the symbols.  The purpose is to provide the reader with links to applicable API pages.  Links directly to code (e.g. function documentation) are accomplished by using the In-Line Code Expressions documented above.
