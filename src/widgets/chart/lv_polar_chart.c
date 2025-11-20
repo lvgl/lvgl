@@ -796,8 +796,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
         int32_t p_act = start_point;
         int32_t p_prev = start_point;
-        int32_t y_tmp = (int32_t)((int32_t)ser->radial_points[p_prev] - chart->ymin[0]) * h;
-        y_tmp  = y_tmp / (chart->ymax[0] - chart->ymin[0]);
+        int32_t y_tmp = (int32_t)((int32_t)ser->radial_points[p_prev] - chart->radial_min[0]) * h;
+        y_tmp  = y_tmp / (chart->radial_max[0] - chart->radial_min[0]);
         line_dsc.p2.y   = h - y_tmp + y_ofs;
 
         lv_value_precise_t y_min = line_dsc.p2.y;
@@ -812,8 +812,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
             p_act = (start_point + i) % chart->point_cnt;
 
-            y_tmp = (int32_t)((int32_t)ser->radial_points[p_act] - chart->ymin[0]) * h;
-            y_tmp = y_tmp / (chart->ymax[0] - chart->ymin[0]);
+            y_tmp = (int32_t)((int32_t)ser->radial_points[p_act] - chart->radial_min[0]) * h;
+            y_tmp = y_tmp / (chart->radial_max[0] - chart->radial_min[0]);
             line_dsc.p2.y  = h - y_tmp + y_ofs;
 
             if(line_dsc.p2.x < layer->_clip_area.x1 - point_w - 1) {
@@ -926,7 +926,7 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
         else {
             if(cursor->point_id == LV_CHART_POINT_NONE) continue;
             lv_point_t p;
-            lv_chart_get_point_pos_by_id(obj, cursor->ser, cursor->point_id, &p);
+            lv_polar_chart_get_point_pos_by_id(obj, cursor->ser, cursor->point_id, &p);
             cx = p.x;
             cy = p.y;
         }
@@ -1099,7 +1099,7 @@ static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t
 {
     lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
 
-    return lv_map(v, chart->ymin[0], chart->ymax[0], 0, h);
+    return lv_map(v, chart->radial_min[0], chart->radial_max[0], 0, h);
 }
 
 #endif
