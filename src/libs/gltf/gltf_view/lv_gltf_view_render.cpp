@@ -1211,7 +1211,6 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 }
 static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
 {
-    const auto & asset = lv_gltf_data_get_asset(model);
     int32_t anim_num = model->current_animation;
     uint32_t scene_index = 0;
 
@@ -1224,18 +1223,18 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
 
     auto tmat = fastgltf::math::fmat4x4{};
     fastgltf::custom_iterate_scene_nodes(
-        *asset, scene_index, &tmat,
-    [&](fastgltf::Node & node, fastgltf::math::fmat4x4 & parentworldmatrix, fastgltf::math::fmat4x4 & localmatrix) {
+        model, scene_index, &tmat,
+        [&](lv_gltf_model_node_t * node, fastgltf::math::fmat4x4 & parentworldmatrix,
+    fastgltf::math::fmat4x4 & localmatrix) {
         bool made_changes = false;
         bool made_rotation_changes = false;
-        if(lv_gltf_data_animation_get_channel_set(anim_num, model, node)->size() > 0) {
-            lv_gltf_data_animation_matrix_apply(model->local_timestamp / 1000., anim_num, model, node,
+        if(lv_gltf_data_animation_get_channel_set(anim_num, model, node->fastgltf_node)->size() > 0) {
+            lv_gltf_data_animation_matrix_apply(model->local_timestamp / 1000., anim_num, model, node->fastgltf_node,
                                                 localmatrix);
             made_changes = true;
         }
-        lv_gltf_model_node_t * model_node = lv_gltf_model_node_get_by_internal_node(model, &node);
-        const uint32_t write_ops_count = lv_array_size(&model_node->write_ops);
-        if(model_node->read_attrs || write_ops_count > 0) {
+        const uint32_t write_ops_count = lv_array_size(&node->write_ops);
+        if(node->read_attrs || write_ops_count > 0) {
             fastgltf::math::fvec3 local_pos;
             fastgltf::math::fquat local_quat;
             fastgltf::math::fvec3 local_scale;
@@ -1243,7 +1242,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
             fastgltf::math::fvec3 local_rot = lv_gltf_math_quaternion_to_euler(local_quat);
 
             for(uint32_t i = 0; i < write_ops_count; ++i) {
-                lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *)lv_array_at(&model_node->write_ops, i);
+                lv_gltf_write_op_t * write_op = (lv_gltf_write_op_t *)lv_array_at(&node->write_ops, i);
                 made_changes = true;
                 switch(write_op->prop) {
                     case LV_GLTF_NODE_PROP_POSITION:
@@ -1268,14 +1267,14 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                                                      local_quat),
                               local_scale);
 
-            if(model_node->read_attrs) {
+            if(node->read_attrs) {
                 bool value_changed = false;
-                lv_3dpoint_t * target_local_position = &model_node->read_attrs->node_data.local_position;
-                lv_3dpoint_t * target_world_position = &model_node->read_attrs->node_data.world_position;
-                lv_3dpoint_t * target_scale = &model_node->read_attrs->node_data.scale;
-                lv_3dpoint_t * target_rotation = &model_node->read_attrs->node_data.rotation;
+                lv_3dpoint_t * target_local_position = &node->read_attrs->node_data.local_position;
+                lv_3dpoint_t * target_world_position = &node->read_attrs->node_data.world_position;
+                lv_3dpoint_t * target_scale = &node->read_attrs->node_data.scale;
+                lv_3dpoint_t * target_rotation = &node->read_attrs->node_data.rotation;
 
-                if(model_node->read_attrs->read_world_position) {
+                if(node->read_attrs->read_world_position) {
                     fastgltf::math::fvec3 world_pos;
                     fastgltf::math::fquat world_quat;
                     fastgltf::math::fvec3 world_scale;
@@ -1298,15 +1297,15 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                     lv_memcpy(target_scale, local_scale.data(), sizeof(*target_scale));
                     value_changed = true;
                 }
-                model_node->read_attrs->value_changed = value_changed;
+                node->read_attrs->value_changed = value_changed;
             }
         }
 
-        if(made_changes || !lv_gltf_data_has_cached_transform(model, &node)) {
-            lv_gltf_data_set_cached_transform(model, &node, parentworldmatrix * localmatrix);
+        if(made_changes || !lv_gltf_data_has_cached_transform(model, node->fastgltf_node)) {
+            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, parentworldmatrix * localmatrix);
         }
 
-        if(node.cameraIndex.has_value()) {
+        if(node->fastgltf_node->cameraIndex.has_value()) {
             current_camera_count++;
             if(current_camera_count == model->camera) {
                 fastgltf::math::fmat4x4 cammat = (parentworldmatrix * localmatrix);
