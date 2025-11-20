@@ -14,6 +14,7 @@
 
 #if LV_USE_GLTF
 
+#include "../math/lv_3dmath.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_area.h"
 #include "../../../misc/lv_color.h"
