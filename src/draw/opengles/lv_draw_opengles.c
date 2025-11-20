@@ -538,6 +538,13 @@ static void draw_from_cached_texture(lv_draw_task_t * t)
             lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
+    /*Do not cache lines rendered from points at dsc->points will be freed*/
+    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * line_dsc = t->draw_dsc;
+        if(line_dsc->points) {
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
+        }
+    }
     LV_PROFILER_DRAW_END;
 }
 

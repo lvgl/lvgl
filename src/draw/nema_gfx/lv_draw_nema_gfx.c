@@ -324,7 +324,7 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
             lv_draw_nema_gfx_layer(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_nema_gfx_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_nema_gfx_line);
             break;
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_ARC:
