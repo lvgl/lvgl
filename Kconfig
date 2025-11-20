@@ -1170,6 +1170,9 @@ menu "LVGL configuration"
 		config LV_USE_CHART
 			bool "Chart"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_POLAR_CHART
+			bool "PolarChart"
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_CHECKBOX
 			bool "Check Box"
 			default y if !LV_CONF_MINIMAL

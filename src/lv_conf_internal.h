@@ -2274,6 +2274,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_POLAR_CHART
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_POLAR_CHART
+            #define LV_USE_POLAR_CHART CONFIG_LV_USE_POLAR_CHART
+        #else
+            #define LV_USE_POLAR_CHART 0
+        #endif
+    #else
+        #define LV_USE_POLAR_CHART      1
+    #endif
+#endif
+
 #ifndef LV_USE_CHECKBOX
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CHECKBOX
