@@ -37,6 +37,7 @@
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
+#include "parsers/lv_xml_polar_chart_parser.h"
 #include "parsers/lv_xml_table_parser.h"
 #include "parsers/lv_xml_dropdown_parser.h"
 #include "parsers/lv_xml_roller_parser.h"
