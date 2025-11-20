@@ -62,7 +62,7 @@ struct _lv_polar_chart_t {
     uint32_t radial_div_cnt;          /**< Number of radial division lines */
     uint32_t point_cnt;         /**< Number of points in all series */
     lv_polar_chart_type_t type  : 4;  /**< Chart type */
-    lv_chart_update_mode_t update_mode : 2;
+    lv_polar_chart_update_mode_t update_mode : 2;
 };
 
 
