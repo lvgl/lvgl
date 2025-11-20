@@ -75,6 +75,13 @@ lv_obj_t * lv_polar_chart_create(lv_obj_t * parent);
 void lv_polar_chart_set_type(lv_obj_t * obj, lv_polar_chart_type_t type);
 
 /**
+ * Set the number of points on a data line on a polar chart
+ * @param obj       pointer to a polar chart object
+ * @param cnt       new number of points on the data lines
+ */
+void lv_polar_chart_set_point_count(lv_obj_t * obj, uint32_t cnt);
+
+/**
  * Set the minimal and maximal y values on an axis
  * @param obj       pointer to a polar chart object
  * @param axis      `LV_POLAR_CHART_AXIS_RADIAL`
