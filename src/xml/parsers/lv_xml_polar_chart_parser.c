@@ -135,8 +135,8 @@ void lv_xml_polar_chart_cursor_apply(lv_xml_parser_state_t * state, const char *
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("pos_x", name)) lv_polar_chart_set_cursor_pos_x(chart, cursor, lv_xml_atoi(value));
-        if(lv_streq("pos_y", name)) lv_polar_chart_set_cursor_pos_y(chart, cursor, lv_xml_atoi(value));
+        if(lv_streq("pos_x", name)) lv_polar_chart_set_cursor_pos_angle(chart, cursor, lv_xml_atoi(value));
+        if(lv_streq("pos_y", name)) lv_polar_chart_set_cursor_pos_radial(chart, cursor, lv_xml_atoi(value));
     }
 }
 
