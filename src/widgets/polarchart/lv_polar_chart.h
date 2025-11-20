@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_chart.h"
+#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 
 #if LV_USE_POLAR_CHART != 0
 
