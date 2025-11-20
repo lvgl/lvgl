@@ -239,7 +239,7 @@ void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t 
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
-    uint32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+    uint32_t start_point = chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
     id = ((int32_t)start_point + id) % chart->point_cnt;
 
     p_out->y += lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
@@ -262,6 +262,7 @@ lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t c
     LV_LOG_INFO("begin");
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_UNUSED(axis);
 
     lv_polar_chart_t * chart    = (lv_polar_chart_t *)obj;
 
@@ -546,8 +547,6 @@ uint32_t lv_polar_chart_get_pressed_point(const lv_obj_t * obj)
 
 int32_t lv_polar_chart_get_first_point_center_offset(lv_obj_t * obj)
 {
-    lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
-
     int32_t x_ofs = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
     return x_ofs;
@@ -577,7 +576,7 @@ static void lv_polar_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t 
     chart->point_cnt   = LV_POLAR_CHART_POINT_CNT_DEF;
     chart->pressed_point_id  = LV_POLAR_CHART_POINT_NONE;
     chart->type        = LV_POLAR_CHART_TYPE_LINE;
-    chart->update_mode = LV_CHART_UPDATE_MODE_SHIFT;
+    chart->update_mode = LV_POLAR_CHART_UPDATE_MODE_SHIFT;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -694,20 +693,20 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
 
     int32_t scroll_left = lv_obj_get_scroll_left(obj);
     int32_t scroll_top = lv_obj_get_scroll_top(obj);
-    if(chart->hdiv_cnt > 1) {
+    if(chart->radial_div_cnt > 1) {
         int32_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
         line_dsc.p1.x = obj->coords.x1;
         line_dsc.p2.x = obj->coords.x2;
 
         i_start = 0;
-        i_end = chart->hdiv_cnt;
+        i_end = chart->radial_div_cnt;
         if(border_opa > LV_OPA_MIN && border_w > 0) {
             if((border_side & LV_BORDER_SIDE_TOP) && (lv_obj_get_style_pad_top(obj, LV_PART_MAIN) == 0)) i_start++;
             if((border_side & LV_BORDER_SIDE_BOTTOM) && (lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
         for(i = i_start; i < i_end; i++) {
-            line_dsc.p1.y = (int32_t)((int32_t)h * i) / (chart->hdiv_cnt - 1);
+            line_dsc.p1.y = (int32_t)((int32_t)h * i) / (chart->radial_div_cnt - 1);
             line_dsc.p1.y += y_ofs;
             line_dsc.p2.y = line_dsc.p1.y;
             line_dsc.base.id1 = i;
@@ -716,19 +715,19 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
         }
     }
 
-    if(chart->vdiv_cnt > 1) {
+    if(chart->angle_div_cnt > 1) {
         int32_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
         line_dsc.p1.y = obj->coords.y1;
         line_dsc.p2.y = obj->coords.y2;
         i_start = 0;
-        i_end = chart->vdiv_cnt;
+        i_end = chart->angle_div_cnt;
         if(border_opa > LV_OPA_MIN && border_w > 0) {
             if((border_side & LV_BORDER_SIDE_LEFT) && (lv_obj_get_style_pad_left(obj, LV_PART_MAIN) == 0)) i_start++;
             if((border_side & LV_BORDER_SIDE_RIGHT) && (lv_obj_get_style_pad_right(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
         for(i = i_start; i < i_end; i++) {
-            line_dsc.p1.x = (int32_t)((int32_t)w * i) / (chart->vdiv_cnt - 1);
+            line_dsc.p1.x = (int32_t)((int32_t)w * i) / (chart->angle_div_cnt - 1);
             line_dsc.p1.x += x_ofs;
             line_dsc.p2.x = line_dsc.p1.x;
             line_dsc.base.id1 = i;
@@ -790,15 +789,15 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
 
         int32_t p_act = start_point;
         int32_t p_prev = start_point;
-        int32_t y_tmp = (int32_t)((int32_t)ser->radial_points[p_prev] - chart->ymin[ser->y_axis_sec]) * h;
-        y_tmp  = y_tmp / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
+        int32_t y_tmp = (int32_t)((int32_t)ser->radial_points[p_prev] - chart->ymin[0]) * h;
+        y_tmp  = y_tmp / (chart->ymax[0] - chart->ymin[0]);
         line_dsc.p2.y   = h - y_tmp + y_ofs;
 
         lv_value_precise_t y_min = line_dsc.p2.y;
@@ -813,8 +812,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
             p_act = (start_point + i) % chart->point_cnt;
 
-            y_tmp = (int32_t)((int32_t)ser->radial_points[p_act] - chart->ymin[ser->y_axis_sec]) * h;
-            y_tmp = y_tmp / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
+            y_tmp = (int32_t)((int32_t)ser->radial_points[p_act] - chart->ymin[0]) * h;
+            y_tmp = y_tmp / (chart->ymax[0] - chart->ymin[0]);
             line_dsc.p2.y  = h - y_tmp + y_ofs;
 
             if(line_dsc.p2.x < layer->_clip_area.x1 - point_w - 1) {
@@ -1005,7 +1004,7 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
 
 
     /*In shift mode the whole chart changes so the whole object*/
-    if(chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT) {
+    if(chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT) {
         lv_obj_invalidate(obj);
         return;
     }
@@ -1100,7 +1099,7 @@ static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t
 {
     lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
 
-    return lv_map(v, chart->ymin[ser->y_axis_sec], chart->ymax[ser->y_axis_sec], 0, h);
+    return lv_map(v, chart->ymin[0], chart->ymax[0], 0, h);
 }
 
 #endif
