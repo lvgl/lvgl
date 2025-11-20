@@ -5,9 +5,9 @@
 
 Building the documentation is easy.  Here are the requirements:
 
-* Doxygen
-* Python >= 3.10
-* C compiler (gcc, msvc, clang, etc...)
+- Doxygen
+- Python >= 3.10
+- C compiler (gcc, msvc, clang, etc...)
 
 Once Python is installed
 
