@@ -129,7 +129,7 @@ static void eve_execute_drawing(lv_draw_eve_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_eve_line(t, t->draw_dsc);
+            lv_draw_line_iterate(t, t->draw_dsc, lv_draw_eve_line);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_eve_border(t, t->draw_dsc, &t->area);
