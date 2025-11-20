@@ -316,7 +316,7 @@ lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t c
     ser->hidden = 0;
 
     uint32_t i;
-    const int32_t def = LV_CHART_POINT_NONE;
+    const int32_t def = LV_POLAR_CHART_POINT_NONE;
     int32_t * p_tmp = ser->radial_points;
     for(i = 0; i < chart->point_cnt; i++) {
         *p_tmp = def;
@@ -400,8 +400,8 @@ lv_polar_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t 
     LV_ASSERT_MALLOC(cursor);
     if(cursor == NULL) return NULL;
 
-    lv_point_set(&cursor->pos, LV_CHART_POINT_NONE, LV_CHART_POINT_NONE);
-    cursor->point_id = LV_CHART_POINT_NONE;
+    lv_point_set(&cursor->pos, LV_POLAR_CHART_POINT_NONE, LV_POLAR_CHART_POINT_NONE);
+    cursor->point_id = LV_POLAR_CHART_POINT_NONE;
     cursor->pos_set = 0;
     cursor->color = color;
     cursor->dir = dir;
@@ -661,7 +661,7 @@ static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         invalidate_point(obj, chart->pressed_point_id);
-        chart->pressed_point_id = LV_CHART_POINT_NONE;
+        chart->pressed_point_id = LV_POLAR_CHART_POINT_NONE;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -844,7 +844,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             /*Don't draw the first point. A second point is also required to draw the line*/
             if(i != 0) {
                 if(crowded_mode) {
-                    if(ser->radial_points[p_prev] != LV_CHART_POINT_NONE && ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                    if(ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE && ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
                         /*Draw only one vertical line between the min and max y-values on the same x-value*/
                         y_max = LV_MAX(y_max, line_dsc.p2.y);
                         y_min = LV_MIN(y_min, line_dsc.p2.y);
@@ -869,12 +869,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     point_area.y1 = (int32_t)line_dsc.p1.y - point_h;
                     point_area.y2 = (int32_t)line_dsc.p1.y + point_h;
 
-                    if(ser->radial_points[p_prev] != LV_CHART_POINT_NONE && ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                    if(ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE && ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
                         line_dsc.base.id2 = i;
                         lv_draw_line(layer, &line_dsc);
                     }
 
-                    if(point_w && point_h && ser->radial_points[p_prev] != LV_CHART_POINT_NONE) {
+                    if(point_w && point_h && ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE) {
                         point_dsc_default.base.id2 = i - 1;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
@@ -887,7 +887,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         /*Draw the last point*/
         if(!crowded_mode && i == chart->point_cnt) {
 
-            if(ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+            if(ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
                 lv_area_t point_area;
                 point_area.x1 = (int32_t)line_dsc.p2.x - point_w;
                 point_area.x2 = (int32_t)line_dsc.p2.x + point_w;
@@ -944,7 +944,7 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
             cy = cursor->pos.y;
         }
         else {
-            if(cursor->point_id == LV_CHART_POINT_NONE) continue;
+            if(cursor->point_id == LV_POLAR_CHART_POINT_NONE) continue;
             lv_point_t p;
             lv_polar_chart_get_point_pos_by_id(obj, cursor->ser, cursor->point_id, &p);
             cx = p.x;
