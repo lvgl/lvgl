@@ -413,22 +413,22 @@ void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_polar_chart_cursor
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
-    cursor->pos.x = x;
+    cursor->pos.x = angle;
     cursor->pos_set = 1;
     lv_polar_chart_refresh(chart);
 }
 
-void lv_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t radial)
+void lv_polar_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t radial)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
-    cursor->pos.y = y;
+    cursor->pos.y = radial;
     cursor->pos_set = 1;
     lv_polar_chart_refresh(chart);
 }
 
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
+void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
                                uint32_t point_id)
 {
     LV_ASSERT_NULL(cursor);
@@ -453,7 +453,7 @@ lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_curs
  * Set/Get value(s)
  *====================*/
 
-void lv_poalr_chart_set_all_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value)
+void lv_polar_chart_set_all_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -480,7 +480,7 @@ void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
 }
 
-void lv_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
+void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
                                 size_t values_cnt)
 {
     size_t i;
@@ -489,7 +489,7 @@ void lv_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, c
     }
 }
 
-void lv_chart_set_series_value_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, int32_t value)
+void lv_polar_chart_set_series_value_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
