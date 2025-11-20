@@ -423,6 +423,17 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
+#if LV_USE_CHART
+    else if(lv_obj_check_type(obj, &lv_polar_chart_class)) {
+        lv_obj_add_style(obj, &theme->styles.card, 0);
+        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &theme->styles.polar_chart_indic, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.card, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.card, LV_PART_CURSOR);
+        lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);
+    }
+#endif
+
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

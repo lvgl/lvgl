@@ -977,6 +977,19 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
+#if LV_USE_POLAR_CHART
+    else if(lv_obj_check_type(obj, &lv_polar_chart_class)) {
+        lv_obj_add_style(obj, &theme->styles.card, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_small, 0);
+        lv_obj_add_style(obj, &theme->styles.chart_bg, 0);
+        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+        lv_obj_add_style(obj, &theme->styles.polar_chart_series, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.polar_chart_indic, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.polar_chart_series, LV_PART_CURSOR);
+    }
+#endif
+
 #if LV_USE_ROLLER
     else if(lv_obj_check_type(obj, &lv_roller_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
