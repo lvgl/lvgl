@@ -379,6 +379,7 @@ use the world position variant. This involves complex matrix calculations during
 will impact performance:
 ￼
 .. code-block:: c
+
     static void node_world_value_cb(lv_event_t * e)
     {
         lv_3dpoint_t local_pos, world_pos;
