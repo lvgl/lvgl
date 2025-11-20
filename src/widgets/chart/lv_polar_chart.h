@@ -93,11 +93,11 @@ void lv_polar_chart_set_axis_min_value(lv_obj_t * obj, lv_polar_chart_axis_t axi
 
 /**
  * Set the maximal y values on an axis
- * @param obj       pointer to a chart object
+ * @param obj       pointer to a polar chart object
  * @param axis      `LV_POLAR_CHART_AXIS_RADIAL`
  * @param max       maximum value of the y axis
  */
-void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_chart_axis_t axis, int32_t max);
+void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t max);
 
 
 /**
