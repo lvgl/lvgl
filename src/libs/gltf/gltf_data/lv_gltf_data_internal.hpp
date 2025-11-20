@@ -369,11 +369,14 @@ fastgltf::math::fvec4 lv_gltf_get_primitive_centerpoint(lv_gltf_model_t * data, 
 fastgltf::math::fvec3 get_cached_centerpoint(lv_gltf_model_t * data, size_t index, int32_t element,
                                              fastgltf::math::fmat4x4 matrix);
 
-void lv_gltf_data_destroy_textures(lv_gltf_model_t * data);
+void lv_gltf_data_delete_textures(lv_gltf_model_t * data);
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t * data);
 void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node,
                              const char * path,
                              const char * ip);
+
+void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node);
+
 void lv_gltf_model_node_add(lv_gltf_model_t * data, const lv_gltf_model_node_t * data_node);
 void lv_gltf_model_node_delete(lv_gltf_model_node_t * node);
 

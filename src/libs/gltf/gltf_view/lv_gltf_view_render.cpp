@@ -384,7 +384,7 @@ static void render_skins(lv_gltf_t * viewer, lv_gltf_model_t * model)
     if(skin_count == 0) {
         return;
     }
-    lv_gltf_data_destroy_textures(model);
+    lv_gltf_data_delete_textures(model);
     for(size_t i = 0; i < skin_count; ++i) {
         const auto & skin_index = lv_gltf_data_get_skin(model, i);
         const auto & skin = model->asset.skins[skin_index];
