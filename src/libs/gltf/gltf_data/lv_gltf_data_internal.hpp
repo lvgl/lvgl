@@ -377,9 +377,6 @@ void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * nod
 
 void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node);
 
-void lv_gltf_model_node_add(lv_gltf_model_t * data, const lv_gltf_model_node_t * data_node);
-void lv_gltf_model_node_delete(lv_gltf_model_node_t * node);
-
 /**
  * @brief Retrieve the pixel data for a specific texture in a GLTF model.
  *
@@ -398,9 +395,9 @@ bool lv_gltf_data_get_texture_pixels(void * pixels, lv_gltf_model_t * data_obj, 
 
 uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t index);
 std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t * data,
-                                                               fastgltf::Node & node);
+                                                               fastgltf::Node * node);
 void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_model_t * gltf_data,
-                                         fastgltf::Node & node,
+                                         fastgltf::Node * node,
                                          fastgltf::math::fmat4x4 & matrix);
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_internal_node(lv_gltf_model_t * model,

@@ -70,12 +70,11 @@ void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node)
     lv_free((void *)node->path);
     lv_free((void *)node->ip);
     lv_array_deinit(&node->write_ops);
-    lv_free((void *)node->read_attrs);
-}
 
-void lv_gltf_model_node_add(lv_gltf_model_t * model, const lv_gltf_model_node_t * model_node)
-{
-    lv_array_push_back(&model->nodes, model_node);
+    if(node->read_attrs) {
+        lv_event_remove_all(&node->read_attrs->event_list);
+        lv_free((void *)node->read_attrs);
+    }
 }
 
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, size_t index)
@@ -87,7 +86,7 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, 
 
     const uint32_t count = lv_array_size(&model->nodes);
     if(index >= count) {
-        LV_LOG_WARN("Invalid index. Max should be %" LV_PRIu32, count - 1);
+        LV_LOG_WARN("Invalid index %zu. Max should be %" LV_PRIu32, index, count - 1);
         return nullptr;
     }
     return (lv_gltf_model_node_t *)lv_array_at(&model->nodes, index);
@@ -184,6 +183,7 @@ lv_event_dsc_t * lv_gltf_model_node_add_event_cb(lv_gltf_model_node_t * node, lv
             LV_LOG_WARN("Failed to allocate memory for read attributes");
             return nullptr;
         }
+        lv_array_init(&node->read_attrs->event_list.array, 1, sizeof(lv_event_dsc_t *));
     }
     return lv_event_add(&node->read_attrs->event_list, cb, filter_list, user_data);
 }
