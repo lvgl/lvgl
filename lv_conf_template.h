@@ -755,8 +755,6 @@
 
 #define LV_USE_CHART      1
 
-#define LV_USE_POLAR_CHART      1
-
 #define LV_USE_CHECKBOX   1
 
 #define LV_USE_DROPDOWN   1   /**< Requires: lv_label */
@@ -785,6 +783,8 @@
 #define LV_USE_MENU       1
 
 #define LV_USE_MSGBOX     1
+
+#define LV_USE_POLAR_CHART      1
 
 #define LV_USE_ROLLER     1   /**< Requires: lv_label */
 

@@ -214,15 +214,9 @@ typedef struct _lv_canvas_t lv_canvas_t;
 
 typedef struct _lv_chart_series_t lv_chart_series_t;
 
-typedef struct _lv_polar_chart_series_t lv_polar_chart_series_t;
-
 typedef struct _lv_chart_cursor_t lv_chart_cursor_t;
 
-typedef struct _lv_polar_chart_cursor_t lv_polar_chart_cursor_t;
-
 typedef struct _lv_chart_t lv_chart_t;
-
-typedef struct _lv_polar_chart_t lv_polar_chart_t;
 
 typedef struct _lv_checkbox_t lv_checkbox_t;
 
@@ -249,6 +243,12 @@ typedef struct _lv_menu_t lv_menu_t;
 typedef struct _lv_menu_page_t lv_menu_page_t;
 
 typedef struct _lv_msgbox_t lv_msgbox_t;
+
+typedef struct _lv_polar_chart_series_t lv_polar_chart_series_t;
+
+typedef struct _lv_polar_chart_cursor_t lv_polar_chart_cursor_t;
+
+typedef struct _lv_polar_chart_t lv_polar_chart_t;
 
 typedef struct _lv_roller_t lv_roller_t;
 
