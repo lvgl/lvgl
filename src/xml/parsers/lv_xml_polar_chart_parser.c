@@ -154,7 +154,7 @@ void lv_xml_polar_chart_axis_apply(lv_xml_parser_state_t * state, const char ** 
     LV_UNUSED(attrs);
 
     lv_obj_t * chart = lv_xml_state_get_parent(state);
-    lv_chart_axis_t axis = polar_chart_axis_to_enum(lv_xml_get_value_of(attrs, "axis"));
+    lv_polar_chart_axis_t axis = polar_chart_axis_to_enum(lv_xml_get_value_of(attrs, "axis"));
 
     for(int i = 0; attrs[i]; i += 2) {
         const char * name = attrs[i];
