@@ -85,7 +85,7 @@ void * lv_xml_polar_chart_series_create(lv_xml_parser_state_t * state, const cha
     if(axis == NULL) axis = "primary_y";
 
     void * item = lv_polar_chart_add_series(lv_xml_state_get_parent(state), lv_color_hex(lv_xml_strtol(color, NULL, 16)),
-                                      polar_chart_axis_to_enum(axis));
+                                            polar_chart_axis_to_enum(axis));
     return item;
 }
 
@@ -118,7 +118,7 @@ void * lv_xml_polar_chart_cursor_create(lv_xml_parser_state_t * state, const cha
     if(dir == NULL) dir = "all";
 
     void * item = lv_polar_chart_add_cursor(lv_xml_state_get_parent(state), lv_color_hex(lv_xml_strtol(color, NULL, 16)),
-                                      lv_xml_dir_to_enum(dir));
+                                            lv_xml_dir_to_enum(dir));
 
     return item;
 }
