@@ -54,14 +54,14 @@ void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * nod
 {
     LV_ASSERT_NULL(node);
     lv_memset(node, 0, sizeof(*node));
+    node->model = model;
     node->fastgltf_node = fastgltf_node;
     node->path = lv_strdup(path);
     node->ip = lv_strdup(ip);
-    node->model = model;
-    lv_array_init(&node->write_ops, 0, sizeof(lv_gltf_write_op_t));
+    LV_ASSERT_MALLOC(node->path);
+    LV_ASSERT_MALLOC(node->ip);
 
-    LV_ASSERT_MALLOC(path);
-    LV_ASSERT_MALLOC(ip);
+    lv_array_init(&node->write_ops, 0, sizeof(lv_gltf_write_op_t));
 }
 
 void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node)
