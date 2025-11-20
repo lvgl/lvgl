@@ -470,13 +470,13 @@ static void style_init(my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
     lv_style_set_radius(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
 
-    int32_t chart_size = LV_DPX_CALC(theme->disp_dpi, 8);
-    lv_style_set_size(&theme->styles.polar_chart_series, chart_size, chart_size);
+    int32_t polar_chart_size = LV_DPX_CALC(theme->disp_dpi, 8);
+    lv_style_set_size(&theme->styles.polar_chart_series, polar_chart_size, polar_chart_size);
     lv_style_set_pad_column(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 2));
 
     style_init_reset(&theme->styles.chart_indic);
     lv_style_set_radius(&theme->styles.chart_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&theme->styles.chart_indic, chart_size, chart_size);
+    lv_style_set_size(&theme->styles.chart_indic, polar_chart_size, polar_chart_size);
     lv_style_set_bg_color(&theme->styles.chart_indic, theme->base.color_primary);
     lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
 #endif
