@@ -49,9 +49,21 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ## reStructuredText Content
 
-LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  Combining the [reStructuredText reference](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) and the [Sphinx Documentation](https://www.sphinx-doc.org/en/master/usage/index.html), you should be able to find any reStructuredText references you will need while creating or modifying LVGL documentation.
+LVGL documentation uses **reStructuredText** (reST), rendered into HTML by Sphinx.  You will find the following is a fairly-complete list of references about how to do things using reStructuredText:
 
-If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page are excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
+| Docutils References (Fundamentals)                           | Sphinx References (What Sphinx Adds to Docutils)             |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Introduction](https://docutils.sourceforge.io/docs/ref/rst/introduction.html) | [Configuration](https://www.sphinx-doc.org/en/master/usage/configuration.html) |
+| [Markup Specification](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html) | [Directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html) |
+| [Markup Specification ∙ Tables](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#tables) | [Directives ∙ Admonitions](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#admonitions-messages-and-warnings) |
+| [Markup Specification ∙ Substitution References](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#substitution-references) | [Referencing](https://www.sphinx-doc.org/en/master/usage/referencing.html) |
+| [Directives](https://docutils.sourceforge.io/docs/ref/rst/directives.html) | [Interpreted Text Roles](https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html) |
+| [Interpreted Text Roles](https://docutils.sourceforge.io/docs/ref/rst/roles.html) | [Glossary](https://www.sphinx-doc.org/en/master/glossary.html) |
+| [Quickstart](https://docutils.sourceforge.io/docs/user/rst/quickstart.html) |                                                              |
+| [Examples](https://docutils.sourceforge.io/docs/user/rst/demo.html) |                                                              |
+| [Quick Reference](https://docutils.sourceforge.io/docs/user/rst/quickref.html) |                                                              |
+
+If you prefer to learn by examples, the [Furo-theme examples](https://sphinx-themes.org/sample-sites/furo/) and especially the [Kitchen Sink page](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/) page are also excellent resources.  View the `.rst` source file that generated that page by clicking the "eye" icon at the top of the page.
 
 Note:  the section headings in these pages use a different convention than the one presented below.  For LVGL documentation, use the [section-heading convention presented below](https://github.com/lvgl/lvgl/tree/master/docs#section-headings).
 
@@ -111,7 +123,7 @@ Layouts           <=== Document title, seen in documentation
 
 ### Section Headings
 
-[Section headings](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining the section title with a punctuation character, at least as long as the text.  Example:
+Section headings are created by underlining the section title with a punctuation character, at least as long as the text.  Example:
 
 ```
 This Is a Heading
@@ -121,43 +133,43 @@ This Is a Heading
 Use these conventions for section headings in LVGL documentation:
 
 ```
-=====
-Title
-=====
-
-Chapter
-*******
+==============
+Document Title
+==============
 
 Section
--------
+*******
 
 Sub Section
-~~~~~~~~~~~
+-----------
 
 Sub Sub Section
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 Sub Sub Sub Section
-'''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^
+
+Sub Sub Sub Sub Section
+'''''''''''''''''''''''
 ```
+
+Try not to use structural levels below "Sub Section", but these are the underlining conventions LVGL documentation uses if you really HAVE to.
 
 Being consistent about this helps the reST parser to format the tables of contents correctly.
 
-For improved readability in the `.rst` file:
+For improved readability in text editors:
 
-- place 3 blank lines above the 2nd and subsequent chapter titles (see above),
-- 2 blank lines above "Section" headings, and
-- 1 blank line above all lower-level section headings.
+- place 3 blank lines above the 2nd and subsequent "Section" titles (see above),
+- 2 blank lines above "Sub Section" headings, and
+- 1 at least blank line above all lower-level section headings.
 
 
 
 ### Italics, Boldface and Underlining
 
-Emphasis using `*italics*`.
+Emphasis using `*italics*`.  Emphasis using `**boldface**`.
 
-Emphasis using `**boldface**`.
-
-Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST Interpreted Text Roles.  Just remember is that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:  ``:u:`underline` ``, ``:ub:`underline and bold` ``, `` `:bi:bold italic` ``.
+Normally underlining and combining these text styles is not possible in reStructuredText.  However, LVGL documentation provides a work-around for this using reST <u>Interpreted Text Roles</u>.  Just remember that the Interpreted Text Role names combine the letters `i`, `b` and `u` to provide the desired combination.  All possible permutations of these letters are supported so you do not have to remember what sequence works.  Examples:  ``:u:`underline` ``, ``:ub:`underline and bold` ``, `` `:bi:bold italic` ``.
 
 
 
@@ -242,7 +254,7 @@ If an external link will be used on many pages:
   For further details see `LVGL Pro`_.
   ```
 
-  Back-quotes are not needed if there are no spaces in the name.
+  Note:  back-quotes are not needed if there are no spaces in the name.
 
 
 
@@ -265,13 +277,15 @@ Reference the link (anchor) by:
 Click :ref:`here <unique_anchor_name>` for more details.
 ```
 
+Results in "Click <span style="color:blue;"><u>here</u></span> for more details."
+
 Or use the heading's text as the link's text:
 
 ```rst
-Learn more at :ref:`unique_anchor_name`.
+Click :ref:`unique_anchor_name` for more details.
 ```
 
-Results in "Learn more at <span style="color:blue;"><u>My Heading</u></span>.".
+Results in "Click <span style="color:blue;"><u>My Heading</u></span> for more details."
 
 `unique_anchor_name` may appear in places other than before a heading, but if so, custom link text (like "here" the first example above) must be provided.
 
@@ -281,7 +295,7 @@ Results in "Learn more at <span style="color:blue;"><u>My Heading</u></span>.".
 
 reStructuredText syntax for creating tables can be found in the [reST examples](https://sphinx-themes.org/sample-sites/furo/kitchen-sink/tables/) referred to above.  (Click on the "eye" icon to see the source file.)
 
-Very long or very wide tables can be difficult to read and use.  Squeeze them down to make them more readable and usable.  To do so, move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and indent your table to make it the "content" of the directive.  Example:
+Very long or very wide tables can be difficult to read and use.  To squeeze them down to make them more readable and usable, move your existing table under a `.. container:: tighter-table-N` directive (`N` = digit 1-7 with 7 being the tightest), and indent your table to make it the "content" of the directive.  Example:
 
 ```rst
 .. container:: tighter-table-3
@@ -303,7 +317,7 @@ This works for all types of tables.
 
 ### Special Symbols
 
-Because not everyone has editors that deal with Unicode characters well, we use reST substitutions to insert special characters into documentation.  A list of the most commonly-used special symbols can be found in `./docs/src/include/substitutions.txt`.  To use one of these, add this line at the top of the `.rst` file if it is not already there:
+Because not everyone has editors that deal with Unicode characters well, please reST substitutions to insert special characters into documentation.  A list of the most commonly-used special symbols can be found in `./docs/src/include/substitutions.txt`.  To use one of these, add this line at the top of the `.rst` file if it is not already there:
 
 ```rst
 .. include:: /include/substitutions.txt
@@ -317,7 +331,7 @@ The temperature outside is 20\ |deg|\ C.
 
 Result:  "The temperature outside is 20°C."
 
-The spaces surrounding substitutions *are required*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` option since their use *always* removes these spaces in the output.  These do not need this escaping:
+The spaces surrounding substitutions *are required for parsing*, but when you need to remove them in the output (as in the example above), do so by escaping them with the `\` character.  Exception:  the `substitutions.txt` file contains 3 substitution definitions which are marked with the `:trim:` option since their use *always* removes these spaces in the output.  These do not need this escaping:
 
 - `|nbsp|` (non-breaking space),
 - `|shy|` (soft hyphen), and
@@ -328,6 +342,8 @@ If you need a substitution that is not already in `substitutions.txt`, please ad
 
 
 ### Referencing API Documentation
+
+Using the following generates links to API documentation that the reader can click directly in the text.
 
 #### In-Line Code Expressions
 
@@ -356,7 +372,7 @@ Arguments that contain more than one word or non-alphanumeric characters will ca
 | :cpp:expr:\`lv_obj_set_layout(widget, LV_LAYOUT_*)\`         | asterisk               |
 | :cpp:expr:\`lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)\`     | asterisk               |
 | :cpp:expr:\`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)\` | cast            |
-| :cpp:expr:\`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);\`    | ampersand & semicolon  |
+| :cpp:expr:\`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);\`    | semicolon  |
 | :cpp:expr:\`lv_obj_set_layout(widget, ...)\`                 | lone ellipsis          |
 
 For such examples, simply use reStructuredText literal markup like this:
