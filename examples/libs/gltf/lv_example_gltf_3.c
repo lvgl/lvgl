@@ -165,7 +165,6 @@ void lv_example_gltf_3(void)
 
     cursor_node = lv_gltf_model_node_get_by_path(grid_model, "/cursor");
 
-    // hide_node(grid_node);
     hide_node(cursor_node);
     lv_obj_add_event_cb(gltf, clicked_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_add_event_cb(gltf, clicked_event_cb, LV_EVENT_PRESSING, NULL);
