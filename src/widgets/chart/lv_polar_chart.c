@@ -150,7 +150,7 @@ void lv_polar_chart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint3
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
-    if(chart->angle_div_cnt == angle_div && chart->radial_div == radial_div) return;
+    if(chart->angle_div_cnt == angle_div && chart->radial_div_cnt == radial_div) return;
 
     chart->angle_div_cnt = angle_div;
     chart->radial_div_cnt = radial_div;
@@ -370,12 +370,12 @@ lv_polar_chart_series_t * lv_polar_chart_get_series_next(const lv_obj_t * obj, c
  * Cursor
  *====================*/
 
-lv_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
+lv_polar_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
-    lv_chart_cursor_t * cursor = lv_ll_ins_head(&chart->cursor_ll);
+    lv_polar_chart_cursor_t * cursor = lv_ll_ins_head(&chart->cursor_ll);
     LV_ASSERT_MALLOC(cursor);
     if(cursor == NULL) return NULL;
 
@@ -388,7 +388,7 @@ lv_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t color,
     return cursor;
 }
 
-void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor)
+void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_polar_chart_cursor_t * cursor)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(cursor);
@@ -398,7 +398,7 @@ void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_chart_cursor_t * cursor)
     lv_free(cursor);
 }
 
-void lv_polar_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
+void lv_polar_chart_set_cursor_pos(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_point_t * pos)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -408,7 +408,7 @@ void lv_polar_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor,
     lv_polar_chart_refresh(chart);
 }
 
-void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t angle)
+void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t angle)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -418,7 +418,7 @@ void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_chart_cursor_t * c
     lv_polar_chart_refresh(chart);
 }
 
-void lv_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t radial)
+void lv_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t radial)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -428,7 +428,7 @@ void lv_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_chart_cursor_t * cursor
     lv_polar_chart_refresh(chart);
 }
 
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
                                uint32_t point_id)
 {
     LV_ASSERT_NULL(cursor);
@@ -441,7 +441,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
     lv_polar_chart_refresh(chart);
 }
 
-lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
+lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -565,7 +565,7 @@ static void lv_polar_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t 
     lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
 
     lv_ll_init(&chart->series_ll, sizeof(lv_polar_chart_series_t));
-    lv_ll_init(&chart->cursor_ll, sizeof(lv_chart_cursor_t));
+    lv_ll_init(&chart->cursor_ll, sizeof(lv_polar_chart_cursor_t));
 
     chart->radial_min = 0;
     chart->angle_min = 0;
@@ -601,7 +601,7 @@ static void lv_polar_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t *
     }
     lv_ll_clear(&chart->series_ll);
 
-    lv_chart_cursor_t * cur;
+    lv_polar_chart_cursor_t * cur;
     while(chart->cursor_ll.head) {
         cur = lv_ll_get_head(&chart->cursor_ll);
         lv_ll_remove(&chart->cursor_ll, cur);
@@ -893,7 +893,7 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
     lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
     if(lv_ll_is_empty(&chart->cursor_ll)) return;
 
-    lv_chart_cursor_t * cursor;
+    lv_polar_chart_cursor_t * cursor;
 
     lv_draw_line_dsc_t line_dsc_ori;
     lv_draw_line_dsc_init(&line_dsc_ori);
