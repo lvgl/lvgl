@@ -279,7 +279,7 @@ void lv_polar_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_curso
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
-                               uint32_t point_id);
+                                     uint32_t point_id);
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
@@ -316,7 +316,8 @@ void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser
  * @param values        the new values to set
  * @param values_cnt    number of items in `values`
  */
-void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[], size_t values_cnt);
+void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
+                                      size_t values_cnt);
 
 /**
  * Set an individual point's y value of a chart's series directly based on its index

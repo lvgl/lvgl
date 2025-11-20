@@ -428,7 +428,8 @@ void lv_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_chart_cursor_t * cursor
     lv_polar_chart_refresh(chart);
 }
 
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_polar_chart_series_t * ser, uint32_t point_id)
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
+                               uint32_t point_id)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -479,7 +480,8 @@ void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
 }
 
-void lv_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[], size_t values_cnt)
+void lv_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
+                                size_t values_cnt)
 {
     size_t i;
     for(i = 0; i < values_cnt; i++) {
