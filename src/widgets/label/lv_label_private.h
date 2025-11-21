@@ -54,8 +54,8 @@ struct _lv_label_t {
     uint8_t expand : 1;                 /**< Ignore real width (used by the library with LV_LABEL_LONG_MODE_SCROLL) */
     uint8_t invalid_size_cache : 1;     /**< 1: Recalculate size and update cache */
     uint8_t need_refr_text : 1;         /**< 1: Refresh text after layout update completion */
-    uint32_t checksum : 1;              /**< The unique checksum of the last text value set */
-    uint32_t last_checksum : 1;         /**< The text checksum from the last time the text was rendered */
+    uint32_t checksum;                  /**< The unique checksum of the last text value set */
+    uint32_t last_checksum;             /**< The text checksum from the last time the text was rendered */
 
     lv_point_t text_size;
 };

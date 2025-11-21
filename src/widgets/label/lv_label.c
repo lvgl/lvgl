@@ -1004,7 +1004,7 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
 
     /*If text checksum is same as last time it was set, cancel*/
     uint32_t new_text_checksum = compute_text_checksum(text);
-    //if(new_text_checksum == label->checksum) return;
+    if(new_text_checksum == label->checksum) return;
     label->checksum = new_text_checksum;
 
     lv_label_revert_dots(obj); /*In case text == label->text*/
