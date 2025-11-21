@@ -100,7 +100,7 @@ an indev event like this:
 
     void key_event_cb(lv_event_t *e)
     {
-        lv_indev_t * indev = lv_event_get_target(e); /*Same as lv_indev_active()*/
+        lv_indev_t * indev = (lv_indev_t *)lv_event_get_target(e); /*Same as lv_indev_active()*/
         if(lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED) {
             LV_LOG_USER("%c", (char) lv_indev_get_key(indev));
         }
