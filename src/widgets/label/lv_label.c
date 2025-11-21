@@ -218,6 +218,7 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
         lv_free(label->translation_tag);
     }
     label->translation_tag = new_tag;
+    label->checksum = 0;
     set_text_internal(obj, lv_tr(tag));
 }
 #endif /*LV_USE_TRANSLATION*/
