@@ -218,7 +218,6 @@ void lv_label_set_translation_tag(lv_obj_t * obj, const char * tag)
         lv_free(label->translation_tag);
     }
     label->translation_tag = new_tag;
-    label->checksum = 0;
     set_text_internal(obj, lv_tr(tag));
 }
 #endif /*LV_USE_TRANSLATION*/
@@ -1005,7 +1004,7 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
 
     /*If text checksum is same as last time it was set, cancel*/
     uint32_t new_text_checksum = compute_text_checksum(text);
-    if(new_text_checksum == label->checksum) return;
+    //if(new_text_checksum == label->checksum) return;
     label->checksum = new_text_checksum;
 
     lv_label_revert_dots(obj); /*In case text == label->text*/
@@ -1051,7 +1050,6 @@ static void remove_translation_tag(lv_obj_t * obj)
     if(label->translation_tag) {
         lv_free(label->translation_tag);
         label->translation_tag = NULL;
-        label->checksum = 0;
     }
 #endif /*LV_USE_TRANSLATION*/
 }
