@@ -1368,15 +1368,23 @@ static void scr_anim_completed(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
-    lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
-    lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_result_t res = lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(res == LV_RESULT_INVALID) {
+        d->act_scr = NULL;
+    }
 
-    if(d->prev_scr && d->del_prev) lv_obj_delete(d->prev_scr);
+    if(d->prev_scr && lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL) != LV_RESULT_INVALID) {
+        if(d->del_prev) {
+            lv_obj_delete(d->prev_scr);
+        }
+    }
     d->prev_scr = NULL;
     d->draw_prev_over_act = false;
     d->scr_to_load = NULL;
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
-    lv_obj_invalidate(d->act_scr);
+    if(d->act_scr) {
+        lv_obj_invalidate(d->act_scr);
+    }
 }
 
 static bool is_out_anim(lv_screen_load_anim_t anim_type)
