@@ -1322,6 +1322,7 @@ static bool load_new_screen(lv_obj_t * scr)
     if(old_scr) {
         res = lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
         old_screen_deleted = res == LV_RESULT_INVALID;
+        old_scr = NULL;
     }
     lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
