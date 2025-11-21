@@ -1051,6 +1051,7 @@ static void remove_translation_tag(lv_obj_t * obj)
     if(label->translation_tag) {
         lv_free(label->translation_tag);
         label->translation_tag = NULL;
+        label->checksum = 0;
     }
 #endif /*LV_USE_TRANSLATION*/
 }
