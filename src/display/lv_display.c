@@ -38,7 +38,7 @@
  **********************/
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 static void update_resolution(lv_display_t * disp);
-static void scr_load_internal(lv_obj_t * scr);
+static bool load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
@@ -749,12 +749,16 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         d->prev_scr = d->act_scr;
         act_scr = d->scr_to_load; /*Active screen changed.*/
 
-        scr_load_internal(d->scr_to_load);
+        if(load_new_screen(d->scr_to_load)) {
+            d->prev_scr = NULL;
+        }
     }
 
     d->scr_to_load = new_scr;
 
-    if(d->prev_scr && d->del_prev) lv_obj_delete(d->prev_scr);
+    if(d->prev_scr && d->del_prev) {
+        lv_obj_delete(d->prev_scr);
+    }
     d->prev_scr = NULL;
 
     d->draw_prev_over_act = is_out_anim(anim_type);
@@ -772,8 +776,10 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-        scr_load_internal(new_scr);
-        if(auto_del && act_scr) lv_obj_delete(act_scr);
+        bool old_screen_deleted = load_new_screen(new_scr);
+        if(!old_screen_deleted && auto_del && act_scr) {
+            lv_obj_delete(act_scr);
+        }
         return;
     }
 
@@ -1300,27 +1306,36 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
-static void scr_load_internal(lv_obj_t * scr)
+/* Returns true if the old screen was deleted while loading the new screen*/
+static bool load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
     LV_ASSERT_NULL(scr);
-    if(scr == NULL) return;
+    if(scr == NULL) return false;
 
     lv_display_t * d = lv_obj_get_display(scr);
-    if(!d) return;  /*Shouldn't happen, just to be sure*/
+    LV_ASSERT_NULL(d);
 
     lv_obj_t * old_scr = d->act_scr;
-
-    if(old_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    lv_result_t res;
+    bool old_screen_deleted = false;
+    if(old_scr) {
+        res = lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+        old_screen_deleted = res == LV_RESULT_INVALID;
+    }
     lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
     d->act_scr = scr;
     d->scr_to_load = NULL;
 
     lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(old_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    if(old_scr) {
+        res = lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+        old_screen_deleted |= res == LV_RESULT_INVALID;
+    }
 
     lv_obj_invalidate(scr);
+    return old_screen_deleted;
 }
 
 static void scr_load_anim_start(lv_anim_t * a)
