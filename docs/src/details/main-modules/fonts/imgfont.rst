@@ -7,7 +7,7 @@ Image font
 Draw image in **label** or **span** obj with :cpp:type:`lv_imgfont`. This is often used to
 display Unicode emoji icons in text.
 
-Supported image formats: determined by enabled LVGL :ref:`image decoders <overview_image_decoder>`.
+Supported image formats: determined by enabled LVGL :ref:`image decoders <image_decoders>`.
 
 
 
