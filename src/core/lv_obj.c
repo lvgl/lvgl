@@ -1149,7 +1149,7 @@ static void screen_create_on_trigger_event_cb(lv_event_t * e)
     LV_ASSERT_NULL(dsc);
 
     lv_obj_t * screen = dsc->target.create_cb();
-    lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, false);
+    lv_screen_load_anim(screen, dsc->anim_type, dsc->duration, dsc->delay, true);
     lv_obj_add_event_cb(screen, delete_on_screen_unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
 }
 
