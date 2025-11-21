@@ -251,6 +251,8 @@ if __name__ == "__main__":
                         help='Update test image using LVGLImage.py script')
     parser.add_argument('--auto-clean', action='store_true', default=False,
                         help='Automatically clean build directories')
+    parser.add_argument('--keep-report', action='store_true', default=False,
+                        help='Skip cleaning gcov report files when --auto-clean and --report are enabled')
 
     args = parser.parse_args()
 
@@ -296,8 +298,13 @@ if __name__ == "__main__":
                 # the rest to solve the storage capacity limit of GitHub CI
                 clean_filters = ['CMakeFiles', '.c']
                 clean_build_dirs_with_filter(build_dir, clean_filters)
-                print(f"Append {build_dir} to clean list")
-                clean_build_dirs.append(build_dir)
+
+                if args.keep_report:
+                    # Retain the gcov report files for subsequent automated coverage analysis.
+                    print(f"Keeping {build_dir} for report")
+                else:
+                    print(f"Append {build_dir} to clean list")
+                    clean_build_dirs.append(build_dir)
             else:
                 # Remove all build directories directly
                 print(f"Removing {build_dir}")

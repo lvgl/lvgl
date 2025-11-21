@@ -134,7 +134,7 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test --auto-clean
+      run: python tests/main.py --report --update-image test --auto-clean --keep-report
     - name: Code coverage analysis
       run: |
         if [ "${{ github.event_name }}" = "pull_request" ]; then
