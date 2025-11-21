@@ -140,6 +140,13 @@ lv_layout_t lv_xml_layout_to_enum(const char * txt);
 lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt);
 
 /**
+ * Convert a blur quality string to enum
+ * @param txt       e.g. "auto"
+ * @return          the related enum, e.g. `LV_BLUR_QUALITY_AUTO`
+ */
+lv_blur_quality_t lv_xml_blur_quality_to_enum(const char * txt);
+
+/**
  * Convert an event trigger string to enum
  * @param txt       e.g. "clicked"
  * @return          the related enum, e.g. `LV_EVENT_CLICKED`

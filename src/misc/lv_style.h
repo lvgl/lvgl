@@ -118,6 +118,12 @@ typedef enum {
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 } lv_border_side_t;
 
+typedef enum {
+    LV_BLUR_QUALITY_AUTO = 0,   /**< Set the quality automatically */
+    LV_BLUR_QUALITY_SPEED,      /**< Prefer speed over precision */
+    LV_BLUR_QUALITY_PRECISION,  /**< Prefer precision over speed*/
+} lv_blur_quality_t;
+
 /** A image colorkey definition.
  *  The transparency within the color range of [low, high] will be set to LV_OPA_TRANSP If the "enable" flag is set to true.
  */
@@ -293,7 +299,11 @@ enum _lv_style_id_t {
     LV_STYLE_GRID_CELL_Y_ALIGN      = 136,
     LV_STYLE_IMAGE_COLORKEY         = 137,
 
-    LV_STYLE_LAST_BUILT_IN_PROP     = 138,
+    LV_STYLE_BLUR_RADIUS            = 138,
+    LV_STYLE_BLUR_BACKDROP          = 139,
+    LV_STYLE_BLUR_QUALITY           = 140,
+
+    LV_STYLE_LAST_BUILT_IN_PROP,
 
     LV_STYLE_NUM_BUILT_IN_PROPS     = LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
