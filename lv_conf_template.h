@@ -784,6 +784,8 @@
 
 #define LV_USE_MSGBOX     1
 
+#define LV_USE_POLAR_CHART      1
+
 #define LV_USE_ROLLER     1   /**< Requires: lv_label */
 
 #define LV_USE_SCALE      1
