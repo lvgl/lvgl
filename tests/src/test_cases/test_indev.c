@@ -100,4 +100,26 @@ void test_indev_wait_release(void)
     TEST_ASSERT_EQUAL_UINT32(2, pressed_count);
 }
 
+static void indev_long_pressed_event_cb(lv_event_t * e)
+{
+    uint32_t * long_pressed_cnt = lv_event_get_user_data(e);
+    (*long_pressed_cnt)++;
+}
+
+void test_indev_long_pressed(void)
+{
+    uint32_t long_pressed_cnt = 0;
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_set_size(btn, 100, 100);
+    lv_obj_add_event_cb(btn, indev_long_pressed_event_cb, LV_EVENT_LONG_PRESSED, &long_pressed_cnt);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    lv_test_mouse_move_to(50, 50);
+    lv_test_mouse_press();
+    lv_test_wait(500);
+    lv_test_mouse_release();
+    lv_test_wait(50);
+    TEST_ASSERT_EQUAL_UINT32(1, long_pressed_cnt);
+}
+
 #endif

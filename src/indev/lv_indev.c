@@ -845,7 +845,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
 
         /*Long press time has elapsed?*/
-        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) > i->long_press_time) {
+        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
             i->long_pr_sent = 1;
             if(data->key == LV_KEY_ENTER) {
                 i->longpr_rep_timestamp = i->timestamp;
@@ -855,7 +855,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*Long press repeated time has elapsed?*/
         else if(i->long_pr_sent != 0 &&
-                lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) > i->long_press_repeat_time) {
+                lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) >= i->long_press_repeat_time) {
 
             i->longpr_rep_timestamp = i->timestamp;
 
@@ -983,7 +983,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
         /*Long press*/
-        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) > i->long_press_time) {
+        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
 
             i->long_pr_sent = 1;
             i->longpr_rep_timestamp = i->timestamp;
@@ -1017,7 +1017,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->long_pr_sent = 1;
         }
         /*Long press repeated time has elapsed?*/
-        else if(i->long_pr_sent != 0 && lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) > i->long_press_repeat_time) {
+        else if(i->long_pr_sent != 0 && lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) >= i->long_press_repeat_time) {
 
             i->longpr_rep_timestamp = i->timestamp;
 
@@ -1383,7 +1383,7 @@ static void indev_proc_press(lv_indev_t * indev)
         /*If there is no scrolling then check for long press time*/
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
             /*Send a long press event if enough time elapsed*/
-            if(lv_tick_diff(indev->timestamp, indev->pr_timestamp) > indev_act->long_press_time) {
+            if(lv_tick_diff(indev->timestamp, indev->pr_timestamp) >= indev_act->long_press_time) {
                 if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
@@ -1396,7 +1396,7 @@ static void indev_proc_press(lv_indev_t * indev)
         }
 
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
-            if(lv_tick_diff(indev->timestamp, indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
+            if(lv_tick_diff(indev->timestamp, indev->longpr_rep_timestamp) >= indev_act->long_press_repeat_time) {
                 if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
                 }
