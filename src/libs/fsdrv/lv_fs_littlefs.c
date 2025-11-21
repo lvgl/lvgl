@@ -136,6 +136,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     lfs_t * lfs = drv->user_data;
     int err = lfs_file_open(lfs, &lf->file, buf, flags);
     if(err) {
+        lv_free(lf);
         return NULL;
     }
 
