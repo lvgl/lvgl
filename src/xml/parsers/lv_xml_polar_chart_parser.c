@@ -82,7 +82,7 @@ void * lv_xml_polar_chart_series_create(lv_xml_parser_state_t * state, const cha
     const char * color = lv_xml_get_value_of(attrs, "color");
     const char * axis = lv_xml_get_value_of(attrs, "axis");
     if(color == NULL) color = "0xff0000";
-    if(axis == NULL) axis = "primary_y";
+    if(axis == NULL) axis = "radial";
 
     void * item = lv_polar_chart_add_series(lv_xml_state_get_parent(state), lv_color_hex(lv_xml_strtol(color, NULL, 16)),
                                             polar_chart_axis_to_enum(axis));
