@@ -802,6 +802,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             new_opt = 0;
             lv_point_t p;
             lv_indev_get_point(indev, &p);
+            lv_obj_transform_point(obj, &p, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
             p.y -= label->coords.y1;
             p.x -= label->coords.x1;
             uint32_t letter_i;
