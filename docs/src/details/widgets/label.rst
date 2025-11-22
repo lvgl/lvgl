@@ -56,7 +56,7 @@ they are stored in ROM memory, which is always accessible.
 .. warning::
 
     Do not use ``const`` strings with :cpp:func:`lv_label_set_text_static` when the
-    Label is being used in :cpp:enumerator:`LV_LABEL_LONG_DOT` mode since the Label
+    Label is being used in :cpp:enumerator:`LV_LABEL_LONG_MODE_DOTS` mode since the Label
     will attempt to do an in-place edit of the string.  This will cause an MCU
     exception by attempting to modify program memory (ROM).
 
@@ -117,13 +117,13 @@ of the text is greater than the height of the Label.
 
 You can specify the long mode with :cpp:expr:`lv_label_set_long_mode(label, LV_LABEL_LONG_...)`
 
-Note that :cpp:enumerator:`LV_LABEL_LONG_DOT` manipulates the text buffer in-place in
+Note that :cpp:enumerator:`LV_LABEL_LONG_MODE_DOTS` manipulates the text buffer in-place in
 order to add/remove the dots. When :cpp:func:`lv_label_set_text` or
 :cpp:func:`lv_label_set_array_text` are used, a separate buffer is allocated and
 this implementation detail is unnoticed. This is not the case with
 :cpp:func:`lv_label_set_text_static`. The buffer you pass to
 :cpp:func:`lv_label_set_text_static` must be writable if you plan to use
-:cpp:enumerator:`LV_LABEL_LONG_DOT`.
+:cpp:enumerator:`LV_LABEL_LONG_MODE_DOTS`.
 
 .. _lv_label_text_recolor:
 

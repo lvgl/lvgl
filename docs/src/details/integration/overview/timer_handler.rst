@@ -66,7 +66,7 @@ See :ref:`timer` section to learn more about timers.
 When No Timers Are Ready
 ************************
 
-:c:func:`lv_timer_handler` will return :c:macro:`LV_NO_TIMER_READY` (``UINT32_MAX``)
+:cpp:func:`lv_timer_handler` will return :c:macro:`LV_NO_TIMER_READY` (``UINT32_MAX``)
 if there are no running timers. This can happen if there are no indevs or they are disabled with `lv_indev_enable()`, running
 animations, or running user-created timers. :cpp:func:`lv_timer_handler` will continue
 to return :c:macro:`LV_NO_TIMER_READY` until there is a running timer. Display
@@ -99,7 +99,7 @@ If there is no external event source, you may choose to exit the loop or simply
 delay for a long time.
 
 If another :ref:`thread <threading>` is
-calling LVGL functions, you may want to call :c:func:`lv_timer_handler` again
+calling LVGL functions, you may want to call :cpp:func:`lv_timer_handler` again
 very soon to handle the effects of those other threads.
 
 

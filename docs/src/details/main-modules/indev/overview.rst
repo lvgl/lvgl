@@ -75,7 +75,7 @@ read and it should call ``read_cb`` again.
 
 If the driver can provide precise timestamps for buffered events, it can
 overwrite ``data->timestamp``. By default, this is initialized to
-:cpp:func:`lv_tick_get()` just before invoking ``read_cb``.
+:cpp:func:`lv_tick_get` just before invoking ``read_cb``.
 
 .. _indev event mode:
 

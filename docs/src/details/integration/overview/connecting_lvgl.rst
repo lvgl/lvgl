@@ -110,7 +110,7 @@ Reliability
 Advancing the tick value should be done in such a way that its timing is reliable and
 not dependent on anything that consumes an unknown amount of time. For an example of
 what *not* to do: this can "seem" to work, but LVGL's timing will be incorrect
-because the execution time of :c:func:`lv_timer_handler` varies from call to call and
+because the execution time of :cpp:func:`lv_timer_handler` varies from call to call and
 thus the delay it introduces cannot be known.
 
 .. code-block:: c
