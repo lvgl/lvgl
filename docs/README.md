@@ -145,15 +145,10 @@ Sub Section
 
 Sub Sub Section
 ~~~~~~~~~~~~~~~
-
-Sub Sub Sub Section
-^^^^^^^^^^^^^^^^^^^
-
-Sub Sub Sub Sub Section
-'''''''''''''''''''''''
 ```
 
-Try not to use structural levels below "Sub Section", but these are the underlining conventions LVGL documentation uses if you really HAVE to.
+1.  ``====``, ``****``, ``----`` are encouraged.
+2.  ``~~~~`` only if really needed.
 
 Being consistent about this helps the reST parser to format the tables of contents correctly.
 
