@@ -65,11 +65,10 @@ void lv_spinbox_set_rollover(lv_obj_t * obj, bool rollover);
 /**
  * Set spinbox digit format (digit count and decimal format)
  * @param obj           pointer to spinbox
- * @param digit_count   number of digit excluding the decimal separator and the sign
- * @param sep_pos       number of digit before the decimal point. If 0, decimal point is not
- * shown
+ * @param digit_count   number of digits excluding the decimal separator and the sign
+ * @param dec_point_pos number of digits before the decimal point (0 = no decimal point)
  */
-void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t sep_pos);
+void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t dec_point_pos);
 
 /**
  * Set the number of digits
@@ -81,14 +80,14 @@ void lv_spinbox_set_digit_count(lv_obj_t * obj, uint32_t digit_count);
 /**
  * Set the position of the decimal point
  * @param obj           pointer to spinbox
- * @param dec_point_pos 0: there is no separator, 2: two integer digits
+ * @param dec_point_pos number of digits before the decimal point (0 = no decimal point)
  */
 void lv_spinbox_set_dec_point_pos(lv_obj_t * obj, uint32_t dec_point_pos);
 
 /**
  * Set spinbox step
  * @param obj   pointer to spinbox
- * @param step  steps on increment/decrement. Can be 1, 10, 100, 1000, etc the digit that will change.
+ * @param step  steps on increment/decrement. Can be 1, 10, 100, 1000, etc.; the digit that will change.
  */
 void lv_spinbox_set_step(lv_obj_t * obj, uint32_t step);
 
@@ -157,13 +156,13 @@ int32_t lv_spinbox_get_step(lv_obj_t * obj);
  *====================*/
 
 /**
- * Select next lower digit for edition by dividing the step by 10
+ * Select next lower digit for editing by dividing the step by 10
  * @param obj   pointer to spinbox
  */
 void lv_spinbox_step_next(lv_obj_t * obj);
 
 /**
- * Select next higher digit for edition by multiplying the step by 10
+ * Select next higher digit for editing by multiplying the step by 10
  * @param obj   pointer to spinbox
  */
 void lv_spinbox_step_prev(lv_obj_t * obj);
