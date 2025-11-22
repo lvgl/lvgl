@@ -1003,7 +1003,7 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
     /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = label->text;
 
-    if (!label->static_txt) label->checksum = compute_text_checksum(text, obj);
+    if(!label->static_txt) label->checksum = compute_text_checksum(text, obj);
 
     lv_label_revert_dots(obj); /*In case text == label->text*/
     const size_t text_len = get_text_length(text);
