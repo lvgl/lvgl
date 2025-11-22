@@ -78,6 +78,8 @@ static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
     static lv_result_t lv_obj_get_any(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
+
+    static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj);
 #endif
 
 /**********************
@@ -166,7 +168,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_OBJ_SCROLL_END,
-        .getter = lv_obj_get_scroll_end,
+        .getter = lv_obj_get_scroll_end_helper,
     },
     {
         .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
@@ -1192,6 +1194,13 @@ static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
 }
 
 #if LV_USE_OBJ_PROPERTY
+static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
+{
+    lv_point_t point;
+    lv_obj_get_scroll_end(obj, &point);
+    return point;
+}
+
 static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1241,4 +1250,4 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
         return LV_RESULT_INVALID;
     }
 }
-#endif
+#endif /*LV_USE_OBJ_PROPERTY*/

@@ -160,7 +160,7 @@ enum _lv_signed_prop_id_t {
     LV_PROPERTY_ID(OBJ, SCROLL_BOTTOM,              LV_PROPERTY_TYPE_INT,       64),
     LV_PROPERTY_ID(OBJ, SCROLL_LEFT,                LV_PROPERTY_TYPE_INT,       65),
     LV_PROPERTY_ID(OBJ, SCROLL_RIGHT,               LV_PROPERTY_TYPE_INT,       66),
-    LV_PROPERTY_ID(OBJ, SCROLL_END,                 LV_PROPERTY_TYPE_INT,       67),
+    LV_PROPERTY_ID(OBJ, SCROLL_END,                 LV_PROPERTY_TYPE_POINT,     67),
     LV_PROPERTY_ID(OBJ, EXT_DRAW_SIZE,              LV_PROPERTY_TYPE_INT,       68),
     LV_PROPERTY_ID(OBJ, EVENT_COUNT,                LV_PROPERTY_TYPE_INT,       69),
     LV_PROPERTY_ID(OBJ, SCREEN,                     LV_PROPERTY_TYPE_OBJ,       70),
