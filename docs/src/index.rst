@@ -81,6 +81,7 @@ Details
     details/auxiliary-modules/index
     details/libs/index
     details/debugging/index
+    guides/index
 
 
 Appendix
