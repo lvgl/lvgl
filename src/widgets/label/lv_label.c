@@ -49,7 +49,7 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
-static uint32_t compute_text_checksum(const char * str);
+static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj);
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
 static void lv_label_refr_text(lv_obj_t * obj);
