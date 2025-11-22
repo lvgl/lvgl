@@ -58,7 +58,7 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
 /**
  * Free resources allocated for testing.
  */
-void lv_xml_test_unregister(void);
+void lv_xml_unregister_test(void);
 
 /**
  * Switch to testing mode. Needs to be called to use `lv_xml_test_run_next()`
@@ -68,9 +68,18 @@ void lv_xml_test_run_init(void);
 /**
  * Run the next test step.
  * @param slowdown  0: max speed, 1: real speed, 2: half speed, ... ,10: ten times slower
- * @return  true: the step passed; false: the step failed
+ * @return          true: the step passed; false: the step failed
  */
 bool lv_xml_test_run_next(uint32_t slowdown);
+
+/**
+ * Run the test until a given step, like running until a breakpoint
+ * @param slowdown  0: max speed, 1: real speed, 2: half speed, ... ,10: ten times slower
+ * @param step      the last step to execute
+ * @return          true: all steps were passed;
+ *                  false: a step failed, use `lv_xml_test_get_step_next` to get which step failed
+ */
+bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step);
 
 /**
  * Leave testing mode.
@@ -91,6 +100,13 @@ uint32_t lv_xml_test_run_all(uint32_t slowdown);
  * @return      the number of `<step>`s
  */
 uint32_t lv_xml_test_get_step_count(void);
+
+/**
+ * Get the next test step's index.
+ * @return      the index of next step
+ */
+uint32_t lv_xml_test_get_step_next(void);
+
 
 /**
  * Get the type of a step

@@ -98,7 +98,7 @@ static lv_tick_get_cb_t tick_cb_original;
 lv_result_t lv_xml_test_register_from_data(const char * xml_def, const char * ref_image_path_prefix)
 {
     /*Cleanup the previous test*/
-    lv_xml_test_unregister();
+    lv_xml_unregister_test();
 
     test.ref_image_path_prefix = ref_image_path_prefix;
 
@@ -181,7 +181,7 @@ lv_result_t lv_xml_test_register_from_file(const char * path, const char * ref_i
     return res;
 }
 
-void lv_xml_test_unregister(void)
+void lv_xml_unregister_test(void)
 {
     uint32_t i;
     for(i = 0; i < test.step_cnt; i++) {
@@ -206,7 +206,7 @@ void lv_xml_test_unregister(void)
     test.steps = NULL;
     test.step_cnt = 0;
 
-    lv_xml_component_unregister(LV_TEST_NAME);
+    lv_xml_unregister_component(LV_TEST_NAME);
 }
 
 void lv_xml_test_run_init(void)
@@ -249,14 +249,43 @@ bool lv_xml_test_run_next(uint32_t slowdown)
     return passed;
 }
 
-void lv_xml_test_run_stop(void)
+bool lv_xml_test_run_to(uint32_t slowdown, uint32_t step)
 {
-    lv_obj_delete(cursor);
-    lv_tick_set_cb(tick_cb_original);
-    lv_display_delete(test_display);
-    lv_test_indev_delete_all();
+    if(test.step_cnt == 0) {
+        LV_LOG_WARN("There are no test steps");
+        return false;
+    }
+
+    if(step >= test.step_cnt) {
+
+        LV_LOG_WARN("%" LV_PRIu32 " step index was greater than the total step count."
+                    "Limited to %" LV_PRIu32,
+                    step, test.step_cnt);
+        step = test.step_cnt - 1;
+    }
+
+    bool passed = true;
+    while(passed && test.step_act <= step) {
+        passed = lv_xml_test_run_next(slowdown);
+    }
+
+    return passed;
 }
 
+void lv_xml_test_run_stop(void)
+{
+    if(cursor) {
+        lv_obj_delete(cursor);
+        cursor = NULL;
+    }
+    if(test_display) {
+        lv_tick_set_cb(tick_cb_original);
+        lv_display_delete(test_display);
+        test_display = NULL;
+    }
+
+    lv_test_indev_delete_all();
+}
 
 uint32_t lv_xml_test_run_all(uint32_t slowdown)
 {
@@ -278,6 +307,11 @@ uint32_t lv_xml_test_run_all(uint32_t slowdown)
 uint32_t lv_xml_test_get_step_count(void)
 {
     return test.step_cnt;
+}
+
+uint32_t lv_xml_test_get_step_next(void)
+{
+    return test.step_act;
 }
 
 lv_xml_test_step_type_t lv_xml_test_get_step_type(uint32_t idx)
@@ -363,9 +397,14 @@ static bool execute_step(lv_xml_test_step_t * step, uint32_t slowdown)
         lv_obj_invalidate(lv_display_get_layer_sys(test_display));
 
         /*Do the actual screenshot compare*/
-        res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
-        if(!res) {
+        lv_test_screenshot_result_t screen_cmp_res;
+        screen_cmp_res = lv_test_screenshot_compare(step->param.screenshot_compare.path);
+        if(screen_cmp_res != LV_TEST_SCREENSHOT_RESULT_PASSED) {
             LV_LOG_WARN("screenshot compare of `%s` failed", step->param.screenshot_compare.path);
+            res = false;
+        }
+        else {
+            res = true;
         }
 
         /*Restore*/
