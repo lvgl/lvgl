@@ -26,7 +26,7 @@
 	        <lv_scale-section min_value="30" max_value="60" style_indicator="scale_sectoion_indic"/>
         </lv_scale>
 
-        <lv_table column_count="4" style_border_side:items="full">
+        <lv_table column_count="4" style_border_side-items="full">
 	        <lv_table-column column="1" width="30px"/>
 	        <lv_table-column column="3" width="20px"/>
 	        <lv_table-cell row="2" column="1" value="hello hello hello hello" ctrl="text_crop|merge_right"/>

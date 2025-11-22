@@ -20,7 +20,7 @@ void test_xml_table_with_attrs(void)
 
     const char * table_attrs[] = {
         "width", "content",
-        "style_border_side:items", "full",
+        "style_border_side-items", "full",
         NULL, NULL,
     };
 
