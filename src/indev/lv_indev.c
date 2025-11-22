@@ -782,6 +782,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
 
+    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
@@ -885,6 +887,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Release happened*/
     else if(is_enabled && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
+
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
@@ -1859,7 +1862,8 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
        code == LV_EVENT_RELEASED ||
        code == LV_EVENT_LONG_PRESSED ||
        code == LV_EVENT_LONG_PRESSED_REPEAT ||
-       code == LV_EVENT_ROTARY) {
+       code == LV_EVENT_ROTARY ||
+       code == LV_EVENT_KEY) {
         lv_indev_send_event(indev, code, indev_obj_act);
         if(indev_reset_check(indev)) return LV_RESULT_INVALID;
 
