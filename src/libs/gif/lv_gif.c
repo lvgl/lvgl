@@ -521,6 +521,9 @@ static void next_frame_task_cb(lv_timer_t * t)
                 gifobj->loop_count--;
             }
         }
+        else if(gifobj->loop_count < 0) {
+            lv_timer_pause(t);
+        }
         if(res != LV_RESULT_OK) return;
     }
     else {
