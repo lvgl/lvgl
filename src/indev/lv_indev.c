@@ -1262,14 +1262,12 @@ static void indev_proc_press(lv_indev_t * indev)
         /*If a new object found the previous was lost, so send a PRESS_LOST event*/
         if(indev->pointer.act_obj != NULL) {
             /*Save the obj because in special cases `act_obj` can change in the event */
-            lv_obj_t * last_obj = indev->pointer.act_obj;
-
-            lv_obj_send_event(last_obj, LV_EVENT_PRESS_LOST, indev_act);
+            lv_obj_t * prev_act_obj = indev->pointer.act_obj;
+            lv_obj_send_event(prev_act_obj, LV_EVENT_PRESS_LOST, indev_act);
             if(indev_reset_check(indev)) return;
         }
 
         indev->pointer.act_obj  = indev_obj_act; /*Save the pressed object*/
-        indev->pointer.last_obj = indev_obj_act;
 
         if(indev_obj_act != NULL) {
 
@@ -1439,7 +1437,6 @@ static void indev_proc_release(lv_indev_t * indev)
         }
 
         indev->pointer.act_obj  = NULL;
-        indev->pointer.last_obj = NULL;
         indev->pr_timestamp           = 0;
         indev->longpr_rep_timestamp   = 0;
         indev->wait_until_release     = 0;
@@ -1637,7 +1634,6 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 {
     if(indev->reset_query) {
         indev->pointer.act_obj           = NULL;
-        indev->pointer.last_obj          = NULL;
         indev->pointer.scroll_obj        = NULL;
         indev->pointer.last_hovered      = NULL;
         indev->timestamp = lv_tick_get();
@@ -1828,10 +1824,6 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
             lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
             lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
             act_obj = NULL;
-        }
-
-        if(obj == NULL || indev->pointer.last_obj == obj) {
-            indev->pointer.last_obj = NULL;
         }
 
         if(indev->pointer.scroll_obj) {
