@@ -990,6 +990,7 @@ static uint32_t compute_text_checksum(const char * str)
     uint32_t checksum = 0;
     while(*str) {
         checksum ^= (uint32_t)(*str);
+        checksum = (checksum << 1) | (checksum >> 31);
         str++;
     }
     return checksum;
