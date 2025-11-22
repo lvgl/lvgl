@@ -987,7 +987,6 @@ static void draw_main(lv_event_t * e)
 
 static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj)
 {
-    lv_label_t * label = (lv_label_t *)obj;
     uint32_t checksum = (lv_obj_get_width(obj) << 8)^lv_obj_get_height(obj);
     while(*str) {
         checksum ^= (uint32_t)(*str);
