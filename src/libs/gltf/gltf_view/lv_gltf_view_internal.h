@@ -41,17 +41,6 @@
 
 #define LV_GLTF_DISTANCE_SCALE_FACTOR 2.5f
 
-/* This is a temporary flag that should only be enabled for testing purposes.
- * Ultimately we'll probably need this to be run-time selectable, per instance.
- * But for now it's all on/off to test with. Note: This disables caching for gltf
- * views, so only use it for continously updated setups. */
-#define LV_GLTF_DIRECT_BUFFER_WRITES 1
-
-/* Simulated configuration values */
-#define LV_GLTF_LINEAR_OUTPUT 0
-#define LV_GLTF_TONEMAP_GAMMA LV_GLTF_GAMMA_BRIGHT
-/* ****************************** */
-
 /* Apply defaults below if not set explicitly */
 
 /* Tone-mapping is not applied if linear output is enabled.
