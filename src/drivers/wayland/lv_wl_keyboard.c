@@ -101,7 +101,7 @@ lv_wl_seat_keyboard_t * lv_wayland_seat_keyboard_create(struct wl_seat * wl_seat
 
     struct wl_keyboard * keyboard = wl_seat_get_keyboard(wl_seat);
     if(!keyboard) {
-        LV_LOG_WARN("Faield to get seat keyboard");
+        LV_LOG_WARN("Failed to get seat keyboard");
         return NULL;
     }
     if(!xkb_context && !(xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS))) {

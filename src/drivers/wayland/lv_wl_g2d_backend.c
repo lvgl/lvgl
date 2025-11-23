@@ -477,7 +477,7 @@ static void dmabuf_done(void * data, struct zwp_linux_dmabuf_feedback_v1 * zwp_l
     LV_UNUSED(zwp_linux_dmabuf_feedback);
     LV_UNUSED(ctx);
 
-    LV_LOG_TRACE("DMABUF feedback done - format is %u", ctx->format);
+    LV_LOG_TRACE("DMABUF feedback done");
 
     /* This event marks the end of a feedback round. The client has received
      * all the format and modifier pairs from all tranches. This allows
