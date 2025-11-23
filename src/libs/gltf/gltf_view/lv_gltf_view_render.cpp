@@ -35,13 +35,6 @@
     #define LV_GLTF_CONVERT_BASE_COLOR_TO_SRGB 1
 #endif
 
-/* This attempts a potential optimization that only clears the alpha channel if the output
- * background is 0% opaque.  Additional testing showed this actually created a slight slowdown
- * so it's optional and off by default.  Needs further testing. */
-#ifndef LV_GLTF_USE_COLORMASKED_CLEAR_FILL
-    #define LV_GLTF_USE_COLORMASKED_CLEAR_FILL 0
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -1217,14 +1210,7 @@ static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color,
     GL_CALL(glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
                          (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f));
 
-    if(LV_GLTF_USE_COLORMASKED_CLEAR_FILL && (bg_opa == LV_OPA_0)) {
-        GL_CALL(glColorMask(false, false, false, true));
-        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-        GL_CALL(glColorMask(true, true, true, true));
-    }
-    else {
-        GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    }
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 }
 
