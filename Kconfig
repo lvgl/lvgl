@@ -237,6 +237,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+			bool "Enable support for RGB565 swapped color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
 		config LV_DRAW_SW_SUPPORT_RGB565A8
 			bool "Enable support for RGB565A8 color format"
 			default y
