@@ -203,6 +203,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t frogfs_fs_drv;
 #endif
 
+#if LV_USE_FS_ROMFS
+    lv_fs_drv_t romfs_fs_drv;
+#endif
+
 #if LV_USE_FREETYPE
     struct _lv_freetype_context_t * ft_context;
 #endif
