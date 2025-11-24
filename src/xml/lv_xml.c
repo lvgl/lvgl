@@ -862,25 +862,30 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     }
 
     /* If not a widget, check if it is a component */
-    if(state->item  == NULL) {
+    if(state->item == NULL) {
         state->item = lv_xml_component_process(state, name, attrs);
     }
 
     /* If not a component either, check if it is a slot, e.g. my_button-icon */
     if(state->item == NULL) {
         char buf[128];
-        lv_strlcpy(buf, name, sizeof(buf));
-        char * bufp = buf;
-        const char * comp_name = lv_xml_split_str(&bufp, '-');
-        const char * slot_name = bufp;
-        lv_xml_component_scope_t * comp_scope = lv_xml_component_get_scope(comp_name);
-        if(comp_scope && lv_streq(comp_name, comp_scope->name)) {
-            state->item = lv_obj_find_by_name(state->parent, slot_name);
+        if(strlen(name) >= sizeof(buf)) {
+            LV_LOG_WARN("Component/slot name '%s' is too long (max 127 chars); skipping slot parsing.", name);
+        }
+        else {
+            lv_strlcpy(buf, name, sizeof(buf));
+            char * bufp = buf;
+            const char * comp_name = lv_xml_split_str(&bufp, '-');
+            const char * slot_name = bufp;
+            lv_xml_component_scope_t * comp_scope = lv_xml_component_get_scope(comp_name);
+            if(comp_scope && lv_streq(comp_name, comp_scope->name)) {
+                state->item = lv_obj_find_by_name(state->parent, slot_name);
+            }
         }
     }
 
-    /* If it isn't a component either then it is unknown */
-    if(state->item  == NULL) {
+    /* If it isn't a slot either then it is unknown */
+    if(state->item == NULL) {
         LV_LOG_WARN("'%s' is not a known widget, element, component, or slot", name);
         return;
     }
@@ -889,7 +894,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     *new_parent = state->item;
 
     if(is_view) {
-        state->view = state->item ;
+        state->view = state->item;
     }
 }
 

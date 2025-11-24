@@ -75,9 +75,9 @@ Just add ``<slot name="my_slot"/>`` to the ``<api>`` to tell the Editor
 which children to expose.
 
 To target a slot on an instance of a component create a child like
-``<component_name-slot_name>`` add the children as needed.
+``<component_name-slot_name>`` and add the children as needed.
 
-Slots are available only for components. In case of widget the more powerful
+Slots are available only for components. In case of a widget the more powerful
 :ref:`elements with get access type <xml_api_element_get>` can be used.
 
 Slots are very useful to create components like screen templates where the user is
