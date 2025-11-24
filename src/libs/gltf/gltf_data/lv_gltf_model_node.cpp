@@ -50,16 +50,16 @@ static void invalidate_model(lv_gltf_model_t * model);
 
 void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node,
                              const char * path,
-                             const char * ip)
+                             const char * numeric_path)
 {
     LV_ASSERT_NULL(node);
     lv_memset(node, 0, sizeof(*node));
     node->model = model;
     node->fastgltf_node = fastgltf_node;
     node->path = lv_strdup(path);
-    node->ip = lv_strdup(ip);
+    node->numeric_path = lv_strdup(numeric_path);
     LV_ASSERT_MALLOC(node->path);
-    LV_ASSERT_MALLOC(node->ip);
+    LV_ASSERT_MALLOC(node->numeric_path);
 
     lv_array_init(&node->write_ops, 0, sizeof(lv_gltf_write_op_t));
 }
@@ -68,7 +68,7 @@ void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node)
 {
     LV_ASSERT_NULL(node);
     lv_free((void *)node->path);
-    lv_free((void *)node->ip);
+    lv_free((void *)node->numeric_path);
     lv_array_deinit(&node->write_ops);
 
     if(node->read_attrs) {
@@ -92,13 +92,13 @@ lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * model, 
     return (lv_gltf_model_node_t *)lv_array_at(&model->nodes, index);
 }
 
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_ip(lv_gltf_model_t * model, const char * ip)
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * model, const char * num_path)
 {
 
     const uint32_t node_count = lv_array_size(&model->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
         lv_gltf_model_node_t * entry = (lv_gltf_model_node_t *) lv_array_at(&model->nodes, i);
-        if(lv_streq(entry->ip, ip)) {
+        if(lv_streq(entry->numeric_path, num_path)) {
             return entry;
         }
     }
@@ -152,7 +152,7 @@ const char * lv_gltf_model_node_get_ip(lv_gltf_model_node_t * node)
         LV_LOG_WARN("Can't get the ip of a null node");
         return nullptr;
     }
-    return node->ip;
+    return node->numeric_path;
 }
 void lv_gltf_model_send_new_values(lv_gltf_model_t * model)
 {

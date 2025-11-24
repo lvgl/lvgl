@@ -44,13 +44,13 @@ extern "C" {
 lv_gltf_model_node_t * lv_gltf_model_node_get_by_index(lv_gltf_model_t * data, size_t index);
 
 /**
- * @brief Get a glTF model node by its IP (internal pointer/identifier)
+ * @brief Get a glTF model node by its numeric path
  *
  * @param data Pointer to the glTF model structure
- * @param ip The IP string of the node to retrieve
+ * @param num_path The numeric path string of the node to retrieve (eg. ".0")
  * @return Pointer to the glTF model node, or NULL if not found
  */
-lv_gltf_model_node_t * lv_gltf_model_node_get_by_ip(lv_gltf_model_t * data, const char * ip);
+lv_gltf_model_node_t * lv_gltf_model_node_get_by_numeric_path(lv_gltf_model_t * data, const char * num_path);
 
 /**
  * @brief Get a glTF model node by its path

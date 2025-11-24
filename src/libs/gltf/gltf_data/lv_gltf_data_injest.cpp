@@ -172,11 +172,11 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
     model->nodes.size = model->asset.nodes.size();
 
     fastgltf::namegen_iterate_scene_nodes(model->asset, scene_index,
-                                          [&](fastgltf::Node & node, const std::string & node_path, const std::string & node_ip,
+                                          [&](fastgltf::Node & node, const std::string & node_path, const std::string & node_num_path,
     size_t node_index, std::size_t child_index) {
         LV_UNUSED(child_index);
         lv_gltf_model_node_t model_node;
-        lv_gltf_model_node_init(model, &model_node, &node, node_path.c_str(), node_ip.c_str());
+        lv_gltf_model_node_init(model, &model_node, &node, node_path.c_str(), node_num_path.c_str());
 
         /* Store the nodes in the same order as fastgltf
          * This is a workaround as we can't assign any type of user data to fastgltf's types*/
