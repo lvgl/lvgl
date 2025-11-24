@@ -325,7 +325,8 @@ void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, 
  * @param x_value   the new 'angle' value of the next data
  * @param y_value   the new 'radial' value of the next data
  */
-void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value, int32_t radial_value);
+void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value,
+                                   int32_t radial_value);
 
 /**
  * Same as `lv_chart_set_next_value` but set the values from an array

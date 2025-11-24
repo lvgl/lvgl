@@ -538,7 +538,8 @@ void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, 
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
 }
 
-void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value, int32_t radial_value)
+void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value,
+                                   int32_t radial_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
