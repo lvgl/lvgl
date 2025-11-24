@@ -1281,7 +1281,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
         if(node.cameraIndex.has_value()) current_camera_count++;
 
         if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
-            auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : parentworldmatrix * localmatrix;
+            auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
             lv_gltf_data_set_cached_transform(gltf_data, &node, world_matrix);
 
             if(node.cameraIndex.has_value()) {
