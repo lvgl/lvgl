@@ -5,28 +5,43 @@
 Syntax
 ======
 
+Overview
+********
 
+The XML engine uses standard XML syntax; however, there are some
+special conventions for property names and values.
 
-Naming conventions
+Naming Conventions
 ******************
 
 - A standard XML syntax is used.
 - Lowercase letters with ``_`` separation are used for attribute names.
 - Tag names follow the usual variable-name rules: they must start with a letter or
   ``'_'`` and the rest of the name may be comprised of letters, ``'_'`` and digits.
+- ``-`` is used to create compound names, e.g. ``lv_chart-series``
 - The LVGL API is followed as much as possible, e.g., ``align="center"``, ``bg_color="0xff0000"``.
 - For colors, all these syntaxes are supported (similar to CSS colors): ``0x112233``,
   ``#112233``, ``112233``, ``0x123``, ``#123``, ``123``.  Note that like CSS,
   ``0x123``, ``#123`` and ``123`` all mean ``#112233``.
 - ``params`` can be referenced with ``$``.
 - ``consts`` can be referenced with ``#``.
-- ``styles`` can be attached to states and/or parts like this:
-  ``styles="style1 style2:pressed style3:focused:scrollbar"``.
-- Local styles (i.e. styles that are stored within the Component and thus not shared
-  by any other Components) can be used like this:
-  ``<lv_label style_text_color="0xff0000" style_text_color:checked="0x00ff00"/>``.
 
 
+Property Names
+**************
+
+In most of the cases XML property names don't have special syntax.
+for example:
+
+.. code-block:: xml
+
+    <some_tag prop="value" other_prop="other value"/>
+
+Local styles also support adding "selectors" to property names:
+
+.. code-block:: xml
+
+    <lv_checkbox style_bg_color-indicator-checked-disabled="0xff0000"/>
 
 Types
 *****
@@ -133,10 +148,8 @@ Compound types
 Types can be compound, meaning multiple options/types are possible.  For example, for
 width: ``type="px|%|content"``.
 
-
-Limiting accepted values
-------------------------
-
+Limiting Accepted Values
+************************
 
 **Not supported yet; the examples below illustrate the planned syntax.**
 
@@ -146,3 +159,4 @@ For example:
 - Enums: ``type="dir(top bottom)"``
 - Colors: ``type="color(0xff0000 0x00ff00 0x0000ff)"``
 - Strings: ``type="string('Ok' 'Cancel')``
+

@@ -76,7 +76,12 @@ Local styles can be used directly, for example:
 
     <lv_label style_bg_opa="200" style_bg_color="0x123456"/>
 
-Selectors are not supported for local style properties yet.
+Selectors are also supported for local style properties:
+
+.. code-block:: xml
+
+    <lv_slider style_bg_opa-indicator-pressed="200"/>
+
 
 
 Local Style Binding

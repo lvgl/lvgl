@@ -332,15 +332,15 @@ const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selec
 {
     *selector = 0;
 
-    char * style_name = lv_xml_split_str(&txt, ':');
-    char * selector_str = lv_xml_split_str(&txt, ':');
+    char * style_name = lv_xml_split_str(&txt, '-');
+    char * selector_str = lv_xml_split_str(&txt, '-');
     while(selector_str != NULL) {
         /* Handle different states and parts */
         *selector |= lv_xml_style_state_to_enum(selector_str);
         *selector |= lv_xml_style_part_to_enum(selector_str);
 
         /* Move to the next token */
-        selector_str = lv_xml_split_str(&txt, ':');
+        selector_str = lv_xml_split_str(&txt, '-');
     }
 
     return style_name;

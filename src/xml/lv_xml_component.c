@@ -282,7 +282,6 @@ lv_result_t lv_xml_component_unregister(const char * name)
     }
     lv_ll_clear(&scope->param_ll);
 
-
     lv_xml_font_t * font;
     LV_LL_READ(&scope->font_ll, font) {
         lv_free((char *)font->name);
