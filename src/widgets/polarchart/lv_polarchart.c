@@ -321,7 +321,7 @@ lv_polarchart_series_t * lv_polarchart_add_series(lv_obj_t * obj, lv_color_t col
     ser->radial_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->radial_points);
 
-    if(chart->type == LV_CHART_TYPE_SCATTER) {
+    if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
         ser->angle_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->angle_points);
         if(NULL == ser->angle_points) {

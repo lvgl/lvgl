@@ -12,7 +12,7 @@ static lv_color_t red_color;
 void setUp(void)
 {
     active_screen = lv_screen_active();
-    polarchart = lv_polar_chart_create(active_screen);
+    polarchart = lv_polarchart_create(active_screen);
 
     red_color = lv_palette_main(LV_PALETTE_RED);
 }
@@ -23,91 +23,91 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-/* NOTE: Default polar chart type is LV_POLAR_CHART_TYPE_LINE */
-void test_polar_chart_add_series(void)
+/* NOTE: Default polar chart type is LV_POLARCHART_TYPE_LINE */
+void test_polarchart_add_series(void)
 {
-    lv_polar_chart_series_t * red_series;
+    lv_polarchart_series_t * red_series;
 
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
     TEST_ASSERT_NOT_NULL_MESSAGE(red_series, "Red series not added to polar chart");
     TEST_ASSERT_NULL_MESSAGE(red_series->x_points, "X points in non scatter polar chart should not point to anything");
 
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_set_point_count_increments(void)
+void test_polarchart_set_point_count_increments(void)
 {
-    lv_polar_chart_series_t * red_series;
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * red_series;
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
-    uint16_t points_in_series = lv_polar_chart_get_point_count(polarchart);
+    uint16_t points_in_series = lv_polarchart_get_point_count(polarchart);
     uint16_t new_point_count = points_in_series * 2;
-    lv_polar_chart_set_point_count(polarchart, new_point_count);
+    lv_polarchart_set_point_count(polarchart, new_point_count);
 
-    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polar_chart_get_point_count(polarchart),
+    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polarchart_get_point_count(polarchart),
                               "Actual points in polar chart are less than expected");
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_set_point_count_decrements(void)
+void test_polarchart_set_point_count_decrements(void)
 {
-    lv_polar_chart_series_t * red_series;
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
-    uint16_t points_in_series = lv_polar_chart_get_point_count(polarchart);
+    lv_polarchart_series_t * red_series;
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
+    uint16_t points_in_series = lv_polarchart_get_point_count(polarchart);
     uint16_t new_point_count = points_in_series / 2;
 
-    lv_polar_chart_set_point_count(polarchart, new_point_count);
+    lv_polarchart_set_point_count(polarchart, new_point_count);
 
-    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polar_chart_get_point_count(polarchart),
+    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polarchart_get_point_count(polarchart),
                               "Actual points in polar chart are more than expected");
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_set_point_count_as_same(void)
+void test_polarchart_set_point_count_as_same(void)
 {
-    lv_polar_chart_series_t * red_series;
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
-    uint16_t points_in_series = lv_polar_chart_get_point_count(polarchart);
+    lv_polarchart_series_t * red_series;
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
+    uint16_t points_in_series = lv_polarchart_get_point_count(polarchart);
     uint16_t new_point_count = points_in_series;
 
-    lv_polar_chart_set_point_count(polarchart, new_point_count);
+    lv_polarchart_set_point_count(polarchart, new_point_count);
 
-    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polar_chart_get_point_count(polarchart),
+    TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_polarchart_get_point_count(polarchart),
                               "Actual points is not equal to original point count");
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_set_new_point_count_as_zero(void)
+void test_polarchart_set_new_point_count_as_zero(void)
 {
-    lv_polar_chart_series_t * red_series;
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * red_series;
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
-    lv_polar_chart_set_point_count(polarchart, 0u);
+    lv_polarchart_set_point_count(polarchart, 0u);
 
-    TEST_ASSERT_EQUAL_MESSAGE(1u, lv_polar_chart_get_point_count(polarchart),
+    TEST_ASSERT_EQUAL_MESSAGE(1u, lv_polarchart_get_point_count(polarchart),
                               "Actual points in polar chart are more than 1");
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_point_is_added_at_the_end_of_a_series(void)
+void test_polarchart_point_is_added_at_the_end_of_a_series(void)
 {
-    lv_polar_chart_series_t * red_series;
-    red_series = lv_polar_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * red_series;
+    red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
     TEST_ASSERT_NOT_NULL_MESSAGE(red_series, "Red series not added to polar chart");
     TEST_ASSERT_NULL_MESSAGE(red_series->x_points, "X points in non scatter polar chart should not point to anything");
 
-    lv_polar_chart_remove_series(polarchart, red_series);
+    lv_polarchart_remove_series(polarchart, red_series);
 }
 
-void test_polar_chart_one_point_when_setting_point_count_to_zero(void)
+void test_polarchart_one_point_when_setting_point_count_to_zero(void)
 {
-    lv_polar_chart_set_point_count(polarchart, 0u);
-    TEST_ASSERT_EQUAL(1u, lv_polar_chart_get_point_count(polarchart));
+    lv_polarchart_set_point_count(polarchart, 0u);
+    TEST_ASSERT_EQUAL(1u, lv_polarchart_get_point_count(polarchart));
 }
 
-static void polar_chart_event_cb(lv_event_t * e)
+static void polarchart_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -116,12 +116,12 @@ static void polar_chart_event_cb(lv_event_t * e)
         lv_draw_task_t * draw_task = lv_event_get_param(e);
         lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-        lv_polar_chart_type_t polar_chart_type = lv_polar_chart_get_type(obj);
-        if(polar_chart_type == LV_POLAR_CHART_TYPE_LINE && base_dsc->part != LV_PART_INDICATOR)  return;
+        lv_polarchart_type_t polarchart_type = lv_polarchart_get_type(obj);
+        if(polarchart_type == LV_POLARCHART_TYPE_LINE && base_dsc->part != LV_PART_INDICATOR)  return;
 
-        const lv_polar_chart_series_t * ser = NULL;
+        const lv_polarchart_series_t * ser = NULL;
         for(uint32_t i = 0; i < base_dsc->id1 + 1; i++) {
-            ser = lv_polar_chart_get_series_next(obj, ser);
+            ser = lv_polarchart_get_series_next(obj, ser);
         }
 
         char buf[8];
@@ -167,53 +167,53 @@ static void polar_chart_event_cb(lv_event_t * e)
 
 void test_draw_task_hooking(void)
 {
-    lv_obj_t * polar_chart_wrapper = lv_obj_create(lv_screen_active());
-    lv_obj_set_size(polar_chart_wrapper, 600, 300);
-    lv_obj_center(polar_chart_wrapper);
+    lv_obj_t * polarchart_wrapper = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(polarchart_wrapper, 600, 300);
+    lv_obj_center(polarchart_wrapper);
 
-    lv_obj_set_parent(polarchart, polar_chart_wrapper);
+    lv_obj_set_parent(polarchart, polarchart_wrapper);
     lv_obj_set_size(polarchart, lv_pct(200), lv_pct(100));
     lv_obj_add_flag(polarchart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-    lv_polar_chart_set_div_line_count(polarchart, 0, 21);
-    lv_polar_chart_set_point_count(polarchart, 21);
-    lv_obj_add_event_cb(polarchart, polar_chart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_polarchart_set_div_line_count(polarchart, 0, 21);
+    lv_polarchart_set_point_count(polarchart, 21);
+    lv_obj_add_event_cb(polarchart, polarchart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
-    lv_polar_chart_series_t * polar_chart_set1 = lv_polar_chart_add_series(polarchart, lv_palette_main(LV_PALETTE_YELLOW),
+    lv_polarchart_series_t * polarchart_set1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_YELLOW),
                                                                            0);
-    lv_polar_chart_series_t * polar_chart_set2 = lv_polar_chart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
+    lv_polarchart_series_t * polarchart_set2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
                                                                            0);
-    lv_polar_chart_series_t * polar_chart_set3 = lv_polar_chart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_polar_chart_set_axis_range(polarchart, LV_POLAR_CHART_AXIS_RADIAL, 0, 700);
+    lv_polarchart_series_t * polarchart_set3 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 700);
 
     int32_t points[21] = {0, 31, 59, 81, 95, 100, 95, 81, 59, 31, 0, -31, -59, -81, -95, -100, -95, -81, -59, -31, 0};
 
     for(uint32_t i = 0; i < 21; i++) {
-        lv_polar_chart_set_next_value(polarchart, polar_chart_set1, points[i] + 100);
-        lv_polar_chart_set_next_value(polarchart, polar_chart_set2, points[i] + 300);
-        lv_polar_chart_set_next_value(polarchart, polar_chart_set3, points[i] + 500);
+        lv_polarchart_set_next_value(polarchart, polarchart_set1, points[i] + 100);
+        lv_polarchart_set_next_value(polarchart, polarchart_set2, points[i] + 300);
+        lv_polarchart_set_next_value(polarchart, polarchart_set3, points[i] + 500);
     }
 
-    lv_obj_scroll_to_x(polar_chart_wrapper, 300, LV_ANIM_OFF);
+    lv_obj_scroll_to_x(polarchart_wrapper, 300, LV_ANIM_OFF);
 
-    lv_polar_chart_set_type(polarchart, LV_POLAR_CHART_TYPE_LINE);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_LINE);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_line_draw_hook.png");
 }
 
-void test_polar_chart_scatter(void)
+void test_polarchart_scatter(void)
 {
     lv_obj_center(polarchart);
     lv_obj_set_size(polarchart, LV_PCT(100), LV_PCT(100));
 
-    lv_chart_set_type(polarchart, LV_POLAR_CHART_TYPE_SCATTER);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_SCATTER);
 
-    lv_chart_set_axis_range(polarchart, LV_POLAR_CHART_AXIS_ANGLE, 50, 100);
-    lv_chart_set_axis_range(polarchart, LV_POLAR_CHART_AXIS_RADIAL, 10, 20);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_ANGLE, 50, 100);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 10, 20);
 
-    lv_polar_chart_set_point_count(polarchart, 3);
-    lv_polar_chart_series_t * ser = lv_chart_add_series(polarchart, red_color, LV_POLAR_CHART_AXIS_RADIAL);
-    lv_polar_chart_set_next_value2(polarchart, ser, 50, 10);
-    lv_polar_chart_set_next_value2(polarchart, ser, 75, 12);
-    lv_polar_chart_set_next_value2(polarchart, ser, 100, 20);
+    lv_polarchart_set_point_count(polarchart, 3);
+    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_set_next_value2(polarchart, ser, 50, 10);
+    lv_polarchart_set_next_value2(polarchart, ser, 75, 12);
+    lv_polarchart_set_next_value2(polarchart, ser, 100, 20);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_scatter.png");
 }
