@@ -944,6 +944,120 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     }
 }
 
+static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
+{
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
+
+    uint32_t i;
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t w     = lv_obj_get_content_width(obj);
+    int32_t h     = lv_obj_get_content_height(obj);
+    int32_t x_ofs = obj->coords.x1 + pad_left + border_width - lv_obj_get_scroll_left(obj);
+    int32_t y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+    lv_polarchart_series_t * ser;
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    line_dsc.base.layer = layer;
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+
+    lv_draw_rect_dsc_t point_dsc_default;
+    lv_draw_rect_dsc_init(&point_dsc_default);
+    point_dsc_default.base.layer = layer;
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &point_dsc_default);
+
+    int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+    int32_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
+
+    /*Do not bother with line ending is the point will over it*/
+    if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
+    if(line_dsc.width == 1) line_dsc.raw_end = 1;
+
+    /*Go through all data lines*/
+    LV_LL_READ_BACK(&chart->series_ll, ser) {
+        if(ser->hidden) continue;
+        line_dsc.color = ser->color;
+        point_dsc_default.bg_color = ser->color;
+
+        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+
+        line_dsc.p1.x = x_ofs;
+        line_dsc.p2.x = x_ofs;
+
+        int32_t p_act = start_point;
+        int32_t p_prev = start_point;
+        if(ser->radial_points[p_act] != LV_CHART_POINT_CNT_DEF) {
+            line_dsc.p2.x = lv_map(ser->angle_points[p_act], chart->angle_min, chart->angle_max, 0, w);
+            line_dsc.p2.x += x_ofs;
+
+            line_dsc.p2.y = lv_map(ser->radial_points[p_act], chart->radial_min, chart->radial_max, 0, h);
+            line_dsc.p2.y = h - line_dsc.p2.y;
+            line_dsc.p2.y += y_ofs;
+        }
+        else {
+            line_dsc.p2.x = (lv_value_precise_t)LV_COORD_MIN;
+            line_dsc.p2.y = (lv_value_precise_t)LV_COORD_MIN;
+        }
+
+        for(i = 0; i < chart->point_cnt; i++) {
+            line_dsc.p1.x = line_dsc.p2.x;
+            line_dsc.p1.y = line_dsc.p2.y;
+
+            p_act = (start_point + i) % chart->point_cnt;
+            if(ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                line_dsc.p2.y =  lv_map(ser->radial_points[p_act], chart->radial_min, chart->radial_max, 0, h);
+                line_dsc.p2.y = h - line_dsc.p2.y;
+                line_dsc.p2.y += y_ofs;
+
+                line_dsc.p2.x = lv_map(ser->angle_points[p_act], chart->angle_min, chart->angle_max, 0, w);
+                line_dsc.p2.x += x_ofs;
+            }
+            else {
+                p_prev = p_act;
+                continue;
+            }
+
+            if(i != 0) { /*Don't draw line *to* the first point.*/
+                lv_area_t point_area;
+                point_area.x1 = (int32_t)line_dsc.p1.x - point_w;
+                point_area.x2 = (int32_t)line_dsc.p1.x + point_w;
+                point_area.y1 = (int32_t)line_dsc.p1.y - point_h;
+                point_area.y2 = (int32_t)line_dsc.p1.y + point_h;
+
+                if(ser->radial_points[p_prev] != LV_CHART_POINT_NONE && ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                    line_dsc.base.id2 = i - 1;
+                    lv_draw_line(layer, &line_dsc);
+                    if(point_w && point_h) {
+                        point_dsc_default.base.id2 = i - 1;
+                        lv_draw_rect(layer, &point_dsc_default, &point_area);
+                    }
+                }
+
+                p_prev = p_act;
+            }
+
+            /*Draw the last point*/
+            if(i == chart->point_cnt - 1) {
+
+                if(ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                    lv_area_t point_area;
+                    point_area.x1 = (int32_t)line_dsc.p2.x - point_w;
+                    point_area.x2 = (int32_t)line_dsc.p2.x + point_w;
+                    point_area.y1 = (int32_t)line_dsc.p2.y - point_h;
+                    point_area.y2 = (int32_t)line_dsc.p2.y + point_h;
+
+                    point_dsc_default.base.id2 = i;
+                    lv_draw_rect(layer, &point_dsc_default, &point_area);
+                }
+            }
+        }
+        line_dsc.base.id1++;
+        point_dsc_default.base.id1++;
+    }
+}
+
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
