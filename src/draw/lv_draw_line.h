@@ -43,11 +43,11 @@ typedef struct {
      * Ignored if `points` are set*/
     lv_point_precise_t p2;
 
-    /**The first point of the line. If `LV_USE_FLOAT` is enabled float number can be also used*/
+    /**Array of points to draw. If `LV_USE_FLOAT` is enabled, float numbers can also be used.*/
     lv_point_precise_t * points;
 
     /**
-     * Number of point in the `points`
+     * Number of points in the `points`
      */
     int32_t point_cnt;
 
