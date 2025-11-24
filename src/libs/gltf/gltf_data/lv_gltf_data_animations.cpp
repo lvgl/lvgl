@@ -159,8 +159,7 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
         }
 
         if(translation_comp_index > -1) {
-            fastgltf::math::fvec3 new_translation;
-            new_translation  = animation_get_vec3_at_timestamp(gltf_data, &anim.samplers[translation_comp_index], timestamp);
+            fastgltf::math::fvec3 new_translation = animation_get_vec3_at_timestamp(gltf_data, &anim.samplers[translation_comp_index], timestamp);
             matrix[3][0] = new_translation[0];
             matrix[3][1] = new_translation[1];
             matrix[3][2] = new_translation[2];
