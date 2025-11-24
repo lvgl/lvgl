@@ -31,7 +31,8 @@ void test_polarchart_add_series(void)
     red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
     TEST_ASSERT_NOT_NULL_MESSAGE(red_series, "Red series not added to polar chart");
-    TEST_ASSERT_NULL_MESSAGE(red_series->angle_points, "'Angle' points in non scatter polar chart should not point to anything");
+    TEST_ASSERT_NULL_MESSAGE(red_series->angle_points,
+                             "'Angle' points in non scatter polar chart should not point to anything");
 
     lv_polarchart_remove_series(polarchart, red_series);
 }
@@ -96,7 +97,8 @@ void test_polarchart_point_is_added_at_the_end_of_a_series(void)
     red_series = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
 
     TEST_ASSERT_NOT_NULL_MESSAGE(red_series, "Red series not added to polar chart");
-    TEST_ASSERT_NULL_MESSAGE(red_series->angle_points, "'Angle' points in non scatter polar chart should not point to anything");
+    TEST_ASSERT_NULL_MESSAGE(red_series->angle_points,
+                             "'Angle' points in non scatter polar chart should not point to anything");
 
     lv_polarchart_remove_series(polarchart, red_series);
 }
