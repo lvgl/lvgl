@@ -567,7 +567,7 @@ void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * se
 }
 
 void lv_polarchart_set_series_values2(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t angle_values[],
-                                 const int32_t radial_values[], size_t values_cnt)
+                                      const int32_t radial_values[], size_t values_cnt)
 {
     size_t i;
     for(i = 0; i < values_cnt; i++) {
@@ -586,8 +586,9 @@ void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t
     invalidate_point(obj, id);
 }
 
-void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t angle_value,
-                                      int32_t radial_value)
+void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id,
+                                           int32_t angle_value,
+                                           int32_t radial_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);

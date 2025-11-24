@@ -347,7 +347,7 @@ void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * se
  * @param values_cnt    number of items in `angle_values` and `radial_values`
  */
 void lv_polarchart_set_series_values2(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t angle_values[],
-                                 const int32_t radial_values[], size_t values_cnt);
+                                      const int32_t radial_values[], size_t values_cnt);
 
 /**
  * Set an individual point's y value of a chart's series directly based on its index
@@ -367,8 +367,9 @@ void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t
  * @param angle_value   the new 'angle' value of the next data
  * @param radial_value   the new 'radial' value of the next data
  */
-void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t angle_value,
-                                      int32_t radial_value);
+void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id,
+                                           int32_t angle_value,
+                                           int32_t radial_value);
 
 /**
  * Set an external array for the 'radial' data points to use for the polarchart
