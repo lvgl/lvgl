@@ -311,12 +311,21 @@ lv_point_t lv_polarchart_get_cursor_point(lv_obj_t * chart, lv_polarchart_cursor
 void lv_polarchart_set_all_values(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value);
 
 /**
- * Set the next point's Y value according to the update mode policy.
+ * Set the next point's 'radial' value according to the update mode policy.
  * @param obj       pointer to chart object
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value of the next data
  */
 void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value);
+
+/**
+ * Set the next point's 'angle' and 'radial' value according to the update mode policy.
+ * @param obj       pointer to chart object
+ * @param ser       pointer to a data series on 'chart'
+ * @param x_value   the new 'angle' value of the next data
+ * @param y_value   the new 'radial' value of the next data
+ */
+void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value, int32_t radial_value);
 
 /**
  * Same as `lv_chart_set_next_value` but set the values from an array

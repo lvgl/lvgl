@@ -213,9 +213,9 @@ void test_polarchart_scatter(void)
 
     lv_polarchart_set_point_count(polarchart, 3);
     lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
-    //lv_polarchart_set_next_value2(polarchart, ser, 50, 10);
-    //lv_polarchart_set_next_value2(polarchart, ser, 75, 12);
-    //lv_polarchart_set_next_value2(polarchart, ser, 100, 20);
+    lv_polarchart_set_next_value2(polarchart, ser, 50, 10);
+    lv_polarchart_set_next_value2(polarchart, ser, 75, 12);
+    lv_polarchart_set_next_value2(polarchart, ser, 100, 20);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_scatter.png");
 }
