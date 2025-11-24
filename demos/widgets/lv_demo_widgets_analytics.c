@@ -92,21 +92,9 @@ void lv_demo_widgets_analytics_create(lv_obj_t * parent)
 
     ser1 = lv_chart_add_series(chart1, lv_theme_get_color_primary(chart1), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
-    //    for(i = 0; i < 12; i++) {
-    //        lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    //    }
-    lv_chart_set_next_value(chart1, ser1, 5);
-    lv_chart_set_next_value(chart1, ser1, 10);
-    lv_chart_set_next_value(chart1, ser1, 15);
-    lv_chart_set_next_value(chart1, ser1, 20);
-    lv_chart_set_next_value(chart1, ser1, 25);
-    lv_chart_set_next_value(chart1, ser1, 30);
-    lv_chart_set_next_value(chart1, ser1, 35);
-    lv_chart_set_next_value(chart1, ser1, 40);
-    lv_chart_set_next_value(chart1, ser1, 45);
-    lv_chart_set_next_value(chart1, ser1, 50);
-    lv_chart_set_next_value(chart1, ser1, 55);
-    lv_chart_set_next_value(chart1, ser1, 60);
+    for(i = 0; i < 12; i++) {
+        lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
+    }
 
     lv_obj_t * chart2_cont = lv_obj_create(parent);
     lv_obj_set_height(chart2_cont, lv_pct(100));
@@ -613,10 +601,10 @@ static void chart_event_cb(lv_event_t * e)
                 tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
                 int32_t full_h = lv_obj_get_height(obj);
-                int32_t fract_uppter = (int32_t)(LV_MIN(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
+                int32_t fract_upper = (int32_t)(LV_MIN(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
                 int32_t fract_lower = (int32_t)(LV_MAX(p1.y, p2.y) - obj_coords.y1) * 255 / full_h;
                 tri_dsc.grad.stops[0].color = lv_chart_get_series_color(obj, ser);
-                tri_dsc.grad.stops[0].opa = 255 - fract_uppter;
+                tri_dsc.grad.stops[0].opa = 255 - fract_upper;
                 tri_dsc.grad.stops[0].frac = 0;
                 tri_dsc.grad.stops[1].color = lv_chart_get_series_color(obj, ser);
                 tri_dsc.grad.stops[1].opa = 255 - fract_lower;

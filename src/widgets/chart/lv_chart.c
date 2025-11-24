@@ -1041,7 +1041,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     int32_t bullet_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
     int32_t bullet_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
-    int32_t distance_x = w  / (chart->point_cnt - 1) + 1;
+    int32_t extra_space_x = w  / (chart->point_cnt - 1) + bullet_w + line_dsc->width;
 
     lv_draw_rect_dsc_t point_draw_dsc;
     if(crowded_mode == false) {
@@ -1052,11 +1052,17 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     lv_point_precise_t * points = NULL;
     if(crowded_mode) {
-        points = lv_malloc((w + 10) * 3 * sizeof(lv_point_precise_t));
+        points = lv_malloc((w + 2 * extra_space_x) * 3 * sizeof(lv_point_precise_t));
     }
     else {
         points = lv_malloc(chart->point_cnt * sizeof(lv_point_precise_t));
     }
+
+    if(line_dsc.points == NULL) {
+        LV_LOG_WARN("Couldn't allocate the points array");
+        return;
+    }
+
     line_dsc.points = points;
 
     /*Go through all data lines*/
@@ -1064,11 +1070,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         if(ser->hidden) {
             if(line_dsc.base.id1 > 0) {
                 line_dsc.base.id1--;
-                point_draw_dsc.base.id1--;
             }
             continue;
         }
-        point_draw_dsc.bg_color = ser->color;
         line_dsc.color = ser->color;
         line_dsc.base.drop_shadow_color = ser->color;
         point_draw_dsc.bg_color = ser->color;
@@ -1088,8 +1092,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         uint32_t i;
         for(i = 0; i < chart->point_cnt; i++) {
             lv_value_precise_t p_x = (int32_t)((w * i) / (chart->point_cnt - 1)) + x_ofs;
-            if(p_x > layer->_clip_area.x2 + distance_x + 1) break;
-            if(p_x < layer->_clip_area.x1 - distance_x - 1) {
+            if(p_x > layer->_clip_area.x2 + extra_space_x + 1) break;
+            if(p_x < layer->_clip_area.x1 - extra_space_x - 1) {
                 p_prev = p_act;
                 continue;
             }
@@ -1144,13 +1148,14 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         /*Draw the line from the accumulated points*/
         lv_draw_line(layer, &line_dsc);
         if(!crowded_mode) {
-
+            point_draw_dsc.bg_color = ser->color;
+            point_draw_dsc.base.id1 = line_dsc.base.id1;
             /*Add the bullets too*/
             if(bullet_w > 0 && bullet_h > 0) {
                 point_draw_dsc.base.id2 = i - 1; /*Start from the last rendered point*/
                 int32_t j;
                 for(j = line_dsc.point_cnt - 1; j >= 0; j--) {
-                    if(points[j].y == LV_CHART_POINT_NONE) continue;
+                    if(points[j].y == LV_DRAW_LINE_POINT_NONE) continue;
 
                     lv_area_t point_area;
                     point_area.x1 = (int32_t)points[j].x - bullet_w;
@@ -1163,7 +1168,6 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 }
             }
         }
-        point_draw_dsc.base.id1--;
         line_dsc.base.id1--;
     }
 
