@@ -1317,12 +1317,10 @@ static bool load_new_screen(lv_obj_t * scr)
     LV_ASSERT_NULL(d);
 
     lv_obj_t * old_scr = d->act_scr;
-    lv_result_t res;
     bool old_screen_deleted = false;
     if(old_scr) {
-        res = lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-        old_screen_deleted = res == LV_RESULT_INVALID;
-        if(old_screen_deleted) {
+        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
+            old_screen_deleted = true;
             old_scr = NULL;
         }
     }
@@ -1333,8 +1331,9 @@ static bool load_new_screen(lv_obj_t * scr)
 
     lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
     if(old_scr) {
-        res = lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
-        old_screen_deleted |= res == LV_RESULT_INVALID;
+        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
+            old_screen_deleted = true;
+        }
     }
 
     lv_obj_invalidate(scr);
@@ -1370,8 +1369,7 @@ static void scr_anim_completed(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
-    lv_result_t res = lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(res == LV_RESULT_INVALID) {
+    if(lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
         d->act_scr = NULL;
     }
 
