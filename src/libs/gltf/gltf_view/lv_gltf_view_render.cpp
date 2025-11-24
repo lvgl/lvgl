@@ -758,16 +758,59 @@ static void draw_lights(lv_gltf_model_t * model, GLuint program)
 lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state, int32_t texture_w,
                                   int32_t texture_h, bool prepare_bg)
 {
+    LV_ASSERT_NULL(viewer);
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state->framebuffer));
 
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
+    //int32_t width = (rotation == LV_DISPLAY_ROTATION_0 || rotation == LV_DISPLAY_ROTATION_180) ? texture_w : texture_h;
+    //int32_t height = (rotation == LV_DISPLAY_ROTATION_0 || rotation == LV_DISPLAY_ROTATION_180) ? texture_h : texture_w;
+    const lv_display_t * display = lv_display_get_default();
+    const lv_display_rotation_t rotation = lv_display_get_rotation((lv_display_t *)display);
+    int32_t width = texture_w;
+    int32_t height = texture_h;
+    int32_t ulx = 0;
+    int32_t uly = 0;
+
+#if LV_GLTF_DIRECT_BUFFER_WRITES
+    const int32_t display_w = lv_display_get_horizontal_resolution(display);
+    const int32_t display_h = lv_display_get_vertical_resolution(display);
+    int32_t screen_w = display_w;
+    int32_t screen_h = display_h;
+    const lv_obj_t * obj = (lv_obj_t *)viewer;
+    if ((rotation == LV_DISPLAY_ROTATION_0) || (rotation == LV_DISPLAY_ROTATION_180)) {
+        ulx = lv_obj_get_x(obj);
+        uly = (screen_h -lv_obj_get_y(obj)) - texture_h;
+    } else {
+        screen_w = display_h;
+        screen_h = display_w;
+        ulx = lv_obj_get_y(obj);
+        uly = lv_obj_get_x(obj);
+        width = texture_h;
+        height = texture_w;
+        if (rotation == LV_DISPLAY_ROTATION_90) {
+            //ulx = ulx;
+            uly = (screen_h - uly) - texture_h;
+        } else {
+            //ulx = (display_w - ulx);
+            uly = (screen_h - uly) - texture_h;
+        }
+    }
+    //int32_t ulx = lv_obj_get_x(obj);
+    //int32_t uly = lv_obj_get_y(obj);
+    //lv_opengles_regular_viewport(ulx, uly, width, height);
+    LV_LOG("DISPLAY WIDTH/HEIGHT / TEXTURE WIDTH/HEIGHT -> ULX/ULY = (%d,%d)/(%d,%d) -> (%d,%d)\n", screen_w, screen_h, width, height, ulx, uly);
+    GL_CALL(glViewport(ulx, uly, width, height));
+    //lv_opengles_viewport(ulx, uly, width, height);
+#else
+    LV_LOG("TEXTURE WIDTH/HEIGHT = (%d,%d)\n", width, height);
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-#endif
+    //lv_opengles_viewport(0, 0, texture_w, texture_h);
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
+#endif
+
     if(prepare_bg) {
 #if !LV_GLTF_DIRECT_BUFFER_WRITES
         /* cast is safe because viewer is a lv_obj_t*/

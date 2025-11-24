@@ -112,13 +112,15 @@ static lv_subject_t animation_speed_subject;
  **********************/
 
 /**********************
- *   GLOBAL FUNCTIONS
+ *   GLOBAL FUNCTIONSc
  **********************/
 
 lv_obj_t * lv_demo_gltf(const char * path)
 {
     lv_obj_t * viewer = lv_gltf_create(lv_screen_active());
-    lv_obj_set_size(viewer, LV_PCT(100), LV_PCT(100));
+    //lv_obj_set_size(viewer, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_size(viewer, LV_PCT(50), LV_PCT(50));
+    //lv_obj_set_pos(viewer, LV_PCT(10), LV_PCT(10));
     lv_obj_remove_flag(viewer, LV_OBJ_FLAG_SCROLLABLE);
     lv_gltf_set_background_mode(viewer, LV_GLTF_BG_MODE_ENVIRONMENT);
     lv_gltf_model_t * model = lv_gltf_load_model_from_file(viewer, path);
@@ -327,7 +329,7 @@ static void create_background_panel(lv_obj_t * panel)
     lv_slider_bind_value(env_brightness_slider, &env_brightness_subject);
     lv_obj_set_width(env_brightness_slider, LV_PCT(100));
 
-    lv_slider_set_min_value(env_brightness_slider, 0);
+    lv_slider_set_min_value(env_brightness_slider, -500); /* MK temp fix for framebuffer issue */
     lv_slider_set_max_value(env_brightness_slider, 1000);
     style_slider(env_brightness_slider, SLIDER_COLOR);
 

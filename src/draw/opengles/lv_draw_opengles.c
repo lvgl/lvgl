@@ -263,6 +263,13 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     int32_t texture_w = lv_area_get_width(&task->_real_area);
     int32_t texture_h = lv_area_get_height(&task->_real_area);
 
+    LV_LOG("DRAW_TO_TEXTURE SIZE (w/h) -> (%d, %d)\n", texture_w, texture_h);
+    if ((texture_w <= 0) || (texture_h <= 0)) {
+        LV_LOG("ERROR BAD TEX SIZE, CANCEL: (w/h) -> (%d, %d)\n", texture_w, texture_h);
+        LV_PROFILER_DRAW_END;
+        return false;
+    }
+
     if(NULL == lv_draw_buf_reshape(&u->render_draw_buf, LV_COLOR_FORMAT_ARGB8888, texture_w, texture_h, LV_STRIDE_AUTO)) {
         uint8_t * data = u->render_draw_buf.unaligned_data;
         uint32_t data_size = LV_DRAW_BUF_SIZE(texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888);
