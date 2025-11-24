@@ -395,11 +395,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
  * The area will be truncated to the object's area and marked for redraw.
  * @param obj       pointer to an object
  * @param           area the area to redraw
-<<<<<<< HEAD
  * @return LV_RESULT_OK: the area is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
-=======
- * @return LV_RESULT_OK: the are is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
->>>>>>> f8c8383bf (fix invalidation)
  *         (maybe it was off-screen or fully clipped)
  */
 lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
