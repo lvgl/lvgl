@@ -212,24 +212,7 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    const lv_display_t * display = lv_display_get_default();
-    const lv_display_rotation_t rotation = lv_display_get_rotation(lv_display_get_default());
-    int32_t disp_height;
-    int32_t rx, ry, rw, rh;
-    if (rotation == LV_DISPLAY_ROTATION_0 || rotation == LV_DISPLAY_ROTATION_180) {
-       disp_height = lv_display_get_vertical_resolution(display);
-       rx = x;
-       ry = y;
-       rw = w;
-       rh = h;
-    } else {
-       disp_height = lv_display_get_horizontal_resolution(display);
-       rx = y;
-       ry = x;
-       rw = h;
-       rh = w;
-    }
-    GL_CALL(glViewport(rx, disp_height-ry-rh, rw, rh));
+    GL_CALL(glViewport(x, lv_display_get_vertical_resolution(lv_display_get_default()) - y - h, w, h));
     LV_PROFILER_DRAW_END;
 }
 
