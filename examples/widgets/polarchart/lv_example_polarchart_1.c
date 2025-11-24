@@ -29,7 +29,7 @@ void lv_example_polarchart_1(void)
         ser2_y_points[i] = (int32_t)lv_rand(50, 90);
     }
 
-    lv_polarchart_refresh(chart); /*Required after direct set*/
+    lv_polarchart_refresh(polarchart); /*Required after direct set*/
 }
 
 #endif
