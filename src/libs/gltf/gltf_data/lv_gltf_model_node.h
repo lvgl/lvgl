@@ -19,7 +19,7 @@ extern "C" {
 #if LV_USE_GLTF
 
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_3dmath.h"
+#include "../math/lv_3dmath.h"
 #include "../../../misc/lv_event.h"
 
 /*********************
