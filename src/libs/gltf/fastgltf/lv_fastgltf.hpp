@@ -39,9 +39,13 @@ FASTGLTF_EXPORT inline auto getLocalTransformMatrix(const Node& node) {
 	}, node.transform);
 }
 
+/**
+ * Attempts to remove the scale component of a 4x4 matrix transform.  Will silently fail if 
+ * any of the component scales is 0 or near zero (which they should never be).
+ */
 FASTGLTF_EXPORT inline void removeScale(fastgltf::math::fmat4x4& matrix) {
 	auto scale = math::fvec3( length(matrix.col(0)), length(matrix.col(1)), length(matrix.col(2)) );
-	if ( length( scale) > 0.0001f ) {
+	if ( ( abs(scale.x()) > 0.0001f) && (abs(scale.y()) > 0.0001f) && (abs(scale.z()) > 0.0001f) ) {
 		matrix.col(0) /= scale.x();
 		matrix.col(1) /= scale.y();
 		matrix.col(2) /= scale.z();
