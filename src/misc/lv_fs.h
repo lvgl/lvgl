@@ -44,6 +44,7 @@ typedef enum {
     LV_FS_RES_NOT_IMP,    /*Requested function is not implemented*/
     LV_FS_RES_OUT_OF_MEM, /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
+    LV_FS_RES_DRIVE_LETTER_ALREADY_USED, /*A drive with this letter is already registered*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
 } lv_fs_res_t;
 
@@ -70,6 +71,8 @@ struct _lv_fs_drv_t {
     char letter;
     uint32_t cache_size;
     bool (*ready_cb)(lv_fs_drv_t * drv);
+
+    void(*remove_cb)(lv_fs_drv_t * drv); /*Optional*/
 
     void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
@@ -130,6 +133,12 @@ void lv_fs_drv_register(lv_fs_drv_t * drv);
  * @return          pointer to a driver or NULL if not found
  */
 lv_fs_drv_t * lv_fs_get_drv(char letter);
+
+/**
+ * Remove a drive and call its remove function if available
+ * @param letter letter identifier of the drive to remove
+ */
+void lv_fs_remove_drive(char letter);
 
 /**
  * Test if a drive is ready or not. If the `ready` function was not initialized `true` will be
