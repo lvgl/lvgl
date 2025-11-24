@@ -147,7 +147,7 @@ void lv_example_gltf_3(void)
     for(size_t i = 0; i < PLANT_COUNT; ++i) {
         lv_gltf_model_t * plant_model = lv_gltf_load_model_from_file(gltf,
                                                                      "A:lvgl/examples/libs/gltf/webp_diffuse_transmission_plant.glb");
-        plant_positions[i].root = lv_gltf_model_node_get_by_ip(plant_model, ".0");
+        plant_positions[i].root = lv_gltf_model_node_get_by_numeric_path(plant_model, ".0");
 
         /* Register an event so that we can get the plant position when it's updated*/
         /* For the plant we are interested in its world position and its rotation

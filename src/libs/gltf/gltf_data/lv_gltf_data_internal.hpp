@@ -93,7 +93,7 @@ typedef struct  {
 
 struct _lv_gltf_model_node_t {
     lv_gltf_model_t * model;
-    const char * ip;
+    const char * numeric_path;
     const char * path;
     fastgltf::Node * fastgltf_node;
     lv_gltf_model_node_attr_t * read_attrs;
@@ -373,7 +373,7 @@ void lv_gltf_data_delete_textures(lv_gltf_model_t * data);
 GLuint lv_gltf_data_create_texture(lv_gltf_model_t * data);
 void lv_gltf_model_node_init(lv_gltf_model_t * model, lv_gltf_model_node_t * node, fastgltf::Node * fastgltf_node,
                              const char * path,
-                             const char * ip);
+                             const char * num_path);
 
 void lv_gltf_model_node_deinit(lv_gltf_model_node_t * node);
 

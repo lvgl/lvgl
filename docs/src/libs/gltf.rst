@@ -415,7 +415,7 @@ Note: World position registration incurs additional computational cost due to ma
 Finding Nodes
 -------------
 
-Access nodes by index, IP (index path) or path:
+Access nodes by index, numeric path or path:
 
 .. code-block::c
 
@@ -428,7 +428,7 @@ Access nodes by index, IP (index path) or path:
     lv_gltf_model_node_t * arm = lv_gltf_model_node_get_by_path(model, "/body/arm");
 
     /* Get by index path (useful for unnamed nodes) */
-    lv_gltf_model_node_t * node = lv_gltf_model_node_get_by_ip(model, ".0.1");
+    lv_gltf_model_node_t * node = lv_gltf_model_node_get_by_numeric_path(model, ".0.1");
 
 
 Image-Based Lighting (IBL)
