@@ -36,6 +36,7 @@ LV_EXPORT_CONST_INT(LV_POLARCHART_POINT_NONE);
 typedef enum {
     LV_POLARCHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_POLARCHART_TYPE_LINE,     /**< Connect the points with lines*/
+    LV_POLARCHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
 } lv_polarchart_type_t;
 
 /**

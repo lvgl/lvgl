@@ -83,6 +83,23 @@ void lv_polarchart_set_type(lv_obj_t * obj, lv_polarchart_type_t type)
     lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->type == type) return;
 
+    if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
+        lv_polarchart_series_t * ser;
+        LV_LL_READ_BACK(&chart->series_ll, ser) {
+            lv_free(ser->angle_points);
+            ser->angle_points = NULL;
+        }
+    }
+
+    if(type == LV_POLARCHART_TYPE_SCATTER) {
+        lv_polarchart_series_t * ser;
+        LV_LL_READ_BACK(&chart->series_ll, ser) {
+            ser->angle_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
+            LV_ASSERT_MALLOC(ser->angle_points);
+            if(ser->angle_points == NULL) return;
+        }
+    }
+
     chart->type = type;
 
     lv_polarchart_refresh(obj);
@@ -100,6 +117,9 @@ void lv_polarchart_set_point_count(lv_obj_t * obj, uint32_t cnt)
     if(cnt < 1) cnt = 1;
 
     LV_LL_READ_BACK(&chart->series_ll, ser) {
+        if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
+            if(!ser->angle_ext_buf_assigned) new_points_alloc(obj, ser, cnt, &ser->angle_points);
+        }
         if(!ser->radial_ext_buf_assigned) new_points_alloc(obj, ser, cnt, &ser->radial_points);
         ser->start_point = 0;
     }
@@ -249,6 +269,11 @@ void lv_polarchart_get_point_pos_by_id(lv_obj_t * obj, lv_polarchart_series_t * 
         int32_t temp_y = value_to_y(obj, ser, ser->radial_points[id], h);
         p_out->y = h - temp_y;
     }
+    else if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
+        p_out->x = lv_map(ser->angle_points[id], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w);
+        int32_t temp_y = value_to_y(obj, ser, ser->radial_points[id], h);
+        p_out->y = h - temp_y;
+    }
     /*LV_POLARCHART_TYPE_NONE*/
     else {
         p_out->x = 0;
@@ -296,7 +321,19 @@ lv_polarchart_series_t * lv_polarchart_add_series(lv_obj_t * obj, lv_color_t col
     ser->radial_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->radial_points);
 
-    ser->angle_points = NULL;
+    if(chart->type == LV_CHART_TYPE_SCATTER) {
+        ser->angle_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
+        LV_ASSERT_MALLOC(ser->angle_points);
+        if(NULL == ser->angle_points) {
+            lv_free(ser->radial_points);
+            lv_ll_remove(&chart->series_ll, ser);
+            lv_free(ser);
+            return NULL;
+        }
+    }
+    else {
+        ser->angle_points = NULL;
+    }
 
     if(ser->radial_points == NULL) {
         if(ser->angle_points) {
@@ -680,6 +717,7 @@ static void lv_polarchart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             if(lv_ll_is_empty(&chart->series_ll) == false) {
                 if(chart->type == LV_POLARCHART_TYPE_LINE) draw_series_line(obj, layer);
+                else if(chart->type == LV_POLARCHART_TYPE_SCATTER) draw_series_scatter(obj, layer);
             }
 
             draw_cursors(obj, layer);
@@ -1013,7 +1051,22 @@ static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)
     if(x < 0) return 0;
     if(x > w) return chart->point_cnt - 1;
     if(chart->type == LV_POLARCHART_TYPE_LINE) return (x * (chart->point_cnt - 1) + w / 2) / w;
-
+    if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
+        /*For scatter polarcharts, the nearest id could be different depending on the series. Just check the first series.*/
+        lv_polarchart_series_t * ser = lv_polarchart_get_series_next(obj, NULL);
+        if(ser) {
+            int32_t best_dist = INT32_MAX;
+            uint32_t best_index = 0;
+            for(uint32_t i = 0; i < chart->point_cnt; i++) {
+                int32_t dist = LV_ABS(x - lv_map(ser->x_points[i], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w));
+                if(dist < best_dist) {
+                    best_dist = dist;
+                    best_index = i;
+                }
+            }
+            return best_index;
+        }
+    }
     return 0;
 }
 
