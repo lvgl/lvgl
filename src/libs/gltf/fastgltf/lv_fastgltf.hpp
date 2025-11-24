@@ -41,9 +41,11 @@ FASTGLTF_EXPORT inline auto getLocalTransformMatrix(const Node& node) {
 
 FASTGLTF_EXPORT inline void removeScale(fastgltf::math::fmat4x4& matrix) {
 	auto scale = math::fvec3( length(matrix.col(0)), length(matrix.col(1)), length(matrix.col(2)) );
-	matrix.col(0) /= scale.x();
-	matrix.col(1) /= scale.y();
-	matrix.col(2) /= scale.z();
+	if ( length( scale) > 0.0001f ) {
+		matrix.col(0) /= scale.x();
+		matrix.col(1) /= scale.y();
+		matrix.col(2) /= scale.z();
+	}
 }
 
 FASTGLTF_EXPORT template <typename AssetType, typename Callback>

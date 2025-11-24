@@ -1281,7 +1281,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
             if(node.cameraIndex.has_value()) {
                 if(current_camera_count == gltf_data->camera) {
                     fastgltf::removeScale(world_matrix);
-                    gltf_data->view_pos = world_matrix.col(3);
+                    gltf_data->view_pos = world_matrix.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
                     gltf_data->view_mat = fastgltf::math::invert(world_matrix);
                 }
             }
