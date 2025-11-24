@@ -92,14 +92,14 @@ void lv_spinbox_set_rollover(lv_obj_t * obj, bool rollover)
     spinbox->rollover = rollover;
 }
 
-void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t sep_pos)
+void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t dec_point_pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
 
-    if(sep_pos >= digit_count) sep_pos = 0;
+    if(dec_point_pos >= digit_count) dec_point_pos = 0;
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
         const int64_t max_val = lv_pow(10, digit_count);
@@ -108,7 +108,7 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
     }
 
     spinbox->digit_count   = digit_count;
-    spinbox->dec_point_pos = sep_pos;
+    spinbox->dec_point_pos = dec_point_pos;
 
     lv_spinbox_updatevalue(obj);
 }
