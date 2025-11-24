@@ -132,13 +132,14 @@ void test_screen_load_with_delete_event(void)
     TEST_ASSERT_EQUAL(lv_obj_is_valid(screen_with_anim_4), true);
 }
 
-static lv_obj_t * screen_create_trigger;
+static void unloaded_event_cb(lv_event_t * e)
+{
+    lv_free(lv_event_get_target_obj(e));
+}
 
 static lv_obj_t * screen_create(void)
 {
     lv_obj_t * screen = lv_obj_create(NULL);
-    screen_create_trigger = lv_obj_create(screen);
-    lv_obj_add_screen_create_event(screen_create_trigger, LV_EVENT_CLICKED, screen_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
     return screen;
 }
 
@@ -147,12 +148,19 @@ void test_screen_mix_event_and_manual_creation(void)
     lv_obj_delete(lv_screen_active());
     size_t free_mem = lv_test_get_free_mem();
 
-    for(size_t i = 0; i < 20; ++i) {
-        lv_screen_load_anim(screen_create(), LV_SCREEN_LOAD_ANIM_NONE, 0, 0, true);
-        lv_obj_send_event(screen_create_trigger, LV_EVENT_CLICKED, NULL);
-    }
+    lv_obj_t * screen = lv_obj_create(NULL);
+    lv_obj_t * screen_create_trigger = lv_obj_create(screen);
+    lv_obj_add_event_cb(screen, unloaded_event_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_obj_add_screen_create_event(screen_create_trigger, LV_EVENT_CLICKED, screen_create, LV_SCREEN_LOAD_ANIM_NONE, 0, 0);
+
+    /* Load a new screen by pressing the create button. The current screen is deleted in our unloaded event cb*/
+    lv_obj_send_event(screen_create_trigger, LV_EVENT_CLICKED, NULL);
+
+    /* Manually loading a screen with auto delete set to `true` should not create a double free */
+    lv_screen_load_anim(screen, LV_SCREEN_LOAD_ANIM_NONE, 0, 0, true);
 
     lv_obj_delete(lv_screen_active());
+
     TEST_ASSERT_MEM_LEAK_LESS_THAN(free_mem, 32);
 }
 
