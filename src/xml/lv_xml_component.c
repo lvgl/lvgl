@@ -312,7 +312,6 @@ lv_result_t lv_xml_component_unregister(const char * name)
 
     lv_xml_subject_t * subject;
     LV_LL_READ(&scope->subjects_ll, subject) {
-        LV_LOG_USER("######################## ");
         lv_free((char *)subject->name);
         if(subject->subject->type == LV_SUBJECT_TYPE_STRING) {
             lv_free((char *)subject->subject->prev_value.pointer);
