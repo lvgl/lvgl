@@ -156,7 +156,7 @@ void test_screen_mix_event_and_manual_creation(void)
     /* Load a new screen by pressing the create button. The current screen is deleted in our unloaded event cb*/
     lv_obj_send_event(screen_create_trigger, LV_EVENT_CLICKED, NULL);
 
-    /* Manually loading a screen with auto delete set to `true` should not create a double free */
+    /* Manually loading a screen with auto delete set to `true` should not lead to a double free */
     lv_screen_load_anim(screen, LV_SCREEN_LOAD_ANIM_NONE, 0, 0, true);
 
     lv_obj_delete(lv_screen_active());
