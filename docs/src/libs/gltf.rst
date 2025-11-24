@@ -351,8 +351,8 @@ Change individual node properties using setter functions. Changes are queued and
 Reading Node Properties
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-For performance reasons, the node properties are only calculated during rendering,
-for that reason, in order to read these, you must first register an event callback.
+For performance reasons, the node properties are only calculated during rendering so, in order to read them,
+you must first register an event callback.
 
 This event callback will be called every time the node properties change.
 
@@ -360,6 +360,7 @@ Property values can only be read from within the ``LV_EVENT_VALUE_CHANGED``
 callback to ensure data validity.
 
 .. code-block:: c
+
     static void node_value_cb(lv_event_t * e)
     {
         lv_3dpoint_t position, rotation, scale;
