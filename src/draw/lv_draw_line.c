@@ -50,8 +50,6 @@ lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_TASK_TYPE_LINE ? (lv_draw_line_dsc_t *)task->draw_dsc : NULL;
 }
 
-lv_draw_line_dsc_t * p;
-
 void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;
@@ -67,6 +65,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         a.y2 = (int32_t)LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width;
     }
     else {
+        if(dsc->point_cnt <= 1) {
+            LV_LOG_INFO("Skip line drawing as point_cnt was 1");
+            return;
+        }
+
         a.x1 = LV_COORD_MAX;
         a.y1 = LV_COORD_MAX;
         a.x2 = LV_COORD_MIN;
@@ -97,7 +100,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
 
     if(dsc->points) {
         lv_draw_line_dsc_t * new_draw_dsc = t->draw_dsc;
-        p = new_draw_dsc;
         size_t array_size = dsc->point_cnt * sizeof(lv_point_precise_t);
         lv_point_precise_t * new_points = lv_malloc(array_size);
         lv_memcpy(new_points, dsc->points, array_size);
@@ -128,6 +130,11 @@ void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
                points[i].y == LV_DRAW_LINE_POINT_NONE) {
                 continue;
             }
+            if(points[i + 1].x == LV_DRAW_LINE_POINT_NONE ||
+               points[i + 1].y == LV_DRAW_LINE_POINT_NONE) {
+                continue;
+            }
+
             dsc_tmp.p1 = points[i];
             dsc_tmp.p2 = points[i + 1];
 

@@ -71,6 +71,15 @@ static void add_faded_area(lv_event_t * e)
     for(i = 0; i < draw_line_dsc->point_cnt - 1; i++) {
         p1 = draw_line_dsc->points[i];
         p2 = draw_line_dsc->points[i + 1];
+        if(p1[i].x == LV_DRAW_LINE_POINT_NONE ||
+           p1[i].y == LV_DRAW_LINE_POINT_NONE) {
+            continue;
+        }
+        if(p2[i].x == LV_DRAW_LINE_POINT_NONE ||
+           p2[i].y == LV_DRAW_LINE_POINT_NONE) {
+            continue;
+        }
+
         tri_dsc.p[0].x = p1.x;
         tri_dsc.p[0].y = p1.y;
         tri_dsc.p[1].x = p2.x;
@@ -80,10 +89,10 @@ static void add_faded_area(lv_event_t * e)
         tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
         int32_t full_h = lv_obj_get_height(obj);
-        int32_t fract_uppter = (int32_t)(LV_MIN(p1.y, p2.y) - coords.y1) * 255 / full_h;
+        int32_t fract_upper = (int32_t)(LV_MIN(p1.y, p2.y) - coords.y1) * 255 / full_h;
         int32_t fract_lower = (int32_t)(LV_MAX(p1.y, p2.y) - coords.y1) * 255 / full_h;
         tri_dsc.grad.stops[0].color = ser_color;
-        tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_uppter);
+        tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_upper);
         tri_dsc.grad.stops[0].frac = 0;
         tri_dsc.grad.stops[1].color = ser_color;
         tri_dsc.grad.stops[1].opa = (lv_opa_t)(255 - fract_lower);
