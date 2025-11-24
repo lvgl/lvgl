@@ -18,15 +18,15 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-#define CAVAS_WIDTH 180
-#define CAVAS_HEIGHT 100
+#define CANVAS_WIDTH 180
+#define CANVAS_HEIGHT 100
 
 
 static void small_canvas_render(const char * name_sub, lv_color_format_t cf, void * canvas_buf, int32_t blur_radius,
                                 uint32_t corner_radius)
 {
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas,    canvas_buf, CAVAS_WIDTH, CAVAS_HEIGHT, cf);
+    lv_canvas_set_buffer(canvas,    canvas_buf, CANVAS_WIDTH, CANVAS_HEIGHT, cf);
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
 
     lv_layer_t layer;
@@ -42,7 +42,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
     label_dsc.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
                      "Curabitur sed velit sed neque tristique sagittis vel et sapien.";
 
-    lv_area_t label1_coords = {10, 10, CAVAS_WIDTH - 10, CAVAS_HEIGHT - 10};
+    lv_area_t label1_coords = {10, 10, CANVAS_WIDTH - 10, CANVAS_HEIGHT - 10};
     lv_draw_label(&layer, &label_dsc, &label1_coords);
 
     /*Blur the middle of the canvas*/
@@ -51,7 +51,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
     blur_dsc.corner_radius = corner_radius;
     blur_dsc.blur_radius = blur_radius;
 
-    lv_area_t fill_coords = {40, 20, CAVAS_WIDTH - 40, CAVAS_HEIGHT - 20};
+    lv_area_t fill_coords = {40, 20, CANVAS_WIDTH - 40, CANVAS_HEIGHT - 20};
     lv_draw_blur(&layer, &blur_dsc, &fill_coords);
 
     /*Draw a semi-transparent rectangle on the blurred area*/
@@ -73,7 +73,7 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
     label_dsc.align = LV_TEXT_ALIGN_CENTER;
     label_dsc.text = buf;
 
-    lv_area_t label2_coords = {50, 30, CAVAS_WIDTH - 50, CAVAS_HEIGHT - 30};
+    lv_area_t label2_coords = {50, 30, CANVAS_WIDTH - 50, CANVAS_HEIGHT - 30};
     lv_draw_label(&layer, &label_dsc, &label2_coords);
 
     lv_canvas_finish_layer(canvas, &layer);
@@ -81,16 +81,16 @@ static void small_canvas_render(const char * name_sub, lv_color_format_t cf, voi
 
 void test_blur(void)
 {
-    static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[16][LV_TEST_WIDTH_TO_STRIDE(CAVAS_WIDTH,
-                                                                                 4) * CAVAS_HEIGHT + LV_DRAW_BUF_ALIGN];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[16][LV_TEST_WIDTH_TO_STRIDE(CANVAS_WIDTH,
+                                                                                 4) * CANVAS_HEIGHT + LV_DRAW_BUF_ALIGN];
 
-    uint32_t corder_radius_options[4] = {0, 4, 16, 32};
+    uint32_t corner_radius_options[4] = {0, 4, 16, 32};
     uint32_t r;
 
     for(r = 0; r < 4; r++) {
         lv_obj_clean(lv_screen_active());
 
-        uint32_t radius_current = corder_radius_options[r];
+        uint32_t radius_current = corner_radius_options[r];
         small_canvas_render("rgb565", LV_COLOR_FORMAT_RGB565, canvas_buf[0], 6, radius_current);
         small_canvas_render("rgb888", LV_COLOR_FORMAT_RGB888, canvas_buf[1], 6, radius_current);
         small_canvas_render("xrgb8888", LV_COLOR_FORMAT_XRGB8888, canvas_buf[2], 6, radius_current);
