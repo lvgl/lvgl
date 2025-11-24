@@ -770,8 +770,7 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
 #else
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-    //lv_opengles_viewport(0, 0, texture_w, texture_h);
-    GL_CALL(glViewport(0, 0, texture_w, texture_h));
+    lv_opengles_viewport(0, 0, texture_w, texture_h);
 #endif
 
     if(prepare_bg) {
