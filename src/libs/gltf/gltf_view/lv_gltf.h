@@ -17,8 +17,6 @@
 #include "../math/lv_3dmath.h"
 #include "../../../misc/lv_types.h"
 #include "../../../misc/lv_area.h"
-#include "../../../misc/lv_color.h"
-#include "../../../misc/lv_3dmath.h"
 #include "../gltf_data/lv_gltf_model.h"
 
 #ifdef __cplusplus
