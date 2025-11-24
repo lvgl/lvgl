@@ -1041,7 +1041,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 
     int32_t bullet_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
     int32_t bullet_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
-    int32_t extra_space_x = w  / (chart->point_cnt - 1) + bullet_w + line_dsc->width;
+    int32_t extra_space_x = w  / (chart->point_cnt - 1) + bullet_w + line_dsc.width;
 
     lv_draw_rect_dsc_t point_draw_dsc;
     if(crowded_mode == false) {
@@ -1058,7 +1058,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         points = lv_malloc(chart->point_cnt * sizeof(lv_point_precise_t));
     }
 
-    if(line_dsc.points == NULL) {
+    if(points == NULL) {
         LV_LOG_WARN("Couldn't allocate the points array");
         return;
     }
