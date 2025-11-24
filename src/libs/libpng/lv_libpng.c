@@ -130,7 +130,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 }
 
 /**
- * Open a PNG image and return the decided image
+ * Open a PNG image and return the decoded image
  * @param decoder pointer to the decoder
  * @param dsc     pointer to the decoder descriptor
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
