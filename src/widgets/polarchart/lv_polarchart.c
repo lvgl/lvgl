@@ -551,8 +551,8 @@ void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser,
         return;
     }
 
-    ser->angle_points[ser->start_point] = x_value;
-    ser->radial_points[ser->start_point] = y_value;
+    ser->angle_points[ser->start_point] = angle_value;
+    ser->radial_points[ser->start_point] = radial_value;
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
     invalidate_point(obj, ser->start_point);
 }
