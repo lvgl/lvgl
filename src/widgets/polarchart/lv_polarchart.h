@@ -322,7 +322,7 @@ void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, 
  * Set the next point's 'angle' and 'radial' value according to the update mode policy.
  * @param obj       pointer to chart object
  * @param ser       pointer to a data series on 'chart'
- * @param x_value   the new 'angle' value of the next data
+ * @param angle_value   the new 'angle' value of the next data
  * @param y_value   the new 'radial' value of the next data
  */
 void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t angle_value,
