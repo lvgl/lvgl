@@ -981,14 +981,14 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = ser->color;
         point_dsc_default.bg_color = ser->color;
 
-        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
 
         int32_t p_act = start_point;
         int32_t p_prev = start_point;
-        if(ser->radial_points[p_act] != LV_CHART_POINT_CNT_DEF) {
+        if(ser->radial_points[p_act] != LV_POLARCHART_POINT_CNT_DEF) {
             line_dsc.p2.x = lv_map(ser->angle_points[p_act], chart->angle_min, chart->angle_max, 0, w);
             line_dsc.p2.x += x_ofs;
 
@@ -1006,7 +1006,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
             line_dsc.p1.y = line_dsc.p2.y;
 
             p_act = (start_point + i) % chart->point_cnt;
-            if(ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+            if(ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                 line_dsc.p2.y =  lv_map(ser->radial_points[p_act], chart->radial_min, chart->radial_max, 0, h);
                 line_dsc.p2.y = h - line_dsc.p2.y;
                 line_dsc.p2.y += y_ofs;
@@ -1026,7 +1026,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.y1 = (int32_t)line_dsc.p1.y - point_h;
                 point_area.y2 = (int32_t)line_dsc.p1.y + point_h;
 
-                if(ser->radial_points[p_prev] != LV_CHART_POINT_NONE && ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                if(ser->radial_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                     line_dsc.base.id2 = i - 1;
                     lv_draw_line(layer, &line_dsc);
                     if(point_w && point_h) {
@@ -1041,7 +1041,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
             /*Draw the last point*/
             if(i == chart->point_cnt - 1) {
 
-                if(ser->radial_points[p_act] != LV_CHART_POINT_NONE) {
+                if(ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                     lv_area_t point_area;
                     point_area.x1 = (int32_t)line_dsc.p2.x - point_w;
                     point_area.x2 = (int32_t)line_dsc.p2.x + point_w;
