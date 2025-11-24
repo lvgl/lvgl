@@ -1265,14 +1265,17 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
             }
 
             // Rebuild the local matrix after applying all overrides
-            worldmatrix_was_inlined = true;
-            inlined_worldmatrix = fastgltf::math::scale(
-                                      fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(parentworldmatrix), local_pos),
-                                                             made_rotation_changes ?
-                                                             lv_gltf_math_euler_to_quaternion(
-                                                                 local_rot[0], local_rot[1], local_rot[2]) :
-                                                             local_quat),
-                                      local_scale);
+            if(made_rotation_changes) local_quat = lv_gltf_math_euler_to_quaternion(local_rot[0], local_rot[1], local_rot[2]);
+
+            if(node.children.size() == 0) {
+                worldmatrix_was_inlined = true;
+                inlined_worldmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(
+                                                                                                                 parentworldmatrix), local_pos), local_quat), local_scale);
+            }
+            else {
+                localmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(),
+                                                                                                     local_pos), local_quat), local_scale);
+            }
         }
 
         if(node.cameraIndex.has_value()) current_camera_count++;
