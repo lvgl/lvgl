@@ -1178,6 +1178,8 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
                                                 localmatrix);
             made_changes = true;
         }
+        bool worldmatrix_was_inlined = false;
+        fastgltf::math::fmat4x4 inlined_worldmatrix;
         if(gltf_data->node_binds.find(&node) != gltf_data->node_binds.end()) {
             lv_gltf_bind_t * current_override = gltf_data->node_binds[&node];
             fastgltf::math::fvec3 local_pos;
@@ -1263,19 +1265,20 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * gltf_data)
             }
 
             // Rebuild the local matrix after applying all overrides
-            localmatrix = fastgltf::math::scale(
-                              fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
-                                                     made_rotation_changes ?
-                                                     lv_gltf_math_euler_to_quaternion(
-                                                         local_rot[0], local_rot[1], local_rot[2]) :
-                                                     local_quat),
-                              local_scale);
+            worldmatrix_was_inlined = true;
+            inlined_worldmatrix = fastgltf::math::scale(
+                                      fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(parentworldmatrix), local_pos),
+                                                             made_rotation_changes ?
+                                                             lv_gltf_math_euler_to_quaternion(
+                                                                 local_rot[0], local_rot[1], local_rot[2]) :
+                                                             local_quat),
+                                      local_scale);
         }
 
         if(node.cameraIndex.has_value()) current_camera_count++;
 
         if(made_changes || !lv_gltf_data_has_cached_transform(gltf_data, &node)) {
-            auto world_matrix = parentworldmatrix * localmatrix;
+            auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : parentworldmatrix * localmatrix;
             lv_gltf_data_set_cached_transform(gltf_data, &node, world_matrix);
 
             if(node.cameraIndex.has_value()) {
