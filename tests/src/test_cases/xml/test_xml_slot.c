@@ -35,9 +35,9 @@ void test_xml_slot_1(void)
         "  <view flex_flow=\"column\" width=\"300\" height=\"400\">"
         "    <my_button/>"
         "    <my_button label=\"Custom label\">"
-        "		<my_button-slot1>"
-        "		  <lv_label text=\"New label\" style_text_color=\"0xf00\"/>"
-        "		</my_button-slot1>"
+        "      <my_button-slot1>"
+        "        <lv_label text=\"New label\" style_text_color=\"0xf00\"/>"
+        "      </my_button-slot1>"
         "    </my_button>"
         "  </view>"
         "</component>";
