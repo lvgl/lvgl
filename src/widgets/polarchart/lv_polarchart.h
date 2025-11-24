@@ -1,10 +1,10 @@
 /**
- * @file lv_polar_chart.h
+ * @file lv_polarchart.h
  *
  */
 
-#ifndef LV_POLAR_CHART_H
-#define LV_POLAR_CHART_H
+#ifndef LV_POLARCHART_H
+#define LV_POLARCHART_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,15 +16,15 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #include "../../core/lv_obj.h"
 
-#if LV_USE_POLAR_CHART != 0
+#if LV_USE_POLARCHART != 0
 
 /*********************
  *      DEFINES
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
-#define LV_POLAR_CHART_POINT_NONE     (INT32_MAX)
-LV_EXPORT_CONST_INT(LV_POLAR_CHART_POINT_NONE);
+#define LV_POLARCHART_POINT_NONE     (INT32_MAX)
+LV_EXPORT_CONST_INT(LV_POLARCHART_POINT_NONE);
 
 /**********************
  *      TYPEDEFS
@@ -34,78 +34,78 @@ LV_EXPORT_CONST_INT(LV_POLAR_CHART_POINT_NONE);
  * Chart types
  */
 typedef enum {
-    LV_POLAR_CHART_TYPE_NONE,     /**< Don't draw the series*/
-    LV_POLAR_CHART_TYPE_LINE,     /**< Connect the points with lines*/
-} lv_polar_chart_type_t;
+    LV_POLARCHART_TYPE_NONE,     /**< Don't draw the series*/
+    LV_POLARCHART_TYPE_LINE,     /**< Connect the points with lines*/
+} lv_polarchart_type_t;
 
 /**
- * Chart update mode for `lv_polar_chart_set_next`
+ * Chart update mode for `lv_polarchart_set_next`
  */
 typedef enum {
-    LV_POLAR_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
-    LV_POLAR_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
-} lv_polar_chart_update_mode_t;
+    LV_POLARCHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
+    LV_POLARCHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
+} lv_polarchart_update_mode_t;
 
 /**
  * Enumeration of the axis'
  */
 typedef enum {
-    LV_POLAR_CHART_AXIS_RADIAL    = 0x00,
-    LV_POLAR_CHART_AXIS_ANGLE     = 0x01,
-    LV_POLAR_CHART_AXIS_LAST
-} lv_polar_chart_axis_t;
+    LV_POLARCHART_AXIS_RADIAL    = 0x00,
+    LV_POLARCHART_AXIS_ANGLE     = 0x01,
+    LV_POLARCHART_AXIS_LAST
+} lv_polarchart_axis_t;
 
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_polar_chart_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_polarchart_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Create a polar chart object
+ * Create a polarchart object
  * @param parent    pointer to an object, it will be the parent of the new chart
  * @return          pointer to the created chart
  */
-lv_obj_t * lv_polar_chart_create(lv_obj_t * parent);
+lv_obj_t * lv_polarchart_create(lv_obj_t * parent);
 
 /**
- * Set a new type for a polar chart
- * @param obj       pointer to a polar chart object
+ * Set a new type for a polarchart
+ * @param obj       pointer to a polarchart object
  * @param type      new type of the chart (from 'lv_chart_type_t' enum)
  */
-void lv_polar_chart_set_type(lv_obj_t * obj, lv_polar_chart_type_t type);
+void lv_polarchart_set_type(lv_obj_t * obj, lv_polarchart_type_t type);
 
 /**
- * Set the number of points on a data line on a polar chart
- * @param obj       pointer to a polar chart object
+ * Set the number of points on a data line on a polarchart
+ * @param obj       pointer to a polarchart object
  * @param cnt       new number of points on the data lines
  */
-void lv_polar_chart_set_point_count(lv_obj_t * obj, uint32_t cnt);
+void lv_polarchart_set_point_count(lv_obj_t * obj, uint32_t cnt);
 
 /**
  * Set the minimal and maximal y values on an axis
- * @param obj       pointer to a polar chart object
- * @param axis      `LV_POLAR_CHART_AXIS_RADIAL`
+ * @param obj       pointer to a polarchart object
+ * @param axis      `LV_POLARCHART_AXIS_RADIAL`
  * @param min       minimum value of the y axis
  * @param max       maximum value of the y axis
  */
-void lv_polar_chart_set_axis_range(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t min, int32_t max);
+void lv_polarchart_set_axis_range(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t min, int32_t max);
 
 /**
  * Set the minimal values on an axis
- * @param obj       pointer to a polar chart object
- * @param axis      `LV_POLAR_CHART_AXIS_RADIAL`
+ * @param obj       pointer to a polarchart object
+ * @param axis      `LV_POLARCHART_AXIS_RADIAL`
  * @param min       minimal value of the y axis
  */
-void lv_polar_chart_set_axis_min_value(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t min);
+void lv_polarchart_set_axis_min_value(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t min);
 
 /**
  * Set the maximal y values on an axis
- * @param obj       pointer to a polar chart object
- * @param axis      `LV_POLAR_CHART_AXIS_RADIAL`
+ * @param obj       pointer to a polarchart object
+ * @param axis      `LV_POLARCHART_AXIS_RADIAL`
  * @param max       maximum value of the y axis
  */
-void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t max);
+void lv_polarchart_set_axis_max_value(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t max);
 
 
 /**
@@ -113,66 +113,66 @@ void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_polar_chart_axis_t axi
  * @param obj              pointer to a chart object
  * @param update_mode      the update mode
  */
-void lv_polar_chart_set_update_mode(lv_obj_t * obj, lv_polar_chart_update_mode_t update_mode);
+void lv_polarchart_set_update_mode(lv_obj_t * obj, lv_polarchart_update_mode_t update_mode);
 
 /**
  * Set the number of angle and radial division lines
- * @param obj           pointer to a polar chart object
+ * @param obj           pointer to a polarchart object
  * @param angle_div     number of angle division lines
  * @param radial_div    number of radial division lines
  */
-void lv_polar_chart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint32_t radial_div);
+void lv_polarchart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint32_t radial_div);
 
 /**
  * Set the number of radial division lines
- * @param obj       pointer to a polar chart object
+ * @param obj       pointer to a polarchart object
  * @param cnt       number of radial division lines
  */
-void lv_polar_chart_set_radial_div_line_count(lv_obj_t * obj, uint32_t cnt);
+void lv_polarchart_set_radial_div_line_count(lv_obj_t * obj, uint32_t cnt);
 
 /**
  * Set the number of angle division lines
- * @param obj       pointer to a polar chart object
+ * @param obj       pointer to a polarchart object
  * @param cnt       number of angle division lines
  */
-void lv_polar_chart_set_angle_div_line_count(lv_obj_t * obj, uint32_t cnt);
+void lv_polarchart_set_angle_div_line_count(lv_obj_t * obj, uint32_t cnt);
 
 /**
  * Get the type of a chart
- * @param obj       pointer to polar chart object
- * @return          type of the polar chart (from 'lv_polar_chart_t' enum)
+ * @param obj       pointer to polarchart object
+ * @return          type of the polarchart (from 'lv_polarchart_t' enum)
  */
-lv_polar_chart_type_t lv_polar_chart_get_type(const lv_obj_t * obj);
+lv_polarchart_type_t lv_polarchart_get_type(const lv_obj_t * obj);
 
 /**
- * Get the data point number per data line on polar chart
- * @param obj       pointer to polar chart object
+ * Get the data point number per data line on polarchart
+ * @param obj       pointer to polarchart object
  * @return          point number on each data line
  */
-uint32_t lv_polar_chart_get_point_count(const lv_obj_t * obj);
+uint32_t lv_polarchart_get_point_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the angle-axis start point in the data array
- * @param obj       pointer to a polar chart object
- * @param ser       pointer to a data series on polar chart
+ * @param obj       pointer to a polarchart object
+ * @param ser       pointer to a data series on polarchart
  * @return          the index of the current angle start point in the data array
  */
-uint32_t lv_polar_chart_get_angle_start_point(const lv_obj_t * obj, lv_polar_chart_series_t * ser);
+uint32_t lv_polarchart_get_angle_start_point(const lv_obj_t * obj, lv_polarchart_series_t * ser);
 
 /**
- * Get the position of a point on the polar chart.
- * @param obj       pointer to a polar chart object
+ * Get the position of a point on the polarchart.
+ * @param obj       pointer to a polarchart object
  * @param ser       pointer to series
  * @param id        the index.
  * @param p_out     store the result position here
  */
-void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, lv_point_t * p_out);
+void lv_polarchart_get_point_pos_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, lv_point_t * p_out);
 
 /**
  * Refresh a chart if its data line has changed
  * @param   obj   pointer to chart object
  */
-void lv_polar_chart_refresh(lv_obj_t * obj);
+void lv_polarchart_refresh(lv_obj_t * obj);
 
 /*======================
  * Series
@@ -185,14 +185,14 @@ void lv_polar_chart_refresh(lv_obj_t * obj);
  * @param axis      the y axis to which the series should be attached (::LV_CHART_AXIS_PRIMARY_RADIAL)
  * @return          pointer to the allocated data series or NULL on failure
  */
-lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_polar_chart_axis_t axis);
+lv_polarchart_series_t * lv_polarchart_add_series(lv_obj_t * obj, lv_color_t color, lv_polarchart_axis_t axis);
 
 /**
  * Deallocate and remove a data series from a chart
  * @param obj       pointer to a chart object
  * @param series    pointer to a data series on 'chart'
  */
-void lv_polar_chart_remove_series(lv_obj_t * obj, lv_polar_chart_series_t * series);
+void lv_polarchart_remove_series(lv_obj_t * obj, lv_polarchart_series_t * series);
 
 /**
  * Hide/Unhide a single series of a chart.
@@ -200,7 +200,7 @@ void lv_polar_chart_remove_series(lv_obj_t * obj, lv_polar_chart_series_t * seri
  * @param series    pointer to a series object
  * @param hide      true: hide the series
  */
-void lv_polar_chart_hide_series(lv_obj_t * chart, lv_polar_chart_series_t * series, bool hide);
+void lv_polarchart_hide_series(lv_obj_t * chart, lv_polarchart_series_t * series, bool hide);
 
 /**
  * Change the color of a series
@@ -208,7 +208,7 @@ void lv_polar_chart_hide_series(lv_obj_t * chart, lv_polar_chart_series_t * seri
  * @param series    pointer to a series object
  * @param color     the new color of the series
  */
-void lv_polar_chart_set_series_color(lv_obj_t * chart, lv_polar_chart_series_t * series, lv_color_t color);
+void lv_polarchart_set_series_color(lv_obj_t * chart, lv_polarchart_series_t * series, lv_color_t color);
 
 /**
  * Get the color of a series
@@ -216,7 +216,7 @@ void lv_polar_chart_set_series_color(lv_obj_t * chart, lv_polar_chart_series_t *
  * @param series    pointer to a series object
  * @return          the color of the series
  */
-lv_color_t lv_polar_chart_get_series_color(lv_obj_t * chart, const lv_polar_chart_series_t * series);
+lv_color_t lv_polarchart_get_series_color(lv_obj_t * chart, const lv_polarchart_series_t * series);
 
 /**
  * Set the index of the x-axis start point in the data array.
@@ -225,7 +225,7 @@ lv_color_t lv_polar_chart_get_series_color(lv_obj_t * chart, const lv_polar_char
  * @param ser       pointer to a data series on 'chart'
  * @param id        the index of the x point in the data array
  */
-void lv_polar_chart_set_x_start_point(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id);
+void lv_polarchart_set_x_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id);
 
 /**
  * Get the next series.
@@ -233,7 +233,7 @@ void lv_polar_chart_set_x_start_point(lv_obj_t * obj, lv_polar_chart_series_t * 
  * @param ser      the previous series or NULL to get the first
  * @return          the next series or NULL if there is no more.
  */
-lv_polar_chart_series_t * lv_polar_chart_get_series_next(const lv_obj_t * chart, const lv_polar_chart_series_t * ser);
+lv_polarchart_series_t * lv_polarchart_get_series_next(const lv_obj_t * chart, const lv_polarchart_series_t * ser);
 
 /*=====================
  * Cursor
@@ -246,14 +246,14 @@ lv_polar_chart_series_t * lv_polar_chart_get_series_next(const lv_obj_t * chart,
  * @param dir       direction of the cursor. `LV_DIR_RIGHT/LEFT/TOP/DOWN/HOR/VER/ALL`. OR-ed values are possible
  * @return          pointer to the created cursor
  */
-lv_polar_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir);
+lv_polarchart_cursor_t  * lv_polarchart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir);
 
 /**
  * Remove a cursor
  * @param obj       pointer to chart object
  * @param cursor    pointer to the cursor
  */
-void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_polar_chart_cursor_t * cursor);
+void lv_polarchart_remove_cursor(lv_obj_t * obj, lv_polarchart_cursor_t * cursor);
 
 /**
  * Set the coordinate of the cursor with respect to the paddings
@@ -261,23 +261,23 @@ void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_polar_chart_cursor_t * curs
  * @param cursor    pointer to the cursor
  * @param pos       the new coordinate of cursor relative to the chart
  */
-void lv_polar_chart_set_cursor_pos(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_point_t * pos);
+void lv_polarchart_set_cursor_pos(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, lv_point_t * pos);
 
 /**
  * Set the 'angle' coordinate of the cursor with respect to the paddings
- * @param chart     pointer to a polar chart object
+ * @param chart     pointer to a polarchart object
  * @param cursor    pointer to the cursor
  * @param angle     the new 'angle' coordinate of cursor relative to the chart
  */
-void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t angle);
+void lv_polarchart_set_cursor_pos_angle(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, int32_t angle);
 
 /**
  * Set the coordinate of the cursor with respect to the paddings
- * @param chart     pointer to a polar chart object
+ * @param chart     pointer to a polarchart object
  * @param cursor    pointer to the cursor
  * @param y         the new 'radial' coordinate of cursor relative to the chart
  */
-void lv_polar_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t radial);
+void lv_polarchart_set_cursor_pos_radial(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, int32_t radial);
 
 /**
  * Stick the cursor to a point
@@ -286,7 +286,7 @@ void lv_polar_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_curso
  * @param ser       pointer to a series
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
-void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
+void lv_polarchart_set_cursor_point(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, lv_polarchart_series_t * ser,
                                      uint32_t point_id);
 
 /**
@@ -295,7 +295,7 @@ void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t *
  * @param cursor    pointer to cursor
  * @return          coordinate of the cursor as lv_point_t
  */
-lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor);
+lv_point_t lv_polarchart_get_cursor_point(lv_obj_t * chart, lv_polarchart_cursor_t * cursor);
 
 /*=====================
  * Set/Get value(s)
@@ -307,7 +307,7 @@ lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_curs
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value for all points. `LV_CHART_POINT_NONE` can be used to hide the points.
  */
-void lv_polar_chart_set_all_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value);
+void lv_polarchart_set_all_values(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value);
 
 /**
  * Set the next point's Y value according to the update mode policy.
@@ -315,7 +315,7 @@ void lv_polar_chart_set_all_values(lv_obj_t * obj, lv_polar_chart_series_t * ser
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value of the next data
  */
-void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value);
+void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value);
 
 /**
  * Same as `lv_chart_set_next_value` but set the values from an array
@@ -324,7 +324,7 @@ void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser
  * @param values        the new values to set
  * @param values_cnt    number of items in `values`
  */
-void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
+void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t values[],
                                       size_t values_cnt);
 
 /**
@@ -334,48 +334,48 @@ void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * 
  * @param id      the index of the x point in the array
  * @param value   value to assign to array point
  */
-void lv_polar_chart_set_series_value_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, int32_t value);
+void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t value);
 
 /**
- * Set an external array for the 'radial' data points to use for the polar chart
+ * Set an external array for the 'radial' data points to use for the polarchart
  * NOTE: It is the users responsibility to make sure the `point_cnt` matches the external array size.
- * @param obj       pointer to a polar chart object
- * @param ser       pointer to a data series on polar chart
- * @param array     external array of points for polar chart
+ * @param obj       pointer to a polarchart object
+ * @param ser       pointer to a data series on polarchart
+ * @param array     external array of points for polarchart
  */
-void lv_polar_chart_set_series_ext_radial_array(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t array[]);
+void lv_polarchart_set_series_ext_radial_array(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t array[]);
 
 /**
- * Set an external array for the 'angle' data points to use for the polar chart
+ * Set an external array for the 'angle' data points to use for the polarchart
  * NOTE: It is the users responsibility to make sure the `point_cnt` matches the external array size.
- * @param obj       pointer to a polar chart object
- * @param ser       pointer to a data series on polar chart
- * @param array     external array of points for polar chart
+ * @param obj       pointer to a polarchart object
+ * @param ser       pointer to a data series on polarchart
+ * @param array     external array of points for polarchart
  */
-void lv_polar_chart_set_series_ext_angle_array(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t array[]);
+void lv_polarchart_set_series_ext_angle_array(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t array[]);
 
 /**
  * Get the array of 'radial' values of a series
- * @param obj   pointer to a polar chart object
- * @param ser   pointer to a data series on polar chart
+ * @param obj   pointer to a polarchart object
+ * @param ser   pointer to a data series on polarchart
  * @return      the array of values with 'point_count' elements
  */
-int32_t * lv_polar_chart_get_series_radial_array(const lv_obj_t * obj, lv_polar_chart_series_t * ser);
+int32_t * lv_polarchart_get_series_radial_array(const lv_obj_t * obj, lv_polarchart_series_t * ser);
 
 /**
  * Get the array of 'angle' values of a series
- * @param obj   pointer to a polar chart object
- * @param ser   pointer to a data series on polar chart
+ * @param obj   pointer to a polarchart object
+ * @param ser   pointer to a data series on polarchart
  * @return      the array of values with 'point_count' elements
  */
-int32_t * lv_polar_chart_get_series_angle_array(const lv_obj_t * obj, lv_polar_chart_series_t * ser);
+int32_t * lv_polarchart_get_series_angle_array(const lv_obj_t * obj, lv_polarchart_series_t * ser);
 
 /**
  * Get the index of the currently pressed point. It's the same for every series.
  * @param obj       pointer to a chart object
  * @return          the index of the point [0 .. point count] or LV_CHART_POINT_ID_NONE if no point is being pressed
  */
-uint32_t lv_polar_chart_get_pressed_point(const lv_obj_t * obj);
+uint32_t lv_polarchart_get_pressed_point(const lv_obj_t * obj);
 
 /**
  * Get the overall offset from the chart's side to the center of the first point.
@@ -383,16 +383,16 @@ uint32_t lv_polar_chart_get_pressed_point(const lv_obj_t * obj);
  * @param obj       pointer to a chart object
  * @return          the offset of the center
  */
-int32_t lv_polar_chart_get_first_point_center_offset(lv_obj_t * obj);
+int32_t lv_polarchart_get_first_point_center_offset(lv_obj_t * obj);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_POLAR_CHART*/
+#endif /*LV_USE_POLARCHART*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_POLAR_CHART_H*/
+#endif /*LV_POLARCHART_H*/

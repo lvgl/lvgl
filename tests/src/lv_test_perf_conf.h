@@ -692,7 +692,7 @@
 
         #define LV_USE_CHART      1
 
-        #define LV_USE_POLAR_CHART      1
+        #define LV_USE_POLARCHART      1
 
         #define LV_USE_CHECKBOX   1
 

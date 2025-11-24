@@ -321,8 +321,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_POLAR_CHART
-    else if(lv_obj_check_type(obj, &lv_polar_chart_class)) {
+#if LV_USE_POLARCHART
+    else if(lv_obj_check_type(obj, &lv_polarchart_class)) {
         lv_obj_add_style(obj, &theme->styles.white, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.light, LV_PART_ITEMS);

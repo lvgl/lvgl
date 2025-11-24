@@ -1,30 +1,30 @@
 /**
- * @file lv_polar_chart.c
+ * @file lv_polarchart.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_polar_chart_private.h"
+#include "lv_polarchart_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj_draw_private.h"
-#if LV_USE_POLAR_CHART != 0
+#if LV_USE_POLARCHART != 0
 
 #include "../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS (&lv_polar_chart_class)
+#define MY_CLASS (&lv_polarchart_class)
 
-#define LV_POLAR_CHART_RADIAL_DIV_DEF 5
-#define LV_POLAR_CHART_ANGLE_DIV_DEF 8
-#define LV_POLAR_CHART_POINT_CNT_DEF 10
-#define LV_POLAR_CHART_LABEL_MAX_TEXT_LENGTH 16
+#define LV_POLARCHART_RADIAL_DIV_DEF 5
+#define LV_POLARCHART_ANGLE_DIV_DEF 8
+#define LV_POLARCHART_POINT_CNT_DEF 10
+#define LV_POLARCHART_LABEL_MAX_TEXT_LENGTH 16
 
 /**********************
  *      TYPEDEFS
@@ -33,31 +33,31 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_polar_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_polar_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static void lv_polarchart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_polarchart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_polarchart_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer);
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
-static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t cnt, int32_t ** a);
-static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t v, int32_t h);
+static void new_points_alloc(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t cnt, int32_t ** a);
+static int32_t value_to_y(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t v, int32_t h);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-const lv_obj_class_t lv_polar_chart_class = {
-    .constructor_cb = lv_polar_chart_constructor,
-    .destructor_cb = lv_polar_chart_destructor,
-    .event_cb = lv_polar_chart_event,
+const lv_obj_class_t lv_polarchart_class = {
+    .constructor_cb = lv_polarchart_constructor,
+    .destructor_cb = lv_polarchart_destructor,
+    .event_cb = lv_polarchart_event,
     .width_def = LV_PCT(100),
     .height_def = LV_DPI_DEF * 2,
-    .instance_size = sizeof(lv_polar_chart_t),
+    .instance_size = sizeof(lv_polarchart_t),
     .base_class = &lv_obj_class,
-    .name = "lv_polar_chart",
+    .name = "lv_polarchart",
 };
 
 /**********************
@@ -68,7 +68,7 @@ const lv_obj_class_t lv_polar_chart_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_polar_chart_create(lv_obj_t * parent)
+lv_obj_t * lv_polarchart_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
@@ -76,26 +76,26 @@ lv_obj_t * lv_polar_chart_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_polar_chart_set_type(lv_obj_t * obj, lv_polar_chart_type_t type)
+void lv_polarchart_set_type(lv_obj_t * obj, lv_polarchart_type_t type)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->type == type) return;
 
     chart->type = type;
 
-    lv_polar_chart_refresh(obj);
+    lv_polarchart_refresh(obj);
 }
 
-void lv_polar_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
+void lv_polarchart_set_point_count(lv_obj_t * obj, uint32_t cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->point_cnt == cnt) return;
 
-    lv_polar_chart_series_t * ser;
+    lv_polarchart_series_t * ser;
 
     if(cnt < 1) cnt = 1;
 
@@ -106,17 +106,17 @@ void lv_polar_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
 
     chart->point_cnt = cnt;
 
-    lv_polar_chart_refresh(obj);
+    lv_polarchart_refresh(obj);
 }
 
-void lv_polar_chart_set_axis_min_value(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t min)
+void lv_polarchart_set_axis_min_value(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t min)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
 
     switch(axis) {
-        case LV_POLAR_CHART_AXIS_RADIAL:
+        case LV_POLARCHART_AXIS_RADIAL:
             if(chart->radial_min == min) return;
             chart->radial_min = min;
             break;
@@ -125,16 +125,16 @@ void lv_polar_chart_set_axis_min_value(lv_obj_t * obj, lv_polar_chart_axis_t axi
             return;
     }
 
-    lv_polar_chart_refresh(obj);
+    lv_polarchart_refresh(obj);
 }
 
-void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t max)
+void lv_polarchart_set_axis_max_value(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     switch(axis) {
-        case LV_POLAR_CHART_AXIS_RADIAL:
+        case LV_POLARCHART_AXIS_RADIAL:
             if(chart->radial_max == max) return;
             chart->radial_max = max;
             break;
@@ -143,33 +143,33 @@ void lv_polar_chart_set_axis_max_value(lv_obj_t * obj, lv_polar_chart_axis_t axi
             return;
     }
 
-    lv_polar_chart_refresh(obj);
+    lv_polarchart_refresh(obj);
 }
 
-void lv_polar_chart_set_axis_range(lv_obj_t * obj, lv_polar_chart_axis_t axis, int32_t min, int32_t max)
+void lv_polarchart_set_axis_range(lv_obj_t * obj, lv_polarchart_axis_t axis, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_set_axis_min_value(obj, axis, min);
-    lv_polar_chart_set_axis_max_value(obj, axis, max);
+    lv_polarchart_set_axis_min_value(obj, axis, min);
+    lv_polarchart_set_axis_max_value(obj, axis, max);
 }
 
-void lv_polar_chart_set_update_mode(lv_obj_t * obj, lv_polar_chart_update_mode_t update_mode)
+void lv_polarchart_set_update_mode(lv_obj_t * obj, lv_polarchart_update_mode_t update_mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->update_mode == update_mode) return;
 
     chart->update_mode = update_mode;
     lv_obj_invalidate(obj);
 }
 
-void lv_polar_chart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint32_t radial_div)
+void lv_polarchart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint32_t radial_div)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->angle_div_cnt == angle_div && chart->radial_div_cnt == radial_div) return;
 
     chart->angle_div_cnt = angle_div;
@@ -178,43 +178,43 @@ void lv_polar_chart_set_div_line_count(lv_obj_t * obj, uint32_t angle_div, uint3
     lv_obj_invalidate(obj);
 }
 
-void lv_polar_chart_set_radial_div_line_count(lv_obj_t * obj, uint32_t cnt)
+void lv_polarchart_set_radial_div_line_count(lv_obj_t * obj, uint32_t cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->radial_div_cnt == cnt) return;
     chart->radial_div_cnt = cnt;
     lv_obj_invalidate(obj);
 }
 
-void lv_polar_chart_set_angle_div_line_count(lv_obj_t * obj, uint32_t cnt)
+void lv_polarchart_set_angle_div_line_count(lv_obj_t * obj, uint32_t cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->angle_div_cnt == cnt) return;
     chart->angle_div_cnt = cnt;
     lv_obj_invalidate(obj);
 }
 
-lv_polar_chart_type_t lv_polar_chart_get_type(const lv_obj_t * obj)
+lv_polarchart_type_t lv_polarchart_get_type(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     return chart->type;
 }
 
-uint32_t lv_polar_chart_get_point_count(const lv_obj_t * obj)
+uint32_t lv_polarchart_get_point_count(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     return chart->point_cnt;
 }
 
-uint32_t lv_polar_chart_get_angle_start_point(const lv_obj_t * obj, lv_polar_chart_series_t * ser)
+uint32_t lv_polarchart_get_angle_start_point(const lv_obj_t * obj, lv_polarchart_series_t * ser)
 {
     LV_ASSERT_NULL(ser);
     LV_UNUSED(obj);
@@ -222,13 +222,13 @@ uint32_t lv_polar_chart_get_angle_start_point(const lv_obj_t * obj, lv_polar_cha
     return ser->start_point;
 }
 
-void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
+void lv_polarchart_get_point_pos_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, lv_point_t * p_out)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(ser);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(id >= chart->point_cnt) {
         LV_LOG_WARN("Invalid index: %"LV_PRIu32, id);
         p_out->x = 0;
@@ -239,7 +239,7 @@ void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t 
     int32_t w = lv_obj_get_content_width(obj);
     int32_t h = lv_obj_get_content_height(obj);
 
-    if(chart->type == LV_POLAR_CHART_TYPE_LINE) {
+    if(chart->type == LV_POLARCHART_TYPE_LINE) {
         if(chart->point_cnt > 1) {
             p_out->x = (w * id) / (chart->point_cnt - 1);
         }
@@ -249,7 +249,7 @@ void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t 
         int32_t temp_y = value_to_y(obj, ser, ser->radial_points[id], h);
         p_out->y = h - temp_y;
     }
-    /*LV_POLAR_CHART_TYPE_NONE*/
+    /*LV_POLARCHART_TYPE_NONE*/
     else {
         p_out->x = 0;
         p_out->y = 0;
@@ -259,14 +259,14 @@ void lv_polar_chart_get_point_pos_by_id(lv_obj_t * obj, lv_polar_chart_series_t 
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
-    uint32_t start_point = chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+    uint32_t start_point = chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
     id = ((int32_t)start_point + id) % chart->point_cnt;
 
     p_out->y += lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
     p_out->y -= lv_obj_get_scroll_top(obj);
 }
 
-void lv_polar_chart_refresh(lv_obj_t * obj)
+void lv_polarchart_refresh(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -277,20 +277,20 @@ void lv_polar_chart_refresh(lv_obj_t * obj)
  * Series
  *=====================*/
 
-lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_polar_chart_axis_t axis)
+lv_polarchart_series_t * lv_polarchart_add_series(lv_obj_t * obj, lv_color_t color, lv_polarchart_axis_t axis)
 {
     LV_LOG_INFO("begin");
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_UNUSED(axis);
 
-    lv_polar_chart_t * chart    = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart    = (lv_polarchart_t *)obj;
 
     /* Allocate space for a new series and add it to the chart series linked list */
-    lv_polar_chart_series_t * ser = lv_ll_ins_tail(&chart->series_ll);
+    lv_polarchart_series_t * ser = lv_ll_ins_tail(&chart->series_ll);
     LV_ASSERT_MALLOC(ser);
     if(ser == NULL) return NULL;
-    lv_memzero(ser, sizeof(lv_polar_chart_series_t));
+    lv_memzero(ser, sizeof(lv_polarchart_series_t));
 
     /* Allocate memory for point_cnt points, handle failure below */
     ser->radial_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
@@ -316,7 +316,7 @@ lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t c
     ser->hidden = 0;
 
     uint32_t i;
-    const int32_t def = LV_POLAR_CHART_POINT_NONE;
+    const int32_t def = LV_POLARCHART_POINT_NONE;
     int32_t * p_tmp = ser->radial_points;
     for(i = 0; i < chart->point_cnt; i++) {
         *p_tmp = def;
@@ -326,12 +326,12 @@ lv_polar_chart_series_t * lv_polar_chart_add_series(lv_obj_t * obj, lv_color_t c
     return ser;
 }
 
-void lv_polar_chart_remove_series(lv_obj_t * obj, lv_polar_chart_series_t * series)
+void lv_polarchart_remove_series(lv_obj_t * obj, lv_polarchart_series_t * series)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(series);
 
-    lv_polar_chart_t * chart    = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart    = (lv_polarchart_t *)obj;
     if(!series->radial_ext_buf_assigned && series->radial_points) lv_free(series->radial_points);
     if(!series->angle_ext_buf_assigned && series->angle_points) lv_free(series->angle_points);
 
@@ -341,25 +341,25 @@ void lv_polar_chart_remove_series(lv_obj_t * obj, lv_polar_chart_series_t * seri
     return;
 }
 
-void lv_polar_chart_hide_series(lv_obj_t * chart, lv_polar_chart_series_t * series, bool hide)
+void lv_polarchart_hide_series(lv_obj_t * chart, lv_polarchart_series_t * series, bool hide)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
 
     series->hidden = hide ? 1 : 0;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-void lv_polar_chart_set_series_color(lv_obj_t * chart, lv_polar_chart_series_t * series, lv_color_t color)
+void lv_polarchart_set_series_color(lv_obj_t * chart, lv_polarchart_series_t * series, lv_color_t color)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
 
     series->color = color;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-lv_color_t lv_polar_chart_get_series_color(lv_obj_t * chart, const lv_polar_chart_series_t * series)
+lv_color_t lv_polarchart_get_series_color(lv_obj_t * chart, const lv_polarchart_series_t * series)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
@@ -368,21 +368,21 @@ lv_color_t lv_polar_chart_get_series_color(lv_obj_t * chart, const lv_polar_char
     return series->color;
 }
 
-void lv_polar_chart_set_x_start_point(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id)
+void lv_polarchart_set_x_start_point(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(id >= chart->point_cnt) return;
     ser->start_point = id;
 }
 
-lv_polar_chart_series_t * lv_polar_chart_get_series_next(const lv_obj_t * obj, const lv_polar_chart_series_t * ser)
+lv_polarchart_series_t * lv_polarchart_get_series_next(const lv_obj_t * obj, const lv_polarchart_series_t * ser)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(ser == NULL) return lv_ll_get_head(&chart->series_ll);
     else return lv_ll_get_next(&chart->series_ll, ser);
 }
@@ -391,17 +391,17 @@ lv_polar_chart_series_t * lv_polar_chart_get_series_next(const lv_obj_t * obj, c
  * Cursor
  *====================*/
 
-lv_polar_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
+lv_polarchart_cursor_t  * lv_polarchart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_dir_t dir)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
-    lv_polar_chart_cursor_t * cursor = lv_ll_ins_head(&chart->cursor_ll);
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
+    lv_polarchart_cursor_t * cursor = lv_ll_ins_head(&chart->cursor_ll);
     LV_ASSERT_MALLOC(cursor);
     if(cursor == NULL) return NULL;
 
-    lv_point_set(&cursor->pos, LV_POLAR_CHART_POINT_NONE, LV_POLAR_CHART_POINT_NONE);
-    cursor->point_id = LV_POLAR_CHART_POINT_NONE;
+    lv_point_set(&cursor->pos, LV_POLARCHART_POINT_NONE, LV_POLARCHART_POINT_NONE);
+    cursor->point_id = LV_POLARCHART_POINT_NONE;
     cursor->pos_set = 0;
     cursor->color = color;
     cursor->dir = dir;
@@ -409,47 +409,47 @@ lv_polar_chart_cursor_t  * lv_polar_chart_add_cursor(lv_obj_t * obj, lv_color_t 
     return cursor;
 }
 
-void lv_polar_chart_remove_cursor(lv_obj_t * obj, lv_polar_chart_cursor_t * cursor)
+void lv_polarchart_remove_cursor(lv_obj_t * obj, lv_polarchart_cursor_t * cursor)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(cursor);
 
-    lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart = (lv_polarchart_t *)obj;
     lv_ll_remove(&chart->cursor_ll, cursor);
     lv_free(cursor);
 }
 
-void lv_polar_chart_set_cursor_pos(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_point_t * pos)
+void lv_polarchart_set_cursor_pos(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, lv_point_t * pos)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
     cursor->pos = *pos;
     cursor->pos_set = 1;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-void lv_polar_chart_set_cursor_pos_angle(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t angle)
+void lv_polarchart_set_cursor_pos_angle(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, int32_t angle)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
     cursor->pos.x = angle;
     cursor->pos_set = 1;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-void lv_polar_chart_set_cursor_pos_radial(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, int32_t radial)
+void lv_polarchart_set_cursor_pos_radial(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, int32_t radial)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
     cursor->pos.y = radial;
     cursor->pos_set = 1;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor, lv_polar_chart_series_t * ser,
+void lv_polarchart_set_cursor_point(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, lv_polarchart_series_t * ser,
                                      uint32_t point_id)
 {
     LV_ASSERT_NULL(cursor);
@@ -457,12 +457,12 @@ void lv_polar_chart_set_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t *
 
     cursor->point_id = point_id;
     cursor->pos_set = 0;
-    if(ser == NULL) ser = lv_polar_chart_get_series_next(chart, NULL);
+    if(ser == NULL) ser = lv_polarchart_get_series_next(chart, NULL);
     cursor->ser = ser;
-    lv_polar_chart_refresh(chart);
+    lv_polarchart_refresh(chart);
 }
 
-lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_cursor_t * cursor)
+lv_point_t lv_polarchart_get_cursor_point(lv_obj_t * chart, lv_polarchart_cursor_t * cursor)
 {
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
@@ -474,54 +474,54 @@ lv_point_t lv_polar_chart_get_cursor_point(lv_obj_t * chart, lv_polar_chart_curs
  * Set/Get value(s)
  *====================*/
 
-void lv_polar_chart_set_all_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value)
+void lv_polarchart_set_all_values(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     uint32_t i;
     for(i = 0; i < chart->point_cnt; i++) {
         ser->radial_points[i] = value;
     }
     ser->start_point = 0;
-    lv_polar_chart_refresh(obj);
+    lv_polarchart_refresh(obj);
 }
 
 
-void lv_polar_chart_set_next_value(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t value)
+void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
 
     ser->radial_points[ser->start_point] = value;
     invalidate_point(obj, ser->start_point);
     ser->start_point = (ser->start_point + 1) % chart->point_cnt;
 }
 
-void lv_polar_chart_set_series_values(lv_obj_t * obj, lv_polar_chart_series_t * ser, const int32_t values[],
+void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t values[],
                                       size_t values_cnt)
 {
     size_t i;
     for(i = 0; i < values_cnt; i++) {
-        lv_polar_chart_set_next_value(obj, ser, values[i]);
+        lv_polarchart_set_next_value(obj, ser, values[i]);
     }
 }
 
-void lv_polar_chart_set_series_value_by_id(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t id, int32_t value)
+void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
 
     if(id >= chart->point_cnt) return;
     ser->radial_points[id] = value;
     invalidate_point(obj, id);
 }
 
-void lv_polar_chart_set_series_ext_radial_array(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t array[])
+void lv_polarchart_set_series_ext_radial_array(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -532,7 +532,7 @@ void lv_polar_chart_set_series_ext_radial_array(lv_obj_t * obj, lv_polar_chart_s
     lv_obj_invalidate(obj);
 }
 
-void lv_polar_chart_set_series_ext_angle_array(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t array[])
+void lv_polarchart_set_series_ext_angle_array(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -543,7 +543,7 @@ void lv_polar_chart_set_series_ext_angle_array(lv_obj_t * obj, lv_polar_chart_se
     lv_obj_invalidate(obj);
 }
 
-int32_t * lv_polar_chart_get_series_radial_array(const lv_obj_t * obj, lv_polar_chart_series_t * ser)
+int32_t * lv_polarchart_get_series_radial_array(const lv_obj_t * obj, lv_polarchart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -551,7 +551,7 @@ int32_t * lv_polar_chart_get_series_radial_array(const lv_obj_t * obj, lv_polar_
     return ser->radial_points;
 }
 
-int32_t * lv_polar_chart_get_series_angle_array(const lv_obj_t * obj, lv_polar_chart_series_t * ser)
+int32_t * lv_polarchart_get_series_angle_array(const lv_obj_t * obj, lv_polarchart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -559,13 +559,13 @@ int32_t * lv_polar_chart_get_series_angle_array(const lv_obj_t * obj, lv_polar_c
     return ser->angle_points;
 }
 
-uint32_t lv_polar_chart_get_pressed_point(const lv_obj_t * obj)
+uint32_t lv_polarchart_get_pressed_point(const lv_obj_t * obj)
 {
-    lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart = (lv_polarchart_t *)obj;
     return chart->pressed_point_id;
 }
 
-int32_t lv_polar_chart_get_first_point_center_offset(lv_obj_t * obj)
+int32_t lv_polarchart_get_first_point_center_offset(lv_obj_t * obj)
 {
     int32_t x_ofs = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
@@ -576,38 +576,38 @@ int32_t lv_polar_chart_get_first_point_center_offset(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_polar_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+static void lv_polarchart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart = (lv_polarchart_t *)obj;
 
-    lv_ll_init(&chart->series_ll, sizeof(lv_polar_chart_series_t));
-    lv_ll_init(&chart->cursor_ll, sizeof(lv_polar_chart_cursor_t));
+    lv_ll_init(&chart->series_ll, sizeof(lv_polarchart_series_t));
+    lv_ll_init(&chart->cursor_ll, sizeof(lv_polarchart_cursor_t));
 
     chart->radial_min = 0;
     chart->angle_min = 0;
     chart->radial_max = 100;
     chart->angle_max = 360;
 
-    chart->radial_div_cnt    = LV_POLAR_CHART_RADIAL_DIV_DEF;
-    chart->angle_div_cnt    = LV_POLAR_CHART_ANGLE_DIV_DEF;
-    chart->point_cnt   = LV_POLAR_CHART_POINT_CNT_DEF;
-    chart->pressed_point_id  = LV_POLAR_CHART_POINT_NONE;
-    chart->type        = LV_POLAR_CHART_TYPE_LINE;
-    chart->update_mode = LV_POLAR_CHART_UPDATE_MODE_SHIFT;
+    chart->radial_div_cnt    = LV_POLARCHART_RADIAL_DIV_DEF;
+    chart->angle_div_cnt    = LV_POLARCHART_ANGLE_DIV_DEF;
+    chart->point_cnt   = LV_POLARCHART_POINT_CNT_DEF;
+    chart->pressed_point_id  = LV_POLARCHART_POINT_NONE;
+    chart->type        = LV_POLARCHART_TYPE_LINE;
+    chart->update_mode = LV_POLARCHART_UPDATE_MODE_SHIFT;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_polar_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+static void lv_polarchart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_polar_chart_t * chart = (lv_polar_chart_t *)obj;
-    lv_polar_chart_series_t * ser;
+    lv_polarchart_t * chart = (lv_polarchart_t *)obj;
+    lv_polarchart_series_t * ser;
     while(chart->series_ll.head) {
         ser = lv_ll_get_head(&chart->series_ll);
         if(!ser) continue;
@@ -620,7 +620,7 @@ static void lv_polar_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t *
     }
     lv_ll_clear(&chart->series_ll);
 
-    lv_polar_chart_cursor_t * cur;
+    lv_polarchart_cursor_t * cur;
     while(chart->cursor_ll.head) {
         cur = lv_ll_get_head(&chart->cursor_ll);
         lv_ll_remove(&chart->cursor_ll, cur);
@@ -631,7 +631,7 @@ static void lv_polar_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t *
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
+static void lv_polarchart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
@@ -644,7 +644,7 @@ static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_current_target(e);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(code == LV_EVENT_PRESSED) {
         lv_indev_t * indev = lv_indev_active();
         lv_point_t p;
@@ -661,7 +661,7 @@ static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         invalidate_point(obj, chart->pressed_point_id);
-        chart->pressed_point_id = LV_POLAR_CHART_POINT_NONE;
+        chart->pressed_point_id = LV_POLARCHART_POINT_NONE;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -679,7 +679,7 @@ static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
             draw_div_lines(obj, layer);
 
             if(lv_ll_is_empty(&chart->series_ll) == false) {
-                if(chart->type == LV_POLAR_CHART_TYPE_LINE) draw_series_line(obj, layer);
+                if(chart->type == LV_POLARCHART_TYPE_LINE) draw_series_line(obj, layer);
             }
 
             draw_cursors(obj, layer);
@@ -691,7 +691,7 @@ static void lv_polar_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
 {
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
 
     int16_t i;
     int16_t i_start;
@@ -759,7 +759,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
 
 static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 {
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(chart->point_cnt < 2) return;
 
     uint32_t i;
@@ -770,7 +770,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     int32_t h     = lv_obj_get_content_height(obj);
     int32_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
     int32_t y_ofs = obj->coords.y1 + pad_top - lv_obj_get_scroll_top(obj);
-    lv_polar_chart_series_t * ser;
+    lv_polarchart_series_t * ser;
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -809,7 +809,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        int32_t start_point = chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
@@ -844,7 +844,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             /*Don't draw the first point. A second point is also required to draw the line*/
             if(i != 0) {
                 if(crowded_mode) {
-                    if(ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE && ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
+                    if(ser->radial_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                         /*Draw only one vertical line between the min and max y-values on the same x-value*/
                         y_max = LV_MAX(y_max, line_dsc.p2.y);
                         y_min = LV_MIN(y_min, line_dsc.p2.y);
@@ -869,12 +869,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     point_area.y1 = (int32_t)line_dsc.p1.y - point_h;
                     point_area.y2 = (int32_t)line_dsc.p1.y + point_h;
 
-                    if(ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE && ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
+                    if(ser->radial_points[p_prev] != LV_POLARCHART_POINT_NONE && ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                         line_dsc.base.id2 = i;
                         lv_draw_line(layer, &line_dsc);
                     }
 
-                    if(point_w && point_h && ser->radial_points[p_prev] != LV_POLAR_CHART_POINT_NONE) {
+                    if(point_w && point_h && ser->radial_points[p_prev] != LV_POLARCHART_POINT_NONE) {
                         point_dsc_default.base.id2 = i - 1;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
@@ -887,7 +887,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         /*Draw the last point*/
         if(!crowded_mode && i == chart->point_cnt) {
 
-            if(ser->radial_points[p_act] != LV_POLAR_CHART_POINT_NONE) {
+            if(ser->radial_points[p_act] != LV_POLARCHART_POINT_NONE) {
                 lv_area_t point_area;
                 point_area.x1 = (int32_t)line_dsc.p2.x - point_w;
                 point_area.x2 = (int32_t)line_dsc.p2.x + point_w;
@@ -909,10 +909,10 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(lv_ll_is_empty(&chart->cursor_ll)) return;
 
-    lv_polar_chart_cursor_t * cursor;
+    lv_polarchart_cursor_t * cursor;
 
     lv_draw_line_dsc_t line_dsc_ori;
     lv_draw_line_dsc_init(&line_dsc_ori);
@@ -944,9 +944,9 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
             cy = cursor->pos.y;
         }
         else {
-            if(cursor->point_id == LV_POLAR_CHART_POINT_NONE) continue;
+            if(cursor->point_id == LV_POLARCHART_POINT_NONE) continue;
             lv_point_t p;
-            lv_polar_chart_get_point_pos_by_id(obj, cursor->ser, cursor->point_id, &p);
+            lv_polarchart_get_point_pos_by_id(obj, cursor->ser, cursor->point_id, &p);
             cx = p.x;
             cy = p.y;
         }
@@ -999,32 +999,32 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
 
 /**
  * Get the nearest index to an X coordinate
- * @param chart pointer to a polar chart object
+ * @param chart pointer to a polarchart object
  * @param coord the coordinate of the point relative to the series area.
  * @return the found index
  */
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)
 {
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     int32_t w = lv_obj_get_content_width(obj);
     int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     x -= pad_left;
 
     if(x < 0) return 0;
     if(x > w) return chart->point_cnt - 1;
-    if(chart->type == LV_POLAR_CHART_TYPE_LINE) return (x * (chart->point_cnt - 1) + w / 2) / w;
+    if(chart->type == LV_POLARCHART_TYPE_LINE) return (x * (chart->point_cnt - 1) + w / 2) / w;
 
     return 0;
 }
 
 static void invalidate_point(lv_obj_t * obj, uint32_t i)
 {
-    lv_polar_chart_t * chart  = (lv_polar_chart_t *)obj;
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
     if(i >= chart->point_cnt) return;
 
 
     /*In shift mode the whole chart changes so the whole object*/
-    if(chart->update_mode == LV_POLAR_CHART_UPDATE_MODE_SHIFT) {
+    if(chart->update_mode == LV_POLARCHART_UPDATE_MODE_SHIFT) {
         lv_obj_invalidate(obj);
         return;
     }
@@ -1034,7 +1034,7 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     int32_t x_ofs = obj->coords.x1 + pleft + bwidth - scroll_left;
 
-    if(chart->type == LV_POLAR_CHART_TYPE_LINE) {
+    if(chart->type == LV_POLARCHART_TYPE_LINE) {
         int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
         int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR);
 
@@ -1061,11 +1061,11 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     }
 }
 
-static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint32_t cnt, int32_t ** a)
+static void new_points_alloc(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t cnt, int32_t ** a)
 {
     if((*a) == NULL) return;
 
-    lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
+    lv_polarchart_t * chart = (lv_polarchart_t *) obj;
     uint32_t point_cnt_old = chart->point_cnt;
     uint32_t i;
 
@@ -1080,7 +1080,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint
                     (*a)[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
             }
             for(i = point_cnt_old; i < cnt; i++) {
-                new_points[i] = LV_POLAR_CHART_POINT_NONE; /*Fill up the rest with default value*/
+                new_points[i] = LV_POLARCHART_POINT_NONE; /*Fill up the rest with default value*/
             }
         }
         else {
@@ -1101,7 +1101,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint
         /*Initialize the new points*/
         if(cnt > point_cnt_old) {
             for(i = point_cnt_old - 1; i < cnt; i++) {
-                (*a)[i] = LV_POLAR_CHART_POINT_NONE;
+                (*a)[i] = LV_POLARCHART_POINT_NONE;
             }
         }
     }
@@ -1115,11 +1115,11 @@ static void new_points_alloc(lv_obj_t * obj, lv_polar_chart_series_t * ser, uint
  * @param h     the height to which the value needs to be mapped
  * @return      the mapped y-coordinate value corresponding to the input value
  */
-static int32_t value_to_y(lv_obj_t * obj, lv_polar_chart_series_t * ser, int32_t v, int32_t h)
+static int32_t value_to_y(lv_obj_t * obj, lv_polarchart_series_t * ser, int32_t v, int32_t h)
 {
     LV_UNUSED(ser);
 
-    lv_polar_chart_t * chart = (lv_polar_chart_t *) obj;
+    lv_polarchart_t * chart = (lv_polarchart_t *) obj;
 
     return lv_map(v, chart->radial_min, chart->radial_max, 0, h);
 }

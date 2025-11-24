@@ -112,8 +112,8 @@ typedef struct {
     lv_style_t line;
 #endif
 
-#if LV_USE_POLAR_CHART
-    lv_style_t polar_chart_series, polar_chart_indic, polar_chart_bg;
+#if LV_USE_POLAR_HART
+    lv_style_t polarchart_series, polarchart_indic, polarchart_bg;
 #endif
 
 #if LV_USE_TABLE
@@ -521,25 +521,25 @@ static void style_init(my_theme_t * theme)
     lv_style_set_pad_ver(&theme->styles.menu_separator, PAD_TINY);
 #endif
 
-#if LV_USE_POLAR_CHART
-    style_init_reset(&theme->styles.polar_chart_bg);
-    lv_style_set_border_post(&theme->styles.polar_chart_bg, false);
-    lv_style_set_pad_column(&theme->styles.polar_chart_bg, LV_DPX_CALC(theme->disp_dpi, 10));
-    lv_style_set_line_color(&theme->styles.polar_chart_bg, theme->color_grey);
+#if LV_USE_POLARCHART
+    style_init_reset(&theme->styles.polarchart_bg);
+    lv_style_set_border_post(&theme->styles.polarchart_bg, false);
+    lv_style_set_pad_column(&theme->styles.polarchart_bg, LV_DPX_CALC(theme->disp_dpi, 10));
+    lv_style_set_line_color(&theme->styles.polarchart_bg, theme->color_grey);
 
-    style_init_reset(&theme->styles.polar_chart_series);
-    lv_style_set_line_width(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
-    lv_style_set_radius(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 3));
+    style_init_reset(&theme->styles.polarchart_series);
+    lv_style_set_line_width(&theme->styles.polarchart_series, LV_DPX_CALC(theme->disp_dpi, 3));
+    lv_style_set_radius(&theme->styles.polarchart_series, LV_DPX_CALC(theme->disp_dpi, 3));
 
-    int32_t polar_chart_size = LV_DPX_CALC(theme->disp_dpi, 8);
-    lv_style_set_size(&theme->styles.polar_chart_series, polar_chart_size, polar_chart_size);
-    lv_style_set_pad_column(&theme->styles.polar_chart_series, LV_DPX_CALC(theme->disp_dpi, 2));
+    int32_t polarchart_size = LV_DPX_CALC(theme->disp_dpi, 8);
+    lv_style_set_size(&theme->styles.polarchart_series, polarchart_size, polarchart_size);
+    lv_style_set_pad_column(&theme->styles.polarchart_series, LV_DPX_CALC(theme->disp_dpi, 2));
 
-    style_init_reset(&theme->styles.polar_chart_indic);
-    lv_style_set_radius(&theme->styles.polar_chart_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&theme->styles.polar_chart_indic, polar_chart_size, polar_chart_size);
-    lv_style_set_bg_color(&theme->styles.polar_chart_indic, theme->base.color_primary);
-    lv_style_set_bg_opa(&theme->styles.polar_chart_indic, LV_OPA_COVER);
+    style_init_reset(&theme->styles.polarchart_indic);
+    lv_style_set_radius(&theme->styles.polarchart_indic, LV_RADIUS_CIRCLE);
+    lv_style_set_size(&theme->styles.polarchart_indic, polarchart_size, polarchart_size);
+    lv_style_set_bg_color(&theme->styles.polarchart_indic, theme->base.color_primary);
+    lv_style_set_bg_opa(&theme->styles.polarchart_indic, LV_OPA_COVER);
 #endif
 
 #if LV_USE_TABLE
@@ -977,16 +977,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_POLAR_CHART
-    else if(lv_obj_check_type(obj, &lv_polar_chart_class)) {
+#if LV_USE_POLARCHART
+    else if(lv_obj_check_type(obj, &lv_polarchart_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_small, 0);
-        lv_obj_add_style(obj, &theme->styles.polar_chart_bg, 0);
+        lv_obj_add_style(obj, &theme->styles.polarchart_bg, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
-        lv_obj_add_style(obj, &theme->styles.polar_chart_series, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &theme->styles.polar_chart_indic, LV_PART_INDICATOR);
-        lv_obj_add_style(obj, &theme->styles.polar_chart_series, LV_PART_CURSOR);
+        lv_obj_add_style(obj, &theme->styles.polarchart_series, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.polarchart_indic, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.polarchart_series, LV_PART_CURSOR);
     }
 #endif
 

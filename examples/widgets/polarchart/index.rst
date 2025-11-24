@@ -2,5 +2,5 @@
 Line Polar Chart
 ----------------
 
-.. lv_example:: widgets/polarchart/lv_example_polar_chart_1
+.. lv_example:: widgets/polarchart/lv_example_polarchart_1
   :language: c

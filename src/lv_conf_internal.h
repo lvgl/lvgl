@@ -2445,15 +2445,15 @@
     #endif
 #endif
 
-#ifndef LV_USE_POLAR_CHART
+#ifndef LV_USE_POLARCHART
     #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_POLAR_CHART
-            #define LV_USE_POLAR_CHART CONFIG_LV_USE_POLAR_CHART
+        #ifdef CONFIG_LV_USE_POLARCHART
+            #define LV_USE_POLARCHART CONFIG_LV_USE_POLARCHART
         #else
-            #define LV_USE_POLAR_CHART 0
+            #define LV_USE_POLARCHART 0
         #endif
     #else
-        #define LV_USE_POLAR_CHART      1
+        #define LV_USE_POLARCHART      1
     #endif
 #endif
 
