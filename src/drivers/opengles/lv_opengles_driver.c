@@ -209,6 +209,13 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
     LV_PROFILER_DRAW_END;
 }
 
+void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    GL_CALL(glViewport(x, lv_display_get_vertical_resolution(lv_display_get_default()) - y - h, w, h));
+    LV_PROFILER_DRAW_END;
+}
+
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
                         bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt)

@@ -758,16 +758,22 @@ static void draw_lights(lv_gltf_model_t * model, GLuint program)
 lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state, int32_t texture_w,
                                   int32_t texture_h, bool prepare_bg)
 {
+    LV_ASSERT_NULL(viewer);
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state->framebuffer));
 
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
-#if !LV_GLTF_DIRECT_BUFFER_WRITES
+
+#if LV_GLTF_DIRECT_BUFFER_WRITES
+    lv_opengles_regular_viewport(lv_obj_get_x((lv_obj_t *)viewer), lv_obj_get_y((lv_obj_t *)viewer), texture_w, texture_h);
+#else
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-#endif
+    //lv_opengles_viewport(0, 0, texture_w, texture_h);
     GL_CALL(glViewport(0, 0, texture_w, texture_h));
+#endif
+
     if(prepare_bg) {
 #if !LV_GLTF_DIRECT_BUFFER_WRITES
         /* cast is safe because viewer is a lv_obj_t*/
