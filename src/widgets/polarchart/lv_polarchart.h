@@ -72,7 +72,7 @@ lv_obj_t * lv_polarchart_create(lv_obj_t * parent);
 /**
  * Set a new type for a polarchart
  * @param obj       pointer to a polarchart object
- * @param type      new type of the chart (from 'lv_chart_type_t' enum)
+ * @param type      new type of the chart (from 'lv_polarchart_type_t' enum)
  */
 void lv_polarchart_set_type(lv_obj_t * obj, lv_polarchart_type_t type);
 
@@ -329,7 +329,7 @@ void lv_polarchart_set_next_value2(lv_obj_t * obj, lv_polarchart_series_t * ser,
                                    int32_t radial_value);
 
 /**
- * Same as `lv_chart_set_next_value` but set the values from an array
+ * Same as `lv_polarchart_set_next_value` but set the values from an array
  * @param obj           pointer to chart object
  * @param ser           pointer to a data series on 'chart'
  * @param values        the new values to set
@@ -339,6 +339,17 @@ void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * se
                                      size_t values_cnt);
 
 /**
+ * Same as `lv_polarchart_set_next_value2` but set the values from an array
+ * @param obj           pointer to chart object
+ * @param ser           pointer to a data series on 'chart'
+ * @param angle_values      the new values to set on the 'angle' axis
+ * @param radial_values      the new values to set on the 'radial' axis
+ * @param values_cnt    number of items in `angle_values` and `radial_values`
+ */
+void lv_polarchart_set_series_values2(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t angle_values[],
+                                 const int32_t radial_values[], size_t values_cnt);
+
+/**
  * Set an individual point's y value of a chart's series directly based on its index
  * @param obj     pointer to a chart object
  * @param ser     pointer to a data series on 'chart'
@@ -346,6 +357,18 @@ void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * se
  * @param value   value to assign to array point
  */
 void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t value);
+
+/**
+ * Set an individual point's 'angle' and 'radial' value of a polarchart's series directly based on its index
+ * Can be used only with `LV_POLARCHART_TYPE_SCATTER`.
+ * @param obj       pointer to chart object
+ * @param ser       pointer to a data series on 'chart'
+ * @param id        the index of the angle point in the array
+ * @param angle_value   the new 'angle' value of the next data
+ * @param radial_value   the new 'radial' value of the next data
+ */
+void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t angle_value,
+                                      int32_t radial_value);
 
 /**
  * Set an external array for the 'radial' data points to use for the polarchart

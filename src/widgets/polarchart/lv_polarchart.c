@@ -566,6 +566,15 @@ void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * se
     }
 }
 
+void lv_polarchart_set_series_values2(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t angle_values[],
+                                 const int32_t radial_values[], size_t values_cnt)
+{
+    size_t i;
+    for(i = 0; i < values_cnt; i++) {
+        lv_polarchart_set_next_value2(obj, ser, angle_values[i], radial_values[i]);
+    }
+}
+
 void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -574,6 +583,24 @@ void lv_polarchart_set_series_value_by_id(lv_obj_t * obj, lv_polarchart_series_t
 
     if(id >= chart->point_cnt) return;
     ser->radial_points[id] = value;
+    invalidate_point(obj, id);
+}
+
+void lv_polarchart_set_series_value_by_id2(lv_obj_t * obj, lv_polarchart_series_t * ser, uint32_t id, int32_t angle_value,
+                                      int32_t radial_value)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(ser);
+    lv_polarchart_t * chart  = (lv_polarchart_t *)obj;
+
+    if(chart->type != LV_POLARCHART_TYPE_SCATTER) {
+        LV_LOG_WARN("Type must be LV_POLARCHART_TYPE_SCATTER");
+        return;
+    }
+
+    if(id >= chart->point_cnt) return;
+    ser->angle_points[id] = angle_value;
+    ser->radial_points[id] = radial_value;
     invalidate_point(obj, id);
 }
 
