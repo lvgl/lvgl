@@ -1,4 +1,3 @@
-.. include:: substitutions.txt
 .. _editor:
 
 ======

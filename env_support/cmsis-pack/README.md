@@ -52,8 +52,6 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_MUSIC
    - LV_USE_DEMO_FLEX_LAYOUT
    - LV_USE_DEMO_MULTILANG
-   - LV_USE_DEMO_TRANSFORM
-   - LV_USE_DEMO_SCROLL
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DEMO_EBIKE
    - LV_USE_DEMO_HIGH_RES
@@ -126,6 +124,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_RLE 0
     - \#define LV_USE_TJPGD 0
     - \#define LV_USE_LIBJPEG_TURBO 0
+    - \#define LV_USE_LIBWEBP 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
     - \#define LV_USE_QRCODE 0

@@ -413,6 +413,42 @@ lv_fs_res_t lv_fs_load_to_buf(void * buf, uint32_t buf_size, const char * path)
     return ret;
 }
 
+void * lv_fs_load_with_alloc(const char * path, uint32_t * size)
+{
+    lv_fs_file_t file;
+    uint8_t * data = NULL;
+
+    lv_fs_res_t ret = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    if(ret != LV_FS_RES_OK) {
+        LV_LOG_WARN("can't open file %s, res %d", path, ret);
+        return NULL;
+    }
+
+    ret = lv_fs_get_size(&file, size);
+    if(ret != LV_FS_RES_OK) {
+        LV_LOG_WARN("can't get file size %s, res %d", path, ret);
+        goto fail;
+    }
+
+    data = lv_malloc(*size);
+    if(data == NULL) {
+        LV_LOG_WARN("malloc failed for data with size %" LV_PRIu32, *size);
+        goto fail;
+    }
+
+    uint32_t bytes_read;
+    ret = lv_fs_read(&file, data, *size, &bytes_read);
+    if(ret != LV_FS_RES_OK || bytes_read != *size) {
+        LV_LOG_WARN("read %s failed, rn %" LV_PRIu32 ", res %d", path, bytes_read, ret);
+        lv_free(data);
+        data = NULL;
+    }
+
+fail:
+    lv_fs_close(&file);
+    return data;
+}
+
 lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
     if(path == NULL) return LV_FS_RES_INV_PARAM;
@@ -513,6 +549,20 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     if(new_drv == NULL) return;
 
     *new_drv = drv_p;
+}
+
+void lv_fs_remove_drive(char letter)
+{
+    lv_fs_drv_t ** drv;
+    LV_LL_READ(fsdrv_ll_p, drv) {
+        if((*drv)->letter == letter) {
+            lv_ll_remove(fsdrv_ll_p, drv); /* remove the drive from the list of registered drives */
+            if((*drv)->remove_cb) {
+                (*drv)->remove_cb(*drv); /* call the remove callback if available */
+            }
+            lv_free(drv); /* free the list node*/
+        }
+    }
 }
 
 lv_fs_drv_t * lv_fs_get_drv(char letter)

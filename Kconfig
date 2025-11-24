@@ -237,6 +237,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+			bool "Enable support for RGB565 swapped color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
 		config LV_DRAW_SW_SUPPORT_RGB565A8
 			bool "Enable support for RGB565A8 color format"
 			default y
@@ -490,6 +495,11 @@ menu "LVGL configuration"
 		config LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
 			bool "Disable linear gradient extension for some older versions of drivers."
 			default n
+			depends on LV_USE_DRAW_VG_LITE
+
+		config LV_VG_LITE_PATH_DUMP_MAX_LEN
+			int "Maximum path dump print length (in points)"
+			default 1000
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_USE_VECTOR_GRAPHIC
@@ -1265,6 +1275,12 @@ menu "LVGL configuration"
 		config LV_USE_WIN
 			bool "Win"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_3DTEXTURE
+			bool "3D Texture"
+			depends on LV_USE_DRAW_OPENGLES
+		config LV_USE_GLTF
+			bool "glTF support"
+			depends on LV_USE_3DTEXTURE
 	endmenu
 
 	menu "Themes"
@@ -1427,6 +1443,9 @@ menu "LVGL configuration"
 
 		config LV_USE_LIBJPEG_TURBO
 			bool "libjpeg-turbo decoder library"
+		
+		config LV_USE_LIBWEBP
+			bool "WebP decoder library"
 
 		config LV_USE_GIF
 			bool "GIF decoder library"
@@ -2210,18 +2229,9 @@ menu "LVGL configuration"
 				bool "Render test for each primitives. Requires at least 480x272 display"
 				default n
 
-			config LV_USE_DEMO_SCROLL
-				bool "Scroll settings test for LVGL"
-				default n
-
 			config LV_USE_DEMO_STRESS
 				bool "Stress test for LVGL"
 				default n
-
-			config LV_USE_DEMO_TRANSFORM
-				bool "Transform test for LVGL"
-				default n
-				depends on LV_FONT_MONTSERRAT_18
 
 			config LV_USE_DEMO_MUSIC
 				bool "Music player demo"
@@ -2257,6 +2267,10 @@ menu "LVGL configuration"
 				bool "vector graphic demo"
 				default n
 				depends on LV_USE_VECTOR_GRAPHIC
+			config LV_USE_DEMO_GLTF
+				bool "glTF demo"
+				default n
+				depends on LV_USE_GLTF
 			config LV_USE_DEMO_SMARTWATCH
 				bool "Smartwatch demo"
 			config LV_USE_DEMO_EBIKE

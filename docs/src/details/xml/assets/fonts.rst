@@ -1,11 +1,9 @@
+.. include:: /include/substitutions.txt
 .. _xml_fonts:
 
 =====
 Fonts
 =====
-
-.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
 
 Overview
 ********

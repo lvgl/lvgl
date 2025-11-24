@@ -32,8 +32,8 @@
  **********************/
 
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
-#if defined(RENESAS_CORTEX_M85)
-    #if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+    #if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
         static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     #endif
 #endif
@@ -114,16 +114,16 @@ void lv_draw_dave2d_init(void)
 static void lv_draw_buf_dave2d_init_handlers(void)
 {
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
 #endif
 #endif
 }
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
 static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     const lv_image_header_t * header = &draw_buf->header;
@@ -141,7 +141,11 @@ static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, cons
     address = address + (area->x1 * (int32_t)bytes_per_pixel) + (stride * (uint32_t)area->y1);
 
     for(i = 0; i < lines; i++) {
+#if defined(RENESAS_CORTEX_M85)
         SCB_CleanInvalidateDCache_by_Addr(address, bytes_to_flush_per_line);
+#else /* _RENESAS_RZA_ */
+        R_BSP_CACHE_CleanInvalidateRange((uint64_t) address, (uint64_t) bytes_to_flush_per_line);
+#endif
         address += stride;
     }
 }
@@ -474,8 +478,8 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     /* remember draw unit for access to unit's context */
     t->draw_unit = (lv_draw_unit_t *)u;
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_layer_t * layer = t->target_layer;
     lv_area_t clipped_area;
     int32_t x;
@@ -533,8 +537,8 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
             break;
     }
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
     lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 #endif
 #endif

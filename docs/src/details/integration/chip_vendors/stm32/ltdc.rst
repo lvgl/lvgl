@@ -1,3 +1,4 @@
+.. include:: /include/substitutions.txt
 .. _stm32 ltdc driver:
 
 =========================
@@ -64,8 +65,9 @@ LTDC layer to create the display for.
 
 For the best visial results, ``optional_other_full_size_buffer`` should be used
 if enough memory is available. Single-buffered mode is what you should use
-if memory is very scarce. If there is almost enough memory for double-buffered
-direct mode, but not quite, then use partial render mode.
+if memory is very scarce. Chips with a CPU data cache have unavoidable visual
+artifacts when using single-buffered direct mode. If there is almost enough
+memory for double-buffered direct mode, but not quite, then use partial render mode.
 
 To clarify what ``my_ltdc_framebuffer_address`` exactly is, it's the value of
 ``pLayerCfg.FBStartAdress`` when the LTDC layer is configured using the STM32 HAL,
@@ -100,9 +102,6 @@ a single buffer if :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` is enabled.
 Linker Script
 *************
 
-.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
-.. |divide| unicode:: U+000F7 .. DIVISION SIGN
-
 You should ensure the LTDC framebuffer memory is actually reserved in the linker script.
 This is a file that normally has the extension ``.ld``.
 In the below example, ``1125K`` is specified because the color depth is 24 (3 bytes per pixel),
@@ -119,6 +118,26 @@ the display width is 800, the display height is 480, and ``1K`` means 1024 bytes
         RAM    (xrw)   : ORIGIN = 0x20119400, LENGTH = 1883K
         FLASH  (rx)    : ORIGIN = 0x08000000, LENGTH = 4096K
     }
+
+If the framebuffer is not reserved in the linker script or the framebuffer is not set during
+board initialization, you may absolutely set it at runtime before creating the LVGL display.
+
+.. code-block:: c
+
+    /* like this */
+    HAL_LTDC_SetAddress(&hltdc, (uint32_t)my_ltdc_framebuffer_address, my_ltdc_layer_index);
+
+    /* and then... */
+
+    lv_display_t * disp;
+    disp = lv_st_ltdc_create_direct(my_ltdc_framebuffer_address,
+                                    optional_other_full_size_buffer,
+                                    my_ltdc_layer_index);
+    /* or */
+    disp = lv_st_ltdc_create_partial(partial_buf1,
+                                     optional_partial_buf2,
+                                     partial_buf_size,
+                                     my_ltdc_layer_index);
 
 
 Display Rotation

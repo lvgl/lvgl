@@ -26,9 +26,10 @@ If most translations are known at compile time, they can be defined using string
 
 .. code-block:: c
 
-    static const char * languages[] = {"en", "de", "es", NULL};
-    static const char * tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
-    static const char * translations[] = {
+    /* Arrays are defined `const` to place them in program space instead of RAM. */
+    static const char * const languages[] = {"en", "de", "es", NULL};
+    static const char * const tags[] = {"tiger", "lion", "rabbit", "elephant", NULL};
+    static const char * const translations[] = {
         "The Tiger", "Der Tiger", "El Tigre",
         "The Lion", "Der Löwe", "El León",
         "The Rabbit", "Das Kaninchen", "El Conejo",

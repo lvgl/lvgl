@@ -23,8 +23,6 @@ void lv_example_xml_2(void)
     lv_obj_t * obj = (lv_obj_t *) lv_xml_create(lv_screen_active(), "view", NULL);
     lv_obj_set_pos(obj, 10, 10);
 
-    lv_xml_component_unregister("my_button");
-
     const char * slider_attrs[] = {
         "x", "200",
         "y", "-15",

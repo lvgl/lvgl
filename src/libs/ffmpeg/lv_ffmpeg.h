@@ -85,6 +85,12 @@ void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd);
  */
 void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en);
 
+/**
+ * Set the video decoder
+ * @param obj pointer to a ffmpeg_player object
+ * @param decoder_name decoder name
+ */
+void lv_ffmpeg_player_set_decoder(lv_obj_t * obj, const char * decoder_name);
 /*=====================
  * Other functions
  *====================*/

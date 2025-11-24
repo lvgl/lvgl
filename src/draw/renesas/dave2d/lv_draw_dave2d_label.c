@@ -88,8 +88,8 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
 
                     const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
+#if defined(RENESAS_CORTEX_M85) || defined(_RENESAS_RZA_)
+#if (BSP_CFG_DCACHE_ENABLED) || defined(_RENESAS_RZA_)
                     d1_cacheblockflush(unit->d2_handle, 0, draw_buf->data, draw_buf->data_size);
 #endif
 #endif
@@ -154,7 +154,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_dave2d_fill_single(t, fill_draw_dsc, fill_area);
+        lv_draw_dave2d_fill(t, fill_draw_dsc, fill_area);
     }
 }
 

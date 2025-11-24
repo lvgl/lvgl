@@ -9,10 +9,11 @@ Main Modules
 
     display/index
     indev/index
-    color
-    font
+    fonts/index
     image
+    color
     timer
     animation
     fs
+    observer/index
     draw/index

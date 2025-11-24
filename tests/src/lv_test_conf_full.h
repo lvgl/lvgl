@@ -80,6 +80,9 @@
 #define LV_USE_TJPGD        1
 #ifndef _WIN32
     #define LV_USE_LIBJPEG_TURBO       1
+    #ifndef LV_USE_LIBWEBP /* If WebP library is not found, defaulting to 0 in CMakeLists.txt */
+        #define LV_USE_LIBWEBP             1
+    #endif
 #endif
 #ifndef LV_USE_FFMPEG
     #define LV_USE_FFMPEG              1
@@ -120,12 +123,10 @@
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER     1
 #define LV_USE_DEMO_FLEX_LAYOUT            1
 #define LV_USE_DEMO_STRESS      1
-#define LV_USE_DEMO_TRANSFORM   1
 #define LV_USE_DEMO_MULTILANG   1
 #define LV_USE_DEMO_RENDER      1
 #define LV_USE_DEMO_MUSIC       1
 #define LV_USE_DEMO_BENCHMARK   1
-#define LV_USE_DEMO_SCROLL      1
 #define LV_USE_DEMO_EBIKE       1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 #define LV_USE_DEMO_HIGH_RES    1

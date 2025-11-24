@@ -931,6 +931,15 @@
         #endif
     #endif
 
+    /** Maximum path dump print length (in points) */
+    #ifndef LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #ifdef CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #else
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
+        #endif
+    #endif
+
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #ifndef LV_USE_VG_LITE_DRIVER
         #ifdef CONFIG_LV_USE_VG_LITE_DRIVER
@@ -3035,6 +3044,15 @@
     #endif
 #endif
 
+/** WebP decoder library */
+#ifndef LV_USE_LIBWEBP
+    #ifdef CONFIG_LV_USE_LIBWEBP
+        #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP
+    #else
+        #define LV_USE_LIBWEBP 0
+    #endif
+#endif
+
 /** GIF decoder library */
 #ifndef LV_USE_GIF
     #ifdef CONFIG_LV_USE_GIF
@@ -4658,24 +4676,6 @@
         #endif
     #endif
 
-    /** Widget transformation demo */
-    #ifndef LV_USE_DEMO_TRANSFORM
-        #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
-            #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
-        #else
-            #define LV_USE_DEMO_TRANSFORM       0
-        #endif
-    #endif
-
-    /** Demonstrate scroll settings */
-    #ifndef LV_USE_DEMO_SCROLL
-        #ifdef CONFIG_LV_USE_DEMO_SCROLL
-            #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
-        #else
-            #define LV_USE_DEMO_SCROLL          0
-        #endif
-    #endif
-
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #ifndef LV_USE_DEMO_EBIKE
         #ifdef CONFIG_LV_USE_DEMO_EBIKE
@@ -4781,8 +4781,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_TRANSFORM       0
-    #define LV_USE_DEMO_SCROLL          0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0

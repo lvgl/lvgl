@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 #include "../../core/lv_obj.h"
-#include "../../others/observer/lv_observer.h"
+#include "../../core/lv_observer.h"
 
 #if LV_USE_SPAN != 0
 

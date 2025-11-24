@@ -328,6 +328,9 @@
     /** Disable linear gradient extension for some older versions of drivers. */
     #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
 
+    /** Maximum path dump print length (in points) */
+    #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
+
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #define LV_USE_VG_LITE_DRIVER  0
     #if LV_USE_VG_LITE_DRIVER
@@ -948,6 +951,9 @@
  *  - Supports complete JPEG specifications and high-performance JPEG decoding. */
 #define LV_USE_LIBJPEG_TURBO 0
 
+/** WebP decoder library */
+#define LV_USE_LIBWEBP 0
+
 /** GIF decoder library */
 #define LV_USE_GIF 0
 #if LV_USE_GIF
@@ -1448,12 +1454,6 @@
 
     /** Smart-phone like multi-language demo */
     #define LV_USE_DEMO_MULTILANG       0
-
-    /** Widget transformation demo */
-    #define LV_USE_DEMO_TRANSFORM       0
-
-    /** Demonstrate scroll settings */
-    #define LV_USE_DEMO_SCROLL          0
 
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #define LV_USE_DEMO_EBIKE           0

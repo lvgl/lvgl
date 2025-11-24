@@ -78,6 +78,7 @@ typedef enum {
     LV_EVENT_REFRESH,             /**< Notify Widget to refresh something on it (for user)*/
     LV_EVENT_READY,               /**< A process has finished */
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
+    LV_EVENT_STATE_CHANGED,       /**< The state of the widget changed*/
 
     /** Other events */
     LV_EVENT_CREATE,              /**< Object is being created */
@@ -93,6 +94,7 @@ typedef enum {
     LV_EVENT_STYLE_CHANGED,       /**< Object's style has changed */
     LV_EVENT_LAYOUT_CHANGED,      /**< A child's position position has changed due to a layout recalculation */
     LV_EVENT_GET_SELF_SIZE,       /**< Get internal size of a widget */
+    LV_EVENT_UPDATE_LAYOUT_COMPLETED,    /**< Sent after layout update completes*/
 
     /** Events of optional LVGL components */
     LV_EVENT_INVALIDATE_AREA,     /**< An area is invalidated (marked for redraw). `lv_event_get_param(e)`

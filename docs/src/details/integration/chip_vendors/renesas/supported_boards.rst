@@ -25,7 +25,7 @@ Supported Boards
          | 2-lane MIPI
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
    * - **EK-RA8P1**
@@ -42,7 +42,7 @@ Supported Boards
          | Parallel RGB888
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/PoxDoQp51G8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/PoxDoQp51G8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek_ra8p1>`__
    * - **EK-RA6M3G**
@@ -59,7 +59,7 @@ Supported Boards
          | Parallel RGB565
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/0kar4Ee3Qic" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/0kar4Ee3Qic" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      -
          | `Demo repository <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
@@ -77,7 +77,7 @@ Supported Boards
          | Parallel RGB565
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/__56v8DsfH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/__56v8DsfH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit>`__
    * - **RZ/G2L-EVKIT**
@@ -91,7 +91,7 @@ Supported Boards
          | Micro-HDMI
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/oeuVvB7y-QA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/oeuVvB7y-QA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_rz-g2l-evkit>`__
    * - **RZ/G2UL-EVKIT**
@@ -106,7 +106,7 @@ Supported Boards
          | with Micro-HDMI bridge
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/VnynDLR36Xc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/VnynDLR36Xc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit>`__
    * - **RZ/A3M**
@@ -124,6 +124,37 @@ Supported Boards
          | MIPI
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/IEjBGgrR_mk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/IEjBGgrR_mk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository <https://github.com/lvgl/lv_port_renesas-ek-rz_a3m>`__
+   * - **EK-RA8D2**
+     -
+         | 1 GHz
+         | Arm Cortex-M85
+     -
+         | 1872KB internal
+         | 128MB external
+         | 1MB internal flash
+     -
+         | 7”
+         | 1024x600
+         | Parallel RGB888
+     - .. raw:: html
+
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/a8eLdqC7rZk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - `Demo repository <https://github.com/lvgl/lv_port_renesas_ek-ra8d2>`__
+   * - **RZ/G3E-EVKIT**
+     -
+         | 1.8 GHz
+         | Arm Cortex-A55
+     -
+         | 4GB LPDDR4X SDRAM
+     -
+         | 1920x1080
+         | Micro-HDMI
+     - .. raw:: html
+
+           <iframe width="160" height="90" src="https://www.youtube.com/embed/0vzvV9nKW4Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - `Demo repository <https://github.com/lvgl/lv_port_renesas_rz-g3e-evkit>`__

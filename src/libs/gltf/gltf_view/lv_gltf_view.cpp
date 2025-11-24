@@ -18,7 +18,7 @@
 #include "../../../core/lv_obj_class_private.h"
 #include "../../../misc/lv_types.h"
 #include "../../../widgets/3dtexture/lv_3dtexture.h"
-#include "ibl/lv_gltf_ibl_sampler.h"
+#include "../gltf_environment/lv_gltf_environment.h"
 #include "assets/lv_gltf_view_shader.h"
 #include <fastgltf/math.hpp>
 #include <fastgltf/tools.hpp>
@@ -49,9 +49,11 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
-static void destroy_environment(lv_gltf_view_env_textures_t * env);
+static void destroy_environment(lv_gltf_environment_t * env);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
+
+static lv_result_t create_default_environment(lv_gltf_t * gltf);
 
 
 const lv_obj_class_t lv_gltf_class = {
@@ -101,6 +103,14 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(!viewer->environment) {
+        lv_result_t res = create_default_environment(viewer);
+        if(res != LV_RESULT_OK) {
+            return NULL;
+        }
+    }
+
     lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
 }
@@ -110,8 +120,32 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
     LV_ASSERT_NULL(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(!viewer->environment) {
+        lv_result_t res = create_default_environment(viewer);
+        if(res != LV_RESULT_OK) {
+            return NULL;
+        }
+    }
+
     lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, &viewer->shader_manager);
     return lv_gltf_add_model(viewer, model);
+}
+void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * gltf = (lv_gltf_t *)obj;
+    if(env == NULL) {
+        LV_LOG_WARN("Refusing to assign a NULL environment to the glTF object");
+        return;
+    }
+
+    if(gltf->environment && gltf->owns_environment) {
+        lv_gltf_environment_delete(gltf->environment);
+        gltf->environment = NULL;
+    }
+    gltf->environment = env;
+    gltf->owns_environment = false;
 }
 
 size_t lv_gltf_get_model_count(lv_obj_t * obj)
@@ -207,6 +241,19 @@ float lv_gltf_get_distance(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_gltf_t * viewer = (lv_gltf_t *)obj;
     return viewer->desc.distance;
+}
+
+float lv_gltf_get_world_distance(const lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+    lv_gltf_view_desc_t * view_desc = &viewer->desc;
+    if(viewer->models.size == 0) {
+        return 0.0f;
+    }
+    lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, 0);
+    return (lv_gltf_data_get_radius(model) * LV_GLTF_DISTANCE_SCALE_FACTOR) * view_desc->distance;
 }
 
 void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
@@ -427,13 +474,122 @@ void lv_gltf_recenter(lv_obj_t * obj, lv_gltf_model_t * model)
     viewer->desc.focal_z = center_position[2];
 }
 
+lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    float norm_mouse_x = (float)screen_pos->x / (float)(lv_obj_get_width(obj));
+    float norm_mouse_y = (float)screen_pos->y / (float)(lv_obj_get_height(obj));
+
+    lv_3dray_t outray = {0};
+
+    fastgltf::math::fmat4x4 proj_mat = fastgltf::math::invert(fastgltf::math::fmat4x4(viewer->projection_matrix));
+
+    /* Convert mouse coordinates to NDC */
+    float x = norm_mouse_x * 2.0f - 1.0f;
+    float y = 1.0f - (norm_mouse_y * 2.0f);
+    float z = -1.0f; /* Clip space z */
+
+    fastgltf::math::fvec4 clip_space_pos = fastgltf::math::fvec4(x, y, z, 1.f);
+    auto ray_eye = (proj_mat) * clip_space_pos;
+    ray_eye[2] = -1.0f;
+    ray_eye[3] = 0.0f;
+
+    /* Calculate ray world direction */
+    fastgltf::math::fvec4 ray_world = fastgltf::math::invert(viewer->view_matrix) * ray_eye;
+    auto ray_direction = fastgltf::math::normalize(fastgltf::math::fvec3(ray_world[0], ray_world[1], ray_world[2]));
+
+    outray.direction = {ray_direction[0], ray_direction[1], ray_direction[2]};
+    outray.origin = {viewer->camera_pos[0], viewer->camera_pos[1], viewer->camera_pos[2]};
+
+    return outray;
+}
+
+lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                             lv_3dpoint_t * collision_point)
+{
+    fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
+    fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);
+    fastgltf::math::fvec3 ray_start = fastgltf::math::fvec3(ray->origin.x, ray->origin.y, ray->origin.z);
+    fastgltf::math::fvec3 ray_direction = fastgltf::math::fvec3(ray->direction.x, ray->direction.y, ray->direction.z);
+
+    float denom = fastgltf::math::dot(plane_normal, ray_direction);
+    if(fabs(denom) > 1e-6) {  /* Check if the ray is not parallel to the plane */
+        fastgltf::math::fvec3 diff = plane_center - ray_start;
+        float t = fastgltf::math::dot(diff, plane_normal) / denom;
+
+        if(t >= 0) {  /* Intersection occurs ahead of the ray origin */
+            /* Calculate the collision point */
+            (*collision_point).x = ray_start[0] + t * ray_direction[0];
+            (*collision_point).y = ray_start[1] + t * ray_direction[1];
+            (*collision_point).z = ray_start[2] + t * ray_direction[2];
+            return LV_RESULT_OK; /* Collision point found */
+        }
+    }
+    return LV_RESULT_INVALID; /* No intersection */
+}
+
+lv_3dplane_t lv_gltf_get_ground_plane(float elevation)
+{
+    lv_3dplane_t outplane = {0};
+    outplane.origin = {0.0f, elevation, 0.0f};
+    outplane.direction = {0.0f, 1.0f, 0.0f};
+    return outplane;
+}
+
+lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+    lv_3dplane_t outplane = {0};
+
+    /* Forward vector is the third column of the matrix */
+    auto forward = fastgltf::math::fvec3(viewer->view_matrix[0][2], viewer->view_matrix[1][2], viewer->view_matrix[2][2]);
+    forward = fastgltf::math::normalize(forward);
+
+    /* Calculate the plane center */
+    const auto & camera_pos = viewer->camera_pos;
+    auto plane_pos = fastgltf::math::fvec3(camera_pos[0], camera_pos[1], camera_pos[2]) - forward * distance;
+    outplane.origin = {plane_pos[0], plane_pos[1], plane_pos[2]};
+    outplane.direction = {-forward[0], -forward[1], -forward[2]};
+    return outplane;
+}
+
+lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos, lv_point_t * screen_pos)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    fastgltf::math::fvec4 world_position_h = fastgltf::math::fvec4(world_pos.x, world_pos.y, world_pos.z, 1.0f);
+    fastgltf::math::fvec4 clip_space_pos = viewer->projection_matrix * viewer->view_matrix * world_position_h;
+
+    /* Check for perspective division (w must not be zero) */
+    if(clip_space_pos[3] == 0.0f) {
+        screen_pos->x = -1;
+        screen_pos->y = -1;
+        return LV_RESULT_INVALID; /* Position is not valid for screen mapping */
+    }
+
+    clip_space_pos /= clip_space_pos[3];
+    float norm_screen_x = clip_space_pos[0] * 0.5f + 0.5f;
+    float norm_screen_y = 0.5f - (clip_space_pos[1] * 0.5f);
+    int32_t win_width = lv_obj_get_width(obj);
+    int32_t win_height = lv_obj_get_height(obj);
+    screen_pos->x = norm_screen_x * win_width;
+    screen_pos->y = norm_screen_y * win_height;
+    return LV_RESULT_OK;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
 {
-
     if(!model) {
         return NULL;
     }
@@ -452,6 +608,18 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
     return model;
 }
 
+static lv_result_t create_default_environment(lv_gltf_t * gltf)
+{
+    lv_gltf_ibl_sampler_t * sampler = lv_gltf_ibl_sampler_create();
+    gltf->environment = lv_gltf_environment_create(sampler, NULL);
+    lv_gltf_ibl_sampler_delete(sampler);
+    if(!gltf->environment) {
+        LV_LOG_WARN("Failed to create default gltf environment");
+        return LV_RESULT_INVALID;
+    }
+    gltf->owns_environment = true;
+    return LV_RESULT_OK;
+}
 
 static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -475,8 +643,6 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_opengl_shader_manager_init(&view->shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
     lv_free(vertex_shader);
     lv_free(frag_shader);
-
-    lv_gltf_ibl_generate_env_textures(&view->env_textures, NULL, 0);
 
     lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_t *));
 
@@ -515,7 +681,9 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
-    destroy_environment(&view->env_textures);
+    if(view->environment && view->owns_environment) {
+        lv_gltf_environment_delete(view->environment);
+    }
 }
 
 static void lv_gltf_view_state_init(lv_gltf_t * view)
@@ -667,10 +835,5 @@ static void setup_background_environment(GLuint program, GLuint * vao, GLuint * 
     GL_CALL(glUseProgram(0));
 }
 
-static void destroy_environment(lv_gltf_view_env_textures_t * env)
-{
-    const unsigned int d[3] = { env->diffuse, env->specular, env->sheen };
-    GL_CALL(glDeleteTextures(3, d));
-}
 
 #endif /*LV_USE_GLTF*/

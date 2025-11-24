@@ -122,40 +122,62 @@ document.addEventListener("DOMContentLoaded", (event) => {
    *---------------------------------------------------------------------*/
   document.querySelectorAll("dl.cpp").forEach((cppListing) => {
     const dt = cppListing.querySelector("dt");
+    let exClass = "expanded";
+    let unExClass = "unexpanded";
     let shouldBeExpanded = false;
     if (dt.id == document.location.hash.substring(1)) shouldBeExpanded = true;
-    cppListing.classList.add(shouldBeExpanded ? "expanded" : "unexpanded");
+    if (shouldBeExpanded) {
+      cppListing.classList.add(exClass);
+
+      /* If `dt.id` is for an enumerator, also expand its parent
+       * <dl class="cpp enum unexpanded"> element. */
+      let parentDlNode = cppListing.parentNode.parentNode;
+      if (
+           parentDlNode != null
+        && parentDlNode.classList.contains("cpp")
+        && parentDlNode.classList.contains("enum")
+        && parentDlNode.classList.contains(unExClass)
+        ) {
+        parentDlNode.classList.remove(unExClass);
+        parentDlNode.classList.add(exClass);
+      }
+
+      /* Have browser scroll `cppListing` into view if it is not already. */
+      cppListing.scrollIntoView();
+    } else {
+      cppListing.classList.add(unExClass);
+    }
     const button = document.createElement("span");
     button.classList.add("lv-api-expansion-button");
     button.addEventListener("click", () => {
-      cppListing.classList.toggle("unexpanded");
-      cppListing.classList.toggle("expanded");
+      cppListing.classList.toggle(unExClass);
+      cppListing.classList.toggle(exClass);
     });
 
     dt.insertBefore(button, dt.firstChild);
   });
 
   /*---------------------------------------------------------------------
-     * Display any current custom banner in `banner.json` at top of each page.
-     *---------------------------------------------------------------------
-     * Custom banners are inserted between these two elements at top of page.
-    <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+   * Display any current custom banner in `banner.json` at top of each page.
+   *---------------------------------------------------------------------
+   * Custom banners are inserted between these two elements at top of page.
+  <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
-    <div class="lv-custom-banner-list">
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement one!
-      </p>
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement two!
-      </p>
-      <p class="lv-custom-banner">
-         <em>Important</em> announcement three!
-      </p>
-    </div>
+  <div class="lv-custom-banner-list">
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement one!
+    </p>
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement two!
+    </p>
+    <p class="lv-custom-banner">
+      <em>Important</em> announcement three!
+    </p>
+  </div>
 
-    <div class="page">
-      ...page content...
-     *---------------------------------------------------------------------*/
+  <div class="page">
+    ...page content...
+   *---------------------------------------------------------------------*/
   let bannerJsonUrl = "https://lvgl.io/data/banner.json";
   let bannerContainerClass = "lv-custom-banner-list";
   let bannerClass = "lv-custom-banner";

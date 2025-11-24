@@ -6,6 +6,8 @@
 /*Bypassing resolution check*/
 #define TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT(path) TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), path);
 
+#define TEST_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -15,6 +17,9 @@ void tearDown(void)
 {
     lv_display_set_matrix_rotation(NULL, false);
     lv_obj_clean(lv_screen_active());
+    lv_obj_clean(lv_layer_top());
+    lv_obj_clean(lv_layer_sys());
+    lv_obj_clean(lv_layer_bottom());
 }
 
 struct display_area_test_set {
@@ -218,6 +223,11 @@ static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t 
 {
     LV_UNUSED(area);
     LV_UNUSED(color_p);
+
+    if(disp->last_area && disp->last_part) {
+        TEST_ASSERT_TRUE(lv_display_flush_is_last(disp));
+    }
+
     lv_display_flush_ready(disp);
 }
 
@@ -281,6 +291,296 @@ void test_display_deleted_during_event(void)
     lv_refr_now(disp);
     TEST_ASSERT_EQUAL(called, 1);
     lv_draw_buf_destroy(buf1);
+}
+
+static void test_display_resolution_full_rotation(
+    lv_display_t * disp,
+    int32_t ori_hor_res, int32_t ori_ver_res,
+    int32_t ori_physical_hor_res, int32_t ori_physical_ver_res,
+    int32_t ori_offset_x, int32_t ori_offset_y)
+{
+    const lv_display_rotation_t rotations[] = {
+        LV_DISPLAY_ROTATION_0,
+        LV_DISPLAY_ROTATION_90,
+        LV_DISPLAY_ROTATION_180,
+        LV_DISPLAY_ROTATION_270,
+        LV_DISPLAY_ROTATION_0,
+    };
+
+    for(size_t i = 0; i < sizeof(rotations) / sizeof(rotations[0]); i++) {
+        lv_display_set_rotation(disp, rotations[i]);
+
+        if(!disp && !lv_display_get_default()) {
+            TEST_ASSERT_EQUAL(LV_DISPLAY_ROTATION_0, lv_display_get_rotation(disp));
+        }
+        else {
+            TEST_ASSERT_EQUAL(rotations[i], lv_display_get_rotation(disp));
+        }
+
+        /* Original resolution should be the same */
+        TEST_ASSERT_EQUAL_INT32(ori_hor_res, lv_display_get_original_horizontal_resolution(disp));
+        TEST_ASSERT_EQUAL_INT32(ori_ver_res, lv_display_get_original_vertical_resolution(disp));
+
+        /* verify resolution */
+        switch(lv_display_get_rotation(disp)) {
+            case LV_DISPLAY_ROTATION_0:
+            case LV_DISPLAY_ROTATION_180:
+                TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res, lv_display_get_physical_horizontal_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res, lv_display_get_physical_vertical_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_hor_res, lv_display_get_horizontal_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_ver_res, lv_display_get_vertical_resolution(disp));
+                break;
+            case LV_DISPLAY_ROTATION_90:
+            case LV_DISPLAY_ROTATION_270:
+                TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res, lv_display_get_physical_horizontal_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res, lv_display_get_physical_vertical_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_ver_res, lv_display_get_horizontal_resolution(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_hor_res, lv_display_get_vertical_resolution(disp));
+                break;
+            default:
+                TEST_FAIL();
+                break;
+        }
+
+        /* verify offset */
+        switch(lv_display_get_rotation(disp)) {
+            case LV_DISPLAY_ROTATION_0:
+                TEST_ASSERT_EQUAL_INT32(ori_offset_x, lv_display_get_offset_x(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_offset_y, lv_display_get_offset_y(disp));
+                break;
+            case LV_DISPLAY_ROTATION_180:
+                TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res - ori_offset_x, lv_display_get_offset_x(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res - ori_offset_y, lv_display_get_offset_y(disp));
+                break;
+            case LV_DISPLAY_ROTATION_90:
+                TEST_ASSERT_EQUAL_INT32(ori_offset_y, lv_display_get_offset_x(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_offset_x, lv_display_get_offset_y(disp));
+                break;
+            case LV_DISPLAY_ROTATION_270:
+                TEST_ASSERT_EQUAL_INT32(ori_physical_ver_res - ori_offset_y, lv_display_get_offset_x(disp));
+                TEST_ASSERT_EQUAL_INT32(ori_physical_hor_res - ori_offset_x, lv_display_get_offset_y(disp));
+                break;
+            default:
+                TEST_FAIL();
+                break;
+        }
+    }
+}
+
+void test_display_resolution(void)
+{
+    lv_display_t * disp_def = lv_display_get_default();
+    TEST_ASSERT_NOT_NULL(disp_def);
+
+    lv_display_t * disp = lv_display_create(480, 320);
+    TEST_ASSERT_NOT_NULL(disp);
+    lv_display_set_default(disp);
+    lv_display_set_flush_cb(disp, never_called);
+    test_display_resolution_full_rotation(disp, 480, 320, 480, 320, 0, 0);
+
+    lv_display_set_resolution(disp, 320, 480);
+    lv_display_set_physical_resolution(disp, 240, 320);
+    lv_display_set_offset(disp, 10, 20);
+    test_display_resolution_full_rotation(disp, 320, 480, 240, 320, 10, 20);
+
+    /* Set same resolution again */
+    lv_display_set_resolution(disp, 320, 480);
+    test_display_resolution_full_rotation(disp, 320, 480, 240, 320, 10, 20);
+
+    /* Test default display */
+    lv_display_set_resolution(NULL, 32, 48);
+    lv_display_set_physical_resolution(NULL, 24, 32);
+    lv_display_set_offset(NULL, 1, 2);
+    test_display_resolution_full_rotation(disp, 32, 48, 24, 32, 1, 2);
+
+    /* Test NULL default display, should not affect the display */
+    lv_display_set_default(NULL);
+    lv_display_set_resolution(NULL, 2, 3);
+    lv_display_set_physical_resolution(NULL, 4, 5);
+    lv_display_set_offset(NULL, 6, 7);
+    test_display_resolution_full_rotation(disp, 32, 48, 24, 32, 1, 2);
+    test_display_resolution_full_rotation(NULL, 0, 0, 0, 0, 0, 0);
+
+    /* Restore default display */
+    lv_display_set_default(disp_def);
+    lv_display_delete(disp);
+}
+
+void test_display_dpi_tile_cnt_antialiasing(void)
+{
+    lv_display_t * disp_def = lv_display_get_default();
+    TEST_ASSERT_NOT_NULL(disp_def);
+
+    lv_display_t * disp = lv_display_create(480, 320);
+    TEST_ASSERT_NOT_NULL(disp);
+    lv_display_set_default(disp);
+    lv_display_set_flush_cb(disp, never_called);
+
+    /* Verify default values */
+    TEST_ASSERT_EQUAL_INT32(LV_DPI_DEF, lv_display_get_dpi(disp));
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
+    TEST_ASSERT_EQUAL_INT32(LV_DRAW_SW_DRAW_UNIT_CNT, lv_display_get_tile_cnt(disp));
+#else
+    TEST_ASSERT_EQUAL_INT32(1, lv_display_get_tile_cnt(disp));
+#endif
+    TEST_ASSERT_EQUAL(LV_COLOR_DEPTH > 8 ? true : false, lv_display_get_antialiasing(disp));
+
+    lv_display_set_dpi(disp, 80);
+    TEST_ASSERT_EQUAL_INT32(80, lv_display_get_dpi(disp));
+    TEST_ASSERT_EQUAL_INT32(TEST_DPX_CALC(80, 0), lv_dpx(0));
+    TEST_ASSERT_EQUAL_INT32(TEST_DPX_CALC(80, 10), lv_dpx(10));
+    TEST_ASSERT_EQUAL_INT32(TEST_DPX_CALC(80, 100), lv_display_dpx(disp, 100));
+
+    lv_display_set_antialiasing(disp, false);
+    TEST_ASSERT_FALSE(lv_display_get_antialiasing(disp));
+    lv_display_set_antialiasing(disp, true);
+    TEST_ASSERT_TRUE(lv_display_get_antialiasing(disp));
+    lv_display_set_tile_cnt(disp, 10);
+    TEST_ASSERT_EQUAL_INT32(10, lv_display_get_tile_cnt(disp));
+
+    /* Test default display, should same affect the display */
+    lv_display_set_dpi(NULL, 160);
+    TEST_ASSERT_EQUAL_INT32(160, lv_display_get_dpi(NULL));
+    lv_display_set_antialiasing(NULL, false);
+    TEST_ASSERT_FALSE(lv_display_get_antialiasing(NULL));
+    lv_display_set_antialiasing(NULL, true);
+    TEST_ASSERT_TRUE(lv_display_get_antialiasing(NULL));
+    lv_display_set_tile_cnt(NULL, 20);
+    TEST_ASSERT_EQUAL_INT32(20, lv_display_get_tile_cnt(NULL));
+
+    /* Test NULL default display, should not affect the display */
+    lv_display_set_default(NULL);
+    lv_display_set_dpi(NULL, 200);
+    TEST_ASSERT_EQUAL_INT32(LV_DPI_DEF, lv_display_get_dpi(NULL));
+    lv_display_set_antialiasing(NULL, false);
+    TEST_ASSERT_FALSE(lv_display_get_antialiasing(NULL));
+    lv_display_set_antialiasing(NULL, true);
+    TEST_ASSERT_FALSE(lv_display_get_antialiasing(NULL));
+    lv_display_set_tile_cnt(NULL, 20);
+    TEST_ASSERT_EQUAL_INT32(0, lv_display_get_tile_cnt(NULL));
+
+    /* Restore default display */
+    lv_display_set_default(disp_def);
+    lv_display_delete(disp);
+}
+
+void test_display_delete_refr_timer(void)
+{
+    lv_display_t * disp = lv_display_create(480, 320);
+    TEST_ASSERT_NOT_NULL(disp);
+    lv_display_set_flush_cb(disp, never_called);
+
+    TEST_ASSERT_NOT_NULL(lv_display_get_refr_timer(disp));
+    lv_display_delete_refr_timer(disp);
+    TEST_ASSERT_NULL(lv_display_get_refr_timer(disp));
+
+    lv_display_delete(disp);
+}
+
+void test_display_buffers_with_stride(void)
+{
+    lv_display_t * disp = lv_display_create(32, 64);
+    TEST_ASSERT_NOT_NULL(disp);
+
+    lv_draw_buf_t * buf1 = lv_draw_buf_create(32, 64, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    TEST_ASSERT_NOT_NULL(buf1);
+    lv_draw_buf_t * buf2 = lv_draw_buf_dup(buf1);
+    TEST_ASSERT_NOT_NULL(buf2);
+
+    lv_display_set_buffers_with_stride(disp, buf1->data, buf2->data, buf1->data_size, LV_STRIDE_AUTO,
+                                       LV_DISPLAY_RENDER_MODE_PARTIAL);
+    TEST_ASSERT_EQUAL_PTR(buf1->data, disp->buf_1->data);
+    TEST_ASSERT_EQUAL_PTR(buf2->data, disp->buf_2->data);
+
+    lv_display_set_buffers_with_stride(disp, buf1->data, buf2->data, buf1->data_size, 32 * sizeof(uint32_t),
+                                       LV_DISPLAY_RENDER_MODE_PARTIAL);
+    TEST_ASSERT_EQUAL_PTR(buf1->data, disp->buf_1->data);
+    TEST_ASSERT_EQUAL_PTR(buf2->data, disp->buf_2->data);
+
+    lv_display_set_buffers_with_stride(disp, buf1->data, buf2->data, buf1->data_size, 32 * sizeof(uint32_t),
+                                       LV_DISPLAY_RENDER_MODE_DIRECT);
+    TEST_ASSERT_EQUAL_PTR(buf1->data, disp->buf_1->data);
+    TEST_ASSERT_EQUAL_PTR(buf2->data, disp->buf_2->data);
+
+    lv_draw_buf_destroy(buf1);
+    lv_draw_buf_destroy(buf2);
+    lv_display_delete(disp);
+}
+
+void test_display_layers(void)
+{
+    lv_obj_t * parents[] = {
+        lv_layer_bottom(), /* Bottom layer should be covered by screen active */
+        lv_screen_active(),
+        lv_layer_top(),
+        lv_layer_sys(),
+    };
+
+    static const lv_palette_t paletts[] = {
+        LV_PALETTE_RED,
+        LV_PALETTE_GREEN,
+        LV_PALETTE_BLUE,
+        LV_PALETTE_YELLOW,
+    };
+
+    static const char * layer_names[] = {
+        "Layer Bottom",
+        "Screen Active",
+        "Layer Top",
+        "Layer Sys",
+    };
+
+    for(size_t i = 0; i < sizeof(parents) / sizeof(parents[0]); i++) {
+        lv_obj_t * obj = lv_obj_create(parents[i]);
+        lv_obj_align(obj, LV_ALIGN_CENTER, 20 * i, 20 * i);
+        lv_obj_set_style_opa(obj, LV_OPA_50, LV_PART_MAIN);
+        lv_obj_set_style_bg_color(obj, lv_palette_main(paletts[i]), LV_PART_MAIN);
+
+        lv_obj_t * label = lv_label_create(obj);
+        lv_label_set_text_fmt(label, "%s", layer_names[i]);
+        lv_obj_center(label);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("display_layers.png");
+
+    lv_display_t * disp_def = lv_display_get_default();
+    TEST_ASSERT_NOT_NULL(disp_def);
+
+    TEST_ASSERT_NOT_NULL(lv_display_get_screen_active(NULL));
+    TEST_ASSERT_NULL(lv_display_get_screen_prev(NULL));
+    TEST_ASSERT_NOT_NULL(lv_display_get_layer_top(NULL));
+    TEST_ASSERT_NOT_NULL(lv_display_get_layer_sys(NULL));
+    TEST_ASSERT_NOT_NULL(lv_display_get_layer_bottom(NULL));
+
+    lv_display_set_default(NULL);
+    TEST_ASSERT_NULL(lv_display_get_screen_active(NULL));
+    TEST_ASSERT_NULL(lv_display_get_screen_prev(NULL));
+    TEST_ASSERT_NULL(lv_display_get_layer_top(NULL));
+    TEST_ASSERT_NULL(lv_display_get_layer_sys(NULL));
+    TEST_ASSERT_NULL(lv_display_get_layer_bottom(NULL));
+
+    lv_display_set_default(disp_def);
+}
+
+void test_display_active_time(void)
+{
+    lv_display_t * disp_def = lv_display_get_default();
+
+    lv_display_trigger_activity(disp_def);
+    lv_tick_inc(1000);
+    TEST_ASSERT_EQUAL_UINT32(1000, lv_display_get_inactive_time(disp_def));
+
+    lv_display_trigger_activity(NULL);
+    lv_tick_inc(1000);
+    TEST_ASSERT_EQUAL_UINT32(1000, lv_display_get_inactive_time(NULL));
+
+    /* Test NULL default display, should not affect the display */
+    lv_display_set_default(NULL);
+    lv_display_trigger_activity(NULL);
+    lv_tick_inc(1000);
+    TEST_ASSERT_EQUAL_UINT32(2000, lv_display_get_inactive_time(NULL));
+
+    lv_display_set_default(disp_def);
 }
 
 #endif

@@ -19,7 +19,7 @@ extern "C" {
 #include "lv_display.h"
 
 #if LV_USE_SYSMON
-#include "../others/sysmon/lv_sysmon_private.h"
+#include "../debugging/sysmon/lv_sysmon_private.h"
 #endif
 
 /*********************
