@@ -44,7 +44,7 @@ struct _lv_polarchart_cursor_t {
     lv_point_t pos;
     int32_t point_id;
     lv_color_t color;
-    lv_polar_chart_series_t * ser;
+    lv_polarchart_series_t * ser;
     lv_dir_t dir;
     uint32_t pos_set: 1;        /**< 1: pos is set; 0: point_id is set */
 };
