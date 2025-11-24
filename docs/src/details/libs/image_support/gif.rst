@@ -35,7 +35,7 @@ The supported color formats are:
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
 
 :cpp:expr:`lv_gif_set_src(widget, src)` works very similarly to :cpp:func:`lv_image_set_src`.
-As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or files.
+As source, it also accepts images as variables (:cpp:struct:`lv_image_dsc_t`) or files.
 
 
 Converting GIF Files to C Arrays

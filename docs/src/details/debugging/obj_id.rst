@@ -60,7 +60,7 @@ other things, depending on the implementation.
 
 This function (whether provided by LVGL or by you --- more on this below) is
 responsible for doing the clean-up of any resources allocated by
-:cpp:func:`lv_obj_assign_id()`
+:cpp:func:`lv_obj_assign_id`
 
 
 :c:macro:`LV_USE_OBJ_ID_BUILTIN`
