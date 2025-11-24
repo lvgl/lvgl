@@ -39,6 +39,7 @@ static void lv_polarchart_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer);
+static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer);
 static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
@@ -270,7 +271,7 @@ void lv_polarchart_get_point_pos_by_id(lv_obj_t * obj, lv_polarchart_series_t * 
         p_out->y = h - temp_y;
     }
     else if(chart->type == LV_POLARCHART_TYPE_SCATTER) {
-        p_out->x = lv_map(ser->angle_points[id], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w);
+        p_out->x = lv_map(ser->angle_points[id], chart->angle_min, chart->angle_max, 0, w);
         int32_t temp_y = value_to_y(obj, ser, ser->radial_points[id], h);
         p_out->y = h - temp_y;
     }
@@ -1058,7 +1059,7 @@ static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)
             int32_t best_dist = INT32_MAX;
             uint32_t best_index = 0;
             for(uint32_t i = 0; i < chart->point_cnt; i++) {
-                int32_t dist = LV_ABS(x - lv_map(ser->x_points[i], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w));
+                int32_t dist = LV_ABS(x - lv_map(ser->angle_points[i], chart->angle_min, chart->angle_max, 0, w));
                 if(dist < best_dist) {
                     best_dist = dist;
                     best_index = i;
