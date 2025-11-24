@@ -179,9 +179,9 @@ void test_draw_task_hooking(void)
     lv_obj_add_event_cb(polarchart, polarchart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
     lv_polarchart_series_t * polarchart_set1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_YELLOW),
-                                                                           0);
+                                                                        0);
     lv_polarchart_series_t * polarchart_set2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
-                                                                           0);
+                                                                        0);
     lv_polarchart_series_t * polarchart_set3 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), 0);
     lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 700);
 
