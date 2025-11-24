@@ -15,9 +15,9 @@ void lv_example_polarchart_1(void)
 
     /*Add two data series*/
     lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
-                                                               LV_POLARCHART_AXIS_RADIAL);
+                                                             LV_POLARCHART_AXIS_RADIAL);
     lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
-                                                               LV_POLARCHART_AXIS_RADIAL);
+                                                             LV_POLARCHART_AXIS_RADIAL);
     int32_t * ser2_y_points = lv_polarchart_get_series_radial_array(polarchart, ser2);
 
     uint32_t i;

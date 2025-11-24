@@ -287,7 +287,7 @@ void lv_polarchart_set_cursor_pos_radial(lv_obj_t * chart, lv_polarchart_cursor_
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_polarchart_set_cursor_point(lv_obj_t * chart, lv_polarchart_cursor_t * cursor, lv_polarchart_series_t * ser,
-                                     uint32_t point_id);
+                                    uint32_t point_id);
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
@@ -325,7 +325,7 @@ void lv_polarchart_set_next_value(lv_obj_t * obj, lv_polarchart_series_t * ser, 
  * @param values_cnt    number of items in `values`
  */
 void lv_polarchart_set_series_values(lv_obj_t * obj, lv_polarchart_series_t * ser, const int32_t values[],
-                                      size_t values_cnt);
+                                     size_t values_cnt);
 
 /**
  * Set an individual point's y value of a chart's series directly based on its index
