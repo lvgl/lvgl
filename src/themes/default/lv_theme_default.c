@@ -112,7 +112,7 @@ typedef struct {
     lv_style_t line;
 #endif
 
-#if LV_USE_POLAR_HART
+#if LV_USE_POLARCHART
     lv_style_t polarchart_series, polarchart_indic, polarchart_bg;
 #endif
 
