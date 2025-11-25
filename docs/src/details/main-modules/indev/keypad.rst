@@ -88,7 +88,31 @@ The most important special keys in your :cpp:func:`read_cb` function are:
 You should translate some of the read keys to these special keys to support navigation
 in a group and interact with selected widgets.
 
-Key remapping
+
+Key Events
+**********
+
+If needed you can easily catch the keys sent by an input device by subscribing to
+an indev event like this:
+
+
+.. code-block:: c
+
+    void key_event_cb(lv_event_t *e)
+    {
+        lv_indev_t * indev = (lv_indev_t *)lv_event_get_target(e); /*Same as lv_indev_active()*/
+        if(lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED) {
+            LV_LOG_USER("%c", (char) lv_indev_get_key(indev));
+        }
+    }
+
+    ...
+
+    lv_indev_add_event_cb(keyboard, key_event_cb, LV_EVENT_KEY, NULL);
+
+
+
+Key Remapping
 *************
 
 Some applications require assigning physical buttons to multiple key events depending
