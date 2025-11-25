@@ -23,8 +23,8 @@ void lv_example_polarchart_2(void)
     lv_obj_t * polarchart = lv_polarchart_create(wrapper);
     lv_obj_set_width(polarchart, lv_pct(100));
     lv_obj_set_flex_grow(polarchart, 1);
-    lv_polarchart_set_type(polarchart, LV_CHART_TYPE_BAR);
-    lv_polarchart_set_axis_range(polarchart, LV_CHART_AXIS_RADIAL, 0, 100);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_BAR);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 100);
     lv_polarchart_set_point_count(polarchart, 12);
     lv_obj_set_style_radius(polarchart, 0, 0);
 
@@ -41,9 +41,9 @@ void lv_example_polarchart_2(void)
 
     /*Add two data series*/
     lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_lighten(LV_PALETTE_GREEN, 2),
-                                                             LV_CHART_AXIS_RADIAL);
+                                                             LV_POLARCHART_AXIS_RADIAL);
     lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_darken(LV_PALETTE_GREEN, 2),
-                                                             LV_CHART_AXIS_RADIAL);
+                                                             LV_POLARCHART_AXIS_RADIAL);
 
     /*Set the next points on 'ser1'*/
     uint32_t i;

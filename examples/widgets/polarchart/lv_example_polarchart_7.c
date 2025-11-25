@@ -48,15 +48,15 @@ void lv_example_polarchart_7(void)
     lv_obj_add_flag(polarchart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_set_style_line_width(polarchart, 0, LV_PART_ITEMS);   /*Remove the lines*/
 
-    lv_polarchart_set_type(polarchart, LV_CHART_TYPE_SCATTER);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_SCATTER);
 
-    lv_polarchart_set_axis_range(polarchart, LV_CHART_AXIS_ANGLE, 0, 360);
-    lv_polarchart_set_axis_range(polarchart, LV_CHART_AXIS_RADIAL, 0, 1000);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_ANGLE, 0, 360);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 1000);
 
     lv_polarchart_set_point_count(polarchart, 50);
 
     lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
-                                                            LV_CHART_AXIS_RADIAL);
+                                                            LV_POLARCHART_AXIS_RADIAL);
     uint32_t i;
     for(i = 0; i < 50; i++) {
         lv_polarchart_set_next_value2(polarchart, ser, (int32_t)lv_rand(0, 200), (int32_t)lv_rand(0, 1000));
