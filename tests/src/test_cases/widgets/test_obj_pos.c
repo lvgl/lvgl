@@ -88,7 +88,7 @@ void test_circular_height_dependency(void)
     lv_obj_set_style_bg_opa(item1, LV_OPA_COVER, 0);
     /**
      * Because parent is size content this will evaluate after all the fixed/clamped children are sized
-     * This means item1 should size to 50 because of item2
+     * This means item1 should size to 100 because of item2
      */
     lv_obj_set_height(item1, LV_PCT(100));
     lv_obj_set_flex_grow(item1, 1);
@@ -101,7 +101,6 @@ void test_circular_height_dependency(void)
     lv_obj_set_flex_grow(item2, 1);
 
     lv_obj_t * item3 = lv_obj_create(cont);
-    // lv_obj_set_flag(item3, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, true);
     lv_obj_set_name(item3, "item3");
     lv_obj_set_style_bg_color(item3, lv_palette_main(LV_PALETTE_GREEN), 0);
     lv_obj_set_style_bg_opa(item3, LV_OPA_COVER, 0);
@@ -150,7 +149,7 @@ void test_circular_width_dependency(void)
     lv_obj_set_style_bg_opa(item1, LV_OPA_COVER, 0);
     /**
      * Because parent is size content this will evaluate after all the fixed/clamped children are sized
-     * This means item1 should size to 50 because of item2
+     * This means item1 should size to 100 because of item2
      */
     lv_obj_set_width(item1, LV_PCT(100));
     lv_obj_set_flex_grow(item1, 1);
@@ -163,7 +162,6 @@ void test_circular_width_dependency(void)
     lv_obj_set_flex_grow(item2, 1);
 
     lv_obj_t * item3 = lv_obj_create(cont);
-    // lv_obj_set_flag(item3, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK, true);
     lv_obj_set_name(item3, "item3");
     lv_obj_set_style_bg_color(item3, lv_palette_main(LV_PALETTE_GREEN), 0);
     lv_obj_set_style_bg_opa(item3, LV_OPA_COVER, 0);

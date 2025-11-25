@@ -142,15 +142,20 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         /**
          * If the object style (after clamping) results in a width that is defined as a percentage of the parent,
          * and if the parent's width is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
-         * influence the parent's content width calculation. Thus, the `h_ignore_size` flag is set accordingly.
+         * influence the parent's content width calculation. Thus, the `w_ignore_size` flag is set accordingly.
          */
-        int32_t w_style = w == minw ? lv_obj_get_style_min_width(obj, LV_PART_MAIN)
-                          : (w == maxw ? lv_obj_get_style_max_width(obj, LV_PART_MAIN)
-                             : lv_obj_get_style_width(obj, LV_PART_MAIN));
+        int32_t w_style;
+        if(w == minw) {
+            w_style = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+        }
+        else if(w == maxw) {
+            w_style = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+        }
+        else {
+            w_style = lv_obj_get_style_width(obj, LV_PART_MAIN);
+        }
         obj->w_ignore_size =
-            (LV_COORD_IS_PCT(w_style) && parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT)
-            ? 1
-            : 0;
+            (LV_COORD_IS_PCT(w_style) && parent->w_layout == 0 && lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT);
     }
 
     int32_t h;
@@ -169,13 +174,18 @@ bool lv_obj_refr_size(lv_obj_t * obj)
          * and if the parent's height is set to LV_SIZE_CONTENT and not managed by a layout, this object should not
          * influence the parent's content height calculation. Thus, the `h_ignore_size` flag is set accordingly.
          */
-        int32_t h_style = h == minh ? lv_obj_get_style_min_height(obj, LV_PART_MAIN)
-                          : (h == maxh ? lv_obj_get_style_max_height(obj, LV_PART_MAIN)
-                             : lv_obj_get_style_height(obj, LV_PART_MAIN));
-        obj->h_ignore_size =
-            (LV_COORD_IS_PCT(h_style) && parent->h_layout == 0 && lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT)
-            ? 1
-            : 0;
+        int32_t h_style;
+        if(h == minh) {
+            h_style = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+        }
+        else if(h == maxh) {
+            h_style = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+        }
+        else {
+            h_style = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        }
+        obj->h_ignore_size = (LV_COORD_IS_PCT(h_style) && parent->h_layout == 0 &&
+                              lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT);
     }
 
     /*Do nothing if the size is not changed*/
