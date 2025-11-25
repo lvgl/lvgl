@@ -14,7 +14,7 @@ static void add_data(lv_timer_t * t)
 
     a[(s + 1) % p] = LV_POLARCHART_POINT_NONE;
     a[(s + 2) % p] = LV_POLARCHART_POINT_NONE;
-    a[(s + 2) % p] = LV_POLARCHART_POINT_NONE;
+    a[(s + 3) % p] = LV_POLARCHART_POINT_NONE;
 
     lv_polarchart_refresh(polarchart);
 }

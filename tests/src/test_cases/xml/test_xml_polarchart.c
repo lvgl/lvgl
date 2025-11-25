@@ -29,7 +29,7 @@ void test_xml_polarchart_with_attrs(void)
         NULL, NULL,
     };
 
-    lv_obj_t * chart = lv_xml_create(scr, "lv_chart", polarchart_attrs);
+    lv_obj_t * chart = lv_xml_create(scr, "lv_polarchart", polarchart_attrs);
     lv_obj_center(chart);
 
     const char * radial_axis_attrs[] = {
@@ -38,7 +38,7 @@ void test_xml_polarchart_with_attrs(void)
         "max_value", "40",
         NULL, NULL,
     };
-    lv_xml_create(chart, "lv_chart-axis", radial_axis_attrs);
+    lv_xml_create(chart, "lv_polarchart-axis", radial_axis_attrs);
 
     const char * series_1_axis_attrs[] = {
         "axis", "radial",
@@ -47,7 +47,7 @@ void test_xml_polarchart_with_attrs(void)
         NULL, NULL,
     };
 
-    lv_polarchart_series_t * ser1 = lv_xml_create(chart, "lv_chart-series", series_1_axis_attrs);
+    lv_polarchart_series_t * ser1 = lv_xml_create(chart, "lv_polarchart-series", series_1_axis_attrs);
 
     lv_polarchart_set_next_value(chart, ser1, 40);
 
