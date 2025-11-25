@@ -25,7 +25,8 @@ void lv_example_polarchart_5(void)
     lv_obj_add_event_cb(polarchart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(polarchart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
-    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
+                                                            LV_POLARCHART_AXIS_RADIAL);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {

@@ -32,7 +32,8 @@ void lv_example_polarchart_8(void)
     lv_obj_center(polarchart);
 
     lv_polarchart_set_point_count(polarchart, 80);
-    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_POLARCHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
+                                                            LV_POLARCHART_AXIS_RADIAL);
     /*Prefill with data*/
     uint32_t i;
     for(i = 0; i < 80; i++) {

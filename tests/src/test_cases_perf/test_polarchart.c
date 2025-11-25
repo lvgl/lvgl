@@ -17,7 +17,7 @@ void setUp(void)
 void test_polarchart(void)
 {
     lv_polarchart_add_series(polarchart, red_color,
-                        LV_CHART_AXIS_RADIAL);
+                             LV_CHART_AXIS_RADIAL);
 
     TEST_ASSERT_MAX_TIME(lv_polarchart_add_series, 1, polarchart, red_color,
                          LV_CHART_AXIS_RADIAL);

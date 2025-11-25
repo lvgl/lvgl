@@ -31,7 +31,8 @@ void lv_example_polarchart_6(void)
     lv_obj_add_event_cb(polarchart, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_refresh_ext_draw_size(polarchart);
 
-    cursor = lv_polarchart_add_cursor(polarchart, lv_palette_main(LV_PALETTE_BLUE), (lv_dir_t)(LV_DIR_LEFT | LV_DIR_BOTTOM));
+    cursor = lv_polarchart_add_cursor(polarchart, lv_palette_main(LV_PALETTE_BLUE),
+                                      (lv_dir_t)(LV_DIR_LEFT | LV_DIR_BOTTOM));
 
     ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_POLARCHART_AXIS_RADIAL);
     uint32_t i;

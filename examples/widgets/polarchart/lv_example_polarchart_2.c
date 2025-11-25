@@ -40,8 +40,10 @@ void lv_example_polarchart_2(void)
     lv_scale_set_text_src(scale_bottom, month);
 
     /*Add two data series*/
-    lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_lighten(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_RADIAL);
-    lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_darken(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser1 = lv_polarchart_add_series(polarchart, lv_palette_lighten(LV_PALETTE_GREEN, 2),
+                                                             LV_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser2 = lv_polarchart_add_series(polarchart, lv_palette_darken(LV_PALETTE_GREEN, 2),
+                                                             LV_CHART_AXIS_RADIAL);
 
     /*Set the next points on 'ser1'*/
     uint32_t i;

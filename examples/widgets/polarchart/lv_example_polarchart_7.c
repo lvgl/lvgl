@@ -33,7 +33,7 @@ static void add_data(lv_timer_t * timer)
 {
     lv_obj_t * polarchart = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_polarchart_set_next_value2(polarchart, lv_polarchart_get_series_next(polarchart, NULL), (int32_t)lv_rand(0, 200),
-                             (int32_t)lv_rand(0, 1000));
+                                  (int32_t)lv_rand(0, 1000));
 }
 
 /**
@@ -55,7 +55,8 @@ void lv_example_polarchart_7(void)
 
     lv_polarchart_set_point_count(polarchart, 50);
 
-    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_RADIAL);
+    lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
+                                                            LV_CHART_AXIS_RADIAL);
     uint32_t i;
     for(i = 0; i < 50; i++) {
         lv_polarchart_set_next_value2(polarchart, ser, (int32_t)lv_rand(0, 200), (int32_t)lv_rand(0, 1000));
