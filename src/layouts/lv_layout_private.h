@@ -26,6 +26,7 @@ extern "C" {
 
 typedef struct {
     lv_layout_update_cb_t cb;
+    lv_layout_get_min_size_cb_t min_size_cb;
     void * user_data;
 } lv_layout_dsc_t;
 
@@ -40,6 +41,8 @@ typedef struct {
 void lv_layout_init(void);
 
 void lv_layout_deinit(void);
+
+bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width);
 
 /**
  * Update the layout of a widget
