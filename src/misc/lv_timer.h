@@ -80,6 +80,15 @@ void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data
 lv_timer_t * lv_timer_create_basic(void);
 
 /**
+ * Create a timer that is bound to a window.
+ * Will be destroyed on LV_EVENT_DELETE, so there is no need to
+ * call lv_timer_delete.
+ * @param parent    pointer to the window; it becomes the parent of the timer
+ * @return          pointer to the created timer
+ */
+lv_timer_t * lv_timer_create_window(lv_obj_t * parent);
+
+/**
  * Create a new lv_timer
  * @param timer_xcb a callback to call periodically.
  *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
