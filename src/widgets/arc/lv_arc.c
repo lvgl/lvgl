@@ -820,8 +820,16 @@ static void inv_arc_area(lv_obj_t * obj, lv_value_precise_t start_angle, lv_valu
     lv_point_t c;
     get_center(obj, &c, &r);
 
+    if(part == LV_PART_INDICATOR) {
+        int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+        int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+        int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+        int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+        r -= LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+    }
+
     int32_t w = lv_obj_get_style_arc_width(obj, part);
-    int32_t rounded = lv_obj_get_style_arc_rounded(obj, part);
+    bool rounded = lv_obj_get_style_arc_rounded(obj, part);
 
     lv_area_t inv_area;
     lv_draw_arc_get_area(c.x, c.y, r, start_angle, end_angle, w, rounded, &inv_area);
@@ -893,6 +901,12 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, int32_t r, 
     int32_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
     int32_t indic_width_half = indic_width / 2;
     r -= indic_width_half;
+
+    int32_t left_indic = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+    int32_t right_indic = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+    int32_t top_indic = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+    int32_t bottom_indic = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    r -= LV_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 
     int32_t angle = (int32_t)get_angle(obj);
     int32_t knob_offset = lv_arc_get_knob_offset(obj);
