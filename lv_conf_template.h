@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.4.0-dev
+ * Configuration file for v9.4.0
  */
 
 /*
@@ -270,14 +270,20 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#define LV_USE_DRAW_G2D 0
+#define LV_USE_G2D 0
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+    /** Use G2D for drawing. **/
+    #define LV_USE_DRAW_G2D 1
+
+    /** Use G2D to rotate display. **/
+    #define LV_USE_ROTATE_G2D 0
+
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #define LV_G2D_HASH_TABLE_SIZE 50
 
-    #if LV_USE_OS
+    #if LV_USE_DRAW_G2D && LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #define LV_USE_G2D_DRAW_THREAD 1
     #endif
@@ -321,6 +327,9 @@
 
     /** Disable linear gradient extension for some older versions of drivers. */
     #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
+
+    /** Maximum path dump print length (in points) */
+    #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
 
     /** Enable usage of the LVGL's built-in vg_lite driver */
     #define LV_USE_VG_LITE_DRIVER  0
@@ -388,6 +397,11 @@
 #if LV_USE_DRAW_EVE
     /* EVE_GEN value: 2, 3, or 4 */
     #define LV_DRAW_EVE_EVE_GENERATION 4
+
+    /* The maximum number of bytes to buffer before a single SPI transmission.
+     * Set it to 0 to disable write buffering.
+     */
+    #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 #endif
 
 /*=======================
@@ -937,6 +951,9 @@
  *  - Supports complete JPEG specifications and high-performance JPEG decoding. */
 #define LV_USE_LIBJPEG_TURBO 0
 
+/** WebP decoder library */
+#define LV_USE_LIBWEBP 0
+
 /** GIF decoder library */
 #define LV_USE_GIF 0
 #if LV_USE_GIF
@@ -995,9 +1012,6 @@
 
 /** Enable ThorVG by assuming that its installed and linked to the project
  *  Requires LV_USE_VECTOR_GRAPHIC */
-#define LV_USE_THORVG_EXTERNAL 0
-
-/** Enable ThorVG by assuming that its installed and linked to the project */
 #define LV_USE_THORVG_EXTERNAL 0
 
 /** Use lvgl built-in LZ4 lib */
@@ -1332,8 +1346,9 @@
 #define LV_USE_ST7796        0
 #define LV_USE_ILI9341       0
 #define LV_USE_FT81X         0
+#define LV_USE_NV3007        0
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #define LV_USE_GENERIC_MIPI 1
 #else
     #define LV_USE_GENERIC_MIPI 0
@@ -1439,12 +1454,6 @@
 
     /** Smart-phone like multi-language demo */
     #define LV_USE_DEMO_MULTILANG       0
-
-    /** Widget transformation demo */
-    #define LV_USE_DEMO_TRANSFORM       0
-
-    /** Demonstrate scroll settings */
-    #define LV_USE_DEMO_SCROLL          0
 
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #define LV_USE_DEMO_EBIKE           0

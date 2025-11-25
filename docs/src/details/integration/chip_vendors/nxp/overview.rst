@@ -1,8 +1,7 @@
+.. include:: /include/substitutions.txt
 ========
 Overview
 ========
-
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of our
 microcontrollers as an optional software component, allowing easy evaluation and
@@ -59,7 +58,7 @@ Basic configuration:
 Basic initialization:
 ^^^^^^^^^^^^^^^^^^^^^
 
-PXP draw initialization is done automatically in :cpp:func:`lv_init()` once the
+PXP draw initialization is done automatically in :cpp:func:`lv_init` once the
 PXP is enabled as a draw unit or to rotate the screen, no user code is required:
 
 .. code-block:: c
@@ -193,16 +192,16 @@ PXP default configuration:
 
 - Implementation depends on multiple OS-specific functions. The struct
   :cpp:struct:`pxp_cfg_t` with callback pointers is used as a parameter for the
-  :cpp:func:`lv_pxp_init()` function. Default implementation for
+  :cpp:func:`lv_pxp_init` function. Default implementation for
   FreeRTOS in lv_pxp_osa.c.
 
-   - :cpp:func:`pxp_interrupt_init()`: Initialize PXP interrupt (HW setup,
+   - :cpp:func:`pxp_interrupt_init`: Initialize PXP interrupt (HW setup,
      OS setup)
-   - :cpp:func:`pxp_interrupt_deinit()`: Deinitialize PXP interrupt (HW setup,
+   - :cpp:func:`pxp_interrupt_deinit`: Deinitialize PXP interrupt (HW setup,
      OS setup)
-   - :cpp:func:`pxp_run()`: Start PXP job. Use OS-specific mechanism to block
+   - :cpp:func:`pxp_run`: Start PXP job. Use OS-specific mechanism to block
      drawing thread.
-   - :cpp:func:`pxp_wait()`: Wait for PXP completion.
+   - :cpp:func:`pxp_wait`: Wait for PXP completion.
 
 
 VGLite accelerator
@@ -230,7 +229,7 @@ Basic configuration:
 Basic initialization:
 ^^^^^^^^^^^^^^^^^^^^^
 
-Initialize VGLite GPU before calling :cpp:func:`lv_init()` by specifying the
+Initialize VGLite GPU before calling :cpp:func:`lv_init` by specifying the
 width/height of tessellation window. The default values for tessellation width
 and height, and command buffer size are in the SDK file "vglite_support.h".
 
@@ -259,7 +258,7 @@ and height, and command buffer size are in the SDK file "vglite_support.h".
     }
     #endif
 
-VGLite draw initialization is done automatically in :cpp:func:`lv_init()` once
+VGLite draw initialization is done automatically in :cpp:func:`lv_init` once
 the VGLite is enabled, no user code is required:
 
 .. code-block:: c
@@ -434,7 +433,7 @@ Basic configuration:
 Basic initialization:
 ^^^^^^^^^^^^^^^^^^^^^
 
-G2D draw initialization is done automatically in :cpp:func:`lv_init()` once the
+G2D draw initialization is done automatically in :cpp:func:`lv_init` once the
 G2D is enabled as a draw unit , no user code is required:
 
 .. code:: c

@@ -45,7 +45,7 @@ void lv_opengles_init(void);
 void lv_opengles_deinit(void);
 
 /**
- * Render a texture
+ * Render a texture using alternate blending mode for smoother translucent materials and correct anti-aliasing of glTF elements when using transparent background
  * @param texture        OpenGL texture ID
  * @param texture_area   the area in the window to render the texture in
  * @param opa            opacity to blend the texture with existing contents

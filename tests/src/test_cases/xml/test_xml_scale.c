@@ -26,8 +26,8 @@ void test_xml_scale_with_attrs(void)
         "max_value", "150",
         "total_tick_count", "16",
         "major_tick_every", "3",
-        "style_length:indicator", "10",
-        "style_transform_rotation:indicator", "300",
+        "style_length-indicator", "10",
+        "style_transform_rotation-indicator", "300",
         NULL, NULL,
     };
 

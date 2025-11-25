@@ -78,7 +78,7 @@ There are two ways to provide this information to LVGL:
         called from an interrupt if writing to a ``uint32_t`` value is atomic on your
         platform.  See below and the :ref:`threading` section to learn more.
 
-Either way, the writing of the ``uint32_t`` Tick value must be :ref:`atomic <atomic>`,
+Either way, the writing of the ``uint32_t`` Tick value must be atomic,
 which is usually the case with a 32- or 64-bit platform.  If you are using a 16-bit
 system (causing the update of the Tick value to not be atomic) and your platform uses
 the Harvard instruction set, you can set a function like this as the callback passed
@@ -110,7 +110,7 @@ Reliability
 Advancing the tick value should be done in such a way that its timing is reliable and
 not dependent on anything that consumes an unknown amount of time. For an example of
 what *not* to do: this can "seem" to work, but LVGL's timing will be incorrect
-because the execution time of :c:func:`lv_timer_handler` varies from call to call and
+because the execution time of :cpp:func:`lv_timer_handler` varies from call to call and
 thus the delay it introduces cannot be known.
 
 .. code-block:: c

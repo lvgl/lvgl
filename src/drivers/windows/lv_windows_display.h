@@ -47,8 +47,8 @@ extern "C" {
  * @param zoom_level The zoom level value. Base value is 100 a.k.a 100%.
  * @param allow_dpi_override Allow DPI override if true, or follow the
  *                           Windows DPI scaling setting dynamically.
- * @param simulator_mode Create simulator mode display if true, or create
- *                       application mode display.
+ * @param simulator_mode Create simulator mode display if true (not resizable),
+ *                       or create application mode display (resizable).
  * @return The created LVGL display object.
 */
 lv_display_t * lv_windows_create_display(

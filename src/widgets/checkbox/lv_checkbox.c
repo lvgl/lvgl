@@ -192,7 +192,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_point_t txt_size;
 
-        lv_text_get_size(&txt_size, cb->txt, font, &attributes);
+        lv_text_get_size_attributes(&txt_size, cb->txt, font, &attributes);
 
         int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -270,7 +270,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     attributes.max_width = LV_COORD_MAX;
 
     lv_point_t txt_size;
-    lv_text_get_size(&txt_size, cb->txt, font, &attributes);
+    lv_text_get_size_attributes(&txt_size, cb->txt, font, &attributes);
 
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);

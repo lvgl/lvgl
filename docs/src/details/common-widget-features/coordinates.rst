@@ -79,10 +79,10 @@ widgets are marked as "dirty." LVGL recalculates dirty widgets’ positions, siz
 and layouts just before redrawing the screen.
 
 So, if you change a widget’s position or size and then immediately read it, call
-:cpp:func:`lv_obj_update_layout()` first to ensure the values are up to date.
+:cpp:func:`lv_obj_update_layout` first to ensure the values are up to date.
 
 Note: Since layout and size may depend on the parent,
-:cpp:func:`lv_obj_update_layout()` recalculates coordinates for **all** widgets on
+:cpp:func:`lv_obj_update_layout` recalculates coordinates for **all** widgets on
 the screen of the given object.
 
 

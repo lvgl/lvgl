@@ -21,7 +21,6 @@
 #include "../misc/lv_profiler.h"
 #include "../misc/lv_types.h"
 #include "../draw/lv_draw_private.h"
-#include "../font/lv_font_fmt_txt.h"
 #include "../stdlib/lv_string.h"
 #include "lv_global.h"
 
@@ -107,6 +106,10 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     LV_PROFILER_REFR_BEGIN;
     lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
+
+    /*The widget will be rendered.
+     *So setters from now should use animations. */
+    obj->rendered = 1;
 
     /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
@@ -259,6 +262,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
 
     layer->_clip_area = clip_area_ori;
+
     LV_PROFILER_REFR_END;
 }
 

@@ -50,8 +50,6 @@ done
 
 if [ $missing_packages_count -gt 0 ]; then
     echo "Missing $missing_packages_count packages detected. Please run 'scripts/install-prerequisites.sh' to install them."
-    echo "Current packages installed:"
-    apt list --installed
     exit 1
 else
     echo "All required packages are installed."
@@ -120,6 +118,13 @@ if [ $? -eq 0 ]; then
     mv ./tests/report ./tests/report-64bit
 else
     echo "64-bit tests failed!"
+    exit 1
+fi
+
+echo "Checking gcov coverage..."
+./scripts/check_gcov_coverage.py
+if [ $? -ne 0 ]; then
+    echo "Gcov coverage check failed!"
     exit 1
 fi
 

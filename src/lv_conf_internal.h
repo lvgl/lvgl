@@ -759,15 +759,37 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#ifndef LV_USE_DRAW_G2D
-    #ifdef CONFIG_LV_USE_DRAW_G2D
-        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+#ifndef LV_USE_G2D
+    #ifdef CONFIG_LV_USE_G2D
+        #define LV_USE_G2D CONFIG_LV_USE_G2D
     #else
-        #define LV_USE_DRAW_G2D 0
+        #define LV_USE_G2D 0
     #endif
 #endif
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+    /** Use G2D for drawing. **/
+    #ifndef LV_USE_DRAW_G2D
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_G2D
+                #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+            #else
+                #define LV_USE_DRAW_G2D 0
+            #endif
+        #else
+            #define LV_USE_DRAW_G2D 1
+        #endif
+    #endif
+
+    /** Use G2D to rotate display. **/
+    #ifndef LV_USE_ROTATE_G2D
+        #ifdef CONFIG_LV_USE_ROTATE_G2D
+            #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
+        #else
+            #define LV_USE_ROTATE_G2D 0
+        #endif
+    #endif
+
     /** Maximum number of buffers that can be stored for G2D draw unit.
      *  Includes the frame buffers and assets. */
     #ifndef LV_G2D_HASH_TABLE_SIZE
@@ -778,7 +800,7 @@
         #endif
     #endif
 
-    #if LV_USE_OS
+    #if LV_USE_DRAW_G2D && LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #ifndef LV_USE_G2D_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
@@ -906,6 +928,15 @@
             #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT CONFIG_LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
         #else
             #define LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT 0
+        #endif
+    #endif
+
+    /** Maximum path dump print length (in points) */
+    #ifndef LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #ifdef CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN CONFIG_LV_VG_LITE_PATH_DUMP_MAX_LEN
+        #else
+            #define LV_VG_LITE_PATH_DUMP_MAX_LEN 1000
         #endif
     #endif
 
@@ -1097,6 +1128,17 @@
             #define LV_DRAW_EVE_EVE_GENERATION CONFIG_LV_DRAW_EVE_EVE_GENERATION
         #else
             #define LV_DRAW_EVE_EVE_GENERATION 4
+        #endif
+    #endif
+
+    /* The maximum number of bytes to buffer before a single SPI transmission.
+     * Set it to 0 to disable write buffering.
+     */
+    #ifndef LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #ifdef CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
+        #else
+            #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
         #endif
     #endif
 #endif
@@ -3002,6 +3044,15 @@
     #endif
 #endif
 
+/** WebP decoder library */
+#ifndef LV_USE_LIBWEBP
+    #ifdef CONFIG_LV_USE_LIBWEBP
+        #define LV_USE_LIBWEBP CONFIG_LV_USE_LIBWEBP
+    #else
+        #define LV_USE_LIBWEBP 0
+    #endif
+#endif
+
 /** GIF decoder library */
 #ifndef LV_USE_GIF
     #ifdef CONFIG_LV_USE_GIF
@@ -3168,15 +3219,6 @@
 
 /** Enable ThorVG by assuming that its installed and linked to the project
  *  Requires LV_USE_VECTOR_GRAPHIC */
-#ifndef LV_USE_THORVG_EXTERNAL
-    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
-        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
-    #else
-        #define LV_USE_THORVG_EXTERNAL 0
-    #endif
-#endif
-
-/** Enable ThorVG by assuming that its installed and linked to the project */
 #ifndef LV_USE_THORVG_EXTERNAL
     #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
         #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
@@ -4301,8 +4343,15 @@
         #define LV_USE_FT81X         0
     #endif
 #endif
+#ifndef LV_USE_NV3007
+    #ifdef CONFIG_LV_USE_NV3007
+        #define LV_USE_NV3007 CONFIG_LV_USE_NV3007
+    #else
+        #define LV_USE_NV3007        0
+    #endif
+#endif
 
-#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341 | LV_USE_NV3007)
     #ifndef LV_USE_GENERIC_MIPI
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_GENERIC_MIPI
@@ -4627,24 +4676,6 @@
         #endif
     #endif
 
-    /** Widget transformation demo */
-    #ifndef LV_USE_DEMO_TRANSFORM
-        #ifdef CONFIG_LV_USE_DEMO_TRANSFORM
-            #define LV_USE_DEMO_TRANSFORM CONFIG_LV_USE_DEMO_TRANSFORM
-        #else
-            #define LV_USE_DEMO_TRANSFORM       0
-        #endif
-    #endif
-
-    /** Demonstrate scroll settings */
-    #ifndef LV_USE_DEMO_SCROLL
-        #ifdef CONFIG_LV_USE_DEMO_SCROLL
-            #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
-        #else
-            #define LV_USE_DEMO_SCROLL          0
-        #endif
-    #endif
-
     /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
     #ifndef LV_USE_DEMO_EBIKE
         #ifdef CONFIG_LV_USE_DEMO_EBIKE
@@ -4750,8 +4781,6 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #define LV_USE_DEMO_FLEX_LAYOUT     0
     #define LV_USE_DEMO_MULTILANG       0
-    #define LV_USE_DEMO_TRANSFORM       0
-    #define LV_USE_DEMO_SCROLL          0
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0

@@ -22,7 +22,7 @@
 #include "../../indev/lv_indev_scroll.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
-#include "../../others/observer/lv_observer_private.h"
+#include "../../core/lv_observer_private.h"
 
 /*********************
  *      DEFINES
@@ -593,7 +593,7 @@ static void draw_main(lv_event_t * e)
 
             /*Get the size of the "selected text"*/
             lv_point_t label_sel_size;
-            lv_text_get_size(&label_sel_size, lv_label_get_text(label), label_dsc.font, &attributes);
+            lv_text_get_size_attributes(&label_sel_size, lv_label_get_text(label), label_dsc.font, &attributes);
 
             /*Move the selected label proportionally with the background label*/
             int32_t roller_h = lv_obj_get_height(obj);
@@ -908,7 +908,7 @@ static int32_t get_selected_label_width(const lv_obj_t * obj)
 
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    lv_text_get_size(&size, txt, font, &attributes);
+    lv_text_get_size_attributes(&size, txt, font, &attributes);
     return size.x;
 }
 
@@ -964,8 +964,11 @@ static void roller_value_changed_event_cb(lv_event_t * e)
 
 static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    /*If the roller is not rendered yet show the new state immediately*/
+    lv_obj_t * obj = lv_observer_get_target_obj(observer);
+    lv_anim_enable_t anim_on = obj->rendered ? LV_ANIM_ON : LV_ANIM_OFF;
     if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
-        lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
+        lv_roller_set_selected(observer->target, subject->value.num, anim_on);
     }
 }
 

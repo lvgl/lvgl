@@ -274,13 +274,23 @@ typedef struct _lv_tileview_tile_t lv_tileview_tile_t;
 
 typedef struct _lv_win_t lv_win_t;
 
+typedef struct _lv_spinner_t lv_spinner_t;
+
 typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
 typedef struct _lv_gltf_t lv_gltf_t;
 
 typedef struct _lv_gltf_model_t lv_gltf_model_t;
 
+typedef struct _lv_gltf_environment lv_gltf_environment_t;
+
+typedef struct _lv_gltf_ibl_sampler lv_gltf_ibl_sampler_t;
+
+typedef struct _lv_subject_t lv_subject_t;
+
 typedef struct _lv_observer_t lv_observer_t;
+
+typedef struct _lv_subject_increment_dsc_t lv_subject_increment_dsc_t;
 
 typedef struct _lv_monkey_config_t lv_monkey_config_t;
 

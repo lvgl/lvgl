@@ -136,6 +136,9 @@ void test_table_should_wrap_long_texts(void)
 
 static void draw_part_event_cb(lv_event_t * e)
 {
+    /* Test lv_event_get_invalidated_area error handling. */
+    TEST_ASSERT_NULL(lv_event_get_invalidated_area(e));
+
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
     /*If the cells are drawn...*/
@@ -176,7 +179,8 @@ static void draw_part_event_cb(lv_event_t * e)
 
 static void invalidate_area_event_cb(lv_event_t * e)
 {
-    lv_area_t * inv = lv_event_get_param(e);
+    lv_area_t * inv = lv_event_get_invalidated_area(e);
+    TEST_ASSERT_NOT_NULL(inv);
     lv_area_copy(&g_inv_area, inv);
     g_inv_count++;
 }

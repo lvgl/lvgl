@@ -436,7 +436,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        lv_text_get_size(&p, dsc->text, dsc->font, &attributes);
+        lv_text_get_size_attributes(&p, dsc->text, dsc->font, &attributes);
         attributes.max_width = p.x;
     }
 

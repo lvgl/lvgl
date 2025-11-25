@@ -27,9 +27,9 @@ static void on_language_change(lv_event_t * e)
 void test_set_language_sends_language_changed_event(void)
 {
 
-    static const char * tags[] = {"tiger", NULL};
-    static const char * languages[]    = {"en", "de", "es", NULL};
-    static const char * translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
+    static const char * const tags[] = {"tiger", NULL};
+    static const char * const languages[]    = {"en", "de", "es", NULL};
+    static const char * const translations[] = { "The Tiger", "Der Tiger", "El Tigre" };
     lv_translation_add_static(languages, tags, translations);
 
     lv_obj_t * label = lv_label_create(NULL);

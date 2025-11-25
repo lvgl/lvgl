@@ -166,6 +166,7 @@ endif()
 
 if ($ENV{NON_AMD64_BUILD})
     set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
+    set(ENV{PKG_CONFIG_PATH} "/usr/lib/i386-linux-gnu/pkgconfig:$ENV{PKG_CONFIG_PATH}")
 endif()
 
 # Options lvgl and examples are compiled with.
@@ -349,6 +350,16 @@ if(NOT WIN32)
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
 
+    find_package(PkgConfig)
+    pkg_check_modules(WebP libwebp)
+
+    if (WebP_FOUND)
+        include_directories(${WebP_INCLUDEDIR})
+    else()
+        message("WebP not found, defaulting to 0")
+        add_definitions(-DLV_USE_LIBWEBP=0)
+    endif()
+
     # Wayland
     find_package(PkgConfig)
     pkg_check_modules(wayland_client wayland-client)
@@ -509,6 +520,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
+            ${WebP_LINK_LIBRARIES}
             ${FFMPEG_LIBRARIES}
             m
             pthread

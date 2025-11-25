@@ -71,11 +71,16 @@ struct _lv_obj_t {
     uint16_t layout_inv : 1;
     uint16_t readjust_scroll_after_layout : 1;
     uint16_t scr_layout_inv : 1;
+    uint16_t scr_layout_complete_pending : 1;
     uint16_t skip_trans : 1;
     uint16_t style_cnt  : 6;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t is_deleting : 1;
+
+    /** The widget is rendered at least once already.
+     * It's used to skip initial animations and transitions. */
+    uint16_t rendered : 1;
 };
 
 /**********************

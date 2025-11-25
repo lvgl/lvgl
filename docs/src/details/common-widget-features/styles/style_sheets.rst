@@ -160,3 +160,25 @@ notified. There are 3 options to do this:
    is ``NULL`` all Widgets will be notified about a style change.
 
 
+Binding Styles
+**************
+
+By using :cpp:expr:`lv_obj_bind_style`, it's possible to add a style to a Widget
+but enable it only if a :ref:`Subject <observer_overview>`'s value is equal to
+a reference value.
+
+It's a great way to implement a light/dark theme switch by normally adding the styles
+for the light theme, and binding only a few styles for the dark theme to change
+only a few colors if, e.g., a ``dark_theme`` subject is ``1``.
+
+For example:
+
+.. code-block:: c
+
+   /*Style for the light theme*/
+   lv_obj_add_style(btn, &style_btn, LV_PART_MAIN);
+   lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
+
+   /*Style for the dark theme changing only a few colors*/
+   lv_obj_bind_style(btn, &style_btn_dark, LV_PART_MAIN, &dark_theme_subject, 1);
+   lv_obj_bind_style(btn, &style_btn_pressed_dark, LV_STATE_PRESSED, &dark_theme_subject, 1);

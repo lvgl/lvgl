@@ -78,6 +78,8 @@ static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
     static lv_result_t lv_obj_get_any(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
+
+    static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj);
 #endif
 
 /**********************
@@ -166,7 +168,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_OBJ_SCROLL_END,
-        .getter = lv_obj_get_scroll_end,
+        .getter = lv_obj_get_scroll_end_helper,
     },
     {
         .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
@@ -994,6 +996,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == LV_STYLE_STATE_CMP_SAME) {
         obj->state = new_state;
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
         return;
     }
 
@@ -1002,6 +1005,18 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     obj->state = new_state;
     lv_obj_update_layer_type(obj);
+
+    /*Skip transitions if the widget is not rendered yet. */
+    if(!obj->rendered) {
+        lv_obj_invalidate(obj);
+        if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+            lv_obj_refresh_ext_draw_size(obj);
+        }
+
+        lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
+        return;
+    }
+
     lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
@@ -1058,6 +1073,8 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
         lv_obj_invalidate(obj);
         lv_obj_refresh_ext_draw_size(obj);
     }
+
+    lv_obj_send_event(obj, LV_EVENT_STATE_CHANGED, &prev_state);
 }
 
 /**
@@ -1143,15 +1160,30 @@ static void play_timeline_on_trigger_event_cb(lv_event_t * e)
     timeline_play_dsc_t * dsc = lv_event_get_user_data(e);
     LV_ASSERT_NULL(dsc);
 
+    /*Reset the progress only if the animation was finished*/
+    uint16_t progress = lv_anim_timeline_get_progress(dsc->at);
     if(dsc->reverse) {
-        lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        if(progress == 0) {
+            lv_anim_timeline_set_progress(dsc->at, LV_ANIM_TIMELINE_PROGRESS_MAX);
+        }
+
+        if(lv_anim_timeline_get_progress(dsc->at) == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(dsc->at, true);
     }
     else {
-        lv_anim_timeline_set_progress(dsc->at, 0);
+        if(progress == LV_ANIM_TIMELINE_PROGRESS_MAX) {
+            lv_anim_timeline_set_progress(dsc->at, 0);
+        }
+
+        if(lv_anim_timeline_get_progress(dsc->at) == 0) {
+            lv_anim_timeline_set_delay(dsc->at, dsc->delay);
+        }
+
         lv_anim_timeline_set_reverse(dsc->at, false);
     }
-    lv_anim_timeline_set_delay(dsc->at, dsc->delay);
     lv_anim_timeline_start(dsc->at);
 }
 
@@ -1162,6 +1194,13 @@ static void delete_on_screen_unloaded_event_cb(lv_event_t * e)
 }
 
 #if LV_USE_OBJ_PROPERTY
+static lv_point_t lv_obj_get_scroll_end_helper(lv_obj_t * obj)
+{
+    lv_point_t point;
+    lv_obj_get_scroll_end(obj, &point);
+    return point;
+}
+
 static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1211,4 +1250,4 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
         return LV_RESULT_INVALID;
     }
 }
-#endif
+#endif /*LV_USE_OBJ_PROPERTY*/

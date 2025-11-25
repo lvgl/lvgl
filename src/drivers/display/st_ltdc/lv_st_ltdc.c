@@ -13,6 +13,7 @@
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
+#include "../../../osal/lv_os_private.h"
 #include "main.h"
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
@@ -49,6 +50,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void flush_wait_cb(lv_display_t * disp);
 static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf);
 static void reload_event_callback(LTDC_HandleTypeDef * hltdc);
+static void clean_dcache(void);
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
     static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d);
@@ -144,7 +146,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     g_data.disp_flushed_in_flush_cb[layer_idx] = false;
 
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
-        if(lv_display_is_double_buffered(disp) && lv_display_flush_is_last(disp)) {
+        bool flush_is_last = lv_display_flush_is_last(disp);
+        if(flush_is_last) {
+            /* there is no ideal time to clean the cache (if present)
+               for **single-buffered** direct mode because the active buffer is drawn to
+               while LTDC is scanning it. Clean it in the last flush, at least,
+               but not every flush because it's expensive for not much visual improvement. */
+            clean_dcache();
+        }
+        if(flush_is_last && lv_display_is_double_buffered(disp)) {
             HAL_LTDC_SetAddress_NoReload(&hltdc, (uint32_t)px_map, layer_idx);
             g_data.layer_interrupt_is_owned[layer_idx] = true;
             HAL_LTDC_Reload(&hltdc, LTDC_RELOAD_VERTICAL_BLANKING);
@@ -172,6 +182,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);
         if(rotation == LV_DISPLAY_ROTATION_0) {
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
+            clean_dcache();
+
             uint32_t dma2d_input_cf = get_dma2d_input_cf_from_lv_cf(cf);
             uint32_t dma2d_output_cf = get_dma2d_output_cf_from_layer_cf(layer_cfg->PixelFormat);
 
@@ -194,12 +206,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
                 fb_p += fb_stride;
                 px_map_p += area_stride;
             }
+            clean_dcache();
             g_data.disp_flushed_in_flush_cb[layer_idx] = true;
 #endif
         }
         else {
             uint32_t area_stride = px_size * area_width;
             lv_draw_sw_rotate(px_map, first_pixel, area_width, area_height, area_stride, fb_stride, rotation, cf);
+            clean_dcache();
             g_data.disp_flushed_in_flush_cb[layer_idx] = true;
         }
     }
@@ -240,6 +254,15 @@ static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
             SYNC_SIGNAL_ISR(i);
         }
     }
+}
+
+static void clean_dcache(void)
+{
+#if defined(__CORTEX_M) && __CORTEX_M == 7
+    SCB_CleanDCache();
+#elif defined(__CORTEX_A) && __CORTEX_A == 7
+    L1C_CleanDCacheAll();
+#endif
 }
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH

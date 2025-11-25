@@ -15,7 +15,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_private.h"
-#include "../../others/observer/lv_observer_private.h"
+#include "../../core/lv_observer_private.h"
 #include "../../draw/lv_draw_arc.h"
 
 /*********************
@@ -275,7 +275,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     if(needle_line_points == NULL) {
         uint32_t i;
         uint32_t line_event_cnt = lv_obj_get_event_count(needle_line);
-        for(i = 0; i < line_event_cnt; i--) {
+        for(i = 0; i < line_event_cnt; i++) {
             lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, i);
             if(lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
                 needle_line_points = lv_event_dsc_get_user_data(dsc);
@@ -1326,7 +1326,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
     lv_point_t label_size;
 
     if(label_dsc->text != NULL) {
-        lv_text_get_size(&label_size, label_dsc->text, label_dsc->font, &attributes);
+        lv_text_get_size_attributes(&label_size, label_dsc->text, label_dsc->font, &attributes);
     }
     else {
         label_size.x = 0;

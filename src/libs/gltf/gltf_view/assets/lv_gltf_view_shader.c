@@ -2528,11 +2528,11 @@ static const lv_opengl_shader_t src_includes[] = {
 
 
         #ifdef MATERIAL_UNLIT
-            //#ifdef HAS_EMISSIVE_MAP
-            //    color = texture(u_EmissiveSampler, getEmissiveUV()).rgb;
-            //#else
+            #ifdef HAS_EMISSIVE_MAP
+                color = f_emissive;
+            #else
                 color = baseColor.rgb;
-            //#endif
+            #endif
         #elif defined(NOT_TRIANGLE) && !defined(HAS_NORMAL_VEC3)
             //Points or Lines with no NORMAL attribute SHOULD be rendered without lighting and instead use the sum of the base color value and the emissive value.
             color = f_emissive + baseColor.rgb;
@@ -2767,7 +2767,9 @@ static const lv_opengl_shader_t src_includes[] = {
 static const lv_opengl_shader_t env_src_includes[] = {
     {
         "fullscreen.vert", R"(
-        precision highp float;
+        precision lowp float;  
+        // The vertex positions being supplied to this shader are
+        // always exactly 0 or 1, so low precision is fine here.
 
         in vec2 aPosition;
         in vec2 aTexCoord;
@@ -2854,7 +2856,6 @@ static const lv_opengl_shader_t env_src_includes[] = {
     {
         "ibl_filtering1.glsl", R"(
 
-        //#version 450
         //#extension GL_ARB_separate_shader_objects : enable
 
         precision highp float;
@@ -3438,7 +3439,7 @@ static const char *src_fragment_shader = R"(
     // [5] "KHR_materials_clearcoat"
     //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
 
-    precision highp float;
+    precision mediump float;
 
 #include <tonemapping.glsl>
 #include <textures1.glsl>
@@ -3497,11 +3498,11 @@ static const size_t src_includes_count = sizeof src_includes / sizeof src_includ
  **********************/
 
 char* lv_gltf_view_shader_get_vertex(void) {
-    return lv_opengl_shader_manager_process_includes(src_vertex_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count );
+    return lv_opengl_shader_manager_process_includes(src_vertex_shader, src_includes, src_includes_count);
 }
 
 char* lv_gltf_view_shader_get_fragment(void) {
-    return lv_opengl_shader_manager_process_includes(src_fragment_shader, GLSL_VERSION_PREFIX, src_includes, src_includes_count);
+    return lv_opengl_shader_manager_process_includes(src_fragment_shader, src_includes, src_includes_count);
 }
 
 void lv_gltf_view_shader_get_src(lv_opengl_shader_portions_t *portions)

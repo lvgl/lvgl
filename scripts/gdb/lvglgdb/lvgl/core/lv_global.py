@@ -57,6 +57,16 @@ class LVGL:
             yield unit
             unit = unit.next
 
+    def image_cache(self):
+        from ..misc.lv_image_cache import LVImageCache
+
+        return LVImageCache(self.lv_global.img_cache)
+
+    def image_header_cache(self):
+        from ..misc.lv_image_header_cache import LVImageHeaderCache
+
+        return LVImageHeaderCache(self.lv_global.img_header_cache)
+
 
 class _LVGLSingleton:
     __slots__ = ("_lvgl", "_ready")
@@ -76,7 +86,7 @@ class _LVGLSingleton:
                 print(f"Failed to get lv_global: {e}")
                 return False
         elif not isinstance(lv_global, Value):
-            lv_global = Value(lv_global)
+            lv_global = Value(lv_global).cast("lv_global_t", ptr=True)
 
         if not lv_global.inited:
             print(

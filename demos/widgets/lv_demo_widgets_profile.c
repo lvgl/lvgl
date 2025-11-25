@@ -457,12 +457,8 @@ static void slider_event_cb(lv_event_t * e)
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
 
-            lv_text_attributes_t attributes;
-            lv_text_attributes_init(&attributes);
-            attributes.max_width = LV_COORD_MAX;
-            attributes.text_flags = LV_TEXT_FLAG_NONE;
             lv_point_t text_size;
-            lv_text_get_size(&text_size, buf, font_normal, &attributes);
+            lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
             lv_area_t draw_task_area;

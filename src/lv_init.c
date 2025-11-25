@@ -30,6 +30,7 @@
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/libwebp/lv_libwebp.h"
 #include "libs/tiny_ttf/lv_tiny_ttf.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
@@ -38,9 +39,9 @@
 #include "themes/simple/lv_theme_simple.h"
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
-#include "others/sysmon/lv_sysmon_private.h"
+#include "debugging/sysmon/lv_sysmon_private.h"
 #include "others/translation/lv_translation.h"
-#include "others/xml/lv_xml.h"
+#include "xml/lv_xml.h"
 
 #if LV_USE_SVG
     #include "libs/svg/lv_svg_decoder.h"
@@ -54,8 +55,10 @@
         #include "draw/nxp/pxp/lv_draw_pxp.h"
     #endif
 #endif
-#if LV_USE_DRAW_G2D
-    #include "draw/nxp/g2d/lv_draw_g2d.h"
+#if LV_USE_G2D
+    #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
+        #include "draw/nxp/g2d/lv_draw_g2d.h"
+    #endif
 #endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
@@ -244,8 +247,10 @@ void lv_init(void)
 #endif
 #endif
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
     lv_draw_g2d_init();
+#endif
 #endif
 
 #if LV_USE_DRAW_DAVE2D
@@ -394,6 +399,10 @@ void lv_init(void)
     lv_libjpeg_turbo_init();
 #endif
 
+#if LV_USE_LIBWEBP
+    lv_libwebp_init();
+#endif
+
 #if LV_USE_BMP
     lv_bmp_init();
 #endif
@@ -475,8 +484,10 @@ void lv_deinit(void)
 #endif
 #endif
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
     lv_draw_g2d_deinit();
+#endif
 #endif
 
 #if LV_USE_DRAW_VG_LITE

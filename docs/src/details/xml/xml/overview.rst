@@ -1,12 +1,9 @@
+.. include:: /include/substitutions.txt
 .. _xml_overview:
 
 ========
 Overview
 ========
-
-
-.. |nbsp|   unicode:: U+000A0 .. NO-BREAK SPACE
-    :trim:
 
 Introduction
 ************
@@ -38,10 +35,13 @@ providing features like:
 - Online share/preview for collaboration and testing
 - `Figma <https://www.figma.com/>`__ integration to easily reimplement Figma designs
 
+
+
 UI Elements
 ***********
 
 It is important to distinguish between :dfn:`Widgets`, :dfn:`Components`, and :dfn:`Screens`.
+
 
 Widgets
 -------
@@ -57,6 +57,7 @@ but rather compiled into the application as C code. The main characteristics of 
 - A custom XML parser is needed to map XML properties to API function calls.
 - They can be compound, containing other Widgets (e.g., ``Tabview``'s tabs, ``Dropdown``'s lists).
 - In the UI editor, they can also be described in XML to create visuals more quickly and export C code.
+
 
 Components
 ----------
@@ -78,6 +79,7 @@ defining Components can be registered in LVGL, and after that, instances can be 
 In other words, LVGL can read the XML files, "learn" the Components from them, and
 thereafter create children as part of Screens and other Components.
 
+
 Screens
 -------
 
@@ -88,6 +90,8 @@ Screens
 - They can be loaded from XML at runtime since they describe only visual aspects of the UI.
 - They do not have an API.
 - They can be referenced in screen load events.
+
+
 
 Global data
 ***********
@@ -104,6 +108,7 @@ can be defined.
 
 Multiple ``globals.xml`` files can be loaded if needed, but each will be saved in the same global scope,
 meaning duplicated items will be added only once.
+
 
 
 Using the XML Files

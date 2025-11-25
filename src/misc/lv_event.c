@@ -338,6 +338,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_REFRESH);
             ENUM_CASE(EVENT_READY);
             ENUM_CASE(EVENT_CANCEL);
+            ENUM_CASE(EVENT_STATE_CHANGED);
 
             /** Other events*/
             ENUM_CASE(EVENT_CREATE);
@@ -353,6 +354,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_STYLE_CHANGED);
             ENUM_CASE(EVENT_LAYOUT_CHANGED);
             ENUM_CASE(EVENT_GET_SELF_SIZE);
+            ENUM_CASE(EVENT_UPDATE_LAYOUT_COMPLETED);
 
             /** Events of optional LVGL components*/
             ENUM_CASE(EVENT_INVALIDATE_AREA);

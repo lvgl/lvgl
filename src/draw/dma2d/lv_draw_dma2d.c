@@ -79,7 +79,7 @@ void lv_draw_dma2d_init(void)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
+#elif defined(STM32H7RS) || defined(STM32N6)
     RCC->AHB5ENR |= RCC_AHB5ENR_DMA2DEN;
 #else
 #warning "LVGL can't enable the clock for DMA2D"
@@ -102,7 +102,7 @@ void lv_draw_dma2d_deinit(void)
     RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR &= ~RCC_AHB3ENR_DMA2DEN;
-#elif defined(STM32H7RS)
+#elif defined(STM32H7RS) || defined(STM32N6)
     RCC->AHB5ENR &= ~RCC_AHB5ENR_DMA2DEN;
 #endif
 
@@ -361,6 +361,7 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
+#if LV_DRAW_DMA2D_ASYNC
 static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
@@ -372,6 +373,7 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
     post_transfer_tasks(u);
     return 0;
 }
+#endif /*LV_DRAW_DMA2D_ASYNC*/
 
 #if !LV_DRAW_DMA2D_ASYNC
 static bool check_transfer_completion(void)

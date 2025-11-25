@@ -141,6 +141,7 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+    indev->key_remap_cb         = NULL;
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -674,6 +675,16 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
     return lv_event_push_and_send(&indev->event_list, code, indev, param);
 }
 
+void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb)
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't remap key on a NULL indev");
+        return;
+    }
+
+    indev->key_remap_cb = remap_cb;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -762,6 +773,11 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
+    /* Remap key using callback */
+    if(i->key_remap_cb) {
+        data->key = i->key_remap_cb(i, data->key);
+    }
+
     /*Save the last key. *It must be done here else `lv_indev_get_key` will return the last key in events*/
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
@@ -801,7 +817,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             /*Simulate a press on the object if ENTER was pressed*/
             if(data->key == LV_KEY_ENTER) {
                 /*Send the ENTER as a normal KEY*/
-                lv_group_send_data(g, LV_KEY_ENTER);
+                if(lv_group_send_data(g, LV_KEY_ENTER) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
 
                 if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
@@ -809,14 +825,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             }
             else if(data->key == LV_KEY_ESC) {
                 /*Send the ESC as a normal KEY*/
-                lv_group_send_data(g, LV_KEY_ESC);
+                if(lv_group_send_data(g, LV_KEY_ESC) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
 
                 if(send_event(LV_EVENT_CANCEL, indev_act) == LV_RESULT_INVALID) return;
             }
             /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
             else {
-                lv_group_send_data(g, data->key);
+                if(lv_group_send_data(g, data->key) == LV_RESULT_INVALID) return;
                 if(indev_reset_check(i)) return;
             }
         }
@@ -829,7 +845,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
 
         /*Long press time has elapsed?*/
-        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) > i->long_press_time) {
+        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
             i->long_pr_sent = 1;
             if(data->key == LV_KEY_ENTER) {
                 i->longpr_rep_timestamp = i->timestamp;
@@ -839,7 +855,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
         /*Long press repeated time has elapsed?*/
         else if(i->long_pr_sent != 0 &&
-                lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) > i->long_press_repeat_time) {
+                lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) >= i->long_press_repeat_time) {
 
             i->longpr_rep_timestamp = i->timestamp;
 
@@ -967,7 +983,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
         /*Long press*/
-        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) > i->long_press_time) {
+        if(i->long_pr_sent == 0 && lv_tick_diff(i->timestamp, i->pr_timestamp) >= i->long_press_time) {
 
             i->long_pr_sent = 1;
             i->longpr_rep_timestamp = i->timestamp;
@@ -1001,7 +1017,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->long_pr_sent = 1;
         }
         /*Long press repeated time has elapsed?*/
-        else if(i->long_pr_sent != 0 && lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) > i->long_press_repeat_time) {
+        else if(i->long_pr_sent != 0 && lv_tick_diff(i->timestamp, i->longpr_rep_timestamp) >= i->long_press_repeat_time) {
 
             i->longpr_rep_timestamp = i->timestamp;
 
@@ -1367,7 +1383,7 @@ static void indev_proc_press(lv_indev_t * indev)
         /*If there is no scrolling then check for long press time*/
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
             /*Send a long press event if enough time elapsed*/
-            if(lv_tick_diff(indev->timestamp, indev->pr_timestamp) > indev_act->long_press_time) {
+            if(lv_tick_diff(indev->timestamp, indev->pr_timestamp) >= indev_act->long_press_time) {
                 if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
@@ -1380,7 +1396,7 @@ static void indev_proc_press(lv_indev_t * indev)
         }
 
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
-            if(lv_tick_diff(indev->timestamp, indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
+            if(lv_tick_diff(indev->timestamp, indev->longpr_rep_timestamp) >= indev_act->long_press_repeat_time) {
                 if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
                 }

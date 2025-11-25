@@ -20,7 +20,7 @@ All LVGL event types are supported with straightforward mapping:
 - :cpp:enumerator:`LV_EVENT_PRESSED`: ``"pressed"``
 - etc.
 
-Call function
+Call Function
 *************
 
 User-defined functions can be called like this:
@@ -108,7 +108,9 @@ This is a simple example of both load and create:
     lv_obj_t * screen1 = lv_xml_create(NULL, "screen1", NULL);
     lv_screen_load(screen1);
 
-Set subject value
+.. _xml_events_set_subject_value:
+
+Set Subject Value
 *****************
 
 It's possible to set a :ref:`Subject <observer_subject>` value on user interaction by adding a special child to any widget:
@@ -126,7 +128,10 @@ It's possible to set a :ref:`Subject <observer_subject>` value on user interacti
 
 The usage is straightforward: the specified ``subject`` will be set to the given ``value`` when the ``trigger`` occurs.
 
-Increment subject value
+
+.. _xml_events_increment_subject_value:
+
+Increment Subject Value
 ***********************
 
 Incrementing or decrementing a :ref:`Subject <observer_subject>` value can be defined as follows:
@@ -136,18 +141,21 @@ Incrementing or decrementing a :ref:`Subject <observer_subject>` value can be de
     <view>
         <lv_button width="200" height="100">
             <subject_increment_event trigger="clicked" subject="subject_int1" step="10"/>
-            <subject_increment_event trigger="clicked" subject="subject_int2" step="-10" min="0" max="50"/>
+            <subject_increment_event trigger="clicked" subject="subject_int2" step="-10" min_value="0" max_value="50"/>
             <subject_increment_event trigger="clicked" subject="subject_float1" step="2"/>
         </lv_button>
     </view>
 
 The ``<subject_increment_event>`` element defines a ``step`` to be added to the subject's current value
-when the ``trigger`` occurs. Optionally, ``min`` and/or ``max`` can be set to limit the subject's value.
+when the ``trigger`` occurs.
 
 ``subject`` must be an ``int`` or ``float`` subject.
 
 If ``step`` is **negative**, the subject's value will be decremented.
 Only integer ``step`` values are supported now.
 
-**Note:** Only integer subjects are supported by ``<subject_increment>``.
+Optionally, ``min_value`` and/or ``max_value`` can be set to limit the subject's value.
+The default min/max values are ``INT32_MIN`` (-2B) and ``INT32_MAX`` (+2B) respectively.
 
+``rollover`` is also an optional property. If it's ``false`` (default) stop at the
+min/max value, if ``true`` jump to the other end.

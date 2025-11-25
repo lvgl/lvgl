@@ -436,7 +436,6 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
 
     Tvg_Paint * obj = tvg_shape_new();
 
-    int32_t y_offset = state->partial_y_offset;
     _tvg_rect rc;
     lv_area_to_tvg(&rc, &dsc->scissor_area);
 
@@ -450,12 +449,11 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
             0.0f, 0.0f, 1.0f,
         };
         _set_paint_matrix(obj, &mtx);
-        mtx.e23 -= (float)(y_offset);
         tvg_shape_append_rect(obj, rc.x + state->translate_x, rc.y + state->translate_y, rc.w, rc.h, 0, 0);
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else {
-        tvg_canvas_set_viewport(canvas, (int32_t)rc.x + state->translate_x, (int32_t)(rc.y - y_offset) + state->translate_y,
+        tvg_canvas_set_viewport(canvas, (int32_t)rc.x + state->translate_x, (int32_t)rc.y + state->translate_y,
                                 (int32_t)rc.w, (int32_t)rc.h);
 
         lv_matrix_t matrix;
@@ -464,7 +462,6 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         lv_matrix_multiply(&matrix, &dsc->matrix);
         Tvg_Matrix mtx;
         lv_matrix_to_tvg(&mtx, &matrix);
-        mtx.e23 -= (float)(y_offset);
         _set_paint_matrix(obj, &mtx);
 
         _set_paint_shape(obj, path);

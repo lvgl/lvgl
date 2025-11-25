@@ -22,9 +22,13 @@ extern "C" {
 #include "../../misc/lv_array.h"
 
 #if LV_USE_VG_LITE_THORVG
-#include "../../others/vg_lite_tvg/vg_lite.h"
+#include "../../debugging/vg_lite_tvg/vg_lite.h"
+#else
+#if LV_USE_VG_LITE_DRIVER
+#include "../../libs/vg_lite_driver/inc/vg_lite.h"
 #else
 #include <vg_lite.h>
+#endif
 #endif
 
 /*********************

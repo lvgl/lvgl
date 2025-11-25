@@ -99,39 +99,50 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
-            if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
-            }
         }
         else {
-            if(add_define(result, "MATERIAL_METALLICROUGHNESS", NULL, false) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
+            if(material.pbrData.baseColorFactor.x() == 0.0f
+               && material.pbrData.baseColorFactor.y() == 0.0f
+               && material.pbrData.baseColorFactor.z() == 0.0f
+               && material.pbrData.metallicFactor == 1.0f
+               && material.pbrData.roughnessFactor == 1.0f
+               && material.emissiveStrength > 0.0f) {
+                /* Special case where settings preclude IBL's ability to have visible effect, so disable it entirely */
+                LV_LOG_TRACE("Special case identified, disabling IBL and enabling UNLIT\n");
+                if(add_define(result, "MATERIAL_UNLIT", NULL, false) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
             }
-            if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
+            else {
+                if(add_define(result, "MATERIAL_METALLICROUGHNESS", NULL, false) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
+                if(add_define(result, "USE_IBL", NULL, false) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
+            }
+            const size_t light_count = data->node_by_light_index.size();
+            if(light_count > 10) {
+                LV_LOG_ERROR("Too many scene lights, max is 10");
+            }
+            else if(light_count > 0) {
+                if(add_define(result, "USE_PUNCTUAL", NULL, false) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
+                char * count = (char *) lv_zalloc(5);
+                lv_snprintf(count, 5, "%zu", light_count);
+                if(add_define(result, "LIGHT_COUNT", count, true) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
+            }
+            else {
+                if(add_define(result, "LIGHT_COUNT", "0", false) == LV_RESULT_INVALID) {
+                    return LV_RESULT_INVALID;
+                }
             }
         }
-        const size_t light_count = data->node_by_light_index.size();
-        if(add_define(result, "USE_IBL", NULL, false) == LV_RESULT_INVALID) {
+        if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
-        }
-        if(light_count > 10) {
-            LV_LOG_ERROR("Too many scene lights, max is 10");
-        }
-        else if(light_count > 0) {
-            if(add_define(result, "USE_PUNCTUAL", NULL, false) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
-            }
-            char * count = (char *) lv_zalloc(5);
-            lv_snprintf(count, 5, "%zu", light_count);
-            if(add_define(result, "LIGHT_COUNT", count, true) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
-            }
-        }
-        else {
-            if(add_define(result, "LIGHT_COUNT", "0", false) == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
-            }
         }
 
         // only set cutoff value for mask material
@@ -214,7 +225,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                                     "HAS_THICKNESS_UV_TRANSFORM");
             }
         }
-        if(material.clearcoat) {
+        if(material.clearcoat && material.clearcoat->clearcoatFactor > 0.0f) {
             if(add_define(result, "MATERIAL_CLEARCOAT", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
@@ -232,7 +243,7 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 return LV_RESULT_INVALID;
             }
         }
-        if(material.diffuseTransmission) {
+        if(material.diffuseTransmission && material.diffuseTransmission->diffuseTransmissionFactor > 0.0f) {
             if(add_define(result, "MATERIAL_DIFFUSE_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
@@ -302,15 +313,19 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
 lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
                                                         size_t n)
 {
-    uint32_t frag_shader_hash = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.frag",
-                                                                       defines, n);
-
-    uint32_t vert_shader_hash = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.vert",
-                                                                       defines, n);
+    uint32_t frag_shader_hash;
+    uint32_t vert_shader_hash;
+    lv_result_t res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.frag",
+                                                             defines, n, LV_OPENGL_GLSL_VERSION_300ES, &frag_shader_hash);
+    LV_ASSERT(res == LV_RESULT_OK);
+    res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.vert",
+                                                 defines, n, LV_OPENGL_GLSL_VERSION_300ES, &vert_shader_hash);
+    LV_ASSERT(res == LV_RESULT_OK);
     lv_opengl_shader_program_t * program =
         lv_opengl_shader_manager_get_program(&view->shader_manager, frag_shader_hash, vert_shader_hash);
 
-    LV_ASSERT_NULL(program);
+    LV_ASSERT_MSG(program != NULL,
+                  "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
 
     GLuint program_id = lv_opengl_shader_program_get_id(program);
 

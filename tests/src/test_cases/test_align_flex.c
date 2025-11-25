@@ -767,4 +767,11 @@ void test_flex_use_rtl(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_use_rtl.png");
 }
 
+
+void test_flex_grow_on_screen_should_not_crash(void)
+{
+    lv_obj_set_flex_grow(lv_screen_active(), 1);
+    lv_refr_now(NULL);
+}
+
 #endif
