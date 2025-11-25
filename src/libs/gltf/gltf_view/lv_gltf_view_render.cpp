@@ -18,6 +18,7 @@
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 #include "../../../drivers/opengles/lv_opengles_debug.h"
+#include "../../../drivers/opengles/lv_opengles_driver.h"
 #include "../../../draw/opengles/lv_draw_opengles.h"
 #include "../math/lv_gltf_math.hpp"
 
