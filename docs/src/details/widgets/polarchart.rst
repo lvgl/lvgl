@@ -380,7 +380,7 @@ No *Keys* are processed by Chart Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/chart/index.rst
+.. include:: ../../examples/widgets/polarchart/index.rst
 
 
 
