@@ -1,8 +1,8 @@
 .. _lv_polarchart:
 
-================
+==========================
 Polarchart (lv_polarchart)
-================
+==========================
 
 
 Overview
@@ -32,7 +32,7 @@ Polarcharts can:
 
 
 Polarchart Basics
-************
+*****************
 
 Each polarchart has the following attributes (over and above attributes found in
 :ref:`all Widgets <base_widget>`):
@@ -98,7 +98,7 @@ Update mode
 
 
 Polarchart layers
-------------
+-----------------
 When a polarchart is drawn, certain things appear on top of other things, in this
 order, from back to front:
 
@@ -148,7 +148,7 @@ Details
 *******
 
 Polarchart type
-----------
+---------------
 
 A polarchart can be one of the following types:
 
