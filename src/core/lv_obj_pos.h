@@ -381,7 +381,7 @@ int32_t lv_obj_get_style_clamped_height(lv_obj_t * obj);
 bool lv_obj_is_width_min(lv_obj_t * obj);
 
 /**
- * @brief Determine if the object's resolved width was limited by its minimum height constraint.
+ * @brief Determine if the object's resolved height was limited by its minimum height constraint.
  *
  * This function reports whether, in the most recent layout / size calculation, the object's
  * final (used) height had to be raised to satisfy a minimum height requirement.
@@ -405,14 +405,14 @@ bool lv_obj_is_height_min(lv_obj_t * obj);
 bool lv_obj_is_width_max(lv_obj_t * obj);
 
 /**
- * @brief Determine if the object's resolved width was limited by its maximum width constraint.
+ * @brief Determine if the object's resolved height was limited by its maximum height constraint.
  *
  * This function reports whether, in the most recent layout / size calculation, the object's
- * final (used) width had to be raised to satisfy a maximum width requirement.
+ * final (used) height had to be raised to satisfy a maximum height requirement.
  *
  * @param obj Pointer to a valid object.
- * @return true  The computed width == the effective maximum width (i.e. it was clamped).
- * @return false The width is smaller than the maximum (not min‑clamped).
+ * @return true  The computed height == the effective maximum height (i.e. it was clamped).
+ * @return false The height is smaller than the maximum (not min‑clamped).
  */
 bool lv_obj_is_height_max(lv_obj_t * obj);
 
