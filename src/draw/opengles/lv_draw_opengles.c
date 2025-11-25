@@ -137,6 +137,11 @@ void lv_draw_opengles_deinit(void)
     g_unit = NULL;
 }
 
+unsigned int lv_draw_opengles_get_framebuffer(void)
+{
+    return (g_unit == NULL) ? 0 : g_unit->framebuffer;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

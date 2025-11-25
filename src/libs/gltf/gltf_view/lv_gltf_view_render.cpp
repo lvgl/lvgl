@@ -18,6 +18,7 @@
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 #include "../../../drivers/opengles/lv_opengles_debug.h"
+#include "../../../draw/opengles/lv_draw_opengles.h"
 #include "../math/lv_gltf_math.hpp"
 
 #include <algorithm>
@@ -961,7 +962,7 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
 #else
-    result.framebuffer = 2;
+    result.framebuffer = lv_draw_opengles_get_framebuffer();
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
 #endif
     return result;
