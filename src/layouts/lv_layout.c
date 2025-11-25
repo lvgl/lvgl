@@ -78,7 +78,7 @@ bool lv_layout_set_min_size_cb(uint32_t layout_id, lv_layout_get_min_size_cb_t m
 bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-    if(layout_id > 0 && layout_id <= layout_cnt) {
+    if(layout_id > 0 && layout_id < layout_cnt) {
         void * user_data = layout_list_def[layout_id].user_data;
         if(layout_list_def[layout_id].min_size_cb) {
             return layout_list_def[layout_id].min_size_cb(obj, size, width, user_data);
@@ -90,7 +90,7 @@ bool lv_layout_get_min_size(lv_obj_t * obj, int32_t * size, bool width)
 void lv_layout_apply(lv_obj_t * obj)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-    if(layout_id > 0 && layout_id <= layout_cnt) {
+    if(layout_id > 0 && layout_id < layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;
         layout_list_def[layout_id].cb(obj, user_data);
     }
