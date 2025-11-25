@@ -23,7 +23,7 @@ void lv_example_polarchart_2(void)
     lv_obj_t * polarchart = lv_polarchart_create(wrapper);
     lv_obj_set_width(polarchart, lv_pct(100));
     lv_obj_set_flex_grow(polarchart, 1);
-    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_BAR);
+    lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_LINE);
     lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 100);
     lv_polarchart_set_point_count(polarchart, 12);
     lv_obj_set_style_radius(polarchart, 0, 0);

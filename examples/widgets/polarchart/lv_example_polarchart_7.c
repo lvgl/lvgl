@@ -18,7 +18,7 @@ static void draw_event_cb(lv_event_t * e)
         int32_t * angle_array = lv_polarchart_get_series_angle_array(obj, ser);
         int32_t * radial_array = lv_polarchart_get_series_radial_array(obj, ser);
         /*dsc->id is the tells drawing order, but we need the ID of the point being drawn.*/
-        uint32_t start_point = lv_polarchart_get_x_start_point(obj, ser);
+        uint32_t start_point = lv_polarchart_get_angle_start_point(obj, ser);
         uint32_t p_act = (start_point + base_dsc->id2) % cnt; /*Consider start point to get the index of the array*/
         lv_opa_t x_opa = (lv_opa_t)((angle_array[p_act] * LV_OPA_50) / 200);
         lv_opa_t y_opa = (lv_opa_t)((radial_array[p_act] * LV_OPA_50) / 1000);
