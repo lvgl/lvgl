@@ -1,6 +1,7 @@
 /**
  * @file lv_eve5.c
  *
+ * EVE5 (BT820) Display Driver for LVGL
  */
 
 /*********************
@@ -46,6 +47,8 @@ typedef struct
 /**********************
  * STATIC PROTOTYPES
  **********************/
+
+/* Display callbacks */
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map);
 static void wait_cb(lv_display_t *disp);
 static void composite_to_framebuffer(lv_eve5_driver_t *drvr);
@@ -83,6 +86,10 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr);
 /**********************
  * GLOBAL FUNCTIONS
  **********************/
+
+/*--------------------
+ * Display
+ *--------------------*/
 
 lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
 {
@@ -180,9 +187,19 @@ EVE_HalContext *lv_eve5_get_hal(lv_display_t *disp)
     return drvr ? drvr->hal : NULL;
 }
 
+Esd_GpuAlloc *lv_eve5_get_allocator(lv_display_t *disp)
+{
+    lv_eve5_driver_t *drvr = lv_display_get_driver_data(disp);
+    return drvr ? drvr->allocator : NULL;
+}
+
 /**********************
  * STATIC FUNCTIONS
  **********************/
+
+/*--------------------
+ * Display Callbacks
+ *--------------------*/
 
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
@@ -198,7 +215,8 @@ static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
     lv_display_t *disp_refr = lv_refr_get_disp_refreshing();
     lv_layer_t *layer = disp_refr ? disp_refr->layer_head : NULL;
 
-	printf("Flush layer 0x%p area (%d,%d)-(%d,%d)\n", layer, area->x1, area->y1, area->x2, area->y2);
+    printf("Flush layer 0x%p area (%d,%d)-(%d,%d)\n",
+           layer, area->x1, area->y1, area->x2, area->y2);
 
     /* Calculate area dimensions */
     int32_t w = lv_area_get_width(area);
