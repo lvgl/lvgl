@@ -175,10 +175,12 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    if(dropdown->text == txt) return;
+    if(dropdown->text == txt)
+        return;
 
     dropdown->text = txt;
 
+    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
 }
 
@@ -784,7 +786,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         res = btn_release_handler(obj);
-        if(res != LV_RESULT_OK) return;
+        if(res != LV_RESULT_OK)
+            return;
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_refresh_self_size(obj);
@@ -795,7 +798,53 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        p->y = lv_font_get_line_height(font);
+
+        int32_t symbol_w = 0;
+        if(dropdown->symbol) {
+            lv_draw_label_dsc_t symbol_dsc;
+            lv_draw_label_dsc_init(&symbol_dsc);
+
+            lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
+            if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
+                lv_point_t size;
+
+                lv_text_get_size(&size,
+                                 dropdown->symbol,
+                                 symbol_dsc.font,
+                                 symbol_dsc.letter_space,
+                                 symbol_dsc.line_space,
+                                 LV_COORD_MAX,
+                                 symbol_dsc.flag);
+                symbol_w = size.x;
+            }
+            else {
+                lv_image_header_t header;
+                lv_result_t decoder_res = lv_image_decoder_get_info(dropdown->symbol, &header);
+                if(decoder_res == LV_RESULT_OK) {
+                    symbol_w = header.w;
+                }
+                else {
+                    symbol_w = 0;
+                }
+            }
+        }
+
+        if(dropdown->text == NULL) {
+            p->y = lv_font_get_line_height(font);
+        }
+        else {
+            lv_draw_label_dsc_t dsc;
+            lv_draw_label_dsc_init(&dsc);
+
+            lv_point_t txt_size;
+            int32_t max_width = lv_obj_calc_dynamic_width(obj, LV_STYLE_MAX_WIDTH) - symbol_w;
+            lv_text_get_size(&txt_size, dropdown->text, font, dsc.letter_space, dsc.line_space, max_width, dsc.flag);
+
+            p->x = txt_size.x;
+            p->y = txt_size.y;
+        }
+
+        p->x += symbol_w;
     }
     else if(code == LV_EVENT_KEY) {
         uint32_t c = lv_event_get_key(e);
@@ -828,7 +877,8 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_t * indev_obj = lv_indev_get_active_obj();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
-                if(res != LV_RESULT_OK) return;
+                if(res != LV_RESULT_OK)
+                    return;
             }
         }
     }
