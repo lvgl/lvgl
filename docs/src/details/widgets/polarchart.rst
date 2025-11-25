@@ -242,7 +242,6 @@ For SCATTER-type polarcharts,
 can be used as well.
 
 .. _polarchart_update_modes:
-.. _update modes:
 
 Update modes
 ------------
