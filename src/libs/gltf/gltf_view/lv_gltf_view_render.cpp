@@ -771,7 +771,7 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
         /* cast is safe because viewer is a lv_obj_t*/
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
-        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
+        GL_CALL(glClearColor(bg_color.blue / 255.0f, bg_color.green / 255.0f, bg_color.red / 255.0f, alpha / 255.0f));
 
         GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -1118,7 +1118,7 @@ static lv_result_t setup_restore_opaque_output(lv_gltf_t * viewer, const lv_gltf
         /* cast is safe because viewer is a lv_obj_t*/
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
-        GL_CALL(glClearColor(bg_color.red / 255.0f, bg_color.green / 255.0f, bg_color.blue / 255.0f, alpha / 255.0f));
+        GL_CALL(glClearColor(bg_color.blue / 255.0f, bg_color.green / 255.0f, bg_color.red / 255.0f, alpha / 255.0f));
         GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }

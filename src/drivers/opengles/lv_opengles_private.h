@@ -107,8 +107,6 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
                         bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
 
-<<<<<<< HEAD
-=======
 
 /**
  * Set the OpenGL viewport, with vertical co-ordinate conversion
@@ -129,7 +127,6 @@ void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip);
 
 
->>>>>>> 3da900b50 (refactor: use only GL_RGBA)
 /**********************
  *      MACROS
  **********************/
