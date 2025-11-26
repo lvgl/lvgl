@@ -884,8 +884,10 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_init(&label_draw_dsc);
     label_draw_dsc.text = label->text;
     label_draw_dsc.text_static = label->static_txt;
+#if LV_LABEL_ENABLED_AGGRESSIVE_CACHING
     if((!label_draw_dsc.text_static) && (label->checksum == label->last_checksum)) label_draw_dsc.text_static = 1;
     label->last_checksum = label->checksum;
+#endif
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
     label_draw_dsc.text_size = label->text_size;
@@ -985,6 +987,7 @@ static void draw_main(lv_event_t * e)
     layer->_clip_area = clip_area_ori;
 }
 
+#if LV_LABEL_ENABLED_AGGRESSIVE_CACHING
 static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj)
 {
     uint32_t checksum = (lv_obj_get_width(obj) << 8)^lv_obj_get_height(obj);
@@ -995,6 +998,7 @@ static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj)
     }
     return checksum;
 }
+#endif
 
 static void set_text_internal(lv_obj_t * obj, const char * text)
 {
@@ -1003,7 +1007,9 @@ static void set_text_internal(lv_obj_t * obj, const char * text)
     /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = label->text;
 
+#if LV_LABEL_ENABLED_AGGRESSIVE_CACHING
     if(!label->static_txt) label->checksum = compute_text_checksum(text, obj);
+#endif
 
     lv_label_revert_dots(obj); /*In case text == label->text*/
     const size_t text_len = get_text_length(text);

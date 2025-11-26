@@ -24,6 +24,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#ifdef CONFIG_LV_LABEL_ENABLED_AGGRESSIVE_CACHING
+#   define LV_LABEL_ENABLED_AGGRESSIVE_CACHING CONFIG_LV_LABEL_ENABLED_AGGRESSIVE_CACHING
+#else
+#   define LV_LABEL_ENABLED_AGGRESSIVE_CACHING 1
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,8 +60,10 @@ struct _lv_label_t {
     uint8_t expand : 1;                 /**< Ignore real width (used by the library with LV_LABEL_LONG_MODE_SCROLL) */
     uint8_t invalid_size_cache : 1;     /**< 1: Recalculate size and update cache */
     uint8_t need_refr_text : 1;         /**< 1: Refresh text after layout update completion */
+#if LV_LABEL_ENABLED_AGGRESSIVE_CACHING
     uint32_t checksum;                  /**< The unique checksum of the last text value set */
     uint32_t last_checksum;             /**< The text checksum from the last time the text was rendered */
+#endif
 
     lv_point_t text_size;
 };
