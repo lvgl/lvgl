@@ -190,7 +190,8 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
-    lv_opengles_shader_set_uniform1i("u_FlipRB", v_flip ? 1 : 0);  /* MK TEMP - v_flip is only true for final output, so this works for a test of only flipping the RB channels for final output layer */
+    lv_opengles_shader_set_uniform1i("u_FlipRB",
+                                     v_flip ? 1 : 0);  /* MK TEMP - v_flip is only true for final output, so this works for a test of only flipping the RB channels for final output layer */
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -230,7 +231,7 @@ void lv_opengles_render_display_texture_rbswap(lv_display_t * display, bool h_fl
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
     lv_opengles_shader_set_uniform1i("u_FlipRB", 1);
-    
+
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
 }
@@ -308,7 +309,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
     lv_opengles_shader_set_uniform1i("u_FlipRB", 0);
-    
+
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
