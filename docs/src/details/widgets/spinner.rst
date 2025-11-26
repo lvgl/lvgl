@@ -73,7 +73,7 @@ No *Keys* are processed by Spinner Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/spinner/index.rst
+.. include:: /examples/widgets/spinner/index.rst
 
 
 

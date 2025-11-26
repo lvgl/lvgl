@@ -171,7 +171,7 @@ contains 2 Drop-Drown List Widgets for the year and month.
 Example
 *******
 
-.. include:: ../../examples/widgets/calendar/index.rst
+.. include:: /examples/widgets/calendar/index.rst
 
 
 

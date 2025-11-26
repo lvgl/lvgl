@@ -123,7 +123,7 @@ See the the bottom of this page for a complete example.
 Example
 *******
 
-.. include:: ../../examples/others/translation/index.rst
+.. include:: /examples/others/translation/index.rst
 
 .. _lv_translation_api:
 

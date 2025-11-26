@@ -128,7 +128,7 @@ No *Keys* are processed by Window Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/win/index.rst
+.. include:: /examples/widgets/win/index.rst
 
 
 

@@ -92,7 +92,7 @@ The Arc Label does not define specific key bindings beyond those inherited from 
 Example
 *******
 
-.. include:: ../../examples/widgets/arclabel/index.rst
+.. include:: /examples/widgets/arclabel/index.rst
 
 .. _lv_arclabel_api:
 

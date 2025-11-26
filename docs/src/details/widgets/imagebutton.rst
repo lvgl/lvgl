@@ -106,7 +106,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/imagebutton/index.rst
+.. include:: /examples/widgets/imagebutton/index.rst
 
 
 

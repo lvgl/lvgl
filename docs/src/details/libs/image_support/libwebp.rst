@@ -60,7 +60,7 @@ For optimal memory usage, combine with LVGL's :ref:`overview_image_caching` feat
 Example
 *******
 
-.. include:: ../../../examples/libs/libwebp/index.rst
+.. include:: /examples/libs/libwebp/index.rst
 
 .. _libwebp_api:
 

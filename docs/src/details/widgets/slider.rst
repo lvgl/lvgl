@@ -148,7 +148,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/slider/index.rst
+.. include:: /examples/widgets/slider/index.rst
 
 
 

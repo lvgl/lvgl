@@ -373,7 +373,7 @@ Call :cpp:expr:`lv_anim_timeline_delete(timeline)` function to delete the Animat
 Examples
 ********
 
-.. include:: ../../examples/anim/index.rst
+.. include:: /examples/anim/index.rst
 
 .. _animations_api:
 

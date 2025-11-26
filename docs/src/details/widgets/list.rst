@@ -85,7 +85,7 @@ No *Keys* are processed by List Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/list/index.rst
+.. include:: /examples/widgets/list/index.rst
 
 
 

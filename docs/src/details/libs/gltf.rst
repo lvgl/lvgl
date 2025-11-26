@@ -471,7 +471,7 @@ Animation speeds use integer values to avoid floating-point arithmetic:
 Examples
 ********
 
-.. include:: ../../examples/libs/gltf/index.rst
+.. include:: /examples/libs/gltf/index.rst
 
 
 

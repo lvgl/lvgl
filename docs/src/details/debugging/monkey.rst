@@ -51,7 +51,7 @@ Note that ``input_range`` has different meanings depending on the ``type`` input
 Example
 *******
 
-.. include:: ../../examples/others/monkey/index.rst
+.. include:: /examples/others/monkey/index.rst
 
 
 

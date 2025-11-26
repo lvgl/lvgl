@@ -215,7 +215,7 @@ through functions such as :cpp:func:`strcpy` and :cpp:func:`strcat` for later us
 Example
 *******
 
-.. include:: ../../examples/others/file_explorer/index.rst
+.. include:: /examples/others/file_explorer/index.rst
 
 
 

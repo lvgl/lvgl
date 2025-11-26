@@ -196,7 +196,7 @@ No *Keys* are processed by Span Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/span/index.rst
+.. include:: /examples/widgets/span/index.rst
 
 
 

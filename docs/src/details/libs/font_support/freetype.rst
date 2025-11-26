@@ -147,7 +147,7 @@ See the :cpp:func:`lv_example_freetype_2_vector_font` function for a usage examp
 Examples
 ********
 
-.. include:: ../../../examples/libs/freetype/index.rst
+.. include:: /examples/libs/freetype/index.rst
 
 
 

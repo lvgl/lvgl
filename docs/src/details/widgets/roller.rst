@@ -128,7 +128,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/roller/index.rst
+.. include:: /examples/widgets/roller/index.rst
 
 
 

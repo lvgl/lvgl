@@ -127,7 +127,7 @@ Programmatically add these buttons to a group if required.
 Example
 *******
 
-.. include:: ../../examples/widgets/tabview/index.rst
+.. include:: /examples/widgets/tabview/index.rst
 
 
 

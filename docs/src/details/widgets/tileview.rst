@@ -90,7 +90,7 @@ No *Keys* are processed by Tileview Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/tileview/index.rst
+.. include:: /examples/widgets/tileview/index.rst
 
 
 

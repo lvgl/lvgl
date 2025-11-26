@@ -86,7 +86,7 @@ No *Keys* are processed by Line Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/line/index.rst
+.. include:: /examples/widgets/line/index.rst
 
 
 

@@ -43,7 +43,7 @@ To destroy the *imgfont* that is no longer used, use :cpp:expr:`lv_imgfont_destr
 Example
 *******
 
-.. include:: ../../../examples/others/imgfont/index.rst
+.. include:: /examples/others/imgfont/index.rst
 
 
 

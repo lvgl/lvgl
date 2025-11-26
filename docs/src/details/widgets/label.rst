@@ -295,7 +295,7 @@ No *Keys* are processed by Label Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/label/index.rst
+.. include:: /examples/widgets/label/index.rst
 
 
 

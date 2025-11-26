@@ -102,7 +102,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/switch/index.rst
+.. include:: /examples/widgets/switch/index.rst
 
 
 

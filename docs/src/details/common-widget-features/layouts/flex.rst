@@ -210,7 +210,7 @@ You can force Flex to put an item into a new line with
 Examples
 ********
 
-.. include:: ../../../examples/layouts/flex/index.rst
+.. include:: /examples/layouts/flex/index.rst
 
 
 ..  Hyperlinks

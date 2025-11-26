@@ -118,7 +118,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/spinbox/index.rst
+.. include:: /examples/widgets/spinbox/index.rst
 
 
 
