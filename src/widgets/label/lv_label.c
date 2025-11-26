@@ -891,10 +891,6 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_init(&label_draw_dsc);
     label_draw_dsc.text = label->text;
     label_draw_dsc.text_static = label->static_txt;
-#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
-    if((!label_draw_dsc.text_static) && (label->checksum == label->last_checksum)) label_draw_dsc.text_static = 1;
-    label->last_checksum = label->checksum;
-#endif
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
     label_draw_dsc.text_size = label->text_size;
@@ -943,6 +939,11 @@ static void draw_main(lv_event_t * e)
     if(!is_common) {
         return;
     }
+
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+    if((!label_draw_dsc.text_static) && (label->checksum == label->last_checksum)) label_draw_dsc.text_static = 1;
+    label->last_checksum = label->checksum;
+#endif
 
     if(label->long_mode == LV_LABEL_LONG_MODE_WRAP) {
         int32_t s = lv_obj_get_scroll_top(obj);
@@ -998,7 +999,7 @@ static void draw_main(lv_event_t * e)
 static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj)
 {
     uint32_t checksum = (lv_obj_get_width(obj) << 8)^lv_obj_get_height(obj);
-    if (str == NULL) return checksum;
+    if(str == NULL) return checksum;
     while(*str) {
         checksum ^= (uint32_t)(*str);
         checksum = (checksum << 1) | (checksum >> 31);
