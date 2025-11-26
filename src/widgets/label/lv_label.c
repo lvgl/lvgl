@@ -1068,7 +1068,16 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     label->need_refr_text = true;
 
     lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
+
+    /**
+     * Ideally we would use `lv_obj_refresh_self_size(obj);` here but it can cause an infinite loop due to the way label
+     * self size is implemented.
+     * The implementation should be revisited in the future since it currently doesn't handle fixed height, content
+     * width in all scenarios properly.
+     * Once that is fixed we should be able to use `lv_obj_refresh_self_size(obj);` here.
+     */
+    if(lv_obj_is_style_any_height_content(obj) || lv_obj_is_style_any_width_content(obj))
+        lv_obj_mark_layout_as_dirty(obj);
 
     lv_obj_request_layout_complete_event(obj);
 }

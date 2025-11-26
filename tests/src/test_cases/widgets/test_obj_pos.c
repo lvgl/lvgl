@@ -83,4 +83,38 @@ void test_style_min_size(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_content_min_size.png");
 }
 
+void test_chaining_invalidation_layout(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont, "cont");
+    lv_obj_set_size(cont, 500, LV_SIZE_CONTENT);
+    lv_obj_set_style_bg_color(cont, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_COVER, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
+
+    lv_obj_t * label = lv_label_create(cont);
+    lv_obj_set_name(label, "label");
+    lv_label_set_text(label, "Dropdown with size content:");
+
+    lv_obj_t * sub_cont = lv_obj_create(cont);
+    lv_obj_set_name(sub_cont, "sub_cont");
+    lv_obj_set_style_bg_color(sub_cont, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(sub_cont, LV_OPA_COVER, 0);
+    lv_obj_set_height(sub_cont, LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(sub_cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_grow(sub_cont, 1);
+    lv_obj_set_style_min_width(sub_cont, LV_SIZE_CONTENT, LV_PART_MAIN);
+
+    lv_obj_t * dd = lv_dropdown_create(sub_cont);
+    lv_obj_set_name(dd, "dropdown");
+    lv_dropdown_set_options(dd, "Short\nA bit longer option\nThe longest option in the list");
+    lv_obj_set_width(dd, 0);
+    lv_obj_set_style_min_width(dd, LV_SIZE_CONTENT, 0);
+    lv_obj_set_flex_grow(dd, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_chained_layout_invalidation_pre.png");
+    lv_dropdown_set_selected(dd, 2);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_chained_layout_invalidation_post.png");
+}
+
 #endif
