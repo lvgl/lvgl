@@ -190,7 +190,7 @@ lv_result_t lv_xml_register_component_from_data(const char * name, const char * 
         if(!scope->view_def) {
             LV_LOG_WARN("Failed to extract view content");
             /* Clean up and return error */
-            lv_xml_component_unregister(name);
+            lv_xml_unregister_component(name);
             return LV_RESULT_INVALID;
         }
     }
@@ -256,7 +256,7 @@ lv_result_t lv_xml_register_component_from_file(const char * path)
     return res;
 }
 
-lv_result_t lv_xml_component_unregister(const char * name)
+lv_result_t lv_xml_unregister_component(const char * name)
 {
     lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
     if(scope == NULL) return LV_RESULT_INVALID;

@@ -32,6 +32,7 @@ extern "C" {
  **********************/
 
 #define lv_tabview_rename_tab lv_tabview_set_tab_text
+#define lv_xml_component_unregister lv_xml_unregister_component
 
 #ifdef __cplusplus
 } /*extern "C"*/
