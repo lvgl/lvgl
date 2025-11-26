@@ -167,6 +167,17 @@ extern "C" {
 #  define CONFIG_LV_USE_MEM_MONITOR_POS LV_ALIGN_CENTER
 #endif
 
+/*******************
+ * SCROLL ANIMATION
+ *******************/
+#ifdef CONFIG_LV_SCROLL_ANIM_TIME_MIN
+#  define LV_SCROLL_ANIM_TIME_MIN CONFIG_LV_SCROLL_ANIM_TIME_MIN
+#endif
+
+#ifdef CONFIG_LV_SCROLL_ANIM_TIME_MAX
+#  define LV_SCROLL_ANIM_TIME_MAX CONFIG_LV_SCROLL_ANIM_TIME_MAX
+#endif
+
 /********************
  * FONT SELECTION
  *******************/

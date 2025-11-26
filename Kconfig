@@ -784,6 +784,19 @@ menu "LVGL configuration"
 					Add a name table to every widget class, so the property can be accessed by name.
 					Note, the const table will increase flash usage.
 
+			config LV_SCROLL_ANIM_TIME_MIN
+				int "Minimum scroll animation time (ms)"
+				default 200
+				help
+					Lower bound of the automatically calculated scroll animation duration.
+
+			config LV_SCROLL_ANIM_TIME_MAX
+				int "Maximum scroll animation time (ms)"
+				default 400
+				help
+					Upper bound of the automatically calculated scroll animation duration.
+					Should be greater than or equal to the minimum value.
+
 			config LV_USE_VG_LITE_THORVG
 				bool "VG-Lite Simulator"
 				default n

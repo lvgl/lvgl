@@ -18,12 +18,6 @@
  *      DEFINES
  *********************/
 #define MY_CLASS (&lv_obj_class)
-#ifndef SCROLL_ANIM_TIME_MIN
-    #define SCROLL_ANIM_TIME_MIN    200    /*ms*/
-#endif
-#ifndef SCROLL_ANIM_TIME_MAX
-    #define SCROLL_ANIM_TIME_MAX    400    /*ms*/
-#endif
 #define SCROLLBAR_MIN_SIZE      (LV_DPX(10))
 
 /**********************
@@ -318,8 +312,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         lv_anim_set_deleted_cb(&a, scroll_end_cb);
 
         if(dx) {
-            uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
-                                               SCROLL_ANIM_TIME_MAX);
+            uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, LV_SCROLL_ANIM_TIME_MIN,
+                                               LV_SCROLL_ANIM_TIME_MAX);
             lv_anim_set_duration(&a, t);
             int32_t sx = lv_obj_get_scroll_x(obj);
             lv_anim_set_values(&a, -sx, -sx + dx);
@@ -333,8 +327,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         }
 
         if(dy) {
-            uint32_t t = lv_anim_speed_clamped((lv_display_get_vertical_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
-                                               SCROLL_ANIM_TIME_MAX);
+            uint32_t t = lv_anim_speed_clamped((lv_display_get_vertical_resolution(d)) >> 1, LV_SCROLL_ANIM_TIME_MIN,
+                                               LV_SCROLL_ANIM_TIME_MAX);
             lv_anim_set_duration(&a, t);
             int32_t sy = lv_obj_get_scroll_y(obj);
             lv_anim_set_values(&a, -sy, -sy + dy);
