@@ -124,7 +124,7 @@ void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
  * @param h_flip            horizontal flip
  * @param v_flip            vertical flip
  */
-void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip);
+void lv_opengles_render_display_texture_rbswap(lv_display_t * display, bool h_flip, bool v_flip);
 
 
 /**********************
