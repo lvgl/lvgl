@@ -35,7 +35,7 @@ void test_xml_polarchart_with_attrs(void)
     const char * radial_axis_attrs[] = {
         "axis", "radial",
         "min_value", "0",
-        "max_value", "40",
+        "max_value", "70",
         NULL, NULL,
     };
     lv_xml_create(chart, "lv_polarchart-axis", radial_axis_attrs);
@@ -43,7 +43,7 @@ void test_xml_polarchart_with_attrs(void)
     const char * series_1_axis_attrs[] = {
         "axis", "radial",
         "color", "0xff0000",
-        "values", "10 20 30 10 20 30",
+        "values", "10 20 30 40 10 20 30 40 10 20 30 40 10",
         NULL, NULL,
     };
 

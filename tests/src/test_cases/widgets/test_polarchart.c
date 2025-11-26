@@ -176,20 +176,20 @@ void test_draw_task_hooking(void)
     lv_obj_set_parent(polarchart, polarchart_wrapper);
     lv_obj_set_size(polarchart, lv_pct(200), lv_pct(100));
     lv_obj_add_flag(polarchart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-    lv_polarchart_set_div_line_count(polarchart, 0, 21);
-    lv_polarchart_set_point_count(polarchart, 21);
+    lv_polarchart_set_div_line_count(polarchart, 0, 12);
+    lv_polarchart_set_point_count(polarchart, 13);
     lv_obj_add_event_cb(polarchart, polarchart_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
 
-    lv_polarchart_series_t * polarchart_set1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_YELLOW),
+    lv_polarchart_series_t * polarchart_set1 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED),
                                                                         0);
     lv_polarchart_series_t * polarchart_set2 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_GREEN),
                                                                         0);
-    lv_polarchart_series_t * polarchart_set3 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_polarchart_series_t * polarchart_set3 = lv_polarchart_add_series(polarchart, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 700);
 
-    int32_t points[21] = {0, 31, 59, 81, 95, 100, 95, 81, 59, 31, 0, -31, -59, -81, -95, -100, -95, -81, -59, -31, 0};
+    int32_t points[13] = {0, 50, 86, 100, 86, 50, 0, -50, -86, -100, -86, -50, 0};
 
-    for(uint32_t i = 0; i < 21; i++) {
+    for(uint32_t i = 0; i < 13; i++) {
         lv_polarchart_set_next_value(polarchart, polarchart_set1, points[i] + 100);
         lv_polarchart_set_next_value(polarchart, polarchart_set2, points[i] + 300);
         lv_polarchart_set_next_value(polarchart, polarchart_set3, points[i] + 500);
@@ -208,14 +208,14 @@ void test_polarchart_scatter(void)
 
     lv_polarchart_set_type(polarchart, LV_POLARCHART_TYPE_SCATTER);
 
-    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_ANGLE, 50, 100);
-    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 10, 20);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_ANGLE, 0, 360);
+    lv_polarchart_set_axis_range(polarchart, LV_POLARCHART_AXIS_RADIAL, 0, 21);
 
     lv_polarchart_set_point_count(polarchart, 3);
     lv_polarchart_series_t * ser = lv_polarchart_add_series(polarchart, red_color, LV_POLARCHART_AXIS_RADIAL);
-    lv_polarchart_set_next_value2(polarchart, ser, 50, 10);
-    lv_polarchart_set_next_value2(polarchart, ser, 75, 12);
-    lv_polarchart_set_next_value2(polarchart, ser, 100, 20);
+    lv_polarchart_set_next_value2(polarchart, ser, 0, 6);
+    lv_polarchart_set_next_value2(polarchart, ser, 90, 15);
+    lv_polarchart_set_next_value2(polarchart, ser, 180, 21);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/polarchart_scatter.png");
 }
