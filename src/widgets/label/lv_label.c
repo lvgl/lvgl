@@ -50,7 +50,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
 #if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
-static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj);
+    static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj);
 #endif
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
