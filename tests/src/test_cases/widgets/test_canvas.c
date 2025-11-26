@@ -450,6 +450,18 @@ static void verify_canvas_px(lv_obj_t * canvas, lv_color_t expected_color, lv_op
     }
 }
 
+static lv_color_t canvas_convert_c16(lv_color_t color)
+{
+    /* Use the same color conversion algorithm as canvas to keep the results consistent */
+    uint16_t px = lv_color_to_u16(color);
+    lv_color16_t * c16 = (lv_color16_t *) &px;
+    lv_color_t ret;
+    ret.red = (c16->red * 2106) >> 8;  /*To make it rounded*/
+    ret.green = (c16->green * 1037) >> 8;
+    ret.blue = (c16->blue * 2106) >> 8;
+    return ret;
+}
+
 void test_canvas_fill_background_formats(void)
 {
     lv_obj_t * canvas = lv_canvas_create(g_screen_active);
@@ -463,6 +475,16 @@ void test_canvas_fill_background_formats(void)
     lv_color_t fill_color_argb = lv_color_hex(0xABCDEF);
     lv_canvas_fill_bg(canvas, fill_color_argb, 0x80);
     verify_canvas_px(canvas, fill_color_argb, 0x80);
+
+    /* Test RGB565 format */
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf_rgb565, 10, 10, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf_rgb565);
+    canvas_draw_buf_reshape(&draw_buf_rgb565);
+    lv_canvas_set_draw_buf(canvas, &draw_buf_rgb565);
+
+    lv_color_t fill_color_rgb565 = lv_color_hex(0x123456);
+    lv_canvas_fill_bg(canvas, fill_color_rgb565, LV_OPA_COVER);
+    verify_canvas_px(canvas, canvas_convert_c16(fill_color_rgb565), LV_OPA_COVER);
 
     /* Test A8 format */
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf_a8, 10, 10, LV_COLOR_FORMAT_A8);
