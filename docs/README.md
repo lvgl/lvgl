@@ -81,7 +81,7 @@ Indent using 4 spaces (not tab characters).  This applies to code blocks as well
 
 If you create a new directory you will need an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
 
-Let's take a look at the `index.rst` file that is located in the `docs/src/details/common-widget-features/layouts` directory.
+Let's take a look at the `index.rst` file that is located in the `docs/src/common-widget-features/layouts` directory.
 
 ```rst
 .. _layouts:

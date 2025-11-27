@@ -61,8 +61,8 @@ Introduction
     :class:    toctree-1-deep  toctree-landing-page
     :maxdepth: 1
 
-    intro/introduction/index
-    intro/getting_started/index
+    introduction/index
+    getting_started/index
 
 
 Details
@@ -73,14 +73,14 @@ Details
     :maxdepth: 1
 
     examples
-    details/integration/index
-    details/common-widget-features/index
-    details/widgets/index
-    details/main-modules/index
-    details/xml/index
-    details/auxiliary-modules/index
-    details/libs/index
-    details/debugging/index
+    integration/index
+    common-widget-features/index
+    widgets/index
+    main-modules/index
+    xml/index
+    auxiliary-modules/index
+    libs/index
+    debugging/index
     guides/index
 
 
