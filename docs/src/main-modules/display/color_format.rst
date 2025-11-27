@@ -30,10 +30,11 @@ Swapping Endian-ness
 In case of RGB565 color format it might be required to swap the 2 bytes
 because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
 
-Traditionally, this required calling :cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)` 
-inside the :ref:`flush_callback`, or implementing a custom function to swap the bytes.
+This usually requires calling :cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)` 
+inside the :ref:`flush_callback`, implementing a custom function to swap the bytes or 
+using the correct color format.
 
-LVGL now supports the :c:macro:`LV_COLOR_FORMAT_RGB565_SWAPPED` color format natively.
+LVGL supports the :c:macro:`LV_COLOR_FORMAT_RGB565_SWAPPED` color format natively.
 By enabling this option, no manual byte swapping is needed at all, 
 simplifying display drivers and eliminating software overhead.
 
