@@ -230,6 +230,26 @@
     #endif
 #endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
+/************************
+ * SCROLL CONFIGURATION
+ ************************/
+
+#ifndef LV_SCROLL_ANIM_TIME_MIN
+    #ifdef CONFIG_LV_SCROLL_ANIM_TIME_MIN
+        #define LV_SCROLL_ANIM_TIME_MIN CONFIG_LV_SCROLL_ANIM_TIME_MIN
+    #else
+        #define LV_SCROLL_ANIM_TIME_MIN 200
+    #endif
+#endif
+
+#ifndef LV_SCROLL_ANIM_TIME_MAX
+    #ifdef CONFIG_LV_SCROLL_ANIM_TIME_MAX
+        #define LV_SCROLL_ANIM_TIME_MAX CONFIG_LV_SCROLL_ANIM_TIME_MAX
+    #else
+        #define LV_SCROLL_ANIM_TIME_MAX 400
+    #endif
+#endif
+
 /*====================
    HAL SETTINGS
  *====================*/
