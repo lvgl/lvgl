@@ -150,7 +150,10 @@ Using these symbols is very simple:
     lv_label_set_text(label, LV_SYMBOL_OK "Apply"); /*Concatenate with a string*/
 
 
-To add a new symbol in a custom font:
+.. _font_adding_a_custom_symbol:
+
+Adding a Custom Symbol
+----------------------
 
 1. Search for a symbol on https://fontawesome.com. For example the
    `USB symbol <https://fontawesome.com/icons/usb?style=brands>`__. Copy its
@@ -165,7 +168,9 @@ To add a new symbol in a custom font:
    Make sure to compile the ``.c`` file of your font.
 6. Declare the font using :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
-**Using the symbol**
+
+Using Your Custom Symbol
+------------------------
 
 1. Convert the Unicode value to UTF8, for example on
    `this site <http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.

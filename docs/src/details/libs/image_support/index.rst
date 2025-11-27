@@ -14,6 +14,7 @@ Image Support
     libpng
     lodepng
     libwebp
+    lz4
     rle
     rlottie
     svg

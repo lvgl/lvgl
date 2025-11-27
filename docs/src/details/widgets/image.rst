@@ -1,4 +1,5 @@
 .. include:: /include/substitutions.txt
+.. include:: /include/external_links.txt
 .. _lv_image:
 
 ================
@@ -11,7 +12,7 @@ Overview
 Images are Widgets that display images from flash (as arrays) or
 from files. Images can also display symbols (``LV_SYMBOL_...``).
 
-Using the :ref:`Image decoder interface <overview_image_decoder>`, custom image formats
+Using the :ref:`Image decoder interface <image_decoders>`, custom image formats
 can be supported as well.
 
 .. _lv_image_parts_and_styles:
@@ -39,7 +40,7 @@ To provide maximum flexibility, the source of the image can be:
 
 To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 
-To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
+To generate a pixel array from a PNG, JPG or BMP image, use the `LVGL Online Image Converter`_
 and set the converted image as the image source with its pointer with
 :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`.
 To make the converted image variable accessible from the C file, declare it with
@@ -88,8 +89,8 @@ Besides RGB888 and ARGB8888 color formats, the following formats are supported:
 - **Indexed**: Image has a color palette, and each pixel is an index into that palette.
 - **Alpha indexed**: The values stored at pixel positions are alpha (opacity) values.
 
-These options can be selected in the image converter. Learn more
-about color formats in the :ref:`overview_image_color_formats` section.
+These options can be selected in the `LVGL Online Image Converter`_.  Learn more
+about color formats in the :ref:`images_color_formats` section.
 
 Recolor
 -------
@@ -141,7 +142,7 @@ causes the transformations to be of higher quality, but slower.
 Transformations require the whole image to be available. Therefore
 indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``) and alpha only images cannot be transformed.
 In other words transformations work only on normal (A)RGB or A8 images stored as a
-C array, or on images provided by a custom :ref:`overview_image_decoder`
+C array, or on images provided by a custom :ref:`image_decoders`
 that returns the whole image.
 
 Note that the real coordinates of image Widgets do not change with a
