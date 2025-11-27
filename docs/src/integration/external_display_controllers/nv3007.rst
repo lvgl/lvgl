@@ -14,7 +14,7 @@ NV3007 supports 3-/4-line serial peripheral interface (SPI) ， quad serial
 peripheral interface (QSPI). The display area can be specified in internal GRAM by
 window address function.
 
-The NV3007 LCD controller `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
+The NV3007 LCD controller `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/display/nv3007>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/blob/master/docs/src/integration/external_display_controllers/gen_mipi.rst>`__.
 It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
@@ -179,4 +179,4 @@ Here is a simple example of using the NV3007 display with Arduino framework and 
 	    delay(5);
 	}
 
-For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/blob/master/docs/src/details/integration/external_display_controllers/gen_mipi.rst>`__.
+For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/blob/master/docs/src/integration/external_display_controllers/gen_mipi.rst>`__.
