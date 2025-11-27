@@ -305,7 +305,7 @@ void test_spinbox_zero_crossing(void)
     TEST_ASSERT_EQUAL(13, lv_spinbox_get_value(spinbox_events));
 }
 
-void test_spinbox_few_gigits(void)
+void test_spinbox_few_digits(void)
 {
     lv_spinbox_set_range(spinbox_events, -20000, 20000);
     lv_spinbox_set_value(spinbox_events, 19000);
