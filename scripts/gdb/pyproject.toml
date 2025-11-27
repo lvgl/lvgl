@@ -13,5 +13,5 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://lvgl.io"
-Documentation = "https://docs.lvgl.io/master/details/debugging/gdb_plugin.html"
+Documentation = "https://docs.lvgl.io/master/debugging/gdb_plugin.html"
 Repository = "https://github.com/lvgl/lvgl"

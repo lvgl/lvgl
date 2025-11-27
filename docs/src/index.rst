@@ -20,27 +20,27 @@ Create beautiful UIs for any MCU, MPU and display type.
 
     <div class="home-cards-container">
         <div class="home-cards">
-            <a href="intro/introduction/index.html" class="home-card">
+            <a href="introduction/index.html" class="home-card">
                 <svg><use href="#svg-home-intro"></use></svg>
                 <h3>Introduction</h3>
                 <p>Get familiar with LVGL.</p>
             </a>
-            <a href="intro/getting_started/index.html" class="home-card">
+            <a href="getting_started/index.html" class="home-card">
                 <svg><use href="#svg-home-getting-started"></use></svg>
                 <h3>Getting Started</h3>
                 <p>Learn how LVGL works.</p>
             </a>
-            <a href="intro/getting_started/whats_next.html" class="home-card">
+            <a href="getting_started/whats_next.html" class="home-card">
                 <svg><use href="#svg-home-play"></use></svg>
                 <h3>Going deeper</h3>
                 <p>Get your feet wet with LVGL.</p>
             </a>
-            <a href="details/integration/index.html" class="home-card">
+            <a href="integration/index.html" class="home-card">
                 <svg><use href="#svg-home-integration"></use></svg>
                 <h3>Integrating LVGL into Your Project</h3>
                 <p>Learn how to add LVGL to your project for any platform, framework and display type.</p>
             </a>
-            <a href="details/widgets/index.html" class="home-card">
+            <a href="widgets/index.html" class="home-card">
                 <svg><use href="#svg-home-widgets"></use></svg>
                 <h3>Widgets</h3>
                 <p>Learn to use LVGL Widgets with examples.</p>

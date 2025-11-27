@@ -50,7 +50,7 @@ For the licenses, see the corresponding `LICENSE.txt` file in each library’s f
 
 **LVGL's XML format**
 - Path:
-    - docs/src/details/auxiliary-modules/xml
+    - docs/src/auxiliary-modules/xml
     - src/others/xml
     - xmls
 
