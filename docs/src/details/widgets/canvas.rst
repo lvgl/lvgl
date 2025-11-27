@@ -115,7 +115,7 @@ No *Keys* are processed by Canvas Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/canvas/index.rst
+.. include:: /examples/widgets/canvas/index.rst
 
 
 

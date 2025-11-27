@@ -52,7 +52,7 @@ for example Compress PNG: https://compresspng.com/
 Example
 *******
 
-.. include:: ../../../examples/libs/lodepng/index.rst
+.. include:: /examples/libs/lodepng/index.rst
 
 
 

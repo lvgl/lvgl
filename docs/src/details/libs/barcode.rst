@@ -52,7 +52,7 @@ Notes
 Example
 *******
 
-.. include:: ../../examples/libs/barcode/index.rst
+.. include:: /examples/libs/barcode/index.rst
 
 
 

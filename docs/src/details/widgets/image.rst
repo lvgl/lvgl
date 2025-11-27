@@ -242,7 +242,7 @@ No *Keys* are processed by Image Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/image/index.rst
+.. include:: /examples/widgets/image/index.rst
 
 
 

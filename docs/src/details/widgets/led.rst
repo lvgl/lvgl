@@ -82,7 +82,7 @@ No *Keys* are processed by LED Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/led/index.rst
+.. include:: /examples/widgets/led/index.rst
 
 
 

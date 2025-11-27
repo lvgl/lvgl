@@ -166,7 +166,7 @@ No *Keys* are processed by Menu Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/menu/index.rst
+.. include:: /examples/widgets/menu/index.rst
 
 
 

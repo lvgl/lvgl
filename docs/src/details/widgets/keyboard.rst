@@ -152,7 +152,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/keyboard/index.rst
+.. include:: /examples/widgets/keyboard/index.rst
 
 
 

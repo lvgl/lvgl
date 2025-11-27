@@ -194,7 +194,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/arc/index.rst
+.. include:: /examples/widgets/arc/index.rst
 
 
 

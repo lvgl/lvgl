@@ -4,5 +4,5 @@
 Examples
 ========
 
-.. include:: ../../../examples/others/observer/index.rst
+.. include:: /examples/others/observer/index.rst
 

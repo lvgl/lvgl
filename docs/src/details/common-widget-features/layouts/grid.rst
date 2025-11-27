@@ -210,7 +210,7 @@ The columns will be placed from right to left.
 Example
 *******
 
-.. include:: ../../../examples/layouts/grid/index.rst
+.. include:: /examples/layouts/grid/index.rst
 
 
 ..  Hyperlinks

@@ -320,7 +320,7 @@ a Widget. Here is an example to see how to handle the event:
 Examples
 ********
 
-.. include:: ../../examples/scroll/index.rst
+.. include:: /examples/scroll/index.rst
 
 .. _scroll_api:
 

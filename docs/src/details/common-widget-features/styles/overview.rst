@@ -252,7 +252,7 @@ background properties" are the properties being referred to:
 Examples
 ********
 
-.. include:: ../../../examples/styles/index.rst
+.. include:: /examples/styles/index.rst
 
 
 

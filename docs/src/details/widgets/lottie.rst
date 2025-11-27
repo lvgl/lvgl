@@ -125,7 +125,7 @@ No keys are processed by Lottie Widgets.
 Example
 *******
 
-.. include:: ../../examples/widgets/lottie/index.rst
+.. include:: /examples/widgets/lottie/index.rst
 
 
 

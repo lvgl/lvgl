@@ -260,7 +260,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/textarea/index.rst
+.. include:: /examples/widgets/textarea/index.rst
 
 
 

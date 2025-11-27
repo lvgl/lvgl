@@ -49,7 +49,7 @@ Limitations
 Example
 *******
 
-.. include:: ../../../examples/libs/bmp/index.rst
+.. include:: /examples/libs/bmp/index.rst
 
 
 

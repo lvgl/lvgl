@@ -86,7 +86,7 @@ hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to receive focus via gridnav.
 Examples
 ********
 
-.. include:: ../../../examples/others/gridnav/index.rst
+.. include:: /examples/others/gridnav/index.rst
 
 
 

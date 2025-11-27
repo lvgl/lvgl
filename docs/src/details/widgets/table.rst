@@ -153,7 +153,7 @@ currently selected cell. Row and column will be set to
 Example
 *******
 
-.. include:: ../../examples/widgets/table/index.rst
+.. include:: /examples/widgets/table/index.rst
 
 MicroPython
 -----------

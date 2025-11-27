@@ -171,7 +171,7 @@ the button will not be activated upon leaving edit mode.
 Example
 *******
 
-.. include:: ../../examples/widgets/buttonmatrix/index.rst
+.. include:: /examples/widgets/buttonmatrix/index.rst
 
 
 

@@ -186,7 +186,7 @@ Keys
 Example
 *******
 
-.. include:: ../../examples/widgets/dropdown/index.rst
+.. include:: /examples/widgets/dropdown/index.rst
 
 
 

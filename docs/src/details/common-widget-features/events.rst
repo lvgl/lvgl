@@ -317,7 +317,7 @@ not the original Widget. To get the original target call
 Examples
 ********
 
-.. include:: ../../examples/event/index.rst
+.. include:: /examples/event/index.rst
 
 
 
