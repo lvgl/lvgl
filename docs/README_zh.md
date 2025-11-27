@@ -62,7 +62,7 @@
   - 灵活的 [样式系统](https://docs.lvgl.io/master/common-widget-features/styles/index.html)，提供约 100 种属性，可自定义控件任意部分与状态。
   - [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) 和 [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) 布局引擎可实现自适应布局。
   - 文本支持 UTF-8 编码，兼容中日韩、泰语、印地语、阿拉伯语、波斯语等。
-  - [数据绑定](https://docs.lvgl.io/master/auxiliary-modules/observer/index.html) 模块轻松连接 UI 与应用逻辑。
+  - [数据绑定](https://docs.lvgl.io/master/main-modules/observer/index.html) 模块轻松连接 UI 与应用逻辑。
   - 渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图像变换等。
   - [强大的 3D 渲染引擎](https://docs.lvgl.io/master/libs/gltf.html)，可使用 OpenGL 显示 [glTF 模型](https://sketchfab.com/)。
   - 支持鼠标、触摸板、按键、键盘、外部按钮、编码器等 [输入设备](https://docs.lvgl.io/master/main-modules/indev.html)。

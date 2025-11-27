@@ -70,7 +70,7 @@ exportar código C ou carregar os XMLs em tempo de execução. Saiba mais aqui.
   - [Sistema de estilos](https://docs.lvgl.io/master/common-widget-features/styles/index.html) flexível com ~100 propriedades para personalizar qualquer parte dos widgets em qualquer estado.
   - Motores de layout tipo [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) e [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) para dimensionar e posicionar widgets de forma responsiva.
   - Texto renderizado com codificação UTF-8, com suporte a CJK, tailandês, híndi, árabe e persa.
-  - [Data bindings](https://docs.lvgl.io/master/auxiliary-modules/observer/index.html) para conectar facilmente a UI ao aplicativo.
+  - [Data bindings](https://docs.lvgl.io/master/main-modules/observer/index.html) para conectar facilmente a UI ao aplicativo.
   - Motor de renderização com suporte a animações, antialiasing, opacidade, rolagem suave, sombras, transformação de imagens e mais.
   - [Poderoso motor de renderização 3D](https://docs.lvgl.io/master/libs/gltf.html) para exibir [modelos glTF](https://sketchfab.com/) com OpenGL.
   - Suporte a mouse, touchpad, keypad, teclado, botões externos e encoder. [Dispositivos de entrada](https://docs.lvgl.io/master/main-modules/indev.html)

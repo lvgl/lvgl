@@ -57,7 +57,7 @@
   - [מערכת סגנונות](https://docs.lvgl.io/master/common-widget-features/styles/index.html) גמישה עם כ~100 מאפייני עיצוב להתאמה של כל חלקי הווידג'טים בכל מצב.
   - מנועי פריסה בסגנון [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) ו־[Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) למיקום וגודל רספונסיביים.
   - טקסט מעובד בקידוד UTF-8 עם תמיכה במערכות כתיבה סינית/יפנית/קוריאנית, תאית, הינדי, ערבית ופרסית.
-  - [קישורי נתונים](https://docs.lvgl.io/master/auxiliary-modules/observer/index.html) לחיבור קל בין ה־UI ליישום.
+  - [קישורי נתונים](https://docs.lvgl.io/master/main-modules/observer/index.html) לחיבור קל בין ה־UI ליישום.
   - מנוע רינדור עם תמיכה באנימציות, החלקת קצוות, שקיפות, גלילה חלקה, צללים, טרנספורמציות תמונה ועוד.
   - [מנוע רינדור 3D חזק](https://docs.lvgl.io/master/libs/gltf.html) להצגת [מודלי glTF](https://sketchfab.com/) עם OpenGL.
   - תמיכה בעכבר, משטח מגע, לוח מקשים, מקלדת, כפתורים חיצוניים ואנקודר [התקני קלט](https://docs.lvgl.io/master/main-modules/indev.html).

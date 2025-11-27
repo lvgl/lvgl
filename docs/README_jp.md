@@ -57,7 +57,7 @@
   - 約 100 のプロパティを持つ柔軟な [スタイルシステム](https://docs.lvgl.io/master/common-widget-features/styles/index.html)。
   - [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) レイアウトエンジンによる自動配置。
   - UTF-8 文字レンダリング。CJK、タイ語、ヒンディー語、アラビア語、ペルシャ語などをサポート。
-  - [データバインディング](https://docs.lvgl.io/master/auxiliary-modules/observer/index.html) により、UI とアプリケーションを簡単に接続。
+  - [データバインディング](https://docs.lvgl.io/master/main-modules/observer/index.html) により、UI とアプリケーションを簡単に接続。
   - レンダリングエンジンはアニメーション、アンチエイリアス、不透明度、スムーズスクロール、影、画像変換をサポート。
   - [3D レンダリングエンジン](https://docs.lvgl.io/master/libs/gltf.html) により [glTF モデル](https://sketchfab.com/) を OpenGL で表示可能。
   - マウス、タッチパッド、キー入力、外部ボタン、エンコーダなどに対応。[入力デバイス](https://docs.lvgl.io/master/main-modules/indev.html)
