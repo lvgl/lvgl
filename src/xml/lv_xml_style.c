@@ -267,6 +267,10 @@ lv_result_t lv_xml_register_style(lv_xml_component_scope_t * scope, const char *
         else SET_STYLE_IF(recolor, lv_xml_to_color(value));
         else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));
 
+        else SET_STYLE_IF(blur_radius, lv_xml_atoi(value));
+        else SET_STYLE_IF(blur_backdrop, lv_xml_to_bool(value));
+        else SET_STYLE_IF(blur_quality, lv_xml_blur_quality_to_enum(value));
+
         else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
 
         else SET_STYLE_IF(flex_flow, lv_xml_flex_flow_to_enum(value));
