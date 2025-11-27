@@ -107,7 +107,7 @@ static const char *src_fragment_shader_v100 = R"(
             gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
         }
         if (u_FlipRB) {
-            color.bgr = color.rgb;
+            gl_FragColor.bgr = gl_FragColor.rgb;
         }
         #ifdef HSV_ADJUST
         gl_FragColor.rgb = adjustHSV(gl_FragColor.rgb);
