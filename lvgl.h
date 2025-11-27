@@ -77,6 +77,7 @@ extern "C" {
 #include "src/widgets/lottie/lv_lottie.h"
 #include "src/widgets/menu/lv_menu.h"
 #include "src/widgets/msgbox/lv_msgbox.h"
+#include "src/widgets/polarchart/lv_polarchart.h"
 #include "src/widgets/roller/lv_roller.h"
 #include "src/widgets/scale/lv_scale.h"
 #include "src/widgets/slider/lv_slider.h"

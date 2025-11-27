@@ -89,6 +89,7 @@ extern "C" {
 #include "src/widgets/dropdown/lv_dropdown_private.h"
 #include "src/widgets/menu/lv_menu_private.h"
 #include "src/widgets/chart/lv_chart_private.h"
+#include "src/widgets/polarchart/lv_polarchart_private.h"
 #include "src/widgets/button/lv_button_private.h"
 #include "src/widgets/scale/lv_scale_private.h"
 #include "src/widgets/led/lv_led_private.h"

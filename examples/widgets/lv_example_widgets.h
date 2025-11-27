@@ -123,6 +123,13 @@ void lv_example_obj_1(void);
 void lv_example_obj_2(void);
 void lv_example_obj_3(void);
 
+void lv_example_polarchart_1(void);
+void lv_example_polarchart_2(void);
+void lv_example_polarchart_5(void);
+void lv_example_polarchart_6(void);
+void lv_example_polarchart_7(void);
+void lv_example_polarchart_8(void);
+
 void lv_example_roller_1(void);
 void lv_example_roller_2(void);
 void lv_example_roller_3(void);

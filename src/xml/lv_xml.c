@@ -37,6 +37,7 @@
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
+#include "parsers/lv_xml_polarchart_parser.h"
 #include "parsers/lv_xml_table_parser.h"
 #include "parsers/lv_xml_dropdown_parser.h"
 #include "parsers/lv_xml_roller_parser.h"
@@ -138,6 +139,13 @@ void lv_xml_init(void)
     lv_xml_register_widget("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_register_widget("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
     lv_xml_register_widget("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
+#endif
+
+#if LV_USE_POLARCHART
+    lv_xml_register_widget("lv_polarchart", lv_xml_polarchart_create, lv_xml_polarchart_apply);
+    lv_xml_register_widget("lv_polarchart-cursor", lv_xml_polarchart_cursor_create, lv_xml_polarchart_cursor_apply);
+    lv_xml_register_widget("lv_polarchart-series", lv_xml_polarchart_series_create, lv_xml_polarchart_series_apply);
+    lv_xml_register_widget("lv_polarchart-axis", lv_xml_polarchart_axis_create, lv_xml_polarchart_axis_apply);
 #endif
 
 #if LV_USE_TABLE
