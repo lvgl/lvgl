@@ -55,6 +55,7 @@
 #define LV_USE_LOTTIE 1
 
 #define LV_USE_FLEX 1
+#define LV_FLEX_PROPAGATE_SIZE_CONTENT 1
 #define LV_USE_GRID 1
 
 #define LV_USE_FS_STDIO     1

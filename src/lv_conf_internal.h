@@ -2710,6 +2710,22 @@
     #endif
 #endif
 
+/** When enabled, flex containers with SIZE_CONTENT will propagate size
+ *  recalculation up to ancestors that also use SIZE_CONTENT.
+ *  This fixes nested SIZE_CONTENT containers collapsing to 0 height,
+ *  but adds a small performance overhead. */
+#ifndef LV_FLEX_PROPAGATE_SIZE_CONTENT
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_FLEX_PROPAGATE_SIZE_CONTENT
+            #define LV_FLEX_PROPAGATE_SIZE_CONTENT CONFIG_LV_FLEX_PROPAGATE_SIZE_CONTENT
+        #else
+            #define LV_FLEX_PROPAGATE_SIZE_CONTENT 0
+        #endif
+    #else
+        #define LV_FLEX_PROPAGATE_SIZE_CONTENT 0
+    #endif
+#endif
+
 /** A layout similar to Grid in CSS. */
 #ifndef LV_USE_GRID
     #ifdef LV_KCONFIG_PRESENT
