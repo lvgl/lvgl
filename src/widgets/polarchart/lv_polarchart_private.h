@@ -74,7 +74,7 @@ struct _lv_polarchart_t {
  *      MACROS
  **********************/
 
-#endif /* LV_USEPOLAR_CHART != 0 */
+#endif /* LV_USE_POLARCHART != 0 */
 
 #ifdef __cplusplus
 } /*extern "C"*/

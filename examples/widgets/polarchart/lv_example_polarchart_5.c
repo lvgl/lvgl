@@ -61,7 +61,7 @@ static void add_faded_area(lv_event_t * e)
     const lv_polarchart_series_t * ser = lv_polarchart_get_series_next(obj, NULL);
     lv_color_t ser_color = lv_polarchart_get_series_color(obj, ser);
 
-    /*Draw a triangle below the line witch some opacity gradient*/
+    /*Draw a triangle below the line which some opacity gradient*/
     lv_draw_line_dsc_t * draw_line_dsc = (lv_draw_line_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
     lv_draw_triangle_dsc_t tri_dsc;
 
@@ -75,10 +75,10 @@ static void add_faded_area(lv_event_t * e)
     tri_dsc.grad.dir = LV_GRAD_DIR_VER;
 
     int32_t full_h = lv_obj_get_height(obj);
-    int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
+    int32_t fract_upper = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
     int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - coords.y1) * 255 / full_h;
     tri_dsc.grad.stops[0].color = ser_color;
-    tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_uppter);
+    tri_dsc.grad.stops[0].opa = (lv_opa_t)(255 - fract_upper);
     tri_dsc.grad.stops[0].frac = 0;
     tri_dsc.grad.stops[1].color = ser_color;
     tri_dsc.grad.stops[1].opa = (lv_opa_t)(255 - fract_lower);
