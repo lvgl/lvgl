@@ -210,9 +210,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             if(add_define(result, "MATERIAL_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
+#if 0 /* Material dispersion is being revisited.*/
             if(add_define(result, "MATERIAL_DISPERSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
+#endif
             if(add_define(result, "MATERIAL_VOLUME", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }

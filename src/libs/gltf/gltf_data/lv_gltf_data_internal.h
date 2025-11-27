@@ -6,6 +6,8 @@
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
 #include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
+#include "../../../misc/lv_array.h"
+
 
 typedef struct {
     GLuint count;
@@ -218,7 +220,7 @@ lv_gltf_data_load_from_bytes(const uint8_t * data, size_t data_size,
  * @param D Pointer to the lv_gltf_data_t object from which to get the radius.
  * @return The radius of the GLTF data object.
  */
-double lv_gltf_data_get_radius(lv_gltf_model_t * D);
+double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
 
 
 /**
@@ -226,7 +228,7 @@ double lv_gltf_data_get_radius(lv_gltf_model_t * D);
  *
  * @param _data Pointer to the lv_gltf_data_t object to be destroyed.
  */
-void lv_gltf_data_destroy(lv_gltf_model_t * _data);
+void lv_gltf_data_delete(lv_gltf_model_t * _data);
 
 /**
  * @brief Copy the bounds information from one GLTF data object to another.
@@ -246,7 +248,6 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              size_t byte_total_count,
                              bool has_alpha);
-
 
 #endif /*LV_USE_GLTF*/
 #endif /* LV_GLTFDATA_PRIVATE_H */

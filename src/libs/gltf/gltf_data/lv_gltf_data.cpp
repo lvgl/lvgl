@@ -65,7 +65,6 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
 
-    new(&data->node_binds) NodeOverrideMap();
     new(&data->node_transform_cache) NodeTransformMap();
     new(&data->opaque_nodes_by_material_index) MaterialIndexMap();
     new(&data->blended_nodes_by_material_index) MaterialIndexMap();
@@ -77,14 +76,18 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
 
-    lv_array_init(&data->binds, 0, sizeof(lv_gltf_bind_t));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
 
-void lv_gltf_data_destroy(lv_gltf_model_t * data)
+void lv_gltf_data_delete(lv_gltf_model_t * data)
 {
-    lv_gltf_data_destroy_textures(data);
+    lv_gltf_data_delete_textures(data);
+    uint32_t node_count = lv_array_size(&data->nodes);
+    for(uint32_t i = 0; i < node_count; ++i) {
+        lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&data->nodes, i);
+        lv_gltf_model_node_deinit(node);
+    }
     lv_free(data);
 }
 
@@ -202,7 +205,7 @@ fastgltf::Asset * lv_gltf_data_get_asset(lv_gltf_model_t * data)
     LV_ASSERT_NULL(data);
     return &data->asset;
 }
-double lv_gltf_data_get_radius(lv_gltf_model_t * data)
+double lv_gltf_data_get_radius(const lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     return data->bound_radius;
@@ -223,9 +226,6 @@ fastgltf::math::fvec3 lv_gltf_data_get_bounds_max(const lv_gltf_model_t * data)
     return data->vertex_max;
 }
 
-
-
-
 void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
 {
     {
@@ -245,7 +245,6 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
     }
     to->bound_radius = from->bound_radius;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -268,4 +267,3 @@ static void update_animation_cb(lv_timer_t * timer)
 }
 
 #endif /*LV_USE_GLTF*/
-
