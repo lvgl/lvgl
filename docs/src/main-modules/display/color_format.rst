@@ -159,6 +159,7 @@ API
 .. API equals:
     LV_COLOR_DEPTH
     LV_COLOR_FORMAT_ARGB8888
+    LV_COLOR_FORMAT_RGB565_SWAPPED
     lv_display_set_buffers
     lv_display_set_color_depth
     lv_display_set_color_format
