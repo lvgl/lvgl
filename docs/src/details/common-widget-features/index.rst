@@ -21,3 +21,4 @@ The following details apply to all types of Widgets.
     flags
     layouts/index
     scrolling
+    cache_framework/index
