@@ -25,7 +25,7 @@ void lv_example_canvas_1(void)
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
-    label_dsc.text = lv_strdup("Some text on text canvas");
+    label_dsc.text = "Some text on text canvas";
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf_16bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
     LV_DRAW_BUF_INIT_STATIC(draw_buf_16bpp);
