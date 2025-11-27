@@ -327,7 +327,7 @@ Reading Node Properties
 
 Change individual node properties using setter functions. Changes are queued and applied during the next render cycle:
 
-￼
+
 .. code-block:: c
 
     /* Get a node from the model */
@@ -347,6 +347,7 @@ Change individual node properties using setter functions. Changes are queued and
     lv_gltf_model_node_set_scale_x(node, 2.0f);
     lv_gltf_model_node_set_scale_y(node, 2.0f);
     lv_gltf_model_node_set_scale_z(node, 2.0f);
+
 
 Reading Node Properties
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -378,16 +379,16 @@ callback to ensure data validity.
     lv_gltf_model_node_add_event_cb(node, node_value_cb, 
                                     LV_EVENT_VALUE_CHANGED, NULL);
 
+
 If you need world-space coordinates (position in global scene coordinates rather than relative to parent),
 use the world position variant. This involves complex matrix calculations during the rendering phase which 
 will impact performance:
-￼
+
 .. code-block:: c
 
     static void node_world_value_cb(lv_event_t * e)
     {
         lv_3dpoint_t local_pos, world_pos;
-        
         /* Both local and world positions are available */
         lv_gltf_model_node_get_local_position(e, &local_pos);
         lv_gltf_model_node_get_world_position(e, &world_pos);
@@ -397,10 +398,10 @@ will impact performance:
         LV_LOG_USER("World: %.2f, %.2f, %.2f\n",
                     world_pos.x, world_pos.y, world_pos.z);
     }
-    
     /* Register with world position calculation enabled */
     lv_gltf_model_node_add_event_cb_with_world_position(node, node_world_value_cb,
                                                         LV_EVENT_VALUE_CHANGED, NULL);
+
 
 Note: World position registration incurs additional computational cost due to matrix transformations. Only use it when you specifically need global coordinates.
 
