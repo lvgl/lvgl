@@ -175,10 +175,6 @@ void test_roller_keypad_events(void)
     int16_t expected_index = 1;
     int16_t actual_index = 0;
 
-    lv_test_wait(20);
-
-    return;
-
     /* Select option index 1 with LV_KEY_RIGHT event */
     lv_roller_set_selected(roller, 0, LV_ANIM_OFF);
     lv_test_key_hit(LV_KEY_RIGHT);
@@ -216,81 +212,103 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
     lv_obj_send_event(overlay, LV_EVENT_PRESSED, NULL);
 }
 
-//void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void)
-//{
-//    char actual_str[OPTION_BUFFER_SZ] = {0x00};
-//
-//    lv_group_remove_obj(roller);
-//    lv_group_add_obj(g, roller_infinite);
-//
-//    /* Select the last option of page 2 */
-//    uint16_t option_count = lv_roller_get_option_count(roller_infinite);
-//    option_count = (option_count * 2) - 1;
-//    lv_roller_set_selected(roller_infinite, option_count, LV_ANIM_OFF);
-//
-//    /* Get the index string */
-//    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
-//
-//    TEST_ASSERT_EQUAL_STRING("Ten", actual_str);
-//    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
-//
-//    lv_test_key_hit(LV_KEY_DOWN);
-//
-//    /* Get the index string */
-//    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
-//    TEST_ASSERT_EQUAL_STRING("One", actual_str);
-//
-//    lv_group_remove_obj(roller_infinite);
-//}
+void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void)
+{
+    char actual_str[OPTION_BUFFER_SZ] = {0x00};
 
-//void test_roller_rendering_test(void)
-//{
-//#if LV_FONT_MONTSERRAT_24
-//    static lv_style_t style_sel;
-//    lv_style_init(&style_sel);
-//    lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
-//    lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
-//    lv_style_set_border_width(&style_sel, 2);
-//    lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
-//
-//    lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
-//    lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
-//    lv_roller_set_options(roller, "One\nTwo\nThree\nFour\nFive", LV_ROLLER_MODE_NORMAL);
-//    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
-//    lv_obj_center(roller);
-//
-//    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_1.png");
-//#else
-//    TEST_PASS();
-//#endif
-//}
-//
-//void test_roller_select_option_with_click(void)
-//{
-//    char actual_str[OPTION_BUFFER_SZ] = {0x00};
-//
-//    lv_test_encoder_click();
-//    lv_test_encoder_turn(1);
-//
-//    /* Get the index string */
-//    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
-//
-//    TEST_ASSERT_EQUAL_STRING("Two", actual_str);
-//    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
-//}
-//
-//void test_roller_release_handler_pointer_indev(void)
-//{
-//    /* Click in the widget */
-//    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 5);
-//    /* Check which is the selected option */
-//    TEST_ASSERT_EQUAL(0, lv_roller_get_selected(roller_mouse));
-//
-//    /* Click further down the roller */
-//    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 100);
-//    /* Check which is the selected option */
-//    TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
-//}
+    lv_group_remove_obj(roller);
+    lv_group_add_obj(g, roller_infinite);
+
+    /* Select the last option of page 2 */
+    uint16_t option_count = lv_roller_get_option_count(roller_infinite);
+    option_count = (option_count * 2) - 1;
+    lv_roller_set_selected(roller_infinite, option_count, LV_ANIM_OFF);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+
+    TEST_ASSERT_EQUAL_STRING("Ten", actual_str);
+    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
+
+    lv_test_key_hit(LV_KEY_DOWN);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+    TEST_ASSERT_EQUAL_STRING("One", actual_str);
+
+    lv_group_remove_obj(roller_infinite);
+}
+
+void test_roller_rendering_test(void)
+{
+    static lv_style_t style_sel;
+    lv_style_init(&style_sel);
+    lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
+    lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
+    lv_style_set_border_width(&style_sel, 2);
+    lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
+
+    lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
+    lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_roller_set_options(roller, "One\nTwo\nThree\nFour\nFive", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
+    lv_obj_center(roller);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_1.png");
+}
+
+void test_roller_select_option_with_click(void)
+{
+    char actual_str[OPTION_BUFFER_SZ] = {0x00};
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(1);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+
+    TEST_ASSERT_EQUAL_STRING("Two", actual_str);
+    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
+}
+
+void test_roller_release_handler_pointer_indev(void)
+{
+    /* Click in the widget */
+    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 5);
+    /* Check which is the selected option */
+    TEST_ASSERT_EQUAL(0, lv_roller_get_selected(roller_mouse));
+
+    /* Click further down the roller */
+    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 100);
+    /* Check which is the selected option */
+    TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
+}
+
+void test_roller_transformed_click(void)
+{
+    lv_obj_t * rotated = lv_obj_create(active_screen);
+    lv_obj_center(rotated);
+    lv_obj_set_size(rotated, 200, 200);
+    lv_obj_set_style_transform_pivot_x(rotated, 100, 0);
+    lv_obj_set_style_transform_pivot_y(rotated, 100, 0);
+    lv_obj_set_style_transform_rotation(rotated, 900, 0);
+
+    lv_obj_set_parent(roller_mouse, rotated);
+
+    lv_obj_t * click_dot = lv_obj_create(active_screen);
+    lv_obj_add_flag(click_dot, LV_OBJ_FLAG_FLOATING);
+    lv_obj_remove_flag(click_dot, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_size(click_dot, 10, 10);
+    lv_obj_set_style_border_width(click_dot, 0, 0);
+    lv_obj_set_style_radius(click_dot, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(click_dot, lv_color_hex3(0xf00), 0);
+    lv_obj_set_pos(click_dot, 380 - 5, 205 - 5);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_4.png");
+
+    lv_test_mouse_click_at(380, 205);
+    TEST_ASSERT_EQUAL_UINT32(1, lv_roller_get_selected(roller_mouse));
+}
 
 void test_roller_appearance(void)
 {
