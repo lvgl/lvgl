@@ -74,6 +74,7 @@ static int32_t lv_obj_get_height_with_margin(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool propagate_size_content_enabled = LV_FLEX_PROPAGATE_SIZE_CONTENT;
 
 /**********************
  *      MACROS
@@ -118,6 +119,16 @@ void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow)
     lv_obj_set_style_flex_grow(obj, grow, 0);
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) lv_obj_mark_layout_as_dirty(parent);
+}
+
+void lv_flex_set_propagate_size_content(bool enable)
+{
+    propagate_size_content_enabled = enable;
+}
+
+bool lv_flex_get_propagate_size_content(void)
+{
+    return propagate_size_content_enabled;
 }
 
 /**********************
@@ -222,21 +233,21 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     if(w_set == LV_SIZE_CONTENT || h_set == LV_SIZE_CONTENT) {
         lv_obj_refr_size(cont);
 
-#if LV_FLEX_PROPAGATE_SIZE_CONTENT
-        /*Propagate SIZE_CONTENT refresh up to ancestors.
-         *When a flex container has SIZE_CONTENT and positions its children,
-         *any ancestor that also has SIZE_CONTENT needs its size recalculated
-         *since child coordinates have now changed.*/
-        lv_obj_t * parent = lv_obj_get_parent(cont);
-        while(parent != NULL) {
-            int32_t pw = lv_obj_get_style_width(parent, LV_PART_MAIN);
-            int32_t ph = lv_obj_get_style_height(parent, LV_PART_MAIN);
-            if(pw == LV_SIZE_CONTENT || ph == LV_SIZE_CONTENT) {
-                lv_obj_refr_size(parent);
+        if(propagate_size_content_enabled) {
+            /*Propagate SIZE_CONTENT refresh up to ancestors.
+             *When a flex container has SIZE_CONTENT and positions its children,
+             *any ancestor that also has SIZE_CONTENT needs its size recalculated
+             *since child coordinates have now changed.*/
+            lv_obj_t * parent = lv_obj_get_parent(cont);
+            while(parent != NULL) {
+                int32_t pw = lv_obj_get_style_width(parent, LV_PART_MAIN);
+                int32_t ph = lv_obj_get_style_height(parent, LV_PART_MAIN);
+                if(pw == LV_SIZE_CONTENT || ph == LV_SIZE_CONTENT) {
+                    lv_obj_refr_size(parent);
+                }
+                parent = lv_obj_get_parent(parent);
             }
-            parent = lv_obj_get_parent(parent);
         }
-#endif
     }
 
     lv_obj_send_event(cont, LV_EVENT_LAYOUT_CHANGED, NULL);

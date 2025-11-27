@@ -89,6 +89,22 @@ void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_a
  */
 void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow);
 
+/**
+ * Enable or disable SIZE_CONTENT propagation to ancestors.
+ * When enabled, flex containers with SIZE_CONTENT will propagate size
+ * refreshes up to any ancestor that also uses SIZE_CONTENT. This fixes
+ * layouts where nested SIZE_CONTENT containers would otherwise collapse to 0.
+ * Default value is set by LV_FLEX_PROPAGATE_SIZE_CONTENT in lv_conf.h.
+ * @param enable true to enable propagation, false to disable
+ */
+void lv_flex_set_propagate_size_content(bool enable);
+
+/**
+ * Get whether SIZE_CONTENT propagation to ancestors is enabled.
+ * @return true if enabled, false if disabled
+ */
+bool lv_flex_get_propagate_size_content(void);
+
 /**********************
  *      MACROS
  **********************/

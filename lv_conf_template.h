@@ -849,10 +849,11 @@
 /** A layout similar to Flexbox in CSS. */
 #define LV_USE_FLEX 1
 
-/** When enabled, flex containers with SIZE_CONTENT will propagate size
+/** Default for SIZE_CONTENT ancestor propagation in flex layouts.
+ *  When enabled, flex containers with SIZE_CONTENT will propagate size
  *  recalculation up to ancestors that also use SIZE_CONTENT.
- *  This fixes nested SIZE_CONTENT containers collapsing to 0 height,
- *  but adds a small performance overhead. */
+ *  This fixes nested SIZE_CONTENT containers collapsing to 0.
+ *  Can be changed at runtime with lv_flex_set_propagate_size_content(). */
 #define LV_FLEX_PROPAGATE_SIZE_CONTENT 0
 
 /** A layout similar to Grid in CSS. */
