@@ -1393,6 +1393,12 @@
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
 
+/** Minimum scroll animation time in milliseconds */
+#define LV_SCROLL_ANIM_TIME_MIN 200
+
+/** Maximum scroll animation time in milliseconds */
+#define LV_SCROLL_ANIM_TIME_MAX 400
+
 /*=====================
 * BUILD OPTIONS
 *======================*/
