@@ -78,7 +78,7 @@ def cmd(s):
 # Get the current branch name
 status, br = subprocess.getstatusoutput("git branch")
 _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
-br = re.sub('\* ', '', br)
+br = re.sub(r'\* ', '', br)
 
 
 urlpath = re.sub('release/', '', br)
