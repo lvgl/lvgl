@@ -136,6 +136,7 @@ typedef struct {
     struct zwp_linux_dmabuf_v1 * handler;
     uint32_t format;
     uint8_t last_used;
+    struct buffer * buffers_to_delete;
 } dmabuf_ctx_t;
 
 typedef struct {
