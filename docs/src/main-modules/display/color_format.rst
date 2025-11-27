@@ -35,7 +35,7 @@ inside the :ref:`flush_callback`, implementing a custom function to swap the byt
 using the correct color format.
 
 LVGL supports the :c:macro:`LV_COLOR_FORMAT_RGB565_SWAPPED` color format natively.
-By enabling this option, no manual byte swapping is needed at all, 
+By using this color format, no manual byte swapping is needed at all, 
 simplifying display drivers and eliminating software overhead.
 
 Note that this is not about swapping the Red and Blue channel but converting
