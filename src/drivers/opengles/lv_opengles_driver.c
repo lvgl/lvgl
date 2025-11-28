@@ -163,7 +163,7 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, false);
+    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, true);
     LV_PROFILER_DRAW_END;
 }
 
