@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" examples_list.py -- Build `examples.rst`
+""" example_list.py -- Build `examples.rst`
 
 `examples.rst` is built by gathering all examples recursively under
 lvgl/examples/.  The recognized directives in that file are then
@@ -94,7 +94,7 @@ Examples Directory Requirements
         etc.
 
 .. note::  The above shows only 2 levels of directories but deeper
-           levels are supported (up to 5).
+           levels are supported (up to 5 below document title).
 
 
 index.rst Requirements
@@ -199,7 +199,7 @@ Enable debug output like this:
     example_list.DEBUG_MODE = True
     example_list.exec(intermediate_dir)
 
-Suppress
+Suppressing DEBUG_MODE (with its informative output) is the default.
 
 
 """
@@ -331,7 +331,7 @@ def generate_output_from_dir(level: int,
                              f: TextIOWrapper) -> list[str]:
     """ Output to `f` based on contents of `file_or_dir`.
 
-    :param level:          Directory depth below the top directory in tree.
+    :param level:          Directory depth below the top directory in tree.  [0-4]
     :param root_len:       Length of root path -- is deleted from paths so that
                              paths are relative to the `lvgl/examples/` dir.
     :param file_or_dir:    Path to "thing" being processed.
@@ -343,9 +343,11 @@ def generate_output_from_dir(level: int,
     :return:               `orig_dir_list` or `dir_order_override` if a
                              dir-order directive is found in index file.
     """
+    if level > 4: return
     section_heading = default_section_heading(level, file_or_dir, is_file)
     example_tuples = []
     dir_order_override = []
+    rel_dir = ''
 
     if is_file:
         announce(__file__, f'Processing file [{file_or_dir}]...')
