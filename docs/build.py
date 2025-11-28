@@ -281,9 +281,9 @@ def intermediate_dir_contents_exists(dir):
         c3 = os.path.isdir(temp_path)
         temp_path = os.path.join(dir, '_static')
         c4 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, 'details')
+        temp_path = os.path.join(dir, 'debugging')
         c5 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, 'intro')
+        temp_path = os.path.join(dir, 'introduction')
         c6 = os.path.isdir(temp_path)
         temp_path = os.path.join(dir, 'contributing')
         c7 = os.path.isdir(temp_path)
@@ -642,8 +642,18 @@ def run(args):
             api_doc_builder.build_api_docs(lvgl_src_dir,
                                            intermediate_dir,
                                            doxyfile_src_file,
-                                           'details',
-                                           'intro'
+                                           'auxiliary-modules',
+                                           'common-widget-features',
+                                           'contributing',
+                                           'debugging',
+                                           'getting_started',
+                                           'guides',
+                                           'integration',
+                                           'introduction',
+                                           'libs',
+                                           'main-modules',
+                                           'widgets',
+                                           'xml',
                                            )
 
         t2 = datetime.now()
