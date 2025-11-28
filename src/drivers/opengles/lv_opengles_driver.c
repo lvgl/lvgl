@@ -317,7 +317,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
-    lv_opengles_shader_set_uniform1i("u_FlipRB", 0);
+    lv_opengles_shader_set_uniform1i("u_FlipRB", flipRB ? 1 : 0);
 
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
