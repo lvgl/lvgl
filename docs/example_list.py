@@ -2,23 +2,23 @@
 """ example_list.py -- Build `examples.rst`
 
 `examples.rst` is built by gathering all examples recursively under
-lvgl/examples/.  The recognized directives in that file are then
+`lvgl/examples/`.  The recognized directives in that file are then
 processed by Sphinx using `lvgl/docs/src/_ext/lv_example.py`.
 
 Subsection names within `examples.rst` are made up of the capitalized
-directory names ('_' and '-' characters are converted to spaces)
-or are spelled out in `index.rst` files if the subsection names should
-be spelled differently.  See "index.rst Requirements" section below
-for details.
+directory names ('_' and '-' characters are converted to spaces) or
+are spelled out in `index.rst` files if the subsection names should be
+spelled differently.  See "index.rst Format" section below for details.
 
 An "example" is defined as:
 
-  - being anywhere under the `lvgl/examples/` directory
-  - the presence of an `index.rst` in a directory with
-  - example C code in file names typically starting with "lv_example_".
+    - being anywhere under the `lvgl/examples/` directory,
+    - the presence of an `index.rst` in a directory with examples, and
+    - example C code in file names typically starting with "lv_example_".
 
-That C code is pulled into each example in the EXAMPLES HTML page, as well
-as every doc where such examples are included, by a directive like this:
+That C code and a live, interactive running example, is pulled into each
+example in the EXAMPLES HTML page, as well as every doc where such
+examples are included, by a directive like this:
 
 .. code::
 
@@ -43,6 +43,8 @@ Usage
 .. code::
 
     import example_list
+    example_list.make_warnings_into_errors()  # Optional
+    example_list.DEBUG_MODE = True            # Optional
     example_list.exec(intermediate_dir)
 
 or run it directly:
@@ -97,8 +99,13 @@ Examples Directory Requirements
            levels are supported (up to 5 below document title).
 
 
-index.rst Requirements
-**********************
+index.rst Format
+****************
+
+Examples
+--------
+Examples are included in `index.rst` files when they are sibling files with
+the example C code.
 
 .. code::
 
@@ -108,13 +115,13 @@ index.rst Requirements
     .. lv_example:: lv_example_anim_1   <-- relative path to stem of C filename
         :language: c
 
-Repeat the above pattern for each example in current directory.  That number may be
-zero (0) for directories like `libs/` in which all examples are in directories below
-that level.  See directory structure above.
+Repeat the above pattern for each example in the current directory.  That number
+may be zero (0) for directories like `libs/` in which all examples are in directories
+below that level.  See directory structure above.
 
-Provide relative paths to each example outside of the current directory, e.g. some
+Provide relative paths to each example outside the current directory, e.g. some
 examples use 2 Widgets, so the example would be local to one `index.rst`, and provide
-a relative path to the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
+a relative path from the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
 
 .. code::
 
@@ -145,13 +152,15 @@ section-heading name underscored with asterisks (*).  Example from
     *******************
 
 
-Optional Directory Reordering
------------------------------
-There are cases where it is not appropriate to present the contents of a directory in
-alphabetical order.  When this is the case, a directive in the `index.rst` file in
-the parent directory can be specified to govern the sequence its subdirectories are
-processed.  The example below is from `lvgl/examples/widgets/index.rst`.  It is
-provided in order to cause the "Base Widget" (obj) directory to be processed first.
+Directory Reordering
+--------------------
+There are cases where it is not appropriate to present the contents of a
+set of subdirectories in alphabetical order.  When this is the case, a
+directive in the `index.rst` file in the parent directory can be specified
+to govern the sequence its subdirectories are processed.  The example below
+is from `lvgl/examples/widgets/index.rst`.  It is provided in order to
+cause the "Base Widget" (obj) directory to be processed first (and thus
+included in the output first).
 
 .. code::
 
@@ -177,15 +186,21 @@ provided in order to cause the "Base Widget" (obj) directory to be processed fir
 Making Warnings into Errors
 ***************************
 
-If `MAKE_WARNINGS_INTO_ERRORS` is True, if there were any warnings issued,
-after the output is completely generated, this script will exit with a
-non-zero exit code.  This can be done by client modules like this:
+If `make_warnings_into_errors()` was called, if there were any warnings
+issued, after the output is completely generated, this script will exit
+with a non-zero exit code.  This can be done by client modules like this:
 
 .. code::
 
     import example_list
     example_list.make_warnings_into_errors()
     example_list.exec(intermediate_dir)
+
+To turn it off:
+
+.. code::
+
+    example_list.make_warnings_into_errors(False)
 
 
 Debug Output
@@ -195,11 +210,9 @@ Enable debug output like this:
 
 .. code::
 
-    import example_list
     example_list.DEBUG_MODE = True
-    example_list.exec(intermediate_dir)
 
-Suppressing DEBUG_MODE (with its informative output) is the default.
+Suppressing DEBUG_MODE is the default.
 
 
 """
@@ -238,6 +251,7 @@ MAKE_WARNINGS_INTO_ERRORS = False
 DEBUG_MODE = False
 THIS_FILE = os.path.basename(__file__)
 _warning_issued = False
+_top_level_heading_count = 0
 
 avoid_dirs = [
     os.path.join('examples', 'arduino'),
@@ -250,7 +264,7 @@ def make_warnings_into_errors(val: bool = True):
     MAKE_WARNINGS_INTO_ERRORS = val
 
 
-def default_section_heading(level: int, path: str, is_file: bool) -> str:
+def _default_section_heading(level: int, path: str, is_file: bool) -> str:
     if is_file:
         dir_path = os.path.dirname(path)
     else:
@@ -272,13 +286,33 @@ def default_section_heading(level: int, path: str, is_file: bool) -> str:
     return result
 
 
-def warn(msg: str):
+def _warn(msg: str):
     global _warning_issued
-    print(f'{THIS_FILE}:  Warning:  ' + msg)
+    if MAKE_WARNINGS_INTO_ERRORS:
+        warning_type = 'Error'
+    else:
+        warning_type = 'Warning'
+
+    if is_silent_mode():
+        print(f'{THIS_FILE}: ' + '\x1b[31m' + f'>>> {warning_type}:  ' + msg + '\x1b[0m')
+    else:
+        announce_colored(THIS_FILE, 'red', f'>>> {warning_type}:  ' + msg)
+
     _warning_issued = True
 
 
-def validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
+def _in_avoid_dirs_list(dir_bep: str) -> bool:
+    result = False
+
+    for avoid_dir in avoid_dirs:
+        if avoid_dir in dir_bep:
+            result = True
+            break
+
+    return result
+
+
+def _validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
     """ Validate sub-dirs that come from an `index.rst` `.. dir_order::` directive.
 
     1.  Check that that each one is an existing directory.
@@ -287,14 +321,18 @@ def validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
     Issue warning if either fails and set `_warning_issued`.
     If MAKE_WARNINGS_INTO_ERRORS, this will make script exit with an error
     code at the end.
-    """
-    okay_so_far = True
 
-    # Check that that each one is an existing directory.
-    for dir in sub_dirs:
-        if not os.path.isdir(dir):
-            okay_so_far = False
-            warn(f'Dir-order directive in {index_rst_path} contains dir [{dir}] that does not exist.')
+    :param sub_dirs:        List of sub-dirs to validate
+    :param index_rst_path:  Path to index.rst file
+    :return:                Whether `sub_dirs` is valid per 1 and 2 above
+    """
+    result = True
+
+    # Check that each sub-dir is an existing directory.
+    for sub_dir in sub_dirs:
+        if not os.path.isdir(sub_dir):
+            result = False
+            _warn(f'Dir-order directive in {index_rst_path} contains dir [{sub_dir}] that does not exist.')
             # We won't break here so that all such dirs can be listed.
 
     # Check that there are none missing except those in `avoid_dirs`.
@@ -308,22 +346,47 @@ def validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
 
     # Are there any missing that are not in `avoid_dirs` list?
     # If so, issue warning about each directory missing.
-    for dir in actual_dirs:
-        if dir not in sub_dirs:
-            is_in_avoid_dirs = False
-            for avoid_dir in avoid_dirs:
-                if avoid_dir in dir:
-                    is_in_avoid_dirs = True
-                    break
+    for sub_dir in actual_dirs:
+        if sub_dir not in sub_dirs:
+            if not _in_avoid_dirs_list(sub_dir):
+                _warn(f'Dir-order directive in {index_rst_path} is missing dir [{sub_dir}].')
+                result = False
 
-            if not is_in_avoid_dirs:
-                warn(f'Dir-order directive in {index_rst_path} is missing dir [{dir}].')
-                okay_so_far = False
-
-    return okay_so_far
+    return result
 
 
-def generate_output_from_dir(level: int,
+def _emit_heading(level: int, hdg: str, f: TextIOWrapper):
+    """
+    Emit reST heading using `header_defs`.
+
+    :param level:  Directory depth below the top directory in tree.  [0-5]
+    :param hdg:    Heading text
+    :param f:      Output file (examples.rst)
+    :return:
+    """
+    assert 0 <= level < len(header_defs), "level out of range"
+    global _top_level_heading_count
+    underline = header_defs[level] * len(hdg)
+    announce(__file__, f'Section heading [{hdg}] at level [{level}].')
+
+    if level == 0:
+        _top_level_heading_count += 1
+        if _top_level_heading_count > 1:
+            f.write('\n\n\n')    # 3 extra lines above (doc) root titles, except 1st
+        f.write(underline)
+        f.write('\n')
+    elif level == 1:
+        f.write('\n\n')          # 2 extra lines above chapters
+    elif level == 2:
+        f.write('\n')            # 1 extra line above sections
+
+    f.write(hdg)
+    f.write('\n')
+    f.write(underline)
+    f.write('\n\n')
+
+
+def _generate_output_from_dir(level: int,
                              root_len: int,
                              file_or_dir: str,
                              is_file: bool,
@@ -343,117 +406,88 @@ def generate_output_from_dir(level: int,
     :return:               `orig_dir_list` or `dir_order_override` if a
                              dir-order directive is found in index file.
     """
-    if level > 4: return
-    section_heading = default_section_heading(level, file_or_dir, is_file)
-    example_tuples = []
     dir_order_override = []
-    rel_dir = ''
+    result_dir_list = orig_dir_list
 
-    if is_file:
-        announce(__file__, f'Processing file [{file_or_dir}]...')
-        # We are processing an index.rst file.
-        with open(file_or_dir, 'r', encoding='utf-8') as fidx:
-            blob = fidx.read()
+    # It is an error to proceed with `level` out of range.  Clamping it to be in
+    # range is also an error because it would cause the output to be corrupted with
+    # an invalid section-heading underscore, which would generate an error later.
+    if 0 <= level and level + 1 < len(header_defs):
+        section_heading = _default_section_heading(level, file_or_dir, is_file)
+        example_tuples = []
+        relative_dir = ''
 
-        lines = blob.split('\n')
-        example_title = ''
-        prev_line = ''
-        dir_path = os.path.dirname(file_or_dir)
-        rel_dir = dir_path[root_len:]
-        in_dir_order_directive = False
-        # Final path to example in example directive requires forward slashes.
-        if DIR_SEP != '/' and DIR_SEP in rel_dir:
-            rel_dir = rel_dir.replace(DIR_SEP, '/')
+        if is_file:
+            announce(__file__, f'Processing file [{file_or_dir}]...')
+            # We are processing an index.rst file.
+            with open(file_or_dir, 'r', encoding='utf-8') as fidx:
+                lines = fidx.read().split('\n')
 
-        # Accumulate data from `index.rst`.  This needs to be done
-        # first in case it overrides the default section heading.
-        for line in lines:
-            if in_dir_order_directive:
-                leading_non_blank = (len(line) > 0) and not (line[0] == ' ' or line[0] == '\t')
+            example_title = ''
+            prev_line = ''
+            dir_path = os.path.dirname(file_or_dir)
+            relative_dir = dir_path[root_len:]
+            in_dir_order_directive = False
+            # Final path to example in example directive requires forward slashes.
+            if DIR_SEP != '/' and DIR_SEP in relative_dir:
+                relative_dir = relative_dir.replace(DIR_SEP, '/')
 
-                if leading_non_blank:
-                    # Leading non-blank character ends dir-order directive.
-                    in_dir_order_directive = False
-                else:
-                    # Still in dir-order directive.
-                    stripped_line = line.strip()
-                    if stripped_line:
-                        dir_order_override.append(os.path.join(dir_path, stripped_line))
-                    continue
+            # Accumulate data from `index.rst`.  This needs to be done
+            # first in case it overrides the default section heading.
+            for line in lines:
+                if in_dir_order_directive:
+                    leading_non_blank = (len(line) > 0) and not (line[0] == ' ' or line[0] == '\t')
 
-            stripped_line = line.strip()
+                    if leading_non_blank:
+                        # Leading non-blank character ends dir-order directive.
+                        in_dir_order_directive = False
+                    else:
+                        # Still in dir-order directive.
+                        stripped_line = line.strip()
+                        if stripped_line:
+                            dir_order_override.append(os.path.join(dir_path, stripped_line))
+                        continue
 
-            if not stripped_line:
-                continue         # Skip blank line.
-            elif stripped_line.startswith('***'):
-                announce(__file__, f'Default section heading [{section_heading}] replaced with [{prev_line}]...')
-                section_heading = prev_line
-            elif stripped_line.startswith('---'):
-                example_title = prev_line
-                announce(__file__, f'Example [{example_title}]...')
-            elif stripped_line.startswith(LV_EXAMPLE_DIRECTIVE):
-                rel_path_from_index_rst = stripped_line.replace(LV_EXAMPLE_DIRECTIVE, '').strip()
-                announce(__file__, f'        [{rel_path_from_index_rst}]')
-                example_tuples.append( (example_title, rel_path_from_index_rst) )
-            elif not in_dir_order_directive and stripped_line.startswith(DIR_ORDER_DIRECTIVE):
-                in_dir_order_directive = True
-                announce(__file__, f'Found DIR-ORDER directive...')
+                stripped_line = line.strip()
 
-            prev_line = stripped_line
+                if not stripped_line:
+                    continue         # Skip blank line.
+                elif stripped_line.startswith('***'):
+                    announce(__file__, f'Default section heading [{section_heading}] replaced with [{prev_line}]...')
+                    section_heading = prev_line
+                elif stripped_line.startswith('---'):
+                    example_title = prev_line
+                    announce(__file__, f'Found example   [{example_title}]...')
+                elif stripped_line.startswith(LV_EXAMPLE_DIRECTIVE):
+                    rel_path_from_index_rst = stripped_line.replace(LV_EXAMPLE_DIRECTIVE, '').strip()
+                    announce(__file__, f'                [{rel_path_from_index_rst}]')
+                    example_tuples.append( (example_title, rel_path_from_index_rst) )
+                elif not in_dir_order_directive and stripped_line.startswith(DIR_ORDER_DIRECTIVE):
+                    in_dir_order_directive = True
+                    announce(__file__, f'Found DIR-ORDER directive.')
 
-    # Output section heading.
-    announce(__file__, f'Section heading [{section_heading}] at level [{level}].')
-    section_heading_underline = header_defs[level] * len(section_heading)
+                prev_line = stripped_line
 
-    if level == 1:
-        f.write('\n\n')      # 2 extra blank lines above chapters
-    elif level == 2:
-        f.write('\n')        # 1 extra blank line above sections
-    elif level == 0:
-        f.write('\n\n\n')    # 3 extra blank lines above (doc) root titles
-        f.write(section_heading_underline)
-        f.write('\n')
+        # Output section heading.  This occurs even when we have descended into an
+        # empty directory with example sub-dirs below it.
+        _emit_heading(level, section_heading, f)
 
-    f.write(section_heading)
-    f.write('\n')
-    f.write(section_heading_underline)
-    f.write('\n\n')
-
-    # Output examples, if any.
-    for example_tuple in example_tuples:
-        example_title = example_tuple[0]
-        rel_path_from_index_rst = example_tuple[1]
-        example_hdg_underline = header_defs[level + 1] * len(example_title)
-        announce(__file__, f'Writing example [{rel_path_from_index_rst}]...')
-
-        if level + 1 == 1:
-            f.write('\n\n')  # 2 extra blank lines above chapters
-        elif level + 1 == 2:
-            f.write('\n')    # 1 extra blank line above sections
-
-        f.write(example_title)
-        f.write('\n')
-        f.write(example_hdg_underline)
-        f.write('\n\n')
-        f.write(LV_EXAMPLE_DIRECTIVE + ' ' + rel_dir + '/' + rel_path_from_index_rst)
-        f.write('\n\n')
+        # Output examples, if any.  Will be empty when we are in an empty directory
+        # with example sub-dirs below it.
+        for example_tuple in example_tuples:
+            example_title = example_tuple[0]
+            rel_path_from_index_rst = example_tuple[1]
+            example_hdg_underline = header_defs[level + 1] * len(example_title)
+            announce(__file__, f'Writing example [{rel_path_from_index_rst}]...')
+            _emit_heading(level + 1, example_title, f)
+            f.write(LV_EXAMPLE_DIRECTIVE + ' ' + relative_dir + '/' + rel_path_from_index_rst)
+            f.write('\n\n')
 
     if dir_order_override:
-        validate_sub_dirs(dir_order_override, file_or_dir)
-        return dir_order_override
-    else:
-        return orig_dir_list
+        _validate_sub_dirs(dir_order_override, file_or_dir)
+        result_dir_list = dir_order_override
 
-
-def need_to_avoid_dir(dir_bep: str) -> bool:
-    result = False
-
-    for avoid_dir in avoid_dirs:
-        if avoid_dir in dir_bep:
-            result = True
-            break
-
-    return result
+    return result_dir_list
 
 
 def process_dir_recursively(level: int, root_len: int, dir_bep: str, f: TextIOWrapper):
@@ -461,15 +495,15 @@ def process_dir_recursively(level: int, root_len: int, dir_bep: str, f: TextIOWr
 
     :param level:     Directory depth below the top directory in tree.
     :param root_len:  Length of root path (gets removed from full path)
-    :param dir_bep:   Source directory *being processed*
+    :param dir_bep:   Directory *being processed*
     :param f:         Output file (examples.rst)
     """
-    announce(__file__, f'Processing dir [{dir_bep}]...')
+    announce(__file__, f'Processing dir  [{dir_bep}]...')
     sub_dirs = []
     idx_files = []
 
     if not os.path.isdir(dir_bep):
-        warn(f'process_dir_recursively: `dir_bep` [{dir_bep}] does not exist.')
+        _warn(f'process_dir_recursively: `dir_bep` [{dir_bep}] does not exist.')
         return
 
     # For each "thing" found in `dir_bep`, build lists:  sub_dirs and idx_files.
@@ -481,14 +515,14 @@ def process_dir_recursively(level: int, root_len: int, dir_bep: str, f: TextIOWr
             idx_files.append(path_bep)
 
     if idx_files:
-        sub_dirs = generate_output_from_dir(level, root_len, idx_files[0], True, sub_dirs, f)
+        sub_dirs = _generate_output_from_dir(level, root_len, idx_files[0], True, sub_dirs, f)
+        # `sub_dirs` can be replaced if `index.rst` contains a dir-order directive.
     else:
-        generate_output_from_dir(level, root_len, dir_bep, False, sub_dirs, f)
+        _generate_output_from_dir(level, root_len, dir_bep, False, sub_dirs, f)
 
-    # `sub_dirs` can be replaced if `index.rst` contains a dir-order directive.
     # Now recursively process sub_dirs.
     for subdir in sub_dirs:
-        if not need_to_avoid_dir(subdir):
+        if not _in_avoid_dirs_list(subdir):
             process_dir_recursively(level + 1, root_len, subdir, f)
 
 
