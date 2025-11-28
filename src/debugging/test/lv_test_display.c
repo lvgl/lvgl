@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_test_display.h"
-#include <src/misc/lv_color.h>
 #if LV_USE_TEST
 
 #include "../../core/lv_global.h"
@@ -15,6 +14,7 @@
 #include "../../drivers/opengles/lv_opengles_texture.h"
 #include "../../drivers/opengles/lv_opengles_private.h"
 #include "../../drivers/opengles/lv_opengles_driver.h"
+#include "../../drivers/opengles/lv_opengles_texture_private.h"
 #include <stdlib.h>
 
 #if LV_USE_DRAW_OPENGLES
@@ -59,11 +59,11 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res)
 #if LV_USE_DRAW_OPENGLES
     glfwInit();
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    GLFWwindow * window = glfwCreateWindow(hor_res, ver_res, "", NULL, NULL);
-    glfwMakeContextCurrent(window);
+    _state.window = glfwCreateWindow(hor_res, ver_res, "", NULL, NULL);
+    glfwMakeContextCurrent(_state.window);
 
     if(!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
-        glfwDestroyWindow(window);
+        glfwDestroyWindow(_state.window);
         lv_draw_buf_destroy(&_state.draw_buf);
         return NULL;
     }
@@ -125,6 +125,12 @@ static void delete_event_cb(lv_event_t * e)
     lv_display_t * disp = lv_event_get_target(e);
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(disp);
     lv_free(draw_buf->unaligned_data);
+#if LV_USE_DRAW_OPENGLES
+    // lv_opengles_texture_deinit(lv_display_get_driver_data(disp));
+    glfwDestroyWindow(_state.window);
+    glfwTerminate();
+#endif
+
 }
 
 #if LV_USE_DRAW_OPENGLES
@@ -138,11 +144,11 @@ static int lv_cf_to_gl_cf(lv_color_format_t cf)
             return 0;
 #endif
         case LV_COLOR_FORMAT_RGB888:
-            return GL_RGB;
+            return GL_BGR;
         case LV_COLOR_FORMAT_ARGB8888:
-            return GL_RGBA;
+            return GL_BGRA;
         case LV_COLOR_FORMAT_XRGB8888:
-            return GL_RGBA;
+            return GL_BGRA;
         default:
             return 0;
     }
@@ -162,21 +168,27 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     uint32_t width = _state.draw_buf.header.w;
     uint32_t height = _state.draw_buf.header.h;
     uint8_t * data = _state.draw_buf.data;
+    uint32_t stride = _state.draw_buf.header.stride;
 
     unsigned int texture_id = lv_opengles_texture_get_texture_id(disp);
-    lv_opengles_render_display_texture(disp, false, false);
+    lv_opengles_render_display_texture(disp, false, true);
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ROW_LENGTH, stride / 4);
 
     /* Special path as Desktop GL doesn't support RGB565*/
     if(!LV_USE_EGL && cf == LV_COLOR_FORMAT_RGB565) {
         glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
     }
     else {
-        GL_CALL(glReadPixels(0, 0, width, height, lv_cf_to_gl_cf(cf), GL_UNSIGNED_BYTE,
-                             data));
+        GL_CALL(glReadPixels(0, 0, width, height, lv_cf_to_gl_cf(cf), GL_UNSIGNED_INT_8_8_8_8, data));
+        // GL_CALL(glGetTexImage(GL_TEXTURE_2D, 0, lv_cf_to_gl_cf(cf), GL_UNSIGNED_BYTE, data));
 
     }
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 #endif
 }
