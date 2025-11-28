@@ -438,6 +438,7 @@ static bool init_egl(lv_sdl_window_t * dsc)
         EGL_RED_SIZE, 8,
         EGL_ALPHA_SIZE, 8,
         EGL_STENCIL_SIZE, 8,
+        EGL_SAMPLES, 4, /* 4x MSAA */
         EGL_NONE
     };
 

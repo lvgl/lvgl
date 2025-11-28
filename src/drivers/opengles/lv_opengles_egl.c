@@ -382,6 +382,7 @@ static EGLConfig create_egl_config(lv_opengles_egl_t * ctx)
         EGL_RED_SIZE, 8,
         EGL_ALPHA_SIZE, 8,
         EGL_STENCIL_SIZE, 8,
+        EGL_SAMPLES, 4, /* 4x MSAA */
 #endif
         EGL_NONE
     };
