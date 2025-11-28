@@ -414,21 +414,19 @@ endif()
 
 # OpenGL ES is required for its driver
 if ($ENV{NON_AMD64_BUILD})
-    message("Disable OpenGL, GLEW or glfw3 for non-amd64 build")
+    message("Disable OpenGL, glfw3 for non-amd64 build")
     add_definitions(-DLV_USE_OPENGLES=0)
 else()
     find_package(OpenGL)
-    find_package(GLEW)
     find_package(glfw3)
 
-    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND)
+    if(OpenGL_FOUND AND glfw3_FOUND)
         # Include directories
         include_directories(${OPENGL_INCLUDE_DIR})
-        include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
     else()
-        message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
+        message("OpenGL, glfw3 not found, defaulting to 0")
         add_definitions(-DLV_USE_OPENGLES=0)
     endif()
 endif()
@@ -532,7 +530,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 
 	if (NOT $ENV{NON_AMD64_BUILD})
 	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+    	        ${OPENGL_LIBRARIES} glfw)
 	endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
