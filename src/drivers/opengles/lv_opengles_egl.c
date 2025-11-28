@@ -131,6 +131,17 @@ void lv_opengles_egl_update(lv_opengles_egl_t * ctx)
     ctx->interface.flip_cb(ctx->interface.driver_data, ctx->vsync);
 }
 
+lv_result_t lv_opengles_egl_bind_current_context(lv_opengles_egl_t * ctx)
+{
+    return eglMakeCurrent(ctx->egl_display, ctx->egl_surface, ctx->egl_surface,
+                          ctx->egl_context) ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+lv_result_t lv_opengles_egl_unbind_current_context(lv_opengles_egl_t * ctx)
+{
+    return eglMakeCurrent(ctx->egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                          EGL_NO_CONTEXT) ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
 
 /**********************
 *   STATIC FUNCTIONS
