@@ -540,7 +540,7 @@ redirects = {
     "porting/sleep":                              "../integration/adding-lvgl-to-your-project/threading.html",
     "porting/tick":                               "../integration/adding-lvgl-to-your-project/connecting_lvgl.html",
     "porting/timer_handler":                      "../integration/adding-lvgl-to-your-project/timer_handler.html",
-    "widgets/obj":                                "../common-widget-features/index.html"                    ,
+    "widgets/obj":                                "../widgets/base_widget.html"                             ,
 }
 
 
