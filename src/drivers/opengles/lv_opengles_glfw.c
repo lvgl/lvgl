@@ -549,11 +549,11 @@ static void window_update_handler(lv_timer_t * t)
                 }
 
 #if LV_USE_DRAW_OPENGLES
-                lv_opengles_render_texture_rbswap(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                                  &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
+                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                           &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
 #else
-                lv_opengles_render_texture_rbswap(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                                  &texture->area, window->h_flip, window->v_flip);
+                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                           &texture->area, window->h_flip, window->v_flip);
 #endif
             }
         }

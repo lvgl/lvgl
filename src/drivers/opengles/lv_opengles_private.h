@@ -105,8 +105,22 @@ extern "C" {
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB);
 
+
+/**
+ * Render a texture using alternate blending mode, with red and blue channels flipped in the shader.
+ * @param texture        OpenGL texture ID
+ * @param texture_area   the area in the window to render the texture in
+ * @param opa            opacity to blend the texture with existing contents
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
+ * @param h_flip         horizontal flip
+ * @param v_flip         vertical flip
+ */
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                       bool h_flip, bool v_flip);
 
 /**
  * Set the OpenGL viewport, with vertical co-ordinate conversion
