@@ -485,6 +485,7 @@ redirects = {
     "integration/framework/tasmota-berry":        "../../integration/frameworks/tasmota-berry.html"         ,
     "integration/ide/pc-simulator":               "../../integration/ide/pc-simulator.html"                 ,
     "integration/os/rt-thread":                   "../../integration/os/rt-thread.html"                     ,
+    "intro/getting_started/index":                "../../getting_started/index.html"                        ,
     "layouts/flex":                               "../common-widget-features/layouts/flex.html"             ,
     "layouts/grid":                               "../common-widget-features/layouts/grid.html"             ,
     "layouts/index":                              "../common-widget-features/layouts/index.html"            ,
