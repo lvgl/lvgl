@@ -60,7 +60,7 @@ Axis ticks and labels with scrolling on a chart
 
 #### Note
 
-Starting the example code filename with `lv_example_` is not a requirement of the the `example_list.py` script, but does make it clear that it is an example, so this pattern should be preserved for new and changed examples.
+Starting the example code filename with `lv_example_` is not a requirement of the `example_list.py` script, but does make it clear that it is an example, so this pattern should be preserved for new and changed examples.
 
 
 ### Custom Section Headings
