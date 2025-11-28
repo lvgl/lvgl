@@ -934,6 +934,13 @@
     #define LV_FS_FROGFS_LETTER '\0'
 #endif
 
+/** API for romfs. */
+#define LV_USE_FS_ROMFS 0
+#if LV_USE_FS_ROMFS
+    #define LV_FS_ROMFS_LETTER '\0'
+    #define LV_FS_ROMFS_PATH ""
+#endif
+
 /** LODEPNG decoder library */
 #define LV_USE_LODEPNG 0
 
