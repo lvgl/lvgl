@@ -635,7 +635,7 @@ lv_draw_vector_dsc_t * lv_draw_vector_dsc_create(lv_layer_t * layer)
     }
 
     dsc->base.layer = layer;
-    dsc->base.dsc_size = sizeof(lv_vector_path_ctx_t);
+    dsc->base.dsc_size = sizeof(*dsc);
 
     dsc->ctx = lv_zalloc(sizeof(lv_vector_path_ctx_t));
     if(dsc->ctx == NULL) {
