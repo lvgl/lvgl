@@ -196,7 +196,7 @@ Enable debug output like this:
 .. code::
 
     import example_list
-    example_list.USE_DEBUG_MODE = True
+    example_list.DEBUG_MODE = True
     example_list.exec(intermediate_dir)
 
 Suppress
@@ -235,7 +235,9 @@ DIR_ORDER_DIRECTIVE = '.. dir_order::'
 DIR_SEP = os.sep
 INDEX_FILENAME = 'index.rst'
 MAKE_WARNINGS_INTO_ERRORS = False
-USE_DEBUG_MODE = False
+DEBUG_MODE = False
+THIS_FILE = os.path.basename(__file__)
+_warning_issued = False
 
 avoid_dirs = [
     os.path.join('examples', 'arduino'),
@@ -243,9 +245,9 @@ avoid_dirs = [
 ]
 
 
-def make_warnings_into_errors():
+def make_warnings_into_errors(val: bool = True):
     global MAKE_WARNINGS_INTO_ERRORS
-    MAKE_WARNINGS_INTO_ERRORS = True
+    MAKE_WARNINGS_INTO_ERRORS = val
 
 
 def default_section_heading(level: int, path: str, is_file: bool) -> str:
@@ -268,6 +270,57 @@ def default_section_heading(level: int, path: str, is_file: bool) -> str:
         result = result[1:]
 
     return result
+
+
+def warn(msg: str):
+    global _warning_issued
+    print(f'{THIS_FILE}:  Warning:  ' + msg)
+    _warning_issued = True
+
+
+def validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
+    """ Validate sub-dirs that come from an `index.rst` `.. dir_order::` directive.
+
+    1.  Check that that each one is an existing directory.
+    2.  Check that there are none missing except those in `avoid_dirs`.
+
+    Issue warning if either fails and set `_warning_issued`.
+    If MAKE_WARNINGS_INTO_ERRORS, this will make script exit with an error
+    code at the end.
+    """
+    okay_so_far = True
+
+    # Check that that each one is an existing directory.
+    for dir in sub_dirs:
+        if not os.path.isdir(dir):
+            okay_so_far = False
+            warn(f'Dir-order directive in {index_rst_path} contains dir [{dir}] that does not exist.')
+            # We won't break here so that all such dirs can be listed.
+
+    # Check that there are none missing except those in `avoid_dirs`.
+    dir_path = os.path.dirname(index_rst_path)
+    actual_dirs = []
+
+    for dir_item in os.listdir(dir_path):
+        path_bep = os.path.join(dir_path, dir_item)
+        if os.path.isdir(path_bep):
+            actual_dirs.append(path_bep)
+
+    # Are there any missing that are not in `avoid_dirs` list?
+    # If so, issue warning about each directory missing.
+    for dir in actual_dirs:
+        if dir not in sub_dirs:
+            is_in_avoid_dirs = False
+            for avoid_dir in avoid_dirs:
+                if avoid_dir in dir:
+                    is_in_avoid_dirs = True
+                    break
+
+            if not is_in_avoid_dirs:
+                warn(f'Dir-order directive in {index_rst_path} is missing dir [{dir}].')
+                okay_so_far = False
+
+    return okay_so_far
 
 
 def generate_output_from_dir(level: int,
@@ -384,6 +437,7 @@ def generate_output_from_dir(level: int,
         f.write('\n\n')
 
     if dir_order_override:
+        validate_sub_dirs(dir_order_override, file_or_dir)
         return dir_order_override
     else:
         return orig_dir_list
@@ -412,6 +466,10 @@ def process_dir_recursively(level: int, root_len: int, dir_bep: str, f: TextIOWr
     sub_dirs = []
     idx_files = []
 
+    if not os.path.isdir(dir_bep):
+        warn(f'process_dir_recursively: `dir_bep` [{dir_bep}] does not exist.')
+        return
+
     # For each "thing" found in `dir_bep`, build lists:  sub_dirs and idx_files.
     for dir_item in os.listdir(dir_bep):
         path_bep = os.path.join(dir_bep, dir_item)
@@ -433,7 +491,7 @@ def process_dir_recursively(level: int, root_len: int, dir_bep: str, f: TextIOWr
 
 
 def exec(intermediate_dir):
-    announce_set_silent_mode(not USE_DEBUG_MODE)
+    announce_set_silent_mode(not DEBUG_MODE)
     output_path = os.path.join(intermediate_dir, 'examples.rst')
     input_paths = [
         os.path.join('..', 'examples'),
@@ -449,6 +507,9 @@ def exec(intermediate_dir):
         for root_path in input_paths:
             root_len = len(root_path) + 1
             process_dir_recursively(0, root_len, root_path, f)
+
+    if MAKE_WARNINGS_INTO_ERRORS and _warning_issued:
+        exit(1)
 
 
 if __name__ == '__main__':
