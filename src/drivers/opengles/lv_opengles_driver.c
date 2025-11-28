@@ -307,7 +307,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         0.0f,       ver_scale,   0.0f,
         hor_translate, ver_translate, 1.0f
     };
-    
+
 
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(blend_opt);
