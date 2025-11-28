@@ -90,7 +90,7 @@ void lv_draw_nanovg_init(void)
     unit->base_unit.event_cb = draw_event_cb;
     unit->base_unit.name = "NANOVG";
 
-    unit->vg = NVG_CTX_CREATE(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+    unit->vg = NVG_CTX_CREATE(0);
     LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
 
     lv_nanovg_utils_init(unit);
