@@ -18,6 +18,11 @@ extern "C" {
 
 #include "../../misc/lv_types.h"
 #include "../../indev/lv_indev_gesture.h"
+#include "../../drivers/opengles/lv_opengles_private.h"
+
+#if LV_USE_DRAW_OPENGLES
+#include <GLFW/glfw3.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -31,6 +36,9 @@ typedef struct {
     lv_indev_t * mouse_indev;
     lv_indev_t * keypad_indev;
     lv_indev_t * encoder_indev;
+#if LV_USE_DRAW_OPENGLES
+    GLFWwindow * window;
+#endif
 
     lv_draw_buf_t draw_buf;
 
