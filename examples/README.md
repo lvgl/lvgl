@@ -47,7 +47,7 @@ Example 1 Title  <-- required for each example
 
 Repeat the above pattern for each example in current directory.  That number may be zero (0) for directories like `libs/` in which all examples are in directories below that level.  See directory structure above.
 
-Provide relative paths to each example outside of the current directory, e.g. some examples use 2 Widgets, so the example would be local to one `index.rst`, and provide a relative path to the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
+Provide relative paths to each example outside of the current directory, e.g. some examples use 2 Widgets, so the example would be local to one `index.rst`, and provide a relative path from the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
 
 ```
 ...
@@ -60,7 +60,7 @@ Axis ticks and labels with scrolling on a chart
 
 #### Note
 
-Starting the example code filename with `lv_example_` is not a requirement of the this script, but does make it clear that it is an example, so this pattern should be preserved for new and changed examples.
+Starting the example code filename with `lv_example_` is not a requirement of the the `example_list.py` script, but does make it clear that it is an example, so this pattern should be preserved for new and changed examples.
 
 
 ### Custom Section Headings
