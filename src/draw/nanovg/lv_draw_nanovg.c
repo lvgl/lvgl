@@ -24,7 +24,7 @@
     #define NVG_CTX_CREATE nvgCreateGL3
     #define NVG_CTX_DELETE nvgDeleteGL3
 #elif defined(NANOVG_GLES2_IMPLEMENTATION)
-    #if LV_USE_OPENGLES
+    #if LV_USE_OPENGLES && LV_USE_EGL
         #include "../../drivers/opengles/lv_opengles_private.h"
     #else
         /* Fallback to default GLES2 headers */
@@ -92,6 +92,7 @@ void lv_draw_nanovg_init(void)
 
     unit->vg = NVG_CTX_CREATE(0);
     LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
+    nvgShapeAntiAlias(unit->vg, true);
 
     lv_nanovg_utils_init(unit);
     lv_draw_nanovg_label_init(unit);
