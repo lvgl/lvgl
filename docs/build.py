@@ -610,6 +610,7 @@ def run(args):
         # in individual documents where applicable.
         # -----------------------------------------------------------------
         announce(__file__, "Generating examples...")
+        example_list.make_warnings_into_errors()
         example_list.exec(intermediate_dir)
 
         # -----------------------------------------------------------------

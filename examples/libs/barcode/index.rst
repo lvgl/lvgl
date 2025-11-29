@@ -1,6 +1,6 @@
 Create a Barcode
 ----------------
 
-.. lv_example:: libs/barcode/lv_example_barcode_1
+.. lv_example:: lv_example_barcode_1
   :language: c
 
