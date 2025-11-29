@@ -210,7 +210,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(lv_display_flush_is_last(disp)) {
         set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        lv_opengles_render_display_texture(disp, false, true);
+        lv_opengles_render_display_texture_rbswap(disp, false, true);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -240,13 +240,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
                              ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                              ctx->texture.fb1));
 #else
 #error("Unsupported color format")
 #endif
 
-        lv_opengles_render_display_texture(disp, false, false);
+        lv_opengles_render_display_texture_rbswap(disp, false, false);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
