@@ -24,10 +24,17 @@ extern "C" {
  *      DEFINES
  *********************/
 
+typedef enum {
+    LV_CANVAS_MODE_BUFFER,
+    LV_CANVAS_MODE_DIRECT,
+} lv_canvas_mode_t;
+
 /**********************
  *      TYPEDEFS
  **********************/
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
+typedef void (*lv_canvas_painting_cb_t)(lv_obj_t * obj, lv_layer_t * layer, void * user_data);
+typedef void (*lv_canvas_painting_end_cb_t)(lv_obj_t * obj, void * user_data);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -96,6 +103,35 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
  */
 void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color);
 
+/**
+ * Set the canvas mode
+ * @param obj       pointer to a canvas object
+ * @param mode      the canvas mode from `lv_canvas_mode_t`
+ */
+void lv_canvas_set_mode(lv_obj_t * obj, lv_canvas_mode_t mode);
+
+/**
+ * Set a callback to draw the canvas for `LV_CANVAS_MODE_DIRECT`.
+ * @param obj       pointer to a canvas object
+ * @param cb        a callback to draw the canvas
+ */
+void lv_canvas_set_painting_cb(lv_obj_t * obj, lv_canvas_painting_cb_t cb);
+
+/**
+ * Set a user data for the painting callback
+ * @param obj       pointer to a canvas object
+ * @param user_data user data
+ */
+void lv_canvas_set_painting_data(lv_obj_t * obj, void * user_data);
+
+/**
+ * Set a painting end callback for LV_CANVAS_MODE_DIRECT.
+ * @param obj       pointer to a canvas object
+ * @param cb        end callback
+ */
+void lv_canvas_set_painting_end_cb(lv_obj_t * obj, lv_canvas_painting_end_cb_t cb);
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -126,6 +162,34 @@ lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
  * @return          pointer to the buffer
  */
 const void * lv_canvas_get_buf(lv_obj_t * canvas);
+
+/**
+ * Get the canvas mode
+ * @param canvas    pointer to a canvas object
+ * @return          the canvas mode from `lv_canvas_mode_t`
+ */
+lv_canvas_mode_t lv_canvas_get_mode(lv_obj_t * canvas);
+
+/**
+ * Get the painting callback for `LV_CANVAS_MODE_DIRECT`
+ * @param obj       pointer to a canvas object
+ * @return          the painting callback
+ */
+lv_canvas_painting_cb_t lv_canvas_get_painting_cb(lv_obj_t * obj);
+
+/**
+ * Get the user data for the painting callback
+ * @param obj       pointer to a canvas object
+ * @return          the user data
+ */
+void * lv_canvas_get_painting_data(lv_obj_t * obj);
+
+/**
+ * Get the painting end callback
+ * @param obj pointer to a canvas object
+ * @return end callback
+ */
+lv_canvas_painting_end_cb_t lv_canvas_get_painting_end_cb(lv_obj_t * obj);
 
 /*=====================
  * Other functions
