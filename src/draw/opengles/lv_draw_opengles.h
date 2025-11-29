@@ -31,6 +31,7 @@ extern "C" {
 
 void lv_draw_opengles_init(void);
 void lv_draw_opengles_deinit(void);
+unsigned int lv_draw_opengles_get_framebuffer(void);
 
 /**********************
  *      MACROS
