@@ -28,7 +28,7 @@ static void create_images(void)
 
     label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "jpeg with exif orientation 0");
-    lv_obj_align(label, LV_ALIGN_CENTER, -150, -100);
+    lv_obj_align(label, LV_ALIGN_CENTER, -150, -110);
 
     img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_180.jpg");
@@ -36,23 +36,55 @@ static void create_images(void)
 
     label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "jpeg with exif orientation 180");
-    lv_obj_align(label, LV_ALIGN_CENTER, 150, -100);
+    lv_obj_align(label, LV_ALIGN_CENTER, 150, -110);
+
+    img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_hflip.jpg");
+    lv_obj_align(img, LV_ALIGN_CENTER, -150, -60);
+
+    label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "jpeg with exif orientation hflip");
+    lv_obj_align(label, LV_ALIGN_CENTER, -150, -20);
+
+    img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_vflip.jpg");
+    lv_obj_align(img, LV_ALIGN_CENTER, 150, -60);
+
+    label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "jpeg with exif orientation vflip");
+    lv_obj_align(label, LV_ALIGN_CENTER, 150, -20);
 
     img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_90.jpg");
-    lv_obj_align(img, LV_ALIGN_CENTER, -150, 40);
+    lv_obj_align(img, LV_ALIGN_CENTER, -280, 70);
 
     label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "jpeg with exif orientation 90");
-    lv_obj_align(label, LV_ALIGN_CENTER, -150, 150);
+    lv_label_set_text(label, "orientation 90");
+    lv_obj_align(label, LV_ALIGN_CENTER, -280, 150);
 
     img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_270.jpg");
-    lv_obj_align(img, LV_ALIGN_CENTER, 150, 40);
+    lv_obj_align(img, LV_ALIGN_CENTER, -100, 70);
 
     label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "jpeg with exif orientation 270");
-    lv_obj_align(label, LV_ALIGN_CENTER, 150, 150);
+    lv_label_set_text(label, "orientation 270");
+    lv_obj_align(label, LV_ALIGN_CENTER, -100, 150);
+
+    img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_transpose.jpg");
+    lv_obj_align(img, LV_ALIGN_CENTER, 100, 70);
+
+    label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "orientation transpose");
+    lv_obj_align(label, LV_ALIGN_CENTER, 70, 150);
+
+    img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_with_exif_orientation_transverse.jpg");
+    lv_obj_align(img, LV_ALIGN_CENTER, 300, 70);
+
+    label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "orientation transverse");
+    lv_obj_align(label, LV_ALIGN_CENTER, 280, 150);
 }
 
 void test_jpg_2(void)
@@ -75,6 +107,22 @@ void test_jpg_2(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 64);
+
+    /* Re-add tjpgd decoder */
+    lv_tjpgd_init();
+}
+
+void test_jpg_cmyk(void)
+{
+    /* Temporarily remove tjpgd decoder */
+    lv_tjpgd_deinit();
+
+    lv_obj_clean(lv_screen_active());
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo_cmyk.jpg");
+    lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_cmyk.png");
 
     /* Re-add tjpgd decoder */
     lv_tjpgd_init();
