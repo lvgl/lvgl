@@ -595,8 +595,12 @@ static int glnvg__renderCreate(void* uptr)
 		"	ftcoord = tcoord;\n"
 		"	fpos = vertex;\n"
 		"	gl_Position = vec4(2.0*vertex.x/viewSize.x - 1.0, 1.0 - 2.0*vertex.y/viewSize.y, 0, 1);\n"
-		"	v_scissorPos = (scissorMat * vec3(vertex, 1.0)).xy;\n"
-		"	v_paintPos = (paintMat * vec3(vertex, 1.0)).xy;\n"
+		"	#if SHADER_TYPE != 2\n" // Not SIMPLE
+		"		v_scissorPos = (scissorMat * vec3(vertex, 1.0)).xy;\n"
+		"	#endif\n"
+		"	#if SHADER_TYPE == 0 || SHADER_TYPE == 1\n" // FILLGRAD or FILLIMG
+		"		v_paintPos = (paintMat * vec3(vertex, 1.0)).xy;\n"
+		"	#endif\n"
 		"}\n";
 
 	static const char* fillFragShader =
@@ -678,7 +682,9 @@ static int glnvg__renderCreate(void* uptr)
 		"\n"
 		"void main(void) {\n"
 		"   vec4 result;\n"
-		"	float scissor = scissorMask(v_scissorPos);\n"
+		"	#if SHADER_TYPE != 2\n" // Not SIMPLE
+		"		float scissor = scissorMask(v_scissorPos);\n"
+		"	#endif\n"
 		"#ifdef EDGE_AA\n"
 		"	float strokeAlpha = strokeMask();\n"
 		"	if (strokeAlpha < strokeThr) discard;\n"
@@ -1048,8 +1054,12 @@ static void glnvg__setUniforms(GLNVGcontext* gl, int uniformOffset, int image, i
 #if NANOVG_GL_USE_UNIFORMBUFFER
 	glBindBufferRange(GL_UNIFORM_BUFFER, GLNVG_FRAG_BINDING, gl->fragBuf, uniformOffset, sizeof(GLNVGfragUniforms));
 #else
-	GLNVGfragUniforms* frag = nvg__fragUniformPtr(gl, uniformOffset);
-	glUniform4fv(gl->shaders[shaderType].loc[GLNVG_LOC_FRAG], NANOVG_GL_UNIFORMARRAY_SIZE, &(frag->uniformArray[0][0]));
+	// Optimization: NSVG_SHADER_SIMPLE doesn't use any uniforms in the fragment shader,
+	// so we can skip uploading them.
+	if (shaderType != NSVG_SHADER_SIMPLE) {
+		GLNVGfragUniforms* frag = nvg__fragUniformPtr(gl, uniformOffset);
+		glUniform4fv(gl->shaders[shaderType].loc[GLNVG_LOC_FRAG], NANOVG_GL_UNIFORMARRAY_SIZE, &(frag->uniformArray[0][0]));
+	}
 #endif
 
 	if (image != 0) {
