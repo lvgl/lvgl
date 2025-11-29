@@ -126,6 +126,10 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
     }
     lv_memzero(window, sizeof(*window));
 
+#if LV_USE_DRAW_NANOVG
+    glfwWindowHint(GLFW_SAMPLES, 4); /* Enable 4x MSAA */
+#endif
+
     /* Create window with graphics context */
     lv_opengles_window_t * existing_window = lv_ll_get_head(&glfw_window_ll);
     window->window = glfwCreateWindow(hor_res, ver_res, title, NULL,
@@ -165,10 +169,6 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
 
     glfwMakeContextCurrent(window->window);
     lv_opengles_init();
-
-#if LV_USE_DRAW_NANOVG
-    lv_draw_nanovg_init();
-#endif
 
     return window;
 }
@@ -332,6 +332,9 @@ lv_display_t * lv_opengles_window_display_create(lv_opengles_window_t * window, 
 
 #if LV_USE_DRAW_OPENGLES
     window->direct_render_invalidated = 1;
+#elif LV_USE_DRAW_NANOVG
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_draw_nanovg_init();
 #endif
 
     return disp;
