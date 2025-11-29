@@ -495,7 +495,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     const size_t digits_len = lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
-    if(leading_zeros_cnt) {
+    if(leading_zeros_cnt > 0) {
         for(i = (int32_t) digits_len; i >= 0; i--) {
             digits[i + leading_zeros_cnt] = digits[i];
         }

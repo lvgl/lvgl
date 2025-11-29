@@ -305,4 +305,13 @@ void test_spinbox_zero_crossing(void)
     TEST_ASSERT_EQUAL(13, lv_spinbox_get_value(spinbox_events));
 }
 
+void test_spinbox_few_digits(void)
+{
+    lv_spinbox_set_range(spinbox_events, -20000, 20000);
+    lv_spinbox_set_value(spinbox_events, 19000);
+    lv_spinbox_set_digit_count(spinbox_events, 3);
+    lv_obj_t * label = lv_obj_get_child(spinbox_events, 0);
+    TEST_ASSERT_EQUAL_STRING("+190", lv_label_get_text(label));
+}
+
 #endif
