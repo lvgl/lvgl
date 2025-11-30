@@ -165,6 +165,33 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
  */
 void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 
+
+/**
+ * Point line needle to specified value.
+ * @param scale            pointer to Scale Widget
+ * @param needle_line      needle_line of the Scale. The line points will be allocated and
+ *                         managed by the Scale unless the line point array was previously set
+ *                         using `lv_line_set_points_mutable`.
+ * @param needle_length    length of the needle
+ *                         - needle_length>0: needle_length=needle_length;
+ * @param value            Scale value needle will point to
+ */
+void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line,
+                              int32_t needle_length, int32_t value);
+
+/**
+ * Point line needle to specified value.
+ * @param scale            pointer to Scale Widget
+ * @param needle_line      needle_line of the Scale. The line points will be allocated and
+ *                         managed by the Scale unless the line point array was previously set
+ *                         using `lv_line_set_points_mutable`.
+ * @param needle_length    length of the needle
+ *                         - needle_length>0: needle_length=needle_length;
+ * @param value            Scale value needle will point to
+ */
+void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line,
+                              int32_t needle_length, int32_t value);
+
 /**
  * Point line needle to specified value.
  * @param obj              pointer to Scale Widget
