@@ -347,13 +347,13 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     if((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
-        (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
+      (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
         lv_scale_update_horizontal_needle(obj, needle_line, needle_length, value);
         return;
     }
 
     if((scale->mode == LV_SCALE_MODE_VERTICAL_LEFT) ||
-        (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT)) {
+      (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT)) {
         lv_scale_update_vertical_needle(obj, needle_line, needle_length, value);
         return;
     }
@@ -387,8 +387,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     int32_t angle = 0;
     int32_t range_span = scale->range_max - scale->range_min;
     if(range_span > 0) {
-        if(value <= scale->range_min) 
-        {
+        if(value <= scale->range_min) {
             angle = 0;
         }
         else if(value >= scale->range_max) {
@@ -440,7 +439,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     else {
         /* Look for previously attached buffer (iterate forwards or backwards depemding) */
         uint32_t ev_cnt = lv_obj_get_event_count(needle_line);
-        for (int32_t i = (int32_t)ev_cnt - 1; i >= 0; i--) {
+        for(int32_t i = (int32_t)ev_cnt - 1; i >= 0; i--) {
             lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, (uint32_t)i);
             if(dsc && lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
                 pts = (lv_point_precise_t *)lv_event_dsc_get_user_data(dsc);
