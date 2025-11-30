@@ -176,8 +176,8 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
  *                         - needle_length>0: needle_length=needle_length;
  * @param value            Scale value needle will point to
  */
-void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line,
-                              int32_t needle_length, int32_t value);
+void lv_scale_update_horizontal_needle(lv_obj_t * scale, lv_obj_t * needle_line,
+                                       int32_t needle_length, int32_t value);
 
 /**
  * Point line needle to specified value.
@@ -189,8 +189,8 @@ void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line,
  *                         - needle_length>0: needle_length=needle_length;
  * @param value            Scale value needle will point to
  */
-void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line,
-                              int32_t needle_length, int32_t value);
+void lv_scale_update_vertical_needle(lv_obj_t * scale, lv_obj_t * needle_line,
+                                     int32_t needle_length, int32_t value);
 
 /**
  * Point line needle to specified value.
