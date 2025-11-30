@@ -273,6 +273,7 @@ void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int
     if (!pts || lv_line_get_point_count(needle_line) < 2) {
         pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
         lv_line_set_points_mutable(needle_line, pts, 2);
+        lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
     }
 
     int32_t line_y = half_w;
@@ -330,6 +331,7 @@ void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line, i
     if (!pts || lv_line_get_point_count(needle_line) < 2) {
         pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
         lv_line_set_points_mutable(needle_line, pts, 2);
+        lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
     }
 
     int32_t line_x = half_w;
