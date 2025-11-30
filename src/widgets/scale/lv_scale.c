@@ -217,17 +217,17 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int32_t needle_length, int32_t value)
+void lv_scale_update_vertical_needle(lv_obj_t * scale, lv_obj_t * needle_line, int32_t needle_length, int32_t value)
 {
     int32_t sw = lv_obj_get_width(scale);
     int32_t sh = lv_obj_get_height(scale);
-    if (sw <= 0 || sh <= 0) return;
+    if(sw <= 0 || sh <= 0) return;
 
-    lv_scale_t *s = (lv_scale_t *)scale;
+    lv_scale_t * s = (lv_scale_t *)scale;
     int32_t minv = s->range_min;
     int32_t maxv = s->range_max;
     int32_t range = maxv - minv;
-    if (range <= 0) return;
+    if(range <= 0) return;
 
     // Map value Y pixel (inverted because 0 is bottom, max is top)
     int32_t rel =
@@ -236,12 +236,12 @@ void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int
 
     // local Y = bottom - proportional distance upward
     int32_t new_local_y = sh - ((rel * sh) / range);
-    if (new_local_y < 0) new_local_y = 0;
-    if (new_local_y > sh) new_local_y = sh;
+    if(new_local_y < 0) new_local_y = 0;
+    if(new_local_y > sh) new_local_y = sh;
 
     // line width
     int32_t lw = lv_obj_get_style_line_width(needle_line, LV_PART_MAIN);
-    if (lw < 1) lw = 1;
+    if(lw < 1) lw = 1;
     int32_t half_w = lw / 2;
 
     // Clamp needle length to object width
@@ -253,15 +253,15 @@ void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int
     // X position: center of width
     int32_t new_obj_x;
 
-    if (s->mode == LV_SCALE_MODE_VERTICAL_LEFT)
+    if(s->mode == LV_SCALE_MODE_VERTICAL_LEFT)
         new_obj_x = 0;
     else
         new_obj_x = sw - obj_w;
 
     // Y position: center needle on new_local_y
     int32_t new_obj_y = new_local_y - half_w;
-    if (new_obj_y < 0) new_obj_y = 0;
-    if (new_obj_y > sh - obj_h) new_obj_y = sh - obj_h;
+    if(new_obj_y < 0) new_obj_y = 0;
+    if(new_obj_y > sh - obj_h) new_obj_y = sh - obj_h;
 
     lv_obj_set_width(needle_line, obj_w);
     lv_obj_set_height(needle_line, obj_h);
@@ -269,8 +269,8 @@ void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int
     lv_obj_set_y(needle_line, new_obj_y);
 
     // Update the line points (horizontal orientation)
-    lv_point_precise_t *pts = lv_line_get_points_mutable(needle_line);
-    if (!pts || lv_line_get_point_count(needle_line) < 2) {
+    lv_point_precise_t * pts = lv_line_get_points_mutable(needle_line);
+    if(!pts || lv_line_get_point_count(needle_line) < 2) {
         pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
         lv_line_set_points_mutable(needle_line, pts, 2);
         lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
@@ -283,27 +283,27 @@ void lv_scale_update_vertical_needle(lv_obj_t *scale, lv_obj_t *needle_line, int
     pts[1].y = line_y;
 }
 
-void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line, int32_t needle_length, int32_t value)
+void lv_scale_update_horizontal_needle(lv_obj_t * scale, lv_obj_t * needle_line, int32_t needle_length, int32_t value)
 {
     int32_t sw = lv_obj_get_width(scale);
     int32_t sh = lv_obj_get_height(scale);
-    if (sw <= 0 || sh <= 0) return;
+    if(sw <= 0 || sh <= 0) return;
 
-    lv_scale_t *s = (lv_scale_t *)scale;
+    lv_scale_t * s = (lv_scale_t *)scale;
     int32_t minv = s->range_min;
     int32_t maxv = s->range_max;
     int32_t range = maxv - minv;
-    if (range <= 0) return;
+    if(range <= 0) return;
 
     // Map value X pixel
     int32_t rel = (value <= minv) ? 0 : (value >= maxv ? range : value - minv);
     int32_t new_local_x = (rel * sw) / range;
-    if (new_local_x < 0) new_local_x = 0;
-    if (new_local_x > sw) new_local_x = sw;
+    if(new_local_x < 0) new_local_x = 0;
+    if(new_local_x > sw) new_local_x = sw;
 
     // Line width
     int32_t lw = lv_obj_get_style_line_width(needle_line, LV_PART_MAIN);
-    if (lw < 1) lw = 1;
+    if(lw < 1) lw = 1;
     int32_t half_w = lw / 2;
 
     // clamp height
@@ -313,22 +313,22 @@ void lv_scale_update_horizontal_needle(lv_obj_t *scale, lv_obj_t *needle_line, i
     int32_t obj_h = clamped_len;
     // move needle to new position
     int32_t new_obj_x = new_local_x - half_w;
-    if (new_obj_x < 0) new_obj_x = 0;
-    if (new_obj_x > sw - obj_w) new_obj_x = sw - obj_w;
+    if(new_obj_x < 0) new_obj_x = 0;
+    if(new_obj_x > sw - obj_w) new_obj_x = sw - obj_w;
 
     // Set position
     lv_obj_set_width(needle_line, obj_w);
     lv_obj_set_height(needle_line, obj_h);
     lv_obj_set_x(needle_line, new_obj_x);
 
-    if (s->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)
+    if(s->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)
         lv_obj_set_y(needle_line, 0);
     else
         lv_obj_set_y(needle_line, sh - obj_h);
 
     // Update the line points
-    lv_point_precise_t *pts = lv_line_get_points_mutable(needle_line);
-    if (!pts || lv_line_get_point_count(needle_line) < 2) {
+    lv_point_precise_t * pts = lv_line_get_points_mutable(needle_line);
+    if(!pts || lv_line_get_point_count(needle_line) < 2) {
         pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
         lv_line_set_points_mutable(needle_line, pts, 2);
         lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
@@ -346,19 +346,19 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    if ((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
+    if((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
         (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
         lv_scale_update_horizontal_needle(obj, needle_line, needle_length, value);
         return;
     }
 
-    if ((scale->mode == LV_SCALE_MODE_VERTICAL_LEFT) ||
+    if((scale->mode == LV_SCALE_MODE_VERTICAL_LEFT) ||
         (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT)) {
         lv_scale_update_vertical_needle(obj, needle_line, needle_length, value);
         return;
     }
 
-    if ((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
+    if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
         (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
         return;
     }
@@ -366,21 +366,18 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     /* Get scale size and center (local coords) */
     int32_t scale_w = lv_obj_get_style_width(obj, LV_PART_MAIN);
     int32_t scale_h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-    if (scale_w != scale_h) return;
+    if(scale_w != scale_h) return;
     int32_t cx = scale_w / 2;
     int32_t cy = scale_h / 2;
 
     /* Clamp needle length to [0, scale/2] */
     int32_t max_len = scale_w / 2;
     int32_t actual_len = needle_length;
-    if (actual_len >= max_len) 
-    {
+    if(actual_len >= max_len) {
         actual_len = max_len;
     }
-    else if (actual_len < 0) 
-    {
-        if (needle_length + max_len < 0) 
-        {
+    else if(actual_len < 0) {
+        if(needle_length + max_len < 0) {
             actual_len = 0;
         }
         else actual_len = max_len + needle_length;
@@ -389,17 +386,15 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     /* Compute angle for value (guard division-by-zero) */
     int32_t angle = 0;
     int32_t range_span = scale->range_max - scale->range_min;
-    if (range_span > 0) {
-        if (value <= scale->range_min) 
+    if(range_span > 0) {
+        if(value <= scale->range_min) 
         {
             angle = 0;
         }
-        else if (value >= scale->range_max)
-        {
+        else if(value >= scale->range_max) {
             angle = scale->angle_range;
         }
-        else 
-        {
+        else {
             angle = (int32_t)((int64_t)scale->angle_range * (value - scale->range_min) / range_span);
         }
     }
@@ -423,15 +418,15 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     int32_t maxy = LV_MAX(cy, ey) + PAD;
 
     /* Clamp to parent (personal preference) */
-    if (minx < 0) minx = 0;
-    if (miny < 0) miny = 0;
-    if (maxx > scale_w - 1) maxx = scale_w - 1;
-    if (maxy > scale_h - 1) maxy = scale_h - 1;
+    if(minx < 0) minx = 0;
+    if(miny < 0) miny = 0;
+    if(maxx > scale_w - 1) maxx = scale_w - 1;
+    if(maxy > scale_h - 1) maxy = scale_h - 1;
 
     int32_t box_w = maxx - minx + 1;
     int32_t box_h = maxy - miny + 1;
-    if (box_w <= 0) box_w = 2;
-    if (box_h <= 0) box_h = 2;
+    if(box_w <= 0) box_w = 2;
+    if(box_h <= 0) box_h = 2;
 
     /* Move/resize the needle_line object to the computed coordinates relative to the scale coordinates */
     lv_obj_set_pos(needle_line, minx, miny);
@@ -439,24 +434,25 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 
     /* Get or allocate mutable points buffer (2 points) */
     lv_point_precise_t * pts = NULL;
-    if (lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
+    if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
         pts = lv_line_get_points_mutable(needle_line);
-    } else {
+    } 
+    else {
         /* Look for previously attached buffer (iterate forwards or backwards depemding) */
         uint32_t ev_cnt = lv_obj_get_event_count(needle_line);
         for (int32_t i = (int32_t)ev_cnt - 1; i >= 0; i--) {
             lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, (uint32_t)i);
-            if (dsc && lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
+            if(dsc && lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
                 pts = (lv_point_precise_t *)lv_event_dsc_get_user_data(dsc);
                 break;
             }
         }
     }
 
-    if (pts == NULL) {
+    if(pts == NULL) {
         pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
         LV_ASSERT_MALLOC(pts);
-        if (pts == NULL) return;
+        if(pts == NULL) return;
         lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
         lv_line_set_points_mutable(needle_line, pts, 2);
     }
