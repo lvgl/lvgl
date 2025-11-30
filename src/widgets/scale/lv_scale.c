@@ -435,7 +435,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     lv_point_precise_t * pts = NULL;
     if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
         pts = lv_line_get_points_mutable(needle_line);
-    } 
+    }
     else {
         /* Look for previously attached buffer (iterate forwards or backwards depemding) */
         uint32_t ev_cnt = lv_obj_get_event_count(needle_line);
