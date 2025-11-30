@@ -347,19 +347,19 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     if((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
-      (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
+       (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
         lv_scale_update_horizontal_needle(obj, needle_line, needle_length, value);
         return;
     }
 
     if((scale->mode == LV_SCALE_MODE_VERTICAL_LEFT) ||
-      (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT)) {
+       (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT)) {
         lv_scale_update_vertical_needle(obj, needle_line, needle_length, value);
         return;
     }
 
     if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
-        (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
+       (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
         return;
     }
 
