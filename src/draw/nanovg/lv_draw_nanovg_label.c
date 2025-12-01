@@ -32,7 +32,7 @@ typedef struct {
     lv_draw_nanovg_unit_t * u;
 
     /* key */
-    const void * bitmap_p;
+    lv_font_glyph_dsc_t g_dsc;
 
     /* value */
     int image_handle;
@@ -218,17 +218,13 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
-    const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
-    if(!glyph_bitmap) {
-        LV_PROFILER_DRAW_END;
-        return -1;
-    }
 
     letter_item_t search_key = { 0 };
     search_key.u = u;
-    search_key.bitmap_p = glyph_bitmap;
+    search_key.g_dsc = *g_dsc;
+    search_key.g_dsc.entry = NULL; /* Exclude the cache entry from the key */
 
-    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->letter_cache, &search_key, g_dsc);
+    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->letter_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
         /* check if the cache is full */
         size_t free_size = lv_cache_get_free_size(u->letter_cache, NULL);
@@ -237,7 +233,7 @@ static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_gly
             lv_nanovg_end_frame(u);
         }
 
-        cache_node_entry = lv_cache_acquire_or_create(u->letter_cache, &search_key, g_dsc);
+        cache_node_entry = lv_cache_acquire_or_create(u->letter_cache, &search_key, NULL);
         if(cache_node_entry == NULL) {
             LV_LOG_ERROR("letter cache creating failed");
             LV_PROFILER_DRAW_END;
@@ -263,34 +259,30 @@ static void letter_cache_release_cb(void * entry, void * user_data)
 
 static bool letter_create_cb(letter_item_t * item, void * user_data)
 {
-    lv_font_glyph_dsc_t * g_dsc = user_data;
+    LV_PROFILER_DRAW_BEGIN;
+    LV_UNUSED(user_data);
+    lv_font_glyph_dsc_t * g_dsc = &item->g_dsc;
 
     const uint32_t w = g_dsc->box_w;
     const uint32_t h = g_dsc->box_h;
 
     lv_draw_buf_t * image_buf = lv_nanovg_reshape_global_image(item->u, LV_COLOR_FORMAT_A8, w, h);
     if(!image_buf) {
+        LV_PROFILER_DRAW_END;
         return false;
     }
 
-    lv_draw_buf_t src_buf;
-    if(lv_draw_buf_init(
-           &src_buf,
-           w, h,
-           LV_COLOR_FORMAT_A8,
-           g_dsc->stride,
-           (void *)item->bitmap_p,
-           g_dsc->stride * h) != LV_RESULT_OK) {
+    if(!lv_font_get_glyph_bitmap(g_dsc, image_buf)) {
+        LV_PROFILER_DRAW_END;
         return false;
     }
-
-    lv_draw_buf_copy(image_buf, NULL, &src_buf, NULL);
 
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageA8");
     item->image_handle = nvgCreateImageA8(item->u->vg, w, h, 0, lv_draw_buf_goto_xy(image_buf, 0, 0));
     LV_PROFILER_DRAW_END_TAG("nvgCreateImageA8");
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
+    LV_PROFILER_DRAW_END;
     return true;
 }
 
@@ -306,8 +298,9 @@ static void letter_free_cb(letter_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const letter_item_t * rhs)
 {
-    if(lhs->bitmap_p != rhs->bitmap_p) {
-        return lhs->bitmap_p > rhs->bitmap_p ? 1 : -1;
+    int cmp_res = lv_memcmp(&lhs->g_dsc, &rhs->g_dsc, sizeof(lv_font_glyph_dsc_t));
+    if(cmp_res != 0) {
+        return cmp_res > 0 ? 1 : -1;
     }
 
     return 0;
@@ -326,21 +319,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A3:
             case LV_FONT_GLYPH_FORMAT_A4:
             case LV_FONT_GLYPH_FORMAT_A8: {
-                    int image_handle = -1;
-                    const lv_color32_t color = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
-
-                    if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font)) {
-                        image_handle = letter_get_image_handle(u, glyph_draw_dsc->g);
-                    }
-                    else {
-                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
-                        if(!glyph_draw_dsc->glyph_data) {
-                            return;
-                        }
-
-                        image_handle = lv_nanovg_image_cache_get_handle_with_draw_buf(u, glyph_draw_dsc->glyph_data, color, 0);
-                    }
-
+                    int image_handle = letter_get_image_handle(u, glyph_draw_dsc->g);
                     if(image_handle < 0) {
                         return;
                     }
