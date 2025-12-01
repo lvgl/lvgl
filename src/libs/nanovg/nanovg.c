@@ -51,6 +51,11 @@
 
 #define NVG_COUNTOF(arr) (sizeof(arr) / sizeof(0[arr]))
 
+/**
+ * This value determines the maximum permissible pixel error when a Bézier curve is subdivided into line segments;
+ * a smaller value results in smoother lines but also more vertices.
+ */
+#define NVG_TESS_TOL_FACTOR 0.5f
 
 enum NVGcommands {
 	NVG_MOVETO = 0,
@@ -202,7 +207,7 @@ error:
 
 static void nvg__setDevicePixelRatio(NVGcontext* ctx, float ratio)
 {
-	ctx->tessTol = 0.25f / ratio;
+	ctx->tessTol = NVG_TESS_TOL_FACTOR / ratio;
 	ctx->distTol = 0.01f / ratio;
 	ctx->fringeWidth = 1.0f / ratio;
 	ctx->devicePxRatio = ratio;
