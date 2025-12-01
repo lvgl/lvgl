@@ -118,26 +118,9 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
         return -1;
     }
 
-    int image_handle = lv_nanovg_image_cache_get_handle_with_draw_buf(u, decoded, color, image_flags);
-
-    lv_image_decoder_close(&decoder_dsc);
-    LV_PROFILER_DRAW_END;
-    return image_handle;
-}
-
-int lv_nanovg_image_cache_get_handle_with_draw_buf(struct _lv_draw_nanovg_unit_t * u,
-                                                   const lv_draw_buf_t * src_buf,
-                                                   lv_color32_t color,
-                                                   int image_flags)
-{
-    LV_PROFILER_DRAW_BEGIN;
-
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(src_buf);
-
     image_item_t search_key = { 0 };
     search_key.u = u;
-    search_key.src_buf = *src_buf;
+    search_key.src_buf = *decoded;
     search_key.color = color;
     search_key.image_flags = image_flags;
 
@@ -157,6 +140,8 @@ int lv_nanovg_image_cache_get_handle_with_draw_buf(struct _lv_draw_nanovg_unit_t
             return -1;
         }
     }
+
+    lv_image_decoder_close(&decoder_dsc);
 
     /* Add the new entry to the pending list */
     lv_pending_add(u->image_pending, &cache_node_entry);

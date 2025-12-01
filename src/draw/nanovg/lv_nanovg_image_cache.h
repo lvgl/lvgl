@@ -59,19 +59,6 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      lv_color32_t color,
                                      int image_flags);
 
-/**
- * @brief Get the image handle from the cache, create a new one if not found
- * @param u pointer to the nanovg unit
- * @param src_buf the source image data
- * @param color the color to apply
- * @param image_flags the image flags
- * @return the image handle, or -1 on failure
- */
-int lv_nanovg_image_cache_get_handle_with_draw_buf(struct _lv_draw_nanovg_unit_t * u,
-                                                   const lv_draw_buf_t * src_buf,
-                                                   lv_color32_t color,
-                                                   int image_flags);
-
 /**********************
  *      MACROS
  **********************/
