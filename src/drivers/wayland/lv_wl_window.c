@@ -326,36 +326,8 @@ static void refr_start_event(lv_event_t * e)
     if(lv_wayland_xdg_is_resize_pending(window)) {
         lv_wayland_xdg_resize(window);
     }
-
-#if 0
-    if(window->resize_pending) {
-#if LV_WAYLAND_USE_DMABUF
-        /* Check surface configuration state before resizing */
-        if(!window->surface_configured) {
-            LV_LOG_TRACE("Deferring resize - surface not configured yet");
-            return;
-        }
-#endif
-        LV_LOG_TRACE("Processing resize: %dx%d -> %dx%d",
-                     lv_wayland_window_get_width(window), lv_wayland_window_get_height(window),
-                     window->resize_width, window->resize_height);
-
-        if(lv_wayland_window_resize(window, window->resize_width, window->resize_height) == LV_RESULT_OK) {
-            window->resize_pending = false;
-#if LV_WAYLAND_USE_DMABUF
-            /* Reset synchronization flags after successful resize */
-            window->surface_configured = false;
-            window->dmabuf_resize_pending = false;
-#endif
-            LV_LOG_TRACE("Window resize completed successfully: %dx%d", lv_wayland_window_get_width(window),
-                         lv_wayland_window_get_height(window));
-        }
-        else {
-            LV_LOG_ERROR("Failed to resize window frame: %d", window->frame_counter);
-        }
-    }
-#endif
 }
+
 static void refr_end_event(lv_event_t * e)
 {
     LV_UNUSED(e);
