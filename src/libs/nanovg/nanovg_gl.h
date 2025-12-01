@@ -248,7 +248,8 @@ struct GLNVGcontext {
 	int ntextures;
 	int ctextures;
 	int textureId;
-	GLuint vertBuf;
+	GLuint vertBuf[2];
+	int vertBufIndex;
 #if defined NANOVG_GL3
 	GLuint vertArr;
 #endif
@@ -757,7 +758,7 @@ static int glnvg__renderCreate(void* uptr)
 #if defined NANOVG_GL3
 	glGenVertexArrays(1, &gl->vertArr);
 #endif
-	glGenBuffers(1, &gl->vertBuf);
+	glGenBuffers(2, gl->vertBuf);
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
 	// Create UBOs
@@ -1299,7 +1300,8 @@ static void glnvg__renderFlush(void* uptr)
 #if defined NANOVG_GL3
 		glBindVertexArray(gl->vertArr);
 #endif
-		glBindBuffer(GL_ARRAY_BUFFER, gl->vertBuf);
+		gl->vertBufIndex = (gl->vertBufIndex + 1) % 2;
+		glBindBuffer(GL_ARRAY_BUFFER, gl->vertBuf[gl->vertBufIndex]);
 		glBufferData(GL_ARRAY_BUFFER, gl->nverts * sizeof(NVGvertex), gl->verts, GL_STREAM_DRAW);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
@@ -1629,8 +1631,8 @@ static void glnvg__renderDelete(void* uptr)
 	if (gl->vertArr != 0)
 		glDeleteVertexArrays(1, &gl->vertArr);
 #endif
-	if (gl->vertBuf != 0)
-		glDeleteBuffers(1, &gl->vertBuf);
+	if (gl->vertBuf[0] != 0)
+		glDeleteBuffers(2, gl->vertBuf);
 
 	for (i = 0; i < gl->ntextures; i++) {
 		if (gl->textures[i].tex != 0 && (gl->textures[i].flags & NVG_IMAGE_NODELETE) == 0)
