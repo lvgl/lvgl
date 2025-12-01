@@ -281,6 +281,8 @@ void lv_scale_update_vertical_needle(lv_obj_t * scale, lv_obj_t * needle_line, i
     pts[0].y = line_y;
     pts[1].x = obj_w;
     pts[1].y = line_y;
+
+    lv_line_set_points_mutable(needle_line, pts, 2);
 }
 
 void lv_scale_update_horizontal_needle(lv_obj_t * scale, lv_obj_t * needle_line, int32_t needle_length, int32_t value)
@@ -339,6 +341,8 @@ void lv_scale_update_horizontal_needle(lv_obj_t * scale, lv_obj_t * needle_line,
     pts[0].y = 0;
     pts[1].x = line_x;
     pts[1].y = obj_h;
+
+    lv_line_set_points_mutable(needle_line, pts, 2);
 }
 
 void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length, int32_t value)
@@ -466,6 +470,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     pts[0].y = rel_cy;
     pts[1].x = rel_ex;
     pts[1].y = rel_ey;
+
+    lv_line_set_points_mutable(needle_line, pts, 2);
 }
 
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
