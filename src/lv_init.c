@@ -42,6 +42,7 @@
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "others/translation/lv_translation.h"
 #include "xml/lv_xml.h"
+#include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
     #include "libs/svg/lv_svg_decoder.h"
@@ -484,6 +485,9 @@ void lv_deinit(void)
 #endif
 #endif
 
+#if LV_USE_WAYLAND
+    lv_wayland_deinit();
+#endif
 #if LV_USE_G2D
 #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
     lv_draw_g2d_deinit();

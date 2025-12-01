@@ -1896,35 +1896,11 @@ menu "LVGL configuration"
 		config LV_USE_WAYLAND
 			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
 			default n
-		config LV_WAYLAND_WINDOW_DECORATIONS
-			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
+
+		config LV_WAYLAND_DIRECT_EXIT
+			bool "Deinitialize LVGL and quit the application when the last wayland window closes"
+			default y
 			depends on LV_USE_WAYLAND
-			default n
-		config LV_WAYLAND_BUF_COUNT
-			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
-			depends on LV_USE_WAYLAND
-			default 1
-		choice
-			prompt "Wayland rendering mode"
-			depends on LV_USE_WAYLAND
-			default LV_WAYLAND_RENDER_MODE_PARTIAL
-
-			config LV_WAYLAND_RENDER_MODE_PARTIAL
-				bool "Use the buffer(s) to render the screen is smaller parts"
-				depends on !LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_DIRECT
-				bool "Only the changed areas will be updated with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_FULL
-				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-		endchoice
-
-		config LV_WAYLAND_USE_DMABUF
-			bool "Use DMA buffers for frame buffers"
-			depends on LV_USE_WAYLAND && LV_USE_G2D
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
