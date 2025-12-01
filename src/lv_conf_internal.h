@@ -1162,6 +1162,25 @@
         #define LV_USE_DRAW_NANOVG 0
     #endif
 #endif
+#if LV_USE_DRAW_NANOVG
+    /** Draw image texture cache count. */
+    #ifndef LV_NANOVG_IMAGE_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+            #define LV_NANOVG_IMAGE_CACHE_CNT CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+        #else
+            #define LV_NANOVG_IMAGE_CACHE_CNT 128
+        #endif
+    #endif
+
+    /** Draw letter texture cache count. */
+    #ifndef LV_NANOVG_LETTER_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+            #define LV_NANOVG_LETTER_CACHE_CNT CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+        #else
+            #define LV_NANOVG_LETTER_CACHE_CNT 512
+        #endif
+    #endif
+#endif
 
 /*=======================
  * FEATURE CONFIGURATION

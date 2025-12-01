@@ -14,6 +14,7 @@
 #include "../../display/lv_display.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
+#include "lv_nanovg_image_cache.h"
 
 #if defined(NANOVG_GL2_IMPLEMENTATION)
     #include <GL/glew.h>
@@ -95,6 +96,7 @@ void lv_draw_nanovg_init(void)
     nvgShapeAntiAlias(unit->vg, true);
 
     lv_nanovg_utils_init(unit);
+    lv_nanovg_image_cache_init(unit);
     lv_draw_nanovg_label_init(unit);
 }
 
@@ -152,7 +154,7 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             break;
 
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, true, -1);
+            lv_draw_nanovg_image(t, t->draw_dsc, &t->area, -1);
             break;
 
         case LV_DRAW_TASK_TYPE_LAYER:

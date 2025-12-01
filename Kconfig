@@ -568,6 +568,16 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_NANOVG && LV_USE_MATRIX
 
+		config LV_NANOVG_IMAGE_CACHE_CNT
+			int "Draw image texture cache count"
+			default 128
+			depends on LV_USE_DRAW_NANOVG
+
+		config LV_NANOVG_LETTER_CACHE_CNT
+			int "Draw letter cache count"
+			default 512
+			depends on LV_USE_DRAW_NANOVG
+
 	endmenu
 
 	menu "Feature Configuration"

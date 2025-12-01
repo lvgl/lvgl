@@ -411,6 +411,13 @@
  * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
  */
 #define LV_USE_DRAW_NANOVG 0
+#if LV_USE_DRAW_NANOVG
+    /** Draw image texture cache count. */
+    #define LV_NANOVG_IMAGE_CACHE_CNT 128
+
+    /** Draw letter texture cache count. */
+    #define LV_NANOVG_LETTER_CACHE_CNT 512
+#endif
 
 /*=======================
  * FEATURE CONFIGURATION
