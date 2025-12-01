@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_NANOVG
 
 #include "lv_nanovg_utils.h"
+#include "lv_nanovg_fbo_cache.h"
 #include "../lv_draw_image_private.h"
 
 /*********************
@@ -50,7 +51,7 @@ void lv_draw_nanovg_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         return;
     }
 
-    int image_handle = lv_nanovg_fb_get_image_handle(layer->user_data);
+    int image_handle = lv_nanovg_fb_get_image_handle(lv_nanovg_fbo_cache_entry_to_fb(layer->user_data));
     if(image_handle <= 0) {
         LV_LOG_WARN("Invalid image handle: %d", image_handle);
         LV_PROFILER_DRAW_END;
