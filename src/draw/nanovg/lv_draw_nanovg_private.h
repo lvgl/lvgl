@@ -49,6 +49,7 @@ extern "C" {
  **********************/
 
 struct _lv_pending_t;
+struct NVGLUframebuffer;
 
 typedef struct _lv_draw_nanovg_unit_t {
     lv_draw_unit_t base_unit;
@@ -62,6 +63,8 @@ typedef struct _lv_draw_nanovg_unit_t {
 
     lv_cache_t * letter_cache;
     struct _lv_pending_t * letter_pending;
+
+    lv_cache_t * fbo_cache;
 } lv_draw_nanovg_unit_t;
 
 /**********************
@@ -167,7 +170,11 @@ void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
  */
 void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
 
-struct NVGLUframebuffer;
+/**
+ * Get image handle from framebuffer
+ * @param fb the framebuffer to get the image handle from
+ * @return the image handle
+ */
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb);
 
 #if LV_USE_VECTOR_GRAPHIC

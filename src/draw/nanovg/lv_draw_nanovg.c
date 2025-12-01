@@ -15,6 +15,7 @@
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_image_cache.h"
+#include "lv_nanovg_fbo_cache.h"
 
 #if defined(NANOVG_GL2_IMPLEMENTATION)
     #include <GL/glew.h>
@@ -97,6 +98,7 @@ void lv_draw_nanovg_init(void)
 
     lv_nanovg_utils_init(unit);
     lv_nanovg_image_cache_init(unit);
+    lv_nanovg_fbo_cache_init(unit);
     lv_draw_nanovg_label_init(unit);
 }
 
@@ -192,18 +194,22 @@ static void on_layer_changed(lv_layer_t * new_layer)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    NVGLUframebuffer * fb = new_layer->user_data;
+    if(!new_layer->user_data) {
+        /* Bind the default framebuffer */
+        nvgluBindFramebuffer(NULL);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     LV_PROFILER_BEGIN_TAG("nvgBindFramebuffer");
-    nvgluBindFramebuffer(fb);
+    nvgluBindFramebuffer(lv_nanovg_fbo_cache_entry_to_fb(new_layer->user_data));
     LV_PROFILER_END_TAG("nvgBindFramebuffer");
 
     /* Clear the off-screen framebuffer */
-    if(fb) {
-        LV_PROFILER_DRAW_BEGIN_TAG("glClear");
-        glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        LV_PROFILER_DRAW_END_TAG("glClear");
-    }
+    LV_PROFILER_DRAW_BEGIN_TAG("glClear");
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    LV_PROFILER_DRAW_END_TAG("glClear");
 
     LV_PROFILER_DRAW_END;
 }
@@ -285,6 +291,8 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_nanovg_unit_t * unit = (lv_draw_nanovg_unit_t *)draw_unit;
     lv_draw_nanovg_label_deinit(unit);
+    lv_nanovg_fbo_cache_deinit(unit);
+    lv_nanovg_image_cache_deinit(unit);
     lv_nanovg_utils_deinit(unit);
     NVG_CTX_DELETE(unit->vg);
     unit->vg = NULL;
@@ -304,27 +312,15 @@ static void draw_event_cb(lv_event_t * e)
             lv_nanovg_clean_up(u);
             break;
         case LV_EVENT_CHILD_CREATED: {
-                LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateFramebuffer");
-                NVGLUframebuffer * fb = nvgluCreateFramebuffer(u->vg,
-                                                               lv_area_get_width(&layer->buf_area),
-                                                               lv_area_get_height(&layer->buf_area),
-                                                               0);
-                LV_PROFILER_DRAW_END_TAG("nvgCreateFramebuffer");
-
-                if(!fb) {
-                    LV_LOG_ERROR("Failed to create framebuffer");
-                    return;
-                }
-
-                layer->user_data = fb;
+                lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
+                                                                   lv_area_get_height(&layer->buf_area), 0);
+                layer->user_data = entry;
             }
             break;
         case LV_EVENT_CHILD_DELETED: {
-                NVGLUframebuffer * fb = layer->user_data;
-                if(fb) {
-                    LV_PROFILER_DRAW_BEGIN_TAG("nvgDeleteFramebuffer");
-                    nvgluDeleteFramebuffer(fb);
-                    LV_PROFILER_DRAW_END_TAG("nvgDeleteFramebuffer");
+                lv_cache_entry_t * entry = layer->user_data;
+                if(entry) {
+                    lv_nanovg_fbo_cache_release(u, entry);
                     layer->user_data = NULL;
                 }
             }
