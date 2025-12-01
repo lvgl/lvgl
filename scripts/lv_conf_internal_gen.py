@@ -278,7 +278,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #ifndef LV_USE_EGL
-	#define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+    #define LV_USE_EGL LV_LINUX_DRM_USE_EGL
 #endif /* LV_USE_EGL */
 
 #if LV_USE_OS
@@ -308,3 +308,5 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 fin.close()
 fout.close()
+
+check_for_tabs(LV_CONF_INTERNAL)
