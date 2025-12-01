@@ -547,6 +547,13 @@ static int glnvg__renderCreate(void* uptr)
 	"\n";
 
 	static const char* fillVertShader =
+		"#ifdef GL_ES\n"
+		"#if defined(NANOVG_GL3)\n"
+		" precision highp float;\n"
+		"#else\n"
+		" precision mediump float;\n"
+		"#endif\n"
+		"#endif\n"
 		"#ifdef NANOVG_GL3\n"
 		"	uniform vec2 viewSize;\n"
 		"	in vec2 vertex;\n"
@@ -605,7 +612,7 @@ static int glnvg__renderCreate(void* uptr)
 
 	static const char* fillFragShader =
 		"#ifdef GL_ES\n"
-		"#if defined(GL_FRAGMENT_PRECISION_HIGH) || defined(NANOVG_GL3)\n"
+		"#if defined(NANOVG_GL3)\n"
 		" precision highp float;\n"
 		"#else\n"
 		" precision mediump float;\n"
@@ -687,7 +694,7 @@ static int glnvg__renderCreate(void* uptr)
 		"	#endif\n"
 		"#ifdef EDGE_AA\n"
 		"	float strokeAlpha = strokeMask();\n"
-		"	if (strokeAlpha < strokeThr) discard;\n"
+		"	// if (strokeAlpha < strokeThr) discard;\n"
 		"#else\n"
 		"	float strokeAlpha = 1.0;\n"
 		"#endif\n"
@@ -708,7 +715,7 @@ static int glnvg__renderCreate(void* uptr)
 		"		vec4 color = texture2D(tex, pt);\n"
 		"#endif\n"
 		"		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
-		"		if (texType == 2) color = vec4(color.x);"
+		"		else if (texType == 2) color = vec4(color.x);"
 		"		// Apply color tint and alpha.\n"
 		"		color *= innerCol;\n"
 		"		// Combine alpha\n"
