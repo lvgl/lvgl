@@ -557,6 +557,7 @@ redirects = {
     "details/main-modules/indev":                    "../../main-modules/indev/index.html"                  ,
     "details/widgets/index":                         "../../widgets/index.html"                             ,
     "details/xml/editor/index":                      "../../../xml/editor/index.html"                       ,
+    "details/xml/index":                             "../../xml/index.html"                                 ,
     "details/xml/tools/cli":                         "../../../xml/tools/cli.html"                          ,
     "details/xml/tools/figma":                       "../../../xml/tools/figma.html"                        ,
     "details/xml/xml/index":                         "../../../xml/xml/index.html"                          ,
