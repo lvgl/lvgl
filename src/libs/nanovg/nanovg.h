@@ -381,6 +381,10 @@ int nvgCreateImageMem(NVGcontext* ctx, int imageFlags, unsigned char* data, int 
 // Returns handle to the image.
 int nvgCreateImageRGBA(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
 
+// Creates image from specified image data.
+// Returns handle to the image.
+int nvgCreateImageA8(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
+
 // Updates image data specified by image handle.
 void nvgUpdateImage(NVGcontext* ctx, int image, const unsigned char* data);
 

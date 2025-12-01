@@ -33,7 +33,6 @@ typedef struct {
 
     /* key */
     const void * bitmap_p;
-    lv_color32_t color;
 
     /* value */
     int image_handle;
@@ -203,10 +202,10 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         float h = lv_area_get_height(dsc->letter_coords);
 
         NVGpaint paint = nvgImagePattern(u->vg, x, y, w, h, 0, image_handle, 1.0f);
+        paint.innerColor = paint.outerColor = nvgRGBA(dsc->color.red, dsc->color.green, dsc->color.blue, dsc->opa);
 
         nvgBeginPath(u->vg);
         nvgRect(u->vg, x, y, w, h);
-        nvgFillColor(u->vg, nvgRGBA(0, 0, 0, 0));
         nvgFillPaint(u->vg, paint);
         nvgFill(u->vg);
     }
@@ -216,7 +215,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
     LV_PROFILER_DRAW_END;
 }
 
-static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_glyph_dsc_t * g_dsc, lv_color32_t color)
+static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_PROFILER_DRAW_BEGIN;
     const void * glyph_bitmap = lv_font_get_glyph_static_bitmap(g_dsc);
@@ -228,7 +227,6 @@ static inline int letter_get_image_handle(lv_draw_nanovg_unit_t * u, lv_font_gly
     letter_item_t search_key = { 0 };
     search_key.u = u;
     search_key.bitmap_p = glyph_bitmap;
-    search_key.color = color;
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->letter_cache, &search_key, g_dsc);
     if(cache_node_entry == NULL) {
@@ -270,7 +268,7 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
     const uint32_t w = g_dsc->box_w;
     const uint32_t h = g_dsc->box_h;
 
-    lv_draw_buf_t * image_buf = lv_nanovg_reshape_global_image(item->u, LV_COLOR_FORMAT_ARGB8888, w, h);
+    lv_draw_buf_t * image_buf = lv_nanovg_reshape_global_image(item->u, LV_COLOR_FORMAT_A8, w, h);
     if(!image_buf) {
         return false;
     }
@@ -286,13 +284,11 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    if(!lv_nanovg_buf_convert(image_buf, &src_buf, item->color)) {
-        return false;
-    }
+    lv_draw_buf_copy(image_buf, NULL, &src_buf, NULL);
 
-    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
-    item->image_handle = nvgCreateImageRGBA(item->u->vg, w, h, 0, lv_draw_buf_goto_xy(image_buf, 0, 0));
-    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageA8");
+    item->image_handle = nvgCreateImageA8(item->u->vg, w, h, 0, lv_draw_buf_goto_xy(image_buf, 0, 0));
+    LV_PROFILER_DRAW_END_TAG("nvgCreateImageA8");
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     return true;
@@ -312,13 +308,6 @@ static lv_cache_compare_res_t letter_compare_cb(const letter_item_t * lhs, const
 {
     if(lhs->bitmap_p != rhs->bitmap_p) {
         return lhs->bitmap_p > rhs->bitmap_p ? 1 : -1;
-    }
-
-    uint32_t lhs_color = *(uint32_t *)&lhs->color;
-    uint32_t rhs_color = *(uint32_t *)&rhs->color;
-
-    if(lhs_color != rhs_color) {
-        return lhs_color > rhs_color ? 1 : -1;
     }
 
     return 0;
@@ -341,7 +330,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     const lv_color32_t color = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
 
                     if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font)) {
-                        image_handle = letter_get_image_handle(u, glyph_draw_dsc->g, color);
+                        image_handle = letter_get_image_handle(u, glyph_draw_dsc->g);
                     }
                     else {
                         glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
