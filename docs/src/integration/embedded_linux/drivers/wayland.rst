@@ -188,7 +188,8 @@ To remove the physical display assignment and return to default behavior, use
     lv_wayland_unassign_physical_display(disp);
 
 
-Building the wayland driver
+
+Building the Wayland Driver
 ***************************
 
 The `reference project <https://github.com/lvgl/lv_port_linux/>`__  uses CMakeLists to generate the necessary dependencies at build time.
