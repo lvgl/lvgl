@@ -350,31 +350,6 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    /* Get or allocate mutable points buffer (2 points) */
-    lv_point_precise_t * pts = NULL;
-    if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
-        pts = lv_line_get_points_mutable(needle_line);
-    }
-    else {
-        /* Look for previously attached buffer (iterate forwards or backwards depemding) */
-        uint32_t ev_cnt = lv_obj_get_event_count(needle_line);
-        for(int32_t i = (int32_t)ev_cnt - 1; i >= 0; i--) {
-            lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, (uint32_t)i);
-            if(dsc && lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
-                pts = (lv_point_precise_t *)lv_event_dsc_get_user_data(dsc);
-                break;
-            }
-        }
-    }
-
-    if(pts == NULL) {
-        pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
-        LV_ASSERT_MALLOC(pts);
-        if(pts == NULL) return;
-        lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
-        lv_line_set_points_mutable(needle_line, pts, 2);
-    }
-
     if((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
        (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM)) {
         lv_scale_update_horizontal_needle(obj, needle_line, needle_length, value);
@@ -459,6 +434,31 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     /* Move/resize the needle_line object to the computed coordinates relative to the scale coordinates */
     lv_obj_set_pos(needle_line, minx, miny);
     lv_obj_set_size(needle_line, box_w, box_h);
+
+    /* Get or allocate mutable points buffer (2 points) */
+    lv_point_precise_t * pts = NULL;
+    if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
+        pts = lv_line_get_points_mutable(needle_line);
+    }
+    else {
+        /* Look for previously attached buffer (iterate forwards or backwards depemding) */
+        uint32_t ev_cnt = lv_obj_get_event_count(needle_line);
+        for(int32_t i = (int32_t)ev_cnt - 1; i >= 0; i--) {
+            lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, (uint32_t)i);
+            if(dsc && lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
+                pts = (lv_point_precise_t *)lv_event_dsc_get_user_data(dsc);
+                break;
+            }
+        }
+    }
+
+    if(pts == NULL) {
+        pts = lv_malloc(sizeof(lv_point_precise_t) * 2);
+        LV_ASSERT_MALLOC(pts);
+        if(pts == NULL) return;
+        lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, pts);
+        lv_line_set_points_mutable(needle_line, pts, 2);
+    }
 
     /* Convert center and endpoint to coordinates *relative to the AABB origin* */
     int32_t rel_cx = cx - minx;
