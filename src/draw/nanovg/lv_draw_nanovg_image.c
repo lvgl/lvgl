@@ -13,6 +13,7 @@
 
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_math.h"
+#include "lv_nanovg_image_cache.h"
 #include "../lv_image_decoder_private.h"
 #include "../lv_draw_image_private.h"
 
@@ -51,7 +52,7 @@ static void fill_repeat_tile_image(
 *   GLOBAL FUNCTIONS
 **********************/
 
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache,
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
                           int image_handle)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -87,13 +88,7 @@ void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, c
             }
         }
 
-        const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, dsc->src, no_cache, false);
-
-        if(!src_buf) {
-            LV_PROFILER_DRAW_END;
-            return;
-        }
-        image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(dsc->recolor, dsc->opa), image_flags);
+        image_handle = lv_nanovg_image_cache_get_handle(u, dsc->src, lv_color_to_32(dsc->recolor, dsc->opa), image_flags);
     }
 
     if(image_handle < 0) {

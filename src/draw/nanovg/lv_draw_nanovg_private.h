@@ -56,8 +56,9 @@ typedef struct _lv_draw_nanovg_unit_t {
     NVGcontext * vg;
     bool is_started;
     lv_draw_buf_t * image_buf;
-    struct _lv_pending_t * image_handle_pending;
-    struct _lv_pending_t * image_dsc_pending;
+
+    lv_cache_t * image_cache;
+    struct _lv_pending_t * image_pending;
 
     lv_cache_t * letter_cache;
     struct _lv_pending_t * letter_pending;
@@ -104,10 +105,9 @@ void lv_draw_nanovg_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
  * @param t pointer to a drawing task
  * @param dsc pointer to an image descriptor
  * @param coords the coordinates of the image
- * @param no_cache true: draw the image directly without caching
  * @param image_handle the handle of the image to draw
  */
-void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords, bool no_cache,
+void lv_draw_nanovg_image(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords,
                           int image_handle);
 
 /**

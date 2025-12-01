@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_NANOVG && LV_USE_VECTOR_GRAPHIC
 
 #include "lv_nanovg_utils.h"
+#include "lv_nanovg_image_cache.h"
 #include "../lv_draw_vector_private.h"
 #include "../lv_image_decoder_private.h"
 #include <float.h>
@@ -96,14 +97,8 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
             break;
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
                 const lv_draw_image_dsc_t * img_dsc = &fill_dsc->img_dsc;
-                const lv_draw_buf_t * src_buf = lv_nanovg_open_image_buffer(u, img_dsc->src, false, false);
-
-                if(!src_buf) {
-                    LV_PROFILER_DRAW_END;
-                    return;
-                }
-
-                int image_handle = lv_nanovg_push_image(u, src_buf, lv_color_to_32(img_dsc->recolor, img_dsc->recolor_opa), 0);
+                int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, lv_color_to_32(img_dsc->recolor,
+                                                                                                    img_dsc->recolor_opa), 0);
                 if(image_handle < 0) {
                     LV_PROFILER_DRAW_END;
                     return;
@@ -117,7 +112,13 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
                     offset_y = offset->y;
                 }
 
-                NVGpaint paint = nvgImagePattern(u->vg, offset_x, offset_y, src_buf->header.w, src_buf->header.h, 0, image_handle,
+                lv_image_header_t header;
+                if(lv_image_decoder_get_info(img_dsc->src, &header) != LV_RESULT_OK) {
+                    LV_PROFILER_DRAW_END;
+                    return;
+                }
+
+                NVGpaint paint = nvgImagePattern(u->vg, offset_x, offset_y, header.w, header.h, 0, image_handle,
                                                  img_dsc->opa / (float)LV_OPA_COVER);
 
                 nvgFillPaint(u->vg, paint);

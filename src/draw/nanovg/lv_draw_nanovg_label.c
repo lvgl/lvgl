@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_NANOVG
 
 #include "lv_nanovg_utils.h"
+#include "lv_nanovg_image_cache.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
@@ -21,8 +22,6 @@
 /*********************
 *      DEFINES
 *********************/
-
-#define LETTER_CACHE_CNT 512
 
 /**********************
 *      TYPEDEFS
@@ -76,7 +75,7 @@ void lv_draw_nanovg_label_init(lv_draw_nanovg_unit_t * u)
         .free_cb = (lv_cache_free_cb_t)letter_free_cb,
     };
 
-    u->letter_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(letter_item_t), LETTER_CACHE_CNT, ops);
+    u->letter_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(letter_item_t), LV_NANOVG_LETTER_CACHE_CNT, ops);
     lv_cache_set_name(u->letter_cache, "NVG_LETTER");
     u->letter_pending = lv_pending_create(sizeof(lv_cache_entry_t *), 4);
     lv_pending_set_free_cb(u->letter_pending, letter_cache_release_cb, u->letter_cache);
@@ -350,7 +349,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                             return;
                         }
 
-                        image_handle = lv_nanovg_push_image(u, glyph_draw_dsc->glyph_data, color, 0);
+                        image_handle = lv_nanovg_image_cache_get_handle_with_draw_buf(u, glyph_draw_dsc->glyph_data, color, 0);
                     }
 
                     if(image_handle < 0) {
@@ -385,7 +384,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
                     image_dsc.rotation = glyph_draw_dsc->rotation;
-                    lv_draw_nanovg_image(t, &image_dsc, glyph_draw_dsc->letter_coords, false, -1);
+                    lv_draw_nanovg_image(t, &image_dsc, glyph_draw_dsc->letter_coords, -1);
                 }
                 break;
 

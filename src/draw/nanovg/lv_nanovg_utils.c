@@ -11,7 +11,6 @@
 
 #if LV_USE_DRAW_NANOVG
 
-#include "../lv_image_decoder_private.h"
 #include "../../misc/lv_pending.h"
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_math.h"
@@ -42,9 +41,6 @@ typedef struct {
 *  STATIC PROTOTYPES
 **********************/
 
-static void image_handle_free_cb(void * entry, void * user_data);
-static void image_dsc_free_cb(void * dsc, void * user_data);
-
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -60,24 +56,11 @@ static void image_dsc_free_cb(void * dsc, void * user_data);
 void lv_nanovg_utils_init(struct _lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT(u->image_handle_pending == NULL);
-
-    u->image_handle_pending = lv_pending_create(sizeof(int), 8);
-    lv_pending_set_free_cb(u->image_handle_pending, image_handle_free_cb, u->vg);
-
-    u->image_dsc_pending = lv_pending_create(sizeof(lv_image_decoder_dsc_t), 8);
-    lv_pending_set_free_cb(u->image_dsc_pending, image_dsc_free_cb, NULL);
 }
 
 void lv_nanovg_utils_deinit(struct _lv_draw_nanovg_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(u->image_handle_pending)
-    lv_pending_destroy(u->image_handle_pending);
-    u->image_handle_pending = NULL;
-
-    LV_ASSERT_NULL(u->image_dsc_pending)
-    lv_pending_destroy(u->image_dsc_pending);
 
     if(u->image_buf) {
         lv_draw_buf_destroy(u->image_buf);
@@ -284,27 +267,11 @@ void lv_nanovg_clean_up(struct _lv_draw_nanovg_unit_t * u)
     LV_ASSERT_NULL(u);
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_pending_remove_all(u->image_handle_pending);
-    lv_pending_remove_all(u->image_dsc_pending);
+    lv_pending_remove_all(u->image_pending);
     lv_pending_remove_all(u->letter_pending);
     u->is_started = false;
 
     LV_PROFILER_DRAW_END;
-}
-
-static void image_handle_free_cb(void * entry, void * user_data)
-{
-    LV_PROFILER_DRAW_BEGIN;
-    NVGcontext * ctx = user_data;
-    int image_handle = *(int *)entry;
-    nvgDeleteImage(ctx, image_handle);
-    LV_PROFILER_DRAW_END;
-}
-
-static void image_dsc_free_cb(void * dsc, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lv_image_decoder_close(dsc);
 }
 
 static void convert_a8_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
@@ -411,62 +378,6 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
     u->image_buf = tmp_buf;
 
     return u->image_buf;
-}
-
-const lv_draw_buf_t * lv_nanovg_open_image_buffer(struct _lv_draw_nanovg_unit_t * u, const void * src,
-                                                  bool no_cache, bool premultiply)
-{
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(src);
-
-    lv_image_decoder_args_t args;
-    lv_memzero(&args, sizeof(lv_image_decoder_args_t));
-    args.premultiply = premultiply;
-    args.no_cache = no_cache;
-
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, src, &args);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to open image");
-        return NULL;
-    }
-
-    const lv_draw_buf_t * decoded = decoder_dsc.decoded;
-    if(decoded == NULL || decoded->data == NULL) {
-        lv_image_decoder_close(&decoder_dsc);
-        LV_LOG_ERROR("image data is NULL");
-        return NULL;
-    }
-
-    lv_pending_add(u->image_dsc_pending, &decoder_dsc);
-
-    return decoded;
-}
-
-int lv_nanovg_push_image(struct _lv_draw_nanovg_unit_t * u, const lv_draw_buf_t * src_buf, lv_color32_t color,
-                         int image_flags)
-{
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(src_buf);
-
-    const uint32_t w = src_buf->header.w;
-    const uint32_t h = src_buf->header.h;
-
-    if(!lv_nanovg_reshape_global_image(u, LV_COLOR_FORMAT_ARGB8888, w, h)) {
-        return -1;
-    }
-
-    if(!lv_nanovg_buf_convert(u->image_buf, src_buf, color)) {
-        return -1;
-    }
-
-    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
-    int image_handle = nvgCreateImageRGBA(u->vg, w, h, image_flags, lv_draw_buf_goto_xy(u->image_buf, 0, 0));
-    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
-
-    lv_pending_add(u->image_handle_pending, &image_handle);
-
-    return image_handle;
 }
 
 /**********************
