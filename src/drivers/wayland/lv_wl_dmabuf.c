@@ -54,6 +54,7 @@ static void dmabuf_format(void * data, struct zwp_linux_dmabuf_v1 * zwp_linux_dm
 static struct buffer * lv_wayland_dmabuf_create_draw_buffers_internal(struct window * window, int width, int height);
 static void buffer_free(struct buffer * buf);
 static void dmabuf_wait_swap_buf(lv_display_t * disp);
+static lv_result_t destroy_draw_buffers(struct buffer * buffers);
 
 #if !LV_USE_ROTATE_G2D
     static struct buffer * dmabuf_acquire_buffer(dmabuf_ctx_t * context, unsigned char * color_p);
@@ -254,6 +255,17 @@ static void buffer_release(void * data, struct wl_buffer * buffer)
     LV_UNUSED(buffer);
     struct buffer * buf = data;
     buf->busy           = 0;
+
+    dmabuf_ctx_t * ctx = &lv_wl_ctx.dmabuf_ctx;
+    if(!ctx->buffers_to_delete) {
+        return;
+    }
+
+    LV_LOG_TRACE("Buffer release");
+    if(destroy_draw_buffers(ctx->buffers_to_delete) == LV_RESULT_OK) {
+        LV_LOG_TRACE("Buffer released, deleted buffers");
+        ctx->buffers_to_delete = NULL;
+    }
 }
 
 static const struct wl_buffer_listener buffer_listener = {.release = buffer_release};
@@ -291,16 +303,11 @@ lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct windo
         return LV_RESULT_INVALID;
     }
 
-    lv_wayland_dmabuf_destroy_draw_buffers(context, window);
-
     struct buffer * buffers = lv_wayland_dmabuf_create_draw_buffers_internal(window, width, height);
     if(!buffers) {
         LV_LOG_ERROR("Failed to create DMABUF buffers for %dx%d", width, height);
         return LV_RESULT_INVALID;
     }
-
-    context->buffers = buffers;
-    lv_wayland_dmabuf_set_draw_buffers(context, window->lv_disp);
 
     /* Clear DMABUF resize pending flag and acknowledge XDG configure if needed */
     window->dmabuf_resize_pending = false;
@@ -314,6 +321,11 @@ lv_result_t lv_wayland_dmabuf_resize_window(dmabuf_ctx_t * context, struct windo
         LV_LOG_TRACE("XDG configure already acknowledged, skipping duplicate acknowledgment");
         window->configure_serial = 0;  /* Reset the serial */
     }
+
+    lv_wayland_dmabuf_destroy_draw_buffers(context, window);
+    context->buffers = buffers;
+
+    lv_wayland_dmabuf_set_draw_buffers(context, window->lv_disp);
 
     LV_LOG_TRACE("DMABUF resize completed successfully: %dx%d", width, height);
     return LV_RESULT_OK;
@@ -336,10 +348,13 @@ void lv_wayland_dmabuf_destroy_draw_buffers(dmabuf_ctx_t * context, struct windo
     if(context->buffers == NULL) {
         return;
     }
-    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
-        buffer_free(&context->buffers[i]);
+
+    if(destroy_draw_buffers(context->buffers) == LV_RESULT_INVALID) {
+        /* Couldn't delete the draw buffers as they might be still busy
+         * Defer deletion to when they are released*/
+        context->buffers_to_delete = context->buffers;
     }
-    free(context->buffers);
+
     context->buffers = NULL;
 }
 
@@ -685,5 +700,21 @@ struct buffer * dmabuf_acquire_pool_buffer(struct window * window, struct graphi
     return window->decorators_buf[id];
 }
 #endif
+
+static lv_result_t destroy_draw_buffers(struct buffer * buffers)
+{
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        if(buffers[i].busy) {
+            LV_LOG_TRACE("Skipping draw buffers destruction as there are still busy buffers");
+            return LV_RESULT_INVALID;
+        }
+    }
+
+    for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
+        buffer_free(&buffers[i]);
+    }
+    free(buffers);
+    return LV_RESULT_OK;
+}
 
 #endif /* LV_WAYLAND_DMABUF */
