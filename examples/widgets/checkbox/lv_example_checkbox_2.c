@@ -6,8 +6,13 @@ static lv_style_t style_radio_chk;
 
 static void event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
-    LV_LOG_USER("%s is selected.", lv_checkbox_get_text(obj));
+    lv_obj_t * obj = lv_event_get_target_obj(e);
+    if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+        LV_LOG_USER("%s is selected.", lv_checkbox_get_text(obj));
+    }
+    else {
+        LV_LOG_USER("%s is de-selected.", lv_checkbox_get_text(obj));
+    }
 }
 
 /**
