@@ -158,7 +158,7 @@ void test_obj_flag_radio_button(void)
         lv_obj_set_y(cb[i], i * 50);
         lv_obj_add_flag(cb[i], LV_OBJ_FLAG_RADIO_BUTTON);
         lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_VALUE_CHANGED, &called[i]);
-        called[0] = 0;
+        called[i] = 0;
     }
 
     /*Click the first checkbox*/
