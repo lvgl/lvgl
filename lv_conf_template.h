@@ -322,6 +322,9 @@
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
 
+    /** VG-Lite unaligned bitmap font maximum cache number. */
+    #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
+
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
 

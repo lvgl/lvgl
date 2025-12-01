@@ -487,6 +487,11 @@ menu "LVGL configuration"
 			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+			int "VG-Lite unaligned bitmap font maximum cache number."
+			default 256
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
 			bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
 			default n

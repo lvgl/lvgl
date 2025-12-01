@@ -913,6 +913,15 @@
         #endif
     #endif
 
+    /** VG-Lite unaligned bitmap font maximum cache number. */
+    #ifndef LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+        #ifdef CONFIG_LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+            #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT CONFIG_LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+        #else
+            #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
+        #endif
+    #endif
+
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #ifndef LV_VG_LITE_DISABLE_VLC_OP_CLOSE
         #ifdef CONFIG_LV_VG_LITE_DISABLE_VLC_OP_CLOSE
