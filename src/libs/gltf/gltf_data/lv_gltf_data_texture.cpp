@@ -37,7 +37,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gltf_data_destroy_textures(lv_gltf_model_t * data)
+void lv_gltf_data_delete_textures(lv_gltf_model_t * data)
 {
     glDeleteTextures(data->skin_tex.size(), data->skin_tex.data());
     data->skin_tex.clear();
