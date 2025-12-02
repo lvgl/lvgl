@@ -14,6 +14,7 @@
     extern const lv_property_name_t lv_arc_property_names[11];
     extern const lv_property_name_t lv_bar_property_names[6];
     extern const lv_property_name_t lv_buttonmatrix_property_names[2];
+    extern const lv_property_name_t lv_chart_property_names[5];
     extern const lv_property_name_t lv_checkbox_property_names[1];
     extern const lv_property_name_t lv_dropdown_property_names[9];
     extern const lv_property_name_t lv_image_property_names[11];
