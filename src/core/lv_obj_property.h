@@ -105,6 +105,7 @@ enum _lv_prop_id_range_boundary_t {
     LV_PROPERTY_SLIDER_START    = 0x0800, /* lv_slider.c */
     LV_PROPERTY_ANIMIMAGE_START = 0x0900, /* lv_animimage.c */
     LV_PROPERTY_ARC_START       = 0x0a00, /* lv_arc.c */
+    LV_PROPERTY_BAR_START       = 0x0b00, /* lv_bar.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
