@@ -36,6 +36,14 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_led_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_led_id_t {
+    LV_PROPERTY_ID(LED, COLOR,      LV_PROPERTY_TYPE_COLOR, 0),
+    LV_PROPERTY_ID(LED, BRIGHTNESS, LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_LED_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
