@@ -142,6 +142,10 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
     indev->key_remap_cb         = NULL;
+#if LV_USE_EXT_DATA
+    indev->ext_data.free_cb = NULL;
+    indev->ext_data.data = NULL;
+#endif
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -163,6 +167,14 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
+
+#if LV_USE_EXT_DATA
+    if(indev->ext_data.free_cb) {
+        indev->ext_data.free_cb(indev->ext_data.data);
+        indev->ext_data.data = NULL;
+    }
+#endif
+
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -684,6 +696,19 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
 
     indev->key_remap_cb = remap_cb;
 }
+
+#if LV_USE_EXT_DATA
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't attach external user data and free_cb callback to a NULL indev");
+        return;
+    }
+
+    indev->ext_data.data = data;
+    indev->ext_data.free_cb = free_cb;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

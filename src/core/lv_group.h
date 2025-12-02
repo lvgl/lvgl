@@ -237,6 +237,22 @@ uint32_t lv_group_get_count(void);
  */
 lv_group_t  * lv_group_by_index(uint32_t index);
 
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to a group
+ *
+ * Associates custom user data with an LVGL group and specifies a destructor function
+ * that will be automatically invoked when the group is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param group      Pointer to a group
+ * @param data       User-defined data pointer to associate with a group
+ * @param free_cb    Callback function for cleaning up ext_data when group is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb)(void * data));
+#endif
+
 /**********************
  *      MACROS
  **********************/

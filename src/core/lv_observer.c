@@ -91,6 +91,19 @@ static void subject_set_string_free_user_data_event_cb(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_EXT_DATA
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data))
+{
+    if(!subject) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL subject");
+        return;
+    }
+
+    subject->ext_data.data = data;
+    subject->ext_data.free_cb = free_cb;
+}
+#endif
+
 void lv_subject_init_int(lv_subject_t * subject, int32_t value)
 {
     lv_memzero(subject, sizeof(lv_subject_t));
@@ -497,6 +510,13 @@ void lv_observer_remove(lv_observer_t * observer)
     }
 
     observer->subject->notify_restart_query = 1;
+
+#if LV_USE_EXT_DATA
+    if(observer->subject->ext_data.free_cb) {
+        observer->subject->ext_data.free_cb(observer->subject->ext_data.data);
+        observer->subject->ext_data.data = NULL;
+    }
+#endif
 
     lv_ll_remove(&(observer->subject->subs_ll), observer);
 
