@@ -123,6 +123,7 @@ extern "C" {
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 #include "src/libs/svg/lv_svg.h"
 #include "src/libs/svg/lv_svg_render.h"
+#include "src/libs/romfs/romfs.h"
 
 #include "src/layouts/lv_layout.h"
 
