@@ -112,6 +112,7 @@ enum _lv_prop_id_range_boundary_t {
     LV_PROPERTY_LINE_START      = 0x0f00, /* lv_line.c */
     LV_PROPERTY_SCALE_START     = 0x1000, /* lv_scale.c */
     LV_PROPERTY_SPINBOX_START   = 0x1100, /* lv_spinbox.c */
+    LV_PROPERTY_SPINNER_START   = 0x1200, /* lv_spinner.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
