@@ -31,9 +31,32 @@
 static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
+#if LV_USE_OBJ_PROPERTY
+static lv_color_t lv_led_get_color(const lv_obj_t * obj)
+{
+    lv_led_t * led = (lv_led_t *)obj;
+    return led->color;
+}
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_LED_COLOR,
+        .setter = lv_led_set_color,
+        .getter = lv_led_get_color,
+    },
+    {
+        .id = LV_PROPERTY_LED_BRIGHTNESS,
+        .setter = lv_led_set_brightness,
+        .getter = lv_led_get_brightness,
+    },
+};
+#endif
 
 const lv_obj_class_t lv_led_class  = {
     .base_class = &lv_obj_class,
@@ -43,6 +66,12 @@ const lv_obj_class_t lv_led_class  = {
     .event_cb = lv_led_event,
     .instance_size = sizeof(lv_led_t),
     .name = "lv_led",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_LED_START,
+    .prop_index_end = LV_PROPERTY_LED_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+#endif
 };
 
 /**********************
