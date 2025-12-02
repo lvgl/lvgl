@@ -56,6 +56,22 @@ static inline bool is_cell_empty(void * cell)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_table_properties[] = {
+    {
+        .id = LV_PROPERTY_TABLE_ROW_COUNT,
+        .setter = lv_table_set_row_count,
+        .getter = lv_table_get_row_count,
+    },
+    {
+        .id = LV_PROPERTY_TABLE_COLUMN_COUNT,
+        .setter = lv_table_set_column_count,
+        .getter = lv_table_get_column_count,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_table_class  = {
     .constructor_cb = lv_table_constructor,
     .destructor_cb = lv_table_destructor,
@@ -67,6 +83,7 @@ const lv_obj_class_t lv_table_class  = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_table_t),
     .name = "lv_table",
+    LV_PROPERTY_CLASS_FIELDS(table, TABLE)
 };
 /**********************
  *      MACROS
