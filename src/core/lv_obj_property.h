@@ -108,6 +108,7 @@ enum _lv_prop_id_range_boundary_t {
     LV_PROPERTY_BAR_START       = 0x0b00, /* lv_bar.c */
     LV_PROPERTY_SWITCH_START    = 0x0c00, /* lv_switch.c */
     LV_PROPERTY_CHECKBOX_START  = 0x0d00, /* lv_checkbox.c */
+    LV_PROPERTY_LED_START       = 0x0e00, /* lv_led.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
