@@ -28,6 +28,7 @@
     extern const lv_property_name_t lv_spinner_property_names[2];
     extern const lv_property_name_t lv_style_property_names[123];
     extern const lv_property_name_t lv_switch_property_names[1];
+    extern const lv_property_name_t lv_table_property_names[2];
     extern const lv_property_name_t lv_textarea_property_names[15];
 #endif
 #endif
