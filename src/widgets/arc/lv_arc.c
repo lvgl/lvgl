@@ -59,6 +59,67 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_arc_properties[] = {
+    {
+        .id = LV_PROPERTY_ARC_START_ANGLE,
+        .setter = lv_arc_set_start_angle,
+        .getter = lv_arc_get_angle_start,
+    },
+    {
+        .id = LV_PROPERTY_ARC_END_ANGLE,
+        .setter = lv_arc_set_end_angle,
+        .getter = lv_arc_get_angle_end,
+    },
+    {
+        .id = LV_PROPERTY_ARC_BG_START_ANGLE,
+        .setter = lv_arc_set_bg_start_angle,
+        .getter = lv_arc_get_bg_angle_start,
+    },
+    {
+        .id = LV_PROPERTY_ARC_BG_END_ANGLE,
+        .setter = lv_arc_set_bg_end_angle,
+        .getter = lv_arc_get_bg_angle_end,
+    },
+    {
+        .id = LV_PROPERTY_ARC_ROTATION,
+        .setter = lv_arc_set_rotation,
+        .getter = lv_arc_get_rotation,
+    },
+    {
+        .id = LV_PROPERTY_ARC_MODE,
+        .setter = lv_arc_set_mode,
+        .getter = lv_arc_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_ARC_VALUE,
+        .setter = lv_arc_set_value,
+        .getter = lv_arc_get_value,
+    },
+    {
+        .id = LV_PROPERTY_ARC_MIN_VALUE,
+        .setter = lv_arc_set_min_value,
+        .getter = lv_arc_get_min_value,
+    },
+    {
+        .id = LV_PROPERTY_ARC_MAX_VALUE,
+        .setter = lv_arc_set_max_value,
+        .getter = lv_arc_get_max_value,
+    },
+    {
+        .id = LV_PROPERTY_ARC_CHANGE_RATE,
+        .setter = lv_arc_set_change_rate,
+        .getter = lv_arc_get_change_rate,
+    },
+    {
+        .id = LV_PROPERTY_ARC_KNOB_OFFSET,
+        .setter = lv_arc_set_knob_offset,
+        .getter = lv_arc_get_knob_offset,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_arc_class  = {
     .constructor_cb = lv_arc_constructor,
     .event_cb = lv_arc_event,
@@ -66,6 +127,7 @@ const lv_obj_class_t lv_arc_class  = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_arc",
+    LV_PROPERTY_CLASS_FIELDS(arc, ARC)
 };
 
 /**********************
@@ -366,6 +428,12 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *)obj)->knob_offset;
+}
+
+uint32_t lv_arc_get_change_rate(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    return ((lv_arc_t *)obj)->chg_rate;
 }
 
 /*=====================
@@ -1079,6 +1147,5 @@ static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 }
 
 #endif /*LV_USE_OBSERVER*/
-
 
 #endif
