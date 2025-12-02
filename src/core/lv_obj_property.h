@@ -118,6 +118,7 @@ enum _lv_prop_id_range_boundary_t {
     LV_PROPERTY_BUTTONMATRIX_START = 0x1500, /* lv_buttonmatrix.c */
     LV_PROPERTY_SPAN_START      = 0x1600, /* lv_span.c */
     LV_PROPERTY_MENU_START      = 0x1700, /* lv_menu.c */
+    LV_PROPERTY_CHART_START     = 0x1800, /* lv_chart.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/

@@ -62,6 +62,17 @@ typedef enum {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_chart_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_chart_id_t {
+    LV_PROPERTY_ID(CHART, TYPE,               LV_PROPERTY_TYPE_INT,   0),
+    LV_PROPERTY_ID(CHART, POINT_COUNT,        LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(CHART, UPDATE_MODE,        LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(CHART, HOR_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   3),
+    LV_PROPERTY_ID(CHART, VER_DIV_LINE_COUNT, LV_PROPERTY_TYPE_INT,   4),
+    LV_PROPERTY_CHART_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -154,6 +165,27 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj);
  * @return          point number on each data line
  */
 uint32_t lv_chart_get_point_count(const lv_obj_t * obj);
+
+/**
+ * Get the update mode of a chart
+ * @param obj       pointer to a chart object
+ * @return          the update mode
+ */
+lv_chart_update_mode_t lv_chart_get_update_mode(const lv_obj_t * obj);
+
+/**
+ * Get the number of horizontal division lines
+ * @param obj       pointer to a chart object
+ * @return          the number of horizontal division lines
+ */
+uint32_t lv_chart_get_hor_div_line_count(const lv_obj_t * obj);
+
+/**
+ * Get the number of vertical division lines
+ * @param obj       pointer to a chart object
+ * @return          the number of vertical division lines
+ */
+uint32_t lv_chart_get_ver_div_line_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the x-axis start point in the data array
