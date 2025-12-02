@@ -30,7 +30,7 @@ extern "C" {
 #include "../lv_draw_triangle.h"
 #include "../lv_draw_line.h"
 #include "../lv_draw_label.h"
-#include "../../font/lv_font_fmt_txt.h"
+#include "../../font/fmt_txt/lv_font_fmt_txt.h"
 #include "../lv_draw_arc.h"
 
 #if LV_DRAW_EVE_WRITE_BUFFER_SIZE != 0 && LV_DRAW_EVE_WRITE_BUFFER_SIZE < 4
