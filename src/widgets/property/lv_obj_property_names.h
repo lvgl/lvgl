@@ -19,6 +19,7 @@
     extern const lv_property_name_t lv_keyboard_property_names[4];
     extern const lv_property_name_t lv_label_property_names[4];
     extern const lv_property_name_t lv_led_property_names[2];
+    extern const lv_property_name_t lv_line_property_names[1];
     extern const lv_property_name_t lv_obj_property_names[74];
     extern const lv_property_name_t lv_roller_property_names[3];
     extern const lv_property_name_t lv_slider_property_names[8];
