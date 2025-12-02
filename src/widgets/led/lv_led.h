@@ -94,6 +94,13 @@ void lv_led_toggle(lv_obj_t * led);
  */
 uint8_t lv_led_get_brightness(const lv_obj_t * obj);
 
+/**
+ * Get the color of a LED object
+ * @param obj       pointer to LED object
+ * @return color    color of the LED
+ */
+lv_color_t lv_led_get_color(const lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

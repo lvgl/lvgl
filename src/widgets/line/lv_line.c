@@ -35,6 +35,17 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_line_properties[] = {
+    {
+        .id = LV_PROPERTY_LINE_Y_INVERT,
+        .setter = lv_line_set_y_invert,
+        .getter = lv_line_get_y_invert,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_line_class = {
     .constructor_cb = lv_line_constructor,
     .event_cb = lv_line_event,
@@ -43,6 +54,7 @@ const lv_obj_class_t lv_line_class = {
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj_class,
     .name = "lv_line",
+    LV_PROPERTY_CLASS_FIELDS(line, LINE)
 };
 
 /**********************
