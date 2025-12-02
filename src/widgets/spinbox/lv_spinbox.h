@@ -33,6 +33,20 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spinbox_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_spinbox_id_t {
+    LV_PROPERTY_ID(SPINBOX, VALUE,                LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_ID(SPINBOX, ROLLOVER,             LV_PROPERTY_TYPE_BOOL, 1),
+    LV_PROPERTY_ID(SPINBOX, DIGIT_COUNT,          LV_PROPERTY_TYPE_INT, 2),
+    LV_PROPERTY_ID(SPINBOX, DEC_POINT_POS,        LV_PROPERTY_TYPE_INT, 3),
+    LV_PROPERTY_ID(SPINBOX, STEP,                 LV_PROPERTY_TYPE_INT, 4),
+    LV_PROPERTY_ID(SPINBOX, MIN_VALUE,            LV_PROPERTY_TYPE_INT, 5),
+    LV_PROPERTY_ID(SPINBOX, MAX_VALUE,            LV_PROPERTY_TYPE_INT, 6),
+    LV_PROPERTY_ID(SPINBOX, DIGIT_STEP_DIRECTION, LV_PROPERTY_TYPE_INT, 7),
+    LV_PROPERTY_SPINBOX_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -151,6 +165,41 @@ int32_t lv_spinbox_get_value(lv_obj_t * obj);
  * @return      value integer step value of the spinbox
  */
 int32_t lv_spinbox_get_step(lv_obj_t * obj);
+
+/**
+ * Get the spinbox digit count
+ * @param obj   pointer to spinbox
+ * @return      number of digits
+ */
+uint32_t lv_spinbox_get_digit_count(lv_obj_t * obj);
+
+/**
+ * Get the decimal point position
+ * @param obj   pointer to spinbox
+ * @return      decimal point position
+ */
+uint32_t lv_spinbox_get_dec_point_pos(lv_obj_t * obj);
+
+/**
+ * Get the spinbox minimum value
+ * @param obj   pointer to spinbox
+ * @return      minimum value
+ */
+int32_t lv_spinbox_get_min_value(lv_obj_t * obj);
+
+/**
+ * Get the spinbox maximum value
+ * @param obj   pointer to spinbox
+ * @return      maximum value
+ */
+int32_t lv_spinbox_get_max_value(lv_obj_t * obj);
+
+/**
+ * Get the digit step direction
+ * @param obj   pointer to spinbox
+ * @return      direction (LV_DIR_RIGHT or LV_DIR_LEFT)
+ */
+lv_dir_t lv_spinbox_get_digit_step_direction(lv_obj_t * obj);
 
 /*=====================
  * Other functions
