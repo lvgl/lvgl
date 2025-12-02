@@ -83,6 +83,51 @@ static void needle_deleted_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_scale_properties[] = {
+    {
+        .id = LV_PROPERTY_SCALE_MODE,
+        .setter = lv_scale_set_mode,
+        .getter = lv_scale_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_TOTAL_TICK_COUNT,
+        .setter = lv_scale_set_total_tick_count,
+        .getter = lv_scale_get_total_tick_count,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_MAJOR_TICK_EVERY,
+        .setter = lv_scale_set_major_tick_every,
+        .getter = lv_scale_get_major_tick_every,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_LABEL_SHOW,
+        .setter = lv_scale_set_label_show,
+        .getter = lv_scale_get_label_show,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_ANGLE_RANGE,
+        .setter = lv_scale_set_angle_range,
+        .getter = lv_scale_get_angle_range,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_ROTATION,
+        .setter = lv_scale_set_rotation,
+        .getter = lv_scale_get_rotation,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_RANGE_MIN_VALUE,
+        .setter = lv_scale_set_min_value,
+        .getter = lv_scale_get_range_min_value,
+    },
+    {
+        .id = LV_PROPERTY_SCALE_RANGE_MAX_VALUE,
+        .setter = lv_scale_set_max_value,
+        .getter = lv_scale_get_range_max_value,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_scale_class  = {
     .constructor_cb = lv_scale_constructor,
     .destructor_cb = lv_scale_destructor,
@@ -91,6 +136,7 @@ const lv_obj_class_t lv_scale_class  = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_scale",
+    LV_PROPERTY_CLASS_FIELDS(scale, SCALE)
 };
 
 /**********************
