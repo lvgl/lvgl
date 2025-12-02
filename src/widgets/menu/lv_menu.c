@@ -37,6 +37,21 @@ static void lv_menu_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_menu_cont_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_menu_section_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_MENU_MODE_HEADER,
+        .setter = lv_menu_set_mode_header,
+        .getter = lv_menu_get_mode_header,
+    },
+    {
+        .id = LV_PROPERTY_MENU_MODE_ROOT_BACK_BUTTON,
+        .setter = lv_menu_set_mode_root_back_button,
+        .getter = lv_menu_get_mode_root_back_button,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_menu_class = {
     .constructor_cb = lv_menu_constructor,
     .destructor_cb = lv_menu_destructor,
@@ -45,6 +60,12 @@ const lv_obj_class_t lv_menu_class = {
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_menu_t),
     .name = "lv_menu",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_MENU_START,
+    .prop_index_end = LV_PROPERTY_MENU_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+#endif
 };
 const lv_obj_class_t lv_menu_page_class = {
     .constructor_cb = lv_menu_page_constructor,
@@ -519,6 +540,20 @@ bool lv_menu_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj)
     }
 
     return false;
+}
+
+lv_menu_mode_header_t lv_menu_get_mode_header(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->mode_header;
+}
+
+lv_menu_mode_root_back_button_t lv_menu_get_mode_root_back_button(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_menu_t * menu = (lv_menu_t *)obj;
+    return menu->mode_root_back_btn;
 }
 
 void lv_menu_clear_history(lv_obj_t * obj)
