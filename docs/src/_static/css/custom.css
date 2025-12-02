@@ -1124,7 +1124,7 @@ article figure img {
  * Code Highlighting
  *-------------------------------------------------------------------------*/
 /* Pygments .p = Punctuation */
-body:not([data-theme=light]) .highlight .p {
+body:not([data-theme="light"]) .highlight .p {
   color: #a883f3;
 }
 
