@@ -32,9 +32,32 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void button_clicked_event_cb(lv_event_t * e);
 static void cont_scroll_end_event_cb(lv_event_t * e);
 
+#if LV_USE_OBJ_PROPERTY
+static void lv_tabview_set_tab_active_property(lv_obj_t * obj, uint32_t idx)
+{
+    lv_tabview_set_active(obj, idx, LV_ANIM_OFF);
+}
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_tabview_properties[] = {
+    {
+        .id = LV_PROPERTY_TABVIEW_TAB_ACTIVE,
+        .setter = lv_tabview_set_tab_active_property,
+        .getter = lv_tabview_get_tab_active,
+    },
+    {
+        .id = LV_PROPERTY_TABVIEW_TAB_BAR_POSITION,
+        .setter = lv_tabview_set_tab_bar_position,
+        .getter = lv_tabview_get_tab_bar_position,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_tabview_class = {
     .constructor_cb = lv_tabview_constructor,
     .event_cb = lv_tabview_event,
@@ -43,6 +66,7 @@ const lv_obj_class_t lv_tabview_class = {
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_tabview_t),
     .name = "lv_tabview",
+    LV_PROPERTY_CLASS_FIELDS(tabview, TABVIEW)
 };
 
 typedef struct {
@@ -283,6 +307,13 @@ lv_obj_t * lv_tabview_get_content(lv_obj_t * tv)
 lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * tv)
 {
     return lv_obj_get_child(tv, 0);
+}
+
+lv_dir_t lv_tabview_get_tab_bar_position(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+    return tabview->tab_pos;
 }
 
 /**********************
