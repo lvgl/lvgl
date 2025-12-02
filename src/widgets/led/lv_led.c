@@ -31,14 +31,6 @@
 static void lv_led_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
-#if LV_USE_OBJ_PROPERTY
-static lv_color_t lv_led_get_color(const lv_obj_t * obj)
-{
-    lv_led_t * led = (lv_led_t *)obj;
-    return led->color;
-}
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -145,6 +137,12 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj)
 
     lv_led_t * led = (lv_led_t *)obj;
     return led->bright;
+}
+
+lv_color_t lv_led_get_color(const lv_obj_t * obj)
+{
+    lv_led_t * led = (lv_led_t *)obj;
+    return led->color;
 }
 
 /**********************
