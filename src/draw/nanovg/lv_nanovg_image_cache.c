@@ -136,6 +136,7 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
         cache_node_entry = lv_cache_acquire_or_create(u->image_cache, &search_key, NULL);
         if(cache_node_entry == NULL) {
             LV_LOG_ERROR("image cache creating failed");
+            lv_image_decoder_close(&decoder_dsc);
             LV_PROFILER_DRAW_END;
             return -1;
         }
