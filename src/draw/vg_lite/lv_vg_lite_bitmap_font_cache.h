@@ -51,7 +51,7 @@ void lv_vg_lite_bitmap_font_cache_deinit(struct _lv_draw_vg_lite_unit_t * unit);
  * @brief Get the bitmap font cache entry for a given font and letter
  * @param unit pointer to the VG-Lite draw unit
  * @param g_dsc pointer to the glyph descriptor
- * @return pointer to the draw buffer containing the cached bitmap font glyph
+ * @return pointer to the draw buffer containing the cached bitmap font glyph, or NULL if the glyph ID is 0 or if cache creation fails
  */
 lv_draw_buf_t * lv_vg_lite_bitmap_font_cache_get(struct _lv_draw_vg_lite_unit_t * unit,
                                                  const lv_font_glyph_dsc_t * g_dsc);

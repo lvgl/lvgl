@@ -94,7 +94,7 @@ void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u)
 void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(u->letter_pending)
+    LV_ASSERT_NULL(u->letter_pending);
     lv_vg_lite_pending_destroy(u->letter_pending);
     u->letter_pending = NULL;
 
@@ -182,7 +182,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
                     }
                     else {
                         if(resolved_font->release_glyph) {
-                            /* For dynamic fonts, it's internal implementation already supports cache management. */
+                            /* For dynamic fonts, its internal implementation already supports cache management. */
                             glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         }
                         else {
