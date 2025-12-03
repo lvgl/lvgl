@@ -94,7 +94,6 @@ void lv_draw_nanovg_init(void)
 
     unit->vg = NVG_CTX_CREATE(0);
     LV_ASSERT_MSG(unit->vg != NULL, "NanoVG init failed");
-    nvgShapeAntiAlias(unit->vg, true);
 
     lv_nanovg_utils_init(unit);
     lv_nanovg_image_cache_init(unit);
