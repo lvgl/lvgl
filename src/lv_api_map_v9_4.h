@@ -34,6 +34,7 @@ extern "C" {
 #define lv_wayland_timer_handler    lv_timer_handler
 #define lv_wayland_display_close_f_t    lv_wayland_display_close_cb_t
 #define lv_xml_component_unregister lv_xml_unregister_component
+#define lv_xml_test_unregister lv_xml_unregister_test
 
 #ifdef __cplusplus
 } /*extern "C"*/
