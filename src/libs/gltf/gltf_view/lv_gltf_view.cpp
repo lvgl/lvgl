@@ -615,7 +615,9 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
         lv_gltf_t * viewer = (lv_gltf_t *)obj;
         GLuint texture_id = lv_gltf_view_render(viewer);
-        lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
+        #if !LV_GLTF_DIRECT_BUFFER_WRITES
+            lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
+        #endif
     }
 
     lv_result_t res;
