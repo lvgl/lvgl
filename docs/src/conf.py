@@ -559,6 +559,7 @@ redirects = {
     "details/widgets/index":                         "../../widgets/index.html"                             ,
     "details/xml/editor/index":                      "../../../xml/editor/index.html"                       ,
     "details/xml/index":                             "../../xml/index.html"                                 ,
+    "details/xml/integration/renesas-dev-tools":     "../../../xml/integration/renesas-dev-tools.html"      ,
     "details/xml/tools/cli":                         "../../../xml/tools/cli.html"                          ,
     "details/xml/tools/figma":                       "../../../xml/tools/figma.html"                        ,
     "details/xml/xml/index":                         "../../../xml/xml/index.html"                          ,
