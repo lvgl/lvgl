@@ -132,8 +132,8 @@ No *Keys* are processed by Message Box Widgets.
 
 .. _lv_msgbox_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/msgbox/index.rst
 

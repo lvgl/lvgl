@@ -292,8 +292,8 @@ No *Keys* are processed by Label Widgets.
 
 .. _lv_label_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/label/index.rst
 

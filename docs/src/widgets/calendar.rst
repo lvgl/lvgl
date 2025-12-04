@@ -168,8 +168,8 @@ contains 2 Drop-Drown List Widgets for the year and month.
 
 
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/calendar/index.rst
 

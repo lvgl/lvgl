@@ -207,8 +207,8 @@ The columns will be placed from right to left.
 
 .. _grid_examples:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/layouts/grid/index.rst
 

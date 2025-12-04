@@ -145,8 +145,8 @@ Keys
 
 .. _lv_slider_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/slider/index.rst
 

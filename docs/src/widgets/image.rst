@@ -240,8 +240,8 @@ No *Keys* are processed by Image Widgets.
 
 .. _lv_image_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/image/index.rst
 
