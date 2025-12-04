@@ -570,4 +570,56 @@ void test_bar_orientation(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_2.png");
 }
 
+void test_bar_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_bar_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test VALUE property */
+    prop.id = LV_PROPERTY_BAR_VALUE;
+    prop.num = 50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_VALUE).num, 50);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_value(obj), 50);
+
+    /* Test MIN_VALUE property */
+    prop.id = LV_PROPERTY_BAR_MIN_VALUE;
+    prop.num = 10;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_MIN_VALUE).num, 10);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_min_value(obj), 10);
+
+    /* Test MAX_VALUE property */
+    prop.id = LV_PROPERTY_BAR_MAX_VALUE;
+    prop.num = 200;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_MAX_VALUE).num, 200);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_max_value(obj), 200);
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_BAR_MODE;
+    prop.num = LV_BAR_MODE_RANGE;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_MODE).num, LV_BAR_MODE_RANGE);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_mode(obj), LV_BAR_MODE_RANGE);
+
+    /* Test START_VALUE property (only works in RANGE mode) */
+    prop.id = LV_PROPERTY_BAR_START_VALUE;
+    prop.num = 20;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_START_VALUE).num, 20);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_start_value(obj), 20);
+
+    /* Test ORIENTATION property */
+    prop.id = LV_PROPERTY_BAR_ORIENTATION;
+    prop.num = LV_BAR_ORIENTATION_VERTICAL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_BAR_ORIENTATION).num, LV_BAR_ORIENTATION_VERTICAL);
+    TEST_ASSERT_EQUAL_INT(lv_bar_get_orientation(obj), LV_BAR_ORIENTATION_VERTICAL);
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif

@@ -309,4 +309,91 @@ static void dummy_event_cb2(lv_event_t * e)
     event_cnt2++;
 }
 
+void test_arc_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_arc_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test START_ANGLE property (PRECISE type) */
+    prop.id = LV_PROPERTY_ARC_START_ANGLE;
+    prop.precise = 45;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_START_ANGLE).precise, 45);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_angle_start(obj), 45);
+
+    /* Test END_ANGLE property (PRECISE type) */
+    prop.id = LV_PROPERTY_ARC_END_ANGLE;
+    prop.precise = 270;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_END_ANGLE).precise, 270);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_angle_end(obj), 270);
+
+    /* Test BG_START_ANGLE property (PRECISE type) */
+    prop.id = LV_PROPERTY_ARC_BG_START_ANGLE;
+    prop.precise = 30;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_BG_START_ANGLE).precise, 30);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_bg_angle_start(obj), 30);
+
+    /* Test BG_END_ANGLE property (PRECISE type) */
+    prop.id = LV_PROPERTY_ARC_BG_END_ANGLE;
+    prop.precise = 300;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_BG_END_ANGLE).precise, 300);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_bg_angle_end(obj), 300);
+
+    /* Test ROTATION property (INT type) */
+    prop.id = LV_PROPERTY_ARC_ROTATION;
+    prop.num = 90;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_ROTATION).num, 90);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_rotation(obj), 90);
+
+    /* Test MODE property (INT type) */
+    prop.id = LV_PROPERTY_ARC_MODE;
+    prop.num = LV_ARC_MODE_SYMMETRICAL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_MODE).num, LV_ARC_MODE_SYMMETRICAL);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_mode(obj), LV_ARC_MODE_SYMMETRICAL);
+
+    /* Test VALUE property (INT type) */
+    lv_arc_set_range(obj, 0, 100);
+    prop.id = LV_PROPERTY_ARC_VALUE;
+    prop.num = 75;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_VALUE).num, 75);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_value(obj), 75);
+
+    /* Test MIN_VALUE property (INT type) */
+    prop.id = LV_PROPERTY_ARC_MIN_VALUE;
+    prop.num = 10;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_MIN_VALUE).num, 10);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_min_value(obj), 10);
+
+    /* Test MAX_VALUE property (INT type) */
+    prop.id = LV_PROPERTY_ARC_MAX_VALUE;
+    prop.num = 200;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_MAX_VALUE).num, 200);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_max_value(obj), 200);
+
+    /* Test CHANGE_RATE property (INT type) */
+    prop.id = LV_PROPERTY_ARC_CHANGE_RATE;
+    prop.num = 50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_CHANGE_RATE).num, 50);
+
+    /* Test KNOB_OFFSET property (INT type) */
+    prop.id = LV_PROPERTY_ARC_KNOB_OFFSET;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_ARC_KNOB_OFFSET).num, 5);
+    TEST_ASSERT_EQUAL_INT(lv_arc_get_knob_offset(obj), 5);
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif

@@ -12,6 +12,7 @@
 
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_property.h"
 
 /*********************
  *      DEFINES
@@ -33,11 +34,33 @@ static void arc_anim_end_angle(void * obj, int32_t v);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_SPINNER_ANIM_DURATION,
+        .setter = lv_spinner_set_anim_duration,
+        .getter = lv_spinner_get_anim_duration,
+    },
+    {
+        .id = LV_PROPERTY_SPINNER_ARC_SWEEP,
+        .setter = lv_spinner_set_arc_sweep,
+        .getter = lv_spinner_get_arc_sweep,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_spinner_class = {
     .base_class = &lv_arc_class,
     .constructor_cb = lv_spinner_constructor,
     .name = "lv_spinner",
     .instance_size = sizeof(lv_spinner_t),
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_SPINNER_START,
+    .prop_index_end = LV_PROPERTY_SPINNER_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+#endif
 };
 
 /**********************
@@ -98,6 +121,18 @@ void lv_spinner_set_arc_sweep(lv_obj_t * obj, uint32_t angle)
     lv_spinner_t * spinner = (lv_spinner_t *)obj;
 
     lv_spinner_set_anim_params(obj, spinner->duration, angle);
+}
+
+uint32_t lv_spinner_get_anim_duration(lv_obj_t * obj)
+{
+    lv_spinner_t * spinner = (lv_spinner_t *)obj;
+    return spinner->duration;
+}
+
+uint32_t lv_spinner_get_arc_sweep(lv_obj_t * obj)
+{
+    lv_spinner_t * spinner = (lv_spinner_t *)obj;
+    return spinner->angle;
 }
 
 /**********************

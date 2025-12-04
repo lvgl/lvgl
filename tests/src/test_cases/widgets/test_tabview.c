@@ -314,4 +314,38 @@ void test_tabview_translation_tag(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
 }
 
+void test_tabview_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * tv = lv_tabview_create(lv_screen_active());
+    lv_tabview_add_tab(tv, "Tab 1");
+    lv_tabview_add_tab(tv, "Tab 2");
+    lv_tabview_add_tab(tv, "Tab 3");
+
+    lv_property_t prop = { };
+
+    /* Test TAB_ACTIVE property */
+    prop.id = LV_PROPERTY_TABVIEW_TAB_ACTIVE;
+    prop.num = 1;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_ACTIVE).num, 1);
+
+    prop.num = 2;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_ACTIVE).num, 2);
+
+    /* Test TAB_BAR_POSITION property */
+    prop.id = LV_PROPERTY_TABVIEW_TAB_BAR_POSITION;
+    prop.num = LV_DIR_BOTTOM;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_BAR_POSITION).num, LV_DIR_BOTTOM);
+
+    prop.num = LV_DIR_LEFT;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_BAR_POSITION).num, LV_DIR_LEFT);
+
+    lv_obj_delete(tv);
+#endif
+}
+
 #endif

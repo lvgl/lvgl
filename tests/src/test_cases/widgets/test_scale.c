@@ -542,4 +542,62 @@ void test_scale_set_line_needle_value(void)
     );
 }
 
+void test_scale_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_scale_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_SCALE_MODE;
+    prop.num = LV_SCALE_MODE_ROUND_INNER;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_MODE).num, LV_SCALE_MODE_ROUND_INNER);
+
+    /* Test TOTAL_TICK_COUNT property */
+    prop.id = LV_PROPERTY_SCALE_TOTAL_TICK_COUNT;
+    prop.num = 21;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_TOTAL_TICK_COUNT).num, 21);
+
+    /* Test MAJOR_TICK_EVERY property */
+    prop.id = LV_PROPERTY_SCALE_MAJOR_TICK_EVERY;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_MAJOR_TICK_EVERY).num, 5);
+
+    /* Test LABEL_SHOW property */
+    prop.id = LV_PROPERTY_SCALE_LABEL_SHOW;
+    prop.num = 0;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_LABEL_SHOW).num, 0);
+
+    /* Test ANGLE_RANGE property */
+    prop.id = LV_PROPERTY_SCALE_ANGLE_RANGE;
+    prop.num = 180;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_ANGLE_RANGE).num, 180);
+
+    /* Test ROTATION property */
+    prop.id = LV_PROPERTY_SCALE_ROTATION;
+    prop.num = 90;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_ROTATION).num, 90);
+
+    /* Test RANGE_MIN_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MIN_VALUE;
+    prop.num = -50;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MIN_VALUE).num, -50);
+
+    /* Test RANGE_MAX_VALUE property */
+    prop.id = LV_PROPERTY_SCALE_RANGE_MAX_VALUE;
+    prop.num = 150;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_obj_get_property(obj, LV_PROPERTY_SCALE_RANGE_MAX_VALUE).num, 150);
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif
