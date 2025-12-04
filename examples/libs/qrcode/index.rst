@@ -1,10 +1,9 @@
-QR-Code Generator
-*****************
+.. example_heading: QR-Code Generator
 
 
 Create a QR Code
 ----------------
 
-.. lv_example:: lv_example_qrcode_1
+.. lv_example:: libs/qrcode/lv_example_qrcode_1
   :language: c
 

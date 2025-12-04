@@ -1,17 +1,16 @@
-Message Box
-***********
+.. example_heading: Message Box
 
 
 Simple Message box
 ------------------
 
-.. lv_example:: lv_example_msgbox_1
+.. lv_example:: widgets/msgbox/lv_example_msgbox_1
   :language: c
 
 Scrolling and styled Message box
 --------------------------------
 
-.. lv_example:: lv_example_msgbox_2
+.. lv_example:: widgets/msgbox/lv_example_msgbox_2
   :language: c
 
 Message box with blurred background
