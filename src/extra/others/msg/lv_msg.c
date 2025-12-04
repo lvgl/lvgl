@@ -115,10 +115,10 @@ uint32_t lv_msg_unsubscribe_obj(uint32_t msg_id, lv_obj_t * obj)
 
 void lv_msg_send(uint32_t msg_id, const void * payload)
 {
-    lv_msg_t m;
-    lv_memset_00(&m, sizeof(m));
-    m.id = msg_id;
-    m.payload = payload;
+    lv_msg_t m = {
+        .id = msg_id,
+        .payload = payload,
+    };
     notify(&m);
 }
 
