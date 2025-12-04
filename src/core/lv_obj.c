@@ -171,6 +171,14 @@ static const lv_property_ops_t properties[] = {
         .getter = lv_obj_get_scroll_end_helper,
     },
     {
+        .id = LV_PROPERTY_OBJ_SCROLL_X,
+        .getter = lv_obj_get_scroll_x,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_Y,
+        .getter = lv_obj_get_scroll_y,
+    },
+    {
         .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
         .getter = lv_obj_get_ext_draw_size,
     },
