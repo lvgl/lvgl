@@ -40,21 +40,28 @@ lvgl/examples/
 ```
 Example 1 Title  <-- required for each example
 ---------------  <-- required for each example
-                                    <-- blank lines are ignored
-.. lv_example:: lv_example_anim_1   <-- relative path to stem of C filename
+                                         <-- blank lines are ignored
+.. lv_example:: anim/lv_example_anim_1   <-- path relative to the `lvgl/examples/` dir
     :language: c
 ```
 
 Repeat the above pattern for each example in current directory.  That number may be zero (0) for directories like `libs/` in which all examples are in directories below that level.  See directory structure above.
 
-Provide relative paths to each example outside of the current directory, e.g. some examples use 2 Widgets, so the example would be local to one `index.rst`, and provide a relative path from the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
+For paths outside the current directory, simply provide the path to the code example relative to the `lvgl/examples/` directory.  Example from `lvgl/examples/widgets/scale/index.rst`:
 
 ```
 ...
 
+A round scale style simulating a compass
+----------------------------------------
+
+.. lv_example:: widgets/scale/lv_example_scale_12
+  :language: c
+
 Axis ticks and labels with scrolling on a chart
 -----------------------------------------------
-.. lv_example:: ../chart/lv_example_chart_2
+
+.. lv_example:: widgets/chart/lv_example_chart_2     <-- path is outside scale/ dir
   :language: c
 ```
 
@@ -65,20 +72,19 @@ Starting the example code filename with `lv_example_` is not a requirement of th
 
 ### Custom Section Headings
 
-If a section heading needs to be spelled differently than the capitalized name of the parent directory, then an `index.rst` file in that directory may contain the desired section-heading name underscored with asterisks (\*).  Example from `lvgl/examples/libs/index.rst`:
+If a section heading needs to be spelled differently than the capitalized name of the parent directory, then an `index.rst` file in that directory may contain the desired section-heading name in an `.. example_heading:` pseudo-directive.  Example from `lvgl/examples/libs/index.rst`:
 
 ```
-3rd-Party Libraries
-*******************
+.. example_heading: 3rd-Party Libraries
 ```
 
 
 ### Optional Directory Reordering
 
-There are cases where it is not appropriate to present the contents of a directory in alphabetical order.  When this is the case, a directive in the `index.rst` file in the parent directory can be specified to govern the sequence its subdirectories are processed.  The example below is from `lvgl/examples/widgets/index.rst`.  It is provided in order to cause the "Base Widget" (obj) directory to be processed first.
+There are cases where it is not appropriate to present the contents of a set of subdirectories in alphabetical order.  When this is the case, a pseudo-directive in the `index.rst` file in the parent directory can be specified to govern the sequence its subdirectories are processed.  The example below is from `lvgl/examples/widgets/index.rst`.  It is provided in order to cause the "Base Widget" (obj) directory to be processed first (and thus included in the output first).
 
 ```rst
-.. dir_order::
+.. dir_order:
 
     obj
     animimg

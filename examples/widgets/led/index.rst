@@ -1,10 +1,9 @@
-LED
-***
+.. example_heading: LED
 
 
 LED with custom style
 ---------------------
 
-.. lv_example:: lv_example_led_1
+.. lv_example:: widgets/led/lv_example_led_1
   :language: c
 

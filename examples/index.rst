@@ -1,4 +1,4 @@
-.. dir_order::
+.. dir_order:
 
     get_started
     styles

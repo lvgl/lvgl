@@ -64,7 +64,7 @@ Examples Directory Requirements
 .. code:: text
 
     lvgl/examples/
-        index.rst        (directory-order directive since sub-dirs
+        index.rst        (.. dir_order: pseudo-directive since sub-dirs
                          are not presented in alphabetical order)
         anim/
             index.rst    (see below for expected contents)
@@ -111,25 +111,32 @@ the example C code.
 
     Example 1 Title  <-- required for each example
     ---------------  <-- required for each example
-                                        <-- blank lines are ignored
-    .. lv_example:: lv_example_anim_1   <-- relative path to stem of C filename
+                                             <-- blank lines are ignored
+    .. lv_example:: anim/lv_example_anim_1   <-- path relative to the `lvgl/examples/` dir
         :language: c
 
 Repeat the above pattern for each example in the current directory.  That number
 may be zero (0) for directories like `libs/` in which all examples are in directories
 below that level.  See directory structure above.
 
-Provide relative paths to each example outside the current directory, e.g. some
-examples use 2 Widgets, so the example would be local to one `index.rst`, and provide
-a relative path from the other.  Example from `lvgl/examples/widgets/scale/index.rst`:
+For paths outside the current directory, simply provide the path to the code example
+relative to the `lvgl/examples/` directory.  Example from
+`lvgl/examples/widgets/scale/index.rst`:
 
 .. code::
 
     ...
 
+    A round scale style simulating a compass
+    ----------------------------------------
+
+    .. lv_example:: widgets/scale/lv_example_scale_12
+      :language: c
+
     Axis ticks and labels with scrolling on a chart
     -----------------------------------------------
-    .. lv_example:: ../chart/lv_example_chart_2
+
+    .. lv_example:: widgets/chart/lv_example_chart_2     <-- path is outside scale/ dir
       :language: c
 
 .. note::
@@ -143,20 +150,19 @@ Custom Section Headings
 -----------------------
 If a section heading needs to be spelled differently than the capitalized name of the
 parent directory, then an `index.rst` file in that directory may contain the desired
-section-heading name underscored with asterisks (*).  Example from
+section-heading name in an ``.. example_heading`` pseudo-directive.  Example from
 `lvgl/examples/libs/index.rst`:
 
 .. code::
 
-    3rd-Party Libraries
-    *******************
+    .. example_heading: 3rd-Party Libraries
 
 
 Directory Reordering
 --------------------
 There are cases where it is not appropriate to present the contents of a
 set of subdirectories in alphabetical order.  When this is the case, a
-directive in the `index.rst` file in the parent directory can be specified
+pseudo-directive in the `index.rst` file in the parent directory can be specified
 to govern the sequence its subdirectories are processed.  The example below
 is from `lvgl/examples/widgets/index.rst`.  It is provided in order to
 cause the "Base Widget" (obj) directory to be processed first (and thus
@@ -164,7 +170,7 @@ included in the output first).
 
 .. code::
 
-    .. dir_order::
+    .. dir_order:
 
         obj
         animimg
@@ -244,7 +250,8 @@ header_defs = [
 ]
 
 LV_EXAMPLE_DIRECTIVE = '.. lv_example::'
-DIR_ORDER_DIRECTIVE = '.. dir_order::'
+EXAMPLE_HEADING_DIRECTIVE = '.. example_heading:'
+DIR_ORDER_DIRECTIVE = '.. dir_order:'
 DIR_SEP = os.sep
 INDEX_FILENAME = 'index.rst'
 MAKE_WARNINGS_INTO_ERRORS = False
@@ -313,7 +320,7 @@ def _in_avoid_dirs_list(dir_bep: str) -> bool:
 
 
 def _validate_sub_dirs(sub_dirs: list[str], index_rst_path: str) -> bool:
-    """ Validate sub-dirs that come from an `index.rst` `.. dir_order::` directive.
+    """ Validate sub-dirs that come from an `index.rst` `.. dir_order:` directive.
 
     1.  Check that that each one is an existing directory.
     2.  Check that there are none missing except those in `avoid_dirs`.
@@ -421,16 +428,14 @@ def _generate_output_from_dir(level: int,
             announce(__file__, f'Processing file [{file_or_dir}]...')
             # We are processing an index.rst file.
             with open(file_or_dir, 'r', encoding='utf-8') as fidx:
+                # It is important that this is NOT fidx.readlines() because
+                # it leaves blank lines containing '\n' instead of ''.
                 lines = fidx.read().split('\n')
 
             example_title = ''
             prev_line = ''
             dir_path = os.path.dirname(file_or_dir)
-            relative_dir = dir_path[root_len:]
             in_dir_order_directive = False
-            # Final path to example in example directive requires forward slashes.
-            if DIR_SEP != '/' and DIR_SEP in relative_dir:
-                relative_dir = relative_dir.replace(DIR_SEP, '/')
 
             # Accumulate data from `index.rst`.  This needs to be done
             # first in case it overrides the default section heading.
@@ -452,16 +457,17 @@ def _generate_output_from_dir(level: int,
 
                 if not stripped_line:
                     continue         # Skip blank line.
-                elif stripped_line.startswith('***'):
-                    announce(__file__, f'Default section heading [{section_heading}] replaced with [{prev_line}]...')
-                    section_heading = prev_line
+                elif stripped_line.startswith(EXAMPLE_HEADING_DIRECTIVE):
+                    new_heading = stripped_line.replace(EXAMPLE_HEADING_DIRECTIVE, '').strip()
+                    announce(__file__, f'Default section heading [{section_heading}] replaced with [{new_heading}]...')
+                    section_heading = new_heading
                 elif stripped_line.startswith('---'):
                     example_title = prev_line
                     announce(__file__, f'Found example   [{example_title}]...')
                 elif stripped_line.startswith(LV_EXAMPLE_DIRECTIVE):
-                    rel_path_from_index_rst = stripped_line.replace(LV_EXAMPLE_DIRECTIVE, '').strip()
-                    announce(__file__, f'                [{rel_path_from_index_rst}]')
-                    example_tuples.append( (example_title, rel_path_from_index_rst) )
+                    rel_path_from_examples_dir = stripped_line.replace(LV_EXAMPLE_DIRECTIVE, '').strip()
+                    announce(__file__, f'                [{rel_path_from_examples_dir}]')
+                    example_tuples.append( (example_title, rel_path_from_examples_dir) )
                 elif not in_dir_order_directive and stripped_line.startswith(DIR_ORDER_DIRECTIVE):
                     in_dir_order_directive = True
                     announce(__file__, f'Found DIR-ORDER directive.')
@@ -476,11 +482,11 @@ def _generate_output_from_dir(level: int,
         # with example sub-dirs below it.
         for example_tuple in example_tuples:
             example_title = example_tuple[0]
-            rel_path_from_index_rst = example_tuple[1]
+            rel_path_from_examples_dir = example_tuple[1]
             example_hdg_underline = header_defs[level + 1] * len(example_title)
-            announce(__file__, f'Writing example [{rel_path_from_index_rst}]...')
+            announce(__file__, f'Writing example [{rel_path_from_examples_dir}]...')
             _emit_heading(level + 1, example_title, f)
-            f.write(LV_EXAMPLE_DIRECTIVE + ' ' + relative_dir + '/' + rel_path_from_index_rst)
+            f.write(LV_EXAMPLE_DIRECTIVE + ' ' + rel_path_from_examples_dir)
             f.write('\n\n')
 
     if dir_order_override:
