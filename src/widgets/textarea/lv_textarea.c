@@ -107,7 +107,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_TEXTAREA_ACCEPTED_CHARS,
-        .setter = lv_textarea_set_accepted_chars,
+        .setter = NULL,
         .getter = lv_textarea_get_accepted_chars,
     },
     {
