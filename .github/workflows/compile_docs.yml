@@ -78,7 +78,7 @@ jobs:
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
