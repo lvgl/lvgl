@@ -759,6 +759,7 @@ lv_observer_t * lv_obj_bind_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_
     if(subject->type != LV_SUBJECT_TYPE_INT && subject->type != LV_SUBJECT_TYPE_COLOR &&
        subject->type != LV_SUBJECT_TYPE_POINTER) {
         uint32_t type_val = subject->type;
+        (void)type_val;
         LV_LOG_WARN("Subject type must be `int`, `color`, or `pointer` (was %"LV_PRIu32")", type_val);
         return NULL;
     }
@@ -1319,6 +1320,7 @@ static void bind_style_prop_observer_cb(lv_observer_t * observer, lv_subject_t *
     else if(subject->type == LV_SUBJECT_TYPE_POINTER) style_v.ptr = lv_subject_get_pointer(subject);
     else {
         uint32_t type_val = subject->type;
+        (void)type_val;
         LV_LOG_WARN("Not supported subject type (%"LV_PRIu32")", type_val);
         return;
     }
