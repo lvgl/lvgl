@@ -292,7 +292,9 @@ set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_CONF_DIR}>
 )
 
-file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
+file(GLOB_RECURSE TEST_IMAGES_SRC 
+	${LVGL_TEST_DIR}/test_images/*.c 
+	${LVGL_TEST_DIR}/../examples/assets/*.c)
 
 add_library(test_common
     STATIC

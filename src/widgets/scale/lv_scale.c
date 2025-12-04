@@ -71,6 +71,9 @@ static void scale_free_line_needle_points_cb(lv_event_t * e);
 
 static bool scale_is_major_tick(lv_scale_t * scale, uint32_t tick_idx);
 
+static lv_result_t update_needle(lv_scale_t * scale, lv_obj_t * needle, int32_t length, int32_t value);
+static void needle_deleted_cb(lv_event_t * e);
+
 #if LV_USE_OBSERVER
     static void scale_section_min_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void scale_section_max_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -297,6 +300,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     needle_line_points[1].y = scale_height / 2 + needle_length_y;
 
     lv_line_set_points_mutable(needle_line, needle_line_points, 2);
+
+    update_needle(scale, needle_line, needle_length, value);
 }
 
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
@@ -320,6 +325,7 @@ void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int3
     }
 
     lv_image_set_rotation(needle_img, (scale->rotation + angle) * 10);
+    update_needle(scale, needle_img, 0, value);
 }
 
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
@@ -586,6 +592,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->draw_ticks_on_top = false;
     scale->custom_label_cnt = 0;
     scale->txt_src = NULL;
+    lv_array_init(&scale->needles, 0, sizeof(lv_scale_needle_t));
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -605,6 +612,13 @@ static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_free(section);
     }
     lv_ll_clear(&scale->section_ll);
+
+    size_t needle_count = lv_array_size(&scale->needles);
+    for(size_t i = 0; i < needle_count; ++i) {
+        lv_scale_needle_t * scale_needle = lv_array_at(&scale->needles, i);
+        lv_obj_remove_event_cb(scale_needle->obj, needle_deleted_cb);
+    }
+    lv_array_deinit(&scale->needles);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -655,6 +669,18 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* NOTE: Extend scale draw size so the first tick label can be shown */
         lv_event_set_ext_draw_size(event, 100);
+    }
+    else if(event_code == LV_EVENT_STYLE_CHANGED) {
+        size_t needle_count = lv_array_size(&scale->needles);
+        for(size_t i = 0; i < needle_count; ++i) {
+            lv_scale_needle_t * needle = lv_array_at(&scale->needles, i);
+            if(lv_obj_has_class(needle->obj, &lv_line_class)) {
+                lv_scale_set_line_needle_value(obj, needle->obj, needle->length, needle->value);
+            }
+            else {
+                lv_scale_set_image_needle_value(obj, needle->obj, needle->value);
+            }
+        }
     }
     else {
         /* Nothing to do. Invalid event */
@@ -1759,6 +1785,46 @@ static void scale_free_line_needle_points_cb(lv_event_t * e)
 static bool scale_is_major_tick(lv_scale_t * scale, uint32_t tick_idx)
 {
     return scale->major_tick_every != 0 && tick_idx % scale->major_tick_every == 0;
+}
+
+static lv_result_t update_needle(lv_scale_t * scale, lv_obj_t * needle, int32_t length, int32_t value)
+{
+    /* First try to find the needle in the haystack (scale's needle list) */
+    size_t needle_count = lv_array_size(&scale->needles);
+    for(size_t i = 0; i < needle_count; ++i) {
+        lv_scale_needle_t * scale_needle = lv_array_at(&scale->needles, i);
+        if(scale_needle->obj == needle) {
+            scale_needle->value = value;
+            scale_needle->length = length;
+            return LV_RESULT_OK;
+        }
+    }
+
+    /* Needle is not yet part of the haystack */
+    lv_scale_needle_t scale_needle = {.obj = needle, .length = length, .value = value};
+    lv_result_t res = lv_array_push_back(&scale->needles, &scale_needle);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to attach needle to scale - not enough memory");
+        return LV_RESULT_INVALID;
+    }
+
+    lv_obj_add_event_cb(needle, needle_deleted_cb, LV_EVENT_DELETE, scale);
+    return LV_RESULT_OK;
+}
+
+static void needle_deleted_cb(lv_event_t * e)
+{
+    lv_scale_t * scale = lv_event_get_user_data(e);
+    lv_obj_t * needle = lv_event_get_target_obj(e);
+
+    size_t needle_count = lv_array_size(&scale->needles);
+    for(size_t i = 0; i < needle_count; ++i) {
+        lv_scale_needle_t * scale_needle = lv_array_at(&scale->needles, i);
+        if(scale_needle->obj == needle) {
+            lv_array_remove(&scale->needles, i);
+            return;
+        }
+    }
 }
 
 #if LV_USE_OBSERVER
