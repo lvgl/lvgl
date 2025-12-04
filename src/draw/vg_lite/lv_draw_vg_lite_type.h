@@ -53,7 +53,9 @@ struct _lv_draw_vg_lite_unit_t {
 
     lv_cache_t * stroke_cache;
 
+    lv_cache_t * bitmap_font_cache;
     struct _lv_vg_lite_pending_t * bitmap_font_pending;
+    struct _lv_vg_lite_pending_t * letter_pending;
 
     uint16_t flush_count;
     uint16_t letter_count;
