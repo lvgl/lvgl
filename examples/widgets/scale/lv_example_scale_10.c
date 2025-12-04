@@ -45,7 +45,7 @@ static void hr_anim_timer_cb(lv_timer_t * timer)
     }
 
     /* Update needle */
-    lv_scale_set_line_needle_value(scale, needle_line, -8, hr_value);
+    lv_scale_set_line_needle_value(scale, needle_line, 180, hr_value);
 
     /* Update HR text */
     lv_label_set_text_fmt(hr_value_label, "%d", hr_value);
@@ -132,7 +132,7 @@ void lv_example_scale_10(void)
 
     int32_t current_hr = 145;
 
-    lv_scale_set_line_needle_value(scale, needle_line, 0, current_hr);
+    lv_scale_set_line_needle_value(scale, needle_line, 50, current_hr);
 
     lv_obj_t * circle = lv_obj_create(lv_screen_active());
     lv_obj_set_size(circle, 130, 130);
