@@ -86,8 +86,8 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_FlipRB", "u_Hue", "u_Saturation", "u_Value" };
+static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -146,14 +146,24 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                       lv_color_black(), false);
+                       lv_color_black(), false, false);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w,
+                                       int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
+                       lv_color_black(), false, true);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false);
+    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, true);
     LV_PROFILER_DRAW_END;
 }
 
@@ -190,6 +200,46 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
+    lv_opengles_shader_set_uniform1i("u_FlipRB", 0);
+
+    lv_opengles_render_draw();
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_display_texture_rbswap(lv_display_t * display, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    unsigned int texture = *(unsigned int *)lv_display_get_driver_data(display);
+    GL_CALL(glActiveTexture(GL_TEXTURE0));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+
+    lv_display_rotation_t rotation = lv_display_get_rotation(display);
+
+    float vert_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN];
+    populate_vertex_buffer(vert_buffer, rotation, &h_flip, &v_flip, 0.f, 0.f, 1.f, 1.f);
+    lv_opengles_vertex_buffer_init(vert_buffer, sizeof(vert_buffer));
+
+    float hor_scale = 1.0f;
+    float ver_scale = 1.0f;
+    float hor_translate = 0.0f;
+    float ver_translate = 0.0f;
+    hor_scale = h_flip ? -hor_scale : hor_scale;
+    ver_scale = v_flip ? ver_scale : -ver_scale;
+
+    const float transposed_matrix[9] = {
+        hor_scale,  0.0f,        0.0f,
+        0.0f,       ver_scale,   0.0f,
+        hor_translate, ver_translate, 1.0f
+    };
+
+    lv_opengles_shader_bind();
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i("u_Texture", 0);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, transposed_matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", 1);
+    lv_opengles_shader_set_uniform1i("u_IsFill", 0);
+    lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
+    lv_opengles_shader_set_uniform1i("u_FlipRB", 1);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -211,7 +261,7 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt)
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -258,6 +308,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         hor_translate, ver_translate, 1.0f
     };
 
+
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
@@ -267,6 +318,8 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
+    lv_opengles_shader_set_uniform1i("u_FlipRB", flipRB ? 1 : 0);
+
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
