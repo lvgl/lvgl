@@ -52,6 +52,7 @@ static void draw_main(lv_event_t * e);
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
 static void lv_label_refr_text(lv_obj_t * obj);
+static void update_layout_completed_cb(lv_event_t * e);
 static void lv_label_revert_dots(lv_obj_t * label);
 static void lv_label_set_dots(lv_obj_t * label, uint32_t dot_begin);
 
@@ -787,6 +788,9 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(label->translation_tag) lv_free(label->translation_tag);
     label->translation_tag = NULL;
 #endif /*LV_USE_TRANSLATION*/
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_remove_event_cb_with_user_data(disp, update_layout_completed_cb, obj);
 }
 
 static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -853,9 +857,6 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
 
-    }
-    else if(code == LV_EVENT_UPDATE_LAYOUT_COMPLETED) {
-        lv_label_refr_text(obj);
     }
 #if LV_USE_TRANSLATION
     else if(code == LV_EVENT_TRANSLATION_LANGUAGE_CHANGED) {
@@ -1065,12 +1066,27 @@ static void lv_label_mark_need_refr_text(lv_obj_t * obj)
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
     label->invalid_size_cache = true;
-    label->need_refr_text = true;
 
     lv_obj_invalidate(obj);
     lv_obj_refresh_self_size(obj);
 
-    lv_obj_request_layout_complete_event(obj);
+    if(!label->need_refr_text) {
+        label->need_refr_text = true;
+        lv_display_t * disp = lv_obj_get_display(obj);
+        lv_display_add_event_cb(disp, update_layout_completed_cb, LV_EVENT_UPDATE_LAYOUT_COMPLETED, obj);
+    }
+}
+
+static void update_layout_completed_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_user_data(e);
+    lv_label_t * label = (lv_label_t *)obj;
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_remove_event_cb_with_user_data(disp, update_layout_completed_cb, obj);
+    if(!label->need_refr_text) return;
+    label->need_refr_text = false;
+    lv_label_refr_text(obj);
 }
 
 /**
@@ -1081,8 +1097,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
     if(label->text == NULL) return;
-    if(!label->need_refr_text) return;
-    label->need_refr_text = false;
 #if LV_LABEL_LONG_TXT_HINT
     label->hint.line_start = -1; /*The hint is invalid if the text changes*/
 #endif

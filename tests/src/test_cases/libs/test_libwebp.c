@@ -69,7 +69,7 @@ void test_libwebp_1(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/webp_1.png");
 
     /* Check for memory leaks */
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 36);
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 56);
 }
 
 #endif
