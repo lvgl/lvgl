@@ -12,3 +12,4 @@ Integration
     xml
     renesas-dev-tools
     arduino
+    zephyr
