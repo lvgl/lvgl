@@ -121,7 +121,7 @@ lv_display_t * lv_linux_fbdev_create(void)
     return disp;
 }
 
-void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
+lv_result_t lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
     char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
@@ -136,7 +136,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     dsc->fbfd = open(dsc->devname, O_RDWR);
     if(dsc->fbfd == -1) {
         perror("Error: cannot open framebuffer device");
-        return;
+        return LV_RESULT_INVALID;
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
@@ -153,13 +153,13 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /*Get fb type*/
     if(ioctl(dsc->fbfd, FBIOGTYPE, &fb) != 0) {
         perror("ioctl(FBIOGTYPE)");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     /*Get screen width*/
     if(ioctl(dsc->fbfd, FBIO_GETLINEWIDTH, &line_length) != 0) {
         perror("ioctl(FBIO_GETLINEWIDTH)");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     dsc->vinfo.xres = (unsigned) fb.fb_width;
@@ -174,13 +174,13 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /* Get fixed screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_FSCREENINFO, &dsc->finfo) == -1) {
         perror("Error reading fixed information");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     /* Get variable screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_VSCREENINFO, &dsc->vinfo) == -1) {
         perror("Error reading variable information");
-        return;
+        return LV_RESULT_INVALID;
     }
 #endif /* LV_LINUX_FBDEV_BSD */
 
@@ -194,7 +194,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);
     if((intptr_t)dsc->fbp == -1) {
         perror("Error: failed to map framebuffer device to memory");
-        return;
+        return LV_RESULT_INVALID;
     }
 #endif
 
@@ -249,6 +249,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+
+    return LV_RESULT_OK;
 }
 
 void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
