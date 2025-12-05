@@ -654,7 +654,9 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_DRAW_MAIN) {
         GLuint texture_id = lv_gltf_view_render(viewer);
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
         lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
+#endif
     }
 
     lv_result_t res;
