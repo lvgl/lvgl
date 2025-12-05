@@ -17,7 +17,6 @@ extern "C" {
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
-#include <float.h>
 
 /*********************
  *      DEFINES
@@ -31,7 +30,7 @@ extern "C" {
  **********************/
 
 typedef struct _lv_vg_lite_path_t lv_vg_lite_path_t;
-typedef struct _lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
+struct _lv_draw_vg_lite_unit_t;
 
 typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 
@@ -39,17 +38,17 @@ typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, con
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_vg_lite_path_init(lv_draw_vg_lite_unit_t * unit);
+void lv_vg_lite_path_init(struct _lv_draw_vg_lite_unit_t * unit);
 
-void lv_vg_lite_path_deinit(lv_draw_vg_lite_unit_t * unit);
+void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
 lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format);
 
 void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path);
 
-lv_vg_lite_path_t * lv_vg_lite_path_get(lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format);
+lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format);
 
-void lv_vg_lite_path_drop(lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path);
+void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path);
 
 void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_format);
 

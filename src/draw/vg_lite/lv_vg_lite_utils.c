@@ -7,18 +7,19 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
-#include "lv_draw_vg_lite_type.h"
 #include "../../misc/lv_area_private.h"
-#include <string.h>
+#include "../../display/lv_display.h"
+#include "../../draw/lv_draw_image.h"
+#include "../lv_image_decoder_private.h"
 #include <math.h>
 
 /*********************
