@@ -183,8 +183,8 @@ Keys
 
 .. _lv_dropdown_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/dropdown/index.rst
 

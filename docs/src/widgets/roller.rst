@@ -125,8 +125,8 @@ Keys
 
 .. _lv_roller_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/roller/index.rst
 

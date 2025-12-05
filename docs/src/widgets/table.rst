@@ -150,8 +150,8 @@ currently selected cell. Row and column will be set to
 
 .. _lv_table_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/table/index.rst
 

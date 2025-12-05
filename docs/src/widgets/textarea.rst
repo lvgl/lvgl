@@ -257,8 +257,8 @@ Keys
 
 .. _lv_textarea_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/textarea/index.rst
 

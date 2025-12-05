@@ -390,8 +390,8 @@ No *Keys* are processed by Chart Widgets.
 
 .. _lv_chart_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/chart/index.rst
 

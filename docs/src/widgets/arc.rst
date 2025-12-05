@@ -191,8 +191,8 @@ Keys
 
 .. _lv_arc_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/arc/index.rst
 

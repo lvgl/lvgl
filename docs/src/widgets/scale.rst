@@ -320,8 +320,8 @@ No *Keys* are processed by Scale Widgets.
 
 .. _lv_scale_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/scale/index.rst
 

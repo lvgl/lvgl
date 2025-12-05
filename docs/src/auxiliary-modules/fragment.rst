@@ -79,8 +79,8 @@ Fragment Based Navigation
 
 .. _fragment_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/others/fragment/index.rst
 

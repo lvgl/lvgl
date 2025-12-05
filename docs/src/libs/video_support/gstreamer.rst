@@ -298,8 +298,8 @@ Once media is loaded (LV_EVENT_READY), you can access:
 
 .. _gstreamer_example:
 
-Examples
-********
+Example
+*******
 
 .. include:: /examples/libs/gstreamer/index.rst
 

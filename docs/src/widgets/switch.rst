@@ -99,8 +99,8 @@ Keys
 
 .. _lv_switch_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/switch/index.rst
 

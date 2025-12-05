@@ -168,8 +168,8 @@ the button will not be activated upon leaving edit mode.
 
 .. _lv_buttonmatrix_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/buttonmatrix/index.rst
 
