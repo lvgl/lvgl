@@ -563,6 +563,21 @@ menu "LVGL configuration"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_NANOVG
+			bool "Use NanoVG Renderer."
+			default n
+			depends on LV_USE_NANOVG && LV_USE_MATRIX
+
+		config LV_NANOVG_IMAGE_CACHE_CNT
+			int "Draw image texture cache count"
+			default 128
+			depends on LV_USE_DRAW_NANOVG
+
+		config LV_NANOVG_LETTER_CACHE_CNT
+			int "Draw letter cache count"
+			default 512
+			depends on LV_USE_DRAW_NANOVG
+
 	endmenu
 
 	menu "Feature Configuration"
@@ -1523,6 +1538,10 @@ menu "LVGL configuration"
 					bool "Use ThorVG external"
 			endchoice
 
+		config LV_USE_NANOVG
+			bool "NanoVG library"
+			default n
+
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"
 			choice
@@ -1864,6 +1883,11 @@ menu "LVGL configuration"
 			depends on LV_USE_SDL
 			default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
 			default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
+
+		config LV_SDL_USE_EGL
+			bool "Use EGL backend for rendering"
+			depends on LV_USE_SDL
+			default n
 
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
