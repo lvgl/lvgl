@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_draw_vector_private.h"
 #include "lv_vg_lite_grad.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
@@ -15,8 +14,7 @@
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_math.h"
-#include "../../misc/lv_types.h"
-#include "../../stdlib/lv_string.h"
+#include "../lv_draw_vector_private.h"
 
 /*********************
  *      DEFINES

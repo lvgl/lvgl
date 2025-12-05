@@ -7,15 +7,14 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_decoder.h"
 
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_utils.h"
-#include <stdlib.h>
-#include <string.h>
 #include "../../core/lv_global.h"
+#include "../lv_image_decoder_private.h"
+#include "../../libs/bin_decoder/lv_bin_decoder.h"
 
 /*********************
  *      DEFINES

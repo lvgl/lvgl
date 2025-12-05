@@ -7,11 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
 
-#include "lv_draw_vg_lite.h"
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
@@ -22,7 +21,6 @@
 #include "../../libs/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
-
 
 /*********************
  *      DEFINES
