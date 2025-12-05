@@ -73,4 +73,126 @@ void test_style_min_size(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_pos_content_min_size.png");
 }
 
+void test_circular_height_dependency(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont, "cont");
+    lv_obj_set_size(cont, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_style_bg_color(cont, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_COVER, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+
+    lv_obj_t * item1 = lv_obj_create(cont);
+    lv_obj_set_name(item1, "item1");
+    lv_obj_set_style_bg_color(item1, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(item1, LV_OPA_COVER, 0);
+    /**
+     * Because parent is size content this will evaluate after all the fixed/clamped children are sized
+     * This means item1 should size to 100 because of item2
+     */
+    lv_obj_set_height(item1, LV_PCT(100));
+    lv_obj_set_flex_grow(item1, 1);
+
+    lv_obj_t * item2 = lv_obj_create(cont);
+    lv_obj_set_name(item2, "item2");
+    lv_obj_set_style_bg_color(item2, lv_palette_main(LV_PALETTE_BLUE), 0);
+    lv_obj_set_style_bg_opa(item2, LV_OPA_COVER, 0);
+    lv_obj_set_height(item2, 100); // fixed size
+    lv_obj_set_flex_grow(item2, 1);
+
+    lv_obj_t * item3 = lv_obj_create(cont);
+    lv_obj_set_name(item3, "item3");
+    lv_obj_set_style_bg_color(item3, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(item3, LV_OPA_COVER, 0);
+    lv_obj_set_height(item3, LV_PCT(100)); // same as item1 but checking if child order matters
+    lv_obj_set_flex_grow(item3, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_circular_height.png");
+    TEST_ASSERT_EQUAL_INT32(100, lv_obj_get_height(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item3));
+
+    /**
+     * Decreasing item2 height should also decrease item1 and item3 height
+     */
+    lv_obj_set_height(item2, 40);
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(40, lv_obj_get_height(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item3));
+
+    lv_obj_set_height(item2, LV_PCT(100));
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_height(item1));
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_height(item2));
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_height(item3));
+
+    lv_obj_set_style_min_height(item2, 50, 0);
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(50, lv_obj_get_height(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_height(item2), lv_obj_get_height(item3));
+}
+
+void test_circular_width_dependency(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_name(cont, "cont");
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_PCT(100));
+    lv_obj_set_style_bg_color(cont, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_set_style_bg_opa(cont, LV_OPA_COVER, 0);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+
+    lv_obj_t * item1 = lv_obj_create(cont);
+    lv_obj_set_name(item1, "item1");
+    lv_obj_set_style_bg_color(item1, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(item1, LV_OPA_COVER, 0);
+    /**
+     * Because parent is size content this will evaluate after all the fixed/clamped children are sized
+     * This means item1 should size to 100 because of item2
+     */
+    lv_obj_set_width(item1, LV_PCT(100));
+    lv_obj_set_flex_grow(item1, 1);
+
+    lv_obj_t * item2 = lv_obj_create(cont);
+    lv_obj_set_name(item2, "item2");
+    lv_obj_set_style_bg_color(item2, lv_palette_main(LV_PALETTE_BLUE), 0);
+    lv_obj_set_style_bg_opa(item2, LV_OPA_COVER, 0);
+    lv_obj_set_width(item2, 100); // fixed size
+    lv_obj_set_flex_grow(item2, 1);
+
+    lv_obj_t * item3 = lv_obj_create(cont);
+    lv_obj_set_name(item3, "item3");
+    lv_obj_set_style_bg_color(item3, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(item3, LV_OPA_COVER, 0);
+    lv_obj_set_width(item3, LV_PCT(100)); // same as item1 but checking if child order matters
+    lv_obj_set_flex_grow(item3, 1);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_circular_width.png");
+    TEST_ASSERT_EQUAL_INT32(100, lv_obj_get_width(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item3));
+
+    /**
+     * Decreasing item2 width should also decrease item1 and item3 width
+     */
+    lv_obj_set_width(item2, 40);
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(40, lv_obj_get_width(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item3));
+
+    lv_obj_set_width(item2, LV_PCT(100));
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_width(item1));
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_width(item2));
+    TEST_ASSERT_EQUAL_INT32(0, lv_obj_get_width(item3));
+
+    lv_obj_set_style_min_width(item2, 50, 0);
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL_INT32(50, lv_obj_get_width(item2));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item1));
+    TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item3));
+}
+
 #endif
