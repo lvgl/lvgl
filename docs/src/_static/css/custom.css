@@ -106,7 +106,7 @@ body[data-theme="dark"] {
 }
 
 @media (prefers-color-scheme: dark) {
-  body {
+  body:not([data-theme="light"]) {
     --color-accent-rgb: 168, 131, 243;
     --color-accent: #a883f3;
     --color-link-underline: #ffffff55;
@@ -397,7 +397,7 @@ code.literal + sub {
   padding: 1.5rem;
 }
 
-[data-theme="dark"] .highlight {
+body:not([data-theme="light"]) .highlight {
   background-color: var(--color-background-secondary) !important;
 }
 
@@ -822,7 +822,7 @@ table.docutils th p {
   background-position: right 0.5rem center;
 }
 
-[data-theme="dark"] #version_dropdown {
+body:not([data-theme="light"]) #version_dropdown {
   box-shadow: 0 0 0 1px var(--color-border-secondary), 0px 2px 4px rgba(0, 0, 0, 0.08);
   background-image: url('data:image/svg+xml,<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 10L8.00001 13L5.00001 10" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 6L8.00001 3.00001L5.00001 5.99999" stroke="%23ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 }
@@ -1124,7 +1124,7 @@ article figure img {
  * Code Highlighting
  *-------------------------------------------------------------------------*/
 /* Pygments .p = Punctuation */
-body[data-theme="dark"] .highlight .p {
+body:not([data-theme="light"]) .highlight .p {
   color: #a883f3;
 }
 
