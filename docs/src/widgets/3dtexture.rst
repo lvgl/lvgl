@@ -67,7 +67,7 @@ Events
 Example
 *******
 
-See the `lv_example_3dtexture <https://github.com/lvgl/lv_example_3dtexture>` repo.
+See the `lv_example_3dtexture <https://github.com/lvgl/lv_example_3dtexture>`__ repo.
 
 
 .. _lv_3dtexture_api:
