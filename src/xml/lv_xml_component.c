@@ -1078,7 +1078,7 @@ static void anim_exec_cb(lv_anim_t * a, int32_t v)
 {
     anim_data_t * anim_data = lv_anim_get_user_data(a);
 
-    lv_style_value_t style_value;
+    lv_style_value_t style_value = {0};
     if(anim_data->prop_type == STYLE_PROP_TYPE_INT || anim_data->prop_type == STYLE_PROP_TYPE_OPA) {
         style_value.num = v;
     }
