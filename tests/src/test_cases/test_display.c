@@ -82,7 +82,7 @@ static void exec_invalidated_drawbuf_size_test(const struct display_area_test_se
     lv_display_delete(disp);
 }
 
-void test_get_invalidated_drawbuf_size_rgb888_partial()
+void test_get_invalidated_drawbuf_size_rgb888_partial(void)
 {
     struct display_area_test_set test_set = {
         .width = 10,
@@ -96,7 +96,7 @@ void test_get_invalidated_drawbuf_size_rgb888_partial()
     exec_invalidated_drawbuf_size_test(&test_set);
 }
 
-void test_get_invalidated_drawbuf_size_rgb888_full()
+void test_get_invalidated_drawbuf_size_rgb888_full(void)
 {
     struct display_area_test_set test_set = {
         .width = 10,
@@ -110,7 +110,7 @@ void test_get_invalidated_drawbuf_size_rgb888_full()
     exec_invalidated_drawbuf_size_test(&test_set);
 }
 
-void test_get_invalidated_drawbuf_size_i1_full()
+void test_get_invalidated_drawbuf_size_i1_full(void)
 {
     struct display_area_test_set test_set =  {
         .width = 180,
@@ -124,7 +124,7 @@ void test_get_invalidated_drawbuf_size_i1_full()
     exec_invalidated_drawbuf_size_test(&test_set);
 }
 
-void test_get_invalidated_drawbuf_size_i1_partial()
+void test_get_invalidated_drawbuf_size_i1_partial(void)
 {
     struct display_area_test_set test_set = {
         .width = 180,
