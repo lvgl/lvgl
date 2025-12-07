@@ -385,7 +385,7 @@ include_directories(${PNG_INCLUDE_DIR})
 if(NOT WIN32)
     # FFmpeg is optional for the image and video test cases
     find_package(PkgConfig)
-    pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+    pkg_check_modules(FFMPEG IMPORTED_TARGET
         libavformat
         libavcodec
         libswscale
