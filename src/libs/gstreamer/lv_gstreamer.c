@@ -455,6 +455,7 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
             }
         };
         lv_image_set_src((lv_obj_t *)streamer, &streamer->frame);
+        gst_buffer_unmap(buffer, &map);
     }
     /* We send the event AFTER setting the image source so that users can query the
      * resolution on this specific event callback */
