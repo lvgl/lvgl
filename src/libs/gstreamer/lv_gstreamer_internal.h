@@ -43,6 +43,8 @@ struct _lv_gstreamer_t {
     GstElement * audio_volume;
     GstSample * last_sample;
     lv_timer_t * gstreamer_timer;
+    GstMapInfo curr_map_info;
+    GstBuffer * curr_buffer;
     GAsyncQueue * frame_queue;
     bool is_video_info_valid;
 };

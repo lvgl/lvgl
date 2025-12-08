@@ -443,6 +443,12 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
     if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
+        if(streamer->curr_buffer) {
+            gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
+        }
+        streamer->curr_buffer = buffer;
+        streamer->curr_map_info = map;
+
         streamer->frame = (lv_image_dsc_t) {
             .data = map.data,
             .data_size = map.size,
@@ -491,7 +497,10 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     if(streamer->last_sample) {
         gst_sample_unref(streamer->last_sample);
     }
-
+    if(streamer->curr_buffer) {
+        gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
+    }
+    lv_timer_delete(streamer->gstreamer_timer);
     g_async_queue_unref(streamer->frame_queue);
 }
 
