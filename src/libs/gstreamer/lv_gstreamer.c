@@ -495,11 +495,11 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
         gst_object_unref(streamer->pipeline);
     }
-    if(streamer->last_sample) {
-        gst_sample_unref(streamer->last_sample);
-    }
     if(streamer->curr_buffer) {
         gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
+    }
+    if(streamer->last_sample) {
+        gst_sample_unref(streamer->last_sample);
     }
     lv_timer_delete(streamer->gstreamer_timer);
     g_async_queue_unref(streamer->frame_queue);
