@@ -1,5 +1,5 @@
 ============================
-ST7789 LCD Controller driver
+ST7789 LCD Controller Driver
 ============================
 
 Overview
@@ -33,7 +33,7 @@ There are no prerequisites.
 
 
 
-Configuring the driver
+Configuring the Driver
 **********************
 
 Enable the ST7789 driver support in lv_conf.h, by cmake compiler define or by KConfig:

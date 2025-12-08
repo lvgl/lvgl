@@ -29,7 +29,7 @@ There are no prerequisites.
 
 
 
-Configuring the driver
+Configuring the Driver
 **********************
 
 Enable the ILI9341 driver support in lv_conf.h, by cmake compiler define or by KConfig:
