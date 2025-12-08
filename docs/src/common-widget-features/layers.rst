@@ -74,7 +74,7 @@ Widgets that share the same parent:
 - Use :cpp:expr:`lv_obj_swap(widget1, widget2)` to swap the layer positions (Z-orders)
   of the two Widgets.
 - When :cpp:expr:`lv_obj_set_parent(widget, new_parent)` is used, ``widget`` will
-  become the fore-most child of ``new_parent``.
+  become the foremost child of ``new_parent``.
 
 
 
