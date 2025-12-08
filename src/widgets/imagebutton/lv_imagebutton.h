@@ -82,16 +82,16 @@ void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, c
  * Set the right image for a state of the image button
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
- * @param src_left      pointer to an image source for the left side of the button
+ * @param src_right      pointer to an image source for the right side of the button
  *                      (a C array or path to a file)
  */
 void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right);
 
 /**
- * Set the left image for a state of the image button
+ * Set the middle image for a state of the image button
  * @param obj           pointer to an image button object
  * @param state         for which state set the new image
- * @param src_left      pointer to an image source for the left side of the button
+ * @param src_mid       pointer to an image source for the middle of the button
  *                      (a C array or path to a file)
  */
 void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid);
