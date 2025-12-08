@@ -42,6 +42,8 @@ is configured to link the "cortex_m33_NemaPVG" binaries when building.
 additionally supports the tessellation and matrix multiplication acceleration that
 the STM32 U5F and U5G NeoChrom cores are capable of.
 
+"cortex_m55" should be used on all STM32N6 series devices.
+
 With a different STM32CubeIDE project, you can configure the libraries to be linked
 by right-clicking the project in the "Project Explorer" sidebar, clicking
 "Properties", navigating to "C/C++ Build", "Settings", "MCU G++ Linker", and then
