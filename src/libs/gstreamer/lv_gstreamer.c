@@ -443,14 +443,14 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
     GstBuffer * buffer = gst_sample_get_buffer(sample);
     GstMapInfo map;
     if(buffer && gst_buffer_map(buffer, &map, GST_MAP_READ)) {
-        if(streamer->curr_buffer) {
-            gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
+        if(streamer->last_buffer) {
+            gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
         }
         if(streamer->last_sample) {
             gst_sample_unref(streamer->last_sample);
         }
-        streamer->curr_buffer = buffer;
-        streamer->curr_map_info = map;
+        streamer->last_buffer = buffer;
+        streamer->last_map_info = map;
 
         streamer->last_sample = sample;
 
@@ -495,8 +495,8 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         gst_element_set_state(streamer->pipeline, GST_STATE_NULL);
         gst_object_unref(streamer->pipeline);
     }
-    if(streamer->curr_buffer) {
-        gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
+    if(streamer->last_buffer) {
+        gst_buffer_unmap(streamer->last_buffer, &streamer->last_map_info);
     }
     if(streamer->last_sample) {
         gst_sample_unref(streamer->last_sample);
