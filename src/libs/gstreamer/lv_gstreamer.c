@@ -446,8 +446,13 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
         if(streamer->curr_buffer) {
             gst_buffer_unmap(streamer->curr_buffer, &streamer->curr_map_info);
         }
+        if(streamer->last_sample) {
+            gst_sample_unref(streamer->last_sample);
+        }
         streamer->curr_buffer = buffer;
         streamer->curr_map_info = map;
+
+        streamer->last_sample = sample;
 
         streamer->frame = (lv_image_dsc_t) {
             .data = map.data,
@@ -468,10 +473,6 @@ static void gstreamer_update_frame(lv_gstreamer_t * streamer)
         lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_READY, streamer);
     }
 
-    if(streamer->last_sample) {
-        gst_sample_unref(streamer->last_sample);
-    }
-    streamer->last_sample = sample;
 }
 static void gstreamer_timer_cb(lv_timer_t * timer)
 {
