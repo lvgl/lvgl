@@ -141,9 +141,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 }
             }
         }
+#if LV_GLTF_LINEAR_OUTPUT
         if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
+#endif
 
         // only set cutoff value for mask material
         if(material.alphaMode == fastgltf::AlphaMode::Mask) {
