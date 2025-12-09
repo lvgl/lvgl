@@ -186,6 +186,9 @@ lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * 
         }
         hash ^= lv_opengl_shader_hash(define);
     }
+    /* hash the version so that the same shader with different versions produces a different hash*/
+    hash ^= lv_opengl_shader_hash(lv_opengles_glsl_version_to_string(glsl_version));
+
     lv_opengl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
         lv_rb_find(&shader->compiled_shaders_map, &shader_map_key);
