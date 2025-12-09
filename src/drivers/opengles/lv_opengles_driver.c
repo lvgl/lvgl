@@ -381,7 +381,7 @@ static void lv_opengles_index_buffer_unbind(void)
 static unsigned int lv_opengles_shader_manager_init(void)
 {
     lv_opengl_shader_program_t * program  = NULL;
-    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+    for(lv_opengl_glsl_version_t version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
         LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
         lv_opengl_shader_portions_t portions;
         lv_opengles_shader_get_source(&portions, version);

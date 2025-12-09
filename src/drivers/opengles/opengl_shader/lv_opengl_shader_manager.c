@@ -62,7 +62,7 @@ static bool string_ends_with(const char * value, const char * suffix);
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len, lv_opengl_glsl_version glsl_version);
+                               size_t permutations_len, lv_opengl_glsl_version_t glsl_version);
 
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader);
 static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
@@ -161,7 +161,7 @@ GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager
 
 lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader, const char * shader_identifier,
                                                    const lv_opengl_shader_define_t * permutations, size_t permutations_len,
-                                                   lv_opengl_glsl_version glsl_version, uint32_t * out_hash)
+                                                   lv_opengl_glsl_version_t glsl_version, uint32_t * out_hash)
 {
     /* First check that the shader identifier exists */
     lv_opengl_shader_t key = { shader_identifier, NULL };
@@ -324,7 +324,7 @@ void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
 
 }
 
-const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version)
+const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version_t version)
 {
 
     switch(version) {
@@ -485,7 +485,7 @@ static char * append_to_shader(char * dst, const char * src, size_t * curr_index
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len, lv_opengl_glsl_version glsl_version)
+                               size_t permutations_len, lv_opengl_glsl_version_t glsl_version)
 {
     const char * defines = lv_opengles_glsl_version_to_string(glsl_version);
     const char * prefix = "#define ";

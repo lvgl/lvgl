@@ -230,7 +230,7 @@ static const size_t src_includes_v300es_count = sizeof src_includes_v300es / siz
  *   GLOBAL FUNCTIONS
  **********************/
 
-char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version) {
+char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version_t version) {
     switch (version){
         case LV_OPENGL_GLSL_VERSION_300ES:
             return lv_opengl_shader_manager_process_includes(src_vertex_shader_v300es, src_includes_v300es, src_includes_v300es_count);
@@ -243,7 +243,7 @@ char * lv_opengles_shader_get_vertex(lv_opengl_glsl_version version) {
     LV_UNREACHABLE();
 }
 
-char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version) {
+char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version_t version) {
     switch (version){
         case LV_OPENGL_GLSL_VERSION_300ES:
             return lv_opengl_shader_manager_process_includes(src_fragment_shader_v300es, src_includes_v300es, src_includes_v300es_count);
@@ -256,7 +256,7 @@ char * lv_opengles_shader_get_fragment(lv_opengl_glsl_version version) {
     LV_UNREACHABLE();
 }
 
-void lv_opengles_shader_get_source(lv_opengl_shader_portions_t *portions, lv_opengl_glsl_version version)
+void lv_opengles_shader_get_source(lv_opengl_shader_portions_t *portions, lv_opengl_glsl_version_t version)
 {
     switch (version){
         case LV_OPENGL_GLSL_VERSION_300ES:
