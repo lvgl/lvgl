@@ -224,8 +224,7 @@ void test_xml_style_prop_binding(void)
         "</component>";
 
     lv_xml_register_component_from_data("comp1", comp1_xml);
-    lv_xml_component_unregister("comp1");
-    return;
+
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
     lv_obj_add_state(obj, LV_STATE_CHECKED);

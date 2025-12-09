@@ -46,10 +46,6 @@ typedef enum {
      */
     LV_TEST_SCREENSHOT_RESULT_NO_REFERENCE_IMAGE,
 
-    /**
-     * The dimension of the reference image is incorrect
-     */
-    LV_TEST_SCREENSHOT_RESULT_BAD_REFERENCE_IMAGE_SIZE
 } lv_test_screenshot_result_t;
 
 /**********************

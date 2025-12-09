@@ -132,7 +132,7 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
         LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
         lv_free(screen_buf_xrgb8888);
         if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
-        return LV_TEST_SCREENSHOT_RESULT_BAD_REFERENCE_IMAGE_SIZE;
+        return LV_TEST_SCREENSHOT_RESULT_FAILED;
     }
 
 
