@@ -291,6 +291,58 @@ lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
     return program;
 }
 
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
+                                                                      const lv_opengl_shader_params_t * frag_shader,
+                                                                      const lv_opengl_shader_params_t * vert_shader,
+                                                                      lv_opengl_glsl_version_t version)
+{
+    uint32_t frag_shader_hash;
+    uint32_t vert_shader_hash;
+
+
+    lv_result_t res = lv_opengl_shader_manager_select_shader(manager, frag_shader->name, frag_shader->permutations,
+                                                             frag_shader->permutations_len,
+                                                             version, &frag_shader_hash);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to compile shader for glsl version %s", lv_opengles_glsl_version_to_string(version));
+        return NULL;
+    }
+
+    res = lv_opengl_shader_manager_select_shader(manager, vert_shader->name, vert_shader->permutations,
+                                                 vert_shader->permutations_len,
+                                                 version, &vert_shader_hash);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to compile shader for glsl version %s", lv_opengles_glsl_version_to_string(version));
+        return NULL;
+    }
+    lv_opengl_shader_program_t * program =
+        lv_opengl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
+
+    if(!program) {
+        LV_LOG_WARN("Failed to link program for glsl version %s", lv_opengles_glsl_version_to_string(version));
+    }
+
+    return program;
+
+}
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program_best_version(
+    lv_opengl_shader_manager_t * manager,
+    const lv_opengl_shader_params_t * frag_shader,
+    const lv_opengl_shader_params_t * vert_shader,
+    const lv_opengl_glsl_version_t * versions, size_t version_count)
+{
+    for(size_t i = 0; i < version_count; ++i) {
+        lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program(manager, frag_shader, vert_shader,
+                                                                                        versions[i]);
+        if(program) {
+            return program;
+        }
+    }
+    return NULL;
+}
+
 void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
 {
     LV_LOG_INFO("Destroying shader cache");

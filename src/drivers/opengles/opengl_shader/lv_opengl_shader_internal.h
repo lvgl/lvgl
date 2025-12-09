@@ -79,6 +79,12 @@ typedef struct _lv_shader_program {
     uint32_t id;
 } lv_opengl_shader_program_t;
 
+typedef struct {
+    const char * name;
+    const lv_opengl_shader_define_t * permutations;
+    size_t permutations_len;
+} lv_opengl_shader_params_t;
+
 typedef enum {
     LV_OPENGL_GLSL_VERSION_300ES,
     LV_OPENGL_GLSL_VERSION_330,
@@ -112,6 +118,18 @@ lv_opengl_shader_program_t * lv_opengl_shader_manager_get_program(lv_opengl_shad
                                                                   uint32_t vertex_shader_hash);
 
 const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version_t version);
+
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
+                                                                      const lv_opengl_shader_params_t * frag_shader,
+                                                                      const lv_opengl_shader_params_t * vert_shader,
+                                                                      lv_opengl_glsl_version_t version);
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program_best_version(
+    lv_opengl_shader_manager_t * manager,
+    const lv_opengl_shader_params_t * frag_shader,
+    const lv_opengl_shader_params_t * vert_shader,
+    const lv_opengl_glsl_version_t * versions, size_t version_count);
 
 /**********************
  *      MACROS
