@@ -81,6 +81,7 @@ typedef struct _lv_shader_program {
 
 typedef enum {
     LV_OPENGL_GLSL_VERSION_300ES,
+    LV_OPENGL_GLSL_VERSION_330,
     LV_OPENGL_GLSL_VERSION_100,
     LV_OPENGL_GLSL_VERSION_LAST,
 } lv_opengl_glsl_version_t;
