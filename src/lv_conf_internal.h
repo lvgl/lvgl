@@ -3823,6 +3823,22 @@
         #define LV_USE_TEST_SCREENSHOT_COMPARE 0
     #endif
 #endif
+
+#if LV_USE_TEST_SCREENSHOT_COMPARE
+    /** 1: Automatically create missing reference images*/
+    #ifndef LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE CONFIG_LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
+            #else
+                #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 0
+            #endif
+        #else
+            #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
+        #endif
+    #endif
+#endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
 #endif /*LV_USE_TEST*/
 
 /** Enable loading XML UIs runtime */

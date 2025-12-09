@@ -129,14 +129,15 @@ for the list of supported input device emulation functions.
 Screenshot Comparison
 ---------------------
 
-``bool lv_test_screenshot_compare(const char * fn_ref)`` is a useful function
+``lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)`` is a useful function
 to compare the content of the emulated display with reference PNG images.
 
 
 This function works in a practical way:
 
 - If the folder(s) referenced in ``fn_ref`` do not exist, they will be created automatically.
-- If the reference image is not found, it will be created automatically from the rendered screen.
+- If the reference image is not found, it will be created automatically from the rendered screen
+  (unless ``LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE`` is ``0``).
 - If the comparison fails, an ``<image_name>_err.png`` file will be created with the rendered content next to the reference image.
 - If the comparison fails, the X and Y coordinates of the first divergent pixel, along with the actual and expected colors, will also be printed.
 
@@ -160,12 +161,11 @@ To read and decode PNG images and to store the converted rendered image, a few M
 (not :cpp:expr:`lv_malloc`).
 
 
-The screenshot comparison uses ``lodepng`` which is built-in to LVGL and just needs to be ebnabled with
+The screenshot comparison uses ``lodepng`` which is built-in to LVGL and just needs to be enabled with
 ``LV_USE_LODEPNG``.
 
 To avoid making the entire Test module dependent on ``lodepng``, screenshot comparison can be individually enabled by
 ``LV_USE_TEST_SCREENSHOT_COMPARE``.
-
 
 
 .. _test_api:

@@ -1204,6 +1204,12 @@
 /** Enable `lv_test_screenshot_compare`.
  * Requires lodepng and a few MB of extra RAM. */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+
+#if LV_USE_TEST_SCREENSHOT_COMPARE
+    /** 1: Automatically create missing reference images*/
+    #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
+#endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
 #endif /*LV_USE_TEST*/
 
 /** Enable loading XML UIs runtime */
