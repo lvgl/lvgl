@@ -366,24 +366,31 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
     /* Restore default blend func */
     EVE_CoDl_blendFunc_default(phost);
     
-    /* Finish display list and swap */
-    EVE_CoDl_display(phost);
-    EVE_CoCmd_swap(phost);
+	/* Finish display list and swap */
+	EVE_CoDl_display(phost);
+	EVE_CoCmd_swap(phost);
+	EVE_CoCmd_graphicsFinish(phost);
 
-    /* Toggle current buffer index */
-    drvr->current_fb = (drvr->current_fb == 0) ? 1 : 0;
+	/* Get sync marker for deferred free */
+	EVE_CmdSync sync = EVE_Cmd_sync(phost);
 
-    /* Wait for composition to complete */
-    EVE_CoCmd_graphicsFinish(phost);
-    EVE_Cmd_waitFlush(phost);
+	/* Toggle current buffer index */
+	drvr->current_fb = (drvr->current_fb == 0) ? 1 : 0;
 
-    /* Free all temporary GPU memory for this frame */
-    /* This includes both SW uploaded buffers and HW Draw Unit buffers (via stolen handles) */
-    for (int i = 0; i < drvr->pending_count; i++)
-    {
-        Esd_GpuAlloc_Free(drvr->allocator, drvr->pending_regions[i].handle);
-    }
-    drvr->pending_count = 0;
+	/* Queue all pending region textures for deferred free */
+	for (int i = 0; i < drvr->pending_count; i++)
+	{
+		Esd_GpuAlloc5_DeferredFree(drvr->allocator, 
+			drvr->pending_regions[i].handle, 
+			sync);
+	}
+	drvr->pending_count = 0;
+
+	/* Wait for composition to complete (optional - can remove now for async) */
+	EVE_Cmd_waitFlush(phost);
+
+	/* Process completed deferred frees (frame end) */
+	EVE_Cmd_syncCompleted(phost); /* This triggers UpdateFree in the Idle callback if applicable */
 }
 
 static void wait_cb(lv_display_t *disp)

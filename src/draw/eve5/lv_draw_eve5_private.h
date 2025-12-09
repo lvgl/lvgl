@@ -37,6 +37,8 @@ extern "C" {
 #define GET_NIBBLE_HI(w) ((uint8_t)((w) >> 4))
 #define GET_NIBBLE_LO(w) ((uint8_t)((w) & 0x0F))
 
+#define EVE5_MAX_FRAME_ALLOCS 256
+
 /**********************
  * TYPEDEFS
  **********************/
@@ -47,6 +49,8 @@ typedef struct {
     Esd_GpuAlloc *allocator;
     lv_cache_t *texture_cache;
 	bool rendering_in_progress;  /* Re-entrancy guard for SW fallback */
+	Esd_GpuHandle frame_allocs[EVE5_MAX_FRAME_ALLOCS];
+	uint16_t frame_alloc_count;
 } lv_draw_eve5_unit_t;
 
 typedef struct {

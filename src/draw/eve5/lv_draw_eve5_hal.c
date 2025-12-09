@@ -99,26 +99,29 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool
     int32_t w = lv_area_get_width(&layer->buf_area);
     int32_t h = lv_area_get_height(&layer->buf_area);
     int32_t aligned_w = ALIGN_UP(w, 16);
+	int32_t aligned_h = ALIGN_UP(h, 16);
 
     /* Allocate texture if needed */
     if(ram_g_addr == GA_INVALID) {
-        uint32_t size = aligned_w * h * 4; /* ARGB8 */
+		uint32_t size = aligned_w * aligned_h * 4; /* ARGB8 */
         handle = Esd_GpuAlloc_Alloc(u->allocator, size, GA_ALIGN_128);
         layer->user_data = Esd_GpuHandle_ToPtrType(handle);
 
         ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
         if(ram_g_addr == GA_INVALID) {
-            LV_LOG_ERROR("EVE5: Failed to allocate layer texture (%"PRId32"x%"PRId32")", w, h);
+            LV_LOG_ERROR("EVE5: Failed to allocate layer texture (%"PRId32"x%"PRId32")", aligned_w, aligned_h);
             layer->user_data = NULL;
             return;
         }
 
         LV_LOG_INFO("EVE5: Allocated layer %p at RAM_G 0x%08X (%"PRId32"x%"PRId32")",
-                    (void *)layer, ram_g_addr, aligned_w, h);
+                    (void *)layer, ram_g_addr, aligned_w, aligned_h);
     }
 
     /* Set render target */
-    EVE_CoCmd_renderTarget(u->hal, ram_g_addr, ARGB8, aligned_w, h);
+    EVE_CoCmd_renderTarget(u->hal, ram_g_addr, ARGB8, aligned_w, aligned_h);
+    LV_LOG_INFO("EVE5: Set render target for layer %p at RAM_G0x%08X (%"PRId32"x%"PRId32")",
+                (void *)layer, ram_g_addr, aligned_w, aligned_h);
 
     /* Start display list */
     EVE_CoCmd_dlStart(u->hal);
@@ -143,13 +146,23 @@ void lv_draw_eve5_hal_init_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool
 
 void lv_draw_eve5_hal_finish_layer(lv_draw_eve5_unit_t *u, lv_layer_t *layer, bool is_screen)
 {
-    LV_UNUSED(layer);
-    LV_UNUSED(is_screen);
+	LV_UNUSED(layer);
+	LV_UNUSED(is_screen);
 
-    EVE_CoDl_display(u->hal);
-    EVE_CoCmd_swap(u->hal);
-    EVE_CoCmd_graphicsFinish(u->hal);
-    EVE_Cmd_waitFlush(u->hal);
+	EVE_CoDl_display(u->hal);
+	EVE_CoCmd_swap(u->hal);
+	EVE_CoCmd_graphicsFinish(u->hal);
+
+	/* Get sync marker for deferred free */
+	EVE_CmdSync sync = EVE_Cmd_sync(u->hal);
+
+	/* Queue all tracked allocations for deferred free */
+	for(uint16_t i = 0; i < u->frame_alloc_count; i++) {
+		Esd_GpuAlloc5_DeferredFree(u->allocator, u->frame_allocs[i], sync);
+	}
+	u->frame_alloc_count = 0;
+
+	EVE_Cmd_waitFlush(u->hal);
 }
 
 /**********************
@@ -281,6 +294,25 @@ static bool get_eve_format_info(lv_color_format_t src_cf,
 }
 
 /**
+* Track a GPU allocation for deferred freeing at end of layer render.
+* Returns the handle unchanged for convenience.
+*/
+static Esd_GpuHandle track_frame_alloc(lv_draw_eve5_unit_t *u, Esd_GpuHandle handle) /* DEFERRED_FREE */
+{
+	if(handle.Id == GA_HANDLE_INVALID.Id) {
+		return handle;
+	}
+
+	if(u->frame_alloc_count >= EVE5_MAX_FRAME_ALLOCS) {
+		LV_LOG_WARN("EVE5: Frame allocation tracking overflow");
+		return handle;
+	}
+
+	u->frame_allocs[u->frame_alloc_count++] = handle;
+	return handle;
+}
+
+/**
  * Upload image to RAM_G with BT820-native format support
  */
 static uint32_t upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_dsc)
@@ -318,6 +350,9 @@ static uint32_t upload_image(lv_draw_eve5_unit_t *u, const lv_image_dsc_t *img_d
         LV_LOG_WARN("EVE5: Failed to allocate image in RAM_G (%d bytes)", eve_size);
         return GA_INVALID;
     }
+
+	/* Track for deferred free */
+	track_frame_alloc(u, handle); /* DEFERRED_FREE */
 
     /* Upload based on format */
     switch(src_cf) {
@@ -632,6 +667,9 @@ static uint32_t upload_glyph(lv_draw_eve5_unit_t *u, const lv_font_fmt_txt_dsc_t
         return GA_INVALID;
     }
 
+	/* Track for deferred free */
+	track_frame_alloc(u, handle); /* DEFERRED FREE */
+
     /* Upload glyph data with aligned stride */
     glyph_bitmap_to_ramg_aligned(u, ram_g_addr, glyph_bitmap, g_w, g_h, 
                                   g_stride, font_dsc->stride);
@@ -789,6 +827,7 @@ void lv_draw_eve5_hal_render_child(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, lv
     int32_t child_w = lv_area_get_width(&child_layer->buf_area);
     int32_t child_h = lv_area_get_height(&child_layer->buf_area);
     int32_t stride = ALIGN_UP(child_w, 16) * 4;
+	int32_t aligned_h = ALIGN_UP(child_h, 16);
 
     int32_t x = child_layer->buf_area.x1 - parent_layer->buf_area.x1;
     int32_t y = child_layer->buf_area.y1 - parent_layer->buf_area.y1;
@@ -800,7 +839,7 @@ void lv_draw_eve5_hal_render_child(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, lv
 
     EVE_CoDl_bitmapHandle(phost, phost->CoScratchHandle);
     EVE_CoDl_bitmapSource(u->hal, child_addr);
-    EVE_CoDl_bitmapLayout(u->hal, ARGB8, stride, child_h);
+    EVE_CoDl_bitmapLayout(u->hal, ARGB8, stride, aligned_h);
     EVE_CoDl_bitmapSize(u->hal, NEAREST, BORDER, BORDER, child_w, child_h);
 
     EVE_CoDl_begin(u->hal, BITMAPS);
@@ -811,6 +850,10 @@ void lv_draw_eve5_hal_render_child(lv_draw_eve5_unit_t *u, lv_draw_task_t *t, lv
 	// TODO: Free after frame render (implement deferred free on frame counter in GPU alloc)
     // Esd_GpuAlloc_Free(u->allocator, child_handle);
     // child_layer->user_data = NULL;
+
+	/* Track child texture for deferred free after parent finishes */
+	track_frame_alloc(u, child_handle); /* DEFERRED_FREE */
+	child_layer->user_data = NULL;  /* Clear to prevent double-free */
 }
 
 /**********************
@@ -848,6 +891,9 @@ void lv_draw_eve5_hal_composite_buffer(lv_draw_eve5_unit_t *u,
     /* Allocate RAM_G for the texture */
     Esd_GpuHandle handle = Esd_GpuAlloc_Alloc(u->allocator, eve_size, GA_ALIGN_4);
     uint32_t ram_g_addr = Esd_GpuAlloc_Get(u->allocator, handle);
+
+	/* Track for deferred free */
+	track_frame_alloc(u, handle); /* DEFERRED FREE */
 
     if(ram_g_addr == GA_INVALID) {
         LV_LOG_WARN("EVE5: Failed to allocate SW fallback texture (%"PRIu32" bytes)", eve_size);

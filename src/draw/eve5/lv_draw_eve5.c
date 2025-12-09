@@ -20,6 +20,8 @@
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 
+#define printf(...) do{}while(0)
+
 /*********************
  * DEFINES
  *********************/
@@ -48,6 +50,7 @@ void lv_draw_eve5_init(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     unit->allocator = allocator;
     unit->texture_cache = NULL; /* TODO: Initialize image cache */
 	unit->rendering_in_progress = false;
+	unit->frame_alloc_count = 0;
     
     printf("[EVE5] Draw unit initialized, ID=%d\n", DRAW_UNIT_ID_EVE5);
 }
