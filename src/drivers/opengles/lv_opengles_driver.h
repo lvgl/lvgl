@@ -81,7 +81,7 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
 void lv_opengles_render_clear(void);
 
 /**
- * Set the OpenGL viewport
+ * Set the OpenGL viewport (note: x,y refer to the lower left co-ordinate)
  * @param x        x position of the viewport
  * @param y        y position of the viewport
  * @param w        width of the viewport

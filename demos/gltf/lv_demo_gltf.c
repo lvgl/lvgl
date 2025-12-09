@@ -112,7 +112,7 @@ static lv_subject_t animation_speed_subject;
  **********************/
 
 /**********************
- *   GLOBAL FUNCTIONS
+ *   GLOBAL FUNCTIONSc
  **********************/
 
 lv_obj_t * lv_demo_gltf(const char * path)
@@ -125,7 +125,7 @@ lv_obj_t * lv_demo_gltf(const char * path)
     LV_ASSERT_NULL(model);
 
     init_subjects(viewer);
-    create_control_panel(viewer);
+    //create_control_panel(viewer);
 
     mouse_event_data_t * mouse_state = lv_zalloc(sizeof(*mouse_state));
     LV_ASSERT_MALLOC(mouse_state);
@@ -223,16 +223,15 @@ static void create_camera_panel(lv_obj_t * panel, lv_obj_t * viewer)
     lv_obj_set_width(pitch_slider, LV_PCT(100));
     lv_slider_set_min_value(pitch_slider, -90);
     lv_slider_set_max_value(pitch_slider, 90);
-
     style_slider(pitch_slider, SLIDER_COLOR);
 
     lv_obj_t * distance_title = add_title_to_row(camera_row, "");
     lv_label_bind_text(distance_title, &distance_subject, "Distance %.2f");
 
     lv_obj_t * distance_slider = lv_slider_create(camera_row);
-    lv_obj_set_width(distance_slider, LV_PCT(100));
     lv_slider_bind_value(distance_slider, &distance_subject);
-    lv_slider_set_min_value(distance_slider, 1);
+    lv_obj_set_width(distance_slider, LV_PCT(100));
+    lv_slider_set_min_value(distance_slider, -10);
     lv_slider_set_max_value(distance_slider, 25);
     style_slider(distance_slider, SLIDER_COLOR);
 
@@ -328,7 +327,7 @@ static void create_background_panel(lv_obj_t * panel)
     lv_slider_bind_value(env_brightness_slider, &env_brightness_subject);
     lv_obj_set_width(env_brightness_slider, LV_PCT(100));
 
-    lv_slider_set_min_value(env_brightness_slider, 0);
+    lv_slider_set_min_value(env_brightness_slider, -500); /* MK temp fix for framebuffer issue */
     lv_slider_set_max_value(env_brightness_slider, 1000);
     style_slider(env_brightness_slider, SLIDER_COLOR);
 

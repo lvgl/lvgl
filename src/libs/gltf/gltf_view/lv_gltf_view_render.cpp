@@ -19,6 +19,8 @@
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 #include "../../../drivers/opengles/lv_opengles_debug.h"
+#include "../../../drivers/opengles/lv_opengles_driver.h"
+#include "../../../draw/opengles/lv_draw_opengles.h"
 #include "../math/lv_gltf_math.hpp"
 #include "../gltf_environment/lv_gltf_environment_private.h"
 
@@ -812,15 +814,23 @@ static void draw_lights(lv_gltf_model_t * model, GLuint program)
 lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state_t * state, int32_t texture_w,
                                   int32_t texture_h, bool prepare_bg)
 {
+    LV_ASSERT_NULL(viewer);
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, state->framebuffer));
 
     if(glGetError() != GL_NO_ERROR) {
         return LV_RESULT_INVALID;
     }
+
+#if LV_GLTF_DIRECT_BUFFER_WRITES
+    lv_opengles_regular_viewport(lv_obj_get_x((lv_obj_t *)viewer), lv_obj_get_y((lv_obj_t *)viewer), texture_w, texture_h);
+#else
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, state->texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, state->renderbuffer, 0));
-    GL_CALL(glViewport(0, 0, texture_w, texture_h));
+    lv_opengles_viewport(0, 0, texture_w, texture_h);
+#endif
+
     if(prepare_bg) {
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
         /* cast is safe because viewer is a lv_obj_t*/
         lv_color_t bg_color = lv_obj_get_style_bg_color((lv_obj_t *)viewer, LV_PART_MAIN);
         uint8_t alpha = lv_obj_get_style_bg_opa((lv_obj_t *)viewer, LV_PART_MAIN);
@@ -828,6 +838,10 @@ lv_result_t render_primary_output(lv_gltf_t * viewer, const lv_gltf_renwin_state
 
         GL_CALL(glClearDepthf(1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+#else
+        GL_CALL(glClearDepthf(1.0f));
+        GL_CALL(glClear(GL_DEPTH_BUFFER_BIT));
+#endif
     }
 
     return glGetError() == GL_NO_ERROR ? LV_RESULT_OK : LV_RESULT_INVALID;
@@ -963,6 +977,7 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
 {
     lv_gltf_renwin_state_t result;
 
+#if !LV_GLTF_DIRECT_BUFFER_WRITES
     GLuint rtex;
     GL_CALL(glGenTextures(1, &rtex));
     result.texture = rtex;
@@ -1001,7 +1016,10 @@ static lv_gltf_renwin_state_t setup_primary_output(int32_t texture_width, int32_
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, result.texture, 0));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, result.renderbuffer, 0));
-
+#else
+    result.framebuffer = lv_draw_opengles_get_framebuffer();
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, result.framebuffer));
+#endif
     return result;
 }
 
