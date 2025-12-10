@@ -414,7 +414,7 @@ LV_ATTRIBUTE_SYNC_READY void lv_display_sync_ready(lv_display_t * disp);
 
 /**
  * Tell if it's the last area of the syncing process.
- * Can be called from `sync_cb` to execute some special display refreshing if needed when all areas are flushed.
+ * Can be called from `sync_cb` to execute some special display refreshing if needed when all areas are synced.
  * @param disp      pointer to display
  * @return          true: it's the last area to sync;
  *                  false: there are other areas too which will be synced soon

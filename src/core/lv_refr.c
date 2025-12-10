@@ -1484,7 +1484,7 @@ static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
 
     disp->sync_cb(disp, area);
     
-    lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, (void *)area);
+    lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)area);
 
     LV_PROFILER_REFR_END;
 }
