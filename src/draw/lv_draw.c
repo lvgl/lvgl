@@ -424,6 +424,7 @@ void lv_layer_reset(lv_layer_t * layer)
 #endif
     layer->opa = LV_OPA_COVER;
     layer->recolor = lv_color32_make(0, 0, 0, 0);
+    layer->all_tasks_added = false;
 }
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
