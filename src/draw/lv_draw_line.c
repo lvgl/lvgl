@@ -67,6 +67,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     else {
         if(dsc->point_cnt <= 1) {
             LV_LOG_INFO("Skip line drawing as point_cnt was 1");
+            LV_PROFILER_DRAW_END;
             return;
         }
 
