@@ -42,6 +42,7 @@ typedef struct
     uint32_t current_fb; // 0 or 1 - which buffer we're rendering to
     rendered_region_t pending_regions[MAX_REGIONS];
     int pending_count;
+    EVE_CmdSync last_frame_sync;
 } lv_eve5_driver_t;
 
 /**********************
@@ -109,6 +110,7 @@ lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     drvr->hal = hal;
     drvr->allocator = allocator;
     drvr->pending_count = 0;
+    drvr->last_frame_sync = EVE_CMD_SYNC_INVALID;
 
     lv_display_set_driver_data(disp, drvr);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -140,8 +142,8 @@ lv_display_t *lv_eve5_create(EVE_HalContext *hal, Esd_GpuAlloc *allocator)
     allocator->TotalReserved = RAM_G_SIZE - RAM_G_AVAILABLE;
     Esd_GpuAlloc_Reset(allocator);
 
-	// TODO: Maybe REG_SC0_RESET
-	// ... need to probably reset swapchain on coprocessor error in case a SWAP gets missed...
+    // TODO: Maybe REG_SC0_RESET
+    // ... need to probably reset swapchain on coprocessor error in case a SWAP gets missed...
 
     /* Initial clear of BOTH framebuffers */
     EVE_CoCmd_dlStart(phost);
@@ -340,7 +342,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
 
         if (region->is_gpu_rendered)
         {
-			printf("Render from GPU\n");
+            // printf("Render from GPU\n");
             /* HW Path: ARGB8, 16-pixel aligned width */
             /* Note: Draw Unit creates stride = ALIGN_UP(w, 16) * 4 */
             int32_t aligned_w = (w + 15) & ~15;  // Must be 16-pixel aligned for BT820
@@ -349,7 +351,7 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
         }
         else
         {
-			printf("Render from software\n");
+            // printf("Render from software\n");
             /* SW Path: Format depends on LV_COLOR_DEPTH, tightly packed */
             EVE_CoDl_bitmapLayout(phost, EVE_SW_BITMAP_FORMAT,
                 w * SW_BYTES_PER_PIXEL, h);
@@ -366,31 +368,38 @@ static void composite_to_framebuffer(lv_eve5_driver_t *drvr)
     /* Restore default blend func */
     EVE_CoDl_blendFunc_default(phost);
     
-	/* Finish display list and swap */
-	EVE_CoDl_display(phost);
-	EVE_CoCmd_swap(phost);
-	EVE_CoCmd_graphicsFinish(phost);
+    /* Finish display list and swap */
+    EVE_CoDl_display(phost);
+    EVE_CoCmd_swap(phost);
+    EVE_CoCmd_graphicsFinish(phost);
 
-	/* Get sync marker for deferred free */
-	EVE_CmdSync sync = EVE_Cmd_sync(phost);
+    /* Get sync marker for deferred free */
+    EVE_CmdSync sync = EVE_Cmd_sync(phost);
 
-	/* Toggle current buffer index */
-	drvr->current_fb = (drvr->current_fb == 0) ? 1 : 0;
+    /* Toggle current buffer index */
+    drvr->current_fb = (drvr->current_fb == 0) ? 1 : 0;
 
-	/* Queue all pending region textures for deferred free */
-	for (int i = 0; i < drvr->pending_count; i++)
-	{
-		Esd_GpuAlloc5_DeferredFree(drvr->allocator, 
-			drvr->pending_regions[i].handle, 
-			sync);
-	}
-	drvr->pending_count = 0;
+    /* Queue all pending region textures for deferred free */
+    for (int i = 0; i < drvr->pending_count; i++)
+    {
+        Esd_GpuAlloc5_DeferredFree(drvr->allocator, 
+            drvr->pending_regions[i].handle, 
+            sync);
+    }
+    drvr->pending_count = 0;
 
-	/* Wait for composition to complete (optional - can remove now for async) */
-	EVE_Cmd_waitFlush(phost);
+    /* Wait for composition to complete (optional - can remove now for async) */
+    // EVE_Cmd_waitFlush(phost);
 
-	/* Process completed deferred frees (frame end) */
-	EVE_Cmd_syncCompleted(phost); /* This triggers UpdateFree in the Idle callback if applicable */
+    /* Wait for previous frame to complete */
+    if (drvr->last_frame_sync != EVE_CMD_SYNC_INVALID) {
+		EVE_Cmd_waitSync(phost, drvr->last_frame_sync);
+    }
+	drvr->last_frame_sync = sync;
+
+    /* Process completed deferred frees (frame end) */
+	EVE_CmdSync completed = EVE_Cmd_syncCompleted(phost); /* This triggers UpdateFree in the Idle callback if applicable */
+	Esd_GpuAlloc5_UpdateFree(drvr->allocator, completed); /* FIXME: Check why Idle in EVE_Cmd_syncCompleted is not calling this consistently */
 }
 
 static void wait_cb(lv_display_t *disp)
@@ -403,7 +412,7 @@ static void wait_cb(lv_display_t *disp)
     }
 
     /* Wait for any pending EVE rendering operations to complete */
-    EVE_Cmd_waitFlush(drvr->hal);
+    // EVE_Cmd_waitFlush(drvr->hal);
 }
 
 #endif /* LV_USE_EVE5 */
