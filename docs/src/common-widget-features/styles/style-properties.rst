@@ -1340,7 +1340,7 @@ Sets the intensity of blurring. Applied on each lv_part separately before the ch
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
   </ul>
 
 drop_shadow_offset_x
@@ -1354,7 +1354,7 @@ Set an offset on the shadow in pixels in X direction.
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
   </ul>
 
 drop_shadow_offset_y
@@ -1368,7 +1368,7 @@ Set an offset on the shadow in pixels in Y direction.
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
   </ul>
 
 drop_shadow_color
