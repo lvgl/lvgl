@@ -184,6 +184,16 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 
+    /*Clicking the same checkbox shouldn't change anything*/
+    lv_test_mouse_click_at(20, 55);
+    TEST_ASSERT_FALSE(lv_obj_has_state(cb[0], LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_UINT32(called[0], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[1], 1);
+    TEST_ASSERT_EQUAL_UINT32(called[2], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[3], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+
     /*Turn on checkbox 2 with a key*/
     lv_group_focus_obj(cb[2]);
     lv_test_key_hit(LV_KEY_UP);
@@ -196,17 +206,27 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 
     /*Nothing happen checking checkbox 2 again*/
-    lv_test_key_hit(LV_KEY_UP);
+    lv_test_key_hit(LV_KEY_RIGHT);
     TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
     TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
     TEST_ASSERT_EQUAL_UINT32(called[0], 2);
     TEST_ASSERT_EQUAL_UINT32(called[1], 2);
-    TEST_ASSERT_EQUAL_UINT32(called[2],);
+    TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 
     /*Can't check off*/
     lv_test_key_hit(LV_KEY_DOWN);
+    TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_UINT32(called[0], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[1], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[2], 1);
+    TEST_ASSERT_EQUAL_UINT32(called[3], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+
+    /*Same with left*/
+    lv_test_key_hit(LV_KEY_LEFT);
     TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
     TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
     TEST_ASSERT_EQUAL_UINT32(called[0], 2);
