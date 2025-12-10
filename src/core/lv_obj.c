@@ -859,17 +859,16 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         void * param = lv_event_get_param(e);
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            bool changed = false;
+
+            bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
-                changed = true;
             }
             /*Radio buttons can't be checked off directly*/
             else if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_RADIO_BUTTON)) {
                 lv_obj_remove_state(obj, LV_STATE_CHECKED);
-                changed = true;
             }
-            if(changed) {
+            if(was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                 lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RESULT_OK) return;
             }
@@ -907,6 +906,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             uint32_t c = lv_event_get_key(e);
+            bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
@@ -918,7 +918,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
-            if(c != LV_KEY_ENTER) {
+            if(c != LV_KEY_ENTER && was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                 lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RESULT_OK) return;
             }

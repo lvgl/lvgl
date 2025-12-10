@@ -140,7 +140,6 @@ void test_obj_flag_overflow_visible_1(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_4.png");
 }
 
-uint32_t expected_checkbox_index;
 static void event_cb(lv_event_t * e)
 {
     uint32_t * called = lv_event_get_user_data(e);
@@ -150,6 +149,10 @@ static void event_cb(lv_event_t * e)
 
 void test_obj_flag_radio_button(void)
 {
+    lv_group_t * g = lv_group_create();
+
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_KEYPAD), g);
+
     lv_obj_t * scr = lv_screen_active();
     lv_obj_t * cb[5];
     uint32_t called[5];
@@ -157,6 +160,7 @@ void test_obj_flag_radio_button(void)
         cb[i] = lv_checkbox_create(scr);
         lv_obj_set_y(cb[i], i * 50);
         lv_obj_add_flag(cb[i], LV_OBJ_FLAG_RADIO_BUTTON);
+        lv_group_add_obj(g, cb[i]);
         lv_obj_add_event_cb(cb[i], event_cb, LV_EVENT_VALUE_CHANGED, &called[i]);
         called[i] = 0;
     }
@@ -177,6 +181,37 @@ void test_obj_flag_radio_button(void)
     TEST_ASSERT_EQUAL_UINT32(called[0], 2);
     TEST_ASSERT_EQUAL_UINT32(called[1], 1);
     TEST_ASSERT_EQUAL_UINT32(called[2], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[3], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+
+    /*Turn on checkbox 2 with a key*/
+    lv_group_focus_obj(cb[2]);
+    lv_test_key_hit(LV_KEY_UP);
+    TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_UINT32(called[0], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[1], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[2], 1);
+    TEST_ASSERT_EQUAL_UINT32(called[3], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+
+    /*Nothing happen checking checkbox 2 again*/
+    lv_test_key_hit(LV_KEY_UP);
+    TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_UINT32(called[0], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[1], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[2],);
+    TEST_ASSERT_EQUAL_UINT32(called[3], 0);
+    TEST_ASSERT_EQUAL_UINT32(called[4], 0);
+
+    /*Can't check off*/
+    lv_test_key_hit(LV_KEY_DOWN);
+    TEST_ASSERT_FALSE(lv_obj_has_state(cb[1], LV_STATE_CHECKED));
+    TEST_ASSERT_TRUE(lv_obj_has_state(cb[2], LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL_UINT32(called[0], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[1], 2);
+    TEST_ASSERT_EQUAL_UINT32(called[2], 1);
     TEST_ASSERT_EQUAL_UINT32(called[3], 0);
     TEST_ASSERT_EQUAL_UINT32(called[4], 0);
 

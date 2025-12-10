@@ -1,7 +1,7 @@
 /**
- * @file lv_xml_obj_parser.c
- *
- */
+* @file lv_xml_obj_parser.c
+*
+*/
 
 /*********************
  *      INCLUDES
@@ -819,7 +819,7 @@ static lv_obj_flag_t flag_to_enum(const char * txt)
     if(lv_streq("adv_hittest", txt)) return LV_OBJ_FLAG_ADV_HITTEST;
     if(lv_streq("ignore_layout", txt)) return LV_OBJ_FLAG_IGNORE_LAYOUT;
     if(lv_streq("floating", txt)) return LV_OBJ_FLAG_FLOATING;
-    if(lv_streq("send_draw_task_evenTS", txt)) return LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS;
+    if(lv_streq("send_draw_task_events", txt)) return LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS;
     if(lv_streq("overflow_visible", txt)) return LV_OBJ_FLAG_OVERFLOW_VISIBLE;
     if(lv_streq("radio_button", txt)) return LV_OBJ_FLAG_RADIO_BUTTON;
     if(lv_streq("flex_in_new_track", txt)) return LV_OBJ_FLAG_FLEX_IN_NEW_TRACK;
