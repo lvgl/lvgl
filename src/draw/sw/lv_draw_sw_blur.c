@@ -198,7 +198,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
 
             buf_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_3_bytes_init(sum, buf_line, sample_len_limited, - px_size * skip_cnt);
+            blur_3_bytes_init(sum, buf_line, sample_len_limited, -(int32_t)px_size * skip_cnt);
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line, intensity);
 
