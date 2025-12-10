@@ -67,7 +67,7 @@ used to modify any widget in the component, but no dedicated API functions are g
 Slots
 -----
 
-With help of "slot" any UI element in the component can be easily exposed as a parent
+With the help of a "slot" any UI element in the component can be easily exposed as a parent
 that can be referenced later and children can be created there.
 
 
