@@ -146,6 +146,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     lv_obj_remove_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
 
+    if(lv_color_format_has_alpha(disp->color_format)) {
+        lv_obj_remove_local_style_prop(disp->bottom_layer, LV_STYLE_BG_OPA, 0);
+    }
+    else {
+        lv_obj_set_style_bg_opa(disp->bottom_layer, 255, 0);
+    }
+
     lv_obj_set_scrollbar_mode(disp->bottom_layer, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scrollbar_mode(disp->top_layer, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scrollbar_mode(disp->sys_layer, LV_SCROLLBAR_MODE_OFF);
@@ -561,6 +568,13 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
     if(disp->buf_1) disp->buf_1->header.cf = color_format;
     if(disp->buf_2) disp->buf_2->header.cf = color_format;
     if(disp->buf_3) disp->buf_3->header.cf = color_format;
+
+    if(lv_color_format_has_alpha(disp->color_format)) {
+        lv_obj_remove_local_style_prop(disp->bottom_layer, LV_STYLE_BG_OPA, 0);
+    }
+    else {
+        lv_obj_set_style_bg_opa(disp->bottom_layer, 255, 0);
+    }
 
     lv_display_send_event(disp, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 }
