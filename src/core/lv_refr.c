@@ -1315,6 +1315,35 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
     }
 
     int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
+    if(max_row == 0) return max_row;
+    if(max_row > area_h) max_row = area_h;
+
+    /*Round down the lines of draw_buf if rounding is added*/
+    lv_area_t tmp;
+    tmp.x1 = 0;
+    tmp.x2 = 0;
+    tmp.y1 = 0;
+
+    int32_t h_tmp = max_row;
+    do {
+        tmp.y2 = h_tmp - 1;
+        lv_display_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);
+
+        /*If this height fits into `max_row` then fine*/
+        if(lv_area_get_height(&tmp) <= max_row) break;
+
+        /*Decrement the height of the area until it fits into `max_row` after rounding*/
+        h_tmp--;
+    } while(h_tmp > 0);
+
+    if(h_tmp <= 0) {
+        LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or too "
+                    "small draw_buf)");
+        return 0;
+    }
+    else {
+        max_row = tmp.y2 + 1;
+    }
 
     return max_row;
 }
