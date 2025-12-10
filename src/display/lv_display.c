@@ -560,8 +560,8 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
 
 void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb)
 {
-    if (disp == NULL) disp = lv_display_get_default();
-    if (disp == NULL) return;
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
 
     disp->sync_cb = sync_cb;
 }
