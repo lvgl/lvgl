@@ -71,12 +71,12 @@ static void add_faded_area(lv_event_t * e)
     for(i = 0; i < draw_line_dsc->point_cnt - 1; i++) {
         p1 = draw_line_dsc->points[i];
         p2 = draw_line_dsc->points[i + 1];
-        if(p1[i].x == LV_DRAW_LINE_POINT_NONE ||
-           p1[i].y == LV_DRAW_LINE_POINT_NONE) {
+        if(p1.x == LV_DRAW_LINE_POINT_NONE ||
+           p1.y == LV_DRAW_LINE_POINT_NONE) {
             continue;
         }
-        if(p2[i].x == LV_DRAW_LINE_POINT_NONE ||
-           p2[i].y == LV_DRAW_LINE_POINT_NONE) {
+        if(p2.x == LV_DRAW_LINE_POINT_NONE ||
+           p2.y == LV_DRAW_LINE_POINT_NONE) {
             continue;
         }
 

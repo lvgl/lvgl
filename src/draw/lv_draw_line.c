@@ -123,6 +123,8 @@ void lv_draw_line_iterate(lv_draw_task_t * t, lv_draw_line_dsc_t * dsc,
         /*Create a temporary dsc where the point array is replaced by 2 points*/
         lv_draw_line_dsc_t dsc_tmp = *dsc;
         size_t point_cnt = dsc_tmp.point_cnt;
+        if(point_cnt <= 1) return;
+
         dsc_tmp.points = NULL;
         dsc_tmp.point_cnt = 0;
         for(i = 0; i < point_cnt - 1; i++) {
