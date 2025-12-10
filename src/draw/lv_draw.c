@@ -545,6 +545,9 @@ lv_layer_t * lv_draw_layer_create_drop_shadow(const lv_draw_dsc_base_t * base, l
     lv_area_increase(&ds_a, blur_radius * 2, blur_radius * 2);
 
     lv_layer_t * ds_layer = lv_draw_layer_create(parent_layer, LV_COLOR_FORMAT_A8, &ds_a);
+    if(ds_layer == NULL) {
+        LV_LOG_WARN("Failed to create a layer for the drop shadow");
+    }
     return ds_layer;
 }
 

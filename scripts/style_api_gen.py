@@ -380,19 +380,19 @@ props = [
 {'section': 'Drop shadow', 'dsc':'Take an A8 snapshot of the given part and blur it.' },
 
 {'name': 'DROP_SHADOW_RADIUS',
- 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
 
 {'name': 'DROP_SHADOW_OFFSET_X',
- 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in X direction."},
 
 {'name': 'DROP_SHADOW_OFFSET_Y',
- 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in Y direction."},
 
 {'name': 'DROP_SHADOW_COLOR',
- 'style_type': 'color',   'var_type': 'lv_color_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color',   'var_type': 'lv_color_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,  'filtered': 1,
  'dsc': "Set the color of the shadow."},
 
 {'name': 'DROP_SHADOW_OPA',

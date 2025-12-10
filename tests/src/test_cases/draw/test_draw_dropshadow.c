@@ -58,6 +58,7 @@ void test_draw_drop_shadow(void)
 
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
 
+    lv_rand_set_seed(0x1234ABCD);
     uint32_t i;
     for(i = 0; i < 10; i++) {
         lv_chart_set_next_value(chart, ser1, (int32_t)lv_rand(10, 50));

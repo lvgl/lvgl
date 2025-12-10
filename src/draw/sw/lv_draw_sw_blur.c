@@ -243,10 +243,6 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                     buf_prev = *buf_line_end;
                 }
 
-                //                buf_line_end[0] = LV_MIN(buf_line_end[0] * 3, 255);
-                //                if(buf_line_end[0] < 128) buf_line_end[0] = 0;
-                //                else buf_line_end[0] = 255;
-
                 /*This is the final pixel, fill the gaps in the line by just repeating the pixel (simple upscale)*/
                 if(skip_cnt == 2) {
                     buf_line_end[1] = buf_line_end[0];

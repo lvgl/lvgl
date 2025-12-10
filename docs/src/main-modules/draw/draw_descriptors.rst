@@ -642,10 +642,10 @@ Drop Shadow Draw Descriptor
 Unlike Box shadow the Drop shadow can be applied for any widgets and parts.
 For example a Label, the Arc's Indicator, an ARGB image, Lines of a chart, etc.
 
-The Drop shadow doesn't have its own draw descriptor but its part of the base
+The Drop shadow doesn't have its own draw descriptor but it's part of the base
 descriptor. This way before rendering anything LVGL can create a new layer with
 A8 color format, render the shape there, blur the layer, and finally blend the
-blurred layer with  an offset.
+blurred layer with an offset.
 
 Creating a layer requires `width x height` bytes of memory. This memory is used only
 temporarily, so in most of the cases if multiple widgets have drop shadow, only one

@@ -112,6 +112,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     if(dsc->base.drop_shadow_opa) {
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, image_coords);
+        LV_ASSERT_NULL(ds_layer);
         lv_draw_image_dsc_t ds_dsc = *dsc;
         ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain arc*/
         lv_draw_image(ds_layer, &ds_dsc, image_coords);

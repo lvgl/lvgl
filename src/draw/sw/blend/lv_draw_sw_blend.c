@@ -208,7 +208,7 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
             lv_draw_sw_blend_color_to_argb8888_premultiplied(fill_dsc);
             break;
 #endif
-#if LV_DRAW_SW_SUPPORT_L8
+#if LV_DRAW_SW_SUPPORT_A8
         case LV_COLOR_FORMAT_A8:
             lv_draw_sw_blend_color_to_a8(fill_dsc);
             break;

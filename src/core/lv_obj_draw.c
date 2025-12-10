@@ -505,6 +505,8 @@ static void drop_shadow_init(const lv_obj_t * obj, lv_part_t part, lv_draw_dsc_b
         base_dsc->drop_shadow_ofs_x = lv_obj_get_style_drop_shadow_offset_x(obj, part);
         base_dsc->drop_shadow_ofs_y = lv_obj_get_style_drop_shadow_offset_y(obj, part);
         base_dsc->drop_shadow_color = lv_obj_get_style_drop_shadow_color(obj, part);
+        base_dsc->drop_shadow_color = normal_apply_layer_recolor(obj, part, base_dsc, base_dsc->drop_shadow_color);
+
         base_dsc->drop_shadow_quality = lv_obj_get_style_drop_shadow_quality(obj, part);
     }
 }
