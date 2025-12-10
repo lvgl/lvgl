@@ -11,7 +11,7 @@
 
 <widget>
     <api>
-        <enumdef name="lv_imagebutton_state" help="Possibel states of an image button">
+        <enumdef name="lv_imagebutton_state" help="Possible states of an image button">
             <enum name="released" help="Released"/>
             <enum name="pressed" help="Pressed"/>
             <enum name="disabled" help="Disabled"/>
