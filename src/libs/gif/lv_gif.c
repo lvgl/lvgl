@@ -404,7 +404,7 @@ static void initialize(lv_gif_t * gifobj)
     gifobj->draw_buf = lv_draw_buf_create(width, height, gifobj->color_format, LV_STRIDE_AUTO);
 
     if(gifobj->draw_buf == NULL) {
-        LV_LOG_WARN("Couldn't allocate memory for the gif with width: %d and height: %d", width, height);
+        LV_LOG_WARN("Couldn't allocate memory for the gif with width: %"LV_PRIu32" and height: %"LV_PRIu32"", width, height);
         GIF_close(gif);
         gifobj->is_open = 0;
         return;
