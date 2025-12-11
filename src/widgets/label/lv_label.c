@@ -49,6 +49,9 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
 
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+    static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj);
+#endif
 static void set_text_internal(lv_obj_t * obj, const char * text);
 static void remove_translation_tag(lv_obj_t * obj);
 static void lv_label_refr_text(lv_obj_t * obj);
@@ -114,6 +117,11 @@ const lv_obj_class_t lv_label_class = {
 #if LV_USE_OBJ_PROPERTY_NAME
     .property_names = lv_label_property_names,
     .names_count = sizeof(lv_label_property_names) / sizeof(lv_property_name_t),
+#endif
+
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+    .checksum = 0,
+    .last_checksum = 0,
 #endif
 
 #endif
@@ -933,6 +941,11 @@ static void draw_main(lv_event_t * e)
         return;
     }
 
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+    if((!label_draw_dsc.text_static) && (label->checksum == label->last_checksum)) label_draw_dsc.text_static = 1;
+    label->last_checksum = label->checksum;
+#endif
+
     if(label->long_mode == LV_LABEL_LONG_MODE_WRAP) {
         int32_t s = lv_obj_get_scroll_top(obj);
         lv_area_move(&txt_coords, 0, -s);
@@ -983,12 +996,30 @@ static void draw_main(lv_event_t * e)
     layer->_clip_area = clip_area_ori;
 }
 
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+static uint32_t compute_text_checksum(const char * str, lv_obj_t * obj)
+{
+    uint32_t checksum = (lv_obj_get_width(obj) << 8)^lv_obj_get_height(obj);
+    if(str == NULL) return checksum;
+    while(*str) {
+        checksum ^= (uint32_t)(*str);
+        checksum = (checksum << 1) | (checksum >> 31);
+        str++;
+    }
+    return checksum;
+}
+#endif
+
 static void set_text_internal(lv_obj_t * obj, const char * text)
 {
     lv_label_t * label = (lv_label_t *)obj;
 
     /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = label->text;
+
+#if LV_LABEL_ENABLE_AGGRESSIVE_CACHING
+    if(!label->static_txt) label->checksum = compute_text_checksum(text, obj);
+#endif
 
     lv_label_revert_dots(obj); /*In case text == label->text*/
     const size_t text_len = get_text_length(text);
