@@ -367,10 +367,8 @@ if(NOT WIN32)
     pkg_check_modules(wayland_client wayland-client)
 
     if (wayland_client_FOUND)
-        pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
-        pkg_check_modules(xkbcommon REQUIRED xkbcommon)
-
-        link_libraries(wayland-client wayland-cursor xkbcommon)
+        pkg_check_modules(WAYLAND REQUIRED wayland-cursor wayland-client wayland-egl xkbcommon)
+        link_libraries(${WAYLAND_LIBRARIES})
 
         # Add auto generated source required for XDG shell
         include_directories("${LVGL_TEST_DIR}/wayland_protocols")
