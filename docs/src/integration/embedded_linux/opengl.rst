@@ -70,6 +70,8 @@ for integration into custom graphics pipelines.
 
 For complete implementation details, see :ref:`OpenGL driver <opengl_driver>`.
 
+.. _3d_gltf_support:
+
 3D/glTF Support
 ===============
 
