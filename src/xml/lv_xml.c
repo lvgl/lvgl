@@ -39,6 +39,7 @@
 #include "parsers/lv_xml_chart_parser.h"
 #include "parsers/lv_xml_table_parser.h"
 #include "parsers/lv_xml_dropdown_parser.h"
+#include "parsers/lv_xml_imagebutton_parser.h"
 #include "parsers/lv_xml_roller_parser.h"
 #include "parsers/lv_xml_scale_parser.h"
 #include "parsers/lv_xml_buttonmatrix_parser.h"
@@ -149,6 +150,15 @@ void lv_xml_init(void)
 #if LV_USE_DROPDOWN
     lv_xml_register_widget("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
     lv_xml_register_widget("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
+#endif
+
+#if LV_USE_IMAGEBUTTON
+    lv_xml_register_widget("lv_imagebutton", lv_xml_imagebutton_create, lv_xml_imagebutton_apply);
+    lv_xml_register_widget("lv_imagebutton-src_left", lv_xml_imagebutton_src_left_create,
+                           lv_xml_imagebutton_src_left_apply);
+    lv_xml_register_widget("lv_imagebutton-src_right", lv_xml_imagebutton_src_right_create,
+                           lv_xml_imagebutton_src_right_apply);
+    lv_xml_register_widget("lv_imagebutton-src_mid", lv_xml_imagebutton_src_mid_create, lv_xml_imagebutton_src_mid_apply);
 #endif
 
 #if LV_USE_ROLLER
