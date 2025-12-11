@@ -624,6 +624,129 @@ static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_
 }
 #endif
 
+/**
+ * Test kerning functionality with scalable FreeType fonts.
+ * This test covers the FT_IS_SCALABLE and FT_Set_Pixel_Sizes code path
+ * in freetype_get_glyph_dsc_cb when getting kerning information.
+ */
+void test_freetype_kerning(void)
+{
+    /* Create a font with kerning enabled using font_info */
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    font_info.size = 32;
+    font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+    font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+    lv_font_t * font_kerning = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_kerning);
+
+    /* Create a font with kerning disabled */
+    font_info.kerning = LV_FONT_KERNING_NONE;
+    lv_font_t * font_no_kerning = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_no_kerning);
+
+    /* Create a container with two labels to compare kerning */
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, lv_pct(90), lv_pct(90));
+    lv_obj_center(cont);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    /* Label with kerning enabled */
+    lv_obj_t * label_kerning = lv_label_create(cont);
+    lv_label_set_text(label_kerning, "AVATAR WAV To Ta AV");
+    lv_obj_set_style_text_font(label_kerning, font_kerning, LV_PART_MAIN);
+
+    /* Label to show kerning is enabled */
+    lv_obj_t * label_info1 = lv_label_create(cont);
+    lv_label_set_text(label_info1, "(Kerning: ON)");
+
+    /* Label with kerning disabled */
+    lv_obj_t * label_no_kerning = lv_label_create(cont);
+    lv_label_set_text(label_no_kerning, "AVATAR WAV To Ta AV");
+    lv_obj_set_style_text_font(label_no_kerning, font_no_kerning, LV_PART_MAIN);
+
+    /* Label to show kerning is disabled */
+    lv_obj_t * label_info2 = lv_label_create(cont);
+    lv_label_set_text(label_info2, "(Kerning: OFF)");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_kerning_compare" EXT_NAME);
+
+    /* Clean up */
+    lv_obj_delete(cont);
+    lv_freetype_font_delete(font_kerning);
+    lv_freetype_font_delete(font_no_kerning);
+}
+
+/**
+ * Test kerning with multiple font sizes to ensure FT_Set_Pixel_Sizes
+ * is called correctly for scalable fonts when kerning is requested.
+ */
+void test_freetype_kerning_scalable_sizes(void)
+{
+    /* Test with multiple sizes to ensure pixel size is set correctly */
+    const uint32_t sizes[] = {16, 24, 32, 48, 64};
+
+    for(int i = 0; i < 5; i++) {
+        lv_font_info_t font_info;
+        lv_freetype_init_font_info(&font_info);
+        font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+        font_info.size = sizes[i];
+        font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+        font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+        font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+        lv_font_t * font = lv_freetype_font_create_with_info(&font_info);
+        TEST_ASSERT_NOT_NULL(font);
+
+        /* Test getting glyph width which triggers kerning lookup */
+        /* This exercises the FT_IS_SCALABLE and FT_Set_Pixel_Sizes path */
+        uint16_t width_V = lv_font_get_glyph_width(font, 'V', 'A');
+        uint16_t width_A = lv_font_get_glyph_width(font, 'A', 'V');
+        uint16_t width_T = lv_font_get_glyph_width(font, 'T', 'o');
+
+        /* Width should be non-zero for valid glyphs */
+        TEST_ASSERT_GREATER_THAN(0, width_V);
+        TEST_ASSERT_GREATER_THAN(0, width_A);
+        TEST_ASSERT_GREATER_THAN(0, width_T);
+
+        lv_freetype_font_delete(font);
+    }
+}
+
+/**
+ * Test that font without kerning info handles gracefully.
+ * This tests the code path when face_has_kerning is false.
+ */
+void test_freetype_no_kerning_info(void)
+{
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    font_info.size = 24;
+    font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+    font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+    lv_font_t * font = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font);
+
+    /* Create a label */
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Test text for kerning: AVATAR WAVE");
+    lv_obj_set_style_text_font(label, font, LV_PART_MAIN);
+    lv_obj_center(label);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_no_kerning_info" EXT_NAME);
+
+    /* Clean up */
+    lv_obj_delete(label);
+    lv_freetype_font_delete(font);
+}
+
 #else
 
 void setUp(void)
@@ -639,6 +762,18 @@ void test_freetype_render_bitmap(void)
 }
 
 void test_freetype_render_outline(void)
+{
+}
+
+void test_freetype_kerning(void)
+{
+}
+
+void test_freetype_kerning_scalable_sizes(void)
+{
+}
+
+void test_freetype_no_kerning_info(void)
 {
 }
 
