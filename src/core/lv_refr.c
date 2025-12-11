@@ -745,7 +745,7 @@ static void refr_sync_areas(void)
             /*Set syncing flags*/
             disp_refr->syncing = true;
             disp_refr->syncing_last = lv_ll_get_tail(&disp_refr->sync_areas) == sync_area;
-            
+
             /*Call sync callback and wait for sync to complete*/
             call_sync_cb(disp_refr, sync_area);
             wait_for_syncing(disp_refr);
@@ -1478,7 +1478,7 @@ static void call_sync_cb(lv_display_t * disp, const lv_area_t * area)
     lv_display_send_event(disp, LV_EVENT_SYNC_START, (void *)area);
 
     disp->sync_cb(disp, area);
-    
+
     lv_display_send_event(disp, LV_EVENT_SYNC_FINISH, (void *)area);
 
     LV_PROFILER_REFR_END;
