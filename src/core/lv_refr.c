@@ -1303,8 +1303,6 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
-    LV_UNUSED(area_h);
-
     lv_color_format_t cf = disp->color_format;
     uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
     uint32_t overhead = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
@@ -1315,7 +1313,7 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
     }
 
     int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
-    if(max_row == 0) return max_row;
+
     if(max_row > area_h) max_row = area_h;
 
     /*Round down the lines of draw_buf if rounding is added*/
