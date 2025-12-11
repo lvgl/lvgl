@@ -456,6 +456,10 @@ typedef struct _lv_draw_eve_unit_t lv_draw_eve_unit_t;
 #endif
 #endif /* LV_UNREACHABLE not defined */
 
+#ifndef LV_ARRAYLEN
+#define LV_ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+#endif /*LV_ARRAYLEN*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
