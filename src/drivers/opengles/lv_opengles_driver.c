@@ -16,6 +16,7 @@
 #include "lv_opengles_private.h"
 
 #include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_shader.h"
@@ -169,7 +170,7 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
 void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
-    unsigned int texture = *(unsigned int *)lv_display_get_driver_data(display);
+    unsigned int texture = (lv_uintptr_t)display->layer_head->user_data;
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
