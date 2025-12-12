@@ -173,6 +173,17 @@ extern const lv_wayland_backend_ops_t wl_backend_ops;
  */
 void * lv_wayland_get_backend_display_data(lv_display_t * display);
 
+/** @brief Set the backend-specific display data
+ *
+ * The backend display data is set automatically to the return type of the
+ * init_display/resize_display, this function should only be used in special
+ * cases where it needs to be overriden temporarily
+ *
+ * @param[in] display Pointer to the LVGL display object
+ * @param[in] data Pointer to backend-specific display data
+ */
+void lv_wayland_set_backend_display_data(lv_display_t * display, void * data);
+
 /**
  * @brief Get the Wayland surface for rendering
  *

@@ -124,19 +124,17 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
 
     /* Let the opengles texture driver handle the texture lifetime */
     ctx->texture.is_texture_owner = true;
-    lv_result_t res = lv_opengles_texture_create_draw_buffers(&ctx->texture, display);
+    /*Initialize the draw buffers and texture*/
+    lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
         ctx->egl_ctx = NULL;
         return LV_RESULT_INVALID;
     }
-    /* This creates the texture for the first time*/
-    lv_opengles_texture_reshape(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
 
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
-
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
 
@@ -172,9 +170,14 @@ static void event_cb(lv_event_t * e)
                 lv_display_set_driver_data(display, NULL);
             }
             break;
-        case LV_EVENT_RESOLUTION_CHANGED:
-            lv_opengles_texture_reshape(display, lv_display_get_horizontal_resolution(display),
-                                        lv_display_get_vertical_resolution(display));
+        case LV_EVENT_RESOLUTION_CHANGED: {
+                lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, display, lv_display_get_horizontal_resolution(display),
+                                                              lv_display_get_vertical_resolution(display));
+
+                if(res != LV_RESULT_OK) {
+                    LV_LOG_ERROR("Failed to resize display");
+                }
+            }
             break;
         default:
             return;
