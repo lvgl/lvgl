@@ -332,7 +332,7 @@ const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version)
             return "#version 100\n";
         case LV_OPENGL_GLSL_VERSION_300ES:
             return "#version 330\n";
-            //return "#version 300 es\n";
+        //return "#version 300 es\n";
         case LV_OPENGL_GLSL_VERSION_LAST:
             LV_LOG_ERROR("LV_OPENGL_GLSL_VERSION_LAST is not a valid version");
             return NULL;

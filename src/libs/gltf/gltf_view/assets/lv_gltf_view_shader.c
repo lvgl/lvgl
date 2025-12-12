@@ -1098,7 +1098,7 @@ static const lv_opengl_shader_t src_includes[] = {
         vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior)
         {
             float framebufferLod = log2(float(u_TransmissionFramebufferSize.x)) * applyIorToRoughness(roughness, ior);
-            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).rgb;
+            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).bgr; // r/b switched intentionally;
 
             return transmittedLight;
         }

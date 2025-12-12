@@ -1207,9 +1207,9 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
 {
     GL_CALL(glClearDepthf(1.0f));
-    /* Red / blue color order reversed below so they'll end up in the correct order 
+    /* Red / blue color order reversed below so they'll end up in the correct order
      * after the shader swaps the channels again, back to correct. */
-    GL_CALL(glClearColor((float)bg_color.blue / 255.0f, (float)bg_color.green / 255.0f, 
+    GL_CALL(glClearColor((float)bg_color.blue / 255.0f, (float)bg_color.green / 255.0f,
                          (float)bg_color.red / 255.0f, (float)bg_opa / 255.0f));
 
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));

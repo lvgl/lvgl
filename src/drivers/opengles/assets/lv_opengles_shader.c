@@ -212,6 +212,7 @@ static const char *src_fragment_shader_v300es = R"(
     
     uniform sampler2D u_Texture;
     uniform lowp float u_Opa;
+    uniform bool u_FlipRB;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
