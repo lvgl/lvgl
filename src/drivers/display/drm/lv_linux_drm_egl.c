@@ -210,7 +210,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(lv_display_flush_is_last(disp)) {
         set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
-        lv_opengles_render_display_texture_rbswap(disp, false, true);
+        lv_opengles_render_display_texture(disp, false, true);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -246,7 +246,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #error("Unsupported color format")
 #endif
 
-        lv_opengles_render_display_texture_rbswap(disp, false, false);
+        lv_opengles_render_display_texture(disp, false, false);
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
