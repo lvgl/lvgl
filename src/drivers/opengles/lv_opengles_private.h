@@ -132,15 +132,6 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
 void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 
 
-/**
- * Render a display texture - Supports rotation - Switches red and blue channels
- * @param display           LVGL Texture display. Created with the `lv_opengles_texture` module
- * @param h_flip            horizontal flip
- * @param v_flip            vertical flip
- */
-void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip);
-
-
 /**********************
  *      MACROS
  **********************/
