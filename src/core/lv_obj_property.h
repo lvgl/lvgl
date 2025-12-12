@@ -58,7 +58,7 @@ extern "C" {
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
-#define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, sizeof(array)/sizeof(array[0]))
+#define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, LV_ARRAYLEN(array))
 
 /* Helper to implement class definition of property and property names */
 /* *INDENT-OFF* */
