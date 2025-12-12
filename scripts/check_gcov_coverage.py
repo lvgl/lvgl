@@ -8,7 +8,7 @@ import json
 import re
 import sys
 import os
-from typing import Dict, Set, Tuple, List
+from typing import Dict, Set, Tuple, List, Optional
 
 
 def create_argument_parser() -> argparse.ArgumentParser:
@@ -22,6 +22,15 @@ def create_argument_parser() -> argparse.ArgumentParser:
         "--commit",
         help="Git commit hash, reference (e.g. HEAD, HEAD~1) or range (base...head)",
         default="HEAD",
+    )
+
+    parser.add_argument(
+        "--path",
+        metavar="PATH",
+        help=(
+            "Analyze coverage for a single file or a directory (relative or absolute path). "
+            "When specified, --commit is ignored."
+        ),
     )
 
     parser.add_argument(
@@ -212,6 +221,126 @@ def check_commit_coverage(
     return covered_lines, total_new_lines, uncovered_lines, skipped_noncoverable
 
 
+def check_path_coverage(path: str, root: str) -> Tuple[int, int, List[Tuple[str, int]]]:
+    """
+    Compute coverage for a specific file or directory.
+    Returns: (covered_lines, total_coverable_lines, uncovered_lines)
+    Notes:
+    - Only lines reported by gcovr as coverable are counted toward totals.
+    - If PATH is a directory, coverage is aggregated over all coverable files within it.
+    - If PATH is a file, coverage is computed only for that file.
+    """
+    # Normalize input path
+    abs_path = os.path.abspath(path)
+    if not os.path.exists(abs_path):
+        print(f"Error: The specified path does not exist: {abs_path}", file=sys.stderr)
+        sys.exit(1)
+
+    # Ensure we operate from repo root to construct relative POSIX paths
+    root = os.path.abspath(root)
+
+    # Build relative POSIX target(s)
+    rel = os.path.relpath(abs_path, root)
+    rel_posix = rel.replace(os.path.sep, "/")
+
+    print("Getting coverage data...")
+    coverage_data = get_coverage_data(root)
+
+    covered = 0
+    total = 0
+    uncovered: List[Tuple[str, int]] = []
+
+    if os.path.isdir(abs_path):
+        # Directory scope: include all files under this directory
+        scoped_files = {}
+        for f, lines in coverage_data.items():
+            # Convert both to absolute paths for comparison
+            f_abs = os.path.abspath(os.path.join(root, f.replace("/", os.path.sep)))
+            # If the common path of abs_path and f_abs is abs_path, f is under abs_path
+            if os.path.commonpath([abs_path, f_abs]) == abs_path:
+                scoped_files[f] = lines
+
+        print(f"Found {len(scoped_files)} coverable file(s) under: {rel_posix}")
+        for filename, line_map in sorted(scoped_files.items()):
+            for lineno, count in line_map.items():
+                total += 1
+                if count > 0:
+                    covered += 1
+                else:
+                    uncovered.append((filename, lineno))
+    else:
+        # File scope
+        if rel_posix in coverage_data:
+            line_map = coverage_data[rel_posix]
+            print(f"Found coverable file: {rel_posix}")
+            for lineno, count in line_map.items():
+                total += 1
+                if count > 0:
+                    covered += 1
+                else:
+                    uncovered.append((rel_posix, lineno))
+        else:
+            print(
+                f"Warning: No coverable lines found for '{rel_posix}' in gcovr output."
+            )
+
+    return covered, total, uncovered
+
+
+def report_coverage(
+    header: str,
+    total: int,
+    covered: int,
+    uncovered: List[Tuple[str, int]],
+    fail_under: float,
+    *,
+    total_label: str,
+    skipped_noncoverable: Optional[int] = None,
+) -> int:
+    """
+    Print a standardized coverage report and return exit code (0/1).
+
+    - header: text to show in the report title (e.g., "commit <hash>", "'<path>'")
+    - total_label: label to use for the total line count (e.g.,
+      "New coverable lines (per gcovr)" for commit mode, or
+      "Coverable lines (per gcovr)" for path mode)
+    - skipped_noncoverable: when provided, prints the skipped non-coverable count
+    """
+
+    title = f" Coverage analysis results for {header} "
+    separator = "=" * len(title)
+    print(f"\n{separator}\n{title}\n{separator}")
+    print(f"{total_label}: {total}")
+    print(f"Covered lines: {covered}")
+    print(f"Uncovered lines: {len(uncovered)}")
+    if skipped_noncoverable is not None:
+        print(f"Skipped non-coverable changed lines: {skipped_noncoverable}")
+
+    retval = 0
+    if total > 0:
+        coverage_percent = (covered / total) * 100
+        print(f"Coverage: {coverage_percent:.2f}%")
+        if coverage_percent < fail_under:
+            print(
+                f"\n✗ Coverage {coverage_percent:.2f}% is below required {fail_under}%"
+            )
+            retval = 1
+
+    if uncovered:
+        print(
+            "\nUncovered lines (explicitly reported by gcovr as coverable with 0 hits):"
+        )
+        for filename, lineno in sorted(uncovered):
+            print(f"  {filename}:{lineno}")
+    else:
+        if total == 0:
+            print("\nNo coverable lines found.")
+        else:
+            print(f"\n✓ Code coverage check passed!")
+
+    return retval
+
+
 def main() -> int:
     """Main entry point"""
     parser = create_argument_parser()
@@ -223,42 +352,33 @@ def main() -> int:
         os.chdir(root)
         print(f"Current working directory: {root}")
 
-        covered, total, uncovered, skipped_noncoverable = check_commit_coverage(
-            args.commit, root
-        )
+        if args.path:
+            # Path mode: ignore commit, compute coverage for file/dir
+            covered, total, uncovered = check_path_coverage(args.path, root)
 
-        # Print results with better formatting
-        title = f" Coverage analysis results for commit {args.commit} "
-        separator = "=" * len(title)
-        print(f"\n{separator}\n{title}\n{separator}")
-        print(f"New coverable lines (per gcovr): {total}")
-        print(f"Covered lines: {covered}")
-        print(f"Uncovered lines: {len(uncovered)}")
-        print(f"Skipped non-coverable changed lines: {skipped_noncoverable}")
-        retval = 0
-
-        if total > 0:
-            coverage_percent = (covered / total) * 100
-            print(f"Coverage: {coverage_percent:.2f}%")
-
-            # Check if coverage meets minimum requirement
-            if coverage_percent < args.fail_under:
-                print(
-                    f"\n✗ Coverage {coverage_percent:.2f}% is below required {args.fail_under}%"
-                )
-                retval = 1
-
-        if uncovered:
-            print(
-                "\nUncovered lines (explicitly reported by gcovr as coverable with 0 hits):"
+            return report_coverage(
+                header=f"'{args.path}'",
+                total=total,
+                covered=covered,
+                uncovered=uncovered,
+                fail_under=args.fail_under,
+                total_label="Coverable lines (per gcovr)",
             )
-            for filename, lineno in sorted(uncovered):
-                print(f"  {filename}:{lineno}")
+        else:
+            # Commit mode: default behavior
+            covered, total, uncovered, skipped_noncoverable = check_commit_coverage(
+                args.commit, root
+            )
 
-            return retval
-
-        print("\n✓ All new coverable code is covered!")
-        return retval
+            return report_coverage(
+                header=f"commit {args.commit}",
+                total=total,
+                covered=covered,
+                uncovered=uncovered,
+                fail_under=args.fail_under,
+                total_label="New coverable lines (per gcovr)",
+                skipped_noncoverable=skipped_noncoverable,
+            )
 
     except subprocess.CalledProcessError as e:
         print(f"Error: Command failed - {e}", file=sys.stderr)

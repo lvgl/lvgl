@@ -16,7 +16,7 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VG_LITE
-#include "../lv_draw.h"
+
 #include "../../draw/lv_draw_vector.h"
 #include "../../draw/lv_draw_arc.h"
 #include "../../draw/lv_draw_rect.h"

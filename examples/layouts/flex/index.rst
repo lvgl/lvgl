@@ -16,8 +16,8 @@ Demonstrate flex grow
 .. lv_example:: layouts/flex/lv_example_flex_3
   :language: c
 
-Demonstrate flex grow.
-----------------------
+Demonstrate flex grow
+---------------------
 
 .. lv_example:: layouts/flex/lv_example_flex_4
   :language: c

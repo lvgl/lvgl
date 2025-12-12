@@ -154,12 +154,6 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj);
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj);
 
 /**
- * Mark screen to send layout completed event after update.
- * @param obj   Any object on the target screen
- */
-void lv_obj_request_layout_complete_event(lv_obj_t * obj);
-
-/**
  * Update the layout of an object.
  * @param obj      pointer to an object whose position and size needs to be updated
  */
@@ -401,14 +395,18 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_
  * The area will be truncated to the object's area and marked for redraw.
  * @param obj       pointer to an object
  * @param           area the area to redraw
+ * @return LV_RESULT_OK: the area is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
+ *         (maybe it was off-screen or fully clipped)
  */
-void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
+lv_result_t lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
 
 /**
  * Mark the object as invalid to redrawn its area
  * @param obj       pointer to an object
+ * @return LV_RESULT_OK: the area is invalidated; LV_RESULT_INVALID: the area wasn't invalidated.
+ *         (maybe it was off-screen or fully clipped)
  */
-void lv_obj_invalidate(const lv_obj_t * obj);
+lv_result_t lv_obj_invalidate(const lv_obj_t * obj);
 
 /**
  * Tell whether an area of an object is visible (even partially) now or not
@@ -467,6 +465,34 @@ int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int3
  * @return              the clamped height
  */
 int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height);
+
+/**
+ * @brief Calculates the width in pixels of an LVGL object based on its style and parent for a given width `prop`.
+ * @param obj Pointer to the LVGL object whose width is being calculated.
+ * @param prop Which style width to calculate for. Valid values are: LV_STYLE_WIDTH, LV_STYLE_MIN_WIDTH, or
+ * LV_STYLE_MAX_WIDTH.
+ * @param content_width Pointer to an integer storing the object's content width. If negative and width is
+ * `LV_SIZE_CONTENT`, it will be calculated.
+ * @return The computed width for the object:
+ * @note If the style width is a fixed value, that value is returned.
+ * @note If the style width is `LV_SIZE_CONTENT`, the content width is calculated and returned.
+ * @note If the style width is a `LV_PCT()`, the percentage is applied to the parent's width.
+ */
+int32_t lv_obj_calc_dynamic_width(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_width);
+
+/**
+ * @brief Calculates the height in pixels of an LVGL object based on its style and parent for a given height `prop`.
+ * @param obj Pointer to the LVGL object whose height is being calculated.
+ * @param prop Which style height to calculate for. Valid values are: LV_STYLE_HEIGHT, LV_STYLE_MIN_HEIGHT, or
+ * LV_STYLE_MAX_HEIGHT.
+ * @param content_height Pointer to an integer storing the object's content height. If negative and height is
+ * `LV_SIZE_CONTENT`, it will be calculated.
+ * @return The computed height for the object:
+ * @note If the style height is a fixed value, that value is returned.
+ * @note If the style height is `LV_SIZE_CONTENT`, the content height is calculated and returned.
+ * @note If the style height is a `LV_PCT()`, the percentage is applied to the parent's height.
+ */
+int32_t lv_obj_calc_dynamic_height(lv_obj_t * obj, lv_style_prop_t prop, int32_t * const content_height);
 
 /**********************
  *      MACROS

@@ -1,3 +1,6 @@
+.. example_heading: XML Components
+
+
 Load components at runtime
 --------------------------
 

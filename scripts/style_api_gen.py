@@ -401,6 +401,18 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Sets the intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent. A value of  255, `LV_OPA_100` or `LV_OPA_COVER` means fully opaque. Intermediate values like LV_OPA_10, LV_OPA_20, etc result in semi-transparency."},
 
+{'name': 'BLUR_RADIUS',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':'`0`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Sets the intensity of blurring. Applied on each lv_part separately before the children are rendered."},
+
+{'name': 'BLUR_BACKDROP',
+ 'style_type': 'num',   'var_type': 'bool',  'default':'`false`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "If `true` the background of the widget will be blurred. The part should have < 100% opacity to make it visible. If `false` the given part will be blurred when it's rendered but before drawing the children."},
+
+{'name': 'BLUR_QUALITY',
+ 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_AUTO`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically. "},
+
  {'name': 'ANIM',
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more."},
@@ -751,7 +763,7 @@ print('''\
 ''')
 print('#endif /* LV_STYLE_GEN_H */')
 
-sys.stdout = open(base_dir + '/../docs/src/details/common-widget-features/styles/style-properties.rst', 'w')
+sys.stdout = open(base_dir + '/../docs/src/common-widget-features/styles/style-properties.rst', 'w')
 
 print('.. _style_properties:')
 print()

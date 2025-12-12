@@ -1,4 +1,5 @@
 #include "lv_gltf_view_shader.h"
+#include "../lv_gltf_view_internal.h"
 
 #if LV_USE_GLTF
 
@@ -12,8 +13,9 @@ static const lv_opengl_shader_t src_includes[] = {
         uniform float u_Exposure;
 
 
-        const float STANDARD_GAMMA = 2.2;
-        const float GAMMA = STANDARD_GAMMA;
+        // const float STANDARD_GAMMA = 2.2; // Retained for reference - unused
+
+        const float GAMMA = )" LV_GLTF_TONEMAP_GAMMA R"(;
         const float INV_GAMMA = 1.0 / GAMMA;
 
 

@@ -61,7 +61,7 @@ lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_nam
  * @param name      the name of the component (used during registration)
  * @return          LV_RESULT_OK on successful  unregistration, LV_RESULT_INVALID otherwise.
  */
-lv_result_t lv_xml_component_unregister(const char * name);
+lv_result_t lv_xml_unregister_component(const char * name);
 
 /**********************
  *      MACROS

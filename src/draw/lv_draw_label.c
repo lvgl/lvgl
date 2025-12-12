@@ -106,7 +106,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
         LV_LOG_WARN("dsc->font == NULL");
         return;
     }
-
+    if(coords->x1 > coords->x2) {
+        /* Attempting to draw a label too small (negative width), cancel to avoid error */
+        return;
+    }
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LABEL);
 

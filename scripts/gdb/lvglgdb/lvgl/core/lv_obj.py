@@ -10,7 +10,9 @@ class LVObject(Value):
     @property
     def class_name(self):
         name = self.class_p.name
-        return name.string() if name else "unknown"
+        if name:
+            return name.string()
+        return self.class_p.format_string(symbols=True, address=True, styling=True)
 
     @property
     def x1(self):

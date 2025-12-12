@@ -58,7 +58,26 @@ extern "C" {
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
-#define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, sizeof(array)/sizeof(array[0]))
+#define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, LV_ARRAYLEN(array))
+
+/* Helper to implement class definition of property and property names */
+/* *INDENT-OFF* */
+#if LV_USE_OBJ_PROPERTY_NAME
+#define LV_PROPERTY_CLASS_FIELDS(widget, uppercase) \
+    .prop_index_start = LV_PROPERTY_##uppercase##_START, \
+    .prop_index_end = LV_PROPERTY_##uppercase##_END, \
+    .properties = lv_##widget##_properties, \
+    .properties_count = LV_ARRAYLEN(lv_##widget##_properties), \
+    .property_names = lv_##widget##_property_names, \
+    .names_count = LV_ARRAYLEN(lv_##widget##_property_names)
+#else
+#define LV_PROPERTY_CLASS_FIELDS(widget, uppercase) \
+    .prop_index_start = LV_PROPERTY_##uppercase##_START, \
+    .prop_index_end = LV_PROPERTY_##uppercase##_END, \
+    .properties = lv_##widget##_properties, \
+    .properties_count = LV_ARRAYLEN(lv_##widget##_properties)
+#endif
+/* *INDENT-ON* */
 
 
 /**********************
@@ -237,6 +256,8 @@ lv_prop_id_t lv_style_property_get_id(const char * name);
 #include "../widgets/property/lv_obj_property_names.h"
 #include "../widgets/property/lv_style_properties.h"
 
+#else
+#define LV_PROPERTY_CLASS_FIELDS(widget, uppercase)
 #endif /*LV_USE_OBJ_PROPERTY*/
 
 #ifdef __cplusplus

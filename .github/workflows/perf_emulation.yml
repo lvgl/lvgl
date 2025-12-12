@@ -27,7 +27,7 @@ jobs:
           - scripts/perf/tests/serialize_results/test.sh
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Check Script
@@ -53,7 +53,7 @@ jobs:
           config : lv_conf_perf64b
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Generate lv_conf.h

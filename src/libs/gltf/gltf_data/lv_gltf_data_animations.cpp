@@ -61,30 +61,30 @@ uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t 
 }
 
 std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t * data,
-                                                               fastgltf::Node & node)
+                                                               fastgltf::Node * node)
 {
     const auto & asset = lv_gltf_data_get_asset(data);
     size_t animation_count = lv_gltf_model_get_animation_count(data);
-    if(data->channel_set_cache.find(&node) == data->channel_set_cache.end()) {
+    if(data->channel_set_cache.find(node) == data->channel_set_cache.end()) {
         std::vector<uint32_t> new_cache = std::vector<uint32_t>();
         if(animation_count > anim_num) {
             auto & anim = asset->animations[anim_num];
 
             for(uint64_t c = 0; c < anim.channels.size(); c++) {
                 auto & channel = anim.channels[c];
-                if(&(asset->nodes[channel.nodeIndex.value()]) == &node) {
+                if(&(asset->nodes[channel.nodeIndex.value()]) == node) {
                     new_cache.push_back(c);
                 }
             }
         }
-        data->channel_set_cache[&node] = new_cache;
+        data->channel_set_cache[node] = new_cache;
     }
-    return &data->channel_set_cache[&node];
+    return &data->channel_set_cache[node];
 }
 
 
 void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_model_t * gltf_data,
-                                         fastgltf::Node & node,
+                                         fastgltf::Node * node,
                                          fastgltf::math::fmat4x4 & matrix)
 {
     const auto & asset = lv_gltf_data_get_asset(gltf_data);

@@ -1,3 +1,5 @@
+.. example_heading: Pinyin IME
+
 
 Pinyin IME 26 key input
 -----------------------

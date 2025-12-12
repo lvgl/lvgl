@@ -28,7 +28,7 @@ jobs:
                        'OPTIONS_SDL']
     name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
       uses: actions/setup-python@v6
@@ -60,7 +60,7 @@ jobs:
     - name: patch freetype vcpkg URL
       run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
@@ -93,7 +93,7 @@ jobs:
       with:
         python-version: '3.12'
     - name: Clone LVGL as a Component
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         path: components/lvgl
     - name: Copy IDF Project Example
@@ -113,7 +113,7 @@ jobs:
                       '32bit build']
     name: Run tests with ${{ matrix.build_config }}
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Setup Python
       uses: actions/setup-python@v6
@@ -134,7 +134,7 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test --auto-clean
+      run: python tests/main.py --report --update-image test --auto-clean --keep-report
     - name: Code coverage analysis
       run: |
         if [ "${{ github.event_name }}" = "pull_request" ]; then

@@ -7,21 +7,20 @@
  *      INCLUDES
  *********************/
 
-#include "../../lvgl.h"
+#include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
 
-#include "lv_draw_vg_lite.h"
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_pending.h"
+#include "lv_vg_lite_bitmap_font_cache.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../libs/freetype/lv_freetype_private.h"
 #include "../lv_draw_label_private.h"
 #include "../lv_draw_image_private.h"
-
 
 /*********************
  *      DEFINES
@@ -85,16 +84,19 @@ void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u)
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, u);
 #endif /* LV_USE_FREETYPE */
 
-    u->bitmap_font_pending = lv_vg_lite_pending_create(sizeof(lv_font_glyph_dsc_t), 8);
-    lv_vg_lite_pending_set_free_cb(u->bitmap_font_pending, bitmap_cache_release_cb, NULL);
+    lv_vg_lite_bitmap_font_cache_init(u, LV_VG_LITE_BITMAP_FONT_CACHE_CNT);
+    u->letter_pending = lv_vg_lite_pending_create(sizeof(lv_font_glyph_dsc_t), 8);
+    lv_vg_lite_pending_set_free_cb(u->letter_pending, bitmap_cache_release_cb, NULL);
 }
 
 void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(u->bitmap_font_pending)
-    lv_vg_lite_pending_destroy(u->bitmap_font_pending);
-    u->bitmap_font_pending = NULL;
+    LV_ASSERT_NULL(u->letter_pending);
+    lv_vg_lite_pending_destroy(u->letter_pending);
+    u->letter_pending = NULL;
+
+    lv_vg_lite_bitmap_font_cache_deinit(u);
 }
 
 void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
@@ -169,14 +171,23 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A3:
             case LV_FONT_GLYPH_FORMAT_A4:
             case LV_FONT_GLYPH_FORMAT_A8: {
+                    const lv_font_t * resolved_font = glyph_draw_dsc->g->resolved_font;
                     vg_lite_buffer_t src_buf;
-                    if(lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font)) {
+                    if(lv_font_has_static_bitmap(resolved_font)) {
                         if(!init_buffer_from_glyph_dsc(&src_buf, glyph_draw_dsc->g)) {
                             return;
                         }
                     }
                     else {
-                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        if(resolved_font->release_glyph) {
+                            /* For dynamic fonts, its internal implementation already supports cache management. */
+                            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        }
+                        else {
+                            /* For non-cached unaligned fonts, we need to manage the cache manually. */
+                            glyph_draw_dsc->glyph_data = lv_vg_lite_bitmap_font_cache_get(u, glyph_draw_dsc->g);
+                        }
+
                         if(!glyph_draw_dsc->glyph_data) {
                             return;
                         }
@@ -365,11 +376,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
     if(dsc->g->entry) {
         /* Increment the cache reference count */
         lv_cache_entry_acquire_data(dsc->g->entry);
-        lv_vg_lite_pending_add(u->bitmap_font_pending, dsc->g);
-    }
-    else if(!lv_font_has_static_bitmap(dsc->g->resolved_font)) {
-        /* If there is no caching or no static bitmap is used, wait for the GPU to finish before releasing the data. */
-        lv_vg_lite_finish(u);
+        lv_vg_lite_pending_add(u->letter_pending, dsc->g);
     }
 
     LV_PROFILER_DRAW_END;

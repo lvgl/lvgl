@@ -60,33 +60,33 @@ exportar código C ou carregar os XMLs em tempo de execução. Saiba mais aqui.
 **Gratuito e portátil**
   - Biblioteca totalmente em C (compatível com C++) sem dependências externas.
   - Pode ser compilada para qualquer MCU ou MPU, com qualquer (RT)OS. Make, CMake e globbing simples são suportados.
-  - Suporta displays monocromáticos, ePaper, OLED, TFT e até monitores. [Displays](https://docs.lvgl.io/master/details/main-modules/display/index.html)
+  - Suporta displays monocromáticos, ePaper, OLED, TFT e até monitores. [Displays](https://docs.lvgl.io/master/main-modules/display/index.html)
   - Licença MIT, o que facilita o uso em projetos comerciais.
   - Precisa de apenas 32 kB de RAM, 128 kB de Flash, um frame buffer e pelo menos um buffer de 1/10 da tela para renderização.
   - Sistema operacional, memória externa e GPU são suportados, mas não obrigatórios.
 
 **Widgets, estilos, layouts e mais**
-  - 30+ [Widgets](https://docs.lvgl.io/master/details/widgets/index.html) embutidos: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table e muitos outros.
-  - [Sistema de estilos](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) flexível com ~100 propriedades para personalizar qualquer parte dos widgets em qualquer estado.
-  - Motores de layout tipo [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) e [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html) para dimensionar e posicionar widgets de forma responsiva.
+  - 30+ [Widgets](https://docs.lvgl.io/master/widgets/index.html) embutidos: Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table e muitos outros.
+  - [Sistema de estilos](https://docs.lvgl.io/master/common-widget-features/styles/index.html) flexível com ~100 propriedades para personalizar qualquer parte dos widgets em qualquer estado.
+  - Motores de layout tipo [Flexbox](https://docs.lvgl.io/master/common-widget-features/layouts/flex.html) e [Grid](https://docs.lvgl.io/master/common-widget-features/layouts/grid.html) para dimensionar e posicionar widgets de forma responsiva.
   - Texto renderizado com codificação UTF-8, com suporte a CJK, tailandês, híndi, árabe e persa.
-  - [Data bindings](https://docs.lvgl.io/master/details/auxiliary-modules/observer/index.html) para conectar facilmente a UI ao aplicativo.
+  - [Data bindings](https://docs.lvgl.io/master/main-modules/observer/index.html) para conectar facilmente a UI ao aplicativo.
   - Motor de renderização com suporte a animações, antialiasing, opacidade, rolagem suave, sombras, transformação de imagens e mais.
-  - [Poderoso motor de renderização 3D](https://docs.lvgl.io/master/details/libs/gltf.html) para exibir [modelos glTF](https://sketchfab.com/) com OpenGL.
-  - Suporte a mouse, touchpad, keypad, teclado, botões externos e encoder. [Dispositivos de entrada](https://docs.lvgl.io/master/details/main-modules/indev.html)
-  - Suporte a [múltiplos displays](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use).
+  - [Poderoso motor de renderização 3D](https://docs.lvgl.io/master/libs/gltf.html) para exibir [modelos glTF](https://sketchfab.com/) com OpenGL.
+  - Suporte a mouse, touchpad, keypad, teclado, botões externos e encoder. [Dispositivos de entrada](https://docs.lvgl.io/master/main-modules/indev.html)
+  - Suporte a [múltiplos displays](https://docs.lvgl.io/master/main-modules/display/overview.html#how-many-displays-can-lvgl-use).
 
 ## 📦️ Plataformas compatíveis
 
 O LVGL não possui dependências externas, por isso é fácil de compilar para qualquer dispositivo e também está disponível em vários gerenciadores de pacotes e RTOS:
 
-- [Biblioteca Arduino](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
+- [Biblioteca Arduino](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [Pacote PlatformIO](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Biblioteca Zephyr](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
+- [Biblioteca Zephyr](https://docs.lvgl.io/master/integration/os/zephyr.html)
 - [Componente ESP-IDF (ESP32)](https://components.espressif.com/components/lvgl/lvgl)
 - [Componente NXP MCUXpresso](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [Biblioteca NuttX](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
+- [Biblioteca NuttX](https://docs.lvgl.io/master/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [Pacote RIOT OS](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
@@ -96,10 +96,10 @@ O LVGL Pro é um conjunto completo para criar, testar, compartilhar e entregar U
 
 Ele é composto por quatro ferramentas integradas:
 
-1. **Editor XML**: o coração do LVGL Pro. Um app de desktop para criar componentes e telas em XML, gerenciar data bindings, traduções, animações, testes e mais. Saiba mais sobre o [formato XML](https://docs.lvgl.io/master/details/xml/xml/index.html) e o [Editor](https://docs.lvgl.io/master/details/xml/editor/index.html).
+1. **Editor XML**: o coração do LVGL Pro. Um app de desktop para criar componentes e telas em XML, gerenciar data bindings, traduções, animações, testes e mais. Saiba mais sobre o [formato XML](https://docs.lvgl.io/master/xml/xml/index.html) e o [Editor](https://docs.lvgl.io/master/xml/editor/index.html).
 2. **Visualizador online**: execute o Editor no navegador, abra projetos do GitHub e compartilhe facilmente sem configurar um ambiente de desenvolvimento. Visite [https://viewer.lvgl.io](https://viewer.lvgl.io).
-3. **Ferramenta CLI**: gere código C e rode testes no CI/CD. Veja os detalhes [aqui](https://docs.lvgl.io/master/details/xml/tools/cli.html).
-4. **Plugin Figma**: sincronize e extraia estilos diretamente do Figma. Veja como funciona [aqui](https://docs.lvgl.io/master/details/xml/tools/figma.html).
+3. **Ferramenta CLI**: gere código C e rode testes no CI/CD. Veja os detalhes [aqui](https://docs.lvgl.io/master/xml/tools/cli.html).
+4. **Plugin Figma**: sincronize e extraia estilos diretamente do Figma. Veja como funciona [aqui](https://docs.lvgl.io/master/xml/tools/figma.html).
 
 Juntas, essas ferramentas permitem criar UIs com eficiência, testá-las com confiabilidade e colaborar com colegas e clientes.
 

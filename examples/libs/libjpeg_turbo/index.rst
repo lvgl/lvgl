@@ -1,3 +1,6 @@
+.. example_heading: libjpeg-turbo
+
+
 Load a JPG image
 -----------------
 

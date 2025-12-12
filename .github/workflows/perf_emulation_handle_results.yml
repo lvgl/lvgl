@@ -27,7 +27,7 @@ jobs:
           - scripts/perf/tests/serialize_results/test.sh
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Check Script
@@ -42,7 +42,7 @@ jobs:
     name: ARM Emulated Benchmark - Handle Results
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

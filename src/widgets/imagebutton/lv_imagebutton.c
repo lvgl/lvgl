@@ -90,6 +90,33 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
     refr_image(obj);
 }
 
+void lv_imagebutton_set_src_left(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_left)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
+    update_src_info(&imagebutton->src_left[state], src_left);
+    refr_image(obj);
+}
+
+void lv_imagebutton_set_src_right(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_right)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
+    update_src_info(&imagebutton->src_right[state], src_right);
+    refr_image(obj);
+}
+
+void lv_imagebutton_set_src_mid(lv_obj_t * obj, lv_imagebutton_state_t state, const void * src_mid)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
+    update_src_info(&imagebutton->src_mid[state], src_mid);
+    refr_image(obj);
+}
+
 void lv_imagebutton_set_state(lv_obj_t * obj, lv_imagebutton_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

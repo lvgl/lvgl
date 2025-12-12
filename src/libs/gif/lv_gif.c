@@ -44,6 +44,7 @@ static void lv_gif_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void draw_raw_cb(GIFDRAW * pDraw);
 static void initialize(lv_gif_t * gifobj);
+static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * draw_buf);
 static void next_frame_task_cb(lv_timer_t * t);
 
 /**********************
@@ -403,7 +404,7 @@ static void initialize(lv_gif_t * gifobj)
     gifobj->draw_buf = lv_draw_buf_create(width, height, gifobj->color_format, LV_STRIDE_AUTO);
 
     if(gifobj->draw_buf == NULL) {
-        LV_LOG_WARN("Couldn't allocate memory for the gif with width: %d and height: %d", width, height);
+        LV_LOG_WARN("Couldn't allocate memory for the gif with width: %"LV_PRIu32" and height: %"LV_PRIu32"", width, height);
         GIF_close(gif);
         gifobj->is_open = 0;
         return;
@@ -420,13 +421,95 @@ static void initialize(lv_gif_t * gifobj)
 
 }
 
+/**
+ * Dispose the previous frame area before rendering the next frame, according to the GIF disposal method.
+ *
+ * This function handles the disposal of the previous frame's area in the GIF image, as specified by the disposal method.
+ * Disposal method values:
+ *   0: No disposal specified (do nothing)
+ *   1: Do not dispose (leave as is)
+ *   2: Restore to background color (the affected area is filled with the background color)
+ *   3: Restore to previous (not implemented here)
+ * Only disposal method 2 ("restore to background") is handled in this function.
+ *
+ * @param gif      Pointer to the GIFIMAGE structure representing the current GIF frame.
+ * @param drawbuf  Pointer to the draw buffer where the frame is rendered.
+ *
+ * Assumptions:
+ *   - The coordinates and dimensions (iX, iY, iWidth, iHeight) are within the bounds of the draw buffer.
+ *   - The palette type and background color are valid for the current GIF frame.
+ */
+static void disposal_last_frame(GIFIMAGE * gif, lv_draw_buf_t * drawbuf)
+{
+    int x = gif->iX;
+    int y = gif->iY;
+    int w = gif->iWidth;
+    int h = gif->iHeight;
+    int disposal_method = (gif->ucGIFBits & 0x1c) >> 2;
+    int i, j;
+
+    /* Bounds validation to prevent out-of-bounds access */
+    if(x < 0 || y < 0 || w <= 0 || h <= 0 ||
+       x + w > drawbuf->header.w || y + h > drawbuf->header.h) {
+        return;
+    }
+    if(disposal_method == 2) {
+        /* Restore to background color */
+        unsigned char bg = gif->ucBackground;
+        unsigned char * palette = (unsigned char *)(gif->bUseLocalPalette ? gif->pLocalPalette : gif->pPalette);
+        switch(gif->ucPaletteType) {
+            case GIF_PALETTE_RGB565_LE:
+            case GIF_PALETTE_RGB565_BE: {
+                    unsigned short * palette16 = (unsigned short *)palette;
+                    for(i = y; i < y + h; i++) {
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        for(j = x; j < x + w; j++) {
+                            *(uint16_t *)(dst + 2 * j) = palette16[bg];
+                        }
+                    }
+                }
+                break;
+            case GIF_PALETTE_RGB888:
+                for(i = y; i < y + h; i++) {
+                    uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                    for(j = x; j < x + w; j++) {
+                        dst[3 * j] = palette[(bg * 3) + 2];
+                        dst[3 * j + 1] = palette[(bg * 3) + 1];
+                        dst[3 * j + 2] = palette[(bg * 3) + 0];
+                    }
+                }
+                break;
+            case GIF_PALETTE_RGB8888: {
+                    lv_color32_t bg_color = lv_color32_make(palette[(bg * 3) + 2], palette[(bg * 3) + 1], palette[(bg * 3)], 0xff);
+                    /* has transparent */
+                    if(gif->ucGIFBits & 1) {
+                        bg_color = lv_color32_make(0, 0, 0, 0);
+                    }
+
+                    for(i = y; i < y + h; i++) {
+                        uint8_t * dst = drawbuf->data + drawbuf->header.stride * i;
+                        for(j = x; j < x + w; j++) {
+                            *(lv_color32_t *)(dst + 4 * j) = bg_color;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_gif_t * gifobj = (lv_gif_t *) obj;
-
+    GIFIMAGE * gif = &gifobj->gif;
     int ms_delay_next;
-    int has_next = GIF_playFrame(&gifobj->gif, &ms_delay_next, gifobj);
+
+    disposal_last_frame(gif, gifobj->draw_buf);
+
+    int has_next = GIF_playFrame(gif, &ms_delay_next, gifobj);
     if(has_next <= 0) {
         /*It was the last repeat*/
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
@@ -437,6 +520,9 @@ static void next_frame_task_cb(lv_timer_t * t)
             else {
                 gifobj->loop_count--;
             }
+        }
+        else if(gifobj->loop_count < 0) {
+            lv_timer_pause(t);
         }
         if(res != LV_RESULT_OK) return;
     }
