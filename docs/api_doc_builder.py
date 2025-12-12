@@ -342,7 +342,7 @@ def _process_end_of_eligible_doc(b: str, rst_file: str) -> (str, str, int):
     links_added_count = len(genned_link_set)
 
     if links_added_count > 0:
-        c = _auto_gen_sep + '\n\n'
+        c = '\n' + _auto_gen_sep + '\n\n'
         for link_name in sorted(genned_link_set, key=_hyperlink_sort_value):
             c += ':ref:`' + link_name + '`\n\n'
 
