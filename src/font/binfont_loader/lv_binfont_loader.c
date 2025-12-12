@@ -461,6 +461,13 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     return glyph_length;
 }
 
+static void release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * glyph_dsc)
+{
+    LV_UNUSED(font);
+    LV_UNUSED(glyph_dsc);
+    /*No custom memory management needed*/
+}
+
 /*
  * Loads a `lv_font_t` from a binary file, given a `lv_fs_file_t`.
  *
@@ -497,6 +504,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->line_height = font_header.ascent - font_header.descent;
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
+    font->release_glyph = release_glyph_cb;
     font->subpx = font_header.subpixels_mode;
     font->underline_position = (int8_t) font_header.underline_position;
     font->underline_thickness = (int8_t) font_header.underline_thickness;

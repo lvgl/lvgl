@@ -570,8 +570,21 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
                 GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
             }
 
-            lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
-            lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
+            if(fill_dsc->opa >= LV_OPA_MAX) {
+                float tex_w = (float)lv_area_get_width(&fill_area);
+                float tex_h = (float)lv_area_get_height(&fill_area);
+                GL_CALL(glEnable(GL_SCISSOR_TEST));
+                GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
+                GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,
+                                     (float)fill_dsc->color.blue / 255.0f, 1.0f));
+                GL_CALL(glClearDepthf(1.0f));
+                GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+                GL_CALL(glDisable(GL_SCISSOR_TEST));
+            }
+            else {
+                lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
+                lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
+            }
 
             if(target_texture) {
                 GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));

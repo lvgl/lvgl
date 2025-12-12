@@ -388,6 +388,10 @@
         <prop name="rotary_sensitivity" type="int" help="Set rotary sensitivity for Crown input devices"/>
         <prop name="recolor" type="color" help="Mix this color to the widget and all its children"/>
         <prop name="recolor_opa" type="opa" help="The intensity of recoloring"/>
+        <prop name="blur_radius" type="int" help="The radius of the blurring"/>
+        <prop name="blur_quality" type="enum:lv_blur_quality" help="Set whether to prefer speed or precision"/>
+        <prop name="blur_backdrop" type="bool" help="true: blur the background first, false: blur the widget"/>
+
     </styledef>
 
     </api>

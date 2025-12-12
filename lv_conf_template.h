@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.4.0
+ * Configuration file for v9.5.0-dev
  */
 
 /*
@@ -321,6 +321,9 @@
 
     /** VG-Lite stroke maximum cache number. */
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
+
+    /** VG-Lite unaligned bitmap font maximum cache number. */
+    #define LV_VG_LITE_BITMAP_FONT_CACHE_CNT 256
 
     /** Remove VLC_OP_CLOSE path instruction (Workaround for NXP) **/
     #define LV_VG_LITE_DISABLE_VLC_OP_CLOSE 0
@@ -712,7 +715,7 @@
 /*==================
  * WIDGETS
  *================*/
-/* Documentation for widgets can be found here: https://docs.lvgl.io/master/details/widgets/index.html . */
+/* Documentation for widgets can be found here: https://docs.lvgl.io/master/widgets/index.html . */
 
 /** 1: Causes these widgets to be given default values at creation time.
  *  - lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
@@ -820,7 +823,7 @@
 /*==================
  * THEMES
  *==================*/
-/* Documentation for themes can be found here: https://docs.lvgl.io/master/details/common-widget-features/styles/styles.html#themes . */
+/* Documentation for themes can be found here: https://docs.lvgl.io/master/common-widget-features/styles/styles.html#themes . */
 
 /** A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT 1
@@ -844,7 +847,7 @@
 /*==================
  * LAYOUTS
  *==================*/
-/* Documentation for layouts can be found here: https://docs.lvgl.io/master/details/common-widget-features/layouts/index.html . */
+/* Documentation for layouts can be found here: https://docs.lvgl.io/master/common-widget-features/layouts/index.html . */
 
 /** A layout similar to Flexbox in CSS. */
 #define LV_USE_FLEX 1
@@ -855,13 +858,13 @@
 /*====================
  * 3RD PARTS LIBRARIES
  *====================*/
-/* Documentation for libraries can be found here: https://docs.lvgl.io/master/details/libs/index.html . */
+/* Documentation for libraries can be found here: https://docs.lvgl.io/master/libs/index.html . */
 
 /* File system interfaces for common APIs */
 
 /** Setting a default driver letter allows skipping the driver prefix in filepaths.
  *  Documentation about how to use the below driver-identifier letters can be found at
- *  https://docs.lvgl.io/master/details/main-modules/fs.html#lv-fs-identifier-letters . */
+ *  https://docs.lvgl.io/master/main-modules/fs.html#lv-fs-identifier-letters . */
 #define LV_FS_DEFAULT_DRIVER_LETTER '\0'
 
 /** API for fopen, fread, etc. */
@@ -1003,7 +1006,9 @@
 #define LV_USE_GLTF  0
 
 /** Enable Vector Graphic APIs
- *  Requires `LV_USE_MATRIX = 1` */
+ *  Requires `LV_USE_MATRIX = 1`
+ *  and a rendering engine supporting vector graphics, e.g.
+ *  (LV_USE_DRAW_SW and LV_USE_THORVG) or LV_USE_DRAW_VG_LITE or LV_USE_NEMA_VG. */
 #define LV_USE_VECTOR_GRAPHIC  0
 
 /** Enable ThorVG (vector graphics library) from the src/libs folder.
@@ -1041,7 +1046,7 @@
 /*==================
  * OTHERS
  *==================*/
-/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/details/auxiliary-modules/index.html . */
+/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/auxiliary-modules/index.html . */
 
 /** 1: Enable API to take snapshot for object */
 #define LV_USE_SNAPSHOT 0
@@ -1199,6 +1204,12 @@
 /** Enable `lv_test_screenshot_compare`.
  * Requires lodepng and a few MB of extra RAM. */
 #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+
+#if LV_USE_TEST_SCREENSHOT_COMPARE
+    /** 1: Automatically create missing reference images*/
+    #define LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE 1
+#endif /*LV_USE_TEST_SCREENSHOT_COMPARE*/
+
 #endif /*LV_USE_TEST*/
 
 /** Enable loading XML UIs runtime */
@@ -1240,11 +1251,7 @@
 /** Use Wayland to open a window and handle input on Linux or BSD desktops */
 #define LV_USE_WAYLAND          0
 #if LV_USE_WAYLAND
-    #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
-    #define LV_WAYLAND_USE_DMABUF           0    /**< Use DMA buffers for frame buffers. Requires LV_DRAW_USE_G2D */
-    #define LV_WAYLAND_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL   /**< DMABUF supports LV_DISPLAY_RENDER_MODE_FULL and LV_DISPLAY_RENDER_MODE_DIRECT*/
-                                                                             /**< When LV_WAYLAND_USE_DMABUF is disabled, only LV_DISPLAY_RENDER_MODE_PARTIAL is supported*/
-    #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME. Not supported using DMABUF*/
+    #define LV_WAYLAND_DIRECT_EXIT          1     /**< 1: Exit the application when all Wayland windows are closed */
 #endif
 
 /** Driver for /dev/fb */

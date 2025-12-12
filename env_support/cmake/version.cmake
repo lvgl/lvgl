@@ -1,7 +1,7 @@
 set(LVGL_VERSION_MAJOR "9")
-set(LVGL_VERSION_MINOR "4")
+set(LVGL_VERSION_MINOR "5")
 set(LVGL_VERSION_PATCH "0")
-set(LVGL_VERSION_INFO  "")
+set(LVGL_VERSION_INFO  "dev")
 
 set(LVGL_VERSION ${LVGL_VERSION_MAJOR}.${LVGL_VERSION_MINOR}.${LVGL_VERSION_PATCH}) # This is a CMake variable
 set(ENV{LVGL_VERSION} ${LVGL_VERSION}) # This is exported Environmental variable

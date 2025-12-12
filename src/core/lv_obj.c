@@ -86,7 +86,7 @@ static void delete_on_screen_unloaded_event_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_obj_properties[] = {
     {
         .id = LV_PROPERTY_OBJ_PARENT,
         .setter = lv_obj_set_parent,
@@ -213,18 +213,7 @@ const lv_obj_class_t lv_obj_class = {
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
     .name = "lv_obj",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_OBJ_START,
-    .prop_index_end = LV_PROPERTY_OBJ_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_obj_property_names,
-    .names_count = sizeof(lv_obj_property_names) / sizeof(lv_property_name_t),
-#endif
-
-#endif
+    LV_PROPERTY_CLASS_FIELDS(obj, OBJ)
 };
 
 /**********************
@@ -693,9 +682,19 @@ static void lv_obj_draw(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);
+
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         draw_dsc.base.layer = layer;
+
+        lv_draw_blur_dsc_t blur_dsc;
+        lv_draw_blur_dsc_init(&blur_dsc);
+        blur_dsc.corner_radius = draw_dsc.radius;
+
+        bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_INDICATOR);
+        lv_obj_init_draw_blur_dsc(obj, LV_PART_MAIN, &blur_dsc);
+        blur_dsc.base.layer = layer;
+        if(backdrop_blur) lv_draw_blur(layer, &blur_dsc, &obj->coords);
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -710,6 +709,9 @@ static void lv_obj_draw(lv_event_t * e)
         lv_area_increase(&coords, w, h);
 
         lv_draw_rect(layer, &draw_dsc, &coords);
+
+        blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_MAIN);
+        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &coords);
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -747,17 +749,34 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
 
     if(lv_area_get_size(&hor_area) <= 0 && lv_area_get_size(&ver_area) <= 0) return;
 
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &rect_dsc);
     if(sb_res != LV_RESULT_OK) return;
 
+    bool backdrop_blur = lv_obj_get_style_blur_backdrop(obj, LV_PART_SCROLLBAR);
+    lv_draw_blur_dsc_t blur_dsc;
+    lv_draw_blur_dsc_init(&blur_dsc);
+    blur_dsc.corner_radius = rect_dsc.radius;
+    blur_dsc.blur_radius = lv_obj_get_style_blur_radius(obj, LV_PART_SCROLLBAR);
+
     if(lv_area_get_size(&hor_area) > 0) {
-        draw_dsc.base.id1 = 0;
-        lv_draw_rect(layer, &draw_dsc, &hor_area);
+        if(backdrop_blur) lv_obj_init_draw_blur_dsc(obj, LV_PART_SCROLLBAR, &blur_dsc);
+        blur_dsc.base.id1 = 0;
+        lv_draw_blur(layer, &blur_dsc, &hor_area);
+
+        rect_dsc.base.id1 = 0;
+        lv_draw_rect(layer, &rect_dsc, &hor_area);
+
+        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        draw_dsc.base.id1 = 1;
-        lv_draw_rect(layer, &draw_dsc, &ver_area);
+        blur_dsc.base.id1 = 1;
+        if(backdrop_blur) lv_draw_blur(layer, &blur_dsc, &ver_area);
+
+        rect_dsc.base.id1 = 1;
+        lv_draw_rect(layer, &rect_dsc, &ver_area);
+
+        if(!backdrop_blur) lv_draw_blur(layer, &blur_dsc, &ver_area);
     }
 }
 

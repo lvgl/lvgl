@@ -69,7 +69,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_dropdown_properties[] = {
     {
         .id = LV_PROPERTY_DROPDOWN_TEXT,
         .setter = lv_dropdown_set_text,
@@ -129,17 +129,7 @@ const lv_obj_class_t lv_dropdown_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_dropdown",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_DROPDOWN_START,
-    .prop_index_end = LV_PROPERTY_DROPDOWN_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_dropdown_property_names,
-    .names_count = sizeof(lv_dropdown_property_names) / sizeof(lv_property_name_t),
-#endif
-#endif
+    LV_PROPERTY_CLASS_FIELDS(dropdown, DROPDOWN)
 };
 
 const lv_obj_class_t lv_dropdownlist_class = {

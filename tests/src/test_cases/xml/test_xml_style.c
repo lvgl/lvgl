@@ -179,7 +179,7 @@ void test_xml_style_remove(void)
     /*s2 is added and removed so the red bg_color shouldn't be applied*/
     TEST_ASSERT_NOT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_KNOB));
 
-    lv_xml_component_unregister("comp1");
+    lv_xml_unregister_component("comp1");
 }
 
 void test_xml_style_binding(void)
@@ -224,8 +224,7 @@ void test_xml_style_prop_binding(void)
         "</component>";
 
     lv_xml_register_component_from_data("comp1", comp1_xml);
-    lv_xml_component_unregister("comp1");
-    return;
+
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
 
     lv_obj_add_state(obj, LV_STATE_CHECKED);

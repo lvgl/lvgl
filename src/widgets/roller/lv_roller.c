@@ -62,7 +62,7 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_roller_properties[] = {
     {
         .id = LV_PROPERTY_ROLLER_OPTIONS,
         .setter = lv_roller_set_options,
@@ -91,17 +91,7 @@ const lv_obj_class_t lv_roller_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "lv_roller",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_ROLLER_START,
-    .prop_index_end = LV_PROPERTY_ROLLER_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_roller_property_names,
-    .names_count = sizeof(lv_roller_property_names) / sizeof(lv_property_name_t),
-#endif
-#endif
+    LV_PROPERTY_CLASS_FIELDS(roller, ROLLER)
 };
 
 const lv_obj_class_t lv_roller_label_class  = {
@@ -802,6 +792,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             new_opt = 0;
             lv_point_t p;
             lv_indev_get_point(indev, &p);
+            lv_obj_transform_point(obj, &p, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
             p.y -= label->coords.y1;
             p.x -= label->coords.x1;
             uint32_t letter_i;

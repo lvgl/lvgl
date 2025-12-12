@@ -266,11 +266,11 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     LV_PROFILER_REFR_END;
 }
 
-void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
+lv_result_t lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_display_get_default();
-    if(!disp) return;
-    if(!lv_display_is_invalidation_enabled(disp)) return;
+    if(!disp) return LV_RESULT_INVALID;
+    if(!lv_display_is_invalidation_enabled(disp)) return LV_RESULT_INVALID;
 
     /**
      * There are two reasons for this issue:
@@ -288,7 +288,7 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
         disp->inv_p = 0;
-        return;
+        return LV_RESULT_OK;
     }
 
     lv_area_t scr_area;
@@ -301,7 +301,7 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     bool suc;
 
     suc = lv_area_intersect(&com_area, area_p, &scr_area);
-    if(suc == false)  return; /*Out of the screen*/
+    if(suc == false)  return LV_RESULT_INVALID; /*Out of the screen*/
 
     if(disp->color_format == LV_COLOR_FORMAT_I1) {
         /*Make sure that the X coordinates start and end on byte boundary.
@@ -315,16 +315,16 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
-        return;
+        return LV_RESULT_OK;
     }
 
     lv_result_t res = lv_display_send_event(disp, LV_EVENT_INVALIDATE_AREA, &com_area);
-    if(res != LV_RESULT_OK) return;
+    if(res != LV_RESULT_OK) return LV_RESULT_INVALID;
 
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
     for(i = 0; i < disp->inv_p; i++) {
-        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
+        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return LV_RESULT_OK;
     }
 
     /*Save the area*/
@@ -337,6 +337,8 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     disp->inv_p++;
 
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+
+    return LV_RESULT_OK;
 }
 
 /**

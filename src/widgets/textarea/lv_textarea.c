@@ -69,7 +69,7 @@ static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_textarea_properties[] = {
     {
         .id = LV_PROPERTY_TEXTAREA_TEXT,
         .setter = lv_textarea_set_text,
@@ -159,18 +159,7 @@ const lv_obj_class_t lv_textarea_class = {
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class,
     .name = "lv_textarea",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_TEXTAREA_START,
-    .prop_index_end = LV_PROPERTY_TEXTAREA_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_textarea_property_names,
-    .names_count = sizeof(lv_textarea_property_names) / sizeof(lv_property_name_t),
-#endif
-
-#endif
+    LV_PROPERTY_CLASS_FIELDS(textarea, TEXTAREA)
 };
 
 static const char * ta_insert_replace;
