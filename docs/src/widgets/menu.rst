@@ -163,8 +163,8 @@ No *Keys* are processed by Menu Widgets.
 
 .. _lv_menu_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/menu/index.rst
 

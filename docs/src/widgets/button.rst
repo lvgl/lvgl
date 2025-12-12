@@ -67,8 +67,8 @@ and :cpp:enumerator:`LV_EVENT_RELEASED` etc.
 
 .. _lv_button_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: /examples/widgets/button/index.rst
 
