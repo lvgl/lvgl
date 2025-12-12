@@ -308,6 +308,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         hor_translate, ver_translate, 1.0f
     };
 
+
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
