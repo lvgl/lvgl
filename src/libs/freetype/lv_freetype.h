@@ -48,9 +48,9 @@ typedef enum {
  * Stores CSS-like weight (e.g., 100..900) in the upper bits.
  * Backwards compatible: BOLD bit still maps to 700 if no explicit weight.
  */
-#  define LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT 16
-#  define LV_FREETYPE_FONT_STYLE_WEIGHT_MASK ((lv_freetype_font_style_t)0xFFFF0000u)
-#  define LV_FREETYPE_FONT_STYLE_WEIGHT(w)                                                                             \
+#define LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT 16
+#define LV_FREETYPE_FONT_STYLE_WEIGHT_MASK ((lv_freetype_font_style_t)0xFFFF0000u)
+#define LV_FREETYPE_FONT_STYLE_WEIGHT(w)                                                                             \
     ((lv_freetype_font_style_t)((uint32_t)(w) << LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT))
 
 static inline int lv_freetype_font_style_get_weight(lv_freetype_font_style_t style)
