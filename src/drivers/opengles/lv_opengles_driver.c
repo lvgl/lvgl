@@ -86,7 +86,7 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_FlipRB", "u_Hue", "u_Saturation", "u_Value" };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
 static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
@@ -199,7 +199,7 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
-    lv_opengles_shader_set_uniform1i("u_FlipRB", 1);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", 1);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -221,7 +221,7 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB)
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool swap_red_blue)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -278,7 +278,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
-    lv_opengles_shader_set_uniform1i("u_FlipRB", flipRB ? 1 : 0);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", swap_red_blue ? 1 : 0);
 
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
