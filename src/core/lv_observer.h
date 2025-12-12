@@ -16,6 +16,10 @@ extern "C" {
 
 #include "lv_obj.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 #if LV_USE_OBSERVER
 
 /*********************
@@ -56,6 +60,9 @@ typedef union {
  * The Subject (an observable value)
  */
 struct _lv_subject_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     lv_ll_t subs_ll;                     /**< Subscribers */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
@@ -78,6 +85,27 @@ typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subjec
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data to an integer Subject with lifecycle management
+ *
+ * Associates arbitrary user-defined data with an LVGL observer and registers a destructor
+ * callback that will be automatically invoked when the observer is deleted. This enables:
+ * - Safe resource cleanup through the destructor mechanism
+ * - Contextual data storage for observer callbacks
+ * - Proper memory management for observer-related resources
+ *
+ * @param subject    pointer to Subject
+ * @param data       User-defined data pointer to associate
+ * @param free_cb    Cleanup function called when:
+ *                   - Observer is explicitly deleted
+ *                   - Observed object is deleted
+ *                   - New data replaces current association
+ *                   NULL indicates no cleanup required
+ */
+void lv_subject_set_external_data(lv_subject_t * subject, void * data, void (* free_cb)(void * data));
+#endif
 
 /**
  * Initialize an integer-type Subject.

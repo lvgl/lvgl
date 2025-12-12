@@ -452,6 +452,22 @@ lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void *
  */
 void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap_cb);
 
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to an indev
+ *
+ * Associates custom user data with an LVGL indev and specifies a destructor function
+ * that will be automatically invoked when the indev is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param indev      Pointer to an indev
+ * @param data       User-defined data pointer to associate with the indev
+ * @param free_cb    Callback function for cleaning up ext_data when indev is deleted.
+ *                   Receives ext_data as parameter. NULL means no cleanup required.
+ */
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data));
+#endif
+
 /**********************
  *      MACROS
  **********************/

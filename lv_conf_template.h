@@ -1400,6 +1400,9 @@
     #define LV_QNX_BUF_COUNT        1    /**< 1 or 2 */
 #endif
 
+/** Enable or disable for external data and destructor function */
+#define LV_USE_EXT_DATA   0
+
 /*=====================
 * BUILD OPTIONS
 *======================*/

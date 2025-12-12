@@ -832,6 +832,23 @@ menu "LVGL configuration"
 				bool "Enable the multi-touch gesture recognition feature"
 				depends on LV_USE_FLOAT
 				default n
+
+			config LV_USE_EXT_DATA
+				bool "External data and destructor"
+				default n
+				help
+					Enable this option to activate external data and destructor functionality,
+					which assists in resource cleanup when objects are freed by either LVGL core
+					or applications. Currently supported features include:
+						- event
+						- object
+						- observer
+						- anim
+						- timer
+						- group
+						- display
+						- indev (input device)
+						- theme
 		endmenu
 	endmenu
 

@@ -61,6 +61,23 @@ bool lv_obj_is_editable(lv_obj_t * obj);
 
 bool lv_obj_is_group_def(lv_obj_t * obj);
 
+#if LV_USE_EXT_DATA
+/**
+ * @brief Associates an array of external data pointers with an LVGL object
+ *
+ * Associates custom user data with an LVGL object and specifies a destructor function
+ * that will be automatically invoked when the object is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param obj          Target LVGL object
+ * @param data         User-defined data pointer to associate with a object
+ * @param free_cb      Cleanup function called for each non-NULL data pointer during
+ *                     object deletion. Receives single data pointer as parameter.
+ *                     NULL means no automatic cleanup.
+ */
+void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data));
+#endif
+
 /**********************
  *      MACROS
  **********************/
