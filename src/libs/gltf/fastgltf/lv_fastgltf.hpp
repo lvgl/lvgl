@@ -199,37 +199,6 @@ inline void custom_iterate_scene_nodes(lv_gltf_model_t * model, std::size_t scen
     }
 }
 
-FASTGLTF_EXPORT template <typename AssetType, typename Callback>
-#if FASTGLTF_HAS_CONCEPTS
-    requires std::same_as<std::remove_cvref_t<AssetType>, Asset>
-    && std::is_invocable_v<Callback, fastgltf::Node &, uint32_t placement>
-#endif
-inline void iterate_scene_nodes_get_placement(AssetType&& asset, std::size_t sceneIndex, Callback callback)
-{
-    uint32_t placement = 0;
-    auto & scene = asset.scenes[sceneIndex];
-    auto & nodes = asset.nodes;
-    auto function = [&](std::size_t nodeIndex, auto & self) -> void {
-        auto & node = nodes[nodeIndex];
-        auto _localMat = getTransformMatrix(node, math::fmat4x4());
-        std::invoke(callback, node, parentWorldMatrix, _localMat);
-        uint32_t num_children = node.children.size();
-        if(num_children > 0) {
-            math::fmat4x4 _parentWorldTemp = parentWorldMatrix * _localMat;
-            if(num_children > 1) {
-                math::fmat4x4 per_child_copy = math::fmat4x4(_parentWorldTemp);
-                for(auto & child : node.children) self(child, per_child_copy, self);
-            }
-            else {
-                self(node.children[0], _parentWorldTemp,  self);
-            }
-        }
-    };
-
-    for(size_t i = 0 ; i < scene.nodeIndices.size(); ++i) {
-        invoke_cb(scene.nodeIndices[i], *initial, invoke_cb);
-    }
-}
 }
 
 
