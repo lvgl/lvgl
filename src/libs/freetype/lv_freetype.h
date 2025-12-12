@@ -43,6 +43,21 @@ typedef enum {
     LV_FREETYPE_FONT_STYLE_BOLD = 1 << 1,
 } lv_freetype_font_style_t;
 
+/*
+ * Optional variable font weight encoding in style.
+ * Stores CSS-like weight (e.g., 100..900) in the upper bits.
+ * Backwards compatible: BOLD bit still maps to 700 if no explicit weight.
+ */
+#  define LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT 16
+#  define LV_FREETYPE_FONT_STYLE_WEIGHT_MASK ((lv_freetype_font_style_t)0xFFFF0000u)
+#  define LV_FREETYPE_FONT_STYLE_WEIGHT(w)                                                                             \
+    ((lv_freetype_font_style_t)((uint32_t)(w) << LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT))
+
+static inline int lv_freetype_font_style_get_weight(lv_freetype_font_style_t style)
+{
+    return (int)(((uint32_t)style & LV_FREETYPE_FONT_STYLE_WEIGHT_MASK) >> LV_FREETYPE_FONT_STYLE_WEIGHT_SHIFT);
+}
+
 typedef lv_freetype_font_style_t LV_FT_FONT_STYLE;
 
 typedef enum {
@@ -58,7 +73,7 @@ typedef enum {
     LV_FREETYPE_OUTLINE_LINE_TO,
     LV_FREETYPE_OUTLINE_CUBIC_TO,
     LV_FREETYPE_OUTLINE_CONIC_TO,
-    LV_FREETYPE_OUTLINE_BORDER_START,     /* When line width > 0 the border glyph is drawn after the regular glyph */
+    LV_FREETYPE_OUTLINE_BORDER_START, /* When line width > 0 the border glyph is drawn after the regular glyph */
 } lv_freetype_outline_type_t;
 
 /* Only path string is required */
@@ -102,7 +117,9 @@ lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info);
  * @param style font style(see lv_freetype_font_style_t for details).
  * @return Created font, or NULL on failure.
  */
-lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
+lv_font_t * lv_freetype_font_create(const char * pathname,
+                                    lv_freetype_font_render_mode_t render_mode,
+                                    uint32_t size,
                                     lv_freetype_font_style_t style);
 
 /**
