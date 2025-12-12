@@ -26,6 +26,7 @@
  *********************/
 
 #define LV_GLTF_DISTANCE_SCALE_FACTOR 2.5f
+#define LV_GLTF_TRANSMISSION_PASS_SIZE 256
 
 /**********************
  *      TYPEDEFS

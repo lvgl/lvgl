@@ -571,7 +571,9 @@ static bool draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         GL_CALL(glDisable(GL_CULL_FACE));
     if(gltfMaterial.alphaMode == fastgltf::AlphaMode::Blend) {
         GL_CALL(glEnable(GL_BLEND));
-        GL_CALL(glDepthMask(GL_FALSE));
+        if(!is_transmission_pass) {
+            GL_CALL(glDepthMask(GL_FALSE));
+        }
         GL_CALL(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
         GL_CALL(glBlendEquation(GL_FUNC_ADD));
         GL_CALL(glEnable(GL_CULL_FACE));
@@ -1040,8 +1042,8 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
 
     float aspect = (float)width / (float)height;
     if(transmission_pass) {
-        width = 256;
-        height = 256;
+        width = LV_GLTF_TRANSMISSION_PASS_SIZE;
+        height = LV_GLTF_TRANSMISSION_PASS_SIZE;
     }
 
     std::visit(fastgltf::visitor{
