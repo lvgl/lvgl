@@ -1,5 +1,7 @@
+.. _generic mipi driver:
+
 =================================================
-Generic MIPI DCS compatible LCD Controller driver
+Generic MIPI DCS-Compatible LCD Controller Driver
 =================================================
 
 Overview
