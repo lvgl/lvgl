@@ -20,6 +20,16 @@
 #define ft_ctx LV_GLOBAL_DEFAULT()->ft_context
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
+/* Temporary stack buffer size for variable-font axes.
+ * Most fonts have only a few axes; use heap only when needed. */
+#define LV_FREETYPE_MAX_STACK_AXES 8
+
+/* Clamp for requested variable font weight before converting to 16.16.
+ * Fonts commonly use CSS-like 100..900, but some support extended ranges.
+ * Keeping this bounded avoids unreasonable inputs and keeps conversion safe. */
+#define LV_FREETYPE_VAR_WEIGHT_MIN 1
+#define LV_FREETYPE_VAR_WEIGHT_MAX 2000
+
 /**< This value is from the FreeType's function `FT_GlyphSlot_Oblique` in `ftsynth.c` */
 #define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x0366A
 
@@ -465,10 +475,12 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
     }
 
     FT_UInt axis_count = mm_var->num_axis;
-    FT_Fixed coords_stack[8];
+    FT_Fixed coords_stack[LV_FREETYPE_MAX_STACK_AXES];
     FT_Fixed * coords = coords_stack;
     bool use_heap = false;
-    if(axis_count > 8) {
+    bool applied = false;
+
+    if(axis_count > LV_FREETYPE_MAX_STACK_AXES) {
         coords = (FT_Fixed *)lv_malloc(axis_count * sizeof(FT_Fixed));
         LV_ASSERT_MALLOC(coords);
         if(!coords) {
@@ -478,7 +490,8 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         use_heap = true;
     }
 
-    if(FT_Get_Var_Design_Coordinates(face, axis_count, coords) == 0) {
+    FT_Error coord_err = FT_Get_Var_Design_Coordinates(face, axis_count, coords);
+    if(coord_err == 0) {
         FT_ULong wght_tag = FT_MAKE_TAG('w', 'g', 'h', 't');
         int wght_index = -1;
         for(FT_UInt i = 0; i < axis_count; i++) {
@@ -490,10 +503,10 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
         if(wght_index >= 0) {
             FT_Fixed min_v = mm_var->axis[wght_index].minimum;
             FT_Fixed max_v = mm_var->axis[wght_index].maximum;
-            if(weight < 1)
-                weight = 1;
-            if(weight > 2000)
-                weight = 2000;
+            if(weight < LV_FREETYPE_VAR_WEIGHT_MIN)
+                weight = LV_FREETYPE_VAR_WEIGHT_MIN;
+            if(weight > LV_FREETYPE_VAR_WEIGHT_MAX)
+                weight = LV_FREETYPE_VAR_WEIGHT_MAX;
             FT_Fixed target = FT_INT_TO_F16DOT16(weight);
             if(target < min_v)
                 target = min_v;
@@ -501,17 +514,14 @@ static bool lv_freetype_set_weight_if_variable(FT_Face face, int weight)
                 target = max_v;
             coords[wght_index] = target;
             (void)FT_Set_Var_Design_Coordinates(face, axis_count, coords);
-            if(use_heap && coords != coords_stack)
-                lv_free(coords);
-            FT_Done_MM_Var(ctx->library, mm_var);
-            return true;
+            applied = true;
         }
     }
 
-    if(use_heap && coords != coords_stack)
+    if(use_heap)
         lv_free(coords);
     FT_Done_MM_Var(ctx->library, mm_var);
-    return false;
+    return applied;
 }
 
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
