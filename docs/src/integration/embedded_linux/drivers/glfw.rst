@@ -181,7 +181,7 @@ used to add content to a texture and the driver will draw the texture in the win
     #else
     #error("Unsupported color format")
     #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, texture_format, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, texture_format, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
 
