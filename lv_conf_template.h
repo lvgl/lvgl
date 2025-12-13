@@ -407,6 +407,18 @@
     #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
 #endif
 
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ */
+#define LV_USE_DRAW_NANOVG 0
+#if LV_USE_DRAW_NANOVG
+    /** Draw image texture cache count. */
+    #define LV_NANOVG_IMAGE_CACHE_CNT 128
+
+    /** Draw letter texture cache count. */
+    #define LV_NANOVG_LETTER_CACHE_CNT 512
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -1019,6 +1031,9 @@
  *  Requires LV_USE_VECTOR_GRAPHIC */
 #define LV_USE_THORVG_EXTERNAL 0
 
+/** Enable NanoVG (vector graphics library) */
+#define LV_USE_NANOVG 0
+
 /** Use lvgl built-in LZ4 lib */
 #define LV_USE_LZ4_INTERNAL  0
 
@@ -1235,6 +1250,7 @@
     #define LV_SDL_FULLSCREEN       0    /**< 1: Make the window full screen by default */
     #define LV_SDL_DIRECT_EXIT      1    /**< 1: Exit the application when all SDL windows are closed */
     #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
+    #define LV_SDL_USE_EGL          0    /**< 1: Use EGL backend for rendering */
 #endif
 
 /** Use X11 to open window on Linux desktop and handle mouse and keyboard */
