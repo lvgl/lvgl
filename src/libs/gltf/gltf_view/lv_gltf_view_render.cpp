@@ -275,7 +275,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
     std::sort(distance_sort_nodes.begin(), distance_sort_nodes.end(),
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
-        return a.first < b.first;
+        return a.first > b.first;
     });
 
     /* Reset the last material index to an unused value once per frame at the start*/
