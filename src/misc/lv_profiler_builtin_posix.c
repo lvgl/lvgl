@@ -112,7 +112,7 @@ static int tid_get_cb(void)
 #elif defined(_WIN32)
     return (int)GetCurrentThreadId();
 #else
-    return (int)pthread_self();
+    return (int)(lv_intptr_t)pthread_self();
 #endif
 }
 
