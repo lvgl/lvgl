@@ -314,4 +314,22 @@ void test_tabview_translation_tag(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
 }
 
+void test_tabview_setting_tab_bar_position_after_size_should_result_in_the_same_result(void)
+{
+    tabview = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_size(tabview, lv_pct(50));
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_add_tab(tabview, "Tab 1");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_11.png");
+    lv_obj_delete(tabview);
+
+    tabview = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, lv_pct(50));
+    lv_tabview_add_tab(tabview, "Tab 1");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_11.png");
+}
+
 #endif

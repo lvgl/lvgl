@@ -235,6 +235,8 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
         }
     }
     tabview->tab_pos = dir;
+    /* Update the tab bar size after the position is changed*/
+    lv_tabview_set_tab_bar_size(obj, tabview->tab_bar_size);
 }
 
 void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size)
@@ -249,6 +251,7 @@ void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size)
     else {
         lv_obj_set_width(tab_bar, size);
     }
+    tabview->tab_bar_size = size;
 }
 
 uint32_t lv_tabview_get_tab_active(lv_obj_t * obj)
@@ -303,7 +306,16 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_LAYOUT_CHANGED, NULL);
     lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_SCROLL_END, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
-    lv_tabview_set_tab_bar_position(obj, LV_DIR_TOP);
+
+    const lv_dir_t default_direction = LV_DIR_TOP;
+    const int32_t dpi = lv_display_get_dpi(lv_obj_get_display(obj));
+    if(default_direction & LV_DIR_VER) {
+        tabview->tab_bar_size = dpi / 2;
+    }
+    else {
+        tabview->tab_bar_size = dpi;
+    }
+    lv_tabview_set_tab_bar_position(obj, default_direction);
 
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
