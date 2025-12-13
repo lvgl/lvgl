@@ -219,4 +219,41 @@ void test_chart_scatter(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_scatter.png");
 }
 
+void test_chart_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_property_t prop;
+
+    /* Test TYPE property */
+    prop.id = LV_PROPERTY_CHART_TYPE;
+    prop.num = LV_CHART_TYPE_BAR;
+    TEST_ASSERT_TRUE(lv_obj_set_property(chart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_CHART_TYPE_BAR, lv_obj_get_property(chart, LV_PROPERTY_CHART_TYPE).num);
+
+    /* Test POINT_COUNT property */
+    prop.id = LV_PROPERTY_CHART_POINT_COUNT;
+    prop.num = 20;
+    TEST_ASSERT_TRUE(lv_obj_set_property(chart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(20, lv_obj_get_property(chart, LV_PROPERTY_CHART_POINT_COUNT).num);
+
+    /* Test UPDATE_MODE property */
+    prop.id = LV_PROPERTY_CHART_UPDATE_MODE;
+    prop.num = LV_CHART_UPDATE_MODE_CIRCULAR;
+    TEST_ASSERT_TRUE(lv_obj_set_property(chart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_CHART_UPDATE_MODE_CIRCULAR, lv_obj_get_property(chart, LV_PROPERTY_CHART_UPDATE_MODE).num);
+
+    /* Test HOR_DIV_LINE_COUNT property */
+    prop.id = LV_PROPERTY_CHART_HOR_DIV_LINE_COUNT;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(chart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(chart, LV_PROPERTY_CHART_HOR_DIV_LINE_COUNT).num);
+
+    /* Test VER_DIV_LINE_COUNT property */
+    prop.id = LV_PROPERTY_CHART_VER_DIV_LINE_COUNT;
+    prop.num = 7;
+    TEST_ASSERT_TRUE(lv_obj_set_property(chart, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(7, lv_obj_get_property(chart, LV_PROPERTY_CHART_VER_DIV_LINE_COUNT).num);
+#endif
+}
+
 #endif

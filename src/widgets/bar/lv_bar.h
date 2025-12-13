@@ -43,6 +43,18 @@ typedef enum {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_bar_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_bar_id_t {
+    LV_PROPERTY_ID(BAR, VALUE,          LV_PROPERTY_TYPE_INT,   0),
+    LV_PROPERTY_ID(BAR, START_VALUE,    LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(BAR, MIN_VALUE,      LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(BAR, MAX_VALUE,      LV_PROPERTY_TYPE_INT,   3),
+    LV_PROPERTY_ID(BAR, MODE,           LV_PROPERTY_TYPE_INT,   4),
+    LV_PROPERTY_ID(BAR, ORIENTATION,    LV_PROPERTY_TYPE_INT,   5),
+    LV_PROPERTY_BAR_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

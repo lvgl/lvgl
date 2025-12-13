@@ -52,6 +52,36 @@ static int32_t value_to_y(lv_obj_t * obj, lv_chart_series_t * ser, int32_t v, in
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_chart_properties[] = {
+    {
+        .id = LV_PROPERTY_CHART_TYPE,
+        .setter = lv_chart_set_type,
+        .getter = lv_chart_get_type,
+    },
+    {
+        .id = LV_PROPERTY_CHART_POINT_COUNT,
+        .setter = lv_chart_set_point_count,
+        .getter = lv_chart_get_point_count,
+    },
+    {
+        .id = LV_PROPERTY_CHART_UPDATE_MODE,
+        .setter = lv_chart_set_update_mode,
+        .getter = lv_chart_get_update_mode,
+    },
+    {
+        .id = LV_PROPERTY_CHART_HOR_DIV_LINE_COUNT,
+        .setter = lv_chart_set_hor_div_line_count,
+        .getter = lv_chart_get_hor_div_line_count,
+    },
+    {
+        .id = LV_PROPERTY_CHART_VER_DIV_LINE_COUNT,
+        .setter = lv_chart_set_ver_div_line_count,
+        .getter = lv_chart_get_ver_div_line_count,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
@@ -61,6 +91,7 @@ const lv_obj_class_t lv_chart_class = {
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class,
     .name = "lv_chart",
+    LV_PROPERTY_CLASS_FIELDS(chart, CHART)
 };
 
 /**********************
@@ -259,6 +290,30 @@ uint32_t lv_chart_get_point_count(const lv_obj_t * obj)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     return chart->point_cnt;
+}
+
+lv_chart_update_mode_t lv_chart_get_update_mode(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->update_mode;
+}
+
+uint32_t lv_chart_get_hor_div_line_count(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->hdiv_cnt;
+}
+
+uint32_t lv_chart_get_ver_div_line_count(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_chart_t * chart  = (lv_chart_t *)obj;
+    return chart->vdiv_cnt;
 }
 
 uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
