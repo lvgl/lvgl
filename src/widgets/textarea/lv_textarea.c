@@ -7,10 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_textarea_private.h"
-#include "../label/lv_label_private.h"
-#include "../../core/lv_obj_class_private.h"
+
 #if LV_USE_TEXTAREA != 0
 
+#include "../label/lv_label_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_group.h"
 #include "../../core/lv_refr.h"
 #include "../../indev/lv_indev.h"
@@ -999,7 +1000,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_POST) {
         draw_cursor(e);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED || code == LV_EVENT_STYLE_CHANGED) {
         lv_textarea_t * ta = (lv_textarea_t *)obj;
         lv_textarea_scroll_to_cusor_pos(obj, ta->cursor.pos);
     }
@@ -1485,6 +1486,7 @@ static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     lv_point_t cur_pos;
+    lv_obj_update_layout(ta->label);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_label_get_letter_pos(ta->label, pos, &cur_pos);
 
