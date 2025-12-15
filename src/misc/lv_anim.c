@@ -632,7 +632,7 @@ static void anim_timer(lv_timer_t * param)
                 }
 
                 if(!state.anim_list_changed) {
-                    /*Restore the original time to see is there is over time, ignoring silly values.
+                    /*Restore the original time to see if there is over time, ignoring silly values.
                      *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
                     if(a->act_time == act_time_before_exec && act_time_original < a->duration * 2) {
                         a->act_time = act_time_original;
