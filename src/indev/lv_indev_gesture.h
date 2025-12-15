@@ -77,7 +77,7 @@ struct lv_indev_gesture_recognizer {
 
     lv_indev_gesture_configuration_t * config;  /* The recognizer config, containing the gestures
                                                    thresholds */
-    lv_recognizer_func_t recog_fn;      /* The recognizer function that this recongnizer must execute */
+    lv_recognizer_func_t recog_fn;      /* The recognizer function that this recognizer must execute */
 };
 
 /**********************
@@ -222,7 +222,7 @@ bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer);
  * Update the recognizers. It execute the recognizers functions and checks for
  * LV_GESTURE_STATE_RECOGNIZED or LV_GESTURE_STATE_ENDED gestures.
  * To be called in the indev read_cb.
- * @param indev             pointer to the indev containing from which the reconizer need an update
+ * @param indev             pointer to the indev containing from which the recognizer need an update
  * @param touches           indev touch data array, containing the last touch data from indev
  *                          since the last recognizers update
  * @param touch_cnt         number of indev touch data in touches

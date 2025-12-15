@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 #define DRAW_UNIT_ID_DAVE2D         4
-/* The amount of tasks exercising pressure to the currrent to get finished
+/* The amount of tasks exercising pressure to the current to get finished
  * This one is used as the main signal to start to render a block of tasks.
  */
 #define DAVE2D_MAX_DRAW_PRESSURE    256
@@ -385,7 +385,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     if(t == NULL) {
         /* No valid task, but there are tasks waiting to be rendered,
-         * start to draw then immediatelly.
+         * start to draw then immediately.
          */
         if(false == lv_ll_is_empty(&draw_tasks_on_dlist)) {
             draw_pressure = 0;

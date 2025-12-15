@@ -163,7 +163,7 @@ void frogfs_stat(const frogfs_fs_t *fs, const frogfs_entry_t *entry,
 
 /**
  * \brief       Open a frogfs entry as a file from a \a frogfs_fs_t instance
- * \param[in]   fs      \a frogfs_fs_t poitner
+ * \param[in]   fs      \a frogfs_fs_t pointer
  * \param[in]   entry   \a frogfs_entry_t pointer
  * \param[in]   flags   open flags
  * \return              \a frogfs_fh_t or \a NULL if not found
@@ -219,7 +219,7 @@ size_t frogfs_tell(frogfs_fh_t *fh);
 size_t frogfs_access(frogfs_fh_t *fh, const void **buf);
 
 /**
- * \brief       Open a directory for reading child entrys
+ * \brief       Open a directory for reading child entries
  * \param[in]   fs      \a frogfs_fs_t pointer
  * \param[in]   entry   \a frogfs_entry_t pointer to root director
  * \return              \a frogfs_dh_t pointer or \a NULL if invalid

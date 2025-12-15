@@ -366,7 +366,7 @@ static lv_freetype_outline_t outline_create(
     }
 
     /* 1 iteration if there is no border */
-    /* 2 iterations if there is a a border and the glyph itsef */
+    /* 2 iterations if there is a border and the glyph itself */
     for(int i = 0; i < (border_width > 0 ? 2 : 1); i++) {
 
         FT_Outline glyph_outline;

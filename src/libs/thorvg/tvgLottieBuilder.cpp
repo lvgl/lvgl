@@ -1174,7 +1174,7 @@ void LottieBuilder::updateMaskings(LottieLayer* layer, float frameNo)
 
     layer->scene->composite(tvg::cast(pShape), compMethod);
 
-    //Apply the subsquent masks
+    //Apply the subsequent masks
     for (auto m = layer->masks.begin() + 1; m < layer->masks.end(); ++m) {
         auto mask = static_cast<LottieMask*>(*m);
         auto method = mask->method;

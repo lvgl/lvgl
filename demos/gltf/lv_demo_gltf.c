@@ -318,7 +318,7 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_dropdown = add_dropdown_to_row(bg_row);
     style_dropdown(background_dropdown);
 
-    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironnement");
+    lv_dropdown_set_options(background_dropdown, "Solid Color\nEnvironment");
     lv_dropdown_bind_value(background_dropdown, &background_subject);
 
     lv_obj_t * env_brightness_title = add_title_to_row(bg_row, "");

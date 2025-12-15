@@ -64,7 +64,7 @@ lv_display_t * lv_linux_drm_create(void);
  * @param disp         Pointer to the display object created with lv_linux_drm_create()
  * @param file         Path to the DRM device file (e.g., "/dev/dri/card0")
  * @param connector_id ID of the DRM connector to use, or -1 to auto-select the first available
- * @return LV_RESULT_OK if the initialization succeeeded or LV_RESULT_INVALID if it failed
+ * @return LV_RESULT_OK if the initialization succeeded or LV_RESULT_INVALID if it failed
  */
 lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id);
 

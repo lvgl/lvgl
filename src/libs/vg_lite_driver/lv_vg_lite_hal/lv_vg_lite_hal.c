@@ -193,7 +193,7 @@ static int split_node(heap_node_t * node, unsigned long size)
     if(split == NULL)
         return -1;
 
-    /* Fill in the data of this node of the remaning size. */
+    /* Fill in the data of this node of the remaining size. */
     split->offset = node->offset + size;
     split->size = node->size - size;
     split->status = 0;

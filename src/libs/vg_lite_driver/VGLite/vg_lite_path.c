@@ -1904,7 +1904,7 @@ vg_lite_error_t vg_lite_draw_linear_grad(vg_lite_buffer_t * target,
         paint_color = (a << 24) | (b << 16) | (g << 8) | r;
     }
 
-    /* compute radial gradient paremeters */
+    /* compute radial gradient parameters */
 
     /* Compute inverse matrix. */
     if(!inverse(&inverse_matrix, matrix))
@@ -2379,7 +2379,7 @@ vg_lite_error_t vg_lite_draw_radial_grad(vg_lite_buffer_t * target,
         paint_color = (a << 24) | (b << 16) | (g << 8) | r;
     }
 
-    /* compute radial gradient paremeters */
+    /* compute radial gradient parameters */
 
     /* Compute inverse matrix. */
     if(!inverse(&inverse_matrix, matrix))
@@ -4198,7 +4198,7 @@ vg_lite_error_t vg_lite_draw_linear_grad(vg_lite_buffer_t * target,
         paint_color = (a << 24) | (b << 16) | (g << 8) | r;
     }
 
-    /* compute linear gradient paremeters */
+    /* compute linear gradient parameters */
 
     /* Compute inverse matrix. */
     if(!inverse(&inverse_matrix, matrix))
@@ -4877,7 +4877,7 @@ vg_lite_error_t vg_lite_draw_radial_grad(vg_lite_buffer_t * target,
         paint_color = (a << 24) | (b << 16) | (g << 8) | r;
     }
 
-    /* compute radial gradient paremeters */
+    /* compute radial gradient parameters */
 
     /* Compute inverse matrix. */
     if(!inverse(&inverse_matrix, matrix))

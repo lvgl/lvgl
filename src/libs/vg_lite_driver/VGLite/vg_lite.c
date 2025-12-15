@@ -3627,7 +3627,7 @@ vg_lite_error_t vg_lite_blit(vg_lite_buffer_t * target,
     uint8_t enableSwPreOpt = 0;
     int32_t matrixOffsetX = 0;
 
-    /* Only accept interger move */
+    /* Only accept integer move */
     if(matrix != NULL && filter == VG_LITE_FILTER_POINT) {
         matrix->m[0][2] = (vg_lite_float_t)(matrix->m[0][2] >= 0 ? (int32_t)(matrix->m[0][2] + 0.5) : (int32_t)(
                                                 matrix->m[0][2] - 0.5));
@@ -4359,7 +4359,7 @@ vg_lite_error_t vg_lite_blit_rect(vg_lite_buffer_t * target,
     uint8_t enableSwPreOpt = 0;
     int32_t matrixOffsetX = 0;
 
-    /* Only accept interger move */
+    /* Only accept integer move */
     if(matrix != NULL && filter == VG_LITE_FILTER_POINT) {
         matrix->m[0][2] = (vg_lite_float_t)(matrix->m[0][2] >= 0 ? (int32_t)(matrix->m[0][2] + 0.5) : (int32_t)(
                                                 matrix->m[0][2] - 0.5));

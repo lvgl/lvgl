@@ -6925,7 +6925,7 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
         if(state->encoder.force_palette) {
             if(info.color.colortype != LCT_GREY && info.color.colortype != LCT_GREY_ALPHA &&
                (auto_color.colortype == LCT_GREY || auto_color.colortype == LCT_GREY_ALPHA)) {
-                /*user speficially forced a PLTE palette, so cannot convert to grayscale types because
+                /*user specifically forced a PLTE palette, so cannot convert to grayscale types because
                 the PNG specification only allows writing a suggested palette in PLTE for truecolor types*/
                 allow_convert = 0;
             }

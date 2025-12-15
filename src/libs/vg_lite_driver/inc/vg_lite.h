@@ -167,7 +167,7 @@ typedef enum vg_lite_error {
     VG_LITE_SUCCESS = 0,            /*! Success. */
     VG_LITE_INVALID_ARGUMENT,       /*! An invalid argument was specified. */
     VG_LITE_OUT_OF_MEMORY,          /*! Out of GPU memory. */
-    VG_LITE_NO_CONTEXT,             /*! No context or an unintialized context specified. */
+    VG_LITE_NO_CONTEXT,             /*! No context or an uninitialized context specified. */
     VG_LITE_TIMEOUT,                /*! A timeout has occurred during a wait. */
     VG_LITE_OUT_OF_RESOURCES,       /*! Out of system resources. */
     VG_LITE_GENERIC_IO,             /*! Cannot communicate with the kernel driver. */
@@ -877,7 +877,7 @@ typedef struct vg_lite_buffer {
     vg_lite_paint_type_t paintType;         /*! Get paintcolor from different paint types. */
     vg_lite_uint8_t fc_enable;              /*! enable im fastclear. */
     vg_lite_uint8_t scissor_buffer;         /*! The buffer is scissor mask buffer. */
-    vg_lite_uint8_t premultiplied;          /*! The RGB pixel values are alpha-premultipled */
+    vg_lite_uint8_t premultiplied;          /*! The RGB pixel values are alpha-premultiplied */
     vg_lite_uint8_t apply_premult;          /*! Need to apply alpha-premultiply */
     struct vg_lite_buffer * lvgl_buffer;    /*! Buffer for SW LVGL blending support */
     vg_lite_color_t bg_color;               /*! Background for edge filter */
@@ -978,14 +978,14 @@ typedef struct vg_lite_radial_gradient {
 
 /* Colorkey definition */
 typedef struct vg_lite_color_key {
-    vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is ture, */
-    vg_lite_uint8_t low_r;                  /*! The R chanel of low_rgb. */
-    vg_lite_uint8_t low_g;                  /*! The G chanel of low_rgb. */
-    vg_lite_uint8_t low_b;                  /*! The B chanel of low_rgb. */
+    vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is true, */
+    vg_lite_uint8_t low_r;                  /*! The R channel of low_rgb. */
+    vg_lite_uint8_t low_g;                  /*! The G channel of low_rgb. */
+    vg_lite_uint8_t low_b;                  /*! The B channel of low_rgb. */
     vg_lite_uint8_t alpha;                  /*! The alpha channel to replace destination pixel alpha channel.*/
-    vg_lite_uint8_t high_r;                 /*! The R chanel of high_rgb. */
-    vg_lite_uint8_t high_g;                 /*! The G chanel of high_rgb. */
-    vg_lite_uint8_t high_b;                 /*! The B chanel of high_rgb. */
+    vg_lite_uint8_t high_r;                 /*! The R channel of high_rgb. */
+    vg_lite_uint8_t high_g;                 /*! The G channel of high_rgb. */
+    vg_lite_uint8_t high_b;                 /*! The B channel of high_rgb. */
 } vg_lite_color_key_t;
 
 /* Four colorkey definition.
@@ -1046,7 +1046,7 @@ vg_lite_error_t vg_lite_flush(void);
 /* Get the value of register from register's address. */
 vg_lite_error_t vg_lite_get_register(vg_lite_uint32_t address, vg_lite_uint32_t * result);
 
-/* Generate a 3x3 homogenous matrix to transform 4 source coordinates to 4 target coordinates. */
+/* Generate a 3x3 homogeneous matrix to transform 4 source coordinates to 4 target coordinates. */
 vg_lite_error_t vg_lite_get_transform_matrix(vg_lite_float_point4_t src, vg_lite_float_point4_t dst,
                                              vg_lite_matrix_t * mat);
 
@@ -1334,7 +1334,7 @@ vg_lite_error_t vg_lite_set_pixel_matrix(vg_lite_pixel_matrix_t matrix, vg_lite_
 
 /* Setup 3x3 gaussian blur weight values to filter image pixels.
  *
- *  Paramters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
+ *  Parameters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
  *
  *                  |  w2   w1   w2 |
  *                  |  w1   w0   w1 |

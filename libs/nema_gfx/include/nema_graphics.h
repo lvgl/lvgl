@@ -363,7 +363,7 @@ int nema_reinit(void);
  *
  * \param baseaddr_phys Address of the source texture, as seen by the GPU
  * \param width Texture width
- * \param height Texture hight
+ * \param height Texture height
  * \param format Texture format
  * \param stride Texture stride. If negative, it's calculated internally.
  * \param wrap_mode  Wrap/Repeat mode to be used. When using 'repeat' or 'mirror', texture dimensions must be a power of two. Otherwise the behavior is undefined.
@@ -377,7 +377,7 @@ void nema_bind_src_tex(uintptr_t baseaddr_phys,
  *
  * \param baseaddr_phys Address of the source2 texture, as seen by the GPU
  * \param width Texture width
- * \param height Texture hight
+ * \param height Texture height
  * \param format Texture format
  * \param stride Texture stride. If negative, it's calculated internally.
  * \param wrap_mode  Wrap/Repeat mode to be used. When using 'repeat' or 'mirror', texture dimensions must be a power of two. Otherwise the behavior is undefined.
@@ -391,7 +391,7 @@ void nema_bind_src2_tex(uintptr_t baseaddr_phys,
  *
  * \param baseaddr_phys Address of the destination texture, as seen by the GPU
  * \param width Texture width
- * \param height Texture hight
+ * \param height Texture height
  * \param format Texture format
  * \param stride Texture stride. If negative, it's calculated internally.
  *
@@ -404,7 +404,7 @@ void nema_bind_dst_tex(uintptr_t baseaddr_phys,
  *
  * \param baseaddr_phys Address of the index texture
  * \param width Index texture width
- * \param height Index texture hight
+ * \param height Index texture height
  * \param format Index texture format
  * \param stride Index texture stride. If negative, it's calculated internally.
  * \param mode Index texture sampling mode.  When using 'NEMA_TEX_REPEAT' or 'NEMA_TEX_MIRROR' wrapping mode,
@@ -423,7 +423,7 @@ void nema_bind_lut_tex( uintptr_t baseaddr_phys,
  *
  * \param baseaddr_phys Address of the depth buffer, as seen by the GPU
  * \param width Buffer width
- * \param height Buffer hight
+ * \param height Buffer height
  *
  */
 void nema_bind_depth_buffer(uintptr_t baseaddr_phys,
@@ -1004,7 +1004,7 @@ void nema_ext_hold_assert_imm(uint32_t hold_id);
  */
 void nema_ext_hold_deassert_imm(uint32_t hold_id);
 
-/** \brief Check for which architeture is the library compiled
+/** \brief Check for which architecture is the library compiled
  *
  * \return Returns string with the architecture name
  *

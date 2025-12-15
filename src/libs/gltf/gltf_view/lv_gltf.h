@@ -48,7 +48,7 @@ typedef enum {
 
 typedef enum {
     LV_GLTF_BG_MODE_SOLID = 0, /** Solid background. Use `lv_obj_set_style_bg_color` to set the background color*/
-    LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environnement background*/
+    LV_GLTF_BG_MODE_ENVIRONMENT = 1, /** Environment background*/
 } lv_gltf_bg_mode_t;
 
 
@@ -392,7 +392,7 @@ lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance);
 /**
  * Calculates a ray originating from the camera and passing through the specified mouse position on the screen.
  * @param obj pointer to a GLTF viewer object
- * @param screen_pos screen co-ordinate, in pixels
+ * @param screen_pos screen coordinate, in pixels
  * @return mouse point ray
  */
 lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t * screen_pos);
