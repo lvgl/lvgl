@@ -136,7 +136,7 @@ static const lv_opengl_shader_t src_includes[] = {
         #ifdef TONEMAP_ACES_HILL_EXPOSURE_BOOST
             // boost exposure as discussed in https://github.com/mrdoob/three.js/pull/19621
             // this factor is based on the exposure correction of Krzysztof Narkowicz in his
-            // implemetation of ACES tone mapping
+            // implementation of ACES tone mapping
             color /= 0.6;
             color = toneMapACES_Hill(color);
         #endif
@@ -3252,7 +3252,7 @@ static const lv_opengl_shader_t env_src_includes[] = {
             // To make the LUT independant from the material's F0, which is part of the Fresnel term
             // when substituted by Schlick's approximation, we factor it out of the integral,
             // yielding to the form: F0 * I1 + I2
-            // I1 and I2 are slighlty different in the Fresnel term, but both only depend on
+            // I1 and I2 are slightly different in the Fresnel term, but both only depend on
             // NoL and roughness, so they are both numerically integrated and written into two channels.
             float A = 0.0;
             float B = 0.0;
