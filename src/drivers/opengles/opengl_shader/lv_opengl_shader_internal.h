@@ -119,7 +119,6 @@ lv_opengl_shader_program_t * lv_opengl_shader_manager_get_program(lv_opengl_shad
 
 const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version_t version);
 
-
 lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
                                                                       const lv_opengl_shader_params_t * frag_shader,
                                                                       const lv_opengl_shader_params_t * vert_shader,

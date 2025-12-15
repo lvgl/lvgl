@@ -792,7 +792,6 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                 .program = program_id,
             };
 
-
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
             const size_t n = lv_array_size(&defines);
             for(size_t i = 0; i < n; ++i) {

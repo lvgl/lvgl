@@ -294,7 +294,6 @@ lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
     return program;
 }
 
-
 lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
                                                                       const lv_opengl_shader_params_t * frag_shader,
                                                                       const lv_opengl_shader_params_t * vert_shader,
@@ -302,7 +301,6 @@ lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_
 {
     uint32_t frag_shader_hash;
     uint32_t vert_shader_hash;
-
 
     lv_result_t res = lv_opengl_shader_manager_select_shader(manager, frag_shader->name, frag_shader->permutations,
                                                              frag_shader->permutations_len,
@@ -327,7 +325,6 @@ lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_
     }
 
     return program;
-
 }
 
 lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program_best_version(

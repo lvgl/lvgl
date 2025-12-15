@@ -72,7 +72,6 @@ static const lv_opengl_glsl_version_t GLSL_VERSIONS[] = {
 };
 static const size_t GLSL_VERSION_COUNT = sizeof(GLSL_VERSIONS) / sizeof(GLSL_VERSIONS[0]);
 
-
 /**********************
  *      MACROS
  **********************/
