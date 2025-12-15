@@ -4782,6 +4782,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
+    #define LV_USE_DEMO_GLTF            0
 #endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4
