@@ -119,6 +119,7 @@ enum NVGimageFlagsGL {
 #include <string.h>
 #include <math.h>
 #include "nanovg.h"
+#include "../../misc/lv_profiler.h"
 
 enum GLNVGuniformLoc {
 	GLNVG_LOC_VIEWSIZE,
@@ -1091,6 +1092,7 @@ static void glnvg__renderViewport(void* uptr, float width, float height, float d
 
 static void glnvg__fill(GLNVGcontext* gl, GLNVGcall* call)
 {
+	LV_PROFILER_DRAW_BEGIN;
 	GLNVGpath* paths = &gl->paths[call->pathOffset];
 	int i, npaths = call->pathCount;
 
@@ -1131,10 +1133,12 @@ static void glnvg__fill(GLNVGcontext* gl, GLNVGcall* call)
 	glDrawArrays(GL_TRIANGLE_STRIP, call->triangleOffset, call->triangleCount);
 
 	glDisable(GL_STENCIL_TEST);
+	LV_PROFILER_DRAW_END;
 }
 
 static void glnvg__convexFill(GLNVGcontext* gl, GLNVGcall* call)
 {
+	LV_PROFILER_DRAW_BEGIN;
 	GLNVGpath* paths = &gl->paths[call->pathOffset];
 	int i, npaths = call->pathCount;
 
@@ -1148,10 +1152,12 @@ static void glnvg__convexFill(GLNVGcontext* gl, GLNVGcall* call)
 			glDrawArrays(GL_TRIANGLE_STRIP, paths[i].strokeOffset, paths[i].strokeCount);
 		}
 	}
+	LV_PROFILER_DRAW_END;
 }
 
 static void glnvg__stroke(GLNVGcontext* gl, GLNVGcall* call)
 {
+	LV_PROFILER_DRAW_BEGIN;
 	GLNVGpath* paths = &gl->paths[call->pathOffset];
 	int npaths = call->pathCount, i;
 
@@ -1195,14 +1201,17 @@ static void glnvg__stroke(GLNVGcontext* gl, GLNVGcall* call)
 		for (i = 0; i < npaths; i++)
 			glDrawArrays(GL_TRIANGLE_STRIP, paths[i].strokeOffset, paths[i].strokeCount);
 	}
+	LV_PROFILER_DRAW_END;
 }
 
 static void glnvg__triangles(GLNVGcontext* gl, GLNVGcall* call)
 {
+	LV_PROFILER_DRAW_BEGIN;
 	glnvg__setUniforms(gl, call->uniformOffset, call->image, NSVG_SHADER_IMG);
 	glnvg__checkError(gl, "triangles fill");
 
 	glDrawArrays(GL_TRIANGLES, call->triangleOffset, call->triangleCount);
+	LV_PROFILER_DRAW_END;
 }
 
 static void glnvg__renderCancel(void* uptr) {
@@ -1259,12 +1268,14 @@ static GLNVGblend glnvg__blendCompositeOperation(NVGcompositeOperationState op)
 
 static void glnvg__renderFlush(void* uptr)
 {
+	LV_PROFILER_DRAW_BEGIN;
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
 	int i;
 
 	if (gl->ncalls > 0) {
 
 		// Setup require GL state.
+		LV_PROFILER_DRAW_BEGIN_TAG("setup_gl_state");
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
@@ -1289,27 +1300,44 @@ static void glnvg__renderFlush(void* uptr)
 		gl->blendFunc.dstRGB = GL_INVALID_ENUM;
 		gl->blendFunc.dstAlpha = GL_INVALID_ENUM;
 		#endif
+		LV_PROFILER_DRAW_END_TAG("setup_gl_state");
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
 		// Upload ubo for frag shaders
+		LV_PROFILER_DRAW_BEGIN_TAG("glBindBuffer");
 		glBindBuffer(GL_UNIFORM_BUFFER, gl->fragBuf);
+		LV_PROFILER_DRAW_END_TAG("glBindBuffer");
+		LV_PROFILER_DRAW_BEGIN_TAG("glBufferData");
 		glBufferData(GL_UNIFORM_BUFFER, gl->nuniforms * gl->fragSize, gl->uniforms, GL_STREAM_DRAW);
+		LV_PROFILER_DRAW_END_TAG("glBufferData");
 #endif
 
 		// Upload vertex data
 #if defined NANOVG_GL3
+		LV_PROFILER_DRAW_BEGIN_TAG("glBindVertexArray");
 		glBindVertexArray(gl->vertArr);
+		LV_PROFILER_DRAW_END_TAG("glBindVertexArray");
 #endif
 		gl->vertBufIndex = (gl->vertBufIndex + 1) % 2;
+		LV_PROFILER_DRAW_BEGIN_TAG("glBindBuffer");
 		glBindBuffer(GL_ARRAY_BUFFER, gl->vertBuf[gl->vertBufIndex]);
+		LV_PROFILER_DRAW_END_TAG("glBindBuffer");
+		LV_PROFILER_DRAW_BEGIN_TAG("glBufferData");
 		glBufferData(GL_ARRAY_BUFFER, gl->nverts * sizeof(NVGvertex), gl->verts, GL_STREAM_DRAW);
+		LV_PROFILER_DRAW_END_TAG("glBufferData");
+		LV_PROFILER_DRAW_BEGIN_TAG("glEnableVertexAttribArray");
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		LV_PROFILER_DRAW_END_TAG("glEnableVertexAttribArray");
+		LV_PROFILER_DRAW_BEGIN_TAG("glVertexAttribPointer");
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(NVGvertex), (const GLvoid*)(size_t)0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(NVGvertex), (const GLvoid*)(0 + 2*sizeof(float)));
+		LV_PROFILER_DRAW_END_TAG("glVertexAttribPointer");
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
+		LV_PROFILER_DRAW_BEGIN_TAG("glBindBuffer");
 		glBindBuffer(GL_UNIFORM_BUFFER, gl->fragBuf);
+		LV_PROFILER_DRAW_END_TAG("glBindBuffer");
 #endif
 
 		for (i = 0; i < gl->ncalls; i++) {
@@ -1341,6 +1369,7 @@ static void glnvg__renderFlush(void* uptr)
 	gl->npaths = 0;
 	gl->ncalls = 0;
 	gl->nuniforms = 0;
+	LV_PROFILER_DRAW_END;
 }
 
 static int glnvg__maxVertCount(const NVGpath* paths, int npaths)
