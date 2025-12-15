@@ -44,7 +44,7 @@ setting the DMA2D flag to true:
         /* Gets the default configuration for the MIPI display controller */
         esp_lcd_dpi_panel_config_t dpi_config = EK79007_1024_600_PANEL_60HZ_CONFIG(LCD_COLOR_PIXEL_FORMAT_RGB888);
 
-        /* Explictly set the DMA2D to assist the buffer transfer */
+        /* Explicitly set the DMA2D to assist the buffer transfer */
         dpi_config.flags.use_dma2d = true;
 
         ek79007_vendor_config_t vendor_config = {
