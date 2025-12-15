@@ -658,8 +658,6 @@ static void load_scene(uint32_t scene)
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
-    LV_UNUSED(timer);
-
     scene_act++;
 
     load_scene(scene_act);
