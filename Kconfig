@@ -577,17 +577,17 @@ menu "LVGL configuration"
 					Specify how important log should be added.
 
 				config LV_LOG_LEVEL_TRACE
-					bool "A lot of logs to give detailed information"
+					bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
 				config LV_LOG_LEVEL_INFO
-					bool "Log important events"
+					bool "LOG_LEVEL_INFO: Log important events"
 				config LV_LOG_LEVEL_WARN
-					bool "Log if something unwanted happened but didn't cause a problem"
+					bool "LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem"
 				config LV_LOG_LEVEL_ERROR
-					bool "Only critical issues, when the system may fail"
+					bool "LOG_LEVEL_ERROR: Only critical issues, when the system may fail"
 				config LV_LOG_LEVEL_USER
-					bool "Only logs added by the user"
+					bool "LOG_LEVEL_USER: Only logs added by the user"
 				config LV_LOG_LEVEL_NONE
-					bool "Do not log anything"
+					bool "LOG_LEVEL_NONE: Do not log anything"
 			endchoice
 
 			config LV_LOG_LEVEL
