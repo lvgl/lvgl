@@ -38,3 +38,5 @@ libavformat-dev:i386
 libavcodec-dev:i386
 libswscale-dev:i386
 libavutil-dev:i386
+libuv1-dev
+libuv1-dev:i386
