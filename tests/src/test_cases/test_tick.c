@@ -59,6 +59,7 @@ void test_tick_get_with_callback(void)
 {
     /* Set callback */
     lv_tick_set_cb(test_tick_cb);
+    TEST_ASSERT_EQUAL(test_tick_cb, lv_tick_get_cb());
 
     /* Test callback value */
     test_tick_value = 1234;
