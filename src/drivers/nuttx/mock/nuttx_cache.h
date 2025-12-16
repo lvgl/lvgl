@@ -20,6 +20,14 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/*********************
+ *      TYPEDEFS
+ *********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
 static inline void up_invalidate_dcache(uintptr_t start, uintptr_t end)
 {
     (void)start;
@@ -31,14 +39,6 @@ static inline void up_flush_dcache(uintptr_t start, uintptr_t end)
     (void)start;
     (void)end;
 }
-
-/*********************
- *      TYPEDEFS
- *********************/
-
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
 
 /**********************
  *      MACROS
