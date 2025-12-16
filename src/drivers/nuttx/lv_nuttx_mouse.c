@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include "../../lvgl_private.h"
 
 #ifdef __NuttX__
