@@ -86,6 +86,14 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  *====================*/
 
 /**
++* Set center pos. See lv_scale_mode_t.
++* @param obj    pointer to Scale Widget
++* @param x      x position of the center of the needle
++* @param y      y position of the center of the needle
++*/
+void lv_scale_set_center_pos(lv_obj_t * obj, int32_t x, int32_t y);
+
+/**
  * Set scale mode. See lv_scale_mode_t.
  * @param obj       pointer to Scale Widget
  * @param mode      the new scale mode
@@ -211,6 +219,15 @@ void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
 void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 
 /**
+ * DEPRECATED, use lv_scale_set_section_rangeinstead.
+ * Set range for specified Scale Section
+ * @param obj           pointer to scale
+ * @param section       pointer to section
+ * @param offset        offset
+ */
+void lv_scale_set_section_offset(lv_obj_t * obj, lv_scale_section_t * section, int32_t offset);
+
+/**
  * Add a Section to specified Scale.  Section will not be drawn until
  * a valid range is set for it using `lv_scale_set_section_range()`.
  * @param obj       pointer to Scale Widget
@@ -284,6 +301,14 @@ void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t *
  * @param style         point to a style
  */
 void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
+
+/**
+ * Set the style of the minor ticks on a section.
+ * @param obj           pointer to object
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ */
+int32_t lv_scale_get_section_offset(lv_obj_t * obj, lv_scale_section_t * section);
 
 /*=====================
  * Getter functions
