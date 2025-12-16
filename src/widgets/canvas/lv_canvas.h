@@ -134,11 +134,11 @@ const void * lv_canvas_get_buf(lv_obj_t * canvas);
 /**
  * Copy a buffer to the canvas
  * @param obj           pointer to a canvas object
- * @param canvas_area   the area of the canvas to copy the new data to. If NULL, copy to the whole buffer.
+ * @param canvas_area   the area of the canvas to copy the new data to
  * @param src_buf       pointer to a buffer holding the source data
- * @param src_area      the area of the destination buffer to copy from. If NULL, copy the whole buffer.
- * @note  canvas_area and src_area should be the same size. If you want to copy all of src_buf, you can leave
- * both areas as NULL (but canvas buffer and src_buf must be the same size.)
+ * @param src_area      the area of the source buffer to copy from. If NULL, copy the whole buffer.
+ * @note  canvas_area and src_area should be the same size. If canvas_area and the size of src_buf are the same,
+ *        src_area can be left NULL.
  */
 void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * src_buf,
                         const lv_area_t * src_area);
