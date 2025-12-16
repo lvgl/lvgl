@@ -148,6 +148,28 @@
     #define LV_USE_LINUX_FBDEV  1
 #endif
 
+#define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 1
+
+#ifdef _WIN32
+    #define LV_USE_NUTTX    0
+#else
+    #define LV_USE_NUTTX    1
+#endif
+#if LV_USE_NUTTX
+    #define LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP    1
+    #define LV_USE_NUTTX_LIBUV                  1
+    #define LV_USE_NUTTX_CUSTOM_INIT            0
+    #define LV_USE_NUTTX_LCD                    1
+    #define LV_NUTTX_LCD_BUFFER_COUNT           2
+    #define LV_NUTTX_LCD_BUFFER_SIZE            60
+    #define LV_USE_NUTTX_TOUCHSCREEN            1
+    #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    20
+    #define LV_USE_NUTTX_MOUSE                  1
+    #define LV_USE_NUTTX_MOUSE_MOVE_STEP        1
+    #define LV_USE_NUTTX_TRACE_FILE             1
+    #define LV_NUTTX_TRACE_FILE_PATH            "/data/lvgl-trace.log"
+#endif
+
 #ifndef LV_USE_WAYLAND
     #define LV_USE_WAYLAND  1
 #endif
