@@ -28,12 +28,12 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-unsigned long up_perf_getfreq(void)
+static unsigned long up_perf_getfreq(void)
 {
     return 1000000; /*1 MHz for mock*/
 }
 
-uint32_t up_perf_gettime(void)
+static uint32_t up_perf_gettime(void)
 {
     return 0;
 }

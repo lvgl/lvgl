@@ -14,12 +14,23 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include <stdint.h>
+
 /*********************
  *      DEFINES
  *********************/
 
-#define up_invalidate_dcache(start, end) do {} while(0)
-#define up_flush_dcache(start, end) do {} while(0)
+static void up_invalidate_dcache(uintptr_t start, uintptr_t end)
+{
+    (void)start;
+    (void)end;
+}
+
+static void up_flush_dcache(uintptr_t start, uintptr_t end)
+{
+    (void)start;
+    (void)end;
+}
 
 /*********************
  *      TYPEDEFS

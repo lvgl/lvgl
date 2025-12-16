@@ -242,7 +242,7 @@ extern "C" {
                                                * Argument: read-only struct
                                                *           fb_overlayinfo_s */
 #  define FBIOSET_COLOR       _FBIOC(0x000d)  /* Set color
-                                               * Aŕgument: read-only struct
+                                               * Argument: read-only struct
                                                *           fb_overlayinfo_s */
 #  define FBIOSET_BLANK       _FBIOC(0x000e)  /* Blank or unblank
                                                * Argument: read-only struct
