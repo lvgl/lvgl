@@ -365,4 +365,19 @@ void test_xml_complex(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/complex_1.png");
 }
 
+void test_xml_label_pound_sign_gets_rendered_properly(void)
+{
+    const char * my_screen =
+        "<screen>"
+        "<view>"
+        "<lv_label align=\"center\" text=\"#\"/>"
+        "</view>"
+        "</screen>";
+    lv_xml_register_component_from_data("screen", my_screen);
+    lv_obj_t * scr = lv_xml_create_screen("screen");
+    lv_screen_load(scr);
+    lv_obj_t * label = lv_obj_get_child(scr, 0);
+    TEST_ASSERT(lv_streq("#", lv_label_get_text(label)));
+}
+
 #endif
