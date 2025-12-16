@@ -20,13 +20,13 @@ extern "C" {
  *      DEFINES
  *********************/
 
-static void up_invalidate_dcache(uintptr_t start, uintptr_t end)
+static inline void up_invalidate_dcache(uintptr_t start, uintptr_t end)
 {
     (void)start;
     (void)end;
 }
 
-static void up_flush_dcache(uintptr_t start, uintptr_t end)
+static inline void up_flush_dcache(uintptr_t start, uintptr_t end)
 {
     (void)start;
     (void)end;

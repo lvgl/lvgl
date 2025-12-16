@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include <stdlib.h>
+#include <stddef.h>
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -88,7 +89,7 @@ struct mallinfo {
  * GLOBAL PROTOTYPES
  **********************/
 
-static struct mm_heap_s * mm_initialize(const char * name, void * mem, size_t size)
+static inline struct mm_heap_s * mm_initialize(const char * name, void * mem, size_t size)
 {
     (void)name;
     (void)mem;
@@ -96,37 +97,37 @@ static struct mm_heap_s * mm_initialize(const char * name, void * mem, size_t si
     return NULL;
 }
 
-static void mm_uninitialize(struct mm_heap_s * heap)
+static inline void mm_uninitialize(struct mm_heap_s * heap)
 {
     (void)heap;
 }
 
-static void * mm_malloc(struct mm_heap_s * heap, size_t size)
+static inline void * mm_malloc(struct mm_heap_s * heap, size_t size)
 {
     (void)heap;
-    return malloc(size);
+    return NULL;
 }
 
-static void mm_free(struct mm_heap_s * heap, void * ptr)
+static inline void mm_free(struct mm_heap_s * heap, void * ptr)
 {
     (void)heap;
-    free(ptr);
+    (void)ptr;
 }
 
-static void mm_memdump(struct mm_heap_s * heap, const struct mm_memdump_s * dump)
+static inline void mm_memdump(struct mm_heap_s * heap, const struct mm_memdump_s * dump)
 {
     (void)heap;
     (void)dump;
 }
 
-static struct mallinfo mm_mallinfo(struct mm_heap_s * heap)
+static inline struct mallinfo mm_mallinfo(struct mm_heap_s * heap)
 {
     (void)heap;
     struct mallinfo info = {0};
     return info;
 }
 
-static int gettid(void)
+static inline int gettid(void)
 {
     return -1;
 }

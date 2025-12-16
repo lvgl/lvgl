@@ -148,14 +148,13 @@
     #define LV_USE_LINUX_FBDEV  1
 #endif
 
-#define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 1
-
 #ifdef _WIN32
     #define LV_USE_NUTTX    0
 #else
     #define LV_USE_NUTTX    1
 #endif
 #if LV_USE_NUTTX
+    #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 1
     #define LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP    1
     #define LV_USE_NUTTX_LIBUV                  1
     #define LV_USE_NUTTX_CUSTOM_INIT            0
