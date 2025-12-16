@@ -29,7 +29,7 @@
     #include <nuttx/tls.h>
     #include <nuttx/clock.h>
 #else
-    #define pthread_get_stacksize_np(tid) 0
+    #include "mock/nuttx_clock.h"
 #endif
 
 /*********************
