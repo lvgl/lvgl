@@ -148,10 +148,12 @@
     #define LV_USE_LINUX_FBDEV  1
 #endif
 
-#ifdef _WIN32
+#ifndef LV_USE_NUTTX
     #define LV_USE_NUTTX    0
-#else
-    #define LV_USE_NUTTX    1
+#endif
+#if defined(_WIN32) && LV_USE_NUTTX
+    #undef LV_USE_NUTTX /* Disable NuttX build on Windows */
+    #define LV_USE_NUTTX    0
 #endif
 #if LV_USE_NUTTX
     #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 1

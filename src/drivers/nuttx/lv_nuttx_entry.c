@@ -22,7 +22,7 @@
 #include "../../../lvgl.h"
 
 #if LV_USE_NUTTX_LIBUV
-#include <uv.h>
+    #include <uv.h>
 #endif
 
 #ifdef __NuttX__
