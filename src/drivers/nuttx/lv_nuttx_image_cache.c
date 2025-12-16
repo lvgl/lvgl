@@ -162,7 +162,7 @@ static bool defer_init(void)
     ctx->heap_size = info.arena;
 
     LV_LOG_USER("heap info:");
-    LV_LOG_USER("  heap: %p", ctx->heap);
+    LV_LOG_USER("  heap: %p", (void *)ctx->heap);
     LV_LOG_USER("  mem: %p", ctx->mem);
     LV_LOG_USER("  mem_size: %" LV_PRIu32, ctx->mem_size);
     LV_LOG_USER("  arena: %d", info.arena);

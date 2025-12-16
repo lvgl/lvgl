@@ -448,7 +448,7 @@ static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
      * It needs to be divisible by pinfo.stride
      */
 
-    buf_offset = pinfo.fbmem - dsc->mem;
+    buf_offset = (uintptr_t)pinfo.fbmem - (uintptr_t)dsc->mem;
 
     if((buf_offset % dsc->pinfo.stride) != 0) {
         LV_LOG_WARN("It is detected that buf_offset(%" PRIuPTR ") "
@@ -461,7 +461,7 @@ static int fbdev_init_mem3(lv_nuttx_fb_t * dsc)
 
     if(buf_offset == 0) {
         dsc->mem3_yoffset = dsc->vinfo.yres * 2;
-        dsc->mem3 = pinfo.fbmem + dsc->mem3_yoffset * pinfo.stride;
+        dsc->mem3 = (uint8_t *)pinfo.fbmem + dsc->mem3_yoffset * pinfo.stride;
         LV_LOG_USER("Use consecutive mem3 = %p, yoffset = %" LV_PRIu32,
                     dsc->mem3, dsc->mem3_yoffset);
     }

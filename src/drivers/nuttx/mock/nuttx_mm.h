@@ -92,7 +92,7 @@ static struct mm_heap_s * mm_initialize(const char * name, void * mem, size_t si
 {
     (void)name;
     (void)mem;
-
+    (void)size;
     return NULL;
 }
 

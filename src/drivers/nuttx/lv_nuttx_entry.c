@@ -24,6 +24,8 @@
 #ifdef __NuttX__
     #include <nuttx/tls.h>
     #include <nuttx/clock.h>
+#else
+    #define pthread_get_stacksize_np(tid) 0
 #endif
 
 /*********************
@@ -204,6 +206,7 @@ void lv_nuttx_run(lv_nuttx_result_t * result)
 #ifdef CONFIG_LV_USE_NUTTX_LIBUV
     lv_nuttx_uv_loop(&ui_loop, result);
 #else
+    LV_UNUSED(result);
     while(1) {
         uint32_t idle;
         idle = lv_timer_handler();
