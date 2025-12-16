@@ -18,7 +18,12 @@
 #include <poll.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <nuttx/video/fb.h>
+
+#ifdef __NuttX__
+    #include <nuttx/video/fb.h>
+#else
+    #include "mock/nuttx_video_fb.h"
+#endif
 
 #include "../../../lvgl.h"
 #include "../../lvgl_private.h"
@@ -334,7 +339,7 @@ static lv_color_format_t fb_fmt_to_color_format(int fmt)
     return LV_COLOR_FORMAT_UNKNOWN;
 }
 
-static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
+static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo)
 {
     if(ioctl(fd, FBIOGET_PLANEINFO, (unsigned long)((uintptr_t)pinfo)) < 0) {
         LV_LOG_ERROR("ERROR: ioctl(FBIOGET_PLANEINFO) failed: %d", errno);

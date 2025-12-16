@@ -11,17 +11,20 @@
 #if LV_USE_NUTTX
 
 #include <time.h>
-#include <nuttx/tls.h>
-#include <nuttx/clock.h>
 #include <syslog.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
 #include "../../core/lv_global.h"
 #include "lv_nuttx_profiler.h"
 #include "lv_nuttx_mouse.h"
-
 #include "../../../lvgl.h"
+
+#ifdef __NuttX__
+    #include <nuttx/tls.h>
+    #include <nuttx/clock.h>
+#endif
 
 /*********************
  *      DEFINES
