@@ -14,6 +14,7 @@
 #if LV_USE_NUTTX
 
 #include "../../draw/lv_draw_buf_private.h"
+#include <stdlib.h>
 
 #ifdef __NuttX__
     #include <nuttx/mm/mm.h>

@@ -103,6 +103,7 @@ static inline void mm_uninitialize(struct mm_heap_s * heap)
 static inline void * mm_malloc(struct mm_heap_s * heap, size_t size)
 {
     (void)heap;
+    (void)size;
     return NULL;
 }
 
