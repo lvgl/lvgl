@@ -23,14 +23,12 @@ extern "C" {
 
 /* Special PID to query the info about alloc, free and mempool */
 
-typedef int pid_t;
-
-#define PID_MM_ORPHAN  ((pid_t)-6)
-#define PID_MM_BIGGEST ((pid_t)-5)
-#define PID_MM_FREE    ((pid_t)-4)
-#define PID_MM_ALLOC   ((pid_t)-3)
-#define PID_MM_LEAK    ((pid_t)-2)
-#define PID_MM_MEMPOOL ((pid_t)-1)
+#define PID_MM_ORPHAN  (-6)
+#define PID_MM_BIGGEST (-5)
+#define PID_MM_FREE    (-4)
+#define PID_MM_ALLOC   (-3)
+#define PID_MM_LEAK    (-2)
+#define PID_MM_MEMPOOL (-1)
 
 #ifndef ULONG_MAX
 #define ULONG_MAX   4294967295UL
@@ -63,7 +61,7 @@ struct mm_heap_s {
 struct malltask {
     /* Negative pid means differently. See include/malloc.h */
 
-    pid_t pid; /* Process id */
+    int pid; /* Process id */
     unsigned long seqmin; /* The minimum sequence */
     unsigned long seqmax; /* The maximum sequence */
 };
