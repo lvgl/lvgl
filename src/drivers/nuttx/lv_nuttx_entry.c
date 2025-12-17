@@ -11,17 +11,26 @@
 #if LV_USE_NUTTX
 
 #include <time.h>
-#include <nuttx/tls.h>
-#include <nuttx/clock.h>
 #include <syslog.h>
 #include <pthread.h>
+#include <unistd.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
 #include "../../core/lv_global.h"
 #include "lv_nuttx_profiler.h"
 #include "lv_nuttx_mouse.h"
-
 #include "../../../lvgl.h"
+
+#if LV_USE_NUTTX_LIBUV
+    #include <uv.h>
+#endif
+
+#ifdef __NuttX__
+    #include <nuttx/tls.h>
+    #include <nuttx/clock.h>
+#else
+    #include "mock/nuttx_clock.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -49,7 +58,7 @@ static uint32_t millis(void);
 #endif
 static void check_stack_size(void);
 
-#ifdef CONFIG_LV_USE_NUTTX_LIBUV
+#if LV_USE_NUTTX_LIBUV
     static void lv_nuttx_uv_loop(lv_nuttx_result_t * result);
 #endif
 
@@ -198,9 +207,10 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
 void lv_nuttx_run(lv_nuttx_result_t * result)
 {
-#ifdef CONFIG_LV_USE_NUTTX_LIBUV
-    lv_nuttx_uv_loop(&ui_loop, result);
+#if LV_USE_NUTTX_LIBUV
+    lv_nuttx_uv_loop(result);
 #else
+    LV_UNUSED(result);
     while(1) {
         uint32_t idle;
         idle = lv_timer_handler();
@@ -294,7 +304,7 @@ static void syslog_print(lv_log_level_t level, const char * buf)
 }
 #endif
 
-#ifdef CONFIG_LV_USE_NUTTX_LIBUV
+#if LV_USE_NUTTX_LIBUV
 static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
 {
     uv_loop_t loop;
@@ -312,7 +322,7 @@ static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
 #endif
 
     data = lv_nuttx_uv_init(&uv_info);
-    uv_run(loop, UV_RUN_DEFAULT);
+    uv_run(&loop, UV_RUN_DEFAULT);
     lv_nuttx_uv_deinit(&data);
 }
 #endif

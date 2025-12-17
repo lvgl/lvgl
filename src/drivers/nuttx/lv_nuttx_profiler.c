@@ -13,10 +13,20 @@
 
 #include "../../misc/lv_profiler_builtin_private.h"
 #include "../../misc/lv_log.h"
+#include "../../core/lv_global.h"
 #include "../../stdlib/lv_sprintf.h"
-#include <nuttx/arch.h>
+#include "../../stdlib/lv_string.h"
+#include "lv_nuttx_entry.h"
 #include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+
+#ifdef __NuttX__
+    #include <nuttx/arch.h>
+#else
+    #include "mock/nuttx_arch.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -126,7 +136,7 @@ static void flush_cb(const char * buf)
 {
 #if LV_USE_NUTTX_TRACE_FILE
     if(trace_fd >= 0) {
-        write(trace_fd, buf, strlen(buf));
+        write(trace_fd, buf, lv_strlen(buf));
         return;
     }
 #endif

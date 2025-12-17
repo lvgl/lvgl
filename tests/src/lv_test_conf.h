@@ -86,6 +86,7 @@ typedef void * lv_user_data_t;
 #define  LV_DPI_DEF         160
 #define  LV_USE_DRAW_SDL    1
 #define  LV_USE_SDL         1
+#define  LV_USE_NUTTX       1
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
