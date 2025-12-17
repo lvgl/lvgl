@@ -518,10 +518,10 @@ static void window_update_handler(lv_timer_t * t)
                                      texture->fb));
 #elif LV_COLOR_DEPTH == 24
                 GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area), 0,
-                                     GL_BGR, GL_UNSIGNED_BYTE, texture->fb));
+                                     GL_RGB, GL_UNSIGNED_BYTE, texture->fb));
 #elif LV_COLOR_DEPTH == 32
                 GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lv_area_get_width(&texture->area), lv_area_get_height(&texture->area),
-                                     0, GL_BGRA, GL_UNSIGNED_BYTE, texture->fb));
+                                     0, GL_RGBA, GL_UNSIGNED_BYTE, texture->fb));
 #else
 #error("Unsupported color format")
 #endif
@@ -530,8 +530,9 @@ static void window_update_handler(lv_timer_t * t)
 
                 GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 
-                lv_opengles_render_texture(window_display_texture, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                lv_opengles_render_texture_rbswap(window_display_texture, &texture->area, texture->opa, window->hor_res,
+                                                  window->ver_res,
+                                                  &texture->area, window->h_flip, window->v_flip);
 #endif
             }
             else {
@@ -548,11 +549,11 @@ static void window_update_handler(lv_timer_t * t)
                 }
 
 #if LV_USE_DRAW_OPENGLES
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
+                lv_opengles_render_texture_rbswap(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                                  &texture->area, window->h_flip, texture->disp == NULL ? window->v_flip : !window->v_flip);
 #else
-                lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                           &texture->area, window->h_flip, window->v_flip);
+                lv_opengles_render_texture_rbswap(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                                  &texture->area, window->h_flip, window->v_flip);
 #endif
             }
         }

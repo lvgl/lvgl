@@ -85,6 +85,7 @@ static const char *src_fragment_shader_v100 = R"(
     uniform float u_Opa;
     uniform bool u_IsFill;
     uniform vec3 u_FillColor;
+    uniform bool u_SwapRB;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -104,6 +105,9 @@ static const char *src_fragment_shader_v100 = R"(
         } else {
             float combinedAlpha = texColor.a * u_Opa;
             gl_FragColor = vec4(texColor.rgb * combinedAlpha, combinedAlpha);
+        }
+        if (u_SwapRB) {
+            gl_FragColor.bgr = gl_FragColor.rgb;
         }
         #ifdef HSV_ADJUST
         gl_FragColor.rgb = adjustHSV(gl_FragColor.rgb);
@@ -208,6 +212,7 @@ static const char *src_fragment_shader_v300es = R"(
     
     uniform sampler2D u_Texture;
     uniform lowp float u_Opa;
+    uniform bool u_SwapRB;
     
     #ifdef HSV_ADJUST
 #include <hsv_adjust.glsl>
@@ -231,6 +236,9 @@ static const char *src_fragment_shader_v300es = R"(
                 color.a *= u_Opa;
                 color.rgb *= color.a;
             }
+        }
+        if (u_SwapRB) {
+            color.bgr = color.rgb;
         }
         #ifdef HSV_ADJUST
         color.rgb = adjustHSV(color.rgb);

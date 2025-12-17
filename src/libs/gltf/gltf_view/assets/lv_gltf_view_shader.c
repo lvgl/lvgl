@@ -1098,7 +1098,7 @@ static const lv_opengl_shader_t src_includes[] = {
         vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior)
         {
             float framebufferLod = log2(float(u_TransmissionFramebufferSize.x)) * applyIorToRoughness(roughness, ior);
-            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).rgb;
+            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).bgr; // r/b switched intentionally;
 
             return transmittedLight;
         }
@@ -2553,12 +2553,13 @@ static const lv_opengl_shader_t src_includes[] = {
             baseColor.a = 1.0;
         #endif
 
+        // The red and blue channels are switched after any tonemapping
+        // They will be switched back the correct way by the 2D shader
         #ifdef LINEAR_OUTPUT
-            g_finalColor = vec4(color.rgb, baseColor.a);
+            g_finalColor = vec4(color.bgr, baseColor.a);
         #else
-            g_finalColor = vec4(toneMap(color), baseColor.a);
+            g_finalColor = vec4(toneMap(color).bgr, baseColor.a);
         #endif
-
 
             /*
         #else
