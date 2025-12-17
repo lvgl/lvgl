@@ -1047,6 +1047,7 @@ static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
         case LV_STYLE_OPA:
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BG_OPA:
+        case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
