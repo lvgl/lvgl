@@ -8,29 +8,31 @@ Draw Pipeline
 What is Drawing?
 ****************
 
-Drawing (also known as :dfn:`rendering`) is writing pixel colors into a buffer where
-they will be delivered to a display panel as pixels.  Sometimes this is done by
-copying colors from places like background- and foreground-color properties.  Other
-times it involves computing those colors before they are written (e.g. combining them
-with other colors when an object higher on the Z axis has partial opacity).
+Drawing (also known as :dfn:`rendering`) is writing pixel colors into a buffer from
+where they will be delivered to a display panel as pixels.  It can mean filling areas
+with a color, blending images, or complex algorithms to calculate rounded corners
+or rotate images.
 
-The following sections cover the LVGL drawing logic and how to use it and optionally
-tune it to fit your particular project (e.g. if you have a GPU or other resources
-that you would like to get involved).
+The following sections cover how LVGL's drawing logic works and how to use it.
 
 
 Draw-Pipeline Overview
 **********************
 
-On modern computing hardware meant to be used with larger display panels, there are
-sometimes options for different ways drawing can be accomplished. For example, some
-MCUs come with hardware that is very good (and fast) at certain types of drawing
-tasks. Alternatively, you might have access to a drawing library that performs
-certain types of drawing tasks with great efficiency. To make it possible to utilize
-such facilities in the most efficient fashion, LVGL v9 and onwards implements a
-:dfn:`Drawing Pipeline`, like an assembly line, where decisions are made as to which
-drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
-(:ref:`Draw Units`) in order to be carried out.
+Modern embedded devices come with a wide variety of solution to speed up rendering:
+
+- 2D GPUs fill areas and blend images
+- 2.5D (Vector graphics)  GPUs
+- 3D GPUs (e.g. for OpenGL)
+- SIMD assembly level acceleration
+- multi-core CPUs
+- Software libraries
+- and more
+
+To make it possible to utilize such facilities in the most efficient fashion, LVGL
+implements a :dfn:`Drawing Pipeline`, like an assembly line, where decisions are
+made as to which drawing tasks (:ref:`Draw Tasks`) are given to which :ref:`Draw Units`
+(rendering engine) in order to be carried out.
 
 This Pipeline is designed so that it is both flexible and extendable.  You can use it
 to perform custom rendering with a GPU, or replace the parts of the built-in software
@@ -85,48 +87,49 @@ capable of performing rendering.
 For a reference implementation of a draw unit, see
 `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`__.
 
-During LVGL's initialization (:cpp:func:`lv_init`), a list of Draw Units is created.
-If :c:macro:`LV_USE_DRAW_SW` is set to ``1`` in ``lv_conf.h`` (it is by default), the
-Software Drawing Unit enters itself at the head of that list.  If your platform has
-other drawing units available, if they are configured to be used in ``lv_conf.h``,
-they are added to this list during LVGL's initialization.  If you are adding your own
-Draw Unit(s), you add each available drawing unit to that list by calling
-:cpp:expr:`lv_draw_create_unit(sizeof(your_draw_unit_t))`.  With each call to that
-function, the newly-created draw unit is added to the head of that list, pushing
-already-existing draw units further back in the list, pushing the Draw Units created
-earlier farther back in the list.  The order of this list (and thus the order in which
-:ref:`Draw Task Evaluation` is performed) is governed by the order in which each Draw
-Unit is created.
 
-Building this list (and initializing the Draw Units) is normally handled automatically
-by configuring the available Draw Units in ``lv_conf.h``, such as setting
-:c:macro:`LV_USE_DRAW_OPENGLES` or
-:c:macro:`LV_USE_PXP` or
-:c:macro:`LV_USE_DRAW_SDL` or
-:c:macro:`LV_USE_DRAW_VG_LITE`
-to ``1``.  However, if you are introducing your own Draw Unit(s), you will need to
-create and initialize it (after :cpp:func:`lv_init`) as above.  This will include
-several things, but setting its ``evaluate_cb`` and ``dispatch_cb`` callbacks
-(mentioned later) are two of them.
+Creating Draw Units
+-------------------
+
+During LVGL's initialization (in :cpp:func:`lv_init`), a list of Draw Units is created
+from the enabled built-in draw units. For example if :c:macro:`LV_USE_DRAW_SW` is
+enabled it will be automatically initialized  and used for renering. It's the same for
+:c:macro:`LV_USE_DRAW_OPENGLES`l :c:macro:`LV_USE_PXP`, :c:macro:`LV_USE_DRAW_SDL`, or
+:c:macro:`LV_USE_DRAW_VG_LITE.`
+
+You can also add your own Draw Unit(s) after :cpp:func:`lv_init` by calling
+:cpp:expr:`lv_draw_create_unit(sizeof(your_draw_unit_t))`.  You also need to
+add custom  ``evaluate_cb`` and ``dispatch_cb`` callbacks (mentioned later)
+to the new draw unit.
 
 For an example of how draw-unit creation and initialization is done, see
 :cpp:func:`lv_draw_sw_init` in lv_draw_sw.c_ or the other draw units whose ``init``
-functions are optionally called in :cpp:func:`lv_init`.
+functions are in :cpp:func:`lv_init`.
 
 Thread Priority
 ---------------
 
-All draw units operate with a configurable thread priority which can be set using the
-:c:macro:`LV_DRAW_THREAD_PRIO` configuration option in ``lv_conf.h``. This allows you
-to fine-tune the priority level across all drawing units, which is especially useful for
-systems with limited priority levels.
+If ``LV_USE_OS`` set to other than  ``LV_OS_NONE`` draw units might use a thread to
+allow waiting for completion of rendering in a non blocking way.
 
-By default, draw units use :c:macro:`LV_THREAD_PRIO_HIGH` as their thread priority.
-This consistent approach ensures that all drawing units (software rendering, hardware
-accelerators like STM32 DMA2D, NXP VGLite, etc.) use the same priority level unless
-explicitly configured otherwise.
+The thread priority can be set using the :c:macro:`LV_DRAW_THREAD_PRIO`
+(c:macro:`LV_THREAD_PRIO_HIGH` by default) configuration option in ``lv_conf.h``.
+This allows you to fine-tune the priority level for rendering in general.
 
-.. _lv_draw_sw.c:  https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c
+
+Clip Area
+---------
+
+LVGL clips the children widgets to the parent's boundary. To that it needs to know
+the current clip area when creating a draw task. The current clip are is the smallest
+intersection of all parent clip areas and the widget to be rendered. So if widget is
+out of its parent at the bottom and only its top part is visible the the clip are will be
+that small top part.
+
+As the current clip area always changes as LVGL travaerses the widget tree the clip
+area is saved in each draw task. This clip area should be considered by the draw units
+too, for example to mask out only a smaller part of image to be blended.
+
 
 
 .. _draw task evaluation:
@@ -148,18 +151,10 @@ In this way, by the time the evaluation sequence is complete, the task will cont
 the score and the ID of the Drawing Unit that will be used to perform that task when
 it is :ref:`dispatched <draw task dispatching>`.
 
-This logic, of course, can be overridden or redefined, depending on system design.
-
-As a side effect, this also ensures that the same Draw Unit will be selected
+This ensures that the same Draw Unit will be selected
 consistently, depending on the type (and nature) of the drawing task, avoiding any
 possible screen jitter in case more than one Draw Unit is capable of performing a
 given task type.
-
-The sequence of the Draw Unit list (with the Software Draw Unit at the end) also
-ensures that the Software Draw Unit is the "buck-stops-here" Draw Unit:  if no other
-Draw Unit reported it was better at a given drawing task, then the Software Draw Unit
-will handle it.
-
 
 .. _draw task dispatching:
 
@@ -175,16 +170,13 @@ available it can take a Draw Task.
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a
 useful helper function which is used by the ``dispatch_cb`` to get the next Draw Task
 it should act on.  If it handled the task, it sets the Draw Task's ``state`` field to
-:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED`.  "Available" in
-this context means that has been queued and assigned to a given Draw Unit and is
-ready to be carried out.  The ramifications of having multiple drawing threads are
-taken into account for this.
+:cpp:enumerator:`LV_DRAW_TASK_STATE_FINISHED`.
 
 
-Run-Time Object Hierarchy
-*************************
+Hierarchy Summary
+*****************
 
-All of the above have this relationship at run time:
+All of the above have this relationship:
 
 - LVGL (global)
 
