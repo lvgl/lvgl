@@ -403,7 +403,6 @@ static lv_result_t lv_glad_init(void)
     if(!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
         LV_LOG_ERROR("Failed to load OpenGL functions");
         return LV_RESULT_INVALID;
-        return -1;
     }
 
     LV_LOG_INFO("GL version: %s", glGetString(GL_VERSION));
