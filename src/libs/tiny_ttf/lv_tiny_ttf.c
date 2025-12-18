@@ -652,11 +652,13 @@ static void tiny_ttf_kerning_cache_free_cb(tiny_ttf_kerning_cache_data_t * node,
 static lv_cache_compare_res_t tiny_ttf_kerning_cache_compare_cb(const tiny_ttf_kerning_cache_data_t * lhs,
                                                                 const tiny_ttf_kerning_cache_data_t * rhs)
 {
-    lv_cache_compare_res_t ret = lhs->glyph1_idx - rhs->glyph1_idx;
-    if(ret == 0) {
-        return lhs->glyph2_idx - rhs->glyph2_idx;
+    if(lhs->glyph1_idx != rhs->glyph1_idx) {
+        return lhs->glyph1_idx > rhs->glyph1_idx ? 1 : -1;
     }
-    return ret;
+    if(lhs->glyph2_idx != rhs->glyph2_idx) {
+        return lhs->glyph2_idx > rhs->glyph2_idx ? 1 : -1;
+    }
+    return 0;
 }
 
 static lv_font_t * tiny_ttf_font_create_cb(const lv_font_info_t * info, const void * src)
