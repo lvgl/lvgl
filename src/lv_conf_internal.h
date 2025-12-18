@@ -4091,6 +4091,22 @@
             #define LV_WAYLAND_DIRECT_EXIT          1     /**< 1: Exit the application when all Wayland windows are closed */
         #endif
     #endif
+    #ifndef LV_WAYLAND_USE_EGL
+        #ifdef CONFIG_LV_WAYLAND_USE_EGL
+            #define LV_WAYLAND_USE_EGL CONFIG_LV_WAYLAND_USE_EGL
+        #else
+            #define LV_WAYLAND_USE_EGL              0    /**< Use EGL for rendering. Required for Wayland EGL support */
+        #endif
+    #endif
+    #if LV_WAYLAND_USE_EGL
+        #ifndef LV_WAYLAND_USE_EGL_DMABUF
+            #ifdef CONFIG_LV_WAYLAND_USE_EGL_DMABUF
+                #define LV_WAYLAND_USE_EGL_DMABUF CONFIG_LV_WAYLAND_USE_EGL_DMABUF
+            #else
+                #define LV_WAYLAND_USE_EGL_DMABUF   0    /**< Use EGL with DMABUF. Required for Wayland EGL-DMABF support */
+            #endif
+        #endif
+    #endif
 #endif
 
 /** Driver for /dev/fb */
@@ -4854,6 +4870,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_WAYLAND_USE_SHM 0
     #define LV_WAYLAND_USE_EGL 0
 #endif
+#if LV_USE_WAYLAND == 0
+    #define LV_WAYLAND_USE_EGL              0
+    #define LV_WAYLAND_USE_EGL_DMABUF       0
+#endif /* LV_USE_WAYLAND */
 
 #if LV_USE_LINUX_DRM == 0
     #define LV_LINUX_DRM_USE_EGL     0
