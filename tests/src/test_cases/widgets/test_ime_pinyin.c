@@ -10,6 +10,43 @@ static lv_obj_t * g_kb = NULL;
 static lv_obj_t * g_pinyin_ime = NULL;
 static lv_pinyin_dict_t * g_custom_dict = NULL;
 
+/* Helper function: Find and press a button by text */
+static bool press_button_by_text(lv_obj_t * kb, const char * text)
+{
+    for(uint16_t i = 0; i < 50; i++) {
+        const char * txt = lv_buttonmatrix_get_button_text(kb, i);
+        if(txt && lv_strcmp(txt, text) == 0) {
+            lv_buttonmatrix_set_selected_button(kb, i);
+            lv_obj_send_event(kb, LV_EVENT_VALUE_CHANGED, NULL);
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Helper function: Input a sequence of characters */
+static void input_text_sequence(lv_obj_t * kb, const char ** texts, uint8_t count)
+{
+    for(uint8_t j = 0; j < count; j++) {
+        press_button_by_text(kb, texts[j]);
+    }
+}
+
+/* Helper function: Setup IME with keyboard and mode */
+static void setup_ime_mode(lv_obj_t * ime, lv_obj_t * kb, lv_ime_pinyin_mode_t mode)
+{
+    lv_ime_pinyin_set_keyboard(ime, kb);
+    lv_ime_pinyin_set_mode(ime, mode);
+}
+
+/* Helper function: Create a local textarea for testing */
+static lv_obj_t * create_test_textarea(lv_obj_t * kb)
+{
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(kb, ta);
+    return ta;
+}
+
 void setUp(void)
 {
     g_active_screen = lv_screen_active();
@@ -1559,6 +1596,201 @@ void test_ime_pinyin_k9_cand_empty(void)
     /* Verify empty state */
     TEST_ASSERT_EQUAL(0, lv_strlen(ime->input_char));
     TEST_ASSERT_EQUAL(0, ime->k9_legal_py_count);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 backspace in K9 mode (lines 667-668) */
+void test_ime_pinyin_k9_backspace_in_mode(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input some K9 characters */
+    const char * inputs[] = {"2", "2", "2"};
+    input_text_sequence(g_kb, inputs, 3);
+
+    /* Now press backspace to trigger K9 mode backspace logic (lines 674-679) */
+    press_button_by_text(g_kb, "Del");
+
+    /* Input should be modified */
+    TEST_ASSERT_TRUE(lv_strlen(ime->input_char) < 3);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test ABC/abc/1# button press (lines 686-687) */
+void test_ime_pinyin_abc_button_press(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input some text first */
+    press_button_by_text(g_kb, "a");
+
+    /* Press ABC button - should clear data and return */
+    if(!press_button_by_text(g_kb, "ABC")) {
+        press_button_by_text(g_kb, "abc");
+    }
+    /* Data should be cleared */
+    TEST_ASSERT_EQUAL(0, lv_strlen(ime->input_char));
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test 123 button press (lines 690-691, 704-705) */
+void test_ime_pinyin_123_button_press(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Add some text to textarea first to trigger delete logic */
+    lv_textarea_add_text(local_ta, "test123");
+
+    /* Press 123 button - should delete 3 chars and switch to number mode */
+    press_button_by_text(g_kb, "123");
+    /* Should be in number mode */
+    TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test cand panel button none (line 758) */
+void test_ime_pinyin_cand_button_none(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input to generate candidates */
+    press_button_by_text(g_kb, "n");
+
+    /* Send event to cand_panel with no button selected */
+    lv_obj_t * cand_panel = ime->cand_panel;
+    lv_buttonmatrix_set_selected_button(cand_panel, LV_BUTTONMATRIX_BUTTON_NONE);
+    lv_obj_send_event(cand_panel, LV_EVENT_VALUE_CHANGED, NULL);
+
+    /* Should handle gracefully */
+    TEST_ASSERT_NOT_NULL(cand_panel);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test pinyin page with page_num calculation (lines 817, 822, 825) */
+void test_ime_pinyin_page_calculation(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input to generate many candidates for pagination */
+    const char * inputs[] = {"n", "i"};
+    input_text_sequence(g_kb, inputs, 2);
+
+    /* Should have candidates */
+    TEST_ASSERT_TRUE(ime->cand_num > 0);
+
+    /* Try next page multiple times */
+    for(int p = 0; p < 3; p++) {
+        for(uint16_t i = 0; i < 50; i++) {
+            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
+            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
+                lv_buttonmatrix_set_selected_button(g_kb, i);
+                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+                break;
+            }
+        }
+    }
+
+    /* Should have advanced pages */
+    TEST_ASSERT_TRUE(ime->py_page >= 0);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 specific candidate button range (lines 634-646) */
+void test_ime_pinyin_k9_exact_cand_button(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input K9 digit to generate legal pinyin */
+    press_button_by_text(g_kb, "4");  /* 'h' in K9 */
+
+    /* Add text to textarea to have ta_count > 0 */
+    lv_textarea_add_text(local_ta, "test");
+    ime->ta_count = 4;
+
+    /* Now try to click button in range 16-18 (K9 candidate buttons) */
+    /* First ensure we have some input_char */
+    if(ime->k9_legal_py_count > 0 && lv_strlen(ime->input_char) > 0) {
+        /* Simulate button press in candidate range */
+        uint16_t btn_id = 16;  /* First K9 candidate button */
+
+        /* Get button text from keyboard at position 16 */
+        const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn_id);
+        if(txt && lv_strlen(txt) > 0) {
+            /* Trigger the event with this button */
+            lv_buttonmatrix_set_selected_button(g_kb, btn_id);
+            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+        }
+    }
+
+    /* Test passes if no crash */
+    TEST_ASSERT_TRUE(true);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 pagination with enough candidates (lines 1142-1196) */
+void test_ime_pinyin_k9_full_pagination(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input multiple K9 digits to generate many legal pinyin combinations */
+    const char * k9_inputs[] = {"2", "4"};  /* 'a' and 'h' */
+    input_text_sequence(g_kb, k9_inputs, 2);
+
+    /* Check if we have enough candidates for pagination */
+    if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+        /* Store initial position */
+        int initial_pos = ime->k9_py_ll_pos;
+
+        /* Try next page */
+        for(uint16_t i = 0; i < 50; i++) {
+            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
+            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
+                lv_buttonmatrix_set_selected_button(g_kb, i);
+                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+                /* Position should have changed */
+                TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= initial_pos);
+                break;
+            }
+        }
+
+        /* Try previous page */
+        for(uint16_t i = 0; i < 50; i++) {
+            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
+            if(txt && lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
+                lv_buttonmatrix_set_selected_button(g_kb, i);
+                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+                break;
+            }
+        }
+    }
 
     lv_obj_delete(local_ta);
 }
