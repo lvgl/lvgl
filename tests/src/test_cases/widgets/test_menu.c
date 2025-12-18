@@ -538,13 +538,14 @@ void test_menu_sidebar_header_mode_variations(void)
     lv_menu_set_sidebar_page(menu, sidebar_page);
     lv_menu_set_page(menu, main_page);
 
-    lv_menu_set_mode_header(menu, LV_MENU_HEADER_TOP_FIXED);
+    /* Start with BOTTOM_FIXED to ensure mode change triggers refresh */
+    lv_menu_set_mode_header(menu, LV_MENU_HEADER_BOTTOM_FIXED);
     lv_refr_now(NULL);
 
     lv_menu_set_mode_header(menu, LV_MENU_HEADER_TOP_UNFIXED);
     lv_refr_now(NULL);
 
-    lv_menu_set_mode_header(menu, LV_MENU_HEADER_BOTTOM_FIXED);
+    lv_menu_set_mode_header(menu, LV_MENU_HEADER_TOP_FIXED);
     lv_refr_now(NULL);
 }
 
