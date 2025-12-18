@@ -733,16 +733,8 @@ void test_ime_pinyin_k9_page_nav_events(void)
 
     /* Now test page navigation if candidates exist */
     if(ime->k9_legal_py_count > 0) {
-        /* Try to find right arrow button (typically at a higher index) */
-        /* Since we can't get button count, try a reasonable range */
-        for(uint16_t i = 16; i < 30; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        /* Try to find right arrow button */
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
     }
 
     /* Verify state is valid */
@@ -870,7 +862,7 @@ void test_ime_pinyin_k26_backspace_key(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Set up some input state */
-    lv_strcpy(ime->input_char, "ni");
+    lv_strlcpy(ime->input_char, "ni", sizeof(ime->input_char));
     ime->ta_count = 2;
 
     /* Find and press backspace key */
@@ -902,7 +894,7 @@ void test_ime_pinyin_k26_enter_key(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Set up some input state */
-    lv_strcpy(ime->input_char, "hao");
+    lv_strlcpy(ime->input_char, "hao", sizeof(ime->input_char));
     ime->ta_count = 3;
 
     /* Find and press Enter key */
@@ -991,14 +983,7 @@ void test_ime_pinyin_cand_page_buttons(void)
     lv_obj_t * cand_panel = ime->cand_panel;
 
     /* First trigger some input to potentially show candidates */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "n") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "n");
 
     /* If candidate panel is visible, test navigation */
     if(!lv_obj_has_flag(cand_panel, LV_OBJ_FLAG_HIDDEN) && ime->cand_num > 0) {
@@ -1028,7 +1013,7 @@ void test_ime_pinyin_k9_candidate_button(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Simulate K9 input by setting button text length */
-    lv_strcpy(ime->input_char, "abc");
+    lv_strlcpy(ime->input_char, "abc", sizeof(ime->input_char));
     ime->ta_count = 3;
     ime->k9_input_str_len = 3;
 
@@ -1059,20 +1044,13 @@ void test_ime_pinyin_k9_backspace_multi(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Set up K9 input state with multiple characters */
-    lv_strcpy(ime->k9_input_str, "234");
+    lv_strlcpy(ime->k9_input_str, "234", sizeof(ime->k9_input_str));
     ime->k9_input_str_len = 3;
     ime->ta_count = 3;
-    lv_strcpy(ime->input_char, "abc");
+    lv_strlcpy(ime->input_char, "abc", sizeof(ime->input_char));
 
     /* Find and press backspace */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
 
     /* After backspace, ta_count should decrease */
     TEST_ASSERT_TRUE(ime->ta_count < 3);
@@ -1092,7 +1070,7 @@ void test_ime_pinyin_abc_buttons(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Set up some input */
-    lv_strcpy(ime->input_char, "test");
+    lv_strlcpy(ime->input_char, "test", sizeof(ime->input_char));
     ime->ta_count = 4;
 
     /* ABC/abc/1# buttons should clear data when pressed
@@ -1114,14 +1092,7 @@ void test_ime_pinyin_123_button(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Find and press 123 button */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "123") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "123");
 
     /* Should switch to K9_NUMBER mode */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
@@ -1141,14 +1112,7 @@ void test_ime_pinyin_keyboard_switch_from_number(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Find and press keyboard switch button */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, LV_SYMBOL_KEYBOARD);
 
     /* Should switch to K9 mode */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9, ime->mode);
@@ -1169,14 +1133,7 @@ void test_ime_pinyin_k9_page_next(void)
 
     /* Simulate multiple K9 inputs to generate many candidates */
     for(int i = 0; i < 5; i++) {
-        for(uint16_t btn = 0; btn < 50; btn++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn);
-            if(txt && lv_strcmp(txt, "abc") == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, btn);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, "abc");
     }
 
     /* If we have many candidates, test next page */
@@ -1184,14 +1141,7 @@ void test_ime_pinyin_k9_page_next(void)
         uint16_t old_pos = ime->k9_py_ll_pos;
 
         /* Find right arrow button on keyboard */
-        for(uint16_t i = 16; i < 30; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
 
         /* Position should change */
         TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= old_pos);
@@ -1213,39 +1163,18 @@ void test_ime_pinyin_k9_page_prev(void)
 
     /* Simulate multiple K9 inputs */
     for(int i = 0; i < 5; i++) {
-        for(uint16_t btn = 0; btn < 50; btn++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn);
-            if(txt && lv_strcmp(txt, "def") == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, btn);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, "def");
     }
 
     /* If we have many candidates, go to next page first then test previous */
     if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
         /* Go to next page */
-        for(uint16_t i = 16; i < 30; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
 
         uint16_t old_pos = ime->k9_py_ll_pos;
 
-        /* Now test previous page - find left arrow */
-        for(uint16_t i = 16; i < 30; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        /* Now test previous page */
+        press_button_by_text(g_kb, LV_SYMBOL_LEFT);
 
         /* Position should decrease or stay same */
         TEST_ASSERT_TRUE(ime->k9_py_ll_pos <= old_pos);
@@ -1266,17 +1195,10 @@ void test_ime_pinyin_k9_select_candidate(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Input K9 text to generate candidates */
-    for(uint16_t btn = 0; btn < 50; btn++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn);
-        if(txt && lv_strcmp(txt, "abc") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, btn);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "abc");
 
     /* Set input state for candidate selection */
-    lv_strcpy(ime->input_char, "a");
+    lv_strlcpy(ime->input_char, "a", sizeof(ime->input_char));
     ime->ta_count = 1;
 
     /* Try to select a K9 candidate button (16-21 range) */
@@ -1308,14 +1230,7 @@ void test_ime_pinyin_search_single_char(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Trigger input by pressing 'a' key */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "a") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "a");
 
     /* Should have candidates */
     TEST_ASSERT_TRUE(ime->cand_num >= 0);
@@ -1335,21 +1250,14 @@ void test_ime_pinyin_k9_cand_button_select(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Input "2" (abc) to generate K9 candidates */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "2") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "2");
 
     /* K9 should have candidates after input */
     TEST_ASSERT_TRUE(ime->k9_legal_py_count >= 0);
 
     /* If we have candidates, try to select one */
     if(ime->k9_legal_py_count > 0) {
-        /* Simulate clicking candidate button (btn_id 16-18) */
+        /* Simulate clicking first non-empty candidate button (btn_id 16-18) */
         /* This should trigger lines 634-646 */
         for(uint16_t i = 16; i < 19; i++) {
             const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
@@ -1376,14 +1284,7 @@ void test_ime_pinyin_k9_pagination_full(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Input "4" which should generate many legal pinyin (h) */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "4") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "4");
 
     /* Check if we have candidates */
     TEST_ASSERT_TRUE(ime->k9_legal_py_count >= 0);
@@ -1391,30 +1292,16 @@ void test_ime_pinyin_k9_pagination_full(void)
     /* If we have enough candidates for pagination, try it */
     if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
         /* Try next page */
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                int old_pos = ime->k9_py_ll_pos;
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                /* Position should advance */
-                TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= old_pos);
-                break;
-            }
-        }
+        int old_pos = ime->k9_py_ll_pos;
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        /* Position should advance */
+        TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= old_pos);
 
         /* Try previous page (lines 1184-1196) */
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
-                int old_pos = ime->k9_py_ll_pos;
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                /* Position should decrease or stay same */
-                TEST_ASSERT_TRUE(ime->k9_py_ll_pos <= old_pos);
-                break;
-            }
-        }
+        old_pos = ime->k9_py_ll_pos;
+        press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+        /* Position should decrease or stay same */
+        TEST_ASSERT_TRUE(ime->k9_py_ll_pos <= old_pos);
     }
 
     lv_obj_delete(local_ta);
@@ -1435,14 +1322,7 @@ void test_ime_pinyin_empty_candidates(void)
     const char * invalid_inputs[] = {"q", "q", "q", "q", "q"};
 
     for(uint8_t j = 0; j < 5; j++) {
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, invalid_inputs[j]) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, invalid_inputs[j]);
     }
 
     /* Should have no or very few candidates */
@@ -1465,28 +1345,14 @@ void test_ime_pinyin_k9_input_length_boundary(void)
 
     /* Input exactly LV_IME_PINYIN_K9_MAX_INPUT-1 (6) characters */
     for(uint8_t j = 0; j < (LV_IME_PINYIN_K9_MAX_INPUT - 1); j++) {
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, "2") == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, "2");
     }
 
     /* Verify input length does not exceed max */
     TEST_ASSERT_TRUE(lv_strlen(ime->input_char) <= LV_IME_PINYIN_K9_MAX_INPUT);
 
     /* Try adding one more (should be blocked) */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "3") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "3");
 
     /* Length should not exceed max */
     TEST_ASSERT_TRUE(lv_strlen(ime->input_char) <= LV_IME_PINYIN_K9_MAX_INPUT);
@@ -1508,28 +1374,14 @@ void test_ime_pinyin_page_prev_at_start(void)
     /* Input "ni" which should give many candidates */
     const char * inputs[] = {"n", "i"};
     for(uint8_t j = 0; j < 2; j++) {
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, inputs[j]) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, inputs[j]);
     }
 
     /* Should be at page 0 */
     TEST_ASSERT_EQUAL(0, ime->py_page);
 
     /* Try to go to previous page (should stay at 0) */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, LV_SYMBOL_LEFT);
 
     /* Should still be at page 0 */
     TEST_ASSERT_EQUAL(0, ime->py_page);
@@ -1552,14 +1404,7 @@ void test_ime_pinyin_search_no_match(void)
     /* Use 'v' which is rare in pinyin */
     const char * rare_inputs[] = {"v", "v"};
     for(uint8_t j = 0; j < 2; j++) {
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, rare_inputs[j]) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, rare_inputs[j]);
     }
 
     /* Should have very few or no candidates */
@@ -1581,16 +1426,9 @@ void test_ime_pinyin_k9_cand_empty(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Clear any existing input first */
-    for(uint16_t i = 0; i < 50; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "Del") == 0) {
-            /* Press Del multiple times */
-            for(int j = 0; j < 10; j++) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            }
-            break;
-        }
+    /* Press Del multiple times */
+    for(int j = 0; j < 10; j++) {
+        press_button_by_text(g_kb, "Del");
     }
 
     /* Verify empty state */
@@ -1700,14 +1538,7 @@ void test_ime_pinyin_page_calculation(void)
 
     /* Try next page multiple times */
     for(int p = 0; p < 3; p++) {
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
     }
 
     /* Should have advanced pages */
@@ -1770,26 +1601,12 @@ void test_ime_pinyin_k9_full_pagination(void)
         int initial_pos = ime->k9_py_ll_pos;
 
         /* Try next page */
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                /* Position should have changed */
-                TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= initial_pos);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        /* Position should have changed */
+        TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= initial_pos);
 
         /* Try previous page */
-        for(uint16_t i = 0; i < 50; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_button_by_text(g_kb, LV_SYMBOL_LEFT);
     }
 
     lv_obj_delete(local_ta);
