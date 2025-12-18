@@ -86,6 +86,48 @@ To enable the EGL backend:
 **Note:** If your target board has OpenGL ES 2.0 support, this backend can be used with LVGL's 3D rendering
 capabilities for glTF model visualization. See [3D/glTF Support](/integration/embedded_linux/opengl) for details on 3D rendering support.
 
+#### Optional DMA-BUF Support
+
+The Wayland EGL backend can optionally use the Linux DMA-BUF protocol for sharing
+GPU buffers with the Wayland compositor.
+
+DMA-BUF allows buffers allocated by the graphics driver to be passed directly to
+the compositor, reducing copies and improving performance on supported systems.
+This is especially useful on embedded Linux platforms where GPU/display
+controllers support zero-copy or low-copy buffer sharing.
+
+**Features:**
+
+- Optional GPU buffer sharing through `linux-dmabuf`
+- Potentially reduced memory copies
+- Better performance on supported embedded platforms
+- Useful together with OpenGL ES/EGL rendering
+
+**Requirements:**
+
+- A Wayland compositor with `zwp_linux_dmabuf_v1` support
+- GPU/display driver support for DMA-BUF
+- EGL/OpenGL ES support
+- The `linux-dmabuf` Wayland protocol generated at build time
+
+Depending on the platform and buffer allocation method, additional libraries such as `libdrm` or `gbm` may also be required.
+
+**Usage:**
+
+1. Enable OpenGL ES and DMA-BUF support in `lv_conf.h`:
+   
+    ```c
+    #define LV_USE_OPENGLES 1
+    #define LV_WAYLAND_USE_EGL_DMABUF 1
+    ```
+
+2. Link your application with the `wayland-egl` library (add to your build system):
+   
+    ```bash
+    -ldrm
+    -lgbm
+    ```
+
 ### G2D Backend
 
 The G2D backend leverages NXP's hardware-accelerated 2D graphics engine available on i.MX processors. This backend provides improved performance on NXP platforms.

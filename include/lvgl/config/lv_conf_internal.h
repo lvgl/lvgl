@@ -4648,6 +4648,17 @@
             #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
         #endif
     #endif
+    #ifndef LV_WAYLAND_USE_EGL_DMABUF
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_WAYLAND_USE_EGL_DMABUF
+                #define LV_WAYLAND_USE_EGL_DMABUF CONFIG_LV_WAYLAND_USE_EGL_DMABUF
+            #else
+                #define LV_WAYLAND_USE_EGL_DMABUF 0
+            #endif
+        #else
+            #define LV_WAYLAND_USE_EGL_DMABUF        1    /**< Enable or disable debug for opengles */
+        #endif
+    #endif
 #endif
 
 /** Use GLFW to open window on PC and handle mouse and keyboard. Requires*/
