@@ -390,8 +390,20 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
     for(i = 0; i < event_cnt; i++) {
         lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
         if(lv_event_dsc_get_cb(event_dsc) == lv_menu_load_page_event_cb) {
-            lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
+            /* Free the old event data */
+            lv_menu_load_page_event_data_t * old_event_data = lv_event_dsc_get_user_data(event_dsc);
             lv_obj_remove_event(obj, i);
+            /* Also remove the corresponding DELETE event callback */
+            event_cnt = lv_obj_get_event_count(obj);
+            for(uint32_t j = 0; j < event_cnt; j++) {
+                lv_event_dsc_t * del_dsc = lv_obj_get_event_dsc(obj, j);
+                if(lv_event_dsc_get_cb(del_dsc) == lv_menu_obj_delete_event_cb &&
+                   lv_event_dsc_get_user_data(del_dsc) == old_event_data) {
+                    lv_obj_remove_event(obj, j);
+                    break;
+                }
+            }
+            lv_free(old_event_data);
             break;
         }
     }
