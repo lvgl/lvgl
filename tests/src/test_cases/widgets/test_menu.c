@@ -114,15 +114,31 @@ void test_menu_set_page(void)
 void test_menu_clear_history(void)
 {
     lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    lv_obj_set_size(menu, 300, 400);
+    lv_obj_center(menu);
+
     lv_obj_t * page1 = lv_menu_page_create(menu, "Page 1");
     lv_obj_t * page2 = lv_menu_page_create(menu, "Page 2");
     lv_obj_t * page3 = lv_menu_page_create(menu, "Page 3");
 
+    lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BUTTON_ENABLED);
+
     lv_menu_set_page(menu, page1);
     lv_menu_set_page(menu, page2);
     lv_menu_set_page(menu, page3);
+    TEST_ASSERT_EQUAL_PTR(page3, lv_menu_get_cur_main_page(menu));
 
     lv_menu_clear_history(menu);
+
+    /* After clear history, back button click should not navigate back */
+    lv_refr_now(NULL);
+    lv_obj_t * back_btn = lv_menu_get_main_header_back_button(menu);
+    lv_area_t coords;
+    lv_obj_get_coords(back_btn, &coords);
+    lv_test_mouse_click_at((coords.x1 + coords.x2) / 2, (coords.y1 + coords.y2) / 2);
+
+    /* Should still be on page3 since history was cleared */
+    TEST_ASSERT_EQUAL_PTR(page3, lv_menu_get_cur_main_page(menu));
 }
 
 void test_menu_sidebar(void)
@@ -602,6 +618,9 @@ void test_menu_group_focus(void)
     lv_area_t coords;
     lv_obj_get_coords(cont, &coords);
     lv_test_mouse_click_at((coords.x1 + coords.x2) / 2, (coords.y1 + coords.y2) / 2);
+
+    /* Verify navigation occurred */
+    TEST_ASSERT_EQUAL_PTR(page2, lv_menu_get_cur_main_page(menu));
 
     lv_group_set_default(NULL);
     lv_group_delete(g);
