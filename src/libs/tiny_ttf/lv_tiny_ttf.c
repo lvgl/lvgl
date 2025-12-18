@@ -270,7 +270,7 @@ static uint16_t ttf_get_glyph_pair_kerning_width(const ttf_font_desc_t * dsc, ui
     tiny_ttf_kerning_cache_data_t * data = lv_cache_entry_get_data(kerning_entry);
     LV_ASSERT_NULL(data);
 
-    lv_cache_release(dsc->glyph_cache, kerning_entry, NULL);
+    lv_cache_release(dsc->kerning_cache, kerning_entry, NULL);
     return data->adv_w16;
 }
 
