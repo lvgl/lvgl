@@ -114,6 +114,7 @@ void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
     lv_cache_entry_release_data(entry, user_data);
 
     if(lv_cache_entry_get_ref(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
+        cache->clz->remove_cb(cache, entry, user_data);
         cache->ops.free_cb(lv_cache_entry_get_data(entry), user_data);
         lv_cache_entry_delete(entry);
     }
