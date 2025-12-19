@@ -1021,10 +1021,10 @@ static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char *
             if(pinyin_k9_is_valid_py(obj, py_comp)) {
                 if((count >= ll_len) || (ll_len == 0)) {
                     ll_index = lv_ll_ins_tail(&pinyin_ime->k9_legal_py_ll);
-                    lv_strlcpy(ll_index->py_str, py_comp, 7);
+                    lv_strlcpy(ll_index->py_str, py_comp, sizeof(ll_index->py_str));
                 }
                 else if((count < ll_len)) {
-                    lv_strlcpy(ll_index->py_str, py_comp, 7);
+                    lv_strlcpy(ll_index->py_str, py_comp, sizeof(ll_index->py_str));
                     ll_index = lv_ll_get_next(&pinyin_ime->k9_legal_py_ll, ll_index);
                 }
                 count++;

@@ -866,7 +866,7 @@ void test_ime_pinyin_k26_backspace_key(void)
     press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
 
     /* Verify ta_count decreased or cleared */
-    TEST_ASSERT_LESS_OR_EQUAL_UINT16(2, ime->ta_count);
+    TEST_ASSERT_EQUAL_UINT16(1, ime->ta_count);
 
     lv_obj_delete(local_ta);
 }
@@ -1188,8 +1188,8 @@ void test_ime_pinyin_search_single_char(void)
     /* Trigger input by pressing 'a' key */
     press_button_by_text(g_kb, "a");
 
-    /* cand_num is uint16_t, always >= 0, verify valid state */
-    TEST_ASSERT_TRUE(ime->cand_num == ime->cand_num);
+    /* verify valid state */
+    TEST_ASSERT_EQUAL_UINT16(1, ime->cand_num);
 
     lv_obj_delete(local_ta);
 }
@@ -1518,9 +1518,6 @@ void test_ime_pinyin_k9_exact_cand_button(void)
             lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
         }
     }
-
-    /* Test passes if no crash */
-    TEST_ASSERT_TRUE(true);
 
     lv_obj_delete(local_ta);
 }
