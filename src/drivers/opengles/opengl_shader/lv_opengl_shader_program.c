@@ -89,7 +89,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
      * when it shuts down. */
 
     /* GL_CALL(glDeleteProgram(program->id)); */
-
+    lv_free(program);
 }
 
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)
