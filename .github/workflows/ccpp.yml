@@ -40,6 +40,8 @@ jobs:
       run:  scripts/install_pngquant.sh
     - name: Verify the environment dependency installation
       run: scripts/run_tests.sh --skip-tests
+    - name: Test MCP server scripts
+      run: python scripts/mcp_server.py --self-test
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
