@@ -315,7 +315,7 @@ void test_cache_entry_alloc(void)
 
     TEST_ASSERT_EQUAL(node_size, lv_cache_entry_get_node_size(entry));
 
-    TEST_ASSERT_EQUAL(entry, lv_cache_entry_get_cache(entry));
+    TEST_ASSERT_EQUAL(cache, lv_cache_entry_get_cache(entry));
 
     lv_cache_entry_delete(entry);
     lv_cache_destroy(cache, NULL);
