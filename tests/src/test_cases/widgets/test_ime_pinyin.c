@@ -24,6 +24,21 @@ static bool press_button_by_text(lv_obj_t * kb, const char * text)
     return false;
 }
 
+/* Helper function: Press first non-empty K9 candidate button in range */
+static bool press_k9_candidate_button(lv_obj_t * kb, uint16_t start, uint16_t end)
+{
+    for(uint16_t i = start; i < end; i++) {
+        const char * txt = lv_buttonmatrix_get_button_text(kb, i);
+        if(txt && lv_strlen(txt) > 0 && txt[0] != ' ' &&
+           lv_strcmp(txt, LV_SYMBOL_LEFT) != 0 && lv_strcmp(txt, LV_SYMBOL_RIGHT) != 0) {
+            lv_buttonmatrix_set_selected_button(kb, i);
+            lv_obj_send_event(kb, LV_EVENT_VALUE_CHANGED, NULL);
+            return true;
+        }
+    }
+    return false;
+}
+
 /* Helper function: Input a sequence of characters */
 static void input_text_sequence(lv_obj_t * kb, const char ** texts, uint8_t count)
 {
@@ -799,15 +814,7 @@ void test_ime_pinyin_k26_letter_keys(void)
 
     /* Simulate pressing letter keys by directly calling the keyboard event */
     /* Find and press 'n' key */
-    uint16_t btn_count = 50; /* Typical keyboard has ~50 buttons */
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, "n") == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, "n");
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
@@ -829,17 +836,9 @@ void test_ime_pinyin_k9_letter_keys(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Simulate pressing K9 buttons by finding buttons with letter combinations */
-    uint16_t btn_count = 50;
-    bool found_k9_key = false;
-
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && (lv_strcmp(txt, "abc") == 0 || lv_strcmp(txt, "def") == 0)) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            found_k9_key = true;
-            break;
-        }
+    bool found_k9_key = press_button_by_text(g_kb, "abc");
+    if(!found_k9_key) {
+        found_k9_key = press_button_by_text(g_kb, "def");
     }
 
     /* If we found and pressed a K9 key, verify processing */
@@ -866,15 +865,7 @@ void test_ime_pinyin_k26_backspace_key(void)
     ime->ta_count = 2;
 
     /* Find and press backspace key */
-    uint16_t btn_count = 50;
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
 
     /* Verify ta_count decreased or cleared */
     TEST_ASSERT_TRUE(ime->ta_count <= 2);
@@ -898,14 +889,8 @@ void test_ime_pinyin_k26_enter_key(void)
     ime->ta_count = 3;
 
     /* Find and press Enter key */
-    uint16_t btn_count = 50;
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && (lv_strcmp(txt, "Enter") == 0 || lv_strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
+    if(!press_button_by_text(g_kb, "Enter")) {
+        press_button_by_text(g_kb, LV_SYMBOL_NEW_LINE);
     }
 
     /* Verify data was cleared */
@@ -926,13 +911,9 @@ void test_ime_pinyin_mode_switch_buttons(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Find and press ABC button (mode switch) */
-    uint16_t btn_count = 50;
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && (lv_strcmp(txt, "ABC") == 0 || lv_strcmp(txt, "abc") == 0 || lv_strcmp(txt, "1#") == 0)) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
+    if(!press_button_by_text(g_kb, "ABC")) {
+        if(!press_button_by_text(g_kb, "abc")) {
+            press_button_by_text(g_kb, "1#");
         }
     }
 
@@ -954,15 +935,7 @@ void test_ime_pinyin_keyboard_switch_button(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Find and press keyboard switch button */
-    uint16_t btn_count = 50;
-    for(uint16_t i = 0; i < btn_count; i++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-        if(txt && lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, i);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_button_by_text(g_kb, LV_SYMBOL_KEYBOARD);
 
     /* Verify mode is valid (K26 -> K9 or vice versa) */
     TEST_ASSERT_TRUE(ime->mode >= 0 && ime->mode <= LV_IME_PINYIN_MODE_K9_NUMBER);
@@ -1018,14 +991,7 @@ void test_ime_pinyin_k9_candidate_button(void)
     ime->k9_input_str_len = 3;
 
     /* Try to find and click K9 candidate buttons (index 16-21 typically) */
-    for(uint16_t btn_id = 16; btn_id < 22; btn_id++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn_id);
-        if(txt && lv_strlen(txt) > 0 && txt[0] != ' ') {
-            lv_buttonmatrix_set_selected_button(g_kb, btn_id);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_k9_candidate_button(g_kb, 16, 22);
 
     TEST_ASSERT_TRUE(ime->k9_input_str_len >= 0);
 
@@ -1202,15 +1168,7 @@ void test_ime_pinyin_k9_select_candidate(void)
     ime->ta_count = 1;
 
     /* Try to select a K9 candidate button (16-21 range) */
-    for(uint16_t btn_id = 16; btn_id < 22; btn_id++) {
-        const char * txt = lv_buttonmatrix_get_button_text(g_kb, btn_id);
-        if(txt && lv_strlen(txt) > 0 && txt[0] != ' ' && lv_strcmp(txt, LV_SYMBOL_LEFT) != 0 &&
-           lv_strcmp(txt, LV_SYMBOL_RIGHT) != 0) {
-            lv_buttonmatrix_set_selected_button(g_kb, btn_id);
-            lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-            break;
-        }
-    }
+    press_k9_candidate_button(g_kb, 16, 22);
 
     /* Input should be processed */
     TEST_ASSERT_NOT_NULL(ime);
@@ -1259,14 +1217,7 @@ void test_ime_pinyin_k9_cand_button_select(void)
     if(ime->k9_legal_py_count > 0) {
         /* Simulate clicking first non-empty candidate button (btn_id 16-18) */
         /* This should trigger lines 634-646 */
-        for(uint16_t i = 16; i < 19; i++) {
-            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
-            if(txt && lv_strlen(txt) > 0 && txt[0] != ' ') {
-                lv_buttonmatrix_set_selected_button(g_kb, i);
-                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
-                break;
-            }
-        }
+        press_k9_candidate_button(g_kb, 16, 19);
     }
 
     lv_obj_delete(local_ta);
@@ -1320,10 +1271,7 @@ void test_ime_pinyin_empty_candidates(void)
 
     /* Input invalid pinyin sequence that won't match anything */
     const char * invalid_inputs[] = {"q", "q", "q", "q", "q"};
-
-    for(uint8_t j = 0; j < 5; j++) {
-        press_button_by_text(g_kb, invalid_inputs[j]);
-    }
+    input_text_sequence(g_kb, invalid_inputs, 5);
 
     /* Should have no or very few candidates */
     /* The code should handle empty candidate list gracefully */
@@ -1373,9 +1321,7 @@ void test_ime_pinyin_page_prev_at_start(void)
 
     /* Input "ni" which should give many candidates */
     const char * inputs[] = {"n", "i"};
-    for(uint8_t j = 0; j < 2; j++) {
-        press_button_by_text(g_kb, inputs[j]);
-    }
+    input_text_sequence(g_kb, inputs, 2);
 
     /* Should be at page 0 */
     TEST_ASSERT_EQUAL(0, ime->py_page);
@@ -1403,9 +1349,7 @@ void test_ime_pinyin_search_no_match(void)
     /* Input pinyin sequence that has very few or no matches */
     /* Use 'v' which is rare in pinyin */
     const char * rare_inputs[] = {"v", "v"};
-    for(uint8_t j = 0; j < 2; j++) {
-        press_button_by_text(g_kb, rare_inputs[j]);
-    }
+    input_text_sequence(g_kb, rare_inputs, 2);
 
     /* Should have very few or no candidates */
     /* The function handles this gracefully */
@@ -1591,22 +1535,306 @@ void test_ime_pinyin_k9_full_pagination(void)
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
-    /* Input multiple K9 digits to generate many legal pinyin combinations */
-    const char * k9_inputs[] = {"2", "4"};  /* 'a' and 'h' */
-    input_text_sequence(g_kb, k9_inputs, 2);
+    /*
+     * Input K9 keys to generate many legal pinyin combinations
+     * K9 keyboard mapping: "abc "=2, "def"=3, "ghi"=4, "jkl"=5, "mno"=6, "pqrs"=7, "tuv"=8, "wxyz"=9
+     * Input "def" + "abc " + "ghi" generates combinations like: dai, dan, dao, fai, fan, fao, etc.
+     * This should produce more than LV_IME_PINYIN_K9_CAND_TEXT_NUM (3) candidates
+     */
+    const char * k9_inputs[] = {"def", "abc ", "ghi"};
+    input_text_sequence(g_kb, k9_inputs, 3);
 
     /* Check if we have enough candidates for pagination */
     if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
         /* Store initial position */
         int initial_pos = ime->k9_py_ll_pos;
 
-        /* Try next page */
+        /* Try next page (dir=1) - covers lines 1160-1174 */
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
         /* Position should have changed */
         TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= initial_pos);
 
-        /* Try previous page */
+        /* Try next page again to ensure we're past first page */
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+
+        /* Try previous page (dir=0) - covers lines 1179-1193 */
         press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 pagination edge cases */
+void test_ime_pinyin_k9_pagination_edge_cases(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /*
+     * Input multiple K9 keys to generate many candidates
+     * "ghi" + "abc " + "mno" + "ghi" -> generates combinations like: hang, gang, hao, gao, etc.
+     */
+    const char * k9_inputs[] = {"ghi", "abc ", "mno", "ghi"};
+    input_text_sequence(g_kb, k9_inputs, 4);
+
+    /* Navigate pages if enough candidates */
+    if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+        /* Navigate forward multiple times */
+        for(int i = 0; i < 5; i++) {
+            press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        }
+
+        /* Navigate backward multiple times */
+        for(int i = 0; i < 5; i++) {
+            press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+        }
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 pagination with different input patterns */
+void test_ime_pinyin_k9_pagination_various_inputs(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Try different input patterns that generate many candidates */
+    /* Pattern 1: "jkl" + "ghi" + "abc " + "mno" */
+    const char * inputs1[] = {"jkl", "ghi", "abc ", "mno"};
+    input_text_sequence(g_kb, inputs1, 4);
+
+    if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+        /* Forward navigation */
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        /* Backward navigation */
+        press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+    }
+
+    /* Clear input and try another pattern */
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
+    press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
+
+    /* Pattern 2: "mno" + "ghi" + "abc " + "mno" */
+    const char * inputs2[] = {"mno", "ghi", "abc ", "mno"};
+    input_text_sequence(g_kb, inputs2, 4);
+
+    if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+        press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 pagination with long input generating many candidates */
+void test_ime_pinyin_k9_pagination_many_candidates(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /*
+     * Use input that generates maximum candidates
+     * "pqrs" + "ghi" + "mno" + "ghi" -> generates: shou, shong, etc.
+     */
+    const char * k9_inputs[] = {"pqrs", "ghi", "mno", "ghi"};
+    input_text_sequence(g_kb, k9_inputs, 4);
+
+    uint32_t ll_len = lv_ll_get_len(&ime->k9_legal_py_ll);
+
+    /* Only test pagination if we have enough candidates */
+    if((ll_len > LV_IME_PINYIN_K9_CAND_TEXT_NUM) &&
+       (ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM)) {
+
+        /* Store initial position */
+        int initial_pos = ime->k9_py_ll_pos;
+
+        /* Navigate forward to last page */
+        for(int i = 0; i < 10; i++) {
+            int prev_pos = ime->k9_py_ll_pos;
+            press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+            /* If position didn't change, we reached the end */
+            if(ime->k9_py_ll_pos == prev_pos) {
+                break;
+            }
+        }
+
+        /* Navigate backward to first page */
+        for(int i = 0; i < 10; i++) {
+            press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+            /* If position is close to initial, stop */
+            if(ime->k9_py_ll_pos <= initial_pos + LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+                break;
+            }
+        }
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 mode candidate selection (covers lines 634-646) */
+void test_ime_pinyin_k9_candidate_selection(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input K9 keys to generate candidates */
+    const char * k9_inputs[] = {"def", "abc "};
+    input_text_sequence(g_kb, k9_inputs, 2);
+
+    /* If we have candidates, try selecting one (btn_id >= 16) */
+    if(ime->k9_legal_py_count > 0) {
+        /* Candidate buttons are in the range 16 to 16 + LV_IME_PINYIN_K9_CAND_TEXT_NUM */
+        /* Button 16 is LV_SYMBOL_LEFT, button 17-19 are candidates */
+        for(uint16_t i = 17; i < 17 + LV_IME_PINYIN_K9_CAND_TEXT_NUM; i++) {
+            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
+            if(txt && lv_strlen(txt) > 0 && txt[0] != ' ') {
+                /* Select this candidate pinyin */
+                lv_buttonmatrix_set_selected_button(g_kb, i);
+                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+                break;
+            }
+        }
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 NUMBER mode switching (covers lines 704-705) */
+void test_ime_pinyin_k9_number_mode_switch(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+
+    /* First set up K9 mode */
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Press "123" to switch to K9_NUMBER mode */
+    press_button_by_text(g_kb, "123");
+
+    /* Verify mode changed to K9_NUMBER */
+    TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
+
+    /* Now press keyboard button to switch back (from K9_NUMBER to K9) */
+    /* In NUMBER mode keyboard, LV_SYMBOL_KEYBOARD is at button index 3 */
+    /* First verify the button text is correct */
+    const char * btn_txt = lv_buttonmatrix_get_button_text(g_kb, 3);
+    if(btn_txt && lv_strcmp(btn_txt, LV_SYMBOL_KEYBOARD) == 0) {
+        lv_buttonmatrix_set_selected_button(g_kb, 3);
+        lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+
+        /* Verify mode changed back to K9 */
+        TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9, ime->mode);
+    }
+    else {
+        /* Try to find keyboard button by searching */
+        for(uint16_t i = 0; i < 20; i++) {
+            const char * txt = lv_buttonmatrix_get_button_text(g_kb, i);
+            if(txt && lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
+                lv_buttonmatrix_set_selected_button(g_kb, i);
+                lv_obj_send_event(g_kb, LV_EVENT_VALUE_CHANGED, NULL);
+                break;
+            }
+        }
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 page navigation reaching boundaries (covers lines 817-840) */
+void test_ime_pinyin_page_navigation_boundaries(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input pinyin that generates many candidates to test pagination */
+    /* 'shi' has many candidates in the dictionary */
+    press_button_by_text(g_kb, "s");
+    press_button_by_text(g_kb, "h");
+    press_button_by_text(g_kb, "i");
+
+    if(ime->cand_num > LV_IME_PINYIN_CAND_TEXT_NUM) {
+        /* Navigate forward multiple pages */
+        uint16_t page_num = ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
+        for(int i = 0; i <= (int)page_num + 1; i++) {
+            press_button_by_text(ime->cand_panel, LV_SYMBOL_RIGHT);
+        }
+
+        /* Now try forward again at last page (should hit return at line 825) */
+        press_button_by_text(ime->cand_panel, LV_SYMBOL_RIGHT);
+        /* Page shouldn't change at boundary */
+
+        /* Navigate back multiple pages */
+        for(int i = 0; i <= (int)page_num + 1; i++) {
+            press_button_by_text(ime->cand_panel, LV_SYMBOL_LEFT);
+        }
+
+        /* Verify we're back at first page */
+        TEST_ASSERT_EQUAL(0, ime->py_page);
+    }
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 input length boundary (covers line 1004) */
+void test_ime_pinyin_k9_max_input_length(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Input maximum length K9 sequence (LV_IME_PINYIN_K9_MAX_INPUT = 7) */
+    const char * k9_inputs[] = {"def", "abc ", "ghi", "jkl", "mno", "pqrs", "tuv"};
+    input_text_sequence(g_kb, k9_inputs, 7);
+
+    /* After 7 inputs, further input should be ignored */
+    press_button_by_text(g_kb, "wxyz");
+    uint16_t len_after = lv_strlen(ime->input_char);
+
+    /* Length should not increase beyond max */
+    TEST_ASSERT_TRUE(len_after <= LV_IME_PINYIN_K9_MAX_INPUT);
+
+    lv_obj_delete(local_ta);
+}
+
+/* Test K9 pagination with exact boundary conditions */
+void test_ime_pinyin_k9_pagination_exact_boundary(void)
+{
+    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
+
+    lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
+
+    /* Use input pattern that generates exactly enough candidates */
+    /* "pqrs" + "ghi" generates: qh, qi, ph, pi, sh, si, rh, ri */
+    const char * k9_inputs[] = {"pqrs", "ghi"};
+    input_text_sequence(g_kb, k9_inputs, 2);
+
+    /* Navigate pages multiple times to hit boundary conditions */
+    if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
+        /* Forward navigation */
+        for(int i = 0; i < 20; i++) {
+            press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
+        }
+        /* Backward navigation many times - should hit line 1193 */
+        for(int i = 0; i < 20; i++) {
+            press_button_by_text(g_kb, LV_SYMBOL_LEFT);
+        }
     }
 
     lv_obj_delete(local_ta);
