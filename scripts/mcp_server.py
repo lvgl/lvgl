@@ -395,7 +395,7 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
     Returns:
         List of TextContent with GDB debug output
     """
-    test_name = arguments.get("test_name", "ime_pinyin")
+    test_name = arguments.get("test_name", "")
     breakpoint_loc = arguments.get("breakpoint", "")
     commands = arguments.get("commands", ["bt", "info locals", "continue"])
     max_hits = arguments.get("max_hits", 3)
@@ -407,6 +407,29 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
 
     # Find test executable
     build_dir = os.path.join(LVGL_ROOT, "tests", "build_test_sysheap")
+
+    # If test_name is empty, list available tests
+    if not test_name:
+        available = glob.glob(os.path.join(build_dir, "test_*"))
+        if available:
+            test_names = [
+                os.path.basename(t).replace("test_", "")
+                for t in available
+                if os.path.isfile(t)
+            ]
+            return [
+                TextContent(
+                    type="text",
+                    text=f"Error: 'test_name' parameter is required.\nAvailable tests: {', '.join(sorted(test_names))}",
+                )
+            ]
+        return [
+            TextContent(
+                type="text",
+                text="Error: 'test_name' parameter is required and no test executables found in build directory.",
+            )
+        ]
+
     test_exe = os.path.join(build_dir, f"test_{test_name}")
 
     if not os.path.exists(test_exe):
@@ -651,7 +674,7 @@ def generate_mcp_config(output_dir: str, server_name: str = "lvgl-test") -> bool
         "servers": {
             server_name: {
                 "type": "stdio",
-                "command": "python3",
+                "command": sys.executable,
                 "args": [script_path],
                 "env": {},
             }
