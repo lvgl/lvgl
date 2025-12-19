@@ -40,8 +40,6 @@ jobs:
       run:  scripts/install_pngquant.sh
     - name: Verify the environment dependency installation
       run: scripts/run_tests.sh --skip-tests
-    - name: Test MCP server scripts
-      run: python scripts/mcp_server.py --self-test
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
@@ -127,6 +125,8 @@ jobs:
       run: scripts/install_pngquant.sh
     - name: Verify the environment dependency installation
       run: scripts/run_tests.sh --skip-tests
+    - name: Test MCP server scripts
+      run: python scripts/mcp_server.py --self-test
     - name: Fix kernel mmap rnd bits
       # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are
