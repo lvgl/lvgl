@@ -685,8 +685,8 @@ void test_ime_pinyin_empty_input(void)
 /* Test K9 full input scenario with keyboard button simulation */
 void test_ime_pinyin_k9_event_input(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -700,14 +700,14 @@ void test_ime_pinyin_k9_event_input(void)
     /* Verify K9 input processing occurred */
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test keyboard event handling with button matrix simulation */
 void test_ime_pinyin_keyboard_events(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -726,15 +726,15 @@ void test_ime_pinyin_keyboard_events(void)
     lv_obj_send_event(g_pinyin_ime, LV_EVENT_FOCUSED, NULL);
     lv_obj_send_event(g_pinyin_ime, LV_EVENT_DEFOCUSED, NULL);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
     TEST_PASS_MESSAGE("Keyboard event handling completed");
 }
 
 /* Test K9 candidate page navigation with button simulation */
 void test_ime_pinyin_k9_page_nav_events(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -754,14 +754,14 @@ void test_ime_pinyin_k9_page_nav_events(void)
     /* Verify state is valid */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test candidate selection through button matrix */
 void test_ime_pinyin_cand_selection(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -779,15 +779,15 @@ void test_ime_pinyin_cand_selection(void)
         lv_obj_send_event(ime->cand_panel, LV_EVENT_VALUE_CHANGED, NULL);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
     TEST_PASS_MESSAGE("Candidate selection test completed");
 }
 
 /* Test K9 number mode with direct mode setting */
 void test_ime_pinyin_k9_number_events(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     /* Directly set to K9_NUMBER mode */
@@ -798,14 +798,14 @@ void test_ime_pinyin_k9_number_events(void)
     /* Verify IME mode is set correctly */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K26 letter key processing */
 void test_ime_pinyin_k26_letter_keys(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -819,14 +819,14 @@ void test_ime_pinyin_k26_letter_keys(void)
     /* Verify input was processed */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 letter key processing with abc/def/ghi buttons */
 void test_ime_pinyin_k9_letter_keys(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -844,14 +844,14 @@ void test_ime_pinyin_k9_letter_keys(void)
         TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test backspace key in K26 mode */
 void test_ime_pinyin_k26_backspace_key(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -868,14 +868,14 @@ void test_ime_pinyin_k26_backspace_key(void)
     /* Verify ta_count decreased or cleared */
     TEST_ASSERT_EQUAL_UINT16(1, ime->ta_count);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test Enter key in K26 mode */
 void test_ime_pinyin_k26_enter_key(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -894,14 +894,14 @@ void test_ime_pinyin_k26_enter_key(void)
     /* Verify data was cleared */
     TEST_ASSERT_EQUAL(0, ime->ta_count);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test mode switch button (ABC/abc/123) */
 void test_ime_pinyin_mode_switch_buttons(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -918,14 +918,14 @@ void test_ime_pinyin_mode_switch_buttons(void)
     /* Verify data was cleared (mode switch clears input) */
     TEST_ASSERT_EQUAL(0, ime->ta_count);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test keyboard mode switch button */
 void test_ime_pinyin_keyboard_switch_button(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -938,14 +938,14 @@ void test_ime_pinyin_keyboard_switch_button(void)
     /* Verify mode is valid (K26 -> K9 or vice versa) */
     TEST_ASSERT_LESS_OR_EQUAL_INT(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test candidate panel page navigation buttons */
 void test_ime_pinyin_cand_page_buttons(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -969,14 +969,14 @@ void test_ime_pinyin_cand_page_buttons(void)
 
     TEST_ASSERT_NOT_NULL(cand_panel);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 candidate button selection */
 void test_ime_pinyin_k9_candidate_button(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -993,14 +993,14 @@ void test_ime_pinyin_k9_candidate_button(void)
 
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 backspace with multiple characters */
 void test_ime_pinyin_k9_backspace_multi(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1019,14 +1019,14 @@ void test_ime_pinyin_k9_backspace_multi(void)
     /* After backspace, ta_count should decrease */
     TEST_ASSERT_LESS_THAN_UINT16(3, ime->ta_count);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test ABC/abc/1# mode switch buttons */
 void test_ime_pinyin_abc_buttons(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -1041,14 +1041,14 @@ void test_ime_pinyin_abc_buttons(void)
        They are keyboard mode switch buttons that trigger clear_data */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test 123 number mode button */
 void test_ime_pinyin_123_button(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1061,14 +1061,14 @@ void test_ime_pinyin_123_button(void)
     /* Should switch to K9_NUMBER mode */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test keyboard switch from K9_NUMBER to K9 */
 void test_ime_pinyin_keyboard_switch_from_number(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9_NUMBER);
@@ -1081,14 +1081,14 @@ void test_ime_pinyin_keyboard_switch_from_number(void)
     /* Should switch to K9 mode */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9, ime->mode);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 candidate panel page navigation (next page) */
 void test_ime_pinyin_k9_page_next(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1111,14 +1111,14 @@ void test_ime_pinyin_k9_page_next(void)
         TEST_ASSERT_GREATER_OR_EQUAL_UINT16(old_pos, ime->k9_py_ll_pos);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 candidate panel page navigation (previous page) */
 void test_ime_pinyin_k9_page_prev(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1144,14 +1144,14 @@ void test_ime_pinyin_k9_page_prev(void)
         TEST_ASSERT_LESS_OR_EQUAL_UINT16(old_pos, ime->k9_py_ll_pos);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test selecting K9 candidate from button matrix */
 void test_ime_pinyin_k9_select_candidate(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1171,14 +1171,14 @@ void test_ime_pinyin_k9_select_candidate(void)
     /* Input should be processed */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test pinyin search with single character */
 void test_ime_pinyin_search_single_char(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -1191,14 +1191,14 @@ void test_ime_pinyin_search_single_char(void)
     /* verify valid state */
     TEST_ASSERT_EQUAL_UINT16(1, ime->cand_num);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 candidate button selection (lines 634-646) */
 void test_ime_pinyin_k9_cand_button_select(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1218,14 +1218,14 @@ void test_ime_pinyin_k9_cand_button_select(void)
         press_k9_candidate_button(g_kb, 16, 19);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination forward and backward (lines 1142-1196) */
 void test_ime_pinyin_k9_pagination_full(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1253,14 +1253,14 @@ void test_ime_pinyin_k9_pagination_full(void)
         TEST_ASSERT_LESS_OR_EQUAL_INT(old_pos, ime->k9_py_ll_pos);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test empty candidate list branch (line 786) */
 void test_ime_pinyin_empty_candidates(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -1275,14 +1275,14 @@ void test_ime_pinyin_empty_candidates(void)
     /* The code should handle empty candidate list gracefully */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 input length boundary (line 1004) */
 void test_ime_pinyin_k9_input_length_boundary(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1303,14 +1303,14 @@ void test_ime_pinyin_k9_input_length_boundary(void)
     /* Length should not exceed max */
     TEST_ASSERT_LESS_OR_EQUAL_SIZE_T(LV_IME_PINYIN_K9_MAX_INPUT, lv_strlen(ime->input_char));
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test pinyin page previous when at first page (line 817) */
 void test_ime_pinyin_page_prev_at_start(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -1330,14 +1330,14 @@ void test_ime_pinyin_page_prev_at_start(void)
     /* Should still be at page 0 */
     TEST_ASSERT_EQUAL(0, ime->py_page);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test search with no match (line 930) */
 void test_ime_pinyin_search_no_match(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K26);
@@ -1353,14 +1353,14 @@ void test_ime_pinyin_search_no_match(void)
     /* The function handles this gracefully */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 candidate list empty case (line 1115) */
 void test_ime_pinyin_k9_cand_empty(void)
 {
-    lv_obj_t * local_ta = lv_textarea_create(lv_screen_active());
-    lv_keyboard_set_textarea(g_kb, local_ta);
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
+    lv_keyboard_set_textarea(g_kb, ta);
 
     lv_ime_pinyin_set_keyboard(g_pinyin_ime, g_kb);
     lv_ime_pinyin_set_mode(g_pinyin_ime, LV_IME_PINYIN_MODE_K9);
@@ -1377,13 +1377,13 @@ void test_ime_pinyin_k9_cand_empty(void)
     TEST_ASSERT_EQUAL(0, lv_strlen(ime->input_char));
     TEST_ASSERT_EQUAL(0, ime->k9_legal_py_count);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 backspace in K9 mode (lines 667-668) */
 void test_ime_pinyin_k9_backspace_in_mode(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1398,13 +1398,13 @@ void test_ime_pinyin_k9_backspace_in_mode(void)
     /* Input should be modified */
     TEST_ASSERT_LESS_THAN_SIZE_T(3, lv_strlen(ime->input_char));
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test ABC/abc/1# button press (lines 686-687) */
 void test_ime_pinyin_abc_button_press(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1419,32 +1419,32 @@ void test_ime_pinyin_abc_button_press(void)
     /* Data should be cleared */
     TEST_ASSERT_EQUAL(0, lv_strlen(ime->input_char));
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test 123 button press (lines 690-691, 704-705) */
 void test_ime_pinyin_123_button_press(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Add some text to textarea first to trigger delete logic */
-    lv_textarea_add_text(local_ta, "test123");
+    lv_textarea_add_text(ta, "test123");
 
     /* Press 123 button - should delete 3 chars and switch to number mode */
     press_button_by_text(g_kb, "123");
     /* Should be in number mode */
     TEST_ASSERT_EQUAL(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test cand panel button none (line 758) */
 void test_ime_pinyin_cand_button_none(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1460,13 +1460,13 @@ void test_ime_pinyin_cand_button_none(void)
     /* Should handle gracefully */
     TEST_ASSERT_NOT_NULL(cand_panel);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test pinyin page with page_num calculation (lines 817, 822, 825) */
 void test_ime_pinyin_page_calculation(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1486,13 +1486,13 @@ void test_ime_pinyin_page_calculation(void)
     /* Verify page state is valid */
     TEST_ASSERT_NOT_NULL(ime);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 specific candidate button range (lines 634-646) */
 void test_ime_pinyin_k9_exact_cand_button(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1501,7 +1501,7 @@ void test_ime_pinyin_k9_exact_cand_button(void)
     press_button_by_text(g_kb, "4");  /* 'h' in K9 */
 
     /* Add text to textarea to have ta_count > 0 */
-    lv_textarea_add_text(local_ta, "test");
+    lv_textarea_add_text(ta, "test");
     ime->ta_count = 4;
 
     /* Now try to click button in range 16-18 (K9 candidate buttons) */
@@ -1519,13 +1519,13 @@ void test_ime_pinyin_k9_exact_cand_button(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination with enough candidates (lines 1142-1196) */
 void test_ime_pinyin_k9_full_pagination(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1556,13 +1556,13 @@ void test_ime_pinyin_k9_full_pagination(void)
         press_button_by_text(g_kb, LV_SYMBOL_LEFT);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination edge cases */
 void test_ime_pinyin_k9_pagination_edge_cases(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1587,13 +1587,13 @@ void test_ime_pinyin_k9_pagination_edge_cases(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination with different input patterns */
 void test_ime_pinyin_k9_pagination_various_inputs(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1626,13 +1626,13 @@ void test_ime_pinyin_k9_pagination_various_inputs(void)
         press_button_by_text(g_kb, LV_SYMBOL_LEFT);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination with long input generating many candidates */
 void test_ime_pinyin_k9_pagination_many_candidates(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1673,13 +1673,13 @@ void test_ime_pinyin_k9_pagination_many_candidates(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 mode candidate selection (covers lines 634-646) */
 void test_ime_pinyin_k9_candidate_selection(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1703,13 +1703,13 @@ void test_ime_pinyin_k9_candidate_selection(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 NUMBER mode switching (covers lines 704-705) */
 void test_ime_pinyin_k9_number_mode_switch(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
 
     /* First set up K9 mode */
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
@@ -1745,13 +1745,13 @@ void test_ime_pinyin_k9_number_mode_switch(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 page navigation reaching boundaries (covers lines 817-840) */
 void test_ime_pinyin_page_navigation_boundaries(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K26);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1782,13 +1782,13 @@ void test_ime_pinyin_page_navigation_boundaries(void)
         TEST_ASSERT_EQUAL(0, ime->py_page);
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 input length boundary (covers line 1004) */
 void test_ime_pinyin_k9_max_input_length(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1804,13 +1804,13 @@ void test_ime_pinyin_k9_max_input_length(void)
     /* Length should not increase beyond max */
     TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, len_after);
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 /* Test K9 pagination with exact boundary conditions */
 void test_ime_pinyin_k9_pagination_exact_boundary(void)
 {
-    lv_obj_t * local_ta = create_test_textarea(g_kb);
+    lv_obj_t * ta = create_test_textarea(g_kb);
     setup_ime_mode(g_pinyin_ime, g_kb, LV_IME_PINYIN_MODE_K9);
 
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
@@ -1832,7 +1832,7 @@ void test_ime_pinyin_k9_pagination_exact_boundary(void)
         }
     }
 
-    lv_obj_delete(local_ta);
+    lv_obj_delete(ta);
 }
 
 #endif
