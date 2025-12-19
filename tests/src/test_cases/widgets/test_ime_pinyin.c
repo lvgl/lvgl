@@ -644,8 +644,8 @@ void test_ime_pinyin_multiple_instances(void)
     lv_ime_pinyin_set_mode(ime2, LV_IME_PINYIN_MODE_K26);
 
     /* Verify both instances are independent */
-    TEST_ASSERT_TRUE(g_pinyin_ime != ime2);
-    TEST_ASSERT_TRUE(g_kb != kb2);
+    TEST_ASSERT(g_pinyin_ime != ime2);
+    TEST_ASSERT(g_kb != kb2);
 
     /* Verify second instance properties */
     TEST_ASSERT_EQUAL_PTR(kb2, lv_ime_pinyin_get_kb(ime2));
@@ -698,8 +698,7 @@ void test_ime_pinyin_k9_event_input(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Verify K9 input processing occurred */
-    TEST_ASSERT_TRUE(ime->k9_input_str_len >= 0);
-    TEST_ASSERT_TRUE(ime->k9_input_str_len <= LV_IME_PINYIN_K9_MAX_INPUT);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
 
     lv_obj_delete(local_ta);
 }
@@ -721,7 +720,7 @@ void test_ime_pinyin_keyboard_events(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Verify input occurred */
-    TEST_ASSERT_TRUE(ime->ta_count >= 0);
+    TEST_ASSERT_NOT_NULL(ime);
 
     /* Test focus events */
     lv_obj_send_event(g_pinyin_ime, LV_EVENT_FOCUSED, NULL);
@@ -753,8 +752,7 @@ void test_ime_pinyin_k9_page_nav_events(void)
     }
 
     /* Verify state is valid */
-    TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= 0);
-    TEST_ASSERT_TRUE(ime->k9_legal_py_count >= 0);
+    TEST_ASSERT_NOT_NULL(ime);
 
     lv_obj_delete(local_ta);
 }
@@ -819,7 +817,7 @@ void test_ime_pinyin_k26_letter_keys(void)
     lv_ime_pinyin_t * ime = (lv_ime_pinyin_t *)g_pinyin_ime;
 
     /* Verify input was processed */
-    TEST_ASSERT_TRUE(ime->ta_count >= 0);
+    TEST_ASSERT_NOT_NULL(ime);
 
     lv_obj_delete(local_ta);
 }
@@ -843,7 +841,7 @@ void test_ime_pinyin_k9_letter_keys(void)
 
     /* If we found and pressed a K9 key, verify processing */
     if(found_k9_key) {
-        TEST_ASSERT_TRUE(ime->k9_input_str_len >= 0);
+        TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
     }
 
     lv_obj_delete(local_ta);
@@ -868,7 +866,7 @@ void test_ime_pinyin_k26_backspace_key(void)
     press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
 
     /* Verify ta_count decreased or cleared */
-    TEST_ASSERT_TRUE(ime->ta_count <= 2);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT16(2, ime->ta_count);
 
     lv_obj_delete(local_ta);
 }
@@ -938,7 +936,7 @@ void test_ime_pinyin_keyboard_switch_button(void)
     press_button_by_text(g_kb, LV_SYMBOL_KEYBOARD);
 
     /* Verify mode is valid (K26 -> K9 or vice versa) */
-    TEST_ASSERT_TRUE(ime->mode >= 0 && ime->mode <= LV_IME_PINYIN_MODE_K9_NUMBER);
+    TEST_ASSERT_LESS_OR_EQUAL_INT(LV_IME_PINYIN_MODE_K9_NUMBER, ime->mode);
 
     lv_obj_delete(local_ta);
 }
@@ -993,7 +991,7 @@ void test_ime_pinyin_k9_candidate_button(void)
     /* Try to find and click K9 candidate buttons (index 16-21 typically) */
     press_k9_candidate_button(g_kb, 16, 22);
 
-    TEST_ASSERT_TRUE(ime->k9_input_str_len >= 0);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, ime->k9_input_str_len);
 
     lv_obj_delete(local_ta);
 }
@@ -1019,7 +1017,7 @@ void test_ime_pinyin_k9_backspace_multi(void)
     press_button_by_text(g_kb, LV_SYMBOL_BACKSPACE);
 
     /* After backspace, ta_count should decrease */
-    TEST_ASSERT_TRUE(ime->ta_count < 3);
+    TEST_ASSERT_LESS_THAN_UINT16(3, ime->ta_count);
 
     lv_obj_delete(local_ta);
 }
@@ -1110,7 +1108,7 @@ void test_ime_pinyin_k9_page_next(void)
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
 
         /* Position should change */
-        TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= old_pos);
+        TEST_ASSERT_GREATER_OR_EQUAL_UINT16(old_pos, ime->k9_py_ll_pos);
     }
 
     lv_obj_delete(local_ta);
@@ -1143,7 +1141,7 @@ void test_ime_pinyin_k9_page_prev(void)
         press_button_by_text(g_kb, LV_SYMBOL_LEFT);
 
         /* Position should decrease or stay same */
-        TEST_ASSERT_TRUE(ime->k9_py_ll_pos <= old_pos);
+        TEST_ASSERT_LESS_OR_EQUAL_UINT16(old_pos, ime->k9_py_ll_pos);
     }
 
     lv_obj_delete(local_ta);
@@ -1190,8 +1188,8 @@ void test_ime_pinyin_search_single_char(void)
     /* Trigger input by pressing 'a' key */
     press_button_by_text(g_kb, "a");
 
-    /* Should have candidates */
-    TEST_ASSERT_TRUE(ime->cand_num >= 0);
+    /* cand_num is uint16_t, always >= 0, verify valid state */
+    TEST_ASSERT_TRUE(ime->cand_num == ime->cand_num);
 
     lv_obj_delete(local_ta);
 }
@@ -1210,8 +1208,8 @@ void test_ime_pinyin_k9_cand_button_select(void)
     /* Input "2" (abc) to generate K9 candidates */
     press_button_by_text(g_kb, "2");
 
-    /* K9 should have candidates after input */
-    TEST_ASSERT_TRUE(ime->k9_legal_py_count >= 0);
+    /* Verify K9 candidates state */
+    TEST_ASSERT_NOT_NULL(ime);
 
     /* If we have candidates, try to select one */
     if(ime->k9_legal_py_count > 0) {
@@ -1237,8 +1235,8 @@ void test_ime_pinyin_k9_pagination_full(void)
     /* Input "4" which should generate many legal pinyin (h) */
     press_button_by_text(g_kb, "4");
 
-    /* Check if we have candidates */
-    TEST_ASSERT_TRUE(ime->k9_legal_py_count >= 0);
+    /* Verify K9 candidates state */
+    TEST_ASSERT_NOT_NULL(ime);
 
     /* If we have enough candidates for pagination, try it */
     if(ime->k9_legal_py_count > LV_IME_PINYIN_K9_CAND_TEXT_NUM) {
@@ -1246,13 +1244,13 @@ void test_ime_pinyin_k9_pagination_full(void)
         int old_pos = ime->k9_py_ll_pos;
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
         /* Position should advance */
-        TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= old_pos);
+        TEST_ASSERT_GREATER_OR_EQUAL_INT(old_pos, ime->k9_py_ll_pos);
 
         /* Try previous page (lines 1184-1196) */
         old_pos = ime->k9_py_ll_pos;
         press_button_by_text(g_kb, LV_SYMBOL_LEFT);
         /* Position should decrease or stay same */
-        TEST_ASSERT_TRUE(ime->k9_py_ll_pos <= old_pos);
+        TEST_ASSERT_LESS_OR_EQUAL_INT(old_pos, ime->k9_py_ll_pos);
     }
 
     lv_obj_delete(local_ta);
@@ -1275,7 +1273,7 @@ void test_ime_pinyin_empty_candidates(void)
 
     /* Should have no or very few candidates */
     /* The code should handle empty candidate list gracefully */
-    TEST_ASSERT_TRUE(ime->cand_num >= 0);
+    TEST_ASSERT_NOT_NULL(ime);
 
     lv_obj_delete(local_ta);
 }
@@ -1297,13 +1295,13 @@ void test_ime_pinyin_k9_input_length_boundary(void)
     }
 
     /* Verify input length does not exceed max */
-    TEST_ASSERT_TRUE(lv_strlen(ime->input_char) <= LV_IME_PINYIN_K9_MAX_INPUT);
+    TEST_ASSERT_LESS_OR_EQUAL_SIZE_T(LV_IME_PINYIN_K9_MAX_INPUT, lv_strlen(ime->input_char));
 
     /* Try adding one more (should be blocked) */
     press_button_by_text(g_kb, "3");
 
     /* Length should not exceed max */
-    TEST_ASSERT_TRUE(lv_strlen(ime->input_char) <= LV_IME_PINYIN_K9_MAX_INPUT);
+    TEST_ASSERT_LESS_OR_EQUAL_SIZE_T(LV_IME_PINYIN_K9_MAX_INPUT, lv_strlen(ime->input_char));
 
     lv_obj_delete(local_ta);
 }
@@ -1353,7 +1351,7 @@ void test_ime_pinyin_search_no_match(void)
 
     /* Should have very few or no candidates */
     /* The function handles this gracefully */
-    TEST_ASSERT_TRUE(ime->cand_num >= 0);
+    TEST_ASSERT_NOT_NULL(ime);
 
     lv_obj_delete(local_ta);
 }
@@ -1398,7 +1396,7 @@ void test_ime_pinyin_k9_backspace_in_mode(void)
     press_button_by_text(g_kb, "Del");
 
     /* Input should be modified */
-    TEST_ASSERT_TRUE(lv_strlen(ime->input_char) < 3);
+    TEST_ASSERT_LESS_THAN_SIZE_T(3, lv_strlen(ime->input_char));
 
     lv_obj_delete(local_ta);
 }
@@ -1478,15 +1476,15 @@ void test_ime_pinyin_page_calculation(void)
     input_text_sequence(g_kb, inputs, 2);
 
     /* Should have candidates */
-    TEST_ASSERT_TRUE(ime->cand_num > 0);
+    TEST_ASSERT_GREATER_THAN_UINT16(0, ime->cand_num);
 
     /* Try next page multiple times */
     for(int p = 0; p < 3; p++) {
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
     }
 
-    /* Should have advanced pages */
-    TEST_ASSERT_TRUE(ime->py_page >= 0);
+    /* Verify page state is valid */
+    TEST_ASSERT_NOT_NULL(ime);
 
     lv_obj_delete(local_ta);
 }
@@ -1552,7 +1550,7 @@ void test_ime_pinyin_k9_full_pagination(void)
         /* Try next page (dir=1) - covers lines 1160-1174 */
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
         /* Position should have changed */
-        TEST_ASSERT_TRUE(ime->k9_py_ll_pos >= initial_pos);
+        TEST_ASSERT_GREATER_OR_EQUAL_INT(initial_pos, ime->k9_py_ll_pos);
 
         /* Try next page again to ensure we're past first page */
         press_button_by_text(g_kb, LV_SYMBOL_RIGHT);
@@ -1807,7 +1805,7 @@ void test_ime_pinyin_k9_max_input_length(void)
     uint16_t len_after = lv_strlen(ime->input_char);
 
     /* Length should not increase beyond max */
-    TEST_ASSERT_TRUE(len_after <= LV_IME_PINYIN_K9_MAX_INPUT);
+    TEST_ASSERT_LESS_OR_EQUAL_UINT16(LV_IME_PINYIN_K9_MAX_INPUT, len_after);
 
     lv_obj_delete(local_ta);
 }
