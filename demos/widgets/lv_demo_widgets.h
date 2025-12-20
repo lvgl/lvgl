@@ -41,6 +41,7 @@ extern "C" {
 void lv_demo_widgets(void);
 void lv_demo_widgets_start_slideshow(void);
 
+void lv_demo_widgets_with_args(const lv_demo_args_t * args);
 /**********************
  *      MACROS
  **********************/
