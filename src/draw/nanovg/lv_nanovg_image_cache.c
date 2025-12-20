@@ -221,8 +221,14 @@ static bool image_create_cb(image_item_t * item, void * user_data)
         return false;
     }
 
+    int flags = item->image_flags;
+    if(cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED
+       || lv_draw_buf_has_flag(&item->src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
+        flags |= NVG_IMAGE_PREMULTIPLIED;
+    }
+
     LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
-    int image_handle = nvgCreateImage(item->u->vg, w, h, item->image_flags, nvg_tex_type, data);
+    int image_handle = nvgCreateImage(item->u->vg, w, h, flags, nvg_tex_type, data);
     LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
     if(image_handle < 0) {
