@@ -1257,7 +1257,7 @@ static const lv_opengl_shader_t src_includes[] = {
         uniform ivec2 u_ScreenSize;
         #endif
 
-        uniform mat4 u_ModelMatrix;
+        uniform highp mat4 u_ModelMatrix;
         uniform mat4 u_ViewMatrix;
         uniform mat4 u_ProjectionMatrix;
 
@@ -3410,7 +3410,7 @@ static const lv_opengl_shader_t env_src_includes[] = {
 
 static const char * src_vertex_shader = R"(
     uniform mat4 u_ViewProjectionMatrix;
-    uniform mat4 u_ModelMatrix;
+    uniform highp mat4 u_ModelMatrix;
     uniform mat4 u_NormalMatrix;
 
     in vec3 a_position;
