@@ -151,6 +151,14 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .getter = lv_obj_get_scroll_snap_y,
     },
     {
+        .id = LV_PROPERTY_OBJ_SCROLL_X,
+        .getter = lv_obj_get_scroll_x,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_Y,
+        .getter = lv_obj_get_scroll_y,
+    },
+    {
         .id = LV_PROPERTY_OBJ_SCROLL_TOP,
         .getter = lv_obj_get_scroll_top,
     },
