@@ -21,6 +21,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+    lv_obj_clean(lv_screen_active());
 }
 
 void testSvgParser(void)
@@ -58,6 +59,28 @@ void testNodeTree(void)
 
     lv_svg_node_delete(node2);
     lv_svg_node_delete(root);
+}
+
+void test_property_is_inherited(void)
+{
+
+    /* Circle should not be filled as parent node as 'fill="none"' attribute*/
+    const char * svg =
+        "<svg width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" fill=\"none\">\n"
+        "<circle cx=\"100\" cy=\"100\" r=\"50\" stroke=\"black\"/>\n"
+        "</svg>";
+
+    static lv_image_dsc_t svg_dsc;
+    svg_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    svg_dsc.header.w = 200;
+    svg_dsc.header.h = 200;
+    svg_dsc.data_size = lv_strlen(svg);
+    svg_dsc.data = (const uint8_t *) svg;
+
+    lv_obj_t * svg_img = lv_image_create(lv_screen_active());
+    lv_image_set_src(svg_img, &svg_dsc);
+    lv_obj_center(svg_img);
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.png");
 }
 
 void testSvgElement(void)
