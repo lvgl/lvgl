@@ -300,14 +300,6 @@ static void canvas_fbo_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
             }
             break;
 
-        case LV_COLOR_FORMAT_RGB565:
-            /* RGB565: directly compatible with GL */
-            for(int32_t y = 0; y < h; y++) {
-                void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
-                glReadPixels(0, y, w, 1, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, row);
-            }
-            break;
-
         default:
             LV_LOG_WARN("Canvas color format %d not supported for NanoVG readback", draw_buf->header.cf);
             break;
