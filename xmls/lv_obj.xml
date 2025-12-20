@@ -30,6 +30,7 @@ Example
 		    <enum name="floating"        help="Do not scroll the object when the parent scrolls and ignore layout"/>
 		    <enum name="send_draw_task_events" help="Send `LV_EVENT_DRAW_TASK_ADDED` events"/>
 		    <enum name="overflow_visible" help="Do not clip the children to the parent's ext draw size"/>
+		    <enum name="radio_button"   help="Allow only one radio_button sibling to be checked"/>
 		    <enum name="flex_in_new_track" help="Start a new flex track on this item"/>
 		    <enum name="layout_1"        help="Custom flag, free to use by layouts"/>
 		    <enum name="layout_2"        help="Custom flag, free to use by layouts"/>
@@ -382,6 +383,8 @@ Example
         <prop name="floating"            type="flag:flag lv_obj_flag" help="Do not scroll the object when the parent scrolls and ignore layout"/>
         <prop name="send_draw_task_events" type="flag:flag lv_obj_flag" help="Send `LV_EVENT_DRAW_TASK_ADDED` events"/>
         <prop name="overflow_visible"    type="flag:flag lv_obj_flag" help="Do not clip the children to the parent's ext draw size"/>
+        <prop name="radio_button"        type="flag:flag lv_obj_flag" help="Allow only one radio_button sibling to be checked"/>
+
         <prop name="flex_in_new_track"   type="flag:flag lv_obj_flag" help="Start a new flex track on this item"/>
 
         <prop name="bind_checked"        type="subject" help="Bind widget’s checked state to a subject"/>
