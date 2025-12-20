@@ -47,7 +47,6 @@ lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thr
                            void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
-    LV_UNUSED(name);
     static const osPriority_t prio_map[] = {
         [LV_THREAD_PRIO_LOWEST] = osPriorityLow,
         [LV_THREAD_PRIO_LOW] = osPriorityBelowNormal,
@@ -57,6 +56,7 @@ lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thr
     };
 
     osThreadAttr_t c_tThreadAttribute = {
+        .name = name,
         .stack_size = stack_size,
         .priority = prio_map[prio],
     };
