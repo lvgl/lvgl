@@ -138,6 +138,11 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
     lv_matrix_multiply(&global_matrix, &layer_matrix);
 #endif
 
+    /* NanoVG will output premultiplied image, set the flag correspondingly. */
+    if(layer->draw_buf) {
+        lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    }
+
     nvgReset(u->vg);
     lv_nanovg_transform(u->vg, &global_matrix);
 
@@ -223,43 +228,29 @@ static void on_layer_changed(lv_layer_t * new_layer)
     LV_PROFILER_DRAW_END;
 }
 
-/**
- * @brief Check if the layer is a canvas layer (needs FBO readback to CPU memory)
- * @param layer pointer to the layer
- * @return true if it's a canvas layer, false otherwise
- */
-static bool is_canvas_layer(lv_layer_t * layer)
-{
-    /* Canvas layer is detected when:
-     * 1. Not during display refresh (lv_refr_get_disp_refreshing() == NULL)
-     * 2. Layer has draw_buf (CPU memory buffer)
-     * This distinguishes canvas from:
-     * - Normal display rendering (disp refreshing != NULL)
-     * - Child layers created through LV_EVENT_CHILD_CREATED (they get FBO via user_data) */
-    if(lv_refr_get_disp_refreshing() != NULL) {
-        return false;  /* During display refresh, not a canvas */
-    }
-    return layer->draw_buf != NULL;
-}
-
-/**
- * @brief Read back FBO content to canvas draw_buf
- * @param u pointer to the nanovg unit
- * @param layer pointer to the canvas layer
- */
-static void canvas_fbo_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
+static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
 {
     LV_PROFILER_DRAW_BEGIN;
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(layer);
 
-    if(!layer->user_data || !layer->draw_buf) {
+    lv_cache_entry_t * entry = layer->user_data;
+
+    if(!entry) {
+        LV_LOG_WARN("No entry available for layer: %p", layer);
         LV_PROFILER_DRAW_END;
         return;
     }
 
-    lv_nanovg_end_frame(u);
+    if(!layer->draw_buf) {
+        LV_LOG_WARN("No draw buffer available for layer: %p", layer);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
-    struct NVGLUframebuffer * fb = lv_nanovg_fbo_cache_entry_to_fb(layer->user_data);
+    struct NVGLUframebuffer * fb = lv_nanovg_fbo_cache_entry_to_fb(entry);
     if(!fb) {
+        LV_LOG_ERROR("No framebuffer available for layer: %p", layer);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -272,52 +263,51 @@ static void canvas_fbo_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     /* Read pixels from FBO */
-    LV_PROFILER_DRAW_BEGIN_TAG("glReadPixels");
+    GLenum format;
+    GLenum type;
 
     /* OpenGL reads bottom-to-top, but LVGL expects top-to-bottom */
     switch(draw_buf->header.cf) {
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-            /* ARGB8888: read as BGRA directly (LVGL native format) */
-            for(int32_t y = 0; y < h; y++) {
-                void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
-                glReadPixels(0, y, w, 1, GL_BGRA, GL_UNSIGNED_BYTE, row);
-            }
+            format = GL_BGRA;
+            type = GL_UNSIGNED_BYTE;
             break;
 
         case LV_COLOR_FORMAT_RGB888:
-            /* RGB888: read as RGB, then swizzle to BGR (LVGL format) */
-            for(int32_t y = 0; y < h; y++) {
-                uint8_t * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
-                glReadPixels(0, y, w, 1, GL_RGB, GL_UNSIGNED_BYTE, row);
-                /* Swizzle RGB -> BGR */
-                for(int32_t x = 0; x < w; x++) {
-                    uint8_t tmp = row[x * 3 + 0];
-                    row[x * 3 + 0] = row[x * 3 + 2];
-                    row[x * 3 + 2] = tmp;
-                }
-            }
+            format = GL_RGB;
+            type = GL_UNSIGNED_BYTE;
             break;
 
         case LV_COLOR_FORMAT_RGB565:
-            /* RGB565: directly compatible with GL */
-            for(int32_t y = 0; y < h; y++) {
-                void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
-                glReadPixels(0, y, w, 1, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, row);
-            }
+            format = GL_RGB;
+            type = GL_UNSIGNED_SHORT_5_6_5;
             break;
 
         default:
-            LV_LOG_WARN("Canvas color format %d not supported for NanoVG readback", draw_buf->header.cf);
-            break;
+            LV_LOG_WARN("Unsupported color format: %d", draw_buf->header.cf);
+            return;
     }
 
-    LV_PROFILER_DRAW_END_TAG("glReadPixels");
+    for(uint32_t y = 0; y < h; y++) {
+        /* Reverse Y coordinate */
+        void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
+        LV_PROFILER_DRAW_BEGIN_TAG("glReadPixels");
+        glReadPixels(0, y, w, 1, format, type, row);
+        LV_PROFILER_DRAW_END_TAG("glReadPixels");
 
-    /* Release the FBO cache entry */
-    lv_nanovg_fbo_cache_release(u, layer->user_data);
-    layer->user_data = NULL;
+        if(draw_buf->header.cf == LV_COLOR_FORMAT_RGB888) {
+            /* Swizzle RGB -> BGR */
+            lv_color_t * px = row;
+            for(uint32_t x = 0; x < w; x++) {
+                uint8_t r = px->blue;
+                px->blue = px->red;
+                px->red = r;
+                px++;
+            }
+        }
+    }
 
     /* Bind back to default framebuffer */
     nvgluBindFramebuffer(NULL);
@@ -334,19 +324,8 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, NANOVG_DRAW_UNIT_ID);
     if(!t || t->preferred_draw_unit_id != NANOVG_DRAW_UNIT_ID) {
-        /* Before going idle, check if this is a canvas layer that needs readback */
-        if(u->current_layer == layer && is_canvas_layer(layer)) {
-            canvas_fbo_readback(u, layer);
-        }
         lv_nanovg_end_frame(u);
         return LV_DRAW_UNIT_IDLE;
-    }
-
-    /* For canvas layer, create temporary FBO if not yet created */
-    if(is_canvas_layer(layer) && !layer->user_data) {
-        lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
-                                                           lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_BGRA);
-        layer->user_data = entry;
     }
 
     if(u->current_layer != layer) {
@@ -449,6 +428,9 @@ static void draw_event_cb(lv_event_t * e)
                     layer->user_data = NULL;
                 }
             }
+            break;
+        case LV_EVENT_SCREEN_LOAD_START:
+            on_layer_readback(u, layer);
             break;
         default:
             break;

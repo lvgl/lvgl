@@ -461,8 +461,13 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->phy_clip_area = *area;
     layer->color_format = color_format;
 
-    if(disp->layer_init) disp->layer_init(disp, layer);
+    if(disp && disp->layer_init) disp->layer_init(disp, layer);
     lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
+
+    if(!disp) {
+        LV_PROFILER_DRAW_END;
+        return;
+    }
 
     if(disp->layer_head) {
         lv_layer_t * tail = disp->layer_head;
