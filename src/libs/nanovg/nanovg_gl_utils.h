@@ -35,7 +35,7 @@ struct NVGLUframebuffer {
 typedef struct NVGLUframebuffer NVGLUframebuffer;
 
 // Helper function to create GL frame buffer to render to.
-// format: NVG_TEXTURE_BGRA (default, LVGL compatible), NVG_TEXTURE_RGBA
+// format: see NVGtexture
 void nvgluBindFramebuffer(NVGLUframebuffer* fb);
 NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags, int format);
 void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
