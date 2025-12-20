@@ -40,6 +40,7 @@
 #define LV_GLTF_GAMMA_DARKEST   "0.8"
 
 #define LV_GLTF_DISTANCE_SCALE_FACTOR 2.5f
+#define LV_GLTF_TRANSMISSION_PASS_SIZE 256
 
 /* Apply defaults below if not set explicitly */
 
