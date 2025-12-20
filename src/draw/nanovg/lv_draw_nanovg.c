@@ -428,6 +428,14 @@ static void draw_event_cb(lv_event_t * e)
                     lv_nanovg_fbo_cache_release(u, entry);
                     layer->user_data = NULL;
                 }
+
+                /**
+                 * Clear current_layer if it's being deleted, so next dispatch
+                 * will properly call on_layer_changed even if layer address is reused
+                 */
+                if(u->current_layer == layer) {
+                    u->current_layer = NULL;
+                }
             }
             break;
         case LV_EVENT_SCREEN_LOAD_START:
