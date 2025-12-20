@@ -207,7 +207,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Wno-unreachable-code
         -Wno-gnu-zero-variadic-macro-arguments
         -Wunused-function
-	-Wno-overlength-strings
+	    -Wno-overlength-strings
     )
 else()
     list(APPEND COMPILE_OPTIONS
@@ -387,7 +387,13 @@ include_directories(${PNG_INCLUDE_DIR})
 if(NOT WIN32)
     # FFmpeg is optional for the image and video test cases
     find_package(PkgConfig)
-    pkg_check_modules(FFMPEG libavformat libavcodec libswscale libavutil)
+    pkg_check_modules(FFMPEG IMPORTED_TARGET
+        libavformat
+        libavcodec
+        libswscale
+        libavutil
+    )
+
     if(FFMPEG_FOUND)
         include_directories(${FFMPEG_INCLUDE_DIRS})
     else()
@@ -521,7 +527,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             ${WebP_LINK_LIBRARIES}
-            ${FFMPEG_LIBRARIES}
+            PkgConfig::FFMPEG
             m
             pthread
             ${TEST_LIBS})
