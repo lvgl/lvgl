@@ -377,17 +377,20 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(layer);
+    lv_layer_init(layer);
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->draw_buf == NULL) {
-        lv_layer_init(layer);
-        return;
-    }
+    if(canvas->draw_buf == NULL) return;
 
     lv_image_header_t * header = &canvas->draw_buf->header;
     lv_area_t canvas_area = {0, 0, header->w - 1,  header->h - 1};
 
-    lv_draw_layer_init(layer, NULL, header->cf, &canvas_area);
     layer->draw_buf = canvas->draw_buf;
+    layer->color_format = header->cf;
+    layer->buf_area = canvas_area;
+    layer->_clip_area = canvas_area;
+    layer->phy_clip_area = canvas_area;
+
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
