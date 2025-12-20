@@ -6,6 +6,10 @@ on:
 
 name: Create Release
 
+# Permissions required to create a release and upload assets
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Create Release
@@ -25,3 +29,37 @@ jobs:
             See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.rst)
           draft: false
           prerelease: false
+
+
+      # --- New Step: Remove large folders and create a lite zip ---
+      - name: Prepare Lite Package
+        run: |
+          echo "Removing large directories..."
+          # Remove specific directories shown in your screenshot
+          rm -rf tests
+          rm -rf demos
+          rm -rf scripts
+          rm -rf docs
+          rm -rf examples
+          
+          # Define the output filename using the tag (e.g., lvgl-lite-v9.3.0.zip)
+          ZIP_NAME="lvgl-lite-${{ github.ref_name }}.zip"
+          
+          echo "Zipping remaining files..."
+          # Zip current directory, excluding hidden git files
+          zip -r $ZIP_NAME . -x ".git/*" ".github/*"
+          
+          # Export the variable for the next step
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+      # --- New Step: Upload the lite zip to the release ---
+      - name: Upload Lite Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Use the upload URL from the create_release step
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.ZIP_NAME }}
+          asset_name: ${{ env.ZIP_NAME }}
+          asset_content_type: application/zip
