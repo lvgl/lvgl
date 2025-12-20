@@ -719,6 +719,7 @@ static int glnvg__renderCreate(void* uptr)
 		"		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
 		"		else if (texType == 2) color = vec4(color.x);"
 		"		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle
+		"		else if (texType == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
 		"		// Apply color tint and alpha.\n"
 		"		color *= innerCol;\n"
 		"		// Combine alpha\n"
@@ -735,6 +736,7 @@ static int glnvg__renderCreate(void* uptr)
 		"		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
 		"		else if (texType == 2) color = vec4(color.x);"
 		"		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle
+		"		else if (texType == 4) color = vec4(color.bgr, 1.0);"  // BGRX -> RGB with alpha=1
 		"		color *= scissor;\n"
 		"		result = color * innerCol;\n"
 		"	#endif\n"
@@ -826,8 +828,8 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	}
 #endif
 
-	if (type == NVG_TEXTURE_BGRA)
-		/* BGRA: upload as RGBA, shader will swizzle BGR->RGB */
+	if (type == NVG_TEXTURE_BGRA || type == NVG_TEXTURE_BGRX)
+		/* BGRA/BGRX: upload as RGBA, shader will swizzle BGR->RGB */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else if (type == NVG_TEXTURE_RGBA)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -919,7 +921,7 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, y);
 #else
 	// No support for all of skip, need to update a whole row at a time.
-	if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_RGBA)
+	if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_RGBA || tex->type == NVG_TEXTURE_BGRX)
 		data += y*tex->width*4;
 	else if (tex->type == NVG_TEXTURE_BGR)
 		data += y*tex->width*3;
@@ -931,8 +933,8 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 	w = tex->width;
 #endif
 
-	if (tex->type == NVG_TEXTURE_BGRA)
-		/* BGRA: upload as RGBA, shader will swizzle BGR->RGB */
+	if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGRX)
+		/* BGRA/BGRX: upload as RGBA, shader will swizzle BGR->RGB */
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else if (tex->type == NVG_TEXTURE_RGBA)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -1045,6 +1047,8 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
 		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_BGRX)
+			frag->s.texType = 4;  // BGRX -> RGB with alpha=1 in shader
 		else if (tex->type == NVG_TEXTURE_RGB565)
 			frag->s.texType = 0;  // RGB565 is directly compatible
 		else
@@ -1054,6 +1058,8 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
 		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3.0f;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_BGRX)
+			frag->s.texType = 4.0f;  // BGRX -> RGB with alpha=1 in shader
 		else if (tex->type == NVG_TEXTURE_RGB565)
 			frag->s.texType = 0.0f;  // RGB565 is directly compatible
 		else

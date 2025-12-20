@@ -624,10 +624,11 @@ int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, floa
 //
 enum NVGtexture {
 	NVG_TEXTURE_ALPHA = 0x01,
-	NVG_TEXTURE_BGRA = 0x02,   /* LVGL ARGB8888 format (memory order: B-G-R-A) */
+	NVG_TEXTURE_BGRA = 0x02,   /* ARGB8888 format (memory order: B-G-R-A) */
 	NVG_TEXTURE_RGBA = 0x03,   /* Standard OpenGL RGBA format */
-	NVG_TEXTURE_BGR = 0x04,    /* LVGL RGB888 format (memory order: B-G-R) */
-	NVG_TEXTURE_RGB565 = 0x05, /* LVGL RGB565 format */
+	NVG_TEXTURE_BGR = 0x04,    /* RGB888 format (memory order: B-G-R) */
+	NVG_TEXTURE_RGB565 = 0x05, /* RGB565 format */
+	NVG_TEXTURE_BGRX = 0x06,   /* XRGB8888 format (memory order: B-G-R-X, X ignored) */
 };
 
 struct NVGscissor {

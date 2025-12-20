@@ -187,11 +187,18 @@ static bool image_create_cb(image_item_t * item, void * user_data)
 
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-        case LV_COLOR_FORMAT_XRGB8888:
             if(stride == w * 4) {
                 /* Stride matches, use directly */
                 data = item->src_buf.data;
                 nvg_tex_type = NVG_TEXTURE_BGRA;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_XRGB8888:
+            if(stride == w * 4) {
+                /* XRGB8888: X channel ignored, alpha forced to 1.0 in shader */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_BGRX;
             }
             break;
 
