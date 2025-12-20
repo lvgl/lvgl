@@ -237,20 +237,20 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     lv_cache_entry_t * entry = layer->user_data;
 
     if(!entry) {
-        LV_LOG_WARN("No entry available for layer: %p", layer);
+        LV_LOG_WARN("No entry available for layer: %p", (void *)layer);
         LV_PROFILER_DRAW_END;
         return;
     }
 
     if(!layer->draw_buf) {
-        LV_LOG_WARN("No draw buffer available for layer: %p", layer);
+        LV_LOG_WARN("No draw buffer available for layer: %p", (void *)layer);
         LV_PROFILER_DRAW_END;
         return;
     }
 
     struct NVGLUframebuffer * fb = lv_nanovg_fbo_cache_entry_to_fb(entry);
     if(!fb) {
-        LV_LOG_ERROR("No framebuffer available for layer: %p", layer);
+        LV_LOG_ERROR("No framebuffer available for layer: %p", (void *)layer);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -287,10 +287,11 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
 
         default:
             LV_LOG_WARN("Unsupported color format: %d", draw_buf->header.cf);
+            LV_PROFILER_DRAW_END;
             return;
     }
 
-    for(uint32_t y = 0; y < h; y++) {
+    for(int32_t y = 0; y < h; y++) {
         /* Reverse Y coordinate */
         void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
         LV_PROFILER_DRAW_BEGIN_TAG("glReadPixels");
@@ -300,7 +301,7 @@ static void on_layer_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
         if(draw_buf->header.cf == LV_COLOR_FORMAT_RGB888) {
             /* Swizzle RGB -> BGR */
             lv_color_t * px = row;
-            for(uint32_t x = 0; x < w; x++) {
+            for(int32_t x = 0; x < w; x++) {
                 uint8_t r = px->blue;
                 px->blue = px->red;
                 px->red = r;
