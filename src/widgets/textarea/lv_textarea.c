@@ -449,6 +449,7 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
         lv_strcpy(ta->placeholder_txt, txt);
         ta->placeholder_txt[txt_len] = '\0';
 #endif
+    }
     lv_obj_invalidate(obj);
 }
 
