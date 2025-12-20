@@ -826,14 +826,9 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	}
 #endif
 
-	if (type == NVG_TEXTURE_BGRA) {
-#ifdef GL_BGRA
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
-#else
-		/* Fallback for platforms without GL_BGRA: use GL_RGBA */
+	if (type == NVG_TEXTURE_BGRA)
+		/* BGRA: upload as RGBA, shader will swizzle BGR->RGB */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-#endif
-	}
 	else if (type == NVG_TEXTURE_RGBA)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else if (type == NVG_TEXTURE_BGR)
@@ -931,13 +926,9 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 	w = tex->width;
 #endif
 
-	if (tex->type == NVG_TEXTURE_BGRA) {
-#ifdef GL_BGRA
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_BGRA, GL_UNSIGNED_BYTE, data);
-#else
+	if (tex->type == NVG_TEXTURE_BGRA)
+		/* BGRA: upload as RGBA, shader will swizzle BGR->RGB */
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
-#endif
-	}
 	else if (tex->type == NVG_TEXTURE_RGBA)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else if (tex->type == NVG_TEXTURE_BGR)
@@ -1043,16 +1034,16 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 		frag->s.type = NSVG_SHADER_FILLIMG;
 
 		#if NANOVG_GL_USE_UNIFORMBUFFER
-		if (tex->type == NVG_TEXTURE_RGBA || tex->type == NVG_TEXTURE_BGRA)
+		if (tex->type == NVG_TEXTURE_RGBA)
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
-		else if (tex->type == NVG_TEXTURE_BGR)
+		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3;  // BGR -> RGB swizzle in shader
 		else
 			frag->s.texType = 2;
 		#else
-		if (tex->type == NVG_TEXTURE_RGBA || tex->type == NVG_TEXTURE_BGRA)
+		if (tex->type == NVG_TEXTURE_RGBA)
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
-		else if (tex->type == NVG_TEXTURE_BGR)
+		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3.0f;  // BGR -> RGB swizzle in shader
 		else
 			frag->s.texType = 2.0f;
