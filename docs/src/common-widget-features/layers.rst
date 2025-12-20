@@ -7,9 +7,10 @@ Layers
 When the term "layer" is used in LVGL documentation, it may refer to one of several
 things:
 
-1.  for Widgets, the :ref:`layers_creation` creates a natural layering of Widgets;
-2.  in the context of pixel rendering (drawing), there are :ref:`draw_layers`;
-3.  permanent :ref:`display_screen_layers` are part of each :ref:`display` object.
+1.  For Widgets, the :ref:`layers_creation` creates a natural layering (Z-order) of
+    Widgets sharing the same parent.
+2.  In the context of pixel rendering (drawing), there are :ref:`draw_layers`.
+3.  Permanent :ref:`display_screen_layers` are part of each :ref:`display` object.
 
 #1 is covered below.  #2 and #3 are covered in :ref:`draw_layers` and
 :ref:`display_screen_layers` respectively.
@@ -38,17 +39,17 @@ its children.
 
    /* Create 2 buttons */
    lv_obj_t * btn1 = lv_button_create(scr);     /* Create the first button on the screen */
-   lv_obj_set_pos(btn1, 60, 40);                      /* Set the position of the first button */
+   lv_obj_set_pos(btn1, 60, 40);                /* Set the position of the first button */
 
    lv_obj_t * btn2 = lv_button_create(scr);     /* Create the second button on the screen */
-   lv_obj_set_pos(btn2, 180, 80);                     /* Set the position of the second button */
+   lv_obj_set_pos(btn2, 180, 80);               /* Set the position of the second button */
 
    /* Add labels to the buttons */
    lv_obj_t * label1 = lv_label_create(btn1);   /* Create a label on the first button */
-   lv_label_set_text(label1, "Button 1");             /* Set the text of the label */
+   lv_label_set_text(label1, "Button 1");       /* Set the text of the label */
 
    lv_obj_t * label2 = lv_label_create(btn2);   /* Create a label on the second button */
-   lv_label_set_text(label2, "Button 2");             /* Set the text of the label */
+   lv_label_set_text(label2, "Button 2");       /* Set the text of the label */
 
    /* Delete the second label */
    lv_obj_delete(label2);
@@ -59,17 +60,21 @@ its children.
 Changing Order
 --------------
 
-There are three explicit ways to bring a Widget to the foreground:
+There are three explicit ways to change a Widget's layer position (Z-order) among
+Widgets that share the same parent:
 
-- Use :cpp:expr:`lv_obj_move_to_index(widget, idx)` to move a Widget to a given index in the order of children.
+- Use :cpp:expr:`lv_obj_move_to_index(widget, idx)` to move a Widget to a new index.
 
-  - ``0``: background
-  - ``child_num - 1``: foreground
-  - ``< 0``: count from the top, to move forward (up): :cpp:expr:`lv_obj_move_to_index(widget, lv_obj_get_index(widget) - 1)`
+  :0:                Background
+  :child_count - 1:  Foreground
+  :< 0:              Count down from the top (-1 = topmost).
+  :lv_obj_get_index(widget) - 1:  Move down 1 layer.
+  :lv_obj_get_index(widget) + 1:  Move up 1 layer.
 
-- Use :cpp:expr:`lv_obj_swap(widget1, widget2)` to swap the relative layer position of two Widgets.
-- When :cpp:expr:`lv_obj_set_parent(widget, new_parent)` is used, ``widget`` will be on the foreground of ``new_parent``.
-
+- Use :cpp:expr:`lv_obj_swap(widget1, widget2)` to swap the layer positions (Z-orders)
+  of the two Widgets.
+- When :cpp:expr:`lv_obj_set_parent(widget, new_parent)` is used, ``widget`` will
+  become the foremost child of ``new_parent``.
 
 
 
@@ -79,6 +84,7 @@ API
 ***
 
 .. API equals:
+    lv_obj_get_index
     lv_obj_move_to_index
     lv_obj_swap
     lv_obj_set_parent
