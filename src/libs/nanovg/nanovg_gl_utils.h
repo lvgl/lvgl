@@ -22,6 +22,7 @@
 
 #if LV_USE_NANOVG
 
+#ifdef NANOVG_GL_IMPLEMENTATION
 struct NVGLUframebuffer {
 	NVGcontext* ctx;
 	GLuint fbo;
@@ -29,11 +30,14 @@ struct NVGLUframebuffer {
 	GLuint texture;
 	int image;
 };
+#endif
+
 typedef struct NVGLUframebuffer NVGLUframebuffer;
 
 // Helper function to create GL frame buffer to render to.
+// format: NVG_TEXTURE_BGRA (default, LVGL compatible), NVG_TEXTURE_RGBA
 void nvgluBindFramebuffer(NVGLUframebuffer* fb);
-NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags);
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags, int format);
 void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
 
 #endif // NANOVG_GL_UTILS_H
@@ -53,7 +57,7 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
 
 static GLint defaultFBO = -1;
 
-NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags)
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags, int format)
 {
 #ifdef NANOVG_FBO_VALID
 	GLint defFBO;
@@ -67,7 +71,7 @@ NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imag
 	if (fb == NULL) goto error;
 	memset(fb, 0, sizeof(NVGLUframebuffer));
 
-	fb->image = nvgCreateImageRGBA(ctx, w, h, imageFlags | NVG_IMAGE_FLIPY | NVG_IMAGE_PREMULTIPLIED, NULL);
+	fb->image = nvgCreateImage(ctx, w, h, imageFlags | NVG_IMAGE_FLIPY | NVG_IMAGE_PREMULTIPLIED, format, NULL);
 
 #if defined NANOVG_GL2
 	fb->texture = nvglImageHandleGL2(ctx, fb->image);
@@ -120,6 +124,7 @@ error:
 	NVG_NOTUSED(w);
 	NVG_NOTUSED(h);
 	NVG_NOTUSED(imageFlags);
+	NVG_NOTUSED(format);
 	return NULL;
 #endif
 }

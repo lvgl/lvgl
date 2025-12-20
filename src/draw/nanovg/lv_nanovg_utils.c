@@ -30,13 +30,6 @@
 *      TYPEDEFS
 **********************/
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-} nvg_color32_t;
-
 /**********************
 *  STATIC PROTOTYPES
 **********************/
@@ -272,85 +265,6 @@ void lv_nanovg_clean_up(struct _lv_draw_nanovg_unit_t * u)
     u->is_started = false;
 
     LV_PROFILER_DRAW_END;
-}
-
-static void convert_a8_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
-{
-    const uint8_t * src_data = src;
-    while(px_cnt--) {
-        dest->a = LV_UDIV255(color.alpha * *src_data);
-        dest->r = color.red;
-        dest->g = color.green;
-        dest->b = color.blue;
-        dest++;
-        src_data++;
-    }
-}
-
-static void convert_argb8888_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
-{
-    LV_UNUSED(color);
-    const lv_color32_t * src_data = src;
-    while(px_cnt--) {
-        dest->a = src_data->alpha;
-        dest->r = src_data->red;
-        dest->g = src_data->green;
-        dest->b = src_data->blue;
-        dest++;
-        src_data++;
-    }
-}
-
-static void convert_rgb888_cb(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color)
-{
-    LV_UNUSED(color);
-    const lv_color_t * src_data = src;
-    while(px_cnt--) {
-        dest->a = 0xFF;
-        dest->r = src_data->red;
-        dest->g = src_data->green;
-        dest->b = src_data->blue;
-        dest++;
-        src_data++;
-    }
-}
-
-
-bool lv_nanovg_buf_convert(lv_draw_buf_t * dest, const lv_draw_buf_t * src, const lv_color32_t color)
-{
-    LV_PROFILER_DRAW_BEGIN;
-
-    void (*convert_cb)(nvg_color32_t * dest, const void * src, uint32_t px_cnt, const lv_color32_t color);
-
-    switch(src->header.cf) {
-        case LV_COLOR_FORMAT_A8:
-            convert_cb = convert_a8_cb;
-            break;
-
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
-        case LV_COLOR_FORMAT_XRGB8888:
-            convert_cb = convert_argb8888_cb;
-            break;
-
-        case LV_COLOR_FORMAT_RGB888:
-            convert_cb = convert_rgb888_cb;
-            break;
-
-        default:
-            LV_LOG_ERROR("Unsupported color format: %d", src->header.cf);
-            LV_PROFILER_DRAW_END;
-            return false;
-    }
-
-    for(uint32_t y = 0; y < src->header.h; y++) {
-        nvg_color32_t * dest_data = lv_draw_buf_goto_xy(dest, 0, y);
-        const void * src_data = lv_draw_buf_goto_xy(src, 0, y);
-        convert_cb(dest_data, src_data, src->header.w, color);
-    }
-
-    LV_PROFILER_DRAW_END;
-    return true;
 }
 
 lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u,

@@ -44,6 +44,15 @@
 #include "../../libs/nanovg/nanovg_gl.h"
 #include "../../libs/nanovg/nanovg_gl_utils.h"
 
+/* GL_BGRA may not be defined on all platforms */
+#ifndef GL_BGRA
+    #ifdef GL_BGRA_EXT
+        #define GL_BGRA GL_BGRA_EXT
+    #else
+        #define GL_BGRA 0x80E1
+    #endif
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -262,39 +271,46 @@ static void canvas_fbo_readback(lv_draw_nanovg_unit_t * u, lv_layer_t * layer)
     int32_t h = lv_area_get_height(&layer->buf_area);
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
-    /* Read pixels from FBO - NanoVG uses RGBA format with premultiplied alpha */
+    /* Read pixels from FBO */
     LV_PROFILER_DRAW_BEGIN_TAG("glReadPixels");
 
-    /* For ARGB8888 format, we need to read as RGBA and convert */
-    if(draw_buf->header.cf == LV_COLOR_FORMAT_ARGB8888 || draw_buf->header.cf == LV_COLOR_FORMAT_XRGB8888) {
-        /* OpenGL reads bottom-to-top, but LVGL expects top-to-bottom */
-        uint8_t * data = draw_buf->data;
-        uint32_t stride = draw_buf->header.stride;
-
-        /* Read line by line in reverse order to flip the image */
-        for(int32_t y = 0; y < h; y++) {
-            uint8_t * row = data + (h - 1 - y) * stride;
-            glReadPixels(0, y, w, 1, GL_RGBA, GL_UNSIGNED_BYTE, row);
-        }
-
-        /* Convert RGBA to BGRA (ARGB8888 in little-endian) */
-        for(int32_t y = 0; y < h; y++) {
-            uint8_t * row = data + y * stride;
-            for(int32_t x = 0; x < w; x++) {
-                uint8_t r = row[x * 4 + 0];
-                uint8_t g = row[x * 4 + 1];
-                uint8_t b = row[x * 4 + 2];
-                uint8_t a = row[x * 4 + 3];
-                /* BGRA format for ARGB8888 */
-                row[x * 4 + 0] = b;
-                row[x * 4 + 1] = g;
-                row[x * 4 + 2] = r;
-                row[x * 4 + 3] = a;
+    /* OpenGL reads bottom-to-top, but LVGL expects top-to-bottom */
+    switch(draw_buf->header.cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            /* ARGB8888: read as BGRA directly (LVGL native format) */
+            for(int32_t y = 0; y < h; y++) {
+                void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
+                glReadPixels(0, y, w, 1, GL_BGRA, GL_UNSIGNED_BYTE, row);
             }
-        }
-    }
-    else {
-        LV_LOG_WARN("Canvas color format %d not supported for NanoVG readback", draw_buf->header.cf);
+            break;
+
+        case LV_COLOR_FORMAT_RGB888:
+            /* RGB888: read as RGB, then swizzle to BGR (LVGL format) */
+            for(int32_t y = 0; y < h; y++) {
+                uint8_t * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
+                glReadPixels(0, y, w, 1, GL_RGB, GL_UNSIGNED_BYTE, row);
+                /* Swizzle RGB -> BGR */
+                for(int32_t x = 0; x < w; x++) {
+                    uint8_t tmp = row[x * 3 + 0];
+                    row[x * 3 + 0] = row[x * 3 + 2];
+                    row[x * 3 + 2] = tmp;
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB565:
+            /* RGB565: directly compatible with GL */
+            for(int32_t y = 0; y < h; y++) {
+                void * row = lv_draw_buf_goto_xy(draw_buf, 0, h - 1 - y);
+                glReadPixels(0, y, w, 1, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, row);
+            }
+            break;
+
+        default:
+            LV_LOG_WARN("Canvas color format %d not supported for NanoVG readback", draw_buf->header.cf);
+            break;
     }
 
     LV_PROFILER_DRAW_END_TAG("glReadPixels");
@@ -329,7 +345,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /* For canvas layer, create temporary FBO if not yet created */
     if(is_canvas_layer(layer) && !layer->user_data) {
         lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
-                                                           lv_area_get_height(&layer->buf_area), 0);
+                                                           lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_BGRA);
         layer->user_data = entry;
     }
 
@@ -422,7 +438,7 @@ static void draw_event_cb(lv_event_t * e)
             break;
         case LV_EVENT_CHILD_CREATED: {
                 lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
-                                                                   lv_area_get_height(&layer->buf_area), 0);
+                                                                   lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_BGRA);
                 layer->user_data = entry;
             }
             break;

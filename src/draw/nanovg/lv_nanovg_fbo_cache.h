@@ -52,9 +52,11 @@ void lv_nanovg_fbo_cache_deinit(struct _lv_draw_nanovg_unit_t * u);
  * @param width the width of the FBO
  * @param height the height of the FBO
  * @param flags the FBO flags
+ * @param format the texture format (NVG_TEXTURE_BGRA or NVG_TEXTURE_RGBA)
  * @return the FBO cache entry, or NULL if not found
  */
-struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(struct _lv_draw_nanovg_unit_t * u, int width, int height, int flags);
+struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(struct _lv_draw_nanovg_unit_t * u, int width, int height, int flags,
+                                                   int format);
 
 /**
  * @brief Release the FBO from the cache

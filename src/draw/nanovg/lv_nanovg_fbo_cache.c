@@ -13,6 +13,7 @@
 
 #include "lv_draw_nanovg_private.h"
 #include "lv_nanovg_utils.h"
+#include "../../libs/nanovg/nanovg_gl_utils.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +33,7 @@ typedef struct {
     int width;
     int height;
     int flags;
+    enum NVGtexture format;
 
     /* value */
     struct NVGLUframebuffer * fbo;
@@ -40,9 +42,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-struct NVGLUframebuffer * nvgluCreateFramebuffer(NVGcontext * ctx, int w, int h, int imageFlags);
-void nvgluDeleteFramebuffer(struct NVGLUframebuffer * fb);
 
 static bool fbo_create_cb(fbo_item_t * item, void * user_data);
 static void fbo_free_cb(fbo_item_t * item, void * user_data);
@@ -84,7 +83,8 @@ void lv_nanovg_fbo_cache_deinit(lv_draw_nanovg_unit_t * u)
     u->fbo_cache = NULL;
 }
 
-struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(lv_draw_nanovg_unit_t * u, int width, int height, int flags)
+struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(lv_draw_nanovg_unit_t * u, int width, int height, int flags,
+                                                   int format)
 {
     LV_PROFILER_DRAW_BEGIN;
     LV_ASSERT_NULL(u);
@@ -94,6 +94,7 @@ struct _lv_cache_entry_t * lv_nanovg_fbo_cache_get(lv_draw_nanovg_unit_t * u, in
     search_key.width = width;
     search_key.height = height;
     search_key.flags = flags;
+    search_key.format = format;
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->fbo_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
@@ -132,7 +133,7 @@ static bool fbo_create_cb(fbo_item_t * item, void * user_data)
     LV_PROFILER_DRAW_BEGIN;
     LV_UNUSED(user_data);
 
-    item->fbo = nvgluCreateFramebuffer(item->u->vg, item->width, item->height, item->flags);
+    item->fbo = nvgluCreateFramebuffer(item->u->vg, item->width, item->height, item->flags, item->format);
     if(!item->fbo) {
         LV_LOG_ERROR("Failed to create FBO");
     }
@@ -163,6 +164,10 @@ static lv_cache_compare_res_t fbo_compare_cb(const fbo_item_t * lhs, const fbo_i
 
     if(lhs->flags != rhs->flags) {
         return lhs->flags > rhs->flags ? 1 : -1;
+    }
+
+    if(lhs->format != rhs->format) {
+        return lhs->format > rhs->format ? 1 : -1;
     }
 
     return 0;

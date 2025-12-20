@@ -169,19 +169,61 @@ static bool image_create_cb(image_item_t * item, void * user_data)
     LV_UNUSED(user_data);
     const uint32_t w = item->src_buf.header.w;
     const uint32_t h = item->src_buf.header.h;
+    const lv_color_format_t cf = item->src_buf.header.cf;
+    const uint32_t stride = item->src_buf.header.stride;
 
-    if(!lv_nanovg_reshape_global_image(item->u, LV_COLOR_FORMAT_ARGB8888, w, h)) {
+    const void * data = NULL;
+    enum NVGtexture nvg_tex_type = NVG_TEXTURE_RGBA;
+
+    /* Check if we can use the source buffer directly (no conversion needed) */
+    switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+            if(stride == w) {
+                /* A8: use directly, shader will handle color tint via innerCol */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_ALPHA;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+        case LV_COLOR_FORMAT_XRGB8888:
+            if(stride == w * 4) {
+                /* Stride matches, use directly */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_BGRA;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB888:
+            if(stride == w * 3) {
+                /* Stride matches, use directly */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_BGR;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB565:
+            if(stride == w * 2) {
+                /* Stride matches, use directly */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_RGB565;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    /* If direct use is not possible, format not supported */
+    if(data == NULL) {
+        LV_LOG_ERROR("Unsupported image format: %d, stride: %" LV_PRIu32, cf, stride);
         return false;
     }
 
-    if(!lv_nanovg_buf_convert(item->u->image_buf, &item->src_buf, item->color)) {
-        return false;
-    }
-
-    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageRGBA");
-    int image_handle = nvgCreateImageRGBA(item->u->vg, w, h, item->image_flags,
-                                          lv_draw_buf_goto_xy(item->u->image_buf, 0, 0));
-    LV_PROFILER_DRAW_END_TAG("nvgCreateImageRGBA");
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
+    int image_handle = nvgCreateImage(item->u->vg, w, h, item->image_flags, nvg_tex_type, data);
+    LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
     if(image_handle < 0) {
         return false;

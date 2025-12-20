@@ -369,21 +369,10 @@ float nvgRadToDeg(float rad);
 // In addition you can upload your own image. The image loading is provided by stb_image.
 // The parameter imageFlags is combination of flags defined in NVGimageFlags.
 
-// Creates image by loading it from the disk from specified file name.
+// Creates image from specified image data with custom format.
+// format: see NVGtexture.
 // Returns handle to the image.
-int nvgCreateImage(NVGcontext* ctx, const char* filename, int imageFlags);
-
-// Creates image by loading it from the specified chunk of memory.
-// Returns handle to the image.
-int nvgCreateImageMem(NVGcontext* ctx, int imageFlags, unsigned char* data, int ndata);
-
-// Creates image from specified image data.
-// Returns handle to the image.
-int nvgCreateImageRGBA(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
-
-// Creates image from specified image data.
-// Returns handle to the image.
-int nvgCreateImageA8(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data);
+int nvgCreateImage(NVGcontext* ctx, int w, int h, int imageFlags, int format, const unsigned char* data);
 
 // Updates image data specified by image handle.
 void nvgUpdateImage(NVGcontext* ctx, int image, const unsigned char* data);
@@ -635,7 +624,10 @@ int nvgTextBreakLines(NVGcontext* ctx, const char* string, const char* end, floa
 //
 enum NVGtexture {
 	NVG_TEXTURE_ALPHA = 0x01,
-	NVG_TEXTURE_RGBA = 0x02,
+	NVG_TEXTURE_BGRA = 0x02,   /* LVGL ARGB8888 format (memory order: B-G-R-A) */
+	NVG_TEXTURE_RGBA = 0x03,   /* Standard OpenGL RGBA format */
+	NVG_TEXTURE_BGR = 0x04,    /* LVGL RGB888 format (memory order: B-G-R) */
+	NVG_TEXTURE_RGB565 = 0x05, /* LVGL RGB565 format */
 };
 
 struct NVGscissor {

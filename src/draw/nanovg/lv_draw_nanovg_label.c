@@ -277,9 +277,9 @@ static bool letter_create_cb(letter_item_t * item, void * user_data)
         return false;
     }
 
-    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImageA8");
-    item->image_handle = nvgCreateImageA8(item->u->vg, w, h, 0, lv_draw_buf_goto_xy(image_buf, 0, 0));
-    LV_PROFILER_DRAW_END_TAG("nvgCreateImageA8");
+    LV_PROFILER_DRAW_BEGIN_TAG("nvgCreateImage");
+    item->image_handle = nvgCreateImage(item->u->vg, w, h, 0, NVG_TEXTURE_ALPHA, lv_draw_buf_goto_xy(image_buf, 0, 0));
+    LV_PROFILER_DRAW_END_TAG("nvgCreateImage");
 
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     LV_PROFILER_DRAW_END;

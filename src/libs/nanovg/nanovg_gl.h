@@ -718,6 +718,7 @@ static int glnvg__renderCreate(void* uptr)
 		"#endif\n"
 		"		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
 		"		else if (texType == 2) color = vec4(color.x);"
+		"		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle
 		"		// Apply color tint and alpha.\n"
 		"		color *= innerCol;\n"
 		"		// Combine alpha\n"
@@ -732,7 +733,8 @@ static int glnvg__renderCreate(void* uptr)
 		"		vec4 color = texture2D(tex, ftcoord);\n"
 		"#endif\n"
 		"		if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
-		"		if (texType == 2) color = vec4(color.x);"
+		"		else if (texType == 2) color = vec4(color.x);"
+		"		else if (texType == 3) color.rgb = color.bgr;"  // BGR -> RGB swizzle
 		"		color *= scissor;\n"
 		"		result = color * innerCol;\n"
 		"	#endif\n"
@@ -824,8 +826,22 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	}
 #endif
 
-	if (type == NVG_TEXTURE_RGBA)
+	if (type == NVG_TEXTURE_BGRA) {
+#ifdef GL_BGRA
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+#else
+		/* Fallback for platforms without GL_BGRA: use GL_RGBA */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+#endif
+	}
+	else if (type == NVG_TEXTURE_RGBA)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	else if (type == NVG_TEXTURE_BGR)
+		/* BGR888: upload as RGB, shader will swizzle BGR->RGB */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	else if (type == NVG_TEXTURE_RGB565)
+		/* RGB565: directly compatible with GL */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
 	else
 #if defined(NANOVG_GLES2) || defined (NANOVG_GL2)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
@@ -908,16 +924,31 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, y);
 #else
 	// No support for all of skip, need to update a whole row at a time.
-	if (tex->type == NVG_TEXTURE_RGBA)
+	if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_RGBA)
 		data += y*tex->width*4;
+	else if (tex->type == NVG_TEXTURE_BGR)
+		data += y*tex->width*3;
+	else if (tex->type == NVG_TEXTURE_RGB565)
+		data += y*tex->width*2;
 	else
 		data += y*tex->width;
 	x = 0;
 	w = tex->width;
 #endif
 
-	if (tex->type == NVG_TEXTURE_RGBA)
+	if (tex->type == NVG_TEXTURE_BGRA) {
+#ifdef GL_BGRA
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_BGRA, GL_UNSIGNED_BYTE, data);
+#else
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+#endif
+	}
+	else if (tex->type == NVG_TEXTURE_RGBA)
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	else if (tex->type == NVG_TEXTURE_BGR)
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGB, GL_UNSIGNED_BYTE, data);
+	else if (tex->type == NVG_TEXTURE_RGB565)
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
 	else
 #if defined(NANOVG_GLES2) || defined(NANOVG_GL2)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
@@ -1019,13 +1050,21 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 		frag->s.type = NSVG_SHADER_FILLIMG;
 
 		#if NANOVG_GL_USE_UNIFORMBUFFER
-		if (tex->type == NVG_TEXTURE_RGBA)
+		if (tex->type == NVG_TEXTURE_RGBA || tex->type == NVG_TEXTURE_BGRA)
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
+		else if (tex->type == NVG_TEXTURE_BGR)
+			frag->s.texType = 3;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_RGB565)
+			frag->s.texType = 0;  // RGB565 is directly compatible
 		else
 			frag->s.texType = 2;
 		#else
-		if (tex->type == NVG_TEXTURE_RGBA)
+		if (tex->type == NVG_TEXTURE_RGBA || tex->type == NVG_TEXTURE_BGRA)
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
+		else if (tex->type == NVG_TEXTURE_BGR)
+			frag->s.texType = 3.0f;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_RGB565)
+			frag->s.texType = 0.0f;  // RGB565 is directly compatible
 		else
 			frag->s.texType = 2.0f;
 		#endif
