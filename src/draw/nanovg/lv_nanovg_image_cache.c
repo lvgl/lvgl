@@ -203,6 +203,14 @@ static bool image_create_cb(image_item_t * item, void * user_data)
             }
             break;
 
+        case LV_COLOR_FORMAT_RGB565:
+            if(stride == w * 2) {
+                /* Stride matches, use directly */
+                data = item->src_buf.data;
+                nvg_tex_type = NVG_TEXTURE_RGB565;
+            }
+            break;
+
         default:
             break;
     }

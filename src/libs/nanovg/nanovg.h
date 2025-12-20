@@ -627,6 +627,7 @@ enum NVGtexture {
 	NVG_TEXTURE_BGRA = 0x02,   /* LVGL ARGB8888 format (memory order: B-G-R-A) */
 	NVG_TEXTURE_RGBA = 0x03,   /* Standard OpenGL RGBA format */
 	NVG_TEXTURE_BGR = 0x04,    /* LVGL RGB888 format (memory order: B-G-R) */
+	NVG_TEXTURE_RGB565 = 0x05, /* LVGL RGB565 format */
 };
 
 struct NVGscissor {

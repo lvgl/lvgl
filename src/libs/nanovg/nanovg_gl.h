@@ -834,6 +834,9 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	else if (type == NVG_TEXTURE_BGR)
 		/* BGR888: upload as RGB, shader will swizzle BGR->RGB */
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	else if (type == NVG_TEXTURE_RGB565)
+		/* RGB565: directly compatible with GL */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
 	else
 #if defined(NANOVG_GLES2) || defined (NANOVG_GL2)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
@@ -920,6 +923,8 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 		data += y*tex->width*4;
 	else if (tex->type == NVG_TEXTURE_BGR)
 		data += y*tex->width*3;
+	else if (tex->type == NVG_TEXTURE_RGB565)
+		data += y*tex->width*2;
 	else
 		data += y*tex->width;
 	x = 0;
@@ -933,6 +938,8 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else if (tex->type == NVG_TEXTURE_BGR)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGB, GL_UNSIGNED_BYTE, data);
+	else if (tex->type == NVG_TEXTURE_RGB565)
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
 	else
 #if defined(NANOVG_GLES2) || defined(NANOVG_GL2)
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
@@ -1038,6 +1045,8 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0 : 1;
 		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_RGB565)
+			frag->s.texType = 0;  // RGB565 is directly compatible
 		else
 			frag->s.texType = 2;
 		#else
@@ -1045,6 +1054,8 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 			frag->s.texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
 		else if (tex->type == NVG_TEXTURE_BGRA || tex->type == NVG_TEXTURE_BGR)
 			frag->s.texType = 3.0f;  // BGR -> RGB swizzle in shader
+		else if (tex->type == NVG_TEXTURE_RGB565)
+			frag->s.texType = 0.0f;  // RGB565 is directly compatible
 		else
 			frag->s.texType = 2.0f;
 		#endif
