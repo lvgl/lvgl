@@ -38,6 +38,7 @@ Create colors from Red, Green and Blue channel values:
    /* From 3 digits. Same as lv_color_hex(0x112233) */
    lv_color_t c = lv_color_hex3(0x123);
 
+
 HSV
 ---
 
@@ -54,6 +55,7 @@ Create colors from Hue, Saturation and Value values:
 
    //From lv_color_t variable
    lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
+
 
 .. _color_palette:
 
@@ -95,6 +97,7 @@ For the lighter variants of a palette color use
 :cpp:expr:`lv_color_t` ``c =`` :cpp:expr:`lv_palette_darken(LV_PALETTE_..., v)`. ``v`` can be
 1..4.
 
+
 .. _color_modify_and_mix:
 
 Modify and mix colors
@@ -116,6 +119,7 @@ The following functions can modify a color:
 
    // Mix two colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
    lv_color_t c = lv_color_mix(c1, c2, ratio);
+
 
 .. _color_builtin:
 
@@ -152,3 +156,9 @@ mixing *ratio*.
 
 API
 ***
+
+.. API equals:
+
+      lv_color_make
+      lv_color_mix
+      lv_palette_main
