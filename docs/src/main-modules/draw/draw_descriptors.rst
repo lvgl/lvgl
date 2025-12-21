@@ -592,8 +592,8 @@ Functions for line drawing:
 - :cpp:expr:`lv_draw_line(layer, &dsc)` creates a task to draw a line.
 - :cpp:expr:`lv_draw_task_get_line_dsc(draw_task)` retrieves line descriptor.
 - :cpp:expr:`lv_draw_line_iterate(draw_task, dsc, callback)` is a helper function
-  to call a callback which draws a line between two points. This way it doesn't matter if
-  ``p1, p2`` or ``points`` were used as it calls the ``callback`` as needed.
+  that invokes a callback to draw a line between two points. It handles both ``p1, p2``
+  and ``points`` inputs, calling the callback as many times as needed.
 
 .. lv_example:: widgets/canvas/lv_example_canvas_7
   :language: c
