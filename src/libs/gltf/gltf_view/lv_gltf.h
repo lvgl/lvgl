@@ -82,6 +82,15 @@ void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * environment
 lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path);
 
 /**
+ * Load a glTF model from a byte array into the viewer
+ * @param obj pointer to a glTF viewer object
+ * @param bytes glTF raw data
+ * @param len glTF raw data length in bytes
+ * @return pointer to the loaded glTF model, or NULL on failure
+ */
+lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len);
+
+/**
  * Get the number of models loaded in the glTF viewer
  * @param obj pointer to a glTF viewer object
  * @return the total number of models in the viewer
