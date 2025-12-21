@@ -451,7 +451,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_LINE_OPA:
         case LV_STYLE_ARC_OPA:
-        case LV_STYLE_DROP_SHADOW_OPA:
         case LV_STYLE_SHADOW_OPA:
             return (lv_style_value_t) {
                 .num = LV_OPA_COVER
