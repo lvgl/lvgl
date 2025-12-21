@@ -566,8 +566,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             }
 
             if(fill_dsc->opa >= LV_OPA_MAX) {
-                float tex_w = (float)lv_area_get_width(&fill_area);
-                float tex_h = (float)lv_area_get_height(&fill_area);
+                int32_t tex_w = lv_area_get_width(&fill_area);
+                int32_t tex_h = lv_area_get_height(&fill_area);
                 GL_CALL(glEnable(GL_SCISSOR_TEST));
                 GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
                 GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,

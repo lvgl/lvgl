@@ -71,7 +71,7 @@ typedef void * lv_user_data_t;
 #elif LV_TEST_OPTION == 8
 
 #define  LV_COLOR_DEPTH     32
-#define  LV_DPI_DEF         130
+#define  LV_DPI_DEF         160
 
 #include "lv_test_conf_opengles.h"
 #include "lv_test_conf_full.h"
