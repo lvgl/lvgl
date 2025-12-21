@@ -82,6 +82,9 @@ void lv_image_cache_drop(const void * src)
     /*If user invalidate image, the header cache should be invalidated too.*/
     lv_image_header_cache_drop(src);
 
+    /*Notify draw units to invalidate any cached resources (e.g., GPU textures) for this image source.*/
+    lv_draw_unit_send_event(NULL, LV_EVENT_INVALIDATE_AREA, (void *)src);
+
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
         return;
@@ -92,7 +95,6 @@ void lv_image_cache_drop(const void * src)
         .src_type = lv_image_src_get_type(src),
     };
 
-    lv_draw_unit_send_event(NULL, LV_EVENT_INVALIDATE_AREA, (void *)src);
     lv_cache_drop(img_cache_p, &search_key, NULL);
 }
 
