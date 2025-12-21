@@ -33,6 +33,11 @@
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
+#define LV_NANOVG_BACKEND_GL2       1
+#define LV_NANOVG_BACKEND_GL3       2
+#define LV_NANOVG_BACKEND_GLES2     3
+#define LV_NANOVG_BACKEND_GLES3     4
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -1163,6 +1168,20 @@
     #endif
 #endif
 #if LV_USE_DRAW_NANOVG
+    /** Select OpenGL backend for NanoVG:
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
+    #ifndef LV_NANOVG_BACKEND
+        #ifdef CONFIG_LV_NANOVG_BACKEND
+            #define LV_NANOVG_BACKEND CONFIG_LV_NANOVG_BACKEND
+        #else
+            #define LV_NANOVG_BACKEND   LV_NANOVG_BACKEND_GLES2
+        #endif
+    #endif
+
     /** Draw image texture cache count. */
     #ifndef LV_NANOVG_IMAGE_CACHE_CNT
         #ifdef CONFIG_LV_NANOVG_IMAGE_CACHE_CNT

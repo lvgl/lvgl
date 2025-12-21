@@ -568,6 +568,23 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_NANOVG && LV_USE_MATRIX
 
+		choice LV_NANOVG_BACKEND
+			prompt "NanoVG OpenGL backend"
+			default LV_NANOVG_BACKEND_GLES2
+			depends on LV_USE_DRAW_NANOVG
+			help
+				Select which OpenGL implementation to use for NanoVG rendering.
+
+			config LV_NANOVG_BACKEND_GL2
+				bool "OpenGL 2.0"
+			config LV_NANOVG_BACKEND_GL3
+				bool "OpenGL 3.0+"
+			config LV_NANOVG_BACKEND_GLES2
+				bool "OpenGL ES 2.0"
+			config LV_NANOVG_BACKEND_GLES3
+				bool "OpenGL ES 3.0+"
+		endchoice
+
 		config LV_NANOVG_IMAGE_CACHE_CNT
 			int "Draw image texture cache count"
 			default 128

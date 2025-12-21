@@ -42,7 +42,18 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/* Select NanoVG OpenGL backend based on LV_NANOVG_BACKEND */
+#if LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GL2
+#define NANOVG_GL2_IMPLEMENTATION
+#elif LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GL3
+#define NANOVG_GL3_IMPLEMENTATION
+#elif LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES2
 #define NANOVG_GLES2_IMPLEMENTATION
+#elif LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES3
+#define NANOVG_GLES3_IMPLEMENTATION
+#else
+#error "Invalid LV_NANOVG_BACKEND value"
+#endif
 
 /**********************
  *      TYPEDEFS

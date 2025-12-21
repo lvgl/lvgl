@@ -79,3 +79,12 @@ animations, and interactive camera controls for embedded 3D visualization.
 
 For complete implementation details, see :ref:`glTF <gltf>`.
 
+NanoVG Draw Unit
+================
+
+The NanoVG draw unit provides a hardware-accelerated 2D vector graphics rendering backend for LVGL.
+It leverages GPU capabilities for antialiased path rendering, efficient image compositing, and text rendering.
+
+For complete implementation details, see :ref:`NanoVG Draw Unit <nanovg_draw_unit>`.
+
+

@@ -412,6 +412,14 @@
  */
 #define LV_USE_DRAW_NANOVG 0
 #if LV_USE_DRAW_NANOVG
+    /** Select OpenGL backend for NanoVG:
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
+    #define LV_NANOVG_BACKEND   LV_NANOVG_BACKEND_GLES2
+
     /** Draw image texture cache count. */
     #define LV_NANOVG_IMAGE_CACHE_CNT 128
 
