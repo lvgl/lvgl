@@ -15,6 +15,7 @@
 #include "lv_nanovg_utils.h"
 #include "../lv_image_decoder_private.h"
 #include "../../misc/lv_pending.h"
+#include "../../misc/lv_iter.h"
 
 /*********************
 *      DEFINES
@@ -33,6 +34,10 @@ typedef struct {
     lv_color32_t color;
     int image_flags;
 
+    /* for drop search */
+    const void * src;
+    lv_image_src_t src_type;
+
     /* value */
     int image_handle;
 } image_item_t;
@@ -45,6 +50,7 @@ static void image_cache_release_cb(void * entry, void * user_data);
 static bool image_create_cb(image_item_t * item, void * user_data);
 static void image_free_cb(image_item_t * item, void * user_data);
 static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const image_item_t * rhs);
+static void image_cache_drop_collect_cb(void * elem);
 
 /**********************
 *  STATIC VARIABLES
@@ -74,6 +80,8 @@ void lv_nanovg_image_cache_init(struct _lv_draw_nanovg_unit_t * u)
     lv_cache_set_name(u->image_cache, "NVG_IMAGE");
     u->image_pending = lv_pending_create(sizeof(lv_cache_entry_t *), 4);
     lv_pending_set_free_cb(u->image_pending, image_cache_release_cb, u->image_cache);
+
+    lv_ll_init(&u->image_drop_ll, sizeof(image_item_t));
 }
 
 void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
@@ -123,6 +131,8 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     search_key.src_buf = *decoded;
     search_key.color = color;
     search_key.image_flags = image_flags;
+    search_key.src = src;
+    search_key.src_type = lv_image_src_get_type(src);
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->image_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
@@ -151,6 +161,33 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
 
     LV_PROFILER_DRAW_END;
     return image_item->image_handle;
+}
+
+void lv_nanovg_image_cache_drop(struct _lv_draw_nanovg_unit_t * u, const void * src)
+{
+    LV_ASSERT_NULL(u);
+    LV_UNUSED(src);
+    if(src == NULL) {
+        lv_cache_drop_all(u->image_cache, NULL);
+        return;
+    }
+
+    u->image_drop_src = src;
+
+    lv_iter_t * iter = lv_cache_iter_create(u->image_cache);
+    LV_ASSERT_NULL(iter);
+
+    /* Collect all cache entries that match the drop source */
+    lv_iter_inspect(iter, image_cache_drop_collect_cb);
+
+    image_item_t * drop_item;
+    LV_LL_READ(&u->image_drop_ll, drop_item) {
+        lv_cache_drop(u->image_cache, drop_item, NULL);
+    }
+
+    lv_ll_clear(&u->image_drop_ll);
+    lv_iter_destroy(iter);
+    u->image_drop_src = NULL;
 }
 
 /**********************
@@ -237,6 +274,11 @@ static bool image_create_cb(image_item_t * item, void * user_data)
         return false;
     }
 
+    if(item->src_type == LV_IMAGE_SRC_FILE) {
+        item->src = lv_strdup(item->src);
+        LV_ASSERT_MALLOC(item->src);
+    }
+
     item->image_handle = image_handle;
     return true;
 }
@@ -248,6 +290,14 @@ static void image_free_cb(image_item_t * item, void * user_data)
     LV_LOG_TRACE("image_handle: %d", item->image_handle);
     nvgDeleteImage(item->u->vg, item->image_handle);
     item->image_handle = -1;
+
+    if(item->src_type == LV_IMAGE_SRC_FILE) {
+        lv_free((void *)item->src);
+        item->src = NULL;
+    }
+
+    item->src_type = LV_IMAGE_SRC_UNKNOWN;
+
     LV_PROFILER_DRAW_END;
 }
 
@@ -270,6 +320,27 @@ static lv_cache_compare_res_t image_compare_cb(const image_item_t * lhs, const i
     }
 
     return 0;
+}
+
+static void image_cache_drop_collect_cb(void * elem)
+{
+    /**
+     * If the cache is deleted during the traversal process,
+     * it will cause iter to become invalid.
+     * Therefore, we will first add it to the drop collection list and postpone the deletion.
+     */
+    LV_ASSERT_NULL(elem);
+    image_item_t * item = elem;
+    const void * src = item->u->image_drop_src;
+    LV_ASSERT_NULL(src);
+    lv_image_src_t src_type = lv_image_src_get_type(src);
+
+    if((src_type == LV_IMAGE_SRC_FILE && lv_strcmp(item->src, src) == 0)
+       || (src_type == LV_IMAGE_SRC_VARIABLE && item->src == src)) {
+        image_item_t * drop_item = lv_ll_ins_tail(&item->u->image_drop_ll);
+        LV_ASSERT_MALLOC(drop_item);
+        *drop_item = *item;
+    }
 }
 
 #endif /*LV_USE_DRAW_NANOVG*/

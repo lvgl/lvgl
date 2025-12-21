@@ -441,6 +441,9 @@ static void draw_event_cb(lv_event_t * e)
         case LV_EVENT_SCREEN_LOAD_START:
             on_layer_readback(u, layer);
             break;
+        case LV_EVENT_INVALIDATE_AREA:
+            lv_nanovg_image_cache_drop(u, lv_event_get_param(e));
+            break;
         default:
             break;
     }

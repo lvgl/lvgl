@@ -59,6 +59,13 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      lv_color32_t color,
                                      int image_flags);
 
+/**
+ * @brief Drop the image from the cache
+ * @param u pointer to the nanovg unit
+ * @param src the source image data
+ */
+void lv_nanovg_image_cache_drop(struct _lv_draw_nanovg_unit_t * u, const void * src);
+
 /**********************
  *      MACROS
  **********************/

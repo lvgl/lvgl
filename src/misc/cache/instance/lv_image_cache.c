@@ -92,6 +92,7 @@ void lv_image_cache_drop(const void * src)
         .src_type = lv_image_src_get_type(src),
     };
 
+    lv_draw_unit_send_event(NULL, LV_EVENT_INVALIDATE_AREA, (void *)src);
     lv_cache_drop(img_cache_p, &search_key, NULL);
 }
 

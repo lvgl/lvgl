@@ -71,6 +71,8 @@ typedef struct _lv_draw_nanovg_unit_t {
 
     lv_cache_t * image_cache;
     struct _lv_pending_t * image_pending;
+    lv_ll_t image_drop_ll;
+    const void * image_drop_src;
 
     lv_cache_t * letter_cache;
     struct _lv_pending_t * letter_pending;
