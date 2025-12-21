@@ -20,10 +20,10 @@
 
 #if LV_USE_NANOVG
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
-#include <memory.h>
+#include "../../stdlib/lv_mem.h"
+#include "../../stdlib/lv_string.h"
+#include "../../misc/lv_log.h"
 
 #include "nanovg.h"
 
@@ -172,29 +172,29 @@ static float nvg__normalize(float *x, float* y)
 static void nvg__deletePathCache(NVGpathCache* c)
 {
 	if (c == NULL) return;
-	if (c->points != NULL) free(c->points);
-	if (c->paths != NULL) free(c->paths);
-	if (c->verts != NULL) free(c->verts);
-	free(c);
+	if (c->points != NULL) lv_free(c->points);
+	if (c->paths != NULL) lv_free(c->paths);
+	if (c->verts != NULL) lv_free(c->verts);
+	lv_free(c);
 }
 
 static NVGpathCache* nvg__allocPathCache(void)
 {
-	NVGpathCache* c = (NVGpathCache*)malloc(sizeof(NVGpathCache));
+	NVGpathCache* c = (NVGpathCache*)lv_malloc(sizeof(NVGpathCache));
 	if (c == NULL) goto error;
-	memset(c, 0, sizeof(NVGpathCache));
+	lv_memzero(c, sizeof(NVGpathCache));
 
-	c->points = (NVGpoint*)malloc(sizeof(NVGpoint)*NVG_INIT_POINTS_SIZE);
+	c->points = (NVGpoint*)lv_malloc(sizeof(NVGpoint)*NVG_INIT_POINTS_SIZE);
 	if (!c->points) goto error;
 	c->npoints = 0;
 	c->cpoints = NVG_INIT_POINTS_SIZE;
 
-	c->paths = (NVGpath*)malloc(sizeof(NVGpath)*NVG_INIT_PATHS_SIZE);
+	c->paths = (NVGpath*)lv_malloc(sizeof(NVGpath)*NVG_INIT_PATHS_SIZE);
 	if (!c->paths) goto error;
 	c->npaths = 0;
 	c->cpaths = NVG_INIT_PATHS_SIZE;
 
-	c->verts = (NVGvertex*)malloc(sizeof(NVGvertex)*NVG_INIT_VERTS_SIZE);
+	c->verts = (NVGvertex*)lv_malloc(sizeof(NVGvertex)*NVG_INIT_VERTS_SIZE);
 	if (!c->verts) goto error;
 	c->nverts = 0;
 	c->cverts = NVG_INIT_VERTS_SIZE;
@@ -293,16 +293,16 @@ static NVGstate* nvg__getState(NVGcontext* ctx)
 
 NVGcontext* nvgCreateInternal(NVGparams* params)
 {
-	NVGcontext* ctx = (NVGcontext*)malloc(sizeof(NVGcontext));
+	NVGcontext* ctx = (NVGcontext*)lv_malloc(sizeof(NVGcontext));
 	int i;
 	if (ctx == NULL) goto error;
-	memset(ctx, 0, sizeof(NVGcontext));
+	lv_memzero(ctx, sizeof(NVGcontext));
 
 	ctx->params = *params;
 	for (i = 0; i < NVG_MAX_FONTIMAGES; i++)
 		ctx->fontImages[i] = 0;
 
-	ctx->commands = (float*)malloc(sizeof(float)*NVG_INIT_COMMANDS_SIZE);
+	ctx->commands = (float*)lv_malloc(sizeof(float)*NVG_INIT_COMMANDS_SIZE);
 	if (!ctx->commands) goto error;
 	ctx->ncommands = 0;
 	ctx->ccommands = NVG_INIT_COMMANDS_SIZE;
@@ -333,7 +333,7 @@ void nvgDeleteInternal(NVGcontext* ctx)
 {
 	int i;
 	if (ctx == NULL) return;
-	if (ctx->commands != NULL) free(ctx->commands);
+	if (ctx->commands != NULL) lv_free(ctx->commands);
 	if (ctx->cache != NULL) nvg__deletePathCache(ctx->cache);
 
 	for (i = 0; i < NVG_MAX_FONTIMAGES; i++) {
@@ -346,7 +346,7 @@ void nvgDeleteInternal(NVGcontext* ctx)
 	if (ctx->params.renderDelete != NULL)
 		ctx->params.renderDelete(ctx->params.userPtr);
 
-	free(ctx);
+	lv_free(ctx);
 }
 
 void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio)
@@ -558,9 +558,9 @@ void nvgTransformMultiply(float* t, const float* s)
 void nvgTransformPremultiply(float* t, const float* s)
 {
 	float s2[6];
-	memcpy(s2, s, sizeof(float)*6);
+	lv_memcpy(s2, s, sizeof(float)*6);
 	nvgTransformMultiply(s2, t);
-	memcpy(t, s2, sizeof(float)*6);
+	lv_memcpy(t, s2, sizeof(float)*6);
 }
 
 int nvgTransformInverse(float* inv, const float* t)
@@ -598,7 +598,7 @@ float nvgRadToDeg(float rad)
 
 static void nvg__setPaintColor(NVGpaint* p, NVGcolor color)
 {
-	memset(p, 0, sizeof(*p));
+	lv_memzero(p, sizeof(*p));
 	nvgTransformIdentity(p->xform);
 	p->radius = 0.0f;
 	p->feather = 1.0f;
@@ -613,7 +613,7 @@ void nvgSave(NVGcontext* ctx)
 	if (ctx->nstates >= NVG_MAX_STATES)
 		return;
 	if (ctx->nstates > 0)
-		memcpy(&ctx->states[ctx->nstates], &ctx->states[ctx->nstates-1], sizeof(NVGstate));
+		lv_memcpy(&ctx->states[ctx->nstates], &ctx->states[ctx->nstates-1], sizeof(NVGstate));
 	ctx->nstates++;
 }
 
@@ -627,7 +627,7 @@ void nvgRestore(NVGcontext* ctx)
 void nvgReset(NVGcontext* ctx)
 {
 	NVGstate* state = nvg__getState(ctx);
-	memset(state, 0, sizeof(*state));
+	lv_memzero(state, sizeof(*state));
 
 	nvg__setPaintColor(&state->fill, nvgRGBA(255,255,255,255));
 	nvg__setPaintColor(&state->stroke, nvgRGBA(0,0,0,255));
@@ -745,7 +745,7 @@ void nvgCurrentTransform(NVGcontext* ctx, float* xform)
 {
 	NVGstate* state = nvg__getState(ctx);
 	if (xform == NULL) return;
-	memcpy(xform, state->xform, sizeof(float)*6);
+	lv_memcpy(xform, state->xform, sizeof(float)*6);
 }
 
 void nvgStrokeColor(NVGcontext* ctx, NVGcolor color)
@@ -804,7 +804,7 @@ NVGpaint nvgLinearGradient(NVGcontext* ctx,
 	float dx, dy, d;
 	const float large = 1e5;
 	NVG_NOTUSED(ctx);
-	memset(&p, 0, sizeof(p));
+	lv_memzero(&p, sizeof(p));
 
 	// Calculate transform aligned to the line
 	dx = ex - sx;
@@ -843,7 +843,7 @@ NVGpaint nvgRadialGradient(NVGcontext* ctx,
 	float r = (inr+outr)*0.5f;
 	float f = (outr-inr);
 	NVG_NOTUSED(ctx);
-	memset(&p, 0, sizeof(p));
+	lv_memzero(&p, sizeof(p));
 
 	nvgTransformIdentity(p.xform);
 	p.xform[4] = cx;
@@ -868,7 +868,7 @@ NVGpaint nvgBoxGradient(NVGcontext* ctx,
 {
 	NVGpaint p;
 	NVG_NOTUSED(ctx);
-	memset(&p, 0, sizeof(p));
+	lv_memzero(&p, sizeof(p));
 
 	nvgTransformIdentity(p.xform);
 	p.xform[4] = x+w*0.5f;
@@ -894,7 +894,7 @@ NVGpaint nvgImagePattern(NVGcontext* ctx,
 {
 	NVGpaint p;
 	NVG_NOTUSED(ctx);
-	memset(&p, 0, sizeof(p));
+	lv_memzero(&p, sizeof(p));
 
 	nvgTransformRotate(p.xform, angle);
 	p.xform[4] = cx;
@@ -956,7 +956,7 @@ void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
 
 	// Transform the current scissor rect into current transform space.
 	// If there is difference in rotation, this will be approximation.
-	memcpy(pxform, state->scissor.xform, sizeof(float)*6);
+	lv_memcpy(pxform, state->scissor.xform, sizeof(float)*6);
 	ex = state->scissor.extent[0];
 	ey = state->scissor.extent[1];
 	nvgTransformInverse(invxorm, state->xform);
@@ -973,7 +973,7 @@ void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
 void nvgResetScissor(NVGcontext* ctx)
 {
 	NVGstate* state = nvg__getState(ctx);
-	memset(state->scissor.xform, 0, sizeof(state->scissor.xform));
+	lv_memzero(state->scissor.xform, sizeof(state->scissor.xform));
 	state->scissor.extent[0] = -1.0f;
 	state->scissor.extent[1] = -1.0f;
 }
@@ -1034,7 +1034,7 @@ static void nvg__appendCommands(NVGcontext* ctx, float* vals, int nvals)
 	if (ctx->ncommands+nvals > ctx->ccommands) {
 		float* commands;
 		int ccommands = ctx->ncommands+nvals + ctx->ccommands/2;
-		commands = (float*)realloc(ctx->commands, sizeof(float)*ccommands);
+		commands = (float*)lv_realloc(ctx->commands, sizeof(float)*ccommands);
 		if (commands == NULL) return;
 		ctx->commands = commands;
 		ctx->ccommands = ccommands;
@@ -1075,7 +1075,7 @@ static void nvg__appendCommands(NVGcontext* ctx, float* vals, int nvals)
 		}
 	}
 
-	memcpy(&ctx->commands[ctx->ncommands], vals, nvals*sizeof(float));
+	lv_memcpy(&ctx->commands[ctx->ncommands], vals, nvals*sizeof(float));
 
 	ctx->ncommands += nvals;
 }
@@ -1100,13 +1100,13 @@ static void nvg__addPath(NVGcontext* ctx)
 	if (ctx->cache->npaths+1 > ctx->cache->cpaths) {
 		NVGpath* paths;
 		int cpaths = ctx->cache->npaths+1 + ctx->cache->cpaths/2;
-		paths = (NVGpath*)realloc(ctx->cache->paths, sizeof(NVGpath)*cpaths);
+		paths = (NVGpath*)lv_realloc(ctx->cache->paths, sizeof(NVGpath)*cpaths);
 		if (paths == NULL) return;
 		ctx->cache->paths = paths;
 		ctx->cache->cpaths = cpaths;
 	}
 	path = &ctx->cache->paths[ctx->cache->npaths];
-	memset(path, 0, sizeof(*path));
+	lv_memzero(path, sizeof(*path));
 	path->first = ctx->cache->npoints;
 	path->winding = NVG_CCW;
 
@@ -1137,14 +1137,14 @@ static void nvg__addPoint(NVGcontext* ctx, float x, float y, int flags)
 	if (ctx->cache->npoints+1 > ctx->cache->cpoints) {
 		NVGpoint* points;
 		int cpoints = ctx->cache->npoints+1 + ctx->cache->cpoints/2;
-		points = (NVGpoint*)realloc(ctx->cache->points, sizeof(NVGpoint)*cpoints);
+		points = (NVGpoint*)lv_realloc(ctx->cache->points, sizeof(NVGpoint)*cpoints);
 		if (points == NULL) return;
 		ctx->cache->points = points;
 		ctx->cache->cpoints = cpoints;
 	}
 
 	pt = &ctx->cache->points[ctx->cache->npoints];
-	memset(pt, 0, sizeof(*pt));
+	lv_memzero(pt, sizeof(*pt));
 	pt->x = x;
 	pt->y = y;
 	pt->flags = (unsigned char)flags;
@@ -1179,7 +1179,7 @@ static NVGvertex* nvg__allocTempVerts(NVGcontext* ctx, int nverts)
 	if (nverts > ctx->cache->cverts) {
 		NVGvertex* verts;
 		int cverts = (nverts + 0xff) & ~0xff; // Round up to prevent allocations when things change just slightly.
-		verts = (NVGvertex*)realloc(ctx->cache->verts, sizeof(NVGvertex)*cverts);
+		verts = (NVGvertex*)lv_realloc(ctx->cache->verts, sizeof(NVGvertex)*cverts);
 		if (verts == NULL) return NULL;
 		ctx->cache->verts = verts;
 		ctx->cache->cverts = cverts;
@@ -2156,19 +2156,19 @@ void nvgDebugDumpPathCache(NVGcontext* ctx)
 	const NVGpath* path;
 	int i, j;
 
-	printf("Dumping %d cached paths\n", ctx->cache->npaths);
+	LV_LOG_USER("Dumping %d cached paths", ctx->cache->npaths);
 	for (i = 0; i < ctx->cache->npaths; i++) {
 		path = &ctx->cache->paths[i];
-		printf(" - Path %d\n", i);
+		LV_LOG_USER(" - Path %d", i);
 		if (path->nfill) {
-			printf("   - fill: %d\n", path->nfill);
+			LV_LOG_USER("   - fill: %d", path->nfill);
 			for (j = 0; j < path->nfill; j++)
-				printf("%f\t%f\n", path->fill[j].x, path->fill[j].y);
+				LV_LOG_USER("%f\t%f", path->fill[j].x, path->fill[j].y);
 		}
 		if (path->nstroke) {
-			printf("   - stroke: %d\n", path->nstroke);
+			LV_LOG_USER("   - stroke: %d", path->nstroke);
 			for (j = 0; j < path->nstroke; j++)
-				printf("%f\t%f\n", path->stroke[j].x, path->stroke[j].y);
+				LV_LOG_USER("%f\t%f", path->stroke[j].x, path->stroke[j].y);
 		}
 	}
 }

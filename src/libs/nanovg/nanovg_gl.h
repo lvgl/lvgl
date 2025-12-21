@@ -114,11 +114,12 @@ enum NVGimageFlagsGL {
 
 #ifdef NANOVG_GL_IMPLEMENTATION
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
 #include "nanovg.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../stdlib/lv_string.h"
+#include "../../stdlib/lv_sprintf.h"
+#include "../../misc/lv_log.h"
 #include "../../misc/lv_profiler.h"
 
 enum GLNVGuniformLoc {
@@ -376,7 +377,7 @@ static GLNVGtexture* glnvg__allocTexture(GLNVGcontext* gl)
 		if (gl->ntextures+1 > gl->ctextures) {
 			GLNVGtexture* textures;
 			int ctextures = glnvg__maxi(gl->ntextures+1, 4) +  gl->ctextures/2; // 1.5x Overallocate
-			textures = (GLNVGtexture*)realloc(gl->textures, sizeof(GLNVGtexture)*ctextures);
+			textures = (GLNVGtexture*)lv_realloc(gl->textures, sizeof(GLNVGtexture)*ctextures);
 			if (textures == NULL) return NULL;
 			gl->textures = textures;
 			gl->ctextures = ctextures;
@@ -384,7 +385,7 @@ static GLNVGtexture* glnvg__allocTexture(GLNVGcontext* gl)
 		tex = &gl->textures[gl->ntextures++];
 	}
 
-	memset(tex, 0, sizeof(*tex));
+	lv_memzero(tex, sizeof(*tex));
 	tex->id = ++gl->textureId;
 
 	return tex;
@@ -406,7 +407,7 @@ static int glnvg__deleteTexture(GLNVGcontext* gl, int id)
 		if (gl->textures[i].id == id) {
 			if (gl->textures[i].tex != 0 && (gl->textures[i].flags & NVG_IMAGE_NODELETE) == 0)
 				glDeleteTextures(1, &gl->textures[i].tex);
-			memset(&gl->textures[i], 0, sizeof(gl->textures[i]));
+			lv_memzero(&gl->textures[i], sizeof(gl->textures[i]));
 			return 1;
 		}
 	}
@@ -420,7 +421,7 @@ static void glnvg__dumpShaderError(GLuint shader, const char* name, const char* 
 	glGetShaderInfoLog(shader, 512, &len, str);
 	if (len > 512) len = 512;
 	str[len] = '\0';
-	printf("Shader %s/%s error:\n%s\n", name, type, str);
+	LV_LOG_ERROR("Shader %s/%s error:\n%s", name, type, str);
 }
 
 static void glnvg__dumpProgramError(GLuint prog, const char* name)
@@ -430,7 +431,7 @@ static void glnvg__dumpProgramError(GLuint prog, const char* name)
 	glGetProgramInfoLog(prog, 512, &len, str);
 	if (len > 512) len = 512;
 	str[len] = '\0';
-	printf("Program %s error:\n%s\n", name, str);
+	LV_LOG_ERROR("Program %s error:\n%s", name, str);
 }
 
 static void glnvg__checkError(GLNVGcontext* gl, const char* str)
@@ -439,7 +440,7 @@ static void glnvg__checkError(GLNVGcontext* gl, const char* str)
 	if ((gl->flags & NVG_DEBUG) == 0) return;
 	err = glGetError();
 	if (err != GL_NO_ERROR) {
-		printf("Error %08x after %s\n", err, str);
+		LV_LOG_ERROR("Error %08x after %s", err, str);
 		return;
 	}
 }
@@ -452,7 +453,7 @@ static int glnvg__createShader(GLNVGshader* shader, const char* name, const char
 	str[0] = header;
 	str[1] = opts != NULL ? opts : "";
 
-	memset(shader, 0, sizeof(*shader));
+	lv_memzero(shader, sizeof(*shader));
 
 	prog = glCreateProgram();
 	vert = glCreateShader(GL_VERTEX_SHADER);
@@ -754,7 +755,7 @@ static int glnvg__renderCreate(void* uptr)
 	int i;
 	char opts[64];
 	for (i = 0; i < GLNVG_SHADER_COUNT; i++) {
-		sprintf(opts, "#define SHADER_TYPE %d\n%s", i, (gl->flags & NVG_ANTIALIAS) ? "#define EDGE_AA 1\n" : "");
+		lv_snprintf(opts, sizeof(opts), "#define SHADER_TYPE %d\n%s", i, (gl->flags & NVG_ANTIALIAS) ? "#define EDGE_AA 1\n" : "");
 		if (glnvg__createShader(&gl->shaders[i], "shader", shaderHeader, opts, fillVertShader, fillFragShader) == 0)
 			return 0;
 		glnvg__checkError(gl, "uniform locations");
@@ -798,12 +799,12 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 	if (glnvg__nearestPow2(w) != (unsigned int)w || glnvg__nearestPow2(h) != (unsigned int)h) {
 		// No repeat
 		if ((imageFlags & NVG_IMAGE_REPEATX) != 0 || (imageFlags & NVG_IMAGE_REPEATY) != 0) {
-			printf("Repeat X/Y is not supported for non power-of-two textures (%d x %d)\n", w, h);
+			LV_LOG_WARN("Repeat X/Y is not supported for non power-of-two textures (%d x %d)", w, h);
 			imageFlags &= ~(NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		}
 		// No mips.
 		if (imageFlags & NVG_IMAGE_GENERATE_MIPMAPS) {
-			printf("Mip-maps is not support for non power-of-two textures (%d x %d)\n", w, h);
+			LV_LOG_WARN("Mip-maps is not support for non power-of-two textures (%d x %d)", w, h);
 			imageFlags &= ~NVG_IMAGE_GENERATE_MIPMAPS;
 		}
 	}
@@ -1003,13 +1004,13 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 	GLNVGtexture* tex = NULL;
 	float invxform[6];
 
-	memset(frag, 0, sizeof(*frag));
+	lv_memzero(frag, sizeof(*frag));
 
 	frag->s.innerCol = glnvg__premulColor(paint->innerColor);
 	frag->s.outerCol = glnvg__premulColor(paint->outerColor);
 
 	if (scissor->extent[0] < -0.5f || scissor->extent[1] < -0.5f) {
-		memset(frag->s.scissorMat, 0, sizeof(frag->s.scissorMat));
+		lv_memzero(frag->s.scissorMat, sizeof(frag->s.scissorMat));
 		frag->s.scissorExt[0] = 1.0f;
 		frag->s.scissorExt[1] = 1.0f;
 		frag->s.scissorScale[0] = 1.0f;
@@ -1023,7 +1024,7 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 		frag->s.scissorScale[1] = sqrtf(scissor->xform[1]*scissor->xform[1] + scissor->xform[3]*scissor->xform[3]) / fringe;
 	}
 
-	memcpy(frag->s.extent, paint->extent, sizeof(frag->s.extent));
+	lv_memcpy(frag->s.extent, paint->extent, sizeof(frag->s.extent));
 	frag->s.strokeMult = (width*0.5f + fringe*0.5f) / fringe;
 	frag->s.strokeThr = strokeThr;
 
@@ -1430,13 +1431,13 @@ static GLNVGcall* glnvg__allocCall(GLNVGcontext* gl)
 	if (gl->ncalls+1 > gl->ccalls) {
 		GLNVGcall* calls;
 		int ccalls = glnvg__maxi(gl->ncalls+1, 128) + gl->ccalls/2; // 1.5x Overallocate
-		calls = (GLNVGcall*)realloc(gl->calls, sizeof(GLNVGcall) * ccalls);
+		calls = (GLNVGcall*)lv_realloc(gl->calls, sizeof(GLNVGcall) * ccalls);
 		if (calls == NULL) return NULL;
 		gl->calls = calls;
 		gl->ccalls = ccalls;
 	}
 	ret = &gl->calls[gl->ncalls++];
-	memset(ret, 0, sizeof(GLNVGcall));
+	lv_memzero(ret, sizeof(GLNVGcall));
 	return ret;
 }
 
@@ -1446,7 +1447,7 @@ static int glnvg__allocPaths(GLNVGcontext* gl, int n)
 	if (gl->npaths+n > gl->cpaths) {
 		GLNVGpath* paths;
 		int cpaths = glnvg__maxi(gl->npaths + n, 128) + gl->cpaths/2; // 1.5x Overallocate
-		paths = (GLNVGpath*)realloc(gl->paths, sizeof(GLNVGpath) * cpaths);
+		paths = (GLNVGpath*)lv_realloc(gl->paths, sizeof(GLNVGpath) * cpaths);
 		if (paths == NULL) return -1;
 		gl->paths = paths;
 		gl->cpaths = cpaths;
@@ -1462,7 +1463,7 @@ static int glnvg__allocVerts(GLNVGcontext* gl, int n)
 	if (gl->nverts+n > gl->cverts) {
 		NVGvertex* verts;
 		int cverts = glnvg__maxi(gl->nverts + n, 4096) + gl->cverts/2; // 1.5x Overallocate
-		verts = (NVGvertex*)realloc(gl->verts, sizeof(NVGvertex) * cverts);
+		verts = (NVGvertex*)lv_realloc(gl->verts, sizeof(NVGvertex) * cverts);
 		if (verts == NULL) return -1;
 		gl->verts = verts;
 		gl->cverts = cverts;
@@ -1478,7 +1479,7 @@ static int glnvg__allocFragUniforms(GLNVGcontext* gl, int n)
 	if (gl->nuniforms+n > gl->cuniforms) {
 		unsigned char* uniforms;
 		int cuniforms = glnvg__maxi(gl->nuniforms+n, 128) + gl->cuniforms/2; // 1.5x Overallocate
-		uniforms = (unsigned char*)realloc(gl->uniforms, structSize * cuniforms);
+		uniforms = (unsigned char*)lv_realloc(gl->uniforms, structSize * cuniforms);
 		if (uniforms == NULL) return -1;
 		gl->uniforms = uniforms;
 		gl->cuniforms = cuniforms;
@@ -1534,17 +1535,17 @@ static void glnvg__renderFill(void* uptr, NVGpaint* paint, NVGcompositeOperation
 	for (i = 0; i < npaths; i++) {
 		GLNVGpath* copy = &gl->paths[call->pathOffset + i];
 		const NVGpath* path = &paths[i];
-		memset(copy, 0, sizeof(GLNVGpath));
+		lv_memzero(copy, sizeof(GLNVGpath));
 		if (path->nfill > 0) {
 			copy->fillOffset = offset;
 			copy->fillCount = path->nfill;
-			memcpy(&gl->verts[offset], path->fill, sizeof(NVGvertex) * path->nfill);
+			lv_memcpy(&gl->verts[offset], path->fill, sizeof(NVGvertex) * path->nfill);
 			offset += path->nfill;
 		}
 		if (path->nstroke > 0) {
 			copy->strokeOffset = offset;
 			copy->strokeCount = path->nstroke;
-			memcpy(&gl->verts[offset], path->stroke, sizeof(NVGvertex) * path->nstroke);
+			lv_memcpy(&gl->verts[offset], path->stroke, sizeof(NVGvertex) * path->nstroke);
 			offset += path->nstroke;
 		}
 	}
@@ -1563,7 +1564,7 @@ static void glnvg__renderFill(void* uptr, NVGpaint* paint, NVGcompositeOperation
 		if (call->uniformOffset == -1) goto error;
 		// Simple shader for stencil
 		frag = nvg__fragUniformPtr(gl, call->uniformOffset);
-		memset(frag, 0, sizeof(*frag));
+		lv_memzero(frag, sizeof(*frag));
 		frag->s.strokeThr = -1.0f;
 		frag->s.type = NSVG_SHADER_SIMPLE;
 		// Fill shader
@@ -1612,11 +1613,11 @@ static void glnvg__renderStroke(void* uptr, NVGpaint* paint, NVGcompositeOperati
 	for (i = 0; i < npaths; i++) {
 		GLNVGpath* copy = &gl->paths[call->pathOffset + i];
 		const NVGpath* path = &paths[i];
-		memset(copy, 0, sizeof(GLNVGpath));
+		lv_memzero(copy, sizeof(GLNVGpath));
 		if (path->nstroke) {
 			copy->strokeOffset = offset;
 			copy->strokeCount = path->nstroke;
-			memcpy(&gl->verts[offset], path->stroke, sizeof(NVGvertex) * path->nstroke);
+			lv_memcpy(&gl->verts[offset], path->stroke, sizeof(NVGvertex) * path->nstroke);
 			offset += path->nstroke;
 		}
 	}
@@ -1667,7 +1668,7 @@ static void glnvg__renderTriangles(void* uptr, NVGpaint* paint, NVGcompositeOper
 	if (call->triangleOffset == -1) goto error;
 	call->triangleCount = nverts;
 
-	memcpy(&gl->verts[call->triangleOffset], verts, sizeof(NVGvertex) * nverts);
+	lv_memcpy(&gl->verts[call->triangleOffset], verts, sizeof(NVGvertex) * nverts);
 
 	// Fill shader
 	call->uniformOffset = glnvg__allocFragUniforms(gl, 1);
@@ -1709,14 +1710,14 @@ static void glnvg__renderDelete(void* uptr)
 		if (gl->textures[i].tex != 0 && (gl->textures[i].flags & NVG_IMAGE_NODELETE) == 0)
 			glDeleteTextures(1, &gl->textures[i].tex);
 	}
-	free(gl->textures);
+	lv_free(gl->textures);
 
-	free(gl->paths);
-	free(gl->verts);
-	free(gl->uniforms);
-	free(gl->calls);
+	lv_free(gl->paths);
+	lv_free(gl->verts);
+	lv_free(gl->uniforms);
+	lv_free(gl->calls);
 
-	free(gl);
+	lv_free(gl);
 }
 
 
@@ -1732,11 +1733,11 @@ NVGcontext* nvgCreateGLES3(int flags)
 {
 	NVGparams params;
 	NVGcontext* ctx = NULL;
-	GLNVGcontext* gl = (GLNVGcontext*)malloc(sizeof(GLNVGcontext));
+	GLNVGcontext* gl = (GLNVGcontext*)lv_malloc(sizeof(GLNVGcontext));
 	if (gl == NULL) goto error;
-	memset(gl, 0, sizeof(GLNVGcontext));
+	lv_memzero(gl, sizeof(GLNVGcontext));
 
-	memset(&params, 0, sizeof(params));
+	lv_memzero(&params, sizeof(params));
 	params.renderCreate = glnvg__renderCreate;
 	params.renderCreateTexture = glnvg__renderCreateTexture;
 	params.renderDeleteTexture = glnvg__renderDeleteTexture;

@@ -19,6 +19,8 @@
 #define NANOVG_GL_UTILS_H
 
 #include "../../lv_conf_internal.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../stdlib/lv_string.h"
 
 #if LV_USE_NANOVG
 
@@ -67,9 +69,9 @@ NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imag
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defFBO);
 	glGetIntegerv(GL_RENDERBUFFER_BINDING, &defaultRBO);
 
-	fb = (NVGLUframebuffer*)malloc(sizeof(NVGLUframebuffer));
+	fb = (NVGLUframebuffer*)lv_malloc(sizeof(NVGLUframebuffer));
 	if (fb == NULL) goto error;
-	memset(fb, 0, sizeof(NVGLUframebuffer));
+	lv_memzero(fb, sizeof(NVGLUframebuffer));
 
 	fb->image = nvgCreateImage(ctx, w, h, imageFlags | NVG_IMAGE_FLIPY | NVG_IMAGE_PREMULTIPLIED, format, NULL);
 
@@ -154,7 +156,7 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer* fb)
 	fb->rbo = 0;
 	fb->texture = 0;
 	fb->image = -1;
-	free(fb);
+	lv_free(fb);
 #else
 	NVG_NOTUSED(fb);
 #endif
