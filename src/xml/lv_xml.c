@@ -869,7 +869,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
     /* If not a component either, check if it is a slot, e.g. my_button-icon */
     if(state->item == NULL) {
         char buf[128];
-        if(strlen(name) >= sizeof(buf)) {
+        if(lv_strlen(name) >= sizeof(buf)) {
             LV_LOG_WARN("Component/slot name '%s' is too long (max 127 chars); skipping slot parsing.", name);
         }
         else {
