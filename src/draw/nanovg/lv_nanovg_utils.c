@@ -274,7 +274,7 @@ lv_draw_buf_t * lv_nanovg_reshape_global_image(struct _lv_draw_nanovg_unit_t * u
 {
     LV_ASSERT_NULL(u);
 
-    uint32_t stride = lv_color_format_get_size(cf) * w;
+    uint32_t stride = (w * lv_color_format_get_bpp(cf) + 7) >> 3;
     lv_draw_buf_t * tmp_buf = lv_draw_buf_reshape(u->image_buf, cf, w, h, stride);
 
     if(!tmp_buf) {
