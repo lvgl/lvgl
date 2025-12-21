@@ -40,8 +40,8 @@ Enable the NanoVG draw unit in ``lv_conf.h``:
     #define LV_USE_DRAW_NANOVG 1
 
     /* Select OpenGL backend (choose one):
-     * - LV_NANOVG_BACKEND_GL2:   Desktop OpenGL 2.0
-     * - LV_NANOVG_BACKEND_GL3:   Desktop OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
      * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
      * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
      */
