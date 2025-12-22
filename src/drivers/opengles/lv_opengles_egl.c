@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_egl.h"
+#include <EGL/eglplatform.h>
 #include <stdint.h>
 
 #if LV_USE_EGL
@@ -92,7 +93,12 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
         ctx->egl_context = EGL_NO_CONTEXT;
     }
     if(ctx->egl_surface && ctx->egl_display) {
-        eglDestroySurface(ctx->egl_display, ctx->egl_surface);
+        if(ctx->interface.destroy_surface_cb) {
+            ctx->interface.destroy_surface_cb(ctx->interface.driver_data, ctx->egl_surface);
+        }
+        else {
+            eglDestroySurface(ctx->egl_display, ctx->egl_surface);
+        }
         ctx->egl_surface = EGL_NO_SURFACE;
     }
 
@@ -195,11 +201,12 @@ static lv_result_t load_egl(lv_opengles_egl_t * ctx)
         goto egl_config_err;
     }
 
-    ctx->native_window = (EGLNativeWindowType)create_native_window(ctx);
-    if(!ctx->native_window) {
-        LV_LOG_ERROR("Failed to create native window");
-        goto create_window_err;
-
+    if(ctx->interface.create_window_cb) {
+        ctx->native_window = (EGLNativeWindowType) create_native_window(ctx);
+        if(!ctx->native_window) {
+            LV_LOG_ERROR("Failed to create native window");
+            goto create_window_err;
+        }
     }
     ctx->egl_surface = create_egl_surface(ctx);
     if(!ctx->egl_surface) {
@@ -438,6 +445,16 @@ static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
 {
     LV_ASSERT_NULL(ctx->egl_display);
     LV_ASSERT_NULL(ctx->egl_config);
+
+    if(ctx->interface.create_surface_cb) {
+        lv_egl_create_surface_params_t params = {
+            .config = ctx->egl_config,
+            .display = ctx->egl_display,
+        };
+        return ctx->interface.create_surface_cb(ctx->interface.driver_data, &params);
+    }
+
+
     LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);
 }
@@ -516,9 +533,7 @@ static void * create_native_window(lv_opengles_egl_t * ctx)
 
     void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
     if(!native_window) {
-        LV_LOG_ERROR("Faield to create window");
-        lv_free(mods);
-        return NULL;
+        LV_LOG_ERROR("Failed to create window");
     }
     lv_free(mods);
     return native_window;

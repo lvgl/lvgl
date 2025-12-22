@@ -4705,4 +4705,4 @@ int gladLoadGL( GLADloadfunc load) {
 }
 #endif
 
-#endif /*LV_USE_OPENGLES*/
+#endif /*LV_USE_OPENGLES && !LV_USE_EGL*/
