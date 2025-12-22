@@ -189,11 +189,20 @@ void test_math_cubic_bezier_result_should_be_precise(void)
     test_cubic_bezier_ease_functions(.25f, .1f, .25f, 1);
 
     int32_t u0 = 0, u1 = 50, u2 = 952, u3 = LV_BEZIER_VAL_MAX;
-    for(int32_t i = 0; i <= 1024; i += 64) {
+    for(int32_t i = 0; i <= 1024; i++) {
         int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
         int32_t cubic_bezier = lv_bezier3(i, u0, u1, u2, u3);
 
         TEST_ASSERT_LESS_OR_EQUAL_INT32(5, LV_ABS(legacy - cubic_bezier));
+    }
+
+    /* Compare with legacy implementation */
+    u0 = 0, u1 = 341, u2 = 683, u3 = 1024;
+
+    for(int32_t i = 0; i <= 1024; i++) {
+        int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
+        int32_t result = lv_bezier3(i, u0, u1, u2, u3);
+        TEST_ASSERT_LESS_OR_EQUAL_INT32(5, LV_ABS(legacy - result));
     }
 }
 
@@ -236,18 +245,6 @@ void test_math_bezier3_basic(void)
     /* Test that it returns a valid value in range */
     int32_t result = lv_bezier3(512, 0, 50, 50, 1024);
     TEST_ASSERT_INT32_WITHIN(512, 512, result);  /* Should be in valid range between 0 and 1024 */
-}
-
-void test_math_bezier3_comparison(void)
-{
-    /* Compare with legacy implementation */
-    int32_t u0 = 0, u1 = 341, u2 = 683, u3 = 1024;
-
-    for(int32_t i = 0; i <= 1024; i += 64) {
-        int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
-        int32_t result = lv_bezier3(i, u0, u1, u2, u3);
-        TEST_ASSERT_LESS_OR_EQUAL_INT32(5, LV_ABS(legacy - result));
-    }
 }
 
 /* Test lv_sqrt function */
