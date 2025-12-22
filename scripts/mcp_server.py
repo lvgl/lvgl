@@ -421,9 +421,9 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
         available = glob.glob(os.path.join(build_dir, "test_*"))
         if available:
             test_names = [
-                os.path.basename(t).replace("test_", "")
-                for t in available
-                if os.path.isfile(t)
+                os.path.basename(test_path).replace("test_", "")
+                for test_path in available
+                if os.path.isfile(test_path)
             ]
             return [
                 TextContent(
