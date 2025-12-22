@@ -448,7 +448,13 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
         return [
             TextContent(
                 type="text",
-                text="Error: 'test_name' parameter is required and no test executables found in build directory.",
+                text=(
+                    "Error: 'test_name' parameter is required and no test executables "
+                    "were found in the test build directory.\n\n"
+                    "Make sure the LVGL tests have been built (for example, by building "
+                    "the tests in 'tests/build_test_sysheap') before running this command, "
+                    "or consult the project test build instructions."
+                ),
             )
         ]
 
