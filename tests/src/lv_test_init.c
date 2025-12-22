@@ -46,12 +46,6 @@ void lv_test_deinit(void)
 #endif
     lv_test_indev_delete_all();
     lv_deinit();
-
-#include <GLFW/glfw3.h>
-#if LV_USE_DRAW_OPENGLES
-    glfwDestroyWindow(LV_GLOBAL_DEFAULT()->test_state.window);
-    glfwTerminate();
-#endif
 }
 
 static void test_log_print_cb(lv_log_level_t level, const char * buf)

@@ -7,6 +7,11 @@
 
 #define LV_DRAW_BUF_STRIDE_ALIGN 1
 #define LV_DRAW_BUF_ALIGN 4
+#define LV_USE_EGL 1
+#if defined(LV_USE_GLFW) && LV_USE_GLFW
+    #undef LV_USE_GLFW
+    #define LV_USE_GLFW 0
+#endif
 
 #define LV_USE_OPENGLES 1
 #define LV_USE_DRAW_OPENGLES 1

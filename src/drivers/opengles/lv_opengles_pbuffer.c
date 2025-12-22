@@ -8,8 +8,6 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_pbuffer.h"
-#include <src/drivers/opengles/glad/include/glad/egl.h>
-
 #if LV_USE_EGL
 
 #include "lv_opengles_egl.h"
@@ -128,7 +126,6 @@ lv_result_t lv_opengles_pbuffer_read_to_draw_buf(lv_display_t * display, lv_draw
         return LV_RESULT_INVALID;
     }
 
-    /* Read pixels from framebuffer */
     if(cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_ARGB8888) {
         GL_CALL(glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data));
     }
@@ -142,7 +139,6 @@ lv_result_t lv_opengles_pbuffer_read_to_draw_buf(lv_display_t * display, lv_draw
         LV_LOG_ERROR("Unsupported color format for readback: %d", cf);
         return LV_RESULT_INVALID;
     }
-
     return LV_RESULT_OK;
 }
 
@@ -172,9 +168,12 @@ static void pbuffer_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_
 
     if(lv_display_flush_is_last(disp)) {
         set_viewport(disp);
-        lv_pbuffer_ctx_t * ctx = lv_display_get_driver_data(disp);
-        lv_opengles_render_display_texture(disp, false, true);
-        lv_opengles_egl_update(ctx->egl_ctx);
+        lv_opengles_render_params_t params  = {
+            .h_flip = false,
+            .v_flip = false,
+            .rb_swap = false
+        };
+        lv_opengles_render_display(disp, &params);
     }
     lv_display_flush_ready(disp);
 }
@@ -213,28 +212,15 @@ static void * pbuffer_create_surface(void * driver_data, const lv_egl_create_sur
     lv_pbuffer_ctx_t * ctx = (lv_pbuffer_ctx_t *)driver_data;
     LV_UNUSED(params);
 
-
-    /* Create PBuffer surface attributes */
     const EGLint pbuffer_attribs[] = {
         EGL_WIDTH, ctx->width,
         EGL_HEIGHT, ctx->height,
         EGL_NONE
     };
 
-    /* Create PBuffer surface */
-    EGLSurface pbuffer_surface = eglCreatePbufferSurface(
-                                     params->display,
-                                     params->config,
-                                     pbuffer_attribs
-                                 );
-
-    if(pbuffer_surface == EGL_NO_SURFACE) {
-        LV_LOG_ERROR("Failed to create PBuffer surface. Error: %#x", eglGetError());
-        return NULL;
-    }
-
-    LV_LOG_USER("Created PBuffer surface: %dx%d", ctx->width, ctx->height);
-    return (void *)pbuffer_surface;
+    return eglCreatePbufferSurface(params->display,
+                                   params->config,
+                                   pbuffer_attribs);
 }
 
 static size_t pbuffer_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count)
@@ -249,16 +235,14 @@ static size_t pbuffer_select_config_cb(void * driver_data, const lv_egl_config_t
 #error("Unsupported color format")
 #endif
 
-    /* Log available configs for debugging */
     for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_USER("Config %zu: %#x %dx%d RGBA(%d,%d,%d,%d) buffer:%d depth:%d samples:%d surface:%d",
-                    i, configs[i].id,
-                    configs[i].max_width, configs[i].max_height,
-                    configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
-                    configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].surface_type);
+        LV_LOG_TRACE("Config %zu: %#x %dx%d RGBA(%d,%d,%d,%d) buffer:%d depth:%d samples:%d surface:%d",
+                     i, configs[i].id,
+                     configs[i].max_width, configs[i].max_height,
+                     configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
+                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].surface_type);
     }
 
-    /* Find a config that supports PBuffer and matches our requirements */
     for(size_t i = 0; i < config_count; ++i) {
         lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
 
@@ -266,7 +250,7 @@ static size_t pbuffer_select_config_cb(void * driver_data, const lv_egl_config_t
            configs[i].max_height >= ctx->height &&
            config_cf == target_cf &&
            (configs[i].surface_type & EGL_PBUFFER_BIT)) {
-            LV_LOG_USER("Selected PBuffer config %zu", i);
+            LV_LOG_INFO("Selected PBuffer config %zu", i);
             return i;
         }
     }
