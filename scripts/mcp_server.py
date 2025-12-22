@@ -64,13 +64,27 @@ def truncate_output(text: str, max_length: int, head_portion_ratio: float = 0.5)
     Returns:
         Truncated text with marker if truncation occurred
     """
+    marker = "\n\n... (output truncated) ...\n\n"
+
+    # If the text already fits within the maximum length, return it unchanged.
     if len(text) <= max_length:
         return text
-    head_len = int(max_length * head_portion_ratio)
-    tail_len = max_length - head_len
-    return text[:head_len] + "\n\n... (output truncated) ...\n\n" + text[-tail_len:]
 
+    # If max_length is too small to accommodate the marker plus any meaningful
+    # content, fall back to a simple hard cutoff.
+    if max_length <= len(marker):
+        return text[:max_length]
 
+    # Reserve space for the marker when calculating head and tail lengths.
+    available_length = max_length - len(marker)
+    head_len = int(available_length * head_ratio)
+    tail_len = available_length - head_len
+
+    # Guard against degenerate cases where tail_len might be zero or negative.
+    if tail_len <= 0:
+        return text[:available_length] + marker
+
+    return text[:head_len] + marker + text[-tail_len:]
 def create_mcp_server():
     """Create and configure the MCP server with all tools."""
     # Import MCP SDK (only when needed for server mode)
