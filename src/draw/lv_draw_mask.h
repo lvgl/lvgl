@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
@@ -28,7 +29,7 @@ extern "C" {
 struct _lv_draw_mask_rect_dsc_t {
     lv_draw_dsc_base_t base;
 
-    /**The area t mask.*/
+    /**The area to mask.*/
     lv_area_t area;
 
     /**The radius of masking*/
