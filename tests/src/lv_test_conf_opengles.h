@@ -16,4 +16,14 @@
 #define LV_USE_OPENGLES 1
 #define LV_USE_DRAW_OPENGLES 1
 
+/* Snapshot is not supported with draw opengles */
+#define LV_USE_SNAPSHOT 0
+
+/* Draw opengl doesn't support vector graphics for now */
+#define LV_USE_LOTTIE 0
+#define LV_USE_SVG 0
+#define LV_USE_VECTOR_GRAPHIC 0
+#define LV_USE_THORVG 0
+#define LV_DRAW_OPENGLES_TEXTURE_CACHE_COUNT 128
+
 #endif /*LV_TEST_CONF_OPENGLES_H*/

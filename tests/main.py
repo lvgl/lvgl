@@ -149,6 +149,12 @@ def run_tests(options_name, test_suite):
     print(label)
     print('=' * len(label), flush=True)
 
+    if options_name == 'OPTIONS_TEST_OPENGLES':
+        supp_file = os.path.abspath(
+            os.path.join(lvgl_test_dir, "lsan-egl.supp")
+        )
+        os.environ["LSAN_OPTIONS"]= f"suppressions={supp_file}"
+
     os.chdir(get_build_dir(options_name))
     args = [
         'ctest',

@@ -102,20 +102,22 @@ void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
         ctx->egl_surface = EGL_NO_SURFACE;
     }
 
+    if(ctx->native_window && ctx->interface.destroy_window_cb) {
+        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
+        ctx->native_window = 0;
+    }
+
+    eglReleaseThread();
+    if(ctx->egl_display) {
+        eglTerminate(ctx->egl_display);
+        ctx->egl_display = EGL_NO_DISPLAY;
+    }
+
     if(ctx->egl_lib_handle) {
         dlclose(ctx->egl_lib_handle);
     }
     if(ctx->opengl_lib_handle) {
         dlclose(ctx->opengl_lib_handle);
-    }
-
-    if(ctx->native_window && ctx->interface.destroy_window_cb) {
-        ctx->interface.destroy_window_cb(ctx->interface.driver_data, (void *)ctx->native_window);
-        ctx->native_window = 0;
-    }
-    if(ctx->egl_display) {
-        eglTerminate(ctx->egl_display);
-        ctx->egl_display = EGL_NO_DISPLAY;
     }
     ctx->egl_config = NULL;
     lv_free(ctx);
@@ -453,7 +455,6 @@ static EGLSurface create_egl_surface(lv_opengles_egl_t * ctx)
         };
         return ctx->interface.create_surface_cb(ctx->interface.driver_data, &params);
     }
-
 
     LV_ASSERT(ctx->native_window != 0);
     return eglCreateWindowSurface(ctx->egl_display, ctx->egl_config, ctx->native_window, NULL);

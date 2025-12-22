@@ -10,7 +10,7 @@
 
 /*
  * Load a vector font
- * ThorVG needs to be enabled, LV_USE_VECTOR_GRAPHICS=1
+ * ThorVG needs to be enabled, LV_USE_VECTOR_GRAPHIC=1
  */
 void lv_example_freetype_2_vector_font(uint32_t font_size, uint32_t border_width)
 {

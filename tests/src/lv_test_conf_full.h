@@ -52,7 +52,10 @@
 #define LV_LABEL_TEXT_SELECTION     1
 
 #define LV_USE_CALENDAR_CHINESE 1
-#define LV_USE_LOTTIE 1
+
+#ifndef LV_USE_LOTTIE
+    #define LV_USE_LOTTIE 1
+#endif
 
 #define LV_USE_FLEX 1
 #define LV_USE_GRID 1
@@ -102,11 +105,22 @@
 #define LV_USE_SYSMON           1
 #define LV_USE_MEM_MONITOR      1
 #define LV_USE_PERF_MONITOR     1
-#define LV_USE_SNAPSHOT         1
+
+#ifndef LV_USE_SNAPSHOT
+    #define LV_USE_SNAPSHOT         1
+#endif
+
 #define LV_USE_THORVG_INTERNAL  1
 #define LV_USE_LZ4_INTERNAL     1
-#define LV_USE_VECTOR_GRAPHIC   1
-#define LV_USE_SVG              1
+
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #define LV_USE_VECTOR_GRAPHIC   1
+#endif
+
+#ifndef LV_USE_SVG
+    #define LV_USE_SVG              1
+#endif
+
 #define LV_USE_SVG_ANIMATION    1
 #define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1

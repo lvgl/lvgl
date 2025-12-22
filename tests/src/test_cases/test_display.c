@@ -233,6 +233,9 @@ static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t 
 
 void test_display_triple_buffer(void)
 {
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("Can't run draw opengl tests unless display is created via OpenGL driver");
+#endif
     lv_display_t * disp = lv_display_create(480, 320);
     lv_display_set_flush_cb(disp, dummy_flush_cb);
     lv_draw_buf_t * buf1 = lv_draw_buf_create(480, 320, LV_COLOR_FORMAT_NATIVE, 0);

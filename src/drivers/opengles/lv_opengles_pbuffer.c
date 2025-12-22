@@ -8,6 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_pbuffer.h"
+#include <src/misc/lv_event.h>
 #if LV_USE_EGL
 
 #include "lv_opengles_egl.h"
@@ -91,7 +92,7 @@ lv_display_t * lv_opengles_pbuffer_create(int32_t hor_res, int32_t ver_res)
 
     lv_opengles_init();
 
-    lv_display_t * disp = lv_opengles_texture_create(hor_res, ver_res);
+    lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(!disp) {
         LV_LOG_ERROR("Failed to create display");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
@@ -99,9 +100,21 @@ lv_display_t * lv_opengles_pbuffer_create(int32_t hor_res, int32_t ver_res)
         return NULL;
     }
 
+    ctx->texture.is_texture_owner = true;
+    lv_result_t res = lv_opengles_texture_reshape(&ctx->texture, disp, hor_res, ver_res);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to create opengl texture");
+        lv_opengles_egl_context_destroy(ctx->egl_ctx);
+        lv_free(ctx);
+        lv_display_delete(disp);
+        return NULL;
+    }
+
     lv_display_set_driver_data(disp, ctx);
     lv_display_set_flush_cb(disp, pbuffer_flush_cb);
-    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
+    lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(disp, pbuffer_event_cb, LV_EVENT_DELETE, NULL);
 
@@ -203,6 +216,7 @@ static void pbuffer_event_cb(lv_event_t * e)
             }
             break;
         default:
+            LV_LOG_USER("Unhandled event '%s'", lv_event_code_get_name(code));
             return;
     }
 }
