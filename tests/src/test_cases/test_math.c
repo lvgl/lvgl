@@ -210,6 +210,17 @@ void test_math_cubic_bezier_boundary_values(void)
     TEST_ASSERT(result2 >= 0 && result2 <= 1024);
 }
 
+void test_math_cubic_bezier_clamps_out_of_range(void)
+{
+    /* Force the bisection fallback to clamp t to the valid range */
+    int32_t below = lv_cubic_bezier(-50, 0, 0, 0, 0);
+    int32_t above = lv_cubic_bezier(LV_BEZIER_VAL_MAX + 50, LV_BEZIER_VAL_MAX, LV_BEZIER_VAL_MAX,
+                                    LV_BEZIER_VAL_MAX, LV_BEZIER_VAL_MAX);
+
+    TEST_ASSERT_EQUAL(0, below);
+    TEST_ASSERT_EQUAL(LV_BEZIER_VAL_MAX, above);
+}
+
 /* Test lv_bezier3 function */
 void test_math_bezier3_basic(void)
 {
@@ -320,6 +331,16 @@ void test_math_sqrt32_approximation(void)
 
     result = lv_sqrt32(10);
     TEST_ASSERT(result >= 3 && result <= 4); /* 3.16... */
+}
+
+void test_math_sqrt32_large_values(void)
+{
+    uint32_t max_sq = 65535U * 65535U;
+
+    TEST_ASSERT_EQUAL(65535, lv_sqrt32(max_sq));          /* Covers saturated upper branch */
+    TEST_ASSERT_EQUAL(32768, lv_sqrt32(0x40000000));      /* Uses highest lookup bucket */
+    TEST_ASSERT_EQUAL(8192, lv_sqrt32(0x4000000));        /* Exercises mid-high lookup path */
+    TEST_ASSERT_EQUAL(256, lv_sqrt32(0x10000));           /* Uses mid-range path and nr1 step */
 }
 
 /* Test lv_atan2 function */
