@@ -109,6 +109,7 @@ void lv_image_header_cache_dump(void)
     LV_LOG_USER("Image cache dump:");
     LV_LOG_USER("\tsize\tdata_size\tcf\trc\ttype\tdecoded\t\t\tsrc");
     lv_iter_inspect(iter, iter_inspect_cb);
+    lv_iter_destroy(iter);
 }
 
 /**********************
