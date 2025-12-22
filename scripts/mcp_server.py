@@ -25,6 +25,12 @@ LVGL_ROOT = os.path.dirname(SCRIPT_DIR)
 # Command execution timeout in seconds (10 minutes)
 COMMAND_TIMEOUT = 600
 
+# Tool name constants
+TOOL_RUN_TESTS = "lvgl_run_tests"
+TOOL_CHECK_COVERAGE = "lvgl_check_coverage"
+TOOL_FORMAT_CODE = "lvgl_format_code"
+TOOL_GDB_DEBUG = "lvgl_gdb_debug"
+
 
 def run_command(cmd: list[str], cwd: str = None) -> tuple[int, str, str]:
     """
@@ -108,10 +114,10 @@ def create_mcp_server():
     async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         """Route tool calls to appropriate handlers."""
         handlers = {
-            "lvgl_run_tests": run_tests,
-            "lvgl_check_coverage": check_coverage,
-            "lvgl_format_code": format_code,
-            "lvgl_gdb_debug": gdb_debug,
+            TOOL_RUN_TESTS: run_tests,
+            TOOL_CHECK_COVERAGE: check_coverage,
+            TOOL_FORMAT_CODE: format_code,
+            TOOL_GDB_DEBUG: gdb_debug,
         }
 
         handler = handlers.get(name)
@@ -134,7 +140,7 @@ def get_tool_definitions(Tool=None):
     """
     tools_data = [
         {
-            "name": "lvgl_run_tests",
+            "name": TOOL_RUN_TESTS,
             "description": """Run LVGL test cases (automatic build + test).
 
 Parameters:
@@ -169,7 +175,7 @@ Examples:
             },
         },
         {
-            "name": "lvgl_check_coverage",
+            "name": TOOL_CHECK_COVERAGE,
             "description": """Check code coverage.
 
 Parameters:
@@ -198,7 +204,7 @@ Examples:
             },
         },
         {
-            "name": "lvgl_format_code",
+            "name": TOOL_FORMAT_CODE,
             "description": """Run code formatting tool (astyle).
 
 Parameters:
@@ -222,7 +228,7 @@ Examples:
             },
         },
         {
-            "name": "lvgl_gdb_debug",
+            "name": TOOL_GDB_DEBUG,
             "description": """Debug test cases using GDB.
 
 Parameters:
@@ -602,10 +608,10 @@ def run_self_test(verbose: bool = False) -> bool:
     try:
         tools = get_tool_definitions()
         expected_tools = [
-            "lvgl_run_tests",
-            "lvgl_check_coverage",
-            "lvgl_format_code",
-            "lvgl_gdb_debug",
+            TOOL_RUN_TESTS,
+            TOOL_CHECK_COVERAGE,
+            TOOL_FORMAT_CODE,
+            TOOL_GDB_DEBUG,
         ]
         tool_names = [t["name"] for t in tools]
 
