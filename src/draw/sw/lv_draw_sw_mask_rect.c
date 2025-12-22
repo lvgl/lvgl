@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../misc/lv_area_private.h"
-#include "../lv_draw_mask_private.h"
+#include "../lv_draw_mask.h"
 #include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 #if LV_DRAW_SW_COMPLEX
