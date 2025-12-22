@@ -485,8 +485,8 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
 
     # Add commands for each breakpoint hit
     for _ in range(max_hits):
-        for c in commands:
-            cmd.extend(["-ex", c])
+        for gdb_command in commands:
+            cmd.extend(["-ex", gdb_command])
 
     cmd.append(test_exe)
 
