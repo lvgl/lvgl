@@ -7,22 +7,27 @@
 #define ERROR_THRESHOLD         5 /*5 in 1024, 0.5% max error allowed*/
 #define NEWTON_ITERATIONS       8
 
-/**********************
- *  HELPER FUNCTIONS
- **********************/
-
 static float do_cubic_bezier_f(float t, float a, float b, float c)
 {
     /*a*t^3 + b*t^2 + c*t*/
     return ((a * t + b) * t + c) * t;
 }
 
+/**
+ * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
+ * @param x time in range of [0..1]
+ * @param x1 x of control point 1 in range of [0..1]
+ * @param y1 y of control point 1 in range of [0..1]
+ * @param x2 x of control point 2 in range of [0..1]
+ * @param y2 y of control point 2 in range of [0..1]
+ * @return the value calculated
+ */
 static float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2)
 {
     float ax, bx, cx, ay, by, cy;
-    float tl, tr, t;
-    float xs;
-    float d;
+    float tl, tr, t;  /*t in cubic-bezier function, used for bisection */
+    float xs;  /*x sampled on curve */
+    float d; /*slope value at specified t*/
 
     if(x == 0 || x == 1) return x;
 
@@ -34,7 +39,8 @@ static float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2)
     by = 3.f * (y2 - y1) - cy;
     ay = 1.f - cy - by;
 
-    t = x;
+    /*Try Newton's method firstly */
+    t = x; /*Make a guess*/
     for(int i = 0; i < NEWTON_ITERATIONS; i++) {
         xs = do_cubic_bezier_f(t, ax, bx, cx);
         xs -= x;
@@ -45,6 +51,7 @@ static float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2)
         t -= xs / d;
     }
 
+    /*Fallback to bisection method for reliability*/
     tl = 0.f, tr = 1.f, t = x;
 
     if(t < tl) {
@@ -68,7 +75,7 @@ found:
     return do_cubic_bezier_f(t, ay, by, cy);
 }
 
-static int test_cubic_bezier_ease_functions(float fx1, float fy1, float fx2, float fy2)
+static bool test_cubic_bezier_ease_functions(float fx1, float fy1, float fx2, float fy2)
 {
     int x1, y1, x2, y2, y;
     float t, t_step, fy;
@@ -83,11 +90,11 @@ static int test_cubic_bezier_ease_functions(float fx1, float fy1, float fx2, flo
         fy = lv_cubic_bezier_f(t, fx1, fy1, fx2, fy2);
         y = lv_cubic_bezier(LV_BEZIER_VAL_FLOAT(t), x1, y1, x2, y2);
         if(LV_ABS(LV_BEZIER_VAL_FLOAT(fy) - y) >= ERROR_THRESHOLD) {
-            return 0;
+            return false;
         }
     }
 
-    return 1;
+    return true;
 }
 
 static uint32_t lv_bezier3_legacy(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
@@ -106,65 +113,71 @@ static uint32_t lv_bezier3_legacy(uint32_t t, uint32_t u0, uint32_t u1, uint32_t
     return v1 + v2 + v3 + v4;
 }
 
-/**********************
- *  TEST FUNCTIONS
- **********************/
+static void assert_sqrt32_floor(uint32_t x)
+{
+    int32_t r = lv_sqrt32(x);
+    uint32_t rr = (uint32_t)r * (uint32_t)r;
+    uint32_t rr_next = (uint32_t)(r + 1) * (uint32_t)(r + 1);
+
+    TEST_ASSERT_GREATER_OR_EQUAL_UINT32(rr, x);
+    TEST_ASSERT_LESS_THAN_UINT32(rr_next, x);
+}
 
 /* Test lv_trigo_sin function */
 void test_math_trigo_sin_basic(void)
 {
     /* Test boundary values */
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(0));
-    TEST_ASSERT_EQUAL(32768, lv_trigo_sin(90));
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(180));
-    TEST_ASSERT_EQUAL(-32768, lv_trigo_sin(270));
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(360));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(0));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_sin(90));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(180));
+    TEST_ASSERT_EQUAL_INT32(-32768, lv_trigo_sin(270));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(360));
 }
 
 void test_math_trigo_sin_negative_angles(void)
 {
     /* Test negative angles */
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(-360));
-    TEST_ASSERT_EQUAL(-32768, lv_trigo_sin(-90));
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(-180));
-    TEST_ASSERT_EQUAL(32768, lv_trigo_sin(-270));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(-360));
+    TEST_ASSERT_EQUAL_INT32(-32768, lv_trigo_sin(-90));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(-180));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_sin(-270));
 }
 
 void test_math_trigo_sin_large_angles(void)
 {
     /* Test large angles */
-    TEST_ASSERT_EQUAL(0, lv_trigo_sin(720));
-    TEST_ASSERT_EQUAL(32768, lv_trigo_sin(450)); /* 450 = 360 + 90 */
-    TEST_ASSERT_EQUAL(-32768, lv_trigo_sin(630)); /* 630 = 360 + 270 */
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_sin(720));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_sin(450)); /* 450 = 360 + 90 */
+    TEST_ASSERT_EQUAL_INT32(-32768, lv_trigo_sin(630)); /* 630 = 360 + 270 */
 }
 
 void test_math_trigo_sin_quadrants(void)
 {
     /* Test all quadrants */
-    TEST_ASSERT(lv_trigo_sin(30) > 0);    /* Q1 */
-    TEST_ASSERT(lv_trigo_sin(120) > 0);   /* Q2 */
-    TEST_ASSERT(lv_trigo_sin(210) < 0);   /* Q3 */
-    TEST_ASSERT(lv_trigo_sin(300) < 0);   /* Q4 */
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_trigo_sin(30));    /* Q1 */
+    TEST_ASSERT_GREATER_THAN_INT32(0, lv_trigo_sin(120));   /* Q2 */
+    TEST_ASSERT_LESS_THAN_INT32(0, lv_trigo_sin(210));   /* Q3 */
+    TEST_ASSERT_LESS_THAN_INT32(0, lv_trigo_sin(300));   /* Q4 */
 }
 
 /* Test lv_trigo_cos function */
 void test_math_trigo_cos_basic(void)
 {
     /* Test boundary values */
-    TEST_ASSERT_EQUAL(32768, lv_trigo_cos(0));
-    TEST_ASSERT_EQUAL(0, lv_trigo_cos(90));
-    TEST_ASSERT_EQUAL(-32768, lv_trigo_cos(180));
-    TEST_ASSERT_EQUAL(0, lv_trigo_cos(270));
-    TEST_ASSERT_EQUAL(32768, lv_trigo_cos(360));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_cos(0));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_cos(90));
+    TEST_ASSERT_EQUAL_INT32(-32768, lv_trigo_cos(180));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_cos(270));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_cos(360));
 }
 
 void test_math_trigo_cos_negative_angles(void)
 {
     /* Test negative angles */
-    TEST_ASSERT_EQUAL(32768, lv_trigo_cos(-360));
-    TEST_ASSERT_EQUAL(0, lv_trigo_cos(-90));
-    TEST_ASSERT_EQUAL(-32768, lv_trigo_cos(-180));
-    TEST_ASSERT_EQUAL(0, lv_trigo_cos(-270));
+    TEST_ASSERT_EQUAL_INT32(32768, lv_trigo_cos(-360));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_cos(-90));
+    TEST_ASSERT_EQUAL_INT32(-32768, lv_trigo_cos(-180));
+    TEST_ASSERT_EQUAL_INT32(0, lv_trigo_cos(-270));
 }
 
 /* Test lv_cubic_bezier function */
@@ -187,7 +200,7 @@ void test_math_cubic_bezier_result_should_be_precise(void)
         int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
         int32_t cubic_bezier = lv_bezier3(i, u0, u1, u2, u3);
 
-        TEST_ASSERT_TRUE(LV_ABS(legacy - cubic_bezier) <= 5);
+        TEST_ASSERT_LESS_OR_EQUAL_INT32(5, LV_ABS(legacy - cubic_bezier));
     }
 }
 
@@ -196,8 +209,8 @@ void test_math_cubic_bezier_edge_cases(void)
     /* Test x = 0 and x = LV_BEZIER_VAL_MAX - should return x directly */
     int32_t result1 = lv_cubic_bezier(0, 341, 512, 683, 1024);
     int32_t result2 = lv_cubic_bezier(1024, 341, 512, 683, 1024);
-    TEST_ASSERT_EQUAL(0, result1);
-    TEST_ASSERT_EQUAL(1024, result2);
+    TEST_ASSERT_EQUAL_INT32(0, result1);
+    TEST_ASSERT_EQUAL_INT32(1024, result2);
 }
 
 void test_math_cubic_bezier_boundary_values(void)
@@ -217,16 +230,16 @@ void test_math_cubic_bezier_clamps_out_of_range(void)
     int32_t above = lv_cubic_bezier(LV_BEZIER_VAL_MAX + 50, LV_BEZIER_VAL_MAX, LV_BEZIER_VAL_MAX,
                                     LV_BEZIER_VAL_MAX, LV_BEZIER_VAL_MAX);
 
-    TEST_ASSERT_EQUAL(0, below);
-    TEST_ASSERT_EQUAL(LV_BEZIER_VAL_MAX, above);
+    TEST_ASSERT_EQUAL_INT32(0, below);
+    TEST_ASSERT_EQUAL_INT32(LV_BEZIER_VAL_MAX, above);
 }
 
 /* Test lv_bezier3 function */
 void test_math_bezier3_basic(void)
 {
     /* Test basic cases */
-    TEST_ASSERT_EQUAL(0, lv_bezier3(0, 0, 50, 952, 1024));
-    TEST_ASSERT_EQUAL(1024, lv_bezier3(1024, 0, 50, 952, 1024));
+    TEST_ASSERT_EQUAL_INT32(0, lv_bezier3(0, 0, 50, 952, 1024));
+    TEST_ASSERT_EQUAL_INT32(1024, lv_bezier3(1024, 0, 50, 952, 1024));
     /* Test that it returns a valid value in range */
     int32_t result = lv_bezier3(512, 0, 50, 50, 1024);
     TEST_ASSERT(result >= 0 && result <= 1024);  /* Should be in valid range */
@@ -240,7 +253,7 @@ void test_math_bezier3_comparison(void)
     for(int32_t i = 0; i <= 1024; i += 64) {
         int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
         int32_t result = lv_bezier3(i, u0, u1, u2, u3);
-        TEST_ASSERT_TRUE(LV_ABS(legacy - result) <= 5);
+        TEST_ASSERT_LESS_OR_EQUAL_INT32(5, LV_ABS(legacy - result));
     }
 }
 
@@ -251,24 +264,24 @@ void test_math_sqrt_basic(void)
 
     /* Test 0 */
     lv_sqrt(0, &result, 0x8000);
-    TEST_ASSERT_EQUAL(0, result.i);
-    TEST_ASSERT_EQUAL(0, result.f);
+    TEST_ASSERT_EQUAL_INT32(0, result.i);
+    TEST_ASSERT_EQUAL_INT32(0, result.f);
 
     /* Test 1 */
     lv_sqrt(1, &result, 0x8000);
-    TEST_ASSERT_EQUAL(1, result.i);
+    TEST_ASSERT_EQUAL_INT32(1, result.i);
 
     /* Test 16 */
     lv_sqrt(16, &result, 0x8000);
-    TEST_ASSERT_EQUAL(4, result.i);
+    TEST_ASSERT_EQUAL_INT32(4, result.i);
 
     /* Test 256 */
     lv_sqrt(256, &result, 0x8000);
-    TEST_ASSERT_EQUAL(16, result.i);
+    TEST_ASSERT_EQUAL_INT32(16, result.i);
 
     /* Test 65536 */
     lv_sqrt(65536, &result, 0x8000);
-    TEST_ASSERT_EQUAL(256, result.i);
+    TEST_ASSERT_EQUAL_INT32(256, result.i);
 }
 
 void test_math_sqrt_fractional(void)
@@ -341,6 +354,14 @@ void test_math_sqrt32_large_values(void)
     TEST_ASSERT_EQUAL(32768, lv_sqrt32(0x40000000));      /* Uses highest lookup bucket */
     TEST_ASSERT_EQUAL(8192, lv_sqrt32(0x4000000));        /* Exercises mid-high lookup path */
     TEST_ASSERT_EQUAL(256, lv_sqrt32(0x10000));           /* Uses mid-range path and nr1 step */
+}
+
+void test_math_sqrt32_midrange_buckets(void)
+{
+    /* Hit the 0x4000000> x >=0x1000000 branches */
+    assert_sqrt32_floor(0x5000000U);  /* takes x>=0x4000000 path */
+    assert_sqrt32_floor(0x2000000U);  /* takes x>=0x1000000 but <0x4000000 path */
+    assert_sqrt32_floor(0x20000000U); /* takes x>=0x10000000 but <0x40000000 path */
 }
 
 /* Test lv_atan2 function */
