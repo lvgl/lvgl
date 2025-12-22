@@ -596,7 +596,7 @@ def run_self_test(verbose: bool = False) -> bool:
             has_schema = "inputSchema" in tool and isinstance(tool["inputSchema"], dict)
             log_test(f"Tool '{tool['name']}' has valid schema", has_schema)
     except Exception as e:
-        log_test("Tool definitions parsing", False, str(e))
+        log_test("Failed to parse tool definitions", False, f"Error: {e}")
 
     # Test 4: Check command execution
     print("\n[4/6] Testing command execution...")
