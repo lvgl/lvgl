@@ -39,7 +39,15 @@ def run_command(cmd: list[str], cwd: str = None) -> tuple[int, str, str]:
         )
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
-        return -1, "", f"Command timed out after {COMMAND_TIMEOUT} seconds"
+        error_message = (
+            f"Command timed out after {COMMAND_TIMEOUT} seconds.\n"
+            f"  Command: {cmd}\n"
+            f"  Working directory: {cwd or os.getcwd()}\n"
+            "This may indicate a long-running build, test, or other operation.\n"
+            "Review the command's output/logs to check for progress or hangs, and "
+            "consider increasing COMMAND_TIMEOUT or optimizing the command if needed."
+        )
+        return -1, "", error_message
     except Exception as e:
         return -1, "", str(e)
 
