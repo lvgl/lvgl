@@ -14,7 +14,7 @@
 #include "../misc/lv_assert.h"
 #include "../misc/lv_event_private.h"
 #include "lv_draw_private.h"
-#include "lv_draw_mask_private.h"
+#include "lv_draw_mask.h"
 #include "lv_draw_vector_private.h"
 #include "lv_draw_3d.h"
 #include "sw/lv_draw_sw.h"
