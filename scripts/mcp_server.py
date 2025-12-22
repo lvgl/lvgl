@@ -87,7 +87,7 @@ def truncate_output(text: str, max_length: int, head_portion_ratio: float = 0.5)
 
     # Reserve space for the marker when calculating head and tail lengths.
     available_length = max_length - len(marker)
-    head_len = int(available_length * head_ratio)
+    head_len = int(available_length * head_portion_ratio)
     tail_len = available_length - head_len
 
     # Guard against degenerate cases where tail_len might be zero or negative.
