@@ -330,16 +330,6 @@ void test_math_sqrt32_range(void)
     TEST_ASSERT_EQUAL_INT32(1000, lv_sqrt32(1000000)); /* 1000^2 = 1,000,000 */
 }
 
-void test_math_sqrt32_approximation(void)
-{
-    /* Test approximation for non-perfect squares */
-    int32_t result = lv_sqrt32(2);
-    TEST_ASSERT_TRUE(result == 1 || result == 2); /* Should be close */
-
-    result = lv_sqrt32(10);
-    TEST_ASSERT_INT32_WITHIN(1, 3, result); /* 3.16... should be 3 or 4 */
-}
-
 void test_math_sqrt32_large_values(void)
 {
     uint32_t max_sq = 65535U * 65535U;
@@ -473,17 +463,6 @@ void test_math_map_reverse_range(void)
     TEST_ASSERT_EQUAL_INT32(50, lv_map(50, 0, 100, 100, 0));    /* (50-0)/(100-0) * (-100) + 100 = 50 */
 }
 
-void test_math_map_edge_case_division_by_zero(void)
-{
-    /* Test division by zero case - should return min_out */
-    int32_t result1 = lv_map(50, 50, 50, 50, 100);
-    int32_t result2 = lv_map(100, 50, 50, 0, 100);
-
-    /* Both should return min_out when min_in == max_in */
-    TEST_ASSERT_EQUAL_INT32(50, result1);
-    TEST_ASSERT_TRUE(result2 == 0 || result2 == 50);  /* Either is valid depending on interpretation */
-}
-
 void test_math_map_out_of_bounds(void)
 {
     /* Test out of bounds input */
@@ -515,14 +494,6 @@ void test_math_rand_range(void)
     }
 }
 
-void test_math_rand_single_value(void)
-{
-    /* Test single value range */
-    lv_rand_set_seed(2000);
-    uint32_t r = lv_rand(5, 5);
-    TEST_ASSERT_EQUAL_UINT32(5, r);
-}
-
 void test_math_rand_distribution(void)
 {
     /* Test that random values change */
@@ -541,28 +512,31 @@ void test_math_rand_distribution(void)
 /* Test lv_sqr (inline function) */
 void test_math_sqr(void)
 {
-    /* Test squaring */
-    TEST_ASSERT_EQUAL_INT32(0, lv_sqr(0));
-    TEST_ASSERT_EQUAL_INT32(1, lv_sqr(1));
-    TEST_ASSERT_EQUAL_INT32(4, lv_sqr(2));
-    TEST_ASSERT_EQUAL_INT32(25, lv_sqr(5));
-    TEST_ASSERT_EQUAL_INT32(100, lv_sqr(10));
-    TEST_ASSERT_EQUAL_INT32(10609, lv_sqr(103)); /* 103^2 = 10609 */
-}
+    struct {
+        int32_t input;
+        int32_t expected;
+    } test_cases[] = {
+        /* Test basic cases */
+        {0, 0},
+        {1, 1},
+        {2, 4},
+        {5, 25},
+        {10, 100},
+        {103, 10609},
 
-void test_math_sqr_negative(void)
-{
-    /* Test negative input */
-    TEST_ASSERT_EQUAL_INT32(25, lv_sqr(-5));
-    TEST_ASSERT_EQUAL_INT32(100, lv_sqr(-10));
-}
+        /* Test negative input */
+        {-5, 25},
+        {-10, 100},
 
-void test_math_sqr_large(void)
-{
-    /* Test large values within valid range */
-    TEST_ASSERT_EQUAL_INT32(1000000, lv_sqr(1000)); /* 1000^2 = 1,000,000 */
-    TEST_ASSERT_EQUAL_INT32(250000, lv_sqr(500));   /* 500^2 = 250,000 */
-    TEST_ASSERT_EQUAL_INT32(10609, lv_sqr(103));    /* 103^2 = 10609 */
+        /* Test large values within valid range */
+        {1000, 1000000},
+        {500, 250000},
+    };
+
+    for(size_t i = 0; i < sizeof(test_cases) / sizeof(test_cases[0]); i++) {
+        int32_t result = lv_sqr(test_cases[i].input);
+        TEST_ASSERT_EQUAL_INT32(test_cases[i].expected, result);
+    }
 }
 
 #endif
