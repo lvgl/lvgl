@@ -30,6 +30,7 @@ style_properties_type = {
     "LV_STYLE_TEXT_FONT": "LV_PROPERTY_TYPE_FONT",
     "LV_STYLE_TEXT_OUTLINE_STROKE_COLOR": "LV_PROPERTY_TYPE_COLOR",
     "LV_STYLE_TRANSITION": "LV_PROPERTY_TYPE_POINTER",
+    "LV_STYLE_DROP_SHADOW_COLOR": "LV_PROPERTY_TYPE_COLOR",
 }
 
 
@@ -68,16 +69,35 @@ def read_widget_properties(directory):
                         id)
 
     def match_styles(file_path):
-        pattern = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_with_value = r'^\s+LV_STYLE_(\w+)\s*=\s*(\d+),'
+        pattern_name_only = r'^\s+LV_STYLE_(\w+)\s*,'
+        last_value = 0
+        process = False
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file.readlines():
-                match = re.match(pattern, line)
+                if re.match("enum _lv_style_id_t", line):
+                    process = True
+                    continue
+
+                if process and re.match("};", line):
+                    return
+
+                if process == False: continue
+                match = re.match(pattern_with_value, line)
+                name = ""
                 if match:
                     name = match.group(1).upper()
+                    last_value = int(match.group(2))
+                else:
+                    match = re.match(pattern_name_only, line)
+                    if match:
+                        name = match.group(1).upper()
+                        last_value += 1
+                if name:
                     id = f"LV_PROPERTY_STYLE_{name}"
                     yield Property("style",
                                    match.group(1).lower(), "style",
-                                   match.group(2), id)
+                                   last_value, id)
 
     properties_by_widget = defaultdict(list)
     for file_path in find_headers(directory):

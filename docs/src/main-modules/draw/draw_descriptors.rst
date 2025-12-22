@@ -190,13 +190,13 @@ The following show some example gradients.
 .. lv_example:: styles/lv_example_style_2
   :language: c
 
-.. lv_example:: styles/lv_example_style_16
-  :language: c
-
 .. lv_example:: styles/lv_example_style_17
   :language: c
 
 .. lv_example:: styles/lv_example_style_18
+  :language: c
+
+.. lv_example:: styles/lv_example_style_19
   :language: c
 
 For each gradient type, multiple color and opacity values can be assigned.  These are
@@ -384,9 +384,9 @@ differences compared to borders in :cpp:type:`lv_draw_rect_dsc_t` are:
 Box Shadow Draw Descriptor
 **************************
 
-The :cpp:type:`lv_draw_box_shadow_dsc_t` box shadow descriptor describes a **rounded
-rectangle-shaped shadow**.  It cannot generate shadows for arbitrary shapes, text, or
-images.  It includes the following fields:
+The :cpp:type:`lv_draw_box_shadow_dsc_t` box shadow descriptor describes a
+**rounded rectangle-shaped shadow**.  It cannot generate shadows for arbitrary
+shapes, text, or images.  It includes the following fields:
 
 :radius:    Radius, :cpp:expr:`LV_RADIUS_CIRCLE`.
 :color:     Shadow color.
@@ -411,7 +411,6 @@ The following functions are used for box shadow drawing:
 
 .. lv_example:: styles/lv_example_style_5
   :language: c
-
 
 
 Image Draw Descriptor
@@ -633,6 +632,37 @@ Functions for blur drawing:
 - :cpp:expr:`lv_draw_task_get_blur_dsc(draw_task)` retrieves blur descriptor.
 
 .. lv_example:: widgets/canvas/lv_example_canvas_10
+  :language: c
+
+
+
+Drop Shadow Draw Descriptor
+***************************
+
+Unlike Box shadow, the Drop shadow can be applied for any widgets and parts.
+For example a Label, the Arc's Indicator, an ARGB image, Lines of a chart, etc.
+
+The Drop shadow doesn't have its own draw descriptor but it's part of the base
+descriptor. This way before rendering anything LVGL can create a new layer with
+A8 color format, render the shape there, blur the layer, and finally blend the
+blurred layer with an offset.
+
+Creating a layer requires `width x height` bytes of memory. This memory is used only
+temporarily, so in most of the cases if multiple widgets have drop shadow, only one
+layer is active  and using memory at a time.
+
+The properties are stored in ``draw_dsc.base.drop_shadow_*``. It includes the
+following fields:
+
+:drop_shadow_opa:       Opacity (0--255 range). Values like ``LV_OPA_TRANSP``,
+                        ``LV_OPA_10``, etc., can also be used. If 0, the drop shadow
+                        won't be rendered
+:drop_shadow_color:     Drop shadow color.
+:drop_shadow_radius:    The blur radius of the drop shadow.
+:drop_shadow_ofs_x:     Horizontal offset.
+:drop_shadow_ofs_y:     Vertical offset.
+
+.. lv_example:: styles/lv_example_style_10
   :language: c
 
 
