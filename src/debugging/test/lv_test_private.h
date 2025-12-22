@@ -21,10 +21,6 @@ extern "C" {
 
 #include "../../drivers/opengles/lv_opengles_private.h"
 
-#if LV_USE_DRAW_OPENGLES
-#include <GLFW/glfw3.h>
-#endif
-
 /*********************
  *      DEFINES
  *********************/

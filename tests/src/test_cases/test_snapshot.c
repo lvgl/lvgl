@@ -2,6 +2,8 @@
 #include "../lvgl.h"
 #include "../lvgl_private.h"
 
+#if LV_USE_SNAPSHOT
+
 #include "unity/unity.h"
 
 #define NUM_SNAPSHOTS 10
@@ -35,6 +37,9 @@ void tearDown(void)
 
 void test_snapshot_should_not_leak_memory(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     uint32_t idx = 0;
     size_t initial_available_memory = 0;
     size_t final_available_memory = 0;
@@ -63,10 +68,14 @@ void test_snapshot_should_not_leak_memory(void)
     final_available_memory = monitor.free_size;
 
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
+#endif
 }
 
 void test_snapshot_with_transform_should_not_leak_memory(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     uint32_t idx = 0;
     size_t initial_available_memory = 0;
     size_t final_available_memory = 0;
@@ -97,10 +106,14 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
     lv_obj_delete(label);
 
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
+#endif
 }
 
 void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);
     lv_label_set_text(label, "Wubba lubba dub dub!");
@@ -121,10 +134,14 @@ void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
+#endif
 }
 
 void test_snapshot_take_snapshot_with_transform(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);
     lv_label_set_text(label, "Wubba lubba dub dub!");
@@ -141,10 +158,14 @@ void test_snapshot_take_snapshot_with_transform(void)
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
+#endif
 }
 
 void test_snapshot_take_snapshot_multiple_widgets(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj_1 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_1, 200, 200);
     lv_obj_set_style_border_width(obj_1, 0, 0);
@@ -201,10 +222,14 @@ void test_snapshot_take_snapshot_multiple_widgets(void)
 
     lv_obj_clean(lv_screen_active());
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_create_draw_buf_with_extended_size(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 50, 40);
 
@@ -225,10 +250,14 @@ void test_snapshot_create_draw_buf_with_extended_size(void)
     TEST_ASSERT_EQUAL_UINT32(expected_h, draw_buf->header.h);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_create_draw_buf_zero_size_object(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 0, 0);
     lv_draw_buf_t * draw_buf = lv_snapshot_create_draw_buf(obj, LV_COLOR_FORMAT_ARGB8888);
@@ -247,10 +276,14 @@ void test_snapshot_create_draw_buf_zero_size_object(void)
     lv_draw_buf_t * buf2 = lv_snapshot_create_draw_buf(obj2, LV_COLOR_FORMAT_ARGB8888);
     TEST_ASSERT_NULL(buf2);
     lv_obj_delete(obj2);
+#endif
 }
 
 void test_snapshot_reshape_draw_buf_normal_object(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 80);
 
@@ -267,10 +300,14 @@ void test_snapshot_reshape_draw_buf_normal_object(void)
     TEST_ASSERT_EQUAL_UINT32(80, draw_buf->header.h);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_reshape_draw_buf_with_extended_size(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 50, 40);
 
@@ -296,10 +333,14 @@ void test_snapshot_reshape_draw_buf_with_extended_size(void)
     TEST_ASSERT_EQUAL_UINT32(total_h, draw_buf->header.h);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_reshape_draw_buf_zero_size_object(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 0, 0);
 
@@ -312,10 +353,14 @@ void test_snapshot_reshape_draw_buf_zero_size_object(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_reshape_draw_buf_invalid_params(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 50, 40);
 
@@ -328,10 +373,14 @@ void test_snapshot_reshape_draw_buf_invalid_params(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_reshape_draw_buf_reshape_failure(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 80);
 
@@ -343,10 +392,14 @@ void test_snapshot_reshape_draw_buf_reshape_failure(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_take_to_draw_buf_supported_formats(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 80);
     lv_obj_set_style_bg_color(obj, lv_color_hex(0xFF0000), 0);
@@ -367,10 +420,14 @@ void test_snapshot_take_to_draw_buf_supported_formats(void)
 
         lv_draw_buf_destroy(draw_buf);
     }
+#endif
 }
 
 void test_snapshot_take_to_draw_buf_unsupported_format(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 50, 40);
 
@@ -383,10 +440,14 @@ void test_snapshot_take_to_draw_buf_unsupported_format(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_take_to_draw_buf_reshape_failure(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 80);
 
@@ -398,10 +459,14 @@ void test_snapshot_take_to_draw_buf_reshape_failure(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_take_to_draw_buf_zero_size_object(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 0, 0);
 
@@ -414,10 +479,14 @@ void test_snapshot_take_to_draw_buf_zero_size_object(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_take_to_draw_buf_invalid_size(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 50, 40);
 
@@ -429,10 +498,14 @@ void test_snapshot_take_to_draw_buf_invalid_size(void)
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);
 
     lv_draw_buf_destroy(draw_buf);
+#endif
 }
 
 void test_snapshot_refresh_logic_sibling_order(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_size(parent, 250, 250);
     lv_obj_set_style_bg_color(parent, lv_color_hex(0xCCCCCC), 0);
@@ -457,10 +530,14 @@ void test_snapshot_refresh_logic_sibling_order(void)
 
     lv_draw_buf_destroy(draw_buf);
     lv_obj_delete(parent);
+#endif
 }
 
 void test_snapshot_refresh_logic_edge_cases(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     /* Test object is the screen itself */
     lv_draw_buf_t * draw_buf1 = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_ARGB8888);
     TEST_ASSERT_NOT_NULL(draw_buf1);
@@ -488,10 +565,14 @@ void test_snapshot_refresh_logic_edge_cases(void)
 
     lv_draw_buf_destroy(draw_buf2);
     lv_obj_delete(simple_obj);
+#endif
 }
 
 void test_snapshot_extreme_size_objects(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     /* Test extreme size objects */
     lv_obj_t * large_obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(large_obj, 500, 400);  /* Large size */
@@ -521,6 +602,7 @@ void test_snapshot_extreme_size_objects(void)
 
     lv_draw_buf_destroy(small_buf);
     lv_obj_delete(small_obj);
+#endif
 }
 
 /* Regression test: rotated image with large bounding box must not
@@ -540,6 +622,9 @@ void test_snapshot_extreme_size_objects(void)
  * With fix: buf_h clamped to 1 -> completes normally. */
 void test_snapshot_rotated_large_bbox_no_overflow(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_display_t * disp = lv_display_get_default();
 
     /* Save original resolution and shrink to 10x10.
@@ -577,6 +662,7 @@ void test_snapshot_rotated_large_bbox_no_overflow(void)
     lv_obj_delete(img);
     lv_draw_buf_destroy(src_buf);
     lv_display_set_resolution(disp, orig_hor, orig_ver);
+#endif
 }
 
 #endif
