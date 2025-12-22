@@ -518,7 +518,7 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
     status = (
         "✅ GDB debug completed"
         if returncode == 0
-        else "⚠️ GDB debug finished (breakpoint may have been hit)"
+        else "❌ GDB debug failed (check output for details)"
     )
     output_parts.insert(0, status)
 
