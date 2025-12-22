@@ -25,6 +25,12 @@ LVGL_ROOT = os.path.dirname(SCRIPT_DIR)
 # Command execution timeout in seconds (10 minutes)
 COMMAND_TIMEOUT = 600
 
+
+def is_dry_run() -> bool:
+    """Return True if running in self-test dry-run mode."""
+    return os.environ.get("MCP_SELF_TEST_DRY_RUN") == "1"
+
+
 # Tool name constants
 TOOL_RUN_TESTS = "lvgl_run_tests"
 TOOL_CHECK_COVERAGE = "lvgl_check_coverage"
@@ -43,6 +49,8 @@ def run_command(cmd: list[str], cwd: str = None) -> tuple[int, str, str]:
     Returns:
         Tuple of (return_code, stdout, stderr)
     """
+    if is_dry_run():
+        return 0, f"[DRY-RUN] {' '.join(cmd)}", ""
     try:
         result = subprocess.run(
             cmd, cwd=cwd, capture_output=True, text=True, timeout=COMMAND_TIMEOUT
@@ -286,6 +294,18 @@ async def run_tests(arguments: dict[str, Any], TextContent) -> list:
     Returns:
         List of TextContent with test results
     """
+    if is_dry_run():
+        return [
+            TextContent(
+                type="text",
+                text=(
+                    "DRY-RUN: run_tests skipped execution. "
+                    f"Args: test_filter={arguments.get('test_filter','')}, "
+                    f"report={arguments.get('report', True)}, "
+                    f"clean={arguments.get('clean', False)}"
+                ),
+            )
+        ]
     test_filter = arguments.get("test_filter", "")
     report = arguments.get("report", True)
     clean = arguments.get("clean", False)
@@ -337,6 +357,15 @@ async def check_coverage(arguments: dict[str, Any], TextContent) -> list:
     Returns:
         List of TextContent with coverage results
     """
+    if is_dry_run():
+        path = arguments.get("path", "") or "(missing)"
+        fail_under = arguments.get("fail_under", 0)
+        return [
+            TextContent(
+                type="text",
+                text=f"DRY-RUN: check_coverage skipped execution. path={path}, fail_under={fail_under}",
+            )
+        ]
     path = arguments.get("path", "")
     fail_under = arguments.get("fail_under", 0)
 
@@ -384,6 +413,14 @@ async def format_code(arguments: dict[str, Any], TextContent) -> list:
     Returns:
         List of TextContent with formatting results
     """
+    if is_dry_run():
+        target = arguments.get("target", "") or "(all)"
+        return [
+            TextContent(
+                type="text",
+                text=f"DRY-RUN: format_code skipped execution. target={target}",
+            )
+        ]
     target = arguments.get("target", "")
 
     scripts_dir = os.path.join(LVGL_ROOT, "scripts")
@@ -429,6 +466,17 @@ async def gdb_debug(arguments: dict[str, Any], TextContent) -> list:
     Returns:
         List of TextContent with GDB debug output
     """
+    if is_dry_run():
+        return [
+            TextContent(
+                type="text",
+                text=(
+                    "DRY-RUN: gdb_debug skipped execution. "
+                    f"test_name={arguments.get('test_name','') or '(missing)'}, "
+                    f"breakpoint={arguments.get('breakpoint','') or '(missing)'}"
+                ),
+            )
+        ]
     test_name = arguments.get("test_name", "")
     breakpoint_loc = arguments.get("breakpoint", "")
     commands = arguments.get("commands", ["bt", "info locals", "continue"])
@@ -587,12 +635,12 @@ def run_self_test(verbose: bool = False) -> bool:
                 print(f"         {line}")
 
     # Test 1: Check LVGL root directory
-    print("\n[1/6] Checking LVGL root directory...")
+    print("\n[1/8] Checking LVGL root directory...")
     lvgl_exists = os.path.isdir(LVGL_ROOT)
     log_test("LVGL root directory exists", lvgl_exists, f"Path: {LVGL_ROOT}")
 
     # Test 2: Check required scripts
-    print("\n[2/6] Checking required scripts...")
+    print("\n[2/8] Checking required scripts...")
     scripts_to_check = [
         ("tests/main.py", "Test runner script"),
         ("scripts/check_gcov_coverage.py", "Coverage check script"),
@@ -604,7 +652,7 @@ def run_self_test(verbose: bool = False) -> bool:
         log_test(f"{description} ({script_path})", exists, f"Full path: {full_path}")
 
     # Test 3: Check tool definitions
-    print("\n[3/6] Validating tool definitions...")
+    print("\n[3/8] Validating tool definitions...")
     try:
         tools = get_tool_definitions()
         expected_tools = [
@@ -631,7 +679,7 @@ def run_self_test(verbose: bool = False) -> bool:
         log_test("Failed to parse tool definitions", False, f"Error: {e}")
 
     # Test 4: Check command execution
-    print("\n[4/6] Testing command execution...")
+    print("\n[4/8] Testing command execution...")
     returncode, stdout, stderr = run_command(["echo", "test"])
     cmd_works = returncode == 0 and "test" in stdout
     log_test(
@@ -640,14 +688,62 @@ def run_self_test(verbose: bool = False) -> bool:
         f"Return code: {returncode}, stdout: {stdout.strip()}",
     )
 
-    # Test 5: Check Python executable
-    print("\n[5/6] Checking Python environment...")
+    # Test 5: Validate truncate_output helper
+    print("\n[5/8] Validating truncate_output helper...")
+    try:
+        sample_text = "x" * 200
+        truncated = truncate_output(sample_text, 50, head_portion_ratio=0.4)
+        has_marker = "... (output truncated) ..." in truncated
+        length_ok = len(truncated) <= 50
+        truncate_ok = has_marker and length_ok
+        details = (
+            f"len={len(truncated)}, has_marker={has_marker}, length_ok={length_ok}"
+        )
+    except Exception as exc:  # pragma: no cover - defensive
+        truncate_ok = False
+        details = f"Exception: {exc}"
+    log_test("truncate_output works", truncate_ok, details)
+
+    # Test 6: Tool functions dry-run
+    print("\n[6/8] Dry-running tool functions...")
+    os.environ["MCP_SELF_TEST_DRY_RUN"] = "1"
+
+    class SimpleTextContent:
+        def __init__(self, type: str, text: str):
+            self.type = type
+            self.text = text
+
+    dry_run_tests = [
+        ("run_tests", run_tests, {"report": False, "clean": False}),
+        ("check_coverage", check_coverage, {"path": "src/misc/lv_math.c"}),
+        ("format_code", format_code, {"target": "tests"}),
+        ("gdb_debug", gdb_debug, {"test_name": "arc", "breakpoint": "main"}),
+    ]
+
+    all_dry_passed = True
+    details_list = []
+    for name, func, args in dry_run_tests:
+        try:
+            result = asyncio.run(func(args, SimpleTextContent))
+            ok = bool(result) and all(getattr(r, "type", "") == "text" for r in result)
+            details_list.append(f"{name}: ok={ok}")
+            all_dry_passed = all_dry_passed and ok
+        except Exception as exc:  # pragma: no cover - defensive
+            all_dry_passed = False
+            details_list.append(f"{name}: exception={exc}")
+    # Clean up dry-run flag to avoid leaking to real usage
+    os.environ.pop("MCP_SELF_TEST_DRY_RUN", None)
+
+    log_test("Tool dry-runs", all_dry_passed, "; ".join(details_list))
+
+    # Test 7: Check Python executable
+    print("\n[7/8] Checking Python environment...")
     py_returncode, py_stdout, _ = run_command([sys.executable, "--version"])
     py_works = py_returncode == 0
     log_test("Python executable works", py_works, f"Python: {py_stdout.strip()}")
 
-    # Test 6: Check MCP SDK availability
-    print("\n[6/6] Checking MCP SDK...")
+    # Test 8: Check MCP SDK availability
+    print("\n[8/8] Checking MCP SDK...")
     try:
         from mcp.server import Server
         from mcp.types import Tool, TextContent
