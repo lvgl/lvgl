@@ -52,21 +52,21 @@ def run_command(cmd: list[str], cwd: str = None) -> tuple[int, str, str]:
         return -1, "", str(e)
 
 
-def truncate_output(text: str, max_length: int, head_ratio: float = 0.5) -> str:
+def truncate_output(text: str, max_length: int, head_portion_ratio: float = 0.5) -> str:
     """
     Truncate long output text while preserving head and tail.
 
     Args:
         text: The text to truncate
         max_length: Maximum allowed length
-        head_ratio: Ratio of head portion to preserve (0.0-1.0)
+        head_portion_ratio: Proportion of the head section to preserve relative to max_length (0.0-1.0)
 
     Returns:
         Truncated text with marker if truncation occurred
     """
     if len(text) <= max_length:
         return text
-    head_len = int(max_length * head_ratio)
+    head_len = int(max_length * head_portion_ratio)
     tail_len = max_length - head_len
     return text[:head_len] + "\n\n... (output truncated) ...\n\n" + text[-tail_len:]
 
