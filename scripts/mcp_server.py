@@ -14,6 +14,10 @@ import subprocess
 import sys
 from typing import Any
 
+# Check Python version
+if sys.version_info < (3, 9):
+    sys.exit("Error: Python 3.9 or higher is required to run this script.")
+
 # Get LVGL root directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LVGL_ROOT = os.path.dirname(SCRIPT_DIR)
@@ -85,6 +89,8 @@ def truncate_output(text: str, max_length: int, head_portion_ratio: float = 0.5)
         return text[:available_length] + marker
 
     return text[:head_len] + marker + text[-tail_len:]
+
+
 def create_mcp_server():
     """Create and configure the MCP server with all tools."""
     # Import MCP SDK (only when needed for server mode)
