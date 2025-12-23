@@ -544,6 +544,12 @@ static void res_chg_event_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif
+#if LV_USE_EGL
+    lv_result_t res = lv_sdl_egl_resize(disp);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to resize window");
+    }
+#endif
 }
 
 static void release_disp_cb(lv_event_t * e)

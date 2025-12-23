@@ -66,6 +66,7 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 #if LV_USE_EGL
 lv_result_t lv_sdl_egl_init(lv_display_t * disp);
+lv_result_t lv_sdl_egl_resize(lv_display_t * disp);
 void lv_sdl_egl_deinit(lv_display_t * disp);
 #endif
 
