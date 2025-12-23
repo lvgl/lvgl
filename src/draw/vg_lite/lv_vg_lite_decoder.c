@@ -25,16 +25,16 @@
 #define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
 
 /* VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
- * so for simplicity, they are uniformly converted to I8 for display.
+ * so for simplicity, convert the formats that VG-Lite cannot directly use.
  */
-#define DEST_IMG_FORMAT LV_COLOR_FORMAT_I8
-#define IS_CONV_INDEX_FORMAT(cf) (cf == LV_COLOR_FORMAT_I1 || cf == LV_COLOR_FORMAT_I2 || cf == LV_COLOR_FORMAT_I4)
+#define IS_CONV_FORMAT(cf) (cf == LV_COLOR_FORMAT_I1 || cf == LV_COLOR_FORMAT_I2 || cf == LV_COLOR_FORMAT_I4 \
+                            || cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB565_SWAPPED)
 
 /* Since the palette and index image are next to each other,
  * the palette size needs to be aligned to ensure that the image is aligned.
  */
-#define DEST_IMG_OFFSET \
-    LV_VG_LITE_ALIGN(LV_COLOR_INDEXED_PALETTE_SIZE(DEST_IMG_FORMAT) * sizeof(lv_color32_t), LV_DRAW_BUF_ALIGN)
+#define I8_IMG_OFFSET \
+    LV_VG_LITE_ALIGN(LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I8) * sizeof(lv_color32_t), LV_DRAW_BUF_ALIGN)
 
 /**********************
  *      TYPEDEFS
@@ -156,39 +156,48 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         return res;
     }
 
-    if(!IS_CONV_INDEX_FORMAT(header->cf)) {
+    if(IS_CONV_FORMAT(header->cf)) {
         return LV_RESULT_INVALID;
     }
 
     if(header->flags & LV_IMAGE_FLAGS_COMPRESSED) {
-        LV_LOG_WARN("NOT Supported compressed index format: %d", header->cf);
+        lv_image_src_t src_type = lv_image_src_get_type(dsc->src);
+        LV_LOG_WARN("NOT Supported compressed flags: %d, format: %d, type: %d, src: %p (%s)",
+                    header->flags, header->cf, src_type, dsc->src, src_type == LV_IMAGE_SRC_FILE ? (const char *)dsc->src : "variable");
         return LV_RESULT_INVALID;
     }
 
-    header->cf = DEST_IMG_FORMAT;
-    return LV_RESULT_OK;
-}
-
-static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-{
-    LV_UNUSED(decoder); /*Unused*/
-
-    lv_draw_buf_t src_img_buf;
-    lv_result_t res = lv_draw_buf_from_image(&src_img_buf, dsc->src);
-    if(res != LV_RESULT_OK) {
-        return res;
+    if(LV_COLOR_FORMAT_IS_INDEXED(header->cf)) {
+        header->cf = LV_COLOR_FORMAT_I8;
+        return LV_RESULT_OK;
     }
 
+    if(header->cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
+        header->cf = LV_COLOR_FORMAT_RGB565;
+        return LV_RESULT_OK;
+    }
+
+    if(header->cf == LV_COLOR_FORMAT_RGB565A8) {
+        header->cf = LV_COLOR_FORMAT_ARGB8888;
+        return LV_RESULT_OK;
+    }
+
+    LV_LOG_WARN("NOT Supported color format: %d", header->cf);
+    return LV_RESULT_INVALID;
+}
+
+static lv_result_t decoder_open_variable_index(lv_image_decoder_dsc_t * dsc, const lv_draw_buf_t * src_img_buf)
+{
     /* Since dsc->header.cf is uniformly set to I8,
      * the original format is obtained from src for conversion.
      */
-    lv_color_format_t src_cf = src_img_buf.header.cf;
+    lv_color_format_t src_cf = src_img_buf->header.cf;
 
     int32_t width = dsc->header.w;
     int32_t height = dsc->header.h;
 
     /* create draw buf */
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, LV_COLOR_FORMAT_I8,
                                                      LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
         return LV_RESULT_INVALID;
@@ -197,7 +206,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     lv_draw_buf_clear(draw_buf, NULL);
     dsc->decoded = draw_buf;
 
-    uint32_t src_stride = image_stride(&src_img_buf.header);
+    uint32_t src_stride = image_stride(&src_img_buf->header);
     uint32_t dest_stride = draw_buf->header.stride;
 
     /*In case of uncompressed formats the image stored in the ROM/RAM.
@@ -222,7 +231,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     /* move to index image map */
     src += palette_size_bytes;
-    dest += DEST_IMG_OFFSET;
+    dest += I8_IMG_OFFSET;
 
     /* copy index image */
     for(int32_t y = 0; y < height; y++) {
@@ -234,50 +243,38 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     return LV_RESULT_OK;
 }
 
-static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open_variable_rgb565(lv_image_decoder_dsc_t * dsc,
+                                                const lv_draw_buf_t * src_img_buf)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    return LV_RESULT_INVALID;
+}
 
+static lv_result_t decoder_open_file_index(lv_image_decoder_dsc_t * dsc,
+                                           lv_fs_file_t * file,
+                                           const lv_image_header_t * src_header)
+{
     uint32_t width = dsc->header.w;
     uint32_t height = dsc->header.h;
     const char * path = dsc->src;
     uint8_t * src_temp = NULL;
 
-    lv_fs_file_t file;
-    lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
-    if(res != LV_FS_RES_OK) {
-        LV_LOG_ERROR("open %s failed", path);
-        return LV_RESULT_INVALID;
-    }
-
-    /* get real src header */
-    lv_image_header_t src_header;
-    uint32_t header_br = 0;
-    res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
-    if(res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
-        LV_LOG_ERROR("read %s lv_image_header_t failed", path);
-        lv_fs_close(&file);
-        return LV_RESULT_INVALID;
-    }
-
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, LV_COLOR_FORMAT_I8,
                                                      LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
-        lv_fs_close(&file);
         return LV_RESULT_INVALID;
     }
 
     lv_draw_buf_clear(draw_buf, NULL);
 
     /* get stride */
-    uint32_t src_stride = image_stride(&src_header);
+    uint32_t src_stride = image_stride(src_header);
     uint32_t dest_stride = draw_buf->header.stride;
 
     dsc->decoded = draw_buf;
     uint8_t * dest = draw_buf->data;
 
     /* index format only */
-    uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(src_header.cf);
+    uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(src_header->cf);
     if(palette_size == 0) {
         LV_LOG_ERROR("file %s invalid palette size: %" LV_PRIu32, path, palette_size);
         goto failed;
@@ -287,7 +284,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
 
     /* read palette */
     uint32_t palette_br = 0;
-    res = lv_fs_read(&file, dest, palette_size_bytes, &palette_br);
+    lv_fs_res_t res = lv_fs_read(file, dest, palette_size_bytes, &palette_br);
     if(res != LV_FS_RES_OK || palette_br != palette_size_bytes) {
         LV_LOG_ERROR("read %s (palette: %" LV_PRIu32 ", br: %" LV_PRIu32 ") failed",
                      path, palette_size_bytes, palette_br);
@@ -307,11 +304,11 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     }
 
     /* move to index image map */
-    dest += DEST_IMG_OFFSET;
+    dest += I8_IMG_OFFSET;
 
     for(uint32_t y = 0; y < height; y++) {
         uint32_t br = 0;
-        res = lv_fs_read(&file, src_temp, src_stride, &br);
+        res = lv_fs_read(file, src_temp, src_stride, &br);
         if(res != LV_FS_RES_OK || br != src_stride) {
             LV_LOG_ERROR("read %s (y: %" LV_PRIu32 ", src_stride: %" LV_PRIu32 ", br: %" LV_PRIu32 ") failed",
                          path, y, src_stride, br);
@@ -319,23 +316,27 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
         }
 
         /* convert to index8 */
-        image_decode_to_index8_line(dest, src_temp, width, src_header.cf);
+        image_decode_to_index8_line(dest, src_temp, width, src_header->cf);
         dest += dest_stride;
     }
 
     lv_free(src_temp);
-
-    lv_fs_close(&file);
     return LV_RESULT_OK;
 
 failed:
     if(src_temp) {
         lv_free(src_temp);
     }
-    lv_fs_close(&file);
     lv_draw_buf_destroy(draw_buf);
     dsc->decoded = NULL;
 
+    return LV_RESULT_INVALID;
+}
+
+static lv_result_t decoder_open_file_rgb565(lv_image_decoder_dsc_t * dsc,
+                                            lv_fs_file_t * file,
+                                            const lv_image_header_t * src_header)
+{
     return LV_RESULT_INVALID;
 }
 
@@ -350,11 +351,75 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_result_t res = LV_RESULT_INVALID;
 
     switch(dsc->src_type) {
-        case LV_IMAGE_SRC_VARIABLE:
-            res = decoder_open_variable(decoder, dsc);
+        case LV_IMAGE_SRC_VARIABLE: {
+                lv_draw_buf_t src_img_buf;
+                lv_result_t res = lv_draw_buf_from_image(&src_img_buf, dsc->src);
+                if(res != LV_RESULT_OK) {
+                    return res;
+                }
+
+                switch(src_img_buf.header.cf) {
+                    case LV_COLOR_FORMAT_I1:
+                    case LV_COLOR_FORMAT_I2:
+                    case LV_COLOR_FORMAT_I4:
+                    case LV_COLOR_FORMAT_I8:
+                        res = decoder_open_variable_index(dsc, &src_img_buf);
+                        break;
+
+                    case LV_COLOR_FORMAT_RGB565_SWAPPED:
+                    case LV_COLOR_FORMAT_RGB565A8:
+                        res = decoder_open_variable_rgb565(dsc, &src_img_buf);
+                        break;
+
+                    default:
+                        LV_LOG_WARN("NOT Supported color format: %d, src: %p", src_img_buf.header.cf, dsc->src);
+                        break;
+                }
+            }
+
             break;
-        case LV_IMAGE_SRC_FILE:
-            res = decoder_open_file(decoder, dsc);
+        case LV_IMAGE_SRC_FILE: {
+                lv_fs_file_t file;
+                lv_fs_res_t fs_res = lv_fs_open(&file, dsc->src, LV_FS_MODE_RD);
+                if(fs_res != LV_FS_RES_OK) {
+                    LV_LOG_ERROR("open %s failed, res: %d", (const char *)dsc->src, fs_res);
+                    return LV_RESULT_INVALID;
+                }
+
+                /* get real src header */
+                lv_image_header_t src_header;
+                uint32_t header_br = 0;
+                fs_res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
+                if(fs_res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
+                    LV_LOG_ERROR("read %s lv_image_header_t failed, res: %d, br: %" LV_PRIu32, (const char *)dsc->src, fs_res, header_br);
+                    lv_fs_close(&file);
+                    return LV_RESULT_INVALID;
+                }
+
+                switch(src_header.cf) {
+                    case LV_COLOR_FORMAT_I1:
+                    case LV_COLOR_FORMAT_I2:
+                    case LV_COLOR_FORMAT_I4:
+                    case LV_COLOR_FORMAT_I8:
+                        res = decoder_open_file_index(dsc, &file, &src_header);
+                        break;
+
+                    case LV_COLOR_FORMAT_RGB565_SWAPPED:
+                    case LV_COLOR_FORMAT_RGB565A8:
+                        res = decoder_open_file_rgb565(dsc, &file, &src_header);
+                        break;
+
+                    default:
+                        LV_LOG_WARN("NOT Supported color format: %d, src: %s", src_header.cf, (const char *)dsc->src);
+                        break;
+                }
+
+                if(res != LV_RESULT_OK) {
+                    LV_LOG_WARN("read %s failed", (const char *)dsc->src);
+                }
+
+                lv_fs_close(&file);
+            }
             break;
         default:
             break;
