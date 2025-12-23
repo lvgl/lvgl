@@ -2,6 +2,8 @@
 #include "../lvgl.h"
 #include "unity/unity.h"
 
+#define TEST_DRAW_BUF_SAVE_PATH(path) "A:src/test_files/draw_buf_save_" path
+
 /* Test setup and teardown */
 void setUp(void)
 {
@@ -223,7 +225,7 @@ void test_draw_buf_save_to_file_rgb565_format(void)
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(100, 100, LV_COLOR_FORMAT_RGB565, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(draw_buf);
 
-    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, "A:rgb565_output.bin");
+    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("rgb565_output.bin"));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_draw_buf_destroy(draw_buf);
@@ -235,7 +237,7 @@ void test_draw_buf_save_to_file_minimal_size(void)
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(1, 1, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(draw_buf);
 
-    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, "A:minimal_output.bin");
+    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("minimal_output.bin"));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_draw_buf_destroy(draw_buf);
@@ -247,9 +249,9 @@ void test_draw_buf_save_to_file_different_extensions(void)
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(10, 10, LV_COLOR_FORMAT_RGB565, LV_STRIDE_AUTO);
 
     /* Test with different file extensions using default file system */
-    lv_result_t res1 = lv_draw_buf_save_to_file(draw_buf, "A:test.bin");
-    lv_result_t res2 = lv_draw_buf_save_to_file(draw_buf, "A:test.raw");
-    lv_result_t res3 = lv_draw_buf_save_to_file(draw_buf, "A:test.dat");
+    lv_result_t res1 = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("test.bin"));
+    lv_result_t res2 = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("test.raw"));
+    lv_result_t res3 = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("test.dat"));
 
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res1);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res2);
@@ -266,7 +268,7 @@ void test_draw_buf_save_to_file_zero_data_size(void)
                                         NULL, 0);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res1);
 
-    lv_result_t res = lv_draw_buf_save_to_file(&draw_buf, "A:zero_size.bin");
+    lv_result_t res = lv_draw_buf_save_to_file(&draw_buf, TEST_DRAW_BUF_SAVE_PATH("zero_size.bin"));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 }
 
@@ -278,7 +280,7 @@ void test_draw_buf_save_to_file_indexed_format(void)
                                         NULL, 0);
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res1);
 
-    lv_result_t res = lv_draw_buf_save_to_file(&draw_buf, "A:indexed.bin");
+    lv_result_t res = lv_draw_buf_save_to_file(&draw_buf, TEST_DRAW_BUF_SAVE_PATH("indexed.bin"));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 }
 
@@ -297,12 +299,12 @@ void test_draw_buf_save_to_file_and_read_decode(void)
         }
     }
 
-    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, "A:decode_XRGB8888.bin");
+    lv_result_t res = lv_draw_buf_save_to_file(draw_buf, TEST_DRAW_BUF_SAVE_PATH("decode_XRGB8888.bin"));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_obj_t * image = lv_image_create(lv_screen_active());
 
-    lv_image_set_src(image, "A:decode_XRGB8888.bin");
+    lv_image_set_src(image, TEST_DRAW_BUF_SAVE_PATH("decode_XRGB8888.bin"));
 
     lv_obj_center(image);
 
