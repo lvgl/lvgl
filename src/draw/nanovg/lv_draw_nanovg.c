@@ -417,8 +417,9 @@ static void draw_event_cb(lv_event_t * e)
             lv_nanovg_clean_up(u);
             break;
         case LV_EVENT_CHILD_CREATED: {
+                /* The internal rendering uses RGBA format, which is switched to LVGL BGRA format during readback. */
                 lv_cache_entry_t * entry = lv_nanovg_fbo_cache_get(u, lv_area_get_width(&layer->buf_area),
-                                                                   lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_BGRA);
+                                                                   lv_area_get_height(&layer->buf_area), 0, NVG_TEXTURE_RGBA);
                 layer->user_data = entry;
             }
             break;
