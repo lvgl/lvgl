@@ -10,7 +10,7 @@
 
 #if LV_USE_SDL && LV_USE_EGL
 
-#include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
 #include <SDL2/SDL_syswm.h>
 #include "lv_sdl_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
@@ -31,6 +31,7 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
 static void destroy_window_cb(void * driver_data, void * native_window);
 static void flip_cb(void * driver_data, bool vsync);
 static size_t select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
+static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display);
 
 /**********************
  *  STATIC VARIABLES
@@ -44,7 +45,50 @@ static size_t select_config_cb(void * driver_data, const lv_egl_config_t * confi
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display)
+lv_result_t lv_sdl_egl_init(lv_display_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
+    int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
+    lv_egl_interface_t ifc = lv_sdl_get_egl_interface(disp);
+    dsc->egl_ctx = lv_opengles_egl_context_create(&ifc);
+    if(!dsc->egl_ctx) {
+        LV_LOG_ERROR("Failed to initialize EGL context");
+        return LV_RESULT_INVALID;
+    }
+
+#if LV_USE_DRAW_OPENGLES
+    dsc->opengles_texture.is_texture_owner = true;
+    lv_result_t res = lv_opengles_texture_reshape(&dsc->opengles_texture, disp, hor_res, ver_res);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to create draw buffers");
+        lv_opengles_egl_context_destroy(dsc->egl_ctx);
+        dsc->egl_ctx = NULL;
+        return LV_RESULT_INVALID;
+    }
+#endif
+
+    return LV_RESULT_OK;
+}
+void lv_sdl_egl_deinit(lv_display_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc->egl_ctx) {
+        lv_opengles_egl_context_destroy(dsc->egl_ctx);
+        dsc->egl_ctx = NULL;
+    }
+
+#if LV_USE_DRAW_OPENGLES
+    lv_opengles_texture_deinit(&dsc->opengles_texture);
+#endif
+}
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display)
 {
     return (lv_egl_interface_t) {
         .driver_data = display,
@@ -57,11 +101,6 @@ lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display)
     };
 
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 static void * create_window_cb(void * driver_data, const lv_egl_native_window_properties_t * props)
 {
     LV_UNUSED(props);
@@ -100,11 +139,11 @@ static size_t select_config_cb(void * driver_data, const lv_egl_config_t * confi
 
 
     for(size_t i = 0; i < config_count; ++i) {
-        LV_LOG_USER("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d renderable type %d",
-                    i, configs[i].id,
-                    configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
-                    configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil,
-                    configs[i].surface_type & EGL_WINDOW_BIT, configs[i].renderable_type & EGL_OPENGL_ES2_BIT);
+        LV_LOG_TRACE("Got config %zu %#x %dx%d %d %d %d %d buffer size %d depth %d  samples %d stencil %d surface type %d renderable type %d",
+                     i, configs[i].id,
+                     configs[i].max_width, configs[i].max_height, configs[i].r_bits, configs[i].g_bits, configs[i].b_bits, configs[i].a_bits,
+                     configs[i].buffer_size, configs[i].depth, configs[i].samples, configs[i].stencil,
+                     configs[i].surface_type & EGL_WINDOW_BIT, configs[i].renderable_type & EGL_OPENGL_ES2_BIT);
     }
 
     for(size_t i = 0; i < config_count; ++i) {
@@ -118,7 +157,7 @@ static size_t select_config_cb(void * driver_data, const lv_egl_config_t * confi
            configs[i].samples == 4
 
           ) {
-            LV_LOG_USER("Choosing config %zu", i);
+            LV_LOG_INFO("Choosing config %zu", i);
             return i;
         }
     }
