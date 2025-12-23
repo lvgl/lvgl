@@ -7,8 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_egl.h"
-#include <EGL/eglplatform.h>
-#include <stdint.h>
 
 #if LV_USE_EGL
 
