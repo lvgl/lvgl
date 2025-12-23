@@ -97,8 +97,9 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
             break;
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
                 const lv_draw_image_dsc_t * img_dsc = &fill_dsc->img_dsc;
+                lv_image_header_t header;
                 int image_handle = lv_nanovg_image_cache_get_handle(u, img_dsc->src, lv_color_to_32(img_dsc->recolor,
-                                                                                                    img_dsc->recolor_opa), 0);
+                                                                                                    img_dsc->recolor_opa), 0, &header);
                 if(image_handle < 0) {
                     LV_PROFILER_DRAW_END;
                     return;
@@ -110,12 +111,6 @@ static void draw_fill(lv_draw_nanovg_unit_t * u, const lv_vector_fill_dsc_t * fi
                 if(fill_dsc->fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
                     offset_x = offset->x;
                     offset_y = offset->y;
-                }
-
-                lv_image_header_t header;
-                if(lv_image_decoder_get_info(img_dsc->src, &header) != LV_RESULT_OK) {
-                    LV_PROFILER_DRAW_END;
-                    return;
                 }
 
                 NVGpaint paint = nvgImagePattern(u->vg, offset_x, offset_y, header.w, header.h, 0, image_handle,

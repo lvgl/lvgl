@@ -100,7 +100,8 @@ void lv_nanovg_image_cache_deinit(struct _lv_draw_nanovg_unit_t * u)
 int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
                                      const void * src,
                                      lv_color32_t color,
-                                     int image_flags)
+                                     int image_flags,
+                                     lv_image_header_t * header)
 {
     LV_PROFILER_DRAW_BEGIN;
 
@@ -113,7 +114,10 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
     lv_image_decoder_dsc_t decoder_dsc;
     lv_result_t res = lv_image_decoder_open(&decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to open image");
+        lv_image_src_t type = lv_image_src_get_type(src);
+        LV_UNUSED(type);
+        LV_LOG_WARN("Failed to open image: type: %d, src: %p (%s)", type, src,
+                    type == LV_IMAGE_SRC_FILE ? (const char *)src : "var");
         LV_PROFILER_DRAW_END;
         return -1;
     }
@@ -124,6 +128,10 @@ int lv_nanovg_image_cache_get_handle(struct _lv_draw_nanovg_unit_t * u,
         LV_LOG_ERROR("image data is NULL");
         LV_PROFILER_DRAW_END;
         return -1;
+    }
+
+    if(header) {
+        *header = decoder_dsc.header;
     }
 
     image_item_t search_key = { 0 };

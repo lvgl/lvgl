@@ -13,6 +13,7 @@
 
 #include "lv_nanovg_math.h"
 #include "lv_nanovg_utils.h"
+#include "lv_nanovg_image_cache.h"
 
 /*********************
 *      DEFINES
@@ -143,7 +144,24 @@ void lv_draw_nanovg_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const
     }
 
     if(dsc->img_src) {
+        lv_image_header_t header;
+        int image_handle = lv_nanovg_image_cache_get_handle(u, dsc->img_src, lv_color32_make(0, 0, 0, 0), 0, &header);
+        if(image_handle < 0) {
+            LV_PROFILER_DRAW_END;
+            return;
+        }
 
+        /* move image to center */
+        float img_half_w = header.w / 2.0f;
+        float img_half_h = header.h / 2.0f;
+
+        NVGpaint paint = nvgImagePattern(u->vg,
+                                         cx - img_half_w, cy - img_half_h,
+                                         header.w, header.h, 0,
+                                         image_handle,
+                                         dsc->opa / (float)LV_OPA_COVER);
+        nvgFillPaint(u->vg, paint);
+        nvgFill(u->vg);
     }
     else {
         lv_nanovg_fill(u->vg, winding, NVG_SOURCE_OVER, lv_nanovg_color_convert(dsc->color, dsc->opa));
