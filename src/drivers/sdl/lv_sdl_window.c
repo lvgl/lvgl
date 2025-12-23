@@ -80,6 +80,10 @@ static lv_timer_t * event_handler_timer;
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
+#if LV_USE_EGL && defined(SDL_VIDEO_DRIVER_X11)
+        SDL_SetHintWithPriority("SDL_VIDEODRIVER", "x11", SDL_HINT_OVERRIDE);
+        SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+#endif
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
