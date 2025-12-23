@@ -126,6 +126,6 @@ Performance Tips
 Limitations
 ===========
 
-- **Blur**: Not natively supported; falls back to software rendering
+- **Blur**: Not natively supported; Using this style will not affect the rendering results.
 - **Complex Gradients**: Limited to 2-color gradients (LVGL supports multi-stop)
 - **Layer Readback**: ``glReadPixels`` for canvas/layer is relatively slow
