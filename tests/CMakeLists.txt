@@ -412,7 +412,7 @@ if(NOT WIN32)
 
     if(FFMPEG_FOUND)
         include_directories(${FFMPEG_INCLUDE_DIRS})
-        list(APPEND EXTERNAL_LIBS ${PkgConfig::FFMPEG})
+        list(APPEND EXTERNAL_LIBS PkgConfig::FFMPEG)
     else()
         message("FFmpeg not found, defaulting to 0")
         add_definitions(-DLV_USE_FFMPEG=0)
