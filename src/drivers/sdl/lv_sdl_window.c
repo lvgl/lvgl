@@ -80,7 +80,7 @@ static lv_timer_t * event_handler_timer;
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
-#if LV_USE_EGL && defined(SDL_VIDEO_DRIVER_X11)
+#if LV_SDL_USE_EGL && defined(SDL_VIDEO_DRIVER_X11)
         SDL_SetHintWithPriority("SDL_VIDEODRIVER", "x11", SDL_HINT_OVERRIDE);
         SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
 #endif
@@ -248,7 +248,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t * argb_px_map = NULL;
 
-#if LV_USE_EGL
+#if LV_SDL_USE_EGL
     if(lv_display_flush_is_last(disp)) {
 #if LV_USE_DRAW_OPENGLES
         lv_opengles_viewport(0, 0,
@@ -397,7 +397,7 @@ static lv_result_t window_create(lv_display_t * disp)
     dsc->zoom = 1.0;
 
     int flag = 0;
-#if LV_USE_EGL
+#if LV_SDL_USE_EGL
     flag |= SDL_WINDOW_OPENGL;
 #endif
 
@@ -411,7 +411,7 @@ static lv_result_t window_create(lv_display_t * disp)
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
-#if LV_USE_EGL
+#if LV_SDL_USE_EGL
     lv_result_t res = lv_sdl_egl_init(disp);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize EGL");
@@ -420,7 +420,7 @@ static lv_result_t window_create(lv_display_t * disp)
 #else
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
-#endif /*LV_USE_EGL*/
+#endif /*LV_SDL_USE_EGL*/
 
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
@@ -544,7 +544,7 @@ static void res_chg_event_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif
-#if LV_USE_EGL
+#if LV_SDL_USE_EGL
     lv_result_t res = lv_sdl_egl_resize(disp);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to resize window");
@@ -565,7 +565,7 @@ static void release_disp_cb(lv_event_t * e)
     SDL_DestroyTexture(dsc->texture);
 #endif
 
-#if LV_USE_EGL
+#if LV_SDL_USE_EGL
     lv_sdl_egl_deinit(disp);
 #endif
     if(dsc->renderer) {

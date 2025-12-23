@@ -4908,6 +4908,13 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif /* LV_USE_EGL */
 
+/* For now only enable LV_SDL_USE_EGL when using DRAW_OPENGLES*/
+#if LV_USE_SDL && LV_USE_OPENGLES && LV_USE_DRAW_OPENGLES
+    #define LV_SDL_USE_EGL 1
+#else
+    #define LV_SDL_USE_EGL 0
+#endif
+
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
         #error "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."

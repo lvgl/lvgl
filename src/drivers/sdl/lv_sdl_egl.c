@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_SDL && LV_USE_EGL
+#if LV_SDL_USE_EGL
 
 #include "../../display/lv_display_private.h"
 #include <SDL2/SDL_syswm.h>
@@ -186,4 +186,4 @@ static void flip_cb(void * driver_data, bool vsync)
     LV_UNUSED(vsync);
 }
 
-#endif
+#endif /*LV_SDL_USE_EGL*/
