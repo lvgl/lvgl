@@ -410,11 +410,16 @@ static lv_result_t window_create(lv_display_t * disp)
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+    if(!dsc->window) {
+        LV_LOG_ERROR("Failed to create SDL window");
+        return LV_RESULT_INVALID;
+    }
 
 #if LV_SDL_USE_EGL
     lv_result_t res = lv_sdl_egl_init(disp);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize EGL");
+        SDL_DestroyWindow(dsc->window);
         return LV_RESULT_INVALID;
     }
 #else
