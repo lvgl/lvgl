@@ -15,7 +15,7 @@
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
-#include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
 #include "../../misc/lv_area_private.h"
 #include "opengl_shader/lv_opengl_shader_internal.h"
 #include "assets/lv_opengles_shader.h"
@@ -166,7 +166,8 @@ void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t 
     lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, true);
     LV_PROFILER_DRAW_END;
 }
-void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
+
+void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params)
 {
     LV_PROFILER_DRAW_BEGIN;
     unsigned int texture = *(unsigned int *)lv_display_get_driver_data(display);
@@ -174,6 +175,8 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
     lv_display_rotation_t rotation = lv_display_get_rotation(display);
+    bool h_flip = params->h_flip;
+    bool v_flip = params->v_flip;
 
     float vert_buffer[LV_OPENGLES_VERTEX_BUFFER_LEN];
     populate_vertex_buffer(vert_buffer, rotation, &h_flip, &v_flip, 0.f, 0.f, 1.f, 1.f);
@@ -199,10 +202,22 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
-    lv_opengles_shader_set_uniform1i("u_SwapRB", 1);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", params->rb_swap);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
+{
+    /*TODO: Deprecate this function and make lv_opengles_render_display public instead*/
+
+    lv_opengles_render_params_t params = {
+        .v_flip = v_flip,
+        .h_flip = h_flip,
+        .rb_swap = true
+    };
+    lv_opengles_render_display(display, &params);
 }
 
 void lv_opengles_render_clear(void)

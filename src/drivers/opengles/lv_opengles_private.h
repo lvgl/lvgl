@@ -101,6 +101,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    bool h_flip;
+    bool v_flip;
+    bool rb_swap;
+} lv_opengles_render_params_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -133,6 +139,7 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
  */
 void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 
+void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params);
 
 /**********************
  *      MACROS
