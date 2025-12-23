@@ -249,12 +249,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     uint32_t * argb_px_map = NULL;
 
 #if LV_USE_EGL
-    /* EGL rendering path */
     if(lv_display_flush_is_last(disp)) {
+#if LV_USE_DRAW_OPENGLES
         lv_opengles_viewport(0, 0,
                              lv_display_get_original_horizontal_resolution(disp),
-                             lv_display_get_horizontal_resolution(disp));
+                             lv_display_get_original_vertical_resolution(disp));
         lv_opengles_render_display_texture(disp, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
         lv_opengles_egl_update(dsc->egl_ctx);
     }
     lv_display_flush_ready(disp);
@@ -411,10 +412,9 @@ static lv_result_t window_create(lv_display_t * disp)
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
 #if LV_USE_EGL
-    lv_egl_interface_t ifc = lv_sdl_get_egl_interface(disp);
-    dsc->egl_ctx = lv_opengles_egl_context_create(&ifc);
-    if(!dsc->egl_ctx) {
-        LV_LOG_ERROR("Failed to initialize EGL context");
+    lv_result_t res = lv_sdl_egl_init(disp);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to initialize EGL");
         return LV_RESULT_INVALID;
     }
 #else
@@ -560,7 +560,7 @@ static void release_disp_cb(lv_event_t * e)
 #endif
 
 #if LV_USE_EGL
-    lv_opengles_egl_context_destroy(dsc->egl_ctx);
+    lv_sdl_egl_deinit(disp);
 #endif
     if(dsc->renderer) {
         SDL_DestroyRenderer(dsc->renderer);

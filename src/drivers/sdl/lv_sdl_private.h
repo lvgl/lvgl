@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_SDL
 
 #include "../opengles/lv_opengles_egl_private.h"
+#include "../opengles/lv_opengles_texture_private.h"
 
 #include LV_SDL_INCLUDE_PATH
 
@@ -47,6 +48,9 @@ typedef struct {
 
 #if LV_USE_EGL
     lv_opengles_egl_t * egl_ctx;
+#if LV_USE_DRAW_OPENGLES
+    lv_opengles_texture_t opengles_texture;
+#endif
 #endif
 } lv_sdl_window_t;
 
@@ -61,7 +65,8 @@ void lv_sdl_mousewheel_handler(SDL_Event * event);
 lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 #if LV_USE_EGL
-lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display);
+lv_result_t lv_sdl_egl_init(lv_display_t * disp);
+void lv_sdl_egl_deinit(lv_display_t * disp);
 #endif
 
 /**********************
