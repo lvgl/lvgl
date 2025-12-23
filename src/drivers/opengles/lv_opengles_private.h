@@ -81,6 +81,10 @@ extern "C" {
 #define GL_RGBA8 0x8058
 #endif
 
+#if !defined(glClearDepthf) && defined(glClearDepth)
+#define glClearDepthf glClearDepth
+#endif
+
 #ifndef LV_GL_PREFERRED_DEPTH
 #ifdef GL_DEPTH_COMPONENT24
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
