@@ -21,7 +21,7 @@ src/drivers/display/ft81x @liamHowatt
 src/drivers/draw/eve @liamHowatt
 src/drivers/evdev @AndreCostaaa
 src/drivers/libinput @AndreCostaaa
-src/drivers/nuttx @liamHowatt
+src/drivers/nuttx @liamHowatt @FASTSHIFT @XuNeo
 src/drivers/qnx @uLipe
 src/drivers/sdl @kisvegabor
 src/drivers/wayland @AndreCostaaa
