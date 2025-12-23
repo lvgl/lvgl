@@ -393,45 +393,31 @@ static void lv_opengles_index_buffer_unbind(void)
 
 static unsigned int lv_opengles_shader_manager_init(void)
 {
-    lv_opengl_shader_program_t * program  = NULL;
-    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+    for(lv_opengl_glsl_version_t version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
         LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
-        lv_opengl_shader_portions_t portions;
-        lv_opengles_shader_get_source(&portions, version);
-        char * vertex_shader = lv_opengles_shader_get_vertex(version);
-        char * frag_shader = lv_opengles_shader_get_fragment(version);
-        lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
-        lv_free(vertex_shader);
-        lv_free(frag_shader);
+        {
+            /* Initialize the shader manager*/
+            lv_opengl_shader_portions_t portions;
+            lv_opengles_shader_get_source(&portions, version);
+            char * vertex_shader = lv_opengles_shader_get_vertex(version);
+            char * frag_shader = lv_opengles_shader_get_fragment(version);
+            lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
+            lv_free(vertex_shader);
+            lv_free(frag_shader);
+        }
 
-        uint32_t frag_shader_hash;
-        uint32_t vert_shader_hash;
-
-        lv_result_t res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0, version,
-                                                                 &frag_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
+        lv_opengl_shader_params_t frag_shader = {.name = "__MAIN__.frag"};
+        lv_opengl_shader_params_t vert_shader = {.name = "__MAIN__.vert"};
+        lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program(&shader_manager, &frag_shader,
+                                                                                        &vert_shader, version);
+        if(program) {
+            LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
+            return lv_opengl_shader_program_get_id(program);
         }
-        res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0, version, &vert_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash, vert_shader_hash);
-        if(!program) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
-        break;
+        lv_opengl_shader_manager_deinit(&shader_manager);
     }
-
-    if(!program) {
-        LV_LOG_ERROR("Failed to initialize shaders");
-        return 0;
-    }
-    return lv_opengl_shader_program_get_id(program);
+    LV_LOG_ERROR("Failed to initialize shaders");
+    return 0;
 }
 
 static lv_result_t lv_opengles_shader_init(void)
