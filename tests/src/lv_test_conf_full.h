@@ -142,7 +142,9 @@
 #define LV_USE_DEMO_MUSIC       1
 #define LV_USE_DEMO_BENCHMARK   1
 #define LV_USE_DEMO_EBIKE       1
-#define LV_USE_DEMO_VECTOR_GRAPHIC  1
+#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+    #define LV_USE_DEMO_VECTOR_GRAPHIC  1
+#endif
 #define LV_USE_DEMO_HIGH_RES    1
 #define LV_USE_DEMO_SMARTWATCH      1
 
