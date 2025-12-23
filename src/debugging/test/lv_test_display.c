@@ -27,13 +27,13 @@
 
 
 static lv_draw_buf_t create_test_draw_buf(int32_t hor_res, int32_t ver_res, lv_color_format_t cf);
+static void delete_event_cb(lv_event_t * e);
 
 #if LV_USE_DRAW_OPENGLES && LV_USE_EGL
     static void refr_ready_event_cb(lv_event_t * e);
 #else
     static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
     static void buf_changed_event_cb(lv_event_t * e);
-    static void delete_event_cb(lv_event_t * e);
 #endif
 
 static lv_display_t * create_display(int32_t hor_res, int32_t ver_res);
@@ -57,6 +57,8 @@ lv_display_t * lv_test_display_create(int32_t hor_res, int32_t ver_res)
     _state.draw_buf = create_test_draw_buf(hor_res, ver_res, cf);
 
     lv_display_t * disp = create_display(hor_res, ver_res);
+
+    lv_display_add_event_cb(disp, delete_event_cb, LV_EVENT_DELETE, NULL);
 
     if(!disp) {
         lv_free(_state.draw_buf.unaligned_data);
@@ -109,7 +111,6 @@ static lv_display_t * create_display(int32_t hor_res, int32_t ver_res)
     lv_display_set_flush_cb(disp, flush_cb);
     lv_display_add_event_cb(disp, buf_changed_event_cb, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
     lv_display_add_event_cb(disp, buf_changed_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-    lv_display_add_event_cb(disp, delete_event_cb, LV_EVENT_DELETE, NULL);
     return disp;
 
 }
@@ -132,6 +133,16 @@ static void buf_changed_event_cb(lv_event_t * e)
     lv_display_set_draw_buffers(disp, &_state.draw_buf, NULL);
 }
 
+
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
+{
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
+    lv_display_flush_ready(disp);
+}
+
+#endif
+
 static void delete_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
@@ -142,15 +153,6 @@ static void delete_event_cb(lv_event_t * e)
         draw_buf->unaligned_data = NULL;
     }
 }
-
-static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
-{
-    LV_UNUSED(area);
-    LV_UNUSED(color_p);
-    lv_display_flush_ready(disp);
-}
-
-#endif
 
 static lv_draw_buf_t create_test_draw_buf(int32_t hor_res, int32_t ver_res, lv_color_format_t cf)
 {
