@@ -58,8 +58,7 @@ lv_result_t lv_sdl_egl_init(lv_display_t * disp)
     }
 
 #if LV_USE_DRAW_OPENGLES
-    dsc->opengles_texture.is_texture_owner = true;
-    lv_result_t res = lv_opengles_texture_reshape(&dsc->opengles_texture, disp, hor_res, ver_res);
+    lv_result_t res = lv_sdl_egl_resize(disp);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(dsc->egl_ctx);
@@ -67,7 +66,6 @@ lv_result_t lv_sdl_egl_init(lv_display_t * disp)
         return LV_RESULT_INVALID;
     }
 #endif
-
     return LV_RESULT_OK;
 }
 void lv_sdl_egl_deinit(lv_display_t * disp)
@@ -81,6 +79,18 @@ void lv_sdl_egl_deinit(lv_display_t * disp)
 #if LV_USE_DRAW_OPENGLES
     lv_opengles_texture_deinit(&dsc->opengles_texture);
 #endif
+}
+
+lv_result_t lv_sdl_egl_resize(lv_display_t * disp)
+{
+#if LV_USE_DRAW_OPENGLES
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
+    int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
+    dsc->opengles_texture.is_texture_owner = true;
+    return lv_opengles_texture_reshape(&dsc->opengles_texture, disp, hor_res, ver_res);
+#endif
+    return LV_RESULT_OK;
 }
 
 
