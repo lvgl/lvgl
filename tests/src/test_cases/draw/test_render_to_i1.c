@@ -18,7 +18,7 @@ void tearDown(void)
 void test_render_to_i1(void)
 {
 #if !LV_BIN_DECODER_RAM_LOAD
-    TEST_IGNORE_MESSAGE("Can't test rotated images with LV_BIN_DECODER_RAM_LOAD=0")
+    TEST_IGNORE_MESSAGE("Can't test rotated images with LV_BIN_DECODER_RAM_LOAD=0");
 #endif
 #if LV_USE_DRAW_VG_LITE
     TEST_IGNORE_MESSAGE("LV_USE_DRAW_VG_LITE doesn't support i1");
