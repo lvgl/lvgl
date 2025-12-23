@@ -8,7 +8,6 @@
  *      INCLUDES
  *********************/
 #include "lv_opengles_pbuffer.h"
-#include <src/misc/lv_event.h>
 #if LV_USE_EGL
 
 #include "lv_opengles_egl.h"
