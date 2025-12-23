@@ -30,6 +30,8 @@
 #define I8_IMG_OFFSET \
     LV_VG_LITE_ALIGN(LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I8) * sizeof(lv_color32_t), LV_DRAW_BUF_ALIGN)
 
+#define SWAP_UINT16(x) ((((x) & 0x00FF) << 8) | (((x) & 0xFF00) >> 8))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -195,6 +197,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decoder_open_variable_index(lv_draw_buf_t * dest_buf, const lv_draw_buf_t * src_buf,
                                                bool premultiply)
 {
+    LV_PROFILER_DECODER_BEGIN;
     /* Since dsc->header.cf is uniformly set to I8,
      * the original format is obtained from src for conversion.
      */
@@ -231,16 +234,60 @@ static lv_result_t decoder_open_variable_index(lv_draw_buf_t * dest_buf, const l
         dest += dest_stride;
     }
 
+    LV_PROFILER_DECODER_END;
     return LV_RESULT_OK;
 }
 
 static lv_result_t decoder_open_variable_rgb565(lv_draw_buf_t * dest_buf,
-                                                const lv_draw_buf_t * src_img_buf, bool premultiply)
+                                                const lv_draw_buf_t * src_buf, bool premultiply)
 {
+    LV_PROFILER_DECODER_BEGIN;
 
+    switch(src_buf->header.cf) {
+        case LV_COLOR_FORMAT_RGB565_SWAPPED: {
+                for(uint32_t y = 0; y < src_buf->header.h; y++) {
+                    const uint16_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
+                    uint16_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    for(uint32_t x = 0; x < src_buf->header.w; x++) {
+                        *dest = SWAP_UINT16(*src);
+                        src++;
+                        dest++;
+                    }
+                }
+            }
+            break;
 
+        case LV_COLOR_FORMAT_RGB565A8: {
+                const uint8_t * alpha_p = lv_draw_buf_goto_xy(src_buf, 0, src_buf->header.h - 1);
+                alpha_p += src_buf->header.stride * src_buf->header.h;
 
-    return LV_RESULT_INVALID;
+                for(uint32_t y = 0; y < src_buf->header.h; y++) {
+                    const lv_color16_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
+                    lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    for(uint32_t x = 0; x < src_buf->header.w; x++) {
+                        dest->red = src->red * 0xFF / 0x1F;
+                        dest->green = src->green * 0xFF / 0x3F;
+                        dest->blue = src->blue * 0xFF / 0x1F;
+                        dest->alpha = *alpha_p;
+
+                        if(premultiply) {
+                            lv_color_premultiply(dest);
+                        }
+
+                        src++;
+                        dest++;
+                        alpha_p++;
+                    }
+                }
+            }
+            break;
+
+        default:
+            return LV_RESULT_INVALID;
+    }
+
+    LV_PROFILER_DECODER_END;
+    return LV_RESULT_OK;
 }
 
 static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
@@ -248,6 +295,7 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
                                            const lv_image_header_t * src_header,
                                            bool premultiply)
 {
+    LV_PROFILER_DECODER_BEGIN;
     uint32_t width = src_header->w;
     uint32_t height = src_header->h;
     uint8_t * src_temp = NULL;
@@ -268,6 +316,7 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
     if(res != LV_FS_RES_OK || palette_br != palette_size_bytes) {
         LV_LOG_ERROR("read palette: %" LV_PRIu32 " failed br: %" LV_PRIu32,
                      palette_br, palette_size_bytes);
+        LV_PROFILER_DECODER_END;
         return LV_RESULT_INVALID;
     }
 
@@ -280,6 +329,7 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
     src_temp = lv_malloc(src_stride);
     if(!src_temp) {
         LV_LOG_ERROR("malloc src_stride: %" LV_PRIu32 " failed", src_stride);
+        LV_PROFILER_DECODER_END;
         return LV_RESULT_INVALID;
     }
 
@@ -294,6 +344,7 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
                          y, src_stride, br);
 
             lv_free(src_temp);
+            LV_PROFILER_DECODER_END;
             return LV_RESULT_INVALID;
         }
 
@@ -303,6 +354,7 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
     }
 
     lv_free(src_temp);
+    LV_PROFILER_DECODER_END;
     return LV_RESULT_OK;
 }
 
@@ -311,6 +363,8 @@ static lv_result_t decoder_open_file_rgb565(lv_draw_buf_t * dest_buf,
                                             const lv_image_header_t * src_header,
                                             bool premultiply)
 {
+    LV_PROFILER_DECODER_BEGIN;
+    LV_PROFILER_DECODER_END;
     return LV_RESULT_INVALID;
 }
 
