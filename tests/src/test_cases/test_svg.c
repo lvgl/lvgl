@@ -1,6 +1,5 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-
 #include "unity/unity.h"
 
 #define LV_ARRAY_GET(array, index, type) ((type*)lv_array_at((array), (index)))
@@ -25,21 +24,33 @@ void tearDown(void)
 
 void testSvgParser(void)
 {
+#if !LV_USE_SVG
+    LV_UNUSED(svg_str_1);
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_node_t * svg = lv_svg_load_data(svg_str_1, lv_strlen(svg_str_1));
     TEST_ASSERT_NOT_EQUAL(NULL, svg);
     lv_svg_node_delete(svg);
+#endif
 }
 
 void testNode(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_node_t * svg = lv_svg_node_create(NULL);
 
     TEST_ASSERT_NOT_EQUAL(NULL, svg);
     lv_svg_node_delete(svg);
+#endif
 }
 
 void testNodeTree(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     lv_svg_node_t * root = lv_svg_node_create(NULL);
 
     lv_svg_node_t * node1 = lv_svg_node_create(root);
@@ -58,10 +69,14 @@ void testNodeTree(void)
 
     lv_svg_node_delete(node2);
     lv_svg_node_delete(root);
+#endif
 }
 
 void testSvgElement(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_1 = \
                          "<svg version=\"1.2\" baseProfile=\"tiny\"></svg>";
     lv_svg_node_t * svg_node1 = lv_svg_load_data(svg_1, lv_strlen(svg_1));
@@ -218,10 +233,14 @@ void testSvgElement(void)
     svg_node_ar = lv_svg_load_data(svg_ar10, lv_strlen(svg_ar10));
     TEST_ASSERT_EQUAL(lv_array_size(&svg_node_ar->attrs), 1);
     lv_svg_node_delete(svg_node_ar);
+#endif
 }
 
 void testPolylineElement(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_poly1 = \
                              "<svg><polyline points=\"100.0,50 200,150.0 180,110 200,200 210,340\"/></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_poly1, lv_strlen(svg_poly1));
@@ -260,11 +279,14 @@ void testPolylineElement(void)
     svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
     TEST_ASSERT_EQUAL(lv_array_size(&svg_node->attrs), 0);
     lv_svg_node_delete(svg_node_root);
-
+#endif
 }
 
 void testPathElement(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_path1 = \
                              "<svg><path d=\" \"/></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_path1, lv_strlen(svg_path1));
@@ -333,10 +355,14 @@ void testPathElement(void)
     TEST_ASSERT_EQUAL(((lv_svg_attr_values_list_t *)(LV_ARRAY_GET(&svg_node->attrs, 0, lv_svg_attr_t))->value.val)->length,
                       10);
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testTransform(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_tr1 = \
                            "<svg><g transform=\" \"/></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_tr1, lv_strlen(svg_tr1));
@@ -445,10 +471,14 @@ void testTransform(void)
     TEST_ASSERT_EQUAL_FLOAT(matrix->m[1][0], 0.176327f);
 
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testStrokeFill(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_sf1 = \
                            "<svg><g fill=\" \"/></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_sf1, lv_strlen(svg_sf1));
@@ -550,10 +580,14 @@ void testStrokeFill(void)
     c = (LV_ARRAY_GET(&svg_node->attrs, 0, lv_svg_attr_t))->value.uval;
     TEST_ASSERT_EQUAL(c, 0x80ffffff);
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testStrokeFillAttrs(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_sf0 = \
                            "<svg><g fill-rule=\'\'/></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_sf0, lv_strlen(svg_sf0));
@@ -632,10 +666,14 @@ void testStrokeFillAttrs(void)
     float c9 = (LV_ARRAY_GET(&svg_node->attrs, 2, lv_svg_attr_t))->value.fval;
     TEST_ASSERT_EQUAL_FLOAT(c9, 1.0f);
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testTextAttrs(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_sf0 = \
                            "<svg><text font-size=\'16\' font-family=\"arial\" font-variant=inherit>hello world!</text></svg>";
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_sf0, lv_strlen(svg_sf0));
@@ -670,10 +708,14 @@ void testTextAttrs(void)
     const char * content3 = svg_node2->xml_id;
     TEST_ASSERT_EQUAL_STRING(content3, "my");
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testGradient(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_gt1 = \
                            "<svg><linearGradient id=\"gt1\" gradientUnits= objectBoundingBox>"
                            "<stop stop-color='red' offset=0.1/>"
@@ -709,10 +751,14 @@ void testGradient(void)
     float cy = (LV_ARRAY_GET(&svg_node1->attrs, 2, lv_svg_attr_t))->value.fval;
     TEST_ASSERT_EQUAL_FLOAT(cy, 200.0f);
     lv_svg_node_delete(svg_node_root);
+#endif
 }
 
 void testBadCase(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
     const char * svg_b1 = \
                           "<rect x=10 y=10 width=100 height=100/>";
     lv_svg_node_t * svg = lv_svg_load_data(svg_b1, lv_strlen(svg_b1));
@@ -875,6 +921,7 @@ void testBadCase(void)
     TEST_ASSERT_EQUAL_FLOAT(matrix->m[1][2], 255.00942f);
 
     lv_svg_node_delete(svg);
+#endif
 }
 
 #endif

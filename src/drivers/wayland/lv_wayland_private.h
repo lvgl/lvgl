@@ -126,8 +126,8 @@ typedef struct {
 
 
 typedef struct _lv_wl_window_t {
-    lv_display_t * lv_disp;
     void * backend_display_data;
+    lv_display_t * lv_disp;
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
     lv_indev_t * lv_indev_touch;

@@ -18,13 +18,13 @@
     #error "lodepng is required for screenshot compare. Enable it in lv_conf.h (LV_USE_LODEPNG 1)"
 #endif
 
-#include "../../lvgl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 #include "../../libs/lodepng/lodepng.h"
+#include "../../core/lv_global.h"
 
 #ifdef _WIN32
     #include <direct.h>
@@ -105,7 +105,7 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
     create_folders_if_needed(fn_ref_full);
 #endif
 
-    lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
+    lv_draw_buf_t * draw_buf = &LV_GLOBAL_DEFAULT()->test_state.draw_buf;
 
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
     buf_to_xrgb8888(draw_buf, screen_buf_xrgb8888);

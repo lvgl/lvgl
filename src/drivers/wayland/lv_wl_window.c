@@ -87,10 +87,10 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         goto create_window_err;
     }
 
+    lv_display_set_driver_data(window->lv_disp, window);
+
     /* Initialize display driver */
     window->backend_display_data = wl_backend_ops.init_display(lv_wl_ctx.backend_data, window->lv_disp, hor_res, ver_res);
-
-    lv_display_set_driver_data(window->lv_disp, window);
 
     lv_wayland_xdg_configure_surface(window);
 
@@ -146,6 +146,14 @@ void * lv_wayland_get_backend_display_data(lv_display_t * display)
     lv_wl_window_t * window = lv_display_get_driver_data(display);
     LV_ASSERT_NULL(window);
     return window->backend_display_data;
+}
+
+void lv_wayland_set_backend_display_data(lv_display_t * display, void * data)
+{
+    LV_ASSERT_NULL(display);
+    lv_wl_window_t * window = lv_display_get_driver_data(display);
+    LV_ASSERT_NULL(window);
+    window->backend_display_data = data;
 }
 
 struct wl_surface * lv_wayland_get_window_surface(lv_display_t * display)

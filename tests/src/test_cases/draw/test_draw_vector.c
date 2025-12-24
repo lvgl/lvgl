@@ -354,11 +354,17 @@ void test_transform(void)
 
 void test_draw_lines(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     canvas_draw("draw_lines", draw_lines);
 }
 
 void test_draw_shapes(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     canvas_draw("draw_shapes", draw_shapes);
 }
 
@@ -393,6 +399,9 @@ static void draw_during_rendering(const char * name, draw_cb_t draw_cb, lv_opa_t
 
 void test_draw_during_rendering(void)
 {
+#if !LV_USE_VECTOR_GRAPHIC
+    TEST_IGNORE_MESSAGE("LV_USE_VECTOR_GRAPHIC is disabled");
+#endif
     /* Enable the Draw Unit dump parameters */
     lv_draw_unit_send_event(NULL, LV_EVENT_FOCUSED, NULL);
 

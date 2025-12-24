@@ -18,9 +18,12 @@ void tearDown(void)
 
 void test_render_to_al88(void)
 {
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("Draw opengles doesn't support LV_COLOR_FORMAT_AL88");
+#endif
 #if LV_USE_DRAW_VG_LITE
-    TEST_PASS();
-#else
+    TEST_IGNORE_MESSAGE("Draw VG_LITE doesn't support LV_COLOR_FORMAT_AL88");
+#endif
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_AL88);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
@@ -42,7 +45,6 @@ void test_render_to_al88(void)
             TEST_ASSERT_EQUAL_SCREENSHOT(buf);
         }
     }
-#endif
 }
 
 #endif

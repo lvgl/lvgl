@@ -1,15 +1,15 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
-
-#if LV_USE_SNAPSHOT
-
 #include "unity/unity.h"
 
 #define NUM_SNAPSHOTS 10
 
 void test_snapshot_should_not_leak_memory(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     uint32_t idx = 0;
     size_t initial_available_memory = 0;
     size_t final_available_memory = 0;
@@ -38,10 +38,14 @@ void test_snapshot_should_not_leak_memory(void)
     final_available_memory = monitor.free_size;
 
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
+#endif
 }
 
 void test_snapshot_with_transform_should_not_leak_memory(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     uint32_t idx = 0;
     size_t initial_available_memory = 0;
     size_t final_available_memory = 0;
@@ -72,10 +76,14 @@ void test_snapshot_with_transform_should_not_leak_memory(void)
     lv_obj_delete(label);
 
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
+#endif
 }
 
 void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);
     lv_label_set_text(label, "Wubba lubba dub dub!");
@@ -96,10 +104,14 @@ void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
+#endif
 }
 
 void test_snapshot_take_snapshot_with_transform(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);
     lv_label_set_text(label, "Wubba lubba dub dub!");
@@ -116,10 +128,14 @@ void test_snapshot_take_snapshot_with_transform(void)
 
     lv_obj_delete(img_obj);
     lv_draw_buf_destroy(draw_dsc);
+#endif
 }
 
 void test_snapshot_take_snapshot_multiple_widgets(void)
 {
+#if !LV_USE_SNAPSHOT
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     lv_obj_t * obj_1 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_1, 200, 200);
     lv_obj_set_style_border_width(obj_1, 0, 0);
@@ -176,30 +192,7 @@ void test_snapshot_take_snapshot_multiple_widgets(void)
 
     lv_obj_clean(lv_screen_active());
     lv_draw_buf_destroy(draw_buf);
-}
-
-#else /*LV_USE_SNAPSHOT*/
-
-void test_snapshot_should_not_leak_memory(void)
-{
-
-}
-
-void test_snapshot_with_transform_should_not_leak_memory(void)
-{
-
-}
-
-void test_snapshot_take_snapshot_immediately_after_obj_create(void)
-{
-
-}
-
-void test_snapshot_take_snapshot_with_transform(void)
-{
-
-}
-
 #endif
+}
 
 #endif

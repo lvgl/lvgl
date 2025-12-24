@@ -109,6 +109,10 @@ static void test_lcd_generic_mipi(lcd_create_cb_t create_cb,
                                   lcd_set_gamma_curve_cb_t set_gamma_curve_cb,
                                   lcd_send_cmd_list_cb_t send_cmd_list_cb)
 {
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("Can't run draw opengl tests unless display is created via OpenGL driver");
+#endif
+
     lv_display_t * disp = create_cb(TEST_LCD_WIDTH, TEST_LCD_HEIGHT, LV_LCD_FLAG_NONE, lcd_send_cmd_cb,
                                     lcd_send_color_cb);
     TEST_ASSERT_NOT_NULL(disp);
@@ -279,6 +283,9 @@ static void lcd_ft81x_spi_cb(lv_display_t * disp, lv_ft81x_spi_operation_t opera
 
 void test_lcd_ft81x(void)
 {
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("Can't run draw opengl tests unless display is created via OpenGL driver");
+#endif
     lv_ft81x_parameters_t params;
     lv_memzero(&params, sizeof(lv_ft81x_parameters_t));
     params.hor_res = TEST_LCD_WIDTH;

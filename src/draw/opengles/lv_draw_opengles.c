@@ -193,17 +193,12 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     unsigned int texture = layer_get_texture(layer);
     if(texture == 0) {
         lv_display_t * disp = lv_refr_get_disp_refreshing();
-        if(layer != disp->layer_head) {
-            int32_t w = lv_area_get_width(&layer->buf_area);
-            int32_t h = lv_area_get_height(&layer->buf_area);
+        LV_ASSERT(layer != disp->layer_head);
+        int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t h = lv_area_get_height(&layer->buf_area);
 
-            texture = create_texture(w, h, NULL);
-
-            layer->user_data = (void *)(uintptr_t)texture;
-        }
-        else {
-            layer->user_data = (void *)(uintptr_t)lv_opengles_texture_get_texture_id(disp);
-        }
+        texture = create_texture(w, h, NULL);
+        layer->user_data = (void *)(uintptr_t)texture;
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -571,8 +566,8 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             }
 
             if(fill_dsc->opa >= LV_OPA_MAX) {
-                float tex_w = (float)lv_area_get_width(&fill_area);
-                float tex_h = (float)lv_area_get_height(&fill_area);
+                int32_t tex_w = lv_area_get_width(&fill_area);
+                int32_t tex_h = lv_area_get_height(&fill_area);
                 GL_CALL(glEnable(GL_SCISSOR_TEST));
                 GL_CALL(glScissor(fill_area.x1, targ_tex_h - fill_area.y1 - tex_h, tex_w, tex_h));
                 GL_CALL(glClearColor((float)fill_dsc->color.red / 255.0f, (float)fill_dsc->color.green / 255.0f,

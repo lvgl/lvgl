@@ -66,6 +66,10 @@ extern "C" {
 #define glTexStorage2D glTexStorage2DEXT
 #endif
 
+#if !defined(glClearDepthf) && defined(glClearDepth)
+#define glClearDepthf glClearDepth
+#endif /*!defined(glClearDepthf) && defined(glClearDepth)*/
+
 #ifndef GL_RGBA32F
 #define GL_RGBA32F 0x8814
 #endif
@@ -105,6 +109,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    bool h_flip;
+    bool v_flip;
+    bool rb_swap;
+} lv_opengles_render_params_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -136,6 +146,8 @@ void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * t
  * @param h        height of the viewport
  */
 void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
+
+void lv_opengles_render_display(lv_display_t * display, const lv_opengles_render_params_t * params);
 
 
 /**********************

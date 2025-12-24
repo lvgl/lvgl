@@ -14,6 +14,7 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
+#if LV_USE_SVG
 static void assert_screenshot(const char * path)
 {
 #ifndef NON_AMD64_BUILD
@@ -27,7 +28,7 @@ static void assert_screenshot(const char * path)
 #endif
 }
 
-void svg_decoder(void)
+static void svg_decoder(void)
 {
     LV_IMAGE_DECLARE(test_image_svg);
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -40,15 +41,6 @@ void svg_decoder(void)
     lv_obj_clean(lv_screen_active());
     lv_image_cache_drop(NULL);
 }
-
-void test_svg_decoder(void)
-{
-    svg_decoder();
-    size_t mem_before = lv_test_get_free_mem();
-    svg_decoder();
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
-}
-
 static void svg_decoder_file(void)
 {
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -62,16 +54,7 @@ static void svg_decoder_file(void)
     lv_obj_clean(lv_screen_active());
     lv_image_cache_drop(NULL);
 }
-
-void test_svg_decoder_file(void)
-{
-    svg_decoder_file();
-    size_t mem_before = lv_test_get_free_mem();
-    svg_decoder_file();
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
-}
-
-void svg_snapshot(void)
+static void svg_snapshot(void)
 {
     LV_IMAGE_DECLARE(test_image_svg);
     lv_obj_t * img = lv_image_create(lv_screen_active());
@@ -91,13 +74,43 @@ void svg_snapshot(void)
     lv_obj_clean(lv_screen_active());
     lv_image_cache_drop(NULL);
 }
+#endif /*LV_USE_SVG*/
+
+void test_svg_decoder(void)
+{
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
+    svg_decoder();
+    size_t mem_before = lv_test_get_free_mem();
+    svg_decoder();
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+#endif
+}
+void test_svg_decoder_file(void)
+{
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("SVG is disabled");
+#else
+    svg_decoder_file();
+    size_t mem_before = lv_test_get_free_mem();
+    svg_decoder_file();
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+#endif
+}
+
+
 
 void test_svg_snapshot(void)
 {
+#if !LV_USE_SVG
+    TEST_IGNORE_MESSAGE("Snapshot is disabled");
+#else
     svg_snapshot();
     size_t mem_before = lv_test_get_free_mem();
     svg_snapshot();
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+#endif
 }
 
 #endif

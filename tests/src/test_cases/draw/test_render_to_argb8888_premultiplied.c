@@ -18,6 +18,9 @@ void tearDown(void)
 
 void test_render_to_argb8888_premultiplied(void)
 {
+#if LV_USE_DRAW_OPENGLES
+    TEST_IGNORE_MESSAGE("Draw opengles doesn't support LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED");
+#endif
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
