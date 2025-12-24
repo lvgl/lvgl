@@ -725,8 +725,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     return res;
                 }
 
-                bool premultiply = lv_draw_buf_has_flag(&src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)
-                                   ? false : dsc->args.premultiply;
+                const bool src_premultiplied = lv_draw_buf_has_flag(&src_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+                const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
 
                 /**
                  * Since lv_draw_buf_from_image automatically calculates the stride,
@@ -767,7 +767,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 }
 
                 if(res == LV_RESULT_OK) {
-                    set_premultiplied_flag_if_needed(dest_buf, dsc->args.premultiply);
+                    set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
                     dsc->decoded = dest_buf;
                 }
                 else {
@@ -803,8 +803,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     src_header.flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
                 }
 
-                bool premultiply = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED
-                                   ? false : dsc->args.premultiply;
+                const bool src_premultiplied = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED;
+                const bool premultiply = src_premultiplied ? false : dsc->args.premultiply;
 
                 src_header.stride = get_image_stride(&src_header);
 
@@ -842,7 +842,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 }
 
                 if(res == LV_RESULT_OK) {
-                    set_premultiplied_flag_if_needed(dest_buf, dsc->args.premultiply);
+                    set_premultiplied_flag_if_needed(dest_buf, src_premultiplied || dsc->args.premultiply);
                     dsc->decoded = dest_buf;
                 }
                 else {
