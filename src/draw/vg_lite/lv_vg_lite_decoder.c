@@ -166,7 +166,6 @@ static lv_color_format_t get_converted_cf(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
-        case LV_COLOR_FORMAT_I8:
             return LV_COLOR_FORMAT_I8;
 
         case LV_COLOR_FORMAT_A1:
