@@ -82,6 +82,8 @@ typedef enum {
     LV_OBJ_FLAG_WIDGET_2        = (1u << 27), /**< Custom flag, free to use by widget*/
     LV_OBJ_FLAG_USER_1          = (1u << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_2          = (1u << 29), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_3          = (1u << 30), /**< Custom flag, free to use by user*/
+    LV_OBJ_FLAG_USER_4          = (1u << 31), /**< Custom flag, free to use by user*/
 } lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
