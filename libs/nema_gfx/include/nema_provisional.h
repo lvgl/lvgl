@@ -46,7 +46,7 @@ extern "C" {
  */
 void nema_fill_triangle_strip_f(float* vertices, int num_vertices, int stride, uint32_t rgba8888);
 
-/** \brief Fill a traingle fan with color (float coordinates)
+/** \brief Fill a triangle fan with color (float coordinates)
  *
  * \param vertices pointer to vertices coordinated (first x coordinate of vertex,
  *                 then y coordinate of vertex)
