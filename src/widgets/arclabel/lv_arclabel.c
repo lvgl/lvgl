@@ -542,17 +542,13 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
             lv_text_encoded_letter_next_2(text_start, &letter, &letter_next, &word_i);
             const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
-            if(processed_letter_count == 0) {
-                processed_letter_count++;
-                continue;
-            }
-            const lv_value_precise_t arc_offset = (prev_letter_w + letter_w + letter_space) / (lv_value_precise_t)2;
+            if(processed_letter_count > 0) {
+                const lv_value_precise_t arc_offset = (prev_letter_w + letter_w + letter_space) / (lv_value_precise_t)2;
 
-            total_arc_length += arc_offset;
-
-            if(letter == 0) {
-                break;
+                total_arc_length += arc_offset;
             }
+
+            if(letter == 0) break;
 
             prev_letter_w = letter_w;
             processed_letter_count++;
