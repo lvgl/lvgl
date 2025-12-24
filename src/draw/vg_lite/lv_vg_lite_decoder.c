@@ -799,6 +799,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     return LV_RESULT_INVALID;
                 }
 
+                if(src_header.magic != LV_IMAGE_HEADER_MAGIC) {
+                    LV_LOG_WARN("Legacy bin image detected: %s", (const char *)dsc->src);
+                    src_header.cf = src_header.magic;
+                    src_header.magic = LV_IMAGE_HEADER_MAGIC;
+                    src_header.flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+                }
+
                 bool premultiply = src_header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED
                                    ? false : dsc->args.premultiply;
 
