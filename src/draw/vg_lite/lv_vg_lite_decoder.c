@@ -39,11 +39,9 @@
 #pragma pack(1)
 
 typedef struct {
-    uint16_t blue : 5;
-    uint16_t green : 6;
-    uint16_t red : 5;
+    lv_color16_t color;
     uint8_t alpha;
-} color_argb8565_t;
+} color16_alpha_t;
 
 #pragma pack()
 
@@ -287,12 +285,12 @@ static void convert_rgb888_line(lv_color32_t * dest, const lv_color_t * src, uin
     }
 }
 
-static void convert_argb8565_line(lv_color32_t * dest, const color_argb8565_t * src, uint32_t px_cnt, bool premultiply)
+static void convert_argb8565_line(lv_color32_t * dest, const color16_alpha_t * src, uint32_t px_cnt, bool premultiply)
 {
     while(px_cnt--) {
-        dest->red = src->red * 0xFF / 0x1F;
-        dest->green = src->green * 0xFF / 0x3F;
-        dest->blue = src->blue * 0xFF / 0x1F;
+        dest->red = src->color.red * 0xFF / 0x1F;
+        dest->green = src->color.green * 0xFF / 0x3F;
+        dest->blue = src->color.blue * 0xFF / 0x1F;
         dest->alpha = src->alpha;
 
         if(premultiply) {
@@ -409,7 +407,7 @@ static lv_result_t decoder_open_variable_rgb(lv_draw_buf_t * dest_buf,
 
         case LV_COLOR_FORMAT_ARGB8565: {
                 for(uint32_t y = 0; y < src_buf->header.h; y++) {
-                    const color_argb8565_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
+                    const color16_alpha_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
                     lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
                     convert_argb8565_line(dest, src, src_buf->header.w, premultiply);
                 }
@@ -466,7 +464,7 @@ static bool file_read_line(lv_fs_file_t * file, void * buf, uint32_t size)
     uint32_t br = 0;
     lv_fs_res_t res = lv_fs_read(file, buf, size, &br);
     if(res != LV_FS_RES_OK || br != size) {
-        LV_LOG_ERROR("read size: %" LV_PRIu32 " failed， br: %" LV_PRIu32" res: %d",
+        LV_LOG_ERROR("read size: %" LV_PRIu32 " failed, br: %" LV_PRIu32 " res: %d",
                      size, br, res);
         return false;
     }
