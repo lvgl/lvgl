@@ -36,6 +36,17 @@
  *      TYPEDEFS
  **********************/
 
+#pragma pack(1)
+
+typedef struct {
+    uint16_t blue : 5;
+    uint16_t green : 6;
+    uint16_t red : 5;
+    uint8_t alpha;
+} color_argb8565_t;
+
+#pragma pack()
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -147,16 +158,25 @@ static void image_decode_to_index8_line(uint8_t * dest, const uint8_t * src, int
 
 static lv_color_format_t get_converted_cf(lv_color_format_t cf)
 {
-    /**
-     * VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
-     * so for simplicity, convert the formats that VG-Lite cannot directly use.
-     */
     switch(cf) {
+        /**
+         * VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
+         * so for simplicity, convert them to I8.
+         */
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
             return LV_COLOR_FORMAT_I8;
+
+        /**
+         * If the GPU does not support the 24-bit format, convert it to ARGB8888;
+         * otherwise, use the normal bin_decoder processing flow.
+         */
+        case LV_COLOR_FORMAT_RGB888:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? LV_COLOR_FORMAT_UNKNOWN : LV_COLOR_FORMAT_XRGB8888;
+        case LV_COLOR_FORMAT_ARGB8565:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? LV_COLOR_FORMAT_UNKNOWN : LV_COLOR_FORMAT_ARGB8888;
 
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_AL88:
@@ -170,6 +190,13 @@ static lv_color_format_t get_converted_cf(lv_color_format_t cf)
     }
 
     return LV_COLOR_FORMAT_UNKNOWN;
+}
+
+static void set_premultiplied_flag_if_needed(lv_draw_buf_t * dest_buf, bool premultiply)
+{
+    if(premultiply && lv_color_format_has_alpha(dest_buf->header.cf)) {
+        lv_draw_buf_set_flag(dest_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    }
 }
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
@@ -222,7 +249,6 @@ static lv_result_t decoder_open_variable_index(lv_draw_buf_t * dest_buf, const l
     if(premultiply) {
         /* pre-multiply palette */
         image_color32_pre_mul((lv_color32_t *)dest, palette_size);
-        lv_draw_buf_set_flag(dest_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
     }
 
     /* move to index image map */
@@ -240,6 +266,61 @@ static lv_result_t decoder_open_variable_index(lv_draw_buf_t * dest_buf, const l
     return LV_RESULT_OK;
 }
 
+static void convert_rgb565_swapped_line(uint16_t * dest, const uint16_t * src, uint32_t px_cnt)
+{
+    while(px_cnt--) {
+        *dest = SWAP_UINT16(*src);
+        dest++;
+        src++;
+    }
+}
+
+static void convert_rgb888_line(lv_color32_t * dest, const lv_color_t * src, uint32_t px_cnt)
+{
+    while(px_cnt--) {
+        dest->red = src->red;
+        dest->green = src->green;
+        dest->blue = src->blue;
+        dest->alpha = 0xFF;
+        src++;
+        dest++;
+    }
+}
+
+static void convert_argb8565_line(lv_color32_t * dest, const color_argb8565_t * src, uint32_t px_cnt, bool premultiply)
+{
+    while(px_cnt--) {
+        dest->red = src->red * 0xFF / 0x1F;
+        dest->green = src->green * 0xFF / 0x3F;
+        dest->blue = src->blue * 0xFF / 0x1F;
+        dest->alpha = src->alpha;
+
+        if(premultiply) {
+            lv_color_premultiply(dest);
+        }
+
+        src++;
+        dest++;
+    }
+}
+
+static void convert_al88_line(lv_color32_t * dest, const lv_color16a_t * src, uint32_t px_cnt, bool premultiply)
+{
+    while(px_cnt--) {
+        dest->red = src->lumi;
+        dest->green = src->lumi;
+        dest->blue = src->lumi;
+        dest->alpha = src->alpha;
+
+        if(premultiply) {
+            lv_color_premultiply(dest);
+        }
+
+        src++;
+        dest++;
+    }
+}
+
 static lv_result_t decoder_open_variable_rgb(lv_draw_buf_t * dest_buf,
                                              const lv_draw_buf_t * src_buf, bool premultiply)
 {
@@ -250,11 +331,25 @@ static lv_result_t decoder_open_variable_rgb(lv_draw_buf_t * dest_buf,
                 for(uint32_t y = 0; y < src_buf->header.h; y++) {
                     const uint16_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
                     uint16_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
-                    for(uint32_t x = 0; x < src_buf->header.w; x++) {
-                        *dest = SWAP_UINT16(*src);
-                        src++;
-                        dest++;
-                    }
+                    convert_rgb565_swapped_line(dest, src, src_buf->header.w);
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB888: {
+                for(uint32_t y = 0; y < src_buf->header.h; y++) {
+                    const lv_color_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
+                    lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    convert_rgb888_line(dest, src, src_buf->header.w);
+                }
+            }
+            break;
+
+        case LV_COLOR_FORMAT_ARGB8565: {
+                for(uint32_t y = 0; y < src_buf->header.h; y++) {
+                    const color_argb8565_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
+                    lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    convert_argb8565_line(dest, src, src_buf->header.w, premultiply);
                 }
             }
             break;
@@ -288,19 +383,7 @@ static lv_result_t decoder_open_variable_rgb(lv_draw_buf_t * dest_buf,
                 for(uint32_t y = 0; y < src_buf->header.h; y++) {
                     const lv_color16a_t * src = lv_draw_buf_goto_xy(src_buf, 0, y);
                     lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
-                    for(uint32_t x = 0; x < src_buf->header.w; x++) {
-                        dest->red = src->lumi;
-                        dest->green = src->lumi;
-                        dest->blue = src->lumi;
-                        dest->alpha = src->alpha;
-
-                        if(premultiply) {
-                            lv_color_premultiply(dest);
-                        }
-
-                        src++;
-                        dest++;
-                    }
+                    convert_al88_line(dest, src, src_buf->header.w, premultiply);
                 }
             }
             break;
@@ -356,7 +439,6 @@ static lv_result_t decoder_open_file_index(lv_draw_buf_t * dest_buf,
     if(premultiply) {
         /* pre-multiply palette */
         image_color32_pre_mul((lv_color32_t *)dest, palette_size);
-        lv_draw_buf_set_flag(dest_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
     }
 
     src_temp = lv_malloc(src_stride);
@@ -410,17 +492,39 @@ static lv_result_t decoder_open_file_rgb(lv_draw_buf_t * dest_buf,
         case LV_COLOR_FORMAT_RGB565_SWAPPED: {
                 for(uint32_t y = 0; y < height; y++) {
                     if(!file_read_line(file, src_temp, src_stride)) {
-                        lv_free(src_temp);
                         goto failed;
                     }
 
                     uint16_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
-                    const uint16_t * src_16 = src_temp;
-                    for(uint32_t x = 0; x < width; x++) {
-                        *dest = SWAP_UINT16(*src_16);
-                        src_16++;
-                        dest++;
+                    convert_rgb565_swapped_line(dest, src_temp, width);
+                }
+
+                res = LV_RESULT_OK;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_RGB888: {
+                for(uint32_t y = 0; y < height; y++) {
+                    if(!file_read_line(file, src_temp, src_stride)) {
+                        goto failed;
                     }
+
+                    lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    convert_rgb888_line(dest, src_temp, width);
+                }
+
+                res = LV_RESULT_OK;
+            }
+            break;
+
+        case LV_COLOR_FORMAT_ARGB8565: {
+                for(uint32_t y = 0; y < height; y++) {
+                    if(!file_read_line(file, src_temp, src_stride)) {
+                        goto failed;
+                    }
+
+                    lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    convert_argb8565_line(dest, src_temp, width, premultiply);
                 }
 
                 res = LV_RESULT_OK;
@@ -429,9 +533,8 @@ static lv_result_t decoder_open_file_rgb(lv_draw_buf_t * dest_buf,
 
         case LV_COLOR_FORMAT_RGB565A8: {
                 /* First pass: read RGB565 and convert to ARGB8888, skip alpha */
-                uint32_t rgb_stride = width * 2; /* RGB565: 2 bytes per pixel */
                 for(uint32_t y = 0; y < height; y++) {
-                    if(!file_read_line(file, src_temp, rgb_stride)) {
+                    if(!file_read_line(file, src_temp, src_stride)) {
                         goto failed;
                     }
 
@@ -453,8 +556,8 @@ static lv_result_t decoder_open_file_rgb(lv_draw_buf_t * dest_buf,
                         goto failed;
                     }
 
-                    uint8_t * src_alpha = src_temp;
                     lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
+                    const uint8_t * src_alpha = src_temp;
                     for(uint32_t x = 0; x < width; x++) {
                         dest->alpha = *src_alpha;
 
@@ -478,21 +581,7 @@ static lv_result_t decoder_open_file_rgb(lv_draw_buf_t * dest_buf,
                     }
 
                     lv_color32_t * dest = lv_draw_buf_goto_xy(dest_buf, 0, y);
-                    const lv_color16a_t * src = src_temp;
-
-                    for(uint32_t x = 0; x < width; x++) {
-                        dest->red = src->lumi;
-                        dest->green = src->lumi;
-                        dest->blue = src->lumi;
-                        dest->alpha = src->alpha;
-
-                        if(premultiply) {
-                            lv_color_premultiply(dest);
-                        }
-
-                        src++;
-                        dest++;
-                    }
+                    convert_al88_line(dest, src_temp, width, premultiply);
                 }
 
                 res = LV_RESULT_OK;
@@ -560,6 +649,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                         break;
 
                     case LV_COLOR_FORMAT_RGB565_SWAPPED:
+                    case LV_COLOR_FORMAT_RGB888:
+                    case LV_COLOR_FORMAT_ARGB8565:
                     case LV_COLOR_FORMAT_RGB565A8:
                     case LV_COLOR_FORMAT_AL88:
                         res = decoder_open_variable_rgb(dest_buf, &src_buf, dsc->args.premultiply);
@@ -572,6 +663,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 }
 
                 if(res == LV_RESULT_OK) {
+                    set_premultiplied_flag_if_needed(dest_buf, dsc->args.premultiply);
                     dsc->decoded = dest_buf;
                 }
                 else {
@@ -606,8 +698,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     return LV_RESULT_INVALID;
                 }
 
-                lv_result_t res = LV_RESULT_INVALID;
-
                 switch(src_header.cf) {
                     case LV_COLOR_FORMAT_I1:
                     case LV_COLOR_FORMAT_I2:
@@ -617,6 +707,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                         break;
 
                     case LV_COLOR_FORMAT_RGB565_SWAPPED:
+                    case LV_COLOR_FORMAT_RGB888:
+                    case LV_COLOR_FORMAT_ARGB8565:
                     case LV_COLOR_FORMAT_RGB565A8:
                     case LV_COLOR_FORMAT_AL88:
                         res = decoder_open_file_rgb(dest_buf, &file, &src_header, dsc->args.premultiply);
@@ -629,6 +721,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 }
 
                 if(res == LV_RESULT_OK) {
+                    set_premultiplied_flag_if_needed(dest_buf, dsc->args.premultiply);
                     dsc->decoded = dest_buf;
                 }
                 else {
