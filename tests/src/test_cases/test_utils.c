@@ -35,7 +35,7 @@ void test_utils_bsearch_empty_array(void)
 {
     int * array = NULL;
     int key = 5;
-    int * result = (int *)_lv_utils_bsearch(&key, array, 0, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, array, 0, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result);
 }
 
@@ -46,13 +46,13 @@ void test_utils_bsearch_single_element(void)
 
     /* Test existing element */
     int key1 = 5;
-    int * result1 = (int *)_lv_utils_bsearch(&key1, array, 1, sizeof(int), compare_int);
+    int * result1 = (int *)lv_utils_bsearch(&key1, array, 1, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result1);
     TEST_ASSERT_EQUAL_INT(5, *result1);
 
     /* Test non-existent element */
     int key2 = 1;
-    int * result2 = (int *)_lv_utils_bsearch(&key2, array, 1, sizeof(int), compare_int);
+    int * result2 = (int *)lv_utils_bsearch(&key2, array, 1, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result2);
 }
 
@@ -61,7 +61,7 @@ void test_utils_bsearch_middle_element(void)
 {
     int array[] = {1, 3, 5, 7, 9};
     int key = 5;
-    int * result = (int *)_lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_INT(5, *result);
 }
@@ -71,7 +71,7 @@ void test_utils_bsearch_not_found(void)
 {
     int array[] = {1, 3, 5, 7, 9};
     int key = 2;
-    int * result = (int *)_lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result);
 }
 
@@ -80,7 +80,7 @@ void test_utils_bsearch_first_element(void)
 {
     int array[] = {1, 3, 5, 7, 9};
     int key = 1;
-    int * result = (int *)_lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_INT(1, *result);
 }
@@ -90,7 +90,7 @@ void test_utils_bsearch_last_element(void)
 {
     int array[] = {1, 3, 5, 7, 9};
     int key = 9;
-    int * result = (int *)_lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, array, 5, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_INT(9, *result);
 }
@@ -100,7 +100,7 @@ void test_utils_bsearch_string_array(void)
 {
     const char * array[] = {"apple", "banana", "cherry", "date", "elderberry"};
     const char * key = "cherry";
-    const char ** result = (const char **)_lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
+    const char ** result = (const char **)lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("cherry", *result);
 }
@@ -110,7 +110,7 @@ void test_utils_bsearch_string_not_found(void)
 {
     const char * array[] = {"apple", "banana", "cherry", "date", "elderberry"};
     const char * key = "fig";
-    const char ** result = (const char **)_lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
+    const char ** result = (const char **)lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
     TEST_ASSERT_NULL(result);
 }
 
@@ -119,7 +119,7 @@ void test_utils_bsearch_repeated_key(void)
 {
     const char * array[] = {"apple", "banana", "apple", "date", "elderberry"};
     const char * key = "apple";
-    const char ** result = (const char **)_lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
+    const char ** result = (const char **)lv_utils_bsearch(&key, array, 5, sizeof(const char *), compare_string);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_STRING("apple", *result);
 }
@@ -135,13 +135,13 @@ void test_utils_bsearch_large_array(void)
 
     /* Test finding existing element */
     int key = 500;
-    int * result = (int *)_lv_utils_bsearch(&key, large_array, LARGE_ARRAY_SIZE, sizeof(int), compare_int);
+    int * result = (int *)lv_utils_bsearch(&key, large_array, LARGE_ARRAY_SIZE, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result);
     TEST_ASSERT_EQUAL_INT(500, *result);
 
     /* Test non-existent element */
     key = 501;
-    result = (int *)_lv_utils_bsearch(&key, large_array, LARGE_ARRAY_SIZE, sizeof(int), compare_int);
+    result = (int *)lv_utils_bsearch(&key, large_array, LARGE_ARRAY_SIZE, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result);
 }
 
@@ -152,29 +152,29 @@ void test_utils_bsearch_two_element_array(void)
 
     /* Test finding first element */
     int key1 = 1;
-    int * result1 = (int *)_lv_utils_bsearch(&key1, array, 2, sizeof(int), compare_int);
+    int * result1 = (int *)lv_utils_bsearch(&key1, array, 2, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result1);
     TEST_ASSERT_EQUAL_INT(1, *result1);
 
     /* Test finding second element */
     int key2 = 3;
-    int * result2 = (int *)_lv_utils_bsearch(&key2, array, 2, sizeof(int), compare_int);
+    int * result2 = (int *)lv_utils_bsearch(&key2, array, 2, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result2);
     TEST_ASSERT_EQUAL_INT(3, *result2);
 
     /* Test element smaller than first */
     int key3 = 0;
-    int * result3 = (int *)_lv_utils_bsearch(&key3, array, 2, sizeof(int), compare_int);
+    int * result3 = (int *)lv_utils_bsearch(&key3, array, 2, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result3);
 
     /* Test element between first and second */
     int key4 = 2;
-    int * result4 = (int *)_lv_utils_bsearch(&key4, array, 2, sizeof(int), compare_int);
+    int * result4 = (int *)lv_utils_bsearch(&key4, array, 2, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result4);
 
     /* Test element larger than second */
     int key5 = 4;
-    int * result5 = (int *)_lv_utils_bsearch(&key5, array, 2, sizeof(int), compare_int);
+    int * result5 = (int *)lv_utils_bsearch(&key5, array, 2, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result5);
 }
 
@@ -185,25 +185,25 @@ void test_utils_bsearch_three_element_array(void)
 
     /* Test finding first element */
     int key1 = 1;
-    int * result1 = (int *)_lv_utils_bsearch(&key1, array, 3, sizeof(int), compare_int);
+    int * result1 = (int *)lv_utils_bsearch(&key1, array, 3, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result1);
     TEST_ASSERT_EQUAL_INT(1, *result1);
 
     /* Test finding second element */
     int key2 = 2;
-    int * result2 = (int *)_lv_utils_bsearch(&key2, array, 3, sizeof(int), compare_int);
+    int * result2 = (int *)lv_utils_bsearch(&key2, array, 3, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result2);
     TEST_ASSERT_EQUAL_INT(2, *result2);
 
     /* Test finding third element */
     int key3 = 3;
-    int * result3 = (int *)_lv_utils_bsearch(&key3, array, 3, sizeof(int), compare_int);
+    int * result3 = (int *)lv_utils_bsearch(&key3, array, 3, sizeof(int), compare_int);
     TEST_ASSERT_NOT_NULL(result3);
     TEST_ASSERT_EQUAL_INT(3, *result3);
 
     /* Test element not found */
     int key4 = 4;
-    int * result4 = (int *)_lv_utils_bsearch(&key4, array, 3, sizeof(int), compare_int);
+    int * result4 = (int *)lv_utils_bsearch(&key4, array, 3, sizeof(int), compare_int);
     TEST_ASSERT_NULL(result4);
 }
 
