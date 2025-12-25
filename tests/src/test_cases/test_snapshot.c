@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -215,7 +216,7 @@ void test_snapshot_create_draw_buf_with_extended_size(void)
     TEST_ASSERT_NOT_NULL(draw_buf);
 
     /* Get extended size before deleting the object */
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     int32_t expected_w = 50 + ext_size * 2;
     int32_t expected_h = 40 + ext_size * 2;
 
@@ -278,7 +279,7 @@ void test_snapshot_reshape_draw_buf_with_extended_size(void)
     lv_obj_set_style_shadow_spread(obj, 3, 0);
 
     /* Calculate size including extended area */
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     int32_t total_w = 50 + ext_size * 2;
     int32_t total_h = 40 + ext_size * 2;
 
@@ -353,7 +354,7 @@ void test_snapshot_take_to_draw_buf_supported_formats(void)
     /* Test supported color formats using common definition */
     for(size_t i = 0; i < NUM_SUPPORTED_FORMATS; i++) {
         /* Create draw buffer with same size as object */
-        int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+        int32_t ext_size = lv_obj_get_ext_draw_size(obj);
         int32_t total_w = 100 + ext_size * 2;
         int32_t total_h = 80 + ext_size * 2;
 
@@ -450,7 +451,7 @@ void test_snapshot_refresh_logic_sibling_order(void)
     TEST_ASSERT_NOT_NULL(draw_buf);
 
     /* Verify snapshot size is correct */
-    int32_t ext_size = _lv_obj_get_ext_draw_size(siblings[2]);
+    int32_t ext_size = lv_obj_get_ext_draw_size(siblings[2]);
     TEST_ASSERT_EQUAL_UINT32(40 + ext_size * 2, draw_buf->header.w);
     TEST_ASSERT_EQUAL_UINT32(40 + ext_size * 2, draw_buf->header.h);
 
@@ -467,7 +468,7 @@ void test_snapshot_refresh_logic_edge_cases(void)
     /* Verify screen snapshot size */
     int32_t screen_w = lv_display_get_horizontal_resolution(NULL);
     int32_t screen_h = lv_display_get_vertical_resolution(NULL);
-    int32_t ext_size = _lv_obj_get_ext_draw_size(lv_screen_active());
+    int32_t ext_size = lv_obj_get_ext_draw_size(lv_screen_active());
     TEST_ASSERT_EQUAL_UINT32(screen_w + ext_size * 2, draw_buf1->header.w);
     TEST_ASSERT_EQUAL_UINT32(screen_h + ext_size * 2, draw_buf1->header.h);
 
@@ -481,7 +482,7 @@ void test_snapshot_refresh_logic_edge_cases(void)
     lv_draw_buf_t * draw_buf2 = lv_snapshot_take(simple_obj, LV_COLOR_FORMAT_ARGB8888);
     TEST_ASSERT_NOT_NULL(draw_buf2);
 
-    int32_t ext_size2 = _lv_obj_get_ext_draw_size(simple_obj);
+    int32_t ext_size2 = lv_obj_get_ext_draw_size(simple_obj);
     TEST_ASSERT_EQUAL_UINT32(50 + ext_size2 * 2, draw_buf2->header.w);
     TEST_ASSERT_EQUAL_UINT32(50 + ext_size2 * 2, draw_buf2->header.h);
 
@@ -499,7 +500,7 @@ void test_snapshot_extreme_size_objects(void)
     lv_draw_buf_t * large_buf = lv_snapshot_take(large_obj, LV_COLOR_FORMAT_RGB565);
     TEST_ASSERT_NOT_NULL(large_buf);
 
-    int32_t ext_size_large = _lv_obj_get_ext_draw_size(large_obj);
+    int32_t ext_size_large = lv_obj_get_ext_draw_size(large_obj);
     TEST_ASSERT_EQUAL_UINT32(500 + ext_size_large * 2, large_buf->header.w);
     TEST_ASSERT_EQUAL_UINT32(400 + ext_size_large * 2, large_buf->header.h);
 
@@ -514,7 +515,7 @@ void test_snapshot_extreme_size_objects(void)
     lv_draw_buf_t * small_buf = lv_snapshot_take(small_obj, LV_COLOR_FORMAT_ARGB8888);
     TEST_ASSERT_NOT_NULL(small_buf);
 
-    int32_t ext_size_small = _lv_obj_get_ext_draw_size(small_obj);
+    int32_t ext_size_small = lv_obj_get_ext_draw_size(small_obj);
     TEST_ASSERT_EQUAL_UINT32(5 + ext_size_small * 2, small_buf->header.w);
     TEST_ASSERT_EQUAL_UINT32(5 + ext_size_small * 2, small_buf->header.h);
 
