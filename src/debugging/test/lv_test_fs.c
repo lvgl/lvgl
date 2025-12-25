@@ -11,7 +11,9 @@
 
 #if LV_USE_TEST
 
+#include "../../misc/lv_assert.h"
 #include "../../misc/lv_fs.h"
+#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
