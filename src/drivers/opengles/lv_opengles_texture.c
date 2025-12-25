@@ -34,6 +34,8 @@
  **********************/
 
 static lv_display_t * lv_opengles_texture_create_common(int32_t w, int32_t h);
+static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display);
+static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * texture, lv_display_t * disp);
 static unsigned int create_texture(int32_t w, int32_t h);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void release_disp_cb(lv_event_t * e);
@@ -52,61 +54,79 @@ static void release_disp_cb(lv_event_t * e);
 
 lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
 {
-    lv_display_t * disp = lv_opengles_texture_create_common(w, h);
-    if(!disp) {
+    lv_display_t * display = lv_opengles_texture_create_common(w, h);
+    if(!display) {
         LV_LOG_ERROR("Failed to create display");
         return NULL;
     }
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+    lv_opengles_texture_t * texture = lv_display_get_driver_data(display);
     unsigned int texture_id = create_texture(w, h);
-    dsc->texture_id = texture_id;
-    dsc->is_texture_owner = true;
-    return disp;
+    texture->texture_id = texture_id;
+    texture->is_texture_owner = true;
+    /* Attach the texture to the display after the texture id has been set*/
+    lv_opengles_texture_attach_to_display(texture, display);
+    return display;
 }
 
 lv_display_t * lv_opengles_texture_create_from_texture_id(int32_t w, int32_t h, unsigned int texture_id)
 {
-    lv_display_t * disp = lv_opengles_texture_create_common(w, h);
-    if(!disp) {
+    lv_display_t * display = lv_opengles_texture_create_common(w, h);
+    if(!display) {
         LV_LOG_ERROR("Failed to create display");
         return NULL;
     }
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
-    dsc->texture_id = texture_id;
-    dsc->is_texture_owner = false;
-    return disp;
+    lv_opengles_texture_t * texture = lv_display_get_driver_data(display);
+    texture->texture_id = texture_id;
+    texture->is_texture_owner = false;
+    /* Attach the texture to the display after the texture id has been set*/
+    lv_opengles_texture_attach_to_display(texture, display);
+    return display;
 }
 
-void lv_opengles_texture_reshape(lv_display_t * disp, int32_t width, int32_t height)
+lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_display_t * display, int32_t width,
+                                        int32_t height)
 {
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+    LV_ASSERT_NULL(display);
+    LV_ASSERT_NULL(texture);
     unsigned int new_texture = create_texture(width, height);
     if(new_texture == GL_NONE) {
         LV_LOG_ERROR("Failed to reshape texture. Couldn't acquire new texture from GPU");
-        return;
+        return LV_RESULT_INVALID;
     }
-#if !LV_USE_DRAW_OPENGLES
-    uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(disp));
+
+#if LV_USE_DRAW_OPENGLES
+    static size_t LV_ATTRIBUTE_MEM_ALIGN dummy_buf;
+    lv_display_set_buffers(display, &dummy_buf, NULL, width * height * 4, LV_DISPLAY_RENDER_MODE_DIRECT);
+#else
+    uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(display));
     uint32_t buf_size = stride * height;
-    uint8_t * buffer = lv_realloc(dsc->fb1, buf_size);
+    uint8_t * buffer = lv_realloc(texture->fb1, buf_size);
     LV_ASSERT_MALLOC(buffer);
     if(!buffer) {
         GL_CALL(glDeleteTextures(1, &new_texture));
         LV_LOG_ERROR("Failed to reshape texture. Couldn't resize buffer");
-        return;
+        return LV_RESULT_INVALID;
     }
-    dsc->fb1 = buffer;
+    texture->fb1 = buffer;
 
-    lv_display_set_buffers(disp, dsc->fb1, NULL, buf_size, lv_display_get_render_mode(disp));
-#endif /*!LV_USE_DRAW_OPENGLES*/
+    lv_display_set_buffers(display, texture->fb1, NULL, buf_size, lv_display_get_render_mode(display));
+#endif /*LV_USE_DRAW_OPENGLES*/
 
-    if(dsc->is_texture_owner && dsc->texture_id != 0) {
-        GL_CALL(glDeleteTextures(1, &dsc->texture_id));
+    if(texture->is_texture_owner && texture->texture_id != 0) {
+        GL_CALL(glDeleteTextures(1, &texture->texture_id));
     }
-    dsc->texture_id = new_texture;
+    texture->texture_id = new_texture;
+    lv_opengles_texture_attach_to_display(texture, display);
+    return LV_RESULT_OK;
 }
 
-lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display)
+static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * texture, lv_display_t * display)
+{
+    LV_ASSERT_NULL(display);
+    display->layer_head->user_data = (void *)(lv_uintptr_t)texture->texture_id;
+}
+
+static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display)
 {
     int32_t w = lv_display_get_horizontal_resolution(display);
     int32_t h = lv_display_get_vertical_resolution(display);
@@ -141,10 +161,12 @@ void lv_opengles_texture_deinit(lv_opengles_texture_t * texture)
 
 unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
-    return dsc->texture_id;
+    if(!disp) {
+        LV_LOG_ERROR("Invalid display");
+        return 0;
+    }
+    return (unsigned int)(lv_uintptr_t)disp->layer_head->user_data;
 }
-
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)
 {
     lv_display_t * disp = NULL;
@@ -238,20 +260,21 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #if !LV_USE_DRAW_OPENGLES
     if(lv_display_flush_is_last(disp)) {
 
-        lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+        lv_opengles_texture_t * texture = lv_display_get_driver_data(disp);
         lv_color_format_t cf = lv_display_get_color_format(disp);
         uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp), cf);
 
-        GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, texture->texture_id));
 
         GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride / lv_color_format_get_size(cf)));
         /*Color depth: 16 (RGB565), 32 (XRGB8888)*/
 #if LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+                             texture->fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_RGBA, GL_UNSIGNED_BYTE, dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+                             texture->fb1));
 #else
 #error("Unsupported color format")
 #endif
