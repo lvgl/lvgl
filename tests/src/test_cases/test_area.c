@@ -563,4 +563,52 @@ void test_area_set_pos(void)
     TEST_ASSERT_EQUAL_INT32(original_height, lv_area_get_height(&area));
 }
 
+/* Test point precise swap function */
+void test_point_precise_swap(void)
+{
+    lv_point_precise_t p1 = {10.5f, 20.7f};
+    lv_point_precise_t p2 = {30.2f, 40.9f};
+    
+    /* Store original values for verification */
+    lv_point_precise_t original_p1 = p1;
+    lv_point_precise_t original_p2 = p2;
+    
+    /* Swap the points */
+    lv_point_precise_swap(&p1, &p2);
+    
+    /* Verify that the points have been swapped correctly */
+    TEST_ASSERT_EQUAL_FLOAT(original_p2.x, p1.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p2.y, p1.y);
+    TEST_ASSERT_EQUAL_FLOAT(original_p1.x, p2.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p1.y, p2.y);
+    
+    /* Test with negative values */
+    lv_point_precise_t p3 = {-15.3f, -25.1f};
+    lv_point_precise_t p4 = {35.7f, -45.8f};
+    
+    lv_point_precise_t original_p3 = p3;
+    lv_point_precise_t original_p4 = p4;
+    
+    lv_point_precise_swap(&p3, &p4);
+    
+    TEST_ASSERT_EQUAL_FLOAT(original_p4.x, p3.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p4.y, p3.y);
+    TEST_ASSERT_EQUAL_FLOAT(original_p3.x, p4.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p3.y, p4.y);
+    
+    /* Test with zero values */
+    lv_point_precise_t p5 = {0.0f, 0.0f};
+    lv_point_precise_t p6 = {100.0f, 200.0f};
+    
+    lv_point_precise_t original_p5 = p5;
+    lv_point_precise_t original_p6 = p6;
+    
+    lv_point_precise_swap(&p5, &p6);
+    
+    TEST_ASSERT_EQUAL_FLOAT(original_p6.x, p5.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p6.y, p5.y);
+    TEST_ASSERT_EQUAL_FLOAT(original_p5.x, p6.x);
+    TEST_ASSERT_EQUAL_FLOAT(original_p5.y, p6.y);
+}
+
 #endif
