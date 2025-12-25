@@ -253,6 +253,20 @@ lv_group_t  * lv_group_by_index(uint32_t index);
 void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb)(void * data));
 #endif
 
+/**
+ * Set user data to the group
+ * @param indev pointer to a group
+ * @param user_data pointer to user data
+ */
+void lv_group_set_user_data(lv_group_t * group, void * user_data);
+
+/**
+ * Get a pointer to the user data of the group
+ * @param indev pointer to a group
+ * @return pointer to the user data or NULL if group is NULL
+ */
+void * lv_group_get_user_data(const lv_group_t * group);
+
 /**********************
  *      MACROS
  **********************/
