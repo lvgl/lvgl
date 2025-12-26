@@ -322,6 +322,7 @@ add_library(test_common
         src/test_assets/test_font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
+        src/test_assets/test_img_bulb_gif.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
         src/test_assets/test_img_emoji_F617.c
