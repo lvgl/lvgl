@@ -169,5 +169,55 @@ void test_arclabel_overflow(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_overflow" EXT_NAME);
 }
+void test_arclabel_opacity(void)
+{
+    if(!font) {
+        LV_LOG_ERROR("freetype font create failed.");
+        TEST_FAIL();
+    }
 
+    lv_obj_set_scrollbar_mode(active_screen, LV_SCROLLBAR_MODE_OFF);
+
+    const int32_t layers      = 16;
+    const int32_t size_min    = 80;
+    const int32_t size_step   = 40;
+    const int32_t pos_ofs_y   = layers * size_step / 6;
+    const int32_t pos_ofs_x   = size_step;
+
+    for(int32_t i = 0; i < layers; i++) {
+        lv_obj_t * arclabel = lv_arclabel_create(active_screen);
+        lv_obj_set_style_text_font(arclabel, font, LV_PART_MAIN);
+        lv_obj_set_style_text_letter_space(arclabel, 2, LV_PART_MAIN);
+        lv_obj_set_style_text_color(arclabel, lv_color_hex(0x666666), LV_PART_MAIN);
+
+        int32_t size = size_min + i * size_step;
+        lv_obj_set_size(arclabel, size, size);
+
+        lv_arclabel_set_angle_start(arclabel, -180);
+        lv_arclabel_set_text_static(arclabel, ARCLABEL_TEXT);
+        lv_arclabel_set_radius(arclabel, LV_PCT(100));
+        lv_arclabel_set_recolor(arclabel, true);
+        lv_arclabel_set_text_vertical_align(arclabel, LV_ARCLABEL_TEXT_ALIGN_LEADING);
+        lv_arclabel_set_dir(arclabel, LV_ARCLABEL_DIR_CLOCKWISE);
+
+        lv_obj_align(arclabel, LV_ALIGN_CENTER, pos_ofs_x, pos_ofs_y);
+
+        /* Use fixed-point LUT for gamma-corrected opacity (base perceived brightness from 1.0 to 0.5)
+         * Values are pre-calculated: (pow(1.0 - (i/15.0)*0.5, 1/2.2) * 255) */
+        static const uint8_t opa_gamma_lut[] = {
+            255, 251, 247, 242, 238, 234, 229, 225, 220, 215, 210, 205, 200, 195, 189, 184
+        };
+
+        int32_t opa_gamma = opa_gamma_lut[i];
+
+        /* Apply light attenuation: final_opa = opa_gamma / (1 + (i*k)^2)
+         * With k = 0.25 (1/4), the formula becomes: opa_gamma * 16 / (16 + i*i) */
+        int32_t final_opa = (opa_gamma * 16) / (16 + i * i);
+        if(final_opa < 0) final_opa = 0;
+        if(final_opa > LV_OPA_COVER) final_opa = LV_OPA_COVER;
+
+        lv_obj_set_style_opa(arclabel, final_opa, LV_PART_MAIN);
+    }
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_opacity" EXT_NAME);
+}
 #endif
