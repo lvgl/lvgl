@@ -6,10 +6,11 @@
 
 LV_IMAGE_DECLARE(test_img_lvgl_logo_png);
 LV_IMAGE_DECLARE(test_arc_bg);
+LV_IMAGE_DECLARE(test_img_lvgl_logo_jpg);
 
 void setUp(void)
 {
-
+    lv_obj_set_style_layout(lv_screen_active(), LV_LAYOUT_NONE, 0);
 }
 
 void tearDown(void)
@@ -663,6 +664,8 @@ void test_image_properties(void)
 
 void test_image_symbol_normal_align(void)
 {
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_t * img;
     uint32_t i;
     lv_image_align_t aligns[] = {
@@ -684,6 +687,8 @@ void test_image_symbol_normal_align(void)
 
 void test_image_symbol_normal_align_offset(void)
 {
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_t * img;
     uint32_t i;
     lv_image_align_t aligns[] = {
@@ -755,9 +760,391 @@ void test_image_raw_data_as_file(void)
 
     lv_obj_t * img_1 = lv_image_create(lv_screen_active());
     lv_image_set_src(img_1, (const char *)&mempath);
+    lv_obj_center(img_1);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_raw_data_as_file.png");
+}
 
+void test_image_antialias_set_get(void)
+{
+    lv_obj_t * img = img_create();
+
+    bool antialias_initial = lv_image_get_antialias(img);
+
+    lv_image_set_antialias(img, antialias_initial);
+    TEST_ASSERT_EQUAL(antialias_initial, lv_image_get_antialias(img));
+
+    lv_image_set_antialias(img, !antialias_initial);
+    TEST_ASSERT_EQUAL(!antialias_initial, lv_image_get_antialias(img));
+}
+
+void test_image_bitmap_map_src_set_get(void)
+{
+    lv_obj_t * img = img_create();
+
+    TEST_ASSERT_EQUAL_PTR(NULL, lv_image_get_bitmap_map_src(img));
+
+    lv_image_set_bitmap_map_src(img, &test_arc_bg);
+    TEST_ASSERT_EQUAL_PTR(&test_arc_bg, lv_image_get_bitmap_map_src(img));
+
+    lv_image_set_bitmap_map_src(img, NULL);
+    TEST_ASSERT_EQUAL_PTR(NULL, lv_image_get_bitmap_map_src(img));
+}
+
+void test_image_offset_getters(void)
+{
+    lv_obj_t * img = img_create();
+
+    int32_t x = 15;
+    int32_t y = -20;
+
+    lv_image_set_offset_x(img, x);
+    lv_image_set_offset_y(img, y);
+
+    TEST_ASSERT_EQUAL_INT32(x, lv_image_get_offset_x(img));
+    TEST_ASSERT_EQUAL_INT32(y, lv_image_get_offset_y(img));
+}
+
+void test_image_get_scale(void)
+{
+    lv_obj_t * img = img_create();
+
+    uint32_t scale_value = 128;
+    lv_image_set_scale(img, scale_value);
+    TEST_ASSERT_EQUAL_UINT32(scale_value, lv_image_get_scale(img));
+
+    scale_value = 256;
+    lv_image_set_scale(img, scale_value);
+    TEST_ASSERT_EQUAL_UINT32(scale_value, lv_image_get_scale(img));
+
+    scale_value = 64;
+    lv_image_set_scale(img, scale_value);
+    TEST_ASSERT_EQUAL_UINT32(scale_value, lv_image_get_scale(img));
+}
+
+void test_image_blend_mode_set_get(void)
+{
+    lv_obj_t * img = img_create();
+
+    /* Get the initial blend mode value */
+    lv_blend_mode_t initial_mode = lv_image_get_blend_mode(img);
+
+    /* Test setting and getting all available blend modes */
+    lv_blend_mode_t mode_values[] = {
+        LV_BLEND_MODE_NORMAL,
+        LV_BLEND_MODE_ADDITIVE,
+        LV_BLEND_MODE_SUBTRACTIVE,
+        LV_BLEND_MODE_MULTIPLY
+    };
+
+    for(uint32_t i = 0; i < sizeof(mode_values) / sizeof(mode_values[0]); i++) {
+        lv_image_set_blend_mode(img, mode_values[i]);
+        TEST_ASSERT_EQUAL_UINT8(mode_values[i], lv_image_get_blend_mode(img));
+    }
+
+    /* Test setting back to initial mode */
+    lv_image_set_blend_mode(img, initial_mode);
+    TEST_ASSERT_EQUAL_UINT8(initial_mode, lv_image_get_blend_mode(img));
+}
+
+void test_image_inner_align_set_get(void)
+{
+    lv_obj_t * img = img_create();
+
+    /* Get the initial inner align value */
+    lv_image_align_t initial_align = lv_image_get_inner_align(img);
+
+    /* Test setting and getting all available align modes */
+    lv_image_align_t align_values[] = {
+        LV_IMAGE_ALIGN_DEFAULT,
+        LV_IMAGE_ALIGN_TOP_LEFT,
+        LV_IMAGE_ALIGN_TOP_MID,
+        LV_IMAGE_ALIGN_TOP_RIGHT,
+        LV_IMAGE_ALIGN_BOTTOM_LEFT,
+        LV_IMAGE_ALIGN_BOTTOM_MID,
+        LV_IMAGE_ALIGN_BOTTOM_RIGHT,
+        LV_IMAGE_ALIGN_LEFT_MID,
+        LV_IMAGE_ALIGN_RIGHT_MID,
+        LV_IMAGE_ALIGN_CENTER,
+        LV_IMAGE_ALIGN_STRETCH,
+        LV_IMAGE_ALIGN_TILE
+    };
+
+    for(uint32_t i = 0; i < sizeof(align_values) / sizeof(align_values[0]); i++) {
+        lv_image_set_inner_align(img, align_values[i]);
+        TEST_ASSERT_EQUAL_UINT8(align_values[i], lv_image_get_inner_align(img));
+    }
+
+    /* Test setting back to initial align */
+    lv_image_set_inner_align(img, initial_align);
+    TEST_ASSERT_EQUAL_UINT8(initial_align, lv_image_get_inner_align(img));
+}
+
+void test_image_hit_test(void)
+{
+    lv_obj_t * img = img_create();
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_update_layout(img);
+
+    /* Test hit test without transformations */
+    lv_point_t point_inside = {
+        .x = 110,
+        .y = 110
+    };
+
+    lv_hit_test_info_t info_no_transform = {
+        .res = false,
+        .point = &point_inside
+    };
+
+    lv_obj_send_event(img, LV_EVENT_HIT_TEST, &info_no_transform);
+    TEST_ASSERT_TRUE(info_no_transform.res);
+
+    /* Test hit test with transformations */
+    /* Set image size to match source image size and apply transformations */
+    int32_t img_w = test_img_lvgl_logo_png.header.w;
+    int32_t img_h = test_img_lvgl_logo_png.header.h;
+    lv_obj_set_size(img, img_w, img_h);
+
+    /* Apply transformations: rotation, scaling, and non-center pivot */
+    lv_image_set_rotation(img, 450);
+    lv_image_set_scale_x(img, 512);
+    lv_image_set_scale_y(img, 512);
+    lv_image_set_pivot(img, 0, 0);
+
+    lv_obj_update_layout(img);
+
+    /* Test point inside the transformed area */
+    lv_point_t point_inside_transformed = {
+        .x = 105,
+        .y = 105
+    };
+
+    lv_hit_test_info_t info_with_transform = {
+        .res = false,
+        .point = &point_inside_transformed
+    };
+
+    lv_obj_send_event(img, LV_EVENT_HIT_TEST, &info_with_transform);
+    TEST_ASSERT_TRUE(info_with_transform.res);
+
+    /* Test point outside the transformed area */
+    lv_point_t point_outside = {
+        .x = 10,
+        .y = 10
+    };
+
+    lv_hit_test_info_t info_outside = {
+        .res = false,
+        .point = &point_outside
+    };
+
+    lv_obj_send_event(img, LV_EVENT_HIT_TEST, &info_outside);
+    TEST_ASSERT_FALSE(info_outside.res);
+}
+
+void test_image_hit_test_else_branch(void)
+{
+    /* Specific test to ensure coverage of the else branch in hit test logic */
+    lv_obj_t * img = img_create();
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_update_layout(img);
+
+    /* This should trigger the else branch because image size != object size */
+    lv_point_t point = {
+        .x = 110,
+        .y = 110
+    };
+
+    lv_hit_test_info_t info = {
+        .res = false,
+        .point = &point
+    };
+
+    lv_obj_send_event(img, LV_EVENT_HIT_TEST, &info);
+    TEST_ASSERT_TRUE(info.res);
+}
+
+void test_image_hit_test_click_area(void)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_set_size(img, 200, 200);
+    lv_obj_update_layout(img);
+
+    lv_point_t point = {.x = 150, .y = 150};
+    lv_hit_test_info_t info = {.res = false, .point = &point};
+    lv_obj_send_event(img, LV_EVENT_HIT_TEST, &info);
+    TEST_ASSERT_TRUE(info.res);
+}
+
+void test_image_cover_check_symbol(void)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, LV_SYMBOL_OK);
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_update_layout(img);
+
+    lv_area_t test_area = {
+        .x1 = 100, .y1 = 100,
+        .x2 = 199, .y2 = 199
+    };
+
+    lv_cover_check_info_t cover_info = {.area = &test_area, .res = LV_COVER_RES_COVER};
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+}
+
+void test_image_cover_check_no_alpha(void)
+{
+    /* Test cover check for images without alpha channel */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_jpg);
+    lv_obj_set_pos(img, 100, 100);
+    lv_obj_set_size(img, 100, 100);
+    /* Ensure base object cover check passes */
+    lv_obj_set_style_bg_opa(img, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_opa(img, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_update_layout(img);
+
+    lv_area_t test_area = {
+        .x1 = 100, .y1 = 100,
+        .x2 = 199, .y2 = 199
+    };
+
+    lv_cover_check_info_t cover_info = {
+        .area = &test_area,
+        .res = LV_COVER_RES_COVER
+    };
+
+    /* Test case 1: Image opacity != LV_OPA_COVER */
+    lv_obj_set_style_image_opa(img, LV_OPA_50, LV_PART_MAIN);
+    lv_image_set_rotation(img, 0);
+    lv_image_set_scale_x(img, LV_SCALE_NONE);
+    lv_image_set_scale_y(img, LV_SCALE_NONE);
+    lv_image_set_bitmap_map_src(img, NULL);
+    lv_obj_update_layout(img);
+
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+
+    /* Test case 2: Rotation != 0 */
+    lv_obj_set_style_image_opa(img, LV_OPA_COVER, LV_PART_MAIN);
+    lv_image_set_rotation(img, 450);
+    lv_image_set_scale_x(img, LV_SCALE_NONE);
+    lv_image_set_scale_y(img, LV_SCALE_NONE);
+    lv_obj_update_layout(img);
+
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+
+    /* Test case 3: No scaling, area inside coords */
+    lv_image_set_rotation(img, 0);
+    lv_image_set_scale_x(img, LV_SCALE_NONE);
+    lv_image_set_scale_y(img, LV_SCALE_NONE);
+    lv_image_set_bitmap_map_src(img, NULL);
+    lv_obj_update_layout(img);
+
+    /* Reset area pointer to test_area */
+    cover_info.area = &test_area;
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, cover_info.res);
+
+    /* Test case 4: No scaling, area outside coords */
+    lv_area_t outside_area = {
+        .x1 = 10, .y1 = 10,
+        .x2 = 50, .y2 = 50
+    };
+    cover_info.area = &outside_area;
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+
+    /* Test case 5: With scaling, area inside transformed bounds */
+    lv_image_set_scale_x(img, 512);
+    lv_image_set_scale_y(img, 512);
+    lv_obj_update_layout(img);
+
+    lv_area_t scaled_inside_area = {
+        .x1 = 110, .y1 = 110,
+        .x2 = 150, .y2 = 150
+    };
+    cover_info.area = &scaled_inside_area;
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_COVER, cover_info.res);
+
+    /* Test case 6: With scaling, area outside transformed bounds */
+    lv_area_t scaled_outside_area = {
+        .x1 = 10, .y1 = 10,
+        .x2 = 50, .y2 = 50
+    };
+    cover_info.area = &scaled_outside_area;
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+
+    /* Test case 7: With bitmap mask */
+    lv_image_set_scale_x(img, LV_SCALE_NONE);
+    lv_image_set_scale_y(img, LV_SCALE_NONE);
+    lv_image_set_bitmap_map_src(img, &test_arc_bg);
+    lv_obj_update_layout(img);
+
+    cover_info.area = &test_area;
+    cover_info.res = LV_COVER_RES_COVER;
+    lv_obj_send_event(img, LV_EVENT_COVER_CHECK, &cover_info);
+    TEST_ASSERT_EQUAL(LV_COVER_RES_NOT_COVER, cover_info.res);
+}
+
+void test_image_set_src_file_to_symbol(void)
+{
+    /* Test switching from FILE to SYMBOL source */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
+    lv_obj_update_layout(img);
+    lv_image_set_src(img, LV_SYMBOL_OK);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_TRUE(lv_obj_get_width(img) >= 0 && lv_obj_get_height(img) >= 0);
+}
+
+void test_image_set_src_with_rotation(void)
+{
+    /* Test setting image source with rotation */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_rotation(img, 450);
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_update_layout(img);
+    TEST_ASSERT_TRUE(lv_obj_get_width(img) >= 0 && lv_obj_get_height(img) >= 0);
+}
+
+void test_image_draw_main_src_null(void)
+{
+    /* Test draw main with NULL src */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_update_layout(img);
+
+    lv_image_t * img_data = (lv_image_t *)img;
+    img_data->src = NULL;
+    lv_obj_invalidate(img);
+    lv_refr_now(NULL);
+}
+
+void test_image_draw_main_unknown_src_type(void)
+{
+    /* Test draw main with unknown src_type */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
+    lv_obj_update_layout(img);
+
+    lv_image_t * img_data = (lv_image_t *)img;
+    img_data->src_type = LV_IMAGE_SRC_UNKNOWN;
+    lv_obj_invalidate(img);
+    lv_refr_now(NULL);
 }
 
 #endif
