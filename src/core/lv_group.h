@@ -255,7 +255,7 @@ void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb
 
 /**
  * Set user data to the group
- * @param indev pointer to a group
+ * @param group pointer to a group
  * @param user_data pointer to user data
  */
 void lv_group_set_user_data(lv_group_t * group, void * user_data);
