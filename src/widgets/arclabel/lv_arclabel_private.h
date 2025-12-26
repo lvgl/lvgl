@@ -58,6 +58,8 @@ struct _lv_arclabel_t {
     lv_arclabel_text_align_t text_align_h; /**< Horizontal text alignment */
     uint8_t static_txt : 1;             /**< Flag to indicate the text is static */
     uint8_t recolor    : 1;             /**< Enable in-line letter re-coloring */
+    uint8_t overflow   : 2;             /**< Overflow mode: 0=visible, 1=ellipsis, 2=clip */
+    uint8_t end_overlap : 2;            /**< End overlap mode: 0=default, 1=prevent, 2=clip, 3=fade */
 };
 
 /**********************
