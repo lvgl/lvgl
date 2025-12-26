@@ -947,6 +947,7 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
                 layer_i = layer_i->next;
             }
 
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, tile_layer);
             if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
         }
         lv_free(tile_layers);

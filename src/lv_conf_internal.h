@@ -33,6 +33,11 @@
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
+#define LV_NANOVG_BACKEND_GL2       1
+#define LV_NANOVG_BACKEND_GL3       2
+#define LV_NANOVG_BACKEND_GLES2     3
+#define LV_NANOVG_BACKEND_GLES3     4
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -1148,6 +1153,50 @@
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE CONFIG_LV_DRAW_EVE_WRITE_BUFFER_SIZE
         #else
             #define LV_DRAW_EVE_WRITE_BUFFER_SIZE 2048
+        #endif
+    #endif
+#endif
+
+/** Use NanoVG Renderer
+ * - Requires LV_USE_NANOVG, LV_USE_MATRIX.
+ */
+#ifndef LV_USE_DRAW_NANOVG
+    #ifdef CONFIG_LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG CONFIG_LV_USE_DRAW_NANOVG
+    #else
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
+#endif
+#if LV_USE_DRAW_NANOVG
+    /** Select OpenGL backend for NanoVG:
+     * - LV_NANOVG_BACKEND_GL2:   OpenGL 2.0
+     * - LV_NANOVG_BACKEND_GL3:   OpenGL 3.0+
+     * - LV_NANOVG_BACKEND_GLES2: OpenGL ES 2.0
+     * - LV_NANOVG_BACKEND_GLES3: OpenGL ES 3.0+
+     */
+    #ifndef LV_NANOVG_BACKEND
+        #ifdef CONFIG_LV_NANOVG_BACKEND
+            #define LV_NANOVG_BACKEND CONFIG_LV_NANOVG_BACKEND
+        #else
+            #define LV_NANOVG_BACKEND   LV_NANOVG_BACKEND_GLES2
+        #endif
+    #endif
+
+    /** Draw image texture cache count. */
+    #ifndef LV_NANOVG_IMAGE_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+            #define LV_NANOVG_IMAGE_CACHE_CNT CONFIG_LV_NANOVG_IMAGE_CACHE_CNT
+        #else
+            #define LV_NANOVG_IMAGE_CACHE_CNT 128
+        #endif
+    #endif
+
+    /** Draw letter texture cache count. */
+    #ifndef LV_NANOVG_LETTER_CACHE_CNT
+        #ifdef CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+            #define LV_NANOVG_LETTER_CACHE_CNT CONFIG_LV_NANOVG_LETTER_CACHE_CNT
+        #else
+            #define LV_NANOVG_LETTER_CACHE_CNT 512
         #endif
     #endif
 #endif
@@ -3238,6 +3287,15 @@
     #endif
 #endif
 
+/** Enable NanoVG (vector graphics library) */
+#ifndef LV_USE_NANOVG
+    #ifdef CONFIG_LV_USE_NANOVG
+        #define LV_USE_NANOVG CONFIG_LV_USE_NANOVG
+    #else
+        #define LV_USE_NANOVG 0
+    #endif
+#endif
+
 /** Use lvgl built-in LZ4 lib */
 #ifndef LV_USE_LZ4_INTERNAL
     #ifdef CONFIG_LV_USE_LZ4_INTERNAL
@@ -3940,6 +3998,13 @@
             #define LV_SDL_MOUSEWHEEL_MODE CONFIG_LV_SDL_MOUSEWHEEL_MODE
         #else
             #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
+        #endif
+    #endif
+    #ifndef LV_SDL_USE_EGL
+        #ifdef CONFIG_LV_SDL_USE_EGL
+            #define LV_SDL_USE_EGL CONFIG_LV_SDL_USE_EGL
+        #else
+            #define LV_SDL_USE_EGL          0    /**< 1: Use EGL backend for rendering */
         #endif
     #endif
 #endif

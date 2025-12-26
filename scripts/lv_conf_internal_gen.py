@@ -71,6 +71,11 @@ fout.write(
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
+#define LV_NANOVG_BACKEND_GL2       1
+#define LV_NANOVG_BACKEND_GL3       2
+#define LV_NANOVG_BACKEND_GLES2     3
+#define LV_NANOVG_BACKEND_GLES3     4
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
