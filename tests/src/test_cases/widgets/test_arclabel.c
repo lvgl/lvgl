@@ -165,10 +165,13 @@ void test_arclabel_overflow(void)
         lv_arclabel_set_dir(arclabel, LV_ARCLABEL_DIR_CLOCKWISE);
         lv_arclabel_set_overflow(arclabel, overflows[i]);
         lv_obj_center(arclabel);
-    }
 
+        lv_obj_refr_size(arclabel);
+        TEST_ASSERT_GREATER_THAN_FLOAT(178, lv_arclabel_get_text_angle(arclabel));
+    }
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_overflow" EXT_NAME);
 }
+
 void test_arclabel_opacity(void)
 {
     if(!font) {
@@ -220,4 +223,5 @@ void test_arclabel_opacity(void)
     }
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arclabel_opacity" EXT_NAME);
 }
+
 #endif
