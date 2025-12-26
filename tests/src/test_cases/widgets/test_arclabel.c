@@ -17,7 +17,7 @@
 #endif
 
 static const char * ARCLABEL_TEXT =
-    "I'm on an #FA7C45 ARC#! Centered with #12c2E9 C##8B68E8 O##c471ed L##B654E5 O##C84AB2 R##DB417A F##f64659 U##ff8888 L# 特性! \n";
+    "I'm on an #FA7C45 ARC#! Centered with #12c2E9 C##8B68E8 O##c471ed L##B654E5 O##C84AB2 R##DB417A F##f64659 U##ff8888 L# 特性!";
 
 static lv_font_t * font;
 static lv_obj_t * active_screen = NULL;
