@@ -280,18 +280,18 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
  * Other functions
  *====================*/
 
-void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf,
-                        const lv_area_t * dest_area)
+void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * src_buf,
+                        const lv_area_t * src_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(canvas_area && dest_buf);
+    LV_ASSERT_NULL(canvas_area && src_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
+    LV_ASSERT_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, "Color formats must be the same");
 
-    lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
+    lv_draw_buf_copy(canvas->draw_buf, canvas_area, src_buf, src_area);
 }
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
