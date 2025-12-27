@@ -434,6 +434,18 @@ void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb
 }
 #endif
 
+void lv_group_set_user_data(lv_group_t * group, void * user_data)
+{
+    if(group == NULL) return;
+    group->user_data = user_data;
+}
+
+void * lv_group_get_user_data(const lv_group_t * group)
+{
+    if(group == NULL) return NULL;
+    return group->user_data;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
