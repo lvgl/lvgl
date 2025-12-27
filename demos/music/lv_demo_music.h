@@ -36,6 +36,7 @@ extern "C" {
  **********************/
 
 void lv_demo_music(void);
+void lv_demo_music_with_args(const lv_demo_args_t * args);
 const char * lv_demo_music_get_title(uint32_t track_id);
 const char * lv_demo_music_get_artist(uint32_t track_id);
 const char * lv_demo_music_get_genre(uint32_t track_id);
