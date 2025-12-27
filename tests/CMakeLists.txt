@@ -11,6 +11,12 @@ cmake_minimum_required(VERSION 3.16)
 if(WIN32)
     set(VCPKG_TARGET_TRIPLET "x64-windows")
     include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
+else()
+    add_compile_options(-Og)
+
+    # Save some space with the test runner tests on linux
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
+    add_link_options(--coverage)
 endif()
 
 project(lvgl_tests LANGUAGES C CXX)
@@ -143,21 +149,20 @@ elseif (OPTIONS_TEST_VG_LITE)
     set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
-
-    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
-    if ($ENV{NON_AMD64_BUILD})
-        # Set a tolerance value for the VG-Lite tests.
-        add_definitions(-DREF_IMG_TOLERANCE=9)
-    endif()
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
 if ($ENV{NON_AMD64_BUILD})
+    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
+    # Set a tolerance value for the VG-Lite tests.
+    add_definitions(-DREF_IMG_TOLERANCE=9)
+
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
     message("Non AMD64 target is specified")
 
     # Ensure 32-bit build
+    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
@@ -374,7 +379,8 @@ if(NOT WIN32)
 
         # Add auto generated source required for XDG shell
         include_directories("${LVGL_TEST_DIR}/wayland_protocols")
-        target_sources(test_common PUBLIC "wayland_protocols/wayland_xdg_shell.c")
+        # Hidden symbols need to be compiled inside the library
+        target_sources(lvgl PRIVATE "wayland_protocols/wayland_xdg_shell.c")
     else()
         add_definitions(-DLV_USE_WAYLAND=0)
     endif()
@@ -432,6 +438,7 @@ else()
         # Include directories
         include_directories(${OPENGL_INCLUDE_DIR})
         include_directories(${GLFW_INCLUDE_DIRS})
+        link_libraries(${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
         message("Enable LV_USE_OPENGLES")
     else()
         message("OpenGL, glfw3 not found, defaulting to 0")
@@ -439,9 +446,12 @@ else()
     endif()
 endif()
 
-if (NOT LIBINPUT_FOUND)
+# Issues with the i386 version of libinput
+if (NOT LIBINPUT_FOUND OR NOT DEFINED $ENV{NON_AMD64_BUILD})
     message("libinput not found, defaulting to 0")
     add_definitions(-DLV_USE_LIBINPUT=0)
+else()
+    link_libraries(input)
 endif()
 
 find_package(PkgConfig)
@@ -456,6 +466,7 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/FindLibDRM.cmake)
 if(Libdrm_FOUND)
     include_directories(${Libdrm_INCLUDE_DIRS})
+    link_libraries(${Libdrm_LIBRARIES})
 else()
     message("libdrm not found, defaulting to 0")
     add_definitions(-DLV_USE_LINUX_DRM=0)
