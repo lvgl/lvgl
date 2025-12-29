@@ -1258,7 +1258,6 @@
     #define LV_SDL_FULLSCREEN       0    /**< 1: Make the window full screen by default */
     #define LV_SDL_DIRECT_EXIT      1    /**< 1: Exit the application when all SDL windows are closed */
     #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
-    #define LV_SDL_USE_EGL          0    /**< 1: Use EGL backend for rendering */
 #endif
 
 /** Use X11 to open window on Linux desktop and handle mouse and keyboard */

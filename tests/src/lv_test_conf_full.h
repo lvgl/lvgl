@@ -195,10 +195,6 @@
 
         #define LV_USE_NANOVG      1
         #define LV_USE_DRAW_NANOVG 1
-        #if defined(LV_USE_SDL) && LV_USE_SDL
-            /* NanoVG requires EGL */
-            #define LV_SDL_USE_EGL 1
-        #endif
     #endif
 #endif
 
