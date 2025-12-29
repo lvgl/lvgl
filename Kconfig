@@ -2119,18 +2119,22 @@ menu "LVGL configuration"
 		config LV_USE_ST7735
 			bool "Use ST7735 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7789
 			bool "Use ST7789 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ST7796
 			bool "Use ST7796 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_ILI9341
 			bool "Use ILI9341 LCD driver"
 			default n
+			select LV_USE_GENERIC_MIPI
 
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
