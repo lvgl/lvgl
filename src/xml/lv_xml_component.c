@@ -190,7 +190,7 @@ lv_result_t lv_xml_register_component_from_data(const char * name, const char * 
         if(!scope->view_def) {
             LV_LOG_WARN("Failed to extract view content");
             /* Clean up and return error */
-            lv_xml_component_unregister(name);
+            lv_xml_unregister_component(name);
             return LV_RESULT_INVALID;
         }
     }
@@ -256,7 +256,7 @@ lv_result_t lv_xml_register_component_from_file(const char * path)
     return res;
 }
 
-lv_result_t lv_xml_component_unregister(const char * name)
+lv_result_t lv_xml_unregister_component(const char * name)
 {
     lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
     if(scope == NULL) return LV_RESULT_INVALID;
@@ -281,7 +281,6 @@ lv_result_t lv_xml_component_unregister(const char * name)
         lv_free((char *)param->type);
     }
     lv_ll_clear(&scope->param_ll);
-
 
     lv_xml_font_t * font;
     LV_LL_READ(&scope->font_ll, font) {
@@ -1048,6 +1047,7 @@ static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
         case LV_STYLE_OPA:
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BG_OPA:
+        case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
@@ -1079,7 +1079,7 @@ static void anim_exec_cb(lv_anim_t * a, int32_t v)
 {
     anim_data_t * anim_data = lv_anim_get_user_data(a);
 
-    lv_style_value_t style_value;
+    lv_style_value_t style_value = {0};
     if(anim_data->prop_type == STYLE_PROP_TYPE_INT || anim_data->prop_type == STYLE_PROP_TYPE_OPA) {
         style_value.num = v;
     }

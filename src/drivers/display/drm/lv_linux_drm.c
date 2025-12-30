@@ -201,7 +201,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
 
 }
 
-void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
+lv_result_t lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
     int ret;
 
@@ -209,7 +209,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);
     if(ret) {
-        return;
+        return LV_RESULT_INVALID;
     }
 
     int32_t hor_res = drm_dev->width;
@@ -220,7 +220,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
         LV_LOG_ERROR("DRM buffer allocation failed");
         close(drm_dev->fd);
         drm_dev->fd = -1;
-        return;
+        return LV_RESULT_INVALID;
     }
 
     LV_LOG_INFO("DRM subsystem and buffer mapped successfully");
@@ -246,6 +246,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+    return LV_RESULT_OK;
 }
 
 void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)

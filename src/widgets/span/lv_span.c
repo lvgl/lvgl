@@ -86,6 +86,36 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_span_properties[] = {
+    {
+        .id = LV_PROPERTY_SPAN_ALIGN,
+        .setter = lv_spangroup_set_align,
+        .getter = lv_spangroup_get_align,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_OVERFLOW,
+        .setter = lv_spangroup_set_overflow,
+        .getter = lv_spangroup_get_overflow,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_INDENT,
+        .setter = lv_spangroup_set_indent,
+        .getter = lv_spangroup_get_indent,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MODE,
+        .setter = lv_spangroup_set_mode,
+        .getter = lv_spangroup_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SPAN_MAX_LINES,
+        .setter = lv_spangroup_set_max_lines,
+        .getter = lv_spangroup_get_max_lines,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_spangroup_class  = {
     .base_class = &lv_obj_class,
     .constructor_cb = lv_spangroup_constructor,
@@ -95,6 +125,7 @@ const lv_obj_class_t lv_spangroup_class  = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .name = "lv_span",
+    LV_PROPERTY_CLASS_FIELDS(span, SPAN)
 };
 
 /**********************

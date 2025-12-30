@@ -14,7 +14,7 @@ jobs:
   build-examples:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Generate lv_conf.h
         run: |
           python ./scripts/generate_lv_conf.py \

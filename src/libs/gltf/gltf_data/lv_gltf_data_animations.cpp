@@ -61,29 +61,30 @@ uint32_t lv_gltf_data_get_animation_total_time(lv_gltf_model_t * data, uint32_t 
 }
 
 std::vector<uint32_t> * lv_gltf_data_animation_get_channel_set(std::size_t anim_num, lv_gltf_model_t * data,
-                                                               fastgltf::Node & node)
+                                                               fastgltf::Node * node)
 {
     const auto & asset = lv_gltf_data_get_asset(data);
     size_t animation_count = lv_gltf_model_get_animation_count(data);
-    if(data->channel_set_cache.find(&node) == data->channel_set_cache.end()) {
+    if(data->channel_set_cache.find(node) == data->channel_set_cache.end()) {
         std::vector<uint32_t> new_cache = std::vector<uint32_t>();
         if(animation_count > anim_num) {
             auto & anim = asset->animations[anim_num];
 
             for(uint64_t c = 0; c < anim.channels.size(); c++) {
                 auto & channel = anim.channels[c];
-                if(&(asset->nodes[channel.nodeIndex.value()]) == &node) {
+                if(&(asset->nodes[channel.nodeIndex.value()]) == node) {
                     new_cache.push_back(c);
                 }
             }
         }
-        data->channel_set_cache[&node] = new_cache;
+        data->channel_set_cache[node] = new_cache;
     }
-    return &data->channel_set_cache[&node];
+    return &data->channel_set_cache[node];
 }
 
+
 void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, lv_gltf_model_t * gltf_data,
-                                         fastgltf::Node & node,
+                                         fastgltf::Node * node,
                                          fastgltf::math::fmat4x4 & matrix)
 {
     const auto & asset = lv_gltf_data_get_asset(gltf_data);
@@ -95,43 +96,76 @@ void lv_gltf_data_animation_matrix_apply(float timestamp, std::size_t anim_num, 
     }
     if(animation_count > anim_num) {
         auto & anim = asset->animations[anim_num];
-        fastgltf::math::fvec3 newPos, newScale;
-        fastgltf::math::fmat3x3 rotmat;
+        bool need_rot_recalc = false;
+        int32_t translation_comp_index = -1;
+        int32_t rotation_comp_index = -1;
+        int32_t scale_comp_index = -1;
+
         for(const auto & c : (*_channel_set)) {
             switch(anim.channels[c].path) {
                 case fastgltf::AnimationPath::Translation:
-                    newPos = animation_get_vec3_at_timestamp(gltf_data, &anim.samplers[c], timestamp);
-                    matrix[3][0] = newPos[0];
-                    matrix[3][1] = newPos[1];
-                    matrix[3][2] = newPos[2];
+                    translation_comp_index = c;
                     break;
                 case fastgltf::AnimationPath::Rotation:
-                    rotmat = fastgltf::math::asMatrix(animation_get_quat_at_timestamp(gltf_data, &anim.samplers[c], timestamp));
-                    matrix[0][0] = rotmat[0][0];
-                    matrix[0][1] = rotmat[0][1];
-                    matrix[0][2] = rotmat[0][2];
-
-                    matrix[1][0] = rotmat[1][0];
-                    matrix[1][1] = rotmat[1][1];
-                    matrix[1][2] = rotmat[1][2];
-
-                    matrix[2][0] = rotmat[2][0];
-                    matrix[2][1] = rotmat[2][1];
-                    matrix[2][2] = rotmat[2][2];
+                    rotation_comp_index = c;
+                    need_rot_recalc = true;
                     break;
                 case fastgltf::AnimationPath::Scale:
-                    newScale = animation_get_vec3_at_timestamp(gltf_data, &anim.samplers[c], timestamp);
-                    for(int32_t rs = 0; rs < 3; ++rs) {
-                        matrix[0][rs] *= newScale[0];
-                        matrix[1][rs] *= newScale[1];
-                        matrix[2][rs] *= newScale[2];
-                    }
+                    scale_comp_index = c;
+                    need_rot_recalc = true;
                     break;
                 case fastgltf::AnimationPath::Weights:
                     LV_LOG_WARN("Unhandled weights animation");
                     break;
             }
         }
+
+        if(need_rot_recalc) {
+            fastgltf::math::fvec3 new_scale;
+            fastgltf::math::fquat new_quat;
+            if(!((scale_comp_index > -1) && (rotation_comp_index > -1))) {
+                fastgltf::math::fvec3 unused;
+                fastgltf::math::decomposeTransformMatrix(matrix, new_scale, new_quat, unused);
+            }
+            if(scale_comp_index > -1) new_scale = animation_get_vec3_at_timestamp(gltf_data, &anim.samplers[scale_comp_index],
+                                                                                      timestamp);
+            if(rotation_comp_index > -1) new_quat = animation_get_quat_at_timestamp(gltf_data, &anim.samplers[rotation_comp_index],
+                                                                                        timestamp);
+
+            float sx = new_scale[0], sy = new_scale[1], sz = new_scale[2];
+            float qx = new_quat[0], qy = new_quat[1], qz = new_quat[2], qw = new_quat[3];
+
+            float x2 = qx + qx, y2 = qy + qy, z2 = qz + qz;
+            float xx = qx * x2, xy = qx * y2, xz = qx * z2;
+            float yy = qy * y2, yz = qy * z2, zz = qz * z2;
+            float wx = qw * x2, wy = qw * y2, wz = qw * z2;
+
+            matrix[0][0] = (1 - (yy + zz)) * sx;
+            matrix[0][1] = (xy + wz) * sx;
+            matrix[0][2] = (xz - wy) * sx;
+
+            matrix[1][0] = (xy - wz) * sy;
+            matrix[1][1] = (1 - (xx + zz)) * sy;
+            matrix[1][2] = (yz + wx) * sy;
+
+            matrix[2][0] = (xz + wy) * sz;
+            matrix[2][1] = (yz - wx) * sz;
+            matrix[2][2] = (1 - (xx + yy)) * sz;
+
+            /* These entries should not be necessary */
+            //matrix[0][3] = 0.f;
+            //matrix[1][3] = 0.f;
+            //matrix[2][3] = 0.f;
+        }
+
+        if(translation_comp_index > -1) {
+            fastgltf::math::fvec3 new_translation = animation_get_vec3_at_timestamp(gltf_data,
+                                                                                    &anim.samplers[translation_comp_index], timestamp);
+            matrix[3][0] = new_translation[0];
+            matrix[3][1] = new_translation[1];
+            matrix[3][2] = new_translation[2];
+        }
+        matrix[3][3] = 1.f;
     }
 }
 

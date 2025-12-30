@@ -58,7 +58,7 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
                                 int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip);
 
 /**
- * Render a display texture - Supports rotation
+ * Render a display texture - Supports rotation - Switches red and blue channels
  * @param display           LVGL Texture display. Created with the `lv_opengles_texture` module
  * @param h_flip            horizontal flip
  * @param v_flip            vertical flip

@@ -135,4 +135,21 @@ void test_checkbox_style_opa(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/checkbox_1.png");
 }
 
+void test_checkbox_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_checkbox_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Test TEXT property */
+    prop.id = LV_PROPERTY_CHECKBOX_TEXT;
+    prop.ptr = "Test Checkbox";
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Test Checkbox", lv_obj_get_property(obj, LV_PROPERTY_CHECKBOX_TEXT).ptr);
+    TEST_ASSERT_EQUAL_STRING("Test Checkbox", lv_checkbox_get_text(obj));
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif

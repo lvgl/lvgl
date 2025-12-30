@@ -179,7 +179,7 @@ void test_xml_style_remove(void)
     /*s2 is added and removed so the red bg_color shouldn't be applied*/
     TEST_ASSERT_NOT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_KNOB));
 
-    lv_xml_component_unregister("comp1");
+    lv_xml_unregister_component("comp1");
 }
 
 void test_xml_style_binding(void)
@@ -211,7 +211,7 @@ void test_xml_style_binding(void)
 
 void test_xml_style_prop_binding(void)
 {
-    const char * comp1_xml = {
+    const char * comp1_xml =
         "<component>"
         " 	<subjects>"
         " 		<int name=\"subject1\" value=\"128\"/>"
@@ -221,12 +221,12 @@ void test_xml_style_prop_binding(void)
         " 		<bind_style_prop prop=\"bg_opa\" selector=\"scrollbar|checked\" subject=\"subject1\"/>"
         " 		<bind_style_prop prop=\"bg_color\" selector=\"scrollbar|checked\" subject=\"subject2\"/>"
         " 	</view>"
-        "</component>"
-    };
+        "</component>";
 
     lv_xml_register_component_from_data("comp1", comp1_xml);
 
     lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
+
     lv_obj_add_state(obj, LV_STATE_CHECKED);
     lv_test_wait(1000); /*Wait for transitions*/
 
@@ -242,6 +242,22 @@ void test_xml_style_prop_binding(void)
 
     TEST_ASSERT_EQUAL_INT(20, lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff00ff), lv_obj_get_style_bg_color(obj, LV_PART_SCROLLBAR | LV_STATE_CHECKED));
+
+}
+
+void test_xml_style_local(void)
+{
+    const char * comp1_xml = {
+        "<component>"
+        " 	<view style_bg_color-checked-pressed-scrollbar=\"0xf00\"/>"
+        "</component>"
+    };
+
+    lv_xml_register_component_from_data("comp1", comp1_xml);
+    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "comp1", NULL);
+
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj,
+                                                                              LV_PART_SCROLLBAR | LV_STATE_CHECKED | LV_STATE_PRESSED));
 }
 
 #endif

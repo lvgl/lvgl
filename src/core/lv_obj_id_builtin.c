@@ -88,7 +88,6 @@ void lv_obj_set_id(lv_obj_t * obj, void * id)
 
 void lv_obj_free_id(lv_obj_t * obj)
 {
-    LV_UNUSED(obj);
     obj->id = NULL;
 }
 

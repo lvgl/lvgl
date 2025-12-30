@@ -135,6 +135,13 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
 
 void lv_obj_destruct(lv_obj_t * obj)
 {
+#if LV_USE_EXT_DATA
+    if(obj->ext_data.free_cb) {
+        obj->ext_data.free_cb(obj->ext_data.data);
+        obj->ext_data.data = NULL;
+    }
+#endif
+
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
     if(obj->class_p->base_class) {
@@ -170,6 +177,19 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
     return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE;
 }
 
+#if LV_USE_EXT_DATA
+void lv_obj_set_external_data(lv_obj_t * obj, void * data, void (* free_cb)(void * data))
+{
+    if(!obj) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL object");
+        return;
+    }
+
+    obj->ext_data.data = data;
+    obj->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -177,6 +197,12 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
 static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_ASSERT_NULL(class_p->name);
+
+#if LV_USE_EXT_DATA
+    obj->ext_data.free_cb = NULL;
+    obj->ext_data.data = NULL;
+#endif
+
     if(obj->class_p->base_class) {
         const lv_obj_class_t * original_class_p = obj->class_p;
 

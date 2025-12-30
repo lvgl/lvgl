@@ -50,7 +50,7 @@ static void lv_animimg_set_src_inner(lv_obj_t * obj, const void * dsc[], size_t 
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_animimage_properties[] = {
     {
         .id = LV_PROPERTY_ANIMIMAGE_SRC,
         .setter = lv_animimg_set_src,
@@ -79,17 +79,7 @@ const lv_obj_class_t lv_animimg_class = {
     .instance_size = sizeof(lv_animimg_t),
     .base_class = &lv_image_class,
     .name = "lv_animimg",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_ANIMIMAGE_START,
-    .prop_index_end = LV_PROPERTY_ANIMIMAGE_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_animimage_property_names,
-    .names_count = sizeof(lv_animimage_property_names) / sizeof(lv_property_name_t),
-#endif
-#endif
+    LV_PROPERTY_CLASS_FIELDS(animimage, ANIMIMAGE)
 };
 
 /**********************

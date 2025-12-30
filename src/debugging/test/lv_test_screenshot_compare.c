@@ -56,7 +56,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool screenshot_compare(const char * fn_ref, uint8_t tolerance);
+static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance);
 static unsigned  read_png_file(lv_draw_buf_t ** refr_draw_buf, unsigned * width, unsigned * height,
                                const char * file_name);
 static unsigned  write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
@@ -75,18 +75,16 @@ static void create_folders_if_needed(const char * path) ;
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_test_screenshot_compare(const char * fn_ref)
+lv_test_screenshot_result_t lv_test_screenshot_compare(const char * fn_ref)
 {
-    bool pass;
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
     lv_refr_now(NULL);
 
-    pass = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
-    if(!pass) return false;
-
-    return true;
+    lv_test_screenshot_result_t res;
+    res = screenshot_compare(fn_ref, REF_IMG_TOLERANCE);
+    return res;
 }
 
 /**********************
@@ -96,14 +94,16 @@ bool lv_test_screenshot_compare(const char * fn_ref)
 /**
  * Compare the content of the frame buffer with a reference image
  * @param fn_ref    reference image path
- * @return          true: test passed; false: test failed
+ * @return          An element of lv_test_screenshot_result_t
  */
-static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
+static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8_t tolerance)
 {
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
 
+#if LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
     create_folders_if_needed(fn_ref_full);
+#endif
 
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
 
@@ -115,18 +115,24 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     unsigned  ref_img_height = 0;
     unsigned  res = read_png_file(&ref_draw_buf, &ref_img_width, &ref_img_height, fn_ref_full);
     if(res) {
+        lv_test_screenshot_result_t comp_res;
+#if LV_TEST_SCREENSHOT_CREATE_REFERENCE_IMAGE
         LV_LOG_WARN("%s%s", fn_ref_full, " was not found, creating it now from the rendered screen");
         write_png_file(screen_buf_xrgb8888, draw_buf->header.w, draw_buf->header.h, fn_ref_full);
+        comp_res = LV_TEST_SCREENSHOT_RESULT_PASSED;
+#else
+        comp_res = LV_TEST_SCREENSHOT_RESULT_NO_REFERENCE_IMAGE;
+#endif
         lv_free(screen_buf_xrgb8888);
         if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
-        return true;
+        return comp_res;
     }
 
     if(ref_img_width != draw_buf->header.w || ref_img_height != draw_buf->header.h) {
         LV_LOG_WARN("The dimensions of the rendered and the %s reference image don't match", fn_ref);
         lv_free(screen_buf_xrgb8888);
         if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
-        return false;
+        return LV_TEST_SCREENSHOT_RESULT_FAILED;
     }
 
 
@@ -173,7 +179,7 @@ static bool screenshot_compare(const char * fn_ref, uint8_t tolerance)
     fflush(stdout);
     lv_free(screen_buf_xrgb8888);
     if(ref_draw_buf) lv_draw_buf_destroy(ref_draw_buf);
-    return !err;
+    return err ? LV_TEST_SCREENSHOT_RESULT_FAILED : LV_TEST_SCREENSHOT_RESULT_PASSED;
 
 }
 

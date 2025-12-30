@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -78,8 +78,8 @@ jobs:
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release/')) }}
+        uses: JamesIves/github-pages-deploy-action@v4.7.4
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
@@ -91,7 +91,7 @@ jobs:
           single-commit: true
       - name: Deploy to master
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
+        uses: JamesIves/github-pages-deploy-action@v4.7.4
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs

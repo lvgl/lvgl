@@ -237,6 +237,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_SUPPORT_RGB565_SWAPPED
+			bool "Enable support for RGB565 swapped color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
 		config LV_DRAW_SW_SUPPORT_RGB565A8
 			bool "Enable support for RGB565A8 color format"
 			default y
@@ -482,6 +487,11 @@ menu "LVGL configuration"
 			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
+		config LV_VG_LITE_BITMAP_FONT_CACHE_CNT
+			int "VG-Lite unaligned bitmap font maximum cache number."
+			default 256
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_VG_LITE_DISABLE_VLC_OP_CLOSE
 			bool "Remove VLC_OP_CLOSE path instruction (Workaround for NXP)"
 			default n
@@ -567,17 +577,17 @@ menu "LVGL configuration"
 					Specify how important log should be added.
 
 				config LV_LOG_LEVEL_TRACE
-					bool "A lot of logs to give detailed information"
+					bool "LOG_LEVEL_TRACE: A lot of logs to give detailed information"
 				config LV_LOG_LEVEL_INFO
-					bool "Log important events"
+					bool "LOG_LEVEL_INFO: Log important events"
 				config LV_LOG_LEVEL_WARN
-					bool "Log if something unwanted happened but didn't cause a problem"
+					bool "LOG_LEVEL_WARN: Log if something unwanted happened but didn't cause a problem"
 				config LV_LOG_LEVEL_ERROR
-					bool "Only critical issues, when the system may fail"
+					bool "LOG_LEVEL_ERROR: Only critical issues, when the system may fail"
 				config LV_LOG_LEVEL_USER
-					bool "Only logs added by the user"
+					bool "LOG_LEVEL_USER: Only logs added by the user"
 				config LV_LOG_LEVEL_NONE
-					bool "Do not log anything"
+					bool "LOG_LEVEL_NONE: Do not log anything"
 			endchoice
 
 			config LV_LOG_LEVEL
@@ -822,6 +832,23 @@ menu "LVGL configuration"
 				bool "Enable the multi-touch gesture recognition feature"
 				depends on LV_USE_FLOAT
 				default n
+
+			config LV_USE_EXT_DATA
+				bool "External data and destructor"
+				default n
+				help
+					Enable this option to activate external data and destructor functionality,
+					which assists in resource cleanup when objects are freed by either LVGL core
+					or applications. Currently supported features include:
+						- event
+						- object
+						- observer
+						- anim
+						- timer
+						- group
+						- display
+						- indev (input device)
+						- theme
 		endmenu
 	endmenu
 
@@ -1766,7 +1793,7 @@ menu "LVGL configuration"
 			default 9 # LVGL_VERSION_MAJOR
 		config LVGL_VERSION_MINOR
 			int
-			default 4 # LVGL_VERSION_MINOR
+			default 5 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
 			default 0 # LVGL_VERSION_PATCH
@@ -1891,35 +1918,11 @@ menu "LVGL configuration"
 		config LV_USE_WAYLAND
 			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
 			default n
-		config LV_WAYLAND_WINDOW_DECORATIONS
-			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
+
+		config LV_WAYLAND_DIRECT_EXIT
+			bool "Deinitialize LVGL and quit the application when the last wayland window closes"
+			default y
 			depends on LV_USE_WAYLAND
-			default n
-		config LV_WAYLAND_BUF_COUNT
-			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
-			depends on LV_USE_WAYLAND
-			default 1
-		choice
-			prompt "Wayland rendering mode"
-			depends on LV_USE_WAYLAND
-			default LV_WAYLAND_RENDER_MODE_PARTIAL
-
-			config LV_WAYLAND_RENDER_MODE_PARTIAL
-				bool "Use the buffer(s) to render the screen is smaller parts"
-				depends on !LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_DIRECT
-				bool "Only the changed areas will be updated with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-
-			config LV_WAYLAND_RENDER_MODE_FULL
-				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
-				depends on LV_WAYLAND_USE_DMABUF
-		endchoice
-
-		config LV_WAYLAND_USE_DMABUF
-			bool "Use DMA buffers for frame buffers"
-			depends on LV_USE_WAYLAND && LV_USE_G2D
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"

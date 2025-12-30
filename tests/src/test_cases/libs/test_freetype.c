@@ -624,6 +624,110 @@ static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_
 }
 #endif
 
+/**
+ * Test kerning functionality with scalable FreeType fonts.
+ * This test covers the FT_IS_SCALABLE and FT_Set_Pixel_Sizes code path
+ * in freetype_get_glyph_dsc_cb when getting kerning information.
+ */
+void test_freetype_kerning(void)
+{
+    /* Create a font with kerning enabled using font_info */
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    font_info.size = 32;
+    font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+    font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+    lv_font_t * font_kerning = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_kerning);
+
+    /* Create a font with kerning disabled */
+    font_info.kerning = LV_FONT_KERNING_NONE;
+    lv_font_t * font_no_kerning = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font_no_kerning);
+
+    /* Test glyph width with kerning - exercises the FT_Set_Pixel_Sizes code path */
+    uint16_t width_kerning = lv_font_get_glyph_width(font_kerning, 'A', 'V');
+    uint16_t width_no_kerning = lv_font_get_glyph_width(font_no_kerning, 'A', 'V');
+
+    /* Both should return valid widths */
+    TEST_ASSERT_GREATER_THAN(0, width_kerning);
+    TEST_ASSERT_GREATER_THAN(0, width_no_kerning);
+
+    /* Clean up */
+    lv_freetype_font_delete(font_kerning);
+    lv_freetype_font_delete(font_no_kerning);
+}
+
+/**
+ * Test kerning with multiple font sizes to ensure FT_Set_Pixel_Sizes
+ * is called correctly for scalable fonts when kerning is requested.
+ */
+void test_freetype_kerning_scalable_sizes(void)
+{
+    /* Test with multiple sizes to ensure pixel size is set correctly */
+    const uint32_t sizes[] = {16, 24, 32, 48, 64};
+
+    for(int i = 0; i < 5; i++) {
+        lv_font_info_t font_info;
+        lv_freetype_init_font_info(&font_info);
+        font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+        font_info.size = sizes[i];
+        font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+        font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+        font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+        lv_font_t * font = lv_freetype_font_create_with_info(&font_info);
+        TEST_ASSERT_NOT_NULL(font);
+
+        /* Test getting glyph width which triggers kerning lookup */
+        /* This exercises the FT_IS_SCALABLE and FT_Set_Pixel_Sizes path */
+        uint16_t width_V = lv_font_get_glyph_width(font, 'V', 'A');
+        uint16_t width_A = lv_font_get_glyph_width(font, 'A', 'V');
+        uint16_t width_T = lv_font_get_glyph_width(font, 'T', 'o');
+
+        /* Width should be non-zero for valid glyphs */
+        TEST_ASSERT_GREATER_THAN(0, width_V);
+        TEST_ASSERT_GREATER_THAN(0, width_A);
+        TEST_ASSERT_GREATER_THAN(0, width_T);
+
+        lv_freetype_font_delete(font);
+    }
+}
+
+/**
+ * Test that font with kerning enabled handles gracefully even if
+ * the font has limited kerning data.
+ */
+void test_freetype_no_kerning_info(void)
+{
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    font_info.size = 24;
+    font_info.render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+    font_info.style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info.kerning = LV_FONT_KERNING_NORMAL;
+
+    lv_font_t * font = lv_freetype_font_create_with_info(&font_info);
+    TEST_ASSERT_NOT_NULL(font);
+
+    /* Test glyph width with various character pairs to exercise kerning lookup */
+    uint16_t width1 = lv_font_get_glyph_width(font, 'A', 'V');
+    uint16_t width2 = lv_font_get_glyph_width(font, 'T', 'o');
+    uint16_t width3 = lv_font_get_glyph_width(font, 'W', 'A');
+
+    /* All widths should be valid (greater than 0) */
+    TEST_ASSERT_GREATER_THAN(0, width1);
+    TEST_ASSERT_GREATER_THAN(0, width2);
+    TEST_ASSERT_GREATER_THAN(0, width3);
+
+    /* Clean up */
+    lv_freetype_font_delete(font);
+}
+
 #else
 
 void setUp(void)
@@ -639,6 +743,18 @@ void test_freetype_render_bitmap(void)
 }
 
 void test_freetype_render_outline(void)
+{
+}
+
+void test_freetype_kerning(void)
+{
+}
+
+void test_freetype_kerning_scalable_sizes(void)
+{
+}
+
+void test_freetype_no_kerning_info(void)
 {
 }
 

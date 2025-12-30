@@ -746,7 +746,8 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -776,6 +777,30 @@ void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selec
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_RECOLOR_OPA, v, selector);
+}
+
+void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BLUR_RADIUS, v, selector);
+}
+
+void lv_obj_set_style_blur_backdrop(lv_obj_t * obj, bool value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BLUR_BACKDROP, v, selector);
+}
+
+void lv_obj_set_style_blur_quality(lv_obj_t * obj, lv_blur_quality_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BLUR_QUALITY, v, selector);
 }
 
 void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector)

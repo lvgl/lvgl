@@ -64,7 +64,11 @@ def parse_defaults(path: str):
         for line in file.readlines():
             if len(line.strip()) == 0 or line.startswith('#'):
                 continue
-            groups = re.search(r'([A-Z0-9_]+)\s+(.+)', line).groups()
+            search_result = re.search(r'([A-Z0-9_]+)\s+(.+)', line)
+            if not search_result:
+                print(f"WARNING: Ignoring line {line}")
+                continue
+            groups = search_result.groups()
             defaults[groups[0]] = groups[1]
 
     return defaults

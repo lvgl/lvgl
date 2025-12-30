@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "../label/lv_label.h"
+#include "../../core/lv_obj_property.h"
 
 #if LV_USE_TABLE != 0
 
@@ -44,6 +45,14 @@ typedef enum {
 } lv_table_cell_ctrl_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_table_class;
+
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_table_id_t {
+    LV_PROPERTY_ID(TABLE, ROW_COUNT,    LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_ID(TABLE, COLUMN_COUNT, LV_PROPERTY_TYPE_INT, 1),
+    LV_PROPERTY_TABLE_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

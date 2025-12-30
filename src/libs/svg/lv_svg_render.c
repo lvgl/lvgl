@@ -208,7 +208,7 @@ struct _lv_svg_drawing_builder_state {
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_svg_render_hal_t hal_funcs = {NULL};
+static lv_svg_render_hal_t hal_funcs = {NULL, NULL};
 
 /**********************
  *  STATIC PROTOTYPES

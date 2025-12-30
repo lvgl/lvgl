@@ -142,9 +142,9 @@ lv_cache_entry_t * lv_cache_entry_alloc(const uint32_t node_size, const lv_cache
         LV_LOG_ERROR("malloc failed");
         return NULL;
     }
-    lv_cache_entry_t * entry = (lv_cache_entry_t *)res;
+    lv_cache_entry_t * entry = (lv_cache_entry_t *)((uint8_t *)res + node_size);
     lv_cache_entry_init(entry, cache, node_size);
-    return (lv_cache_entry_t *)((uint8_t *)entry + node_size);
+    return entry;
 }
 
 void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const uint32_t node_size)

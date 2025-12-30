@@ -87,14 +87,14 @@ void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const l
 
     manager->sources_map = create_shader_map(sources, len);
     if(vert_src != NULL) {
-        lv_opengl_shader_t entry = { "__MAIN__.vert", lv_strdup(vert_src) };
+        lv_opengl_shader_source_t entry = { { "__MAIN__.vert", lv_strdup(vert_src) }, 1 };
         lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node,
                       "Failed to insert shader source to source map");
         lv_memcpy(node->data, &entry, sizeof(entry));
     }
     if(frag_src != NULL) {
-        lv_opengl_shader_t entry = { "__MAIN__.frag", lv_strdup(frag_src) };
+        lv_opengl_shader_source_t entry = { { "__MAIN__.frag", lv_strdup(frag_src) }, 1 };
         lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
         lv_memcpy(node->data, &entry, sizeof(entry));
@@ -304,21 +304,21 @@ void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
         if(shader->src_allocated) {
             lv_free((void *)shader->data.source);
         }
-        lv_rb_remove_node(&manager->sources_map, node);
+        lv_rb_drop_node(&manager->sources_map, node);
     }
     lv_rb_destroy(&manager->sources_map);
 
     while((node = manager->compiled_shaders_map.root)) {
         lv_opengl_compiled_shader_t * shader = node->data;
         GL_CALL(glDeleteShader(shader->id));
-        lv_rb_remove_node(&manager->compiled_shaders_map, node);
+        lv_rb_drop_node(&manager->compiled_shaders_map, node);
     }
 
     lv_rb_destroy(&manager->compiled_shaders_map);
     while((node = manager->programs_map.root)) {
         lv_opengl_program_map_key_t * program_key = node->data;
         lv_opengl_shader_program_destroy(program_key->program);
-        lv_rb_remove_node(&manager->programs_map, node);
+        lv_rb_drop_node(&manager->programs_map, node);
     }
     lv_rb_destroy(&manager->programs_map);
 

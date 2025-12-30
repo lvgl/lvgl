@@ -207,7 +207,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Wno-unreachable-code
         -Wno-gnu-zero-variadic-macro-arguments
         -Wunused-function
-	-Wno-overlength-strings
+	    -Wno-overlength-strings
     )
 else()
     list(APPEND COMPILE_OPTIONS
@@ -292,7 +292,9 @@ set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_CONF_DIR}>
 )
 
-file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
+file(GLOB_RECURSE TEST_IMAGES_SRC 
+	${LVGL_TEST_DIR}/test_images/*.c 
+	${LVGL_TEST_DIR}/../examples/assets/*.c)
 
 add_library(test_common
     STATIC
@@ -385,7 +387,13 @@ include_directories(${PNG_INCLUDE_DIR})
 if(NOT WIN32)
     # FFmpeg is optional for the image and video test cases
     find_package(PkgConfig)
-    pkg_check_modules(FFMPEG libavformat libavcodec libswscale libavutil)
+    pkg_check_modules(FFMPEG IMPORTED_TARGET
+        libavformat
+        libavcodec
+        libswscale
+        libavutil
+    )
+
     if(FFMPEG_FOUND)
         include_directories(${FFMPEG_INCLUDE_DIRS})
     else()
@@ -414,21 +422,19 @@ endif()
 
 # OpenGL ES is required for its driver
 if ($ENV{NON_AMD64_BUILD})
-    message("Disable OpenGL, GLEW or glfw3 for non-amd64 build")
+    message("Disable OpenGL, glfw3 for non-amd64 build")
     add_definitions(-DLV_USE_OPENGLES=0)
 else()
     find_package(OpenGL)
-    find_package(GLEW)
     find_package(glfw3)
 
-    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND)
+    if(OpenGL_FOUND AND glfw3_FOUND)
         # Include directories
         include_directories(${OPENGL_INCLUDE_DIR})
-        include_directories(${GLEW_INCLUDE_DIRS})
         include_directories(${GLFW_INCLUDE_DIRS})
         message("Enable LV_USE_OPENGLES")
     else()
-        message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
+        message("OpenGL, glfw3 not found, defaulting to 0")
         add_definitions(-DLV_USE_OPENGLES=0)
     endif()
 endif()
@@ -521,7 +527,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             ${WebP_LINK_LIBRARIES}
-            ${FFMPEG_LIBRARIES}
+            PkgConfig::FFMPEG
             m
             pthread
             ${TEST_LIBS})
@@ -532,7 +538,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
 
 	if (NOT $ENV{NON_AMD64_BUILD})
 	    target_link_libraries(${test_name} PRIVATE
-    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+    	        ${OPENGL_LIBRARIES} glfw)
 	endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})

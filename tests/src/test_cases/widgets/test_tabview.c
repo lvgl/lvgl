@@ -314,4 +314,56 @@ void test_tabview_translation_tag(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), "tiger");
 }
 
+void test_tabview_setting_tab_bar_position_after_size_should_result_in_the_same_result(void)
+{
+    tabview = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_size(tabview, lv_pct(50));
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_add_tab(tabview, "Tab 1");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_11.png");
+    lv_obj_delete(tabview);
+
+    tabview = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, lv_pct(50));
+    lv_tabview_add_tab(tabview, "Tab 1");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_11.png");
+}
+
+void test_tabview_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * tv = lv_tabview_create(lv_screen_active());
+    lv_tabview_add_tab(tv, "Tab 1");
+    lv_tabview_add_tab(tv, "Tab 2");
+    lv_tabview_add_tab(tv, "Tab 3");
+
+    lv_property_t prop = { };
+
+    /* Test TAB_ACTIVE property */
+    prop.id = LV_PROPERTY_TABVIEW_TAB_ACTIVE;
+    prop.num = 1;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_ACTIVE).num);
+
+    prop.num = 2;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(2, lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_ACTIVE).num);
+
+    /* Test TAB_BAR_POSITION property */
+    prop.id = LV_PROPERTY_TABVIEW_TAB_BAR_POSITION;
+    prop.num = LV_DIR_BOTTOM;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_DIR_BOTTOM, lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_BAR_POSITION).num);
+
+    prop.num = LV_DIR_LEFT;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tv, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_obj_get_property(tv, LV_PROPERTY_TABVIEW_TAB_BAR_POSITION).num);
+
+    lv_obj_delete(tv);
+#endif
+}
+
 #endif

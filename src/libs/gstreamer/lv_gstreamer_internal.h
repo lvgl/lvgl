@@ -37,11 +37,13 @@ struct _lv_gstreamer_t {
     lv_image_t image;
     lv_image_dsc_t frame;
     GstVideoInfo video_info;
+    GstMapInfo last_map_info;
+    GstBuffer * last_buffer;
+    GstSample * last_sample;
     GstElement * pipeline;
     GstElement * audio_convert;
     GstElement * video_convert;
     GstElement * audio_volume;
-    GstSample * last_sample;
     lv_timer_t * gstreamer_timer;
     GAsyncQueue * frame_queue;
     bool is_video_info_valid;

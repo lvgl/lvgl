@@ -102,7 +102,7 @@ lv_display_t * lv_linux_drm_create(void)
     return ctx->display;
 }
 
-void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t connector_id)
+lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t connector_id)
 {
     LV_UNUSED(connector_id);
     lv_drm_ctx_t * ctx = lv_display_get_driver_data(display);
@@ -110,7 +110,7 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     lv_result_t err = drm_device_init(ctx, file);
     if(err != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize DRM device");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     lv_display_set_resolution(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
@@ -119,7 +119,7 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
     ctx->egl_ctx = lv_opengles_egl_context_create(&ctx->egl_interface);
     if(!ctx->egl_ctx) {
         LV_LOG_ERROR("Failed to create egl context");
-        return;
+        return LV_RESULT_INVALID;
     }
 
     /* Let the opengles texture driver handle the texture lifetime */
@@ -129,7 +129,7 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
         LV_LOG_ERROR("Failed to create draw buffers");
         lv_opengles_egl_context_destroy(ctx->egl_ctx);
         ctx->egl_ctx = NULL;
-        return;
+        return LV_RESULT_INVALID;
     }
     /* This creates the texture for the first time*/
     lv_opengles_texture_reshape(display, ctx->drm_mode->hdisplay, ctx->drm_mode->vdisplay);
@@ -139,6 +139,8 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
 
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
+
+    return LV_RESULT_OK;
 }
 
 void lv_linux_drm_set_mode_cb(lv_display_t * disp, lv_linux_drm_select_mode_cb_t callback)
@@ -240,7 +242,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
                              ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                              ctx->texture.fb1));
 #else
 #error("Unsupported color format")

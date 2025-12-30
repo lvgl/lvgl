@@ -142,6 +142,10 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
     indev->key_remap_cb         = NULL;
+#if LV_USE_EXT_DATA
+    indev->ext_data.free_cb = NULL;
+    indev->ext_data.data = NULL;
+#endif
 
 #if LV_USE_GESTURE_RECOGNITION
     lv_indev_gesture_init(indev);
@@ -163,6 +167,14 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
+
+#if LV_USE_EXT_DATA
+    if(indev->ext_data.free_cb) {
+        indev->ext_data.free_cb(indev->ext_data.data);
+        indev->ext_data.data = NULL;
+    }
+#endif
+
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -685,6 +697,19 @@ void lv_indev_set_key_remap_cb(lv_indev_t * indev, lv_indev_key_remap_cb_t remap
     indev->key_remap_cb = remap_cb;
 }
 
+#if LV_USE_EXT_DATA
+void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb)(void * data))
+{
+    if(!indev) {
+        LV_LOG_WARN("Can't attach external user data and free_cb callback to a NULL indev");
+        return;
+    }
+
+    indev->ext_data.data = data;
+    indev->ext_data.free_cb = free_cb;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -781,6 +806,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Save the last key. *It must be done here else `lv_indev_get_key` will return the last key in events*/
     uint32_t prev_key = i->keypad.last_key;
     i->keypad.last_key = data->key;
+
+    lv_indev_send_event(indev_act, LV_EVENT_KEY, NULL);
 
     lv_group_t * g = i->group;
     if(g == NULL) return;
@@ -885,6 +912,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     /*Release happened*/
     else if(is_enabled && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
+
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
@@ -1262,14 +1290,12 @@ static void indev_proc_press(lv_indev_t * indev)
         /*If a new object found the previous was lost, so send a PRESS_LOST event*/
         if(indev->pointer.act_obj != NULL) {
             /*Save the obj because in special cases `act_obj` can change in the event */
-            lv_obj_t * last_obj = indev->pointer.act_obj;
-
-            lv_obj_send_event(last_obj, LV_EVENT_PRESS_LOST, indev_act);
+            lv_obj_t * prev_act_obj = indev->pointer.act_obj;
+            lv_obj_send_event(prev_act_obj, LV_EVENT_PRESS_LOST, indev_act);
             if(indev_reset_check(indev)) return;
         }
 
         indev->pointer.act_obj  = indev_obj_act; /*Save the pressed object*/
-        indev->pointer.last_obj = indev_obj_act;
 
         if(indev_obj_act != NULL) {
 
@@ -1439,7 +1465,6 @@ static void indev_proc_release(lv_indev_t * indev)
         }
 
         indev->pointer.act_obj  = NULL;
-        indev->pointer.last_obj = NULL;
         indev->pr_timestamp           = 0;
         indev->longpr_rep_timestamp   = 0;
         indev->wait_until_release     = 0;
@@ -1637,7 +1662,6 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 {
     if(indev->reset_query) {
         indev->pointer.act_obj           = NULL;
-        indev->pointer.last_obj          = NULL;
         indev->pointer.scroll_obj        = NULL;
         indev->pointer.last_hovered      = NULL;
         indev->timestamp = lv_tick_get();
@@ -1830,10 +1854,6 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
             act_obj = NULL;
         }
 
-        if(obj == NULL || indev->pointer.last_obj == obj) {
-            indev->pointer.last_obj = NULL;
-        }
-
         if(indev->pointer.scroll_obj) {
             /* Avoid recursive calls */
             scroll_obj = indev->pointer.scroll_obj;
@@ -1859,7 +1879,8 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
        code == LV_EVENT_RELEASED ||
        code == LV_EVENT_LONG_PRESSED ||
        code == LV_EVENT_LONG_PRESSED_REPEAT ||
-       code == LV_EVENT_ROTARY) {
+       code == LV_EVENT_ROTARY ||
+       code == LV_EVENT_KEY) {
         lv_indev_send_event(indev, code, indev_obj_act);
         if(indev_reset_check(indev)) return LV_RESULT_INVALID;
 

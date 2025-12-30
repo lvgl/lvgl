@@ -234,7 +234,7 @@ static void grid_mark_area_diff(char grid[GRID_HEIGHT][GRID_WIDTH], const lv_are
     }
 }
 
-void test_area_diff_property()
+void test_area_diff_property(void)
 {
     lv_rand_set_seed(7875);
 

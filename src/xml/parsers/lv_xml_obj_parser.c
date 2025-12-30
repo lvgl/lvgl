@@ -1,7 +1,7 @@
 /**
- * @file lv_xml_obj_parser.c
- *
- */
+* @file lv_xml_obj_parser.c
+*
+*/
 
 /*********************
  *      INCLUDES
@@ -141,6 +141,8 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
                                                                             lv_xml_to_bool(value));
         else if(lv_streq("overflow_visible", name))     lv_obj_set_flag(item, LV_OBJ_FLAG_OVERFLOW_VISIBLE,
                                                                             lv_xml_to_bool(value));
+        else if(lv_streq("radio_button", name))     lv_obj_set_flag(item, LV_OBJ_FLAG_RADIO_BUTTON,
+                                                                        lv_xml_to_bool(value));
         else if(lv_streq("flex_in_new_track", name))    lv_obj_set_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK,
                                                                             lv_xml_to_bool(value));
 
@@ -817,8 +819,9 @@ static lv_obj_flag_t flag_to_enum(const char * txt)
     if(lv_streq("adv_hittest", txt)) return LV_OBJ_FLAG_ADV_HITTEST;
     if(lv_streq("ignore_layout", txt)) return LV_OBJ_FLAG_IGNORE_LAYOUT;
     if(lv_streq("floating", txt)) return LV_OBJ_FLAG_FLOATING;
-    if(lv_streq("send_draw_task_evenTS", txt)) return LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS;
+    if(lv_streq("send_draw_task_events", txt)) return LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS;
     if(lv_streq("overflow_visible", txt)) return LV_OBJ_FLAG_OVERFLOW_VISIBLE;
+    if(lv_streq("radio_button", txt)) return LV_OBJ_FLAG_RADIO_BUTTON;
     if(lv_streq("flex_in_new_track", txt)) return LV_OBJ_FLAG_FLEX_IN_NEW_TRACK;
     if(lv_streq("layout_1", txt)) return LV_OBJ_FLAG_LAYOUT_1;
     if(lv_streq("layout_2", txt)) return LV_OBJ_FLAG_LAYOUT_2;
@@ -826,8 +829,6 @@ static lv_obj_flag_t flag_to_enum(const char * txt)
     if(lv_streq("widget_2", txt)) return LV_OBJ_FLAG_WIDGET_2;
     if(lv_streq("user_1", txt)) return LV_OBJ_FLAG_USER_1;
     if(lv_streq("user_2", txt)) return LV_OBJ_FLAG_USER_2;
-    if(lv_streq("user_3", txt)) return LV_OBJ_FLAG_USER_3;
-    if(lv_streq("user_4", txt)) return LV_OBJ_FLAG_USER_4;
 
     LV_LOG_WARN("%s is an unknown value for flag", txt);
     return 0; /*Return 0 in lack of a better option. */
@@ -953,6 +954,9 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
     else SET_STYLE_IF(recolor, lv_xml_to_color(value));
     else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));
+    else SET_STYLE_IF(blur_radius, lv_xml_atoi(value));
+    else SET_STYLE_IF(blur_backdrop, lv_xml_to_bool(value));
+    else SET_STYLE_IF(blur_quality, lv_xml_blur_quality_to_enum(value));
 
     else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
 

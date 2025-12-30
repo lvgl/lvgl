@@ -11,6 +11,9 @@
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_array.h"
+
 /*********************
  *      DEFINES
  *********************/
