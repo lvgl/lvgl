@@ -474,7 +474,7 @@ static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     model->last_material_index = materialIndex;
     model->last_pass_was_transmission = is_transmission_pass;
 
-    const GLuint program = compiled_shader->shaderset.program;
+    const GLuint program = compiled_shader->program;
 
     GL_CALL(glUseProgram(program));
 
