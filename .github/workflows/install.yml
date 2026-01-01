@@ -31,18 +31,18 @@ jobs:
 
       - name: Build an application with the installed version of LVGL
         run: |
-          echo "#include <lvgl/lvgl.h> 
-            #include <lvgl/lvgl.h> 
-            #include <lvgl/demos/lv_demos.h> 
-            #include <lvgl/examples/lv_examples.h> 
-            int main(void) { 
+          echo "#include <lvgl/lvgl.h>
+            #include <lvgl/lvgl.h>
+            #include <lvgl/demos/lv_demos.h>
+            #include <lvgl/examples/lv_examples.h>
+            int main(void) {
               lv_init();
               lv_example_label_1();
               lv_demo_widgets();
-              while(1) { 
-                lv_timer_handler(); 
-              } 
-              return 0; 
+              while(1) {
+                lv_timer_handler();
+              }
+              return 0;
           }" >> main.c
           # We link with `g++` as thorvg (ThorVG library) contains C++ code that requires C++ runtime symbols
-          g++ main.c -o main -I$(pwd)/lvgl-install/include -L$(pwd)/lvgl-install/lib -llvgl_thorvg -llvgl_examples -llvgl_demos -llvgl -lm
+          g++ main.c -o main -I$(pwd)/lvgl-install/include -L$(pwd)/lvgl-install/lib -llvgl_examples -llvgl_demos -llvgl -llvgl_thorvg -lm
