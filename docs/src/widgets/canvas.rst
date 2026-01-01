@@ -71,8 +71,9 @@ ignored. Similarly, if opacity is not supported
 (e.g. :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`), it will be ignored.
 
 An array of pixels can be copied to the Canvas with
-:cpp:expr:`lv_canvas_copy_buf(canvas, buffer_to_copy, x, y, width, height)`. The
-color format of the buffer and Canvas need to match.
+:cpp:expr:`lv_canvas_copy_buf(canvas, canvas_area, src_buf, src_area)`. The
+color format of the buffer and Canvas need to match. If the canvas area and source buffer
+are the same size, the source area can be left NULL.
 
 To draw something to the Canvas use LVGL's draw functions directly. See the examples for more details.
 
