@@ -4768,16 +4768,23 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #if LV_USE_WAYLAND
     /*Automatically detect wayland backend*/
-    #if LV_USE_G2D
+    #if LV_USE_OPENGLES
+        #define LV_WAYLAND_USE_EGL 1
+        #define LV_WAYLAND_USE_G2D 0
+        #define LV_WAYLAND_USE_SHM 0
+    #elif LV_USE_G2D
+        #define LV_WAYLAND_USE_EGL 0
         #define LV_WAYLAND_USE_G2D 1
         #define LV_WAYLAND_USE_SHM 0
     #else
+        #define LV_WAYLAND_USE_EGL 0
         #define LV_WAYLAND_USE_G2D 0
         #define LV_WAYLAND_USE_SHM 1
     #endif
 #else
     #define LV_WAYLAND_USE_G2D 0
     #define LV_WAYLAND_USE_SHM 0
+    #define LV_WAYLAND_USE_EGL 0
 #endif
 
 #if LV_USE_LINUX_DRM == 0
@@ -4827,8 +4834,19 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #ifndef LV_USE_EGL
-    #define LV_USE_EGL LV_LINUX_DRM_USE_EGL
+    #if LV_LINUX_DRM_USE_EGL || LV_WAYLAND_USE_EGL
+        #define LV_USE_EGL 1
+    #else
+        #define LV_USE_EGL 0
+    #endif
 #endif /* LV_USE_EGL */
+
+/* For now only enable LV_SDL_USE_EGL when using DRAW_OPENGLES*/
+#if LV_USE_SDL && LV_USE_OPENGLES && LV_USE_DRAW_OPENGLES
+    #define LV_SDL_USE_EGL 1
+#else
+    #define LV_SDL_USE_EGL 0
+#endif
 
 #if LV_USE_OS
     #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
