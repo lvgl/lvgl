@@ -15,9 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
-#include "../../misc/lv_types.h"
-#include LV_STDBOOL_INCLUDE
-#include LV_STDINT_INCLUDE
+
 #if LV_USE_GIF
 
 #include "../../misc/lv_color.h"
@@ -96,6 +94,36 @@ int32_t lv_gif_get_loop_count(lv_obj_t * obj);
  * @param count the loop count to set
  */
 void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count);
+
+/**
+ * Set whether to decode invisible object.
+ * @param obj        pointer to a gif object
+ * @param auto_pause true: auto pause when invisible, false: don't auto pause
+ */
+void lv_gif_set_auto_pause_invisible(lv_obj_t * obj, bool auto_pause);
+
+/**
+ * Get gif width & height
+ * @param src pointer to a gif file
+ * @param w pointer to store width
+ * @param h pointer to store height
+ * @return true: success; false: failed
+ */
+bool lv_gif_get_size(const char * src, uint16_t * w, uint16_t * h);
+
+/**
+ * Get frame count of the GIF.
+ * @param obj pointer to a gif object
+ * @return frame count of the GIF
+ */
+int32_t lv_gif_get_frame_count(lv_obj_t * obj);
+
+/**
+ * Get the current frame index of the GIF.
+ * @param obj pointer to a gif object
+ * @return current frame index of the GIF
+ */
+int32_t lv_gif_get_current_frame_index(lv_obj_t * obj);
 
 /**********************
  *      MACROS

@@ -13,11 +13,11 @@
 #ifndef __ANIMATEDGIF__
 #define __ANIMATEDGIF__
 
-#include "../../../../misc/lv_fs.h"
 #include "../../../../lv_conf_internal.h"
-#include LV_STDINT_INCLUDE
-#include LV_LIMITS_INCLUDE
-#include "../../../../stdlib/lv_string.h"
+
+#if LV_USE_GIF
+
+#include "../../../../misc/lv_fs.h"
 
 //
 // GIF Animator
@@ -223,5 +223,7 @@ typedef struct gif_image_tag
 #endif // ALLOWS_UNALIGNED
 #define BIGINT int32_t
 #define BIGUINT uint32_t
+
+#endif // LV_USE_GIF
 
 #endif // __ANIMATEDGIF__
