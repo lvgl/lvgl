@@ -71,6 +71,12 @@ static const demo_entry_info_t demos_entry_info[] = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+void lv_demo_args_init(lv_demo_args_t * args)
+{
+    LV_ASSERT_NULL(args);
+    lv_memzero(args, sizeof(lv_demo_args_t));
+    args->parent = lv_screen_active();
+}
 
 bool lv_demos_create(char * info[], int size)
 {
