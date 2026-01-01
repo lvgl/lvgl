@@ -108,6 +108,20 @@ extern "C" {
 #endif
 
 /*******************
+ * LV_NANOVG_BACKEND
+ *******************/
+
+#ifdef CONFIG_LV_NANOVG_BACKEND_GL2
+#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GL2
+#elif defined(CONFIG_LV_NANOVG_BACKEND_GL3)
+#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GL3
+#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES2)
+#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GLES2
+#elif defined(CONFIG_LV_NANOVG_BACKEND_GLES3)
+#  define CONFIG_LV_NANOVG_BACKEND LV_NANOVG_BACKEND_GLES3
+#endif
+
+/*******************
  * LV_MEM_SIZE
  *******************/
 
