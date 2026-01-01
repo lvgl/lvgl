@@ -45,7 +45,7 @@ jobs:
             --seconds 1800
 
       - name: Upload Comment
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: comment
           path: comment.md
@@ -65,7 +65,7 @@ jobs:
           echo ${{ github.event.number }} > pr_number
 
       - name: Upload PR number as artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pr_number
           path: pr_number
