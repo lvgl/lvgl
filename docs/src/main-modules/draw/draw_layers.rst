@@ -9,10 +9,10 @@ Not to be confused with a :ref:`Display's main 4 layers <display_screen_layers>`
 properties, so different sets of pixels are correctly combined.  Factors requiring
 such layers are:
 
-- partial opacity
 - bit-mask being applied
 - blend mode
 - clipped corners (a bit-mask application)
+- layered opacity
 - transformations
 
     - scale
@@ -234,7 +234,6 @@ Memory Limit for Layers
 The total memory available for layers at once is controlled by
 :c:macro:`LV_DRAW_LAYER_MAX_MEMORY` in ``lv_conf.h``.  If set to ``0``, there is no
 limit.
-
 
 
 API
