@@ -53,11 +53,17 @@ void lv_draw_vg_lite_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t
 
     LV_PROFILER_DRAW_BEGIN;
 
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+
 #if LV_USE_VG_LITE_THORVG
     /**
      * ThorVG does not yet support simulating the VG_LITE_BLEND_DST_IN blend mode,
      * and uses software rendering to achieve this
      */
+
+    /* Since the buffer content will be modified later, it is necessary to ensure that ThorVG rendering is complete. */
+    lv_vg_lite_finish(u);
+
     lv_layer_t * target_layer = t->target_layer;
     const lv_area_t * buf_area = &target_layer->buf_area;
     lv_area_t clear_area;
@@ -123,8 +129,6 @@ void lv_draw_vg_lite_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t
     lv_free(mask_buf);
     lv_draw_sw_mask_free_param(&param);
 #else
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
-
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_bounding_box_area(path, &t->clip_area);
 
