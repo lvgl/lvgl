@@ -193,17 +193,12 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     unsigned int texture = layer_get_texture(layer);
     if(texture == 0) {
         lv_display_t * disp = lv_refr_get_disp_refreshing();
-        if(layer != disp->layer_head) {
-            int32_t w = lv_area_get_width(&layer->buf_area);
-            int32_t h = lv_area_get_height(&layer->buf_area);
+        LV_ASSERT(layer != disp->layer_head);
+        int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t h = lv_area_get_height(&layer->buf_area);
 
-            texture = create_texture(w, h, NULL);
-
-            layer->user_data = (void *)(uintptr_t)texture;
-        }
-        else {
-            layer->user_data = (void *)(uintptr_t)lv_opengles_texture_get_texture_id(disp);
-        }
+        texture = create_texture(w, h, NULL);
+        layer->user_data = (void *)(uintptr_t)texture;
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
