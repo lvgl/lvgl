@@ -7,7 +7,7 @@ Integrating LVGL
 .. toctree::
     :maxdepth: 2
 
-    overview/index
+    overview
     pc/index
     embedded_linux/index
     rtos/index

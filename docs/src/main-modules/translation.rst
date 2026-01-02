@@ -87,6 +87,15 @@ the tag itself will be returned.
 
 If the tag is not found at all, the tag itself will be used as a fallback as well.
 
+Support in Widgets
+******************
+
+Several Widgets provide a convenient API to support translations. These functions also update the texts if the target language changes. Some examples:
+- :cpp:expr:`lv_label_set_translation_tag(label, "some_tag")`
+- :cpp:expr:`lv_tabview_set_tab_translation_tag(tab, "some_tag")`
+
+For more information check the documentation page of the given widget.
+
 Dynamically Updating UI Text
 ****************************
 
