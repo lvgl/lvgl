@@ -1278,10 +1278,6 @@
 #define LV_USE_WAYLAND          0
 #if LV_USE_WAYLAND
     #define LV_WAYLAND_DIRECT_EXIT          1     /**< 1: Exit the application when all Wayland windows are closed */
-    #define LV_WAYLAND_USE_EGL              0    /**< Use EGL for rendering. Required for Wayland EGL support */
-    #if LV_WAYLAND_USE_EGL
-        #define LV_WAYLAND_USE_EGL_DMABUF   0    /**< Use EGL with DMABUF. Required for Wayland EGL-DMABF support */
-    #endif
 #endif
 
 /** Driver for /dev/fb */
