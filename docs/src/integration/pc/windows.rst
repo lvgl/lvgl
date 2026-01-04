@@ -1,3 +1,5 @@
+.. _windows_pc:
+
 =======
 Windows
 =======
