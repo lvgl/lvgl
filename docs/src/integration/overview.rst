@@ -22,7 +22,9 @@ rest of your source code.
 
 Frameworks and Package Registries
 ---------------------------------
+
 LVGL is also available as:
+
 - `Arduino library <https://docs.lvgl.io/master/details/integration/framework/arduino.html>`__
 - `PlatformIO package <https://registry.platformio.org/libraries/lvgl/lvgl>`__
 - `Zephyr library <https://docs.lvgl.io/master/details/integration/os/zephyr.html>`__
@@ -122,9 +124,9 @@ commands. Here is a list of some useful commands:
 
 - ``menuconfig``: Opens a console menu interface to modify the configuration values.
 - ``guiconfig`` (needs ``tkinter``): Opens a graphical interface to modify the
-   configuration values.
+  configuration values.
 - ``savedefconfig``: Saves the current .config as a defconfig, listing only non-default
-   values.
+  values.
 - ``alldefconfig``: Creates a .config with all default values.
 - ``genconfig``: Generates a C header from the config, following ``autoconf.h`` format.
 
