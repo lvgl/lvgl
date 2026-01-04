@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='800' height='800' viewBox='0 0 800 800' >
+    <defs>
+        <solidColor id='ggg13' solid-color='#ff0000' solid-opacity='0.5'/>
+        <solidColor id='ggg14' solid-color='green' solid-opacity='0.5'/>
+        <solidColor id='ggg15' solid-color='rgb(0,0,255)' solid-opacity='0.5'/>
+    </defs>
+    <rect x='100' y='50' width='100' height='100' fill='url(#ggg13)'/>
+    <rect x='251' y='50' width='100' height='100' fill='url(#ggg14)'/>
+    <rect x='402' y='50' width='100' height='100' fill='url(#ggg15)'/>
+    <rect x='100' y='251' width='100' height='100' fill='red'/>
+    <rect x='251' y='251' width='100' height='100' fill='green'/>
+    <rect x='402' y='251' width='100' height='100' fill='blue'/>
+</svg>

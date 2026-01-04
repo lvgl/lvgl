@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width='400' height='400'>
+    <g >
+        <g >
+            <text x='20' y='120' fill='black' font-size='16'>《G》</text>
+        </g>
+        <text x='50' y='120' fill='black' font-size='16'>《text》</text>
+        <defs>
+            <g id='ggg2'>
+                <rect x='20' y='20' width='30' height='30' />
+            </g>
+        </defs>
+        <use xlink:href='#ggg2' x='100' y='100' />
+        <image xlink:href='dot_square.png' x='150' y='100' width='50' height='50' />
+    </g>
+</svg>
