@@ -657,6 +657,13 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
 void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 
 /**
+ * Rotate a point in-place according to the display's rotation
+ * @param disp      pointer to a display
+ * @param point     pointer to a point to rotate
+ */
+void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point);
+
+/**
  * Get the size of the draw buffers
  * @param disp      pointer to a display
  * @return          the size of the draw buffer in bytes for valid display, 0 otherwise

@@ -583,4 +583,43 @@ void test_display_active_time(void)
     lv_display_set_default(disp_def);
 }
 
+void test_display_rotate_point(void)
+{
+    lv_display_t * disp = lv_display_create(480, 320);
+    TEST_ASSERT_NOT_NULL(disp);
+    lv_display_set_flush_cb(disp, never_called);
+
+    lv_point_t point;
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    point.x = 10;
+    point.y = 20;
+    lv_display_rotate_point(disp, &point);
+    TEST_ASSERT_EQUAL_INT32(10, point.x);
+    TEST_ASSERT_EQUAL_INT32(20, point.y);
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    point.x = 10;
+    point.y = 20;
+    lv_display_rotate_point(disp, &point);
+    TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.x);
+    TEST_ASSERT_EQUAL_INT32(10, point.y);
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    point.x = 10;
+    point.y = 20;
+    lv_display_rotate_point(disp, &point);
+    TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.x);
+    TEST_ASSERT_EQUAL_INT32(320 - 20 - 1, point.y);
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    point.x = 10;
+    point.y = 20;
+    lv_display_rotate_point(disp, &point);
+    TEST_ASSERT_EQUAL_INT32(20, point.x);
+    TEST_ASSERT_EQUAL_INT32(480 - 10 - 1, point.y);
+
+    lv_display_delete(disp);
+}
+
 #endif
