@@ -22,17 +22,16 @@ rest of your source code.
 
 Frameworks and Package Registries
 ---------------------------------
-
 LVGL is also available as:
-- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
-- [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
-- [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
-- [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
+- `Arduino library <https://docs.lvgl.io/master/details/integration/framework/arduino.html>`__
+- `PlatformIO package <https://registry.platformio.org/libraries/lvgl/lvgl>`__
+- `Zephyr library <https://docs.lvgl.io/master/details/integration/os/zephyr.html>`__
+- `ESP-IDF(ESP32) component <https://components.espressif.com/components/lvgl/lvgl>`__
+- `NXP MCUXpresso component <https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY>`__
+- `NuttX library <https://docs.lvgl.io/master/details/integration/os/nuttx.html>`__
+- `RT-Thread RTOS <https://docs.lvgl.io/master/details/integration/os/rt-thread.html>`__
 - CMSIS-Pack
-- [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
+- `RIOT OS package <https://doc.riot-os.org/group__pkg__lvgl.html#details>`__
 
 Usually, LVGL is ready to use in these frameworks. You can also find a description
 at :ref:`integration_index`.
@@ -95,11 +94,11 @@ include path manually (e.g. ``-I../include/gui``). In this case, LVGL
 will attempt to include ``lv_conf.h`` simply with ``#include "lv_conf.h"``
 instead of ``lvgl/lvgl.h``.
 
-2. Set a custom path via the :c:macro:`LV_CONF_PATH` define. For example:
-``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``.
+2. Set a custom path via the :c:macro:`LV_CONF_PATH` define.
+For example: ``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``.
 
 3. Delete some settings from ``lv_conf.h`` and set them via compile options.
-For example: ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``.
+For example: ``-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1``.
 
 4. To fully skip ``lv_conf.h`` and use only compiler options (see point 3),
 define :c:macro:`LV_CONF_SKIP` as a compiler option. Unset options will get a
@@ -258,7 +257,7 @@ In the simplest case, it can be done like this:
    }
 
 If ``LV_USE_OS`` is set, :cpp:expr:`lv_sleep_ms()` will be the sleep function
-provided by the operating system (otherwise it will fall back to a blocking delay).
+provided by the operating system, otherwise it will fall back to a blocking delay.
 Of course, you can use any custom delay, wait, or sleep functions instead.
 
 Sleep Management
