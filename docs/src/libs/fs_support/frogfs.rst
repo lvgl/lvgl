@@ -7,9 +7,10 @@ FrogFS
 `frogfs <https://github.com/jkent/frogfs>`__
 is a read-only :ref:`filesystem <file_system>` for packing a directory
 tree of files into a single "blob" which can be distributed easily or
-built into a firmware. It is suitable for packaging XML files into your
-app. See the intro to :ref:`XML in LVGL <xml_main>` if you are
-interested in using XML.
+built into a firmware.
+
+A typical application of FrogFS is to create blobs from the XML files
+and other assets created by `LVGL Pro <pro.lvgl.io>`__.
 
 A copy of the frogfs source is inside LVGL. It has been
 reduced to a subset of the original functionality for simple loading
@@ -119,7 +120,6 @@ all comments and insignificant whitespace. This is a form of compression
 that does not require a decompression step. The only drawback is that the
 incorrect line number relative to the un-minified version will be logged if
 there is a parse failure.
-See the intro to :ref:`XML in LVGL <xml_main>`.
 
 You can prepare a frogfs blob with minified XML files. In your ``frogfs``
 clone directory make a copy of ``tools/transform-html-minifier.js`` called

@@ -25,6 +25,7 @@ extern "C" {
 #include "src/stdlib/lv_mem_private.h"
 #include "src/others/file_explorer/lv_file_explorer_private.h"
 #include "src/others/fragment/lv_fragment_private.h"
+#include "src/others/translation/lv_translation_private.h"
 #include "src/libs/qrcode/lv_qrcode_private.h"
 #include "src/libs/barcode/lv_barcode_private.h"
 #include "src/draw/lv_draw_triangle_private.h"
@@ -52,7 +53,6 @@ extern "C" {
 #include "src/core/lv_obj_event_private.h"
 #include "src/core/lv_observer_private.h"
 
-#include "src/xml/lv_xml_private.h"
 #include "src/debugging/sysmon/lv_sysmon_private.h"
 #include "src/debugging/monkey/lv_monkey_private.h"
 
@@ -68,6 +68,7 @@ extern "C" {
 #include "src/misc/lv_style_private.h"
 #include "src/misc/lv_color_op_private.h"
 #include "src/misc/lv_anim_private.h"
+#include "src/misc/lv_anim_timeline_private.h"
 
 #include "src/widgets/msgbox/lv_msgbox_private.h"
 #include "src/widgets/buttonmatrix/lv_buttonmatrix_private.h"

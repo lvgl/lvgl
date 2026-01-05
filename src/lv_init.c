@@ -41,7 +41,6 @@
 #include "osal/lv_os_private.h"
 #include "debugging/sysmon/lv_sysmon_private.h"
 #include "others/translation/lv_translation.h"
-#include "xml/lv_xml.h"
 #include "drivers/wayland/lv_wayland_private.h"
 
 #if LV_USE_SVG
@@ -416,10 +415,6 @@ void lv_init(void)
     lv_translation_init();
 #endif
 
-#if LV_USE_XML
-    lv_xml_init();
-#endif
-
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -526,10 +521,6 @@ void lv_deinit(void)
 
 #if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
-#endif
-
-#if LV_USE_XML
-    lv_xml_deinit();
 #endif
 
 #if LV_USE_TRANSLATION
