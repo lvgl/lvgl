@@ -207,7 +207,7 @@ void _pathAppendArcTo(Array<PathCommand>* cmds, Array<Point>* pts, Point* cur, P
         //Ensure delta theta < 0 or else add 360 degrees
         if (deltaTheta < 0.0f) deltaTheta += 2.0f * MATH_PI;
     } else {
-        //Ensure delta theta > 0 or else subtract 360 degrees
+        //Ensure delta theta > 0 or else substract 360 degrees
         if (deltaTheta > 0.0f) deltaTheta -= 2.0f * MATH_PI;
     }
 

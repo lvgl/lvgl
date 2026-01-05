@@ -152,7 +152,7 @@ const frogfs_entry_t *frogfs_get_entry(const frogfs_fs_t *fs, const char *path)
         middle--;
     }
 
-    /* walk through candidates and look for a match */
+    /* walk through canidates and look for a match */
     const frogfs_entry_t *entry;
     do {
         entry = (const void *) fs->head + e->offs;

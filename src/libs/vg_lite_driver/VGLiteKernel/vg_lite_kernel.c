@@ -315,7 +315,7 @@ static void gpu(int enable)
     }
 }
 
-/* Initialize some customized modules [DDRLess]. */
+/* Initialize some customized modeuls [DDRLess]. */
 static vg_lite_error_t init_3rd(vg_lite_kernel_initialize_t * data)
 {
     vg_lite_error_t error = VG_LITE_SUCCESS;

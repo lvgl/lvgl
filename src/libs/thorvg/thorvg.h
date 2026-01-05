@@ -259,7 +259,7 @@ enum class CanvasEngine
  */
 enum class Type : uint8_t
 {
-    Undefined = 0,         ///< Unknown class
+    Undefined = 0,         ///< Unkown class
     Shape,                 ///< Shape class
     Scene,                 ///< Scene class
     Picture,               ///< Picture class
