@@ -49,6 +49,9 @@ To add Arm2D to your project, follow these steps:
 8. Arm2D tries to read/write multiple data with a single instruction. Therefore, it's important to use the fastest memory (e.g., ``BSS`` or ``TCM``) for LVGL's buffer to avoid memory bandwidth bottlenecks.
 9. Enable ``LV_USE_DRAW_ARM2D_SYNC 1`` and ``LV_USE_DRAW_SW_ASM LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h``.
 
+
+.. _neon acceleration:
+
 Neon Acceleration
 -----------------
 

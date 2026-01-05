@@ -9,7 +9,7 @@ JPEG image decompressor module that highly optimized for small embedded systems.
 works with very low memory consumption, so that it can be incorporated into tiny
 microcontrollers, such as AVR, 8051, PIC, Z80, Cortex-M0, etc..
 
-For a detailed introduction, see: `TJpgDec <http://elm-chan.org/fsw/tjpgd/>`__.
+For a detailed introduction, see: `TJpgDec <https://elm-chan.org/fsw/tjpgd/>`__.
 
 
 

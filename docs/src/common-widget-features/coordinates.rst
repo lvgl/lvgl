@@ -121,7 +121,7 @@ Boxing Model
 
 LVGL follows the CSS ``border-box`` model:
 
-https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/box-sizing
 
 A widget's "box" includes:
 

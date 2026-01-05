@@ -1,3 +1,4 @@
+.. include:: /include/external_links.txt
 .. _grid:
 
 ====
@@ -211,13 +212,6 @@ Examples
 ********
 
 .. include:: /examples/layouts/grid/index.rst
-
-
-..  Hyperlinks
-
-.. _css grid:     https://css-tricks.com/snippets/css/complete-guide-grid/
-.. _fr units:     https://css-tricks.com/introduction-fr-css-unit/
-.. _css subgrid:  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid
 
 
 

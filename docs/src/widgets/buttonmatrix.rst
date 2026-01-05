@@ -66,7 +66,7 @@ The buttons' width can be set in proportion to the width of other buttons in the
 row with :cpp:expr:`lv_buttonmatrix_set_button_width(btn_matrix, button_id, width)` E.g. in a
 line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
 will have 33 % width and *buttonB* will have 66 % width.  This is similar to how the
-`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
+`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-grow>`__
 property works in CSS. The width must be in the range [1..15] with the default being 1.
 
 Button behavior

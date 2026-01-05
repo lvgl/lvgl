@@ -33,7 +33,7 @@ Run the Project
 
   .. code-block:: shell
 
-      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
+      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc.git --recurse-submodules
 
   Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
@@ -41,7 +41,7 @@ Run the Project
 
   .. code-block:: shell
 
-      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git
+      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc.git
 
 - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select
   ``General`` / ``Existing projects into workspace``.

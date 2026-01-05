@@ -75,6 +75,8 @@ provided implementations by setting :c:macro:`LV_USE_NEMA_HAL` to a value other 
 :c:macro:`LV_NEMA_HAL_CUSTOM`.
 
 
+.. _neochrom vector graphics:
+
 Vector Graphics
 ***************
 

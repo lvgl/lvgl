@@ -24,7 +24,7 @@ run LVGL.  The minimal requirements are:
 
   * `pointers <https://www.tutorialspoint.com/cprogramming/c_pointers.htm>`__.
   * `structs <https://www.tutorialspoint.com/cprogramming/c_structures.htm>`__.
-  * `callbacks <https://www.geeksforgeeks.org/callbacks-in-c/>`__.
+  * `callbacks <https://www.geeksforgeeks.org/c/callbacks-in-c/>`__.
 
 .. note::
     *Memory usage may vary depending on architecture, compiler and build options.*
