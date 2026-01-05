@@ -166,7 +166,7 @@ Some examples are:
 
 - you cannot delete a Widget because something else is still using it,
 - you don't want to block execution now, or
-- you just want defer the deletion for any reasons
+- you just want to defer the deletion for any reason
 
 For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call ``my_function`` on
