@@ -71,6 +71,7 @@ static void populate_dropdown(lv_obj_t * dropdown, const char * prefix, size_t c
 
 static lv_obj_t * add_row(lv_obj_t * parent);
 static lv_obj_t * add_button_to_row(lv_obj_t * row, lv_color_t color);
+
 static lv_obj_t * add_title_to_row(lv_obj_t * row, const char * title);
 static lv_obj_t * add_dropdown_to_row(lv_obj_t * row);
 
