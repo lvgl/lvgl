@@ -39,7 +39,7 @@ to perform custom rendering with a GPU or replace parts of the built-in software
 rendering logic to any extent desired.
 
 Using events, it's also possible to modify :ref:`draw tasks` or insert new ones as
-LVGL renders widgets.
+LVGL renders Widgets.
 
 The following sections describe the basic terminology and concepts of rendering.
 
