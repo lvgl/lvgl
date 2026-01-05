@@ -4,6 +4,10 @@
 Fragment
 ========
 
+.. warning::
+
+    This module is now deprecated and will be removed in an upcoming release.
+
 Fragment is a concept copied from
 `Android <https://developer.android.com/guide/fragments>`__.
 
