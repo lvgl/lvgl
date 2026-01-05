@@ -68,7 +68,7 @@ int GIF_openFile(GIFIMAGE *pGIF, const char *szFilename, GIF_DRAW_CALLBACK *pfnD
 
     if (res != LV_FS_RES_OK) {
         pGIF->iError = GIF_FILE_NOT_OPEN;
-        LV_LOG_WARN("Failed to open file: %s, res: %d", szFilename, res);    
+        LV_LOG_WARN("Failed to open file: %s, res: %d", szFilename, res);
         return 0;
     }
 
