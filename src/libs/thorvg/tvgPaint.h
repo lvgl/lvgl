@@ -56,7 +56,7 @@ namespace tvg
         RenderMethod* renderer = nullptr;
         struct {
             Matrix m;                 //input matrix
-            Matrix cm;                //multiplied parents matrix
+            Matrix cm;                //multipled parents matrix
             float degree;             //rotation degree
             float scale;              //scale factor
             bool overriding;          //user transform?

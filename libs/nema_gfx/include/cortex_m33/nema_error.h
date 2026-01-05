@@ -36,7 +36,7 @@ extern "C" {
 
 // Error Handling
 
-#define  NEMA_ERR_NO_ERROR                     (0x00000000U) /**< No error has occurred */
+#define  NEMA_ERR_NO_ERROR                     (0x00000000U) /**< No error has occured */
 #define  NEMA_ERR_SYS_INIT_FAILURE             (0x00000001U) /**< System initialization failure */
 #define  NEMA_ERR_GPU_ABSENT                   (0x00000002U) /**< Nema GPU is absent */
 #define  NEMA_ERR_RB_INIT_FAILURE              (0x00000004U) /**< Ring buffer initialization failure */

@@ -99,7 +99,7 @@ extern "C"
 #define EVE_CMDFIFO_SIZE ((uint32_t) 4U*1024UL)
 #define EVE_RAM_DL_SIZE  ((uint32_t) 8U*1024UL)
 
-/* display list list commands, most need OR's arguments */
+/* diplay list list commands, most need OR's arguments */
 #define DL_DISPLAY       ((uint32_t) 0x00000000UL)
 #define DL_BITMAP_SOURCE ((uint32_t) 0x01000000UL)
 #define DL_CLEAR_COLOR_RGB ((uint32_t) 0x02000000UL)
@@ -1003,7 +1003,7 @@ static inline uint32_t TAG_MASK(uint8_t mask)
 
 //#define VERTEX2F(x,y) ((DL_VERTEX2F) | ((((uint32_t) (x)) & 0x7FFFUL) << 15U) | (((uint32_t) (y)) & 0x7FFFUL))
 /**
- * @brief Set coordinates for graphics primitives.
+ * @brief Set coordinates for graphics primitves.
  * @return a 32 bit word for use with EVE_cmd_dl()
  */
 static inline uint32_t VERTEX2F(int16_t xc0, int16_t yc0)
@@ -1015,7 +1015,7 @@ static inline uint32_t VERTEX2F(int16_t xc0, int16_t yc0)
 
 //#define VERTEX2II(x,y,handle,cell) ((DL_VERTEX2II) | (((x) & 0x1FFUL) << 21U) | (((y) & 0x1FFUL) << 12U) | (((handle) & 0x1FUL) << 7U) | ((cell) & 0x7FUL))
 /**
- * @brief Set coordinates, bitmap-handle and cell-number for graphics primitives.
+ * @brief Set coordinates, bitmap-handle and cell-number for graphics primitves.
  * @return a 32 bit word for use with EVE_cmd_dl()
  */
 static inline uint32_t VERTEX2II(uint16_t xc0, uint16_t yc0, uint8_t handle, uint8_t cell)

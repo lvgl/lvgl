@@ -203,7 +203,7 @@ static bool _updateColorTable(SwFill* fill, const Fill* fdata, const SwSurface* 
         fill->ctable[i] = rgba;
 
     //For repeat fill spread apply anti-aliasing between the last and first colors,
-    //otherwise make sure the last color stop is represented at the end of the table.
+    //othewise make sure the last color stop is represented at the end of the table.
     if (repeat) _applyAA(fill, iAABegin, iAAEnd);
     else fill->ctable[GRADIENT_STOP_SIZE - 1] = rgba;
 

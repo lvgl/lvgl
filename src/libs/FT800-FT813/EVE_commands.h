@@ -34,7 +34,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 - added prototype for EVE_cmd_plkfreq()
 - replaced BT81X_ENABLE with "EVE_GEN > 2"
 - removed FT81X_ENABLE as FT81x already is the lowest supported chip revision now
-- removed the formerly as deprecated marked EVE_get_touch_tag()
+- removed the formerly as deprected marked EVE_get_touch_tag()
 - changed EVE_color_rgb() to use a 32 bit value like the rest of the color commands
 - removed the meta-commands EVE_cmd_point(), EVE_cmd_line() and EVE_cmd_rect()
 - removed obsolete functions EVE_get_cmdoffset(void) and EVE_report_cmdoffset(void) - cmdoffset is gone
@@ -60,8 +60,8 @@ EVE_cmd_animstartram_burst()
 - added prototypes for EVE_cmd_runanim(), EVE_cmd_runanim_burst()
 - added prototype for EVE_cmd_wait()
 - removed the history from before 4.0
-- added an enum with return codes to have the functions return something more meaningful
-- finally removed EVE_cmd_start() after setting it to deprecated with the first 5.0 release
+- added an enum with return codes to have the functions return something more meaningfull
+- finally removed EVE_cmd_start() after setting it to deprecatd with the first 5.0 release
 - renamed EVE_cmd_execute() to EVE_execute_cmd() to be more consistent, this is is not an EVE command
 - added the return-value of EVE_FIFO_HALF_EMPTY to EVE_busy() to indicate there is more than 2048 bytes available
 - removed the 4.0 history

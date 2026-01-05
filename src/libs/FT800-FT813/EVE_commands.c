@@ -46,7 +46,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 has EVE_PCLK_FREQ defined
 - replaced BT81X_ENABLE with "EVE_GEN > 2"
 - removed FT81X_ENABLE as FT81x already is the lowest supported chip revision now
-- removed the formerly as deprecated marked EVE_get_touch_tag()
+- removed the formerly as deprected marked EVE_get_touch_tag()
 - changed EVE_color_rgb() to use a 32 bit value like the rest of the color commands
 - removed the meta-commands EVE_cmd_point(), EVE_cmd_line() and EVE_cmd_rect()
 - split all display-list commands into two functions: EVE_cmd_XXX() and EVE_cmd_XXX_burst()
@@ -89,7 +89,7 @@ lists
     but only for 8-Bit controllers
 - changed EVE_memRead8(), EVE_memRead16() and EVE_memRead32() to use
     spi_transmit_32() for the initial address+zero byte transfer
-    This speeds up ESP32/ESP8266 by several us, has no measurable effect
+    This speeds up ESP32/ESP8266 by several us, has no measureable effect
     for ATSAMD51 and is a little slower for AVR.
 - Bugfix: not sure why but setting private_block_write() to static broke it, without "static" it works
 - Bugfix: EVE_cmd_flashspirx() was using CMD_FLASHREAD
@@ -104,19 +104,19 @@ an issue but not correct either.
 - fixed a few cppcheck warnings
 - fixed a few CERT warnings
 - converted all TABs to SPACEs
-- made EVE_TOUCH_RZTHRESH in EVE_init() optional to a) remove it from EVE_config.h and b) make it configurable
+- made EVE_TOUCH_RZTHRESH in EVE_init() optional to a) remove it from EVE_config.h and b) make it configureable
 externally
 - changed EVE_init() to write 1200U to REG_TOUCH_RZTHRESH if EVE_TOUCH_RZTHRESH is not defined
-- changed EVE_init() to return E_OK = 0x00 in case of success and more meaningful values in case of failure
+- changed EVE_init() to return E_OK = 0x00 in case of success and more meaningfull values in case of failure
 - changed EVE_busy() to return EVE_IS_BUSY if EVE is busy and E_OK = 0x00 if EVE is not busy - no real change in
 functionality
-- finally removed EVE_cmd_start() after setting it to deprecated with the first 5.0 release
+- finally removed EVE_cmd_start() after setting it to deprecatd with the first 5.0 release
 - renamed EVE_cmd_execute() to EVE_execute_cmd() to be more consistent, this is is not an EVE command
-- changed EVE_init_flash() to return E_OK in case of success and more meaningful values in case of failure
+- changed EVE_init_flash() to return E_OK in case of success and more meaningfull values in case of failure
 - added the return-value of EVE_FIFO_HALF_EMPTY to EVE_busy() to indicate there is more than 2048 bytes available
 - minor cleanup, less break and else statements
 - added the burst code back into all the functions for which there is a _burst version, this allows to use the version
-without the trailing _burst in the name when execution speed is not an issue - e.g. with all targets supporting DMA
+without the traling _burst in the name when exceution speed is not an issue - e.g. with all targets supporting DMA
 - removed the 4.0 history
 - added the optional parameter EVE_ROTATE as define to EVE_init() to allow for screen rotation during init
     thanks for the idea to AndrejValand on Github!
@@ -140,7 +140,7 @@ without the trailing _burst in the name when execution speed is not an issue - e
 - Bugfix: EVE_init() did not set the audio engine to "mute" as intended, but to "silent"
 - Bugfix: EVE_busy() returns E_NOT_OK now on coprocessor faults.
     thanks for the report to Z0ld3n on Github!
-- Fix: reworked EVE_busy() to return EVE_FAULT_RECOVERED on detected coprocessor faults,
+- Fix: reworked EVE_busy() to return EVE_FAULT_RECOVERED on deteced coprocessor faults,
     removed the flash commands from the fault recovery sequence as these are project specific.
 - added EVE_get_and_reset_fault_state() to check if EVE_busy() triggered a fault recovery
 - added notes on how to use to EVE_cmd_setfont2() and EVE_cmd_romfont()
@@ -1299,7 +1299,7 @@ uint8_t EVE_init_flash(void)
 
     status = EVE_memRead8(REG_FLASH_STATUS); /* should be 0x02 - FLASH_STATUS_BASIC, power-up is done and the attached flash is detected */
 
-     /* we are somehow still in init, give it a little more time, this should never happen */
+     /* we are somehow still in init, give it a litte more time, this should never happen */
     while (EVE_FLASH_STATUS_INIT == status)
     {
         status = EVE_memRead8(REG_FLASH_STATUS);
@@ -1470,7 +1470,7 @@ const uint8_t eve_gt911_data[1184U] PROGMEM =
 
 /**
  * @brief Waits for either reading REG_ID with a value of 0x7c, indicating that
- *  an EVE chip is present and ready to communicate, or until a timeout of 400ms has passed.
+ *  an EVE chip is present and ready to communicate, or untill a timeout of 400ms has passed.
  * @return Returns E_OK in case of success, EVE_FAIL_REGID_TIMEOUT if the
  * value of 0x7c could not be read.
  */
@@ -1497,7 +1497,7 @@ static uint8_t wait_regid(void)
 /**
  * @brief Waits for either REG_CPURESET to indicate that the audio, touch and
  * coprocessor units finished their respective reset cycles,
- * or until a timeout of 50ms has passed.
+ * or untill a timeout of 50ms has passed.
  * @return Returns E_OK in case of success, EVE_FAIL_RESET_TIMEOUT if either the
  * audio, touch or coprocessor unit indicate a fault by not returning from reset.
  */

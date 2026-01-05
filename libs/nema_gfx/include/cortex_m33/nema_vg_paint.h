@@ -27,7 +27,7 @@
 
 /**
  * @file
- * @brief Paint operation related functions. Paint is an internal (opaque) struct of NemaVG.
+ * @brief Paint operation related fuctions. Paint is an internal (opaque) struct of NemaVG.
  * The functions defined here can be used access its parameters.
  *
  */

@@ -2317,7 +2317,7 @@ _convert_circle_arc(
     else {
         theta_span = _Angle(EndX - CenterX, EndY - CenterY, Radius) - theta1;
         if(theta_span == 0.0f) {
-            /* Handle special case for huge scaling. */
+            /* Handle specail case for huge scaling. */
             *point_list = NULL;
             error = VG_LITE_SUCCESS;
             return error;
@@ -3002,13 +3002,13 @@ _close_stroke_sub_path(
         stroke_conversion->left_point->y = last_stroke_point->y;
     }
 
-    /* Adjust the two end points of the first point. */
+    /* Adjust the two end ponts of the first point. */
     first_stroke_point->x = stroke_conversion->right_point->x;
     first_stroke_point->y = stroke_conversion->right_point->y;
     last_stroke_point->x = stroke_conversion->left_point->x;
     last_stroke_point->y = stroke_conversion->left_point->y;
 
-    /* Concatenate right and left point lists. */
+    /* Concatnate right and left point lists. */
     stroke_conversion->right_point->next = stroke_conversion->left_point;
     stroke_conversion->left_point->prev = stroke_conversion->right_point;
 

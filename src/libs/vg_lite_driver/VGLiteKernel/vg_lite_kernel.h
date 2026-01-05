@@ -120,25 +120,25 @@ extern "C" {
     successful. This value is set to zero, so if any function returns a non-zero value, an error has occurred.
     */
 typedef enum vg_lite_error {
-    VG_LITE_SUCCESS = 0,          /*! Success.                                          */
-    VG_LITE_INVALID_ARGUMENT,     /*! An invalid argument was specified.                */
-    VG_LITE_OUT_OF_MEMORY,        /*! Out of GPU memory                                 */
-    VG_LITE_NO_CONTEXT,           /*! No context or an uninitialized context specified. */
-    VG_LITE_TIMEOUT,              /*! A timeout has occurred during a wait.             */
-    VG_LITE_OUT_OF_RESOURCES,     /*! Out of system resources.                          */
-    VG_LITE_GENERIC_IO,           /*! Cannot communicate with the kernel driver.        */
-    VG_LITE_NOT_SUPPORT,          /*! Function call not supported.                      */
-    VG_LITE_ALREADY_EXISTS,       /*! Object already exists                             */
-    VG_LITE_NOT_ALIGNED,          /*! Data alignment error                              */
-    VG_LITE_FLEXA_TIME_OUT,       /*! VG timeout requesting for segment buffer          */
-    VG_LITE_FLEXA_HANDSHAKE_FAIL, /*! VG and SBI synchronizer handshake failed          */
-    VG_LITE_SYSTEM_CALL_FAIL,     /*! kernel api call fail                              */
+    VG_LITE_SUCCESS = 0,          /*! Success.                                         */
+    VG_LITE_INVALID_ARGUMENT,     /*! An invalid argument was specified.               */
+    VG_LITE_OUT_OF_MEMORY,        /*! Out of GPU memory                                */
+    VG_LITE_NO_CONTEXT,           /*! No context or an unintialized context specified. */
+    VG_LITE_TIMEOUT,              /*! A timeout has occurred during a wait.            */
+    VG_LITE_OUT_OF_RESOURCES,     /*! Out of system resources.                         */
+    VG_LITE_GENERIC_IO,           /*! Cannot communicate with the kernel driver.       */
+    VG_LITE_NOT_SUPPORT,          /*! Function call not supported.                     */
+    VG_LITE_ALREADY_EXISTS,       /*! Object already exists                            */
+    VG_LITE_NOT_ALIGNED,          /*! Data alignment error                             */
+    VG_LITE_FLEXA_TIME_OUT,       /*! VG timeout requesting for segment buffer         */
+    VG_LITE_FLEXA_HANDSHAKE_FAIL, /*! VG and SBI synchronizer handshake failed         */
+    VG_LITE_SYSTEM_CALL_FAIL,     /*! kernel api call fail                             */
 }
 vg_lite_error_t;
 #endif
 
 typedef enum vg_lite_kernel_counter {
-    /* Don't touch the counter. */
+    /* Dont't touch the counter. */
     VG_LITE_NONE,
 
     /* Turn the counter on. */
@@ -319,13 +319,13 @@ typedef struct vg_lite_kernel_initialize {
     /* GPU address for command buffer. */
     uint32_t command_buffer_gpu[CMDBUF_COUNT];
 
-    /* GPU addresses for tessellation buffers. */
+    /* GPU addresses for tesselation buffers. */
     uint32_t physical_addr;
 
     /* Logic addresses for tessellation buffers: used by SW Tessellator. */
     uint8_t * logical_addr;
 
-    /* Size of each level of the tessellation buffer. */
+    /* Size of each level of the tesselation buffer. */
     uint32_t tessbuf_size;
 
     /* Size of each level of the vg count buffer. */

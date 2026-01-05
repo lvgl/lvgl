@@ -282,7 +282,7 @@ int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t * v
 
 /*!
  @brief After call vg_lite_hal_map(), flush cpu cache according the direction
- specified by parameter cache_op.
+ spicified by parameter cache_op.
  */
 vg_lite_error_t vg_lite_hal_operation_cache(void * handle, vg_lite_cache_op_t cache_op);
 

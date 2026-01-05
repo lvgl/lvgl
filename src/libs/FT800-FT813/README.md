@@ -89,16 +89,16 @@ This library currently has nine files that I hope are named to make clear what t
 - EVE.h - this has all defines for FT81x / BT81x itself, so here are options, registers, commands and macros defined
 - EVE_commands.c - this has all the API functions that are to be called from an application
 - EVE_commands.h - this contains the prototypes for the functions in EVE_commands.c
-- EVE_config.h - this has all the parameters for the numerous supported display modules, here is defined which set of parameters is to be used
+- EVE_config.h - this has all the parameters for the numerous supported display modules, here is definded which set of parameters is to be used
 - EVE_target.c - this has non-portable specific code for a number of supported controllers, mostly to support DMA
 - EVE_target.h - this has non-portable pin defines and code as "static inline" functions for all supported controllers
 - EVE_target.cpp - this is for Arduino C++ targets
 - EVE_cpp_wrapper.cpp - this is for Arduino C++ targets
 - EVE_cpp_wrapper.h - this is for Arduino C++ targets
 
-Additionally there are these two:
+Addtionally there are these two:
 - EVE_supplemental.c
-- EVE_supplemental.h
+- EVE_suppplemental.h
 
 This has the prototype and implementation for extra functions, so far:
 - EVE_widget_circle() - widget function to draw a circle
@@ -146,7 +146,7 @@ The final EVE_end_cmd_burst() either pulls back the chip-select to high.
 Or if we have DMA it calls EVE_start_dma_transfer() to start pushing out the buffer in the background.
 
 As we have 7 commands for EVE in these simple examples, the second one has the address overhead removed from six commands and therefore needs to transfer 18 bytes less over SPI.  
-So even with a small 8-bit controller that does not support DMA this is a useful optimization for building display lists.
+So even with a small 8-bit controller that does not support DMA this is a usefull optimization for building display lists.
 
 Using DMA has one caveat: we need to limit the transfer to <4k as we are writing to the FIFO of EVEs command co-processor. This is usually not an issue though as we can shorten the display list generation with previously generated snippets that we attach to the current list with CMD_APPEND. And when we use widgets like CMD_BUTTON or CMD_CLOCK the generated display list grows by a larger amount than what we need to put into the command-FIFO so we likely reach the 8k limit of the display-list before we hit the 4k limit of the command-FIFO.
 It is possible to use two or more DMA transfers to the FIFO to build a single display list, either to get around the 4k limit of the FIFO or in order to distribute the workload better of the time necessary between two display renewals.
@@ -220,10 +220,10 @@ The desired TFT is selected by adding a define for it to the build-environment, 
 There is a list of available options at the start of EVE_config.h sorted by chipset.
 
 The pins used for Chip-Select and Power-Down setup in the EVE_target/EVE_target_XXXXX.h file for your target with defines and these defines can be bypassed with defines in the build-environment.  
-Check the appropriate header file for your desired target.
+Check the apropriate header file for your desired target.
 
 When compiling for AVR you need to provide the clock it is running at in order to make the _delay_ms() calls used to initialize the TFT work with the intended timing.
-For other platforms you need to provide a DELAY_MS(ms) function that works at least between 1ms and 56ms and is not performing these delays shorter than requested.
+For other plattforms you need to provide a DELAY_MS(ms) function that works at least between 1ms and 56ms and is not performing these delays shorter than requested.
 The DELAY_MS(ms) is only used during initialization of the FT8xx/BT8xx.
 
 In Addition you need to initialize the pins used for Chip-Select and Power-Down in your hardware correctly to output.

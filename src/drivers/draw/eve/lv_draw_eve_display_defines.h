@@ -35,7 +35,7 @@ extern "C" {
 #define LV_EVE_EVE_CMDFIFO_SIZE ((uint32_t) 4U*1024UL)
 #define LV_EVE_EVE_RAM_DL_SIZE  ((uint32_t) 8U*1024UL)
 
-/* display list list commands, most need OR's arguments */
+/* display list commands, most need OR's arguments */
 #define LV_EVE_DL_DISPLAY       ((uint32_t) 0x00000000UL)
 #define LV_EVE_DL_BITMAP_SOURCE ((uint32_t) 0x01000000UL)
 #define LV_EVE_DL_CLEAR_COLOR_RGB ((uint32_t) 0x02000000UL)

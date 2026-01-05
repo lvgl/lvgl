@@ -27,7 +27,7 @@
 
 /**
  * @file
- * @brief Path operation related functions
+ * @brief Path operation related fuctions
  *
  */
 
