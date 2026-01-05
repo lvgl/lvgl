@@ -31,13 +31,15 @@ jobs:
           prerelease: false
 
 
-      # --- New Step: Remove large folders and create a lite zip ---
+      # Remove large folders and create a lite zip
       - name: Prepare Lite Package
         run: |
           echo "Preparing lite package in a temporary directory..."
           
           # Create a temporary directory for the lite package contents
-          mkdir -p lite
+          FOLDER_NAME="lvgl-${{ github.ref_name }}-lite"
+          ZIP_NAME="$FOLDER_NAME.zip"
+          mkdir -p $FOLDER_NAME
           
           echo "Copying files to lite directory (excluding large/unnecessary folders)..."
           rsync -av \
@@ -48,20 +50,15 @@ jobs:
             --exclude='scripts' \
             --exclude='docs' \
             --exclude='examples' \
-            ./ lite/
+            ./ $FOLDER_NAME
           
-          # Define the output filename using the tag (e.g., lvgl-lite-v9.3.0.zip)
-          ZIP_NAME="lvgl-lite-${{ github.ref_name }}.zip"
-          
-          echo "Zipping lite directory..."
-          # Create the zip from inside the lite directory, outputting to the repository root
-          cd lite
-          zip -r "../$ZIP_NAME" . 
+          # Create a zip with lvgl-lite directory as its root directory
+          zip -r "$ZIP_NAME" $FOLDER_NAME 
           
           # Export the variable for the next step
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
-      # --- New Step: Upload the lite zip to the release ---
+      # Upload the lite zip to the release
       - name: Upload Lite Asset
         uses: softprops/action-gh-release@v2
         env:
