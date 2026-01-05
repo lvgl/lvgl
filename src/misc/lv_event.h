@@ -245,6 +245,19 @@ uint32_t lv_event_register_id(void);
  */
 const char * lv_event_code_get_name(lv_event_code_t code);
 
+#if LV_USE_EXT_DATA
+/**
+ * Set external data and its destructor for an event descriptor.
+ * This allows associating custom data with an event callback that will be automatically cleaned up
+ * when the event descriptor is removed or destroyed.
+ * @param dsc         pointer to an event descriptor (from lv_obj_add_event_cb)
+ * @param data        pointer to the external data to associate with the event descriptor
+ * @param free_cb     function pointer to a destructor that will be called to clean up the external data.
+ *                    The destructor will receive the data pointer as its parameter.
+ */
+void lv_event_desc_set_external_data(lv_event_dsc_t * dsc, void * data, void (* free_cb)(void * data));
+#endif
+
 /**********************
  *      MACROS
  **********************/

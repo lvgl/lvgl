@@ -67,6 +67,10 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
     group->user_data      = NULL;
+#if LV_USE_EXT_DATA
+    group->ext_data.free_cb = NULL;
+    group->ext_data.data = NULL;
+#endif
 
     return group;
 }
@@ -100,6 +104,12 @@ void lv_group_delete(lv_group_t * group)
 
     lv_ll_clear(&(group->obj_ll));
     lv_ll_remove(group_ll_p, group);
+#if LV_USE_EXT_DATA
+    if(group->ext_data.free_cb) {
+        group->ext_data.free_cb(group->ext_data.data);
+        group->ext_data.data = NULL;
+    }
+#endif
     lv_free(group);
 }
 
@@ -410,6 +420,32 @@ lv_group_t  * lv_group_by_index(uint32_t index)
 
     return NULL;
 }
+
+#if LV_USE_EXT_DATA
+void lv_group_set_external_data(lv_group_t * group, void * data, void (* free_cb)(void * data))
+{
+    if(!group) {
+        LV_LOG_WARN("Can't attach external user data and destructor callback to a NULL group");
+        return;
+    }
+
+    group->ext_data.data = data;
+    group->ext_data.free_cb = free_cb;
+}
+#endif
+
+void lv_group_set_user_data(lv_group_t * group, void * user_data)
+{
+    if(group == NULL) return;
+    group->user_data = user_data;
+}
+
+void * lv_group_get_user_data(const lv_group_t * group)
+{
+    if(group == NULL) return NULL;
+    return group->user_data;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

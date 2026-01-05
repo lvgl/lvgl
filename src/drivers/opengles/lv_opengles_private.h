@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
+
 #if LV_USE_OPENGLES
 
 #include "../../misc/lv_area.h"
@@ -24,11 +25,12 @@ extern "C" {
 #include "glad/include/glad/gles2.h"
 #include "glad/include/glad/egl.h"
 #else
-/* For now, by default we add glew and glfw.
-   In the future we need to consider adding a config for setting these includes*/
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "glad/include/glad/gl.h"
 #endif /*LV_USE_EGL*/
+
+#if LV_USE_GLFW
+#include <GLFW/glfw3.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -79,6 +81,10 @@ extern "C" {
 #define GL_RGBA8 0x8058
 #endif
 
+#if !defined(glClearDepthf) && defined(glClearDepth)
+#define glClearDepthf glClearDepth
+#endif
+
 #ifndef LV_GL_PREFERRED_DEPTH
 #ifdef GL_DEPTH_COMPONENT24
 #define LV_GL_PREFERRED_DEPTH GL_DEPTH_COMPONENT24
@@ -105,7 +111,32 @@ extern "C" {
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt);
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB);
+
+
+/**
+ * Render a texture using alternate blending mode, with red and blue channels flipped in the shader.
+ * @param texture        OpenGL texture ID
+ * @param texture_area   the area in the window to render the texture in
+ * @param opa            opacity to blend the texture with existing contents
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
+ * @param h_flip         horizontal flip
+ * @param v_flip         vertical flip
+ */
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
+                                       bool h_flip, bool v_flip);
+
+/**
+ * Set the OpenGL viewport, with vertical co-ordinate conversion
+ * @param x        x position of the viewport
+ * @param y        y position of the viewport
+ * @param w        width of the viewport
+ * @param h        height of the viewport
+ */
+void lv_opengles_regular_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
+
 
 /**********************
  *      MACROS

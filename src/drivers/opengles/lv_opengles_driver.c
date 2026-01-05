@@ -86,8 +86,8 @@ static unsigned int index_buffer_count = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_Hue", "u_Saturation", "u_Value" };
-static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa", "u_IsFill", "u_FillColor", "u_SwapRB", "u_Hue", "u_Saturation", "u_Value" };
+static int shader_location[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**********************
  *      MACROS
@@ -146,17 +146,26 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
-                       lv_color_black(), false);
+                       lv_color_black(), false, false);
+    LV_PROFILER_DRAW_END;
+}
+
+void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
+                                       int32_t disp_w,
+                                       int32_t disp_h, const lv_area_t * texture_clip_area, bool h_flip, bool v_flip)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    lv_opengles_render(texture, texture_area, opa, disp_w, disp_h, texture_clip_area, h_flip, v_flip,
+                       lv_color_black(), false, true);
     LV_PROFILER_DRAW_END;
 }
 
 void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false);
+    lv_opengles_render(0, area, opa, disp_w, disp_h, area, false, false, color, false, true);
     LV_PROFILER_DRAW_END;
 }
-
 void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, bool v_flip)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -190,6 +199,7 @@ void lv_opengles_render_display_texture(lv_display_t * display, bool h_flip, boo
     lv_opengles_shader_set_uniform1f("u_Opa", 1);
     lv_opengles_shader_set_uniform1i("u_IsFill", 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", 1.0f, 1.0f, 1.0f);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", 1);
 
     lv_opengles_render_draw();
     LV_PROFILER_DRAW_END;
@@ -211,7 +221,7 @@ void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt)
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool swap_red_blue)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_area_t intersection;
@@ -258,6 +268,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
         hor_translate, ver_translate, 1.0f
     };
 
+
     lv_opengles_shader_bind();
     lv_opengles_enable_blending(blend_opt);
     lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
@@ -267,6 +278,8 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
     lv_opengles_shader_set_uniform1i("u_IsFill", texture == 0);
     lv_opengles_shader_set_uniform3f("u_FillColor", (float)fill_color.red / 255.0f, (float)fill_color.green / 255.0f,
                                      (float)fill_color.blue / 255.0f);
+    lv_opengles_shader_set_uniform1i("u_SwapRB", swap_red_blue ? 1 : 0);
+
     lv_opengles_render_draw();
     lv_opengles_disable_blending();
     LV_PROFILER_DRAW_END;
@@ -380,45 +393,31 @@ static void lv_opengles_index_buffer_unbind(void)
 
 static unsigned int lv_opengles_shader_manager_init(void)
 {
-    lv_opengl_shader_program_t * program  = NULL;
-    for(lv_opengl_glsl_version version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
+    for(lv_opengl_glsl_version_t version = LV_OPENGL_GLSL_VERSION_300ES; version < LV_OPENGL_GLSL_VERSION_LAST; ++version) {
         LV_LOG_INFO("Trying GLSL version %s", lv_opengles_glsl_version_to_string(version));
-        lv_opengl_shader_portions_t portions;
-        lv_opengles_shader_get_source(&portions, version);
-        char * vertex_shader = lv_opengles_shader_get_vertex(version);
-        char * frag_shader = lv_opengles_shader_get_fragment(version);
-        lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
-        lv_free(vertex_shader);
-        lv_free(frag_shader);
+        {
+            /* Initialize the shader manager*/
+            lv_opengl_shader_portions_t portions;
+            lv_opengles_shader_get_source(&portions, version);
+            char * vertex_shader = lv_opengles_shader_get_vertex(version);
+            char * frag_shader = lv_opengles_shader_get_fragment(version);
+            lv_opengl_shader_manager_init(&shader_manager, portions.all, portions.count, vertex_shader, frag_shader);
+            lv_free(vertex_shader);
+            lv_free(frag_shader);
+        }
 
-        uint32_t frag_shader_hash;
-        uint32_t vert_shader_hash;
-
-        lv_result_t res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.frag", NULL, 0, version,
-                                                                 &frag_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
+        lv_opengl_shader_params_t frag_shader = {.name = "__MAIN__.frag"};
+        lv_opengl_shader_params_t vert_shader = {.name = "__MAIN__.vert"};
+        lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program(&shader_manager, &frag_shader,
+                                                                                        &vert_shader, version);
+        if(program) {
+            LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
+            return lv_opengl_shader_program_get_id(program);
         }
-        res = lv_opengl_shader_manager_select_shader(&shader_manager, "__MAIN__.vert", NULL, 0, version, &vert_shader_hash);
-        if(res != LV_RESULT_OK) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        program = lv_opengl_shader_manager_get_program(&shader_manager, frag_shader_hash, vert_shader_hash);
-        if(!program) {
-            lv_opengl_shader_manager_deinit(&shader_manager);
-            continue;
-        }
-        LV_LOG_INFO("Compiled shaders with version %s", lv_opengles_glsl_version_to_string(version));
-        break;
+        lv_opengl_shader_manager_deinit(&shader_manager);
     }
-
-    if(!program) {
-        LV_LOG_ERROR("Failed to initialize shaders");
-        return 0;
-    }
-    return lv_opengl_shader_program_get_id(program);
+    LV_LOG_ERROR("Failed to initialize shaders");
+    return 0;
 }
 
 static lv_result_t lv_opengles_shader_init(void)

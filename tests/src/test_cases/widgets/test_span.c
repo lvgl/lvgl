@@ -603,4 +603,45 @@ void test_spangroup_less_letter_overflow(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_15.png");
 }
 
+void test_span_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_spangroup_create(lv_screen_active());
+
+    lv_property_t prop = { };
+
+    /* Test ALIGN property */
+    prop.id = LV_PROPERTY_SPAN_ALIGN;
+    prop.num = LV_TEXT_ALIGN_CENTER;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_TEXT_ALIGN_CENTER, lv_obj_get_property(obj, LV_PROPERTY_SPAN_ALIGN).num);
+
+    /* Test OVERFLOW property */
+    prop.id = LV_PROPERTY_SPAN_OVERFLOW;
+    prop.num = LV_SPAN_OVERFLOW_ELLIPSIS;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SPAN_OVERFLOW_ELLIPSIS, lv_obj_get_property(obj, LV_PROPERTY_SPAN_OVERFLOW).num);
+
+    /* Test INDENT property */
+    prop.id = LV_PROPERTY_SPAN_INDENT;
+    prop.num = 20;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(20, lv_obj_get_property(obj, LV_PROPERTY_SPAN_INDENT).num);
+
+    /* Test MODE property */
+    prop.id = LV_PROPERTY_SPAN_MODE;
+    prop.num = LV_SPAN_MODE_BREAK;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SPAN_MODE_BREAK, lv_obj_get_property(obj, LV_PROPERTY_SPAN_MODE).num);
+
+    /* Test MAX_LINES property */
+    prop.id = LV_PROPERTY_SPAN_MAX_LINES;
+    prop.num = 3;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(3, lv_obj_get_property(obj, LV_PROPERTY_SPAN_MAX_LINES).num);
+
+    lv_obj_delete(obj);
+#endif
+}
+
 #endif

@@ -84,6 +84,12 @@ const lv_obj_class_t lv_gltf_class = {
  *  STATIC VARIABLES
  **********************/
 
+static const lv_opengl_glsl_version_t GLSL_VERSIONS[] = {
+    LV_OPENGL_GLSL_VERSION_300ES,
+    LV_OPENGL_GLSL_VERSION_330,
+};
+static const size_t GLSL_VERSION_COUNT = sizeof(GLSL_VERSIONS) / sizeof(GLSL_VERSIONS[0]);
+
 /**********************
  *      MACROS
  **********************/
@@ -688,8 +694,8 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_gltf_view_state_init(lv_gltf_t * view)
 {
     lv_memset(&view->state, 0, sizeof(view->state));
-    view->state.opaque_frame_buffer_width = 256;
-    view->state.opaque_frame_buffer_height = 256;
+    view->state.opaque_frame_buffer_width = LV_GLTF_TRANSMISSION_PASS_SIZE;
+    view->state.opaque_frame_buffer_height = LV_GLTF_TRANSMISSION_PASS_SIZE;
     view->state.material_variant = 0;
     view->state.render_state_ready = false;
     view->state.render_opaque_buffer = false;
@@ -762,10 +768,30 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                 lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &model_primitive);
 
             LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
-            lv_gltf_compiled_shader_t compiled_shader;
-            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_opengl_shader_define_t *)defines.data,
-                                                                            lv_array_size(&defines));
-            compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
+
+            lv_opengl_shader_params_t frag_shader = {.name = "__MAIN__.frag",
+                                                     .permutations = (lv_opengl_shader_define_t *) defines.data,
+                                                     .permutations_len = lv_array_size(&defines)
+                                                    };
+
+            lv_opengl_shader_params_t vert_shader = {.name = "__MAIN__.vert",
+                                                     .permutations = (lv_opengl_shader_define_t *) defines.data,
+                                                     .permutations_len = lv_array_size(&defines)
+                                                    };
+
+            lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program_best_version(&viewer->shader_manager,
+                                                                                                         &frag_shader,
+                                                                                                         &vert_shader, GLSL_VERSIONS, GLSL_VERSION_COUNT);
+            LV_ASSERT_MSG(program != NULL,
+                          "Failed to link program. This probably means your platform doesn't support a required GLSL version");
+            GLuint program_id = lv_opengl_shader_program_get_id(program);
+            GL_CALL(glUseProgram(program_id));
+
+            lv_gltf_compiled_shader_t compiled_shader = {
+                .uniforms = lv_gltf_uniform_locations_create(program_id),
+                .program = program_id,
+            };
+
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
             const size_t n = lv_array_size(&defines);
             for(size_t i = 0; i < n; ++i) {

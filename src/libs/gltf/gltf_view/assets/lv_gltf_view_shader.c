@@ -1098,7 +1098,7 @@ static const lv_opengl_shader_t src_includes[] = {
         vec3 getTransmissionSample(vec2 fragCoord, float roughness, float ior)
         {
             float framebufferLod = log2(float(u_TransmissionFramebufferSize.x)) * applyIorToRoughness(roughness, ior);
-            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).rgb;
+            vec3 transmittedLight = textureLod(u_TransmissionFramebufferSampler, fragCoord.xy, framebufferLod).bgr; // r/b switched intentionally;
 
             return transmittedLight;
         }
@@ -1257,7 +1257,7 @@ static const lv_opengl_shader_t src_includes[] = {
         uniform ivec2 u_ScreenSize;
         #endif
 
-        uniform mat4 u_ModelMatrix;
+        uniform highp mat4 u_ModelMatrix;
         uniform mat4 u_ViewMatrix;
         uniform mat4 u_ProjectionMatrix;
 
@@ -2553,12 +2553,13 @@ static const lv_opengl_shader_t src_includes[] = {
             baseColor.a = 1.0;
         #endif
 
+        // The red and blue channels are switched after any tonemapping
+        // They will be switched back the correct way by the 2D shader
         #ifdef LINEAR_OUTPUT
-            g_finalColor = vec4(color.rgb, baseColor.a);
+            g_finalColor = vec4(color.bgr, baseColor.a);
         #else
-            g_finalColor = vec4(toneMap(color), baseColor.a);
+            g_finalColor = vec4(toneMap(color).bgr, baseColor.a);
         #endif
-
 
             /*
         #else
@@ -3409,7 +3410,7 @@ static const lv_opengl_shader_t env_src_includes[] = {
 
 static const char * src_vertex_shader = R"(
     uniform mat4 u_ViewProjectionMatrix;
-    uniform mat4 u_ModelMatrix;
+    uniform highp mat4 u_ModelMatrix;
     uniform mat4 u_NormalMatrix;
 
     in vec3 a_position;

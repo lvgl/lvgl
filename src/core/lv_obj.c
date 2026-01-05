@@ -151,6 +151,14 @@ static const lv_property_ops_t lv_obj_properties[] = {
         .getter = lv_obj_get_scroll_snap_y,
     },
     {
+        .id = LV_PROPERTY_OBJ_SCROLL_X,
+        .getter = lv_obj_get_scroll_x,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_Y,
+        .getter = lv_obj_get_scroll_y,
+    },
+    {
         .id = LV_PROPERTY_OBJ_SCROLL_TOP,
         .getter = lv_obj_get_scroll_top,
     },
@@ -848,11 +856,38 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         void * param = lv_event_get_param(e);
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
-            else lv_obj_remove_state(obj, LV_STATE_CHECKED);
 
-            lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RESULT_OK) return;
+            bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
+            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
+                lv_obj_add_state(obj, LV_STATE_CHECKED);
+            }
+            /*Radio buttons can't be checked off directly*/
+            else if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_RADIO_BUTTON)) {
+                lv_obj_remove_state(obj, LV_STATE_CHECKED);
+            }
+            if(was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+                lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RESULT_OK) return;
+            }
+        }
+    }
+    else if(code == LV_EVENT_VALUE_CHANGED) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_RADIO_BUTTON) && lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+            lv_obj_t * parent = lv_obj_get_parent(obj);
+            if(parent) {
+                uint32_t child_cnt = lv_obj_get_child_count(parent);
+                uint32_t i;
+                for(i = 0; i < child_cnt; i++) {
+                    lv_obj_t * sibling = lv_obj_get_child(parent, i);
+                    if(obj == sibling) continue;
+
+                    if(lv_obj_has_flag(sibling, LV_OBJ_FLAG_RADIO_BUTTON) && lv_obj_has_state(sibling, LV_STATE_CHECKED)) {
+                        lv_obj_remove_state(sibling, LV_STATE_CHECKED);
+                        lv_result_t res = lv_obj_send_event(sibling, LV_EVENT_VALUE_CHANGED, NULL);
+                        if(res != LV_RESULT_OK) return;
+                    }
+                }
+            }
         }
     }
     else if(code == LV_EVENT_PRESS_LOST) {
@@ -868,15 +903,19 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             uint32_t c = lv_event_get_key(e);
+            bool was_checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
             else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-                lv_obj_remove_state(obj, LV_STATE_CHECKED);
+                /*Radio buttons can't be checked off directly*/
+                if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_RADIO_BUTTON)) {
+                    lv_obj_remove_state(obj, LV_STATE_CHECKED);
+                }
             }
 
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
-            if(c != LV_KEY_ENTER) {
+            if(c != LV_KEY_ENTER && was_checked != lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                 lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RESULT_OK) return;
             }

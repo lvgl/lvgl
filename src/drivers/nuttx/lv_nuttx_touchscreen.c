@@ -17,11 +17,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <debug.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <nuttx/input/touchscreen.h>
 #include "../../lvgl_private.h"
+
+#ifdef __NuttX__
+    #include <debug.h>
+    #include <nuttx/input/touchscreen.h>
+#else
+    #include "mock/nuttx_input_touchscreen.h"
+#endif
 
 /*********************
  *      DEFINES

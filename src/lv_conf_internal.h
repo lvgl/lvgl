@@ -4503,6 +4503,15 @@
     #endif
 #endif
 
+/** Enable or disable for external data and destructor function */
+#ifndef LV_USE_EXT_DATA
+    #ifdef CONFIG_LV_USE_EXT_DATA
+        #define LV_USE_EXT_DATA CONFIG_LV_USE_EXT_DATA
+    #else
+        #define LV_USE_EXT_DATA   0
+    #endif
+#endif
+
 /*=====================
 * BUILD OPTIONS
 *======================*/
@@ -4798,6 +4807,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
+    #define LV_USE_DEMO_GLTF            0
 #endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4

@@ -26,6 +26,13 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_line_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_line_id_t {
+    LV_PROPERTY_ID(LINE, Y_INVERT, LV_PROPERTY_TYPE_BOOL, 0),
+    LV_PROPERTY_LINE_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

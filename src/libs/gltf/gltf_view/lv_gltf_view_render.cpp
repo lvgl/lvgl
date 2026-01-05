@@ -275,7 +275,7 @@ static GLuint lv_gltf_view_render_model(lv_gltf_t * viewer, lv_gltf_model_t * mo
     }
     std::sort(distance_sort_nodes.begin(), distance_sort_nodes.end(),
     [](const NodeIndexDistancePair & a, const NodeIndexDistancePair & b) {
-        return a.first < b.first;
+        return a.first > b.first;
     });
 
     /* Reset the last material index to an unused value once per frame at the start*/
@@ -474,7 +474,7 @@ static bool setup_primitive(int32_t prim_num, lv_gltf_t * viewer, lv_gltf_model_
     model->last_material_index = materialIndex;
     model->last_pass_was_transmission = is_transmission_pass;
 
-    const GLuint program = compiled_shader->shaderset.program;
+    const GLuint program = compiled_shader->program;
 
     GL_CALL(glUseProgram(program));
 
@@ -572,7 +572,9 @@ static bool draw_material(lv_gltf_t * viewer, const lv_gltf_uniform_locations_t 
         GL_CALL(glDisable(GL_CULL_FACE));
     if(gltfMaterial.alphaMode == fastgltf::AlphaMode::Blend) {
         GL_CALL(glEnable(GL_BLEND));
-        GL_CALL(glDepthMask(GL_FALSE));
+        if(!is_transmission_pass) {
+            GL_CALL(glDepthMask(GL_FALSE));
+        }
         GL_CALL(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
         GL_CALL(glBlendEquation(GL_FUNC_ADD));
         GL_CALL(glEnable(GL_CULL_FACE));
@@ -1037,8 +1039,8 @@ static void setup_view_proj_matrix_from_camera(lv_gltf_t * viewer, uint32_t came
 
     float aspect = (float)width / (float)height;
     if(transmission_pass) {
-        width = 256;
-        height = 256;
+        width = LV_GLTF_TRANSMISSION_PASS_SIZE;
+        height = LV_GLTF_TRANSMISSION_PASS_SIZE;
     }
 
     std::visit(fastgltf::visitor{
@@ -1207,8 +1209,10 @@ static void setup_draw_environment_background(lv_opengl_shader_manager_t * manag
 static void setup_draw_solid_background(lv_gltf_t * viewer, lv_color_t bg_color, lv_opa_t bg_opa)
 {
     GL_CALL(glClearDepthf(1.0f));
-    GL_CALL(glClearColor((float)bg_color.red / 255.0f, (float)bg_color.green / 255.0f,
-                         (float)bg_color.blue / 255.0f, (float)bg_opa / 255.0f));
+    /* Red / blue color order reversed below so they'll end up in the correct order
+     * after the shader swaps the channels again, back to correct. */
+    GL_CALL(glClearColor((float)bg_color.blue / 255.0f, (float)bg_color.green / 255.0f,
+                         (float)bg_color.red / 255.0f, (float)bg_opa / 255.0f));
 
     GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
@@ -1238,6 +1242,8 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                                                 localmatrix);
             made_changes = true;
         }
+        bool worldmatrix_was_inlined = false;
+        fastgltf::math::fmat4x4 inlined_worldmatrix;
         const uint32_t write_ops_count = lv_array_size(&node->write_ops);
         if(node->read_attrs || write_ops_count > 0) {
             fastgltf::math::fvec3 local_pos;
@@ -1264,13 +1270,17 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
             }
 
             /* Rebuild the local matrix after applying all write operations*/
-            localmatrix = fastgltf::math::scale(
-                              fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(), local_pos),
-                                                     made_rotation_changes ?
-                                                     lv_gltf_math_euler_to_quaternion(
-                                                         local_rot[0], local_rot[1], local_rot[2]) :
-                                                     local_quat),
-                              local_scale);
+            if(made_rotation_changes) local_quat = lv_gltf_math_euler_to_quaternion(local_rot[0], local_rot[1], local_rot[2]);
+
+            if(node->fastgltf_node->children.size() == 0) {
+                worldmatrix_was_inlined = true;
+                inlined_worldmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(
+                                                                                                                 parentworldmatrix), local_pos), local_quat), local_scale);
+            }
+            else {
+                localmatrix = fastgltf::math::scale(fastgltf::math::rotate(fastgltf::math::translate(fastgltf::math::fmat4x4(),
+                                                                                                     local_pos), local_quat), local_scale);
+            }
 
             if(node->read_attrs) {
                 bool value_changed = false;
@@ -1307,17 +1317,18 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
         }
 
         if(made_changes || !lv_gltf_data_has_cached_transform(model, node->fastgltf_node)) {
-            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, parentworldmatrix * localmatrix);
+            auto world_matrix = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
+            lv_gltf_data_set_cached_transform(model, node->fastgltf_node, world_matrix);
         }
 
         if(node->fastgltf_node->cameraIndex.has_value()) {
             current_camera_count++;
             if(current_camera_count == model->camera) {
-                fastgltf::math::fmat4x4 cammat = (parentworldmatrix * localmatrix);
-                model->view_pos[0] = cammat[3][0];
-                model->view_pos[1] = cammat[3][1];
-                model->view_pos[2] = cammat[3][2];
+                fastgltf::math::fmat4x4 cammat = worldmatrix_was_inlined ? inlined_worldmatrix : (parentworldmatrix * localmatrix);
+                fastgltf::removeScale(cammat);
+                model->view_pos = cammat.col(3);  /* Implicit conversion from 4 element column to 3 element vector */
                 model->view_mat = fastgltf::math::invert(cammat);
+
             }
         }
     });

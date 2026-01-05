@@ -20,6 +20,11 @@
 //===========================================================================
 #include "AnimatedGIF.h"
 
+#if LV_USE_GIF
+
+#include "../../../../misc/lv_log.h"
+#include "../../../../stdlib/lv_string.h"
+
 static const unsigned char cGIFBits[9] = {1,4,4,4,8,8,8,8,8}; // convert odd bpp values to ones we can handle
 
 // forward references
@@ -58,14 +63,28 @@ int GIF_openFile(GIFIMAGE *pGIF, const char *szFilename, GIF_DRAW_CALLBACK *pfnD
     pGIF->pfnDraw = pfnDraw;
     pGIF->pfnOpen = NULL;
     pGIF->pfnClose = closeFile;
-    if (LV_FS_RES_OK != lv_fs_open(&pGIF->GIFFile.fHandle, szFilename, LV_FS_MODE_RD))
-       return 0;
+
+    lv_fs_res_t res = lv_fs_open(&pGIF->GIFFile.fHandle, szFilename, LV_FS_MODE_RD);
+
+    if (res != LV_FS_RES_OK) {
+        pGIF->iError = GIF_FILE_NOT_OPEN;
+        LV_LOG_WARN("Failed to open file: %s, res: %d", szFilename, res);
+        return 0;
+    }
+
     lv_fs_seek(&pGIF->GIFFile.fHandle, 0, LV_FS_SEEK_END);
     uint32_t pos;
     lv_fs_tell(&pGIF->GIFFile.fHandle, &pos);
     pGIF->GIFFile.iSize = pos;
     lv_fs_seek(&pGIF->GIFFile.fHandle, 0, LV_FS_SEEK_SET);
-    return GIFInit(pGIF);
+
+    int ret = GIFInit(pGIF);
+    if (!ret) {
+        LV_LOG_WARN("Failed to initialize GIF from file: %s, err: %d", szFilename, pGIF->iError);
+        lv_fs_close(&pGIF->GIFFile.fHandle);
+    }
+
+    return ret;
 } /* GIF_openFile() */
 
 void GIF_close(GIFIMAGE *pGIF)
@@ -1501,4 +1520,4 @@ init_codetable:
 //    return -1;
 } /* DecodeLZW() */
 
-
+#endif // LV_USE_GIF

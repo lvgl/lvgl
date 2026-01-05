@@ -115,8 +115,11 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
 
+    if(draw_buf == NULL) return;
+
     lv_color_format_t cf = draw_buf->header.cf;
     uint8_t * data = lv_draw_buf_goto_xy(draw_buf, x, y);
+    if(data == NULL) return;
 
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
         uint8_t shift;
@@ -188,6 +191,8 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
+    if(canvas->draw_buf == NULL) return;
+
     lv_draw_buf_set_palette(canvas->draw_buf, index, color);
     lv_obj_invalidate(obj);
 }
@@ -214,6 +219,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 
     lv_image_header_t * header = &canvas->draw_buf->header;
     const uint8_t * px = lv_draw_buf_goto_xy(canvas->draw_buf, x, y);
+    if(px == NULL) return ret;
 
     switch(header->cf) {
         case LV_COLOR_FORMAT_ARGB8888:
@@ -284,7 +290,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
                         const lv_area_t * src_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(canvas_area && src_buf);
+    LV_ASSERT_NULL(src_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;

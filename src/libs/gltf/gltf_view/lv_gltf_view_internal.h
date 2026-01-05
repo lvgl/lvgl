@@ -40,6 +40,7 @@
 #define LV_GLTF_GAMMA_DARKEST   "0.8"
 
 #define LV_GLTF_DISTANCE_SCALE_FACTOR 2.5f
+#define LV_GLTF_TRANSMISSION_PASS_SIZE 256
 
 /* Apply defaults below if not set explicitly */
 
@@ -145,9 +146,6 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer);
 lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_gltf_model_t * data,
                                                         fastgltf::Node * node,
                                                         fastgltf::Primitive * prim);
-
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
-                                                        size_t n);
 
 /**********************
  *      MACROS
