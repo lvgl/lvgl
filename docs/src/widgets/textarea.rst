@@ -143,7 +143,8 @@ Accepted characters
 -------------------
 
 You can set a list of accepted characters with
-:cpp:expr:`lv_textarea_set_accepted_chars(textarea, list)` where ``list`` is a
+:cpp:expr:`lv_textarea_set_accepted_chars(textarea, list)` or
+:cpp:expr:`lv_textarea_set_accepted_chars_static(textarea, list)` where ``list`` is a
 pointer to a NUL-terminated string, or NULL to accept all characters.  Characters
 entered not in this list will be ignored.
 
