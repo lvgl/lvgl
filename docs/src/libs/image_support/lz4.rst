@@ -20,10 +20,10 @@ binary data is directly decoded to RAM.
 Which Library
 *************
 
-If ``LV_USE_LZ4_INTERNAL`` is enabled in ``lv_conf.h``, LVGL's internal copy of the
+If :c:macro:`LV_USE_LZ4_INTERNAL` is enabled in ``lv_conf.h``, LVGL's internal copy of the
 LZ4 decompression algorithm is used (``./src/libs/lz4/lz4.c``).
 
-If ``LV_USE_LZ4_EXTERNAL`` is enabled, the LVGL project is assumed to be compiled and
+If :c:macro:`LV_USE_LZ4_EXTERNAL` is enabled, the LVGL project is assumed to be compiled and
 linked with an external LZ4 library that provides the :cpp:func:`LZ4_decompress_safe`
 function.
 
@@ -50,7 +50,7 @@ Usage
 *****
 
 To use the LZ4 Decoder, enable it in ``lv_conf.h`` configuration file by setting
-either ``LV_USE_LZ4_INTERNAL`` or ``LV_USE_LZ4_EXTERNAL`` to ``1``.  LZ4 images can
+either :c:macro:`LV_USE_LZ4_INTERNAL` or :c:macro:`LV_USE_LZ4_EXTERNAL` to ``1``.  LZ4 images can
 then be used in the same way as other images.
 
 .. code-block:: c

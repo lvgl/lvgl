@@ -22,8 +22,8 @@ mode.
 
 .. code-block:: c
 
-	#define LV_USE_LINUX_FBDEV           1
-	#define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
+    #define LV_USE_LINUX_FBDEV           1
+    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
 
 Usage
 -----
@@ -33,12 +33,13 @@ node on the display (usually this is ``/dev/fb0``).
 
 .. code-block:: c
 
-	lv_display_t *disp = lv_linux_fbdev_create();
-	lv_linux_fbdev_set_file(disp, "/dev/fb0");
+    lv_display_t *disp = lv_linux_fbdev_create();
+    lv_linux_fbdev_set_file(disp, "/dev/fb0");
 
-If your screen stays black or only draws partially, you can try enabling direct rendering via ``LV_DISPLAY_RENDER_MODE_DIRECT``. Additionally,
-you can activate a force refresh mode with ``lv_linux_fbdev_set_force_refresh(true)``. This usually has a performance impact though and shouldn't
-be enabled unless really needed.
+If your screen stays black or only draws partially, you can try enabling direct
+rendering via :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT`. Additionally, you can
+activate a force refresh mode with ``lv_linux_fbdev_set_force_refresh(true)``. This
+usually has a performance impact though and shouldn't be enabled unless really needed.
 
 Hide the cursor
 ---------------
@@ -47,8 +48,8 @@ You may encounter a blinking cursor on the screen. The method to hide it
 varies depending on the platform. For instance, here is how it can be done
 on a Raspberry Pi:
 
-  1. Edit ``/boot/cmdline.txt`` file.
-  2. Add ``vt.global_cursor_default=0``.
+    1. Edit ``/boot/cmdline.txt`` file.
+    2. Add ``vt.global_cursor_default=0``.
 
 Common mistakes
 ---------------
@@ -74,7 +75,7 @@ device, such as resolution, pixel depth, and timings.
 
 .. code-block::
 
-	fbset -fb /dev/fb0
+    fbset -fb /dev/fb0
 
 To prevent display-related issues, it is recommended to ensure all devices,
 including the HDMI display, are connected and powered on before powering up

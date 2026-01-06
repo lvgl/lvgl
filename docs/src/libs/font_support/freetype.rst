@@ -133,7 +133,7 @@ This is achieved by setting the style attributes with the
 You will have to account for the increased width and height of letter due to the added letter outline,
 to avoid letters overlapping space them out using :cpp:func:`lv_style_set_text_letter_space`
 
-To use vector fonts with ThorVG, you will have to enable ``LV_USE_VECTOR_GRAPHICS`` in ``lv_conf.h``
+To use vector fonts with ThorVG, you will have to enable :c:macro:`LV_USE_VECTOR_GRAPHICS` in ``lv_conf.h``
 
 .. note::
 

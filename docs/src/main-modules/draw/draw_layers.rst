@@ -36,7 +36,7 @@ The following style properties trigger the creation of a "Simple Layer":
 - ``bitmap_mask_src``
 - ``blend_mode``
 
-In this case, the Widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE``
+In this case, the Widget will be sliced into :c:macro:`LV_DRAW_LAYER_SIMPLE_BUF_SIZE`
 sized chunks.
 
 If there is no memory for a new chunk, LVGL will try allocating the layer after
@@ -102,7 +102,7 @@ line, it will:
 
     Result of Clip Corner Style
 
-There is a temporary RAM cost to doing this.  With ``LV_USE_LAYER_DEBUG`` on...
+There is a temporary RAM cost to doing this.  With :c:macro:`LV_USE_LAYER_DEBUG` on...
 
 .. figure:: /_static/images/clip_corner_3_layers_created.png
     :align: center
