@@ -33,8 +33,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride);
-static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity);
+static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride, bool swapped);
+static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity, bool swapped);
 
 static void blur_3_bytes_init(uint32_t * sum, volatile uint8_t * buf, uint32_t sample_len, int32_t stride);
 static inline void blur_3_bytes(uint32_t * sum, volatile uint8_t * buf, uint32_t intensity);
@@ -144,25 +144,26 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
             }
         }
         else if(px_size == 2) {
+            bool swapped = t->target_layer->draw_buf->header.cf == LV_COLOR_FORMAT_RGB565_SWAPPED;
             uint16_t * buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, stride_px * skip_cnt);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, stride_px * skip_cnt, swapped);
             uint16_t buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 if(buf16_prev != *buf16_column) {
-                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity);
+                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity, swapped);
                     buf16_prev = *buf16_column;
                 }
                 buf16_column += stride_px * skip_cnt;
             }
 
             buf16_column = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, -stride_px * skip_cnt);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column, sample_len_limited, -stride_px * skip_cnt, swapped);
             buf16_prev = buf16_column[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 if(buf16_prev != *buf16_column) {
-                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity);
+                    *buf16_column = blur_2_bytes(sum, *buf16_column, intensity, swapped);
                     buf16_prev = *buf16_column;
                 }
                 buf16_column -= stride_px * skip_cnt;
@@ -231,25 +232,26 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         }
         else if(px_size == 2) {
+            bool swapped = t->target_layer->draw_buf->header.cf == LV_COLOR_FORMAT_RGB565_SWAPPED;
             uint16_t * buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited,  skip_cnt);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited,  skip_cnt, swapped);
             uint16_t buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(buf16_prev != *buf16_line) {
-                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity);
+                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity, swapped);
                     buf16_prev = *buf16_line;
                 }
                 buf16_line += skip_cnt;
             }
 
             buf16_line = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, - skip_cnt);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line, sample_len_limited, - skip_cnt, swapped);
             buf16_prev = buf16_line[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 if(buf16_prev != *buf16_line) {
-                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity);
+                    *buf16_line = blur_2_bytes(sum, *buf16_line, intensity, swapped);
                     buf16_prev = *buf16_line;
                 }
 
@@ -304,7 +306,7 @@ static void blur_3_bytes_init(uint32_t * sum, volatile uint8_t * buf, uint32_t s
     sum[2] = (sum[2] << BLUR_INTENSITY_BITS) / sample_len;
 }
 
-static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride)
+static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sample_len, int32_t stride, bool swapped)
 {
     uint32_t s;
 
@@ -312,9 +314,12 @@ static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sampl
     sum[1] = 0;
     sum[2] = 0;
     for(s = 0; s < sample_len; s++) {
-        sum[0] += buf->red;
-        sum[1] += buf->green;
-        sum[2] += buf->blue;
+        uint16_t v = *(uint16_t *)buf;
+        if(swapped) v = (v >> 8) | (v << 8);
+        lv_color16_t * c = (lv_color16_t *)&v;
+        sum[0] += c->red;
+        sum[1] += c->green;
+        sum[2] += c->blue;
         buf += stride;
     }
 
@@ -323,11 +328,13 @@ static void blur_2_bytes_init(uint32_t * sum, lv_color16_t * buf, uint32_t sampl
     sum[2] = (sum[2] << BLUR_INTENSITY_BITS) / sample_len;
 }
 
-static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity)
+static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intensity, bool swapped)
 {
     const uint32_t inv = BLUR_INTENSITY_MAX - intensity;
     const uint32_t half = BLUR_INTENSITY_MAX >> 1;
     const uint32_t shift = BLUR_INTENSITY_BITS;
+
+    if(swapped) px = (px >> 8) | (px << 8);
 
     /* unpack */
     uint32_t r =  px >> 11;
@@ -352,7 +359,9 @@ static inline uint16_t blur_2_bytes(uint32_t * sum, uint16_t px, uint32_t intens
     g = (s1 + half) >> shift;
     b = (s2 + half) >> shift;
 
-    return (uint16_t)((r << 11) | (g << 5) | b);
+    uint16_t res = (uint16_t)((r << 11) | (g << 5) | b);
+    if(swapped) res = (res >> 8) | (res << 8);
+    return res;
 }
 
 
