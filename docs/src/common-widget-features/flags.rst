@@ -35,7 +35,7 @@ The available flags are:
 - :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`: Enable more accurate hit (click) testing (e.g., account for rounded corners).
 - :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT`: Exclude the widget from layout positioning.
 - :cpp:enumerator:`LV_OBJ_FLAG_FLOATING`: Do not scroll with the parent and ignore layout.
-- :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`: Enable sending ``LV_EVENT_DRAW_TASK_ADDED`` events.
+- :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`: Enable sending :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED` events.
 - :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE`: Allow children to overflow outside the widget's bounds.
 - :cpp:enumerator:`LV_OBJ_FLAG_RADIO_BUTTON`: Allow only one ``RADIO_BUTTON`` sibling to be checked.
 - :cpp:enumerator:`LV_OBJ_FLAG_FLEX_IN_NEW_TRACK`: Start a new flex track on this item.

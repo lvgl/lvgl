@@ -381,7 +381,7 @@ will be updated to reflect the written content.
 ------------------------------------------------------
 
 The driver's ``seek`` will not actually be called unless the ``whence``
-is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
+is :cpp:enumerator:`LV_FS_SEEK_END`, in which case ``seek`` and ``tell`` will be called
 to determine where the end of the file is.
 
 ``lv_fs_tell`` :sub:`(behavior when cache is enabled)`

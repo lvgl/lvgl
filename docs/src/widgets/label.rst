@@ -171,7 +171,7 @@ Very long text
 
 LVGL can efficiently handle very long (e.g. > 40k characters) Labels by
 saving some extra data (~12 bytes) to speed up drawing. To enable this
-feature, set ``LV_LABEL_LONG_TXT_HINT`` to ``1`` in ``lv_conf.h``.
+feature, set :c:macro:`LV_LABEL_LONG_TXT_HINT` to ``1`` in ``lv_conf.h``.
 
 .. _lv_label_custom_scrolling_animations:
 
@@ -220,7 +220,7 @@ the Subject's value is used to update the Label's text as follows:
 
 
 :float Subject:     Subject's float value is used with the ``format_string`` argument.
-                    Requires ``LV_USE_FLOAT``.
+                    Requires :c:macro:`LV_USE_FLOAT`.
                     See :ref:`observer_format_string` for details.
 
 Note that this is a one-way binding (Subject ===> Widget).

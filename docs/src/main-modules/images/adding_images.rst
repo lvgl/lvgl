@@ -81,8 +81,8 @@ Another way you can add an image to your project is by using the
 this with a target color format matching the Display the image is going to be sent
 to. Optionally, you can use a command-line argument to cause the image contents to
 be compressed using RLE or LZ4 compression as well.  Of course, the decompression
-logic must be part of your project by enabling appropriate ``LV_USE_RLE``,
-``LV_USE_LZ4_INTERNAL``, and/or ``LV_USE_LZ4_EXTERNAL`` macros in your ``lv_conf.h``
+logic must be part of your project by enabling appropriate :c:macro:`LV_USE_RLE`,
+:c:macro:`LV_USE_LZ4_INTERNAL`, and/or :c:macro:`LV_USE_LZ4_EXTERNAL` macros in your ``lv_conf.h``
 file.
 
 This enables the drawing logic to have a very low RAM footprint because the pixels

@@ -94,4 +94,4 @@ can enable LVGL's support for the corresponding RTOS and LVGL will use the
 thread creation and synchronization primitives of the respective RTOS when
 rendering, depending on the renderers enabled.
 
-Set ``LV_USE_OS`` to ``LV_OS_FREERTOS`` or ``LV_OS_CMSIS_RTOS2``.
+Set :c:macro:`LV_USE_OS` to :c:macro:`LV_OS_FREERTOS` or :c:macro:`LV_OS_CMSIS_RTOS2`.

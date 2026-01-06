@@ -91,7 +91,7 @@ Use of MUTEXes requires:
 2.  releasing the MUTEX (unlocking it) afterwards.
 
 If your OS is integrated with LVGL (the macro :c:macro:`LV_USE_OS` has a value
-other than ``LV_OS_NONE`` in ``lv_conf.h``) you can use :cpp:func:`lv_lock()` and
+other than :c:macro:`LV_OS_NONE` in ``lv_conf.h``) you can use :cpp:func:`lv_lock()` and
 :cpp:func:`lv_unlock()` to perform #1 and #2.
 
 When this is the case, :cpp:func:`lv_timer_handler` calls :cpp:func:`lv_lock()`

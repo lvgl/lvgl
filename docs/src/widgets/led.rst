@@ -44,8 +44,8 @@ a predefined ON or OFF value. The :cpp:expr:`lv_led_toggle(led)` toggles between
 the ON and OFF state.
 
 You can set custom LED ON and OFF brightness values by defining macros
-``LV_LED_BRIGHT_MAX`` and ``LV_LED_BRIGHT_MIN`` in your project.  Their default
-values are 80 and 255. These too must be in the range [0..255].
+:c:macro:`LV_LED_BRIGHT_MAX` and :c:macro:`LV_LED_BRIGHT_MIN` in your project.  Their default
+values are 255 and 80. These too must be in the range [0..255].
 
 
 

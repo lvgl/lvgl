@@ -141,5 +141,5 @@ In the ``CMakeLists.txt`` file of the ``ui_project/`` directory, created by the 
         )
     endif ()
 
-**Important note:** Zephyr automatically defines the ``LV_CONF_INCLUDE_SIMPLE`` symbol during
+**Important note:** Zephyr automatically defines the :c:macro:`LV_CONF_INCLUDE_SIMPLE` symbol during
 the LVGL module build process, so it is not necessary to define it manually in your CMakeLists.txt.

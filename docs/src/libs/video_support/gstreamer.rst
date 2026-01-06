@@ -19,7 +19,7 @@ LVGL's GStreamer implementation provides comprehensive media playback capabiliti
 
 **Media Source Support:**
 
-* Local files via file:// URIs
+* Local files via ``file://`` URIs
 * Network streaming with HTTP/HTTPS support
 * RTSP streaming for live video feeds
 * UDP streaming for low-latency applications
@@ -30,7 +30,7 @@ LVGL's GStreamer implementation provides comprehensive media playback capabiliti
 
 **URI Scheme Support:**
 
-Using the URI factory (``LV_GSTREAMER_FACTORY_URI_DECODE``), you can specify various URI schemes as media sources:
+Using the URI factory (:c:macro:`LV_GSTREAMER_FACTORY_URI_DECODE`), you can specify various URI schemes as media sources:
 
 * **Local files**: ``file://path/to/video.mp4``
 * **Web streams**: ``http://example.com/stream.webm``, ``https://secure.example.com/video.mp4``
@@ -89,57 +89,57 @@ Setup
 
    **Option 1: Direct linking with LVGL (Recommended)**
 
-.. code-block:: cmake
+   .. code-block:: cmake
 
-    find_package(PkgConfig REQUIRED)
+        find_package(PkgConfig REQUIRED)
 
-    # Find GStreamer packages
-    pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
-    pkg_check_modules(GSTREAMER_VIDEO REQUIRED gstreamer-video-1.0)
-    pkg_check_modules(GSTREAMER_APP REQUIRED gstreamer-app-1.0)
+        # Find GStreamer packages
+        pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+        pkg_check_modules(GSTREAMER_VIDEO REQUIRED gstreamer-video-1.0)
+        pkg_check_modules(GSTREAMER_APP REQUIRED gstreamer-app-1.0)
 
-    # Link with LVGL
-    target_include_directories(lvgl PUBLIC
-        ${GSTREAMER_INCLUDE_DIRS}
-        ${GSTREAMER_VIDEO_INCLUDE_DIRS}
-        ${GSTREAMER_APP_INCLUDE_DIRS})
-    target_link_libraries(lvgl PUBLIC
-        ${GSTREAMER_LIBRARIES}
-        ${GSTREAMER_VIDEO_LIBRARIES}
-        ${GSTREAMER_APP_LIBRARIES})
+        # Link with LVGL
+        target_include_directories(lvgl PUBLIC
+            ${GSTREAMER_INCLUDE_DIRS}
+            ${GSTREAMER_VIDEO_INCLUDE_DIRS}
+            ${GSTREAMER_APP_INCLUDE_DIRS})
+        target_link_libraries(lvgl PUBLIC
+            ${GSTREAMER_LIBRARIES}
+            ${GSTREAMER_VIDEO_LIBRARIES}
+            ${GSTREAMER_APP_LIBRARIES})
 
 4. **Manual Compilation with pkg-config**
 
    You can also compile manually using pkg-config to query the necessary flags:
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    # Get compilation flags
-    gcc $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0) \
-        -o your_app your_app.c lvgl.a
+        # Get compilation flags
+        gcc $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-video-1.0 gstreamer-app-1.0) \
+            -o your_app your_app.c lvgl.a
 
 5. **Basic Setup Example**
 
-.. code-block:: c
+   .. code-block:: c
 
-    int main(void)
-    {
-        /* Initialize LVGL */
-        lv_init();
+        int main(void)
+        {
+            /* Initialize LVGL */
+            lv_init();
 
-        /* Setup display driver */
-        lv_display_t *display = lv_display_create(800, 480);
-        /* ... configure display driver ... */
+            /* Setup display driver */
+            lv_display_t *display = lv_display_create(800, 480);
+            /* ... configure display driver ... */
 
-        /* Create and run your GStreamer application */
-        lv_example_gstreamer_1();
+            /* Create and run your GStreamer application */
+            lv_example_gstreamer_1();
 
-        while (1) {
-            lv_timer_handler();
+            while (1) {
+                lv_timer_handler();
+            }
+
+            return 0;
         }
-
-        return 0;
-    }
 
 Usage
 *****
@@ -280,10 +280,10 @@ State Management
 
 The GStreamer widget maintains these states:
 
-- ``LV_GSTREAMER_STATE_NULL``: Initial state, no media loaded
-- ``LV_GSTREAMER_STATE_READY``: Media loaded and ready to play
-- ``LV_GSTREAMER_STATE_PAUSED``: Playback paused
-- ``LV_GSTREAMER_STATE_PLAYING``: Active playback
+- :cpp:enumerator:`LV_GSTREAMER_STATE_NULL`: Initial state, no media loaded
+- :cpp:enumerator:`LV_GSTREAMER_STATE_READY`: Media loaded and ready to play
+- :cpp:enumerator:`LV_GSTREAMER_STATE_PAUSED`: Playback paused
+- :cpp:enumerator:`LV_GSTREAMER_STATE_PLAYING`: Active playback
 
 Media Information Access
 ------------------------
