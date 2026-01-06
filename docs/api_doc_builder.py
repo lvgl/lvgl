@@ -818,7 +818,7 @@ def _recursively_create_api_rst_files(depth: int,
         elig_sub_dirs.sort()
         elig_h_files.sort()
 
-        # Create index.rst plus .RST files for any .H* file directly in in dir.
+        # Create index.rst plus .RST files for any .H* file directly in dir.
         _create_rst_files_for_dir(src_root_len,
                                   src_dir_bep,
                                   elig_h_files,
