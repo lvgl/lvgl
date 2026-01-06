@@ -321,11 +321,22 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
+    const int32_t clip_offset_x = clip_area.x1 - image_area.x1;
+    const int32_t clip_offset_y = clip_area.y1 - image_area.y1;
+
     /* If rotation is not required, blit directly */
-    if(!dsc->rotation) {
+    if(!dsc->rotation
+#if LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+       /**
+        * For some hardware, the rect.x/y parameters of vg_lite_blit_rect do not work correctly,
+        * so the fallback is to vg_lite_draw_pattern for processing.
+        */
+       && (clip_offset_x == 0 && clip_offset_y == 0)
+#endif
+      ) {
         vg_lite_rectangle_t rect = {
-            .x = clip_area.x1 - image_area.x1,
-            .y = clip_area.y1 - image_area.y1,
+            .x = clip_offset_x,
+            .y = clip_offset_y,
             .width = lv_area_get_width(&clip_area),
             .height = lv_area_get_height(&clip_area)
         };
