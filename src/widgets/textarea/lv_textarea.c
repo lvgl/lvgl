@@ -559,8 +559,28 @@ void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    ta->accepted_chars = list;
+    char * copied_list = NULL;
+    if(list) {
+        copied_list = lv_strdup(list);
+        LV_ASSERT_MALLOC(copied_list);
+    }
+
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->static_accepted_chars = 0;
+    ta->accepted_chars = copied_list;
 }
+
+void lv_textarea_set_accepted_chars_static(lv_obj_t * obj, const char * list)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->static_accepted_chars = 1;
+    ta->accepted_chars = (char *)list;
+}
+
 
 void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num)
 {
@@ -893,6 +913,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->pwd_bullet        = NULL;
     ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
     ta->accepted_chars    = NULL;
+    ta->static_accepted_chars = 1;
     ta->max_length        = 0;
     ta->cursor.show      = 1;
     /*It will be set to zero later (with zero value lv_textarea_set_cursor_pos(obj, 0); wouldn't do anything as there is no difference)*/
@@ -938,6 +959,8 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_free(ta->placeholder_txt);
         ta->placeholder_txt = NULL;
     }
+    if(!ta->static_accepted_chars) lv_free(ta->accepted_chars);
+    ta->accepted_chars = NULL;
 }
 
 static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
