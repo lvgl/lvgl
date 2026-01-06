@@ -458,7 +458,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
          */
         vg_lite_matrix_t internal_matrix;
         vg_lite_identity(&internal_matrix);
-        const float pivot_x = dsc->pivot.x / scale;
+        const float pivot_x = (dsc->pivot.x + dsc->g->ofs_x) / scale;
         const float pivot_y = dsc->g->box_h + dsc->g->ofs_y;
         vg_lite_translate(pivot_x, pivot_y, &internal_matrix);
         vg_lite_rotate(dsc->rotation / 10.0f, &internal_matrix);
