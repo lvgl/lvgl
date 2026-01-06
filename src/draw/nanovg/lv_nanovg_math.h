@@ -51,16 +51,32 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Check if the floating point number is zero
+ * @param a the number to check
+ * @return true if the number is zero, false otherwise
+ */
 static inline bool nvg_math_is_zero(float a)
 {
     return (NVG_MATH_FABSF(a) < FLT_EPSILON);
 }
 
+/**
+ * Check if two floating point numbers are equal
+ * @param a the first number
+ * @param b the second number
+ * @return true if the numbers are equal, false otherwise
+ */
 static inline bool nvg_math_is_equal(float a, float b)
 {
     return nvg_math_is_zero(a - b);
 }
 
+/**
+ * Calculate the inverse square root (1/sqrt(x))
+ * @param number the input number
+ * @return the inverse square root
+ */
 static inline float nvg_math_inv_sqrtf(float number)
 {
     /* From https://en.wikipedia.org/wiki/Fast_inverse_square_root#Avoiding_undefined_behavior */
