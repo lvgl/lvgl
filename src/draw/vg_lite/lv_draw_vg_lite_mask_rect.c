@@ -16,7 +16,7 @@
 #include "lv_vg_lite_path.h"
 #include "../../misc/lv_area_private.h"
 #include "../sw/lv_draw_sw_mask_private.h"
-#include "../lv_draw_mask_private.h"
+#include "../lv_draw_mask.h"
 
 /*********************
  *      DEFINES
