@@ -6,7 +6,7 @@ Overview
 --------
 
 The **X11** display/input `drivers <https://github.com/lvgl/lvgl/tree/master/src/drivers/x11>`__
-offers support for simulating the LVGL display and keyboard/mouse inputs in an X11
+offer support for simulating the LVGL display and keyboard/mouse inputs in an X11
 desktop window.
 
 It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
