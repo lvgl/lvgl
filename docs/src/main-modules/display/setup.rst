@@ -143,7 +143,9 @@ An example looks like this:
     {
         /* The most simple case (also the slowest) to send all rendered pixels to the
          * screen one-by-one.  `put_px` is just an example.  It needs to be implemented by you. */
-        uint16_t * buf16 = (uint16_t *)px_map; /* Let's say it's a 16 bit (RGB565) display */
+        /* Let's say it's a 16 bit (RGB565) display */
+        uint16_t * buf16 = (uint16_t *)px_map;
+        /* if using a monochrome display (LV_COLOR_DEPTH 1), make sure to skip the palette! (https://docs.lvgl.io/master/main-modules/display/color_format.html#monochrome-displays) */
         int32_t x, y;
         for(y = area->y1; y <= area->y2; y++) {
             for(x = area->x1; x <= area->x2; x++) {
