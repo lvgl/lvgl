@@ -526,7 +526,11 @@ void lv_obj_refr(lv_layer_t * layer, lv_obj_t * obj)
         lv_area_t layer_area_full;
         lv_area_t obj_draw_size;
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
-        if(res != LV_RESULT_OK) return;
+        if(res != LV_RESULT_OK) {
+            layer->opa = layer_opa_ori;
+            layer->recolor = layer_recolor;
+            return;
+        }
 
         /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
