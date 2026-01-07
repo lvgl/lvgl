@@ -915,9 +915,12 @@ extern "C" {
 
             /* Create a Picture from current target buffer content */
             auto picture = Picture::gen();
-            TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, target, 0));
+            TVG_CHECK_RETURN_VG_ERROR(picture_load(ctx, picture, target));
 
-            /* Clear target buffer manually */
+            /**
+             * Since the contents of the target buffer have already been copied into the picture,
+             * we can now clean up the target buffer in preparation for rendering the masked image.
+             */
             lv_memzero(target->memory, target->stride * target->height);
 
             /* Render masked picture back */
