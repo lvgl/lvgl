@@ -73,7 +73,6 @@ typedef struct {
 } lv_wl_egl_ctx_t;
 
 typedef struct {
-    lv_opengles_texture_t texture;
     struct wl_egl_window * egl_window;
     lv_opengles_egl_t * egl_ctx;
     bool delete_pending;
@@ -250,9 +249,6 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_wl_egl_ctx_t * ctx,
         goto egl_ctx_err;
     }
 
-    /* Let the opengles texture driver handle the texture lifetime */
-    ddata->texture.is_texture_owner = true;
-
     /* Load glEGLimage */
     load_egl_extensions();
 
@@ -307,8 +303,6 @@ static void egl_destroy_display_data(lv_wl_egl_display_data_t * ddata)
         delete_buffer(ddata->egl_ctx, &ddata->buffers[i]);
     }
 
-    lv_opengles_texture_deinit(&ddata->texture);
-
     if(ddata->egl_ctx) {
         lv_opengles_egl_context_destroy(ddata->egl_ctx);
         ddata->egl_ctx = NULL;
@@ -335,13 +329,6 @@ static lv_wl_buffer_t * get_next_buffer(lv_wl_egl_display_data_t * ddata)
         if(!ddata->buffers[index].busy) {
             ddata->last_used = (index + 1) % LV_WL_EGL_BUF_COUNT;
             return &ddata->buffers[index];
-        }
-    }
-
-    while(ddata->buffers[ddata->last_used].busy) {
-        if(wl_display_dispatch(lv_wl_ctx.wl_display) < 0) {
-            LV_LOG_ERROR("wl_display_dispatch failed while waiting for buffer");
-            return NULL;
         }
     }
 
@@ -606,14 +593,11 @@ static uint32_t lv_cf_to_drm_cf(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_XRGB8888:
             return DRM_FORMAT_XRGB8888;
-            break;
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
             return DRM_FORMAT_ARGB8888;
-            break;
         case LV_COLOR_FORMAT_RGB565:
             return DRM_FORMAT_RGB565;
-            break;
         default:
             return DRM_FORMAT_ARGB8888;
     }
@@ -624,13 +608,10 @@ static uint32_t lv_drm_cf_to_gbm_cf(uint32_t drm_cf)
     switch(drm_cf) {
         case DRM_FORMAT_XRGB8888:
             return GBM_FORMAT_XRGB8888;
-            break;
         case DRM_FORMAT_ARGB8888:
             return GBM_FORMAT_ARGB8888;
-            break;
         case DRM_FORMAT_RGB565:
             return GBM_FORMAT_RGB565;
-            break;
         default:
             return GBM_FORMAT_ARGB8888;
     }
