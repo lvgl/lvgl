@@ -415,7 +415,7 @@ static void arclabel_draw_main(lv_event_t * e)
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const lv_color_t color = lv_obj_get_style_text_color(obj, LV_PART_MAIN);
-    const lv_opa_t opa = lv_obj_get_style_text_opa(obj, LV_PART_MAIN);
+    const lv_opa_t opa = LV_OPA_MIX2(layer->opa, lv_obj_get_style_text_opa(obj, LV_PART_MAIN));
     const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
     const int32_t line_height = font->line_height;

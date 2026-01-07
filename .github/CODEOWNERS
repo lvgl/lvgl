@@ -1,6 +1,6 @@
 # These owners will be the default owners for everything in
 # the repo. Unless a later match takes precedence
-* @kisvegabor @AndreCostaaa @liamHowatt @uLipe
+* @kisvegabor @AndreCostaaa @liamHowatt @uLipe @FASTSHIFT
 
 demos/gltf @AndreCostaaa
 examples/libs/gltf @AndreCostaaa
@@ -32,4 +32,4 @@ src/libs/gltf @AndreCostaaa
 src/libs/gstreamer @AndreCostaaa
 src/libs/tiny_ttf @AndreCostaaa
 src/libs/vg_lite_driver @uLipe
-src/misc/cache @AndreCostaaa
+src/misc/cache @AndreCostaaa @FASTSHIFT
