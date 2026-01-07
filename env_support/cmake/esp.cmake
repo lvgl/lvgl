@@ -65,10 +65,6 @@ endif()
       INCLUDE_DIRS ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../
                    ${LVGL_ROOT_DIR}/examples ${LVGL_ROOT_DIR}/demos
       PRIV_REQUIRES ${IDF_COMPONENTS})
-
-if(CONFIG_LV_USE_LOVYAN_GFX)
-  target_link_libraries(${COMPONENT_LIB} PUBLIC idf::LovyanGFX)
-endif()
 endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
