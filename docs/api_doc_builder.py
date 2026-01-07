@@ -68,6 +68,10 @@ doxy_src_file_ext_list = [
     '.h++'
 ]
 
+# Excluded from doxygen via EXCLUDE config item.  (This config
+# item is set in `doxygen_xml.py`.)
+_cfg_exclude_list = ['lv_conf_internal.h']
+
 # Multi-line match ``API + newline + \*\*\* + whitespace``.
 # NB:  the ``\s*`` at the end forces the regex to match the whitespace
 # at the end including all \r\n's.  This will match UP TO:
@@ -794,7 +798,9 @@ def _recursively_create_api_rst_files(depth: int,
             # `ext` is converted to lower case so that any incidental case change
             # in the extension on Windows will not break this algorithm.
             if ext.lower() in doxy_src_file_ext_list:
-                eligible = (dir_item in doxygen_xml.files)
+                eligible = (dir_item in doxygen_xml.files
+                        and dir_item not in _cfg_exclude_list)
+
                 if eligible:
                     elig_h_files.append(path_bep)  # Add file to list.
                     elig_h_file_count += 1
