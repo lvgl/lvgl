@@ -721,20 +721,11 @@ void lv_indev_set_external_data(lv_indev_t * indev, void * data, void (* free_cb
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_display_t * disp = i->disp;
     /*Save the raw points so they can be used again in indev_read_core*/
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        data->point.x = disp->hor_res - data->point.x - 1;
-        data->point.y = disp->ver_res - data->point.y - 1;
-    }
-    if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        int32_t tmp = data->point.y;
-        data->point.y = data->point.x;
-        data->point.x = disp->ver_res - tmp - 1;
-    }
+    lv_display_rotate_point(i->disp, &data->point);
 
     /*Simple sanity check*/
     if(data->point.x < 0) {

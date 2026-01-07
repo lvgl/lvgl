@@ -931,6 +931,15 @@
         #endif
     #endif
 
+    /** Disable blit rectangular offset to resolve certain hardware errors. */
+    #ifndef LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #ifdef CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #else
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
+        #endif
+    #endif
+
     /** Disable linear gradient extension for some older versions of drivers. */
     #ifndef LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
         #ifdef CONFIG_LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
