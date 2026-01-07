@@ -20,6 +20,9 @@
  **********************/
 typedef struct {
     LGFX * tft;
+    lv_display_rotation_t rotation;
+    int32_t hor_res;
+    int32_t ver_res;
 } lv_lovyan_gfx_t;
 
 /**********************
@@ -60,6 +63,10 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
     dsc->tft->fillScreen(0x00000);
+
+    dsc->rotation = LV_DISPLAY_ROTATION_0;
+    dsc->hor_res = hor_res;
+    dsc->ver_res = ver_res;
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -104,9 +111,11 @@ static void resolution_changed_event_cb(lv_event_t * e)
 {
     lv_display_t * disp = (lv_display_t *)lv_event_get_target(e);
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_display_get_driver_data(disp);
-    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
-    int32_t ver_res = lv_display_get_vertical_resolution(disp);
     lv_display_rotation_t rot = lv_display_get_rotation(disp);
+
+    dsc->rotation = rot;
+    dsc->hor_res = lv_display_get_original_horizontal_resolution(disp);
+    dsc->ver_res = lv_display_get_original_vertical_resolution(disp);
 
     /* handle rotation */
     switch(rot) {
@@ -136,9 +145,25 @@ static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data)
     }
     else {
         data->state = LV_INDEV_STATE_PRESSED;
-        /*Set the coordinates*/
-        data->point.x = x;
-        data->point.y = y;
+
+        switch(dsc->rotation) {
+            case LV_DISPLAY_ROTATION_90:
+                data->point.x = y;
+                data->point.y = dsc->ver_res - x - 1;
+                break;
+            case LV_DISPLAY_ROTATION_180:
+                data->point.x = dsc->hor_res - x - 1;
+                data->point.y = dsc->ver_res - y - 1;
+                break;
+            case LV_DISPLAY_ROTATION_270:
+                data->point.x = dsc->hor_res - y - 1;
+                data->point.y = x;
+                break;
+            default:
+                data->point.x = x;
+                data->point.y = y;
+                break;
+        }
     }
 }
 
