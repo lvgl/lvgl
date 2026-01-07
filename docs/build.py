@@ -274,27 +274,27 @@ def cmd(cmd_str, start_dir=None, exit_on_error=True):
         sys.exit(1)
 
 
-def intermediate_dir_contents_exists(dir):
+def intermediate_dir_contents_exists(intermediate_dir):
     """Provide answer to question:  Can we have reasonable confidence that
     the contents of `intermediate_directory` already exists?
     """
     result = False
-    c1 = os.path.isdir(dir)
+    c1 = os.path.isdir(intermediate_dir)
 
     if c1:
-        temp_path = os.path.join(dir, 'CHANGELOG.rst')
+        temp_path = os.path.join(intermediate_dir, 'CHANGELOG.rst')
         c2 = os.path.exists(temp_path)
-        temp_path = os.path.join(dir, '_ext')
+        temp_path = os.path.join(intermediate_dir, '_ext')
         c3 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, '_static')
+        temp_path = os.path.join(intermediate_dir, '_static')
         c4 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, 'debugging')
+        temp_path = os.path.join(intermediate_dir, 'debugging')
         c5 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, 'introduction')
+        temp_path = os.path.join(intermediate_dir, 'introduction')
         c6 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, 'contributing')
+        temp_path = os.path.join(intermediate_dir, 'contributing')
         c7 = os.path.isdir(temp_path)
-        temp_path = os.path.join(dir, cfg_examples_dir)
+        temp_path = os.path.join(intermediate_dir, cfg_examples_dir)
         c8 = os.path.isdir(temp_path)
         result = c2 and c3 and c4 and c5 and c6 and c7 and c8
 
@@ -309,16 +309,22 @@ def run():
         announce(__file__, f'{setting_name:18} = [{val}]')
 
     def print_settings(args, and_exit: bool):
-        """Print all settings and optionally exit; used for debugging."""
+        """Print all settings and optionally exit; used for debugging.
+
+        This routine has proven useful for verification and validation,
+        and is being kept for future debugging purposes.
+        """
+        # Targets
         print_setting("build_html", cfg_target_html in args.targets)
         print_setting("build_latex", cfg_target_latex in args.targets)
         print_setting("build_intermediate", cfg_target_intermediate in args.targets)
+        print_setting("clean_all", cfg_target_clean_all in args.targets)
+        print_setting("clean_intermediate", cfg_target_clean_intermediate in args.targets)
+        print_setting("clean_html", cfg_target_clean_html in args.targets)
+        print_setting("clean_latex", cfg_target_clean_latex in args.targets)
+        # Options
         print_setting("skip_api", args.skip_api)
         print_setting("fresh_sphinx_env", args.fresh_sphinx_env)
-        print_setting("clean_all", args.clean_all)
-        print_setting("clean_intermediate", args.clean_intermediate)
-        print_setting("clean_html", args.clean_html)
-        print_setting("clean_latex", args.clean_latex)
 
         if and_exit:
             exit(0)
@@ -388,6 +394,7 @@ def run():
         intermediate_dir = os.path.join(base_dir, cfg_default_intermediate_dir)
 
     lv_conf_file = os.path.join(intermediate_dir, cfg_lv_conf_filename)
+    lv_temp_conf_file_for_doxygen = os.path.join(lvgl_src_dir, cfg_lv_conf_filename)
     version_dst_file = os.path.join(intermediate_dir, cfg_lv_version_filename)
     top_index_file = os.path.join(intermediate_dir, cfg_top_index_filename)
     doxyfile_src_file = os.path.join(base_dir, cfg_doxyfile_filename)
@@ -581,6 +588,10 @@ def run():
         # Build <intermediate_dir>/lv_conf.h from lv_conf_template.h.
         # -----------------------------------------------------------------
         config_builder.run(lv_conf_file)
+        # Build a temporary version of this file in ../src/ so Doxygen can see it.
+        # Reason:  Doxygen's input is the master `lvgl/src/` directory,
+        # not the intermediate directory.  This file gets deleted later.
+        config_builder.run(lv_temp_conf_file_for_doxygen)
 
         # -----------------------------------------------------------------
         # Copy `lv_version.h` into intermediate directory.
@@ -639,6 +650,11 @@ def run():
                                            'xml',
                                            )
 
+        # Now that Doxygen has run, this file is no longer needed.
+        # Clean up now rather than later to keep logic clean.
+        os.remove(lv_temp_conf_file_for_doxygen)
+
+        # Note time when this stage completed.
         t2 = datetime.now()
         announce(__file__, 'Example/API run time:  ' + str(t2 - t1))
 
