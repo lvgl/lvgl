@@ -158,24 +158,24 @@ menu "LVGL configuration"
 			bool "Use RTOS task with a direct notification for synchronization"
 			default y
 			depends on LV_OS_FREERTOS
-		help
-			Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-			than unblocking a task using an intermediary object such as a binary semaphore.
-			RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+			help
+				Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+				than unblocking a task using an intermediary object such as a binary semaphore.
+				RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
 		config LV_DRAW_BUF_STRIDE_ALIGN
 			int "Buffer stride alignment"
 			default 1
-		help
-			Align the stride of all layers and images to this bytes.
+			help
+				Align the stride of all layers and images to this bytes.
 
 		config LV_DRAW_BUF_ALIGN
 			int "Buffer address alignment"
 			default 4
-		help
-			Align the start address of draw_buf addresses to this bytes.
+			help
+				Align the start address of draw_buf addresses to this bytes.
 
 		config LV_DRAW_TRANSFORM_USE_MATRIX
 			bool "Using matrix for transformations"
@@ -229,8 +229,8 @@ menu "LVGL configuration"
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
 			default y
-		help
-			Required to draw anything on the screen.
+			help
+				Required to draw anything on the screen.
 
 		config LV_DRAW_SW_SUPPORT_RGB565
 			bool "Enable support for RGB565 color format"
@@ -380,11 +380,11 @@ menu "LVGL configuration"
 			depends on LV_DRAW_SW_ASM_CUSTOM
 
 		config LV_USE_PXP
-		bool "Use NXP's PXP on iMX RTxxx platforms"
-		default n
+			bool "Use NXP's PXP on iMX RTxxx platforms"
+			default n
 
 		config LV_USE_DRAW_PXP
-		bool "Use PXP for drawing"
+			bool "Use PXP for drawing"
 			depends on LV_USE_PXP
 			default y
 
@@ -405,19 +405,19 @@ menu "LVGL configuration"
 		config LV_USE_G2D
 			bool "Use NXP's G2D on MPU platforms"
 			default n
-		
+
 		config LV_USE_DRAW_G2D
 			bool "Use G2D for drawing."
 			depends on LV_USE_G2D
 			default y
-		
+
 		config LV_USE_ROTATE_G2D
 			bool "Use G2D to rotate display."
 			depends on LV_USE_G2D
 			default n
 
 		config LV_G2D_HASH_TABLE_SIZE
-			bool "Maximum number of buffers that can be stored for G2D draw unit."
+			int "Maximum number of buffers that can be stored for G2D draw unit."
 			default 50
 			depends on LV_USE_G2D
 			help
@@ -545,13 +545,13 @@ menu "LVGL configuration"
 			depends on LV_USE_OPENGLES
 
 		config LV_USE_PPA
-		bool "Use Espressif's PPA accelerator for ESP SoCs"
-		default n
+			bool "Use Espressif's PPA accelerator for ESP SoCs"
+			default n
 
 		config LV_USE_PPA_IMG
-		bool "Use Espressif's PPA accelerator for Image draw"
-		default n
-		depends on LV_USE_PPA
+			bool "Use Espressif's PPA accelerator for Image draw"
+			default n
+			depends on LV_USE_PPA
 
 		config LV_USE_DRAW_EVE
 			bool "Use EVE FT81X GPU."
@@ -2098,6 +2098,11 @@ menu "LVGL configuration"
 		config LV_USE_LOVYAN_GFX
 			bool "Use LovyanGFX driver"
 			default n
+			help
+				Enable LovyanGFX driver. 
+				Note: In ESP-IDF, you must manually link the LovyanGFX library in your project's 
+				CMakeLists.txt or idf_component.yml as auto-linking is not provided by LVGL.
+
 		config LV_LGFX_USER_INCLUDE
 			string "Header for LovyanGFX user configuration"
 			default "lv_lgfx_user.hpp"
@@ -2283,7 +2288,7 @@ menu "LVGL configuration"
 			config LV_USE_DEMO_EBIKE
 				bool "Ebike demo"
 			config LV_USE_DEMO_HIGH_RES
-			bool "High resolution demo"
+				bool "High resolution demo"
 		endif
 	endmenu
 
