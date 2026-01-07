@@ -115,7 +115,7 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_border_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain arc*/
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain border*/
         lv_draw_border(ds_layer, &ds_dsc, coords);
         lv_draw_layer_finish_drop_shadow(&dsc->base, layer, ds_layer);
     }
@@ -205,7 +205,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_rect_dsc_t ds_dsc = *dsc;
-        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain arc*/
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain shadow*/
         ds_dsc.shadow_opa = 0;
         lv_draw_rect(ds_layer, &ds_dsc, coords);
         lv_draw_layer_finish_drop_shadow(&dsc->base, layer, ds_layer);
