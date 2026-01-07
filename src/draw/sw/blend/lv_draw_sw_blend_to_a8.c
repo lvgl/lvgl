@@ -449,7 +449,7 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
     int32_t y;
 
     if(mask_buf == NULL && opa >= LV_OPA_MAX) {
-        if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_TO_A8_WITH_OPA(dsc)) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_TO_A8(dsc)) {
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; src_x < w; dest_x++, src_x++) {
                     if(get_bit(src_buf_i1, src_x))  dest_buf_a8[dest_x] = 0xff;
@@ -460,7 +460,7 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
         }
     }
     else if(mask_buf == NULL && opa < LV_OPA_MAX) {
-        if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_TO_A8(dsc)) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_I1_BLEND_TO_A8_WITH_OPA(dsc)) {
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; src_x < w; dest_x++, src_x++) {
                     if(get_bit(src_buf_i1, src_x)) {
