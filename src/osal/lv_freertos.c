@@ -15,7 +15,6 @@
 #include "lv_os_private.h"
 #if LV_USE_OS == LV_OS_FREERTOS
 
-#include <string.h>
 #include "atomic.h"
 
 #include "../tick/lv_tick.h"
@@ -406,56 +405,6 @@ void lv_freertos_task_switch_out(void)
 
 uint32_t lv_os_get_idle_percent(void)
 {
-#ifdef ESP_PLATFORM
-    // ESP32 "Proper" implementation using FreeRTOS System State
-    static uint32_t last_total_time = 0;
-    static uint32_t last_idle_time = 0;
-    
-    TaskStatus_t * pxTaskStatusArray;
-    volatile UBaseType_t uxArraySize, x;
-    uint32_t ulTotalRunTime = 0;
-    uint32_t current_idle_time = 0;
-    uint32_t pct = 0;
-
-    // Take a snapshot of the number of tasks in case it changes while we are accessing the array
-    uxArraySize = uxTaskGetNumberOfTasks();
-    pxTaskStatusArray = lv_malloc(uxArraySize * sizeof(TaskStatus_t));
-
-    if(pxTaskStatusArray != NULL) {
-        // Generate raw status information about each task.
-        uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, &ulTotalRunTime);
-        
-        // Iterate through the tasks to find the IDLE task(s)
-        for(x = 0; x < uxArraySize; x++) {
-             // Check for IDLE task name (usually "IDLE" or "IDLE0", "IDLE1" on SMP)
-            if(strncmp(pxTaskStatusArray[x].pcTaskName, "IDLE", 4) == 0) {
-                 current_idle_time += pxTaskStatusArray[x].ulRunTimeCounter;
-            }
-        }
-
-            // Avoid division by zero and handle counter overflow
-            if (ulTotalRunTime > last_total_time) {
-                 uint32_t total_delta = ulTotalRunTime - last_total_time;
-                 uint32_t idle_delta = current_idle_time - last_idle_time;
-                 
-                 // Normalize total time by number of cores as run time stats are per-core
-                 #ifdef CONFIG_FREERTOS_NUMBER_OF_CORES
-                 total_delta *= CONFIG_FREERTOS_NUMBER_OF_CORES;
-                 #endif
-                 
-                 // Clamp idle delta to total delta to avoid > 100% due to race conditions in SMP stats
-                 if (idle_delta > total_delta) idle_delta = total_delta;
-                 
-                 pct = (idle_delta * 100) / total_delta;
-            }
-        last_total_time = ulTotalRunTime;
-        last_idle_time = current_idle_time;
-
-        lv_free(pxTaskStatusArray);
-    }
-    
-    return pct;
-#else
     if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
         LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
         return 0;
@@ -468,7 +417,6 @@ uint32_t lv_os_get_idle_percent(void)
     globals->freertos_idle_time_sum = 0;
 
     return pct;
-#endif
 }
 
 void lv_sleep_ms(uint32_t ms)
