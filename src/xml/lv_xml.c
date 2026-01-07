@@ -794,6 +794,10 @@ static void resolve_consts(const char ** item_attrs, lv_xml_component_scope_t * 
         if(lv_streq(name, "styles")) continue; /*Styles will handle it themselves*/
         if(value[0] == '#') {
             const char * value_clean = &value[1];
+            /* if there's no constant value, we keep `#` as is */
+            if(*value_clean == '\0') {
+                continue;
+            }
 
             const char * const_value = lv_xml_get_const(scope, value_clean);
             if(const_value) {
