@@ -931,6 +931,15 @@
         #endif
     #endif
 
+    /** Disable blit rectangular offset to resolve certain hardware errors. */
+    #ifndef LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #ifdef CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET CONFIG_LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET
+        #else
+            #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET 0
+        #endif
+    #endif
+
     /** Disable linear gradient extension for some older versions of drivers. */
     #ifndef LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
         #ifdef CONFIG_LV_VG_LITE_DISABLE_LINEAR_GRADIENT_EXT
@@ -4807,6 +4816,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_DEMO_EBIKE           0
     #define LV_USE_DEMO_HIGH_RES        0
     #define LV_USE_DEMO_SMARTWATCH      0
+    #define LV_USE_DEMO_GLTF            0
 #endif /* LV_BUILD_DEMOS */
 
 #ifndef LV_USE_LZ4

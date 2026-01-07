@@ -63,6 +63,55 @@ These properties are set once (at creation time), and there are no specific
 ``set`` functions to modify the property later. LVGL's general API can still be
 used to modify any widget in the component, but no dedicated API functions are generated.
 
+
+Slots
+-----
+
+With the help of a "slot" any UI element in the component can be easily exposed as a parent
+that can be referenced later and children can be created there.
+
+
+Just add ``<slot name="my_slot"/>`` to the ``<api>`` to tell the Editor
+which children to expose.
+
+To target a slot on an instance of a component create a child like
+``<component_name-slot_name>`` and add the children as needed.
+
+Slots are available only for components. In case of a widget the more powerful
+:ref:`elements with get access type <xml_api_element_get>` can be used.
+
+Slots are very useful to create components like screen templates where the user is
+allowed to create children on certain internal UI elements.
+
+.. code-block:: xml
+
+    <!-- simple_screen.xml -->
+    <component>
+        <api>
+            <slot name="icon_area"/>
+            <slot name="content_area"/>
+        </api>
+
+        <view width="100%" height="100%" flex_flow="column">
+            <lv_obj name="icon_area" width="100%" height="30" flex_flow="row"/>
+            <lv_obj name="content_area" width="100%" flex_grow="1" flex_flow="column"/>
+        </view>
+    </component>
+
+    <!-- main_screen.xml -->
+    <component>
+        <view extends="simple_screen" width="100%">
+            <simple_screen-icon_area>
+                <lv_image src="img1"/>
+                <lv_image src="img2"/>
+            </simple_screen-icon_area>
+
+            <simple_screen-content_area>
+                <lv_label text="Some content"/>
+            </simple_screen-content_area>
+        </view>
+    </component>
+
 Limitations
 -----------
 
@@ -89,7 +138,12 @@ Example
 
     <!-- my_list.xml -->
     <component>
+        <api>
+            <slot name="header"/>
+        </api>
+
         <view flex_flow="column">
+            <lv_obj name="header" width="100%"/>
             <my_button button_label="First"/>
             <my_button button_label="Wifi" button_icon="img_wifi"/>
             <my_button button_label="Third"/>
@@ -254,6 +308,9 @@ LVGL's UI Editor generates this:
 
     lv_obj_t * my_widget_add_indicator(lv_obj_t * parent, lv_color_t color, int32_t max_value);
     void my_widget_set_indicator_value(lv_obj_t * obj, int32_t value);
+
+
+.. _xml_api_element_get:
 
 access="get"
 ~~~~~~~~~~~~

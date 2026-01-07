@@ -354,4 +354,33 @@ void test_table_cell_select_should_not_allow_set_on_table_with_no_rows(void)
     TEST_ASSERT_EQUAL_UINT32(LV_TABLE_CELL_NONE, selected_column);
 }
 
+void test_table_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * tbl = lv_table_create(lv_screen_active());
+
+    lv_table_set_row_count(tbl, 5);
+    lv_table_set_column_count(tbl, 3);
+
+    /* Test getters */
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(tbl, LV_PROPERTY_TABLE_ROW_COUNT).num);
+    TEST_ASSERT_EQUAL_INT(3, lv_obj_get_property(tbl, LV_PROPERTY_TABLE_COLUMN_COUNT).num);
+
+    /* Test setters */
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_TABLE_ROW_COUNT;
+    prop.num = 8;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tbl, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(8, lv_table_get_row_count(tbl));
+
+    prop.id = LV_PROPERTY_TABLE_COLUMN_COUNT;
+    prop.num = 4;
+    TEST_ASSERT_TRUE(lv_obj_set_property(tbl, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(4, lv_table_get_column_count(tbl));
+
+    lv_obj_delete(tbl);
+#endif
+}
+
 #endif

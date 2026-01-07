@@ -24,6 +24,7 @@ static void cb_delete_assertion(lv_event_t * event);
 
 lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 {
+    LV_LOG_WARN("lv_fragment is deprecated and will be removed in an upcoming release.");
     LV_ASSERT_NULL(cls);
     LV_ASSERT_NULL(cls->create_obj_cb);
     LV_ASSERT(cls->instance_size >= sizeof(lv_fragment_t));

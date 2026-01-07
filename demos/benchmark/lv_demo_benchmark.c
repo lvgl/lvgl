@@ -975,6 +975,8 @@ static uint32_t loop_optimizable(void)
     for(i = 0; i < 100000; i++) {
         c++;
     }
+
+    LV_UNUSED(c);
     return 0;
 }
 static uint32_t loop_not_optimizable(void)

@@ -212,10 +212,6 @@ lv_gltf_model_t * lv_gltf_data_load_internal(const void * data_source, size_t da
 
 static lv_gltf_model_t * create_data_from_file(const char * path)
 {
-#if !FASTGLTF_HAS_MEMORY_MAPPED_FILE
-#error This version of fastgltf can not open GLTF files from filesystem. Either encode your GLB into a source file and create or build fastgltf with FASTGLTF_HAS_MEMORY_MAPPED_FILE set to '1'
-#endif
-
     lv_fs_file_t file;
     lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) {

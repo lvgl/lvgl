@@ -151,17 +151,19 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_task_t * t, const lv_dra
 
             int32_t dash_cnt = dash_start;
             int32_t i;
-            for(i = 0; i < blend_area_w; i++, dash_cnt++) {
-                if(dash_cnt <= dsc->dash_width) {
+            for(i = 0; i < blend_area_w;) {
+                if(dash_cnt < dsc->dash_width) {
                     int16_t diff = dsc->dash_width - dash_cnt;
                     i += diff;
                     dash_cnt += diff;
                 }
-                else if(dash_cnt > dsc->dash_gap + dsc->dash_width) {
-                    dash_cnt = 0;
-                }
                 else {
                     mask_buf[i] = 0x00;
+                    i++;
+                    dash_cnt++;
+                }
+                if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                    dash_cnt = 0;
                 }
 
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;

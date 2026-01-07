@@ -28,6 +28,13 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_switch_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_switch_id_t {
+    LV_PROPERTY_ID(SWITCH, ORIENTATION, LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_SWITCH_END,
+};
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

@@ -115,8 +115,11 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
 
+    if(draw_buf == NULL) return;
+
     lv_color_format_t cf = draw_buf->header.cf;
     uint8_t * data = lv_draw_buf_goto_xy(draw_buf, x, y);
+    if(data == NULL) return;
 
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
         uint8_t shift;
@@ -188,6 +191,8 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
+    if(canvas->draw_buf == NULL) return;
+
     lv_draw_buf_set_palette(canvas->draw_buf, index, color);
     lv_obj_invalidate(obj);
 }
@@ -214,6 +219,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 
     lv_image_header_t * header = &canvas->draw_buf->header;
     const uint8_t * px = lv_draw_buf_goto_xy(canvas->draw_buf, x, y);
+    if(px == NULL) return ret;
 
     switch(header->cf) {
         case LV_COLOR_FORMAT_ARGB8888:
@@ -228,9 +234,9 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
             break;
         case LV_COLOR_FORMAT_RGB565: {
                 lv_color16_t * c16 = (lv_color16_t *) px;
-                ret.red = (c16[0].red * 2106) >> 8;  /*To make it rounded*/
-                ret.green = (c16[0].green * 1037) >> 8;
-                ret.blue = (c16[0].blue * 2106) >> 8;
+                ret.red = (c16->red * 2106) >> 8;  /*To make it rounded*/
+                ret.green = (c16->green * 1037) >> 8;
+                ret.blue = (c16->blue * 2106) >> 8;
                 ret.alpha = 0xFF;
                 break;
             }
@@ -280,18 +286,18 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
  * Other functions
  *====================*/
 
-void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf,
-                        const lv_area_t * dest_area)
+void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * src_buf,
+                        const lv_area_t * src_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(canvas_area && dest_buf);
+    LV_ASSERT_NULL(src_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
+    LV_ASSERT_MSG(canvas->draw_buf->header.cf == src_buf->header.cf, "Color formats must be the same");
 
-    lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
+    lv_draw_buf_copy(canvas->draw_buf, canvas_area, src_buf, src_area);
 }
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
