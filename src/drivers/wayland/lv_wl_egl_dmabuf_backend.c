@@ -354,7 +354,6 @@ static inline void set_viewport(lv_display_t * display)
 
 static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_UNUSED(px_map);
     LV_UNUSED(area);
 
     if(!lv_display_flush_is_last(disp)) {
@@ -407,15 +406,18 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
         return NULL;
     }
 
-    uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(display));
+    lv_color_format_t cf = lv_display_get_color_format(display);
+    uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     uint32_t buf_size = stride * height;
+
     uint8_t * buf1 = lv_malloc(buf_size);
     uint8_t * buf2 = lv_malloc(buf_size);
     LV_ASSERT_MALLOC(buf1);
     LV_ASSERT_MALLOC(buf2);
     if(!buf1 || !buf2) {
         LV_LOG_ERROR("Failed to allocate display buffer");
-        return LV_RESULT_INVALID;
+        egl_destroy_display_data(ddata);
+        return NULL;
     }
 
     lv_display_set_buffers(display, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
@@ -437,22 +439,24 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
         return NULL;
     }
 
-    /* Free old buffer before set new one */
-    void * old_buf1 = lv_display_get_buf_active(display);
-    void * old_buf2 = display->buf_2;
-    lv_free(old_buf1);
-    lv_free(old_buf2);
-
-    uint32_t stride = lv_draw_buf_width_to_stride(width, lv_display_get_color_format(display));
+    lv_color_format_t cf = lv_display_get_color_format(display);
+    uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
     uint32_t buf_size = stride * height;
+
     uint8_t * buf1 = lv_malloc(buf_size);
     uint8_t * buf2 = lv_malloc(buf_size);
     LV_ASSERT_MALLOC(buf1);
     LV_ASSERT_MALLOC(buf2);
     if(!buf1 || !buf2) {
         LV_LOG_ERROR("Failed to allocate display buffer");
-        return LV_RESULT_INVALID;
+        egl_destroy_display_data(ddata);
+        return NULL;
     }
+
+    void * old_buf1 = lv_display_get_buf_active(display);
+    void * old_buf2 = display->buf_2;
+    lv_free(old_buf1);
+    lv_free(old_buf2);
 
     lv_display_set_buffers(display, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
 
@@ -706,13 +710,8 @@ static void init_buffer(lv_wl_egl_ctx_t * ctx, lv_wl_buffer_t * buffer, uint32_t
 
     struct zwp_linux_buffer_params_v1 * params = zwp_linux_dmabuf_v1_create_params(ctx->handler);
 
-    zwp_linux_buffer_params_v1_add(params,
-                                   buffer->dmabuf_fd,
-                                   0,
-                                   buffer->offset,
-                                   buffer->stride,
-                                   0,
-                                   0);
+    zwp_linux_buffer_params_v1_add(params, buffer->dmabuf_fd, 0,
+                                   buffer->offset, buffer->stride, 0, 0);
 
     zwp_linux_buffer_params_v1_add_listener(params, &params_listener, buffer);
     zwp_linux_buffer_params_v1_create(params, width, height, drm_cf, 0);
