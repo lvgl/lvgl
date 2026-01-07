@@ -1,11 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "src/debugging/test/lv_test_helpers.h"
-#include "src/display/lv_display.h"
 #include "src/misc/cache/instance/lv_image_cache.h"
-#include "src/draw/lv_draw_vector.h"
-#include <string.h>
-
 #include "unity/unity.h"
 
 static lv_layer_t layer;
@@ -34,8 +29,6 @@ void tearDown(void)
         canvas = NULL;
     }
 }
-
-#if LV_USE_VECTOR_GRAPHIC || LV_USE_VECTOR_GRAPHIC_OPTIMIZE
 
 #define SNAPSHOT_NAME(n) (#n)
 
@@ -261,5 +254,4 @@ void test_draw_arc_path(void)
     lv_draw_vector_dsc_delete(ctx);
 }
 
-#endif
 #endif
