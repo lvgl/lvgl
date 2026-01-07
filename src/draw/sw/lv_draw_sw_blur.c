@@ -136,9 +136,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(px_size == 1) {
             /*Compiler optimization might mishandle it, so add volatile*/
             uint8_t * buf_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
-            uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
             blur_1_bytes_init(sum, buf_column_start, sample_len_limited, stride_byte * skip_cnt);
-            blur_1_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
 
             uint8_t buf_prev = buf_column_start[0] + 1; /*Make sure that it's not equal in the first round*/
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -149,6 +147,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf_column_start += stride_byte * skip_cnt;
             }
 
+            uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
+            blur_1_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
             buf_prev = buf_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 if(buf_prev != *buf_column_end) {
@@ -160,9 +160,7 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         }
         else if(px_size == 2) {
             uint16_t * buf16_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
-            uint16_t * buf16_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_start, sample_len_limited, stride_px * skip_cnt, swapped);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_end, sample_len_limited, -stride_px * skip_cnt, swapped);
             uint16_t buf16_prev = buf16_column_start[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -173,6 +171,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf16_column_start += stride_px * skip_cnt;
             }
 
+            uint16_t * buf16_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_column_end, sample_len_limited, -stride_px * skip_cnt, swapped);
             buf16_prev = buf16_column_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
@@ -186,15 +186,15 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         else if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_column_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_start);
-            volatile uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
             blur_3_bytes_init(sum, buf_column_start, sample_len_limited, stride_byte * skip_cnt);
-            blur_3_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
 
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum, buf_column_start, intensity);
                 buf_column_start += stride_byte * skip_cnt;
             }
 
+            volatile uint8_t * buf_column_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x, y_end);
+            blur_3_bytes_init(sum, buf_column_end, sample_len_limited, -stride_byte * skip_cnt);
             for(y = y_start; y <= y_end; y += skip_cnt) {
                 blur_3_bytes(sum, buf_column_end, intensity);
                 buf_column_end -= stride_byte * skip_cnt;
@@ -222,10 +222,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         if(px_size == 1) {
             /*Compiler optimization might mishandle it, so add volatile*/
             uint8_t * buf_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
 
             blur_1_bytes_init(sum, buf_line_start, sample_len_limited, px_size * skip_cnt);
-            blur_1_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
 
             uint8_t buf_prev = buf_line_start[0] + 1; /*Make sure that it's not equal in the first round*/
             for(x = x_start + skip_cnt; x <= x_end; x += skip_cnt) {
@@ -236,6 +234,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf_line_start += next_px_ofs_byte;
             }
 
+            uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
+            blur_1_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
             buf_prev = buf_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -267,11 +267,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
 
         }
         else if(px_size == 2) {
-            bool swapped = t->target_layer->draw_buf->header.cf == LV_COLOR_FORMAT_RGB565_SWAPPED;
             uint16_t * buf16_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            uint16_t * buf16_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
             blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_start, sample_len_limited,  skip_cnt, swapped);
-            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_end, sample_len_limited, - skip_cnt, swapped);
 
             uint16_t buf16_prev = buf16_line_start[0] + 1; /*Make sure that it's not equal in the first round*/
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -283,6 +280,8 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
                 buf16_line_start += skip_cnt;
             }
 
+            uint16_t * buf16_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
+            blur_2_bytes_init(sum, (lv_color16_t *)buf16_line_end, sample_len_limited, - skip_cnt, swapped);
             buf16_prev = buf16_line_end[0] + 1; /*Make sure that it's not equal in the first round*/
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
@@ -317,14 +316,15 @@ void lv_draw_sw_blur(lv_draw_task_t * t, const lv_draw_blur_dsc_t * dsc, const l
         else if(px_size >= 3) {
             /*Compiler optimization might mishandle it, so add volatile*/
             volatile uint8_t * buf_line_start = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_start, y);
-            volatile uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
 
             blur_3_bytes_init(sum, buf_line_start, sample_len_limited, px_size * skip_cnt);
-            blur_3_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
             for(x = x_start + skip_cnt; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line_start, intensity);
                 buf_line_start += next_px_ofs_byte;
             }
+
+            volatile uint8_t * buf_line_end = lv_draw_buf_goto_xy(t->target_layer->draw_buf, x_end, y);
+            blur_3_bytes_init(sum, buf_line_end, sample_len_limited, - px_size * skip_cnt);
 
             for(x = x_start; x <= x_end; x += skip_cnt) {
                 blur_3_bytes(sum, buf_line_end, intensity);
