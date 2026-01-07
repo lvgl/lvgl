@@ -250,7 +250,9 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_wl_egl_ctx_t * ctx,
     }
 
     /* Load glEGLimage */
-    load_egl_extensions();
+    if(!glEGLImageTargetTexture2DOES) {
+        load_egl_extensions();
+    }
 
     ddata->drm_fd = open_drm_device();
     if(ddata->drm_fd < 0) {
