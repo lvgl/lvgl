@@ -36,14 +36,11 @@
  *      TYPEDEFS
  **********************/
 
-#pragma pack(1)
-
+/* This structure represents the ARGB8565 format (3 bytes per pixel). */
 typedef struct {
     lv_color16_t color;
     uint8_t alpha;
 } color16_alpha_t;
-
-#pragma pack()
 
 /**********************
  *  STATIC PROTOTYPES
