@@ -28,7 +28,6 @@
 typedef struct {
     HANDLE dir_p;
     char next_fn[LV_FS_MAX_PATH_LEN];
-    lv_fs_res_t next_error;
 } dir_handle_t;
 
 /**********************
@@ -365,7 +364,6 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
     handle->dir_p = INVALID_HANDLE_VALUE;
-    handle->next_error = LV_FS_RES_OK;
     WIN32_FIND_DATAA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
@@ -394,11 +392,9 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     if(handle->dir_p == INVALID_HANDLE_VALUE) {
         lv_free(handle);
-        handle->next_error = fs_error_from_win32(GetLastError());
         return INVALID_HANDLE_VALUE;
     }
     else {
-        handle->next_error = LV_FS_RES_OK;
         return handle;
     }
 }
@@ -419,7 +415,6 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
     dir_handle_t * handle = (dir_handle_t *)dir_p;
     lv_strlcpy(fn, handle->next_fn, fn_len);
-    lv_fs_res_t current_error = handle->next_error;
     lv_strcpy(handle->next_fn, "");
 
     WIN32_FIND_DATAA fdata;
@@ -439,11 +434,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         }
     }
 
-    if(handle->next_fn[0] == '\0') {
-        handle->next_error = fs_error_from_win32(GetLastError());
-    }
-
-    return current_error;
+    return LV_FS_RES_OK;
 }
 
 /**
