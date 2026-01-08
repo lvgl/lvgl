@@ -143,7 +143,7 @@ static void read_touch(lv_indev_t * indev, lv_indev_data_t * data)
          * and pass raw (Physical/Rotation 0) coordinates to LVGL.
          */
         uint8_t rotation = dsc->tft->getRotation();
-        
+
         /* Note: width() and height() return dimensions for the *current* rotation */
         int32_t w = dsc->tft->width();
         int32_t h = dsc->tft->height();
