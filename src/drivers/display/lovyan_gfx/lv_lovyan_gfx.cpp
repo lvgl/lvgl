@@ -20,9 +20,6 @@
  **********************/
 typedef struct {
     LGFX * tft;
-    lv_display_rotation_t rotation;
-    int32_t hor_res;
-    int32_t ver_res;
 } lv_lovyan_gfx_t;
 
 /**********************
@@ -63,10 +60,6 @@ lv_display_t * lv_lovyan_gfx_create(uint32_t hor_res, uint32_t ver_res, void * b
     dsc->tft->setBrightness(255);
     dsc->tft->startWrite();
     dsc->tft->fillScreen(0x00000);
-
-    dsc->rotation = LV_DISPLAY_ROTATION_0;
-    dsc->hor_res = hor_res;
-    dsc->ver_res = ver_res;
 
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -111,11 +104,9 @@ static void resolution_changed_event_cb(lv_event_t * e)
 {
     lv_display_t * disp = (lv_display_t *)lv_event_get_target(e);
     lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_display_get_driver_data(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
     lv_display_rotation_t rot = lv_display_get_rotation(disp);
-
-    dsc->rotation = rot;
-    dsc->hor_res = lv_display_get_original_horizontal_resolution(disp);
-    dsc->ver_res = lv_display_get_original_vertical_resolution(disp);
 
     /* handle rotation */
     switch(rot) {
@@ -140,26 +131,50 @@ static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data)
     uint16_t x;
     uint16_t y;
     bool touched = dsc->tft->getTouch(&x, &y);
+    
     if(!touched) {
         data->state = LV_INDEV_STATE_RELEASED;
     }
     else {
         data->state = LV_INDEV_STATE_PRESSED;
 
-        switch(dsc->rotation) {
-            case LV_DISPLAY_ROTATION_90:
+        /* LovyanGFX returns coordinates relative to the current software rotation.
+         * LVGL will also rotate the input coordinates based on the display rotation.
+         * To avoid "double rotation", we must reverse the LovyanGFX rotation 
+         * and pass raw (Physical/Rotation 0) coordinates to LVGL.
+         */
+        
+        uint8_t rotation = dsc->tft->getRotation();
+        /* Note: width() and height() return dimensions for the *current* rotation */
+        int32_t w = dsc->tft->width();
+        int32_t h = dsc->tft->height();
+
+        switch(rotation) {
+            case 1: /* Landscape (90 deg CW) */
+                /* Rot 0 (Phys) Top-Left becomes Rot 1 Top-Right. 
+                   We must map Rot 1 back to Rot 0. 
+                   Phys X = Rot1 Y
+                   Phys Y = Rot1 Width - 1 - Rot1 X */
                 data->point.x = y;
-                data->point.y = dsc->ver_res - x - 1;
+                data->point.y = w - 1 - x;
                 break;
-            case LV_DISPLAY_ROTATION_180:
-                data->point.x = dsc->hor_res - x - 1;
-                data->point.y = dsc->ver_res - y - 1;
+                
+            case 2: /* Portrait Inverted (180 deg) */
+                /* Phys X = Rot2 Width - 1 - Rot2 X
+                   Phys Y = Rot2 Height - 1 - Rot2 Y */
+                data->point.x = w - 1 - x;
+                data->point.y = h - 1 - y;
                 break;
-            case LV_DISPLAY_ROTATION_270:
-                data->point.x = dsc->hor_res - y - 1;
+                
+            case 3: /* Landscape Inverted (270 deg CW) */
+                /* Phys X = Rot3 Height - 1 - Rot3 Y 
+                   Phys Y = Rot3 X */
+                data->point.x = h - 1 - y;
                 data->point.y = x;
                 break;
-            default:
+                
+            default: /* Portrait (0 deg) */
+                /* Pass through raw coordinates */
                 data->point.x = x;
                 data->point.y = y;
                 break;
