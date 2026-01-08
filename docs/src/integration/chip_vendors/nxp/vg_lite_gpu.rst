@@ -69,6 +69,64 @@ Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the ti
 For detailed instructions, see :ref:`vg_lite_tvg`.
 
 
+Image Decoder Color Format Conversion
+*************************************
+
+The VG-Lite image decoder automatically converts certain color formats that are not natively
+supported by the GPU hardware into compatible formats. This conversion happens transparently
+during the image decoding process.
+
+The following table shows the color format mapping:
+
+.. list-table::
+   :widths: 30 30 40
+   :header-rows: 1
+
+   * - Source Format
+     - Target Format
+     - Description
+   * - ``LV_COLOR_FORMAT_I1``
+     - ``LV_COLOR_FORMAT_I8``
+     - VG-Lite index formats require endian + bit flipping, converted to I8 for simplicity
+   * - ``LV_COLOR_FORMAT_I2``
+     - ``LV_COLOR_FORMAT_I8``
+     - Same as above
+   * - ``LV_COLOR_FORMAT_I4``
+     - ``LV_COLOR_FORMAT_I8``
+     - Same as above
+   * - ``LV_COLOR_FORMAT_A1``
+     - ``LV_COLOR_FORMAT_A8``
+     - Alpha format expanded to 8-bit
+   * - ``LV_COLOR_FORMAT_A2``
+     - ``LV_COLOR_FORMAT_A8``
+     - Alpha format expanded to 8-bit
+   * - ``LV_COLOR_FORMAT_RGB888``
+     - ``LV_COLOR_FORMAT_XRGB8888``
+     - Converted when GPU doesn't support 24-bit format
+   * - ``LV_COLOR_FORMAT_ARGB8565``
+     - ``LV_COLOR_FORMAT_ARGB8888``
+     - Converted when GPU doesn't support 24-bit format
+   * - ``LV_COLOR_FORMAT_RGB565A8``
+     - ``LV_COLOR_FORMAT_ARGB8888``
+     - Separate RGB + Alpha planes merged into ARGB8888
+   * - ``LV_COLOR_FORMAT_AL88``
+     - ``LV_COLOR_FORMAT_ARGB8888``
+     - Alpha + Luminance converted to ARGB8888
+   * - ``LV_COLOR_FORMAT_RGB565_SWAPPED``
+     - ``LV_COLOR_FORMAT_RGB565``
+     - Byte order swapped
+
+**Notes:**
+
+- Formats not listed above will return ``LV_COLOR_FORMAT_UNKNOWN`` and be passed to other decoders in the chain.
+- The 24-bit format conversion (``RGB888``, ``ARGB8565``) depends on GPU capability, queried via ``vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT)``.
+  If the GPU supports 24-bit formats, the decoder will skip these formats and let the default binary decoder handle them.
+- Index formats (``I1``, ``I2``, ``I4``) maintain their palette but expand index values to 8-bit for GPU compatibility.
+- Alpha formats (``A1``, ``A2``) are linearly scaled to 8-bit (e.g., A1: 0→0, 1→255; A2: 0→0, 1→85, 2→170, 3→255).
+- **Compressed formats are not supported.** Images with ``LV_IMAGE_FLAGS_COMPRESSED`` flag will be rejected by this decoder
+  and passed to other decoders that support decompression.
+
+
 API
 ***
 
@@ -81,4 +139,3 @@ API
 .. API equals:      vglite_create_rect_path_data
 
 .. API equals:      vglite_get_color
-
