@@ -2099,8 +2099,8 @@ menu "LVGL configuration"
 			bool "Use LovyanGFX driver"
 			default n
 			help
-				Enable LovyanGFX driver. 
-				Note: In ESP-IDF, you must manually link the LovyanGFX library in your project's 
+				Enable LovyanGFX driver.
+				Note: In ESP-IDF, you must manually link the LovyanGFX library in your project's
 				CMakeLists.txt or idf_component.yml as auto-linking is not provided by LVGL.
 
 		config LV_LGFX_USER_INCLUDE
