@@ -75,7 +75,7 @@ If you prefer using third-party libraries like `LovyanGFX <https://github.com/lo
 
       idf.py add-dependency "lovyan03/lovyan_gfx"
 
-2. Since LVGL does not automatically link third-party libraries, you must manually link it in your project's ``main/CMakeLists.txt``:
+2. Since LVGL does not automatically link third-party libraries, you must manually link it in your project's ``CMakeLists.txt``:
 
    .. code-block:: cmake
 
