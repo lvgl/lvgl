@@ -294,7 +294,8 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
     int32_t height = lv_display_get_vertical_resolution(display);
     lv_result_t res = lv_opengles_texture_reshape(&ddata->texture, display, width, height);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to create resize display");
+        LV_LOG_ERROR("Failed to resize display");
+        return ddata;
     }
 
     wl_egl_window_resize(ddata->egl_window, width, height, 0, 0);
