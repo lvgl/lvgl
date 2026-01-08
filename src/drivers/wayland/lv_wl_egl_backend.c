@@ -59,7 +59,6 @@ static void * wl_egl_create_window(void * driver_data, const lv_egl_native_windo
 static void wl_egl_destroy_window(void * driver_data, void * native_window);
 static size_t wl_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 static void wl_egl_flip_cb(void * driver_data, bool vsync);
-static inline void set_viewport(lv_display_t * display);
 
 /**********************
  *  STATIC VARIABLES
@@ -173,12 +172,6 @@ static void flush_wait_cb(lv_display_t * disp)
     }
 }
 
-static inline void set_viewport(lv_display_t * display)
-{
-    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
-                         lv_display_get_original_vertical_resolution(display));
-}
-
 #if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 
 static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
@@ -202,7 +195,8 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     }
 
 #if LV_USE_DRAW_OPENGLES
-    set_viewport(disp);
+    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
+                         lv_display_get_original_vertical_resolution(display));
     lv_opengles_render_display_texture(disp, false, true);
 #endif /*LV_USE_DRAW_OPENGLES*/
 
@@ -239,7 +233,8 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     int32_t disp_width = lv_display_get_horizontal_resolution(disp);
     int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
-    set_viewport(disp);
+    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
+                         lv_display_get_original_vertical_resolution(display));
 
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(disp_width, cf);
