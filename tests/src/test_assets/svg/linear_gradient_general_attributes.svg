@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='800' height='800' viewBox='0 0 800 800' >
+    <defs>
+        <linearGradient id='ggg16' x1='0%' y1='0%' x2='100%' y2='0%' gradientUnits='objectBoundingBox'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='blue' />
+        </linearGradient>
+    </defs>
+    <rect x='10' y='10' width='50' height='50' fill='url(#ggg16)' />
+    <rect x='65' y='10' width='50' height='50' fill='url(#ggg16)' />
+    <defs>
+        <linearGradient id='ggg17' x1='0%' y1='0%' x2='100%' y2='0%' gradientUnits='userSpaceOnUse'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='blue' stop-opacity='0.5'/>
+        </linearGradient>
+    </defs>
+    <defs>
+        <linearGradient id='ggg18' x1='0%' y1='0%' x2='100%' y2='0%' gradientUnits='userSpaceOnUse'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='blue' stop-opacity='1.0'/>
+        </linearGradient>
+    </defs>
+    <rect x='10' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='65' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='120' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='175' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='230' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='285' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='340' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='395' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='450' y='65' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='10' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='65' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='120' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='175' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='230' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='285' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='340' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='395' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='450' y='120' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='10' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='65' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='120' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='175' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='230' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='285' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='340' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='395' y='175' width='50' height='50' fill='url(#ggg17)' />
+    <rect x='450' y='175' width='50' height='50' fill='url(#ggg17)' />
+
+    <rect x='10' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='65' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='120' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='175' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='230' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='285' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='340' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='395' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='450' y='240' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='10' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='65' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='120' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='175' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='230' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='285' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='340' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='395' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='450' y='295' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='10' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='65' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='120' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='175' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='230' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='285' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='340' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='395' y='350' width='50' height='50' fill='url(#ggg18)' />
+    <rect x='450' y='350' width='50' height='50' fill='url(#ggg18)' />
+</svg>

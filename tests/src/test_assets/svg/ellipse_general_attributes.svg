@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width='400' height='400'>
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='0.5' stop-color='green' />
+            <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+
+    <ellipse cx='400' cy='125' rx='30' ry='25'/>
+    <ellipse cx='30' cy='125' rx='30' ry='25' fill='red'/>
+    <ellipse cx='92' cy='125' rx='30' ry='25' fill='#ff0000'/>
+    <ellipse cx='153' cy='125' rx='30' ry='25' fill='rgb(255,0,0)'/>
+    <ellipse cx='214' cy='125' rx='30' ry='25' fill='rgba(255,0,0,0.5)'/>
+    <ellipse cx='275' cy='125' rx='30' ry='25' fill='none'/>
+    <ellipse cx='336' cy='125' rx='30' ry='25' fill='url(#ggg1)'/>
+
+    <ellipse cx='35' cy='180' rx='30' ry='25' fill='white' stroke='green'/>
+    <ellipse cx='100' cy='180' rx='30' ry='25' fill='white' stroke='url(#ggg1)' />
+
+    <ellipse cx='35' cy='230' rx='30' ry='25' transform='translate(0, 50)'/>
+    <ellipse cx='92' cy='260' rx='30' ry='25' transform='rotate(295, 100, 100)'/>
+    <ellipse cx='120' cy='230' rx='30' ry='25' transform='scale(1.4, 1.4)'/>
+    <ellipse cx='214' cy='230' rx='30' ry='25' transform='skewX(10)'/>
+    <ellipse cx='275' cy='230' rx='30' ry='25' transform='skewY(20)'/>
+    <ellipse cx='336' cy='230' rx='30' ry='25' transform='matrix(1, 0, 0.3640, 1, 0, 0)'/>
+    <ellipse cx='35' cy='230' rx='30' ry='25' fill='pink' stroke='red' transform='matrix(1, 0, 0.3640, 1, 0, 0)'/>
+</svg>
