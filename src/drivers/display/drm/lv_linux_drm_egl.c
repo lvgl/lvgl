@@ -135,6 +135,8 @@ lv_result_t lv_linux_drm_set_file(lv_display_t * display, const char * file, int
 
     lv_display_set_flush_cb(display, flush_cb);
     lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
+
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
     lv_display_add_event_cb(ctx->display, event_cb, LV_EVENT_DELETE, NULL);
 
@@ -206,7 +208,7 @@ static inline void set_viewport(lv_display_t * display)
     lv_opengles_viewport(0, 0, disp_width, disp_height);
 }
 
-#if LV_USE_DRAW_OPENGLES
+#if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
@@ -215,7 +217,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     if(lv_display_flush_is_last(disp)) {
         set_viewport(disp);
         lv_drm_ctx_t * ctx = lv_display_get_driver_data(disp);
+#if LV_USE_DRAW_OPENGLES
         lv_opengles_render_display_texture(disp, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
         lv_opengles_egl_update(ctx->egl_ctx);
     }
     lv_display_flush_ready(disp);
