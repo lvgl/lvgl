@@ -81,6 +81,11 @@ extern "C" {
 #define GL_RGBA8 0x8058
 #endif
 
+/* In Desktop GL GL_RGB565 is not supported. Use RGB instead */
+#if LV_USE_GLFW
+#define GL_RGB565 GL_RGB
+#endif
+
 #if !defined(glClearDepthf) && defined(glClearDepth)
 #define glClearDepthf glClearDepth
 #endif
