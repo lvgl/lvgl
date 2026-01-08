@@ -295,14 +295,15 @@ static void * wl_egl_resize_display(void * backend_ctx, lv_display_t * display)
     LV_UNUSED(backend_ctx);
     lv_wl_egl_display_data_t * ddata = lv_wayland_get_backend_display_data(display);
 
-    lv_result_t res = lv_opengles_texture_reshape(&ddata->texture, display,
-                                                  lv_display_get_horizontal_resolution(display),
-                                                  lv_display_get_vertical_resolution(display));
+    int32_t width = lv_display_get_horizontal_resolution(display);
+    int32_t height = lv_display_get_vertical_resolution(display);
+    lv_result_t res = lv_opengles_texture_reshape(&ddata->texture, display, width, height);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to create resize display");
     }
 
-    return lv_wayland_get_backend_display_data(display);
+    wl_egl_window_resize(ddata->egl_window, width, height, 0, 0);
+    return ddata;
 }
 
 static void wl_egl_deinit_display(void * backend_ctx, lv_display_t * display)
