@@ -1,41 +1,99 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_LOG
+#if LV_BUILD_EXAMPLES
+
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
- * Test between a full background modal and a recolor modal
+ * Using various gradients for button background
  */
 void lv_example_style_19(void)
 {
-    /*Add lv_example_style_11 as background*/
-    lv_example_style_11();
+    static const lv_color_t grad_colors[2] = {
+        LV_COLOR_MAKE(0x26, 0xa0, 0xda),
+        LV_COLOR_MAKE(0x31, 0x47, 0x55),
+    };
 
-    /* Set to 1 to enable recolor overlay instead of solid background */
-#if 0
-    /* Apply a screen-wide tint using recolor (efficient overlay).
-     * This modifies the visual appearance by blending a semi-transparent color
-     * over existing content without creating additional objects.
-     * It’s lighter on performance compared to a full-size background object. */
-    lv_obj_set_style_recolor(lv_screen_active(), lv_color_black(), 0);
-    lv_obj_set_style_recolor_opa(lv_screen_active(), LV_OPA_50, 0);
-#else
-    /* Simulate a modal background by setting a semi-transparent black background
-     * on lv_layer_top(), the highest built-in layer.
-     * This method creates a new full-screen object and can consume more resources
-     * compared to recolor, especially when using images or gradients. */
-    lv_obj_set_style_bg_color(lv_layer_top(), lv_color_black(), 0);
-    lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_50, 0);
-#endif
+    /*Create a linear gradient going from the top left corner to the bottom at an angle, with reflected color map*/
+    static lv_style_t style_with_linear_gradient_bg;
+    static lv_grad_dsc_t linear_gradient_dsc;     /*NOTE: the gradient descriptor must be static or global variable!*/
 
-    lv_obj_t * obj = lv_slider_create(lv_layer_top());
-    lv_obj_center(obj);
+    lv_style_init(&style_with_linear_gradient_bg);
+    lv_grad_init_stops(&linear_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_linear_init(&linear_gradient_dsc, lv_pct(0), lv_pct(0), lv_pct(20), lv_pct(100), LV_GRAD_EXTEND_REFLECT);
+    lv_style_set_bg_grad(&style_with_linear_gradient_bg, &linear_gradient_dsc);
+    lv_style_set_bg_opa(&style_with_linear_gradient_bg, LV_OPA_COVER);
 
-    lv_refr_now(NULL); /*Update layouts and render*/
+    /*Create a radial gradient with the center in the top left 1/3rd of the object, extending to the bottom right corner, with reflected color map*/
+    static lv_style_t style_with_radial_gradient_bg;
+    static lv_grad_dsc_t radial_gradient_dsc;     /*NOTE: the gradient descriptor must be static or global variable!*/
 
-    lv_obj_invalidate(lv_screen_active());
+    lv_style_init(&style_with_radial_gradient_bg);
+    lv_grad_init_stops(&radial_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_radial_init(&radial_gradient_dsc, lv_pct(30), lv_pct(30), lv_pct(100), lv_pct(100), LV_GRAD_EXTEND_REFLECT);
+    lv_style_set_bg_grad(&style_with_radial_gradient_bg, &radial_gradient_dsc);
+    lv_style_set_bg_opa(&style_with_radial_gradient_bg, LV_OPA_COVER);
 
-    uint32_t t = lv_tick_get();
-    lv_refr_now(NULL); /*Render only*/
-    LV_LOG_USER("%" LV_PRIu32 " ms\n", lv_tick_elaps(t));
+    /*Create buttons with different gradient styles*/
+
+    lv_obj_t * btn;
+    lv_obj_t * label;
+
+    /*Simple horizontal gradient*/
+    btn = lv_button_create(lv_screen_active());
+    lv_obj_set_style_bg_color(btn, grad_colors[0], 0);
+    lv_obj_set_style_bg_grad_color(btn, grad_colors[1], 0);
+    lv_obj_set_style_bg_grad_dir(btn, LV_GRAD_DIR_HOR, 0);
+    lv_obj_set_size(btn, 150, 50);
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, -100);
+
+    label = lv_label_create(btn);
+    lv_label_set_text(label, "Horizontal");
+    lv_obj_center(label);
+
+    /*Simple vertical gradient*/
+    btn = lv_button_create(lv_screen_active());
+    lv_obj_set_style_bg_color(btn, grad_colors[0], 0);
+    lv_obj_set_style_bg_grad_color(btn, grad_colors[1], 0);
+    lv_obj_set_style_bg_grad_dir(btn, LV_GRAD_DIR_VER, 0);
+    lv_obj_set_size(btn, 150, 50);
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, -40);
+
+    label = lv_label_create(btn);
+    lv_label_set_text(label, "Vertical");
+    lv_obj_center(label);
+
+    /*Complex linear gradient*/
+    btn = lv_button_create(lv_screen_active());
+    lv_obj_add_style(btn, &style_with_linear_gradient_bg, 0);
+    lv_obj_set_size(btn, 150, 50);
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 20);
+
+    label = lv_label_create(btn);
+    lv_label_set_text(label, "Linear");
+    lv_obj_center(label);
+
+    /*Complex radial gradient*/
+    btn = lv_button_create(lv_screen_active());
+    lv_obj_add_style(btn, &style_with_radial_gradient_bg, 0);
+    lv_obj_set_size(btn, 150, 50);
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 80);
+
+    label = lv_label_create(btn);
+    lv_label_set_text(label, "Radial");
+    lv_obj_center(label);
 }
 
-#endif
+#else
+
+void lv_example_style_19(void)
+{
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_obj_set_width(label, LV_PCT(80));
+    lv_label_set_text(label, "LV_USE_DRAW_SW_COMPLEX_GRADIENTS is not enabled");
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
+    lv_obj_center(label);
+}
+
+#endif /*LV_USE_DRAW_SW_COMPLEX_GRADIENTS*/
+
+#endif /*LV_BUILD_EXAMPLES*/

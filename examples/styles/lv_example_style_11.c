@@ -2,49 +2,39 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Using multiple styles
+ * Creating a transition
  */
 void lv_example_style_11(void)
 {
-    /*A base style*/
-    static lv_style_t style_base;
-    lv_style_init(&style_base);
-    lv_style_set_bg_color(&style_base, lv_palette_main(LV_PALETTE_LIGHT_BLUE));
-    lv_style_set_border_color(&style_base, lv_palette_darken(LV_PALETTE_LIGHT_BLUE, 3));
-    lv_style_set_border_width(&style_base, 2);
-    lv_style_set_radius(&style_base, 10);
-    lv_style_set_shadow_width(&style_base, 10);
-    lv_style_set_shadow_offset_y(&style_base, 5);
-    lv_style_set_shadow_opa(&style_base, LV_OPA_50);
-    lv_style_set_text_color(&style_base, lv_color_white());
-    lv_style_set_width(&style_base, 100);
-    lv_style_set_height(&style_base, LV_SIZE_CONTENT);
+    static const lv_style_prop_t props[] = {LV_STYLE_BG_COLOR, LV_STYLE_BORDER_COLOR, LV_STYLE_BORDER_WIDTH, 0};
 
-    /*Set only the properties that should be different*/
-    static lv_style_t style_warning;
-    lv_style_init(&style_warning);
-    lv_style_set_bg_color(&style_warning, lv_palette_main(LV_PALETTE_YELLOW));
-    lv_style_set_border_color(&style_warning, lv_palette_darken(LV_PALETTE_YELLOW, 3));
-    lv_style_set_text_color(&style_warning, lv_palette_darken(LV_PALETTE_YELLOW, 4));
+    /* A default transition
+     * Make it fast (100ms) and start with some delay (200 ms)*/
+    static lv_style_transition_dsc_t trans_def;
+    lv_style_transition_dsc_init(&trans_def, props, lv_anim_path_linear, 100, 200, NULL);
 
-    /*Create an object with the base style only*/
-    lv_obj_t * obj_base = lv_obj_create(lv_screen_active());
-    lv_obj_add_style(obj_base, &style_base, 0);
-    lv_obj_align(obj_base, LV_ALIGN_LEFT_MID, 20, 0);
+    /* A special transition when going to pressed state
+     * Make it slow (500 ms) but start  without delay*/
+    static lv_style_transition_dsc_t trans_pr;
+    lv_style_transition_dsc_init(&trans_pr, props, lv_anim_path_linear, 500, 0, NULL);
 
-    lv_obj_t * label = lv_label_create(obj_base);
-    lv_label_set_text(label, "Base");
-    lv_obj_center(label);
+    static lv_style_t style_def;
+    lv_style_init(&style_def);
+    lv_style_set_transition(&style_def, &trans_def);
 
-    /*Create another object with the base style and earnings style too*/
-    lv_obj_t * obj_warning = lv_obj_create(lv_screen_active());
-    lv_obj_add_style(obj_warning, &style_base, 0);
-    lv_obj_add_style(obj_warning, &style_warning, 0);
-    lv_obj_align(obj_warning, LV_ALIGN_RIGHT_MID, -20, 0);
+    static lv_style_t style_pr;
+    lv_style_init(&style_pr);
+    lv_style_set_bg_color(&style_pr, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_border_width(&style_pr, 6);
+    lv_style_set_border_color(&style_pr, lv_palette_darken(LV_PALETTE_RED, 3));
+    lv_style_set_transition(&style_pr, &trans_pr);
 
-    label = lv_label_create(obj_warning);
-    lv_label_set_text(label, "Warning");
-    lv_obj_center(label);
+    /*Create an object with the new style_pr*/
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, &style_def, 0);
+    lv_obj_add_style(obj, &style_pr, LV_STATE_PRESSED);
+
+    lv_obj_center(obj);
 }
 
 #endif

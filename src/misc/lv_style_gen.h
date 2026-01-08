@@ -101,6 +101,15 @@ void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value);
 void lv_style_set_text_outline_stroke_color(lv_style_t * style, lv_color_t value);
 void lv_style_set_text_outline_stroke_width(lv_style_t * style, int32_t value);
 void lv_style_set_text_outline_stroke_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_blur_radius(lv_style_t * style, int32_t value);
+void lv_style_set_blur_backdrop(lv_style_t * style, bool value);
+void lv_style_set_blur_quality(lv_style_t * style, lv_blur_quality_t value);
+void lv_style_set_drop_shadow_radius(lv_style_t * style, int32_t value);
+void lv_style_set_drop_shadow_offset_x(lv_style_t * style, int32_t value);
+void lv_style_set_drop_shadow_offset_y(lv_style_t * style, int32_t value);
+void lv_style_set_drop_shadow_color(lv_style_t * style, lv_color_t value);
+void lv_style_set_drop_shadow_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_drop_shadow_quality(lv_style_t * style, lv_blur_quality_t value);
 void lv_style_set_radius(lv_style_t * style, int32_t value);
 void lv_style_set_radial_offset(lv_style_t * style, int32_t value);
 void lv_style_set_clip_corner(lv_style_t * style, bool value);
@@ -110,9 +119,6 @@ void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_recolor(lv_style_t * style, lv_color_t value);
 void lv_style_set_recolor_opa(lv_style_t * style, lv_opa_t value);
-void lv_style_set_blur_radius(lv_style_t * style, int32_t value);
-void lv_style_set_blur_backdrop(lv_style_t * style, bool value);
-void lv_style_set_blur_quality(lv_style_t * style, lv_blur_quality_t value);
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 void lv_style_set_anim_duration(lv_style_t * style, uint32_t value);
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
@@ -578,6 +584,51 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
         .prop = LV_STYLE_TEXT_OUTLINE_STROKE_OPA, .value = { .num = (int32_t)val } \
     }
 
+#define LV_STYLE_CONST_BLUR_RADIUS(val) \
+    { \
+        .prop = LV_STYLE_BLUR_RADIUS, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_BLUR_BACKDROP(val) \
+    { \
+        .prop = LV_STYLE_BLUR_BACKDROP, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_BLUR_QUALITY(val) \
+    { \
+        .prop = LV_STYLE_BLUR_QUALITY, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_RADIUS(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_RADIUS, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_OFFSET_X(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_OFFSET_X, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_OFFSET_Y(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_OFFSET_Y, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_COLOR(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_COLOR, .value = { .color = val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_OPA(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_DROP_SHADOW_QUALITY(val) \
+    { \
+        .prop = LV_STYLE_DROP_SHADOW_QUALITY, .value = { .num = (int32_t)val } \
+    }
+
 #define LV_STYLE_CONST_RADIUS(val) \
     { \
         .prop = LV_STYLE_RADIUS, .value = { .num = (int32_t)val } \
@@ -621,21 +672,6 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 #define LV_STYLE_CONST_RECOLOR_OPA(val) \
     { \
         .prop = LV_STYLE_RECOLOR_OPA, .value = { .num = (int32_t)val } \
-    }
-
-#define LV_STYLE_CONST_BLUR_RADIUS(val) \
-    { \
-        .prop = LV_STYLE_BLUR_RADIUS, .value = { .num = (int32_t)val } \
-    }
-
-#define LV_STYLE_CONST_BLUR_BACKDROP(val) \
-    { \
-        .prop = LV_STYLE_BLUR_BACKDROP, .value = { .num = (int32_t)val } \
-    }
-
-#define LV_STYLE_CONST_BLUR_QUALITY(val) \
-    { \
-        .prop = LV_STYLE_BLUR_QUALITY, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_ANIM(val) \
