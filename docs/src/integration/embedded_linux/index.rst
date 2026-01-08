@@ -9,5 +9,6 @@ Running under Embedded Linux
 
     overview
     opengl
+    nanovg
     os/index
     drivers/index
