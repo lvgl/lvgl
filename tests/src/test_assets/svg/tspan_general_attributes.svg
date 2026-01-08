@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='800' height='800' viewBox='0 0 800 800' >
+    <defs>
+        <linearGradient id='ggg1' x1='0%' y1='0%' x2='100%' y2='0%'>
+        <stop offset='0' stop-color='red' />
+        <stop offset='0.5' stop-color='green' />
+        <stop offset='1' stop-color='blue' />
+        </linearGradient>
+    </defs>
+
+    <text x='151' y='10' fill='black' font-size='18'>---------------------------------------------------</text>
+	<text x='200' y='100' font-size='24' font-family='Arial'>This is
+    	<tspan >SVG</tspan>
+        <tspan dx='10' dy='10' font-size='16'>text</tspan>
+    </text>
+    <text x='400' y='100' font-size='24' font-family='Courier'>This is
+    	<tspan >SVG</tspan>
+        <tspan dx='10' dy='10' font-size='30'>text</tspan>
+    </text>
+    <text x='200' y='150' font-size='24' font-family='Arial'>This is
+    	<tspan >SVG</tspan>
+        <tspan dx='10' dy='10' font-style='oblique' font-size='18'>text</tspan>
+    </text>
+    <text x='400' y='150' font-size='24' font-weight='900' font-family='Arial'>This is
+    	<tspan >SVG</tspan>
+        <tspan dx='10' dy='10' font-size='18'>text</tspan>
+    </text>
+    <text x='200' y='200' font-size='24' font-variant='small-caps' font-family='Arial'>This is
+    	<tspan >SVG</tspan>
+        <tspan dx='10' dy='10' font-size='18'>text</tspan>
+    </text>
+
+	<text x='200' y='240' font-size='24' font-family='Arial'>This is
+    	<tspan fill='red'>SVG</tspan>
+    </text>
+    	<text x='350' y='240' font-size='24' font-family='Arial'>This is
+    	<tspan fill='#ff0000'>SVG</tspan>
+    </text>
+    	<text x='500' y='240' font-size='24' font-family='Arial'>This is
+    	<tspan fill='rgb(255,0,0)'>SVG</tspan>
+    </text>
+    	<text x='200' y='270' font-size='24' font-family='Arial'>This is
+    	<tspan fill='rgba(255,0,0,0.5)'>SVG</tspan>
+    </text>
+    	<text x='350' y='270' font-size='24' font-family='Arial'>This is
+    	<tspan fill='none'>SVG</tspan>
+    </text>
+    	<text x='500' y='270' font-size='24' font-family='Arial'>This is
+    	<tspan fill='url(#ggg1)'>SVG</tspan>
+
+    </text>
+    	<text x='10' y='320' font-size='50' font-family='Arial'>This is
+    	<tspan fill='yellow' stroke='green'>SVGSVGSVGSVGSVGSVGSVG</tspan>
+    </text>
+    	<text x='10' y='370' font-size='50' font-family='Arial'>This is
+    	<tspan fill='yellow' stroke='url(#ggg1)'>SVGSVGSVGSVGSVGSVGSVG</tspan>
+    </text>
+
+   	<text x='200' y='420' font-size='24' font-family='Arial'>This is
+    	<tspan fill='red' transform='translate(0, 50)'>SVG</tspan>
+    </text>
+	<text x='350' y='420' font-size='24' font-family='Arial'>This is
+    	<tspan fill='red' transform='rotate(270, 100, 100)'>SVG</tspan>
+    </text>
+</svg>
