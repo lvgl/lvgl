@@ -108,6 +108,11 @@ static lv_test_screenshot_result_t screenshot_compare(const char * fn_ref, uint8
     lv_draw_buf_t * draw_buf = lv_display_get_buf_active(NULL);
 
     uint8_t * screen_buf_xrgb8888 = lv_malloc(draw_buf->header.w * draw_buf->header.h * 4);
+    if(!screen_buf_xrgb8888) {
+        LV_LOG_ERROR("Not enough memory to compare display with screenshot");
+        return LV_TEST_SCREENSHOT_RESULT_FAILED;
+    }
+
     buf_to_xrgb8888(draw_buf, screen_buf_xrgb8888);
 
     lv_draw_buf_t * ref_draw_buf = NULL;
