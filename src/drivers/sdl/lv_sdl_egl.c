@@ -48,8 +48,6 @@ static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display);
 lv_result_t lv_sdl_egl_init(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
-    int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
     lv_egl_interface_t ifc = lv_sdl_get_egl_interface(disp);
     dsc->egl_ctx = lv_opengles_egl_context_create(&ifc);
     if(!dsc->egl_ctx) {
@@ -83,6 +81,7 @@ void lv_sdl_egl_deinit(lv_display_t * disp)
 
 lv_result_t lv_sdl_egl_resize(lv_display_t * disp)
 {
+    LV_UNUSED(disp);
 #if LV_USE_DRAW_OPENGLES
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
