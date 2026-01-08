@@ -195,8 +195,8 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     }
 
 #if LV_USE_DRAW_OPENGLES
-    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
-                         lv_display_get_original_vertical_resolution(display));
+    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(disp),
+                         lv_display_get_original_vertical_resolution(disp));
     lv_opengles_render_display_texture(disp, false, true);
 #endif /*LV_USE_DRAW_OPENGLES*/
 
@@ -233,8 +233,8 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     int32_t disp_width = lv_display_get_horizontal_resolution(disp);
     int32_t disp_height = lv_display_get_vertical_resolution(disp);
 
-    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(display),
-                         lv_display_get_original_vertical_resolution(display));
+    lv_opengles_viewport(0, 0, lv_display_get_original_horizontal_resolution(disp),
+                         lv_display_get_original_vertical_resolution(disp));
 
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(disp_width, cf);
