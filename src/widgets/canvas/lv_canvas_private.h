@@ -32,6 +32,11 @@ struct _lv_canvas_t {
     lv_image_t img;
     lv_draw_buf_t * draw_buf;
     lv_draw_buf_t static_buf;
+
+    lv_canvas_mode_t mode;
+    void * painting_cb_data;
+    lv_canvas_painting_cb_t painting_cb;
+    lv_canvas_painting_end_cb_t painting_end_cb;
 };
 
 

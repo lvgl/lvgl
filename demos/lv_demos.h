@@ -49,6 +49,10 @@ typedef struct _lv_demo_args lv_demo_args_t;
 #include "gltf/lv_demo_gltf.h"
 #endif
 
+#if LV_USE_DEMO_VECTOR_DODGER
+#include "vector_dodger/lv_demo_vector_dodger.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

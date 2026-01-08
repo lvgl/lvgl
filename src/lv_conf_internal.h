@@ -4734,6 +4734,15 @@
             #define LV_USE_DEMO_SMARTWATCH      0
         #endif
     #endif
+
+    /* Vector Dodger Game */
+    #ifndef LV_USE_DEMO_VECTOR_DODGER
+        #ifdef CONFIG_LV_USE_DEMO_VECTOR_DODGER
+            #define LV_USE_DEMO_VECTOR_DODGER CONFIG_LV_USE_DEMO_VECTOR_DODGER
+        #else
+            #define LV_USE_DEMO_VECTOR_DODGER   0
+        #endif
+    #endif
 #endif /* LV_BUILD_DEMOS */
 
 

@@ -34,6 +34,7 @@
  **********************/
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_canvas_event_cb(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,6 +43,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
     .destructor_cb = lv_canvas_destructor,
+    .event_cb = lv_canvas_event_cb,
     .instance_size = sizeof(lv_canvas_t),
     .base_class = &lv_image_class,
     .name = "lv_canvas",
@@ -197,6 +199,35 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
     lv_obj_invalidate(obj);
 }
 
+void lv_canvas_set_mode(lv_obj_t * obj, lv_canvas_mode_t mode)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    c->mode = mode;
+    lv_obj_invalidate(obj);
+}
+
+void lv_canvas_set_painting_cb(lv_obj_t * obj, lv_canvas_painting_cb_t painting_cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    c->painting_cb = painting_cb;
+}
+
+void lv_canvas_set_painting_data(lv_obj_t * obj, void * user_data)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    c->painting_cb_data = user_data;
+}
+
+void lv_canvas_set_painting_end_cb(lv_obj_t * obj, lv_canvas_painting_end_cb_t cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    c->painting_end_cb = cb;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -280,6 +311,34 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
         return canvas->draw_buf->unaligned_data;
 
     return NULL;
+}
+
+lv_canvas_mode_t lv_canvas_get_mode(lv_obj_t * canvas)
+{
+    LV_ASSERT_OBJ(canvas, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)canvas;
+    return c->mode;
+}
+
+lv_canvas_painting_cb_t lv_canvas_get_painting_cb(lv_obj_t * canvas)
+{
+    LV_ASSERT_OBJ(canvas, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)canvas;
+    return c->painting_cb;
+}
+
+void * lv_canvas_get_painting_data(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    return c->painting_cb_data;
+}
+
+lv_canvas_painting_end_cb_t lv_canvas_get_painting_end_cb(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_canvas_t * c = (lv_canvas_t *)obj;
+    return c->painting_end_cb;
 }
 
 /*=====================
@@ -385,16 +444,27 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     LV_ASSERT_NULL(layer);
     lv_layer_init(layer);
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->draw_buf == NULL) return;
 
-    lv_image_header_t * header = &canvas->draw_buf->header;
-    lv_area_t canvas_area = {0, 0, header->w - 1,  header->h - 1};
+    switch(canvas->mode) {
+        case LV_CANVAS_MODE_BUFFER: {
+                if(canvas->draw_buf == NULL)
+                    return;
 
-    layer->draw_buf = canvas->draw_buf;
-    layer->color_format = header->cf;
-    layer->buf_area = canvas_area;
-    layer->_clip_area = canvas_area;
-    layer->phy_clip_area = canvas_area;
+                lv_image_header_t * header = &canvas->draw_buf->header;
+                lv_area_t canvas_area = { 0, 0, header->w - 1, header->h - 1 };
+
+                layer->draw_buf = canvas->draw_buf;
+                layer->color_format = header->cf;
+                layer->buf_area = canvas_area;
+                layer->_clip_area = canvas_area;
+                layer->phy_clip_area = canvas_area;
+                break;
+            }
+        case LV_CANVAS_MODE_DIRECT: {
+                LV_LOG_ERROR("LV_CANVAS_MODE_DIRECT doesn't need init layer");
+                break;
+            }
+    }
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
@@ -439,6 +509,46 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     if(canvas->draw_buf == NULL) return;
 
     lv_image_cache_drop(&canvas->draw_buf);
+}
+
+static void lv_canvas_event_cb(const lv_obj_class_t * class_p, lv_event_t * e)
+{
+    LV_UNUSED(class_p);
+
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
+    lv_canvas_t * canvas = (lv_canvas_t *)obj;
+
+    switch(canvas->mode) {
+        case LV_CANVAS_MODE_BUFFER: {
+                if(canvas->draw_buf == NULL)
+                    return;
+
+                lv_obj_event_base(class_p, e);
+                break;
+            }
+        case LV_CANVAS_MODE_DIRECT: {
+                if(code != LV_EVENT_DRAW_MAIN) {
+                    lv_obj_event_base(class_p, e);
+                    return;
+                }
+
+                if(canvas->painting_cb == NULL) {
+                    LV_LOG_ERROR("canvas painting_cb is null %d", code);
+                    return;
+                }
+
+                lv_layer_t * layer = lv_event_get_layer(e);
+                const lv_area_t _clip_area = layer->_clip_area;
+                layer->_clip_area = obj->coords;
+                canvas->painting_cb(obj, layer, canvas->painting_cb_data);
+                if(canvas->painting_end_cb) {
+                    canvas->painting_end_cb(obj, canvas->painting_cb_data);
+                }
+                layer->_clip_area = _clip_area;
+                break;
+            }
+    }
 }
 
 #endif
