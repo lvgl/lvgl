@@ -12,8 +12,8 @@ void lv_example_style_10(void)
     lv_style_set_drop_shadow_color(&style, lv_palette_main(LV_PALETTE_RED));
     lv_style_set_drop_shadow_radius(&style, 16);
     lv_style_set_drop_shadow_opa(&style, 255);
-    //    lv_style_set_drop_shadow_offset_x(&style, 5);
-    //    lv_style_set_drop_shadow_offset_y(&style, 10);
+    lv_style_set_drop_shadow_offset_x(&style, 5);
+    lv_style_set_drop_shadow_offset_y(&style, 10);
 
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_arc_create(lv_screen_active());

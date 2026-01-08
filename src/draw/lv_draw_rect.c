@@ -76,12 +76,12 @@ void lv_draw_fill(lv_layer_t * layer, const lv_draw_fill_dsc_t * dsc, const lv_a
     LV_PROFILER_DRAW_BEGIN;
 
     if(dsc->base.drop_shadow_opa) {
-        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, coords);
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_fill_dsc_t ds_dsc = *dsc;
         ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain fill*/
         lv_draw_fill(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(&dsc->base, layer, ds_layer);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_FILL);
@@ -112,12 +112,12 @@ void lv_draw_border(lv_layer_t * layer, const lv_draw_border_dsc_t * dsc, const 
     LV_PROFILER_DRAW_BEGIN;
 
     if(dsc->base.drop_shadow_opa) {
-        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, coords);
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_border_dsc_t ds_dsc = *dsc;
         ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain border*/
         lv_draw_border(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(&dsc->base, layer, ds_layer);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_BORDER);
@@ -202,13 +202,13 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     }
 
     if(dsc->base.drop_shadow_opa && (has_fill || has_outline)) {
-        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(&dsc->base, layer, coords);
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
         LV_ASSERT_NULL(ds_layer);
         lv_draw_rect_dsc_t ds_dsc = *dsc;
         ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain shadow*/
         ds_dsc.shadow_opa = 0;
         lv_draw_rect(ds_layer, &ds_dsc, coords);
-        lv_draw_layer_finish_drop_shadow(&dsc->base, layer, ds_layer);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
     }
 
     lv_draw_task_t * t;
