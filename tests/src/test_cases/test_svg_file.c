@@ -126,7 +126,7 @@ void test_svg_file(void)
     test_svg_draw("polygon_general_attributes", 0.5f);
     test_svg_draw("path_general_attributes", 1.0f);
     test_svg_draw("solidcolor_general_attributes", 1.0f);
-    test_svg_draw("linear_gradiwnt_general_attributes", 1.0f);
+    test_svg_draw("linear_gradient_general_attributes", 1.0f);
     test_svg_draw("radial_gradient_general_attributes", 2.0f);
     test_svg_draw("text_general_attributes", 1.0f);
     test_svg_draw("tspan_general_attributes", 1.0f);
