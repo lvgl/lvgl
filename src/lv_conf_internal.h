@@ -4908,8 +4908,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif /* LV_USE_EGL */
 
-/* For now only enable LV_SDL_USE_EGL when using DRAW_OPENGLES*/
-#if LV_USE_SDL && LV_USE_OPENGLES && LV_USE_DRAW_OPENGLES
+#if LV_USE_SDL && LV_USE_OPENGLES && (LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG)
     #define LV_SDL_USE_EGL 1
 #else
     #define LV_SDL_USE_EGL 0
