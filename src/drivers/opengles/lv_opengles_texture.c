@@ -116,7 +116,9 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
         GL_CALL(glDeleteTextures(1, &texture->texture_id));
     }
     texture->texture_id = new_texture;
+#if !LV_USE_DRAW_NANOVG
     lv_opengles_texture_attach_to_display(texture, display);
+#endif /*!LV_USE_DRAW_NANOVG*/
     return LV_RESULT_OK;
 }
 
