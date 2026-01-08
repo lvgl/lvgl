@@ -45,6 +45,7 @@ extern "C" {
 #include "src/themes/lv_theme_private.h"
 #include "src/core/lv_refr_private.h"
 #include "src/core/lv_obj_style_private.h"
+
 #include "src/core/lv_obj_private.h"
 #include "src/core/lv_obj_scroll_private.h"
 #include "src/core/lv_obj_draw_private.h"
