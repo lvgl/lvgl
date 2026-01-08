@@ -1,5 +1,4 @@
-/**
- * @file lv_wl_egl_backend.c
+/** @file lv_wl_egl_backend.c
  *
  */
 
@@ -180,7 +179,7 @@ static inline void set_viewport(lv_display_t * display)
                          lv_display_get_original_vertical_resolution(display));
 }
 
-#if LV_USE_DRAW_OPENGLES
+#if LV_USE_DRAW_OPENGLES || LV_USE_DRAW_NANOVG
 
 static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
@@ -202,8 +201,10 @@ static void egl_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
         return;
     }
 
+#if LV_USE_DRAW_OPENGLES
     set_viewport(disp);
     lv_opengles_render_display_texture(disp, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
 
     /* Swap buffers through EGL */
     lv_opengles_egl_update(ddata->egl_ctx);
@@ -284,7 +285,7 @@ static void * wl_egl_init_display(void * backend_ctx, lv_display_t * display, in
 
     lv_display_set_flush_cb(display, egl_flush_cb);
     lv_display_set_flush_wait_cb(display, flush_wait_cb);
-    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(display, LV_USE_DRAW_NANOVG ? LV_DISPLAY_RENDER_MODE_FULL : LV_DISPLAY_RENDER_MODE_DIRECT);
 
     return ddata;
 }
