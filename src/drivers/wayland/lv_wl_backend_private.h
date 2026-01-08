@@ -177,7 +177,7 @@ void * lv_wayland_get_backend_display_data(lv_display_t * display);
  *
  * The backend display data is set automatically to the return type of the
  * init_display/resize_display, this function should only be used in special
- * cases where it needs to be overriden temporarily
+ * cases where it needs to be overridden temporarily
  *
  * @param[in] display Pointer to the LVGL display object
  * @param[in] data Pointer to backend-specific display data
