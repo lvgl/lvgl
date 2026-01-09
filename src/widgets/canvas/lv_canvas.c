@@ -395,11 +395,16 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
     layer->phy_clip_area = canvas_area;
+
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
-    if(layer->draw_task_head == NULL) return;
+    if(layer->draw_task_head == NULL) {
+        lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
+        return;
+    }
 
     bool task_dispatched;
 
@@ -412,6 +417,9 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
             lv_draw_dispatch_request();
         }
     }
+
+    lv_draw_unit_send_event(NULL, LV_EVENT_SCREEN_LOAD_START, layer);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer);
     lv_obj_invalidate(canvas);
 }
 

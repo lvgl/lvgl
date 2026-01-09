@@ -69,6 +69,16 @@ void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
     a.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     a.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
+    if(dsc->base.drop_shadow_opa) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, &a);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_triangle_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain triangle*/
+        lv_draw_triangle(ds_layer, &ds_dsc);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+    }
+
+
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_TRIANGLE);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));

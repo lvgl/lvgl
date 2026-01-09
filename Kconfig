@@ -568,6 +568,38 @@ menu "LVGL configuration"
 			default 2048
 			depends on LV_USE_DRAW_EVE
 
+		config LV_USE_DRAW_NANOVG
+			bool "Use NanoVG Renderer."
+			default n
+			depends on LV_USE_NANOVG && LV_USE_MATRIX
+
+		choice LV_NANOVG_BACKEND
+			prompt "NanoVG OpenGL backend"
+			default LV_NANOVG_BACKEND_GLES2
+			depends on LV_USE_DRAW_NANOVG
+			help
+				Select which OpenGL implementation to use for NanoVG rendering.
+
+			config LV_NANOVG_BACKEND_GL2
+				bool "OpenGL 2.0"
+			config LV_NANOVG_BACKEND_GL3
+				bool "OpenGL 3.0+"
+			config LV_NANOVG_BACKEND_GLES2
+				bool "OpenGL ES 2.0"
+			config LV_NANOVG_BACKEND_GLES3
+				bool "OpenGL ES 3.0+"
+		endchoice
+
+		config LV_NANOVG_IMAGE_CACHE_CNT
+			int "Draw image texture cache count"
+			default 128
+			depends on LV_USE_DRAW_NANOVG
+
+		config LV_NANOVG_LETTER_CACHE_CNT
+			int "Draw letter cache count"
+			default 512
+			depends on LV_USE_DRAW_NANOVG
+
 	endmenu
 
 	menu "Feature Configuration"
@@ -1544,6 +1576,10 @@ menu "LVGL configuration"
 				config LV_USE_THORVG_EXTERNAL
 					bool "Use ThorVG external"
 			endchoice
+
+		config LV_USE_NANOVG
+			bool "NanoVG library"
+			default n
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"

@@ -2,27 +2,22 @@
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 /**
- * Add styles to parts and states
+ * Local styles
  */
 void lv_example_style_13(void)
 {
-    static lv_style_t style_indic;
-    lv_style_init(&style_indic);
-    lv_style_set_bg_color(&style_indic, lv_palette_lighten(LV_PALETTE_RED, 3));
-    lv_style_set_bg_grad_color(&style_indic, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_HOR);
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_bg_color(&style, lv_palette_main(LV_PALETTE_GREEN));
+    lv_style_set_border_color(&style, lv_palette_lighten(LV_PALETTE_GREEN, 3));
+    lv_style_set_border_width(&style, 3);
 
-    static lv_style_t style_indic_pr;
-    lv_style_init(&style_indic_pr);
-    lv_style_set_shadow_color(&style_indic_pr, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_shadow_width(&style_indic_pr, 10);
-    lv_style_set_shadow_spread(&style_indic_pr, 3);
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_style(obj, &style, 0);
 
-    /*Create an object with the new style_pr*/
-    lv_obj_t * obj = lv_slider_create(lv_screen_active());
-    lv_obj_add_style(obj, &style_indic, LV_PART_INDICATOR);
-    lv_obj_add_style(obj, &style_indic_pr, LV_PART_INDICATOR | LV_STATE_PRESSED);
-    lv_slider_set_value(obj, 70, LV_ANIM_OFF);
+    /*Overwrite the background color locally*/
+    lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_ORANGE), LV_PART_MAIN);
+
     lv_obj_center(obj);
 }
 

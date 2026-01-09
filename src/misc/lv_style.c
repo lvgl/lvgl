@@ -140,12 +140,17 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
     [LV_STYLE_RECOLOR] = 0,
     [LV_STYLE_RECOLOR_OPA] = 0,
 
+    [LV_STYLE_DROP_SHADOW_RADIUS] =        LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_DROP_SHADOW_OFFSET_X] =      LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_DROP_SHADOW_OFFSET_Y] =      LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_DROP_SHADOW_OPA] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+
 #if LV_USE_FLEX
-    [LV_STYLE_FLEX_FLOW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    [LV_STYLE_FLEX_MAIN_PLACE] =              LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    [LV_STYLE_FLEX_CROSS_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    [LV_STYLE_FLEX_TRACK_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    [LV_STYLE_FLEX_GROW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_FLOW] =                 LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_MAIN_PLACE] =           LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_CROSS_PLACE] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_TRACK_PLACE] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_GROW] =                 LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 #endif
 
 #if LV_USE_GRID
@@ -429,6 +434,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_ARC_COLOR:
         case LV_STYLE_LINE_COLOR:
         case LV_STYLE_TEXT_COLOR:
+        case LV_STYLE_DROP_SHADOW_COLOR:
         case LV_STYLE_IMAGE_RECOLOR:
         case LV_STYLE_RECOLOR:
             return (lv_style_value_t) {
@@ -443,9 +449,9 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_BG_MAIN_OPA:
         case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
-        case LV_STYLE_SHADOW_OPA:
         case LV_STYLE_LINE_OPA:
         case LV_STYLE_ARC_OPA:
+        case LV_STYLE_SHADOW_OPA:
             return (lv_style_value_t) {
                 .num = LV_OPA_COVER
             };
@@ -469,6 +475,10 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_ROTARY_SENSITIVITY:
             return (lv_style_value_t) {
                 .num = 256
+            };
+        case LV_STYLE_DROP_SHADOW_QUALITY:
+            return (lv_style_value_t) {
+                .num = LV_BLUR_QUALITY_PRECISION
             };
 
 #if LV_USE_GRID
