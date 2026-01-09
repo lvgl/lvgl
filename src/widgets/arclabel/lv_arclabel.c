@@ -51,6 +51,8 @@ static void lv_arclabel_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, uint32_t radius,
                                                     const lv_value_precise_t angle_size, int32_t letter_space, bool recolor,
                                                     const lv_arclabel_overflow_t overflow, bool end_overlap, bool * need_ellipsis, uint32_t * letter_count);
+static lv_value_precise_t arclabel_calc_arc_text_total_angle(lv_obj_t * obj, int32_t * arc_radius, bool * need_ellipsis,
+                                                             uint32_t * letter_count);
 static const char * recolor_cmd_get_next(const char * text_in, uint32_t len_in,
                                          const char ** text_out, uint32_t * len_out,
                                          lv_color_t * color_out);
@@ -356,6 +358,13 @@ bool lv_arclabel_get_end_overlap(lv_obj_t * obj)
     return ((lv_arclabel_t *) obj)->end_overlap;
 }
 
+lv_value_precise_t lv_arclabel_get_text_angle(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    return arclabel_calc_arc_text_total_angle(obj, NULL, NULL, NULL);
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -418,42 +427,14 @@ static void arclabel_draw_main(lv_event_t * e)
     const lv_opa_t opa = LV_OPA_MIX2(layer->opa, lv_obj_get_style_text_opa(obj, LV_PART_MAIN));
     const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
-    const int32_t line_height = font->line_height;
-    const int32_t base_line = font->base_line;
-    int32_t arc_r_delta = 0;
-    int32_t arc_r = arclabel->radius;
-
-    if(arc_r == LV_SIZE_CONTENT) arc_r = LV_PCT(100);
-    if(LV_COORD_IS_PCT(arc_r)) {
-        const int32_t width = lv_area_get_width(&coords);
-        const int32_t height = lv_area_get_height(&coords);
-        arc_r = lv_pct_to_px(arc_r, LV_MIN(width, height)) / 2;
-    }
-
-    switch(arclabel->text_align_v) {
-        case LV_ARCLABEL_TEXT_ALIGN_LEADING:
-            arc_r_delta = line_height - base_line;
-            break;
-        case LV_ARCLABEL_TEXT_ALIGN_CENTER:
-            arc_r_delta = line_height / 2 - base_line;
-            break;
-        case LV_ARCLABEL_TEXT_ALIGN_TRAILING:
-            arc_r_delta = -base_line;
-            break;
-        default:
-            break;
-    }
-
-    arc_r += arclabel->dir == LV_ARCLABEL_DIR_CLOCKWISE ? -arc_r_delta : arc_r_delta;
-
+    int32_t arc_r = 0;
     bool need_ellipsis = false;
+    uint32_t processed_total_word_count = 0;
+    const lv_value_precise_t total_visible_angle = arclabel_calc_arc_text_total_angle(obj, &arc_r, &need_ellipsis,
+                                                                                      &processed_total_word_count);
+
     const int32_t offset = arclabel->offset;
     const lv_value_precise_t angle_offset = rad_to_deg(offset, arc_r);
-    uint32_t processed_total_word_count = 0;
-
-    lv_value_precise_t total_visible_angle = calc_arc_text_total_angle(text_start, font, arc_r,
-                                                                       arclabel->angle_size, letter_space, arclabel->recolor,
-                                                                       arclabel->overflow, arclabel->end_overlap, &need_ellipsis, &processed_total_word_count);
 
     lv_value_precise_t angle_start = 0;
     switch(arclabel->text_align_h) {
@@ -568,6 +549,54 @@ static void arclabel_draw_main(lv_event_t * e)
     }
 }
 
+static lv_value_precise_t arclabel_calc_arc_text_total_angle(lv_obj_t * obj, int32_t * arc_radius, bool * need_ellipsis,
+                                                             uint32_t * letter_count)
+{
+    lv_arclabel_t * arclabel = (lv_arclabel_t *)obj;
+
+    const char * text = arclabel->text;
+    const char * text_start = text;
+
+    lv_area_t coords;
+    lv_obj_get_content_coords(obj, &coords);
+
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+
+    const int32_t line_height = font->line_height;
+    const int32_t base_line = font->base_line;
+    int32_t arc_r_delta = 0;
+    int32_t arc_r = arclabel->radius;
+
+    if(arc_r == LV_SIZE_CONTENT) arc_r = LV_PCT(100);
+    if(LV_COORD_IS_PCT(arc_r)) {
+        const int32_t width = lv_area_get_width(&coords);
+        const int32_t height = lv_area_get_height(&coords);
+        arc_r = lv_pct_to_px(arc_r, LV_MIN(width, height)) / 2;
+    }
+
+    switch(arclabel->text_align_v) {
+        case LV_ARCLABEL_TEXT_ALIGN_LEADING:
+            arc_r_delta = line_height - base_line;
+            break;
+        case LV_ARCLABEL_TEXT_ALIGN_CENTER:
+            arc_r_delta = line_height / 2 - base_line;
+            break;
+        case LV_ARCLABEL_TEXT_ALIGN_TRAILING:
+            arc_r_delta = -base_line;
+            break;
+        default:
+            break;
+    }
+
+    arc_r += arclabel->dir == LV_ARCLABEL_DIR_CLOCKWISE ? -arc_r_delta : arc_r_delta;
+    if(arc_radius != NULL) *arc_radius = arc_r;
+    lv_value_precise_t total_visible_angle = calc_arc_text_total_angle(text_start, font, arc_r,
+                                                                       arclabel->angle_size, letter_space, arclabel->recolor,
+                                                                       arclabel->overflow, arclabel->end_overlap, need_ellipsis, letter_count);
+    return total_visible_angle;
+}
+
 static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, const uint32_t radius,
                                                     const lv_value_precise_t angle_size, const int32_t letter_space, const bool recolor,
                                                     const lv_arclabel_overflow_t overflow, bool end_overlap, bool * need_ellipsis, uint32_t * letter_count)
@@ -580,6 +609,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     lv_value_precise_t total_arc_length = 0;
     lv_value_precise_t pre_total_arc_length = 0;
     uint32_t pre_processed_letter_count = 0;
+    lv_value_precise_t ellipsis_arc_length = 0;
     bool full = false;
     uint32_t letter = 0;
     uint32_t letter_next = 0;
@@ -587,7 +617,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     lv_value_precise_t available_arc_length = angle_size_in_arc_length;
     if(overflow == LV_ARCLABEL_OVERFLOW_ELLIPSIS) {
         lv_value_precise_t dot_width = lv_font_get_glyph_width(font, '.', '.');
-        lv_value_precise_t ellipsis_arc_length = 3 * dot_width + 2 * letter_space;
+        ellipsis_arc_length = 3 * dot_width + 2 * letter_space;
         if(available_arc_length > ellipsis_arc_length) available_arc_length -= ellipsis_arc_length;
         else available_arc_length = 0;
     }
@@ -628,7 +658,9 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     }
 
     if(full && (overflow == LV_ARCLABEL_OVERFLOW_ELLIPSIS || overflow == LV_ARCLABEL_OVERFLOW_CLIP)) {
-        total_arc_length = pre_total_arc_length;
+        total_arc_length = pre_total_arc_length + (overflow == LV_ARCLABEL_OVERFLOW_ELLIPSIS
+                                                   ? ellipsis_arc_length
+                                                   : 0);
         processed_letter_count = pre_processed_letter_count;
     }
 
