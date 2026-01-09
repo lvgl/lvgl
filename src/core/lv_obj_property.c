@@ -175,7 +175,7 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
         return value;
     }
 
-    lv_obj_get_local_style_prop(obj, id, &value.style, selector);
+    value.style = lv_obj_get_style_prop(obj, selector, id);
     value.id = id;
     value.selector = selector;
     return value;
