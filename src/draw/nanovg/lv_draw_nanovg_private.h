@@ -22,6 +22,7 @@ extern "C" {
 #include "../../draw/lv_draw_vector.h"
 #include "../../draw/lv_draw_arc.h"
 #include "../../draw/lv_draw_rect.h"
+#include "../../draw/lv_draw_3d.h"
 #include "../../draw/lv_draw_image.h"
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_line.h"
@@ -83,6 +84,16 @@ typedef struct _lv_draw_nanovg_unit_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_3DTEXTURE
+/**
+ * Draw 3D texture on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a 3D draw descriptor
+ * @param coords the coordinates of the 3D texture
+ */
+void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**
  * Draw arc on a NanoVG context
