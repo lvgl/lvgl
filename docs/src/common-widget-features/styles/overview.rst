@@ -1,3 +1,4 @@
+.. include:: /include/external_links.txt
 .. _styles_overview:
 
 ===============
@@ -253,14 +254,4 @@ Examples
 ********
 
 .. include:: /examples/styles/index.rst
-
-
-
-..  Hyperlinks
-
-.. _pseudo-elements:
-.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
-.. _pseudo-classes:
-.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
-
 

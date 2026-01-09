@@ -59,7 +59,7 @@ Commit Message Format
 *********************
 
 The commit messages format is inspired by `Angular Commit
-Format <https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit>`__.
+Format <https://github.com/angular/angular/blob/main/CONTRIBUTING.md#-commit-message-guidelines>`__.
 
 The following structure should be used:
 

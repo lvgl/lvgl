@@ -122,7 +122,7 @@ please refer to the example code below.
 
 .. admonition::  Further Reading
 
-    `FreeType tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
+    `FreeType tutorial <https://freetype.org/freetype2/docs/tutorial/step1.html>`__
 
 Rendering vector fonts is supported with VGLite or ThorVG,
 when using vector fonts with ThorVG, it is possible to set a letter outline of a different color.

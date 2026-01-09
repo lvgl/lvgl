@@ -28,7 +28,7 @@ It is designed to automatically generate timing and data signals for different L
 Setting up a project and further integration with Renesas' ecosystem is described in detail on :ref:`page Renesas <renesas>`.
 Check out the following repositories for ready-to-use examples:
 
-- `EK-RA8D1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
+- `EK-RA8D1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1_gcc>`__
 - `EK-RA6M3G <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
 - `RX72N Envision Kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit>`__
 

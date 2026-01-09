@@ -123,7 +123,7 @@ The Text Area supports password mode which can be enabled with
 :cpp:expr:`lv_textarea_set_password_mode(textarea, true)`.
 
 By default, if the ``•`` (`Bullet,
-U+2022 <http://www.fileformat.info/info/unicode/char/2022/index.htm>`__)
+U+2022 <https://www.fileformat.info/info/unicode/char/2022/index.htm>`__)
 character exists in the font, the entered characters are converted to it after
 a configurable delay after each new character is entered. If ``•`` does not
 exist in the font, ``*`` will be used. You can override the default
