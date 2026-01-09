@@ -418,7 +418,7 @@ static bool lv_font_manager_add_src_core(lv_font_manager_t * manager,
         LV_ASSERT_NULL(font_src->src);
     }
 
-    LV_LOG_INFO("name: %s, src: %p add success", name, src);
+    LV_LOG_INFO("name: %s, src: %p add success", name, (void *)src);
     return true;
 }
 
