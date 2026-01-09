@@ -45,6 +45,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_USE_FREETYPE
+typedef struct {
+    lv_vg_lite_path_t * inside_path;     /*The regular glyph*/
+    lv_vg_lite_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
+    lv_vg_lite_path_t * cur_path;
+} lv_draw_vg_lite_letter_outlines_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -406,6 +413,11 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
 {
     LV_PROFILER_DRAW_BEGIN;
 
+    int32_t w;
+    int32_t h;
+    int32_t offset_x;
+    int32_t offset_y;
+
     lv_area_t letter_area;
     lv_area_t path_clip_area;
     if(!draw_letter_clip_areas(t, dsc, &letter_area, &path_clip_area)) {
@@ -418,14 +430,24 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
     path_clip_area.x2++;
     path_clip_area.y2++;
+    lv_draw_vg_lite_letter_outlines_t * paths = (lv_draw_vg_lite_letter_outlines_t *)dsc->glyph_data;
+    LV_ASSERT_NULL(paths);
 
-    lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
+    lv_vg_lite_path_t * outline = paths->inside_path;
+    lv_vg_lite_path_t * outside_path = paths->outside_path;
+
     const lv_point_t glyph_pos = {
         dsc->letter_coords->x1 - dsc->g->ofs_x,
         dsc->letter_coords->y1 + dsc->g->box_h + dsc->g->ofs_y
     };
     /* scale size */
     const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
+
+    w = (int32_t)((float) dsc->g->box_w + dsc->outline_stroke_width * 2 * scale);
+    h = (int32_t)((float) dsc->g->box_h + dsc->outline_stroke_width * 2 * scale);
+
+    offset_x = (int32_t)((float) dsc->g->ofs_x - dsc->outline_stroke_width * scale);
+    offset_y = (int32_t)((float) dsc->g->ofs_y - dsc->outline_stroke_width * scale);
 
     const bool has_rotation_with_cliped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
 
@@ -469,14 +491,42 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
          */
         vg_lite_matrix_t internal_matrix;
         vg_lite_identity(&internal_matrix);
-        const float pivot_x = (dsc->pivot.x + dsc->g->ofs_x) / scale;
-        const float pivot_y = dsc->g->box_h + dsc->g->ofs_y;
+        const float pivot_x = (dsc->pivot.x + offset_x/*dsc->g->ofs_x*/) / scale;
+        const float pivot_y = h/*dsc->g->box_h*/ + offset_y/*dsc->g->ofs_y*/;
         vg_lite_translate(pivot_x, pivot_y, &internal_matrix);
         vg_lite_rotate(dsc->rotation / 10.0f, &internal_matrix);
         vg_lite_translate(-pivot_x, -pivot_y, &internal_matrix);
 
         lv_vg_lite_path_t * outline_transformed = lv_vg_lite_path_get(u, VG_LITE_FP32);
         lv_vg_lite_path_set_transform(outline_transformed, &internal_matrix);
+
+        if(dsc->outline_stroke_width > 0) {
+
+            lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(outside_path), outline_iter_cb, outline_transformed);
+            lv_vg_lite_path_set_bounding_box(outline_transformed, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+
+            vg_lite_set_stroke(lv_vg_lite_path_get_path(outline_transformed),
+                               VG_LITE_CAP_BUTT,
+                               VG_LITE_JOIN_MITER,
+                               (vg_lite_float_t)dsc->outline_stroke_width,
+                               1.0f,
+                               NULL,
+                               0,
+                               0.0f,
+                               lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true));
+
+            vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outline_transformed), VG_LITE_DRAW_FILL_STROKE_PATH);
+            vg_lite_update_stroke(lv_vg_lite_path_get_path(outline_transformed));
+
+            lv_vg_lite_draw(
+                &u->target_buffer,
+                lv_vg_lite_path_get_path(outline_transformed),
+                VG_LITE_FILL_NON_ZERO,
+                &draw_matrix,
+                VG_LITE_BLEND_SRC_OVER,
+                lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true));
+        }
+
         lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(outline), outline_iter_cb, outline_transformed);
         lv_vg_lite_path_set_bounding_box(outline_transformed, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
 
@@ -497,13 +547,22 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     if(dsc->rotation) {
         /* The bounding rectangle before scaling relative to the original coordinates of the path */
         lv_area_t box_area;
-        box_area.x1 = dsc->g->ofs_x;
-        box_area.y1 = -dsc->g->box_h - dsc->g->ofs_y;
-        lv_area_set_width(&box_area, dsc->g->box_w);
-        lv_area_set_height(&box_area, dsc->g->box_h);
+        box_area.x1 = offset_x/*dsc->g->ofs_x*/;
+        box_area.y1 = -h - offset_y /*-dsc->g->box_h - dsc->g->ofs_y*/;
+        lv_area_set_width(&box_area, w /*dsc->g->box_w*/);
+        lv_area_set_height(&box_area, h/*dsc->g->box_h*/);
 
         /* Workaround for loss of rotation precision */
         lv_area_increase(&box_area, 5, 5);
+
+        if(dsc->outline_stroke_width > 0) {
+            lv_vg_lite_path_set_bounding_box(outside_path,
+                                             box_area.x1 / scale,
+                                             box_area.y1 / scale,
+                                             box_area.x2 / scale,
+                                             box_area.y2 / scale);
+
+        }
 
         /* Scale the path area to fit the original path data */
         lv_vg_lite_path_set_bounding_box(outline,
@@ -513,7 +572,34 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
                                          box_area.y2 / scale);
     }
     else {
+        if(dsc->outline_stroke_width > 0) {
+            lv_vg_lite_path_set_bounding_box(outside_path, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+        }
         lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+    }
+
+    if(dsc->outline_stroke_width > 0) {
+
+        vg_lite_set_stroke(lv_vg_lite_path_get_path(outside_path),
+                           VG_LITE_CAP_BUTT,
+                           VG_LITE_JOIN_MITER,
+                           (vg_lite_float_t)dsc->outline_stroke_width,
+                           1.0f,
+                           NULL,
+                           0,
+                           0.0f,
+                           lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true));
+
+        vg_lite_set_draw_path_type(lv_vg_lite_path_get_path(outside_path), VG_LITE_DRAW_FILL_STROKE_PATH);
+        vg_lite_update_stroke(lv_vg_lite_path_get_path(outside_path));
+
+        lv_vg_lite_draw(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(outside_path),
+            VG_LITE_FILL_NON_ZERO,
+            &draw_matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            lv_vg_lite_color(dsc->outline_stroke_color, dsc->outline_stroke_opa, true));
     }
 
     lv_vg_lite_draw(
@@ -530,11 +616,19 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
 static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_vg_lite_path_t * outline = param->outline;
+    lv_draw_vg_lite_letter_outlines_t * glyph_paths = (lv_draw_vg_lite_letter_outlines_t *)param->outline;
+    lv_vg_lite_path_t * outline = glyph_paths->cur_path;
     LV_ASSERT_NULL(outline);
 
     lv_freetype_outline_type_t type = param->type;
     switch(type) {
+
+        case LV_FREETYPE_OUTLINE_BORDER_START:
+            /* Inside path is done - create the border path */
+            lv_vg_lite_path_close(glyph_paths->cur_path);
+            glyph_paths->cur_path = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+            glyph_paths->outside_path = glyph_paths->cur_path;
+            break;
 
         /**
          * Reverse the Y-axis coordinate direction to achieve
@@ -571,12 +665,27 @@ static void freetype_outline_event_cb(lv_event_t * e)
     LV_PROFILER_DRAW_BEGIN;
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
+    lv_draw_vg_lite_letter_outlines_t * glyph_paths;
     switch(code) {
         case LV_EVENT_CREATE:
-            param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+            glyph_paths = lv_malloc_zeroed(sizeof(lv_draw_vg_lite_letter_outlines_t));
+            LV_ASSERT_MALLOC(glyph_paths);
+
+            glyph_paths->cur_path = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+            glyph_paths->inside_path = glyph_paths->cur_path;
+            param->outline = glyph_paths;
             break;
         case LV_EVENT_DELETE:
-            lv_vg_lite_path_destroy(param->outline);
+            glyph_paths = (lv_draw_vg_lite_letter_outlines_t *)param->outline;
+            if(glyph_paths->inside_path != NULL) {
+                lv_vg_lite_path_destroy(glyph_paths->inside_path);
+            }
+            if(glyph_paths->outside_path != NULL) {
+                lv_vg_lite_path_destroy(glyph_paths->outside_path);
+            }
+
+            lv_free(glyph_paths);
+
             break;
         case LV_EVENT_INSERT:
             vg_lite_outline_push(param);
