@@ -59,6 +59,8 @@ typedef struct {
 
 typedef struct _lv_gstreamer_t lv_gstreamer_t;
 
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gstreamer_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
