@@ -97,11 +97,6 @@ static void draw_event_cb(lv_event_t * e);
 
 void lv_draw_nanovg_init(void)
 {
-    lv_display_render_mode_t mode = lv_display_get_render_mode(NULL);
-    if(mode != LV_DISPLAY_RENDER_MODE_FULL) {
-        LV_LOG_ERROR("Detect render mode(%d) is not FULL. The rendering result may be incorrect.", mode);
-    }
-
     static bool initialized = false;
     if(initialized) return;
     initialized = true;
