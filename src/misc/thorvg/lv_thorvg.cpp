@@ -40,54 +40,56 @@ using namespace tvg;
 
 class LvCanvas : public Canvas
 {
-public:
-    LvCanvas(lv_display_t * disp);
-    ~LvCanvas();
+    public:
+        LvCanvas(lv_display_t * disp);
+        ~LvCanvas();
 
-    Result target(uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h);
+        Result target(uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t h);
 };
 
 class LvRenderer : public RenderMethod
 {
-public:
-    RenderRegion m_vport;
-    lv_draw_buf_t m_draw_buf;
-    lv_layer_t m_layer;
-    lv_display_t * m_disp;
-    BlendMethod m_blend_method_tvg;
-    lv_vector_blend_t m_blend_method;
+    public:
+        RenderRegion m_vport;
+        lv_draw_buf_t m_draw_buf;
+        lv_layer_t m_layer;
+        lv_display_t * m_disp;
+        BlendMethod m_blend_method_tvg;
+        lv_vector_blend_t m_blend_method;
 
-    LvRenderer(lv_display_t * disp);
-    ~LvRenderer();
+        LvRenderer(lv_display_t * disp);
+        ~LvRenderer();
 
-    void target(pixel_t * data, uint32_t stride, uint32_t w, uint32_t h);
+        void target(pixel_t * data, uint32_t stride, uint32_t w, uint32_t h);
 
-    RenderData prepare(const RenderShape& rshape, RenderData data, const Matrix& transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags, bool clipper) override;
-    RenderData prepare(RenderSurface* surface, RenderData data, const Matrix& transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags) override;
-    bool preRender() override;
-    bool renderShape(RenderData data) override;
-    bool renderImage(RenderData data) override;
-    bool postRender() override;
-    void dispose(RenderData data) override;
-    RenderRegion region(RenderData data) override;
-    RenderRegion viewport() override;
-    bool viewport(const RenderRegion& vp) override;
-    bool blend(BlendMethod method) override;
-    ColorSpace colorSpace() override;
-    const RenderSurface* mainSurface() override;
+        RenderData prepare(const RenderShape & rshape, RenderData data, const Matrix & transform, Array<RenderData> & clips,
+                           uint8_t opacity, RenderUpdateFlag flags, bool clipper) override;
+        RenderData prepare(RenderSurface * surface, RenderData data, const Matrix & transform, Array<RenderData> & clips,
+                           uint8_t opacity, RenderUpdateFlag flags) override;
+        bool preRender() override;
+        bool renderShape(RenderData data) override;
+        bool renderImage(RenderData data) override;
+        bool postRender() override;
+        void dispose(RenderData data) override;
+        RenderRegion region(RenderData data) override;
+        RenderRegion viewport() override;
+        bool viewport(const RenderRegion & vp) override;
+        bool blend(BlendMethod method) override;
+        ColorSpace colorSpace() override;
+        const RenderSurface * mainSurface() override;
 
-    bool clear() override;
-    bool sync() override;
+        bool clear() override;
+        bool sync() override;
 
-    RenderCompositor* target(const RenderRegion& region, ColorSpace cs) override;
-    bool beginComposite(RenderCompositor* cmp, CompositeMethod method, uint8_t opacity) override;
-    bool endComposite(RenderCompositor* cmp) override;
+        RenderCompositor * target(const RenderRegion & region, ColorSpace cs) override;
+        bool beginComposite(RenderCompositor * cmp, CompositeMethod method, uint8_t opacity) override;
+        bool endComposite(RenderCompositor * cmp) override;
 
-    bool prepare(RenderEffect* effect) override;
-    bool effect(RenderCompositor* cmp, const RenderEffect* effect) override;
+        bool prepare(RenderEffect * effect) override;
+        bool effect(RenderCompositor * cmp, const RenderEffect * effect) override;
 
-private:
-    void finish_layer();
+    private:
+        void finish_layer();
 };
 
 /**********************
@@ -95,8 +97,8 @@ private:
  **********************/
 
 static void lvmat_from_tvgmat(lv_matrix_t * dst, const Matrix * src);
-static float path_length(const RenderShape& rshape);
-static Point line_at(const Line& line, float at);
+static float path_length(const RenderShape & rshape);
+static Point line_at(const Line & line, float at);
 static lv_grad_stop_t * lvstops_from_tvgstops(const Fill::ColorStop * stops_tvg, uint32_t cnt);
 
 /**********************
@@ -113,18 +115,18 @@ static lv_grad_stop_t * lvstops_from_tvgstops(const Fill::ColorStop * stops_tvg,
 
 extern "C" {
 
-Tvg_Canvas * lv_thorvg_canvas_create(lv_display_t * disp)
-{
-    return (Tvg_Canvas *) new LvCanvas(disp);
-}
+    Tvg_Canvas * lv_thorvg_canvas_create(lv_display_t * disp)
+    {
+        return (Tvg_Canvas *) new LvCanvas(disp);
+    }
 
-Tvg_Result lv_thorvg_canvas_set_target(Tvg_Canvas* canvas, uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h)
-{
-    if (!canvas) return TVG_RESULT_INVALID_ARGUMENT;
-    LvCanvas * lvcanvas = (LvCanvas *) canvas;
-    lvcanvas->target(buffer, stride, w, h);
-    return (Tvg_Result) Result::Success;
-}
+    Tvg_Result lv_thorvg_canvas_set_target(Tvg_Canvas * canvas, uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t h)
+    {
+        if(!canvas) return TVG_RESULT_INVALID_ARGUMENT;
+        LvCanvas * lvcanvas = (LvCanvas *) canvas;
+        lvcanvas->target(buffer, stride, w, h);
+        return (Tvg_Result) Result::Success;
+    }
 
 } /* extern "C" */
 
@@ -140,9 +142,9 @@ LvCanvas::~LvCanvas()
 {
 }
 
-Result LvCanvas::target(uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h)
+Result LvCanvas::target(uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t h)
 {
-    if (Canvas::pImpl->status != Status::Damaged && Canvas::pImpl->status != Status::Synced) {
+    if(Canvas::pImpl->status != Status::Damaged && Canvas::pImpl->status != Status::Synced) {
         return Result::InsufficientCondition;
     }
 
@@ -182,7 +184,8 @@ void LvRenderer::target(pixel_t * data, uint32_t stride, uint32_t w, uint32_t h)
     m_layer.phy_clip_area = area;
 }
 
-RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const Matrix& transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags, bool clipper)
+RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, const Matrix & transform,
+                               Array<RenderData> & clips, uint8_t opacity, RenderUpdateFlag flags, bool clipper)
 {
     LV_UNUSED(clips);
     LV_UNUSED(opacity);
@@ -190,7 +193,7 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
     LV_UNUSED(flags);
 
     lv_draw_vector_dsc_t * dsc = (lv_draw_vector_dsc_t *) data;
-    if (dsc) {
+    if(dsc) {
         lv_draw_vector_dsc_delete(dsc);
     }
     dsc = lv_draw_vector_dsc_create(&m_layer);
@@ -209,8 +212,8 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
     /* fill */
 
     lv_draw_vector_dsc_set_fill_rule(dsc, rshape.rule == FillRule::Winding ? LV_VECTOR_FILL_NONZERO :
-                                          rshape.rule == FillRule::EvenOdd ? LV_VECTOR_FILL_EVENODD :
-                                          LV_VECTOR_FILL_NONZERO);
+                                     rshape.rule == FillRule::EvenOdd ? LV_VECTOR_FILL_EVENODD :
+                                     LV_VECTOR_FILL_NONZERO);
 
     lv_draw_vector_dsc_set_fill_opa(dsc, rshape.color[3]);
     lv_color_t fill_color;
@@ -222,9 +225,9 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
     if(rshape.fill) {
         FillSpread spread = rshape.fill->spread();
         lv_draw_vector_dsc_set_fill_gradient_spread(dsc, spread == FillSpread::Pad ? LV_VECTOR_GRADIENT_SPREAD_PAD :
-                                                         spread == FillSpread::Reflect ? LV_VECTOR_GRADIENT_SPREAD_REFLECT :
-                                                         spread == FillSpread::Repeat? LV_VECTOR_GRADIENT_SPREAD_REPEAT :
-                                                         LV_VECTOR_GRADIENT_SPREAD_PAD);
+                                                    spread == FillSpread::Reflect ? LV_VECTOR_GRADIENT_SPREAD_REFLECT :
+                                                    spread == FillSpread::Repeat ? LV_VECTOR_GRADIENT_SPREAD_REPEAT :
+                                                    LV_VECTOR_GRADIENT_SPREAD_PAD);
         mat_tvg = rshape.fill->transform();
         lvmat_from_tvgmat(&mat, &mat_tvg);
         lv_draw_vector_dsc_set_fill_transform(dsc, &mat);
@@ -247,13 +250,13 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
         stroke_color.alpha = rshape.stroke->color[3];
         lv_draw_vector_dsc_set_stroke_color32(dsc, stroke_color);
         lv_draw_vector_dsc_set_stroke_cap(dsc, rshape.stroke->cap == StrokeCap::Square ? LV_VECTOR_STROKE_CAP_SQUARE :
-                                               rshape.stroke->cap == StrokeCap::Round ? LV_VECTOR_STROKE_CAP_ROUND :
-                                               rshape.stroke->cap == StrokeCap::Butt ? LV_VECTOR_STROKE_CAP_BUTT :
-                                               LV_VECTOR_STROKE_CAP_BUTT);
+                                          rshape.stroke->cap == StrokeCap::Round ? LV_VECTOR_STROKE_CAP_ROUND :
+                                          rshape.stroke->cap == StrokeCap::Butt ? LV_VECTOR_STROKE_CAP_BUTT :
+                                          LV_VECTOR_STROKE_CAP_BUTT);
         lv_draw_vector_dsc_set_stroke_join(dsc, rshape.stroke->join == StrokeJoin::Bevel ? LV_VECTOR_STROKE_JOIN_BEVEL :
-                                                rshape.stroke->join == StrokeJoin::Round ? LV_VECTOR_STROKE_JOIN_ROUND :
-                                                rshape.stroke->join == StrokeJoin::Miter ? LV_VECTOR_STROKE_JOIN_MITER :
-                                                LV_VECTOR_STROKE_JOIN_MITER);
+                                           rshape.stroke->join == StrokeJoin::Round ? LV_VECTOR_STROKE_JOIN_ROUND :
+                                           rshape.stroke->join == StrokeJoin::Miter ? LV_VECTOR_STROKE_JOIN_MITER :
+                                           LV_VECTOR_STROKE_JOIN_MITER);
         lv_draw_vector_dsc_set_stroke_miter_limit(dsc, rshape.stroke->miterlimit);
 
         if(rshape.stroke->dashPattern) {
@@ -263,9 +266,9 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
         if(rshape.stroke->fill) {
             FillSpread spread = rshape.stroke->fill->spread();
             lv_draw_vector_dsc_set_stroke_gradient_spread(dsc, spread == FillSpread::Pad ? LV_VECTOR_GRADIENT_SPREAD_PAD :
-                                                               spread == FillSpread::Reflect ? LV_VECTOR_GRADIENT_SPREAD_REFLECT :
-                                                               spread == FillSpread::Repeat? LV_VECTOR_GRADIENT_SPREAD_REPEAT :
-                                                               LV_VECTOR_GRADIENT_SPREAD_PAD);
+                                                          spread == FillSpread::Reflect ? LV_VECTOR_GRADIENT_SPREAD_REFLECT :
+                                                          spread == FillSpread::Repeat ? LV_VECTOR_GRADIENT_SPREAD_REPEAT :
+                                                          LV_VECTOR_GRADIENT_SPREAD_PAD);
             mat_tvg = rshape.stroke->fill->transform();
             lvmat_from_tvgmat(&mat, &mat_tvg);
             lv_draw_vector_dsc_set_stroke_transform(dsc, &mat);
@@ -308,7 +311,7 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
     uint32_t pt_i = 0;
     for(uint32_t i = 0; i < rshape.path.cmds.count; i++) {
         lv_fpoint_t pts[3];
-        switch (rshape.path.cmds[i]) {
+        switch(rshape.path.cmds[i]) {
             case PathCommand::Close:
                 if(l >= trim_begin && l <= trim_end) {
                     lv_vector_path_close(vp);
@@ -326,84 +329,84 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
                 pt_i++;
                 break;
             case PathCommand::LineTo: {
-                const Line line = {*prev, rshape.path.pts[pt_i]};
+                    const Line line = {*prev, rshape.path.pts[pt_i]};
 
-                float seg_len = line.length();
-                float seg_start = l;
-                l += seg_len;
+                    float seg_len = line.length();
+                    float seg_start = l;
+                    l += seg_len;
 
-                if(!(l < trim_begin || seg_start > trim_end)) {
-                    if(!did_a_moveto) {
-                        did_a_moveto = true;
-                        float trimmed_start = trim_begin - seg_start;
-                        Point moveto_point = line_at(line, trimmed_start);
-                        pts[0].x = moveto_point.x;
-                        pts[0].y = moveto_point.y;
-                        lv_vector_path_move_to(vp, &pts[0]);
+                    if(!(l < trim_begin || seg_start > trim_end)) {
+                        if(!did_a_moveto) {
+                            did_a_moveto = true;
+                            float trimmed_start = trim_begin - seg_start;
+                            Point moveto_point = line_at(line, trimmed_start);
+                            pts[0].x = moveto_point.x;
+                            pts[0].y = moveto_point.y;
+                            lv_vector_path_move_to(vp, &pts[0]);
+                        }
+
+                        Point end_point;
+                        if(trim_end >= l) {
+                            end_point = line.pt2;
+                        }
+                        else {
+                            float trimmed_end = trim_end - seg_start;
+                            end_point = line_at(line, trimmed_end);
+                        }
+                        pts[0].x = end_point.x;
+                        pts[0].y = end_point.y;
+                        lv_vector_path_line_to(vp, &pts[0]);
                     }
 
-                    Point end_point;
-                    if(trim_end >= l) {
-                        end_point = line.pt2;
-                    }
-                    else {
-                        float trimmed_end = trim_end - seg_start;
-                        end_point = line_at(line, trimmed_end);
-                    }
-                    pts[0].x = end_point.x;
-                    pts[0].y = end_point.y;
-                    lv_vector_path_line_to(vp, &pts[0]);
+                    prev = &rshape.path.pts[pt_i];
+                    pt_i++;
+                    break;
                 }
-
-                prev = &rshape.path.pts[pt_i];
-                pt_i++;
-                break;
-            }
             case PathCommand::CubicTo: {
-                Bezier bez = {*prev, rshape.path.pts[pt_i], rshape.path.pts[pt_i + 1], rshape.path.pts[pt_i + 2]};
+                    Bezier bez = {*prev, rshape.path.pts[pt_i], rshape.path.pts[pt_i + 1], rshape.path.pts[pt_i + 2]};
 
-                float seg_len = bez.length();
-                float seg_start = l;
-                l += seg_len;
+                    float seg_len = bez.length();
+                    float seg_start = l;
+                    l += seg_len;
 
-                if(!(l < trim_begin || seg_start > trim_end)) {
-                    Bezier bez_left;
+                    if(!(l < trim_begin || seg_start > trim_end)) {
+                        Bezier bez_left;
 
-                    if(!did_a_moveto) {
-                        did_a_moveto = true;
-                        float trimmed_start = trim_begin - seg_start;
-                        float t = trimmed_start / seg_len;
-                        /* `bez` becomes the right split. `bez_left` unused */
-                        bez.split(t, bez_left);
-                        pts[0].x = bez.start.x;
-                        pts[0].y = bez.start.y;
-                        lv_vector_path_move_to(vp, &pts[0]);
+                        if(!did_a_moveto) {
+                            did_a_moveto = true;
+                            float trimmed_start = trim_begin - seg_start;
+                            float t = trimmed_start / seg_len;
+                            /* `bez` becomes the right split. `bez_left` unused */
+                            bez.split(t, bez_left);
+                            pts[0].x = bez.start.x;
+                            pts[0].y = bez.start.y;
+                            lv_vector_path_move_to(vp, &pts[0]);
+                        }
+
+                        const Bezier * cubic_to;
+                        if(trim_end >= l) {
+                            cubic_to = &bez;
+                        }
+                        else {
+                            float trimmed_end = trim_end - seg_start;
+                            float t = trimmed_end / seg_len;
+                            /* `bez` becomes the right split */
+                            bez.split(t, bez_left);
+                            cubic_to = &bez_left;
+                        }
+                        pts[0].x = cubic_to->ctrl1.x;
+                        pts[0].y = cubic_to->ctrl1.y;
+                        pts[1].x = cubic_to->ctrl2.x;
+                        pts[1].y = cubic_to->ctrl2.y;
+                        pts[2].x = cubic_to->end.x;
+                        pts[2].y = cubic_to->end.y;
+                        lv_vector_path_cubic_to(vp, &pts[0], &pts[1], &pts[2]);
                     }
 
-                    const Bezier * cubic_to;
-                    if(trim_end >= l) {
-                        cubic_to = &bez;
-                    }
-                    else {
-                        float trimmed_end = trim_end - seg_start;
-                        float t = trimmed_end / seg_len;
-                        /* `bez` becomes the right split */
-                        bez.split(t, bez_left);
-                        cubic_to = &bez_left;
-                    }
-                    pts[0].x = cubic_to->ctrl1.x;
-                    pts[0].y = cubic_to->ctrl1.y;
-                    pts[1].x = cubic_to->ctrl2.x;
-                    pts[1].y = cubic_to->ctrl2.y;
-                    pts[2].x = cubic_to->end.x;
-                    pts[2].y = cubic_to->end.y;
-                    lv_vector_path_cubic_to(vp, &pts[0], &pts[1], &pts[2]);
+                    prev = &rshape.path.pts[pt_i + 2];
+                    pt_i += 3;
+                    break;
                 }
-
-                prev = &rshape.path.pts[pt_i + 2];
-                pt_i += 3;
-                break;
-            }
             default:
                 LV_ASSERT(0);
                 break;
@@ -417,7 +420,8 @@ RenderData LvRenderer::prepare(const RenderShape& rshape, RenderData data, const
     return dsc;
 }
 
-RenderData LvRenderer::prepare(RenderSurface * surface, RenderData data, const Matrix& transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags)
+RenderData LvRenderer::prepare(RenderSurface * surface, RenderData data, const Matrix & transform,
+                               Array<RenderData> & clips, uint8_t opacity, RenderUpdateFlag flags)
 {
     return nullptr;
 }
@@ -466,7 +470,7 @@ RenderRegion LvRenderer::viewport()
     return m_vport;
 }
 
-bool LvRenderer::viewport(const RenderRegion& vp)
+bool LvRenderer::viewport(const RenderRegion & vp)
 {
     m_vport = vp;
     return true;
@@ -506,7 +510,7 @@ bool LvRenderer::sync()
     return true;
 }
 
-RenderCompositor * LvRenderer::target(const RenderRegion& region, ColorSpace cs)
+RenderCompositor * LvRenderer::target(const RenderRegion & region, ColorSpace cs)
 {
     return nullptr;
 }
@@ -562,7 +566,7 @@ static void lvmat_from_tvgmat(lv_matrix_t * dst, const Matrix * src)
     dst->m[2][2] = src->e33;
 }
 
-static float path_length(const RenderShape& rshape)
+static float path_length(const RenderShape & rshape)
 {
     float l = 0;
 
@@ -572,7 +576,7 @@ static float path_length(const RenderShape& rshape)
 
     uint32_t pt_i = 0;
     for(uint32_t i = 0; i < rshape.path.cmds.count; i++) {
-        switch (rshape.path.cmds[i]) {
+        switch(rshape.path.cmds[i]) {
             case PathCommand::Close:
                 l += length(prev, first);
                 break;
@@ -599,7 +603,7 @@ static float path_length(const RenderShape& rshape)
     return l;
 }
 
-static Point line_at(const Line& line, float at)
+static Point line_at(const Line & line, float at)
 {
     float len = line.length();
     return {
