@@ -382,8 +382,8 @@ void test_spangroup_get_span_coords(void)
     active_screen = lv_screen_active();
     spangroup = lv_spangroup_create(active_screen);
 
-    const uint32_t span_count = 5;
-    lv_span_t * spans[span_count];
+    lv_span_t * spans[5];
+    const uint32_t span_count = sizeof(spans) / sizeof(spans[0]);
 
     /* Set styles and properties for the span group */
     lv_obj_set_style_outline_width(spangroup, 1, 0);
