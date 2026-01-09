@@ -31,7 +31,6 @@ typedef struct {
     lv_opengles_texture_t texture;
     struct wl_egl_window * egl_window;
     lv_opengles_egl_t * egl_ctx;
-    bool delete_pending;
 } lv_wl_egl_display_data_t;
 
 /**********************
