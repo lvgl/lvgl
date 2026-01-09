@@ -143,6 +143,7 @@ static lv_wl_egl_display_data_t * egl_create_display_data(lv_display_t * display
 texture_err:
     lv_opengles_egl_context_destroy(ddata->egl_ctx);
 egl_ctx_err:
+    lv_wayland_set_backend_display_data(display, NULL);
     lv_free(ddata);
     return NULL;
 }
