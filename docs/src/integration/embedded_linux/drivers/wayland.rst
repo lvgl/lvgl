@@ -54,10 +54,7 @@ It uses Wayland's shared memory protocol (``wl_shm``) for rendering, which is su
 * Double-buffered direct rendering
 * Universal compatibility with all Wayland compositors
 * No special hardware requirements
-
-**Limitations:**
-
-* Rotation is not currently supported
+* Rotation support
 
 **Usage:**
 
@@ -250,7 +247,6 @@ Current state and objectives
 
 * EGL Support
 * Server-side window decorations
-* Rotation support for the SHM backend
 
 
 
