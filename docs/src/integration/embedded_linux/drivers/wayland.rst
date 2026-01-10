@@ -64,6 +64,46 @@ It uses Wayland's shared memory protocol (``wl_shm``) for rendering, which is su
 The SHM backend is enabled by default and requires no additional configuration.
 
 
+EGL Backend
+-----------
+
+The **EGL Backend** provides hardware-accelerated rendering for the Wayland driver using OpenGL ES.
+It utilizes the EGL (Embedded-System Graphics Library) interface to create OpenGL ES rendering contexts,
+enabling GPU-accelerated graphics on Wayland compositors that support the necessary protocols.
+
+**Features:**
+
+* Hardware-accelerated rendering via OpenGL ES
+* Full rotation support
+* Compatible with LVGL 3D rendering capabilities (see :ref:`3d_gltf_support`)
+* Efficient GPU-based compositing
+
+**Requirements:**
+
+* OpenGL ES 2.0 support on the target hardware
+* ``LV_USE_OPENGLES`` must be enabled in your LVGL configuration
+* Must link with the ``wayland-egl`` library
+
+**Usage:**
+
+To enable the EGL backend:
+
+1. Enable OpenGL ES support in your LVGL configuration:
+
+   .. code-block:: c
+
+      #define LV_USE_OPENGLES 1
+
+2. Link your application with the ``wayland-egl`` library (add to your build system):
+
+   .. code-block:: bash
+
+      -lwayland-egl
+
+**Note:** If your target board has OpenGL ES 2.0 support, this backend can be used with LVGL's 3D rendering
+capabilities for glTF model visualization. See :ref:`3d_gltf_support` for details on 3D rendering support.
+
+
 G2D Backend
 -----------
 
@@ -82,13 +122,20 @@ The G2D backend leverages NXP's hardware-accelerated 2D graphics engine availabl
 
 **Usage:**
 
-Enable the G2D backend in ``lv_conf.h``:
+To enable the G2D backend:
 
-.. code:: c
+1. Enable G2D support in your LVGL configuration:
 
-   #define LV_USE_DRAW_G2D  1
+   .. code-block:: c
 
-When ``LV_USE_DRAW_G2D`` is enabled, the Wayland driver will automatically use the G2D backend instead of the default SHM backend.
+      #define LV_USE_G2D 1
+      #define LV_USE_DRAW_G2D 1
+
+2. Link your application with the ``g2d`` library (add to your build system):
+
+   .. code-block:: bash
+
+      -lg2d
 
 
 
@@ -248,7 +295,6 @@ For applications that don't need decorations (fullscreen, kiosk mode, etc.), sim
 Current state and objectives
 ****************************
 
-* EGL Support
 * Server-side window decorations
 * Rotation support for the SHM backend
 

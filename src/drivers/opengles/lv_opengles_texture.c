@@ -123,7 +123,10 @@ lv_result_t lv_opengles_texture_reshape(lv_opengles_texture_t * texture, lv_disp
 static void lv_opengles_texture_attach_to_display(lv_opengles_texture_t * texture, lv_display_t * display)
 {
     LV_ASSERT_NULL(display);
+    LV_UNUSED(texture);
+#if !LV_USE_DRAW_NANOVG
     display->layer_head->user_data = (void *)(lv_uintptr_t)texture->texture_id;
+#endif /*!LV_USE_DRAW_NANOVG*/
 }
 
 static lv_result_t lv_opengles_texture_create_draw_buffers(lv_opengles_texture_t * texture, lv_display_t * display)
