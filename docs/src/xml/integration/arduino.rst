@@ -1,14 +1,14 @@
 .. _editor_integration_arduino:
 
-========================================
-Using the Exported C Code on Arduino IDE
-========================================
+===========
+Arduino IDE
+===========
 
 Overview
 ********
 
-This guide explains how to properly integrate your LVGL Editor exported project into 
-an Arduino sketch, why it must go inside the src folder, and how to fix include paths 
+This guide explains how to properly integrate your LVGL Editor exported project into
+an Arduino sketch, why it must go inside the src folder, and how to fix include paths
 for successful compilation.
 
 Arduino Build System

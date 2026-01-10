@@ -41,7 +41,7 @@ for :ref:`NeoChrom <neochrom>`. NemaVG --- an extension to NeoChrom's
 base support --- is implemented by this MCU.
 
 The MCU has an LCD driver peripheral which LVGL uses to update the
-display. See the :ref:`LTDC <stm32 ltdc driver>` driver docs
+display. See the :ref:`LTDC <stm32_ltdc_driver>` driver docs
 for more info and how to customize its use.
 
 
