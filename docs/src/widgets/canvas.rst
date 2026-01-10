@@ -33,12 +33,19 @@ Buffer
 The Canvas needs a buffer in which to store the drawn image. To assign a
 buffer to a Canvas, use
 :cpp:expr:`lv_canvas_set_buffer(canvas, buffer, width, height, LV_COLOR_FORMAT_...)`.
-Where ``buffer`` is a static buffer (not just a local variable) to hold
-the image of the Canvas. For example, for a 100x50 ARGB8888 buffer:
-``static uint8_t buffer[100 * 50 * 4]``.
 
-Or you can use
-``static uint8_t buffer[LV_CANVAS_BUF_SIZE(width, height, bits_per_pixel, stride_in_bytes)]``.
+Where ``buffer`` has to be valid for the entire lifecycle of the object created by :cpp:expr:`lv_canvas_create`.
+It can be allocated by using :cpp:func:`lv_malloc` or a statically allocated array.
+
+For example, for a 100x50 ARGB8888 buffer you can use:
+
+-  ``uint8_t* buffer = lv_malloc(100 * 50 * 4)``
+
+-  ``static uint8_t buffer[100 * 50 * 4]``
+
+-  ``static uint8_t buffer[LV_CANVAS_BUF_SIZE(width, height, bits_per_pixel, stride_in_bytes)]``
+
+In case you choose the :cpp:expr:`lv_malloc` way, it is up to the programmer to free the memory area, for example, on :cpp:expr:`LV_EVENT_DELETE` event.
 
 Canvas supports all the color formats like
 :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` or :cpp:enumerator:`LV_COLOR_FORMAT_I2`. See the full
