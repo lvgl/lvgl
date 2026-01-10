@@ -45,7 +45,7 @@ For example, for a 100x50 ARGB8888 buffer you can use:
 
 -  ``static uint8_t buffer[LV_CANVAS_BUF_SIZE(width, height, bits_per_pixel, stride_in_bytes)]``
 
-In case you choose the :cpp:expr:`lv_malloc` way, it is up to the programmer to free the memory area, for example, on :cpp:expr:`LV_EVENT_DELETE` event.
+In case you choose the :cpp:expr:`lv_malloc` way, it is up to the programmer to free the memory area, for example, on :cpp:enumerator:`LV_EVENT_DELETE` event.
 
 Canvas supports all the color formats like
 :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` or :cpp:enumerator:`LV_COLOR_FORMAT_I2`. See the full
