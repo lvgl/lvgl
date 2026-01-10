@@ -152,7 +152,7 @@ value directly.  Note that this is a two-way binding (Subject <===> Widget), so 
 user's direct interaction with the Arc Widget updates the Subject's value and vice
 versa.
 
-It supports integer subjects and, when ``LV_USE_FLOAT`` is enabled, float subjects.
+It supports integer subjects and, when :c:macro:`LV_USE_FLOAT` is enabled, float subjects.
 
 
 - :cpp:expr:`lv_arc_bind_value(arc, &subject)`

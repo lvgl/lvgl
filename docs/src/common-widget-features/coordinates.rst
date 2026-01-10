@@ -269,7 +269,7 @@ automatically as the parent’s size changes.
 Content
 -------
 
-Use ``LV_SIZE_CONTENT`` to size the widget based on its children:
+Use :c:macro:`LV_SIZE_CONTENT` to size the widget based on its children:
 
 .. code-block:: c
 
@@ -277,8 +277,8 @@ Use ``LV_SIZE_CONTENT`` to size the widget based on its children:
    lv_obj_t * label = lv_label_create(cont);
    lv_label_set_text(label, "Some text");
 
-Ignored for hidden (``LV_OBJ_FLAG_HIDDEN``) or floating (``LV_OBJ_FLAG_FLOATING``)
-widgets.
+Ignored for hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) or floating
+(:cpp:enumerator:`LV_OBJ_FLAG_FLOATING`) widgets.
 
 Layouts
 -------
@@ -294,7 +294,7 @@ Min and Max Size
 
 LVGL supports ``min-width``, ``max-width``, ``min-height``, and ``max-height``.
 
-Use them to set limits when using ``LV_SIZE_CONTENT`` or percentage sizes:
+Use them to set limits when using :c:macro:`LV_SIZE_CONTENT` or percentage sizes:
 
 .. code-block:: c
 
@@ -326,7 +326,7 @@ Useful for hover or press effects.
 Percentage-based translation is relative to the widget’s own size (not the parent).
 
 Coordinate translation applies after layout and affects scrollbars and
-``LV_SIZE_CONTENT``.
+:c:macro:`LV_SIZE_CONTENT`.
 
 
 
