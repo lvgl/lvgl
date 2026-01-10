@@ -125,20 +125,58 @@ static void resolution_changed_event_cb(lv_event_t * e)
     }
 }
 
-static void read_touch(lv_indev_t * indev_driver, lv_indev_data_t * data)
+static void read_touch(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_indev_get_driver_data(indev_driver);
-    uint16_t x;
-    uint16_t y;
+    lv_lovyan_gfx_t * dsc = (lv_lovyan_gfx_t *)lv_indev_get_driver_data(indev);
+    uint16_t x, y;
     bool touched = dsc->tft->getTouch(&x, &y);
+
     if(!touched) {
         data->state = LV_INDEV_STATE_RELEASED;
     }
     else {
         data->state = LV_INDEV_STATE_PRESSED;
-        /*Set the coordinates*/
-        data->point.x = x;
-        data->point.y = y;
+
+        /* LovyanGFX returns coordinates relative to the current software rotation.
+         * LVGL will also rotate the input coordinates based on the display rotation.
+         * To avoid "double rotation", we must reverse the LovyanGFX rotation
+         * and pass raw (Physical/Rotation 0) coordinates to LVGL.
+         */
+        uint8_t rotation = dsc->tft->getRotation();
+
+        /* Note: width() and height() return dimensions for the *current* rotation */
+        int32_t w = dsc->tft->width();
+        int32_t h = dsc->tft->height();
+
+        switch(rotation) {
+            case 1: /* Landscape (90 deg CW) */
+                /* Rot 0 (Phys) Top-Left becomes Rot 1 Top-Right.
+                 * Phys X = Rot1 Y
+                 * Phys Y = Rot1 Width - 1 - Rot1 X */
+                data->point.x = y;
+                data->point.y = w - 1 - x;
+                break;
+
+            case 2: /* Portrait Inverted (180 deg) */
+                /* Phys X = Rot2 Width - 1 - Rot2 X
+                 * Phys Y = Rot2 Height - 1 - Rot2 Y */
+                data->point.x = w - 1 - x;
+                data->point.y = h - 1 - y;
+                break;
+
+            case 3: /* Landscape Inverted (270 deg CW) */
+                /* Phys X = Rot3 Height - 1 - Rot3 Y
+                 * Phys Y = Rot3 X */
+                data->point.x = h - 1 - y;
+                data->point.y = x;
+                break;
+
+            default: /* Portrait (0 deg) */
+                /* Pass through raw coordinates */
+                data->point.x = x;
+                data->point.y = y;
+                break;
+        }
     }
 }
 
