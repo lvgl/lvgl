@@ -83,6 +83,8 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     d2_u8 current_fill_mode;
     d2_u32 src_blend_mode;
     d2_u32 dst_blend_mode;
+    d2_u32 src_alpha_blend_mode = d2_getalphablendmodesrc(u->d2_handle);
+    d2_u32 dst_alpha_blend_mode = d2_getalphablendmodedst(u->d2_handle);
     void * p_intermediate_buf = NULL;
 
 #if LV_USE_OS
@@ -209,7 +211,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
         d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
     }
     else { //Formats with an alpha channel,
-        d2_settextureoperation(u->d2_handle, d2_to_copy, d2_to_copy, d2_to_copy, d2_to_copy);
+        d2_settextureoperation(u->d2_handle, d2_to_multiply, d2_to_copy, d2_to_copy, d2_to_copy);
     }
 
     if(LV_BLEND_MODE_NORMAL == draw_dsc->blend_mode) { /**< Simply mix according to the opacity value*/
@@ -300,6 +302,7 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     d2_setfillmode(u->d2_handle, current_fill_mode);
     d2_settextureoperation(u->d2_handle, a_texture_op, r_texture_op, g_texture_op, b_texture_op);
     d2_setblendmode(u->d2_handle, src_blend_mode, dst_blend_mode);
+    d2_setalphablendmode(u->d2_handle, src_alpha_blend_mode, dst_alpha_blend_mode);
 
     if(NULL != p_intermediate_buf) {
         lv_free(p_intermediate_buf);
