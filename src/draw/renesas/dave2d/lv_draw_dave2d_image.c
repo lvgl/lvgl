@@ -83,8 +83,8 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     d2_u8 current_fill_mode;
     d2_u32 src_blend_mode;
     d2_u32 dst_blend_mode;
-    d2_u32 src_alpha_blend_mode = d2_getalphablendmodesrc(u->d2_handle);
-    d2_u32 dst_alpha_blend_mode = d2_getalphablendmodedst(u->d2_handle);
+    d2_u32 src_alpha_blend_mode;
+    d2_u32 dst_alpha_blend_mode;
     void * p_intermediate_buf = NULL;
 
 #if LV_USE_OS
@@ -92,6 +92,9 @@ static void img_draw_core(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_d
     status = lv_mutex_lock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
+
+    src_alpha_blend_mode = d2_getalphablendmodesrc(u->d2_handle);
+    dst_alpha_blend_mode = d2_getalphablendmodedst(u->d2_handle);
 
     buffer_area = t->target_layer->buf_area;
     draw_area = *img_coords;

@@ -62,13 +62,13 @@ static void dave2d_draw_border_simple(lv_draw_task_t * t, const lv_area_t * oute
 
     lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)t->draw_unit;
 
-    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
     local_outer_area = *outer_area;
     local_inner_area = *inner_area;
 
