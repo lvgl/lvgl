@@ -1,5 +1,5 @@
 /**
- * @file lv_thorvg.c
+ * @file lv_thorvg.cpp
  *
  */
 
@@ -235,6 +235,20 @@ RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, cons
         stops = lvstops_from_tvgstops(stops_tvg, stop_cnt);
         lv_draw_vector_dsc_set_fill_gradient_color_stops(dsc, stops, stop_cnt);
         lv_free(stops);
+        if(rshape.fill->type() == Type::LinearGradient) {
+            const LinearGradient * linear_grad = (const LinearGradient *) rshape.fill;
+            float x1, y1, x2, y2;
+            if(linear_grad->linear(&x1, &y1, &x2, &y2) == Result::Success) {
+                lv_draw_vector_dsc_set_fill_linear_gradient(dsc, x1, y1, x2, y2);
+            }
+        }
+        else if(rshape.fill->type() == Type::RadialGradient) {
+            const RadialGradient * linear_grad = (const RadialGradient *) rshape.fill;
+            float cx, cy, radius;
+            if(linear_grad->radial(&cx, &cy, &radius) == Result::Success) {
+                lv_draw_vector_dsc_set_fill_radial_gradient(dsc, cx, cy, radius);
+            }
+        }
     }
 
 
@@ -276,6 +290,20 @@ RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, cons
             stops = lvstops_from_tvgstops(stops_tvg, stop_cnt);
             lv_draw_vector_dsc_set_stroke_gradient_color_stops(dsc, stops, stop_cnt);
             lv_free(stops);
+            if(rshape.stroke->fill->type() == Type::LinearGradient) {
+                const LinearGradient * linear_grad = (const LinearGradient *) rshape.stroke->fill;
+                float x1, y1, x2, y2;
+                if(linear_grad->linear(&x1, &y1, &x2, &y2) == Result::Success) {
+                    lv_draw_vector_dsc_set_stroke_linear_gradient(dsc, x1, y1, x2, y2);
+                }
+            }
+            else if(rshape.stroke->fill->type() == Type::RadialGradient) {
+                const RadialGradient * linear_grad = (const RadialGradient *) rshape.stroke->fill;
+                float cx, cy, radius;
+                if(linear_grad->radial(&cx, &cy, &radius) == Result::Success) {
+                    lv_draw_vector_dsc_set_stroke_radial_gradient(dsc, cx, cy, radius);
+                }
+            }
         }
     }
 
