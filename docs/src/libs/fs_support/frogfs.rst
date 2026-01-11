@@ -9,7 +9,7 @@ is a read-only :ref:`filesystem <file_system>` for packing a directory
 tree of files into a single "blob" which can be distributed easily or
 built into a firmware.
 
-A typically application of FrogFS to create blobs from the XML files
+A typical application of FrogFS is to create blobs from the XML files
 and other assets created by `LVGL Pro <pro.lvgl.io>`__.
 
 A copy of the frogfs source is inside LVGL. It has been
