@@ -175,7 +175,7 @@ void LvRenderer::target(pixel_t * data, uint32_t stride, uint32_t w, uint32_t h)
 {
     lv_draw_buf_init(&m_draw_buf, w, h, LV_COLOR_FORMAT_ARGB8888, stride * 4, data, stride * 4 * h);
 
-    const lv_area_t area = { .x1 = 0, .y1 = 0, .x2 = (int32_t) w - 1, .y2 = (int32_t) h - 1 };
+    const lv_area_t area = { 0, 0, (int32_t) w - 1, (int32_t) h - 1 };
     lv_layer_init(&m_layer);
     m_layer.draw_buf = &m_draw_buf;
     m_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
