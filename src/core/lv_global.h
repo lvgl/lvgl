@@ -274,12 +274,6 @@ typedef struct _lv_global_t {
     lv_evdev_discovery_t * evdev_discovery;
 #endif
 
-#if LV_USE_XML
-    const char * xml_path_prefix;
-    uint32_t lv_event_xml_store_timeline;
-    lv_ll_t xml_loads;
-#endif
-
 #if LV_USE_DRAW_EVE
     lv_draw_eve_unit_t * draw_eve_unit;
 #endif
