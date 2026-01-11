@@ -280,7 +280,8 @@ void lv_draw_dave2d_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, con
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         d2_setalphamode(u->d2_handle, current_alpha_mode);
         d2_setfillmode(u->d2_handle, d2_fm_color); //default
-    } else {
+    }
+    else {
         d2_setalpha(u->d2_handle, current_alpha);
     }
 
