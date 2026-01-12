@@ -12,8 +12,6 @@
 #if LV_USE_DRAW_NANOVG && LV_USE_3DTEXTURE
 
 #include "../../draw/lv_draw_3d.h"
-#include "../../libs/nanovg/nanovg_gl.h"
-#include "../../libs/nanovg/nanovg_gl_utils.h"
 #include "../../drivers/opengles/lv_opengles_driver.h"
 #include "lv_nanovg_utils.h"
 #include "lv_nanovg_fbo_cache.h"
@@ -46,10 +44,11 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
 {
     LV_PROFILER_DRAW_BEGIN;
 
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
+
     /* End NanoVG frame temporarily to allow direct OpenGL rendering */
     lv_nanovg_end_frame(u);
 
-    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)t->draw_unit;
     lv_layer_t * layer = t->target_layer;
 
     /* Get target layer info */
