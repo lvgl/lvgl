@@ -683,6 +683,7 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     for(size_t i = 0; i < n; ++i) {
         lv_gltf_data_delete(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
+    lv_array_deinit(&view->models);
     if(view->environment && view->owns_environment) {
         lv_gltf_environment_delete(view->environment);
     }
