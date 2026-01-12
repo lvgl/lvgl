@@ -136,23 +136,6 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 *   STATIC FUNCTIONS
 **********************/
 
-static inline void convert_letter_matrix(lv_matrix_t * matrix, const lv_draw_glyph_dsc_t * dsc)
-{
-    lv_matrix_translate(matrix, dsc->letter_coords->x1, dsc->letter_coords->y1);
-
-    if(!dsc->rotation) {
-        return;
-    }
-
-    const lv_point_t pivot = {
-        .x = dsc->pivot.x,
-        .y = dsc->g->box_h + dsc->g->ofs_y
-    };
-    lv_matrix_translate(matrix, pivot.x, pivot.y);
-    lv_matrix_rotate(matrix, dsc->rotation / 10.0f);
-    lv_matrix_translate(matrix, -pivot.x, -pivot.y);
-}
-
 static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
                                    lv_area_t * cliped_area)
 {
