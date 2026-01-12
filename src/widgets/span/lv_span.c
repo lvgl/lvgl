@@ -44,11 +44,13 @@ struct _snippet_stack {
     uint32_t        index;
 };
 
+#if LV_USE_OBSERVER
 typedef struct {
     lv_subject_t * subject;
     void * element; /**< span of a span group*/
     const char * fmt;
 } bind_element_string_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
