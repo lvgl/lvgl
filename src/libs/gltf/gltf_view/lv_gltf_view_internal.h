@@ -104,10 +104,45 @@ typedef struct {
 } lv_gltf_view_desc_t;
 
 typedef struct {
+    /* Blend state */
     GLboolean blend_enabled;
     GLint blend_src;
     GLint blend_dst;
     GLint blend_equation;
+
+    /* Depth state */
+    GLboolean depth_test_enabled;
+    GLboolean depth_mask;
+    GLint depth_func;
+
+    /* Face culling state */
+    GLboolean cull_face_enabled;
+    GLint cull_face_mode;
+    GLint front_face;
+
+    /* Stencil state */
+    GLboolean stencil_test_enabled;
+    GLuint stencil_mask;
+    GLint stencil_func;
+    GLint stencil_ref;
+    GLuint stencil_value_mask;
+
+    /* Buffer bindings */
+    GLuint current_vao;
+    GLuint current_vbo;
+    GLuint current_ibo;
+    GLuint current_program;
+
+    /* Texture state */
+    GLint active_texture;
+    GLuint bound_texture_2d;
+
+    /* Viewport and scissor */
+    GLint viewport[4];
+    GLboolean scissor_test_enabled;
+    GLint scissor_box[4];
+
+    /* Clear values */
     GLfloat clear_depth;
     GLfloat clear_color[4];
 } lv_opengl_state_t;
