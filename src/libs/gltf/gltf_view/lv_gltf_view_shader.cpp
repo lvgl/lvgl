@@ -200,11 +200,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.specularGlossiness->diffuseTexture, "HAS_DIFFUSE_MAP",
-                                   "HAS_DIFFUSE_UV_TRANSFORM")) {
+                                   "HAS_DIFFUSE_UV_TRANSFORM") == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.specularGlossiness->specularGlossinessTexture,
-                                   "HAS_SPECULARGLOSSINESS_MAP", "HAS_SPECULARGLOSSINESS_UV_TRANSFORM")) {
+                                   "HAS_SPECULARGLOSSINESS_MAP", "HAS_SPECULARGLOSSINESS_UV_TRANSFORM") == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
