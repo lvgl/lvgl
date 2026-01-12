@@ -168,17 +168,59 @@ GLuint lv_gltf_view_render(lv_gltf_t * viewer)
 
 static void lv_gltf_view_push_opengl_state(lv_opengl_state_t * state)
 {
+    /* Blend state */
     GL_CALL(glGetBooleanv(GL_BLEND, &state->blend_enabled));
     GL_CALL(glGetIntegerv(GL_BLEND_SRC_ALPHA, &state->blend_src));
     GL_CALL(glGetIntegerv(GL_BLEND_DST_ALPHA, &state->blend_dst));
     GL_CALL(glGetIntegerv(GL_BLEND_EQUATION, &state->blend_equation));
+
+    /* Depth state */
+    GL_CALL(glGetBooleanv(GL_DEPTH_TEST, &state->depth_test_enabled));
+    GL_CALL(glGetBooleanv(GL_DEPTH_WRITEMASK, &state->depth_mask));
+    GL_CALL(glGetIntegerv(GL_DEPTH_FUNC, &state->depth_func));
+
+    /* Face culling state */
+    GL_CALL(glGetBooleanv(GL_CULL_FACE, &state->cull_face_enabled));
+    GL_CALL(glGetIntegerv(GL_CULL_FACE_MODE, &state->cull_face_mode));
+    GL_CALL(glGetIntegerv(GL_FRONT_FACE, &state->front_face));
+
+    /* Stencil state */
+    GL_CALL(glGetBooleanv(GL_STENCIL_TEST, &state->stencil_test_enabled));
+    GL_CALL(glGetIntegerv(GL_STENCIL_WRITEMASK, (GLint *)&state->stencil_mask));
+    GL_CALL(glGetIntegerv(GL_STENCIL_FUNC, &state->stencil_func));
+    GL_CALL(glGetIntegerv(GL_STENCIL_REF, &state->stencil_ref));
+    GL_CALL(glGetIntegerv(GL_STENCIL_VALUE_MASK, (GLint *)&state->stencil_value_mask));
+
+    /* Buffer bindings */
+#ifndef GL_VERTEX_ARRAY_BINDING
+#ifdef GL_VERTEX_ARRAY_BINDING_OES
+#define GL_VERTEX_ARRAY_BINDING GL_VERTEX_ARRAY_BINDING_OES
+#else
+#define GL_VERTEX_ARRAY_BINDING 0x85B5
+#endif
+#endif
+    GL_CALL(glGetIntegerv(GL_VERTEX_ARRAY_BINDING, (GLint *)&state->current_vao));
+    GL_CALL(glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint *)&state->current_vbo));
+    GL_CALL(glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, (GLint *)&state->current_ibo));
+    GL_CALL(glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *)&state->current_program));
+
+    /* Texture state */
+    GL_CALL(glGetIntegerv(GL_ACTIVE_TEXTURE, &state->active_texture));
+    GL_CALL(glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint *)&state->bound_texture_2d));
+
+    /* Viewport and scissor */
+    GL_CALL(glGetIntegerv(GL_VIEWPORT, state->viewport));
+    GL_CALL(glGetBooleanv(GL_SCISSOR_TEST, &state->scissor_test_enabled));
+    GL_CALL(glGetIntegerv(GL_SCISSOR_BOX, state->scissor_box));
+
+    /* Clear values */
     GL_CALL(glGetFloatv(GL_COLOR_CLEAR_VALUE, state->clear_color));
     GL_CALL(glGetFloatv(GL_DEPTH_CLEAR_VALUE, &state->clear_depth));
 }
 
 static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
 {
-    GL_CALL(glDisable(GL_CULL_FACE));
+    /* Restore blend state */
     if(state->blend_enabled) {
         GL_CALL(glEnable(GL_BLEND));
     }
@@ -187,7 +229,58 @@ static void lv_gltf_view_pop_opengl_state(const lv_opengl_state_t * state)
     }
     GL_CALL(glBlendFunc(state->blend_src, state->blend_dst));
     GL_CALL(glBlendEquation(state->blend_equation));
-    GL_CALL(glDepthMask(GL_TRUE));
+
+    /* Restore depth state */
+    if(state->depth_test_enabled) {
+        GL_CALL(glEnable(GL_DEPTH_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_DEPTH_TEST));
+    }
+    GL_CALL(glDepthMask(state->depth_mask));
+    GL_CALL(glDepthFunc(state->depth_func));
+
+    /* Restore face culling state */
+    if(state->cull_face_enabled) {
+        GL_CALL(glEnable(GL_CULL_FACE));
+    }
+    else {
+        GL_CALL(glDisable(GL_CULL_FACE));
+    }
+    GL_CALL(glCullFace(state->cull_face_mode));
+    GL_CALL(glFrontFace(state->front_face));
+
+    /* Restore stencil state */
+    if(state->stencil_test_enabled) {
+        GL_CALL(glEnable(GL_STENCIL_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_STENCIL_TEST));
+    }
+    GL_CALL(glStencilMask(state->stencil_mask));
+    GL_CALL(glStencilFunc(state->stencil_func, state->stencil_ref, state->stencil_value_mask));
+
+    /* Restore buffer bindings */
+    GL_CALL(glBindVertexArray(state->current_vao));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, state->current_vbo));
+    GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, state->current_ibo));
+    GL_CALL(glUseProgram(state->current_program));
+
+    /* Restore texture state */
+    GL_CALL(glActiveTexture(state->active_texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, state->bound_texture_2d));
+
+    /* Restore viewport and scissor */
+    GL_CALL(glViewport(state->viewport[0], state->viewport[1], state->viewport[2], state->viewport[3]));
+    if(state->scissor_test_enabled) {
+        GL_CALL(glEnable(GL_SCISSOR_TEST));
+    }
+    else {
+        GL_CALL(glDisable(GL_SCISSOR_TEST));
+    }
+    GL_CALL(glScissor(state->scissor_box[0], state->scissor_box[1], state->scissor_box[2], state->scissor_box[3]));
+
+    /* Restore clear values */
     GL_CALL(glClearColor(state->clear_color[0], state->clear_color[1], state->clear_color[2], state->clear_color[3]));
     GL_CALL(glClearDepthf(state->clear_depth));
 }
