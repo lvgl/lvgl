@@ -82,6 +82,10 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
 
 void lv_gltf_data_delete(lv_gltf_model_t * data)
 {
+    LV_ASSERT_NULL(data);
+    lv_timer_delete(data->animation_update_timer);
+    data->animation_update_timer = NULL;
+
     lv_gltf_data_delete_textures(data);
     uint32_t node_count = lv_array_size(&data->nodes);
     for(uint32_t i = 0; i < node_count; ++i) {
