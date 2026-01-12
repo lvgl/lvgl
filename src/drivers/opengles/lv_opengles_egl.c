@@ -84,6 +84,9 @@ lv_opengles_egl_t * lv_opengles_egl_context_create(const lv_egl_interface_t * in
 
 void lv_opengles_egl_context_destroy(lv_opengles_egl_t * ctx)
 {
+    if(!ctx) {
+        return;
+    }
     if(ctx->egl_display) {
         eglMakeCurrent(ctx->egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if(ctx->egl_context) {
