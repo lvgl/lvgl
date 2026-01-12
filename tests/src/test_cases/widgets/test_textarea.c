@@ -41,8 +41,16 @@ static bool test_font_get_glyph_dsc(const lv_font_t * font,
     return false;
 }
 
+const void * test_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+{
+    LV_UNUSED(g_dsc);
+    LV_UNUSED(draw_buf);
+    return NULL;
+}
+
 static lv_font_t test_font_no_bullet = {
     .get_glyph_dsc = test_font_get_glyph_dsc,
+    .get_glyph_bitmap = test_font_get_glyph_bitmap,
     .line_height = 14,
     .base_line = 12,
 };
@@ -78,6 +86,8 @@ void test_textarea_should_return_actual_text_when_password_mode_is_enabled(void)
 
     TEST_ASSERT_TRUE(lv_textarea_get_password_mode(textarea));
     TEST_ASSERT_EQUAL_STRING(text, lv_textarea_get_text(textarea));
+
+    lv_textarea_set_password_mode(textarea, false);
 }
 
 void test_textarea_should_update_label_style_with_one_line_enabled(void)
@@ -281,10 +291,6 @@ void test_textarea_set_max_length(void)
     lv_textarea_set_max_length(textarea, 8);
     lv_textarea_add_text(textarea, "1234567890");
     TEST_ASSERT_EQUAL_STRING("12345678", lv_textarea_get_text(textarea));
-
-    lv_textarea_set_password_mode(textarea, true);
-    lv_textarea_set_text(textarea, "1234567890");
-    TEST_ASSERT_EQUAL_STRING("1234567890", lv_textarea_get_text(textarea));
 }
 
 void test_textarea_set_insert_replace(void)
@@ -311,24 +317,37 @@ void test_textarea_placeholder_text_show_one_line(void)
 void test_textarea_password_mode(void)
 {
     lv_textarea_set_one_line(textarea, false);
-    lv_textarea_set_password_mode(textarea, true);
 
     lv_textarea_set_text(textarea, "123456");
+    lv_textarea_set_password_mode(textarea, true);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode.png");
 
+    lv_textarea_set_password_mode(textarea, false);
+
     lv_textarea_set_text(textarea, "123456789");
+    lv_textarea_set_password_mode(textarea, true);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_update.png");
 
+    lv_textarea_set_password_mode(textarea, false);
+
     lv_textarea_add_text(textarea, "abc");
+    lv_textarea_set_password_mode(textarea, true);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_add_text.png");
 
+    lv_textarea_set_password_mode(textarea, false);
+
     lv_textarea_add_char(textarea, 'a');
+    lv_textarea_set_password_mode(textarea, true);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_add_char.png");
 
+    lv_textarea_set_password_mode(textarea, false);
+
     lv_textarea_delete_char(textarea);
+    lv_textarea_set_password_mode(textarea, true);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_delete_char.png");
 
     lv_textarea_set_password_mode(textarea, false);
+
     lv_textarea_set_text(textarea, "1234567890");
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_normal_mode.png");
 }
@@ -348,18 +367,20 @@ void test_textarea_password_mode_hide_char(void)
     lv_textarea_add_char(textarea, 'b');
 
     lv_test_wait(550);
-    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_nide_char_tow.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_hide_char_two.png");
 
     lv_textarea_add_char(textarea, 'c');
     lv_textarea_set_password_mode(textarea, false);
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_password_mode_to_normal_mode.png");
+
+    lv_textarea_set_text(textarea, "");
 }
 
 void test_textarea_set_password_bullet(void)
 {
     lv_textarea_set_one_line(textarea, false);
-    lv_textarea_set_password_mode(textarea, true);
     lv_textarea_set_text(textarea, "1234567890");
+    lv_textarea_set_password_mode(textarea, true);
 
     lv_obj_set_style_text_font(textarea, &test_font_no_bullet, 0);
     TEST_ASSERT_EQUAL_STRING("*", lv_textarea_get_password_bullet(textarea));
@@ -369,6 +390,9 @@ void test_textarea_set_password_bullet(void)
 
     lv_textarea_set_password_bullet(textarea, NULL);
     TEST_ASSERT_EQUAL_STRING("*", lv_textarea_get_password_bullet(textarea));
+
+    lv_textarea_set_password_mode(textarea, false);
+    lv_textarea_set_text(textarea, "");
 }
 
 void test_textarea_delete_char(void)
@@ -424,9 +448,9 @@ void test_textarea_set_align(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("textarea_align_right.png");
 }
 
-void test_textarea_corsor_show(void)
+void test_textarea_cursor_show(void)
 {
-    lv_obj_set_style_anim_duration(textarea, 1000, LV_PART_CURSOR);
+    lv_textarea_set_password_show_time(textarea, 1000);
     lv_obj_send_event(textarea, LV_EVENT_FOCUSED, NULL);
 
     lv_test_wait(1000);
@@ -572,4 +596,23 @@ void test_textarea_key_event(void)
     lv_obj_send_event(textarea, LV_EVENT_KEY, (void *) &key);
     TEST_ASSERT_EQUAL_STRING("Hello World1", lv_textarea_get_text(textarea));
 }
+
+void test_textarea_check_placeholder_text_position(void)
+{
+    lv_textarea_set_placeholder_text(textarea, "Placeholder");
+    lv_textarea_set_one_line(textarea, true);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_center.png");
+
+    lv_textarea_set_one_line(textarea, false);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_top.png");
+
+    lv_obj_set_style_align(lv_textarea_get_label(textarea), LV_ALIGN_LEFT_MID, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_left_mid.png");
+
+    lv_obj_set_style_align(lv_textarea_get_label(textarea), LV_ALIGN_TOP_LEFT, LV_PART_MAIN);
+    lv_obj_set_style_pad_top(lv_textarea_get_label(textarea), 50, LV_PART_TEXTAREA_PLACEHOLDER);
+    lv_obj_set_style_pad_left(lv_textarea_get_label(textarea), 50, LV_PART_TEXTAREA_PLACEHOLDER);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_pad_left_top_50.png");
+}
+
 #endif
