@@ -63,6 +63,9 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
     lv_area_t clip_area = t->clip_area;
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
+    /* Reinitialize OpenGL ES driver state after NanoVG modified it */
+    lv_opengles_reinit_state();
+
     /* Use LVGL's OpenGL ES rendering infrastructure */
     lv_opengles_viewport(0, 0, layer_w, layer_h);
     lv_opengles_render_texture(dsc->tex_id, &dest_area, dsc->opa, layer_w, layer_h,
