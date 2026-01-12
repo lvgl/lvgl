@@ -1399,17 +1399,13 @@ static void draw_placeholder(lv_event_t * e)
 
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
-        int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        int32_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-        int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        lv_obj_t * label = ta->label;
+        int32_t left = lv_obj_get_style_pad_left(label, LV_PART_TEXTAREA_PLACEHOLDER);
+        int32_t top = lv_obj_get_style_pad_top(label, LV_PART_TEXTAREA_PLACEHOLDER);
         lv_area_t ph_coords;
-        lv_area_copy(&ph_coords, &obj->coords);
-        ph_coords.x1 += left + border_width;
-        ph_coords.x2 -= right + border_width;
-        ph_coords.y1 += top + border_width;
-        ph_coords.y2 -= bottom + border_width;
+
+        lv_area_copy(&ph_coords, &label->coords);
+        lv_area_move(&ph_coords, left, top);
         ph_dsc.text = ta->placeholder_txt;
         ph_dsc.text_size = ta->placeholder_txt_size;
         lv_draw_label(layer, &ph_dsc, &ph_coords);
@@ -1544,11 +1540,13 @@ static void lv_textarea_scroll_to_cusor_pos(lv_obj_t * obj, int32_t pos)
 static void calc_placeholder_text_size(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
+    if(!ta->placeholder_txt) return;
 
     lv_draw_label_dsc_t ph_dsc;
     lv_draw_label_dsc_init(&ph_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_TEXTAREA_PLACEHOLDER, &ph_dsc);
     ph_dsc.text = ta->placeholder_txt;
+    ph_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
     lv_text_get_size(&ta->placeholder_txt_size, ph_dsc.text, ph_dsc.font, ph_dsc.letter_space, ph_dsc.line_space,

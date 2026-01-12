@@ -41,8 +41,16 @@ static bool test_font_get_glyph_dsc(const lv_font_t * font,
     return false;
 }
 
+const void * test_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+{
+    LV_UNUSED(g_dsc);
+    LV_UNUSED(draw_buf);
+    return NULL;
+}
+
 static lv_font_t test_font_no_bullet = {
     .get_glyph_dsc = test_font_get_glyph_dsc,
+    .get_glyph_bitmap = test_font_get_glyph_bitmap,
     .line_height = 14,
     .base_line = 12,
 };
@@ -588,4 +596,23 @@ void test_textarea_key_event(void)
     lv_obj_send_event(textarea, LV_EVENT_KEY, (void *) &key);
     TEST_ASSERT_EQUAL_STRING("Hello World1", lv_textarea_get_text(textarea));
 }
+
+void test_textarea_check_placeholder_text_position(void)
+{
+    lv_textarea_set_placeholder_text(textarea, "Placeholder");
+    lv_textarea_set_one_line(textarea, true);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_center.png");
+
+    lv_textarea_set_one_line(textarea, false);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_top.png");
+
+    lv_obj_set_style_align(lv_textarea_get_label(textarea), LV_ALIGN_LEFT_MID, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_left_mid.png");
+
+    lv_obj_set_style_align(lv_textarea_get_label(textarea), LV_ALIGN_TOP_LEFT, LV_PART_MAIN);
+    lv_obj_set_style_pad_top(lv_textarea_get_label(textarea), 50, LV_PART_TEXTAREA_PLACEHOLDER);
+    lv_obj_set_style_pad_left(lv_textarea_get_label(textarea), 50, LV_PART_TEXTAREA_PLACEHOLDER);
+    TEST_ASSERT_EQUAL_SCREENSHOT("textarea_placeholder_pad_left_top_50.png");
+}
+
 #endif
