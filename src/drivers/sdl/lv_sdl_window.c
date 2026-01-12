@@ -19,6 +19,7 @@
 #include "../../lv_init.h"
 #include "../../draw/lv_draw_buf.h"
 #include "../../draw/nanovg/lv_draw_nanovg.h"
+#include "../../drivers/opengles/lv_opengles_driver.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -37,13 +38,15 @@
     #include <SDL2/SDL_syswm.h>
     #include <EGL/egl.h>
     #include <EGL/eglext.h>
+    #include "../../drivers/opengles/glad/include/glad/gles2.h"
+    #include <dlfcn.h>
 #else
     #define LV_SDL_USE_EGL 0
 
-#if LV_USE_DRAW_NANOVG
-    #undef LV_USE_DRAW_NANOVG
-    #define LV_USE_DRAW_NANOVG 0
-#endif
+    #if LV_USE_DRAW_NANOVG
+        #undef LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
 #endif
 
 #if LV_COLOR_DEPTH == 1 && LV_SDL_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL
@@ -80,6 +83,7 @@ typedef struct {
         EGLSurface surface;
         EGLContext context;
         EGLConfig config;
+        void * gl_lib_handle;
     } egl;
 #endif
 } lv_sdl_window_t;
@@ -140,6 +144,9 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #if LV_USE_DRAW_NANOVG
 #if !LV_SDL_USE_EGL
 #error "NANOVG requires LV_SDL_USE_EGL"
+#endif
+#if LV_USE_OPENGLES
+    lv_opengles_init();
 #endif
     lv_draw_nanovg_init();
 #endif
@@ -437,8 +444,36 @@ static void sdl_event_handler(lv_timer_t * t)
 }
 
 #if LV_SDL_USE_EGL
+static void * s_gl_lib_handle = NULL;
+
+static GLADapiproc glad_egl_load_cb(void * userptr, const char * name)
+{
+    LV_UNUSED(userptr);
+    GLADapiproc proc = NULL;
+
+    /* First try eglGetProcAddress for extension functions */
+    proc = (GLADapiproc)eglGetProcAddress(name);
+    if(proc) return proc;
+
+    /* Fall back to dlsym for core functions */
+    if(s_gl_lib_handle) {
+        proc = (GLADapiproc)dlsym(s_gl_lib_handle, name);
+    }
+    return proc;
+}
+
 static bool init_egl(lv_sdl_window_t * dsc)
 {
+    /* Load OpenGL ES library */
+    dsc->egl.gl_lib_handle = dlopen("libGLESv2.so", RTLD_LAZY);
+    if(!dsc->egl.gl_lib_handle) {
+        dsc->egl.gl_lib_handle = dlopen("libGLESv2.so.2", RTLD_LAZY);
+    }
+    if(!dsc->egl.gl_lib_handle) {
+        LV_LOG_ERROR("Failed to load OpenGL ES library: %s", dlerror());
+        return false;
+    }
+
     dsc->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if(dsc->egl.display == EGL_NO_DISPLAY) {
         LV_LOG_ERROR("Failed to get EGL display");
@@ -506,6 +541,17 @@ static bool init_egl(lv_sdl_window_t * dsc)
         return false;
     }
 
+    /* Load GLES2 functions via GLAD */
+    s_gl_lib_handle = dsc->egl.gl_lib_handle;
+    if(!gladLoadGLES2UserPtr(glad_egl_load_cb, NULL)) {
+        LV_LOG_ERROR("Failed to load OpenGL ES2 functions via GLAD");
+        return false;
+    }
+
+    LV_LOG_INFO("OpenGL ES version: %s", glGetString(GL_VERSION));
+    LV_LOG_INFO("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    LV_LOG_INFO("GL extensions: %s", glGetString(GL_EXTENSIONS));
+
     return true;
 }
 
@@ -520,6 +566,10 @@ static void deinit_egl(lv_sdl_window_t * dsc)
             eglDestroySurface(dsc->egl.display, dsc->egl.surface);
         }
         eglTerminate(dsc->egl.display);
+    }
+    if(dsc->egl.gl_lib_handle) {
+        dlclose(dsc->egl.gl_lib_handle);
+        dsc->egl.gl_lib_handle = NULL;
     }
     dsc->egl.display = EGL_NO_DISPLAY;
     dsc->egl.context = EGL_NO_CONTEXT;

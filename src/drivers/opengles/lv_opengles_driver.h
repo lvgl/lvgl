@@ -89,6 +89,12 @@ void lv_opengles_render_clear(void);
  */
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 
+/**
+ * Reinitialize OpenGL state after external GL operations (e.g., NanoVG)
+ * This rebinds VAO, VBO, IBO and resets vertex attributes
+ */
+void lv_opengles_reinit_state(void);
+
 /**********************
  *      MACROS
  **********************/
