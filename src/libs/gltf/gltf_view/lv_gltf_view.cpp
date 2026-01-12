@@ -49,7 +49,6 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
-static void destroy_environment(lv_gltf_environment_t * env);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 
