@@ -19,7 +19,7 @@
 #include "lv_nanovg_fbo_cache.h"
 
 #if LV_USE_3DTEXTURE
-#include "lv_nanovg_3d.h"
+    #include "lv_nanovg_3d.h"
 #endif
 
 #if LV_USE_OPENGLES && LV_USE_EGL

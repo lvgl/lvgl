@@ -18,7 +18,7 @@
 #include "../../misc/lv_math.h"
 
 #if LV_USE_CGLTF
-#include "../../libs/cgltf/lv_cgltf.h"
+    #include "../../libs/cgltf/lv_cgltf.h"
 #endif
 
 /* Include OpenGL headers based on backend */
@@ -208,11 +208,11 @@ static const char * fragment_shader_src =
  **********************/
 
 #define GL_CHECK_ERROR() do { \
-    GLenum err = glGetError(); \
-    if(err != GL_NO_ERROR) { \
-        LV_LOG_WARN("GL error: 0x%x at %s:%d", err, __FILE__, __LINE__); \
-    } \
-} while(0)
+        GLenum err = glGetError(); \
+        if(err != GL_NO_ERROR) { \
+            LV_LOG_WARN("GL error: 0x%x at %s:%d", err, __FILE__, __LINE__); \
+        } \
+    } while(0)
 
 /**********************
  *   GLOBAL FUNCTIONS
