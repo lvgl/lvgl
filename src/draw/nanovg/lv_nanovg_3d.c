@@ -30,8 +30,13 @@
     #include <GL/glext.h>
 #endif
 
-/* Include NanoVG GL header for nvglCreateImageFromHandle functions */
-#include "../../libs/nanovg/nanovg_gl.h"
+/* Forward declarations for NanoVG GL functions (defined in nanovg_gl.h)
+ * We cannot include nanovg_gl.h here as it contains implementation code
+ * that would cause multiple definition errors */
+int nvglCreateImageFromHandleGL2(NVGcontext * ctx, GLuint textureId, int w, int h, int flags);
+int nvglCreateImageFromHandleGL3(NVGcontext * ctx, GLuint textureId, int w, int h, int flags);
+int nvglCreateImageFromHandleGLES2(NVGcontext * ctx, GLuint textureId, int w, int h, int flags);
+int nvglCreateImageFromHandleGLES3(NVGcontext * ctx, GLuint textureId, int w, int h, int flags);
 
 /* Define NanoVG texture creation function based on backend */
 #if LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GL2
