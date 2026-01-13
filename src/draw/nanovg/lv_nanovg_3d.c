@@ -57,6 +57,15 @@ int nvglCreateImageFromHandleGLES3(NVGcontext * ctx, GLuint textureId, int w, in
 
 #define MAX_MESHES 64
 
+/* GLES2 only supports GL_UNSIGNED_SHORT for indices */
+#if LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES2 || LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES3
+    #define GL_INDEX_TYPE GL_UNSIGNED_SHORT
+    typedef uint16_t gl_index_t;
+#else
+    #define GL_INDEX_TYPE GL_UNSIGNED_INT
+    typedef uint32_t gl_index_t;
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -451,7 +460,7 @@ uint32_t lv_nanovg_3d_render_to_texture(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_m
         /* Draw */
         if(mesh->ibo && mesh->index_count > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-            glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, mesh->index_count, GL_INDEX_TYPE, 0);
         }
         else if(mesh->vertex_count > 0) {
             glDrawArrays(GL_TRIANGLES, 0, mesh->vertex_count);
@@ -566,7 +575,7 @@ void lv_nanovg_3d_render_direct(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_model_t *
         /* Draw */
         if(mesh->ibo && mesh->index_count > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-            glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, mesh->index_count, GL_INDEX_TYPE, 0);
         }
         else if(mesh->vertex_count > 0) {
             glDrawArrays(GL_TRIANGLES, 0, mesh->vertex_count);
@@ -752,6 +761,9 @@ static bool create_shader_program(lv_nanovg_3d_ctx_t * ctx)
     ctx->a_position = glGetAttribLocation(ctx->shader_program, "a_position");
     ctx->a_normal = glGetAttribLocation(ctx->shader_program, "a_normal");
     ctx->a_texcoord = glGetAttribLocation(ctx->shader_program, "a_texcoord");
+
+    LV_LOG_INFO("Shader program created: program=%u, a_position=%d, a_normal=%d",
+                ctx->shader_program, ctx->a_position, ctx->a_normal);
 
     return true;
 }
@@ -970,6 +982,9 @@ static bool upload_mesh_to_gpu(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_mesh_t * g
 
     lv_memzero(gpu_mesh, sizeof(lv_nanovg_3d_mesh_t));
 
+    LV_LOG_INFO("Uploading mesh: vertices=%u, indices=%u",
+                mesh_data->vertex_count, mesh_data->index_count);
+
     /* Upload positions */
     if(mesh_data->positions && mesh_data->vertex_count > 0) {
         glGenBuffers(1, &gpu_mesh->vbo_positions);
@@ -977,6 +992,7 @@ static bool upload_mesh_to_gpu(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_mesh_t * g
         glBufferData(GL_ARRAY_BUFFER, mesh_data->vertex_count * 3 * sizeof(float),
                      mesh_data->positions, GL_STATIC_DRAW);
         gpu_mesh->vertex_count = mesh_data->vertex_count;
+        LV_LOG_INFO("  VBO positions: %u", gpu_mesh->vbo_positions);
     }
 
     /* Upload normals */
@@ -985,6 +1001,7 @@ static bool upload_mesh_to_gpu(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_mesh_t * g
         glBindBuffer(GL_ARRAY_BUFFER, gpu_mesh->vbo_normals);
         glBufferData(GL_ARRAY_BUFFER, mesh_data->vertex_count * 3 * sizeof(float),
                      mesh_data->normals, GL_STATIC_DRAW);
+        LV_LOG_INFO("  VBO normals: %u", gpu_mesh->vbo_normals);
     }
 
     /* Upload texcoords */
@@ -995,13 +1012,34 @@ static bool upload_mesh_to_gpu(lv_nanovg_3d_ctx_t * ctx, lv_nanovg_3d_mesh_t * g
                      mesh_data->texcoords, GL_STATIC_DRAW);
     }
 
-    /* Upload indices */
+    /* Upload indices - convert to uint16 for GLES2 compatibility */
     if(mesh_data->indices && mesh_data->index_count > 0) {
+#if LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES2 || LV_NANOVG_BACKEND == LV_NANOVG_BACKEND_GLES3
+        /* GLES2 only supports GL_UNSIGNED_SHORT for indices */
+        if(mesh_data->index_count > 65535) {
+            LV_LOG_WARN("Index count %u exceeds GLES2 limit, truncating", mesh_data->index_count);
+        }
+        uint16_t * indices16 = lv_malloc(mesh_data->index_count * sizeof(uint16_t));
+        if(indices16) {
+            for(uint32_t i = 0; i < mesh_data->index_count; i++) {
+                indices16[i] = (uint16_t)(mesh_data->indices[i] & 0xFFFF);
+            }
+            glGenBuffers(1, &gpu_mesh->ibo);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpu_mesh->ibo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_data->index_count * sizeof(uint16_t),
+                         indices16, GL_STATIC_DRAW);
+            lv_free(indices16);
+            gpu_mesh->index_count = mesh_data->index_count;
+            LV_LOG_INFO("  IBO (uint16): %u, count=%u", gpu_mesh->ibo, gpu_mesh->index_count);
+        }
+#else
         glGenBuffers(1, &gpu_mesh->ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpu_mesh->ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh_data->index_count * sizeof(uint32_t),
                      mesh_data->indices, GL_STATIC_DRAW);
         gpu_mesh->index_count = mesh_data->index_count;
+        LV_LOG_INFO("  IBO (uint32): %u, count=%u", gpu_mesh->ibo, gpu_mesh->index_count);
+#endif
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
