@@ -213,7 +213,7 @@ lv_obj_t * lv_msgbox_add_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     const char * text = lv_text_set_text_vfmt(fmt, args);
     va_end(args);
 
-    if (text) {
+    if(text) {
         lv_label_set_text(label, text);
         lv_obj_set_width(label, lv_pct(100));
     }
