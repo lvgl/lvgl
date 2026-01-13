@@ -24,6 +24,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** @cond */
+typedef struct _lv_font_fmt_txt_glyph_loader_t lv_font_fmt_txt_glyph_loader_t;
+/** @endcond */
+
 /** This describes a glyph.*/
 typedef struct {
 #if LV_FONT_FMT_TXT_LARGE == 0
@@ -191,6 +195,10 @@ typedef struct {
      * 4, 8, 16, 32, 64: each line is padded to the given byte boundaries
      */
     uint8_t stride;
+
+#if LV_BINFONT_DYNAMIC_LOAD
+    lv_font_fmt_txt_glyph_loader_t * loader;
+#endif
 } lv_font_fmt_txt_dsc_t;
 
 typedef struct {

@@ -1082,6 +1082,10 @@ menu "LVGL configuration"
 			bool "Enable drawing placeholders when glyph dsc is not found"
 			default y
 
+		config LV_BINFONT_DYNAMIC_LOAD
+			bool "Enable dynamic glyph bitmap loading for binary fonts"
+			default n
+
 		menu "Enable static fonts"
 			config LV_DEMO_BENCHMARK_ALIGNED_FONTS
 				depends on LV_USE_DEMO_BENCHMARK
