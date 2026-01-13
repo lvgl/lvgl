@@ -45,6 +45,7 @@
 #define LV_FONT_DEFAULT         &lv_font_montserrat_14
 #define LV_FONT_FMT_TXT_LARGE   1
 #define LV_USE_FONT_COMPRESSED  1
+#define LV_BINFONT_DYNAMIC_LOAD 1
 #define LV_USE_BIDI 1
 #define LV_USE_ARABIC_PERSIAN_CHARS 1
 #define LV_USE_PERF_MONITOR         1
