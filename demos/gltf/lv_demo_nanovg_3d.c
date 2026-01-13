@@ -211,15 +211,7 @@ static void canvas_draw_cb(lv_event_t * e)
     int32_t layer_h = lv_area_get_height(&layer->buf_area);
 
     /* Find the NanoVG draw unit */
-    lv_draw_nanovg_unit_t * u = NULL;
-    lv_draw_unit_t * draw_unit = LV_GLOBAL_DEFAULT()->draw_info.unit_head;
-    while(draw_unit) {
-        if(draw_unit->name && lv_strcmp(draw_unit->name, "NANOVG") == 0) {
-            u = (lv_draw_nanovg_unit_t *)draw_unit;
-            break;
-        }
-        draw_unit = draw_unit->next;
-    }
+    lv_draw_nanovg_unit_t * u = (lv_draw_nanovg_unit_t *)lv_draw_get_unit_by_name("NANOVG");
 
     if(u && u->is_started) {
         /* End the current NanoVG frame */

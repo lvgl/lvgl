@@ -265,6 +265,13 @@ void lv_draw_dispatch_request(void);
 uint32_t lv_draw_get_unit_count(void);
 
 /**
+ * Find a draw unit by its name.
+ * @param name  the name of the draw unit to find (e.g., "NANOVG", "SW")
+ * @return      pointer to the draw unit or NULL if not found
+ */
+lv_draw_unit_t * lv_draw_get_unit_by_name(const char * name);
+
+/**
  * If there is only one draw unit check the first draw task if it's available.
  * If there are multiple draw units call `lv_draw_get_next_available_task` to find a task.
  * @param layer             the draw layer to search in
