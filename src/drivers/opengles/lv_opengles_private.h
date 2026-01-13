@@ -82,7 +82,7 @@ extern "C" {
 #endif
 
 /* In Desktop GL GL_RGB565 is not supported. Use RGB instead */
-#if LV_USE_GLFW
+#if !LV_USE_EGL
 #define GL_RGB565 GL_RGB
 #endif
 
