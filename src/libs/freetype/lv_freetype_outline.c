@@ -251,7 +251,7 @@ static lv_result_t outline_push_point(
 
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
-    param.outline = outline;
+    param.outlines = outline;
     param.type = type;
     ft_vector_to_lv_vector(&param.control1, control1);
     ft_vector_to_lv_vector(&param.control2, control2);
@@ -357,7 +357,7 @@ static lv_freetype_outline_t outline_create(
     lv_freetype_outline_t outline;
 
     res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
-    outline = param.outline;
+    outline = param.outlines;
 
     if(res != LV_RESULT_OK || !outline) {
         LV_LOG_ERROR("Outline object create failed");
@@ -441,16 +441,14 @@ https://stackoverflow.com/questions/3465809/how-to-interpret-a-freetype-glyph-ou
         }
 
         if(i == 0 && border_width > 0) {
-
             /* Close the border glyph before decomposing the inside glyph */
-            res = outline_push_point(outline, LV_FREETYPE_OUTLINE_BORDER_START, NULL, NULL, NULL);
+        	outline_send_event(ctx, LV_EVENT_REFRESH, &param);
             if(res != LV_RESULT_OK) {
                 LV_LOG_ERROR("Outline object close failed");
                 outline_delete(ctx, outline);
                 LV_PROFILER_FONT_END;
                 return NULL;
             }
-
         }
         else if(i == 0 || (i == 1 && border_width > 0)) {
 
@@ -473,7 +471,7 @@ static lv_result_t outline_delete(lv_freetype_context_t * ctx, lv_freetype_outli
 {
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
-    param.outline = outline;
+    param.outlines = outline;
 
     return outline_send_event(ctx, LV_EVENT_DELETE, &param);
 }

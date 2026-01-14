@@ -365,86 +365,92 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
  * on the received outline events emitted by lv_freetype_outline.c */
 static void freetype_outline_event_cb(lv_event_t * e)
 {
+    lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
 
-    lv_fpoint_t pnt;
-    lv_fpoint_t ctrl_pnt1;
-    lv_fpoint_t ctrl_pnt2;
-    lv_draw_sw_letter_outlines_t * glyph_paths;
-    lv_vector_path_t * path;
-    lv_freetype_outline_event_param_t * outline_event;
+    switch(lv_event_get_code(e)) {
+        case LV_EVENT_CREATE: {
+                /*Create the inside path*/
+                lv_draw_sw_letter_outlines_t * outlines;
+                outlines = lv_malloc_zeroed(sizeof(lv_draw_sw_letter_outlines_t));
+                LV_ASSERT_MALLOC(outlines);
 
-    outline_event = lv_event_get_param(e);
-    pnt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->to.x);
-    pnt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->to.y);
-    glyph_paths = outline_event->outline;
+                outlines->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
+                outlines->inside_path = outlines->cur_path;
+                param->outlines = outlines;
+                break;
+            }
 
-    if(lv_event_get_code(e) == LV_EVENT_CREATE) {
+        case LV_EVENT_DELETE: {
+                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
+                if(outlines->inside_path != NULL) {
+                    lv_vector_path_clear(outlines->inside_path);
+                    lv_vector_path_delete(outlines->inside_path);
+                }
 
-        glyph_paths = lv_malloc_zeroed(sizeof(lv_draw_sw_letter_outlines_t));
-        LV_ASSERT_MALLOC(glyph_paths);
+                if(outlines->outside_path != NULL) {
+                    lv_vector_path_clear(outlines->outside_path);
+                    lv_vector_path_delete(outlines->outside_path);
+                }
 
-        glyph_paths->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
-        glyph_paths->inside_path = glyph_paths->cur_path;
-        outline_event->outline = glyph_paths;
-        return;
+                lv_free(outlines);
+                break;
+            }
 
-    }
-    else if(lv_event_get_code(e) == LV_EVENT_DELETE) {
+        case LV_EVENT_REFRESH: {
+                /* Inside path is done - create the a new path for the stroke*/
+                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
+                lv_vector_path_close(outlines->inside_path);
+                outlines->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
+                outlines->outside_path = outlines->cur_path;
+                break;
+            }
+        case LV_EVENT_INSERT: {
+                lv_fpoint_t pnt;
+                lv_fpoint_t ctrl_pnt1;
+                lv_fpoint_t ctrl_pnt2;
+                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
+                lv_vector_path_t * path = outlines->cur_path;
 
-        if(glyph_paths->inside_path != NULL) {
-            lv_vector_path_clear(glyph_paths->inside_path);
-            lv_vector_path_delete(glyph_paths->inside_path);
-        }
+                switch(param->type) {
+                    case LV_FREETYPE_OUTLINE_MOVE_TO:
+                        pnt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
+                        pnt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                        lv_vector_path_move_to(path, &pnt);
+                        break;
 
-        if(glyph_paths->outside_path != NULL) {
-            lv_vector_path_clear(glyph_paths->outside_path);
-            lv_vector_path_delete(glyph_paths->outside_path);
-        }
+                    case LV_FREETYPE_OUTLINE_LINE_TO:
+                        pnt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
+                        pnt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                        lv_vector_path_line_to(path, &pnt);
+                        break;
 
-        lv_free(glyph_paths);
-        return;
+                    case LV_FREETYPE_OUTLINE_CUBIC_TO:
+                        pnt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
+                        pnt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                        ctrl_pnt1.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.x);
+                        ctrl_pnt1.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
+                        ctrl_pnt2.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.x);
+                        ctrl_pnt2.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control2.y);
+                        lv_vector_path_cubic_to(path, &ctrl_pnt1, &ctrl_pnt2, &pnt);
+                        break;
 
-    }
-    else if(outline_event->type == LV_FREETYPE_OUTLINE_BORDER_START) {
-
-        /* Inside path is done - create the border path */
-        lv_vector_path_close(glyph_paths->cur_path);
-        glyph_paths->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
-        glyph_paths->outside_path = glyph_paths->cur_path;
-        return;
-    }
-
-    path = glyph_paths->cur_path;
-
-    switch(outline_event->type) {
-
-        case LV_FREETYPE_OUTLINE_MOVE_TO:
-            lv_vector_path_move_to(path, &pnt);
-            break;
-
-        case LV_FREETYPE_OUTLINE_LINE_TO:
-            lv_vector_path_line_to(path, &pnt);
-            break;
-
-        case LV_FREETYPE_OUTLINE_CUBIC_TO:
-            ctrl_pnt1.x = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control1.x);
-            ctrl_pnt1.y = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control1.y);
-            ctrl_pnt2.x = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control2.x);
-            ctrl_pnt2.y = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control2.y);
-            lv_vector_path_cubic_to(path, &ctrl_pnt1, &ctrl_pnt2, &pnt);
-            break;
-
-        case LV_FREETYPE_OUTLINE_CONIC_TO:
-            ctrl_pnt1.x = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control1.x);
-            ctrl_pnt1.y = LV_FREETYPE_F26DOT6_TO_FLOAT(outline_event->control1.y);
-            lv_vector_path_quad_to(path, &ctrl_pnt1, &pnt);
-            break;
-        case LV_FREETYPE_OUTLINE_END:
-        case LV_FREETYPE_OUTLINE_BORDER_START:
-            /* It's not necessary to close the path and
-             * border start is handled above
-             */
-            break;
+                    case LV_FREETYPE_OUTLINE_CONIC_TO:
+                        pnt.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.x);
+                        pnt.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->to.y);
+                        ctrl_pnt1.x = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.x);
+                        ctrl_pnt1.y = LV_FREETYPE_F26DOT6_TO_FLOAT(param->control1.y);
+                        lv_vector_path_quad_to(path, &ctrl_pnt1, &pnt);
+                        break;
+                    case LV_FREETYPE_OUTLINE_END:
+                        /* It's not necessary to close the path and
+                         * border start is handled above
+                         */
+                        break;
+                }
+                break;
+            }
+        default:
+            LV_LOG_WARN("Invalid event code");
     }
 }
 
