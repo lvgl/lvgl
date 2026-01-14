@@ -292,9 +292,17 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     if(cf == LV_COLOR_FORMAT_ARGB8888) {
 
         if(glyph_dsc->outline_stroke_width > 0) {
-            lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->outline_stroke_color);
-            lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
-            lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->outside_path);
+            if(glyph_paths->outside_path) {
+                lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->outline_stroke_color);
+                lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
+                lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->outside_path);
+            }
+            else {
+                lv_draw_vector_dsc_set_stroke_color(vector_dsc, glyph_dsc->outline_stroke_color);
+                lv_draw_vector_dsc_set_stroke_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
+                lv_draw_vector_dsc_set_stroke_width(vector_dsc, glyph_dsc->outline_stroke_width);
+                lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->inside_path);
+            }
         }
 
         lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
@@ -326,6 +334,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
         dummy_t.clip_area = vector_dsc->base.layer->_clip_area;
         dummy_t.target_layer = vector_dsc->base.layer;
         dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
+        dummy_t.opa = 255;
         dummy_t.draw_dsc = vector_dsc;
         lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
     }
