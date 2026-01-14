@@ -72,7 +72,7 @@ typedef struct {
 } lv_freetype_outline_sizes_t;
 
 struct _lv_freetype_outline_event_param_t {
-    lv_freetype_outline_t outline;
+    lv_freetype_outline_t outlines;
     lv_freetype_outline_type_t type;
     lv_freetype_outline_vector_t to;
     lv_freetype_outline_vector_t control1;
