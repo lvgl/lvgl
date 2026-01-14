@@ -787,40 +787,32 @@ static void refr_invalid_areas(void)
 
         lv_area_t inv_a = disp_refr->inv_areas[i];
         if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-            /*Calculate the max row num*/
             int32_t w = lv_area_get_width(&inv_a);
             int32_t h = lv_area_get_height(&inv_a);
 
-            int32_t max_row = get_max_row(disp_refr, w, h);
-
             int32_t row;
-            int32_t row_last = 0;
             lv_area_t sub_area;
-            sub_area.x1 = inv_a.x1;
-            sub_area.x2 = inv_a.x2;
             int32_t y_off = 0;
-            for(row = inv_a.y1; row + max_row - 1 <= inv_a.y2; row += max_row) {
-                /*Calc. the next y coordinates of draw_buf*/
+
+            row = inv_a.y1;
+            do {
+                int32_t max_row = get_max_row(disp_refr, w, h);
+
+                /* Create sub area */
+                sub_area.x1 = inv_a.x1;
+                sub_area.x2 = inv_a.x2;
                 sub_area.y1 = row;
                 sub_area.y2 = row + max_row - 1;
-                if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
-                row_last = sub_area.y2;
-                if(inv_a.y2 == row_last) disp_refr->last_part = 1;
-                refr_area(&sub_area, y_off);
-                y_off += lv_area_get_height(&sub_area);
-                draw_buf_flush(disp_refr);
-            }
 
-            /*If the last y coordinates are not handled yet ...*/
-            if(inv_a.y2 != row_last) {
-                /*Calc. the next y coordinates of draw_buf*/
-                sub_area.y1 = row;
-                sub_area.y2 = inv_a.y2;
-                disp_refr->last_part = 1;
+                if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
+                if(sub_area.y2 == inv_a.y2) disp_refr->last_part = 1;
+
                 refr_area(&sub_area, y_off);
                 y_off += lv_area_get_height(&sub_area);
                 draw_buf_flush(disp_refr);
-            }
+                row += max_row;
+
+            } while(disp_refr->last_part == false);
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL ||
                 disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
