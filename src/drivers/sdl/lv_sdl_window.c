@@ -552,7 +552,7 @@ static void res_chg_event_cb(lv_event_t * e)
 #if LV_SDL_USE_EGL
     lv_result_t res = lv_sdl_egl_resize(disp);
     if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to resize window");
+        LV_LOG_ERROR("Failed to resize EGL display");
     }
 #endif
 }
