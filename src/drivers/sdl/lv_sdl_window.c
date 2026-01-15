@@ -18,6 +18,7 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
+#include "../opengles/lv_opengles_driver.h"
 #include "../../draw/lv_draw_buf.h"
 
 /* for aligned_alloc */
@@ -45,29 +46,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    SDL_Window * window;
-    SDL_Renderer * renderer;
-#if LV_USE_DRAW_SDL == 0
-    SDL_Texture * texture;
-    uint8_t * fb1;
-    uint8_t * fb2;
-    uint8_t * fb_act;
-    uint8_t * buf1;
-    uint8_t * buf2;
-    uint8_t * rotated_buf;
-    size_t rotated_buf_size;
-#endif
-    float zoom;
-    uint8_t ignore_size_chg;
-} lv_sdl_window_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static inline int sdl_render_mode(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
-static void window_create(lv_display_t * disp);
+static lv_result_t window_create(lv_display_t * disp);
 static void window_update(lv_display_t * disp);
 #if LV_USE_DRAW_SDL == 0
     static void texture_resize(lv_display_t * disp);
@@ -95,6 +80,10 @@ static lv_timer_t * event_handler_timer;
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
+#if LV_SDL_USE_EGL && defined(SDL_VIDEO_DRIVER_X11)
+        SDL_SetHintWithPriority("SDL_VIDEODRIVER", "x11", SDL_HINT_OVERRIDE);
+        SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+#endif
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
@@ -113,10 +102,15 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         lv_free(dsc);
         return NULL;
     }
-    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_display_set_driver_data(disp, dsc);
-    window_create(disp);
-
+    lv_result_t res = window_create(disp);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_ERROR("Failed to initialize window");
+        lv_free(dsc);
+        lv_display_delete(disp);
+        return NULL;
+    }
+    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_display_set_flush_cb(disp, flush_cb);
 
 #if LV_USE_DRAW_SDL == 0
@@ -254,6 +248,20 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t * argb_px_map = NULL;
 
+#if LV_SDL_USE_EGL
+    if(lv_display_flush_is_last(disp)) {
+#if LV_USE_DRAW_OPENGLES
+        lv_opengles_viewport(0, 0,
+                             lv_display_get_original_horizontal_resolution(disp),
+                             lv_display_get_original_vertical_resolution(disp));
+        lv_opengles_render_display_texture(disp, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
+        lv_opengles_egl_update(dsc->egl_ctx);
+    }
+    lv_display_flush_ready(disp);
+    return;
+#endif
+
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
 
         if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
@@ -383,12 +391,16 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
-static void window_create(lv_display_t * disp)
+static lv_result_t window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
     int flag = 0;
+#if LV_SDL_USE_EGL
+    flag |= SDL_WINDOW_OPENGL;
+#endif
+
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
@@ -398,9 +410,23 @@ static void window_create(lv_display_t * disp)
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+    if(!dsc->window) {
+        LV_LOG_ERROR("Failed to create SDL window");
+        return LV_RESULT_INVALID;
+    }
 
+#if LV_SDL_USE_EGL
+    lv_result_t res = lv_sdl_egl_init(disp);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to initialize EGL");
+        SDL_DestroyWindow(dsc->window);
+        return LV_RESULT_INVALID;
+    }
+#else
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
+#endif /*LV_SDL_USE_EGL*/
+
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 
@@ -414,6 +440,7 @@ static void window_create(lv_display_t * disp)
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif /*LV_USE_DRAW_SDL == 0*/
+    return LV_RESULT_OK;
 }
 
 static void window_update(lv_display_t * disp)
@@ -522,6 +549,12 @@ static void res_chg_event_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif
+#if LV_SDL_USE_EGL
+    lv_result_t res = lv_sdl_egl_resize(disp);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to resize EGL display");
+    }
+#endif
 }
 
 static void release_disp_cb(lv_event_t * e)
@@ -536,7 +569,13 @@ static void release_disp_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     SDL_DestroyTexture(dsc->texture);
 #endif
-    SDL_DestroyRenderer(dsc->renderer);
+
+#if LV_SDL_USE_EGL
+    lv_sdl_egl_deinit(disp);
+#endif
+    if(dsc->renderer) {
+        SDL_DestroyRenderer(dsc->renderer);
+    }
     SDL_DestroyWindow(dsc->window);
 #if LV_USE_DRAW_SDL == 0
     if(dsc->fb1) sdl_draw_buf_free(dsc->fb1);
