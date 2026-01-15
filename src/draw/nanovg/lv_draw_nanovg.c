@@ -204,6 +204,12 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
             lv_draw_nanovg_vector(t, t->draw_dsc);
             break;
 #endif
+
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+            lv_draw_nanovg_3d(t, t->draw_dsc, &t->area);
+            break;
+#endif
         default:
             LV_LOG_ERROR("unknown draw task type: %d", t->type);
             break;
@@ -381,6 +387,9 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
 #endif
             break;
 

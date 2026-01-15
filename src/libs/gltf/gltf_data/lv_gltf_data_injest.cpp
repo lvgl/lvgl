@@ -104,6 +104,33 @@ static inline GLsizei get_level_count(int32_t width, int32_t height)
     return static_cast<GLsizei>(1 + floor(log2(width > height ? width : height)));
 }
 
+/**
+ * @brief Allocate immutable texture storage with fallback for GLES2
+ *
+ * glTexStorage2D (GL_EXT_texture_storage) may not be available on all GLES2 drivers.
+ * This function falls back to glTexImage2D when the extension is not available.
+ */
+static inline void tex_storage_2d_compat(GLenum target, GLsizei levels, GLenum internalformat,
+                                         GLsizei width, GLsizei height)
+{
+#ifdef glTexStorage2D
+    if(glad_glTexStorage2DEXT) {
+        glTexStorage2D(target, levels, internalformat, width, height);
+        return;
+    }
+#endif
+    /* Fallback: use glTexImage2D for each mipmap level */
+    GLenum format = GL_RGBA;
+    if(internalformat == GL_RGB8) {
+        format = GL_RGB;
+    }
+    for(GLsizei level = 0; level < levels; level++) {
+        glTexImage2D(target, level, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, NULL);
+        width = (width > 1) ? (width / 2) : 1;
+        height = (height > 1) ? (height / 2) : 1;
+    }
+}
+
 static void load_mesh_texture_impl(lv_gltf_model_t * data, const fastgltf::TextureInfo & material_prop,
                                    GLuint * primitive_tex_prop,
                                    GLint * primitive_tex_uv_id);
@@ -490,7 +517,7 @@ bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t *
             LV_LOG_TRACE("Loading image: %s", image.name.c_str());
             const std::string path(file_path.uri.path().begin(), file_path.uri.path().end());
             unsigned char * data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
-            glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
+            tex_storage_2d_compat(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         },
@@ -502,7 +529,7 @@ bool injest_image(lv_opengl_shader_manager_t * shader_manager, lv_gltf_model_t *
             unsigned char * data = stbi_load_from_memory(
                 reinterpret_cast<const stbi_uc *>(vector.bytes.data()),
                 static_cast<int32_t>(vector.bytes.size()), &width, &height, &nrChannels, 4);
-            glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
+            tex_storage_2d_compat(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
             stbi_image_free(data);
         },
@@ -562,7 +589,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
                     return true;
                 }
                 LV_LOG_TRACE("[WEBP] width: %d height: %d", width, height);
-                glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
+                tex_storage_2d_compat(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 stbi_image_free(data);
                 return false;
@@ -580,7 +607,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
                 uint8_t * unpacked = WebPDecodeRGBA(
                                          reinterpret_cast<const uint8_t *>(vector.bytes.data() + buffer_view.byteOffset),
                                          static_cast<std::size_t>(buffer_view.byteLength), &width, &height);
-                glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
+                tex_storage_2d_compat(GL_TEXTURE_2D, get_level_count(width, height), GL_RGBA8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
                                 unpacked);
                 WebPFree(unpacked);
@@ -589,7 +616,7 @@ static bool injest_image_from_buffer_view(lv_gltf_model_t * data, fastgltf::sour
                 uint8_t * unpacked = WebPDecodeRGB(
                                          reinterpret_cast<const uint8_t *>(vector.bytes.data() + buffer_view.byteOffset),
                                          static_cast<std::size_t>(buffer_view.byteLength), &width, &height);
-                glTexStorage2D(GL_TEXTURE_2D, get_level_count(width, height), GL_RGB8, width, height);
+                tex_storage_2d_compat(GL_TEXTURE_2D, get_level_count(width, height), GL_RGB8, width, height);
                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE,
                                 unpacked);
                 WebPFree(unpacked);
