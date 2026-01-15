@@ -26,6 +26,10 @@
     #define M_PI 3.1415926f
 #endif
 
+#ifndef LV_SVG_MAX_DEPTH
+    #define LV_SVG_MAX_DEPTH (10)
+#endif /*LV_SVG_MAX_DEPTH*/
+
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define ABS(a) fabsf(a)
@@ -1060,6 +1064,29 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
     }
     if(state->draw_dsc->stroke_ref) {
         obj->stroke_ref = lv_strdup(state->draw_dsc->stroke_ref);
+    }
+
+    const lv_svg_node_t * parents[LV_SVG_MAX_DEPTH];
+    uint32_t depth = 0;
+    const lv_svg_node_t * cur = (lv_svg_node_t *)node->base.parent;
+
+    while(cur && depth < LV_SVG_MAX_DEPTH) {
+        parents[depth++] = cur;
+        cur = (lv_svg_node_t *)cur->base.parent;
+        if(depth == LV_SVG_MAX_DEPTH - 1 && cur) {
+            LV_LOG_WARN("Reached maximum svg depth but still couldn't find root node. "
+                        "Increase LV_SVG_MAX_DEPTH in order to have this SVG rendered properly. "
+                        "Current Depth is %d",
+                        LV_SVG_MAX_DEPTH);
+        }
+    }
+
+    for(int32_t i = depth - 1; i >= 0; i--) {
+        uint32_t len = lv_array_size(&parents[i]->attrs);
+        for(uint32_t j = 0; j < len; j++) {
+            lv_svg_attr_t * attr = lv_array_at(&parents[i]->attrs, j);
+            obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
+        }
     }
 
     uint32_t len = lv_array_size(&node->attrs);
