@@ -69,6 +69,12 @@ set(LVGL_TEST_OPTIONS_VG_LITE
     -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
+set(LVGL_TEST_OPTIONS_RISCV_V
+    -DLV_TEST_OPTION=5
+    -DLVGL_CI_USING_SYS_HEAP
+    -DLV_USE_DRAW_SW_ASM=LV_DRAW_SW_ASM_RISCV_V
+)
+
 set(LVGL_TEST_OPTIONS_SDL
     -DLV_TEST_OPTION=7
 )
@@ -149,6 +155,13 @@ elseif (OPTIONS_TEST_VG_LITE)
         # Set a tolerance value for the VG-Lite tests.
         add_definitions(-DREF_IMG_TOLERANCE=9)
     endif()
+elseif (OPTIONS_TEST_RISCV_V)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_RISCV_V} ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (CONFIG_LV_BUILD_EXAMPLES OFF CACHE BOOL "disable examples" FORCE)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
+    message(STATUS "RISC-V Vector (RVV) software emulation test enabled")
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()

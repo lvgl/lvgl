@@ -363,6 +363,8 @@ menu "LVGL configuration"
 				bool "1: NEON"
 			config LV_DRAW_SW_ASM_HELIUM
 				bool "2: HELIUM"
+			config LV_DRAW_SW_ASM_RISCV_V
+				bool "3: RISC-V Vector"
 			config LV_DRAW_SW_ASM_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -372,6 +374,7 @@ menu "LVGL configuration"
 			default 0 if LV_DRAW_SW_ASM_NONE
 			default 1 if LV_DRAW_SW_ASM_NEON
 			default 2 if LV_DRAW_SW_ASM_HELIUM
+			default 3 if LV_DRAW_SW_ASM_RISCV_V
 			default 255 if LV_DRAW_SW_ASM_CUSTOM
 
 		config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
