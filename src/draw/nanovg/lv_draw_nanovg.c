@@ -18,6 +18,10 @@
 #include "lv_nanovg_image_cache.h"
 #include "lv_nanovg_fbo_cache.h"
 
+#if LV_USE_3DTEXTURE
+    #include "lv_nanovg_3d.h"
+#endif
+
 #if LV_USE_OPENGLES && LV_USE_EGL
     #include "../../drivers/opengles/lv_opengles_private.h"
 #else
@@ -115,6 +119,11 @@ void lv_draw_nanovg_init(void)
     lv_nanovg_image_cache_init(unit);
     lv_nanovg_fbo_cache_init(unit);
     lv_draw_nanovg_label_init(unit);
+
+#if LV_USE_3DTEXTURE
+    /* Initialize NanoVG 3D extension */
+    lv_draw_nanovg_3d_init(unit->vg);
+#endif
 }
 
 int lv_nanovg_fb_get_image_handle(struct NVGLUframebuffer * fb)
@@ -202,6 +211,11 @@ static void draw_execute(lv_draw_nanovg_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
             lv_draw_nanovg_vector(t, t->draw_dsc);
+            break;
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+            lv_draw_nanovg_3d(t, t->draw_dsc, &t->area);
             break;
 #endif
         default:
@@ -381,6 +395,9 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
 #endif
             break;
 

@@ -19,6 +19,7 @@
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
 #include "../../draw/lv_draw_buf.h"
+#include "../../draw/nanovg/lv_draw_nanovg.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -32,6 +33,19 @@
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include "lv_sdl_private.h"
+
+#ifdef LV_SDL_USE_EGL
+    #include <SDL2/SDL_syswm.h>
+    #include <EGL/egl.h>
+    #include <EGL/eglext.h>
+#else
+    #define LV_SDL_USE_EGL 0
+
+    #if LV_USE_DRAW_NANOVG
+        #undef LV_USE_DRAW_NANOVG
+        #define LV_USE_DRAW_NANOVG 0
+    #endif
+#endif
 
 #if LV_COLOR_DEPTH == 1 && LV_SDL_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL
     #error SDL LV_COLOR_DEPTH 1 requires LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
@@ -60,6 +74,15 @@ typedef struct {
 #endif
     float zoom;
     uint8_t ignore_size_chg;
+
+#if LV_SDL_USE_EGL
+    struct {
+        EGLDisplay display;
+        EGLSurface surface;
+        EGLContext context;
+        EGLConfig config;
+    } egl;
+#endif
 } lv_sdl_window_t;
 
 /**********************
@@ -118,6 +141,13 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     window_create(disp);
 
     lv_display_set_flush_cb(disp, flush_cb);
+
+#if LV_USE_DRAW_NANOVG
+#if !LV_SDL_USE_EGL
+#error "NANOVG requires LV_SDL_USE_EGL"
+#endif
+    lv_draw_nanovg_init();
+#endif
 
 #if LV_USE_DRAW_SDL == 0
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
@@ -254,6 +284,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t * argb_px_map = NULL;
 
+#if LV_SDL_USE_EGL
+    /* EGL rendering path */
+    if(lv_display_flush_is_last(disp)) {
+        eglSwapBuffers(dsc->egl.display, dsc->egl.surface);
+    }
+    lv_display_flush_ready(disp);
+    return;
+#endif
+
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
 
         if(cf == LV_COLOR_FORMAT_RGB565_SWAPPED) {
@@ -383,6 +422,97 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
+#if LV_SDL_USE_EGL
+static bool init_egl(lv_sdl_window_t * dsc)
+{
+    dsc->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if(dsc->egl.display == EGL_NO_DISPLAY) {
+        LV_LOG_ERROR("Failed to get EGL display");
+        return false;
+    }
+
+    if(!eglInitialize(dsc->egl.display, NULL, NULL)) {
+        LV_LOG_ERROR("Failed to initialize EGL");
+        return false;
+    }
+
+    const EGLint config_attribs[] = {
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+        EGL_BLUE_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_RED_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_STENCIL_SIZE, 8,
+        EGL_SAMPLES, 4, /* 4x MSAA */
+        EGL_NONE
+    };
+
+    EGLint num_configs;
+    if(!eglChooseConfig(dsc->egl.display, config_attribs, &dsc->egl.config, 1, &num_configs)) {
+        LV_LOG_ERROR("Failed to choose EGL config");
+        return false;
+    }
+
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    SDL_GetWindowWMInfo(dsc->window, &wmInfo);
+
+    EGLNativeWindowType native_window;
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+    native_window = wmInfo.info.win.window;
+#elif defined(SDL_VIDEO_DRIVER_X11)
+    native_window = wmInfo.info.x11.window;
+#elif defined(SDL_VIDEO_DRIVER_WAYLAND)
+    native_window = wmInfo.info.wl.surface;
+#else
+    LV_LOG_ERROR("Unsupported platform for EGL");
+    return false;
+#endif
+
+    dsc->egl.surface = eglCreateWindowSurface(dsc->egl.display, dsc->egl.config, native_window, NULL);
+    if(dsc->egl.surface == EGL_NO_SURFACE) {
+        LV_LOG_ERROR("Failed to create EGL surface");
+        return false;
+    }
+
+    const EGLint context_attribs[] = {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE
+    };
+
+    dsc->egl.context = eglCreateContext(dsc->egl.display, dsc->egl.config, EGL_NO_CONTEXT, context_attribs);
+    if(dsc->egl.context == EGL_NO_CONTEXT) {
+        LV_LOG_ERROR("Failed to create EGL context");
+        return false;
+    }
+
+    if(!eglMakeCurrent(dsc->egl.display, dsc->egl.surface, dsc->egl.surface, dsc->egl.context)) {
+        LV_LOG_ERROR("Failed to make EGL context current");
+        return false;
+    }
+
+    return true;
+}
+
+static void deinit_egl(lv_sdl_window_t * dsc)
+{
+    if(dsc->egl.display != EGL_NO_DISPLAY) {
+        eglMakeCurrent(dsc->egl.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        if(dsc->egl.context != EGL_NO_CONTEXT) {
+            eglDestroyContext(dsc->egl.display, dsc->egl.context);
+        }
+        if(dsc->egl.surface != EGL_NO_SURFACE) {
+            eglDestroySurface(dsc->egl.display, dsc->egl.surface);
+        }
+        eglTerminate(dsc->egl.display);
+    }
+    dsc->egl.display = EGL_NO_DISPLAY;
+    dsc->egl.context = EGL_NO_CONTEXT;
+    dsc->egl.surface = EGL_NO_SURFACE;
+}
+#endif
+
 static void window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
@@ -393,14 +523,25 @@ static void window_create(lv_display_t * disp)
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
 
+#if LV_SDL_USE_EGL
+    flag |= SDL_WINDOW_OPENGL;
+#endif
+
     int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
     int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
+#if LV_SDL_USE_EGL
+    if(!init_egl(dsc)) {
+        LV_LOG_ERROR("Failed to initialize EGL, falling back to SDL renderer");
+    }
+#else
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
+#endif /*LV_SDL_USE_EGL*/
+
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 
@@ -536,7 +677,12 @@ static void release_disp_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     SDL_DestroyTexture(dsc->texture);
 #endif
-    SDL_DestroyRenderer(dsc->renderer);
+#if LV_SDL_USE_EGL
+    deinit_egl(dsc);
+#endif
+    if(dsc->renderer) {
+        SDL_DestroyRenderer(dsc->renderer);
+    }
     SDL_DestroyWindow(dsc->window);
 #if LV_USE_DRAW_SDL == 0
     if(dsc->fb1) sdl_draw_buf_free(dsc->fb1);

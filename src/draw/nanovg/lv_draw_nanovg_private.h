@@ -26,6 +26,7 @@ extern "C" {
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_line.h"
 #include "../../draw/lv_draw_triangle.h"
+#include "../../draw/lv_draw_3d.h"
 #include "../../misc/lv_area_private.h"
 
 #if !LV_USE_NANOVG
@@ -182,6 +183,16 @@ void lv_draw_nanovg_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
  * @param dsc pointer to a mask descriptor
  */
 void lv_draw_nanovg_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc);
+
+#if LV_USE_3DTEXTURE
+/**
+ * Draw 3D texture on a NanoVG context
+ * @param t pointer to a drawing task
+ * @param dsc pointer to a 3D draw descriptor
+ * @param coords the coordinates of the 3D texture
+ */
+void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**
  * Get image handle from framebuffer
