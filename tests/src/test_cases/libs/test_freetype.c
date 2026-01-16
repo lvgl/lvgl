@@ -572,15 +572,15 @@ static void freetype_outline_event_cb(lv_event_t * e)
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
         case LV_EVENT_CREATE:
-            param->outline = lv_malloc_zeroed(sizeof(lv_ll_t));
-            lv_ll_init(param->outline, sizeof(lv_freetype_outline_event_param_t));
+            param->outlines = lv_malloc_zeroed(sizeof(lv_ll_t));
+            lv_ll_init(param->outlines, sizeof(lv_freetype_outline_event_param_t));
             break;
         case LV_EVENT_DELETE:
-            lv_ll_clear(param->outline);
-            lv_free(param->outline);
+            lv_ll_clear(param->outlines);
+            lv_free(param->outlines);
             break;
         case LV_EVENT_INSERT: {
-                void * entry = lv_ll_ins_tail(param->outline);
+                void * entry = lv_ll_ins_tail(param->outlines);
                 lv_memcpy(entry, param, sizeof(lv_freetype_outline_event_param_t));
                 break;
             }

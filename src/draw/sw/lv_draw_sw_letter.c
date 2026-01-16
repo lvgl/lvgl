@@ -38,12 +38,6 @@
  **********************/
 #if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
-typedef struct {
-    lv_vector_path_t * inside_path;     /*The regular glyph*/
-    lv_vector_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
-    lv_vector_path_t * cur_path;
-} lv_draw_sw_letter_outlines_t;
-
 #endif /* LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG */
 
 /**********************
@@ -233,25 +227,26 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
 static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_dsc)
 {
 
-    lv_draw_sw_letter_outlines_t * glyph_paths;
     lv_draw_vector_dsc_t * vector_dsc;
     lv_draw_buf_t * draw_buf;
     lv_matrix_t matrix;
     lv_layer_t layer;
 
-    glyph_paths = (lv_draw_sw_letter_outlines_t *) glyph_dsc->glyph_data;
-    LV_ASSERT_NULL(glyph_paths);
+    lv_vector_path_t * paths = (lv_vector_path_t *) glyph_dsc->glyph_data;
+    LV_ASSERT_NULL(paths);
 
-    int32_t cf;
+    int32_t cf = LV_COLOR_FORMAT_ARGB8888;
     int32_t w;
     int32_t h;
     uint32_t stride;
-    float scale;
     lv_area_t buf_area;
 
-    cf = LV_COLOR_FORMAT_ARGB8888;
-
-    scale = LV_FREETYPE_F26DOT6_TO_FLOAT(lv_freetype_outline_get_scale(glyph_dsc->g->resolved_font));
+    float scale = 1.0;
+#if LV_USE_FREETYPE
+    if(lv_freetype_is_outline_font(glyph_dsc->g->resolved_font)) {
+        scale = LV_FREETYPE_F26DOT6_TO_FLOAT(lv_freetype_outline_get_scale(glyph_dsc->g->resolved_font));
+    }
+#endif
     w = (int32_t)((float) glyph_dsc->g->box_w + glyph_dsc->outline_stroke_width * 2 * scale);
     h = (int32_t)((float) glyph_dsc->g->box_h + glyph_dsc->outline_stroke_width * 2 * scale);
     buf_area.x1 = 0;
@@ -292,23 +287,17 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     if(cf == LV_COLOR_FORMAT_ARGB8888) {
 
         if(glyph_dsc->outline_stroke_width > 0) {
-            if(glyph_paths->outside_path) {
-                lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->outline_stroke_color);
-                lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
-                lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->outside_path);
-            }
-            else {
-                lv_draw_vector_dsc_set_stroke_color(vector_dsc, glyph_dsc->outline_stroke_color);
-                lv_draw_vector_dsc_set_stroke_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
-                lv_draw_vector_dsc_set_stroke_width(vector_dsc, glyph_dsc->outline_stroke_width);
-                lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->inside_path);
-            }
+            lv_draw_vector_dsc_set_stroke_color(vector_dsc, glyph_dsc->outline_stroke_color);
+            lv_draw_vector_dsc_set_stroke_opa(vector_dsc, glyph_dsc->outline_stroke_opa);
+            lv_draw_vector_dsc_set_stroke_width(vector_dsc, glyph_dsc->outline_stroke_width);
+            lv_draw_vector_dsc_add_path(vector_dsc, paths);
+            lv_draw_vector_dsc_set_stroke_opa(vector_dsc, 0);
+            lv_draw_vector_dsc_set_stroke_width(vector_dsc, 0);
         }
 
         lv_draw_vector_dsc_set_fill_color(vector_dsc, glyph_dsc->color);
         lv_draw_vector_dsc_set_fill_opa(vector_dsc, glyph_dsc->opa);
-        lv_draw_vector_dsc_add_path(vector_dsc, glyph_paths->inside_path);
-
+        lv_draw_vector_dsc_add_path(vector_dsc, paths);
     }
     else {
         LV_LOG_ERROR("Unsupported color format: %d", cf);
@@ -370,46 +359,22 @@ static void freetype_outline_event_cb(lv_event_t * e)
     switch(lv_event_get_code(e)) {
         case LV_EVENT_CREATE: {
                 /*Create the inside path*/
-                lv_draw_sw_letter_outlines_t * outlines;
-                outlines = lv_malloc_zeroed(sizeof(lv_draw_sw_letter_outlines_t));
-                LV_ASSERT_MALLOC(outlines);
-
-                outlines->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
-                outlines->inside_path = outlines->cur_path;
-                param->outlines = outlines;
+                param->outlines = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
+                LV_ASSERT_MALLOC(param->outlines);
                 break;
             }
 
         case LV_EVENT_DELETE: {
-                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
-                if(outlines->inside_path != NULL) {
-                    lv_vector_path_clear(outlines->inside_path);
-                    lv_vector_path_delete(outlines->inside_path);
-                }
-
-                if(outlines->outside_path != NULL) {
-                    lv_vector_path_clear(outlines->outside_path);
-                    lv_vector_path_delete(outlines->outside_path);
-                }
-
-                lv_free(outlines);
+                lv_vector_path_clear(param->outlines);
+                lv_vector_path_delete(param->outlines);
                 break;
             }
 
-        case LV_EVENT_REFRESH: {
-                /* Inside path is done - create the a new path for the stroke*/
-                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
-                lv_vector_path_close(outlines->inside_path);
-                outlines->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
-                outlines->outside_path = outlines->cur_path;
-                break;
-            }
         case LV_EVENT_INSERT: {
                 lv_fpoint_t pnt;
                 lv_fpoint_t ctrl_pnt1;
                 lv_fpoint_t ctrl_pnt2;
-                lv_draw_sw_letter_outlines_t * outlines = param->outlines;
-                lv_vector_path_t * path = outlines->cur_path;
+                lv_vector_path_t * path = param->outlines;
 
                 switch(param->type) {
                     case LV_FREETYPE_OUTLINE_MOVE_TO:
