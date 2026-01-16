@@ -485,11 +485,12 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     int32_t col_x2 = 0;
     int32_t col_w = 0;
 
-    if (rev && col_span > 1) {
+    if(rev && col_span > 1) {
         col_x1 = c->x[col_pos + col_span - 1];
         col_x2 = c->x[col_pos] + c->w[col_pos];
         col_w = col_x2 - col_x1;
-    } else {
+    }
+    else {
         col_x1 = c->x[col_pos];
         col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
         col_w = col_x2 - col_x1;
