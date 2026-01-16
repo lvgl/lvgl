@@ -24,7 +24,7 @@
  *      TYPEDEFS
  **********************/
 
-/* the type of the AnimatedGIF pallete type passed to `GIF_begin` */
+/* the type of the AnimatedGIF palette type passed to `GIF_begin` */
 typedef unsigned char animatedgif_color_format_t;
 
 typedef struct {
