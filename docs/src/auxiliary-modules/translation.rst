@@ -90,7 +90,7 @@ If the tag is not found at all, the tag itself will be used as a fallback as wel
 Dynamically Updating UI Text
 ****************************
 
-When :cpp:expr:`lv_translation_set_language("language")` is called, LVGL sends ``LV_EVENT_TRANSLATION_LANGUAGE_CHANGED`` to every widget, allowing you to update text automatically.
+When :cpp:expr:`lv_translation_set_language("language")` is called, LVGL sends :cpp:enumerator:`LV_EVENT_TRANSLATION_LANGUAGE_CHANGED` to every widget, allowing you to update text automatically.
 
 The new language can be retrieved by either calling :cpp:expr:`lv_translation_get_language()` or by getting the event parameter in the event callback with :cpp:expr:`lv_event_get_param(e)`
 

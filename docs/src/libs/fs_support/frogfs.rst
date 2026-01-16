@@ -70,8 +70,8 @@ blob builds.
 Usage in LVGL
 *************
 
-Set ``LV_USE_FS_FROGFS`` to ``1`` in your ``lv_conf.h``. Set
-``LV_FS_FROGFS_LETTER`` to a letter like ``'F'``.
+Set :c:macro:`LV_USE_FS_FROGFS` to ``1`` in your ``lv_conf.h``. Set
+:c:macro:`LV_FS_FROGFS_LETTER` to a letter like ``'F'``.
 
 .. code-block:: c
 

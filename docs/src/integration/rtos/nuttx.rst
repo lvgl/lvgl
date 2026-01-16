@@ -239,8 +239,8 @@ reasonable as NuttX fully implements these standard library APIs. Whether or
 not you choose to use NuttX's ``malloc`` depends on whether you want LVGL
 to allocate from the NuttX global heap or use its own.
 
-Where is ``LV_OS_NUTTX``?
--------------------------
+Where is :c:macro:`LV_OS_NUTTX`?
+--------------------------------
 
 NuttX tries to be POSIX compliant where possible, meaning it supports
 pthreads (POSIX threads). To enable OS features in LVGL on NuttX,
