@@ -818,37 +818,42 @@ void test_arc_small_value_range_drag_responsiveness(void)
     lv_obj_send_event(arc, LV_EVENT_ROTARY, &rotary_diff);
     TEST_ASSERT_EQUAL_INT32(5, lv_arc_get_value(arc));  /* Should clamp at 5 */
 
-    /* Test drag with small range using same approach as test_arc_drag_prevents_big_angle_jumps */
-    lv_arc_set_value(arc, 2);  /* Start from middle value */
-
-    /* Use the helper function approach - reuse run_arc_drag_test coordinates */
-    lv_arc_set_bg_angles(arc, 135, 45);  /* Default angles */
+    /* Test drag with small range - must actually change the value*/
+    lv_arc_set_bg_angles(arc, 135, 45);  /* Default angles: 270° span */
+    lv_arc_set_value(arc, 1);  /* Start near min */
+    int32_t value_before_drag = lv_arc_get_value(arc);
 
     int32_t center_x = 400;
     int32_t center_y = 240;
     int32_t radius = 85;
 
-    /* Drag from one position to another on the arc */
-    int32_t x1 = center_x + (radius * lv_trigo_sin(180)) / LV_TRIGO_SIN_MAX;
-    int32_t y1 = center_y - (radius * lv_trigo_cos(180)) / LV_TRIGO_SIN_MAX;
-    int32_t x2 = center_x + (radius * lv_trigo_sin(270)) / LV_TRIGO_SIN_MAX;
-    int32_t y2 = center_y - (radius * lv_trigo_cos(270)) / LV_TRIGO_SIN_MAX;
+    /* Calculate drag positions:
+     * - Start at angle ~150° (near value 0-1)
+     * - End at angle ~330° (near value 4-5)
+     * This should produce a significant value change */
+    int32_t x_start = center_x + (radius * lv_trigo_sin(160)) / LV_TRIGO_SIN_MAX;
+    int32_t y_start = center_y - (radius * lv_trigo_cos(160)) / LV_TRIGO_SIN_MAX;
+    int32_t x_end = center_x + (radius * lv_trigo_sin(350)) / LV_TRIGO_SIN_MAX;
+    int32_t y_end = center_y - (radius * lv_trigo_cos(350)) / LV_TRIGO_SIN_MAX;
 
+    /* Perform drag with sufficient time for rate-limited movement */
     lv_test_mouse_release();
     lv_test_wait(50);
-    lv_test_mouse_move_to(x1, y1);
+    lv_test_mouse_move_to(x_start, y_start);
     lv_test_mouse_press();
     lv_test_wait(500);
-    lv_test_mouse_move_to(x2, y2);
+    lv_test_mouse_move_to(x_end, y_end);
     lv_test_wait(500);
     lv_test_mouse_release();
     lv_test_wait(50);
 
-    /* Value may or may not have changed depending on drag detection,
-     * but it should at least not crash and value should be valid */
-    int32_t final_value = lv_arc_get_value(arc);
-    TEST_ASSERT_GREATER_OR_EQUAL_INT32(0, final_value);
-    TEST_ASSERT_LESS_OR_EQUAL_INT32(5, final_value);
+    int32_t value_after_drag = lv_arc_get_value(arc);
+
+    /* The drag MUST change the value - this is the core assertion for drag responsiveness.*/
+    TEST_ASSERT_NOT_EQUAL_INT32(value_before_drag, value_after_drag);
+
+    /* Additionally verify the value moved in the expected direction (increased) */
+    TEST_ASSERT_GREATER_THAN_INT32(value_before_drag, value_after_drag);
 }
 
 /*
