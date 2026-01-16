@@ -569,8 +569,10 @@ Line Draw Descriptor
 The :cpp:type:`lv_draw_line_dsc_t` line descriptor defines line rendering with
 these fields:
 
-:p1:           First point of line (supports floating-point coordinates).
-:p2:           Second point of line (supports floating-point coordinates).
+:p1:           First point of line (supports floating-point coordinates). Ignored if ``points`` are set.
+:p2:           Second point of line (supports floating-point coordinates). Ignored if ``points`` are set.
+:points:       Array of points to draw.
+:point_cnt:    Number of points in ``points``
 :color:        Line color.
 :width:        Line thickness.
 :opa:          Line opacity (0--255).
@@ -580,11 +582,17 @@ these fields:
 :round_end:    Rounds the line end.
 :raw_end:      Set to 1 to skip end calculations if they are unnecessary.
 
++If a large amount of points needs to be rendered it's recommended to use ``points``
+instead of ``p1`` and ``p2`` as it avoids creating many draw tasks.
+
 Functions for line drawing:
 
 - :cpp:expr:`lv_draw_line_dsc_init(&dsc)` initializes a line descriptor.
 - :cpp:expr:`lv_draw_line(layer, &dsc)` creates a task to draw a line.
 - :cpp:expr:`lv_draw_task_get_line_dsc(draw_task)` retrieves line descriptor.
+- :cpp:expr:`lv_draw_line_iterate(draw_task, dsc, callback)` is a helper function
+  to call a callback which draws a line between two points. This way it doesn't matter if
+  ``p1, p2`` or ``points`` were used as it calls the ``callback`` as needed.
 
 .. lv_example:: widgets/canvas/lv_example_canvas_7
   :language: c
