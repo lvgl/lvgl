@@ -474,7 +474,7 @@ static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * 
     uint32_t row_span = get_row_span(item);
     if(row_span == 0 || col_span == 0) return;
 
-    bool rev = lv_obj_get_style_base_dir(item, LV_PART_MAIN) == LV_BASE_DIR_RTL;
+    bool rev = lv_obj_get_style_base_dir(lv_obj_get_parent(item), LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     uint32_t col_pos = get_col_pos(item);
     uint32_t row_pos = get_row_pos(item);
