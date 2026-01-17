@@ -91,7 +91,7 @@ void test_grid_ltr(void)
     const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
-    lv_obj_t* grid = lv_obj_create(lv_screen_active());
+    lv_obj_t * grid = lv_obj_create(lv_screen_active());
     lv_obj_set_style_base_dir(grid, LV_BASE_DIR_LTR, LV_PART_MAIN);
     lv_obj_set_size(grid, lv_pct(100), lv_pct(100));
     lv_obj_set_grid_dsc_array(grid, col_dsc, row_dsc);
@@ -109,7 +109,7 @@ void test_grid_rtl(void)
     const int32_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     const int32_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
-    lv_obj_t* grid = lv_obj_create(lv_screen_active());
+    lv_obj_t * grid = lv_obj_create(lv_screen_active());
     lv_obj_set_style_base_dir(grid, LV_BASE_DIR_RTL, LV_PART_MAIN);
     lv_obj_set_size(grid, lv_pct(100), lv_pct(100));
     lv_obj_set_grid_dsc_array(grid, col_dsc, row_dsc);
