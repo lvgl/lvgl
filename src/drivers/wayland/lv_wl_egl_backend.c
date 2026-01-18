@@ -359,10 +359,14 @@ static size_t wl_egl_select_config_cb(void * driver_data, const lv_egl_config_t 
 
     for(size_t i = 0; i < config_count; ++i) {
         lv_color_format_t config_cf = lv_opengles_egl_color_format_from_egl_config(&configs[i]);
-        if(configs[i].max_width >= target_w &&
-           configs[i].max_height >= target_h &&
-           config_cf == target_cf &&
-           configs[i].surface_type & EGL_WINDOW_BIT) {
+        const bool resolution_matches = configs[i].max_width >= target_w &&
+                                        configs[i].max_height >= target_h;
+        const bool is_nanovg_compatible = (configs[i].renderable_type & EGL_OPENGL_ES2_BIT) != 0 &&
+                                          configs[i].stencil == 8 && configs[i].samples == 4;
+        const bool is_window = (configs[i].surface_type & EGL_WINDOW_BIT) != 0;
+        const bool is_compatible_with_draw_unit = is_nanovg_compatible || !LV_USE_DRAW_NANOVG;
+
+        if(is_window && resolution_matches && config_cf == target_cf && is_compatible_with_draw_unit) {
             LV_LOG_TRACE("Choosing config %zu", i);
             return i;
         }
