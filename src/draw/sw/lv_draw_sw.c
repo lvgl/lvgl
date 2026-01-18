@@ -302,6 +302,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         if(thread_dsc->inited) lv_thread_sync_signal(&thread_dsc->sync);
     }
 
+    LV_PROFILER_DRAW_END;
     if(all_idle) return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     else return taken_cnt;
 
