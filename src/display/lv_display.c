@@ -32,13 +32,25 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    LV_LOAD_SCREEN_RESULT_OK,
+    LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED,
+    LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED,
+    LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED,
+} lv_load_screen_result_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool old_screen_deleted(lv_load_screen_result_t res);
+static bool new_screen_deleted(lv_load_screen_result_t res);
+
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
 static void update_resolution(lv_display_t * disp);
-static bool load_new_screen(lv_obj_t * scr);
+static void screen_event_delete_cb(lv_event_t * e);
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
@@ -772,9 +784,15 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
         d->prev_scr = d->act_scr;
         act_scr = d->scr_to_load; /*Active screen changed.*/
-
-        if(load_new_screen(d->scr_to_load)) {
+        lv_load_screen_result_t res = load_new_screen(d->scr_to_load);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(old_screen_deleted(res)) {
             d->prev_scr = NULL;
+        }
+        if(new_screen_deleted(res)) {
+            return;
         }
     }
 
@@ -800,8 +818,14 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-        bool old_screen_deleted = load_new_screen(new_scr);
-        if(!old_screen_deleted && auto_del && act_scr) {
+        lv_load_screen_result_t res = load_new_screen(new_scr);
+        if(res == LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED) {
+            return;
+        }
+        if(new_screen_deleted(res)) {
+            d->act_scr = NULL;
+        }
+        if(!old_screen_deleted(res) && auto_del && act_scr) {
             lv_obj_delete(act_scr);
         }
         return;
@@ -1327,6 +1351,15 @@ void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free
  *   STATIC FUNCTIONS
  **********************/
 
+static bool old_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED;
+}
+static bool new_screen_deleted(lv_load_screen_result_t res)
+{
+    return res == LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED || res == LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
+}
+
 static void update_resolution(lv_display_t * disp)
 {
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
@@ -1370,8 +1403,14 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
+static void screen_event_delete_cb(lv_event_t * e)
+{
+    lv_obj_t ** screen_var = lv_event_get_user_data(e);
+    *screen_var = NULL;
+}
+
 /* Returns true if the old screen was deleted while loading the new screen*/
-static bool load_new_screen(lv_obj_t * scr)
+static lv_load_screen_result_t load_new_screen(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
     LV_ASSERT_NULL(scr);
@@ -1381,27 +1420,60 @@ static bool load_new_screen(lv_obj_t * scr)
     LV_ASSERT_NULL(d);
 
     lv_obj_t * old_scr = d->act_scr;
-    bool old_screen_deleted = false;
+    /* Attach an event delete cb to the screen so we know if the screen is deleted during an event*/
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        lv_obj_add_event_cb(old_scr, screen_event_delete_cb, LV_EVENT_DELETE, &old_scr);
+    }
+    lv_obj_add_event_cb(scr, screen_event_delete_cb, LV_EVENT_DELETE, &scr);
+
+    if(old_scr) {
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOAD_START, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL) == LV_RESULT_INVALID) {
             old_scr = NULL;
         }
     }
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+
+    if(lv_display_send_event(d, LV_EVENT_SCREEN_LOAD_START, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL) == LV_RESULT_INVALID) {
+        scr = NULL;
+    }
 
     d->act_scr = scr;
     d->scr_to_load = NULL;
 
-    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(scr && lv_display_send_event(d, LV_EVENT_SCREEN_LOADED, scr) == LV_RESULT_INVALID) {
+        return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+    }
+
+    if(scr && lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL) == LV_RESULT_INVALID) {
+        d->act_scr = NULL;
+        scr = NULL;
+    }
+
     if(old_scr) {
-        if(lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
-            old_screen_deleted = true;
+        if(lv_display_send_event(d, LV_EVENT_SCREEN_UNLOADED, old_scr) == LV_RESULT_INVALID) {
+            return LV_LOAD_SCREEN_RESULT_DISPLAY_DELETED;
+        }
+        if(old_scr && lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL) == LV_RESULT_INVALID) {
+            old_scr = NULL;
         }
     }
 
-    lv_obj_invalidate(scr);
-    return old_screen_deleted;
+    if(scr) {
+        lv_obj_invalidate(scr);
+        lv_obj_remove_event_cb(scr, screen_event_delete_cb);
+    }
+
+    if(!old_scr) {
+        return scr ? LV_LOAD_SCREEN_RESULT_OLD_SCREEN_DELETED : LV_LOAD_SCREEN_RESULT_BOTH_SCREENS_DELETED;
+    }
+    lv_obj_remove_event_cb(old_scr, screen_event_delete_cb);
+    return scr ? LV_LOAD_SCREEN_RESULT_OK : LV_LOAD_SCREEN_RESULT_NEW_SCREEN_DELETED;
 }
 
 static void scr_load_anim_start(lv_anim_t * a)
