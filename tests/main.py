@@ -34,6 +34,7 @@ test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
     'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
     'OPTIONS_TEST_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
+    'OPTIONS_TEST_RISCV_V': 'RISC-V Vector emulation with full config, 32 bit color depth',
 }
 
 
