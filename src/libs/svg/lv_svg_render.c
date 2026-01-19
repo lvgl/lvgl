@@ -1073,7 +1073,7 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
     while(cur && depth < LV_SVG_MAX_DEPTH) {
         parents[depth++] = cur;
         cur = (lv_svg_node_t *)cur->base.parent;
-        if(depth == LV_SVG_MAX_DEPTH - 1 && cur) {
+        if(depth == LV_SVG_MAX_DEPTH && cur) {
             LV_LOG_WARN("Reached maximum svg depth but still couldn't find root node. "
                         "Increase LV_SVG_MAX_DEPTH in order to have this SVG rendered properly. "
                         "Current Depth is %d",
