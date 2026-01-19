@@ -470,7 +470,6 @@ lv_color_format_t lv_opengles_egl_color_format_from_egl_config(const lv_egl_conf
             return LV_COLOR_FORMAT_ARGB8888;
         }
         else {
-
             return LV_COLOR_FORMAT_RGB888;
         }
     }
@@ -495,6 +494,7 @@ static lv_result_t lv_egl_config_from_egl_config(lv_opengles_egl_t * ctx, lv_egl
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_STENCIL_SIZE, &lv_egl_config->stencil);
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SAMPLES, &lv_egl_config->samples);
     res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_SURFACE_TYPE, &lv_egl_config->surface_type);
+    res &= eglGetConfigAttrib(ctx->egl_display, egl_config, EGL_RENDERABLE_TYPE, &lv_egl_config->renderable_type);
 
     if(!res) {
         LV_LOG_WARN("Failed to fetch egl config properties");
