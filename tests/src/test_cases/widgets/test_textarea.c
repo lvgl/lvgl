@@ -83,6 +83,14 @@ void test_textarea_should_scroll_to_the_end(void)
     TEST_ASSERT(lv_textarea_get_one_line(textarea));
 }
 
+void test_textarea_should_not_scroll_if_text_is_fully_visible(void)
+{
+    lv_textarea_set_text(textarea, "Type here...");
+    lv_obj_set_width(textarea, 100);
+    lv_obj_center(textarea);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/textarea_1.png");
+}
+
 void test_textarea_should_update_placeholder_text(void)
 {
     const char * new_placeholder = "LVGL Rocks!!!!!";
