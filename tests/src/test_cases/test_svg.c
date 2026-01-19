@@ -64,7 +64,7 @@ void testNodeTree(void)
 void test_property_is_inherited(void)
 {
 
-    /* Circle should not be filled as parent node as 'fill="none"' attribute*/
+    /* Circle should not be filled as parent node has 'fill="none"' attribute*/
     const char * svg =
         "<svg width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" fill=\"none\">\n"
         "<circle cx=\"100\" cy=\"100\" r=\"50\" stroke=\"black\"/>\n"
