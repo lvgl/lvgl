@@ -216,4 +216,53 @@ void test_circular_width_dependency(void)
     TEST_ASSERT_EQUAL_INT32(lv_obj_get_width(item2), lv_obj_get_width(item3));
 }
 
+static void cont_create_x_y(lv_obj_t * parent, const char * text, int32_t x, int32_t y)
+{
+    lv_obj_t * cont = lv_obj_create(parent);
+    lv_obj_remove_style(cont, NULL, LV_PART_MAIN);
+    lv_obj_set_style_border_width(cont, 1, LV_PART_MAIN);
+    lv_obj_set_size(cont, 150, 30);
+    lv_obj_set_pos(cont, x, y);
+
+    lv_obj_t * label = lv_label_create(cont);
+    lv_label_set_text(label, text);
+
+    lv_obj_t * rect_top_right = lv_obj_create(cont);
+    lv_obj_remove_style(rect_top_right, NULL, LV_PART_MAIN);
+    lv_obj_set_size(rect_top_right, 10, 10);
+    lv_obj_set_align(rect_top_right, LV_ALIGN_TOP_RIGHT);
+    lv_obj_set_style_bg_color(rect_top_right, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect_top_right, LV_OPA_COVER, LV_PART_MAIN);
+
+    lv_obj_t * rect_bottom_left = lv_obj_create(cont);
+    lv_obj_remove_style(rect_bottom_left, NULL, LV_PART_MAIN);
+    lv_obj_set_size(rect_bottom_left, 10, 10);
+    lv_obj_set_align(rect_bottom_left, LV_ALIGN_BOTTOM_LEFT);
+    lv_obj_set_style_bg_color(rect_bottom_left, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect_bottom_left, LV_OPA_COVER, LV_PART_MAIN);
+
+    lv_obj_t * rect_bottom_right = lv_obj_create(cont);
+    lv_obj_remove_style(rect_bottom_right, NULL, LV_PART_MAIN);
+    lv_obj_set_size(rect_bottom_right, 10, 10);
+    lv_obj_set_align(rect_bottom_right, LV_ALIGN_BOTTOM_RIGHT);
+    lv_obj_set_style_bg_color(rect_bottom_right, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(rect_bottom_right, LV_OPA_COVER, LV_PART_MAIN);
+}
+
+void test_rtl_pos_x_y(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+
+    lv_obj_set_size(cont, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_base_dir(cont, LV_BASE_DIR_RTL, LV_PART_MAIN);
+
+    cont_create_x_y(cont, "(0,0)", 0, 0);
+    cont_create_x_y(cont, "(50,50)", 50, 50);
+    cont_create_x_y(cont, "(100,100)", 100, 100);
+    cont_create_x_y(cont, "(150,150)", 150, 150);
+    cont_create_x_y(cont, "(100,200)", 100, 200);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/rtl_pos_x_y.png");
+}
+
 #endif

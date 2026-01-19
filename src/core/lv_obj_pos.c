@@ -813,8 +813,11 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
     lv_align_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
 
+    bool rtl = false;
+
     if(align == LV_ALIGN_DEFAULT) {
-        if(lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_ALIGN_TOP_RIGHT;
+        rtl = lv_obj_get_style_base_dir(parent, LV_PART_MAIN) == LV_BASE_DIR_RTL;
+        if(rtl) align = LV_ALIGN_TOP_RIGHT;
         else align = LV_ALIGN_TOP_LEFT;
     }
 
@@ -825,7 +828,7 @@ void lv_obj_refr_pos(lv_obj_t * obj)
             x += pw / 2 - w / 2;
             break;
         case LV_ALIGN_TOP_RIGHT:
-            x += pw - w;
+            x = rtl ? pw - w - x : pw - w + x;
             break;
         case LV_ALIGN_LEFT_MID:
             y += ph / 2 - h / 2;
