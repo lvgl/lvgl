@@ -72,6 +72,7 @@ static void _deinit_draw_dsc(lv_vector_path_ctx_t * dsc);
 static void _copy_draw_dsc(lv_vector_path_ctx_t * dst, const lv_vector_path_ctx_t * src);
 static void _prepare_render(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t * dsc);
 static void _special_render(const lv_svg_render_obj_t * obj, lv_draw_vector_dsc_t * dsc);
+static bool is_attr_inheritable(lv_svg_attr_type_t t);
 #if LV_USE_FREETYPE
     static void _freetype_outline_cb(lv_event_t * e);
 #endif
@@ -224,6 +225,68 @@ void lv_svg_render_init(const lv_svg_render_hal_t * hal)
 #if LV_USE_FREETYPE
         lv_freetype_outline_add_event(_freetype_outline_cb, LV_EVENT_ALL, NULL);
 #endif
+    }
+}
+
+/* Reference: https://www.w3.org/TR/SVGTiny12/attributeTable.html */
+static bool is_attr_inheritable(lv_svg_attr_type_t t)
+{
+    switch(t) {
+        case LV_SVG_ATTR_ID:
+        case LV_SVG_ATTR_XML_ID:
+        case LV_SVG_ATTR_VERSION:
+        case LV_SVG_ATTR_BASE_PROFILE:
+        case LV_SVG_ATTR_VIEWBOX:
+        case LV_SVG_ATTR_PRESERVE_ASPECT_RATIO:
+        case LV_SVG_ATTR_DISPLAY:
+        case LV_SVG_ATTR_X:
+        case LV_SVG_ATTR_Y:
+        case LV_SVG_ATTR_WIDTH:
+        case LV_SVG_ATTR_HEIGHT:
+        case LV_SVG_ATTR_RX:
+        case LV_SVG_ATTR_RY:
+        case LV_SVG_ATTR_CX:
+        case LV_SVG_ATTR_CY:
+        case LV_SVG_ATTR_R:
+        case LV_SVG_ATTR_X1:
+        case LV_SVG_ATTR_Y1:
+        case LV_SVG_ATTR_X2:
+        case LV_SVG_ATTR_Y2:
+        case LV_SVG_ATTR_POINTS:
+        case LV_SVG_ATTR_D:
+        case LV_SVG_ATTR_PATH_LENGTH:
+        case LV_SVG_ATTR_XLINK_HREF:
+        case LV_SVG_ATTR_GRADIENT_UNITS:
+        case LV_SVG_ATTR_GRADIENT_STOP_OFFSET:
+        case LV_SVG_ATTR_TRANSFORM:
+#if LV_USE_SVG_ANIMATION
+        case LV_SVG_ATTR_ATTRIBUTE_NAME:
+        case LV_SVG_ATTR_ATTRIBUTE_TYPE:
+        case LV_SVG_ATTR_BEGIN:
+        case LV_SVG_ATTR_END:
+        case LV_SVG_ATTR_DUR:
+        case LV_SVG_ATTR_MIN:
+        case LV_SVG_ATTR_MAX:
+        case LV_SVG_ATTR_RESTART:
+        case LV_SVG_ATTR_REPEAT_COUNT:
+        case LV_SVG_ATTR_REPEAT_DUR:
+        case LV_SVG_ATTR_CALC_MODE:
+        case LV_SVG_ATTR_VALUES:
+        case LV_SVG_ATTR_KEY_TIMES:
+        case LV_SVG_ATTR_KEY_SPLINES:
+        case LV_SVG_ATTR_KEY_POINTS:
+        case LV_SVG_ATTR_FROM:
+        case LV_SVG_ATTR_TO:
+        case LV_SVG_ATTR_BY:
+        case LV_SVG_ATTR_ADDITIVE:
+        case LV_SVG_ATTR_ACCUMULATE:
+        case LV_SVG_ATTR_PATH:
+        case LV_SVG_ATTR_ROTATE:
+        case LV_SVG_ATTR_TRANSFORM_TYPE:
+#endif
+            return false;
+        default:
+            return true;
     }
 }
 
@@ -1066,33 +1129,38 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
         obj->stroke_ref = lv_strdup(state->draw_dsc->stroke_ref);
     }
 
-    const lv_svg_node_t * parents[LV_SVG_MAX_DEPTH];
-    uint32_t depth = 0;
-    const lv_svg_node_t * cur = (lv_svg_node_t *)node->base.parent;
+    if(obj->clz->set_attr) {
+        const lv_svg_node_t * parents[LV_SVG_MAX_DEPTH];
+        uint32_t depth = 0;
+        const lv_svg_node_t * cur = (lv_svg_node_t *)node->base.parent;
 
-    while(cur && depth < LV_SVG_MAX_DEPTH) {
-        parents[depth++] = cur;
-        cur = (lv_svg_node_t *)cur->base.parent;
-        if(depth == LV_SVG_MAX_DEPTH && cur) {
-            LV_LOG_WARN("Reached maximum svg depth but still couldn't find root node. "
-                        "Increase LV_SVG_MAX_DEPTH in order to have this SVG rendered properly. "
-                        "Current Depth is %d",
-                        LV_SVG_MAX_DEPTH);
+        while(cur && depth < LV_SVG_MAX_DEPTH) {
+            parents[depth++] = cur;
+            cur = (lv_svg_node_t *)cur->base.parent;
+            if(depth == LV_SVG_MAX_DEPTH && cur) {
+                LV_LOG_WARN("Reached maximum svg depth but still couldn't find root node. "
+                            "Increase LV_SVG_MAX_DEPTH in order to have this SVG rendered properly. "
+                            "Current Depth is %d",
+                            LV_SVG_MAX_DEPTH);
+            }
         }
-    }
 
-    for(int32_t i = depth - 1; i >= 0; i--) {
-        uint32_t len = lv_array_size(&parents[i]->attrs);
-        for(uint32_t j = 0; j < len; j++) {
-            lv_svg_attr_t * attr = lv_array_at(&parents[i]->attrs, j);
+        for(int32_t i = depth - 1; i >= 0; i--) {
+            uint32_t len = lv_array_size(&parents[i]->attrs);
+            for(uint32_t j = 0; j < len; j++) {
+                lv_svg_attr_t * attr = lv_array_at(&parents[i]->attrs, j);
+                if(!is_attr_inheritable(attr->id)) {
+                    continue;
+                }
+                obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
+            }
+        }
+
+        uint32_t len = lv_array_size(&node->attrs);
+        for(uint32_t i = 0; i < len; i++) {
+            lv_svg_attr_t * attr = lv_array_at(&node->attrs, i);
             obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
         }
-    }
-
-    uint32_t len = lv_array_size(&node->attrs);
-    for(uint32_t i = 0; i < len; i++) {
-        lv_svg_attr_t * attr = lv_array_at(&node->attrs, i);
-        obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
     }
     if(node->type == LV_SVG_TAG_G) { /* only <g> need store it */
         state->draw_dsc->fill_ref = obj->fill_ref;
