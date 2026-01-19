@@ -528,7 +528,7 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
     }
 
     uint32_t len = ptr - str;
-    uint8_t r = 0, g = 0, b = 0;
+    uint32_t r = 0, g = 0, b = 0;
 
     if(*str == '#') {
         if(len == 4) { // three digit hex format '#rgb'
@@ -564,7 +564,7 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
         str += 5;
         bool valid_color = true;
         float vals[3] = {0};
-        uint8_t alpha = 255;
+        uint32_t alpha = 255;
 
         for(int i = 0; i < 3; i++) {
             str = _parse_number(str, ptr, &vals[i]);
