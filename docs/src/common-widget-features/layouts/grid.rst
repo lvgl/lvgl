@@ -199,6 +199,15 @@ The columns will be placed from right to left.
 
 
 
+Edge cases and notes
+--------------------
+
+- Min/max as content or percent: Child Widgets can set min/max width/height to
+  :c:macro:`LV_SIZE_CONTENT` or :cpp:expr:`LV_PCT(x)`. These constraints are respected
+  when computing :c:macro:`LV_GRID_CONTENT` tracks (tracks sized to their largest
+  child) and when distributing space to FR-unit tracks.
+
+
 .. admonition::  Further Reading
 
     - Learn more about `CSS Grid`_ layout.

@@ -204,6 +204,30 @@ You can force Flex to put an item into a new line with
     Learn more about `CSS Flexbox`_.
 
 
+Edge cases and notes
+--------------------
+
+The following behaviors clarify interactions between flex grow, wrapping and size constraints:
+
+- Grow with LV_SIZE_CONTENT parent: If a flex container's size on the main axis is
+   :c:macro:`LV_SIZE_CONTENT` and it contains items with non-zero grow, the grown items
+   initially use their own minimum size when determining the container's content size.
+   If the container has min/max constraints that force a concrete size, the remaining
+   space is then distributed among grow items (respecting each item's min/max).
+
+- Wrapping with grow: For :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP` and
+   :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP`, wrapping is used as expected even when the
+   object is grown in the same direction and its size in that direction is
+   :c:macro:`LV_SIZE_CONTENT`. In this case the :c:macro:`LV_SIZE_CONTENT` constraint is
+   ignored to be consistent with how the object size is calculated, and the grown size is used.
+
+- Min/max as content or percent: Item min/max width/height can be set to
+   :c:macro:`LV_SIZE_CONTENT` or :cpp:expr:`LV_PCT(x)`. These constraints are respected
+   during grow and wrapping and can clamp size of grown items.
+
+- Gaps with zero-size grow: Padding/gap is still applied even if a grown item ends up
+   with zero size on the main axis; this matches CSS flex behavior.
+
 
 .. _flex_examples:
 
