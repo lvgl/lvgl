@@ -63,6 +63,15 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
     a.y1 = (int32_t)LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width;
     a.y2 = (int32_t)LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width;
 
+    if(dsc->base.drop_shadow_opa) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, &a);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_line_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain line*/
+        lv_draw_line(ds_layer, &ds_dsc);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+    }
+
     lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LINE);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));

@@ -62,7 +62,7 @@ static bool string_ends_with(const char * value, const char * suffix);
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len, lv_opengl_glsl_version glsl_version);
+                               size_t permutations_len, lv_opengl_glsl_version_t glsl_version);
 
 static GLuint compile_shader(const char * shader_source, bool is_vertex_shader);
 static GLuint link_program(GLuint vertex_shader_id, GLuint fragment_shader_id);
@@ -87,14 +87,14 @@ void lv_opengl_shader_manager_init(lv_opengl_shader_manager_t * manager, const l
 
     manager->sources_map = create_shader_map(sources, len);
     if(vert_src != NULL) {
-        lv_opengl_shader_t entry = { "__MAIN__.vert", lv_strdup(vert_src) };
+        lv_opengl_shader_source_t entry = { { "__MAIN__.vert", lv_strdup(vert_src) }, 1 };
         lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node,
                       "Failed to insert shader source to source map");
         lv_memcpy(node->data, &entry, sizeof(entry));
     }
     if(frag_src != NULL) {
-        lv_opengl_shader_t entry = { "__MAIN__.frag", lv_strdup(frag_src) };
+        lv_opengl_shader_source_t entry = { { "__MAIN__.frag", lv_strdup(frag_src) }, 1 };
         lv_rb_node_t * node = lv_rb_insert(&manager->sources_map, &entry);
         LV_ASSERT_MSG(node, "Failed to insert shader to shader map");
         lv_memcpy(node->data, &entry, sizeof(entry));
@@ -161,7 +161,7 @@ GLuint lv_opengl_shader_manager_get_texture(lv_opengl_shader_manager_t * manager
 
 lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * shader, const char * shader_identifier,
                                                    const lv_opengl_shader_define_t * permutations, size_t permutations_len,
-                                                   lv_opengl_glsl_version glsl_version, uint32_t * out_hash)
+                                                   lv_opengl_glsl_version_t glsl_version, uint32_t * out_hash)
 {
     /* First check that the shader identifier exists */
     lv_opengl_shader_t key = { shader_identifier, NULL };
@@ -186,6 +186,9 @@ lv_result_t lv_opengl_shader_manager_select_shader(lv_opengl_shader_manager_t * 
         }
         hash ^= lv_opengl_shader_hash(define);
     }
+    /* hash the version so that the same shader with different versions produces a different hash*/
+    hash ^= lv_opengl_shader_hash(lv_opengles_glsl_version_to_string(glsl_version));
+
     lv_opengl_compiled_shader_t shader_map_key = { hash, 0 };
     lv_rb_node_t * shader_map_node =
         lv_rb_find(&shader->compiled_shaders_map, &shader_map_key);
@@ -291,6 +294,55 @@ lv_opengl_shader_manager_get_program(lv_opengl_shader_manager_t * manager,
     return program;
 }
 
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program(lv_opengl_shader_manager_t * manager,
+                                                                      const lv_opengl_shader_params_t * frag_shader,
+                                                                      const lv_opengl_shader_params_t * vert_shader,
+                                                                      lv_opengl_glsl_version_t version)
+{
+    uint32_t frag_shader_hash;
+    uint32_t vert_shader_hash;
+
+    lv_result_t res = lv_opengl_shader_manager_select_shader(manager, frag_shader->name, frag_shader->permutations,
+                                                             frag_shader->permutations_len,
+                                                             version, &frag_shader_hash);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to compile shader for glsl version %s", lv_opengles_glsl_version_to_string(version));
+        return NULL;
+    }
+
+    res = lv_opengl_shader_manager_select_shader(manager, vert_shader->name, vert_shader->permutations,
+                                                 vert_shader->permutations_len,
+                                                 version, &vert_shader_hash);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_WARN("Failed to compile shader for glsl version %s", lv_opengles_glsl_version_to_string(version));
+        return NULL;
+    }
+    lv_opengl_shader_program_t * program =
+        lv_opengl_shader_manager_get_program(manager, frag_shader_hash, vert_shader_hash);
+
+    if(!program) {
+        LV_LOG_WARN("Failed to link program for glsl version %s", lv_opengles_glsl_version_to_string(version));
+    }
+
+    return program;
+}
+
+lv_opengl_shader_program_t * lv_opengl_shader_manager_compile_program_best_version(
+    lv_opengl_shader_manager_t * manager,
+    const lv_opengl_shader_params_t * frag_shader,
+    const lv_opengl_shader_params_t * vert_shader,
+    const lv_opengl_glsl_version_t * versions, size_t version_count)
+{
+    for(size_t i = 0; i < version_count; ++i) {
+        lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program(manager, frag_shader, vert_shader,
+                                                                                        versions[i]);
+        if(program) {
+            return program;
+        }
+    }
+    return NULL;
+}
+
 void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
 {
     LV_LOG_INFO("Destroying shader cache");
@@ -304,27 +356,27 @@ void lv_opengl_shader_manager_deinit(lv_opengl_shader_manager_t * manager)
         if(shader->src_allocated) {
             lv_free((void *)shader->data.source);
         }
-        lv_rb_remove_node(&manager->sources_map, node);
+        lv_rb_drop_node(&manager->sources_map, node);
     }
     lv_rb_destroy(&manager->sources_map);
 
     while((node = manager->compiled_shaders_map.root)) {
         lv_opengl_compiled_shader_t * shader = node->data;
         GL_CALL(glDeleteShader(shader->id));
-        lv_rb_remove_node(&manager->compiled_shaders_map, node);
+        lv_rb_drop_node(&manager->compiled_shaders_map, node);
     }
 
     lv_rb_destroy(&manager->compiled_shaders_map);
     while((node = manager->programs_map.root)) {
         lv_opengl_program_map_key_t * program_key = node->data;
         lv_opengl_shader_program_destroy(program_key->program);
-        lv_rb_remove_node(&manager->programs_map, node);
+        lv_rb_drop_node(&manager->programs_map, node);
     }
     lv_rb_destroy(&manager->programs_map);
 
 }
 
-const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version)
+const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version_t version)
 {
 
     switch(version) {
@@ -332,6 +384,8 @@ const char * lv_opengles_glsl_version_to_string(lv_opengl_glsl_version version)
             return "#version 100\n";
         case LV_OPENGL_GLSL_VERSION_300ES:
             return "#version 300 es\n";
+        case LV_OPENGL_GLSL_VERSION_330:
+            return "#version 330\n";
         case LV_OPENGL_GLSL_VERSION_LAST:
             LV_LOG_ERROR("LV_OPENGL_GLSL_VERSION_LAST is not a valid version");
             return NULL;
@@ -485,7 +539,7 @@ static char * append_to_shader(char * dst, const char * src, size_t * curr_index
 
 static char * construct_shader(const char * source,
                                const lv_opengl_shader_define_t * permutations,
-                               size_t permutations_len, lv_opengl_glsl_version glsl_version)
+                               size_t permutations_len, lv_opengl_glsl_version_t glsl_version)
 {
     const char * defines = lv_opengles_glsl_version_to_string(glsl_version);
     const char * prefix = "#define ";

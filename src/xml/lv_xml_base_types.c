@@ -238,6 +238,16 @@ lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
+lv_blur_quality_t lv_xml_blur_quality_to_enum(const char * txt)
+{
+    if(lv_streq("auto", txt)) return LV_BLUR_QUALITY_AUTO;
+    if(lv_streq("speed", txt)) return LV_BLUR_QUALITY_SPEED;
+    if(lv_streq("precision", txt)) return LV_BLUR_QUALITY_PRECISION;
+
+    LV_LOG_WARN("%s is an unknown value for blur_quality", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 lv_event_code_t lv_xml_trigger_text_to_enum_value(const char * txt)
 {
     if(lv_streq("all", txt)) return LV_EVENT_ALL;

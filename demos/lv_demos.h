@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "../lvgl.h"
 
+typedef struct _lv_demo_args lv_demo_args_t;
+
 #if LV_USE_DEMO_BENCHMARK
 #include "benchmark/lv_demo_benchmark.h"
 #endif
@@ -54,10 +56,19 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_demo_args {
+    lv_obj_t * parent;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the lv_demo_args_t structure with default values.
+ * @param args Pointer to the lv_demo_args_t structure to be initialized.
+ */
+void lv_demo_args_init(lv_demo_args_t * args);
 
 /**
  * Call lv_demo_xxx.

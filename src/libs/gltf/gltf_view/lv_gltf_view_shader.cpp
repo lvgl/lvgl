@@ -141,9 +141,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 }
             }
         }
+#if LV_GLTF_LINEAR_OUTPUT
         if(add_define(result, "LINEAR_OUTPUT", NULL, false) == LV_RESULT_INVALID) {
             return LV_RESULT_INVALID;
         }
+#endif
 
         // only set cutoff value for mask material
         if(material.alphaMode == fastgltf::AlphaMode::Mask) {
@@ -198,11 +200,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.specularGlossiness->diffuseTexture, "HAS_DIFFUSE_MAP",
-                                   "HAS_DIFFUSE_UV_TRANSFORM")) {
+                                   "HAS_DIFFUSE_UV_TRANSFORM") == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
             if(add_texture_defines(result, material.specularGlossiness->specularGlossinessTexture,
-                                   "HAS_SPECULARGLOSSINESS_MAP", "HAS_SPECULARGLOSSINESS_UV_TRANSFORM")) {
+                                   "HAS_SPECULARGLOSSINESS_MAP", "HAS_SPECULARGLOSSINESS_UV_TRANSFORM") == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
         }
@@ -210,9 +212,11 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
             if(add_define(result, "MATERIAL_TRANSMISSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
+#if 0 /* Material dispersion is being revisited.*/
             if(add_define(result, "MATERIAL_DISPERSION", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
+#endif
             if(add_define(result, "MATERIAL_VOLUME", NULL, false) == LV_RESULT_INVALID) {
                 return LV_RESULT_INVALID;
             }
@@ -298,42 +302,6 @@ lv_result_t lv_gltf_view_shader_injest_discover_defines(lv_array_t * result, lv_
         }
     }
     return LV_RESULT_OK;
-}
-
-/**
- * @brief Compile and load shaders.
- *
- * This function compiles and loads the shaders from the specified shader cache, preparing them
- * for use in rendering operations. It returns a structure containing the shader set information.
- *
- * @param shaders Pointer to the lv_opengl_shader_cache_t structure containing the shader cache.
- * @return A gl_renwin_shaderset_t structure representing the compiled and loaded shaders.
- */
-
-lv_gltf_shaderset_t lv_gltf_view_shader_compile_program(lv_gltf_t * view, const lv_opengl_shader_define_t * defines,
-                                                        size_t n)
-{
-    uint32_t frag_shader_hash;
-    uint32_t vert_shader_hash;
-    lv_result_t res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.frag",
-                                                             defines, n, LV_OPENGL_GLSL_VERSION_300ES, &frag_shader_hash);
-    LV_ASSERT(res == LV_RESULT_OK);
-    res = lv_opengl_shader_manager_select_shader(&view->shader_manager, "__MAIN__.vert",
-                                                 defines, n, LV_OPENGL_GLSL_VERSION_300ES, &vert_shader_hash);
-    LV_ASSERT(res == LV_RESULT_OK);
-    lv_opengl_shader_program_t * program =
-        lv_opengl_shader_manager_get_program(&view->shader_manager, frag_shader_hash, vert_shader_hash);
-
-    LV_ASSERT_MSG(program != NULL,
-                  "Failed to link program. This probably means your platform doesn't support GLSL version 300 es");
-
-    GLuint program_id = lv_opengl_shader_program_get_id(program);
-
-    GL_CALL(glUseProgram(program_id));
-    lv_gltf_shaderset_t shader_prog;
-    shader_prog.program = program_id;
-
-    return shader_prog;
 }
 
 /**********************

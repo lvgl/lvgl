@@ -44,6 +44,12 @@ typedef enum {
     LV_ARCLABEL_TEXT_ALIGN_TRAILING = 3,
 } lv_arclabel_text_align_t;
 
+typedef enum {
+    LV_ARCLABEL_OVERFLOW_VISIBLE,  /**< Show full text, may overflow object area */
+    LV_ARCLABEL_OVERFLOW_ELLIPSIS, /**< Show ellipsis (...) when text overflows */
+    LV_ARCLABEL_OVERFLOW_CLIP      /**< Clip text at arc boundary */
+} lv_arclabel_overflow_t;
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arclabel_class;
 
 /**********************
@@ -168,6 +174,21 @@ void lv_arclabel_set_text_vertical_align(lv_obj_t * obj, lv_arclabel_text_align_
  */
 void lv_arclabel_set_text_horizontal_align(lv_obj_t * obj, lv_arclabel_text_align_t align);
 
+/**
+ * Set the overflow behavior for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @param overflow  the overflow mode (visible, ellipsis, clip)
+ */
+void lv_arclabel_set_overflow(lv_obj_t * obj, lv_arclabel_overflow_t overflow);
+
+/**
+ * Set the end overlap behavior for an arc label object.
+ * This controls how text is handled when it would overlap at the end of a 360-degree arc.
+ * @param obj       pointer to an arc label object
+ * @param overlap   set the arc label's end overlap behavior
+ */
+void lv_arclabel_set_end_overlap(lv_obj_t * obj, bool overlap);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -237,6 +258,31 @@ lv_arclabel_text_align_t lv_arclabel_get_text_vertical_align(lv_obj_t * obj);
  * @return          the horizontal alignment
  */
 lv_arclabel_text_align_t lv_arclabel_get_text_horizontal_align(lv_obj_t * obj);
+
+/**
+ * Get the overflow behavior for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @return          the overflow mode
+ */
+lv_arclabel_overflow_t lv_arclabel_get_overflow(lv_obj_t * obj);
+
+/**
+ * Get the end overlap behavior for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @return          the end overlap mode
+ */
+bool lv_arclabel_get_end_overlap(lv_obj_t * obj);
+
+/**
+ * Get the text angle for an arc label object.
+ * @note            The text angle is calculated at runtime. You can get the updated value
+ *                  after the arclabel's size has been updated.
+ *                  Returns the real rendered text angle in degrees except in
+ *                  `LV_ARCLABEL_OVERFLOW_VISIBLE` mode.
+ * @param obj       pointer to an arc label object
+ * @return          the text angle (if `LV_USE_FLOAT` is enabled it can be fractional too.)
+ */
+lv_value_precise_t lv_arclabel_get_text_angle(lv_obj_t * obj);
 
 /*=====================
  * Other functions

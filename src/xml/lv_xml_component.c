@@ -53,7 +53,7 @@ static void end_metadata_handler(void * user_data, const char * name);
 static void process_const_element(lv_xml_parser_state_t * state, const char ** attrs);
 static void process_font_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
 static void process_image_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
-static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs);
+static void process_prop_element(lv_xml_parser_state_t * state, const char * name, const char ** attrs);
 static char * extract_view_content(const char * xml_definition);
 static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop);
 static void anim_exec_cb(lv_anim_t * a, int32_t v);
@@ -107,7 +107,7 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
         return NULL;
     }
 
-    /* Apply the properties of the component, e.g. <my_button x="20" styles="red"/> */
+    /* Apply the properties of the component, e.g. <my_button x="20" width="300"/> */
     state->item = item;
     lv_widget_processor_t * extended_proc = lv_xml_widget_get_extended_widget_processor(scope->extends);
     extended_proc->apply_cb(state, attrs);
@@ -129,6 +129,8 @@ lv_obj_t * lv_xml_component_process(lv_xml_parser_state_t * state, const char * 
 
 lv_xml_component_scope_t * lv_xml_component_get_scope(const char * component_name)
 {
+    if(component_name == NULL) return NULL;
+
     lv_xml_component_scope_t * scope;
     LV_LL_READ(&component_scope_ll, scope) {
         if(lv_streq(scope->name, component_name)) return scope;
@@ -190,7 +192,7 @@ lv_result_t lv_xml_register_component_from_data(const char * name, const char * 
         if(!scope->view_def) {
             LV_LOG_WARN("Failed to extract view content");
             /* Clean up and return error */
-            lv_xml_component_unregister(name);
+            lv_xml_unregister_component(name);
             return LV_RESULT_INVALID;
         }
     }
@@ -256,7 +258,7 @@ lv_result_t lv_xml_register_component_from_file(const char * path)
     return res;
 }
 
-lv_result_t lv_xml_component_unregister(const char * name)
+lv_result_t lv_xml_unregister_component(const char * name)
 {
     lv_xml_component_scope_t * scope = lv_xml_component_get_scope(name);
     if(scope == NULL) return LV_RESULT_INVALID;
@@ -868,8 +870,10 @@ static void process_grad_stop_element(lv_xml_parser_state_t * state, const char 
     dsc->stops_count++;
 }
 
-static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs)
+static void process_prop_element(lv_xml_parser_state_t * state, const char * name, const char ** attrs)
 {
+    if(!lv_streq(name, "prop")) return;
+
     lv_xml_param_t * prop = lv_ll_ins_tail(&state->scope.param_ll);
     lv_memzero(prop, sizeof(lv_xml_param_t));
 
@@ -904,7 +908,7 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     switch(state->section) {
         case LV_XML_PARSER_SECTION_API:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <api>*/
-            process_prop_element(state, attrs);
+            process_prop_element(state, name, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_CONSTS:
@@ -1047,6 +1051,7 @@ static style_prop_anim_type_t style_prop_anim_get_type(lv_style_prop_t prop)
         case LV_STYLE_OPA:
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BG_OPA:
+        case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
@@ -1078,7 +1083,7 @@ static void anim_exec_cb(lv_anim_t * a, int32_t v)
 {
     anim_data_t * anim_data = lv_anim_get_user_data(a);
 
-    lv_style_value_t style_value;
+    lv_style_value_t style_value = {0};
     if(anim_data->prop_type == STYLE_PROP_TYPE_INT || anim_data->prop_type == STYLE_PROP_TYPE_OPA) {
         style_value.num = v;
     }

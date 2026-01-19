@@ -57,7 +57,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag);
  **********************/
 
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_slider_properties[] = {
     {
         .id = LV_PROPERTY_SLIDER_VALUE,
         .setter = lv_slider_set_value,
@@ -75,12 +75,12 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_SLIDER_MIN_VALUE,
-        .setter = NULL,
+        .setter = lv_slider_set_min_value,
         .getter = lv_slider_get_min_value,
     },
     {
         .id = LV_PROPERTY_SLIDER_MAX_VALUE,
-        .setter = NULL,
+        .setter = lv_slider_set_max_value,
         .getter = lv_slider_get_max_value,
     },
     {
@@ -109,17 +109,7 @@ const lv_obj_class_t lv_slider_class = {
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class,
     .name = "lv_slider",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_SLIDER_START,
-    .prop_index_end = LV_PROPERTY_SLIDER_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_slider_property_names,
-    .names_count = sizeof(lv_slider_property_names) / sizeof(lv_property_name_t),
-#endif
-#endif
+    LV_PROPERTY_CLASS_FIELDS(slider, SLIDER)
 };
 
 /**********************

@@ -53,6 +53,17 @@ static void lv_switch_anim_completed(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t lv_switch_properties[] = {
+    {
+        .id = LV_PROPERTY_SWITCH_ORIENTATION,
+        .setter = lv_switch_set_orientation,
+        .getter = lv_switch_get_orientation,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_switch_class = {
     .constructor_cb = lv_switch_constructor,
     .destructor_cb = lv_switch_destructor,
@@ -63,6 +74,7 @@ const lv_obj_class_t lv_switch_class = {
     .instance_size = sizeof(lv_switch_t),
     .base_class = &lv_obj_class,
     .name = "lv_switch",
+    LV_PROPERTY_CLASS_FIELDS(switch, SWITCH)
 };
 
 /**********************

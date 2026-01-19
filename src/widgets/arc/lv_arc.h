@@ -39,6 +39,23 @@ typedef enum {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arc_class;
 
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_arc_id_t {
+    LV_PROPERTY_ID(ARC, START_ANGLE,        LV_PROPERTY_TYPE_PRECISE,   0),
+    LV_PROPERTY_ID(ARC, END_ANGLE,          LV_PROPERTY_TYPE_PRECISE,   1),
+    LV_PROPERTY_ID(ARC, BG_START_ANGLE,     LV_PROPERTY_TYPE_PRECISE,   2),
+    LV_PROPERTY_ID(ARC, BG_END_ANGLE,       LV_PROPERTY_TYPE_PRECISE,   3),
+    LV_PROPERTY_ID(ARC, ROTATION,           LV_PROPERTY_TYPE_INT,       4),
+    LV_PROPERTY_ID(ARC, MODE,               LV_PROPERTY_TYPE_INT,       5),
+    LV_PROPERTY_ID(ARC, VALUE,              LV_PROPERTY_TYPE_INT,       6),
+    LV_PROPERTY_ID(ARC, MIN_VALUE,          LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_ID(ARC, MAX_VALUE,          LV_PROPERTY_TYPE_INT,       8),
+    LV_PROPERTY_ID(ARC, CHANGE_RATE,        LV_PROPERTY_TYPE_INT,       9),
+    LV_PROPERTY_ID(ARC, KNOB_OFFSET,        LV_PROPERTY_TYPE_INT,       10),
+    LV_PROPERTY_ARC_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -232,6 +249,13 @@ int32_t lv_arc_get_rotation(const lv_obj_t * obj);
  * @return          arc's current knob offset
  */
 int32_t lv_arc_get_knob_offset(const lv_obj_t * obj);
+
+/**
+ * Get the change rate of an arc
+ * @param obj       pointer to an arc object
+ * @return          the change rate
+ */
+uint32_t lv_arc_get_change_rate(lv_obj_t * obj);
 
 /*=====================
  * Other functions

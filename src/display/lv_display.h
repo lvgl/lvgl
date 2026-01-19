@@ -657,6 +657,13 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
 void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 
 /**
+ * Rotate a point in-place according to the display's rotation
+ * @param disp      pointer to a display
+ * @param point     pointer to a point to rotate
+ */
+void lv_display_rotate_point(lv_display_t * disp, lv_point_t * point);
+
+/**
  * Get the size of the draw buffers
  * @param disp      pointer to a display
  * @return          the size of the draw buffer in bytes for valid display, 0 otherwise
@@ -731,6 +738,22 @@ int32_t lv_dpx(int32_t n);
  * @return      number of pixels to use to make that distance
  */
 int32_t lv_display_dpx(const lv_display_t * disp, int32_t n);
+
+#if LV_USE_EXT_DATA
+/**
+ * @brief Attaches external user data and destructor callback to a display
+ *
+ * Associates custom user data with an LVGL display and specifies a destructor function
+ * that will be automatically invoked when the display is deleted to properly clean up
+ * the associated resources.
+ *
+ * @param disp       Pointer to a display
+ * @param data       User-defined data pointer to associate with the display
+ * @param free_cb    Callback function for cleaning up data when display is deleted.
+ *                   Receives data as parameter. NULL means no cleanup required.
+ */
+void lv_display_set_external_data(lv_display_t * disp, void * data, void (* free_cb)(void * data));
+#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/

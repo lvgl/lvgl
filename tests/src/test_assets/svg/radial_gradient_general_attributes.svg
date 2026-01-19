@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width='400' height='400' viewBox='0 0 800 800' >
+    <defs>
+        <radialGradient id='ggg18' cx='50%' cy='50%' r='50%' gradientUnits='objectBoundingBox'>
+            <stop offset='0' stop-color='white' />
+            <stop offset='1' stop-color='blue' />
+        </radialGradient>
+        <radialGradient id='ggg19' cx='200' cy='200' r='150' gradientUnits='userSpaceOnUse'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='1' stop-color='blue' stop-opacity='0.5'/>
+        </radialGradient>
+        <radialGradient id='ggg20' cx='200' cy='200' r='150' gradientUnits='userSpaceOnUse'>
+            <stop offset='0' stop-color='red' />
+            <stop offset='1' stop-color='blue' stop-opacity='1.0'/>
+        </radialGradient>
+    </defs>
+    <circle cx='50' cy='50' r='25' fill='url(#ggg18)' />
+    <circle cx='101' cy='50' r='25' fill='url(#ggg18)' />
+    <circle cx='152' cy='50' r='25' fill='pink' />
+    <circle cx='203' cy='50' r='25' fill='pink' />
+    <circle cx='50' cy='101' r='25' fill='url(#ggg20)' />
+    <circle cx='101' cy='101' r='25' fill='url(#ggg19)' />
+    <circle cx='152' cy='101' r='25' fill='url(#ggg19)' />
+    <circle cx='203' cy='101' r='25' fill='url(#ggg19)' />
+    <circle cx='254' cy='101' r='25' fill='url(#ggg19)' />
+    <circle cx='305' cy='101' r='25' fill='url(#ggg19)' />
+    <circle cx='355' cy='101' r='25' fill='url(#ggg20)' />
+
+    <circle cx='50' cy='152' r='25' fill='url(#ggg20)' />
+    <circle cx='101' cy='152' r='25' fill='url(#ggg19)' />
+    <circle cx='152' cy='152' r='25' fill='url(#ggg19)' />
+    <circle cx='203' cy='152' r='25' fill='url(#ggg19)' />
+    <circle cx='254' cy='152' r='25' fill='url(#ggg19)' />
+    <circle cx='305' cy='152' r='25' fill='url(#ggg19)' />
+    <circle cx='355' cy='152' r='25' fill='url(#ggg20)' />
+
+    <circle cx='50' cy='203' r='25' fill='url(#ggg20)' />
+    <circle cx='101' cy='203' r='25' fill='url(#ggg19)' />
+    <circle cx='152' cy='203' r='25' fill='url(#ggg19)' />
+    <circle cx='203' cy='203' r='25' fill='url(#ggg19)' />
+    <circle cx='254' cy='203' r='25' fill='url(#ggg19)' />
+    <circle cx='305' cy='203' r='25' fill='url(#ggg19)' />
+    <circle cx='355' cy='203' r='25' fill='url(#ggg20)' />
+
+    <circle cx='50' cy='254' r='25' fill='url(#ggg20)' />
+    <circle cx='101' cy='254' r='25' fill='url(#ggg19)' />
+    <circle cx='152' cy='254' r='25' fill='url(#ggg19)' />
+    <circle cx='203' cy='254' r='25' fill='url(#ggg19)' />
+    <circle cx='254' cy='254' r='25' fill='url(#ggg19)' />
+    <circle cx='305' cy='254' r='25' fill='url(#ggg19)' />
+    <circle cx='355' cy='254' r='25' fill='url(#ggg20)' />
+
+    <circle cx='50' cy='305' r='25' fill='url(#ggg20)' />
+    <circle cx='101' cy='305' r='25' fill='url(#ggg19)' />
+    <circle cx='152' cy='305' r='25' fill='url(#ggg19)' />
+    <circle cx='203' cy='305' r='25' fill='url(#ggg19)' />
+    <circle cx='254' cy='305' r='25' fill='url(#ggg19)' />
+    <circle cx='305' cy='305' r='25' fill='url(#ggg19)' />
+    <circle cx='355' cy='305' r='25' fill='url(#ggg20)' />
+</svg>

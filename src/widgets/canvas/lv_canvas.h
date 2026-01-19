@@ -85,6 +85,22 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
 void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa);
 
 /**
+ * Set a pixel's color and opacity without invalidating the canvas object
+ * In order for the canvas to be redrawn, the user is required to manually call `lv_obj_invalidate`
+ *
+ * @param obj   pointer to a canvas
+ * @param x     X coordinate of the pixel
+ * @param y     Y coordinate of the pixel
+ * @param color the color
+ * @param opa   the opacity
+ * @note        The following color formats are supported
+ *              LV_COLOR_FORMAT_I1/2/4/8, LV_COLOR_FORMAT_A8,
+ *              LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888,
+ *              LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888
+ */
+void lv_canvas_set_px_skip_invalidate(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa);
+
+/**
  * Set the palette color of a canvas for index format. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
  * @param obj       pointer to canvas object
  * @param index     the palette color to set:
@@ -134,12 +150,14 @@ const void * lv_canvas_get_buf(lv_obj_t * canvas);
 /**
  * Copy a buffer to the canvas
  * @param obj           pointer to a canvas object
- * @param canvas_area   the area of the canvas to copy
- * @param dest_buf      pointer to a buffer to store the copied data
- * @param dest_area     the area of the destination buffer to copy to. If omitted NULL, copy to the whole `dest_buf`
+ * @param canvas_area   the area of the canvas to copy the new data to
+ * @param src_buf       pointer to a buffer holding the source data
+ * @param src_area      the area of the source buffer to copy from. If NULL, copy the whole buffer.
+ * @note  canvas_area and src_area should be the same size. If canvas_area and the size of src_buf are the same,
+ *        src_area can be left NULL.
  */
-void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf,
-                        const lv_area_t * dest_area);
+void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * src_buf,
+                        const lv_area_t * src_area);
 
 /**
  * Fill the canvas with color

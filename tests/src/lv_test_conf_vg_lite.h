@@ -41,4 +41,11 @@
     The rendering engine needs to support 3x3 matrix transformations.*/
 #define LV_DRAW_TRANSFORM_USE_MATRIX            1
 
+/* Used to test coverage of different configuration combinations */
+#ifdef NON_AMD64_BUILD
+    #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET  1
+#else
+    #define LV_VG_LITE_DISABLE_BLIT_RECT_OFFSET  0
+#endif
+
 #endif /* LV_TEST_CONF_VG_LITE_H */

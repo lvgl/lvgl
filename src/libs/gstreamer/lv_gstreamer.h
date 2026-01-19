@@ -23,7 +23,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gstreamer_class;
 
 /* Using the `URI` "factory", we can specify various URI schemes as media sources including
  * - local files (file://)
@@ -39,8 +38,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gstreamer_class;
 #define LV_GSTREAMER_FACTORY_FILE            "filesrc"
 #define LV_GSTREAMER_PROPERTY_FILE            "location"
 
-/** These sources are untested. For most of them, URI_DECODE can probably be used instead */
-#ifdef LV_GSTREAMER_ENABLE_UNTESTED_SOURCES
 #define LV_GSTREAMER_FACTORY_HTTP            "souphttpsrc"
 #define LV_GSTREAMER_PROPERTY_HTTP            "location"
 
@@ -64,7 +61,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gstreamer_class;
 
 #define LV_GSTREAMER_FACTORY_APP             "appsrc"
 #define LV_GSTREAMER_PROPERTY_APP             NULL
-#endif
 
 /**********************
  *      TYPEDEFS

@@ -60,7 +60,7 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_OBJ_PROPERTY
-static const lv_property_ops_t properties[] = {
+static const lv_property_ops_t lv_keyboard_properties[] = {
     {
         .id = LV_PROPERTY_KEYBOARD_TEXTAREA,
         .setter = lv_keyboard_set_textarea,
@@ -92,18 +92,7 @@ const lv_obj_class_t lv_keyboard_class = {
     .editable = 1,
     .base_class = &lv_buttonmatrix_class,
     .name = "lv_keyboard",
-#if LV_USE_OBJ_PROPERTY
-    .prop_index_start = LV_PROPERTY_KEYBOARD_START,
-    .prop_index_end = LV_PROPERTY_KEYBOARD_END,
-    .properties = properties,
-    .properties_count = sizeof(properties) / sizeof(properties[0]),
-
-#if LV_USE_OBJ_PROPERTY_NAME
-    .property_names = lv_keyboard_property_names,
-    .names_count = sizeof(lv_keyboard_property_names) / sizeof(lv_property_name_t),
-#endif
-
-#endif
+    LV_PROPERTY_CLASS_FIELDS(keyboard, KEYBOARD)
 };
 
 static const char * const default_kb_map_lc[] = {LV_KEYBOARD_CTRL_BUTTON_MODE_SPECIAL, "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",

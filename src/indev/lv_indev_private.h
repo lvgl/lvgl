@@ -18,6 +18,10 @@ extern "C" {
 #include "lv_indev_scroll.h"
 #include "lv_indev_gesture.h"
 
+#if LV_USE_EXT_DATA
+#include "../lvgl_private.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +32,9 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t {
+#if LV_USE_EXT_DATA
+    lv_ext_data_t ext_data;
+#endif
     /** Input device type*/
     lv_indev_type_t type;
 
@@ -92,7 +99,6 @@ struct _lv_indev_t {
         lv_point_t scroll_throw_vect;
         lv_point_t scroll_throw_vect_ori;
         lv_obj_t * act_obj;      /*The object being pressed*/
-        lv_obj_t * last_obj;     /*The last object which was pressed*/
         lv_obj_t * scroll_obj;   /*The object being scrolled*/
         lv_obj_t * last_pressed; /*The lastly pressed object*/
         lv_obj_t * last_hovered; /*The lastly hovered object*/

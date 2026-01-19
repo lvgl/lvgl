@@ -64,15 +64,24 @@ lv_opengl_shader_program_t * lv_opengl_shader_program_create(unsigned int _progr
 void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
 {
 #ifndef __EMSCRIPTEN__
-    GLuint shader_names[10];
-    GLsizei shader_count;
-    GL_CALL(glGetAttachedShaders(program->id, 10, &shader_count,
-                                 shader_names));
+    GLint shader_num = 0;
+    GL_CALL(glGetProgramiv(program->id, GL_ATTACHED_SHADERS, &shader_num));
 
-    // Detach and delete each shader
-    for(GLsizei i = 0; i < shader_count; ++i) {
-        if(shader_names[i] != 0)
-            GL_CALL(glDetachShader(program->id, shader_names[i]));
+    if(shader_num > 0) {
+        GLuint * shader_names = lv_malloc(shader_num * sizeof(GLuint));
+
+        if(shader_names) {
+            GLsizei shader_count;
+            GL_CALL(glGetAttachedShaders(program->id, shader_num, &shader_count,
+                                         shader_names));
+
+            // Detach and delete each shader
+            for(GLsizei i = 0; i < shader_count && i < shader_num; ++i) {
+                if(shader_names[i] != 0)
+                    GL_CALL(glDetachShader(program->id, shader_names[i]));
+            }
+            lv_free(shader_names);
+        }
     }
 #endif
 
@@ -89,7 +98,7 @@ void lv_opengl_shader_program_destroy(lv_opengl_shader_program_t * program)
      * when it shuts down. */
 
     /* GL_CALL(glDeleteProgram(program->id)); */
-
+    lv_free(program);
 }
 
 GLuint lv_opengl_shader_program_get_id(lv_opengl_shader_program_t * program)

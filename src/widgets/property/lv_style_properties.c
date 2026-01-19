@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[121] = {
+const lv_property_name_t lv_style_property_names[130] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -40,6 +40,9 @@ const lv_property_name_t lv_style_property_names[121] = {
     {"bg_opa",                 LV_PROPERTY_STYLE_BG_OPA,},
     {"bitmap_mask_src",        LV_PROPERTY_STYLE_BITMAP_MASK_SRC,},
     {"blend_mode",             LV_PROPERTY_STYLE_BLEND_MODE,},
+    {"blur_backdrop",          LV_PROPERTY_STYLE_BLUR_BACKDROP,},
+    {"blur_quality",           LV_PROPERTY_STYLE_BLUR_QUALITY,},
+    {"blur_radius",            LV_PROPERTY_STYLE_BLUR_RADIUS,},
     {"border_color",           LV_PROPERTY_STYLE_BORDER_COLOR,},
     {"border_opa",             LV_PROPERTY_STYLE_BORDER_OPA,},
     {"border_post",            LV_PROPERTY_STYLE_BORDER_POST,},
@@ -48,6 +51,12 @@ const lv_property_name_t lv_style_property_names[121] = {
     {"clip_corner",            LV_PROPERTY_STYLE_CLIP_CORNER,},
     {"color_filter_dsc",       LV_PROPERTY_STYLE_COLOR_FILTER_DSC,},
     {"color_filter_opa",       LV_PROPERTY_STYLE_COLOR_FILTER_OPA,},
+    {"drop_shadow_color",      LV_PROPERTY_STYLE_DROP_SHADOW_COLOR,},
+    {"drop_shadow_offset_x",   LV_PROPERTY_STYLE_DROP_SHADOW_OFFSET_X,},
+    {"drop_shadow_offset_y",   LV_PROPERTY_STYLE_DROP_SHADOW_OFFSET_Y,},
+    {"drop_shadow_opa",        LV_PROPERTY_STYLE_DROP_SHADOW_OPA,},
+    {"drop_shadow_quality",    LV_PROPERTY_STYLE_DROP_SHADOW_QUALITY,},
+    {"drop_shadow_radius",     LV_PROPERTY_STYLE_DROP_SHADOW_RADIUS,},
     {"flex_cross_place",       LV_PROPERTY_STYLE_FLEX_CROSS_PLACE,},
     {"flex_flow",              LV_PROPERTY_STYLE_FLEX_FLOW,},
     {"flex_grow",              LV_PROPERTY_STYLE_FLEX_GROW,},

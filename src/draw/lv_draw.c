@@ -462,6 +462,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->color_format = color_format;
 
     if(disp->layer_init) disp->layer_init(disp, layer);
+    lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_CREATED, layer);
 
     if(disp->layer_head) {
         lv_layer_t * tail = disp->layer_head;
@@ -537,6 +538,41 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
     *area = t->area;
 }
 
+lv_layer_t * lv_draw_layer_create_drop_shadow(lv_layer_t * parent_layer, const lv_draw_dsc_base_t * base,
+                                              const lv_area_t * area)
+{
+    lv_area_t drop_shadow_area = *area;
+    int32_t blur_radius = base->drop_shadow_blur_radius;
+
+    /* x2 to have some extra space for cleaner blurring */
+    lv_area_increase(&drop_shadow_area, blur_radius * 2, blur_radius * 2);
+
+    lv_layer_t * ds_layer = lv_draw_layer_create(parent_layer, LV_COLOR_FORMAT_A8, &drop_shadow_area);
+    if(ds_layer == NULL) {
+        LV_LOG_WARN("Failed to create a layer for the drop shadow");
+    }
+    return ds_layer;
+}
+
+void lv_draw_layer_finish_drop_shadow(lv_layer_t * drop_shadow_layer, const lv_draw_dsc_base_t * base)
+{
+    lv_area_t drop_shadow_area = drop_shadow_layer->buf_area;
+    lv_draw_blur_dsc_t blur_dsc;
+    lv_draw_blur_dsc_init(&blur_dsc);
+    blur_dsc.blur_radius = base->drop_shadow_blur_radius;
+    blur_dsc.quality = base->drop_shadow_quality;
+    lv_draw_blur(drop_shadow_layer, &blur_dsc, &drop_shadow_layer->buf_area);
+
+    lv_area_move(&drop_shadow_area, base->drop_shadow_ofs_x, base->drop_shadow_ofs_y);
+
+    lv_draw_image_dsc_t layer_draw_dsc;
+    lv_draw_image_dsc_init(&layer_draw_dsc);
+    layer_draw_dsc.src = drop_shadow_layer;
+    layer_draw_dsc.recolor = base->drop_shadow_color;
+    layer_draw_dsc.opa = base->drop_shadow_opa;
+    lv_draw_layer(drop_shadow_layer->parent, &layer_draw_dsc, &drop_shadow_area);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -605,6 +641,8 @@ static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
             return sizeof(lv_draw_arc_dsc_t);
         case LV_DRAW_TASK_TYPE_TRIANGLE:
             return sizeof(lv_draw_triangle_dsc_t);
+        case LV_DRAW_TASK_TYPE_BLUR:
+            return sizeof(lv_draw_blur_dsc_t);
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
             return sizeof(lv_draw_mask_rect_dsc_t);
 
@@ -667,6 +705,7 @@ static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
                 l2 = l2->next;
             }
 
+            lv_draw_unit_send_event(NULL, LV_EVENT_CHILD_DELETED, layer_drawn);
             if(disp->layer_deinit) {
                 LV_PROFILER_DRAW_BEGIN_TAG("layer_deinit");
                 disp->layer_deinit(disp, layer_drawn);

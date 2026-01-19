@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_BUTTONMATRIX != 0
 
 #include "../../core/lv_obj.h"
+#include "../../core/lv_obj_property.h"
 
 /*********************
  *      DEFINES
@@ -66,6 +67,14 @@ typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_i
                                                  const lv_area_t * clip_area);
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_buttonmatrix_class;
+
+#if LV_USE_OBJ_PROPERTY
+enum _lv_property_buttonmatrix_id_t {
+    LV_PROPERTY_ID(BUTTONMATRIX, SELECTED_BUTTON, LV_PROPERTY_TYPE_INT, 0),
+    LV_PROPERTY_ID(BUTTONMATRIX, ONE_CHECKED,     LV_PROPERTY_TYPE_BOOL, 1),
+    LV_PROPERTY_BUTTONMATRIX_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -69,6 +69,11 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 static int32_t lv_obj_get_width_with_margin(const lv_obj_t * obj);
 static int32_t lv_obj_get_height_with_margin(const lv_obj_t * obj);
 
+static inline int32_t div_round_closest(int32_t dividend, int32_t divisor)
+{
+    return (dividend + divisor / 2) / divisor;
+}
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -441,13 +446,11 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 grow_max_size -= t->grow_dsc[i].final_size;
             }
         }
-        int32_t grow_unit;
 
         for(i = 0; i < t->grow_item_cnt; i++) {
             if(t->grow_dsc[i].clamped == 0) {
                 LV_ASSERT(grow_value_sum != 0);
-                grow_unit = grow_max_size / grow_value_sum;
-                int32_t size = grow_unit * t->grow_dsc[i].grow_value;
+                int32_t size = div_round_closest(grow_max_size * t->grow_dsc[i].grow_value, grow_value_sum);
                 int32_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
 
                 if(size_clamp != size) {

@@ -27,7 +27,7 @@ jobs:
           - scripts/perf/tests/serialize_results/test.sh
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Check Script
@@ -53,7 +53,7 @@ jobs:
           config : lv_conf_perf64b
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Generate lv_conf.h
@@ -79,7 +79,7 @@ jobs:
           sudo cat $(docker inspect --format='{{.LogPath}}' so3-lvperf) | python scripts/perf/filter_docker_benchmark_logs.py results-${{matrix.image_type}}-${{matrix.config}}.json
 
       - name: Upload Results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: results-${{matrix.image_type}}-${{matrix.config}}
           path: results-${{matrix.image_type}}-${{matrix.config}}.json
@@ -96,7 +96,7 @@ jobs:
           echo ${{ github.event.number }} > pr_number
 
       - name: Upload PR number as artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pr_number
           path: pr_number

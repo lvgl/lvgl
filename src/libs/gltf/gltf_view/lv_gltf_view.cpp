@@ -49,12 +49,12 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_gltf_view_state_init(lv_gltf_t * state);
 static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * state);
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
-static void destroy_environment(lv_gltf_environment_t * env);
 static void setup_compile_and_load_bg_shader(lv_opengl_shader_manager_t * manager);
 static void setup_background_environment(GLuint program, GLuint * vao, GLuint * indexBuffer, GLuint * vertexBuffer);
 
 static lv_result_t create_default_environment(lv_gltf_t * gltf);
 
+static void display_refr_end_event_cb(lv_event_t * e);
 
 const lv_obj_class_t lv_gltf_class = {
     &lv_3dtexture_class,
@@ -83,6 +83,12 @@ const lv_obj_class_t lv_gltf_class = {
  *  STATIC VARIABLES
  **********************/
 
+static const lv_opengl_glsl_version_t GLSL_VERSIONS[] = {
+    LV_OPENGL_GLSL_VERSION_300ES,
+    LV_OPENGL_GLSL_VERSION_330,
+};
+static const size_t GLSL_VERSION_COUNT = sizeof(GLSL_VERSIONS) / sizeof(GLSL_VERSIONS[0]);
+
 /**********************
  *      MACROS
  **********************/
@@ -95,6 +101,9 @@ lv_obj_t * lv_gltf_create(lv_obj_t * parent)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
+    LV_ASSERT_NULL(disp);
+    lv_display_add_event_cb(disp, display_refr_end_event_cb, LV_EVENT_REFR_READY, obj);
     return obj;
 }
 
@@ -507,8 +516,8 @@ lv_3dray_t lv_gltf_get_ray_from_2d_coordinate(lv_obj_t * obj, const lv_point_t *
     return outray;
 }
 
-lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
-                                             lv_3dpoint_t * collision_point)
+lv_result_t lv_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3dplane_t * plane,
+                                        lv_3dpoint_t * collision_point)
 {
     fastgltf::math::fvec3 plane_center = fastgltf::math::fvec3(plane->origin.x, plane->origin.y, plane->origin.z);
     fastgltf::math::fvec3 plane_normal = fastgltf::math::fvec3(plane->direction.x, plane->direction.y, plane->direction.z);
@@ -529,14 +538,6 @@ lv_result_t lv_gltf_intersect_ray_with_plane(const lv_3dray_t * ray, const lv_3d
         }
     }
     return LV_RESULT_INVALID; /* No intersection */
-}
-
-lv_3dplane_t lv_gltf_get_ground_plane(float elevation)
-{
-    lv_3dplane_t outplane = {0};
-    outplane.origin = {0.0f, elevation, 0.0f};
-    outplane.direction = {0.0f, 1.0f, 0.0f};
-    return outplane;
 }
 
 lv_3dplane_t lv_gltf_get_current_view_plane(lv_obj_t * obj, float distance)
@@ -594,7 +595,7 @@ static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t *
         return NULL;
     }
     if(lv_array_push_back(&viewer->models, &model) == LV_RESULT_INVALID) {
-        lv_gltf_data_destroy(model);
+        lv_gltf_data_delete(model);
         return NULL;
     }
     model->viewer = viewer;
@@ -653,10 +654,10 @@ static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
     lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
 
     if(code == LV_EVENT_DRAW_MAIN) {
-        lv_obj_t * obj = (lv_obj_t *)lv_event_get_current_target(e);
-        lv_gltf_t * viewer = (lv_gltf_t *)obj;
         GLuint texture_id = lv_gltf_view_render(viewer);
         lv_3dtexture_set_src((lv_obj_t *)&viewer->texture, (lv_3dtexture_id_t)texture_id);
     }
@@ -679,18 +680,22 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
-        lv_gltf_data_destroy(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
+        lv_gltf_data_delete(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
     }
+    lv_array_deinit(&view->models);
     if(view->environment && view->owns_environment) {
         lv_gltf_environment_delete(view->environment);
     }
+    lv_display_t * disp = lv_obj_get_display(obj);
+    LV_ASSERT_NULL(disp);
+    lv_display_remove_event_cb_with_user_data(disp, display_refr_end_event_cb, obj);
 }
 
 static void lv_gltf_view_state_init(lv_gltf_t * view)
 {
     lv_memset(&view->state, 0, sizeof(view->state));
-    view->state.opaque_frame_buffer_width = 256;
-    view->state.opaque_frame_buffer_height = 256;
+    view->state.opaque_frame_buffer_width = LV_GLTF_TRANSMISSION_PASS_SIZE;
+    view->state.opaque_frame_buffer_height = LV_GLTF_TRANSMISSION_PASS_SIZE;
     view->state.material_variant = 0;
     view->state.render_state_ready = false;
     view->state.render_opaque_buffer = false;
@@ -763,10 +768,30 @@ static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
                 lv_gltf_view_shader_injest_discover_defines(&defines, model, &node, &model_primitive);
 
             LV_ASSERT_MSG(result == LV_RESULT_OK, "Couldn't injest shader defines");
-            lv_gltf_compiled_shader_t compiled_shader;
-            compiled_shader.shaderset = lv_gltf_view_shader_compile_program(viewer, (lv_opengl_shader_define_t *)defines.data,
-                                                                            lv_array_size(&defines));
-            compiled_shader.uniforms = lv_gltf_uniform_locations_create(compiled_shader.shaderset.program);
+
+            lv_opengl_shader_params_t frag_shader = {.name = "__MAIN__.frag",
+                                                     .permutations = (lv_opengl_shader_define_t *) defines.data,
+                                                     .permutations_len = lv_array_size(&defines)
+                                                    };
+
+            lv_opengl_shader_params_t vert_shader = {.name = "__MAIN__.vert",
+                                                     .permutations = (lv_opengl_shader_define_t *) defines.data,
+                                                     .permutations_len = lv_array_size(&defines)
+                                                    };
+
+            lv_opengl_shader_program_t * program = lv_opengl_shader_manager_compile_program_best_version(&viewer->shader_manager,
+                                                                                                         &frag_shader,
+                                                                                                         &vert_shader, GLSL_VERSIONS, GLSL_VERSION_COUNT);
+            LV_ASSERT_MSG(program != NULL,
+                          "Failed to link program. This probably means your platform doesn't support a required GLSL version");
+            GLuint program_id = lv_opengl_shader_program_get_id(program);
+            GL_CALL(glUseProgram(program_id));
+
+            lv_gltf_compiled_shader_t compiled_shader = {
+                .uniforms = lv_gltf_uniform_locations_create(program_id),
+                .program = program_id,
+            };
+
             lv_gltf_store_compiled_shader(model, material_index, &compiled_shader);
             const size_t n = lv_array_size(&defines);
             for(size_t i = 0; i < n; ++i) {
@@ -836,4 +861,13 @@ static void setup_background_environment(GLuint program, GLuint * vao, GLuint * 
 }
 
 
+static void display_refr_end_event_cb(lv_event_t * e)
+{
+    lv_gltf_t * viewer = (lv_gltf_t *) lv_event_get_user_data(e);
+    uint32_t model_count = lv_array_size(&viewer->models);
+    for(uint32_t i = 0; i < model_count; ++i) {
+        lv_gltf_model_t * model = *(lv_gltf_model_t **)lv_array_at(&viewer->models, i);
+        lv_gltf_model_send_new_values(model);
+    }
+}
 #endif /*LV_USE_GLTF*/

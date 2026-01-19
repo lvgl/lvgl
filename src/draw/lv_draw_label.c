@@ -106,8 +106,22 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
         LV_LOG_WARN("dsc->font == NULL");
         return;
     }
-
+    if(coords->x1 > coords->x2) {
+        /* Attempting to draw a label too small (negative width), cancel to avoid error */
+        return;
+    }
     LV_PROFILER_DRAW_BEGIN;
+
+    if(dsc->base.drop_shadow_opa) {
+        lv_layer_t * ds_layer = lv_draw_layer_create_drop_shadow(layer, &dsc->base, coords);
+        LV_ASSERT_NULL(ds_layer);
+        lv_draw_label_dsc_t ds_dsc = *dsc;
+        ds_dsc.base.drop_shadow_opa = 0; /*Disable drop shadow so rendering below will render plain label*/
+        lv_draw_label(ds_layer, &ds_dsc, coords);
+        lv_draw_layer_finish_drop_shadow(ds_layer, &dsc->base);
+    }
+
+
     lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LABEL);
 
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
