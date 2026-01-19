@@ -80,7 +80,12 @@ void test_property_is_inherited(void)
     lv_obj_t * svg_img = lv_image_create(lv_screen_active());
     lv_image_set_src(svg_img, &svg_dsc);
     lv_obj_center(svg_img);
-    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.png");
+
+#ifndef NON_AMD64_BUILD
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp64.png");
+#else
+    TEST_ASSERT_EQUAL_SCREENSHOT("svg_02.lp32.png");
+#endif
 }
 
 void testSvgElement(void)
