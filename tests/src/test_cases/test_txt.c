@@ -205,4 +205,29 @@ void test_lv_text_encoded_letter_next_2_should_handle_two_utf8_characters(void)
     TEST_ASSERT_EQUAL_UINT32(2, ofs);           /* Offset after 'é' */
 }
 
+void test_txt_next_line_should_skip_leading_whitespace_after_wrap(void)
+{
+    const lv_font_t * font = LV_FONT_DEFAULT;
+    const char * txt = "aaa bbb";
+
+    /* Calculate width of "aaa" to set max_width just enough for it */
+    lv_text_attributes_t attrs;
+    lv_text_attributes_init(&attrs);
+    attrs.letter_space = 1;
+    attrs.text_flags = LV_TEXT_FLAG_NONE;
+
+    /* Get width of "aaa" (3 chars) */
+    int32_t word_width = lv_text_get_width(txt, 3, font, &attrs);
+
+    /* Set max_width to fit "aaa" but not the trailing space */
+    attrs.max_width = word_width;
+
+    /* Get first line - should be "aaa" */
+    uint32_t line1_end = lv_text_get_next_line(txt, LV_TEXT_LEN_MAX, font, NULL, &attrs);
+
+    /* The next line should start at 'b', not at the space */
+    /* txt[3] is ' ', txt[4] is 'b' */
+    TEST_ASSERT_EQUAL_CHAR('b', txt[line1_end]);
+}
+
 #endif

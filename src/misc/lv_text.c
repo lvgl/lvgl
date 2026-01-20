@@ -408,6 +408,12 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
         }
     }
 
+    /*Skip leading spaces so wrapped lines don't start with whitespace.
+     *Only ASCII space can appear here since LV_TXT_BREAK_CHARS excludes other whitespace.*/
+    while(i < len && txt[i] == ' ') {
+        i++;
+    }
+
     if(used_width != NULL) {
         *used_width = line_w;
     }
