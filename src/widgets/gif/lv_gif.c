@@ -13,7 +13,7 @@
 #include "../../misc/cache/lv_cache.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../widgets/image/lv_image_private.h"
-#include "AnimatedGIF/src/AnimatedGIF.h"
+#include "../../libs/gif/AnimatedGIF.h"
 
 /*********************
  *      DEFINES
