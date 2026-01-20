@@ -252,8 +252,17 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     cf = LV_COLOR_FORMAT_ARGB8888;
 
     scale = LV_FREETYPE_F26DOT6_TO_FLOAT(lv_freetype_outline_get_scale(glyph_dsc->g->resolved_font));
-    w = (int32_t)((float) glyph_dsc->g->box_w + glyph_dsc->outline_stroke_width * 2 * scale);
-    h = (int32_t)((float) glyph_dsc->g->box_h + glyph_dsc->outline_stroke_width * 2 * scale);
+    float w_float = glyph_dsc->g->box_w + glyph_dsc->outline_stroke_width * 2 * scale;
+    float h_float = glyph_dsc->g->box_h + glyph_dsc->outline_stroke_width * 2 * scale;
+    w = (int32_t)(w_float);
+    h = (int32_t)(h_float);
+    if (w_float > w){
+        w += 1;
+    }
+    if (h_float > h){
+        h += 1;
+    }
+
     buf_area.x1 = 0;
     buf_area.y1 = 0;
     lv_area_set_width(&buf_area, w);
@@ -276,8 +285,8 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
     vector_dsc = lv_draw_vector_dsc_create(&layer);
 
-    int32_t offset_x;
-    int32_t offset_y;
+    float offset_x;
+    float offset_y;
 
     offset_x = (int32_t)((float) glyph_dsc->g->ofs_x - glyph_dsc->outline_stroke_width * scale);
     offset_y = (int32_t)((float) glyph_dsc->g->ofs_y - glyph_dsc->outline_stroke_width * scale);
