@@ -785,6 +785,8 @@
 
 #define LV_USE_DROPDOWN   1   /**< Requires: lv_label */
 
+#define LV_USE_FORM       1   /**< Requires: lv_label, lv_textarea */
+
 #define LV_USE_IMAGE      1   /**< Requires: lv_label */
 
 #define LV_USE_IMAGEBUTTON     1

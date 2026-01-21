@@ -2366,6 +2366,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_FORM
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FORM
+            #define LV_USE_FORM CONFIG_LV_USE_FORM
+        #else
+            #define LV_USE_FORM 0
+        #endif
+    #else
+        #define LV_USE_FORM       1   /**< Requires: lv_label, lv_textarea */
+    #endif
+#endif
+
 #ifndef LV_USE_IMAGE
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_IMAGE
