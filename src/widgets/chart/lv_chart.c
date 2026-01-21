@@ -1077,6 +1077,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
             continue;
         }
         line_dsc.color = ser->color;
+        line_dsc.base.drop_shadow_color = ser->color;
 
         int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         int32_t p_act = start_point;
