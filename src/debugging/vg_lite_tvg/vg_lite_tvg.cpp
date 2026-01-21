@@ -935,11 +935,11 @@ extern "C" {
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, matrix));
         if(path->stroke) {
-			TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->cap_style));
-//			TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->dash_pattern, path->stroke->dash_));
-			TVG_CHECK_RETURN_VG_ERROR(shape->stroke(B(path->stroke_color), G(path->stroke_color), R(path->stroke_color), A(path->stroke_color)));
-			TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->line_width));
+            TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->cap_style));
+            TVG_CHECK_RETURN_VG_ERROR(shape->stroke(B(path->stroke_color), G(path->stroke_color), R(path->stroke_color), A(path->stroke_color)));
+            TVG_CHECK_RETURN_VG_ERROR(shape->stroke(path->stroke->line_width));
         }
+
 		TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));

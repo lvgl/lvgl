@@ -371,25 +371,25 @@ static lv_freetype_outline_t outline_create(
     for(int j = 0; j < tag_size; j++) {
 
 #if 0
-    	if(j == 0 && (glyph_outline.tags[j] & 0x1) == 0) {
-    		/* TODO handle the case where the first point is 'off curve' */
-    		https://stackoverflow.com/questions/3465809/how-to-interpret-a-freetype-glyph-outline-when-the-first-point-on-the-contour-is
-    	}
+        if(j == 0 && (glyph_outline.tags[j] & 0x1) == 0) {
+            /* TODO handle the case where the first point is 'off curve'
+            https://stackoverflow.com/questions/3465809/how-to-interpret-a-freetype-glyph-outline-when-the-first-point-on-the-contour-is */
+        }
 #endif
-    	if((glyph_outline.tags[j] & 0x1) == 0x1) {
-    		segments++;
-    		vectors++;
-    	}
-    	else {
-    		int jj = j + 1 < tag_size ? j + 1 : 0;
-    		if(glyph_outline.tags[jj] & 0x1) {
-    			vectors++;
-    		}
-    		else {
-    			segments++;
-    			vectors += 2;
-    		}
-    	}
+        if((glyph_outline.tags[j] & 0x1) == 0x1) {
+            segments++;
+            vectors++;
+        }
+        else {
+            int jj = j + 1 < tag_size ? j + 1 : 0;
+            if(glyph_outline.tags[jj] & 0x1) {
+                vectors++;
+            }
+            else {
+                segments++;
+                vectors += 2;
+            }
+        }
     }
 
     /*Also for every contour we may have a line for close*/
@@ -402,19 +402,19 @@ static lv_freetype_outline_t outline_create(
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&glyph_outline, &outline_funcs, outline);
     if(error) {
-    	FT_ERROR_MSG("FT_Outline_Decompose", error);
-    	outline_delete(ctx, outline);
-    	LV_PROFILER_FONT_END;
-    	return NULL;
+        FT_ERROR_MSG("FT_Outline_Decompose", error);
+        outline_delete(ctx, outline);
+        LV_PROFILER_FONT_END;
+        return NULL;
     }
 
     /* Close the border glyph or the regular glyph */
     res = outline_push_point(outline, LV_FREETYPE_OUTLINE_END, NULL, NULL, NULL);
     if(res != LV_RESULT_OK) {
-    	LV_LOG_ERROR("Outline object close failed");
-    	outline_delete(ctx, outline);
-    	LV_PROFILER_FONT_END;
-    	return NULL;
+        LV_LOG_ERROR("Outline object close failed");
+        outline_delete(ctx, outline);
+        LV_PROFILER_FONT_END;
+        return NULL;
     }
 
     LV_PROFILER_FONT_END;
