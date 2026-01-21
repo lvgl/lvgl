@@ -1208,6 +1208,10 @@ static void draw_series_curve(lv_obj_t * obj, lv_layer_t * layer)
     dashes[1] = lv_obj_get_style_line_dash_gap(obj, LV_PART_ITEMS);
 
     lv_draw_vector_dsc_t * dsc = lv_draw_vector_dsc_create(layer);
+    if(dsc == NULL) {
+        LV_LOG_WARN("Couldn't allocate vector dsc");
+        return;
+    }
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
     dsc->base.id1 = ser_cnt - 1;
     point_dsc_default.base.id1 = dsc->base.id1;
