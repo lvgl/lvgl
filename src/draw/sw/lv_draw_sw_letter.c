@@ -288,8 +288,8 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     float offset_x;
     float offset_y;
 
-    offset_x = (int32_t)((float) glyph_dsc->g->ofs_x - glyph_dsc->outline_stroke_width * scale);
-    offset_y = (int32_t)((float) glyph_dsc->g->ofs_y - glyph_dsc->outline_stroke_width * scale);
+    offset_x = glyph_dsc->g->ofs_x - glyph_dsc->outline_stroke_width * scale;
+    offset_y = glyph_dsc->g->ofs_y - glyph_dsc->outline_stroke_width * scale;
 
     /*Invert Y-Axis - Freetype's origin point is in the bottom left corner*/
     lv_matrix_scale(&matrix, 1, -1);
