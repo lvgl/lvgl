@@ -47,11 +47,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-//typedef struct {
-//    lv_vg_lite_path_t * inside_path;     /*The regular glyph*/
-//    lv_vg_lite_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
-//    lv_vg_lite_path_t * cur_path;
-//} lv_draw_vg_lite_letter_outlines_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -462,7 +457,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     const int32_t stroke_width_scaled = (int32_t)(dsc->outline_stroke_width / scale);
     const lv_point_precise_t p1 = { path_clip_area.x1 - stroke_width_scaled, path_clip_area.y1 - stroke_width_scaled };
     const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
-    const lv_point_precise_t p2 = { path_clip_area.x2 + stroke_width_scaled, path_clip_area.y2 + stroke_width_scaled};
+    const lv_point_precise_t p2 = { path_clip_area.x2 + stroke_width_scaled, path_clip_area.y2 + stroke_width_scaled };
     const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
     if(has_rotation_with_clipped) {
