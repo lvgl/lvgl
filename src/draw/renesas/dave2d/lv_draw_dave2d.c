@@ -19,7 +19,9 @@
 /* The amount of tasks exercising pressure to the current to get finished
  * This one is used as the main signal to start to render a block of tasks.
  */
-#define DAVE2D_MAX_DRAW_PRESSURE    512
+#ifndef DAVE2D_MAX_DRAW_PRESSURE
+    #define DAVE2D_MAX_DRAW_PRESSURE    512
+#endif
 
 #if (DAVE2D_MAX_DRAW_PRESSURE < 256)
     #error "DRAW Pressure should be at least 256 otherwise the Dave engine may crash!"
@@ -70,8 +72,6 @@ static uint32_t draw_pressure = 0;
 #if LV_USE_OS
     lv_mutex_t xd2Semaphore;
 #endif
-
-extern lv_subject_t subject_gpu_enable;
 
 /**********************
  *      MACROS
@@ -247,8 +247,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     LV_UNUSED(u);
     int32_t ret = 0;
 
-    if(lv_subject_get_int(&subject_gpu_enable) == 0) return 0;
-
     lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
 
     if(!lv_draw_dave2d_is_dest_cf_supported(draw_dsc_base->layer->color_format))
@@ -286,7 +284,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                     ret = 0;
                     break;
                 }
-                //                if(lv_area_get_size(&t->area) < 30 * 30) break;
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
