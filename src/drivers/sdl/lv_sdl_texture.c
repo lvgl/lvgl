@@ -72,6 +72,7 @@ static lv_result_t init_display(lv_display_t * display)
                                          LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
     if(!ddata->renderer) {
         LV_LOG_ERROR("Failed to create SDL renderer '%s'", SDL_GetError());
+        lv_free(ddata);
         return LV_RESULT_INVALID;
     }
     lv_sdl_backend_set_display_data(display, ddata);
