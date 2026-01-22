@@ -13,6 +13,13 @@
 
 #include "../../draw/lv_draw_vector.h"
 #include "../lv_matrix.h"
+#include "../lv_area_private.h"
+#include "../lv_assert.h"
+
+#include "../../draw/lv_draw_vector_private.h"
+#include "../../draw/sw/blend/lv_draw_sw_blend_private.h"
+#include "../../draw/sw/blend/lv_draw_sw_blend_to_argb8888.h"
+
 
 #if LV_USE_THORVG_EXTERNAL
     #include <thorvg.h>
@@ -38,6 +45,11 @@ using namespace tvg;
  *      TYPEDEFS
  **********************/
 
+class LvCanvas;
+struct LvSurface;
+struct LvCompositor;
+class LvRenderer;
+
 class LvCanvas : public Canvas
 {
     public:
@@ -47,15 +59,30 @@ class LvCanvas : public Canvas
         Result target(uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t h);
 };
 
+struct LvSurface
+{
+    LvCompositor * compositor;
+    BlendMethod blend_method_tvg;
+    lv_vector_blend_t blend_method;
+    lv_layer_t * layer;
+};
+
+struct LvCompositor : RenderCompositor
+{
+    LvSurface * surf_prev;
+    LvCompositor * comp_prev;
+    lv_layer_t layer;
+};
+
 class LvRenderer : public RenderMethod
 {
     public:
         RenderRegion m_vport;
         lv_draw_buf_t m_draw_buf;
-        lv_layer_t m_layer;
         lv_display_t * m_disp;
-        BlendMethod m_blend_method_tvg;
-        lv_vector_blend_t m_blend_method;
+        LvSurface * m_surface;
+        LvSurface m_root_surface;
+        lv_layer_t m_root_layer;
 
         LvRenderer(lv_display_t * disp);
         ~LvRenderer();
@@ -89,7 +116,7 @@ class LvRenderer : public RenderMethod
         bool effect(RenderCompositor * cmp, const RenderEffect * effect) override;
 
     private:
-        void finish_layer();
+        void finish_layer(lv_layer_t * layer);
 };
 
 /**********************
@@ -100,6 +127,17 @@ static void lvmat_from_tvgmat(lv_matrix_t * dst, const Matrix * src);
 static float path_length(const RenderShape & rshape);
 static Point line_at(const Line & line, float at);
 static lv_grad_stop_t * lvstops_from_tvgstops(const Fill::ColorStop * stops_tvg, uint32_t cnt);
+static void invert_alpha(lv_opa_t * data, uint32_t w, uint32_t h, uint32_t stride);
+static void argb8888_to_a8(const lv_draw_sw_blend_image_dsc_t * dsc);
+static void blend_image_to_a8(const lv_draw_sw_blend_image_dsc_t * dsc);
+static void a8_to_argb8888(const lv_draw_sw_blend_image_dsc_t * dsc);
+static void blend_image_from_a8(const lv_draw_sw_blend_image_dsc_t * dsc);
+static bool blend_img_dsc_prepare(
+    lv_draw_sw_blend_image_dsc_t * dsc,
+    lv_layer_t * dst_layer,
+    lv_layer_t * src_layer,
+    lv_layer_t * mask_layer
+);
 
 /**********************
  *  STATIC VARIABLES
@@ -150,6 +188,11 @@ Result LvCanvas::target(uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t
 
     LvRenderer * renderer = (LvRenderer *) Canvas::pImpl->renderer;
 
+    // if(renderer->m_compositor) {
+    //     LV_LOG_WARN("Not prepared to set a target while the renderer has an active compositor.");
+    //     return Result::InsufficientCondition;
+    // }
+
     renderer->target(buffer, stride, w, h);
     Canvas::pImpl->vport = {0, 0, (int32_t)w, (int32_t)h};
     renderer->viewport(Canvas::pImpl->vport);
@@ -162,9 +205,14 @@ Result LvCanvas::target(uint32_t * buffer, uint32_t stride, uint32_t w, uint32_t
     return Result::Success;
 }
 
-LvRenderer::LvRenderer(lv_display_t * disp) :
-    m_disp(disp)
+LvRenderer::LvRenderer(lv_display_t * disp)
 {
+    m_disp = disp;
+    m_surface = &m_root_surface;
+    m_root_surface.compositor = nullptr;
+    m_root_surface.blend_method_tvg = BlendMethod::Normal;
+    m_root_surface.blend_method = LV_VECTOR_BLEND_SRC_OVER;
+    m_root_surface.layer = &m_root_layer;
 }
 
 LvRenderer::~LvRenderer()
@@ -174,14 +222,15 @@ LvRenderer::~LvRenderer()
 void LvRenderer::target(pixel_t * data, uint32_t stride, uint32_t w, uint32_t h)
 {
     lv_draw_buf_init(&m_draw_buf, w, h, LV_COLOR_FORMAT_ARGB8888, stride * 4, data, stride * 4 * h);
+    lv_draw_buf_clear(&m_draw_buf, NULL);
 
     const lv_area_t area = { 0, 0, (int32_t) w - 1, (int32_t) h - 1 };
-    lv_layer_init(&m_layer);
-    m_layer.draw_buf = &m_draw_buf;
-    m_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
-    m_layer.buf_area = area;
-    m_layer._clip_area = area;
-    m_layer.phy_clip_area = area;
+    lv_layer_init(&m_root_layer);
+    m_root_layer.draw_buf = &m_draw_buf;
+    m_root_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
+    m_root_layer.buf_area = area;
+    m_root_layer._clip_area = area;
+    m_root_layer.phy_clip_area = area;
 }
 
 RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, const Matrix & transform,
@@ -192,11 +241,13 @@ RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, cons
     LV_UNUSED(clipper);
     LV_UNUSED(flags);
 
+    // LV_LOG_USER("prepare");
+
     lv_draw_vector_dsc_t * dsc = (lv_draw_vector_dsc_t *) data;
     if(dsc) {
         lv_draw_vector_dsc_delete(dsc);
     }
-    dsc = lv_draw_vector_dsc_create(&m_layer);
+    dsc = lv_draw_vector_dsc_create(m_surface->layer);
 
     lv_matrix_t mat;
     Matrix mat_tvg;
@@ -215,14 +266,9 @@ RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, cons
                                      rshape.rule == FillRule::EvenOdd ? LV_VECTOR_FILL_EVENODD :
                                      LV_VECTOR_FILL_NONZERO);
 
-    lv_draw_vector_dsc_set_fill_opa(dsc, rshape.color[3]);
-    lv_color_t fill_color;
-    fill_color.red = rshape.color[0];
-    fill_color.green = rshape.color[1];
-    fill_color.blue = rshape.color[2];
-    lv_draw_vector_dsc_set_fill_color(dsc, fill_color);
-
     if(rshape.fill) {
+        lv_draw_vector_dsc_set_fill_opa(dsc, LV_OPA_COVER);
+
         FillSpread spread = rshape.fill->spread();
         lv_draw_vector_dsc_set_fill_gradient_spread(dsc, spread == FillSpread::Pad ? LV_VECTOR_GRADIENT_SPREAD_PAD :
                                                     spread == FillSpread::Reflect ? LV_VECTOR_GRADIENT_SPREAD_REFLECT :
@@ -249,6 +295,14 @@ RenderData LvRenderer::prepare(const RenderShape & rshape, RenderData data, cons
                 lv_draw_vector_dsc_set_fill_radial_gradient(dsc, cx, cy, radius);
             }
         }
+    }
+    else {
+        lv_draw_vector_dsc_set_fill_opa(dsc, rshape.color[3]);
+        lv_color_t fill_color;
+        fill_color.red = rshape.color[0];
+        fill_color.green = rshape.color[1];
+        fill_color.blue = rshape.color[2];
+        lv_draw_vector_dsc_set_fill_color(dsc, fill_color);
     }
 
 
@@ -461,12 +515,20 @@ bool LvRenderer::preRender()
 
 bool LvRenderer::renderShape(RenderData data)
 {
-    if(!data) return false;
+    if(!data) {
+        // LV_LOG_USER("renderShape (null)");
+        return false;
+    }
     lv_draw_vector_dsc_t * dsc = (lv_draw_vector_dsc_t *) data;
+    // lv_color32_t col = dsc->ctx->fill_dsc.color;
+    // LV_LOG_USER("renderShape %p %d %d %d %d", dsc, col.red, col.green, col.blue, col.alpha);
 
-    lv_draw_vector_dsc_set_blend_mode(dsc, m_blend_method);
+    dsc->base.layer = m_surface->layer;
+    lv_draw_vector_dsc_set_blend_mode(dsc, m_surface->blend_method);
 
     lv_draw_vector(dsc);
+
+    finish_layer(m_surface->layer);
 
     return true;
 }
@@ -506,13 +568,13 @@ bool LvRenderer::viewport(const RenderRegion & vp)
 
 bool LvRenderer::blend(BlendMethod method)
 {
-    if(method == m_blend_method_tvg) return true;
-    m_blend_method_tvg = method;
+    if(method == m_surface->blend_method_tvg) return true;
+    m_surface->blend_method_tvg = method;
 
-    if(method == BlendMethod::Multiply) m_blend_method = LV_VECTOR_BLEND_MULTIPLY;
-    else if(method == BlendMethod::Screen) m_blend_method = LV_VECTOR_BLEND_SCREEN;
-    else if(method == BlendMethod::Add) m_blend_method = LV_VECTOR_BLEND_ADDITIVE;
-    else m_blend_method = LV_VECTOR_BLEND_SRC_OVER;
+    if(method == BlendMethod::Multiply) m_surface->blend_method = LV_VECTOR_BLEND_MULTIPLY;
+    else if(method == BlendMethod::Screen) m_surface->blend_method = LV_VECTOR_BLEND_SCREEN;
+    else if(method == BlendMethod::Add) m_surface->blend_method = LV_VECTOR_BLEND_ADDITIVE;
+    else m_surface->blend_method = LV_VECTOR_BLEND_SRC_OVER;
 
     return false;
 }
@@ -534,23 +596,180 @@ bool LvRenderer::clear()
 
 bool LvRenderer::sync()
 {
-    finish_layer();
+    // if(m_compositor) {
+    //     LV_LOG_WARN("Was not expecting there to be an unfinished composition at sync");
+    // }
+    finish_layer(m_root_surface.layer);
     return true;
 }
 
 RenderCompositor * LvRenderer::target(const RenderRegion & region, ColorSpace cs)
 {
-    return nullptr;
+    lv_color_format_t cf;
+    switch(cs) {
+        case ColorSpace::ARGB8888:
+            cf = LV_COLOR_FORMAT_ARGB8888;
+            // LV_LOG_USER("target ARGB8888 %d %d", region.w, region.h);
+            break;
+        case ColorSpace::Grayscale8:
+            cf = LV_COLOR_FORMAT_A8;
+            // LV_LOG_USER("target A8 %d %d", region.w, region.h);
+            break;
+        default:
+            // LV_LOG_USER("target ??? %d %d", region.w, region.h);
+            return nullptr;
+    }
+
+    lv_area_t area;
+    area.x1 = region.x;
+    area.y1 = region.y;
+    lv_area_set_width(&area, region.w);
+    lv_area_set_height(&area, region.h);
+
+    if(!lv_area_intersect(&area, &area, &m_surface->layer->buf_area)) {
+        return nullptr;
+    }
+
+    LvSurface * surf = new LvSurface;
+    surf->compositor = new LvCompositor;
+    surf->compositor->surf_prev = m_surface;
+    surf->compositor->comp_prev = m_surface->compositor;
+    lv_layer_init(&surf->compositor->layer);
+    surf->compositor->layer.color_format = cf;
+    surf->compositor->layer.buf_area = area;
+    surf->compositor->layer._clip_area = area;
+    surf->compositor->layer.phy_clip_area = area;
+    surf->compositor->layer.draw_buf = lv_draw_buf_create(lv_area_get_width(&area),
+                                                          lv_area_get_height(&area),
+                                                          cf, 0);
+    lv_draw_buf_clear(surf->compositor->layer.draw_buf, NULL);
+    surf->blend_method_tvg = BlendMethod::Normal;
+    surf->blend_method = LV_VECTOR_BLEND_SRC_OVER;
+    surf->layer = &surf->compositor->layer;
+
+    m_surface = surf;
+
+    return surf->compositor;
 }
 
 bool LvRenderer::beginComposite(RenderCompositor * cmp, CompositeMethod method, uint8_t opacity)
 {
-    return false;
+    // LV_LOG_USER("beginComposite %p %d %d", cmp, (int) method, (int) opacity);
+    if(!cmp) return false;
+    LvCompositor * comp = (LvCompositor *) cmp;
+
+    comp->method = method;
+    comp->opacity = opacity;
+
+    if (comp->method != CompositeMethod::None) {
+        m_surface = comp->surf_prev;
+        m_surface->compositor = comp;
+    }
+
+    return true;
 }
 
 bool LvRenderer::endComposite(RenderCompositor * cmp)
 {
-    return false;
+    LvCompositor * comp = (LvCompositor *) cmp;
+    // LV_LOG_USER("endComposite %p", cmp);
+
+    m_surface = comp->surf_prev;
+    m_surface->compositor = comp->comp_prev;
+
+    if (comp->method == CompositeMethod::None) {
+        lv_layer_t * mask_layer = m_surface->compositor
+                                  && m_surface->compositor->layer.color_format == LV_COLOR_FORMAT_A8
+                                  ? &m_surface->compositor->layer : NULL;
+
+        finish_layer(m_surface->layer);
+        if(mask_layer) finish_layer(mask_layer);
+        finish_layer(&comp->layer);
+
+        lv_draw_sw_blend_image_dsc_t dsc;
+        lv_memzero(&dsc, sizeof(dsc));
+        dsc.opa = comp->opacity;
+        lv_draw_layer_alloc_buf(m_surface->layer);
+        lv_draw_layer_alloc_buf(&comp->layer);
+        if(mask_layer) lv_draw_layer_alloc_buf(mask_layer);
+        blend_img_dsc_prepare(&dsc, m_surface->layer, &comp->layer, mask_layer);
+        if(mask_layer && m_surface->compositor->method == CompositeMethod::InvAlphaMask) {
+            invert_alpha(
+                (lv_opa_t *) dsc.mask_buf,
+                dsc.dest_w,
+                dsc.dest_h,
+                dsc.mask_stride
+            );
+        }
+
+        // lv_draw_layer_alloc_buf(m_surface->layer);
+        // dsc.dest_buf = m_surface->layer->draw_buf->data;
+        // dsc.dest_w = m_surface->layer->draw_buf->header.w;
+        // dsc.dest_h = m_surface->layer->draw_buf->header.h;
+        // dsc.dest_stride = m_surface->layer->draw_buf->header.stride;
+        // if(mask_layer) {
+        //     lv_draw_layer_alloc_buf(mask_layer);
+        //     dsc.mask_buf = mask_layer->draw_buf->data;
+        //     dsc.mask_stride = mask_layer->draw_buf->header.stride;
+
+        //     if(m_surface->compositor->method == CompositeMethod::InvAlphaMask) {
+        //         invert_alpha(
+        //             mask_layer->draw_buf->data,
+        //             mask_layer->draw_buf->header.w,
+        //             mask_layer->draw_buf->header.h,
+        //             mask_layer->draw_buf->header.stride
+        //         );
+        //     }
+        // }
+        // dsc.src_buf = comp->layer.draw_buf->data;
+        // dsc.src_stride = comp->layer.draw_buf->header.stride;
+        // dsc.src_color_format = comp->layer.color_format;
+        // dsc.opa = comp->opacity;
+        // // dsc.blend_mode = 
+        // dsc.src_area = comp->layer.buf_area;
+
+        if(m_surface->layer->color_format == LV_COLOR_FORMAT_A8) {
+            blend_image_to_a8(&dsc);
+        }
+        else if(dsc.src_color_format == LV_COLOR_FORMAT_A8) {
+            blend_image_from_a8(&dsc);
+        }
+        else {
+            lv_draw_sw_blend_image_to_argb8888(&dsc);
+        }
+
+        if(mask_layer && m_surface->compositor->method == CompositeMethod::InvAlphaMask) {
+            invert_alpha(
+                (lv_opa_t *) dsc.mask_buf,
+                dsc.dest_w,
+                dsc.dest_h,
+                dsc.mask_stride
+            );
+        }
+
+        // if(mask_layer) {
+        //     if(m_surface->compositor->method == CompositeMethod::InvAlphaMask) {
+        //         invert_alpha(
+        //             mask_layer->draw_buf->data,
+        //             mask_layer->draw_buf->header.w,
+        //             mask_layer->draw_buf->header.h,
+        //             mask_layer->draw_buf->header.stride
+        //         );
+        //     }
+        // }
+
+        // lv_draw_image_dsc_init(&dsc);
+        // dsc.src = &comp->layer;
+        // dsc.bitmap_mask_src = (lv_image_dsc_t *)((LvCompositor *) m_layer_act->user_data)->layer.draw_buf;
+        // comp->layer.parent = m_layer_act;
+        // lv_draw_layer(m_layer_act, &dsc, &comp->layer.buf_area);
+        // finish_layer(m_layer_act);
+    }
+
+    lv_draw_buf_destroy(comp->layer.draw_buf);
+    delete comp;
+
+    return true;
 }
 
 
@@ -564,15 +783,11 @@ bool LvRenderer::effect(RenderCompositor * cmp, const RenderEffect * effect)
     return false;
 }
 
-void LvRenderer::finish_layer()
+void LvRenderer::finish_layer(lv_layer_t * layer)
 {
-    if(m_layer.draw_task_head == NULL) return;
-
-    bool task_dispatched;
-
-    while(m_layer.draw_task_head) {
+    while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        task_dispatched = lv_draw_dispatch_layer(m_disp, &m_layer);
+        bool task_dispatched = lv_draw_dispatch_layer(m_disp, layer);
 
         if(!task_dispatched) {
             lv_draw_wait_for_finish();
@@ -651,6 +866,155 @@ static lv_grad_stop_t * lvstops_from_tvgstops(const Fill::ColorStop * stops_tvg,
         stops[i].opa = stops_tvg[i].a;
     }
     return stops;
+}
+
+static void invert_alpha(lv_opa_t * data, uint32_t w, uint32_t h, uint32_t stride)
+{
+    lv_opa_t * row = data;
+
+    for(uint32_t y = 0; y < h; y++) {
+        for(uint32_t x = 0; x < w; x++) {
+            row[x] = 255 - row[x];
+        }
+
+        row += stride;
+    }
+}
+
+static void argb8888_to_a8(const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    const int32_t h = dsc->dest_h;
+    const int32_t w = dsc->dest_w;
+    const int32_t src_stride = dsc->src_stride;
+    const int32_t dst_stride = dsc->dest_stride;
+
+    const lv_color32_t * src_p = (const lv_color32_t *) dsc->src_buf;
+    lv_opa_t * dst_p = (lv_opa_t *) dsc->dest_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        for(int32_t x = 0; x < w; x++) {
+            dst_p[x] = src_p[x].alpha;
+        }
+
+        src_p += src_stride / 4;
+        dst_p += dst_stride;
+    }
+}
+
+static void blend_image_to_a8(const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    if(dsc->mask_buf == NULL) {
+        argb8888_to_a8(dsc);
+        return;
+    }
+
+    const int32_t h = dsc->dest_h;
+    const int32_t w = dsc->dest_w;
+    const int32_t src_stride = dsc->src_stride;
+    const int32_t dst_stride = dsc->dest_stride;
+    const int32_t mask_stride = dsc->mask_stride;
+
+    const lv_color32_t * src_p = (const lv_color32_t *) dsc->src_buf;
+    lv_opa_t * dst_p = (lv_opa_t *) dsc->dest_buf;
+    const lv_opa_t * mask_p = (lv_opa_t *) dsc->mask_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        for(int32_t x = 0; x < w; x++) {
+            dst_p[x] = LV_OPA_MIX2(src_p[x].alpha, mask_p[x]);
+        }
+
+        src_p += src_stride / 4;
+        dst_p += dst_stride;
+        mask_p += mask_stride;
+    }
+}
+
+static void a8_to_argb8888(const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    const int32_t h = dsc->dest_h;
+    const int32_t w = dsc->dest_w;
+    const int32_t src_stride = dsc->src_stride;
+    const int32_t dst_stride = dsc->dest_stride;
+
+    const lv_opa_t * src_p = (const lv_opa_t *) dsc->src_buf;
+    lv_color32_t * dst_p = (lv_color32_t *) dsc->dest_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        for(int32_t x = 0; x < w; x++) {
+            dst_p[x].alpha = src_p[x];
+        }
+
+        src_p += src_stride;
+        dst_p += dst_stride / 4;
+    }
+}
+
+static void blend_image_from_a8(const lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    if(dsc->mask_buf == NULL) {
+        a8_to_argb8888(dsc);
+        return;
+    }
+
+    const int32_t h = dsc->dest_h;
+    const int32_t w = dsc->dest_w;
+    const int32_t src_stride = dsc->src_stride;
+    const int32_t dst_stride = dsc->dest_stride;
+    const int32_t mask_stride = dsc->mask_stride;
+
+    const lv_opa_t * src_p = (const lv_opa_t *) dsc->src_buf;
+    lv_color32_t * dst_p = (lv_color32_t *) dsc->dest_buf;
+    const lv_opa_t * mask_p = (lv_opa_t *) dsc->mask_buf;
+
+    for(int32_t y = 0; y < h; y++) {
+        for(int32_t x = 0; x < w; x++) {
+            dst_p[x].alpha = LV_OPA_MIX2(src_p[x], mask_p[x]);
+        }
+
+        src_p += src_stride;
+        dst_p += dst_stride / 4;
+        mask_p += mask_stride;
+    }
+}
+
+static bool blend_img_dsc_prepare(
+    lv_draw_sw_blend_image_dsc_t * dsc,
+    lv_layer_t * dst_layer,
+    lv_layer_t * src_layer,
+    lv_layer_t * mask_layer
+)
+{
+    lv_area_t area;
+    if(!lv_area_intersect(&area, &dst_layer->buf_area, &src_layer->buf_area)) {
+        return false;
+    }
+    if(mask_layer) {
+        if(!lv_area_intersect(&area, &area, &mask_layer->buf_area)) {
+            return false;
+        }
+    }
+
+    dsc->dest_w = lv_area_get_width(&area);
+    dsc->dest_h = lv_area_get_height(&area);
+    dsc->dest_buf = lv_draw_layer_go_to_xy(dst_layer, area.x1 - dst_layer->buf_area.x1, area.y1 - dst_layer->buf_area.y1);
+    dsc->dest_stride = dst_layer->draw_buf->header.stride
+                       + (lv_color_format_get_size(dst_layer->color_format)
+                          * (lv_area_get_width(&dst_layer->buf_area)
+                             - lv_area_get_width(&area)));
+    dsc->src_buf = lv_draw_layer_go_to_xy(src_layer, area.x1 - src_layer->buf_area.x1, area.y1 - src_layer->buf_area.y1);
+    dsc->src_stride = src_layer->draw_buf->header.stride;
+                    //   + (lv_color_format_get_size(src_layer->color_format)
+                    //      * (lv_area_get_width(&src_layer->buf_area)
+                    //         - lv_area_get_width(&area)));
+    dsc->src_color_format = src_layer->color_format;
+    if(mask_layer) {
+        dsc->mask_buf = (lv_opa_t *) lv_draw_layer_go_to_xy(mask_layer, area.x1 - mask_layer->buf_area.x1, area.y1 - mask_layer->buf_area.y1);
+        dsc->mask_stride = mask_layer->draw_buf->header.stride;
+                        //    + (lv_area_get_width(&dst_layer->buf_area)
+                        //       - lv_area_get_width(&area));
+    }
+
+    return true;
 }
 
 #endif /* LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL */
