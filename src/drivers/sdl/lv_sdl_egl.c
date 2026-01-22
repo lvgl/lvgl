@@ -172,7 +172,7 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     native_window = wmInfo.info.wl.surface;
 #else
     LV_LOG_ERROR("Unsupported platform for EGL");
-    return false;
+    return NULL;
 #endif
     return (void *)native_window;
 }
