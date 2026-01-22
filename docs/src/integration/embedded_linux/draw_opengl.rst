@@ -54,6 +54,8 @@ Enable in lv_conf.h
 
 .. code-block:: c
 
+    #define LV_USE_OPENGLES 1
+
     #define LV_USE_DRAW_OPENGLES 1
 
     /* Configurable cache count. Bigger cache will improve performance */
