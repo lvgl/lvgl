@@ -13,6 +13,7 @@
 #include <SDL2/SDL_syswm.h>
 #include "lv_sdl_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
+#include "../opengles/lv_opengles_driver.h"
 #include "../../draw/lv_draw_buf.h"
 
 /*********************
@@ -83,13 +84,15 @@ static lv_result_t init_display(lv_display_t * display)
         return LV_RESULT_INVALID;
     }
 
+    lv_sdl_backend_set_display_data(display, ddata);
+
     if(LV_USE_DRAW_NANOVG) {
         static lv_draw_buf_t draw_buf;
         static uint8_t dummy_buf;
         lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
 
         lv_display_set_draw_buffers(display, &draw_buf, NULL);
-        lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+        lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
     }
     else {
         lv_result_t res = resize_display(display);
@@ -97,12 +100,13 @@ static lv_result_t init_display(lv_display_t * display)
             LV_LOG_ERROR("Failed to create draw buffers");
             lv_opengles_egl_context_destroy(ddata->egl_ctx);
             lv_free(ddata);
+            lv_sdl_backend_set_display_data(display, NULL);
             return LV_RESULT_INVALID;
         }
+        lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
     }
     lv_display_set_flush_cb(display, flush_cb);
 
-    lv_sdl_backend_set_display_data(display, ddata);
     return LV_RESULT_OK;
 
 }
