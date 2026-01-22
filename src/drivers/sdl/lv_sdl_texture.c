@@ -82,7 +82,7 @@ static lv_result_t init_display(lv_display_t * display)
     lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
 
     lv_display_set_draw_buffers(display, &draw_buf, NULL);
-    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_set_flush_cb(display, flush_cb);
     return LV_RESULT_OK;
 }
