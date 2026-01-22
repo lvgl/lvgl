@@ -117,11 +117,6 @@ static const lv_property_ops_t lv_textarea_properties[] = {
         .getter = lv_textarea_get_max_length,
     },
     {
-        .id = LV_PROPERTY_TEXTAREA_INSERT_REPLACE,
-        .setter = lv_textarea_set_insert_replace,
-        .getter = NULL,
-    },
-    {
         .id = LV_PROPERTY_TEXTAREA_TEXT_SELECTION,
         .setter = lv_textarea_set_text_selection,
         .getter = lv_textarea_get_text_selection,

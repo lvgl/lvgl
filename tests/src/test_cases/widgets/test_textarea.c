@@ -219,11 +219,6 @@ void test_textarea_properties(void)
     TEST_ASSERT_EQUAL_INT(10, lv_textarea_get_max_length(obj));
     TEST_ASSERT_EQUAL_INT(10, lv_obj_get_property(obj, LV_PROPERTY_TEXTAREA_MAX_LENGTH).num);
 
-    prop.id = LV_PROPERTY_TEXTAREA_INSERT_REPLACE;
-    prop.ptr = "abcdef";
-    /*No getter function for this property*/
-    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-
     prop.id = LV_PROPERTY_TEXTAREA_TEXT_SELECTION;
     prop.num = true;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
