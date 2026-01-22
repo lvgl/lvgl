@@ -10,10 +10,10 @@
 
 #if LV_SDL_USE_EGL
 
-#include "../../display/lv_display_private.h"
 #include <SDL2/SDL_syswm.h>
 #include "lv_sdl_private.h"
 #include "../opengles/lv_opengles_egl_private.h"
+#include "../../draw/lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -22,6 +22,10 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_opengles_egl_t * egl_ctx;
+    lv_opengles_texture_t opengles_texture;
+} lv_sdl_egl_display_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -32,6 +36,21 @@ static void destroy_window_cb(void * driver_data, void * native_window);
 static void flip_cb(void * driver_data, bool vsync);
 static size_t select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display);
+static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map);
+
+static lv_result_t init_display(lv_display_t * display);
+static lv_result_t resize_display(lv_display_t * display);
+static void deinit_display(lv_display_t * display);
+static SDL_Renderer * get_renderer(lv_display_t * display);
+static lv_result_t redraw(lv_display_t * display);
+
+const lv_sdl_backend_ops_t lv_sdl_backend_ops = {
+    .init_display = init_display,
+    .resize_display = resize_display,
+    .deinit_display = deinit_display,
+    .redraw = redraw,
+    .get_renderer = get_renderer,
+};
 
 /**********************
  *  STATIC VARIABLES
@@ -45,57 +64,79 @@ static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_sdl_egl_init(lv_display_t * disp)
-{
-    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    lv_egl_interface_t ifc = lv_sdl_get_egl_interface(disp);
-    dsc->egl_ctx = lv_opengles_egl_context_create(&ifc);
-    if(!dsc->egl_ctx) {
-        LV_LOG_ERROR("Failed to initialize EGL context");
-        return LV_RESULT_INVALID;
-    }
-
-#if LV_USE_DRAW_OPENGLES
-    lv_result_t res = lv_sdl_egl_resize(disp);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to create draw buffers");
-        lv_opengles_egl_context_destroy(dsc->egl_ctx);
-        dsc->egl_ctx = NULL;
-        return LV_RESULT_INVALID;
-    }
-#endif
-    return LV_RESULT_OK;
-}
-void lv_sdl_egl_deinit(lv_display_t * disp)
-{
-    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    if(dsc->egl_ctx) {
-        lv_opengles_egl_context_destroy(dsc->egl_ctx);
-        dsc->egl_ctx = NULL;
-    }
-
-#if LV_USE_DRAW_OPENGLES
-    lv_opengles_texture_deinit(&dsc->opengles_texture);
-#endif
-}
-
-lv_result_t lv_sdl_egl_resize(lv_display_t * disp)
-{
-    LV_UNUSED(disp);
-#if LV_USE_DRAW_OPENGLES
-    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
-    int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
-    dsc->opengles_texture.is_texture_owner = true;
-    return lv_opengles_texture_reshape(&dsc->opengles_texture, disp, hor_res, ver_res);
-#endif
-    return LV_RESULT_OK;
-}
-
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_result_t init_display(lv_display_t * display)
+{
+    lv_egl_interface_t ifc = lv_sdl_get_egl_interface(display);
+    lv_sdl_egl_display_data_t * ddata = lv_malloc_zeroed(sizeof(*ddata));
+    if(!ddata) {
+        LV_LOG_WARN("Failed to allocate memory for display data");
+        return LV_RESULT_INVALID;
+    }
+    ddata->egl_ctx = lv_opengles_egl_context_create(&ifc);
+    if(!ddata->egl_ctx) {
+        LV_LOG_ERROR("Failed to initialize EGL context");
+        lv_free(ddata);
+        return LV_RESULT_INVALID;
+    }
+
+    if(LV_USE_DRAW_NANOVG) {
+        static lv_draw_buf_t draw_buf;
+        static uint8_t dummy_buf;
+        lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
+
+        lv_display_set_draw_buffers(display, &draw_buf, NULL);
+        lv_display_set_render_mode(display, LV_DISPLAY_RENDER_MODE_DIRECT);
+    }
+    else {
+        lv_result_t res = resize_display(display);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to create draw buffers");
+            lv_opengles_egl_context_destroy(ddata->egl_ctx);
+            lv_free(ddata);
+            return LV_RESULT_INVALID;
+        }
+    }
+    lv_display_set_flush_cb(display, flush_cb);
+
+    lv_sdl_backend_set_display_data(display, ddata);
+    return LV_RESULT_OK;
+
+}
+static lv_result_t resize_display(lv_display_t * display)
+{
+    if(!LV_USE_DRAW_OPENGLES) {
+        return LV_RESULT_OK;
+    }
+
+    lv_sdl_egl_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
+    LV_ASSERT_NULL(ddata);
+
+    int32_t hor_res = lv_sdl_window_get_horizontal_resolution(display);
+    int32_t ver_res = lv_sdl_window_get_vertical_resolution(display);
+    ddata->opengles_texture.is_texture_owner = true;
+    return lv_opengles_texture_reshape(&ddata->opengles_texture, display, hor_res, ver_res);
+
+}
+static void deinit_display(lv_display_t * display)
+{
+    lv_sdl_egl_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
+    if(ddata->egl_ctx) {
+        lv_opengles_egl_context_destroy(ddata->egl_ctx);
+        ddata->egl_ctx = NULL;
+    }
+
+    if(LV_USE_DRAW_OPENGLES) {
+        lv_opengles_texture_deinit(&ddata->opengles_texture);
+    }
+
+    lv_free(ddata);
+    lv_sdl_backend_set_display_data(display, NULL);
+}
+
 
 static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display)
 {
@@ -113,10 +154,10 @@ static lv_egl_interface_t lv_sdl_get_egl_interface(lv_display_t * display)
 static void * create_window_cb(void * driver_data, const lv_egl_native_window_properties_t * props)
 {
     LV_UNUSED(props);
-    lv_sdl_window_t * dsc = lv_display_get_driver_data(driver_data);
+    lv_display_t * display = (lv_display_t *)driver_data;
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
-    SDL_GetWindowWMInfo(dsc->window, &wmInfo);
+    SDL_GetWindowWMInfo(lv_sdl_window_get_window(display), &wmInfo);
 
     EGLNativeWindowType native_window;
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
@@ -130,6 +171,27 @@ static void * create_window_cb(void * driver_data, const lv_egl_native_window_pr
     return false;
 #endif
     return (void *)native_window;
+}
+
+static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
+{
+
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
+    lv_sdl_egl_display_data_t * ddata = lv_sdl_backend_get_display_data(display);
+    LV_ASSERT_NULL(ddata);
+
+    if(lv_display_flush_is_last(display)) {
+#if LV_USE_DRAW_OPENGLES
+        lv_opengles_viewport(0, 0,
+                             lv_display_get_original_horizontal_resolution(display),
+                             lv_display_get_original_vertical_resolution(display));
+        lv_opengles_render_display_texture(display, false, true);
+#endif /*LV_USE_DRAW_OPENGLES*/
+        lv_opengles_egl_update(ddata->egl_ctx);
+    }
+    lv_display_flush_ready(display);
+    return;
 }
 
 static size_t select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count)
@@ -165,7 +227,6 @@ static size_t select_config_cb(void * driver_data, const lv_egl_config_t * confi
         const bool is_compatible_with_draw_unit = is_nanovg_compatible || !LV_USE_DRAW_NANOVG;
 
         if(is_window && resolution_matches && config_cf == target_cf && is_compatible_with_draw_unit) {
-
             LV_LOG_INFO("Choosing config %zu", i);
             return i;
         }
@@ -183,6 +244,18 @@ static void flip_cb(void * driver_data, bool vsync)
 
     LV_UNUSED(driver_data);
     LV_UNUSED(vsync);
+}
+
+
+static SDL_Renderer * get_renderer(lv_display_t * display)
+{
+    LV_UNUSED(display);
+    return NULL;
+}
+static lv_result_t redraw(lv_display_t * display)
+{
+    LV_UNUSED(display);
+    return LV_RESULT_OK;
 }
 
 #endif /*LV_SDL_USE_EGL*/
