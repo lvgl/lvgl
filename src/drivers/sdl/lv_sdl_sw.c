@@ -277,7 +277,9 @@ static void flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * p
             }
             /* skip the palette */
             px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
-            lv_draw_sw_i1_to_argb8888(px_map, argb_px_map, width, height, width / 8, width * 4, 0xFF000000u, 0xFFFFFFFFu);
+            const uint32_t i1_stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_I1);
+            const uint32_t argb8888_stride = lv_draw_buf_width_to_stride(width, LV_COLOR_FORMAT_ARGB8888);
+            lv_draw_sw_i1_to_argb8888(px_map, argb_px_map, width, height, i1_stride, argb8888_stride, 0xFF000000u, 0xFFFFFFFFu);
             px_map = (uint8_t *)argb_px_map;
         }
 
