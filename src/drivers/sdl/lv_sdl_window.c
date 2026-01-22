@@ -84,7 +84,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     }
     lv_display_set_driver_data(disp, dsc);
     lv_result_t res = window_create(disp);
-    if(res == LV_RESULT_INVALID) {
+    if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to initialize window");
         lv_free(dsc);
         lv_display_delete(disp);
