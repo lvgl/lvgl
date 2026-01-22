@@ -51,7 +51,7 @@ The following drivers can be used and will automatically create and maintain an 
 
 All drivers except the GLFW driver use EGL (Embedded-System Graphics Library) under the hood.
 
-Additionally, LVGL provides a generic OpenGL driver which the user may use to embedded 
+Additionally, LVGL provides a generic OpenGL driver which the user may use to embed 
 OpenGL textures in existing OpenGL applications. This driver assumes an existing OpenGL context
 and generates textures with hardware acceleration for integration into custom graphics pipelines.
 
