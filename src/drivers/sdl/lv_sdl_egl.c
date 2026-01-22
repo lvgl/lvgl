@@ -209,7 +209,7 @@ static size_t select_config_cb(void * driver_data, const lv_egl_config_t * confi
 #elif LV_COLOR_DEPTH == 32
     lv_color_format_t target_cf = LV_COLOR_FORMAT_ARGB8888;
 #else
-#error("Unsupported color format")
+#error "Unsupported color format"
 #endif
 
 
