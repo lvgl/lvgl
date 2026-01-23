@@ -256,10 +256,10 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     float h_float = glyph_dsc->g->box_h + glyph_dsc->outline_stroke_width * 2 * scale;
     w = (int32_t)(w_float);
     h = (int32_t)(h_float);
-    if (w_float > w){
+    if(w_float > w){
         w += 1;
     }
-    if (h_float > h){
+    if(h_float > h){
         h += 1;
     }
 
