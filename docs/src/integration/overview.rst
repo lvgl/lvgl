@@ -141,7 +141,7 @@ Usage
     cd <lvgl_repo>
     menuconfig
 
-Make changes to the config and exit using `Esc` or `Q`, and save your configuration.
+Make changes to the config and exit using ``Esc`` or ``Q``, and save your configuration.
 The ``.config`` file is now created and lists the configuration values.
 
 3. Run CMake with the ``-DLV_USE_KCONFIG=ON`` flag:
