@@ -137,11 +137,11 @@ static void indev_scroll_press_event_cb(lv_event_t * e)
 
 static void indev_scroll_press_lost_event_cb(lv_event_t * e)
 {
-    uint32_t * pressed_count = lv_event_get_user_data(e);
+    uint32_t * press_lost_count = lv_event_get_user_data(e);
 
     switch(lv_event_get_code(e)) {
         case LV_EVENT_PRESS_LOST:
-            (*pressed_count)++;
+            (*press_lost_count)++;
             break;
         default:
             break;
