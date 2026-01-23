@@ -321,6 +321,20 @@ uint32_t lv_draw_get_unit_count(void)
     return _draw_info.unit_cnt;
 }
 
+lv_draw_unit_t * lv_draw_get_unit_by_name(const char * name)
+{
+    if(name == NULL) return NULL;
+
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        if(u->name && lv_strcmp(u->name, name) == 0) {
+            return u;
+        }
+        u = u->next;
+    }
+    return NULL;
+}
+
 lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
     if(_draw_info.unit_cnt == 1) {

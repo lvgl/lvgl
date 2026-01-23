@@ -843,6 +843,10 @@
 
 #define LV_USE_3DTEXTURE  0
 
+/** Enable cgltf library for glTF model loading.
+ *  Requires `LV_USE_3DTEXTURE = 1` */
+#define LV_USE_CGLTF      0
+
 /*==================
  * THEMES
  *==================*/
@@ -1480,6 +1484,9 @@
 
     /** GLTF demo */
     #define LV_USE_DEMO_GLTF            0
+
+    /** NanoVG GLTF demo (using cgltf and NanoVG 3D extension) */
+    #define LV_USE_DEMO_NANOVG_GLTF     0
 
     /*---------------------------
      * Demos from lvgl/lv_demos
