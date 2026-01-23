@@ -1263,7 +1263,7 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != indev->pointer.act_obj) {
-        /*If a no previous object was lost, overwrite the last point.*/
+        /*If no previous object was lost, overwrite the last point.*/
         if(indev->pointer.act_obj == NULL) {
             indev->pointer.last_point.x = indev->pointer.act_point.x;
             indev->pointer.last_point.y = indev->pointer.act_point.y;
