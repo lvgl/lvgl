@@ -593,330 +593,336 @@ RST_HEADING = f'''\
 # =========================================================================
 
 def extra_info(p):
-  result = ('', '', '', '')
+    result = ('', '', '', '')
 
-  if "default" in p:
-    default = str(p["default"])
+    if "default" in p:
+        default = str(p["default"])
 
-    inherited = "No"
-    if p["inherited"]: inherited = "Yes"
+        inherited = "No"
+        if p["inherited"]: inherited = "Yes"
 
-    layout = "No"
-    if p["layout"]: layout = "Yes"
+        layout = "No"
+        if p["layout"]: layout = "Yes"
 
-    ext_draw = "No"
-    if p["ext_draw"]: ext_draw = "Yes"
+        ext_draw = "No"
+        if p["ext_draw"]: ext_draw = "Yes"
 
-    result = (default, inherited, layout, ext_draw)
+        result = (default, inherited, layout, ext_draw)
 
-  return result
+    return result
 
 
 def word_wrapped_description(desc, in_a_comment=False):
-  """
-  Return word-wrapped `dsc` in a format appropriate based on `in_a_comment`.
+    """
+    Return word-wrapped `dsc` in a format appropriate based on `in_a_comment`.
 
-  :param desc:          Description string (sometimes long)
-  :param in_a_comment:  (optional) Is description in a comment?
-  :return:
-  """
-  if in_a_comment:
-    extra = 6
-  else:
-    extra = 9
-
-  if '\n' in desc:
-    # Newlines are embedded in description.  We assume that the
-    # word wrapping was done by the writer.  Keep default.
-    if not in_a_comment:
-      result = desc
-    else:
-      lines = desc.split('\n')
-      for i, line in enumerate(lines):
-        lines[i] = ' * ' + line
-      result = '\n'.join(lines)
-
-  elif len(desc) <= _cfg_word_wrap_col + extra:
-    # No word-wrapping needed.  Keep default.
-    if not in_a_comment:
-      result = desc
-    else:
-      result = ' * ' + desc
-
-  else:
-    # Word wrapping is needed.
-    lines = []
-    working_desc = desc
-    one_third_width = _cfg_word_wrap_col // 3
-
-    while len(working_desc) > _cfg_word_wrap_col:
-      # Identify word-wrap column if a reasonable one is available.
-      i = working_desc.rfind(' ', 0, _cfg_word_wrap_col)
-      if i >= one_third_width:
-        lines.append(working_desc[0:i])  # Excludes space.
-        working_desc = working_desc[i + 1:]  # Skips space.
-      else:
-        # Reasonable word-wrap location not found before `one_third_width`.
-        # Keep what we have and exit loop.
-        lines.append(working_desc)
-        working_desc = ''
-        break
-
-    # Any more left?  Add it as last line.
-    if working_desc:
-      lines.append(working_desc)
-
+    :param desc:          Description string (sometimes long)
+    :param in_a_comment:  (optional) Is description in a comment?
+    :return:
+    """
     if in_a_comment:
-      # Prepend comment prefix.
-      for i, line in enumerate(lines):
-        lines[i] = ' * ' + line
+        extra = 6
+    else:
+        extra = 9
 
-    result = '\n'.join(lines)
+    if '\n' in desc:
+        # Newlines are embedded in description.  We assume that the
+        # word wrapping was done by the writer.  Keep default.
+        if not in_a_comment:
+            result = desc
+        else:
+            lines = desc.split('\n')
+            for i, line in enumerate(lines):
+                lines[i] = ' * ' + line
+            result = '\n'.join(lines)
 
-  return result
+    elif len(desc) <= _cfg_word_wrap_col + extra:
+        # No word-wrapping needed.  Keep default.
+        if not in_a_comment:
+            result = desc
+        else:
+            result = ' * ' + desc
+
+    else:
+        # Word wrapping is needed.
+        lines = []
+        working_desc = desc
+        one_third_width = _cfg_word_wrap_col // 3
+
+        while len(working_desc) > _cfg_word_wrap_col:
+            # Identify word-wrap column if a reasonable one is available.
+            i = working_desc.rfind(' ', 0, _cfg_word_wrap_col)
+            if i >= one_third_width:
+                lines.append(working_desc[0:i])  # Excludes space.
+                working_desc = working_desc[i + 1:]  # Skips space.
+            else:
+                # Reasonable word-wrap location not found before `one_third_width`.
+                # Keep what we have and exit loop.
+                lines.append(working_desc)
+                working_desc = ''
+                break
+
+        # Any more left?  Add it as last line.
+        if working_desc:
+            lines.append(working_desc)
+
+        if in_a_comment:
+            # Prepend comment prefix.
+            for i, line in enumerate(lines):
+                lines[i] = ' * ' + line
+
+        result = '\n'.join(lines)
+
+    return result
 
 
 def optionally_append_extra_info(p, dsc):
-  d, i, L, e = extra_info(p)
-  if d:
-    dsc += f'\n * Default: {d}, inherited: {i}, layout: {L}, ext. draw: {e}.'
+    d, i, L, e = extra_info(p)
+    if d:
+        dsc += f'\n * Default: {d}, inherited: {i}, layout: {L}, ext. draw: {e}.'
 
-  return dsc
+    return dsc
 
 
 def print_value_param(p, indent='', is_for_const=False):
-  # Compute correct wording for description of `value` argument.
-  style_type = p['style_type']
-  spelled_out_type = 'Value'
-  if is_for_const:
-    arg_name = 'val'
-  else:
-    arg_name = 'value'
+    # Compute correct wording for description of `value` argument.
+    style_type = p['style_type']
+    spelled_out_type = 'Value'
+    if is_for_const:
+        arg_name = 'val'
+    else:
+        arg_name = 'value'
 
-  if style_type == 'num':
-    # Keep default.  Nothing to do.
-    print(f' * @param  {arg_name}   {indent}Value to submit')
-  elif style_type == 'color':
-    print(f' * @param  {arg_name}   {indent}Color to submit')
-  elif style_type == 'ptr':
-    type_prefix = 'Pointer to'
-    spelled_out_type = 'value'
-    name = p['name']
+    if style_type == 'num':
+        # Keep default.  Nothing to do.
+        print(f' * @param  {arg_name}   {indent}Value to submit')
+    elif style_type == 'color':
+        print(f' * @param  {arg_name}   {indent}Color to submit')
+    elif style_type == 'ptr':
+        type_prefix = 'Pointer to'
+        spelled_out_type = 'value'
+        name = p['name']
 
-    if name == 'BG_GRAD':
-        spelled_out_type = 'gradient descriptor'
-    elif 'IMAGE_SRC' in name:
-        spelled_out_type = 'image source'
-    elif name == 'IMAGE_COLORKEY':
-        spelled_out_type = 'image color key'
-    elif name == 'TEXT_FONT':
-        spelled_out_type = 'font'
-    elif name == 'COLOR_FILTER_DSC':
-        spelled_out_type = 'color-filter descriptor'
-    elif name == 'ANIM':
-        spelled_out_type = 'animation descriptor'
-    elif name == 'TRANSITION':
-        spelled_out_type = 'transition descriptor'
-    elif name == 'BITMAP_MASK_SRC':
-        spelled_out_type = 'A8 bitmap mask'
-    elif name == 'GRID_COLUMN_DSC_ARRAY':
-        spelled_out_type = 'grid-column descriptor array'
-    elif name == 'GRID_ROW_DSC_ARRAY':
-        spelled_out_type = 'grid-row descriptor array'
+        if name == 'BG_GRAD':
+            spelled_out_type = 'gradient descriptor'
+        elif 'IMAGE_SRC' in name:
+            spelled_out_type = 'image source'
+        elif name == 'IMAGE_COLORKEY':
+            spelled_out_type = 'image color key'
+        elif name == 'TEXT_FONT':
+            spelled_out_type = 'font'
+        elif name == 'COLOR_FILTER_DSC':
+            spelled_out_type = 'color-filter descriptor'
+        elif name == 'ANIM':
+            spelled_out_type = 'animation descriptor'
+        elif name == 'TRANSITION':
+            spelled_out_type = 'transition descriptor'
+        elif name == 'BITMAP_MASK_SRC':
+            spelled_out_type = 'A8 bitmap mask'
+        elif name == 'GRID_COLUMN_DSC_ARRAY':
+            spelled_out_type = 'grid-column descriptor array'
+        elif name == 'GRID_ROW_DSC_ARRAY':
+            spelled_out_type = 'grid-row descriptor array'
 
-    print(f' * @param  {arg_name}   {indent}{type_prefix} {spelled_out_type}')
+        print(f' * @param  {arg_name}   {indent}{type_prefix} {spelled_out_type}')
 
 
 def style_set_doxygen_comment(p):
-  dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
-  dsc = optionally_append_extra_info(p, dsc)
-  print('/**')
-  print(dsc)
-  print(f' * @param  style   Pointer to style')
-  print_value_param(p)
-  print(' */')
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print('/**')
+    print(dsc)
+    print(f' * @param  style   Pointer to style')
+    print_value_param(p)
+    print(' */')
 
 
 def style_const_set_doxygen_comment(p):
-  print('/**')
-  dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
-  dsc = optionally_append_extra_info(p, dsc)
-  print(dsc)
-  print_value_param(p, is_for_const=True)
-  print(' */')
+    print('/**')
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print(dsc)
+    print_value_param(p, is_for_const=True)
+    print(' */')
 
 
 def style_get_cast(style_type, var_type):
-  cast = ""
-  if style_type != 'color':
-    cast = "(" + var_type + ")"
-  return cast
+    cast = ""
+    if style_type != 'color':
+        cast = "(" + var_type + ")"
+    return cast
 
 
 def style_set_cast(style_type):
-  cast = ""
-  if style_type == 'num':
-    cast = "(int32_t)"
-  return cast
+    cast = ""
+    if style_type == 'num':
+        cast = "(int32_t)"
+    return cast
 
 
 def style_set_c(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  cast = style_set_cast(p['style_type'])
-  print()
-  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value)")
-  print("{")
-  print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + cast + "value")
-  print("    };")
-  print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
-  print("}")
+    cast = style_set_cast(p['style_type'])
+    print()
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value)")
+    print("{")
+    print("    lv_style_value_t v = {")
+    print("        ." + p['style_type'] + " = " + cast + "value")
+    print("    };")
+    print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] + ", v);")
+    print("}")
 
 
 def style_set_h(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  style_set_doxygen_comment(p)
-  print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-  print()
+    style_set_doxygen_comment(p)
+    print("void lv_style_set_" + p['name'].lower() + "(lv_style_t * style, " + p['var_type'] + " value);")
+    print()
 
 
 def style_const_set(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  style_const_set_doxygen_comment(p)
-  cast = style_set_cast(p['style_type'])
-  print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
-  print("    { \\")
-  print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
-  print("    }")
-  print()
+    style_const_set_doxygen_comment(p)
+    cast = style_set_cast(p['style_type'])
+    print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
+    print("    { \\")
+    print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] + " = " + cast + "val } \\")
+    print("    }")
+    print()
 
 
 def local_style_set_doxygen_comment(p):
-  dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
-  dsc = optionally_append_extra_info(p, dsc)
-  print('/**')
-  print(dsc)
-  print(' * @param  obj        Pointer to Widget')
-  print_value_param(p, indent='   ')
-  print(' * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:')
-  print('                          - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
-  print('                          - `LV_STATE_PRSSED`')
-  print('                          - `LV_PART_KNOB`')
-  print('                          - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
-  print(' */')
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
+    print('/**')
+    print(dsc)
+    print(' * @param  obj        Pointer to Widget')
+    print_value_param(p, indent='   ')
+    print(' * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:')
+    print('                          - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
+    print('                          - `LV_STATE_PRSSED`')
+    print('                          - `LV_PART_KNOB`')
+    print('                          - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
+    print(' */')
 
 
 def local_style_get_doxygen_comment(p):
-  dsc = p['dsc']
+    dsc = p['dsc']
 
-  if dsc.startswith('Set'):
-      dsc = dsc.replace('Set', 'Get', 1)
+    if dsc.startswith('Set'):
+        dsc = dsc.replace('Set', 'Get', 1)
 
-  dsc = word_wrapped_description(dsc, in_a_comment=True)
-  dsc = optionally_append_extra_info(p, dsc)
+    dsc = word_wrapped_description(dsc, in_a_comment=True)
+    dsc = optionally_append_extra_info(p, dsc)
 
-  print('/**')
-  print(dsc)
-  print(f' * @param  obj    Pointer to Widget')
-  print(f' * @param  part   One of the `LV_PART_...` enum values')
-  print(' */')
+    print('/**')
+    print(dsc)
+    print(f' * @param  obj    Pointer to Widget')
+    print(f' * @param  part   One of the `LV_PART_...` enum values')
+    print(' */')
 
 
 def local_style_get_h(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  local_style_get_doxygen_comment(p)
-  cast = style_get_cast(p['style_type'], p['var_type'])
-  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, lv_part_t part)")
-  print("{")
-  print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
-  print("    return " + cast + "v." + p['style_type'] + ";")
-  print("}")
-  print()
-
-  if 'filtered' in p and p['filtered']:
     local_style_get_doxygen_comment(p)
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
+    cast = style_get_cast(p['style_type'], p['var_type'])
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
+        'name'].lower() + "(const lv_obj_t * obj, lv_part_t part)")
     print("{")
-    print("    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
+    print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
     print("    return " + cast + "v." + p['style_type'] + ";")
     print("}")
     print()
 
+    if 'filtered' in p and p['filtered']:
+        local_style_get_doxygen_comment(p)
+        print("static inline " + p['var_type'] + " lv_obj_get_style_" + p[
+            'name'].lower() + "_filtered(const lv_obj_t * obj, lv_part_t part)")
+        print("{")
+        print(
+            "    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" +
+            p['name'] + "));")
+        print("    return " + cast + "v." + p['style_type'] + ";")
+        print("}")
+        print()
+
 
 def local_style_set_c(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  cast = style_set_cast(p['style_type'])
-  print()
-  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
-  print("{")
-  print("    lv_style_value_t v = {")
-  print("        ." + p['style_type'] +" = " + cast + "value")
-  print("    };")
-  print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
-  print("}")
+    cast = style_set_cast(p['style_type'])
+    print()
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
+        'var_type'] + " value, lv_style_selector_t selector)")
+    print("{")
+    print("    lv_style_value_t v = {")
+    print("        ." + p['style_type'] + " = " + cast + "value")
+    print("    };")
+    print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] + ", v, selector);")
+    print("}")
 
 
 def local_style_set_h(p):
-  if 'section' in p: return
+    if 'section' in p: return
 
-  local_style_set_doxygen_comment(p)
-  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
-  print()
+    local_style_set_doxygen_comment(p)
+    print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p[
+        'var_type'] + " value, lv_style_selector_t selector);")
+    print()
 
 
 def docs(p):
-  if "section" in p:
-    print()
-    print(p['section'])
-    print("-" * len(p['section']))
-    print()
-    print(p['dsc'])
-    return
+    if "section" in p:
+        print()
+        print(p['section'])
+        print("-" * len(p['section']))
+        print()
+        print(p['dsc'])
+        return
 
-  li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
+    li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
 
-  dsc = word_wrapped_description(p['dsc'], in_a_comment=False)
+    dsc = word_wrapped_description(p['dsc'], in_a_comment=False)
 
-  print()
-  name = p["name"].lower()
-  print(name)
-  print("~" * len(name))
-  print()
-  print(dsc)
-
-  if 'default' in p:
-    d, i, L, e = extra_info(p)
     print()
-    print(".. raw:: html")
+    name = p["name"].lower()
+    print(name)
+    print("~" * len(name))
     print()
-    print("  <ul>")
-    print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
-    print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
-    print("  <li " + li_style + "'><strong>Layout</strong> " + L + "</li>")
-    print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
-    print("  </ul>")
+    print(dsc)
+
+    if 'default' in p:
+        d, i, L, e = extra_info(p)
+        print()
+        print(".. raw:: html")
+        print()
+        print("  <ul>")
+        print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
+        print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
+        print("  <li " + li_style + "'><strong>Layout</strong> " + L + "</li>")
+        print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
+        print("  </ul>")
 
 
 def guard_proc(p):
-  global guard
-  if 'section' in p:
-    if guard:
-      guard_close()
-    if 'guard' in p:
-      guard = p['guard']
-      print(f"#if {guard}")
+    global guard
+    if 'section' in p:
+        if guard:
+            guard_close()
+        if 'guard' in p:
+            guard = p['guard']
+            print(f"#if {guard}")
 
 
 def guard_close():
-  global guard
-  if guard:
-    print(f"#endif /* {guard} */\n")
-  guard = ""
+    global guard
+    if guard:
+        print(f"#endif /* {guard} */\n")
+    guard = ""
 
 
 # =========================================================================
@@ -947,15 +953,15 @@ print()
 
 guard = ""
 for prop in props:
-  guard_proc(prop)
-  local_style_get_h(prop)
-  _total_func_count += 1
+    guard_proc(prop)
+    local_style_get_h(prop)
+    _total_func_count += 1
 guard_close()
 
 for prop in props:
-  guard_proc(prop)
-  local_style_set_h(prop)
-  _total_func_count += 1
+    guard_proc(prop)
+    local_style_set_h(prop)
+    _total_func_count += 1
 guard_close()
 
 print()
@@ -977,8 +983,8 @@ print('#include "lv_obj.h"')
 print()
 
 for prop in props:
-  guard_proc(prop)
-  local_style_set_c(prop)
+    guard_proc(prop)
+    local_style_set_c(prop)
 guard_close()
 
 # -------------------------------------------------------------------------
@@ -991,8 +997,8 @@ print('#include "lv_style.h"')
 print()
 
 for prop in props:
-  guard_proc(prop)
-  style_set_c(prop)
+    guard_proc(prop)
+    style_set_c(prop)
 guard_close()
 
 # -------------------------------------------------------------------------
@@ -1011,15 +1017,15 @@ extern "C" {
 ''')
 
 for prop in props:
-  guard_proc(prop)
-  style_set_h(prop)
-  _total_func_count += 1
+    guard_proc(prop)
+    style_set_h(prop)
+    _total_func_count += 1
 guard_close()
 
 for prop in props:
-  guard_proc(prop)
-  style_const_set(prop)
-  _total_func_count += 1
+    guard_proc(prop)
+    style_const_set(prop)
+    _total_func_count += 1
 guard_close()
 
 print()
@@ -1043,7 +1049,7 @@ print('Style Properties')
 print('================')
 
 for prop in props:
-  docs(prop)
+    docs(prop)
 
 # -------------------------------------------------------------------------
 # Report
@@ -1053,15 +1059,15 @@ print(f'Total functions commented:  {_total_func_count}.')
 print('Checking for problems... ')
 explain = False
 for prop in props:
-  if not 'section' in prop:
-    if not prop['dsc'].endswith('.'):
-      print(f'dsc does not end with "." for: [{prop["name"]}]')
-      explain = True
+    if not 'section' in prop:
+        if not prop['dsc'].endswith('.'):
+            print(f'dsc does not end with "." for: [{prop["name"]}]')
+            explain = True
 
 if explain:
-  print()
-  print('A "." is needed at the end of "dsc" values so that it separates the end')
-  print('of the description in the function API documentation from the extra info')
-  print('at the end:  default, inherited, layout and ext draw information.')
+    print()
+    print('A "." is needed at the end of "dsc" values so that it separates the end')
+    print('of the description in the function API documentation from the extra info')
+    print('at the end:  default, inherited, layout and ext draw information.')
 else:
-  print('OK.')
+    print('OK.')
