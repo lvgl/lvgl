@@ -335,13 +335,13 @@ static void create_background_panel(lv_obj_t * panel)
     lv_obj_t * background_blur_title = add_title_to_row(bg_row, "");
     lv_label_bind_text(background_blur_title, &background_blur_subject, "Background Blur %d");
 
-    lv_obj_t * backgorund_blur_slider = lv_slider_create(bg_row);
-    lv_slider_bind_value(backgorund_blur_slider, &background_blur_subject);
-    lv_obj_set_width(backgorund_blur_slider, LV_PCT(100));
-    lv_slider_set_min_value(backgorund_blur_slider, 0);
-    lv_slider_set_max_value(backgorund_blur_slider, 100);
+    lv_obj_t * background_blur_slider = lv_slider_create(bg_row);
+    lv_slider_bind_value(background_blur_slider, &background_blur_subject);
+    lv_obj_set_width(background_blur_slider, LV_PCT(100));
+    lv_slider_set_min_value(background_blur_slider, 0);
+    lv_slider_set_max_value(background_blur_slider, 100);
 
-    style_slider(backgorund_blur_slider, SLIDER_COLOR);
+    style_slider(background_blur_slider, SLIDER_COLOR);
 
 }
 

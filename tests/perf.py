@@ -26,10 +26,10 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def main() -> bool:
-    epilog = """This program runs LVGL perfomance tests
-    In order to provide timing consitency between host computers,
-    these runs are run in an ARM emulated environnement inside QEMU.
-    For the runtime environnement, SO3 is used which is a lightweight, ARM-based 
+    epilog = """This program runs LVGL performance tests
+    In order to provide timing consistency between host computers,
+    these runs are run in an ARM emulated environment inside QEMU.
+    For the runtime environment, SO3 is used which is a lightweight, ARM-based 
     operating system.
     Right now, this script requires a host linux computer as we depend on
     `losetup` which is used to set up and control loop devices.

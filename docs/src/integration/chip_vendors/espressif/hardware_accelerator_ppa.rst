@@ -36,7 +36,7 @@ Save the file and then rebuild the project, this will be sufficient to add the P
 no further steps are required from the user code perspective.
 
 Is it suggested to use PPA with the double buffer support of the ESP LVGL Port since it will not offer performance increase when using it in partial mode due
-to DMA2D memory bandwith. To have te best performance and experience you can use the following snippet code to start the LVGL subsystem
+to DMA2D memory bandwidth. To have te best performance and experience you can use the following snippet code to start the LVGL subsystem
 for ESP-IDF:
 
    .. code:: c

@@ -516,7 +516,7 @@ void test_display_layers(void)
         lv_layer_sys(),
     };
 
-    static const lv_palette_t paletts[] = {
+    static const lv_palette_t palettes[] = {
         LV_PALETTE_RED,
         LV_PALETTE_GREEN,
         LV_PALETTE_BLUE,
@@ -534,7 +534,7 @@ void test_display_layers(void)
         lv_obj_t * obj = lv_obj_create(parents[i]);
         lv_obj_align(obj, LV_ALIGN_CENTER, 20 * i, 20 * i);
         lv_obj_set_style_opa(obj, LV_OPA_50, LV_PART_MAIN);
-        lv_obj_set_style_bg_color(obj, lv_palette_main(paletts[i]), LV_PART_MAIN);
+        lv_obj_set_style_bg_color(obj, lv_palette_main(palettes[i]), LV_PART_MAIN);
 
         lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%s", layer_names[i]);

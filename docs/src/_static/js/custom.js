@@ -296,13 +296,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
             const pgParent = page.parentElement;
             pgParent.insertBefore(newDiv, page);
 
-            /* Finally, we need to tell the page element that its `min-hight`
-             * is 100% minus the hight of all the banners, including the one
+            /* Finally, we need to tell the page element that its `min-height`
+             * is 100% minus the height of all the banners, including the one
              * supplied by `conf.py` in `conf.html_theme_options.announcement`
              * if one is present === var(--header-height).
              *
              * This extends short pages by just enough to place [PREV] and [NEXT]
-             * buttoms and footer at bottom of page without scrolling.
+             * buttons and footer at bottom of page without scrolling.
              *
              * Note:  this overrides the `min-height` property set for this
              * element in `furo.css`, which is:  calc(100% - var(--header-height)).

@@ -137,7 +137,7 @@ void lv_draw_nanovg_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, c
 **********************/
 
 static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * cliped_area)
+                                   lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -158,7 +158,7 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(cliped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
         return false;
     }
 
