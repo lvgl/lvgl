@@ -25,11 +25,11 @@ static void add_dynamic(void)
     lv_translation_tag_dsc_t * tag;
     tag = lv_translation_add_tag(pack, "table");
     lv_translation_set_tag_translation(pack, tag, 0, "It's a table");
-    lv_translation_set_tag_translation(pack, tag, 1, "Das is in Tish");
+    lv_translation_set_tag_translation(pack, tag, 1, "Das ist ein Tish");
 
     tag = lv_translation_add_tag(pack, "chair");
     lv_translation_set_tag_translation(pack, tag, 0, "It's a chair");
-    lv_translation_set_tag_translation(pack, tag, 1, "Das ist in Stuhl");
+    lv_translation_set_tag_translation(pack, tag, 1, "Das ist ein Stuhl");
 }
 
 /**
