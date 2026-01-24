@@ -74,7 +74,7 @@ static inline int32_t lv_obj_get_style_height(const lv_obj_t * obj, lv_part_t pa
 
 /**
  * Gets a minimal height. Pixel and percentage values can be used. Percentage values
- * are relative to the width of the parent's content area.
+ * are relative to the height of the parent's content area.
  * Default: 0, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
@@ -715,7 +715,7 @@ static inline int32_t lv_obj_get_style_border_width(const lv_obj_t * obj, lv_par
  * Get only which side(s) the border should be drawn. Possible values are
  * `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as
  * well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
- * Default: `LV_BORDER_SIDE_NONE`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BORDER_SIDE_FULL`, inherited: No, layout: No, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
@@ -1291,7 +1291,7 @@ static inline bool lv_obj_get_style_blur_backdrop(const lv_obj_t * obj, lv_part_
 }
 
 /**
- * Getting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
+ * Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
  * quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower
  * blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
  * Default: `LV_BLUR_QUALITY_AUTO`, inherited: No, layout: No, ext. draw: No.
@@ -1378,10 +1378,10 @@ static inline lv_opa_t lv_obj_get_style_drop_shadow_opa(const lv_obj_t * obj, lv
 }
 
 /**
- * Getting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
+ * Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
  * quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower
  * blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
- * Default: `LV_BLUR_QUALITY_AUTO`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BLUR_QUALITY_PRECISION`, inherited: No, layout: No, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
@@ -1665,7 +1665,7 @@ static inline lv_flex_align_t lv_obj_get_style_flex_track_place(const lv_obj_t *
 
 /**
  * Defines how much space to take proportionally from the free space of the Widget's track.
- * Default: `LV_FLEX_ALIGN_ROW`, inherited: No, layout: Yes, ext. draw: No.
+ * Default: `0`, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
  */
@@ -1858,7 +1858,7 @@ void lv_obj_set_style_height(lv_obj_t * obj, int32_t value, lv_style_selector_t 
 
 /**
  * Sets a minimal height. Pixel and percentage values can be used. Percentage values
- * are relative to the width of the parent's content area.
+ * are relative to the height of the parent's content area.
  * Default: 0, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit
@@ -2497,7 +2497,7 @@ void lv_obj_set_style_border_width(lv_obj_t * obj, int32_t value, lv_style_selec
  * Set only which side(s) the border should be drawn. Possible values are
  * `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as
  * well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
- * Default: `LV_BORDER_SIDE_NONE`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BORDER_SIDE_FULL`, inherited: No, layout: No, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
@@ -3112,7 +3112,7 @@ void lv_obj_set_style_drop_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_s
  * Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
  * quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower
  * blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
- * Default: `LV_BLUR_QUALITY_AUTO`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BLUR_QUALITY_PRECISION`, inherited: No, layout: No, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
@@ -3418,7 +3418,7 @@ void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv
 
 /**
  * Defines how much space to take proportionally from the free space of the Widget's track.
- * Default: `LV_FLEX_ALIGN_ROW`, inherited: No, layout: Yes, ext. draw: No.
+ * Default: `0`, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:

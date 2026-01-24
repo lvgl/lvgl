@@ -53,7 +53,7 @@ void lv_style_set_height(lv_style_t * style, int32_t value);
 
 /**
  * Sets a minimal height. Pixel and percentage values can be used. Percentage values
- * are relative to the width of the parent's content area.
+ * are relative to the height of the parent's content area.
  * Default: 0, inherited: No, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
@@ -462,7 +462,7 @@ void lv_style_set_border_width(lv_style_t * style, int32_t value);
  * Set only which side(s) the border should be drawn. Possible values are
  * `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as
  * well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
- * Default: `LV_BORDER_SIDE_NONE`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BORDER_SIDE_FULL`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
  */
@@ -852,7 +852,7 @@ void lv_style_set_drop_shadow_opa(lv_style_t * style, lv_opa_t value);
  * Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
  * quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower
  * blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
- * Default: `LV_BLUR_QUALITY_AUTO`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BLUR_QUALITY_PRECISION`, inherited: No, layout: No, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
  */
@@ -1048,7 +1048,7 @@ void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value);
 
 /**
  * Defines how much space to take proportionally from the free space of the Widget's track.
- * Default: `LV_FLEX_ALIGN_ROW`, inherited: No, layout: Yes, ext. draw: No.
+ * Default: `0`, inherited: No, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
  */
@@ -1185,7 +1185,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 
 /**
  * Sets a minimal height. Pixel and percentage values can be used. Percentage values
- * are relative to the width of the parent's content area.
+ * are relative to the height of the parent's content area.
  * Default: 0, inherited: No, layout: Yes, ext. draw: No.
  * @param  val   Value to submit
  */
@@ -1686,7 +1686,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * Set only which side(s) the border should be drawn. Possible values are
  * `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as
  * well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
- * Default: `LV_BORDER_SIDE_NONE`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BORDER_SIDE_FULL`, inherited: No, layout: No, ext. draw: No.
  * @param  val   Value to submit
  */
 #define LV_STYLE_CONST_BORDER_SIDE(val) \
@@ -2166,7 +2166,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
  * Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over
  * quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower
  * blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
- * Default: `LV_BLUR_QUALITY_AUTO`, inherited: No, layout: No, ext. draw: No.
+ * Default: `LV_BLUR_QUALITY_PRECISION`, inherited: No, layout: No, ext. draw: No.
  * @param  val   Value to submit
  */
 #define LV_STYLE_CONST_DROP_SHADOW_QUALITY(val) \
@@ -2406,7 +2406,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 
 /**
  * Defines how much space to take proportionally from the free space of the Widget's track.
- * Default: `LV_FLEX_ALIGN_ROW`, inherited: No, layout: Yes, ext. draw: No.
+ * Default: `0`, inherited: No, layout: Yes, ext. draw: No.
  * @param  val   Value to submit
  */
 #define LV_STYLE_CONST_FLEX_GROW(val) \

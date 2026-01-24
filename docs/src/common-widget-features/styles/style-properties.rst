@@ -77,7 +77,7 @@ min_height
 ~~~~~~~~~~
 
 Sets a minimal height. Pixel and percentage values can be used. Percentage values
-are relative to the width of the parent's content area.
+are relative to the height of the parent's content area.
 
 .. raw:: html
 
@@ -785,7 +785,7 @@ well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
 .. raw:: html
 
   <ul>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BORDER_SIDE_NONE`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BORDER_SIDE_FULL`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
@@ -1484,7 +1484,7 @@ blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically.
 .. raw:: html
 
   <ul>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BLUR_QUALITY_AUTO`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BLUR_QUALITY_PRECISION`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
@@ -1821,7 +1821,7 @@ Defines how much space to take proportionally from the free space of the Widget'
 .. raw:: html
 
   <ul>
-  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FLEX_ALIGN_ROW`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0`</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>

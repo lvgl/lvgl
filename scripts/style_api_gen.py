@@ -37,7 +37,7 @@ props = [
 
 {'name': 'MIN_HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets a minimal height. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
+ 'dsc': "Sets a minimal height. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'MAX_HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -224,7 +224,7 @@ props = [
  'dsc': "Set width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
- 'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_FULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set only which side(s) the border should be drawn. Possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
 
 {'name': 'BORDER_POST',
@@ -413,7 +413,7 @@ props = [
  'dsc': "Set the opacity of the shadow."},
 
 {'name': 'DROP_SHADOW_QUALITY',
- 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_AUTO`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'lv_blur_quality_t',  'default':'`LV_BLUR_QUALITY_PRECISION`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Setting to `LV_BLUR_QUALITY_SPEED` the blurring algorithm will prefer speed over quality. `LV_BLUR_QUALITY_PRECISION` will force using higher quality but slower blur. With `LV_BLUR_QUALITY_AUTO` the quality will be selected automatically."},
 
 {'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
@@ -510,7 +510,7 @@ props = [
  'dsc': "Defines how to align the tracks of the flow."},
 
 {'name': 'FLEX_GROW',
- 'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'uint8_t', 'default':'`0`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Defines how much space to take proportionally from the free space of the Widget's track."},
 
 
