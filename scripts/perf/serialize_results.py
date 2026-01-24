@@ -141,7 +141,7 @@ def main():
 
     # Keep old mpk files
     for mpk_file in input_mpk:
-        print(f"Couldn't find new reults to add to {mpk_file}. Copying it")
+        print(f"Couldn't find new results to add to {mpk_file}. Copying it")
         mpk_path = path(input_folder, mpk_file)
         output_path = path(output_folder, mpk_file)
         shutil.copy2(mpk_path, output_path)

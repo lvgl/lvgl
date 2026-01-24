@@ -159,7 +159,7 @@
 {"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429942853Z"}
 {"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429949053Z"}
 {"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429958813Z"}
-{"log":"Now bootstraping the kernel ...\r\n","stream":"stdout","time":"2025-03-14T20:32:17.430034164Z"}
+{"log":"Now bootstrapping the kernel ...\r\n","stream":"stdout","time":"2025-03-14T20:32:17.430034164Z"}
 {"log":"SO3: allocating a kernel heap of 33554404 bytes at address c0044000.\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673343683Z"}
 {"log":"memory_init: Device tree virt addr: c3a00000\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673549157Z"}
 {"log":"memory_init: relocating the device tree from 0xc3a00000 to 0xc21a4000 (size of 4224 bytes)\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673910253Z"}
