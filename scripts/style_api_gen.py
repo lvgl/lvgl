@@ -812,8 +812,10 @@ def local_style_set_doxygen_comment(p):
 def local_style_get_doxygen_comment(p):
     dsc = p['dsc']
 
-    if dsc.startswith('Set'):
-        dsc = dsc.replace('Set', 'Get', 1)
+    if dsc.startswith('Set '):
+        dsc = dsc.replace('Set ', 'Get ', 1)
+    elif dsc.startswith('Sets '):
+        dsc = dsc.replace('Sets ', 'Gets ', 1)
 
     dsc = word_wrapped_description(dsc, in_a_comment=True)
     dsc = optionally_append_extra_info(p, dsc)
