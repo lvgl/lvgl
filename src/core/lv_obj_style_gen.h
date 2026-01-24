@@ -1616,7 +1616,7 @@ static inline uint32_t lv_obj_get_style_rotary_sensitivity(const lv_obj_t * obj,
 
 #if LV_USE_FLEX
 /**
- * Defines in which direct the flex layout should arrange the children.
+ * Defines in which direction the flex layout should arrange the children.
  * Default: `LV_FLEX_FLOW_NONE`, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj    Pointer to Widget
  * @param  part   One of the `LV_PART_...` enum values
@@ -1808,7 +1808,7 @@ static inline int32_t lv_obj_get_style_grid_cell_row_span(const lv_obj_t * obj, 
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1822,7 +1822,7 @@ void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1836,7 +1836,7 @@ void lv_obj_set_style_min_width(lv_obj_t * obj, int32_t value, lv_style_selector
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1850,7 +1850,7 @@ void lv_obj_set_style_max_width(lv_obj_t * obj, int32_t value, lv_style_selector
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1864,7 +1864,7 @@ void lv_obj_set_style_height(lv_obj_t * obj, int32_t value, lv_style_selector_t 
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1878,7 +1878,7 @@ void lv_obj_set_style_min_height(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1892,7 +1892,7 @@ void lv_obj_set_style_max_height(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1907,7 +1907,7 @@ void lv_obj_set_style_length(lv_obj_t * obj, int32_t value, lv_style_selector_t 
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1922,7 +1922,7 @@ void lv_obj_set_style_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1940,7 +1940,7 @@ void lv_obj_set_style_y(lv_obj_t * obj, int32_t value, lv_style_selector_t selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1954,7 +1954,7 @@ void lv_obj_set_style_align(lv_obj_t * obj, lv_align_t value, lv_style_selector_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1968,7 +1968,7 @@ void lv_obj_set_style_transform_width(lv_obj_t * obj, int32_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1983,7 +1983,7 @@ void lv_obj_set_style_transform_height(lv_obj_t * obj, int32_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -1998,7 +1998,7 @@ void lv_obj_set_style_translate_x(lv_obj_t * obj, int32_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2012,7 +2012,7 @@ void lv_obj_set_style_translate_y(lv_obj_t * obj, int32_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2026,7 +2026,7 @@ void lv_obj_set_style_translate_radial(lv_obj_t * obj, int32_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2040,7 +2040,7 @@ void lv_obj_set_style_transform_scale_x(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2053,7 +2053,7 @@ void lv_obj_set_style_transform_scale_y(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2066,7 +2066,7 @@ void lv_obj_set_style_transform_rotation(lv_obj_t * obj, int32_t value, lv_style
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2079,7 +2079,7 @@ void lv_obj_set_style_transform_pivot_x(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2093,7 +2093,7 @@ void lv_obj_set_style_transform_pivot_y(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2107,7 +2107,7 @@ void lv_obj_set_style_transform_skew_x(lv_obj_t * obj, int32_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2120,7 +2120,7 @@ void lv_obj_set_style_transform_skew_y(lv_obj_t * obj, int32_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2133,7 +2133,7 @@ void lv_obj_set_style_pad_top(lv_obj_t * obj, int32_t value, lv_style_selector_t
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2146,7 +2146,7 @@ void lv_obj_set_style_pad_bottom(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2159,7 +2159,7 @@ void lv_obj_set_style_pad_left(lv_obj_t * obj, int32_t value, lv_style_selector_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2172,7 +2172,7 @@ void lv_obj_set_style_pad_right(lv_obj_t * obj, int32_t value, lv_style_selector
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2185,7 +2185,7 @@ void lv_obj_set_style_pad_row(lv_obj_t * obj, int32_t value, lv_style_selector_t
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2198,7 +2198,7 @@ void lv_obj_set_style_pad_column(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2211,7 +2211,7 @@ void lv_obj_set_style_pad_radial(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2224,7 +2224,7 @@ void lv_obj_set_style_margin_top(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2237,7 +2237,7 @@ void lv_obj_set_style_margin_bottom(lv_obj_t * obj, int32_t value, lv_style_sele
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2250,7 +2250,7 @@ void lv_obj_set_style_margin_left(lv_obj_t * obj, int32_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2263,7 +2263,7 @@ void lv_obj_set_style_margin_right(lv_obj_t * obj, int32_t value, lv_style_selec
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2278,7 +2278,7 @@ void lv_obj_set_style_bg_color(lv_obj_t * obj, lv_color_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2291,7 +2291,7 @@ void lv_obj_set_style_bg_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2305,7 +2305,7 @@ void lv_obj_set_style_bg_grad_color(lv_obj_t * obj, lv_color_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2319,7 +2319,7 @@ void lv_obj_set_style_bg_grad_dir(lv_obj_t * obj, lv_grad_dir_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2333,7 +2333,7 @@ void lv_obj_set_style_bg_main_stop(lv_obj_t * obj, int32_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2346,7 +2346,7 @@ void lv_obj_set_style_bg_grad_stop(lv_obj_t * obj, int32_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2359,7 +2359,7 @@ void lv_obj_set_style_bg_main_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2375,7 +2375,7 @@ void lv_obj_set_style_bg_grad_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  * @param  value      Pointer to gradient descriptor
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2389,7 +2389,7 @@ void lv_obj_set_style_bg_grad(lv_obj_t * obj, const lv_grad_dsc_t * value, lv_st
  * @param  value      Pointer to image source
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2404,7 +2404,7 @@ void lv_obj_set_style_bg_image_src(lv_obj_t * obj, const void * value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2417,7 +2417,7 @@ void lv_obj_set_style_bg_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_sele
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2433,7 +2433,7 @@ void lv_obj_set_style_bg_image_recolor(lv_obj_t * obj, lv_color_t value, lv_styl
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2446,7 +2446,7 @@ void lv_obj_set_style_bg_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_st
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2459,7 +2459,7 @@ void lv_obj_set_style_bg_image_tiled(lv_obj_t * obj, bool value, lv_style_select
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2474,7 +2474,7 @@ void lv_obj_set_style_border_color(lv_obj_t * obj, lv_color_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2487,7 +2487,7 @@ void lv_obj_set_style_border_opa(lv_obj_t * obj, lv_opa_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2502,7 +2502,7 @@ void lv_obj_set_style_border_width(lv_obj_t * obj, int32_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2516,7 +2516,7 @@ void lv_obj_set_style_border_side(lv_obj_t * obj, lv_border_side_t value, lv_sty
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2529,7 +2529,7 @@ void lv_obj_set_style_border_post(lv_obj_t * obj, bool value, lv_style_selector_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2542,7 +2542,7 @@ void lv_obj_set_style_outline_width(lv_obj_t * obj, int32_t value, lv_style_sele
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2557,7 +2557,7 @@ void lv_obj_set_style_outline_color(lv_obj_t * obj, lv_color_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2570,7 +2570,7 @@ void lv_obj_set_style_outline_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2583,7 +2583,7 @@ void lv_obj_set_style_outline_pad(lv_obj_t * obj, int32_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2596,7 +2596,7 @@ void lv_obj_set_style_shadow_width(lv_obj_t * obj, int32_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2609,7 +2609,7 @@ void lv_obj_set_style_shadow_offset_x(lv_obj_t * obj, int32_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2623,7 +2623,7 @@ void lv_obj_set_style_shadow_offset_y(lv_obj_t * obj, int32_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2636,7 +2636,7 @@ void lv_obj_set_style_shadow_spread(lv_obj_t * obj, int32_t value, lv_style_sele
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2651,7 +2651,7 @@ void lv_obj_set_style_shadow_color(lv_obj_t * obj, lv_color_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2666,7 +2666,7 @@ void lv_obj_set_style_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2679,7 +2679,7 @@ void lv_obj_set_style_image_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selecto
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2694,7 +2694,7 @@ void lv_obj_set_style_image_recolor(lv_obj_t * obj, lv_color_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2709,7 +2709,7 @@ void lv_obj_set_style_image_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style
  * @param  value      Pointer to image color key
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2722,7 +2722,7 @@ void lv_obj_set_style_image_colorkey(lv_obj_t * obj, const lv_image_colorkey_t *
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2735,7 +2735,7 @@ void lv_obj_set_style_line_width(lv_obj_t * obj, int32_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2749,7 +2749,7 @@ void lv_obj_set_style_line_dash_width(lv_obj_t * obj, int32_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2762,7 +2762,7 @@ void lv_obj_set_style_line_dash_gap(lv_obj_t * obj, int32_t value, lv_style_sele
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2775,7 +2775,7 @@ void lv_obj_set_style_line_rounded(lv_obj_t * obj, bool value, lv_style_selector
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2788,7 +2788,7 @@ void lv_obj_set_style_line_color(lv_obj_t * obj, lv_color_t value, lv_style_sele
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2801,7 +2801,7 @@ void lv_obj_set_style_line_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2814,7 +2814,7 @@ void lv_obj_set_style_arc_width(lv_obj_t * obj, int32_t value, lv_style_selector
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2827,7 +2827,7 @@ void lv_obj_set_style_arc_rounded(lv_obj_t * obj, bool value, lv_style_selector_
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2840,7 +2840,7 @@ void lv_obj_set_style_arc_color(lv_obj_t * obj, lv_color_t value, lv_style_selec
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2854,7 +2854,7 @@ void lv_obj_set_style_arc_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_
  * @param  value      Pointer to image source
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2867,7 +2867,7 @@ void lv_obj_set_style_arc_image_src(lv_obj_t * obj, const void * value, lv_style
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2882,7 +2882,7 @@ void lv_obj_set_style_text_color(lv_obj_t * obj, lv_color_t value, lv_style_sele
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2895,7 +2895,7 @@ void lv_obj_set_style_text_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector
  * @param  value      Pointer to font
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2908,7 +2908,7 @@ void lv_obj_set_style_text_font(lv_obj_t * obj, const lv_font_t * value, lv_styl
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2921,7 +2921,7 @@ void lv_obj_set_style_text_letter_space(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2935,7 +2935,7 @@ void lv_obj_set_style_text_line_space(lv_obj_t * obj, int32_t value, lv_style_se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2951,7 +2951,7 @@ void lv_obj_set_style_text_decor(lv_obj_t * obj, lv_text_decor_t value, lv_style
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2964,7 +2964,7 @@ void lv_obj_set_style_text_align(lv_obj_t * obj, lv_text_align_t value, lv_style
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2977,7 +2977,7 @@ void lv_obj_set_style_text_outline_stroke_color(lv_obj_t * obj, lv_color_t value
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -2992,7 +2992,7 @@ void lv_obj_set_style_text_outline_stroke_width(lv_obj_t * obj, int32_t value, l
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3006,7 +3006,7 @@ void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3021,7 +3021,7 @@ void lv_obj_set_style_blur_radius(lv_obj_t * obj, int32_t value, lv_style_select
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3036,7 +3036,7 @@ void lv_obj_set_style_blur_backdrop(lv_obj_t * obj, bool value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3050,7 +3050,7 @@ void lv_obj_set_style_blur_quality(lv_obj_t * obj, lv_blur_quality_t value, lv_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3063,7 +3063,7 @@ void lv_obj_set_style_drop_shadow_radius(lv_obj_t * obj, int32_t value, lv_style
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3076,7 +3076,7 @@ void lv_obj_set_style_drop_shadow_offset_x(lv_obj_t * obj, int32_t value, lv_sty
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3089,7 +3089,7 @@ void lv_obj_set_style_drop_shadow_offset_y(lv_obj_t * obj, int32_t value, lv_sty
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3102,7 +3102,7 @@ void lv_obj_set_style_drop_shadow_color(lv_obj_t * obj, lv_color_t value, lv_sty
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3117,7 +3117,7 @@ void lv_obj_set_style_drop_shadow_opa(lv_obj_t * obj, lv_opa_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3131,7 +3131,7 @@ void lv_obj_set_style_drop_shadow_quality(lv_obj_t * obj, lv_blur_quality_t valu
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3144,7 +3144,7 @@ void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t 
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3158,7 +3158,7 @@ void lv_obj_set_style_radial_offset(lv_obj_t * obj, int32_t value, lv_style_sele
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3173,7 +3173,7 @@ void lv_obj_set_style_clip_corner(lv_obj_t * obj, bool value, lv_style_selector_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3189,7 +3189,7 @@ void lv_obj_set_style_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t se
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3202,7 +3202,7 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  * @param  value      Pointer to color-filter descriptor
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3215,7 +3215,7 @@ void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3228,7 +3228,7 @@ void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_
  * @param  value      Color to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3244,7 +3244,7 @@ void lv_obj_set_style_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selecto
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3260,7 +3260,7 @@ void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selec
  * @param  value      Pointer to animation descriptor
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3275,7 +3275,7 @@ void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_sel
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3288,7 +3288,7 @@ void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_sel
  * @param  value      Pointer to transition descriptor
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3302,7 +3302,7 @@ void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3316,7 +3316,7 @@ void lv_obj_set_style_blend_mode(lv_obj_t * obj, lv_blend_mode_t value, lv_style
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3329,7 +3329,7 @@ void lv_obj_set_style_layout(lv_obj_t * obj, uint16_t value, lv_style_selector_t
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3343,7 +3343,7 @@ void lv_obj_set_style_base_dir(lv_obj_t * obj, lv_base_dir_t value, lv_style_sel
  * @param  value      Pointer to A8 bitmap mask
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3357,7 +3357,7 @@ void lv_obj_set_style_bitmap_mask_src(lv_obj_t * obj, const void * value, lv_sty
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3365,13 +3365,13 @@ void lv_obj_set_style_rotary_sensitivity(lv_obj_t * obj, uint32_t value, lv_styl
 
 #if LV_USE_FLEX
 /**
- * Defines in which direct the flex layout should arrange the children.
+ * Defines in which direction the flex layout should arrange the children.
  * Default: `LV_FLEX_FLOW_NONE`, inherited: No, layout: Yes, ext. draw: No.
  * @param  obj        Pointer to Widget
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3384,7 +3384,7 @@ void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3397,7 +3397,7 @@ void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3410,7 +3410,7 @@ void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3423,7 +3423,7 @@ void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3439,7 +3439,7 @@ void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector
  * @param  value      Pointer to grid-column descriptor array
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3452,7 +3452,7 @@ void lv_obj_set_style_grid_column_dsc_array(lv_obj_t * obj, const int32_t * valu
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3465,7 +3465,7 @@ void lv_obj_set_style_grid_column_align(lv_obj_t * obj, lv_grid_align_t value, l
  * @param  value      Pointer to grid-row descriptor array
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3478,7 +3478,7 @@ void lv_obj_set_style_grid_row_dsc_array(lv_obj_t * obj, const int32_t * value, 
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3491,7 +3491,7 @@ void lv_obj_set_style_grid_row_align(lv_obj_t * obj, lv_grid_align_t value, lv_s
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3504,7 +3504,7 @@ void lv_obj_set_style_grid_cell_column_pos(lv_obj_t * obj, int32_t value, lv_sty
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3517,7 +3517,7 @@ void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_grid_align_t value, l
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3530,7 +3530,7 @@ void lv_obj_set_style_grid_cell_column_span(lv_obj_t * obj, int32_t value, lv_st
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3543,7 +3543,7 @@ void lv_obj_set_style_grid_cell_row_pos(lv_obj_t * obj, int32_t value, lv_style_
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */
@@ -3556,7 +3556,7 @@ void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_grid_align_t value, l
  * @param  value      Value to submit
  * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:
                           - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`
-                          - `LV_STATE_PRSSED`
+                          - `LV_STATE_PRESSED`
                           - `LV_PART_KNOB`
                           - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`
  */

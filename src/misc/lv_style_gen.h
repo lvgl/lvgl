@@ -1015,7 +1015,7 @@ void lv_style_set_rotary_sensitivity(lv_style_t * style, uint32_t value);
 
 #if LV_USE_FLEX
 /**
- * Defines in which direct the flex layout should arrange the children.
+ * Defines in which direction the flex layout should arrange the children.
  * Default: `LV_FLEX_FLOW_NONE`, inherited: No, layout: Yes, ext. draw: No.
  * @param  style   Pointer to style
  * @param  value   Value to submit
@@ -2365,7 +2365,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 
 #if LV_USE_FLEX
 /**
- * Defines in which direct the flex layout should arrange the children.
+ * Defines in which direction the flex layout should arrange the children.
  * Default: `LV_FLEX_FLOW_NONE`, inherited: No, layout: Yes, ext. draw: No.
  * @param  val   Value to submit
  */

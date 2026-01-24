@@ -492,7 +492,7 @@ props = [
 
 {'name': 'FLEX_FLOW',
  'style_type': 'num',   'var_type': 'lv_flex_flow_t', 'default':'`LV_FLEX_FLOW_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines in which direct the flex layout should arrange the children."},
+ 'dsc': "Defines in which direction the flex layout should arrange the children."},
 
 
 {'name': 'FLEX_MAIN_PLACE',
@@ -803,7 +803,7 @@ def local_style_set_doxygen_comment(p):
     print_value_param(p, indent='   ')
     print(' * @param  selector   A joint type for `lv_part_t` and `lv_state_t`. Example values:')
     print('                          - `0`: means `LV_PART_MAIN | LV_STATE_DEFAULT`')
-    print('                          - `LV_STATE_PRSSED`')
+    print('                          - `LV_STATE_PRESSED`')
     print('                          - `LV_PART_KNOB`')
     print('                          - `LV_PART_KNOB | LV_STATE_PRESSED | LV_STATE_CHECKED`')
     print(' */')

@@ -1760,7 +1760,7 @@ Flex layout properties.
 flex_flow
 ~~~~~~~~~
 
-Defines in which direct the flex layout should arrange the children.
+Defines in which direction the flex layout should arrange the children.
 
 .. raw:: html
 
