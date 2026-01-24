@@ -694,7 +694,7 @@ PFNGLISBUFFERPROC glad_glIsBuffer = NULL;
 PFNGLISBUFFERARBPROC glad_glIsBufferARB = NULL;
 PFNGLISENABLEDPROC glad_glIsEnabled = NULL;
 PFNGLISENABLEDINDEXEDEXTPROC glad_glIsEnabledIndexedEXT = NULL;
-PFNGLISENABLEDIPROC glad_glIsEnabled = NULL;
+PFNGLISENABLEDIPROC glad_glIsEnabledi = NULL;
 PFNGLISFRAMEBUFFERPROC glad_glIsFramebuffer = NULL;
 PFNGLISFRAMEBUFFEREXTPROC glad_glIsFramebufferEXT = NULL;
 PFNGLISLISTPROC glad_glIsList = NULL;
@@ -2216,7 +2216,7 @@ static void glad_gl_load_GL_VERSION_3_0( GLADuserptrloadfunc load, void* userptr
     glad_glGetUniformuiv = (PFNGLGETUNIFORMUIVPROC) load(userptr, "glGetUniformuiv");
     glad_glGetVertexAttribIiv = (PFNGLGETVERTEXATTRIBIIVPROC) load(userptr, "glGetVertexAttribIiv");
     glad_glGetVertexAttribIuiv = (PFNGLGETVERTEXATTRIBIUIVPROC) load(userptr, "glGetVertexAttribIuiv");
-    glad_glIsEnabled = (PFNGLISENABLEDIPROC) load(userptr, "glIsEnabled");
+    glad_glIsEnabledi = (PFNGLISENABLEDIPROC) load(userptr, "glIsEnabledi");
     glad_glIsFramebuffer = (PFNGLISFRAMEBUFFERPROC) load(userptr, "glIsFramebuffer");
     glad_glIsRenderbuffer = (PFNGLISRENDERBUFFERPROC) load(userptr, "glIsRenderbuffer");
     glad_glIsVertexArray = (PFNGLISVERTEXARRAYPROC) load(userptr, "glIsVertexArray");
@@ -3807,8 +3807,8 @@ static void glad_gl_resolve_aliases(void) {
     if (glad_glGetVertexAttribPointervNV == NULL && glad_glGetVertexAttribPointervARB != NULL) glad_glGetVertexAttribPointervNV = (PFNGLGETVERTEXATTRIBPOINTERVNVPROC)glad_glGetVertexAttribPointervARB;
     if (glad_glIsBuffer == NULL && glad_glIsBufferARB != NULL) glad_glIsBuffer = (PFNGLISBUFFERPROC)glad_glIsBufferARB;
     if (glad_glIsBufferARB == NULL && glad_glIsBuffer != NULL) glad_glIsBufferARB = (PFNGLISBUFFERARBPROC)glad_glIsBuffer;
-    if (glad_glIsEnabled == NULL && glad_glIsEnabledIndexedEXT != NULL) glad_glIsEnabled = (PFNGLISENABLEDIPROC)glad_glIsEnabledIndexedEXT;
-    if (glad_glIsEnabledIndexedEXT == NULL && glad_glIsEnabled != NULL) glad_glIsEnabledIndexedEXT = (PFNGLISENABLEDINDEXEDEXTPROC)glad_glIsEnabled;
+    if (glad_glIsEnabledi == NULL && glad_glIsEnabledIndexedEXT != NULL) glad_glIsEnabledi = (PFNGLISENABLEDIPROC)glad_glIsEnabledIndexedEXT;
+    if (glad_glIsEnabledIndexedEXT == NULL && glad_glIsEnabledi != NULL) glad_glIsEnabledIndexedEXT = (PFNGLISENABLEDINDEXEDEXTPROC)glad_glIsEnabledi;
     if (glad_glIsFramebuffer == NULL && glad_glIsFramebufferEXT != NULL) glad_glIsFramebuffer = (PFNGLISFRAMEBUFFERPROC)glad_glIsFramebufferEXT;
     if (glad_glIsFramebufferEXT == NULL && glad_glIsFramebuffer != NULL) glad_glIsFramebufferEXT = (PFNGLISFRAMEBUFFEREXTPROC)glad_glIsFramebuffer;
     if (glad_glIsProgramARB == NULL && glad_glIsProgramNV != NULL) glad_glIsProgramARB = (PFNGLISPROGRAMARBPROC)glad_glIsProgramNV;

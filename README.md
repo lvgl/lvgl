@@ -85,7 +85,7 @@ export C code, or load the XMLs at runtime. Learn more here.
 
 ## 📦️ Platform Support
 
-LVGL has no external dependencies, so it can be easily compiled for any devices and it's  also available in many package managers and TOSes:
+LVGL has no external dependencies, so it can be easily compiled for any devices and it's  also available in many package managers and RTOSes:
 
 - [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
