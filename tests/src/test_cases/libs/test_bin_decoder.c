@@ -227,7 +227,7 @@ void test_bin_decoder_decoder_dsc_error_handling(void)
 {
     lv_image_decoder_dsc_t * decoder_dsc = get_image_decoder_dsc();
 
-    /* Test info invalid file exension */
+    /* Test info invalid file extension */
     decoder_dsc->src = "test_image.png";
     lv_result_t result = lv_bin_decoder_info(NULL, decoder_dsc, NULL);
     TEST_ASSERT_EQUAL(LV_RESULT_INVALID, result);

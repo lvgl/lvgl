@@ -519,7 +519,7 @@ static void * create_native_window(lv_opengles_egl_t * ctx)
 
     void * native_window = ctx->interface.create_window_cb(ctx->interface.driver_data, &properties);
     if(!native_window) {
-        LV_LOG_ERROR("Faield to create window");
+        LV_LOG_ERROR("Failed to create window");
         lv_free(mods);
         return NULL;
     }

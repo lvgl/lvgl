@@ -377,7 +377,7 @@ static void ibl_panorama_to_cubemap(lv_gltf_ibl_sampler_t * sampler)
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         while(status != GL_FRAMEBUFFER_COMPLETE) {
             status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            LV_LOG_ERROR("Environnement render error not complete. Expected %d. Got %d", GL_FRAMEBUFFER_COMPLETE,
+            LV_LOG_ERROR("Environment render error not complete. Expected %d. Got %d", GL_FRAMEBUFFER_COMPLETE,
                          status);
         }
         GL_CALL(glViewport(0, 0, sampler->cube_map_resolution, sampler->cube_map_resolution));
@@ -584,7 +584,7 @@ static void init_fullscreen_quad(lv_gltf_ibl_sampler_t * sampler)
         1.0f,  1.0f
     };
 
-    /* Texture coords go from 0 0 (left botton) to 1 1 (right top)*/
+    /* Texture coords go from 0 0 (left bottom) to 1 1 (right top)*/
     GLfloat texCoords[] = {
         0.0f, 0.0f,
         1.0f, 0.0f,
