@@ -908,4 +908,22 @@ void test_label_invalidate_area(void)
     lv_display_remove_event_cb_with_user_data(lv_display_get_default(), display_invalidate_area_cb, &i);
 }
 
+void test_label_no_leading_space_after_line_wrap(void)
+{
+    /*
+     * Test for issue #9629: Leading space after line wrap in labels
+     * When text wraps at a space character, the next line should not
+     * start with that space.
+     */
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label, "LongWord not!");
+    lv_obj_set_size(test_label, 80, 100);
+    lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREEN), 0);
+    lv_obj_set_style_bg_opa(test_label, LV_OPA_COVER, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_no_leading_space.png");
+}
+
 #endif

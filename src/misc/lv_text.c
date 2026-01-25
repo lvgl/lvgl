@@ -412,6 +412,11 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
         *used_width = line_w;
     }
 
+    /*Skip leading spaces of the next line*/
+    while(i < len && txt[i] == ' ') {
+        i++;
+    }
+
     return i;
 }
 
