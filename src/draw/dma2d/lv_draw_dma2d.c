@@ -157,6 +157,41 @@ uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_col
 
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf)
 {
+    /* Check that addresses are valid regarding to alignment constraints */
+    if(((conf->output_cf == LV_DRAW_DMA2D_OUTPUT_CF_ARGB8888) &&
+        (((uint32_t)(uintptr_t) conf->output_address) & 0x03)) ||
+       ((conf->output_cf == LV_DRAW_DMA2D_OUTPUT_CF_RGB888) &&
+        (((uint32_t)(uintptr_t) conf->output_address) & 0x03)) ||
+       ((conf->output_cf == LV_DRAW_DMA2D_OUTPUT_CF_RGB565) &&
+        (((uint32_t)(uintptr_t) conf->output_address) & 0x01)) ||
+       ((conf->output_cf == LV_DRAW_DMA2D_OUTPUT_CF_ARGB1555) &&
+        (((uint32_t)(uintptr_t) conf->output_address) & 0x01))) {
+        LV_LOG_WARN("Incompatible output address %p and format 0x%x",
+                    conf->output_address, conf->output_cf);
+    }
+    if(((conf->fg_cf == LV_DRAW_DMA2D_FGBG_CF_ARGB8888) &&
+        (((uint32_t)(uintptr_t) conf->fg_address) & 0x03)) ||
+       ((conf->fg_cf == LV_DRAW_DMA2D_FGBG_CF_RGB888) &&
+        (((uint32_t)(uintptr_t) conf->fg_address) & 0x03)) ||
+       ((conf->fg_cf == LV_DRAW_DMA2D_FGBG_CF_RGB565) &&
+        (((uint32_t)(uintptr_t) conf->fg_address) & 0x01)) ||
+       ((conf->fg_cf == LV_DRAW_DMA2D_FGBG_CF_ARGB1555) &&
+        (((uint32_t)(uintptr_t) conf->fg_address) & 0x01))) {
+        LV_LOG_WARN("Incompatible foreground address %p and format 0x%x",
+                    conf->fg_address, conf->fg_cf);
+    }
+    if(((conf->bg_cf == LV_DRAW_DMA2D_FGBG_CF_ARGB8888) &&
+        (((uint32_t)(uintptr_t) conf->bg_address) & 0x03)) ||
+       ((conf->bg_cf == LV_DRAW_DMA2D_FGBG_CF_RGB888) &&
+        (((uint32_t)(uintptr_t) conf->bg_address) & 0x03)) ||
+       ((conf->bg_cf == LV_DRAW_DMA2D_FGBG_CF_RGB565) &&
+        (((uint32_t)(uintptr_t) conf->bg_address) & 0x01)) ||
+       ((conf->bg_cf == LV_DRAW_DMA2D_FGBG_CF_ARGB1555) &&
+        (((uint32_t)(uintptr_t) conf->bg_address) & 0x01))) {
+        LV_LOG_WARN("Incompatible background address %p and format 0x%x",
+                    conf->bg_address, conf->bg_cf);
+    }
+
     /* number of lines register */
     DMA2D->NLR = (conf->w << DMA2D_NLR_PL_Pos) | (conf->h << DMA2D_NLR_NL_Pos);
 
