@@ -227,7 +227,8 @@ are available if needed. They are wrappers around ``EVE_memRead8()``, etc.
 
 Register definitions and other EVE enumerations are available when you include
 ``lvgl.h`` under the prefix namespace ``LV_EVE_``. I.e., ``REG_ID`` is available
-as ``LV_EVE_REG_ID`` and ``EVE_ROM_CHIPID`` is available as ``LV_EVE_EVE_ROM_CHIPID``, etc.
+as :c:macro:`LV_EVE_REG_ID` and :c:macro:`EVE_ROM_CHIPID` is available as
+:c:macro:`LV_EVE_EVE_ROM_CHIPID`, etc.
 
 
 Further Reading

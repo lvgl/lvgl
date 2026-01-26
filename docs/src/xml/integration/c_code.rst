@@ -8,7 +8,7 @@ Overview
 ********
 
 When C code is exported from LVGL's UI Editor, no XML is needed at all
-(``LV_USE_XML`` can be ``0``), and it's very similar to the case when the C code is
+(:c:macro:`LV_USE_XML` can be ``0``), and it's very similar to the case when the C code is
 written by hand.
 
 The exported C code can simply be dropped into the project and compiled into the

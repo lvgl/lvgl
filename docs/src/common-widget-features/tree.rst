@@ -67,7 +67,7 @@ Setting Names
 -------------
 
 To address these issues, LVGL introduces a powerful Widget naming system that can be enabled
-by setting ``LV_USE_OBJ_NAME`` in ``lv_conf.h``.
+by setting :c:macro:`LV_USE_OBJ_NAME` in ``lv_conf.h``.
 
 A custom name can be assigned using :cpp:expr:`lv_obj_set_name(obj, "name")` or
 :cpp:expr:`lv_obj_set_name_static(obj, "name")`. The "static" variant requires that the passed

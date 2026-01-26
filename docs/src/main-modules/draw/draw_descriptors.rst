@@ -394,7 +394,7 @@ shapes, text, or images.  It includes the following fields:
 :spread:    Expands the rectangle in all directions; can be negative.
 :ofs_x:     Horizontal offset.
 :ofs_y:     Vertical offset.
-:opa:       Opacity (0--255 range). Values like ``LV_OPA_TRANSP``, ``LV_OPA_10``,
+:opa:       Opacity (0--255 range). Values like :cpp:enumerator:`LV_OPA_TRANSP`, :cpp:enumerator:`LV_OPA_10`,
             etc., can also be used.
 :bg_cover:  Set to 1 if the background will cover the shadow (a hint for the
             renderer to skip masking).
@@ -421,7 +421,7 @@ image drawing.  It is a complex descriptor with the following options:
 
 :src:              The image source, either a pointer to `lv_image_dsc_t` or a file path.
 :opa:              Opacity in the 0--255 range. Options like
-                   ``LV_OPA_TRANSP``, ``LV_OPA_10``, etc., can also be used.
+                   :cpp:enumerator:`LV_OPA_TRANSP`, :cpp:enumerator:`LV_OPA_10`, etc., can also be used.
 :clip_radius:      Clips the corners of the image with this radius.  Use
                    `LV_RADIUS_CIRCLE` for the maximum radius.
 :rotation:         Image rotation in 0.1-degree units (e.g., 234 means 23.4\ |deg|\ ).
@@ -496,7 +496,7 @@ for controlling text rendering:
 :ofs_y:         Vertical text offset.
 :sel_start:     Index of the first character for selection (character index, not byte
                 index, since some characters can be multi-byte characters).
-                ``LV_DRAW_LABEL_NO_TXT_SEL`` means no selection.
+                :c:macro:`LV_DRAW_LABEL_NO_TXT_SEL` means no selection.
 :sel_end:       Index of the last character for selection.
 :sel_color:     Color of selected characters.
 :sel_bg_color:  Background color for selected characters.
@@ -610,7 +610,7 @@ Triangles are defined by :cpp:type:`lv_draw_triangle_dsc_t`, which includes:
 :p[3]:   3 points for the triangle's vertices.
 :color:  Triangle color.
 :opa:    Triangle opacity.
-:grad:   Gradient options. If ``grad.dir`` is not ``LV_GRAD_DIR_NONE``, the
+:grad:   Gradient options. If ``grad.dir`` is not :cpp:enumerator:`LV_GRAD_DIR_NONE`, the
          ``color`` field is ignored. The ``opa`` field adjusts overall opacity.
 
 Functions for triangle drawing:

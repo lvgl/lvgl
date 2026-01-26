@@ -65,21 +65,21 @@ Using Logging
 
 You use the log module via the following macros:
 
-- ``LV_LOG_TRACE(text)``
-- ``LV_LOG_INFO(text)``
-- ``LV_LOG_WARN(text)``
-- ``LV_LOG_ERROR(text)``
-- ``LV_LOG_USER(text)``
-- ``LV_LOG(text)``
+- :c:macro:`LV_LOG_TRACE`\ (text)
+- :c:macro:`LV_LOG_INFO`\ (text)
+- :c:macro:`LV_LOG_WARN`\ (text)
+- :c:macro:`LV_LOG_ERROR`\ (text)
+- :c:macro:`LV_LOG_USER`\ (text)
+- :c:macro:`LV_LOG`\ (text)
 
 The first 5 macros append the following information to your ``text``:
 
 -  Log Level name ("Trace", "Info", "Warn", "Error", "User")
--  \__FILE\_\_
--  \__LINE\_\_
--  \__func\_\_
+-  ``__FILE__``
+-  ``__LINE__``
+-  ``__func__``
 
-``LV_LOG(text)`` is similar to ``LV_LOG_USER`` but has no extra information added.
+:c:macro:`LV_LOG`\ (text) is similar to :c:macro:`LV_LOG_USER` but has no extra information added.
 
 
 

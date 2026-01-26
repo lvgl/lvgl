@@ -94,15 +94,14 @@ To use vector graphics with NeoChrom, you should enable the following configs in
     LV_USE_MATRIX 1
     LV_USE_FLOAT 1
 
-To use the SVG widget, additionally enable ``LV_USE_SVG``.
+To use the SVG widget, additionally enable :c:macro:`LV_USE_SVG`.
 
-If there is RAM available, SVG performance can be increased by enabling the image cache,
-``LV_CACHE_DEF_SIZE``.
-``LV_CACHE_DEF_SIZE`` is a cache size in bytes. If it is large enough for your SVGs,
+If there is RAM available, SVG performance can be increased by enabling the image cache, :c:macro:`LV_CACHE_DEF_SIZE`.
+:c:macro:`LV_CACHE_DEF_SIZE` is a cache size in bytes. If it is large enough for your SVGs,
 it will cache decoded SVG data so it does not need to be parsed every refresh, significantly
 reducing SVG redraw time.
 
-``LV_USE_DEMO_VECTOR_GRAPHIC`` is a demo you can enable which draws some vector graphics shapes.
+:c:macro:`LV_USE_DEMO_VECTOR_GRAPHIC` is a demo you can enable which draws some vector graphics shapes.
 Gradient and image fills are not supported yet, as well as dashed strokes. These are
 missing from the demo when it is run with the NeoChrom driver.
 

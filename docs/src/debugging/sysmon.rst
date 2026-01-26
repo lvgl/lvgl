@@ -13,9 +13,9 @@ metrics directly on your display. It supports both performance monitoring
 Dependencies
 ************
 
-- Requires ``LV_USE_LABEL = 1`` in lv_conf.h
-- Requires ``LV_USE_OBSERVER = 1`` in lv_conf.h
-- Requires ``LV_USE_SYSMON = 1`` in lv_conf.h
+- Requires :c:macro:`LV_USE_LABEL` = 1 in lv_conf.h
+- Requires :c:macro:`LV_USE_OBSERVER` = 1 in lv_conf.h
+- Requires :c:macro:`LV_USE_SYSMON` = 1 in lv_conf.h
 
 
 
@@ -168,4 +168,4 @@ Timers
 
 - Performance: ``perf_update_timer_cb``
 - Memory: ``mem_update_timer_cb``
-- Default period: 300ms (``LV_SYSMON_REFR_PERIOD_DEF``)
+- Default period: 300ms (:c:macro:`LV_SYSMON_REFR_PERIOD_DEF`)

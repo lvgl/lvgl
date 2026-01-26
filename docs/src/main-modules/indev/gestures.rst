@@ -75,7 +75,7 @@ gestures are supported:
 - Two fingers rotation
 - Two fingers swipe (infinite)
 
-To enable multi-touch gesture recognition, set the ``LV_USE_GESTURE_RECOGNITION``
+To enable multi-touch gesture recognition, set the :c:macro:`LV_USE_GESTURE_RECOGNITION`
 option in the ``lv_conf.h`` file.
 
 
@@ -125,16 +125,16 @@ Here is a generic example of the ``read_cb``:
 
 LVGL sends events if the gestures are in one of the following states:
 
-- ``LV_INDEV_GESTURE_STATE_RECOGNIZED``: The gesture has been recognized and is now
+- :cpp:enumerator:`LV_INDEV_GESTURE_STATE_RECOGNIZED`: The gesture has been recognized and is now
   active.
-- ``LV_INDEV_GESTURE_STATE_ENDED``: The gesture has ended.
+- :cpp:enumerator:`LV_INDEV_GESTURE_STATE_ENDED`: The gesture has ended.
 
 
 
 Events
 ------
 
-Once a gesture is recognized or ended, a ``LV_EVENT_GESTURE`` is sent. The user can
+Once a gesture is recognized or ended, a :cpp:enumerator:`LV_EVENT_GESTURE` is sent. The user can
 use these functions to gather more information about the gesture:
 
 - :cpp:expr:`lv_event_get_gesture_type(lv_event_t * e)`: Get the type of the gesture.

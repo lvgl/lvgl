@@ -227,7 +227,7 @@ Solving the Problem
 ~~~~~~~~~~~~~~~~~~~
 
 - Replace the global/static local var with :cpp:expr:`(LV_GLOBAL_DEFAULT()->_var)`
-- Include ``lv_global.h`` on files that use ``LV_GLOBAL_DEFAULT``
+- Include ``lv_global.h`` on files that use :c:macro:`LV_GLOBAL_DEFAULT`
 - Add ``_var`` to ``lv_global_t`` on ``lv_global.h``
 
 
