@@ -116,9 +116,11 @@ typedef struct {
 typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * volatile task_act;
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t writing_area;
-#endif
+
+    /** Last draw task clipped area, stored here so that we can invalidate
+    the cache after the drawing operation is done. This can either happen
+    immediately after the draw operation is done or on the DMA2D IRQ callback */
+    lv_area_t last_clipped_area;
 #if LV_DRAW_DMA2D_ASYNC
     lv_thread_sync_t interrupt_signal;
 #endif

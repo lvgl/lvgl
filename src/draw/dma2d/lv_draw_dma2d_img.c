@@ -87,19 +87,6 @@ static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc
     uint32_t image_cf_size = LV_COLOR_FORMAT_GET_SIZE(image_cf);
     if(image_stride == 0) image_stride = image_cf_size * decoded->header.w;
 
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t dest_area = {
-        .first_byte = dest_first_pixel,
-        .width_bytes = w * output_cf_size,
-        .height = h,
-        .stride = dest_stride
-    };
-    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) t->draw_unit;
-    lv_memcpy(&u->writing_area, &dest_area, sizeof(lv_draw_dma2d_cache_area_t));
-    /* make sure the background area DMA2D is blending is up-to-date in main memory */
-    lv_draw_dma2d_clean_cache(&dest_area);
-#endif
-
     const void * image_first_byte = src_buf
                                     + (image_stride * (clipped_img_area->y1 - draw_dsc->image_area.y1))
                                     + (image_cf_size * (clipped_img_area->x1 - draw_dsc->image_area.x1));
