@@ -656,7 +656,8 @@ static void lv_refr_join_area(void)
 static void refr_sync_areas(void)
 {
     /*Do not sync if not direct double buffered and no sync callback set*/
-    const bool auto_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT && lv_display_is_double_buffered(disp_refr);
+    const bool auto_sync = disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT &&
+                           lv_display_is_double_buffered(disp_refr);
     const bool user_sync = disp_refr->sync_cb != NULL;
     if(!auto_sync && !user_sync) return;
 
