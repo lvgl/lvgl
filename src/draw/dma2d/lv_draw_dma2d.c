@@ -345,13 +345,19 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t->draw_unit = draw_unit;
     draw_dma2d_unit->task_act = t;
 
+    /* Abort rapidly if nothing to do */
+    lv_area_t clipped_coords;
+    if(!lv_area_intersect(&clipped_coords, &t->area, &t->clip_area)) {
+        draw_dma2d_unit->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
+        draw_dma2d_unit->task_act = NULL;
+
+        lv_draw_dispatch_request();
+
+        return 1;
+    }
+
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * dsc = t->draw_dsc;
-        const lv_area_t * coords = &t->area;
-        lv_area_t clipped_coords;
-        if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
-            return LV_DRAW_UNIT_IDLE;
-        }
 
         void * dest = lv_draw_layer_go_to_xy(layer,
                                              clipped_coords.x1 - layer->buf_area.x1,
@@ -373,14 +379,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
     }
     else if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-        lv_draw_image_dsc_t * dsc = t->draw_dsc;
-        const lv_area_t * coords = &t->area;
-        lv_area_t clipped_coords;
-        if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
-            return LV_DRAW_UNIT_IDLE;
-        }
-
-        lv_draw_dma2d_image(t, dsc, &t->area);
+        lv_draw_dma2d_image(t, t->draw_dsc, &t->area);
     }
 
     lv_draw_dispatch_request();
