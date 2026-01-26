@@ -91,17 +91,6 @@ static void lv_draw_dma2d_image_core(lv_draw_task_t * t, const lv_draw_image_dsc
                                     + (image_stride * (clipped_img_area->y1 - draw_dsc->image_area.y1))
                                     + (image_cf_size * (clipped_img_area->x1 - draw_dsc->image_area.x1));
 
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t src_area = {
-        .first_byte = image_first_byte,
-        .width_bytes = w * image_cf_size,
-        .height = h,
-        .stride = image_stride
-    };
-    /* make sure the image area is up-to-date in main memory for DMA2D */
-    lv_draw_dma2d_clean_cache(&src_area);
-#endif
-
     uint32_t output_offset = (dest_stride / output_cf_size) - w;
     lv_draw_dma2d_configuration_t conf = {
         .mode = LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_BLENDING,
