@@ -500,8 +500,15 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     if(streamer->last_sample) {
         gst_sample_unref(streamer->last_sample);
     }
+    if(streamer->frame_queue) {
+        GstSample * sample;
+        while((sample = g_async_queue_try_pop(streamer->frame_queue)) != NULL) {
+            gst_sample_unref(sample);
+        }
+        g_async_queue_unref(streamer->frame_queue);
+        streamer->frame_queue = NULL;
+    }
     lv_timer_delete(streamer->gstreamer_timer);
-    g_async_queue_unref(streamer->frame_queue);
 }
 
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
