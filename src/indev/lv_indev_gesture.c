@@ -492,7 +492,7 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
                 to be higher than the threshold to pass it as recognized */
                 gesture_calculate_factors(r->info, 2);
                 dist = SQUARE_SUM(r->info->delta_x, r->info->delta_y);
-                if(dist > SQUARE(lv_indev_active()->gesture_limit)) {
+                if(dist > SQUARE(lv_indev_active()->gesture_min_distance)) {
                     r->state = LV_INDEV_GESTURE_STATE_RECOGNIZED;
                 }
                 break;
