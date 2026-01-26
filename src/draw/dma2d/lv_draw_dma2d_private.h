@@ -116,9 +116,7 @@ typedef struct {
 typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * volatile task_act;
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t writing_area;
-#endif
+    lv_area_t clipped_area;
 #if LV_DRAW_DMA2D_ASYNC
     lv_thread_sync_t interrupt_signal;
 #endif

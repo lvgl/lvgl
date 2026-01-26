@@ -12,6 +12,7 @@
 
 #include "../sw/lv_draw_sw.h"
 #include "../../misc/lv_area_private.h"
+#include "../lv_draw_buf_private.h"
 
 #if !LV_DRAW_DMA2D_ASYNC && LV_USE_DRAW_DMA2D_INTERRUPT
     #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE
@@ -41,6 +42,9 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit);
     static bool check_transfer_completion(void);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
+#if LV_DRAW_DMA2D_CACHE
+    static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -57,9 +61,21 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+void lv_draw_buf_dma2d_init_handlers(void)
+{
+#if LV_DRAW_DMA2D_CACHE
+    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * font_handlers = lv_draw_buf_get_font_handlers();
+    lv_draw_buf_handlers_t * image_handlers = lv_draw_buf_get_image_handlers();
+    handlers->invalidate_cache_cb = invalidate_cache;
+    font_handlers->invalidate_cache_cb = invalidate_cache;
+    image_handlers->invalidate_cache_cb = invalidate_cache;
+#endif
+}
 
 void lv_draw_dma2d_init(void)
 {
+    lv_draw_buf_dma2d_init_handlers();
     lv_draw_dma2d_unit_t * draw_dma2d_unit = lv_draw_create_unit(sizeof(lv_draw_dma2d_unit_t));
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
@@ -240,6 +256,33 @@ void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuratio
                 ;
 }
 
+
+#if LV_DRAW_DMA2D_CACHE
+static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
+{
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
+    lv_color_format_t cf = header->cf;
+
+    uint8_t * address = draw_buf->data;
+    int32_t i = 0;
+    uint32_t bytes_per_pixel = lv_color_format_get_size(cf);
+    int32_t width = lv_area_get_width(area);
+    int32_t lines = lv_area_get_height(area);
+    int32_t bytes_to_flush_per_line = (int32_t)width * (int32_t)bytes_per_pixel;
+
+    /* Stride is in bytes, not pixels */
+    address = address + (area->x1 * (int32_t)bytes_per_pixel) + (stride * (uint32_t)area->y1);
+
+    for(i = 0; i < lines; i++) {
+        if(SCB->CCR & SCB_CCR_DC_Msk) {
+            SCB_CleanInvalidateDCache_by_Addr(address, bytes_to_flush_per_line);
+        }
+        address += stride;
+    }
+}
+#endif
+
 #if LV_DRAW_DMA2D_CACHE
 void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 {
@@ -356,12 +399,19 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return 1;
     }
 
+    int32_t x = 0 - t->target_layer->buf_area.x1;
+    int32_t y = 0 - t->target_layer->buf_area.y1;
+
+    draw_dma2d_unit->clipped_area = clipped_coords;
+    lv_area_move(&draw_dma2d_unit->clipped_area, x, y);
+
+    /* Invalidate cache */
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &draw_dma2d_unit->clipped_area);
+
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * dsc = t->draw_dsc;
 
-        void * dest = lv_draw_layer_go_to_xy(layer,
-                                             clipped_coords.x1 - layer->buf_area.x1,
-                                             clipped_coords.y1 - layer->buf_area.y1);
+        void * dest = lv_draw_layer_go_to_xy(layer, draw_dma2d_unit->clipped_area.x1, draw_dma2d_unit->clipped_area.y1);
 
         lv_draw_dma2d_fill(t, dest,
                            lv_area_get_width(&clipped_coords),
@@ -405,9 +455,9 @@ static bool check_transfer_completion(void)
 
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u)
 {
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_invalidate_cache(&u->writing_area);
-#endif
+    /* Invalidate cache */
+    lv_draw_buf_invalidate_cache(u->task_act->target_layer->draw_buf, &u->clipped_area);
+
     u->task_act->state = LV_DRAW_TASK_STATE_FINISHED;
     u->task_act = NULL;
 }
