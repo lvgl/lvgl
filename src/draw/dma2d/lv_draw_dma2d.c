@@ -363,20 +363,10 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                                              clipped_coords.x1 - layer->buf_area.x1,
                                              clipped_coords.y1 - layer->buf_area.y1);
 
-        if(dsc->opa >= LV_OPA_MAX) {
-            lv_draw_dma2d_opaque_fill(t,
-                                      dest,
-                                      lv_area_get_width(&clipped_coords),
-                                      lv_area_get_height(&clipped_coords),
-                                      lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
-        }
-        else {
-            lv_draw_dma2d_fill(t,
-                               dest,
-                               lv_area_get_width(&clipped_coords),
-                               lv_area_get_height(&clipped_coords),
-                               lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
-        }
+        lv_draw_dma2d_fill(t, dest,
+                           lv_area_get_width(&clipped_coords),
+                           lv_area_get_height(&clipped_coords),
+                           lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
     }
     else if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
         lv_draw_dma2d_image(t, t->draw_dsc, &t->area);
