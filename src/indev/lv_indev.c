@@ -131,17 +131,17 @@ lv_indev_t * lv_indev_create(void)
 
     indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
-    indev->disp                 = lv_display_get_default();
-    indev->type                 = LV_INDEV_TYPE_NONE;
-    indev->mode                 = LV_INDEV_MODE_TIMER;
-    indev->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
-    indev->scroll_throw         = LV_INDEV_DEF_SCROLL_THROW;
-    indev->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
-    indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
-    indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
-    indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
-    indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
-    indev->key_remap_cb         = NULL;
+    indev->disp                   = lv_display_get_default();
+    indev->type                   = LV_INDEV_TYPE_NONE;
+    indev->mode                   = LV_INDEV_MODE_TIMER;
+    indev->scroll_limit           = LV_INDEV_DEF_SCROLL_LIMIT;
+    indev->scroll_throw           = LV_INDEV_DEF_SCROLL_THROW;
+    indev->long_press_time        = LV_INDEV_DEF_LONG_PRESS_TIME;
+    indev->long_press_repeat_time = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
+    indev->gesture_min_distance   = LV_INDEV_DEF_GESTURE_LIMIT;
+    indev->gesture_min_velocity   = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
+    indev->rotary_sensitivity     = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+    indev->key_remap_cb           = NULL;
 #if LV_USE_EXT_DATA
     indev->ext_data.free_cb = NULL;
     indev->ext_data.data = NULL;
@@ -412,6 +412,21 @@ void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw)
     if(indev == NULL) return;
 
     indev->scroll_throw = scroll_throw;
+}
+
+void lv_indev_set_gesture_min_distance(lv_indev_t * indev, uint8_t min_distance)
+{
+
+    if(indev == NULL) return;
+
+    indev->gesture_min_distance = min_distance;
+}
+
+void lv_indev_set_gesture_min_velocity(lv_indev_t * indev, uint8_t gesture_min_velocity)
+{
+    if(indev == NULL) return;
+
+    indev->gesture_min_velocity = gesture_min_velocity;
 }
 
 void * lv_indev_get_user_data(const lv_indev_t * indev)
@@ -1769,8 +1784,8 @@ void indev_gesture(lv_indev_t * indev)
     indev->pointer.gesture_sum.x += indev->pointer.vect.x;
     indev->pointer.gesture_sum.y += indev->pointer.vect.y;
 
-    if((LV_ABS(indev->pointer.gesture_sum.x) > indev_act->gesture_limit) ||
-       (LV_ABS(indev->pointer.gesture_sum.y) > indev_act->gesture_limit)) {
+    if((LV_ABS(indev->pointer.gesture_sum.x) > indev_act->gesture_min_distance) ||
+       (LV_ABS(indev->pointer.gesture_sum.y) > indev_act->gesture_min_distance)) {
 
         indev->pointer.gesture_sent = 1;
 

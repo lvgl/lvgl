@@ -59,10 +59,13 @@ Simple gestures are always enabled and very easy to use:
 To trigger a gesture, two things need to happen. The movement needs to be:
 
 1. fast enough: the difference between the current and the previous point must be
-   greater than ``indev->gesture_min_velocity``
+   greater than Indev's ``gesture_min_velocity``
 2. large enough: the difference between the first and the current point must be
-   greater than ``indev->gesture_limit``
+   greater than Indev's ``gesture_min_distance``
 
+
+These limits can be set via :cpp:func:`lv_indev_set_gesture_min_velocity` and
+:cpp:func:`lv_indev_set_gesture_min_distance` accordingly.
 
 
 Multi-touch Gestures

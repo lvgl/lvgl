@@ -71,11 +71,11 @@ struct _lv_indev_t {
     /**< Drag throw slow-down in [%]. Greater value means faster slow-down*/
     uint8_t scroll_throw;
 
-    /**< At least this difference should be between two points to evaluate as gesture*/
+    /**< Minimum velocity: difference between consecutive points must exceed this (in pixels) to detect gesture speed */
     uint8_t gesture_min_velocity;
 
-    /**< At least this difference should be to send a gesture*/
-    uint8_t gesture_limit;
+    /**< Minimum distance: total travel from first to current point must exceed this (in pixels) to trigger gesture */
+    uint8_t gesture_min_distance;
 
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
