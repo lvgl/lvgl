@@ -43,22 +43,6 @@ void lv_draw_dma2d_fill(lv_draw_task_t * t, void * first_pixel, int32_t w, int32
     lv_draw_dma2d_output_cf_t output_cf = lv_draw_dma2d_cf_to_dma2d_output_cf(cf);
     uint32_t cf_size = LV_COLOR_FORMAT_GET_SIZE(cf);
 
-#if LV_DRAW_DMA2D_CACHE
-    lv_draw_dma2d_cache_area_t cache_area = {
-        .first_byte = first_pixel,
-        .width_bytes = w * cf_size,
-        .height = h,
-        .stride = stride
-    };
-    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) t->draw_unit;
-    lv_memcpy(&u->writing_area, &cache_area, sizeof(lv_draw_dma2d_cache_area_t));
-
-    if(dsc->opa < LV_OPA_MAX) {
-        /* make sure the background area DMA2D is blending is up-to-date in main memory */
-        lv_draw_dma2d_clean_cache(&cache_area);
-    }
-#endif
-
     uint32_t output_offset = (stride / cf_size) - w;
 
     lv_draw_dma2d_configuration_t conf = {
