@@ -283,24 +283,6 @@ static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * a
 }
 #endif
 
-#if LV_DRAW_DMA2D_CACHE
-void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
-{
-    if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_InvalidateDCache_by_Addr((uint32_t *)mem_area->first_byte,
-                                     mem_area->stride * mem_area->height);
-    }
-}
-
-void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
-{
-    if(SCB->CCR & SCB_CCR_DC_Msk) {
-        SCB_CleanDCache_by_Addr((uint32_t *)mem_area->first_byte,
-                                mem_area->stride * mem_area->height);
-    }
-}
-#endif
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
