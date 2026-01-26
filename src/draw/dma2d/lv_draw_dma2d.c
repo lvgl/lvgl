@@ -380,12 +380,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             return LV_DRAW_UNIT_IDLE;
         }
 
-        if(dsc->opa >= LV_OPA_MAX) {
-            lv_draw_dma2d_opaque_image(t, dsc, &t->area);
-        }
-        else {
-            lv_draw_dma2d_image(t, dsc, &t->area);
-        }
+        lv_draw_dma2d_image(t, dsc, &t->area);
     }
 
     lv_draw_dispatch_request();
