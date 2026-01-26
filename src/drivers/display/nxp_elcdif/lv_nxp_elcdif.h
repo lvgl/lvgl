@@ -40,7 +40,7 @@ extern "C" {
  * @param frame_buffer1     pointer the first frame buffers
  * @param frame_buffer2     pointer the second frame buffers
  * @param buf_size          size of a buffer in bytes (must be at least as large as the screen)
- * @return                  a display object initialized and registerd on the LVGL runtime
+ * @return                  a display object initialized and registered on the LVGL runtime
  */
 lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcdif_rgb_mode_config_t * config,
                                                    void * frame_buffer1,
@@ -55,7 +55,7 @@ lv_display_t * lv_nxp_display_elcdif_create_direct(LCDIF_Type * base, const elcd
 * @param frame_buffer1     pointer the first frame buffers
 * @param frame_buffer2     pointer the second frame buffers
 * @param buf_size          size of a buffer in bytes
-* @return                  a display object initialized and registerd on the LVGL runtime
+* @return                  a display object initialized and registered on the LVGL runtime
 */
 lv_display_t * lv_nxp_display_elcdif_create_partial(LCDIF_Type * base, const elcdif_rgb_mode_config_t * config,
                                                     void * frame_buffer1,
@@ -68,7 +68,7 @@ lv_display_t * lv_nxp_display_elcdif_create_partial(LCDIF_Type * base, const elc
  * @param disp              The display instance that contains the eLCD related data
  *
  * @note: the parameter disp is tipycally the return value after
- *        `lv_nxp_display_elcdif_create_direct` has been sucessfully executed
+ *        `lv_nxp_display_elcdif_create_direct` has been successfully executed
  */
 void lv_nxp_display_elcdif_event_handler(const lv_display_t * disp);
 /**********************

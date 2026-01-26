@@ -4,6 +4,8 @@ extend-exclude = [
     "docs/src/_static/css/fontawesome.min.css",
     "docs/CHANGELOG.rst",
     "docs/README_*",
+    "docs/src/_static/css/*.min.css",
+    "docs/src/_static/jquery.js",
     "libs/",
     "scripts/gen_json/create_fake_lib_c.py",
     "src/libs/",
@@ -26,6 +28,8 @@ extend-ignore-re = [
     "ist",
     "ACI\\)",
     "ACI \\(",
+    "glIndexs",
+    "glIsEnabledi",
     "PNGs",
     "STRUCT_FIELDs",
 ]
@@ -42,6 +46,10 @@ extend-ignore-identifiers-re = [
 [default.extend-identifiers]
 "aout_p" = "aout_p"
 "PN" = "PN"
+"rin" = "rin"
+"mask_rin_param" = "mask_rin_param"
 "thr_tick" = "thr_tick"
 "VGLITE_BLIT_SPLIT_THR" = "VGLITE_BLIT_SPLIT_THR"
 "yout" = "yout"
+# Typo in STM32 HAL
+"FBStartAdress" = "FBStartAdress"

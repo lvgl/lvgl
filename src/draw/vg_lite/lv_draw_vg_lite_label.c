@@ -275,7 +275,7 @@ static inline void convert_letter_matrix(vg_lite_matrix_t * matrix, const lv_dra
 }
 
 static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc, lv_area_t * letter_area,
-                                   lv_area_t * cliped_area)
+                                   lv_area_t * clipped_area)
 {
     *letter_area = *dsc->letter_coords;
 
@@ -296,7 +296,7 @@ static bool draw_letter_clip_areas(lv_draw_task_t * t, const lv_draw_glyph_dsc_t
         lv_area_move(letter_area, dsc->letter_coords->x1, dsc->letter_coords->y1);
     }
 
-    if(!lv_area_intersect(cliped_area, &t->clip_area, letter_area)) {
+    if(!lv_area_intersect(clipped_area, &t->clip_area, letter_area)) {
         return false;
     }
 
@@ -427,13 +427,13 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     /* scale size */
     const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
 
-    const bool has_rotation_with_cliped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
+    const bool has_rotation_with_clipped = dsc->rotation && !lv_area_is_in(&letter_area, &t->clip_area, false);
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    if(!has_rotation_with_cliped && dsc->rotation) {
+    if(!has_rotation_with_clipped && dsc->rotation) {
         vg_lite_translate(glyph_pos.x + dsc->pivot.x, glyph_pos.y, &matrix);
         vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
         vg_lite_translate(-dsc->pivot.x, 0, &matrix);
@@ -462,7 +462,7 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
     const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
-    if(has_rotation_with_cliped) {
+    if(has_rotation_with_clipped) {
         /**
          * When intersecting the clipping region,
          * rotate the path contents without rotating the bounding box for cropping

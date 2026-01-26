@@ -541,7 +541,7 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
     lv_indev_gesture_type_t type;
 
     /* First check if a recognizer state is RECOGNIZED or ENDED. *
-     * In that case, call its recongizer function and reset the other*/
+     * In that case, call its recognizer function and reset the other*/
     type = get_first_recognized_or_ended_gesture(indev);
     if(type != LV_INDEV_GESTURE_NONE) {
 

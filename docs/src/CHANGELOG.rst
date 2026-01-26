@@ -234,7 +234,7 @@ Fixes
 - **fix(wayland): correctly get driver data in lv_wayland_assign_physical_display** `9017 <https://github.com/lvgl/lvgl/pull/9017>`__
 - **fix(draw/neon): disable function using an invalid intrinsic on arm32** `9019 <https://github.com/lvgl/lvgl/pull/9019>`__
 - **fix(OpenGL/DRM): fix misc info logs** `9027 <https://github.com/lvgl/lvgl/pull/9027>`__
-- **fix(draw/vglite): update the wait interrupt function to use the lv_sync_wait instead of the FreeRTOS Semaphore specifc API** `9007 <https://github.com/lvgl/lvgl/pull/9007>`__
+- **fix(draw/vglite): update the wait interrupt function to use the lv_sync_wait instead of the FreeRTOS Semaphore specific API** `9007 <https://github.com/lvgl/lvgl/pull/9007>`__
 - **fix(draw): fix render issue when triangle overhangs by sorting points** `9002 <https://github.com/lvgl/lvgl/pull/9002>`__
 - **fix(table): remove free calls to user data** `8881 <https://github.com/lvgl/lvgl/pull/8881>`__
 - **fix(wayland): bind driver data to display's driver data instead of user data** `8991 <https://github.com/lvgl/lvgl/pull/8991>`__
@@ -256,7 +256,7 @@ Fixes
 - **fix(vg_lite): replace FLT_MIN to -FLT_MAX** `8940 <https://github.com/lvgl/lvgl/pull/8940>`__
 - **fix(matrix): fix matrix transformation area coordinate error** `8928 <https://github.com/lvgl/lvgl/pull/8928>`__
 - **fix(vector): rename and enhance rectangle path function with xywh parameters** `8934 <https://github.com/lvgl/lvgl/pull/8934>`__
-- **fix(msgbox): remove superflous dependency check** `8916 <https://github.com/lvgl/lvgl/pull/8916>`__
+- **fix(msgbox): remove superfluous dependency check** `8916 <https://github.com/lvgl/lvgl/pull/8916>`__
 - **fix(sysmon): division by zero error** `8918 <https://github.com/lvgl/lvgl/pull/8918>`__
 - **fix(flex): fix alignment issue when using rtl in flex layout** `8929 <https://github.com/lvgl/lvgl/pull/8929>`__
 - **fix(vector): adjust image stride handling in fill pattern and add test case** `8815 <https://github.com/lvgl/lvgl/pull/8815>`__
@@ -306,7 +306,7 @@ Fixes
 - **fix(event): don't try to trickle to deleted widgets** `8777 <https://github.com/lvgl/lvgl/pull/8777>`__
 - **fix(vg_lite): fix rotated vector font clipping error** `8739 <https://github.com/lvgl/lvgl/pull/8739>`__
 - **fix(EVE): rounded arcs with transparency** `8767 <https://github.com/lvgl/lvgl/pull/8767>`__
-- **fix(image): reset img when src_type is unknow or info is wrong** `8716 <https://github.com/lvgl/lvgl/pull/8716>`__
+- **fix(image): reset img when src_type is unknown or info is wrong** `8716 <https://github.com/lvgl/lvgl/pull/8716>`__
 - **fix(image_decoder): fix memory leaks caused by multi-core rendering** `8735 <https://github.com/lvgl/lvgl/pull/8735>`__
 - **fix(image): fix unused var warning when LV_LOG_WARN isn't available** `8591 <https://github.com/lvgl/lvgl/pull/8591>`__
 - **fix(tests): fix gcovr report generation failure** `8727 <https://github.com/lvgl/lvgl/pull/8727>`__
@@ -347,7 +347,7 @@ Fixes
 - **fix(label): fix label clip overflow** `8557 <https://github.com/lvgl/lvgl/pull/8557>`__
 - **fix(NemaGFX): non-grad triangle coords** `8524 <https://github.com/lvgl/lvgl/pull/8524>`__
 - **fix(draw_vector): ensure vector_graphic can be used if it's enabled** `8522 <https://github.com/lvgl/lvgl/pull/8522>`__
-- **fix(svg): add log for unsupport path command.** `8545 <https://github.com/lvgl/lvgl/pull/8545>`__
+- **fix(svg): add log for unsupported path command.** `8545 <https://github.com/lvgl/lvgl/pull/8545>`__
 - **fix(xml): add missing subject_set_float_event to the schema** `8538 <https://github.com/lvgl/lvgl/pull/8538>`__
 - **fix(lv_example_bar_7):  make bar fit in 320x240 box for webpage** `8525 <https://github.com/lvgl/lvgl/pull/8525>`__
 - **fix(xml): fix scale section props** `8528 <https://github.com/lvgl/lvgl/pull/8528>`__
@@ -410,7 +410,7 @@ Examples
 Docs
 ~~~~
 
-- **docs(xml): fix the descripton of how to initialize the UI from C** `9070 <https://github.com/lvgl/lvgl/pull/9070>`__
+- **docs(xml): fix the description of how to initialize the UI from C** `9070 <https://github.com/lvgl/lvgl/pull/9070>`__
 - **docs(README): remove outdated content and add new features** `9023 <https://github.com/lvgl/lvgl/pull/9023>`__
 - **docs(xml): Fix array type description count to 3 (#9013)** `9028 <https://github.com/lvgl/lvgl/pull/9028>`__
 - **docs: update the esp docs indentation at the FS section.** `9031 <https://github.com/lvgl/lvgl/pull/9031>`__
@@ -633,7 +633,7 @@ Others
 - **initial commit** `1906242 <https://github.com/lvgl/lvgl/commit/1906242741cddea3fb680d5f15822a18d888e467>`__
 - **chore(doc-build):  adjustments after discussion with André.** `6d546a8 <https://github.com/lvgl/lvgl/commit/6d546a8695aa415c3a527ca163597706bbb631c5>`__
 - **chore: minor fixed in XML and observer related codes** `b4c9d2e <https://github.com/lvgl/lvgl/commit/b4c9d2e690adaa18b4fcc788783f0fa59fb20708>`__
-- **chore(xml): memzero malloced memoried for consitent behavior** `584bac6 <https://github.com/lvgl/lvgl/commit/584bac61995b54c17e6ef0e9cb6650f32020825e>`__
+- **chore(xml): memzero malloced memoried for consistent behavior** `584bac6 <https://github.com/lvgl/lvgl/commit/584bac61995b54c17e6ef0e9cb6650f32020825e>`__
 - **chore: minor formatting and optimizations** `b946eb6 <https://github.com/lvgl/lvgl/commit/b946eb6294d82dea0917589f1d8572d2503238f5>`__
 - **refactor(arc_label): improve angle calculations and type safety** `6cbf36a <https://github.com/lvgl/lvgl/commit/6cbf36afaa8adf820f0e1cc5793391280663fdf9>`__
 - **chore(observer): add _event suffix to add_subject_set/increment** `bd9e9d2 <https://github.com/lvgl/lvgl/commit/bd9e9d2f49fe8a3c47c60f2cd217d0ffd7a854f5>`__
