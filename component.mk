@@ -53,8 +53,6 @@ COMPONENT_SRCDIRS := . \
                   src/others/snapshot \
                   src/others/sysmon \
                   src/others/test \
-                  src/others/xml \
-                  src/others/xml/parsers \
                   src/themes \
                   src/themes/basic \
                   src/themes/default \

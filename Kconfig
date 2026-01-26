@@ -408,12 +408,12 @@ menu "LVGL configuration"
 		config LV_USE_G2D
 			bool "Use NXP's G2D on MPU platforms"
 			default n
-		
+
 		config LV_USE_DRAW_G2D
 			bool "Use G2D for drawing."
 			depends on LV_USE_G2D
 			default y
-		
+
 		config LV_USE_ROTATE_G2D
 			bool "Use G2D to rotate display."
 			depends on LV_USE_G2D
@@ -1505,7 +1505,7 @@ menu "LVGL configuration"
 
 		config LV_USE_LIBJPEG_TURBO
 			bool "libjpeg-turbo decoder library"
-		
+
 		config LV_USE_LIBWEBP
 			bool "WebP decoder library"
 
@@ -1827,8 +1827,6 @@ menu "LVGL configuration"
 			depends on LV_USE_TEST
 		config LV_USE_TRANSLATION
 			bool "Enable text translation support"
-		config LV_USE_XML
-			bool "Enable loading XML UIs runtime"
 		config LV_USE_COLOR_FILTER
 			bool "Enable color filter style"
 			default n
