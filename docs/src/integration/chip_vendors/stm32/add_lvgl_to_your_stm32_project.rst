@@ -13,7 +13,7 @@ is the ``.ioc`` file. It describes all the peripheral configurations and pin map
 A board with a display is much easier to get started with if the
 LCD is already configured in the ``.ioc`` file. If the board LCD is
 controlled by the LTDC (LCD-TFT Display Controller) peripheral,
-you can use the :ref:`LVGL LTDC driver <stm32 ltdc driver>`.
+you can use the :ref:`LVGL LTDC driver <stm32_ltdc_driver>`.
 
 
 Add LVGL to your Project
@@ -32,7 +32,7 @@ Now that the source files are included in your project, follow the instructions 
 ``lv_conf.h`` file and initialize the display.
 Before manually initializing your display though, check to see
 if your project uses the LTDC (LCD-TFT Display Controller) peripheral. If it
-does, you can simply :ref:`use LVGL's LTDC driver <stm32 ltdc driver>`.
+does, you can simply :ref:`use LVGL's LTDC driver <stm32_ltdc_driver>`.
 
 
 Using LVGL with STM32 HAL
@@ -77,7 +77,7 @@ Display Driver
 
 Before manually initializing your display, check to see
 if your project uses the LTDC (LCD-TFT Display Controller) peripheral. If it
-does, you can simply :ref:`use LVGL's LTDC driver <stm32 ltdc driver>`.
+does, you can simply :ref:`use LVGL's LTDC driver <stm32_ltdc_driver>`.
 
 If your display is :ref:`one that LVGL has a driver for <display controllers>`,
 you should use it so that you have less driver logic to implement in

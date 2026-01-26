@@ -50,7 +50,7 @@ LVGL has good support for the graphical hardware acceleration peripherals that s
 models feature. Sometimes these features can be utilized together at the same time.
 See the individual pages about them.
 
-- :ref:`LTDC: display controller. <stm32 ltdc driver>`
+- :ref:`LTDC: display controller. <stm32_ltdc_driver>`
 - :ref:`DMA2D: asynchronous pixel data memory operations. <dma2d>`
 - :ref:`NeoChrom: GPU for rendering 2D graphics primitives. <neochrom>`
 
