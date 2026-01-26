@@ -4,6 +4,12 @@
 
 #include "unity/unity.h"
 
+#ifndef NON_AMD64_BUILD
+    #define EXT_NAME ".lp64.png"
+#else
+    #define EXT_NAME ".lp32.png"
+#endif
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * chart = NULL;
 
@@ -265,7 +271,7 @@ void test_chart_curve(void)
     lv_chart_set_next_value(chart, ser2, 55);
     lv_chart_set_next_value(chart, ser2, LV_CHART_POINT_NONE);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_curve.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_curve" EXT_NAME);
 #endif /*LV_USE_VECTOR_GRAPHIC*/
 }
 
