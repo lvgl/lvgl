@@ -83,14 +83,15 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
                 continue;
             }
 
-            a.x1 = (int32_t)LV_MIN(a.x1, dsc->points[i].x);
-            a.x2 = (int32_t)LV_MAX(a.x2, dsc->points[i].x);
-            a.y1 = (int32_t)LV_MIN(a.y1, dsc->points[i].y);
-            a.y2 = (int32_t)LV_MAX(a.y2, dsc->points[i].y);
+            a.x1 = (int32_t)LV_MIN(a.x1, dsc->points[i].x) - dsc->width;
+            a.x2 = (int32_t)LV_MAX(a.x2, dsc->points[i].x) + dsc->width;
+            a.y1 = (int32_t)LV_MIN(a.y1, dsc->points[i].y) - dsc->width;
+            a.y2 = (int32_t)LV_MAX(a.y2, dsc->points[i].y) + dsc->width;
         }
 
         if(a.x1 == LV_COORD_MAX) {
             LV_LOG_INFO("No valid point was found. Not adding the draw task.");
+            LV_PROFILER_DRAW_END;
             return;
         }
         lv_area_increase(&a, dsc->width, dsc->width);
@@ -112,6 +113,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_d
         lv_draw_line_dsc_t * new_draw_dsc = t->draw_dsc;
         size_t array_size = dsc->point_cnt * sizeof(lv_point_precise_t);
         lv_point_precise_t * new_points = lv_malloc(array_size);
+        if(new_points == NULL) {
+            LV_LOG_WARN("Couldn't allocate %d points", dsc->point_cnt);
+            LV_ASSERT_NULL(new_points);
+            LV_PROFILER_DRAW_END;
+            return;
+        }
         lv_memcpy(new_points, dsc->points, array_size);
         new_draw_dsc->points = new_points;
     }

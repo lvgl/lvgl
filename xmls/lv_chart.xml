@@ -15,6 +15,7 @@
             <enum name="bar" help="Draw data points as bars"/>
             <enum name="stacked" help="Draw series as stacked bars on top of each other"/>
             <enum name="scatter" help="Draw data points as unconnected dots"/>
+            <enum name="curve" help="Connect data points with Bezier curves"/>
         </enumdef>
 
         <enumdef name="lv_chart_update_mode" help="How the chart handles new data points">
