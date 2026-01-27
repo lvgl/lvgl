@@ -22,8 +22,8 @@
 
 #if LV_USE_GIF
 
-#include "../../../../misc/lv_log.h"
-#include "../../../../stdlib/lv_string.h"
+#include "../../misc/lv_log.h"
+#include "../../stdlib/lv_string.h"
 
 static const unsigned char cGIFBits[9] = {1,4,4,4,8,8,8,8,8}; // convert odd bpp values to ones we can handle
 

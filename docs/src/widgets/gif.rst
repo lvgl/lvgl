@@ -1,14 +1,21 @@
 .. include:: /include/substitutions.txt
 .. _gif:
 
-===========
-GIF Decoder
-===========
+============
+GIF (lv_gif)
+============
 
-**GIF Decoder** is an LVGL extension that enables you to use GIF images in your LVGL UI.
+The GIF Widget internally uses the
+`AnimatedGIF <https://github.com/bitbank2/AnimatedGIF/tree/master>`__
+GIF Decoder library, enabling you to use GIF images in your LVGL UI.
 
-The implementation uses the `AnimatedGIF <https://github.com/bitbank2/AnimatedGIF/tree/master>`__
-library.
+
+
+Parts and Styles
+****************
+
+- :cpp:enumerator:`LV_PART_MAIN` A background rectangle that uses the :ref:`typical
+  background style properties <typical bg props>`.
 
 
 
@@ -16,9 +23,9 @@ Usage
 *****
 
 Once enabled in ``lv_conf.h`` by setting :c:macro:`LV_USE_GIF` to ``1``,
-:cpp:expr:`lv_gif_create(parent)` can be used to create a gif widget.
+:cpp:expr:`lv_gif_create(parent)` can be used to create a GIF Widget.
 
-Set the color format of the gif framebuffer with :cpp:expr:`lv_gif_set_color_format(widget, color_format)`.
+Set the color format of the GIF framebuffer with :cpp:expr:`lv_gif_set_color_format(widget, color_format)`.
 Use :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` for gifs with transparency.
 It is set to :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` by default.
 Significant RAM can be saved by using a smaller color format.
@@ -47,7 +54,7 @@ converter since LVGL v9.0.  However, there is still a way to do it through the
 
 .. code-block:: bash
 
-   python  ./scripts/LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
+    python  ./scripts/LVGLImage.py  --cf RAW  --ofmt C  -o .  --name my_gif_image_array  input.gif
 
 will produce all the bytes from the ``input.gif`` in unaltered form in a C array,
 ready to use in this code:
@@ -69,7 +76,7 @@ Example:
 
 .. code-block:: c
 
-   lv_gif_set_src(widget, "S:path/to/example.gif");
+    lv_gif_set_src(widget, "S:path/to/example.gif");
 
 Note that, a file system driver needs to be registered to open images
 from files.  To do so, follow the instructions in :ref:`file_system`.
@@ -83,6 +90,21 @@ To decode and display a GIF animation ~25 kB of RAM is needed plus
 (color format pixel size + 1) |times| image width |times| image height.
 RGB565 has a pixel size of 2, RGB888 has a pixel size of 3, and
 ARGB8888 has a pixel size of 4.
+
+
+
+Events
+******
+
+- :cpp:enumerator:`LV_EVENT_READY` is emitted when the GIF animation has completed
+  rendering its last frame.
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`lv_obj_events` emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
 
 
 .. _gif_example:

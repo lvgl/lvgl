@@ -70,6 +70,7 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/checkbox \
                   src/widgets/colorwheel \
                   src/widgets/dropdown \
+                  src/widgets/gif \
                   src/widgets/image \
                   src/widgets/imgbtn \
                   src/widgets/keyboard \

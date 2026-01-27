@@ -33,3 +33,4 @@ src/libs/gstreamer @AndreCostaaa
 src/libs/tiny_ttf @AndreCostaaa
 src/libs/vg_lite_driver @uLipe
 src/misc/cache @AndreCostaaa @FASTSHIFT
+src/widgets/gif @liamHowatt
