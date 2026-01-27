@@ -32,10 +32,6 @@ extern "C" {
 #include <GLFW/glfw3.h>
 #endif
 
-#if !LV_USE_MATRIX
-#error "Require LV_USE_MATRIX = 1"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -126,8 +122,7 @@ typedef struct {
 
 void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                         int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB,
-                        const lv_matrix_t * matrix);
+                        bool h_flip, bool v_flip, lv_color_t fill_color, bool blend_opt, bool flipRB);
 
 
 /**
@@ -142,7 +137,7 @@ void lv_opengles_render(unsigned int texture, const lv_area_t * texture_area, lv
  */
 void lv_opengles_render_texture_rbswap(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa,
                                        int32_t disp_w, int32_t disp_h, const lv_area_t * texture_clip_area,
-                                       bool h_flip, bool v_flip, const lv_matrix_t * matrix);
+                                       bool h_flip, bool v_flip);
 
 /**
  * Set the OpenGL viewport, with vertical co-ordinate conversion

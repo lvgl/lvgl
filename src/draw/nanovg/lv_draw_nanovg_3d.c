@@ -67,16 +67,10 @@ void lv_draw_nanovg_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const l
     /* Reinitialize OpenGL ES driver state after NanoVG modified it */
     lv_opengles_reinit_state();
 
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    const lv_matrix_t * matrix = &layer->matrix;
-#else
-    const lv_matrix_t * matrix = NULL;
-#endif
-
     /* Use LVGL's OpenGL ES rendering infrastructure */
     lv_opengles_viewport(0, 0, layer_w, layer_h);
     lv_opengles_render_texture_rbswap(dsc->tex_id, &dest_area, dsc->opa, layer_w, layer_h,
-                                      &clip_area, dsc->h_flip, !dsc->v_flip, matrix);
+                                      &clip_area, dsc->h_flip, !dsc->v_flip);
 
     LV_PROFILER_DRAW_END;
 }
