@@ -92,8 +92,6 @@ extern "C" {
 #include "src/widgets/3dtexture/lv_3dtexture.h"
 #include "src/widgets/ime/lv_ime_pinyin.h"
 
-#include "src/xml/lv_xml.h"
-
 #include "src/debugging/sysmon/lv_sysmon.h"
 #include "src/debugging/monkey/lv_monkey.h"
 #include "src/debugging/test/lv_test.h"

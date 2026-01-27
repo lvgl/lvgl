@@ -3909,15 +3909,6 @@
 
 #endif /*LV_USE_TEST*/
 
-/** Enable loading XML UIs runtime */
-#ifndef LV_USE_XML
-    #ifdef CONFIG_LV_USE_XML
-        #define LV_USE_XML CONFIG_LV_USE_XML
-    #else
-        #define LV_USE_XML    0
-    #endif
-#endif
-
 /** 1: Enable text translation support */
 #ifndef LV_USE_TRANSLATION
     #ifdef CONFIG_LV_USE_TRANSLATION
