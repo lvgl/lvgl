@@ -8,7 +8,7 @@
 
 #include "lv_wayland_private.h"
 
-#if LV_WAYLAND_USE_EGL
+#if LV_WAYLAND_USE_EGL == 1 && LV_USE_DRAW_OPENGLES == 1
 
 #include "../../display/lv_display_private.h"
 #include "../opengles/lv_opengles_driver.h"
