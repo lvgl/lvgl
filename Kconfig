@@ -168,7 +168,7 @@ menu "LVGL configuration"
 			depends on LV_OS_FREERTOS
 			help
 				Enable this to provide a custom implementation of lv_os_get_idle_percent.
-				This is useful for multi-core systems like ESP32 where the default
+				This is useful for multi-core systems where the default
 				FreeRTOS implementation might not sufficiently track idle time across all cores.
 
 	endmenu
