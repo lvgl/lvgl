@@ -32,6 +32,8 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
+    d2_u8 current_alpha = d2_getalpha(u->d2_handle);
+
     buffer_area = t->target_layer->buf_area;
     p1_x = dsc->p1.x - buffer_area.x1;
     p1_y = dsc->p1.y - buffer_area.y1;
@@ -69,6 +71,7 @@ void lv_draw_dave2d_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
     d2_renderline(u->d2_handle, D2_FIX4(p1_x), D2_FIX4(p1_y), D2_FIX4(p2_x),
                   D2_FIX4(p2_y), D2_FIX4(dsc->width), d2_le_exclude_none);
 
+    d2_setalpha(u->d2_handle, current_alpha);
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
     LV_ASSERT(LV_RESULT_OK == status);
