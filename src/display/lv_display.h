@@ -338,7 +338,7 @@ void lv_display_set_sync_cb(lv_display_t * disp, lv_display_sync_cb_t sync_cb);
  * If not set the `disp->syncing` flag is used which can be cleared with `lv_display_sync_ready()`
  * @param disp      pointer to a display
  * @param wait_cb   a callback to call while LVGL is waiting for sync ready.
- *                  If NULL `lv_display_sync_ready()` can be used to signal that flushing is ready.
+ *                  If NULL `lv_display_sync_ready()` can be used to signal that syncing is ready.
  */
 void lv_display_set_sync_wait_cb(lv_display_t * disp, lv_display_sync_wait_cb_t wait_cb);
 
