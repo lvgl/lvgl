@@ -41,7 +41,7 @@ static void lv_gstreamer_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void on_decode_pad_added(GstElement * element, GstPad * pad, gpointer user_data);
 static GstFlowReturn on_new_sample(GstElement * sink, gpointer user_data);
 static void gstreamer_timer_cb(lv_timer_t * timer);
-static void gstreamer_poll_bus(lv_gstreamer_t * streamer);
+static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer);
 static void gstreamer_update_frame(lv_gstreamer_t * streamer);
 static lv_result_t gstreamer_make_and_add_to_pipeline(lv_gstreamer_t * streamer,
                                                       const lv_gstreamer_pipeline_element_t * elements, size_t element_count);
@@ -383,7 +383,7 @@ static void lv_gstreamer_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
+static lv_result_t gstreamer_poll_bus(lv_gstreamer_t * streamer)
 {
     GstBus * bus = gst_element_get_bus(streamer->pipeline);
     GstMessage * msg;
@@ -402,6 +402,12 @@ static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
                 }
             case GST_MESSAGE_EOS:
                 LV_LOG_INFO("End of stream");
+                if(lv_obj_send_event((lv_obj_t *)streamer, LV_EVENT_STATE_CHANGED, NULL) == LV_RESULT_INVALID) {
+                    /* Object deleted inside event handler */
+                    gst_object_unref(bus);
+                    gst_message_unref(msg);
+                    return LV_RESULT_INVALID;
+                }
                 break;
             case GST_MESSAGE_STATE_CHANGED: {
                     GstState old_state, new_state;
@@ -417,6 +423,7 @@ static void gstreamer_poll_bus(lv_gstreamer_t * streamer)
         gst_message_unref(msg);
     }
     gst_object_unref(bus);
+    return LV_RESULT_OK;
 }
 
 static void gstreamer_update_frame(lv_gstreamer_t * streamer)
@@ -481,7 +488,9 @@ static void gstreamer_timer_cb(lv_timer_t * timer)
         return;
     }
 
-    gstreamer_poll_bus(streamer);
+    if(gstreamer_poll_bus(streamer) == LV_RESULT_INVALID) {
+        return;
+    }
     gstreamer_update_frame(streamer);
 }
 
