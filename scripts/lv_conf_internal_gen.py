@@ -69,6 +69,12 @@ fout.write(
 #define LV_DRAW_SW_ASM_RISCV_V          3
 #define LV_DRAW_SW_ASM_CUSTOM           255
 
+#define LV_NEMA_LIB_NONE            0
+#define LV_NEMA_LIB_M33_REVC        1
+#define LV_NEMA_LIB_M33_NEMAPVG     2
+#define LV_NEMA_LIB_M55             3
+#define LV_NEMA_LIB_M7              4
+
 #define LV_NEMA_HAL_CUSTOM          0
 #define LV_NEMA_HAL_STM32           1
 
