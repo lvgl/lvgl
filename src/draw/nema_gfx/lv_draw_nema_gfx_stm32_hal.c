@@ -14,19 +14,16 @@
 
 #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
 
+#include "lv_draw_nema_gfx_utils.h"
+
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
-
-#include <nema_sys_defs.h>
-#include <nema_core.h>
 
 #include <assert.h>
 #include <string.h>
 
 #include LV_NEMA_STM32_HAL_INCLUDE
-
-#include "tsi_malloc.h"
 
 extern GPU2D_HandleTypeDef hgpu2d;
 
