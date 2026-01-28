@@ -286,6 +286,14 @@
     #endif
 #endif
 
+#ifndef LV_OS_IDLE_PERCENT_CUSTOM
+    #ifdef CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
+        #define LV_OS_IDLE_PERCENT_CUSTOM CONFIG_LV_OS_IDLE_PERCENT_CUSTOM
+    #else
+        #define LV_OS_IDLE_PERCENT_CUSTOM 0
+    #endif
+#endif
+
 #if LV_USE_OS == LV_OS_CUSTOM
     #ifndef LV_OS_CUSTOM_INCLUDE
         #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
