@@ -14,6 +14,11 @@
 #include "../../misc/lv_area_private.h"
 #include "../lv_draw_buf_private.h"
 
+#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
+    #include <zephyr/kernel.h>
+    #include <zephyr/irq.h>
+#endif
+
 #if !LV_DRAW_DMA2D_ASYNC && LV_USE_DRAW_DMA2D_INTERRUPT
     #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE
 #endif
@@ -42,6 +47,10 @@ static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 #if LV_DRAW_DMA2D_CACHE
     static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 #endif
+#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
+    static void zephyr_dma2d_irq_handler(void *);
+#endif
+
 
 /**********************
  *  STATIC VARIABLES
@@ -101,8 +110,13 @@ void lv_draw_dma2d_init(void)
     /* disable dead time */
     DMA2D->AMTCR = 0;
 
+#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
+    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(dma2d)), DT_IRQ(DT_NODELABEL(dma2d), priority), zephyr_dma2d_irq_handler, NULL, 0);
+    irq_enable(DT_IRQN(DT_NODELABEL(dma2d)));
+#else
     /* enable the interrupt */
     NVIC_EnableIRQ(DMA2D_IRQn);
+#endif
 }
 
 void lv_draw_dma2d_deinit(void)
@@ -283,6 +297,15 @@ static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * a
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+#if defined(__ZEPHYR__) && LV_USE_DRAW_DMA2D_INTERRUPT
+static void zephyr_dma2d_irq_handler(void *)
+{
+    /* Clear Transfer Complete flag */
+    DMA2D->IFCR = DMA2D_IFCR_CTCIF;
+
+    lv_draw_dma2d_transfer_complete_interrupt_handler();
+}
+#endif
 
 static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
