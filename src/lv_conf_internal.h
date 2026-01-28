@@ -1132,7 +1132,14 @@
         #ifdef CONFIG_LV_USE_PPA_IMG
             #define LV_USE_PPA_IMG CONFIG_LV_USE_PPA_IMG
         #else
-            #define LV_USE_PPA_IMG 0
+            #define LV_USE_PPA_IMG      0
+        #endif
+    #endif
+    #ifndef LV_PPA_BURST_LENGTH
+        #ifdef CONFIG_LV_PPA_BURST_LENGTH
+            #define LV_PPA_BURST_LENGTH CONFIG_LV_PPA_BURST_LENGTH
+        #else
+            #define LV_PPA_BURST_LENGTH    128
         #endif
     #endif
 #endif

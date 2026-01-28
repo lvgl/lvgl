@@ -556,6 +556,13 @@ menu "LVGL configuration"
 		default n
 		depends on LV_USE_PPA
 
+		config LV_PPA_BURST_LENGTH
+		int "PPA Burst length in bytes"
+		depends on LV_USE_PPA
+		default 128
+		help
+			PPA burst length size in bytes.
+
 		config LV_USE_DRAW_EVE
 			bool "Use EVE FT81X GPU."
 			default n
