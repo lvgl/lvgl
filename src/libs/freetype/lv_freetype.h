@@ -58,7 +58,6 @@ typedef enum {
     LV_FREETYPE_OUTLINE_LINE_TO,
     LV_FREETYPE_OUTLINE_CUBIC_TO,
     LV_FREETYPE_OUTLINE_CONIC_TO,
-    LV_FREETYPE_OUTLINE_BORDER_START,     /* When line width > 0 the border glyph is drawn after the regular glyph */
 } lv_freetype_outline_type_t;
 
 /* Only path string is required */
