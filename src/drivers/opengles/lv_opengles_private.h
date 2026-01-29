@@ -20,7 +20,10 @@ extern "C" {
 
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
-#include "../../misc/lv_matrix.h"
+
+#if !LV_USE_MATRIX
+#error "Require LV_USE_MATRIX = 1"
+#endif
 
 #if LV_USE_EGL
 #include "glad/include/glad/gles2.h"
@@ -31,10 +34,6 @@ extern "C" {
 
 #if LV_USE_GLFW
 #include <GLFW/glfw3.h>
-#endif
-
-#if !LV_USE_MATRIX
-#error "Require LV_USE_MATRIX = 1"
 #endif
 
 /*********************

@@ -12,6 +12,7 @@
 
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_profiler.h"
+#include "../../misc/lv_matrix.h"
 #include "lv_opengles_debug.h"
 #include "lv_opengles_private.h"
 
@@ -341,7 +342,8 @@ void lv_opengles_render(const lv_opengles_render_params_t * params)
     lv_matrix_identity(&matrix);
     if(params->matrix) {
         lv_matrix_multiply(&matrix, params->matrix);
-    } else {
+    }
+    else {
         lv_matrix_translate(&matrix, hor_translate, ver_translate);
         lv_matrix_scale(&matrix, hor_scale, ver_scale);
     }
