@@ -687,7 +687,6 @@ def optionally_append_extra_info(p, dsc):
 def print_value_param(p, indent='', is_for_const=False):
     # Compute correct wording for description of `value` argument.
     style_type = p['style_type']
-    spelled_out_type = 'Value'
     if is_for_const:
         arg_name = 'val'
     else:
