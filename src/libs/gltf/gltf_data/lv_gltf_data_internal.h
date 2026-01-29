@@ -1,6 +1,12 @@
 #ifndef LV_GLTFDATA_PRIVATE_H
 #define LV_GLTFDATA_PRIVATE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
 #include "../../../lv_conf_internal.h"
 
 #ifdef __cplusplus
@@ -9,9 +15,7 @@ extern "C" {
 
 #if LV_USE_GLTF
 #include "../../../drivers/opengles/opengl_shader/lv_opengl_shader_internal.h"
-#include "../../../draw/lv_image_dsc.h"
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_array.h"
 
 
 typedef struct {
@@ -226,7 +230,7 @@ double lv_gltf_data_get_radius(const lv_gltf_model_t * model);
  *
  * @param _data Pointer to the lv_gltf_data_t object to be destroyed.
  */
-void lv_gltf_data_delete(lv_gltf_model_t * _data);
+void lv_gltf_model_delete(lv_gltf_model_t * _data);
 
 /**
  * @brief Copy the bounds information from one GLTF data object to another.
@@ -247,6 +251,13 @@ void lv_gltf_data_rgb_to_bgr(uint8_t * pixel_buffer,
                              size_t byte_total_count,
                              bool has_alpha);
 
+lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer);
+void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer);
+void lv_gltf_model_invalidate(lv_gltf_model_t * model);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /*LV_USE_GLTF*/
 
 #ifdef __cplusplus

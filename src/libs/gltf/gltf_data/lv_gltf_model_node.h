@@ -26,6 +26,15 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_GLTF_ANIM_SPEED_TENTH 100
+#define LV_GLTF_ANIM_SPEED_QUARTER 250
+#define LV_GLTF_ANIM_SPEED_HALF 500
+#define LV_GLTF_ANIM_SPEED_NORMAL 1000
+#define LV_GLTF_ANIM_SPEED_2X 2000
+#define LV_GLTF_ANIM_SPEED_3X 3000
+#define LV_GLTF_ANIM_SPEED_4X 4000
+#define LV_GLTF_DEFAULT_CAMERA 0
+
 /**********************
  *      TYPEDEFS
  **********************/
