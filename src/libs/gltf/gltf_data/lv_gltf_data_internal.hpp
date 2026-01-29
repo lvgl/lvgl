@@ -8,11 +8,9 @@
 #include "../gltf_view/lv_gltf.h"
 #include "lv_gltf_data_internal.h"
 
-#include "../../../misc/lv_array.h"
 #include "../../../drivers/opengles/lv_opengles_private.h"
 
 #include "../../../misc/lv_types.h"
-#include "../../../misc/lv_ll.h"
 #include "../../../misc/lv_event.h"
 
 #ifdef __cplusplus
@@ -111,7 +109,7 @@ struct _lv_gltf_model_t {
     std::vector<size_t> validated_skins;
     std::vector<GLuint> skin_tex;
     NodePrimCenterMap local_mesh_to_center_points_by_primitive;
-    lv_gltf_t * viewer;
+    lv_array_t viewers;
 
     std::vector<lv_gltf_mesh_data_t> meshes;
     std::vector<GLuint> textures;
@@ -128,6 +126,7 @@ struct _lv_gltf_model_t {
     size_t current_animation;
     size_t last_material_index;
 
+    int32_t animation_speed_ratio;
     uint32_t last_camera_index;
     int32_t last_anim_num;
 

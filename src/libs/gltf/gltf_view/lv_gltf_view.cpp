@@ -13,6 +13,7 @@
 
 #include "../gltf_data/lv_gltf_model.h"
 #include "../gltf_data/lv_gltf_data_internal.hpp"
+#include "../gltf_data/lv_gltf_data_internal.h"
 #include "../../../draw/lv_draw_3d.h"
 #include "../fastgltf/lv_fastgltf.hpp"
 #include "../../../core/lv_obj_class_private.h"
@@ -42,7 +43,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model);
+static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool owned);
 static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_gltf_event(const lv_obj_class_t * class_p, lv_event_t * e);
@@ -121,7 +122,7 @@ lv_gltf_model_t * lv_gltf_load_model_from_file(lv_obj_t * obj, const char * path
     }
 
     lv_gltf_model_t * model = lv_gltf_data_load_from_file(path, &viewer->shader_manager);
-    return lv_gltf_add_model(viewer, model);
+    return add_model(viewer, model, true);
 }
 
 lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * bytes, size_t len)
@@ -138,8 +139,23 @@ lv_gltf_model_t * lv_gltf_load_model_from_bytes(lv_obj_t * obj, const uint8_t * 
     }
 
     lv_gltf_model_t * model = lv_gltf_data_load_from_bytes(bytes, len, &viewer->shader_manager);
-    return lv_gltf_add_model(viewer, model);
+    return add_model(viewer, model, true);
 }
+
+lv_result_t lv_gltf_add_model(lv_obj_t * obj, lv_gltf_model_t * model)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_gltf_t * viewer = (lv_gltf_t *)obj;
+
+    if(!viewer->environment) {
+        lv_result_t res = create_default_environment(viewer);
+        if(res != LV_RESULT_OK) {
+            return LV_RESULT_INVALID;
+        }
+    }
+    return add_model(viewer, model, false) != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
 void lv_gltf_set_environment(lv_obj_t * obj, lv_gltf_environment_t * env)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -267,19 +283,16 @@ float lv_gltf_get_world_distance(const lv_obj_t * obj)
 
 void lv_gltf_set_animation_speed(lv_obj_t * obj, uint32_t value)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    viewer->desc.animation_speed_ratio = value;
-    lv_obj_invalidate(obj);
+    LV_UNUSED(obj);
+    LV_UNUSED(value);
+    LV_LOG_WARN("API change. lv_gltf_set_animation_speed should now be set on the model directly via `lv_gltf_model_set_animation_speed`");
 }
 
 uint32_t lv_gltf_get_animation_speed(const lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_gltf_t * viewer = (lv_gltf_t *)obj;
-    return viewer->desc.animation_speed_ratio;
+    LV_UNUSED(obj);
+    LV_LOG_WARN("API change. lv_gltf_get_animation_speed should now be called on the model directly via `lv_gltf_model_get_animation_speed`");
+    return 0;
 }
 
 void lv_gltf_set_focal_x(lv_obj_t * obj, float value)
@@ -589,18 +602,26 @@ lv_result_t lv_gltf_world_to_screen(lv_obj_t * obj, const lv_3dpoint_t world_pos
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_gltf_model_t * lv_gltf_add_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
+static lv_gltf_model_t * add_model(lv_gltf_t * viewer, lv_gltf_model_t * model, bool owned)
 {
     if(!model) {
         return NULL;
     }
-    if(lv_array_push_back(&viewer->models, &model) == LV_RESULT_INVALID) {
-        lv_gltf_data_delete(model);
+    lv_gltf_model_data_t model_data = {.model = model, .owned = owned};
+    if(lv_array_push_back(&viewer->models, &model_data) != LV_RESULT_OK) {
+        if(owned) {
+            lv_gltf_model_delete(model);
+        }
         return NULL;
     }
-    model->viewer = viewer;
+    if(lv_gltf_model_add_viewer(model, (lv_obj_t *)viewer) != LV_RESULT_OK) {
+        if(owned) {
+            lv_gltf_model_delete(model);
+        }
+        lv_array_remove(&viewer->models, lv_array_size(&viewer->models) - 1);
+        return NULL;
+    }
     lv_gltf_parse_model(viewer, model);
-
 
     if(lv_array_size(&viewer->models) == 1) {
         lv_gltf_recenter((lv_obj_t *)viewer, model);
@@ -645,7 +666,7 @@ static void lv_gltf_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_free(vertex_shader);
     lv_free(frag_shader);
 
-    lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_t *));
+    lv_array_init(&view->models, LV_GLTF_INITIAL_MODEL_CAPACITY, sizeof(lv_gltf_model_data_t *));
 
     LV_TRACE_OBJ_CREATE("end");
 }
@@ -680,7 +701,13 @@ static void lv_gltf_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     view->ibm_by_skin_then_node.~IbmBySkinThenNodeMap();
     const size_t n = lv_array_size(&view->models);
     for(size_t i = 0; i < n; ++i) {
-        lv_gltf_data_delete(*(lv_gltf_model_t **)lv_array_at(&view->models, i));
+        lv_gltf_model_data_t * model_data = (lv_gltf_model_data_t *)lv_array_at(&view->models, i);
+        if(model_data->owned) {
+            lv_gltf_model_delete(model_data->model);
+        }
+        else {
+            lv_gltf_model_remove_viewer(model_data->model, obj);
+        }
     }
     lv_array_deinit(&view->models);
     if(view->environment && view->owns_environment) {
@@ -710,7 +737,6 @@ static void lv_gltf_view_desc_init(lv_gltf_view_desc_t * desc)
     desc->bg_mode = LV_GLTF_BG_MODE_ENVIRONMENT;
     desc->aa_mode = LV_GLTF_AA_MODE_OFF;
     desc->fov = 45.f;
-    desc->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     desc->frame_was_antialiased = false;
 }
 static void lv_gltf_parse_model(lv_gltf_t * viewer, lv_gltf_model_t * model)
