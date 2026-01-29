@@ -74,12 +74,13 @@ enabling GPU-accelerated graphics on Wayland compositors that support the necess
 * Full rotation support
 * Compatible with LVGL 3D rendering capabilities (see :ref:`3d_gltf_support`)
 * Efficient GPU-based compositing
+* Add DMABUF feature for Wayland compositor
 
 **Requirements:**
 
 * OpenGL ES 2.0 support on the target hardware
 * ``LV_USE_OPENGLES`` must be enabled in your LVGL configuration
-* Must link with the ``wayland-egl`` library
+* Must link with the ``wayland-egl`` library and optionally ``drm`` and ``gbm`` for DMABUF support
 
 **Usage:**
 
@@ -90,12 +91,28 @@ To enable the EGL backend:
    .. code-block:: c
 
       #define LV_USE_OPENGLES 1
+      #define LV_USE_DRAW_OPENGLES 1
 
 2. Link your application with the ``wayland-egl`` library (add to your build system):
 
    .. code-block:: bash
 
       -lwayland-egl
+
+To enable the EGL backend with DMABUF support:
+
+1. Enable OpenGL ES support in your LVGL configuration:
+
+   .. code-block:: c
+
+      #define LV_USE_OPENGLES 1
+      #define LV_USE_DRAW_OPENGLES 0
+
+2. Link your application with the ``wayland-egl``, ``drm``, ``gbm`` libraries (add to your build system):
+
+   .. code-block:: bash
+
+      -lwayland-egl -ldrm -lgbm
 
 **Note:** If your target board has OpenGL ES 2.0 support, this backend can be used with LVGL's 3D rendering
 capabilities for glTF model visualization. See :ref:`3d_gltf_support` for details on 3D rendering support.
