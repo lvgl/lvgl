@@ -1405,7 +1405,7 @@ static void lv_gltf_view_recache_all_transforms(lv_gltf_model_t * model)
                     lv_memcpy(target_scale, local_scale.data(), sizeof(*target_scale));
                     value_changed = true;
                 }
-                node->read_attrs->value_changed = value_changed;
+                node->read_attrs->value_changed |= value_changed;
             }
         }
 
