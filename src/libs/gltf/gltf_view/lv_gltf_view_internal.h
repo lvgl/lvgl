@@ -95,7 +95,6 @@ typedef struct {
     float focal_y;
     float focal_z;
     bool frame_was_antialiased;
-    int32_t animation_speed_ratio;
     lv_gltf_aa_mode_t aa_mode;
     lv_gltf_bg_mode_t bg_mode;
     float blur_bg;              /** How much to blur the environment background, between 0.0 and 1.0 */
@@ -155,6 +154,11 @@ typedef struct {
 #include <fastgltf/math.hpp>
 #include <fastgltf/types.hpp>
 #include <map>
+
+typedef struct {
+    lv_gltf_model_t * model;
+    bool owned;
+} lv_gltf_model_data_t;
 
 struct _lv_gltf_t {
     lv_3dtexture_t texture;

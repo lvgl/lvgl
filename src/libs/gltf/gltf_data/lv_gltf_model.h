@@ -119,6 +119,27 @@ bool lv_gltf_model_is_animation_paused(lv_gltf_model_t * model);
  */
 size_t lv_gltf_model_get_animation(lv_gltf_model_t * model);
 
+/**
+ * Set the animation speed ratio
+ *
+ * The actual ratio is the value parameter / LV_GLTF_ANIM_SPEED_NORMAL
+ * Values greater than LV_GLTF_ANIM_SPEED_NORMAL will speed-up the animation
+ * Values less than LV_GLTF_ANIM_SPEED_NORMAL will slow down the animation
+ *
+ * @param model pointer to a glTF model
+ * @param value speed-up ratio of the animation
+ */
+void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value);
+
+/**
+ * Get the animation speed ratio
+ *
+ * The actual ratio is the return value / LV_GLTF_ANIM_SPEED_NORMAL
+ *
+ * @param model pointer to a glTF model
+ */
+uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

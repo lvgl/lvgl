@@ -15,7 +15,6 @@
 #include "../../../misc/lv_assert.h"
 #include "../../../core/lv_obj_pos.h"
 #include "../../../misc/lv_timer.h"
-#include "../gltf_view/lv_gltf_view_internal.h"
 
 
 /*********************
@@ -61,6 +60,7 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     data->last_frame_no_motion = false;
     data->_last_frame_no_motion = false;
 
+    data->animation_speed_ratio = LV_GLTF_ANIM_SPEED_NORMAL;
     data->animation_update_timer = lv_timer_create(update_animation_cb, LV_DEF_REFR_PERIOD, data);
     lv_timer_pause(data->animation_update_timer);
     LV_ASSERT_NULL(data->animation_update_timer);
@@ -76,11 +76,12 @@ lv_gltf_model_t * lv_gltf_data_create_internal(const char * gltf_path,
     new(&data->meshes) std::vector<lv_gltf_mesh_data_t>();
     new(&data->textures) std::vector<GLuint>();
 
+    lv_array_init(&data->viewers, 1, sizeof(lv_gltf_t *));
     lv_array_init(&data->compiled_shaders, 1, sizeof(lv_gltf_compiled_shader_t));
     return data;
 }
 
-void lv_gltf_data_delete(lv_gltf_model_t * data)
+void lv_gltf_model_delete(lv_gltf_model_t * data)
 {
     LV_ASSERT_NULL(data);
     lv_timer_delete(data->animation_update_timer);
@@ -92,6 +93,7 @@ void lv_gltf_data_delete(lv_gltf_model_t * data)
         lv_gltf_model_node_t * node  = (lv_gltf_model_node_t *) lv_array_at(&data->nodes, i);
         lv_gltf_model_node_deinit(node);
     }
+    lv_array_deinit(&data->viewers);
     lv_array_deinit(&data->nodes);
     lv_array_deinit(&data->compiled_shaders);
 
@@ -266,6 +268,49 @@ void lv_gltf_data_copy_bounds_info(lv_gltf_model_t * to, lv_gltf_model_t * from)
     to->bound_radius = from->bound_radius;
 }
 
+void lv_gltf_model_set_animation_speed(lv_gltf_model_t * model, uint32_t value)
+{
+    if(!model) {
+        return;
+    }
+    model->animation_speed_ratio = value;
+    lv_gltf_model_invalidate(model);
+}
+uint32_t lv_gltf_model_get_animation_speed(const lv_gltf_model_t * model)
+{
+    if(!model) {
+        return 0;
+    }
+    return model->animation_speed_ratio;
+}
+
+lv_result_t lv_gltf_model_add_viewer(lv_gltf_model_t * model, lv_obj_t * viewer)
+{
+    return lv_array_push_back(&model->viewers, &viewer);
+}
+
+void lv_gltf_model_remove_viewer(lv_gltf_model_t * model, lv_obj_t * target_viewer)
+{
+    const uint32_t viewer_count = lv_array_size(&model->viewers);
+    for(uint32_t i = 0; i < viewer_count; ++i) {
+        lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
+        if(viewer == target_viewer) {
+            LV_LOG_USER("Removing %u", i);
+            lv_array_remove_unordered(&model->viewers, i);
+            return;
+        }
+    }
+}
+
+void lv_gltf_model_invalidate(lv_gltf_model_t * model)
+{
+    const uint32_t viewer_count = lv_array_size(&model->viewers);
+    for(uint32_t i = 0; i < viewer_count; ++i) {
+        lv_obj_t * viewer = *(lv_obj_t **)lv_array_at(&model->viewers, i);
+        lv_obj_invalidate(viewer);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -278,12 +323,13 @@ static void update_animation_cb(lv_timer_t * timer)
     const uint32_t delta = lv_tick_diff(current_tick, model->last_tick);
 
     model->last_tick = current_tick;
-    model->local_timestamp += (delta * model->viewer->desc.animation_speed_ratio) / 1000;
+    model->local_timestamp += (delta * model->animation_speed_ratio) / 1000;
 
     if(model->local_timestamp >= model->current_animation_max_time) {
         model->local_timestamp = 50;
     }
-    lv_obj_invalidate((lv_obj_t *)model->viewer);
+    lv_gltf_model_invalidate(model);
 }
+
 
 #endif /*LV_USE_GLTF*/
