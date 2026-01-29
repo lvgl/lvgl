@@ -445,6 +445,9 @@ static int32_t wait_finish_cb(lv_draw_unit_t * draw_unit)
 {
     lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) draw_unit;
 
+    /* No need to wait if the DMA2D doesn't have task to complete */
+    if(u->task_act == NULL) return 0;
+
     /* If a DMA2D task has been dispatched, wait its interrupt */
     lv_thread_sync_wait(&u->interrupt_signal);
 
