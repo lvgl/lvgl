@@ -2053,6 +2053,15 @@
     #endif
 #endif
 
+/** Enable dynamic glyph bitmap loading for binary fonts. */
+#ifndef LV_USE_FONT_DYNAMIC_LOAD
+    #ifdef CONFIG_LV_USE_FONT_DYNAMIC_LOAD
+        #define LV_USE_FONT_DYNAMIC_LOAD CONFIG_LV_USE_FONT_DYNAMIC_LOAD
+    #else
+        #define LV_USE_FONT_DYNAMIC_LOAD 0
+    #endif
+#endif
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
