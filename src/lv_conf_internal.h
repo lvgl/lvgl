@@ -4516,8 +4516,7 @@
 #endif
 
 /** Use a generic OpenGL driver that can be used to embed in other applications or used with GLFW/EGL
- *  Requirements:
- * - `LV_USE_MATRIX = 1`.
+ * - Requires LV_USE_MATRIX.
  */
 #ifndef LV_USE_OPENGLES
     #ifdef CONFIG_LV_USE_OPENGLES

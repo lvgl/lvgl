@@ -22,7 +22,7 @@ extern "C" {
 #include "../../misc/lv_color.h"
 
 #if !LV_USE_MATRIX
-#error "Require LV_USE_MATRIX = 1"
+#error "LV_USE_OPENGLES requires LV_USE_MATRIX"
 #endif
 
 #if LV_USE_EGL
