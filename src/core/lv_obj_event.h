@@ -107,6 +107,12 @@ uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
 /**
+ * Remove all event_cb
+ * @param obj           pointer to a obj
+ */
+void lv_obj_remove_event_all(lv_obj_t * obj);
+
+/**
  * Get the input device passed as parameter to indev related events.
  * @param e     pointer to an event
  * @return      the indev that triggered the event or NULL if called on a not indev related event
