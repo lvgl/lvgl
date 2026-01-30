@@ -678,8 +678,18 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
     lv_area_t clip_area = t->clip_area;
     lv_area_move(&clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
 
-    lv_opengles_render(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, dsc->h_flip, !dsc->v_flip,
-                       lv_color_black(), true, false);
+    lv_opengles_render_params_t params;
+    lv_opengles_render_params_init(&params);
+    params.texture = dsc->tex_id;
+    params.texture_area = coords;
+    params.opa = dsc->opa;
+    params.disp_w = targ_tex_w;
+    params.disp_h = targ_tex_h;
+    params.texture_clip_area = &clip_area;
+    params.h_flip = dsc->h_flip;
+    params.v_flip = !dsc->v_flip;
+    params.blend_opt = true;
+    lv_opengles_render(&params);
 
     if(target_texture) {
         GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
